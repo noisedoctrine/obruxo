@@ -92,6 +92,9 @@ EXPERIMENT9_CONSTRUCTION_RECIPE = EXPERIMENT8_CONSTRUCTION_RECIPE
 EXPERIMENT9_RESIDUAL_WIDTH = 8
 EXPERIMENT9_RESIDUAL_DEPTH = 16
 EXPERIMENT9_EPS = 1e-4
+EXPERIMENT9_BUDGET_BASELINE_WIDTH = 8
+EXPERIMENT9_BUDGET_ANCHOR_DEPTHS = (24, 32, 48, 64)
+EXPERIMENT9_BUDGET_WIDTHS = (4, 6)
 EXPERIMENT9_CLIP_POLICIES = (
     "final_only",
     "unipolar_guard_each_layer",
@@ -149,6 +152,10 @@ class Experiment7Job:
     normalization_label: str = ""
     decoder_hygiene_policy: str = ""
     snap_policy: str = "none"
+    budget_anchor_width: int = 0
+    budget_anchor_depth: int = 0
+    budget_anchor_head_outputs: int = 0
+    budget_actual_head_outputs: int = 0
 
     @property
     def label(self) -> str:
@@ -491,6 +498,24 @@ def _experiment9_head_scalars(policy: Experiment7Policy, stage_count: int) -> in
             int("gain" in policy.affine_modulation) + int("offset" in policy.affine_modulation)
         )
     return scalars
+
+
+def _experiment9_phase_head_outputs(width: int, residual_depth: int) -> int:
+    return 33 + int(residual_depth) * (int(width) + 1)
+
+
+def _closest_even_depth_for_head_budget(*, width: int, target_head_outputs: int) -> int:
+    raw_depth = max(2.0, (float(target_head_outputs) - 33.0) / float(int(width) + 1))
+    lower = max(2, int(np.floor(raw_depth / 2.0)) * 2)
+    upper = max(2, int(np.ceil(raw_depth / 2.0)) * 2)
+    candidates = sorted({lower, upper})
+    return min(
+        candidates,
+        key=lambda depth: (
+            abs(_experiment9_phase_head_outputs(width, depth) - int(target_head_outputs)),
+            depth,
+        ),
+    )
 
 
 def _xpu_shift_impl() -> str:
@@ -2833,6 +2858,10 @@ def evaluate_experiment9_chain(
     result["normalization_label"] = job.normalization_label
     result["decoder_hygiene_policy"] = job.decoder_hygiene_policy
     result["snap_policy"] = job.snap_policy
+    result["budget_anchor_width"] = job.budget_anchor_width
+    result["budget_anchor_depth"] = job.budget_anchor_depth
+    result["budget_anchor_head_outputs"] = job.budget_anchor_head_outputs
+    result["budget_actual_head_outputs"] = job.budget_actual_head_outputs
     paths = result[["dataset_index", "configuration", "family", "candidate", "eval_resolution"]].copy()
     paths["base_index"] = encoding.base_indices
     paths["base_phase"] = encoding.base_phases
@@ -3587,11 +3616,16 @@ def _make_experiment9_job(
     *,
     section: str,
     modifier_label: str,
+    residual_width: int = EXPERIMENT9_RESIDUAL_WIDTH,
+    residual_depth: int = EXPERIMENT9_RESIDUAL_DEPTH,
     target_scope: str = "",
     affine_modulation: str = "",
     normalization_label: str = "raw",
     decoder_hygiene_policy: str = "bipolar_guard_each_layer",
     snap_policy: str = "none",
+    budget_anchor_width: int = 0,
+    budget_anchor_depth: int = 0,
+    budget_anchor_head_outputs: int = 0,
     beam_width: int,
     seed: int,
     batch_size: int | None,
@@ -3600,7 +3634,9 @@ def _make_experiment9_job(
         raise ValueError(f"unsupported Experiment 9 decoder hygiene policy: {decoder_hygiene_policy}")
     if snap_policy not in EXPERIMENT9_SNAP_POLICIES:
         raise ValueError(f"unsupported Experiment 9 snap policy: {snap_policy}")
-    internal_depth = EXPERIMENT9_RESIDUAL_DEPTH // 2
+    if residual_depth % 2:
+        raise ValueError(f"Experiment 9 residual depth must be even: {residual_depth}")
+    internal_depth = residual_depth // 2
     if section == "9A":
         policy = Experiment7Policy(
             EXPERIMENT9_CONSTRUCTION_RECIPE,
@@ -3627,25 +3663,26 @@ def _make_experiment9_job(
         normalization_label,
         decoder_hygiene_policy,
         snap_policy,
-        f"W{EXPERIMENT9_RESIDUAL_WIDTH}D{EXPERIMENT9_RESIDUAL_DEPTH}",
+        f"W{residual_width}D{residual_depth}",
         f"bw{beam_width}",
         f"eval{EXPERIMENT9_RESOLUTION}",
         f"sample33_seed{seed}",
     ]
     job_id = "_".join(_safe_id(part) for part in key_parts if part)
+    job_seed = seed + residual_width * 100 if section == "9D" else seed + len(job_id) * 7
     return Experiment7Job(
         job_id=job_id,
         experiment="9",
         policy=policy,
-        k=EXPERIMENT9_RESIDUAL_WIDTH,
+        k=residual_width,
         d=internal_depth,
         eval_resolution=EXPERIMENT9_RESOLUTION,
         beam_width=beam_width,
         batch_size=max(1, int(batch_size)) if batch_size is not None else 6,
-        seed=seed + len(job_id) * 7,
+        seed=job_seed,
         weight=_structured_weight(
             _dummy_chain_for_weight(
-                k=EXPERIMENT9_RESIDUAL_WIDTH,
+                k=residual_width,
                 d=internal_depth,
                 resolution=EXPERIMENT9_RESOLUTION,
             ),
@@ -3661,7 +3698,40 @@ def _make_experiment9_job(
         normalization_label=normalization_label,
         decoder_hygiene_policy=decoder_hygiene_policy,
         snap_policy=snap_policy,
+        budget_anchor_width=budget_anchor_width,
+        budget_anchor_depth=budget_anchor_depth,
+        budget_anchor_head_outputs=budget_anchor_head_outputs,
+        budget_actual_head_outputs=_experiment9_phase_head_outputs(residual_width, residual_depth),
     )
+
+
+def _make_experiment9_budget_jobs(*, beam_width: int, seed: int, batch_size: int | None) -> list[Experiment7Job]:
+    jobs: list[Experiment7Job] = []
+    for anchor_depth in EXPERIMENT9_BUDGET_ANCHOR_DEPTHS:
+        target_head_outputs = _experiment9_phase_head_outputs(EXPERIMENT9_BUDGET_BASELINE_WIDTH, anchor_depth)
+        for width in EXPERIMENT9_BUDGET_WIDTHS:
+            residual_depth = _closest_even_depth_for_head_budget(
+                width=width,
+                target_head_outputs=target_head_outputs,
+            )
+            jobs.append(
+                _make_experiment9_job(
+                    section="9D",
+                    modifier_label=f"phase_only_W{width}_budget_W8D{anchor_depth}",
+                    residual_width=width,
+                    residual_depth=residual_depth,
+                    normalization_label="raw",
+                    decoder_hygiene_policy="final_only",
+                    snap_policy="none",
+                    budget_anchor_width=EXPERIMENT9_BUDGET_BASELINE_WIDTH,
+                    budget_anchor_depth=anchor_depth,
+                    budget_anchor_head_outputs=target_head_outputs,
+                    beam_width=beam_width,
+                    seed=seed,
+                    batch_size=batch_size,
+                )
+            )
+    return jobs
 
 
 def _make_experiment9_screen_jobs(*, beam_width: int, seed: int, batch_size: int | None = None) -> list[Experiment7Job]:
@@ -3709,6 +3779,7 @@ def _make_experiment9_screen_jobs(*, beam_width: int, seed: int, batch_size: int
                 batch_size=batch_size,
             )
         )
+    jobs.extend(_make_experiment9_budget_jobs(beam_width=beam_width, seed=seed, batch_size=batch_size))
     return jobs
 
 
@@ -3814,10 +3885,150 @@ def _run_experiment9_job(
         normalization_label=job.normalization_label,
         decoder_hygiene_policy=job.decoder_hygiene_policy,
         snap_policy=job.snap_policy,
+        budget_anchor_width=job.budget_anchor_width,
+        budget_anchor_depth=job.budget_anchor_depth,
+        budget_anchor_head_outputs=job.budget_anchor_head_outputs,
+        budget_actual_head_outputs=job.budget_actual_head_outputs,
     )
     _log_progress(f"{job.label}: writing checkpoint")
     _write_checkpoint(output_dir, job, chain, result, subsets, paths, usage, construction)
     return job.job_id
+
+
+def _run_experiment9_prefix_group(
+    catalog_path: Path,
+    codebook_path: Path,
+    output_dir: Path,
+    jobs: list[Experiment7Job],
+    *,
+    max_shapes: int | None,
+    quick: bool,
+) -> list[str]:
+    pending = sorted([job for job in jobs if not _checkpoint_done(output_dir, job.job_id)], key=lambda item: item.d)
+    if not pending:
+        return [job.job_id for job in jobs]
+    reference = pending[-1]
+    max_depth = max(job.d for job in jobs)
+    _log_progress(
+        f"Grouped Experiment 9D execution: W={reference.k}, max residual D={max_depth * 2}, "
+        f"pending residual depths={','.join(str(job.residual_depth) for job in pending)}"
+    )
+    dataset = _load_cached_dataset(catalog_path, reference.eval_resolution)
+    _assert_author_split(dataset)
+    dataset, sample_hash = _prepare_dataset_for_job(output_dir, dataset, reference)
+    if quick:
+        dataset = replace(
+            dataset,
+            train_indices=dataset.train_indices[: min(len(dataset.train_indices), 160)],
+            validation_indices=dataset.validation_indices[: min(len(dataset.validation_indices), 96)],
+        )
+    for grouped in pending:
+        grouped.estimated_peak_memory_mb = _check_memory_budget(
+            grouped,
+            train_count=len(dataset.train_indices),
+            validation_count=len(dataset.validation_indices),
+        )
+    validation_indices = dataset.validation_indices.copy()
+    train_indices = dataset.train_indices.copy()
+    if max_shapes is not None:
+        validation_indices = validation_indices[:max_shapes]
+        train_indices = train_indices[:max_shapes]
+    if quick:
+        validation_indices = validation_indices[: min(len(validation_indices), 96)]
+        train_indices = train_indices[: min(len(train_indices), 96)]
+    _, stock = _load_cached_stock(codebook_path, reference.eval_resolution)
+    stock = stock[:15]
+    _log_progress(
+        f"9D W{reference.k}: dataset ready train={len(dataset.train_indices):,} "
+        f"validation={len(dataset.validation_indices):,}; training once to residual D{max_depth * 2}"
+    )
+    max_chain, max_construction, train_elapsed = _train_or_load_experiment7_chain(
+        dataset,
+        stock,
+        catalog_path=catalog_path,
+        codebook_path=codebook_path,
+        output_dir=output_dir,
+        experiment=reference.experiment,
+        policy=reference.policy,
+        k=reference.k,
+        d=max_depth,
+        seed=reference.seed,
+        quick=quick,
+        eval_resolution=reference.eval_resolution,
+        sample_hash=sample_hash,
+    )
+    snap_anchors, snap_radii, snap_stats = _infer_snap_schwarzschild(dataset, "none")
+    completed_ids = []
+    for index, job in enumerate(pending, start=1):
+        prefix = _prefix_chain(
+            max_chain,
+            named_depth=job.d,
+            name=_chain_name(job.policy, k=job.k, d=job.d),
+        )
+        layer_values = pd.to_numeric(
+            max_construction["layer"]
+            if "layer" in max_construction.columns
+            else pd.Series(np.zeros(len(max_construction)), index=max_construction.index),
+            errors="coerce",
+        ).fillna(0).astype(int)
+        construction = max_construction[layer_values <= job.d].copy()
+        _log_progress(
+            f"{job.label}: evaluating 9D prefix {index}/{len(pending)} "
+            f"validation={len(validation_indices):,}, train={len(train_indices):,}"
+        )
+        result, subsets, paths, usage = evaluate_experiment9_chain(
+            dataset,
+            validation_indices,
+            prefix,
+            job=job,
+            elapsed_training_seconds=train_elapsed * (job.d / max_depth),
+            snap_anchors=snap_anchors,
+            snap_radii=snap_radii,
+            snap_stats=snap_stats,
+            progress_label=job.label,
+        )
+        train_result, _, _, _ = evaluate_experiment9_chain(
+            dataset,
+            train_indices,
+            prefix,
+            job=job,
+            elapsed_training_seconds=0.0,
+            snap_anchors=snap_anchors,
+            snap_radii=snap_radii,
+            snap_stats=snap_stats,
+            progress_label=None,
+        )
+        train_metrics = {
+            "train_rmse_median": float(np.median(train_result["rmse"])),
+            "train_rmse_p95": float(np.percentile(train_result["rmse"], 95)),
+            "train_rmse_p99": float(np.percentile(train_result["rmse"], 99)),
+            "validation_rmse_median": float(np.median(result["rmse"])),
+            "validation_rmse_p95": float(np.percentile(result["rmse"], 95)),
+            "validation_rmse_p99": float(np.percentile(result["rmse"], 99)),
+        }
+        train_metrics["generalization_gap_p95"] = train_metrics["validation_rmse_p95"] - train_metrics["train_rmse_p95"]
+        for key, value in train_metrics.items():
+            result[key] = value
+        construction = construction.assign(
+            modifier_policy=job.policy.modifier_policy,
+            modifier_label=job.modifier_label or job.policy.modifier_policy,
+            residual_clip_policy=job.policy.residual_clip_policy,
+            residual_depth=job.residual_depth,
+            experiment9_section=job.experiment9_section,
+            target_scope=job.target_scope,
+            affine_modulation=job.affine_modulation,
+            normalization_label=job.normalization_label,
+            decoder_hygiene_policy=job.decoder_hygiene_policy,
+            snap_policy=job.snap_policy,
+            budget_anchor_width=job.budget_anchor_width,
+            budget_anchor_depth=job.budget_anchor_depth,
+            budget_anchor_head_outputs=job.budget_anchor_head_outputs,
+            budget_actual_head_outputs=job.budget_actual_head_outputs,
+        )
+        _write_checkpoint(output_dir, job, prefix, result, subsets, paths, usage, construction)
+        completed_ids.append(job.job_id)
+        _log_progress(f"{job.label}: checkpoint complete from grouped 9D execution")
+    return completed_ids
 
 
 def _run_jobs(
@@ -3847,6 +4058,12 @@ def _run_jobs(
             grouped_jobs = [candidate for candidate in jobs if _job_group_key_7b(candidate) == _job_group_key_7b(job)]
         elif experiment == "8":
             group_kind, grouped_jobs = _experiment8_group_for(job, jobs, output_dir)
+        elif experiment == "9" and job.experiment9_section == "9D":
+            grouped_jobs = [
+                candidate for candidate in jobs
+                if candidate.experiment9_section == "9D"
+                and _job_group_key_7b(candidate) == _job_group_key_7b(job)
+            ]
         else:
             grouped_jobs = [candidate for candidate in jobs if _job_group_key(candidate) == _job_group_key(job)]
         progress = _progress_from_jobs(output_dir, jobs, experiment, started_at=str(progress.get("started_at")))
@@ -3910,6 +4127,27 @@ def _run_jobs(
                     quick=quick,
                 )
             print(f"Completed grouped Experiment 8 checkpoints: {len(completed_ids)}", flush=True)
+        elif experiment == "9":
+            if job.experiment9_section == "9D":
+                labels = ", ".join(
+                    f"W{grouped.k}D{grouped.residual_depth}->W{grouped.budget_anchor_width}D{grouped.budget_anchor_depth}"
+                    for grouped in grouped_jobs
+                    if not _checkpoint_done(output_dir, grouped.job_id)
+                )
+                print(f"{job.label} grouped 9D prefixes: {labels}", flush=True)
+                completed_ids = _run_experiment9_prefix_group(
+                    catalog_path,
+                    codebook_path,
+                    output_dir,
+                    grouped_jobs,
+                    max_shapes=max_shapes,
+                    quick=quick,
+                )
+                print(f"Completed grouped Experiment 9D checkpoints: {len(completed_ids)}", flush=True)
+            else:
+                print(job.label, flush=True)
+                _run_experiment9_job(catalog_path, codebook_path, output_dir, job, max_shapes=max_shapes, quick=quick)
+                print(f"Completed {job.label}", flush=True)
         else:
             print(job.label, flush=True)
             _run_job(catalog_path, codebook_path, output_dir, job, max_shapes=max_shapes, quick=quick)
@@ -4139,6 +4377,10 @@ def run_experiment7_analysis(output_dir: Path, *, experiment: str) -> dict[str, 
         "normalization_label",
         "decoder_hygiene_policy",
         "snap_policy",
+        "budget_anchor_width",
+        "budget_anchor_depth",
+        "budget_anchor_head_outputs",
+        "budget_actual_head_outputs",
         "train_rmse_median",
         "train_rmse_p95",
         "train_rmse_p99",
@@ -4386,7 +4628,15 @@ def run_experiment9_screen(
                     },
                     "9B": {"decoder_hygiene_policy": list(EXPERIMENT9_CLIP_POLICIES)},
                     "9C": {"snap_policy": list(EXPERIMENT9_SNAP_POLICIES)},
+                    "9D": {
+                        "question": "equivalent phase-only output-head budget for narrow residual widths",
+                        "baseline_width": EXPERIMENT9_BUDGET_BASELINE_WIDTH,
+                        "anchor_depths": list(EXPERIMENT9_BUDGET_ANCHOR_DEPTHS),
+                        "tested_widths": list(EXPERIMENT9_BUDGET_WIDTHS),
+                        "decoder_hygiene_policy": "final_only",
+                    },
                 },
+                "job_count": len(jobs),
             },
             indent=2,
         ),

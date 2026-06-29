@@ -11,12 +11,14 @@ import pandas as pd
 
 
 ROOT = Path("artifacts/additive_finalization_9_screen")
+EXPERIMENT8_ROOT = Path("artifacts/additive_finalization_8_screen")
 ANALYTICS = ROOT / "analytics"
+EXPERIMENT8_ANALYTICS = EXPERIMENT8_ROOT / "analytics"
 REPORTS = Path("reports")
 REPORT = REPORTS / "experiment-09-findings.md"
 PLOTS = REPORTS / "images" / "experiment-09"
 
-SECTION_ORDER = ["9A", "9B", "9C"]
+SECTION_ORDER = ["9A", "9B", "9C", "9D", "9D_ref"]
 SCOPE_ORDER = ["base_only", "residuals_only", "base_and_residuals"]
 MODULATION_ORDER = ["phase_gain", "phase_offset", "phase_gain_offset"]
 NORMALIZATION_ORDER = ["raw", "range_normalized"]
@@ -37,6 +39,9 @@ SNAP_ORDER = [
     "data_snap_dyadic_2",
     "data_snap_dyadic_2_triadic_1",
 ]
+PERFECT_EPS = 0.02
+EXPECTED_JOB_COUNT = 39
+W8_BUDGET_ANCHORS = [24, 32, 48, 64]
 
 
 def _format_value(value: object) -> str:
@@ -79,6 +84,7 @@ def _add_accounting(summary: pd.DataFrame) -> pd.DataFrame:
         "normalization_label",
         "decoder_hygiene_policy",
         "snap_policy",
+        "budget_source",
     ):
         if column not in frame:
             frame[column] = ""
@@ -100,14 +106,67 @@ def _add_accounting(summary: pd.DataFrame) -> pd.DataFrame:
         "snap_radius_median",
         "snap_changed_value_rate",
         "snap_mean_abs_delta",
+        "all_eval_points_under_0.02",
+        "perfect_lfo_rate_eps_0.02",
+        "perfect_lfo_percent_eps_0.02",
+        "perfect_lfo_count_eps_0.02",
+        "budget_anchor_width",
+        "budget_anchor_depth",
+        "budget_anchor_head_outputs",
+        "budget_actual_head_outputs",
     ):
         if column not in frame:
             frame[column] = np.nan
+        frame[column] = pd.to_numeric(frame[column], errors="coerce")
+    if frame["perfect_lfo_rate_eps_0.02"].isna().all() and "all_eval_points_under_0.02" in frame:
+        frame["perfect_lfo_rate_eps_0.02"] = frame["all_eval_points_under_0.02"]
+    frame["perfect_lfo_percent_eps_0.02"] = frame["perfect_lfo_rate_eps_0.02"] * 100.0
+    if "shapes" in frame:
+        frame["perfect_lfo_count_eps_0.02"] = frame["perfect_lfo_rate_eps_0.02"] * pd.to_numeric(frame["shapes"], errors="coerce")
     return frame
 
 
 def _color_for_section(section: str) -> str:
-    return {"9A": "#2563eb", "9B": "#16a34a", "9C": "#f97316"}.get(section, "#64748b")
+    return {"9A": "#2563eb", "9B": "#16a34a", "9C": "#f97316", "9D": "#9333ea", "9D_ref": "#64748b"}.get(section, "#64748b")
+
+
+def _load_experiment8_budget_references() -> pd.DataFrame:
+    summary_path = EXPERIMENT8_ANALYTICS / "summary.csv"
+    if not summary_path.exists():
+        return pd.DataFrame()
+    frame = pd.read_csv(summary_path)
+    required = {"residual_width", "residual_depth", "modifier_label", "residual_clip_policy"}
+    if not required.issubset(frame.columns):
+        return pd.DataFrame()
+    refs = frame[
+        (pd.to_numeric(frame["residual_width"], errors="coerce") == 8)
+        & (pd.to_numeric(frame["residual_depth"], errors="coerce").isin(W8_BUDGET_ANCHORS))
+        & (frame["modifier_label"].astype(str) == "phase_only")
+        & (frame["residual_clip_policy"].astype(str) == "final_only")
+    ].copy()
+    if refs.empty:
+        return refs
+    refs["experiment9_section"] = "9D_ref"
+    refs["budget_source"] = "experiment8_reused"
+    refs["budget_anchor_width"] = 8
+    refs["budget_anchor_depth"] = pd.to_numeric(refs["residual_depth"], errors="coerce")
+    refs["budget_anchor_head_outputs"] = refs["dense_outputs"]
+    refs["budget_actual_head_outputs"] = refs["dense_outputs"]
+    refs["perfect_lfo_rate_eps_0.02"] = pd.to_numeric(refs.get("all_eval_points_under_0.02", np.nan), errors="coerce")
+    return refs
+
+
+def _with_budget_references(summary: pd.DataFrame) -> pd.DataFrame:
+    refs = _add_accounting(_load_experiment8_budget_references())
+    if refs.empty:
+        return summary
+    for column in summary.columns:
+        if column not in refs:
+            refs[column] = np.nan
+    for column in refs.columns:
+        if column not in summary:
+            summary[column] = np.nan
+    return pd.concat([summary, refs[summary.columns]], ignore_index=True, sort=False)
 
 
 def _save_9a_affine_grid(frame: pd.DataFrame, path: Path) -> None:
@@ -236,6 +295,85 @@ def _save_head_outputs(frame: pd.DataFrame, path: Path) -> None:
     plt.close(fig)
 
 
+def _save_perfect_lfo_rate(frame: pd.DataFrame, path: Path) -> None:
+    if frame.empty or frame["perfect_lfo_rate_eps_0.02"].isna().all():
+        return
+    plot = frame.copy()
+    plot["label"] = (
+        plot["experiment9_section"].astype(str)
+        + " "
+        + plot.get("modifier_label", pd.Series("", index=plot.index)).astype(str)
+    )
+    plot = plot.sort_values(["experiment9_section", "perfect_lfo_rate_eps_0.02"], ascending=[True, False])
+    fig, ax = plt.subplots(figsize=(12.2, max(4.8, 0.26 * len(plot))))
+    colors = [_color_for_section(str(section)) for section in plot["experiment9_section"]]
+    positions = np.arange(len(plot))
+    ax.barh(positions, plot["perfect_lfo_percent_eps_0.02"], color=colors, alpha=0.86)
+    ax.set_yticks(positions)
+    ax.set_yticklabels(plot["label"].tolist(), fontsize=7)
+    ax.invert_yaxis()
+    ax.set_xlabel(f"LFOs with every sampled point within +/-{PERFECT_EPS:g} (%)")
+    ax.set_title("Experiment 9 perfect sampled-curve reconstruction rate")
+    ax.grid(axis="x", alpha=0.25)
+    fig.tight_layout()
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+
+def _save_budget_equivalence(frame: pd.DataFrame, path: Path) -> None:
+    if frame.empty:
+        return
+    subset = frame[frame["experiment9_section"].isin(["9D", "9D_ref"])].copy()
+    if subset.empty:
+        return
+    subset["residual_width"] = pd.to_numeric(subset["residual_width"], errors="coerce")
+    subset["residual_depth"] = pd.to_numeric(subset["residual_depth"], errors="coerce")
+    subset["budget_anchor_depth"] = pd.to_numeric(subset["budget_anchor_depth"], errors="coerce")
+    subset = subset.dropna(subset=["residual_width", "budget_anchor_depth"])
+    if subset.empty:
+        return
+    fig, axes = plt.subplots(1, 3, figsize=(15.2, 4.8), sharex=True)
+    metrics = [
+        ("rmse_median", "Median RMSE"),
+        ("rmse_p95", "P95 RMSE"),
+        ("perfect_lfo_percent_eps_0.02", f"Perfect LFOs +/-{PERFECT_EPS:g} (%)"),
+    ]
+    palette = {4: "#2563eb", 6: "#16a34a", 8: "#64748b"}
+    for ax, (metric, title) in zip(axes, metrics):
+        for width, group in subset.groupby("residual_width"):
+            group = group.sort_values("budget_anchor_depth")
+            style = "--" if int(width) == 8 else "-"
+            marker = "s" if int(width) == 8 else "o"
+            ax.plot(
+                group["budget_anchor_depth"],
+                group[metric],
+                label=f"W{int(width)}",
+                color=palette.get(int(width), "#9333ea"),
+                marker=marker,
+                linestyle=style,
+                linewidth=1.8,
+            )
+            for _, row in group.iterrows():
+                if pd.notna(row.get("residual_depth")) and int(row.residual_width) != 8:
+                    ax.annotate(
+                        f"D{int(row.residual_depth)}",
+                        (row.budget_anchor_depth, row[metric]),
+                        fontsize=7,
+                        xytext=(3, 3),
+                        textcoords="offset points",
+                    )
+        ax.set_title(title)
+        ax.set_xlabel("W8 equivalent anchor depth")
+        ax.grid(alpha=0.25)
+    axes[0].set_ylabel("error")
+    axes[2].set_ylabel("coverage")
+    axes[2].legend(title="tested width")
+    fig.suptitle("Experiment 9D equivalent output-head budget screen")
+    fig.tight_layout()
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+
 def _save_snap_diagnostics(frame: pd.DataFrame, path: Path) -> None:
     if frame.empty:
         return
@@ -263,7 +401,7 @@ def _save_snap_diagnostics(frame: pd.DataFrame, path: Path) -> None:
     plt.close(fig)
 
 
-def _report_tables(summary: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def _report_tables(summary: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     columns = [
         "target_scope",
         "affine_modulation",
@@ -271,6 +409,7 @@ def _report_tables(summary: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, p
         "head_outputs",
         "rmse_median",
         "rmse_p95",
+        "perfect_lfo_percent_eps_0.02",
         "train_rmse_p95",
         "generalization_gap_p95",
         "gain_under_eps_rate",
@@ -283,6 +422,7 @@ def _report_tables(summary: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, p
         "head_outputs",
         "rmse_median",
         "rmse_p95",
+        "perfect_lfo_percent_eps_0.02",
         "train_rmse_p95",
         "generalization_gap_p95",
     ]
@@ -299,12 +439,29 @@ def _report_tables(summary: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, p
         "snap_mean_abs_delta",
         "rmse_median",
         "rmse_p95",
+        "perfect_lfo_percent_eps_0.02",
     ]
     table_9c = summary[summary["experiment9_section"] == "9C"].copy()
     if not table_9c.empty:
         table_9c = _ordered(table_9c, "snap_policy", SNAP_ORDER)
         table_9c = table_9c[[column for column in columns_9c if column in table_9c.columns]]
-    return table_9a, table_9b, table_9c
+    columns_9d = [
+        "budget_source",
+        "residual_width",
+        "residual_depth",
+        "budget_anchor_width",
+        "budget_anchor_depth",
+        "head_outputs",
+        "budget_anchor_head_outputs",
+        "rmse_median",
+        "rmse_p95",
+        "perfect_lfo_percent_eps_0.02",
+    ]
+    table_9d = summary[summary["experiment9_section"].isin(["9D", "9D_ref"])].copy()
+    if not table_9d.empty:
+        table_9d = table_9d.sort_values(["budget_anchor_depth", "residual_width"])
+        table_9d = table_9d[[column for column in columns_9d if column in table_9d.columns]]
+    return table_9a, table_9b, table_9c, table_9d
 
 
 def _write_report(summary: pd.DataFrame) -> None:
@@ -313,20 +470,21 @@ def _write_report(summary: pd.DataFrame) -> None:
         REPORT.write_text("# Experiment 9 Findings\n\nNo completed jobs yet.\n", encoding="utf-8")
         return
 
-    table_9a, table_9b, table_9c = _report_tables(summary)
+    table_9a, table_9b, table_9c, table_9d = _report_tables(summary)
     best = summary.sort_values(["rmse_p95", "rmse_median"]).iloc[0]
     best_9a = table_9a.iloc[0] if not table_9a.empty else None
     best_9b_source = summary[summary["experiment9_section"] == "9B"].sort_values(["rmse_p95", "rmse_median"])
     best_9c_source = summary[summary["experiment9_section"] == "9C"].sort_values(["rmse_p95", "rmse_median"])
     best_9b = best_9b_source.iloc[0] if not best_9b_source.empty else None
     best_9c = best_9c_source.iloc[0] if not best_9c_source.empty else None
-    completed = len(summary)
+    completed = int((summary["experiment9_section"] != "9D_ref").sum())
 
     lines = [
-        f"Completed jobs in current analytics: {completed}/31.",
+        f"Completed jobs in current analytics: {completed}/{EXPECTED_JOB_COUNT} excluding reused Experiment 8 reference rows.",
         (
             f"Overall best P95 is `{best.modifier_label}` in section `{best.experiment9_section}`: "
-            f"median {best.rmse_median:.6g}, P95 {best.rmse_p95:.6g}."
+            f"median {best.rmse_median:.6g}, P95 {best.rmse_p95:.6g}, "
+            f"perfect-rate {best['perfect_lfo_percent_eps_0.02']:.3g}%."
         ),
     ]
     if best_9a is not None:
@@ -349,7 +507,10 @@ Experiment 9 is a quick fixed-budget W8D16 screen at 120-point evaluation resolu
 - Does range normalization make those scalars useful?
 - Which synth-style clipping or limiting policy should be the phase-only decoder baseline?
 - Do data-derived snap anchors improve final output cheaply?
+- At equivalent output-head budget, do very narrow/deep W4/W6 residual stacks beat W8 references?
 - Do train and validation errors move together, or are any variants just fitting the train sample?
+
+The third primary quality metric is `perfect_lfo_rate_eps_0.02`: the share of LFOs whose every sampled evaluation point is within +/-0.02 of the target curve. This is stricter than RMSE and different from editor-node preservation.
 
 ## Executive Read
 
@@ -374,6 +535,20 @@ The heatmaps separate median and P95, and compare raw versus range-normalized ta
 ![9C snap diagnostics](images/experiment-09/experiment9_9c_snap_diagnostics.png)
 
 {_markdown_table(table_9c)}
+
+## 9D Equivalent Budget Narrow-Depth Screen
+
+![9D equivalent budget](images/experiment-09/experiment9_9d_budget_equivalence.png)
+
+W4 and W6 jobs are run at depths whose phase-only output-head count is closest to W8D24, W8D32, W8D48, and W8D64. W8D24 and W8D32 reference rows are reused from Experiment 8 analytics when available; W8D48 and W8D64 are budget anchors only unless those rows are later produced.
+
+{_markdown_table(table_9d)}
+
+## Perfect Reconstruction Rate
+
+![Perfect LFO rate](images/experiment-09/experiment9_perfect_lfo_rate.png)
+
+`perfect_lfo_rate_eps_0.02` is the fraction of validation LFOs with `max_abs_error <= 0.02` over the sampled evaluation grid.
 
 ## Train Vs Validation
 
@@ -410,9 +585,11 @@ def main() -> None:
         return
     summary = _add_accounting(pd.read_csv(summary_path))
     summary.to_csv(ANALYTICS / "summary.csv", index=False)
-    section_9a = summary[summary["experiment9_section"] == "9A"].copy()
-    section_9b = summary[summary["experiment9_section"] == "9B"].copy()
-    section_9c = summary[summary["experiment9_section"] == "9C"].copy()
+    report_summary = _with_budget_references(summary.copy())
+    section_9a = report_summary[report_summary["experiment9_section"] == "9A"].copy()
+    section_9b = report_summary[report_summary["experiment9_section"] == "9B"].copy()
+    section_9c = report_summary[report_summary["experiment9_section"] == "9C"].copy()
+    section_9d = report_summary[report_summary["experiment9_section"].isin(["9D", "9D_ref"])].copy()
     _save_9a_affine_grid(section_9a, PLOTS / "experiment9_9a_affine_grid.png")
     _save_policy_metric_panels(
         section_9b,
@@ -422,9 +599,11 @@ def main() -> None:
         PLOTS / "experiment9_9b_decoder_hygiene_panels.png",
     )
     _save_snap_diagnostics(section_9c, PLOTS / "experiment9_9c_snap_diagnostics.png")
-    _save_train_validation(summary, PLOTS / "experiment9_train_vs_validation_p95.png")
-    _save_head_outputs(summary, PLOTS / "experiment9_head_outputs_vs_rmse.png")
-    _write_report(summary)
+    _save_budget_equivalence(section_9d, PLOTS / "experiment9_9d_budget_equivalence.png")
+    _save_perfect_lfo_rate(report_summary[report_summary["experiment9_section"] != "9D_ref"], PLOTS / "experiment9_perfect_lfo_rate.png")
+    _save_train_validation(report_summary, PLOTS / "experiment9_train_vs_validation_p95.png")
+    _save_head_outputs(report_summary, PLOTS / "experiment9_head_outputs_vs_rmse.png")
+    _write_report(report_summary)
     print(REPORT)
 
 

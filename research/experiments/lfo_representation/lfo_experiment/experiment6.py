@@ -1021,6 +1021,9 @@ def summarize_results(results: pd.DataFrame, subsets: pd.DataFrame) -> tuple[pd.
     for threshold in NODE_THRESHOLDS:
         coverage = results.groupby("configuration")["node_max_error"].apply(lambda x, t=threshold: float(np.mean(x <= t)))
         summary[f"all_nodes_under_{threshold:g}"] = summary["configuration"].map(coverage)
+    for threshold in NODE_THRESHOLDS:
+        coverage = results.groupby("configuration")["max_abs_error"].apply(lambda x, t=threshold: float(np.mean(x <= t)))
+        summary[f"all_eval_points_under_{threshold:g}"] = summary["configuration"].map(coverage)
 
     threshold_rows = []
     merged = results.merge(subsets, on=["dataset_index", "configuration"], how="left")
@@ -1052,6 +1055,17 @@ def summarize_results(results: pd.DataFrame, subsets: pd.DataFrame) -> tuple[pd.
                         "shapes": int(len(members)),
                     }
                 )
+            for threshold in NODE_THRESHOLDS:
+                threshold_rows.append(
+                    {
+                        "configuration": configuration,
+                        "subset": subset_name.replace("subset_", ""),
+                        "metric": "all_eval_points",
+                        "threshold": threshold,
+                        "coverage": float(np.mean(members.max_abs_error <= threshold)),
+                        "shapes": int(len(members)),
+                    }
+                )
         for topology, members in group.groupby("topology"):
             for threshold in RMSE_THRESHOLDS:
                 threshold_rows.append(
@@ -1072,6 +1086,17 @@ def summarize_results(results: pd.DataFrame, subsets: pd.DataFrame) -> tuple[pd.
                         "metric": "all_nodes",
                         "threshold": threshold,
                         "coverage": float(np.mean(members.node_max_error <= threshold)),
+                        "shapes": int(len(members)),
+                    }
+                )
+            for threshold in NODE_THRESHOLDS:
+                threshold_rows.append(
+                    {
+                        "configuration": configuration,
+                        "subset": f"topology_{topology}",
+                        "metric": "all_eval_points",
+                        "threshold": threshold,
+                        "coverage": float(np.mean(members.max_abs_error <= threshold)),
                         "shapes": int(len(members)),
                     }
                 )
