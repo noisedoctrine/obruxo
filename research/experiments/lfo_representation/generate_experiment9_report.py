@@ -12,7 +12,9 @@ import pandas as pd
 
 ROOT = Path("artifacts/additive_finalization_9_screen")
 ANALYTICS = ROOT / "analytics"
-PLOTS = ANALYTICS / "plots"
+REPORTS = Path("reports")
+REPORT = REPORTS / "experiment-09-findings.md"
+PLOTS = REPORTS / "images" / "experiment-09"
 
 SECTION_ORDER = ["9A", "9B", "9C"]
 SCOPE_ORDER = ["base_only", "residuals_only", "base_and_residuals"]
@@ -306,9 +308,9 @@ def _report_tables(summary: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, p
 
 
 def _write_report(summary: pd.DataFrame) -> None:
-    report_path = ROOT / "EXPERIMENT_9_FINDINGS.md"
+    REPORTS.mkdir(parents=True, exist_ok=True)
     if summary.empty:
-        report_path.write_text("# Experiment 9 Findings\n\nNo completed jobs yet.\n", encoding="utf-8")
+        REPORT.write_text("# Experiment 9 Findings\n\nNo completed jobs yet.\n", encoding="utf-8")
         return
 
     table_9a, table_9b, table_9c = _report_tables(summary)
@@ -355,7 +357,7 @@ Experiment 9 is a quick fixed-budget W8D16 screen at 120-point evaluation resolu
 
 ## 9A Affine And Normalization
 
-![9A affine grid](analytics/plots/experiment9_9a_affine_grid.png)
+![9A affine grid](images/experiment-09/experiment9_9a_affine_grid.png)
 
 The heatmaps separate median and P95, and compare raw versus range-normalized targets on the same color scale for each metric.
 
@@ -363,25 +365,25 @@ The heatmaps separate median and P95, and compare raw versus range-normalized ta
 
 ## 9B Decoder Hygiene
 
-![9B decoder hygiene](analytics/plots/experiment9_9b_decoder_hygiene_panels.png)
+![9B decoder hygiene](images/experiment-09/experiment9_9b_decoder_hygiene_panels.png)
 
 {_markdown_table(table_9b)}
 
 ## 9C Snap Schwarzschild Radius
 
-![9C snap diagnostics](analytics/plots/experiment9_9c_snap_diagnostics.png)
+![9C snap diagnostics](images/experiment-09/experiment9_9c_snap_diagnostics.png)
 
 {_markdown_table(table_9c)}
 
 ## Train Vs Validation
 
-![Train vs validation](analytics/plots/experiment9_train_vs_validation_p95.png)
+![Train vs validation](images/experiment-09/experiment9_train_vs_validation_p95.png)
 
 The diagonal is train P95 equals validation P95. Rows far above it are variants that look materially better on train than validation.
 
 ## Output-Head Accounting
 
-![Head outputs](analytics/plots/experiment9_head_outputs_vs_rmse.png)
+![Head outputs](images/experiment-09/experiment9_head_outputs_vs_rmse.png)
 
 `head_outputs` is categorical logits plus continuous scalar outputs per LFO. In 9A, gain/offset cost depends on whether the scalar family applies to base, residual layers, or both; clipping and snap policies do not add model outputs.
 
@@ -396,7 +398,7 @@ The diagonal is train P95 equals validation P95. Rows far above it are variants 
 - `analytics/paths.csv`
 - `analytics/plots/`
 """
-    report_path.write_text(report, encoding="utf-8")
+    REPORT.write_text(report, encoding="utf-8")
 
 
 def main() -> None:
@@ -404,7 +406,7 @@ def main() -> None:
     summary_path = ANALYTICS / "summary.csv"
     if not summary_path.exists():
         _write_report(pd.DataFrame())
-        print(ROOT / "EXPERIMENT_9_FINDINGS.md")
+        print(REPORT)
         return
     summary = _add_accounting(pd.read_csv(summary_path))
     summary.to_csv(ANALYTICS / "summary.csv", index=False)
@@ -423,7 +425,7 @@ def main() -> None:
     _save_train_validation(summary, PLOTS / "experiment9_train_vs_validation_p95.png")
     _save_head_outputs(summary, PLOTS / "experiment9_head_outputs_vs_rmse.png")
     _write_report(summary)
-    print(ROOT / "EXPERIMENT_9_FINDINGS.md")
+    print(REPORT)
 
 
 if __name__ == "__main__":

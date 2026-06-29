@@ -1,4 +1,4 @@
-# Experiment 4 Findings: Phase-Factorized Residual Codebooks
+﻿# Experiment 4 Findings: Phase-Factorized Residual Codebooks
 
 ## What did this experiment ask?
 
@@ -47,8 +47,8 @@ Even 64 positions gave away much of the continuous-offset result. A continuous s
 | Configuration | Dense outputs | Median RMSE | P95 RMSE |
 |---|---:|---:|---:|
 | Shared | 105 | 0.007051 | 0.076554 |
-| Shared layer 1, topology layers 2–4 | 108 | 0.007806 | 0.071169 |
-| Shared layers 1–2, topology layers 3–4 | 108 | 0.006913 | 0.071610 |
+| Shared layer 1, topology layers 2â€“4 | 108 | 0.007806 | 0.071169 |
+| Shared layers 1â€“2, topology layers 3â€“4 | 108 | 0.006913 | 0.071610 |
 | Additive K8 shared + K8 topology | 116 | 0.005739 | 0.053648 |
 | Additive K16 + K16 upper bound | 180 | 0.002900 | 0.043579 |
 
@@ -58,7 +58,7 @@ The additive K8+K8 branch produced the strongest practical geometry result. It k
 
 ## Layer visualization
 
-![Representative LFO layer decompositions](artifacts/phase_factorized_residual/layer_decomposition_examples.png)
+![Representative LFO layer decompositions](images/experiment-04/layer_decomposition_examples.png)
 
 The main visual shows common, median, and tail held-out examples for smooth, continuous, and discontinuous curves. Detailed SVGs show each canonical code, its phase/gain-transformed contribution, cumulative prefixes, and the final target overlay. The codebook atlas compares canonical atoms with translated uses of the same code.
 
@@ -83,3 +83,4 @@ Experiment 5 should test inferability rather than expand the oracle codec grid a
 3. Optimize decoded reconstruction and rendered-effect loss as the primary objectives. Exact code accuracy should remain diagnostic because multiple code/phase/gain paths can reconstruct the same curve.
 4. Measure median and tail reconstruction, circular phase error, topology routing, code stability under small perturbations, and performance by modulation destination, rate, and depth.
 5. Fit predicted dense curves back to valid Vital points and powers before selecting the representation used by the complete audio-to-preset model.
+

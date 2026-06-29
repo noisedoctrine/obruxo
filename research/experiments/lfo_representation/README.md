@@ -132,7 +132,8 @@ Experiments 1-5 established the representation family:
 - XPU exact alignment matched CPU numerically for the tested path and was much
   faster.
 
-The consolidated report is `EXPERIMENTS_1_5_CONSOLIDATED_REPORT.md`.
+The consolidated report is
+[experiments-01-05-consolidated-report.md](reports/experiments-01-05-consolidated-report.md).
 
 ### Experiment 6
 
@@ -161,7 +162,7 @@ screen. It fixed the current planning baseline:
 - test cheap clipping policies without broad grid explosion.
 
 The full generated report is
-`artifacts/additive_finalization_8_screen/EXPERIMENT_8_FINDINGS.md`.
+[experiment-08-findings.md](reports/experiment-08-findings.md).
 
 ### Experiment 9
 
@@ -292,16 +293,29 @@ ignored by git.
 
 ## Report Index
 
-- `FINDINGS.md`: initial corpus and Experiment 1 oracle baselines.
-- `EXPERIMENT_2_FINDINGS.md`: stacked categorical residual codebooks.
-- `EXPERIMENT_3_FINDINGS.md`: frequency-first residual peeling.
-- `EXPERIMENT_4_FINDINGS.md`: phase factorization and mixed dictionaries.
-- `EXPERIMENT_5_FINDINGS.md`: exact phase-alignment oracle.
-- `EXPERIMENTS_1_5_CONSOLIDATED_REPORT.md`: design synthesis through
-  Experiment 5.
+- [experiment-01-findings.md](reports/experiment-01-findings.md): initial
+  corpus and Experiment 1 oracle baselines.
+- [experiment-02-findings.md](reports/experiment-02-findings.md): stacked
+  categorical residual codebooks.
+- [experiment-03-findings.md](reports/experiment-03-findings.md):
+  frequency-first residual peeling.
+- [experiment-04-findings.md](reports/experiment-04-findings.md): phase
+  factorization and mixed dictionaries.
+- [experiment-05-findings.md](reports/experiment-05-findings.md): exact
+  phase-alignment oracle.
+- [experiment-06-findings.md](reports/experiment-06-findings.md): codebook
+  selection and parameter-efficiency screen.
+- [experiment-07a-findings.md](reports/experiment-07a-findings.md):
+  construction-policy and modifier screen.
+- [experiment-08-findings.md](reports/experiment-08-findings.md): cheap
+  size/modifier/clipping screen.
+- [experiment-09-findings.md](reports/experiment-09-findings.md): quick
+  decoder/modifier hygiene screen.
+- [experiments-01-05-consolidated-report.md](reports/experiments-01-05-consolidated-report.md):
+  design synthesis through Experiment 5.
 - `experiment6_codebook_selection/`: Experiment 6 plan and runner notes.
 - `EXPERIMENT_8_PLAN.md`: cheap size/modifier/clipping screen plan.
-- `artifacts/additive_finalization_8_screen/EXPERIMENT_8_FINDINGS.md`: generated
-  Experiment 8 report.
-- `artifacts/additive_finalization_9_screen/EXPERIMENT_9_FINDINGS.md`: generated
-  Experiment 9 report once jobs complete.
+
+Rendered report images live under [reports/images/](reports/images/), with one
+subfolder per experiment. The raw run outputs still live under `artifacts/`,
+which is ignored by git.

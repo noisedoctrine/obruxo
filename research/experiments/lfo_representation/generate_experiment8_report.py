@@ -13,7 +13,9 @@ import pandas as pd
 
 ROOT = Path("artifacts/additive_finalization_8_screen")
 ANALYTICS = ROOT / "analytics"
-PLOTS = ANALYTICS / "plots"
+REPORTS = Path("reports")
+REPORT = REPORTS / "experiment-08-findings.md"
+PLOTS = REPORTS / "images" / "experiment-08"
 CONFIG_PATTERN = re.compile(r"W(?P<W>\d+)D(?P<D>\d+)\s+(?P<modifier>\S+)\s+(?P<clip>\S+)")
 
 
@@ -900,17 +902,17 @@ This is the intended interface cost: `32` base categorical choices, `W*D` residu
 
 `serialized_fields` is kept only as a storage/decoder count. It is not the neural output-head burden, because a categorical code index is emitted by a softmax over its codebook.
 
-![Output accounting](analytics/plots/experiment8_output_head_accounting.png)
+![Output accounting](images/experiment-08/experiment8_output_head_accounting.png)
 
 ## Size Screen
 
-![Median and P95 heatmaps](analytics/plots/experiment8_size_heatmap_pair.png)
+![Median and P95 heatmaps](images/experiment-08/experiment8_size_heatmap_pair.png)
 
 D4 is kept in the tables and source CSV, but omitted from the scatter/ablation plots because its error is too far above the useful comparison range.
 
-![Size screen colored by width](analytics/plots/experiment8_size_rmse_vs_head_outputs_by_width.png)
+![Size screen colored by width](images/experiment-08/experiment8_size_rmse_vs_head_outputs_by_width.png)
 
-![Size screen colored by depth](analytics/plots/experiment8_size_rmse_vs_head_outputs_by_depth.png)
+![Size screen colored by depth](images/experiment-08/experiment8_size_rmse_vs_head_outputs_by_depth.png)
 
 Top size jobs by P95:
 
@@ -920,7 +922,7 @@ Top size jobs by P95:
 
 At W12D16, gain/offset were tested on top of phase. The deltas below are versus phase-only at the same W/D. Gain and offset have equal structural head cost, but their empirical quality deltas are separate facts.
 
-![Modifier RMSE](analytics/plots/experiment8_modifier_rmse_panels.png)
+![Modifier RMSE](images/experiment-08/experiment8_modifier_rmse_panels.png)
 
 {_markdown_table(modifier_table)}
 
@@ -930,7 +932,7 @@ The modifier result is not a broad endorsement of more continuous outputs. Offse
 
 Intermediate clipping was tested only for W12D16 with phase+gain. It has zero output-head cost, so its quality-per-output ratio is undefined rather than merely large.
 
-![Clipping RMSE](analytics/plots/experiment8_clipping_rmse_panels.png)
+![Clipping RMSE](images/experiment-08/experiment8_clipping_rmse_panels.png)
 
 {_markdown_table(clipping_table)}
 
@@ -940,7 +942,7 @@ Intermediate `[-1, 1]` clipping improves both median and P95 versus phase+gain w
 
 Output cost is analytic. Quality value is empirical, measured with controlled finite differences between rows that differ by one design move where the screen contains such a pair. In the paired chart below, the left panel is the cost of asking the model to emit more outputs; the right panel is the observed RMSE change per added output. More negative is better.
 
-![Marginal cost and value](analytics/plots/experiment8_marginal_cost_value_pair.png)
+![Marginal cost and value](images/experiment-08/experiment8_marginal_cost_value_pair.png)
 
 {zero_cost_sentence}
 
@@ -948,7 +950,7 @@ The full row-level marginal table is saved as `analytics/marginal_efficiency.csv
 
 ## Runtime And Memory
 
-![Runtime scaling](analytics/plots/experiment8_runtime_scaling_pair.png)
+![Runtime scaling](images/experiment-08/experiment8_runtime_scaling_pair.png)
 
 The measured elapsed time rises mostly with total residual work: more residual layers and wider dictionaries both cost. Estimated peak memory was not a decision driver in this screen: the phase-only size jobs ranged from {memory_min:.1f} MB to {memory_max:.1f} MB.
 
@@ -958,13 +960,13 @@ For SOTA ML-style comparison, this is better treated as a rate-distortion / Pare
 
 The Pareto frontiers below keep only configurations where no smaller output-head model has equal or better error. Median and P95 are intentionally separate because they answer different modeling questions.
 
-![Median output-head Pareto](analytics/plots/experiment8_pareto_median_head_outputs.png)
+![Median output-head Pareto](images/experiment-08/experiment8_pareto_median_head_outputs.png)
 
 Median RMSE output-head frontier:
 
 {_markdown_table(median_frontier_table)}
 
-![P95 output-head Pareto](analytics/plots/experiment8_pareto_p95_head_outputs.png)
+![P95 output-head Pareto](images/experiment-08/experiment8_pareto_p95_head_outputs.png)
 
 P95 RMSE output-head frontier:
 
@@ -993,7 +995,8 @@ The efficient direction is not simply fewer outputs; deep enough models sharply 
 - `analytics/paths.csv`
 - `analytics/plots/`
 """
-    (ROOT / "EXPERIMENT_8_FINDINGS.md").write_text(report, encoding="utf-8")
+    REPORTS.mkdir(parents=True, exist_ok=True)
+    REPORT.write_text(report, encoding="utf-8")
 
 
 def main() -> None:
@@ -1079,7 +1082,7 @@ def main() -> None:
         PLOTS / "experiment8_pareto_p95_head_outputs.png",
     )
     _write_report(summary)
-    print(ROOT / "EXPERIMENT_8_FINDINGS.md")
+    print(REPORT)
 
 
 if __name__ == "__main__":

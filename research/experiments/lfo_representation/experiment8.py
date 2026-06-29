@@ -83,6 +83,12 @@ def main() -> None:
         print(experiment7_status(output_dir, "8"))
     else:
         result = run_experiment7_analysis(output_dir, experiment="8")
+        subprocess.run(
+            [sys.executable, str(EXPERIMENT_DIR / "generate_experiment8_report.py")],
+            check=True,
+            env=_environment(args.artifacts),
+            cwd=EXPERIMENT_DIR,
+        )
         print(f"Wrote Experiment 8 screen analytics to {result['analytics_dir']}")
 
 

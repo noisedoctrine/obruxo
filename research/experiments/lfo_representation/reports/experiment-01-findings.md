@@ -1,6 +1,7 @@
 # LFO Representation Experiment Findings
 
-Experiment 2's stacked residual-codebook results are reported separately in `EXPERIMENT_2_FINDINGS.md`.
+Experiment 2's stacked residual-codebook results are reported separately in
+[experiment-02-findings.md](experiment-02-findings.md).
 
 ## 2026-06-21: Initial corpus and oracle run
 
