@@ -91,7 +91,7 @@ Experiments 1-5 established the representation family:
 The consolidated report is
 [experiments-01-05-consolidated-report.md](./reports/experiments-01-05-consolidated-report.md).
 
-### Experiment 6
+### [Experiment 6](./reports/experiment-06-findings.md)
 
 Experiment 6 moved from "can this representation work?" to "which generation
 recipe should produce the codebooks?" It introduced stronger reporting around
@@ -109,7 +109,7 @@ Carry forward:
 Report:
 [experiment-06-findings.md](./reports/experiment-06-findings.md).
 
-### Experiment 7A
+### [Experiment 7A](./reports/experiment-07a-findings.md)
 
 Experiment 7A tested construction-policy variants and led us away from
 frequency-first as the carry-forward policy. The important communication cleanup
@@ -326,7 +326,8 @@ ignored by git.
   decoder/modifier hygiene screen.
 - [experiments-01-05-consolidated-report.md](./reports/experiments-01-05-consolidated-report.md):
   design synthesis through Experiment 5.
-- `experiment6_codebook_selection/`: Experiment 6 plan and runner notes.
+- [experiment6_codebook_selection/](./experiment6_codebook_selection/):
+  Experiment 6 plan and runner notes.
 - `EXPERIMENT_8_PLAN.md`: cheap size/modifier/clipping screen plan.
 
 Rendered report images live under [reports/images/](./reports/images/), with
