@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+.coverage
+htmlcov/
+
+# Local datasets and generated research outputs
+datasets/
+research/experiments/neural_proxy/generated_midi/
+
+# Local agent scratchpad
+.agents/
+.codex/
+
+# Local editor state
+.vscode/
+.idea/
+
+# Local temporary files
+*.tmp
+*.temp
+*.log
+~$*
+.DS_Store
+Thumbs.db
+
+# Local secrets and machine-specific environment
+.env
+.env.*
+
+# Notebook/editor checkpoints
+.ipynb_checkpoints/

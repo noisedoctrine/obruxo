@@ -1,0 +1,3 @@
+- (stretch goal) could multiple encoders be used to stack representations - then ablations can be used to decide which one(s) to keep
+- considering the users are musicians, the whole e2e should run on modern CPU's igpu reasonably well. E.g. 15-20s might be reasonable for a single clip, so maybe we can budget 10-15s for the encoders to do their thing. RAM is less of a concern, because speed is likely the limiting factor, but lets assume a generous max of 8gb so we do not rule out good solutions just because they missed these soft criteria by a tiny amount. obviously though, less memory would be better if possible.
+
