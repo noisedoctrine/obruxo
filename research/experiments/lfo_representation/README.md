@@ -53,66 +53,22 @@ common structure and topology-specific tail structure fair coverage.
   phase factorization is one of the biggest wins in the sequence.
 - **No-op codes are part of the design, not a convenience.** They let solved
   shapes stop accumulating residual noise.
-- **Depth is currently the main quality lever.** Experiment 8 strongly favored
-  narrow/deep stacks over wide/shallow stacks at similar output-head cost.
+- **Depth is currently the main quality lever.** Experiment 8 suggests deeper
+  residual stacks are more valuable than simply widening the residual alphabet,
+  but this remains a learnability question for the downstream model.
+- **Width buys coverage, but with diminishing returns.** The useful question is
+  marginal value per output head, not the absolute best oracle RMSE.
 - **Offset is not carried forward by default.** In Experiment 8 it degraded P95
   at the tested anchor.
 - **Gain is not globally settled.** It was critical in earlier phase-aware
   experiments, but in the Experiment 8 W12D16 modifier screen it tied phase-only
   unless paired with the promising clipping policy.
-- **Per-layer clipping is promising.** Experiment 8 showed a zero-output-cost
-  improvement for intermediate `[-1, 1]` clipping in the phase+gain anchor.
+- **Decoder hygiene matters.** Per-layer clipping gave a cheap improvement in
+  Experiment 8, so Experiment 9 tests clipping, limiting, normalization, and
+  snap behavior directly.
 - **XPU is the default target for new oracle runs.** CPU remains a correctness
   fallback, but the production labeling path should avoid repeated XPU/CPU
   handoff.
-
-## Current Best References
-
-From Experiment 8's cheap 120-point, beam-4 screen:
-
-| Role | Config | Head outputs | Median RMSE | P95 RMSE | Notes |
-|---|---:|---:|---:|---:|---|
-| Compact deep reference | `W8D32 phase_only final_only` | 321 | 0.000920 | 0.012003 | Strong parameter-efficiency point |
-| Best quality in screen | `W16D32 phase_only final_only` | 577 | 0.000651 | 0.010222 | Best median and P95 |
-| Modifier anchor | `W12D16 phase_only final_only` | 241 | 0.001958 | 0.026819 | Gain tied, offset worsened P95 |
-| Clipping anchor | `W12D16 phase_gain intermediate_m11_final_01` | 258 | 0.001759 | 0.023425 | Best cheap decoder-policy signal |
-
-Interpretation:
-
-- `W8D32` is the parameter-efficient deep reference.
-- `W16D32` is the current quality reference.
-- The next useful work is not just "more width"; it is understanding decoder
-  hygiene, normalization, gain/offset scope, and whether deeper narrow stacks
-  stay learnable.
-
-## Output-Head Accounting
-
-The model-facing output burden is not the number of serialized fields. A
-categorical code index means the model emits a softmax over that codebook.
-
-Use:
-
-```text
-head_outputs = 32 + W*D + (D + 1) * (I_phase + I_gain + I_offset)
-```
-
-where:
-
-- `32` is the base categorical choice;
-- `W*D` is the total residual categorical vocabulary emitted across layers;
-- each enabled scalar family costs one scalar for the base and one per residual
-  layer.
-
-In the current experiments phase is assumed enabled:
-
-```text
-phase-only baseline = 33 + D(W + 1)
-optional gain       = +(D + 1)
-optional offset     = +(D + 1)
-```
-
-Cost is analytic. Quality value must be measured with controlled empirical
-contrasts.
 
 ## Evidence Trail
 
@@ -133,7 +89,7 @@ Experiments 1-5 established the representation family:
   faster.
 
 The consolidated report is
-[experiments-01-05-consolidated-report.md](reports/experiments-01-05-consolidated-report.md).
+[experiments-01-05-consolidated-report.md](./reports/experiments-01-05-consolidated-report.md).
 
 ### Experiment 6
 
@@ -142,13 +98,35 @@ recipe should produce the codebooks?" It introduced stronger reporting around
 threshold coverage, editor-node preservation, complexity accounting, and
 candidate construction recipes.
 
-Details live in `experiment6_codebook_selection/`.
+Carry forward:
+
+- compare structured codebooks against direct grids, not just against stock
+  shapes;
+- evaluate median and tail behavior separately;
+- track model-output cost and decoder storage separately;
+- treat editor-node preservation as a distinct concern from sampled-curve RMSE.
+
+Report:
+[experiment-06-findings.md](./reports/experiment-06-findings.md).
 
 ### Experiment 7A
 
 Experiment 7A tested construction-policy variants and led us away from
 frequency-first as the carry-forward policy. The important communication cleanup
 from this phase was nomenclature: count real residual layers, not named bundles.
+
+Carry forward:
+
+- use `topology_balanced_common_then_tail` as the construction recipe to test
+  next;
+- do not let frequency-first dominate plots or conclusions when it is plainly a
+  poor policy;
+- keep "shared" and "topology" as codebook-construction details, not hidden
+  model-facing layer types;
+- evaluate modifier effects only through controlled contrasts.
+
+Report:
+[experiment-07a-findings.md](./reports/experiment-07a-findings.md).
 
 ### Experiment 8
 
@@ -161,8 +139,18 @@ screen. It fixed the current planning baseline:
 - test gain/offset separately from phase;
 - test cheap clipping policies without broad grid explosion.
 
-The full generated report is
-[experiment-08-findings.md](reports/experiment-08-findings.md).
+Carry forward:
+
+- depth appears to be the dominant quality lever among the tested size knobs;
+- width has value, but its marginal value must be judged against the added
+  categorical output burden;
+- gain and offset have equal structural cost but different empirical value;
+- per-layer clipping is a zero-output-cost decoder policy worth isolating;
+- no single oracle "best" config should be treated as final, because deeper
+  oracle stacks can always keep improving.
+
+Report:
+[experiment-08-findings.md](./reports/experiment-08-findings.md).
 
 ### Experiment 9
 
@@ -177,6 +165,9 @@ answer questions that Experiment 8 exposed rather than expanding the size grid:
 Experiment 9 should record both train and validation metrics, because worse
 validation under more degrees of freedom may reflect the construction/decoder
 objective rather than normal overfitting.
+
+Report:
+[experiment-09-findings.md](./reports/experiment-09-findings.md).
 
 ## Open Questions
 
@@ -207,6 +198,28 @@ objective rather than normal overfitting.
 - **Grid resolution.** Cheap screens use low resolution deliberately. Final
   audits may need musically composite grids, especially for triplet-like or
   discontinuous custom shapes.
+
+## Output-Head Accounting
+
+The model-facing output burden is not the number of serialized fields. A
+categorical code index means the model emits a softmax over that codebook.
+
+Use:
+
+```text
+head_outputs = 32 + W*D + (D + 1) * (I_phase + I_gain + I_offset)
+```
+
+In the current experiments phase is assumed enabled:
+
+```text
+phase-only baseline = 33 + D(W + 1)
+optional gain       = +(D + 1)
+optional offset     = +(D + 1)
+```
+
+Cost is analytic. Quality value must be measured with controlled empirical
+contrasts.
 
 ## Operations
 
@@ -293,29 +306,29 @@ ignored by git.
 
 ## Report Index
 
-- [experiment-01-findings.md](reports/experiment-01-findings.md): initial
+- [experiment-01-findings.md](./reports/experiment-01-findings.md): initial
   corpus and Experiment 1 oracle baselines.
-- [experiment-02-findings.md](reports/experiment-02-findings.md): stacked
+- [experiment-02-findings.md](./reports/experiment-02-findings.md): stacked
   categorical residual codebooks.
-- [experiment-03-findings.md](reports/experiment-03-findings.md):
+- [experiment-03-findings.md](./reports/experiment-03-findings.md):
   frequency-first residual peeling.
-- [experiment-04-findings.md](reports/experiment-04-findings.md): phase
+- [experiment-04-findings.md](./reports/experiment-04-findings.md): phase
   factorization and mixed dictionaries.
-- [experiment-05-findings.md](reports/experiment-05-findings.md): exact
+- [experiment-05-findings.md](./reports/experiment-05-findings.md): exact
   phase-alignment oracle.
-- [experiment-06-findings.md](reports/experiment-06-findings.md): codebook
+- [experiment-06-findings.md](./reports/experiment-06-findings.md): codebook
   selection and parameter-efficiency screen.
-- [experiment-07a-findings.md](reports/experiment-07a-findings.md):
+- [experiment-07a-findings.md](./reports/experiment-07a-findings.md):
   construction-policy and modifier screen.
-- [experiment-08-findings.md](reports/experiment-08-findings.md): cheap
+- [experiment-08-findings.md](./reports/experiment-08-findings.md): cheap
   size/modifier/clipping screen.
-- [experiment-09-findings.md](reports/experiment-09-findings.md): quick
+- [experiment-09-findings.md](./reports/experiment-09-findings.md): quick
   decoder/modifier hygiene screen.
-- [experiments-01-05-consolidated-report.md](reports/experiments-01-05-consolidated-report.md):
+- [experiments-01-05-consolidated-report.md](./reports/experiments-01-05-consolidated-report.md):
   design synthesis through Experiment 5.
 - `experiment6_codebook_selection/`: Experiment 6 plan and runner notes.
 - `EXPERIMENT_8_PLAN.md`: cheap size/modifier/clipping screen plan.
 
-Rendered report images live under [reports/images/](reports/images/), with one
-subfolder per experiment. The raw run outputs still live under `artifacts/`,
+Rendered report images live under [reports/images/](./reports/images/), with
+one subfolder per experiment. The raw run outputs still live under `artifacts/`,
 which is ignored by git.
