@@ -110,63 +110,97 @@ def connect(ax, n_from, n_to, *, side_from="bottom", side_to="top",
 
 # --- Diagram: modulation gap -------------------------------------------------
 def diagram_modulation_gap():
-    fig, (axL, axR) = plt.subplots(1, 2, figsize=(12, 5.2))
+    """Left: static knob vector. Right: same knobs + modulation curves above."""
+    fig, (axL, axR) = plt.subplots(1, 2, figsize=(13, 5.6))
 
-    axL.set_title("What Syntheon emits\n(static knob vector)", fontsize=11,
-                  color=INK, weight="bold")
-    axL.set_xlim(0, 10); axL.set_ylim(0, 10)
-    axL.set_axis_off()
     labels = ["osc1", "osc2", "flt", "atk", "dec", "sus", "rel", "fx1", "fx2"]
     vals = [0.7, 0.4, 0.6, 0.3, 0.5, 0.8, 0.35, 0.55, 0.25]
+
+    # ---------------- left panel: static knob vector -----------------
+    axL.set_xlim(0, 10); axL.set_ylim(0, 10)
+    axL.set_axis_off()
+    axL.set_title("What Syntheon emits\na static knob vector",
+                  fontsize=11.5, color=INK, weight="bold", pad=10)
+    base = 1.5
+    top = 9.0
+    span = top - base
     for i, (lab, v) in enumerate(zip(labels, vals)):
         x = 1 + i
-        axL.plot([x, x], [1, 1 + v * 6], color=ACCENT, lw=8,
-                 solid_capstyle="round", alpha=0.85)
-        axL.plot([x - 0.35, x + 0.35], [1 + v * 6, 1 + v * 6],
-                 color=INK, lw=1.5)
-        axL.text(x, 0.4, lab, ha="center", va="top", fontsize=8, color=INK_SOFT)
-    axL.plot([0.3, 9.7], [1, 1], color=LINE, lw=1)
-    axL.text(5, 9.2, "every value is a fixed scalar", ha="center",
-             fontsize=9, color=INK_SOFT, style="italic")
-    axL.text(5, 8.4, "no time axis, no curves", ha="center",
-             fontsize=9, color="#b42318", weight="bold")
+        axL.plot([x, x], [base, base + v * span], color=ACCENT, lw=9,
+                 solid_capstyle="round", alpha=0.9)
+        axL.plot([x - 0.38, x + 0.38], [base + v * span, base + v * span],
+                 color=INK, lw=1.6)
+        axL.text(x, base - 0.5, lab, ha="center", va="top",
+                 fontsize=8.5, color=INK_SOFT)
+    axL.plot([0.3, 9.7], [base, base], color=LINE, lw=1.2)
+    axL.text(5, 9.65, "every value is a fixed scalar", ha="center",
+             fontsize=9.5, color=INK_SOFT, style="italic")
+    axL.text(5, 0.15, "no time axis \u00b7 no curves \u00b7 no routing",
+             ha="center", fontsize=9.5, color="#b42318", weight="bold")
 
-    axR.set_title("What an evolving Vital sound needs\n(static params + modulation)",
-                  fontsize=11, color=INK, weight="bold")
+    # ---------------- right panel: static + modulation ---------------
     axR.set_xlim(0, 10); axR.set_ylim(0, 10)
     axR.set_axis_off()
+    axR.set_title("What an evolving Vital sound needs\nstatic knobs + modulation",
+                  fontsize=11.5, color=INK, weight="bold", pad=10)
+
+    # band layout: knobs low, curves high, clearly separated
+    knob_base = 1.5
+    knob_top = 3.7
+    knob_span = knob_top - knob_base
+    curve_base = 4.6      # shared baseline for modulation curves
+    curve_top = 9.0
+
+    # divider between the two bands
+    axR.plot([0.3, 9.7], [4.15, 4.15], color=LINE, lw=0.8, ls=(0, (4, 3)))
+    axR.text(0.35, 3.95, "static params (Syntheon's ceiling)",
+             fontsize=8, color=INK_SOFT, style="italic", va="top")
+    axR.text(0.35, 9.25, "modulation \u2014 what Syntheon can't emit",
+             fontsize=8, color=EXTEND, style="italic", weight="bold", va="top")
+
+    # static knobs (dimmed, in lower band)
     for i, (lab, v) in enumerate(zip(labels, vals)):
         x = 1 + i
-        axR.plot([x, x], [1, 1 + v * 2.2], color=INK_SOFT, lw=6,
-                 solid_capstyle="round", alpha=0.25)
-        axR.text(x, 0.4, lab, ha="center", va="top", fontsize=7,
-                 color="#b0b6bc")
-    axR.text(5, 3.9, "static params (Syntheon's ceiling)",
-             ha="center", fontsize=8, color=INK_SOFT, style="italic")
+        axR.plot([x, x], [knob_base, knob_base + v * knob_span],
+                 color=INK_SOFT, lw=7, solid_capstyle="round", alpha=0.3)
+        axR.text(x, knob_base - 0.5, lab, ha="center", va="top",
+                 fontsize=7.5, color="#9aa0a6")
+    axR.plot([0.3, 9.7], [knob_base, knob_base], color=LINE, lw=1)
 
-    t = np.linspace(0, 2 * np.pi, 200)
-    xlfo = np.linspace(1, 9, 200)
-    lfo = 6.8 + 1.0 * np.sin(2 * t)
-    axR.plot(xlfo, lfo, color=EXTEND, lw=2.2)
-    axR.text(1.1, 8.3, "LFO curve", color=EXTEND, fontsize=8.5, weight="bold")
+    # LFO curve (sine) in upper band
+    t = np.linspace(0, 4 * np.pi, 400)
+    xlfo = np.linspace(0.8, 9.2, 400)
+    lfo_mid = (curve_base + curve_top) / 2
+    lfo_amp = (curve_top - curve_base) / 2 * 0.55
+    lfo = lfo_mid + lfo_amp * np.sin(2 * t)
+    axR.plot(xlfo, lfo, color=EXTEND, lw=2.4)
+    axR.text(0.9, curve_top - 0.1, "LFO", color=EXTEND, fontsize=9,
+             weight="bold", va="top")
 
-    xe = np.linspace(1, 9, 200)
-    seg = np.array([0.0, 0.6, 0.4, 0.4, 0.0])
-    xe_seg = np.linspace(1, 9, len(seg))
-    env = 5.0 + np.interp(xe, xe_seg, seg) * 1.4
-    axR.plot(xe, env, color=ACCENT, lw=2.2)
-    axR.text(1.1, 7.0, "envelope / automation", color=ACCENT,
-             fontsize=8.5, weight="bold")
+    # envelope / automation curve (ADSR-ish) in upper band, below the LFO
+    xe = np.linspace(0.8, 9.2, 400)
+    # normalized ADSR: quick attack, decay, sustain, release
+    env_norm = np.zeros_like(xe)
+    a, d, s_lvl, r = 0.05, 0.25, 0.6, 0.9
+    for j, xv in enumerate((xe - 0.8) / 8.4):
+        if xv < a:
+            env_norm[j] = xv / a
+        elif xv < a + d:
+            env_norm[j] = 1.0 - (1.0 - s_lvl) * (xv - a) / d
+        elif xv < r:
+            env_norm[j] = s_lvl
+        else:
+            env_norm[j] = s_lvl * max(0.0, 1.0 - (xv - r) / (1.0 - r))
+    env = curve_base + 0.05 + env_norm * (curve_top - curve_base - 0.1) * 0.45
+    axR.plot(xe, env, color=ACCENT, lw=2.4)
+    axR.text(9.1, curve_base + 0.15, "envelope", color=ACCENT, fontsize=9,
+             weight="bold", va="bottom", ha="right")
 
-    axR.annotate("", xy=(8.6, 5.2), xytext=(8.6, 6.8),
-                 arrowprops=dict(arrowstyle="<->", color=LINE, lw=1.2))
-    axR.text(8.95, 6.0, "routing\n+ amount", fontsize=8, color=INK_SOFT,
-             ha="left", va="center")
-
-    fig.suptitle("The modulation gap", fontsize=13, weight="bold",
+    fig.suptitle("The modulation gap", fontsize=14, weight="bold",
                  color=INK, y=1.0)
     fig.tight_layout()
-    fig.savefig(OUT / "syntheon_modulation_gap.png", dpi=180, bbox_inches="tight")
+    fig.savefig(OUT / "syntheon_modulation_gap.png", dpi=180,
+                bbox_inches="tight")
     plt.close(fig)
 
 
@@ -244,141 +278,134 @@ def slab_connect(ax, n_from, n_to, *, side_from="right", side_to="left",
 
 
 def diagram_architecture_nn():
-    fig, ax = plt.subplots(figsize=(17, 9))
-    ax.set_xlim(0, 17)
-    ax.set_ylim(0, 9)
+    fig, ax = plt.subplots(figsize=(18, 10))
+    ax.set_xlim(0, 18)
+    ax.set_ylim(0, 10)
     ax.set_axis_off()
 
-    ax.text(0.1, 8.65, "WTSv2 \u2014 Syntheon's Vital model",
-            fontsize=15, weight="bold", color=INK)
-    ax.text(0.1, 8.25,
+    ax.text(0.1, 9.65, "WTSv2 \u2014 Syntheon's Vital model",
+            fontsize=16, weight="bold", color=INK)
+    ax.text(0.1, 9.2,
             "forward pass, traced from syntheon/inferencer/vital/models/*.py",
-            fontsize=9, color=INK_SOFT, style="italic")
+            fontsize=9.5, color=INK_SOFT, style="italic")
 
-    # three lanes, left to right
-    wt_y = 6.4      # wavetable lane (top)
-    mid_y = 4.2     # encoder / shared lane (middle)
-    adsr_y = 2.0    # ADSR lane (bottom)
-    x = 1.6
+    # lane y-centers, well separated
+    wt_y = 7.2       # wavetable lane (top)
+    mid_y = 4.6      # encoder / shared lane (middle)
+    adsr_y = 2.0     # ADSR lane (bottom)
 
-    # ---- inputs (column) ----
-    pitch = slab(ax, x, wt_y + 0.6, 1.3, 0.6, fc=SLAB_INPUT,
-                 label="pitch", fontsize=8)
-    loud = slab(ax, x, mid_y, 1.3, 0.6, fc=SLAB_INPUT,
-                label="loudness", fontsize=8)
-    audio = slab(ax, x, adsr_y + 0.6, 1.3, 0.6, fc=SLAB_INPUT,
-                 label="audio y", fontsize=8)
-    mfcc = slab(ax, x, adsr_y - 0.8, 1.3, 0.6, fc=SLAB_INPUT,
-                label="mfcc", fontsize=8)
+    # ---- inputs (left column) ----
+    xi = 1.5
+    pitch = slab(ax, xi, wt_y, 1.4, 0.7, fc=SLAB_INPUT, label="pitch",
+                 fontsize=8.5)
+    loud = slab(ax, xi, mid_y, 1.4, 0.7, fc=SLAB_INPUT, label="loudness",
+                fontsize=8.5)
+    audio = slab(ax, xi, adsr_y + 0.9, 1.4, 0.7, fc=SLAB_INPUT,
+                 label="audio y", fontsize=8.5)
+    mfcc = slab(ax, xi, adsr_y - 0.9, 1.4, 0.7, fc=SLAB_INPUT,
+                label="mfcc", fontsize=8.5)
 
     # ---- encoder (shared) ----
-    x = 3.7
-    enc = slab(ax, x, mid_y, 1.7, 1.6, fc=SLAB_ENC,
-               label="encoder", sublabel="in_mlps \u2192 GRU\n\u2192 out_mlp",
-               fontsize=8)
-    # encoder fan-in: pitch, loudness, mfcc -> enc
-    slab_connect(ax, pitch, enc, side_from="right", side_to="left",
-                 rad=0.18)
+    x = 4.0
+    enc = slab(ax, x, mid_y, 1.9, 1.8, fc=SLAB_ENC, label="encoder",
+               sublabel="in_mlps\u2192GRU\n\u2192out_mlp", fontsize=8.5)
+    slab_connect(ax, pitch, enc, side_from="right", side_to="left", rad=0.20)
     slab_connect(ax, loud, enc, color=SLAB_LINE)
-    slab_connect(ax, mfcc, enc, side_from="right", side_to="left",
-                 rad=-0.18)
+    slab_connect(ax, mfcc, enc, side_from="right", side_to="left", rad=-0.20)
 
     # ---- wavetable lane (top) ----
-    x = 6.1
-    extract = slab(ax, x, wt_y + 0.6, 2.1, 0.95, fc=SLAB_WT,
-                   label="wavetable", sublabel="extraction",
-                   fontsize=8)
-    # audio + pitch -> extract
+    x = 6.8
+    extract = slab(ax, x, wt_y, 2.3, 1.1, fc=SLAB_WT, label="wavetable",
+                   sublabel="extraction", fontsize=8.5)
     slab_connect(ax, audio, extract, side_from="right", side_to="left",
                  rad=0.22)
-    slab_connect(ax, pitch, extract, side_from="right", side_to="top",
-                 rad=0.05, color=SLAB_LINE)
+    slab_connect(ax, pitch, extract, side_from="right", side_to="left",
+                 rad=0.08, color=SLAB_LINE, lw=0.9)
 
-    x = 8.9
-    attn = slab(ax, x, wt_y + 0.6, 1.7, 0.95, fc=SLAB_WT,
-                label="attention", sublabel="softmax mix", fontsize=8)
+    x = 9.6
+    attn = slab(ax, x, wt_y, 1.9, 1.1, fc=SLAB_WT, label="attention",
+                sublabel="softmax", fontsize=8.5)
     slab_connect(ax, extract, attn)
 
-    x = 11.6
-    wtsynth = slab(ax, x, wt_y + 0.6, 2.0, 1.3, fc=SLAB_WT,
-                   label="wavetable", sublabel="osc V2\n+ phase accum",
-                   fontsize=8)
+    x = 12.3
+    wtsynth = slab(ax, x, wt_y, 2.2, 1.4, fc=SLAB_WT, label="wavetable",
+                   sublabel="osc V2", fontsize=8.5)
     slab_connect(ax, attn, wtsynth)
-    # pitch -> wtsynth (long thin feed)
-    slab_connect(ax, pitch, wtsynth, side_from="right", side_to="left",
-                 rad=-0.32, lw=0.9)
-    # loudness -> wtsynth (amplitude)
-    slab_connect(ax, loud, wtsynth, side_from="right", side_to="left",
-                 rad=-0.18, lw=0.9)
 
-    x = 14.3
-    harm = slab(ax, x, wt_y + 0.6, 1.4, 0.9, fc=SLAB_WT,
-                label="harmonic", fontsize=8)
+    x = 15.2
+    harm = slab(ax, x, wt_y, 1.6, 1.1, fc=SLAB_WT, label="harmonic",
+                fontsize=8.5)
     slab_connect(ax, wtsynth, harm)
 
+    # pitch & loudness also feed the oscillator/amplitude; annotate compactly
+    # rather than drawing two long crossing arrows
+    ax.annotate("pitch + loudness\nfeed osc / amplitude",
+                xy=(wtsynth[0] - wtsynth[2] / 2, wtsynth[1] + 0.1),
+                xytext=(6.6, wt_y + 1.55),
+                fontsize=7.5, color=SLAB_LINE, style="italic",
+                ha="left", va="center",
+                arrowprops=dict(arrowstyle="-", color=SLAB_LINE,
+                                lw=0.8, ls=(0, (3, 2))))
+
     # ---- noise lane (middle, off encoder) ----
-    x = 6.1
-    noise_proj = slab(ax, x, mid_y, 2.1, 1.0, fc=SLAB_NOISE,
-                      label="noise proj", sublabel="scale_fn \u2192 IR",
-                      fontsize=8, textcolor=INK)
+    x = 6.8
+    noise_proj = slab(ax, x, mid_y, 2.3, 1.15, fc=SLAB_NOISE,
+                      label="noise proj", sublabel="scale_fn\u2192IR",
+                      fontsize=8.5, textcolor=INK)
     slab_connect(ax, enc, noise_proj, color=SLAB_LINE)
-    x = 8.9
-    noise_filt = slab(ax, x, mid_y, 1.7, 1.0, fc=SLAB_NOISE,
-                      label="filtered", sublabel="fft_convolve",
-                      fontsize=8, textcolor=INK)
+    x = 9.6
+    noise_filt = slab(ax, x, mid_y, 1.9, 1.15, fc=SLAB_NOISE,
+                      label="filtered", sublabel="fft_conv",
+                      fontsize=8.5, textcolor=INK)
     slab_connect(ax, noise_proj, noise_filt, color=SLAB_LINE)
 
     # ---- ADSR lane (bottom) ----
-    x = 6.1
-    adsr_gru = slab(ax, x, adsr_y, 2.1, 1.0, fc=SLAB_ADSR,
-                    label="ADSR GRUs", sublabel="3\u00d7 bidir \u2192 sigmoid",
-                    fontsize=8)
-    # loudness -> adsr (long)
+    x = 6.8
+    adsr_gru = slab(ax, x, adsr_y, 2.3, 1.15, fc=SLAB_ADSR,
+                    label="ADSR GRUs", sublabel="3\u00d7bidir\u2192sig",
+                    fontsize=8.5)
     slab_connect(ax, loud, adsr_gru, side_from="right", side_to="left",
                  rad=-0.22, color=SLAB_LINE)
-    x = 8.9
-    adsr_env = slab(ax, x, adsr_y, 1.7, 1.0, fc=SLAB_ADSR,
-                    label="ADSR env", sublabel="power-fn shape",
-                    fontsize=8)
+    x = 9.6
+    adsr_env = slab(ax, x, adsr_y, 1.9, 1.15, fc=SLAB_ADSR,
+                    label="ADSR env", sublabel="power-fn",
+                    fontsize=8.5)
     slab_connect(ax, adsr_gru, adsr_env, color=SLAB_LINE)
 
     # ---- convergence (right) ----
-    x = 14.3
-    summ = slab(ax, x, mid_y, 2.0, 1.0, fc=SLAB_OUT,
-                label="sum", sublabel="harm + noise", fontsize=8)
-    slab_connect(ax, harm, summ, side_from="bottom", side_to="top",
-                 rad=0.15)
+    x = 15.2
+    summ = slab(ax, x, mid_y, 2.0, 1.15, fc=SLAB_OUT, label="sum",
+                sublabel="harm+noise", fontsize=8.5)
+    slab_connect(ax, harm, summ, side_from="bottom", side_to="top", rad=0.18)
     slab_connect(ax, noise_filt, summ, side_from="right", side_to="left",
-                 rad=0.2, color=SLAB_LINE)
+                 rad=0.22, color=SLAB_LINE)
 
-    final = slab(ax, x, adsr_y, 2.0, 1.0, fc=SLAB_OUT,
-                 label="output", sublabel="signal \u00d7 ADSR",
-                 fontsize=8)
-    slab_connect(ax, summ, final, side_from="bottom", side_to="top",
-                 rad=0.15)
+    final = slab(ax, x, adsr_y, 2.0, 1.15, fc=SLAB_OUT, label="output",
+                 sublabel="sig\u00d7ADSR", fontsize=8.5)
+    slab_connect(ax, summ, final, side_from="bottom", side_to="top", rad=0.18)
     slab_connect(ax, adsr_env, final, side_from="right", side_to="left",
-                 rad=0.0, color=SLAB_LINE)
+                 color=SLAB_LINE)
 
-    # reverb note
-    ax.text(0.2, 0.4,
-            "note: the Reverb module exists in the code but is commented out\n"
-            "in forward() \u2014 the shipped model does not apply reverb.",
-            fontsize=8, color="#b42318", style="italic", va="bottom")
-
-    # legend (lane colors)
+    # legend across the bottom (no title collision)
     legend_items = [
         ("input", SLAB_INPUT), ("encoder / shared", SLAB_ENC),
         ("wavetable path", SLAB_WT), ("noise path", SLAB_NOISE),
         ("ADSR path", SLAB_ADSR), ("output", SLAB_OUT),
     ]
-    lx, ly = 0.4, 8.0
+    lx, ly = 0.4, 0.35
     for i, (name, col) in enumerate(legend_items):
-        rx = lx + (i % 3) * 2.5
-        ry = ly - (i // 3) * 0.4
-        ax.add_patch(plt.Rectangle((rx, ry), 0.25, 0.18,
+        rx = lx + i * 2.7
+        ax.add_patch(plt.Rectangle((rx, ly), 0.28, 0.20,
                                    fc=col, ec=SLAB_EDGE, lw=0.7))
-        ax.text(rx + 0.32, ry + 0.09, name, fontsize=7.5,
-                color=INK, va="center")
+        ax.text(rx + 0.36, ly + 0.10, name, fontsize=8, color=INK,
+                va="center")
+
+    # reverb note, bottom right
+    ax.text(17.9, 0.45,
+            "Reverb module exists in code\nbut is commented out in forward()\n"
+            "\u2014 shipped model applies no reverb",
+            fontsize=7.8, color="#b42318", style="italic",
+            va="center", ha="right")
 
     fig.tight_layout()
     fig.savefig(OUT / "syntheon_architecture_nn.png", dpi=180,

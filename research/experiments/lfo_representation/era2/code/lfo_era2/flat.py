@@ -36,6 +36,7 @@ def construct_flat_assets_from_curves(
     targets: np.ndarray,
     *,
     base_dictionary: np.ndarray | None = None,
+    base_dictionary_size: int = 32,
     residual_layer_count: int,
     width: int,
     backend: BackendPreference = "auto",
@@ -54,14 +55,26 @@ def construct_flat_assets_from_curves(
     if width < 1:
         raise ValueError("width must be positive")
     if base_dictionary is None:
-        base_dictionary = synthetic_base_dictionary(32, target_matrix.shape[1])
+        base_dictionary = _select_observed_atoms(
+            target_matrix,
+            width=base_dictionary_size,
+            backend=backend,
+            chunk_size=chunk_size,
+            include_zero=False,
+        )
 
     base_result = nearest_indices(target_matrix, base_dictionary, backend=backend, chunk_size=chunk_size)
     prefix = np.asarray(base_dictionary, dtype=np.float32)[base_result.indices].copy()
     residual_layers: list[np.ndarray] = []
     for _ in range(residual_layer_count):
         residual = target_matrix - prefix
-        atoms = _select_observed_atoms(residual, width=width, backend=backend, chunk_size=chunk_size)
+        atoms = _select_observed_atoms(
+            residual,
+            width=width,
+            backend=backend,
+            chunk_size=chunk_size,
+            include_zero=True,
+        )
         residual_layers.append(atoms)
         layer_result = nearest_indices(residual, atoms, backend=backend, chunk_size=chunk_size)
         prefix = prefix + atoms[layer_result.indices]
@@ -293,17 +306,31 @@ def _select_observed_atoms(
     width: int,
     backend: BackendPreference,
     chunk_size: int,
+    include_zero: bool = True,
 ) -> np.ndarray:
-    atoms = [np.zeros(residuals.shape[1], dtype=np.float32)]
+    matrix = np.asarray(residuals, dtype=np.float32)
+    if matrix.ndim != 2:
+        raise ValueError("residuals must have shape [rows, resolution]")
+    atoms = []
     selected: set[int] = set()
+    if include_zero:
+        atoms.append(np.zeros(matrix.shape[1], dtype=np.float32))
+    elif len(matrix):
+        center = np.mean(matrix, axis=0, dtype=np.float32)
+        distances = np.mean((matrix - center[None, :]) ** 2, axis=1)
+        first = int(np.argmin(distances))
+        atoms.append(matrix[first].astype(np.float32))
+        selected.add(first)
+    else:
+        atoms.append(np.zeros(matrix.shape[1], dtype=np.float32))
     while len(atoms) < width:
         current = np.stack(atoms).astype(np.float32)
-        result = nearest_indices(residuals, current, backend=backend, chunk_size=chunk_size)
+        result = nearest_indices(matrix, current, backend=backend, chunk_size=chunk_size)
         order = np.argsort(result.losses)[::-1]
         candidate = next((int(index) for index in order if int(index) not in selected), None)
         if candidate is None:
-            atoms.append(np.zeros(residuals.shape[1], dtype=np.float32))
+            atoms.append(np.zeros(matrix.shape[1], dtype=np.float32))
         else:
             selected.add(candidate)
-            atoms.append(residuals[candidate].astype(np.float32))
+            atoms.append(matrix[candidate].astype(np.float32))
     return np.stack(atoms).astype(np.float32)

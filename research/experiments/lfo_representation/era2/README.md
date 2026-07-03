@@ -34,10 +34,61 @@ Run the framework smoke path with:
 python .\research\experiments\lfo_representation\era2\code\run_era2.py smoke-flat
 ```
 
+Run Experiment 10 with the local `py312` environment:
+
+```text
+$env:MKL_THREADING_LAYER='SEQUENTIAL'
+conda run -n py312 python .\research\experiments\lfo_representation\era2\code\run_era2.py run-screen --screen experiment10 --profile quick --backend auto
+```
+
+Estimate the theoretical fixed-grid ceiling before running Experiment 10:
+
+```text
+conda run -n py312 python .\research\experiments\lfo_representation\era2\code\run_era2.py grid-ceiling
+```
+
+Defaults:
+
+```text
+atom_grid_points = 24,36,48,60,72,96,100
+dense_points = 1920
+```
+
+This audit asks how well a fixed `N`-point LFO grid can reproduce the corpus in
+the best case. It changes atom dimensionality, not `D`, `W`, atom selection, or
+model prediction head budget.
+
+`run-screen` prints live status automatically while it runs. The same is true
+when continuing a run:
+
+```text
+conda run -n py312 python .\research\experiments\lfo_representation\era2\code\run_era2.py run-screen --screen experiment10 --profile quick --backend auto --run-dir <run_dir> --resume
+```
+
+Use `--no-monitor` only for scripted runs where stdout should stay quiet.
+
+Run artifacts are written under:
+
+```text
+era2/artifacts/experiment_10/runs/<run_id>/
+```
+
+Attach to an existing run from another terminal:
+
+```text
+conda run -n py312 python .\research\experiments\lfo_representation\era2\code\run_era2.py status --run-dir <run_dir> --watch 5
+```
+
+Regenerate analytics:
+
+```text
+conda run -n py312 python .\research\experiments\lfo_representation\era2\code\run_era2.py analyze --run-dir <run_dir>
+```
+
 Run tests with:
 
 ```text
-python -m unittest discover research\experiments\lfo_representation\era2\tests
+conda run -n py312 python -m unittest discover research\experiments\lfo_representation\era2\tests
 ```
 
 Use a Python environment with NumPy installed. PyTorch/XPU is optional and only
@@ -45,3 +96,7 @@ used by the `auto` backend for larger batched scoring workloads when available.
 
 The smoke path writes generated artifacts under
 [artifacts/smoke_flat/](./artifacts/smoke_flat/).
+
+Experiment 10 runtime paths remain topology-free. Topology labels may appear
+only in analysis-only bucket metrics; they are not model inputs, targets, loss
+fields, decoder lookup keys, or model prediction head budget terms.

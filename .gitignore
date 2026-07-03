@@ -12,6 +12,7 @@ htmlcov/
 # Local datasets and generated research outputs
 datasets/
 research/experiments/neural_proxy/generated_midi/
+research/experiments/lfo_representation/era2/artifacts/
 
 # Local agent scratchpad
 .agents/

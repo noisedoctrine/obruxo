@@ -130,32 +130,26 @@ reason for us to look elsewhere for that job.
 
 ## The architecture in brief
 
-Salvaged from the generated report (these parts were accurate) and trimmed hard.
+The outer pipeline is simple enough that text carries it:
 
 ```text
   audio.wav (16 kHz, fixed 4 s)
       │
       ├──► CREPE (large) ──► f0
       ├──► A-weighted loudness
+      ├──► MFCC (30 coeffs)
       │
       ▼
   ┌─────────────────────────────────────────┐
   │  Inferencer   (WTSv2 / Diff-WTS)        │
-  │                                          │
-  │   load_model()                           │
-  │      └─ 10 wavetables, 100 harmonics,    │
-  │         65 bands, 30 MFCC, hidden 256    │
-  │   inference()                            │
-  │      └─ differentiable wavetable synth + │
-  │         attention mixing + differentiable│
-  │         ADSR + learnable reverb IR       │
-  │   convert_to_preset()                    │
+  │   forward() → reconstructs audio from   │
+  │   pitch/loudness/Mfcc + a wavetable     │
+  │   extracted from the input audio        │
   └─────────────────────────────────────────┘
       │
-      ▼  parameter dict (raw model outputs)
+      ▼  parameter dict (wavetable(s) + ADSR + attention)
   ┌─────────────────────────────────────────┐
   │  Converter   (Vital-specific)            │
-  │                                          │
   │   Vital scaling:  attack/decay = quartic │
   │                    sustain    = linear   │
   │   wavetables → Base64                    │
@@ -165,6 +159,13 @@ Salvaged from the generated report (these parts were accurate) and trimmed hard.
       ▼
   preset.vital
 ```
+
+Inside the Inferencer, `WTSv2.forward()` has real branching — three input
+features fan into a shared encoder, a wavetable path and a noise path split off
+the hidden state, an ADSR path runs in parallel off loudness, and they reconverge.
+That topology is what the diagram below is for:
+
+![WTSv2 architecture](images/syntheon_architecture_nn.png)
 
 A few facts worth keeping:
 
@@ -181,6 +182,17 @@ A few facts worth keeping:
   scaling, sustain is linear. Without applying this, inferred values don't map
   to audible changes. Vital's source (`synth_parameters.cpp`, `value_bridge.h`)
   is the reference.
+- **Reverb is dead code in the shipped model.** A learnable reverb module
+  (`Reverb`) is defined, but the call in `forward()` is commented out
+  (`# signal = self.reverb(signal)`). So despite what the generated report
+  claimed, the shipped model applies no reverb. Worth noting because it's the
+  kind of thing that looks like a feature until you read the source.
+- **Wavetable count: train vs. inference disagree.** The training config sets
+  `n_wavetables: 10`, but the shipped inference path loads the model with
+  `num_wavetables=1` and `preload_wt=True` (i.e. one wavetable extracted from
+  the input audio), and the converter writes `N_WAVETABLES = 1`. So the
+  "attention over a bank of wavetables" idea from the Differentiable Wavetable
+  Synthesis paper is effectively collapsed to a single table at inference time.
 
 ## Inherit / Reject / Extend
 
