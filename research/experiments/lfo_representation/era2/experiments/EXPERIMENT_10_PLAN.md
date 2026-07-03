@@ -1,133 +1,177 @@
-# Experiment 10 Plan: Subdivision And Direct Grid Audit
+# Experiment 10 Plan: Control-Point X Grid Audit
 
 ## Summary
 
-Experiment 10 is reset. The previous raw point-grid version overloaded `N` as
-both point count and grid quality, then accidentally tested inclusive grid slots
-instead of the subdivision logic that mattered in Era 1.
-
 Experiment 10 is a standalone corpus/grid audit. It is not a normal Era 2 model
-experiment, and the shared model-runner CLI should not grow interfaces just to
-support it.
+experiment, and it should not shape the shared model-runner interface.
 
-The corrected experiment keeps three questions separate:
-
-1. raw point-count coverage;
-2. subdivision coverage of original x boundaries;
-3. Era-1-style direct sampled-grid reconstruction.
-
-The processed LFO corpus remains the source:
+The central question is now:
 
 ```text
-raw Vital point set + occurrence count + dense 1920 reference
+How well can a fixed x-grid place the original ordered Vital LFO control-point x positions?
 ```
 
-## Renderer Contract
+This is not a curve reconstruction test. It ignores y values and does not draw
+straight lines, Beziers, power curves, or any other segment between predicted
+points.
 
-Reference curves are rendered from the original Vital-ish point representation:
+## Naming Contract
 
-- original x/y points;
-- original powers;
-- original smooth flag;
-- duplicate x positions preserved.
+Use point counts as the public experiment variable:
 
-For raw-point and subdivision questions, the renderer must apply the true
-segment shape. It must not silently replace every segment with linear
-interpolation.
+```text
+grid_point_count = number of inclusive x-grid points
+subdivision_count = grid_point_count - 1
+```
 
-Direct sampled grids are different. A direct grid stores only y-values sampled
-at fixed phases, so its decoder is periodic linear interpolation between those
-y-values. That is not a claim about the source shape; it is the decoder contract
-for the direct y-grid representation.
+`subdivision_count` is inferred. Do not use it as the primary row label or CLI
+argument.
+
+`W` is reserved for residual-layer atom choices in Era 2 model experiments.
+Experiment 10 must not use `W` for grid size.
+
+Factor language applies to the inferred subdivision count:
+
+```text
+grid_point_count = 97
+subdivision_count = 96
+96 is divisible by 2 and 3
+```
 
 ## Questions
 
-### 1. Point-count coverage
+### 1. Source Point-Count Frequency
 
-For each point budget:
+Vital LFOs already have an upper bound of 100 points, so "coverage under 100"
+is not useful. The useful corpus fact is the frequency by source point count,
+reported two ways:
 
-```text
-24, 36, 48, 60, 72, 96, 100
-```
+- deduplicated LFO corpus: each unique raw LFO shape counts once;
+- LFO corpus: each unique shape is weighted by its occurrence count.
 
-report how many raw LFO shapes already fit:
-
-```text
-raw_num_points <= point_budget
-```
-
-This is corpus accounting only. Do not attach RMSE to over-budget shapes by
-silently decimating them.
-
-### 2. Subdivision boundary coverage
-
-For each subdivision count:
+Output:
 
 ```text
-24,25,32,36,37,40,48,49,60,61,64,72,73,80,96,97,100
+point_count_frequency.csv
+plots/experiment10_point_count_frequency.png
 ```
 
-test how close each original interior x boundary is to the nearest grid point:
+### 2. Control-Point X Placement
+
+For each `grid_point_count`, infer:
 
 ```text
-nearest(k / subdivisions)
+subdivision_count = grid_point_count - 1
 ```
 
-Report exact-hit coverage and nearest-distance statistics. This directly tests
-the Era 1 claim that musically composite grids, especially multiples of 3, cover
-real LFO boundaries better.
-
-### 3. Direct sampled-grid reconstruction
-
-Replicate the Era 1 direct-grid idea on the processed corpus:
+Then score each true ordered control point:
 
 ```text
-sample true raw curve at i / W for i in 0..W-1
-store W y-values
-decode by periodic linear interpolation
-evaluate against true raw curve at 1920 samples
+x_pred_i = nearest fixed grid point to x_true_i
+error_i = abs(x_pred_i - x_true_i)
 ```
 
-This answers whether a factor-of-3 direct grid can beat or match a higher
-non-factor-of-3 grid, rather than merely beating a smaller grid.
-
-The explicit comparisons are:
+For uniform grids, the fixed grid points are:
 
 ```text
-24 vs 25
-24 vs 32
-36 vs 37
-36 vs 40
-48 vs 49
-48 vs 64
-60 vs 61
-60 vs 64
-72 vs 73
-72 vs 80
-96 vs 97
-96 vs 100
+k / subdivision_count
 ```
 
-A factor-of-3 grid only gets credit if it beats or matches the higher-capacity
-non-factor-of-3 comparator on direct-grid P95 RMSE.
+Repeated grid points are allowed because Vital LFOs can use duplicate x
+positions for discontinuities.
+
+Report all-point and interior-only statistics. Interior-only stats matter most
+because endpoints at 0 and 1 are usually fixed and can otherwise make the grid
+look artificially good.
+
+Also report the fraction of LFOs whose maximum control-point x error is at most
+0.01:
+
+```text
+max_i(abs(x_pred_i - x_true_i)) <= 0.01
+```
+
+Report that fraction two ways:
+
+- deduplicated LFO corpus;
+- occurrence-weighted LFO corpus.
+
+Output:
+
+```text
+control_point_x_summary.csv
+plots/experiment10_control_point_x_p95.png
+plots/experiment10_lfo_pass_rate_0p01.png
+```
+
+### 3. Global Non-Uniform Grid
+
+Add fixed global non-uniform x-grids as a baseline against uniform grids. These
+grids are learned offline from corpus control-point x positions and stored in
+the decoder. The deployed model would still predict only a grid slot; it would
+not predict the grid locations.
+
+Report two learned global grids:
+
+- `global_quantile / deduplicated`: learned from unique LFO shapes with equal
+  point weight;
+- `global_quantile / occurrence_weighted`: learned from point positions weighted
+  by LFO occurrence count.
+
+Output:
+
+```text
+global_nonuniform_grids.json
+plots/experiment10_nonuniform_delta.png
+```
+
+### 4. Factor Checks
+
+Compare grid point counts whose inferred subdivision count is divisible by 3
+against higher grid point counts whose inferred subdivision count is not
+divisible by 3.
+
+Example:
+
+```text
+25 grid points -> 24 subdivisions
+26 grid points -> 25 subdivisions
+33 grid points -> 32 subdivisions
+```
+
+The comparison should be read as:
+
+```text
+Does a factor-3 subdivision grid beat or match a higher point-count non-factor-3 grid?
+```
+
+Output:
+
+```text
+factor3_grid_point_comparisons.csv
+```
 
 ## Outputs
 
 Experiment 10 writes:
 
 ```text
-research/experiments/lfo_representation/era2/artifacts/experiment_10/subdivision_grid/
+research/experiments/lfo_representation/era2/artifacts/experiment_10/control_point_x_grid/
 ```
 
 Expected files:
 
 - `manifest.json`
-- `point_budget_summary.csv`
-- `subdivision_summary.csv`
-- `direct_grid_summary.csv`
-- `factor3_comparisons.csv`
+- `point_count_frequency.csv`
+- `control_point_x_summary.csv`
+- `global_nonuniform_grids.json`
+- `factor3_grid_point_comparisons.csv`
 - `summary.csv`
-- `EXPERIMENT_10_SUBDIVISION_GRID_REPORT.md`
+- `EXPERIMENT_10_CONTROL_POINT_X_GRID_REPORT.md`
+- `plots/experiment10_point_count_frequency.png`
+- `plots/experiment10_control_point_x_p95.png`
+- `plots/experiment10_lfo_pass_rate_0p01.png`
+- `plots/experiment10_nonuniform_delta.png`
 
 ## Non-Goals
 
@@ -135,20 +179,17 @@ Experiment 10 does not:
 
 - choose residual atoms;
 - calculate model prediction head budget;
-- decide Experiment 11 rows;
 - test runtime topology;
-- decimate raw point sets;
-- optimize y-values by least squares.
+- predict y values;
+- render curves between predicted points;
+- evaluate sampled y-grid reconstruction;
+- test per-LFO adaptive grids.
 
-The deprecated least-squares fixed-basis preflight should not be used for
-`96` vs `100` decisions.
+Per-LFO adaptive grids are a different representation family because they
+require additional runtime predictions.
 
 ## Command
 
 ```text
 conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment10_grid_audit.py
 ```
-
-The command is standalone by design. It may use the processed corpus and shared
-LFO parsing/rendering utilities, but it does not define the Era 2 runtime model
-interface.

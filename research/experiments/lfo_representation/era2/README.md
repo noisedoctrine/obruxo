@@ -47,7 +47,7 @@ Use `--no-capture-output` for long-running commands. Plain `conda run` can
 buffer child-process stdout until the command exits, which makes progress
 checkpoints look like they are not printing.
 
-Run Experiment 10, the standalone subdivision/direct-grid audit:
+Run Experiment 10, the standalone control-point x-grid audit:
 
 ```text
 conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment10_grid_audit.py
@@ -56,16 +56,19 @@ conda run --no-capture-output -n py312 python .\research\experiments\lfo_represe
 Defaults:
 
 ```text
-point_budgets = 24,36,48,60,72,96,100
-subdivisions = 24,25,32,36,37,40,48,49,60,61,64,72,73,80,96,97,100
-dense_resolution = 1920
+grid_point_counts = 24,25,26,32,33,36,37,38,40,41,48,49,50,60,61,62,64,65,72,73,74,80,81,96,97,98,100
 ```
 
-This experiment reports raw point-count coverage, subdivision coverage of
-original x boundaries, and Era-1-style direct sampled-grid reconstruction. It
-tests whether factor-of-3 grids beat or match higher non-factor-of-3 grids
-rather than only beating smaller grids. It is intentionally outside the shared
-Era 2 model-runner CLI.
+This experiment reports source point-count frequency and ordered control-point
+x placement. The public row variable is `grid_point_count`; the inferred
+`subdivision_count` is always `grid_point_count - 1`. The metric scores x-axis
+placement only, so y values and segment connection rules are intentionally out
+of scope. It also reports the fraction of LFOs whose maximum control-point x
+error is at most `0.01`, plus fixed global non-uniform quantile grids learned
+offline from deduplicated and occurrence-weighted corpus x positions. `W`
+remains reserved for residual-layer atom choices in model experiments.
+The generated markdown report embeds plots under
+`era2/artifacts/experiment_10/control_point_x_grid/plots/`.
 
 Run Experiment 11, the topology-free flat-categorical residual screen:
 

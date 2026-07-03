@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Standalone Experiment 10 subdivision and direct-grid LFO audit."""
+"""Standalone Experiment 10 control-point x-grid audit."""
 
 from __future__ import annotations
 
@@ -12,37 +12,62 @@ from typing import Any, Callable
 
 import numpy as np
 
-from lfo_era2.dataset import LfoShape, power_scale
-from lfo_era2.metrics import rmse_per_curve
+from lfo_era2.dataset import LfoShape
 from lfo_era2.processed_corpus import (
     DEFAULT_CORPUS_DIR,
-    DEFAULT_DENSE_RESOLUTION,
     DEFAULT_METADATA,
     build_lfo_corpus,
     load_processed_shape_corpus,
 )
 
 
-DEFAULT_POINT_BUDGETS = (24, 36, 48, 60, 72, 96, 100)
-DEFAULT_SUBDIVISIONS = (24, 25, 32, 36, 37, 40, 48, 49, 60, 61, 64, 72, 73, 80, 96, 97, 100)
-DEFAULT_FACTOR3_COMPARISONS = (
-    (24, 25),
-    (24, 32),
-    (36, 37),
-    (36, 40),
-    (48, 49),
-    (48, 64),
-    (60, 61),
-    (60, 64),
-    (72, 73),
-    (72, 80),
-    (96, 97),
-    (96, 100),
+DEFAULT_GRID_POINT_COUNTS = (
+    24,
+    25,
+    26,
+    32,
+    33,
+    36,
+    37,
+    38,
+    40,
+    41,
+    48,
+    49,
+    50,
+    60,
+    61,
+    62,
+    64,
+    65,
+    72,
+    73,
+    74,
+    80,
+    81,
+    96,
+    97,
+    98,
+    100,
+)
+DEFAULT_FACTOR3_GRID_POINT_COMPARISONS = (
+    (25, 26),
+    (25, 33),
+    (37, 38),
+    (37, 41),
+    (49, 50),
+    (49, 65),
+    (61, 62),
+    (61, 65),
+    (73, 74),
+    (73, 81),
+    (97, 98),
 )
 VITAL_MAX_POINTS = 100
-BOUNDARY_EXACT_TOLERANCE = 1e-6
+EXACT_TOLERANCE = 1e-6
+CONTROL_POINT_X_PASS_TOLERANCE = 0.01
 ERA2_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_OUTPUT_DIR = ERA2_ROOT / "artifacts" / "experiment_10" / "subdivision_grid"
+DEFAULT_OUTPUT_DIR = ERA2_ROOT / "artifacts" / "experiment_10" / "control_point_x_grid"
 
 
 def parser() -> argparse.ArgumentParser:
@@ -51,20 +76,11 @@ def parser() -> argparse.ArgumentParser:
     root.add_argument("--corpus-dir", type=Path, default=DEFAULT_CORPUS_DIR)
     root.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     root.add_argument(
-        "--point-budgets",
-        "--point-counts",
-        dest="point_budgets",
-        default=",".join(str(value) for value in DEFAULT_POINT_BUDGETS),
-        help="comma-separated raw point-count budgets",
+        "--grid-point-counts",
+        dest="grid_point_counts",
+        default=",".join(str(value) for value in DEFAULT_GRID_POINT_COUNTS),
+        help="comma-separated inclusive x-grid point counts",
     )
-    root.add_argument(
-        "--subdivisions",
-        "--atom-grid-points",
-        dest="subdivisions",
-        default=",".join(str(value) for value in DEFAULT_SUBDIVISIONS),
-        help="comma-separated x-grid subdivision counts / direct-grid widths",
-    )
-    root.add_argument("--dense-resolution", "--dense-points", dest="dense_resolution", type=int, default=DEFAULT_DENSE_RESOLUTION)
     root.add_argument("--include-inactive", action="store_true")
     root.add_argument("--no-build-corpus", action="store_true")
     root.add_argument("--force-rebuild-corpus", action="store_true")
@@ -77,15 +93,13 @@ def main(argv: list[str] | None = None) -> None:
         metadata_path=args.metadata,
         corpus_dir=args.corpus_dir,
         output_dir=args.output_dir,
-        point_budgets=parse_counts(args.point_budgets),
-        subdivisions=parse_counts(args.subdivisions),
-        dense_resolution=args.dense_resolution,
+        grid_point_counts=parse_counts(args.grid_point_counts),
         active_only=not args.include_inactive,
         build_corpus_if_missing=not args.no_build_corpus,
         force_rebuild_corpus=args.force_rebuild_corpus,
         progress=lambda message: print(message, flush=True),
     )
-    print(f"Wrote Experiment 10 grid-audit results to {result['output_dir']}", flush=True)
+    print(f"Wrote Experiment 10 x-grid audit results to {result['output_dir']}", flush=True)
     print(f"summary={result['summary']}", flush=True)
     print(f"report={result['report']}", flush=True)
 
@@ -95,9 +109,7 @@ def run_experiment10_grid_audit(
     corpus_dir: Path = DEFAULT_CORPUS_DIR,
     metadata_path: Path = DEFAULT_METADATA,
     output_dir: Path = DEFAULT_OUTPUT_DIR,
-    point_budgets: tuple[int, ...] = DEFAULT_POINT_BUDGETS,
-    subdivisions: tuple[int, ...] = DEFAULT_SUBDIVISIONS,
-    dense_resolution: int = DEFAULT_DENSE_RESOLUTION,
+    grid_point_counts: tuple[int, ...] = DEFAULT_GRID_POINT_COUNTS,
     active_only: bool = True,
     build_corpus_if_missing: bool = True,
     force_rebuild_corpus: bool = False,
@@ -113,85 +125,108 @@ def run_experiment10_grid_audit(
         build_lfo_corpus(
             metadata_path=metadata_path,
             output_dir=corpus_dir,
-            dense_resolution=dense_resolution,
             force=force_rebuild_corpus,
             progress=progress,
         )
 
     if progress:
-        progress(f"experiment10: loading processed LFO shape corpus resolution={dense_resolution}")
-    corpus = load_processed_shape_corpus(
-        corpus_dir,
-        resolution=dense_resolution,
-        active_only=active_only,
-        mmap=True,
-    )
+        progress("experiment10: loading processed LFO shape corpus")
+    corpus = load_processed_shape_corpus(corpus_dir, active_only=active_only, mmap=True)
     if not corpus.shapes:
         raise ValueError("Experiment 10 requires at least one LFO shape")
 
-    reference = np.asarray(corpus.curves, dtype=np.float32)
     weights = np.asarray(corpus.active_occurrence_count if active_only else corpus.occurrence_count, dtype=np.float64)
-    point_lengths = np.asarray([len(shape.points) for shape in corpus.shapes], dtype=np.int32)
-    point_rows = _point_budget_rows(point_lengths, weights, point_budgets=point_budgets)
-    subdivision_rows = []
-    direct_rows = []
-    for index, subdivisions_count in enumerate(subdivisions, start=1):
+    source_point_counts = np.asarray([len(shape.points) for shape in corpus.shapes], dtype=np.int32)
+    point_frequency_rows = _point_count_frequency_rows(source_point_counts, weights)
+    control_rows = []
+    learned_grid_records = []
+    for index, grid_point_count in enumerate(grid_point_counts, start=1):
         if progress:
-            progress(f"experiment10: [{index}/{len(subdivisions)}] subdivisions={subdivisions_count} starting")
-        subdivision_rows.append(
-            _subdivision_row(
+            progress(f"experiment10: [{index}/{len(grid_point_counts)}] grid_point_count={grid_point_count} starting")
+        uniform_grid = _uniform_grid(grid_point_count)
+        rows_for_count = [
+            _control_point_x_row(
                 corpus.shapes,
                 weights,
-                point_lengths,
-                subdivisions_count=subdivisions_count,
+                grid_point_count=grid_point_count,
+                grid_kind="uniform",
+                grid_learning_weighting="none",
+                grid_points=uniform_grid,
             )
-        )
-        direct_rows.append(
-            _direct_grid_row(
+        ]
+        for weighting in ("deduplicated", "occurrence_weighted"):
+            learned_grid = _global_quantile_grid(
                 corpus.shapes,
-                reference,
                 weights,
-                width=subdivisions_count,
-                dense_resolution=dense_resolution,
-                progress=progress,
+                grid_point_count=grid_point_count,
+                weighting=weighting,
             )
-        )
+            learned_grid_records.append(
+                {
+                    "grid_kind": "global_quantile",
+                    "grid_learning_weighting": weighting,
+                    "grid_point_count": int(grid_point_count),
+                    "grid_points": [float(value) for value in learned_grid],
+                }
+            )
+            rows_for_count.append(
+                _control_point_x_row(
+                    corpus.shapes,
+                    weights,
+                    grid_point_count=grid_point_count,
+                    grid_kind="global_quantile",
+                    grid_learning_weighting=weighting,
+                    grid_points=learned_grid,
+                )
+            )
+        control_rows.extend(rows_for_count)
+        uniform_row = rows_for_count[0]
         if progress:
             progress(
                 "experiment10: "
-                f"[{index}/{len(subdivisions)}] subdivisions={subdivisions_count} done "
-                f"boundary_exact={subdivision_rows[-1]['boundary_exact_rate_weighted']:.4f} "
-                f"direct_p95={direct_rows[-1]['direct_grid_p95_rmse_weighted']:.8f}"
+                f"[{index}/{len(grid_point_counts)}] grid_point_count={grid_point_count} "
+                f"subdivision_count={uniform_row['subdivision_count']} "
+                f"uniform_interior_p95={uniform_row['control_point_x_p95_abs_error_interior_occurrence_weighted']:.8f}"
             )
-
-    tables = {
-        "point_budget": point_rows,
-        "subdivision": subdivision_rows,
-        "direct_grid": direct_rows,
-        "factor3": _factor3_rows(subdivision_rows, direct_rows, comparisons=DEFAULT_FACTOR3_COMPARISONS),
-        "summary": _summary_rows(subdivision_rows, direct_rows),
-    }
+    factor3_rows = _factor3_grid_point_rows(control_rows, comparisons=DEFAULT_FACTOR3_GRID_POINT_COMPARISONS)
 
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    _write_csv(output_dir / "point_budget_summary.csv", tables["point_budget"])
-    _write_csv(output_dir / "subdivision_summary.csv", tables["subdivision"])
-    _write_csv(output_dir / "direct_grid_summary.csv", tables["direct_grid"])
-    _write_csv(output_dir / "factor3_comparisons.csv", tables["factor3"])
-    _write_csv(output_dir / "summary.csv", tables["summary"])
-    (output_dir / "EXPERIMENT_10_SUBDIVISION_GRID_REPORT.md").write_text(_report(tables), encoding="utf-8")
+    _write_csv(output_dir / "point_count_frequency.csv", point_frequency_rows)
+    _write_csv(output_dir / "control_point_x_summary.csv", control_rows)
+    _write_csv(output_dir / "factor3_grid_point_comparisons.csv", factor3_rows)
+    _write_csv(output_dir / "summary.csv", control_rows)
+    (output_dir / "global_nonuniform_grids.json").write_text(
+        json.dumps(learned_grid_records, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    plot_paths = _write_plots(
+        output_dir / "plots",
+        point_frequency_rows=point_frequency_rows,
+        control_rows=control_rows,
+    )
+    report = _report(
+        point_frequency_rows=point_frequency_rows,
+        control_rows=control_rows,
+        factor3_rows=factor3_rows,
+        plot_paths=plot_paths,
+    )
+    report_path = output_dir / "EXPERIMENT_10_CONTROL_POINT_X_GRID_REPORT.md"
+    report_path.write_text(report, encoding="utf-8")
     manifest = {
         "experiment_id": "experiment_10",
-        "experiment_name": "subdivision_grid_and_direct_grid_audit",
+        "experiment_name": "control_point_x_grid_audit",
         "corpus_dir": str(corpus_dir),
         "corpus_manifest": corpus.manifest,
-        "point_budgets": list(point_budgets),
-        "subdivisions": list(subdivisions),
-        "factor3_comparisons": [list(pair) for pair in DEFAULT_FACTOR3_COMPARISONS],
-        "dense_resolution": int(dense_resolution),
+        "grid_point_counts": list(grid_point_counts),
+        "factor3_grid_point_comparisons": [list(pair) for pair in DEFAULT_FACTOR3_GRID_POINT_COMPARISONS],
         "active_only": bool(active_only),
-        "method": "point_count_coverage_plus_subdivision_boundary_coverage_plus_direct_grid_reproduction",
-        "renderer_contract": "Raw shape references and x-boundary checks use Vital-ish power/smooth rendering; direct sampled grids store only y-values and decode with periodic linear interpolation.",
+        "method": "point_count_frequency_plus_control_point_x_grid_error",
+        "grid_count_contract": "Experiment 10 varies grid_point_count. subdivision_count is inferred as grid_point_count - 1. W is reserved for residual-layer atom choices.",
+        "control_point_x_contract": "Control-point placement is evaluated on x only. For each true ordered control point, the predicted x is the nearest point in the fixed grid; y is not scored and no curve is rendered.",
+        "pass_rate_contract": "lfo_all_points_within_0p01_* is the fraction of LFOs whose maximum control-point x error is <= 0.01.",
+        "nonuniform_grid_contract": "global_quantile grids are fixed offline-learned decoder grids. They do not require the deployed model to predict grid locations.",
+        "report_plots": plot_paths,
         "standalone_note": "Experiment 10 is intentionally outside the shared Era 2 model-runner CLI.",
         "elapsed_seconds": time.perf_counter() - started,
     }
@@ -201,199 +236,250 @@ def run_experiment10_grid_audit(
     return {
         "output_dir": str(output_dir),
         "summary": str(output_dir / "summary.csv"),
-        "point_budget_summary": str(output_dir / "point_budget_summary.csv"),
-        "subdivision_summary": str(output_dir / "subdivision_summary.csv"),
-        "direct_grid_summary": str(output_dir / "direct_grid_summary.csv"),
-        "factor3_comparisons": str(output_dir / "factor3_comparisons.csv"),
-        "report": str(output_dir / "EXPERIMENT_10_SUBDIVISION_GRID_REPORT.md"),
+        "point_count_frequency": str(output_dir / "point_count_frequency.csv"),
+        "control_point_x_summary": str(output_dir / "control_point_x_summary.csv"),
+        "factor3_grid_point_comparisons": str(output_dir / "factor3_grid_point_comparisons.csv"),
+        "global_nonuniform_grids": str(output_dir / "global_nonuniform_grids.json"),
+        "plots": {key: str(output_dir / relative_path) for key, relative_path in plot_paths.items()},
+        "report": str(report_path),
         "manifest": manifest,
-        "rows": tables["summary"],
+        "rows": control_rows,
     }
 
 
-def _point_budget_rows(
-    point_lengths: np.ndarray,
-    weights: np.ndarray,
-    *,
-    point_budgets: tuple[int, ...],
-) -> list[dict[str, Any]]:
+def _point_count_frequency_rows(point_counts: np.ndarray, weights: np.ndarray) -> list[dict[str, Any]]:
     rows = []
-    total_weight = float(np.sum(weights))
-    for budget in point_budgets:
-        within = point_lengths <= budget
-        within_weight = float(np.sum(weights[within]))
+    unique_total = int(len(point_counts))
+    occurrence_total = float(np.sum(weights))
+    cumulative_unique = 0
+    cumulative_occurrence = 0.0
+    for source_point_count in sorted(int(value) for value in np.unique(point_counts)):
+        mask = point_counts == source_point_count
+        deduplicated_count = int(np.sum(mask))
+        occurrence_count = float(np.sum(weights[mask]))
+        cumulative_unique += deduplicated_count
+        cumulative_occurrence += occurrence_count
         rows.append(
             {
-                "point_budget": int(budget),
-                "unique_shape_count": int(len(point_lengths)),
-                "occurrence_weight_total": total_weight,
-                "within_point_budget_unique": int(np.sum(within)),
-                "within_point_budget_weighted": within_weight,
-                "over_point_budget_unique": int(np.sum(~within)),
-                "over_point_budget_weighted": float(np.sum(weights[~within])),
-                "point_budget_coverage_unique": float(np.mean(within)) if len(within) else 0.0,
-                "point_budget_coverage_weighted": within_weight / total_weight if total_weight else 0.0,
-                "max_source_point_count": int(np.max(point_lengths)) if len(point_lengths) else 0,
+                "source_point_count": source_point_count,
+                "deduplicated_lfo_count": deduplicated_count,
+                "deduplicated_lfo_fraction": deduplicated_count / unique_total if unique_total else 0.0,
+                "deduplicated_lfo_cumulative_fraction": cumulative_unique / unique_total if unique_total else 0.0,
+                "lfo_corpus_occurrence_count": occurrence_count,
+                "lfo_corpus_occurrence_fraction": occurrence_count / occurrence_total if occurrence_total else 0.0,
+                "lfo_corpus_cumulative_fraction": cumulative_occurrence / occurrence_total if occurrence_total else 0.0,
             }
         )
     return rows
 
 
-def _subdivision_row(
+def _uniform_grid(grid_point_count: int) -> np.ndarray:
+    if grid_point_count < 2:
+        raise ValueError("grid_point_count must be at least 2")
+    return np.linspace(0.0, 1.0, int(grid_point_count), dtype=np.float64)
+
+
+def _global_quantile_grid(
     shapes: tuple[LfoShape, ...],
     weights: np.ndarray,
-    point_lengths: np.ndarray,
     *,
-    subdivisions_count: int,
-) -> dict[str, Any]:
-    distances = []
-    distance_weights = []
-    exact_weights = []
-    for shape, weight in zip(shapes, weights):
+    grid_point_count: int,
+    weighting: str,
+) -> np.ndarray:
+    if grid_point_count < 2:
+        raise ValueError("grid_point_count must be at least 2")
+    if grid_point_count == 2:
+        return np.asarray([0.0, 1.0], dtype=np.float64)
+    values = []
+    value_weights = []
+    for shape, occurrence_weight in zip(shapes, weights):
         interior = shape.points[:, 0]
         interior = interior[(interior > 0.0) & (interior < 1.0)]
         if not len(interior):
             continue
-        nearest_index = np.rint(interior * subdivisions_count)
-        nearest = np.clip(nearest_index / subdivisions_count, 0.0, 1.0)
-        distance = np.abs(interior - nearest)
-        distances.append(distance)
-        distance_weights.append(np.full(len(distance), float(weight), dtype=np.float64))
-        exact_weights.append(np.where(distance <= BOUNDARY_EXACT_TOLERANCE, float(weight), 0.0))
-    if distances:
-        all_distances = np.concatenate(distances)
-        all_weights = np.concatenate(distance_weights)
-        all_exact_weights = np.concatenate(exact_weights)
-    else:
-        all_distances = np.asarray([], dtype=np.float64)
-        all_weights = np.asarray([], dtype=np.float64)
-        all_exact_weights = np.asarray([], dtype=np.float64)
-    total_boundary_weight = float(np.sum(all_weights))
-    vital_eligible = point_lengths <= VITAL_MAX_POINTS
-    vital_weight = float(np.sum(weights[vital_eligible]))
-    return {
-        "subdivisions": int(subdivisions_count),
-        "inclusive_grid_slots": int(subdivisions_count + 1),
-        "direct_grid_nodes": int(subdivisions_count),
-        "divisible_by_3": bool(subdivisions_count % 3 == 0),
-        "divisible_by_5": bool(subdivisions_count % 5 == 0),
-        "fits_100_direct_grid_nodes": bool(subdivisions_count <= VITAL_MAX_POINTS),
-        "fits_100_inclusive_slots": bool(subdivisions_count + 1 <= VITAL_MAX_POINTS),
-        "vital_point_coverage_unique": float(np.mean(vital_eligible)) if len(vital_eligible) else 0.0,
-        "vital_point_coverage_weighted": vital_weight / float(np.sum(weights)) if np.sum(weights) else 0.0,
-        "boundary_occurrence_weight": total_boundary_weight,
-        "boundary_exact_weighted": float(np.sum(all_exact_weights)),
-        "boundary_exact_rate_weighted": float(np.sum(all_exact_weights) / total_boundary_weight) if total_boundary_weight else 1.0,
-        "boundary_nearest_dx_mean_weighted": _weighted_mean(all_distances, all_weights),
-        "boundary_nearest_dx_median_weighted": _weighted_quantile(all_distances, all_weights, 0.5),
-        "boundary_nearest_dx_p95_weighted": _weighted_quantile(all_distances, all_weights, 0.95),
-        "boundary_nearest_dx_p99_weighted": _weighted_quantile(all_distances, all_weights, 0.99),
-        "boundary_nearest_dx_max": float(np.max(all_distances)) if len(all_distances) else 0.0,
-    }
+        values.append(interior)
+        if weighting == "deduplicated":
+            value_weights.append(np.ones(len(interior), dtype=np.float64))
+        elif weighting == "occurrence_weighted":
+            value_weights.append(np.full(len(interior), float(occurrence_weight), dtype=np.float64))
+        else:
+            raise ValueError(f"unsupported nonuniform grid weighting: {weighting}")
+    if not values:
+        return _uniform_grid(grid_point_count)
+    all_values = np.concatenate(values)
+    all_weights = np.concatenate(value_weights)
+    interior_count = grid_point_count - 2
+    quantiles = np.arange(1, interior_count + 1, dtype=np.float64) / float(interior_count + 1)
+    grid = np.concatenate(
+        [
+            np.asarray([0.0], dtype=np.float64),
+            np.asarray([_weighted_quantile(all_values, all_weights, float(q)) for q in quantiles], dtype=np.float64),
+            np.asarray([1.0], dtype=np.float64),
+        ]
+    )
+    return _expand_to_unique_grid_points(grid, grid_point_count)
 
 
-def _direct_grid_row(
+def _expand_to_unique_grid_points(grid: np.ndarray, grid_point_count: int) -> np.ndarray:
+    rounded = np.round(np.clip(np.asarray(grid, dtype=np.float64), 0.0, 1.0), 12)
+    unique = sorted(set(float(value) for value in rounded) | {0.0, 1.0})
+    while len(unique) < grid_point_count:
+        gaps = [(unique[index + 1] - unique[index], index) for index in range(len(unique) - 1)]
+        _, gap_index = max(gaps, key=lambda item: item[0])
+        midpoint = 0.5 * (unique[gap_index] + unique[gap_index + 1])
+        unique.insert(gap_index + 1, midpoint)
+    if len(unique) > grid_point_count:
+        interior = [value for value in unique if value not in {0.0, 1.0}]
+        keep = max(0, grid_point_count - 2)
+        quantile_indices = np.linspace(0, max(0, len(interior) - 1), keep).round().astype(int) if keep else []
+        unique = [0.0] + [interior[int(index)] for index in quantile_indices] + [1.0]
+    return np.asarray(sorted(unique), dtype=np.float64)
+
+
+def _nearest_grid_distances(values: np.ndarray, grid_points: np.ndarray) -> np.ndarray:
+    values = np.asarray(values, dtype=np.float64)
+    grid_points = np.asarray(grid_points, dtype=np.float64)
+    right = np.searchsorted(grid_points, values, side="left")
+    right = np.clip(right, 0, len(grid_points) - 1)
+    left = np.clip(right - 1, 0, len(grid_points) - 1)
+    return np.minimum(np.abs(values - grid_points[left]), np.abs(values - grid_points[right]))
+
+
+def _control_point_x_row(
     shapes: tuple[LfoShape, ...],
-    reference: np.ndarray,
     weights: np.ndarray,
     *,
-    width: int,
-    dense_resolution: int,
-    progress: Callable[[str], None] | None,
+    grid_point_count: int,
+    grid_kind: str,
+    grid_learning_weighting: str,
+    grid_points: np.ndarray,
 ) -> dict[str, Any]:
-    started = time.perf_counter()
-    grid_phase = np.arange(width, dtype=np.float64) / float(width)
-    eval_phase = np.arange(dense_resolution, dtype=np.float64) / float(dense_resolution)
-    reconstructed = np.empty_like(reference, dtype=np.float32)
-    step = max(1, len(shapes) // 10)
-    for index, shape in enumerate(shapes):
-        if progress and (index == 0 or (index + 1) % step == 0 or index + 1 == len(shapes)):
-            progress(f"experiment10: subdivisions={width} direct grid {_percent(index + 1, len(shapes))} shapes={index + 1}/{len(shapes)}")
-        values = _sample_shape_at_phase(shape, grid_phase)
-        reconstructed[index] = _interp_periodic_values(values, eval_phase)
-    rmse = rmse_per_curve(reference, reconstructed)
+    if grid_point_count < 2:
+        raise ValueError("grid_point_count must be at least 2")
+    grid_points = np.asarray(grid_points, dtype=np.float64)
+    if len(grid_points) != grid_point_count:
+        raise ValueError("grid_points length must match grid_point_count")
+    subdivision_count = int(grid_point_count) - 1 if grid_kind == "uniform" else ""
+    all_distances = []
+    all_occurrence_weights = []
+    all_deduplicated_weights = []
+    interior_distances = []
+    interior_occurrence_weights = []
+    interior_deduplicated_weights = []
+    lfo_all_pass = []
+    lfo_interior_pass = []
+    for shape, weight in zip(shapes, weights):
+        x = shape.points[:, 0]
+        distance = _nearest_grid_distances(x, grid_points)
+        occurrence_point_weights = np.full(len(distance), float(weight), dtype=np.float64)
+        deduplicated_point_weights = np.ones(len(distance), dtype=np.float64)
+        all_distances.append(distance)
+        all_occurrence_weights.append(occurrence_point_weights)
+        all_deduplicated_weights.append(deduplicated_point_weights)
+        lfo_all_pass.append(bool(np.max(distance) <= CONTROL_POINT_X_PASS_TOLERANCE))
+
+        interior = (x > 0.0) & (x < 1.0)
+        if np.any(interior):
+            interior_distances.append(distance[interior])
+            interior_occurrence_weights.append(occurrence_point_weights[interior])
+            interior_deduplicated_weights.append(deduplicated_point_weights[interior])
+            lfo_interior_pass.append(bool(np.max(distance[interior]) <= CONTROL_POINT_X_PASS_TOLERANCE))
+        else:
+            lfo_interior_pass.append(True)
+
+    all_dx = np.concatenate(all_distances) if all_distances else np.asarray([], dtype=np.float64)
+    all_occurrence_w = np.concatenate(all_occurrence_weights) if all_occurrence_weights else np.asarray([], dtype=np.float64)
+    all_deduplicated_w = np.concatenate(all_deduplicated_weights) if all_deduplicated_weights else np.asarray([], dtype=np.float64)
+    interior_dx = np.concatenate(interior_distances) if interior_distances else np.asarray([], dtype=np.float64)
+    interior_occurrence_w = np.concatenate(interior_occurrence_weights) if interior_occurrence_weights else np.asarray([], dtype=np.float64)
+    interior_deduplicated_w = np.concatenate(interior_deduplicated_weights) if interior_deduplicated_weights else np.asarray([], dtype=np.float64)
+    lfo_all_pass_array = np.asarray(lfo_all_pass, dtype=np.bool_)
+    lfo_interior_pass_array = np.asarray(lfo_interior_pass, dtype=np.bool_)
     return {
-        "subdivisions": int(width),
-        "direct_grid_nodes": int(width),
-        "direct_grid_elapsed_seconds": time.perf_counter() - started,
-        "direct_grid_median_rmse_unique": float(np.median(rmse)),
-        "direct_grid_p95_rmse_unique": float(np.quantile(rmse, 0.95)),
-        "direct_grid_p99_rmse_unique": float(np.quantile(rmse, 0.99)),
-        "direct_grid_max_rmse_unique": float(np.max(rmse)),
-        "direct_grid_mean_rmse_weighted": _weighted_mean(rmse, weights),
-        "direct_grid_median_rmse_weighted": _weighted_quantile(rmse, weights, 0.5),
-        "direct_grid_p95_rmse_weighted": _weighted_quantile(rmse, weights, 0.95),
-        "direct_grid_p99_rmse_weighted": _weighted_quantile(rmse, weights, 0.99),
+        "grid_kind": grid_kind,
+        "grid_learning_weighting": grid_learning_weighting,
+        "grid_point_count": int(grid_point_count),
+        "subdivision_count": subdivision_count,
+        "subdivision_divisible_by_2": bool(subdivision_count % 2 == 0) if grid_kind == "uniform" else "",
+        "subdivision_divisible_by_3": bool(subdivision_count % 3 == 0) if grid_kind == "uniform" else "",
+        "subdivision_divisible_by_5": bool(subdivision_count % 5 == 0) if grid_kind == "uniform" else "",
+        "fits_vital_100_points": bool(grid_point_count <= VITAL_MAX_POINTS),
+        "unique_grid_point_count": int(len(np.unique(grid_points))),
+        "control_point_x_grid_step": float(1.0 / subdivision_count) if grid_kind == "uniform" else "",
+        "control_point_x_max_rounding_error": float(0.5 / subdivision_count) if grid_kind == "uniform" else "",
+        "control_point_x_occurrence_weight_all": float(np.sum(all_occurrence_w)),
+        "control_point_x_exact_rate_all_occurrence_weighted": _exact_rate(all_dx, all_occurrence_w),
+        "control_point_x_mean_abs_error_all_occurrence_weighted": _weighted_mean(all_dx, all_occurrence_w),
+        "control_point_x_median_abs_error_all_occurrence_weighted": _weighted_quantile(all_dx, all_occurrence_w, 0.5),
+        "control_point_x_p95_abs_error_all_occurrence_weighted": _weighted_quantile(all_dx, all_occurrence_w, 0.95),
+        "control_point_x_p99_abs_error_all_occurrence_weighted": _weighted_quantile(all_dx, all_occurrence_w, 0.99),
+        "control_point_x_exact_rate_all_deduplicated": _exact_rate(all_dx, all_deduplicated_w),
+        "control_point_x_mean_abs_error_all_deduplicated": _weighted_mean(all_dx, all_deduplicated_w),
+        "control_point_x_median_abs_error_all_deduplicated": _weighted_quantile(all_dx, all_deduplicated_w, 0.5),
+        "control_point_x_p95_abs_error_all_deduplicated": _weighted_quantile(all_dx, all_deduplicated_w, 0.95),
+        "control_point_x_p99_abs_error_all_deduplicated": _weighted_quantile(all_dx, all_deduplicated_w, 0.99),
+        "control_point_x_max_abs_error_all": float(np.max(all_dx)) if len(all_dx) else 0.0,
+        "control_point_x_occurrence_weight_interior": float(np.sum(interior_occurrence_w)),
+        "control_point_x_exact_rate_interior_occurrence_weighted": _exact_rate(interior_dx, interior_occurrence_w),
+        "control_point_x_mean_abs_error_interior_occurrence_weighted": _weighted_mean(interior_dx, interior_occurrence_w),
+        "control_point_x_median_abs_error_interior_occurrence_weighted": _weighted_quantile(interior_dx, interior_occurrence_w, 0.5),
+        "control_point_x_p95_abs_error_interior_occurrence_weighted": _weighted_quantile(interior_dx, interior_occurrence_w, 0.95),
+        "control_point_x_p99_abs_error_interior_occurrence_weighted": _weighted_quantile(interior_dx, interior_occurrence_w, 0.99),
+        "control_point_x_exact_rate_interior_deduplicated": _exact_rate(interior_dx, interior_deduplicated_w),
+        "control_point_x_mean_abs_error_interior_deduplicated": _weighted_mean(interior_dx, interior_deduplicated_w),
+        "control_point_x_median_abs_error_interior_deduplicated": _weighted_quantile(interior_dx, interior_deduplicated_w, 0.5),
+        "control_point_x_p95_abs_error_interior_deduplicated": _weighted_quantile(interior_dx, interior_deduplicated_w, 0.95),
+        "control_point_x_p99_abs_error_interior_deduplicated": _weighted_quantile(interior_dx, interior_deduplicated_w, 0.99),
+        "control_point_x_max_abs_error_interior": float(np.max(interior_dx)) if len(interior_dx) else 0.0,
+        "lfo_all_points_within_0p01_deduplicated_fraction": float(np.mean(lfo_all_pass_array)) if len(lfo_all_pass_array) else 0.0,
+        "lfo_all_points_within_0p01_occurrence_fraction": _weighted_bool_fraction(lfo_all_pass_array, weights),
+        "lfo_interior_points_within_0p01_deduplicated_fraction": float(np.mean(lfo_interior_pass_array)) if len(lfo_interior_pass_array) else 0.0,
+        "lfo_interior_points_within_0p01_occurrence_fraction": _weighted_bool_fraction(lfo_interior_pass_array, weights),
     }
 
 
-def _sample_shape_at_phase(shape: LfoShape, phase: np.ndarray) -> np.ndarray:
-    phase = np.asarray(phase, dtype=np.float64)
-    x = shape.points[:, 0]
-    y = shape.points[:, 1]
-    right = np.searchsorted(x, phase, side="left")
-    right = np.clip(right, 1, len(x) - 1)
-    left = right - 1
-    width = x[right] - x[left]
-    local = np.divide(phase - x[left], width, out=np.ones_like(phase), where=width > 0.0)
-    local = np.clip(local, 0.0, 1.0)
-    if shape.smooth:
-        local = local * local * (3.0 - 2.0 * local)
-    local = power_scale(local, shape.powers[left])
-    return (y[left] + local * (y[right] - y[left])).astype(np.float32)
-
-
-def _interp_periodic_values(values: np.ndarray, phase: np.ndarray) -> np.ndarray:
-    width = len(values)
-    position = (np.asarray(phase, dtype=np.float64) % 1.0) * float(width)
-    left = np.floor(position).astype(np.int64) % width
-    right = (left + 1) % width
-    frac = position - np.floor(position)
-    return (values[left] * (1.0 - frac) + values[right] * frac).astype(np.float32)
-
-
-def _factor3_rows(
-    subdivision_rows: list[dict[str, Any]],
-    direct_rows: list[dict[str, Any]],
+def _factor3_grid_point_rows(
+    control_rows: list[dict[str, Any]],
     *,
     comparisons: tuple[tuple[int, int], ...],
 ) -> list[dict[str, Any]]:
-    subdivision_by_count = {int(row["subdivisions"]): row for row in subdivision_rows}
-    direct_by_count = {int(row["subdivisions"]): row for row in direct_rows}
+    rows_by_grid_point_count = {
+        int(row["grid_point_count"]): row
+        for row in control_rows
+        if row["grid_kind"] == "uniform"
+    }
     rows = []
-    for factor3, higher in comparisons:
-        if factor3 not in subdivision_by_count or higher not in subdivision_by_count:
+    for factor3_grid_point_count, higher_grid_point_count in comparisons:
+        if factor3_grid_point_count not in rows_by_grid_point_count or higher_grid_point_count not in rows_by_grid_point_count:
             continue
-        a_sub = subdivision_by_count[factor3]
-        b_sub = subdivision_by_count[higher]
-        a_direct = direct_by_count[factor3]
-        b_direct = direct_by_count[higher]
+        factor3 = rows_by_grid_point_count[factor3_grid_point_count]
+        higher = rows_by_grid_point_count[higher_grid_point_count]
         rows.append(
             {
-                "factor3_subdivisions": int(factor3),
-                "higher_nonfactor3_subdivisions": int(higher),
-                "extra_direct_grid_nodes_for_higher": int(higher - factor3),
-                "factor3_boundary_exact_rate_weighted": a_sub["boundary_exact_rate_weighted"],
-                "higher_boundary_exact_rate_weighted": b_sub["boundary_exact_rate_weighted"],
-                "boundary_exact_rate_delta_factor3_minus_higher": float(a_sub["boundary_exact_rate_weighted"] - b_sub["boundary_exact_rate_weighted"]),
-                "factor3_boundary_p95_dx_weighted": a_sub["boundary_nearest_dx_p95_weighted"],
-                "higher_boundary_p95_dx_weighted": b_sub["boundary_nearest_dx_p95_weighted"],
-                "boundary_p95_dx_delta_factor3_minus_higher": float(a_sub["boundary_nearest_dx_p95_weighted"] - b_sub["boundary_nearest_dx_p95_weighted"]),
-                "factor3_direct_p95_rmse_weighted": a_direct["direct_grid_p95_rmse_weighted"],
-                "higher_direct_p95_rmse_weighted": b_direct["direct_grid_p95_rmse_weighted"],
-                "direct_p95_rmse_delta_factor3_minus_higher": float(a_direct["direct_grid_p95_rmse_weighted"] - b_direct["direct_grid_p95_rmse_weighted"]),
-                "factor3_direct_p95_beats_or_matches_higher": bool(a_direct["direct_grid_p95_rmse_weighted"] <= b_direct["direct_grid_p95_rmse_weighted"]),
+                "factor3_grid_point_count": int(factor3_grid_point_count),
+                "factor3_subdivision_count": int(factor3["subdivision_count"]),
+                "higher_nonfactor3_grid_point_count": int(higher_grid_point_count),
+                "higher_nonfactor3_subdivision_count": int(higher["subdivision_count"]),
+                "extra_grid_points_for_higher": int(higher_grid_point_count - factor3_grid_point_count),
+                "factor3_interior_p95_abs_error": factor3["control_point_x_p95_abs_error_interior_occurrence_weighted"],
+                "higher_interior_p95_abs_error": higher["control_point_x_p95_abs_error_interior_occurrence_weighted"],
+                "interior_p95_abs_error_delta_factor3_minus_higher": float(
+                    factor3["control_point_x_p95_abs_error_interior_occurrence_weighted"]
+                    - higher["control_point_x_p95_abs_error_interior_occurrence_weighted"]
+                ),
+                "factor3_beats_or_matches_higher_on_interior_p95": bool(
+                    factor3["control_point_x_p95_abs_error_interior_occurrence_weighted"]
+                    <= higher["control_point_x_p95_abs_error_interior_occurrence_weighted"]
+                ),
+                "factor3_interior_mean_abs_error": factor3["control_point_x_mean_abs_error_interior_occurrence_weighted"],
+                "higher_interior_mean_abs_error": higher["control_point_x_mean_abs_error_interior_occurrence_weighted"],
+                "interior_mean_abs_error_delta_factor3_minus_higher": float(
+                    factor3["control_point_x_mean_abs_error_interior_occurrence_weighted"]
+                    - higher["control_point_x_mean_abs_error_interior_occurrence_weighted"]
+                ),
             }
         )
     return rows
-
-
-def _summary_rows(
-    subdivision_rows: list[dict[str, Any]],
-    direct_rows: list[dict[str, Any]],
-) -> list[dict[str, Any]]:
-    direct_by_count = {int(row["subdivisions"]): row for row in direct_rows}
-    return [{**row, **direct_by_count[int(row["subdivisions"])]} for row in subdivision_rows]
 
 
 def parse_counts(value: str) -> tuple[int, ...]:
@@ -425,6 +511,22 @@ def _weighted_quantile(values: np.ndarray, weights: np.ndarray, quantile: float)
     return float(sorted_values[min(index, len(sorted_values) - 1)])
 
 
+def _exact_rate(values: np.ndarray, weights: np.ndarray) -> float:
+    total = float(np.sum(weights))
+    if total <= 0.0:
+        return 1.0
+    return float(np.sum(weights[values <= EXACT_TOLERANCE]) / total)
+
+
+def _weighted_bool_fraction(values: np.ndarray, weights: np.ndarray) -> float:
+    values = np.asarray(values, dtype=np.bool_)
+    weights = np.asarray(weights, dtype=np.float64)
+    total = float(np.sum(weights))
+    if total <= 0.0 or not len(values):
+        return 0.0
+    return float(np.sum(weights[values]) / total)
+
+
 def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
     fieldnames: list[str] = []
     for row in rows:
@@ -437,41 +539,233 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         writer.writerows(rows)
 
 
-def _report(tables: dict[str, list[dict[str, Any]]]) -> str:
+def _write_plots(
+    plot_dir: Path,
+    *,
+    point_frequency_rows: list[dict[str, Any]],
+    control_rows: list[dict[str, Any]],
+) -> dict[str, str]:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    plot_dir.mkdir(parents=True, exist_ok=True)
+    paths = {
+        "point_count_frequency": plot_dir / "experiment10_point_count_frequency.png",
+        "x_error_p95": plot_dir / "experiment10_control_point_x_p95.png",
+        "lfo_pass_rate_0p01": plot_dir / "experiment10_lfo_pass_rate_0p01.png",
+        "nonuniform_delta": plot_dir / "experiment10_nonuniform_delta.png",
+    }
+    _plot_point_count_frequency(plt, paths["point_count_frequency"], point_frequency_rows)
+    _plot_control_metric(
+        plt,
+        paths["x_error_p95"],
+        control_rows,
+        metric="control_point_x_p95_abs_error_interior_occurrence_weighted",
+        ylabel="Interior P95 abs x error",
+        title="Control-point x placement error by grid type",
+    )
+    _plot_control_metric(
+        plt,
+        paths["lfo_pass_rate_0p01"],
+        control_rows,
+        metric="lfo_all_points_within_0p01_occurrence_fraction",
+        ylabel="Occurrence-weighted LFO fraction",
+        title="LFOs with every control point within 0.01 of grid",
+        y_limits=(0.0, 1.02),
+    )
+    _plot_nonuniform_delta(plt, paths["nonuniform_delta"], control_rows)
+    return {key: path.relative_to(plot_dir.parent).as_posix() for key, path in paths.items()}
+
+
+def _plot_point_count_frequency(plt: Any, path: Path, rows: list[dict[str, Any]]) -> None:
+    x = np.asarray([int(row["source_point_count"]) for row in rows], dtype=np.float64)
+    dedup = np.asarray([float(row["deduplicated_lfo_fraction"]) for row in rows], dtype=np.float64)
+    occurrence = np.asarray([float(row["lfo_corpus_occurrence_fraction"]) for row in rows], dtype=np.float64)
+    fig, ax = plt.subplots(figsize=(11.5, 5.8), constrained_layout=True)
+    width = 0.42
+    ax.bar(x - width / 2.0, dedup, width=width, label="Deduplicated LFO corpus", color="#4C78A8")
+    ax.bar(x + width / 2.0, occurrence, width=width, label="Occurrence-weighted LFO corpus", color="#F58518")
+    ax.set_title("Source control-point count frequency")
+    ax.set_xlabel("Source point count")
+    ax.set_ylabel("Fraction of corpus")
+    ax.grid(axis="y", alpha=0.25)
+    ax.legend(frameon=False)
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+
+def _plot_control_metric(
+    plt: Any,
+    path: Path,
+    rows: list[dict[str, Any]],
+    *,
+    metric: str,
+    ylabel: str,
+    title: str,
+    y_limits: tuple[float, float] | None = None,
+) -> None:
+    fig, ax = plt.subplots(figsize=(11.5, 5.8), constrained_layout=True)
+    for label, group in _group_control_rows(rows).items():
+        ordered = sorted(group, key=lambda row: int(row["grid_point_count"]))
+        x = [int(row["grid_point_count"]) for row in ordered]
+        y = [float(row[metric]) for row in ordered]
+        ax.plot(x, y, marker="o", linewidth=2.0, markersize=4.5, label=label)
+    ax.set_title(title)
+    ax.set_xlabel("Grid point count")
+    ax.set_ylabel(ylabel)
+    if y_limits is not None:
+        ax.set_ylim(*y_limits)
+    ax.grid(alpha=0.25)
+    ax.legend(frameon=False)
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+
+def _plot_nonuniform_delta(plt: Any, path: Path, rows: list[dict[str, Any]]) -> None:
+    uniform_by_points = {
+        int(row["grid_point_count"]): row
+        for row in rows
+        if row["grid_kind"] == "uniform"
+    }
+    fig, ax = plt.subplots(figsize=(11.5, 5.8), constrained_layout=True)
+    for weighting in ("deduplicated", "occurrence_weighted"):
+        ordered = sorted(
+            [
+                row
+                for row in rows
+                if row["grid_kind"] == "global_quantile" and row["grid_learning_weighting"] == weighting
+            ],
+            key=lambda row: int(row["grid_point_count"]),
+        )
+        x = []
+        y = []
+        for row in ordered:
+            grid_point_count = int(row["grid_point_count"])
+            baseline = uniform_by_points.get(grid_point_count)
+            if baseline is None:
+                continue
+            x.append(grid_point_count)
+            y.append(
+                float(row["control_point_x_p95_abs_error_interior_occurrence_weighted"])
+                - float(baseline["control_point_x_p95_abs_error_interior_occurrence_weighted"])
+            )
+        ax.plot(x, y, marker="o", linewidth=2.0, markersize=4.5, label=f"global quantile ({weighting})")
+    ax.axhline(0.0, color="#222222", linewidth=1.0)
+    ax.set_title("Global non-uniform grid P95 delta vs uniform")
+    ax.set_xlabel("Grid point count")
+    ax.set_ylabel("Interior P95 abs x error delta")
+    ax.grid(alpha=0.25)
+    ax.legend(frameon=False)
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+
+def _group_control_rows(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+    groups: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        label = _grid_label(row)
+        groups.setdefault(label, []).append(row)
+    return groups
+
+
+def _grid_label(row: dict[str, Any]) -> str:
+    if row["grid_kind"] == "uniform":
+        return "uniform"
+    if row["grid_kind"] == "global_quantile":
+        return f"global quantile ({row['grid_learning_weighting']})"
+    return f"{row['grid_kind']} ({row['grid_learning_weighting']})"
+
+
+def _report(
+    *,
+    point_frequency_rows: list[dict[str, Any]],
+    control_rows: list[dict[str, Any]],
+    factor3_rows: list[dict[str, Any]],
+    plot_paths: dict[str, str],
+) -> str:
     lines = [
-        "# Experiment 10: Subdivision And Direct Grid Audit",
+        "# Experiment 10: Control-Point X Grid Audit",
         "",
-        "Experiment 10 is a standalone corpus/grid audit, not an Era 2 model-runner experiment. The point-count table is only corpus accounting. The main tests are subdivision boundary coverage and Era-1-style direct sampled-grid reproduction.",
+        "Experiment 10 is a standalone corpus/grid audit, not an Era 2 model-runner experiment. It asks how many source control points real LFOs use, then tests how well inclusive x-grid point counts place those ordered control-point x positions.",
         "",
-        "Renderer contract:",
+        "Naming contract:",
         "",
-        "- Raw LFO references are rendered from the original points, powers, and smooth flag.",
-        "- Boundary coverage measures how close original x positions are to a subdivision grid.",
-        "- Direct grids sample the true raw curve at `i / W`, store only y-values, then decode by periodic linear interpolation.",
+        "- `W` is reserved for residual-layer atom choices in Era 2 model experiments.",
+        "- Experiment 10 varies `grid_point_count`.",
+        "- `subdivision_count = grid_point_count - 1`.",
+        "- Factor language applies to the inferred `subdivision_count`, not to `grid_point_count`.",
+        "- Example: `grid_point_count = 97` means `subdivision_count = 96`, which is divisible by 2 and 3.",
         "",
-        "## Factor-of-3 comparisons",
+        "Control-point x contract:",
         "",
-        "| factor-3 subdivisions | higher non-factor-3 | direct p95 delta | factor-3 beats/matches higher | boundary exact delta | boundary p95 dx delta |",
-        "| ---: | ---: | ---: | :---: | ---: | ---: |",
+        "- For each true ordered control point, predicted x is the nearest point in the fixed grid.",
+        "- For `uniform`, grid points are `k / subdivision_count`.",
+        "- For `global_quantile`, grid points are fixed offline-learned non-uniform positions.",
+        "- Y is ignored, and no line, Bezier, power curve, or other segment is rendered.",
+        "- Repeated grid points are allowed because discontinuous LFOs can contain repeated x positions.",
+        "- `lfo_all_points_within_0p01_*` reports the fraction of LFOs whose maximum x error is at most 0.01.",
+        "",
+        "Global non-uniform grids:",
+        "",
+        "- `global_quantile` grids are learned once offline from corpus control-point x positions.",
+        "- The deployed model would still predict a grid slot; it would not predict the grid positions.",
+        "- Both deduplicated and occurrence-weighted learned grids are reported.",
+        "",
+        "## Analytics Read",
+        "",
+        "- Point-count frequency shows how often real LFOs use each raw control-point count.",
+        "- P95 x-error shows the tail cost of grid placement among interior control points.",
+        "- The `<=0.01` plot is the easiest operational read: it asks whether every control point in an LFO is close enough to the grid.",
+        "- Non-uniform deltas compare fixed learned grids against uniform grids at the same `grid_point_count`; negative is better.",
+        "",
+        "## Source Point-Count Frequency",
+        "",
+        f"![Source point-count frequency]({plot_paths['point_count_frequency']})",
+        "",
+        "| source point count | deduplicated LFOs | dedup fraction | LFO corpus occurrences | corpus fraction |",
+        "| ---: | ---: | ---: | ---: | ---: |",
     ]
-    for row in tables["factor3"]:
+    for row in point_frequency_rows:
         lines.append(
-            "| {factor3_subdivisions} | {higher_nonfactor3_subdivisions} | {direct_p95_rmse_delta_factor3_minus_higher:.8f} | {factor3_direct_p95_beats_or_matches_higher} | {boundary_exact_rate_delta_factor3_minus_higher:.8f} | {boundary_p95_dx_delta_factor3_minus_higher:.8f} |".format(
+            "| {source_point_count} | {deduplicated_lfo_count} | {deduplicated_lfo_fraction:.6f} | {lfo_corpus_occurrence_count:.0f} | {lfo_corpus_occurrence_fraction:.6f} |".format(
                 **row
             )
         )
     lines.extend(
         [
             "",
-            "## Point-count coverage",
+            "## Control-Point X Placement",
             "",
-            "| point budget | weighted coverage | over-budget unique |",
-            "| ---: | ---: | ---: |",
+            f"![Interior P95 x error by grid type]({plot_paths['x_error_p95']})",
+            "",
+            f"![LFO pass rate at 0.01 tolerance]({plot_paths['lfo_pass_rate_0p01']})",
+            "",
+            f"![Non-uniform grid delta versus uniform]({plot_paths['nonuniform_delta']})",
+            "",
+            "| grid kind | learning weight | grid point count | subdivisions | div by 3 | LFOs <=0.01 dedup | LFOs <=0.01 corpus | interior mean x error | interior p95 x error |",
+            "| --- | --- | ---: | ---: | :---: | ---: | ---: | ---: | ---: |",
         ]
     )
-    for row in tables["point_budget"]:
+    for row in control_rows:
         lines.append(
-            "| {point_budget} | {point_budget_coverage_weighted:.6f} | {over_point_budget_unique} |".format(
+            "| {grid_kind} | {grid_learning_weighting} | {grid_point_count} | {subdivision_count} | {subdivision_divisible_by_3} | {lfo_all_points_within_0p01_deduplicated_fraction:.6f} | {lfo_all_points_within_0p01_occurrence_fraction:.6f} | {control_point_x_mean_abs_error_interior_occurrence_weighted:.8f} | {control_point_x_p95_abs_error_interior_occurrence_weighted:.8f} |".format(
+                **row
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "## Factor-3 Subdivision Checks",
+            "",
+            "| factor-3 grid points | factor-3 subdivisions | higher grid points | higher subdivisions | p95 delta | factor-3 beats/matches higher |",
+            "| ---: | ---: | ---: | ---: | ---: | :---: |",
+        ]
+    )
+    for row in factor3_rows:
+        lines.append(
+            "| {factor3_grid_point_count} | {factor3_subdivision_count} | {higher_nonfactor3_grid_point_count} | {higher_nonfactor3_subdivision_count} | {interior_p95_abs_error_delta_factor3_minus_higher:.8f} | {factor3_beats_or_matches_higher_on_interior_p95} |".format(
                 **row
             )
         )
@@ -480,18 +774,13 @@ def _report(tables: dict[str, list[dict[str, Any]]]) -> str:
             "",
             "Interpretation notes:",
             "",
-            "- A negative direct p95 delta means the factor-of-3 grid beat the higher non-factor-of-3 grid.",
-            "- The direct-grid comparison is not a model prediction head claim. It is a dense y-node reproduction baseline.",
+            "- A negative p95 delta means the factor-3 subdivision grid beat the higher point-count comparator.",
+            "- This is not a reconstruction metric; it ignores y and all segment connection rules.",
+            "- This is not a model prediction head budget claim.",
             "- Topology remains analysis-only in the processed corpus.",
         ]
     )
     return "\n".join(lines) + "\n"
-
-
-def _percent(done: int, total: int) -> str:
-    if total <= 0:
-        return "0.0%"
-    return f"{100.0 * min(done, total) / total:.1f}%"
 
 
 if __name__ == "__main__":

@@ -46,24 +46,45 @@ class ProcessedCorpusTests(unittest.TestCase):
                 metadata_path=metadata,
                 corpus_dir=corpus_dir,
                 output_dir=output_dir,
-                point_budgets=(3, 4),
-                subdivisions=(3, 4),
-                dense_resolution=64,
+                grid_point_counts=(4, 5),
             )
 
             self.assertTrue(Path(result["summary"]).exists())
             self.assertTrue(Path(result["report"]).exists())
-            self.assertTrue(Path(result["point_budget_summary"]).exists())
-            self.assertTrue(Path(result["subdivision_summary"]).exists())
-            self.assertTrue(Path(result["direct_grid_summary"]).exists())
-            with Path(result["point_budget_summary"]).open("r", encoding="utf-8", newline="") as handle:
+            self.assertTrue(Path(result["point_count_frequency"]).exists())
+            self.assertTrue(Path(result["control_point_x_summary"]).exists())
+            self.assertTrue(Path(result["factor3_grid_point_comparisons"]).exists())
+            self.assertTrue(Path(result["global_nonuniform_grids"]).exists())
+            for plot_path in result["plots"].values():
+                self.assertTrue(Path(plot_path).exists())
+            self.assertIn("grid_point_count - 1", result["manifest"]["grid_count_contract"])
+            self.assertIn("W is reserved", result["manifest"]["grid_count_contract"])
+            self.assertIn("x only", result["manifest"]["control_point_x_contract"])
+            self.assertIn("0.01", result["manifest"]["pass_rate_contract"])
+            report_text = Path(result["report"]).read_text(encoding="utf-8")
+            self.assertIn("subdivision_count = grid_point_count - 1", report_text)
+            self.assertIn("plots/experiment10_point_count_frequency.png", report_text)
+            self.assertIn("plots/experiment10_lfo_pass_rate_0p01.png", report_text)
+            with Path(result["point_count_frequency"]).open("r", encoding="utf-8", newline="") as handle:
                 point_rows = list(csv.DictReader(handle))
-            self.assertEqual([row["point_budget"] for row in point_rows], ["3", "4"])
-            self.assertLess(float(point_rows[0]["point_budget_coverage_weighted"]), 1.0)
-            self.assertEqual(float(point_rows[1]["point_budget_coverage_weighted"]), 1.0)
+            self.assertEqual([row["source_point_count"] for row in point_rows], ["3", "4"])
+            self.assertEqual([row["deduplicated_lfo_count"] for row in point_rows], ["1", "1"])
+            self.assertEqual([row["lfo_corpus_occurrence_count"] for row in point_rows], ["2.0", "1.0"])
             with Path(result["summary"]).open("r", encoding="utf-8", newline="") as handle:
                 rows = list(csv.DictReader(handle))
-            self.assertEqual([row["subdivisions"] for row in rows], ["3", "4"])
+            self.assertEqual(len(rows), 6)
+            self.assertEqual([row["grid_point_count"] for row in rows[:3]], ["4", "4", "4"])
+            self.assertEqual([row["grid_kind"] for row in rows[:3]], ["uniform", "global_quantile", "global_quantile"])
+            self.assertEqual(rows[0]["subdivision_count"], "3")
+            self.assertEqual(rows[1]["subdivision_count"], "")
+            with Path(result["control_point_x_summary"]).open("r", encoding="utf-8", newline="") as handle:
+                control_rows = list(csv.DictReader(handle))
+            self.assertEqual(len(control_rows), 6)
+            self.assertIn("control_point_x_p95_abs_error_interior_occurrence_weighted", control_rows[0])
+            self.assertIn("lfo_all_points_within_0p01_deduplicated_fraction", control_rows[0])
+            learned_grids = json.loads(Path(result["global_nonuniform_grids"]).read_text(encoding="utf-8"))
+            self.assertEqual(len(learned_grids), 4)
+            self.assertEqual(learned_grids[0]["grid_kind"], "global_quantile")
 
 
 def _write_fixture_corpus(root: Path) -> Path:
