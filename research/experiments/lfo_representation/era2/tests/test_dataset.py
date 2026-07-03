@@ -28,6 +28,19 @@ class DatasetTests(unittest.TestCase):
         self.assertTrue(np.all(curve >= 0.0))
         self.assertTrue(np.all(curve <= 1.0))
 
+    def test_sample_shape_uses_power_curve(self) -> None:
+        shape = LfoShape.from_json(
+            {
+                "name": "curved",
+                "num_points": 2,
+                "points": [0.0, 0.0, 1.0, 1.0],
+                "powers": [2.0, 0.0],
+                "smooth": False,
+            }
+        )
+        midpoint = float(sample_shape(shape, resolution=4)[2])
+        self.assertNotAlmostEqual(midpoint, 0.5)
+
     def test_tiny_dataset_has_train_validation_split(self) -> None:
         dataset = make_tiny_curve_dataset(resolution=16, row_count=20)
         self.assertEqual(dataset.curves.shape, (20, 16))

@@ -128,13 +128,20 @@ def load_presetshare_curve_dataset(
     topology: list[int] = []
     shapes: list[LfoShape] = []
     errors = 0
+    total_rows = _metadata_row_total(metadata_path, limit=metadata_limit) if progress else None
+    if progress:
+        progress(f"dataset: metadata rows to scan={total_rows}")
     with metadata_path.open("r", encoding="utf-8", newline="") as handle:
         reader = csv.DictReader(handle)
         for ordinal, record in enumerate(reader, start=1):
-            if progress and (ordinal == 1 or ordinal % 500 == 0):
-                progress(f"dataset: scanned metadata rows={ordinal} collected_lfos={len(curves)} errors={errors}")
             if metadata_limit is not None and ordinal > metadata_limit:
                 break
+            if progress and (ordinal == 1 or ordinal % 500 == 0):
+                progress(
+                    "dataset: "
+                    f"{_percent(ordinal, total_rows)} scanned metadata rows={ordinal}/{total_rows} "
+                    f"collected_lfos={len(curves)} errors={errors}"
+                )
             preset_file = record.get("preset_file", "")
             if not preset_file:
                 continue
@@ -175,7 +182,10 @@ def load_presetshare_curve_dataset(
     if not curves:
         raise ValueError(f"no usable LFO curves found in {metadata_path}")
     if progress:
-        progress(f"dataset: finished scan collected_lfos={len(curves)} errors={errors}")
+        progress(
+            "dataset: "
+            f"100.0% finished scan collected_lfos={len(curves)} errors={errors}"
+        )
 
     curve_array = np.stack(curves).astype(np.float32)
     topology_array = np.asarray(topology, dtype=np.int8)
@@ -310,6 +320,18 @@ def _dataset_fingerprint(metadata_path: Path, rows: list[dict[str, Any]], *, res
         "first_signatures": [row.get("shape_signature", "") for row in rows[:64]],
     }
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
+
+
+def _metadata_row_total(metadata_path: Path, *, limit: int | None) -> int:
+    with metadata_path.open("r", encoding="utf-8", newline="") as handle:
+        total = max(0, sum(1 for _ in handle) - 1)
+    return min(total, int(limit)) if limit is not None else total
+
+
+def _percent(done: int, total: int | None) -> str:
+    if not total:
+        return "0.0%"
+    return f"{100.0 * min(done, total) / total:.1f}%"
 
 
 def _bool(value: Any) -> bool:

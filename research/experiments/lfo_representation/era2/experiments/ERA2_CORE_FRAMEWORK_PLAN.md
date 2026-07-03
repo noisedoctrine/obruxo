@@ -7,7 +7,7 @@ Build a small, self-contained Era 2 Python framework under
 `research/experiments/lfo_representation/era2/tests/`.
 
 This first pass is framework plus smoke validation. It does not run the full
-Experiment 10 screen. It creates the reusable pieces needed for Experiment 10
+Experiment 11 screen. It creates the reusable pieces needed for Experiment 11
 and later work, then proves the topology-free flat-categorical path with a tiny
 deterministic smoke run.
 
@@ -36,7 +36,7 @@ offline oracle construction -> reconstruction assets -> runtime interface -> dec
   loss, decoder lookup, or head accounting.
 
 - `ExperimentRowManifest`
-  Records the Experiment 10-era row fields: construction identity, runtime
+  Records the Experiment 11-era row fields: construction identity, runtime
   interface, decoder policy, dictionary scope, output counts, topology flags,
   storage counts, and method-specific parameters.
 
@@ -138,7 +138,7 @@ Tests should cover:
 
 ## Assumptions
 
-- No full Experiment 10 screen in this first pass.
+- No full Experiment 11 screen in this first pass.
 - No SciPy, plotting, multiprocessing, or background monitors.
 - NumPy is the only required third-party dependency for the framework tests.
 - PyTorch/XPU is optional and used only when available and beneficial.

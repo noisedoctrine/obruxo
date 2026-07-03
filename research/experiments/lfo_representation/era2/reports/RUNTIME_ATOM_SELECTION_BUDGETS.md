@@ -922,7 +922,7 @@ before model-facing targets exist.
 
 ## What Should Be Tested First Later
 
-This note does not choose Experiment 10 rows. It does narrow the path.
+This note does not choose Experiment 11 rows. It does narrow the path.
 
 The first high-velocity Era 2 baseline should be:
 

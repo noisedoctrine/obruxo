@@ -100,14 +100,14 @@ def _run_report(run_dir: Path, rows: list[dict[str, Any]]) -> str:
     manifest_path = run_dir / "run_manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() else {}
     lines = [
-        "# Experiment 10 Run Report",
+        "# Experiment 11 Run Report",
         "",
         f"- Run id: `{manifest.get('run_id', run_dir.name)}`",
         f"- Screen: `{manifest.get('screen', '')}`",
         f"- Profile: `{manifest.get('profile', '')}`",
         f"- Completed rows: `{len(rows)}`",
         "",
-        "This report summarizes topology-free flat-categorical Experiment 10 rows. "
+        "This report summarizes topology-free flat-categorical Experiment 11 rows. "
         "Any topology bucket metrics are analysis-only and do not participate in runtime targets, loss, decoder lookup, or model prediction head budget.",
         "",
         "## Best Rows By Validation P95",

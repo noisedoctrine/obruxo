@@ -1,313 +1,154 @@
-# Experiment 10 Plan: Method-Neutral Era 2 Accounting
+# Experiment 10 Plan: Subdivision And Direct Grid Audit
 
 ## Summary
 
-Experiment 10 should establish the Era 2 experiment accounting frame, not
-prematurely choose a runtime atom-selection winner.
+Experiment 10 is reset. The previous raw point-grid version overloaded `N` as
+both point count and grid quality, then accidentally tested inclusive grid slots
+instead of the subdivision logic that mattered in Era 1.
 
-The core split is:
+Experiment 10 is a standalone corpus/grid audit. It is not a normal Era 2 model
+experiment, and the shared model-runner CLI should not grow interfaces just to
+support it.
 
-```text
-offline oracle construction -> method-neutral reconstruction assets -> runtime model-choice interface -> model prediction head budget
-```
+The corrected experiment keeps three questions separate:
 
-This keeps topology, oracle search, atom/basis construction, and decoder-policy
-decisions separate from the deployed model interface. The output of Experiment
-10 should make future rows comparable across flat categorical, basis
-coefficients, path addressing, and continuous address without mixing oracle
-construction with model-choice accounting.
+1. raw point-count coverage;
+2. subdivision coverage of original x boundaries;
+3. Era-1-style direct sampled-grid reconstruction.
 
-## Experiment 10 Goal
-
-Experiment 10 has two jobs:
-
-1. Define the row manifest and metrics needed for Era 2 comparisons.
-2. Run or prepare the first small, clean, topology-free flat-categorical
-   baseline screen to validate that accounting path.
-
-It is not a broad addressing-method shootout. The point is to make sure each
-future experiment records the parameters needed to estimate model prediction
-head budget under different runtime choice methods while keeping the oracle path
-independent.
-
-## Core Design Rule
-
-Every row must separate three identities:
+The processed LFO corpus remains the source:
 
 ```text
-oracle_construction_id
-runtime_interface_id
-decoder_policy_id
+raw Vital point set + occurrence count + dense 1920 reference
 ```
 
-`oracle_construction_id` says how offline reconstruction assets are built.
-Topology may appear here only as an offline construction signal.
+## Renderer Contract
 
-`runtime_interface_id` says what the deployed audio model must emit. Topology
-must not appear here.
+Reference curves are rendered from the original Vital-ish point representation:
 
-`decoder_policy_id` says which deterministic reconstruction choices are applied
-with zero or explicit model-head cost.
+- original x/y points;
+- original powers;
+- original smooth flag;
+- duplicate x positions preserved.
 
-## No-Runtime-Topology Contract
+For raw-point and subdivision questions, the renderer must apply the true
+segment shape. It must not silently replace every segment with linear
+interpolation.
 
-Every clean Era 2 row must satisfy:
+Direct sampled grids are different. A direct grid stores only y-values sampled
+at fixed phases, so its decoder is periodic linear interpolation between those
+y-values. That is not a claim about the source shape; it is the decoder contract
+for the direct y-grid representation.
+
+## Questions
+
+### 1. Point-count coverage
+
+For each point budget:
 
 ```text
-topology_used_at_runtime = false
-topology_used_in_targets = false
-topology_used_in_loss = false
-topology_used_in_decoder_lookup = false
-topology_used_in_head_accounting = false
+24, 36, 48, 60, 72, 96, 100
 ```
 
-The only topology flag that may be true in a clean row is:
+report how many raw LFO shapes already fit:
 
 ```text
-topology_used_in_construction = true
+raw_num_points <= point_budget
 ```
 
-That flag means topology helped build or balance offline assets. It must not
-change the model-facing target schema, decoder lookup, loss, masks, or
-`head_outputs` formula.
+This is corpus accounting only. Do not attach RMSE to over-budget shapes by
+silently decimating them.
 
-## Required Row Parameters
+### 2. Subdivision boundary coverage
 
-Every Experiment 10-era row should log:
+For each subdivision count:
 
 ```text
-experiment_id
-oracle_construction_id
-runtime_interface_id
-decoder_policy_id
-base_dictionary_size
-D
-scalar_families
-scalar_outputs
-categorical_outputs
-continuous_outputs
-head_outputs_formula
-head_outputs_actual
-dictionary_scope
-codebook_storage_count
-oracle_construction_time
-oracle_encoding_time
-topology_used_in_construction
-topology_used_at_runtime
-topology_used_in_targets
-topology_used_in_loss
-topology_used_in_decoder_lookup
-topology_used_in_head_accounting
+24,25,32,36,37,40,48,49,60,61,64,72,73,80,96,97,100
 ```
 
-## Runtime-Specific Parameters
-
-Flat categorical rows:
+test how close each original interior x boundary is to the nearest grid point:
 
 ```text
-addressing_scheme = flat_categorical
-W_by_residual_layer
-residual_atom_selection_outputs = sum(W_d)
+nearest(k / subdivisions)
 ```
 
-Basis-coefficient rows:
+Report exact-hit coverage and nearest-distance statistics. This directly tests
+the Era 1 claim that musically composite grids, especially multiples of 3, cover
+real LFO boundaries better.
+
+### 3. Direct sampled-grid reconstruction
+
+Replicate the Era 1 direct-grid idea on the processed corpus:
 
 ```text
-addressing_scheme = basis_coefficients
-basis_count = P
-coefficient_constraint
-basis_construction_policy
-coefficient_target_policy
-continuous_basis_outputs = D * P
+sample true raw curve at i / W for i in 0..W-1
+store W y-values
+decode by periodic linear interpolation
+evaluate against true raw curve at 1920 samples
 ```
 
-Path-address rows:
+This answers whether a factor-of-3 direct grid can beat or match a higher
+non-factor-of-3 grid, rather than merely beating a smaller grid.
+
+The explicit comparisons are:
 
 ```text
-addressing_scheme = path_address
-branch_factors
-path_length
-leaf_capacity
-reachable_atom_count
-unused_leaf_count
-tree_build_policy
-path_loss_policy
-head_sharing_policy
+24 vs 25
+24 vs 32
+36 vs 37
+36 vs 40
+48 vs 49
+48 vs 64
+60 vs 61
+60 vs 64
+72 vs 73
+72 vs 80
+96 vs 97
+96 vs 100
 ```
 
-Continuous-address rows:
+A factor-of-3 grid only gets credit if it beats or matches the higher-capacity
+non-factor-of-3 comparator on direct-grid P95 RMSE.
+
+## Outputs
+
+Experiment 10 writes:
 
 ```text
-addressing_scheme = continuous_address
-address_dim = E
-codebook_size
-embedding_training_policy
-distance_metric
-nearest_neighbor_policy
+research/experiments/lfo_representation/era2/artifacts/experiment_10/subdivision_grid/
 ```
 
-## Required Metrics
+Expected files:
 
-Reconstruction quality:
+- `manifest.json`
+- `point_budget_summary.csv`
+- `subdivision_summary.csv`
+- `direct_grid_summary.csv`
+- `factor3_comparisons.csv`
+- `summary.csv`
+- `EXPERIMENT_10_SUBDIVISION_GRID_REPORT.md`
+
+## Non-Goals
+
+Experiment 10 does not:
+
+- choose residual atoms;
+- calculate model prediction head budget;
+- decide Experiment 11 rows;
+- test runtime topology;
+- decimate raw point sets;
+- optimize y-values by least squares.
+
+The deprecated least-squares fixed-basis preflight should not be used for
+`96` vs `100` decisions.
+
+## Command
 
 ```text
-median_rmse
-p90_rmse
-p95_rmse
-p99_rmse
-max_rmse
-strict_perfect_lfo_rate
-node_max_error_median
-node_max_error_p95
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment10_grid_audit.py
 ```
 
-Model-budget metrics:
-
-```text
-head_outputs_actual
-categorical_outputs
-continuous_outputs
-scalar_outputs
-outputs_per_residual_layer
-quality_per_100_head_outputs
-```
-
-Oracle/runtime separability diagnostics:
-
-```text
-oracle_quality_metrics
-runtime_interface_budget_metrics
-decoder_policy_cost
-topology_contract_pass
-```
-
-Offline stratification metrics:
-
-```text
-topology_bucket_rmse_median
-topology_bucket_rmse_p95
-worst_topology_bucket
-topology_p95_gap
-```
-
-These topology metrics are analysis-only. They must not imply runtime topology
-conditioning.
-
-## Learnability Proxies
-
-Flat categorical:
-
-```text
-atom_usage_entropy_by_layer
-dead_atom_rate
-dominant_atom_share_by_layer
-```
-
-Basis coefficients:
-
-```text
-coefficient_mean_abs
-coefficient_sparsity_rate
-coefficient_p95_abs
-basis_usage_energy_share
-```
-
-Path address:
-
-```text
-branch_usage_entropy_by_level
-dead_branch_rate
-invalid_leaf_rate
-```
-
-Continuous address:
-
-```text
-nearest_neighbor_margin_median
-nearest_neighbor_margin_p95
-embedding_norm_p95
-```
-
-## First Screen
-
-The first Experiment 10 screen should be a small, fast, topology-free
-flat-categorical baseline screen.
-
-It should validate:
-
-- the manifest fields;
-- the no-runtime-topology contract;
-- clean `head_outputs` accounting;
-- oracle/runtime separation;
-- report tables and plots.
-
-Do not include basis coefficients, path addressing, or continuous address in
-the first screen except as formula-only accounting rows. Full reconstruction
-runs for those methods belong after the flat manifest/accounting path is proven
-clean.
-
-## First-Screen Row Shape
-
-Use phase-only flat categorical residual layers:
-
-```text
-head_outputs = 32 + D * W + (D + 1)
-```
-
-Model-facing targets:
-
-```text
-base_index
-base_phase
-residual_layer_1_index
-residual_layer_1_phase
-...
-residual_layer_D_index
-residual_layer_D_phase
-```
-
-Budget bands should be internal Era 2 bands, not inherited Era 1 row names:
-
-```text
-small:  ~256-384 head_outputs
-medium: ~512-640 head_outputs
-large:  ~960-1152 head_outputs
-```
-
-Rows should emphasize narrow/deep flat-categorical settings, for example:
-
-```text
-W4 deep rows
-W6 medium-depth rows
-W8 reference rows
-```
-
-Exact row values should be chosen so `head_outputs_actual` lands near those
-budget bands and all rows share the same runtime contract.
-
-## What Experiment 10 Should Not Do
-
-Experiment 10 should not:
-
-- reuse topology-conditioned Era 1 target schemas;
-- include topology in decoder lookup;
-- compare by codebook storage as the primary capacity axis;
-- treat Era 1 W/D names as baselines;
-- promote gain or offset into the first screen;
-- include snap as a default decoder policy;
-- treat basis coefficients, path addressing, or continuous address as mature
-  reconstruction contenders before the flat baseline is audited.
-
-Era 1 rows may be cited as historical context or budget anchors only.
-
-## Assumptions
-
-- Flat categorical remains the first runnable baseline because it is the
-  easiest runtime interface to audit.
-- Basis coefficients are the first genuinely distinct non-tree follow-up
-  candidate.
-- Path addressing is the first structured discrete follow-up.
-- Continuous address is later because embedding geometry and nearest-neighbor
-  target generation add more ambiguity.
-- The primary scarce resource is the model prediction head budget, not oracle
-  search time, codebook storage, or serialized field count.
+The command is standalone by design. It may use the processed corpus and shared
+LFO parsing/rendering utilities, but it does not define the Era 2 runtime model
+interface.

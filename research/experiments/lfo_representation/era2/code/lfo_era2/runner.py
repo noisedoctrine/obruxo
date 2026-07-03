@@ -1,4 +1,4 @@
-"""Experiment 10 runner, status, and artifact orchestration."""
+"""Experiment 11 runner, status, and artifact orchestration."""
 
 from __future__ import annotations
 
@@ -56,10 +56,10 @@ class ExperimentRunManifest:
 ERA2_ROOT = Path(__file__).resolve().parents[2]
 REPO_ROOT = ERA2_ROOT.parents[3]
 DEFAULT_METADATA = REPO_ROOT / "datasets" / "presetshare" / "raw" / "presetshare_vital_metadata.csv"
-DEFAULT_RUN_ROOT = ERA2_ROOT / "artifacts" / "experiment_10" / "runs"
+DEFAULT_RUN_ROOT = ERA2_ROOT / "artifacts" / "experiment_11" / "runs"
 
 
-def experiment10_row_specs(profile: str, *, backend: BackendPreference = "auto") -> list[ExperimentRowSpec]:
+def experiment11_row_specs(profile: str, *, backend: BackendPreference = "auto") -> list[ExperimentRowSpec]:
     profile = profile.lower()
     if profile == "quick":
         rows = [
@@ -99,7 +99,7 @@ def experiment10_row_specs(profile: str, *, backend: BackendPreference = "auto")
     ]
 
 
-def run_experiment10_screen(
+def run_experiment11_screen(
     *,
     profile: str = "quick",
     backend: BackendPreference = "auto",
@@ -112,7 +112,7 @@ def run_experiment10_screen(
     analyze: bool = True,
     monitor: Callable[[Path], None] | None = None,
 ) -> dict[str, Any]:
-    specs = row_specs or experiment10_row_specs(profile, backend=backend)
+    specs = row_specs or experiment11_row_specs(profile, backend=backend)
     if not specs:
         raise ValueError("at least one row spec is required")
     run_dir = _resolve_run_dir(run_dir)
@@ -133,7 +133,7 @@ def run_experiment10_screen(
     status = _load_status(run_dir) or _initial_status(run_id, profile, specs)
     manifest = ExperimentRunManifest(
         run_id=run_id,
-        screen="experiment10",
+        screen="experiment11",
         profile=profile,
         row_count=len(specs),
         started_at_utc=status["started_at_utc"],
@@ -249,7 +249,7 @@ def _run_row(spec: ExperimentRowSpec, dataset: Era2CurveDataset, row_dir: Path) 
         raise ValueError(f"target schema uses old stage terminology: {schema_stage_keys}")
 
     manifest = ExperimentRowManifest(
-        experiment_id="experiment_10",
+        experiment_id="experiment_11",
         oracle_construction_id="topology_blind_observed_residual_stack_v1",
         runtime_interface_id="flat_categorical_per_residual_layer",
         decoder_policy_id="final_clip",
@@ -278,7 +278,7 @@ def _run_row(spec: ExperimentRowSpec, dataset: Era2CurveDataset, row_dir: Path) 
             **assets.metadata,
             **dataset.manifest_fields(),
         },
-        notes="Experiment 10 topology-free flat-categorical row.",
+        notes="Experiment 11 topology-free flat-categorical row.",
     )
     train_metrics = _prefix("train", reconstruction_summary(dataset.train_curves, train_reconstructed))
     validation_metrics = _prefix("validation", reconstruction_summary(dataset.validation_curves, validation_reconstructed))

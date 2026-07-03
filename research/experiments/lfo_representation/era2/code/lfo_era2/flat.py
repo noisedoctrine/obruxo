@@ -44,7 +44,7 @@ def construct_flat_assets_from_curves(
 ) -> ReconstructionAssets:
     """Build a simple topology-free observed residual dictionary stack.
 
-    This is intentionally basic. It gives Experiment 10 a clean construction
+    This is intentionally basic. It gives Experiment 11 a clean construction
     path without importing Era 1's monolithic training code.
     """
     target_matrix = np.asarray(targets, dtype=np.float32)
@@ -253,7 +253,7 @@ def run_flat_smoke(
             "backend_used": encoded.backend_used,
             "schema_stage_key_violations": schema_stage_keys,
         },
-        notes="Tiny deterministic framework smoke run; not an Experiment 10 result.",
+        notes="Tiny deterministic framework smoke run; not an Experiment 11 result.",
     )
 
     metrics = reconstruction_summary(targets, reconstructed)

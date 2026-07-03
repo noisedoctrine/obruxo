@@ -11,11 +11,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "code"))
 
 from lfo_era2.analytics import analyze_run  # noqa: E402
 from lfo_era2.dataset import make_tiny_curve_dataset  # noqa: E402
-from lfo_era2.runner import ExperimentRowSpec, run_experiment10_screen, status_text  # noqa: E402
+from lfo_era2.runner import ExperimentRowSpec, run_experiment11_screen, status_text  # noqa: E402
 
 
 class RunnerTests(unittest.TestCase):
-    def test_experiment10_tiny_run_writes_status_rows_and_analytics(self) -> None:
+    def test_experiment11_tiny_run_writes_status_rows_and_analytics(self) -> None:
         dataset = make_tiny_curve_dataset(resolution=24, row_count=24)
         specs = [
             ExperimentRowSpec(row_id="tiny_w2_d2", D=2, W=2, budget_band="tiny", resolution=24, train_count=8, validation_count=4, backend="numpy"),
@@ -23,7 +23,7 @@ class RunnerTests(unittest.TestCase):
         ]
         with tempfile.TemporaryDirectory() as tmp:
             run_dir = Path(tmp) / "run_tiny"
-            result = run_experiment10_screen(
+            result = run_experiment11_screen(
                 profile="quick",
                 backend="numpy",
                 run_dir=run_dir,
@@ -45,7 +45,7 @@ class RunnerTests(unittest.TestCase):
         ]
         with tempfile.TemporaryDirectory() as tmp:
             run_dir = Path(tmp) / "run_tiny"
-            run_experiment10_screen(
+            run_experiment11_screen(
                 profile="quick",
                 backend="numpy",
                 run_dir=run_dir,
@@ -70,7 +70,7 @@ class RunnerTests(unittest.TestCase):
             def monitor(path: Path) -> None:
                 seen.append(path)
 
-            run_experiment10_screen(
+            run_experiment11_screen(
                 profile="quick",
                 backend="numpy",
                 run_dir=run_dir,
