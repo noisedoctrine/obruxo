@@ -170,7 +170,223 @@ def diagram_modulation_gap():
     plt.close(fig)
 
 
-# --- Diagram: WTSv2 architecture --------------------------------------------
+# --- Diagram: WTSv2 architecture (NN-style slabs) ---------------------------
+# PlotNeuralNet / AlexNet visual language: extruded 3D layer slabs, thin
+# connectors, muted palette, side labels. Keeps the real branching topology
+# (wavetable / noise / ADSR lanes converging), just in the NN-diagram idiom.
+
+# slab palette (muted, PlotNeuralNet-ish)
+SLAB_INPUT = "#edc949"   # amber  - inputs
+SLAB_ENC = "#76b7b2"     # teal   - encoder / shared
+SLAB_WT = "#4e79a7"      # blue   - wavetable path
+SLAB_NOISE = "#bab0ac"   # warm gray - noise path
+SLAB_ADSR = "#59a14f"    # green  - ADSR path
+SLAB_OUT = "#af7aa1"     # mauve  - outputs
+SLAB_EDGE = "#3d3d3d"
+SLAB_LINE = "#7a7a7a"
+
+
+def slab(ax, x, y, w, h, depth=0.45, *, fc, label=None, sublabel=None,
+         fontsize=8, ec=SLAB_EDGE, textcolor="white", lw=0.9, zorder=4):
+    """Draw an extruded 'neural net layer' slab and return its front face rect.
+
+    Front face is centered at (x, y). Depth extends up-right for the 3D effect.
+    """
+    # top face (parallelogram toward upper-right)
+    top = plt.Polygon([
+        (x - w / 2, y + h / 2),
+        (x - w / 2 + depth, y + h / 2 + depth),
+        (x + w / 2 + depth, y + h / 2 + depth),
+        (x + w / 2, y + h / 2),
+    ], closed=True, fc=_shade(fc, 1.25), ec=ec, lw=lw, zorder=zorder)
+    # right face
+    right = plt.Polygon([
+        (x + w / 2, y + h / 2),
+        (x + w / 2 + depth, y + h / 2 + depth),
+        (x + w / 2 + depth, y - h / 2 + depth),
+        (x + w / 2, y - h / 2),
+    ], closed=True, fc=_shade(fc, 0.75), ec=ec, lw=lw, zorder=zorder)
+    # front face
+    front = FancyBboxPatch(
+        (x - w / 2, y - h / 2), w, h,
+        boxstyle="round,pad=0.002,rounding_size=0.06",
+        fc=fc, ec=ec, lw=lw, zorder=zorder + 1,
+    )
+    for p in (top, right):
+        ax.add_patch(p)
+    ax.add_patch(front)
+    txt = label or ""
+    if sublabel:
+        txt = f"{label}\n{sublabel}" if label else sublabel
+    ax.text(x, y, txt, ha="center", va="center", fontsize=fontsize,
+            color=textcolor, weight="bold", zorder=zorder + 2)
+    return (x, y, w, h)
+
+
+def _shade(hexcolor, factor):
+    """Lighten (>1) or darken (<1) a hex color."""
+    h = hexcolor.lstrip("#")
+    r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
+    r = int(min(max(r * factor, 0), 255))
+    g = int(min(max(g * factor, 0), 255))
+    b = int(min(max(b * factor, 0), 255))
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
+def slab_connect(ax, n_from, n_to, *, side_from="right", side_to="left",
+                 color=SLAB_LINE, lw=1.1, rad=0.0, zorder=1):
+    sf = {"bottom": bottom, "top": top, "left": left, "right": right}[side_from]
+    st = {"bottom": bottom, "top": top, "left": left, "right": right}[side_to]
+    x0, y0 = sf(n_from)
+    x1, y1 = st(n_to)
+    arrow(ax, x0, y0, x1, y1, color=color, lw=lw,
+          connectionstyle=f"arc3,rad={rad}", zorder=zorder)
+
+
+def diagram_architecture_nn():
+    fig, ax = plt.subplots(figsize=(17, 9))
+    ax.set_xlim(0, 17)
+    ax.set_ylim(0, 9)
+    ax.set_axis_off()
+
+    ax.text(0.1, 8.65, "WTSv2 \u2014 Syntheon's Vital model",
+            fontsize=15, weight="bold", color=INK)
+    ax.text(0.1, 8.25,
+            "forward pass, traced from syntheon/inferencer/vital/models/*.py",
+            fontsize=9, color=INK_SOFT, style="italic")
+
+    # three lanes, left to right
+    wt_y = 6.4      # wavetable lane (top)
+    mid_y = 4.2     # encoder / shared lane (middle)
+    adsr_y = 2.0    # ADSR lane (bottom)
+    x = 1.6
+
+    # ---- inputs (column) ----
+    pitch = slab(ax, x, wt_y + 0.6, 1.3, 0.6, fc=SLAB_INPUT,
+                 label="pitch", fontsize=8)
+    loud = slab(ax, x, mid_y, 1.3, 0.6, fc=SLAB_INPUT,
+                label="loudness", fontsize=8)
+    audio = slab(ax, x, adsr_y + 0.6, 1.3, 0.6, fc=SLAB_INPUT,
+                 label="audio y", fontsize=8)
+    mfcc = slab(ax, x, adsr_y - 0.8, 1.3, 0.6, fc=SLAB_INPUT,
+                label="mfcc", fontsize=8)
+
+    # ---- encoder (shared) ----
+    x = 3.7
+    enc = slab(ax, x, mid_y, 1.7, 1.6, fc=SLAB_ENC,
+               label="encoder", sublabel="in_mlps \u2192 GRU\n\u2192 out_mlp",
+               fontsize=8)
+    # encoder fan-in: pitch, loudness, mfcc -> enc
+    slab_connect(ax, pitch, enc, side_from="right", side_to="left",
+                 rad=0.18)
+    slab_connect(ax, loud, enc, color=SLAB_LINE)
+    slab_connect(ax, mfcc, enc, side_from="right", side_to="left",
+                 rad=-0.18)
+
+    # ---- wavetable lane (top) ----
+    x = 6.1
+    extract = slab(ax, x, wt_y + 0.6, 2.1, 0.95, fc=SLAB_WT,
+                   label="wavetable", sublabel="extraction",
+                   fontsize=8)
+    # audio + pitch -> extract
+    slab_connect(ax, audio, extract, side_from="right", side_to="left",
+                 rad=0.22)
+    slab_connect(ax, pitch, extract, side_from="right", side_to="top",
+                 rad=0.05, color=SLAB_LINE)
+
+    x = 8.9
+    attn = slab(ax, x, wt_y + 0.6, 1.7, 0.95, fc=SLAB_WT,
+                label="attention", sublabel="softmax mix", fontsize=8)
+    slab_connect(ax, extract, attn)
+
+    x = 11.6
+    wtsynth = slab(ax, x, wt_y + 0.6, 2.0, 1.3, fc=SLAB_WT,
+                   label="wavetable", sublabel="osc V2\n+ phase accum",
+                   fontsize=8)
+    slab_connect(ax, attn, wtsynth)
+    # pitch -> wtsynth (long thin feed)
+    slab_connect(ax, pitch, wtsynth, side_from="right", side_to="left",
+                 rad=-0.32, lw=0.9)
+    # loudness -> wtsynth (amplitude)
+    slab_connect(ax, loud, wtsynth, side_from="right", side_to="left",
+                 rad=-0.18, lw=0.9)
+
+    x = 14.3
+    harm = slab(ax, x, wt_y + 0.6, 1.4, 0.9, fc=SLAB_WT,
+                label="harmonic", fontsize=8)
+    slab_connect(ax, wtsynth, harm)
+
+    # ---- noise lane (middle, off encoder) ----
+    x = 6.1
+    noise_proj = slab(ax, x, mid_y, 2.1, 1.0, fc=SLAB_NOISE,
+                      label="noise proj", sublabel="scale_fn \u2192 IR",
+                      fontsize=8, textcolor=INK)
+    slab_connect(ax, enc, noise_proj, color=SLAB_LINE)
+    x = 8.9
+    noise_filt = slab(ax, x, mid_y, 1.7, 1.0, fc=SLAB_NOISE,
+                      label="filtered", sublabel="fft_convolve",
+                      fontsize=8, textcolor=INK)
+    slab_connect(ax, noise_proj, noise_filt, color=SLAB_LINE)
+
+    # ---- ADSR lane (bottom) ----
+    x = 6.1
+    adsr_gru = slab(ax, x, adsr_y, 2.1, 1.0, fc=SLAB_ADSR,
+                    label="ADSR GRUs", sublabel="3\u00d7 bidir \u2192 sigmoid",
+                    fontsize=8)
+    # loudness -> adsr (long)
+    slab_connect(ax, loud, adsr_gru, side_from="right", side_to="left",
+                 rad=-0.22, color=SLAB_LINE)
+    x = 8.9
+    adsr_env = slab(ax, x, adsr_y, 1.7, 1.0, fc=SLAB_ADSR,
+                    label="ADSR env", sublabel="power-fn shape",
+                    fontsize=8)
+    slab_connect(ax, adsr_gru, adsr_env, color=SLAB_LINE)
+
+    # ---- convergence (right) ----
+    x = 14.3
+    summ = slab(ax, x, mid_y, 2.0, 1.0, fc=SLAB_OUT,
+                label="sum", sublabel="harm + noise", fontsize=8)
+    slab_connect(ax, harm, summ, side_from="bottom", side_to="top",
+                 rad=0.15)
+    slab_connect(ax, noise_filt, summ, side_from="right", side_to="left",
+                 rad=0.2, color=SLAB_LINE)
+
+    final = slab(ax, x, adsr_y, 2.0, 1.0, fc=SLAB_OUT,
+                 label="output", sublabel="signal \u00d7 ADSR",
+                 fontsize=8)
+    slab_connect(ax, summ, final, side_from="bottom", side_to="top",
+                 rad=0.15)
+    slab_connect(ax, adsr_env, final, side_from="right", side_to="left",
+                 rad=0.0, color=SLAB_LINE)
+
+    # reverb note
+    ax.text(0.2, 0.4,
+            "note: the Reverb module exists in the code but is commented out\n"
+            "in forward() \u2014 the shipped model does not apply reverb.",
+            fontsize=8, color="#b42318", style="italic", va="bottom")
+
+    # legend (lane colors)
+    legend_items = [
+        ("input", SLAB_INPUT), ("encoder / shared", SLAB_ENC),
+        ("wavetable path", SLAB_WT), ("noise path", SLAB_NOISE),
+        ("ADSR path", SLAB_ADSR), ("output", SLAB_OUT),
+    ]
+    lx, ly = 0.4, 8.0
+    for i, (name, col) in enumerate(legend_items):
+        rx = lx + (i % 3) * 2.5
+        ry = ly - (i // 3) * 0.4
+        ax.add_patch(plt.Rectangle((rx, ry), 0.25, 0.18,
+                                   fc=col, ec=SLAB_EDGE, lw=0.7))
+        ax.text(rx + 0.32, ry + 0.09, name, fontsize=7.5,
+                color=INK, va="center")
+
+    fig.tight_layout()
+    fig.savefig(OUT / "syntheon_architecture_nn.png", dpi=180,
+                bbox_inches="tight")
+    plt.close(fig)
+
+
+# --- Diagram: WTSv2 architecture (swim-lane flowchart) ----------------------
 def diagram_architecture():
     fig, ax = plt.subplots(figsize=(15, 12))
     ax.set_xlim(0, 15)
@@ -212,15 +428,12 @@ def diagram_architecture():
     noise_out = box(ax, 2.9, 3.6, 1.8, 0.5, "filtered noise",
                     fc="#f4f4f5", ec=NOISE_C, fontsize=8)
 
-    arrow(ax, 1.5, inp_y - 0.28, 2.4, enc[1] + enc[3] / 2)
-    arrow(ax, 2.9, inp_y - 0.28, 2.9, enc[1] + enc[3] / 2)
-    arrow(ax, 4.3, inp_y - 0.28, 3.5, enc[1] + enc[3] / 2)
-    arrow(ax, enc[1], enc[1] - enc[3] / 2 - 0.0, hidden[1] + hidden[3] / 2,
-          color=INK_SOFT)
-    arrow(ax, hidden[1], hidden[1] - hidden[3] / 2, noise[1] + noise[3] / 2,
-          color=NOISE_C)
-    arrow(ax, noise[1], noise[1] - noise[3] / 2, noise_out[1] + noise_out[3] / 2,
-          color=NOISE_C)
+    connect(ax, pitch, enc, side_from="bottom", side_to="top", rad=-0.15)
+    connect(ax, loud, enc, color=INK_SOFT)
+    connect(ax, mfcc, enc, side_from="bottom", side_to="top", rad=0.15)
+    connect(ax, enc, hidden, color=INK_SOFT)
+    connect(ax, hidden, noise, color=NOISE_C)
+    connect(ax, noise, noise_out, color=NOISE_C)
 
     # ---- wavetable lane ----
     extract = box(ax, 7.6, 8.3, 4.4, 1.0,
@@ -238,31 +451,23 @@ def diagram_architecture():
     harm = box(ax, 7.6, 4.1, 2.0, 0.55, "harmonic",
                fc="#dce8f5", ec=ACCENT, fontsize=8.5, weight="bold")
 
-    arrow(ax, audio[1], audio[1] - audio[3] / 2,
-          extract[1] + extract[3] / 2, color=ACCENT)
-    arrow(ax, pitch[1], pitch[1] - pitch[3] / 2, 0, 0)  # placeholder, removed below
-    # pitch -> extraction (curve)
-    arrow(ax, pitch[1] + pitch[2] / 2, pitch[1], extract[1] - extract[2] / 2,
-          extract[1] + 0.2, color=INPUT_C, lw=1.1,
-          connectionstyle="arc3,rad=-0.35")
+    connect(ax, audio, extract, color=ACCENT)
+    # pitch feeds extraction (curves across lane boundary)
+    connect(ax, pitch, extract, side_from="right", side_to="left",
+            color=INPUT_C, lw=1.1, rad=-0.35)
     ax.text(5.0, 9.15, "pitch", fontsize=7, color=INPUT_C, style="italic")
 
-    arrow(ax, extract[1], extract[1] - extract[3] / 2,
-          attn[1] + attn[3] / 2, color=ACCENT)
-    arrow(ax, attn[1], attn[1] - attn[3] / 2,
-          synth[1] + synth[3] / 2, color=ACCENT)
-    # loudness -> synth amplitude (curve across)
-    arrow(ax, loud[1] + loud[2] / 2, loud[1], synth[1] - synth[2] / 2,
-          synth[1] + 0.15, color=INPUT_C, lw=1.1,
-          connectionstyle="arc3,rad=-0.25")
+    connect(ax, extract, attn, color=ACCENT)
+    connect(ax, attn, synth, color=ACCENT)
+    # loudness -> synth (amplitude) crosses left
+    connect(ax, loud, synth, side_from="right", side_to="left",
+            color=INPUT_C, lw=1.1, rad=-0.25)
     ax.text(5.6, 5.95, "loudness\n(amplitude)", fontsize=7, color=INPUT_C,
             style="italic", ha="center")
-    # pitch -> synth oscillator
-    arrow(ax, pitch[1] + pitch[2] / 2, pitch[1] - 0.1,
-          synth[1] - synth[2] / 2 + 0.2, synth[1] - 0.1, color=INPUT_C, lw=1.0,
-          connectionstyle="arc3,rad=-0.45")
-    arrow(ax, synth[1], synth[1] - synth[3] / 2,
-          harm[1] + harm[3] / 2, color=ACCENT)
+    # pitch -> synth oscillator (deep curve)
+    connect(ax, pitch, synth, side_from="right", side_to="left",
+            color=INPUT_C, lw=1.0, rad=-0.5)
+    connect(ax, synth, harm, color=ACCENT)
 
     # ---- ADSR lane ----
     adsr_gru = box(ax, 12.6, 7.4, 3.4, 1.1,
@@ -273,13 +478,11 @@ def diagram_architecture():
     adsr_env = box(ax, 12.6, 5.4, 2.8, 0.8,
                    "ADSR envelope\n(get_amp_shaper: power-fn shaping)",
                    fc="#d6eceb", ec=ADSR_C, fontsize=7.7)
-    # loudness -> ADSR (curve across all lanes)
-    arrow(ax, loud[1] + loud[2] / 2, loud[1], adsr_gru[1] - adsr_gru[2] / 2,
-          adsr_gru[1] + 0.1, color=INPUT_C, lw=1.1,
-          connectionstyle="arc3,rad=-0.2")
+    # loudness -> ADSR (curves across all lanes)
+    connect(ax, loud, adsr_gru, side_from="right", side_to="left",
+            color=INPUT_C, lw=1.1, rad=-0.2)
     ax.text(8.7, 8.7, "loudness", fontsize=7, color=INPUT_C, style="italic")
-    arrow(ax, adsr_gru[1], adsr_gru[1] - adsr_gru[3] / 2,
-          adsr_env[1] + adsr_env[3] / 2, color=ADSR_C)
+    connect(ax, adsr_gru, adsr_env, color=ADSR_C)
 
     # ---- convergence ----
     summ = box(ax, 7.6, 2.7, 4.0, 0.7,
@@ -289,16 +492,12 @@ def diagram_architecture():
                 "final signal  =  signal  \u00d7  ADSR",
                 fc="#ece3fb", ec=EXTEND, fontsize=8.6, weight="bold", lw=1.5)
 
-    arrow(ax, harm[1], harm[1] - harm[3] / 2, summ[1] + summ[2] / 2 - 0.3,
-          summ[1] + summ[3] / 2, color=ACCENT)
-    arrow(ax, noise_out[1], noise_out[1] - noise_out[3] / 2,
-          summ[1] - summ[2] / 2 + 0.3, summ[1] + summ[3] / 2, color=NOISE_C,
-          connectionstyle="arc3,rad=0.2")
-    arrow(ax, adsr_env[1], adsr_env[1] - adsr_env[3] / 2,
-          final[1] + final[2] / 2 - 0.4, final[1] + final[3] / 2,
-          color=ADSR_C, connectionstyle="arc3,rad=0.25")
-    arrow(ax, summ[1], summ[1] - summ[3] / 2,
-          final[1] + final[3] / 2, color=EXTEND)
+    connect(ax, harm, summ, color=ACCENT)
+    connect(ax, noise_out, summ, side_from="bottom", side_to="left",
+            color=NOISE_C, rad=0.2)
+    connect(ax, adsr_env, final, side_from="bottom", side_to="right",
+            color=ADSR_C, rad=0.25)
+    connect(ax, summ, final, color=EXTEND)
 
     # reverb note
     ax.text(0.4, 0.5,
@@ -314,4 +513,5 @@ def diagram_architecture():
 if __name__ == "__main__":
     diagram_modulation_gap()
     diagram_architecture()
+    diagram_architecture_nn()
     print(f"wrote {len(list(OUT.glob('*.png')))} PNG(s) to {OUT}")
