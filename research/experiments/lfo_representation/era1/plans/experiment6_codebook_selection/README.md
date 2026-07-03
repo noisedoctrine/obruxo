@@ -18,11 +18,11 @@ The detailed plan is in [EXPERIMENT_6_PLAN.md](EXPERIMENT_6_PLAN.md).
 
 Runnable implementation is available.
 
-- Module: `lfo_experiment/experiment6.py`
-- Worker: `lfo_experiment/experiment6_worker.py`
-- Background runner: `run_experiment6_background.cmd`
-- Output directory: `artifacts/codebook_selection/`
-- Completion marker: `artifacts/codebook_selection/COMPLETED_EXCPERIMENT_6.txt`
+- Module: [experiment6.py](../../code/lfo_experiment/experiment6.py)
+- Worker: [experiment6_worker.py](../../code/lfo_experiment/experiment6_worker.py)
+- Background runner: [run_experiment6_background.cmd](../../code/run_experiment6_background.cmd)
+- Output directory: [artifacts/codebook_selection/](../../artifacts/codebook_selection/)
+- Completion marker: `../../artifacts/codebook_selection/COMPLETED_EXCPERIMENT_6.txt`
 
 The implementation evaluates oracle reconstruction, factor-of-3 direct-grid baselines, phase-residual candidate families, threshold coverage, editor-node preservation, complexity accounting, Pareto plots, and pseudo-AIC/BIC diagnostics. Neural predictor training is intentionally not part of the default run; this run is for choosing the codebook-generation approach before we spend more time on inferability.
 
@@ -31,7 +31,7 @@ The implementation evaluates oracle reconstruction, factor-of-3 direct-grid base
 Experiment 6 now checkpoints each candidate independently under:
 
 ```text
-artifacts/codebook_selection/checkpoints/
+../../artifacts/codebook_selection/checkpoints/
 ```
 
 Restarting the experiment skips completed checkpoints and aggregates whatever is complete at the end. Candidate-level parallelism is available with `--parallel N`; use `--parallel 2` as the cautious laptop default.
@@ -39,7 +39,7 @@ Restarting the experiment skips completed checkpoints and aggregates whatever is
 Progress is written to:
 
 ```text
-artifacts/codebook_selection/progress.json
+../../artifacts/codebook_selection/progress.json
 ```
 
 The status command reports completed candidates, estimated workload progress, elapsed time, and ETA.

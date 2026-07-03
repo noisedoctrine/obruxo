@@ -24,16 +24,7 @@ That gap is not a footnote. It is the reason this project exists.
 
 This deserves to be up front, not buried in a limitations section.
 
-```text
-  What Syntheon emits              What an evolving Vital sound actually needs
-  ┌────────────────────┐           ┌────────────────────────────┐
-  │ static knob vector │           │ static knob vector         │ ◄── Syntheon's ceiling
-  │  osc, filter,      │           │ + modulation curves        │     (a strict subset)
-  │  env, fx ...       │   vs      │   (LFO / env / automation) │
-  │  all fixed values  │           │ + modulation routing       │ ◄── our wedge
-  └────────────────────┘           │ + modulation amounts       │
-                                   └────────────────────────────┘
-```
+![The modulation gap](images/syntheon_modulation_gap.png)
 
 Syntheon predicts a flat vector of synthesizer parameters. The moment a sound's
 character comes from a filter sweep, an LFO on pitch, an envelope shaping a
@@ -84,25 +75,58 @@ Syntheon doesn't have a formal paper — only an ADC22 talk. So to understand th
                         Syntheon / WTSv2  (gudgud96, ADC22 talk)
 ```
 
-Key contributions we actually care about, one line each:
+What each actually contributed, weighted by how much of it Syntheon carried
+over:
 
-- **DDSP (Engel et al., ICML 2020).** The foundational move: build a synthesizer
-  out of differentiable signal-processing blocks (oscillators, filters, reverb)
-  so you can train the whole thing end-to-end against an audio loss, instead of
-  treating synthesis as a fixed black box. Syntheon's entire training loop is
-  this idea applied to wavetable synthesis.
-- **Differentiable Wavetable Synthesis (Shan et al., ICASSP 2022).** This is the
-  paper "WTSv2" is adapted from — confirmed by Tan's own `diff-wave-synth` repo,
-  which is an unofficial PyTorch implementation of it. The contribution: a bank
-  of wavetables mixed by a differentiable attention mechanism, giving a compact
-  representation of timbre that's cheaper than additive harmonic synthesis.
-- **CREPE (Kim et al., ISMIR 2018).** A CNN pitch tracker. Syntheon uses the
-  large variant as a preprocessing step to get f0, which the wavetable oscillator
-  then needs. It's the state-of-the-art for monophonic pitch, at the cost of
-  being slow.
-- **DiffSynth (Masuda & Shimamura, 2021).** Differentiable ADSR envelopes with
-  power-function shaping and differentiable rounding, for sound-matching.
-  Syntheon's envelope design is lifted from here.
+**Differentiable Wavetable Synthesis — Shan et al., ICASSP 2022** *(heaviest
+contribution; this is effectively the model).*
+"WTSv2" is this paper — Tan's own `diff-wave-synth` repo is an unofficial
+PyTorch implementation of it, and Syntheon's model is the adapted version.
+The core idea: replace a single fixed oscillator waveform with a *bank* of
+wavetables and learn a differentiable mixing weight (an attention mechanism)
+over them. That gives you a compact, continuous representation of timbre — you
+shape sound by interpolating between a few stored single-cycle waveforms rather
+than summing hundreds of additive harmonics. It's cheaper and more
+synth-native than DDSP's additive harmonic oscillator, which matters because it
+maps directly onto how a wavetable synth like Vital actually works. Syntheon
+inherits the wavetable bank, the attention-mixing, the linear interpolation
+between table samples, and the phase-accumulation oscillator pretty much as-is.
+
+**DDSP: Differentiable Digital Signal Processing — Engel et al., ICML 2020**
+*(foundational contribution; defines the training paradigm).*
+The move that makes all of this trainable: build the synthesizer out of
+differentiable signal-processing primitives — harmonic oscillators, filtered
+noise, reverb — so you can backpropagate an audio-domain loss all the way back
+to the synth's controls. Instead of treating synthesis as a fixed black box and
+training a separate model to mimic its output, you train *through* the synth.
+Syntheon takes several concrete things from the DDSP-PyTorch reference
+implementation: the multiscale STFT spectral loss (its exact 6-scale setup), the
+A-weighted loudness extraction, and the MLP/GRU module builders. Less directly
+but more importantly, DDSP is the reason a "predict params, render audio,
+compare to target, update params" loop is even possible — that loop *is*
+Syntheon's training objective.
+
+**DiffSynth — Masuda & Shimamura, 2021** *(medium contribution; the envelope
+design).*
+DiffSynth is a differentiable synthesizer built specifically for
+sound-matching — i.e. the same task as Syntheon, just framed as resynthesis.
+Syntheon's envelope handling is lifted from here: the differentiable ADSR with
+power-function shaping (pow > 0 for convex curves, pow < 0 for concave), the
+custom autograd function for differentiable rounding, and the soft-minimum
+clamping with a temperature parameter. The differentiable rounding matters
+because it lets gradients flow through the discrete time-quantization of the
+envelope, which you need for end-to-end training. Syntheon borrows the envelope
+module but swaps the oscillator for the wavetable approach above.
+
+**CREPE — Kim et al., ISMIR 2018** *(lightest contribution; just a preprocessing
+step).*
+A CNN pitch estimator trained on a huge semi-supervised corpus — at the time,
+the state of the art for monophonic f0 tracking. Syntheon uses the large
+variant purely as a front-end: run audio through CREPE, get an f0 contour, feed
+that to the wavetable oscillator. It's not integrated into the differentiable
+graph; it's a fixed feature extractor. Slow (the large model is heavy), but
+accurate, and it's the obvious off-the-shelf choice for pitch — there's no
+reason for us to look elsewhere for that job.
 
 ## The architecture in brief
 

@@ -51,7 +51,7 @@ Use labels like `W16D24`, where:
 
 Persist the shared sample at:
 
-`artifacts/additive_finalization_8_screen/screen_sample_indices.npz`
+`../artifacts/additive_finalization_8_screen/screen_sample_indices.npz`
 
 ## Modifier Labels
 

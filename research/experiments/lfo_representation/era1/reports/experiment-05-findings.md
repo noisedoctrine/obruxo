@@ -6,7 +6,7 @@ Experiment 5 asked a narrow but important question:
 
 The short answer is that phase factorization is sound, but it only pays off fully when alignment is solved independently per code and then used inside beam search. Greedy selection with the stronger aligner is useful diagnostically, but the practical reconstruction gains come from separating alignment quality from layered search quality.
 
-The full run completed successfully at `2026-06-26T18:35:40+08:00`; stderr was empty. Artifacts are under `artifacts/phase_alignment_oracle/`.
+The full run completed successfully at `2026-06-26T18:35:40+08:00`; stderr was empty. Artifacts are under `../artifacts/phase_alignment_oracle/`.
 
 ## What was tested
 

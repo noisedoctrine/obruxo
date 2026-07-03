@@ -267,7 +267,7 @@ Exact code accuracy is secondary because multiple code/phase/gain paths may reco
 Write artifacts under:
 
 ```text
-artifacts/codebook_selection/
+../../artifacts/codebook_selection/
 ```
 
 Expected outputs:

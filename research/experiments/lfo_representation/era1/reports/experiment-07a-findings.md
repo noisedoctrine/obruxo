@@ -1,4 +1,4 @@
-﻿# Experiment 7A Findings: Additive Finalization Policy Selection
+# Experiment 7A Findings: Additive Finalization Policy Selection
 
 ## Decision read
 
@@ -169,14 +169,14 @@ Notes:
 Use this generated config as the primary 7B seed:
 
 ```text
-artifacts/additive_finalization_7a/candidate_7b_configs/experiment7b_topology_balanced_common_then_tail_none.json
+../artifacts/additive_finalization_7a/candidate_7b_configs/experiment7b_topology_balanced_common_then_tail_none.json
 ```
 
 Secondary challengers, only if 7B budget allows:
 
 ```text
-artifacts/additive_finalization_7a/candidate_7b_configs/experiment7b_topology_balanced_common_then_tail_global_offset.json
-artifacts/additive_finalization_7a/candidate_7b_configs/experiment7b_greedy_global_improvement_none.json
+../artifacts/additive_finalization_7a/candidate_7b_configs/experiment7b_topology_balanced_common_then_tail_global_offset.json
+../artifacts/additive_finalization_7a/candidate_7b_configs/experiment7b_greedy_global_improvement_none.json
 ```
 
 Do **not** use `frequency_first` for 7B based on the complete 960 run. Do **not** expand modifiers first; spend 7B budget on residual-stage width/count scaling of the topology-balanced policy while tracking both median and P95.

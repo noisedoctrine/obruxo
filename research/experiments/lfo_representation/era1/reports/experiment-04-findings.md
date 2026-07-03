@@ -1,4 +1,4 @@
-﻿# Experiment 4 Findings: Phase-Factorized Residual Codebooks
+# Experiment 4 Findings: Phase-Factorized Residual Codebooks
 
 ## What did this experiment ask?
 
@@ -47,8 +47,8 @@ Even 64 positions gave away much of the continuous-offset result. A continuous s
 | Configuration | Dense outputs | Median RMSE | P95 RMSE |
 |---|---:|---:|---:|
 | Shared | 105 | 0.007051 | 0.076554 |
-| Shared layer 1, topology layers 2â€“4 | 108 | 0.007806 | 0.071169 |
-| Shared layers 1â€“2, topology layers 3â€“4 | 108 | 0.006913 | 0.071610 |
+| Shared layer 1, topology layers 2–4 | 108 | 0.007806 | 0.071169 |
+| Shared layers 1–2, topology layers 3–4 | 108 | 0.006913 | 0.071610 |
 | Additive K8 shared + K8 topology | 116 | 0.005739 | 0.053648 |
 | Additive K16 + K16 upper bound | 180 | 0.002900 | 0.043579 |
 
@@ -72,7 +72,7 @@ Yes. Neural prediction was intentionally deferred, but the environment was verif
 - FFT round-trip maximum error `4.17e-7`;
 - gradients were finite.
 
-The machine-readable check is in `artifacts/phase_factorized_residual/pytorch_environment.json`.
+The machine-readable check is in `../artifacts/phase_factorized_residual/pytorch_environment.json`.
 
 ## Proposed research direction for Experiment 5
 
