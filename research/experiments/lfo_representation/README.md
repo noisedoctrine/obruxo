@@ -5,10 +5,8 @@ This folder is split by research era.
 Era 1 is the preserved evidence base: historical code, reports, audits, plans,
 plots, and generated artifacts from Experiments 1-9.
 
-Era 2 is the active research direction. It has a design space and empty
-workspace folders, but no implementation scaffold yet. That is deliberate: Era
-2 code should start fresh from the clarified model-facing contract, not from the
-Era 1 file structure.
+Era 2 is the active research direction. Its framework code starts fresh from the
+clarified model-facing contract instead of copying the Era 1 file structure.
 
 ## Where Things Live
 
@@ -19,8 +17,12 @@ Era 1 file structure.
 - [era1/audits/lfo_experiments_1to9_audit_results.md](./era1/audits/lfo_experiments_1to9_audit_results.md):
   conceptual audit of the Era 1 topology/accounting ambiguity.
 - [era2/](./era2/): clean Era 2 research workspace.
-- [era2/design/LFO_ERA2_DESIGN.md](./era2/design/LFO_ERA2_DESIGN.md):
+- [era2/reports/LFO_ERA2_DESIGN.md](./era2/reports/LFO_ERA2_DESIGN.md):
   Era 2 research priors and design contract.
+- [era2/experiments/ERA2_CORE_FRAMEWORK_PLAN.md](./era2/experiments/ERA2_CORE_FRAMEWORK_PLAN.md):
+  implementation plan for the Era 2 core framework.
+- [era2/code/](./era2/code/): compact framework package for Experiment 10 and
+  later Era 2 work.
 
 ## Era 2 Contract
 
@@ -40,7 +42,8 @@ model for the LFO component.
 - Do not add new Era 2 code under [era1/code/](./era1/code/).
 - Do not import Era 1 code into new Era 2 work unless that dependency is
   deliberate and audited.
+- Keep new Era 2 framework code under [era2/code/](./era2/code/).
 - Keep generated Era 2 outputs under [era2/artifacts/](./era2/artifacts/).
 - Keep Era 2 writeups under [era2/reports/](./era2/reports/) or
-  [era2/notes/](./era2/notes/), depending on whether they are polished results
-  or working notes.
+  [era2/notes/](./era2/notes/), depending on whether they are polished research
+  notes/results or working notes.
