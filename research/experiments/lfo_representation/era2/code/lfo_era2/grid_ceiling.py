@@ -7,7 +7,7 @@ from pathlib import Path
 import csv
 import json
 import time
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 
@@ -49,19 +49,30 @@ def run_grid_ceiling_audit(
     metadata_limit: int | None = None,
     active_only: bool = True,
     chunk_size: int = 512,
+    progress: Callable[[str], None] | None = None,
 ) -> dict[str, Any]:
     started = time.perf_counter()
+    if progress:
+        progress(
+            "grid-ceiling: loading metadata "
+            f"dense_points={dense_points} active_only={active_only} metadata_limit={metadata_limit}"
+        )
     dataset = load_presetshare_curve_dataset(
         metadata_path,
         resolution=dense_points,
         active_only=active_only,
         metadata_limit=metadata_limit,
+        progress=progress,
     )
     if not dataset.shapes:
         raise ValueError("grid ceiling audit requires source LFO shapes")
+    if progress:
+        progress(f"grid-ceiling: loaded {len(dataset.shapes)} LFO shapes")
     reference_dense = dataset.curves.astype(np.float32)
     results = []
-    for points in atom_grid_points:
+    for index, points in enumerate(atom_grid_points, start=1):
+        if progress:
+            progress(f"grid-ceiling: [{index}/{len(atom_grid_points)}] N={points} starting")
         row_started = time.perf_counter()
         reconstructed = best_fixed_grid_reconstruction(
             dataset.shapes,
@@ -69,6 +80,7 @@ def run_grid_ceiling_audit(
             dense_points=dense_points,
             reference_dense=reference_dense,
             chunk_size=chunk_size,
+            progress=progress,
         )
         metrics = reconstruction_summary(reference_dense, reconstructed)
         metrics.update(_topology_metrics(reference_dense, reconstructed, dataset.topology))
@@ -81,6 +93,12 @@ def run_grid_ceiling_audit(
                 metrics=metrics,
             )
         )
+        if progress:
+            progress(
+                "grid-ceiling: "
+                f"[{index}/{len(atom_grid_points)}] N={points} done "
+                f"elapsed={results[-1].elapsed_seconds:.1f}s p95_rmse={metrics['p95_rmse']:.8f}"
+            )
     rows = [result.as_row() for result in results]
     output_dir.mkdir(parents=True, exist_ok=True)
     _write_csv(output_dir / "summary.csv", rows)
@@ -98,6 +116,8 @@ def run_grid_ceiling_audit(
         "method": "bounded_least_squares_projection_onto_inclusive_fixed_linear_point_grid",
     }
     write_json(output_dir / "manifest.json", manifest)
+    if progress:
+        progress(f"grid-ceiling: wrote summary/report to {output_dir}")
     return {
         "output_dir": str(output_dir),
         "summary": str(output_dir / "summary.csv"),
@@ -114,6 +134,7 @@ def best_fixed_grid_reconstruction(
     dense_points: int,
     reference_dense: np.ndarray | None = None,
     chunk_size: int = 512,
+    progress: Callable[[str], None] | None = None,
 ) -> np.ndarray:
     if atom_grid_points < 2:
         raise ValueError("atom_grid_points must be at least 2")
@@ -127,12 +148,22 @@ def best_fixed_grid_reconstruction(
     dense = np.asarray(reference_dense, dtype=np.float32)
     output = np.empty_like(dense)
     chunk_size = max(1, int(chunk_size))
+    if progress:
+        progress(
+            f"grid-ceiling: N={atom_grid_points} projecting {len(dense)} curves "
+            f"in chunks of {chunk_size}"
+        )
     for start in range(0, len(dense), chunk_size):
         stop = min(start + chunk_size, len(dense))
         values = dense[start:stop].astype(np.float64)
         grid_values = values @ pinv.T
         invalid_rows = np.flatnonzero((np.min(grid_values, axis=1) < 0.0) | (np.max(grid_values, axis=1) > 1.0))
         if len(invalid_rows):
+            if progress:
+                progress(
+                    f"grid-ceiling: N={atom_grid_points} rows {start}-{stop} "
+                    f"bounded least squares for {len(invalid_rows)} curves"
+                )
             grid_values[invalid_rows] = _bounded_grid_values(
                 basis,
                 values[invalid_rows],

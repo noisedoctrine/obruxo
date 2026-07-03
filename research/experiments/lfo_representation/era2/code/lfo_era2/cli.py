@@ -118,6 +118,7 @@ def main() -> None:
             metadata_limit=args.metadata_limit,
             active_only=not args.include_inactive,
             chunk_size=args.chunk_size,
+            progress=lambda message: print(message, flush=True),
         )
         print(f"Wrote grid ceiling audit to {result['output_dir']}")
         print(f"summary={result['summary']}")

@@ -12,7 +12,7 @@ import csv
 import hashlib
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 
@@ -118,6 +118,7 @@ def load_presetshare_curve_dataset(
     resolution: int = 128,
     active_only: bool = True,
     metadata_limit: int | None = None,
+    progress: Callable[[str], None] | None = None,
 ) -> Era2CurveDataset:
     metadata_path = Path(metadata_path)
     if not metadata_path.exists():
@@ -130,6 +131,8 @@ def load_presetshare_curve_dataset(
     with metadata_path.open("r", encoding="utf-8", newline="") as handle:
         reader = csv.DictReader(handle)
         for ordinal, record in enumerate(reader, start=1):
+            if progress and (ordinal == 1 or ordinal % 500 == 0):
+                progress(f"dataset: scanned metadata rows={ordinal} collected_lfos={len(curves)} errors={errors}")
             if metadata_limit is not None and ordinal > metadata_limit:
                 break
             preset_file = record.get("preset_file", "")
@@ -171,6 +174,8 @@ def load_presetshare_curve_dataset(
                 shapes.append(shape)
     if not curves:
         raise ValueError(f"no usable LFO curves found in {metadata_path}")
+    if progress:
+        progress(f"dataset: finished scan collected_lfos={len(curves)} errors={errors}")
 
     curve_array = np.stack(curves).astype(np.float32)
     topology_array = np.asarray(topology, dtype=np.int8)
