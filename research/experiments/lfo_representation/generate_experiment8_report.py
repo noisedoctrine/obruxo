@@ -47,6 +47,20 @@ def _modifier_indicators(summary: pd.DataFrame) -> tuple[pd.Series, pd.Series]:
     return has_gain, has_offset
 
 
+def _flattened_residual_logits(width: pd.Series, depth: pd.Series, topology_conditioned: pd.Series) -> pd.Series:
+    """Model-facing residual categorical size after flattening topology dictionaries.
+
+    `topology_balanced_common_then_tail` alternates shared and topology-specific
+    residual layers. Shared layers cost W logits. Topology-specific layers are
+    deployed as one flattened categorical vocabulary, so they cost 3W logits.
+    """
+    shared_layers = (depth + 1) // 2
+    topology_layers = depth // 2
+    flattened_topology = width * (shared_layers + 3 * topology_layers)
+    shared_only = width * depth
+    return flattened_topology.where(topology_conditioned.astype(bool), shared_only)
+
+
 def _add_head_accounting(summary: pd.DataFrame) -> pd.DataFrame:
     """Add the intended downstream output-head accounting.
 
@@ -57,12 +71,14 @@ def _add_head_accounting(summary: pd.DataFrame) -> pd.DataFrame:
     frame = summary.copy()
     width = frame["residual_width"].astype(int)
     depth = frame["residual_depth"].astype(int)
+    topology_conditioned = frame.get("topology_dependency", pd.Series(False, index=frame.index)).astype(bool)
     has_gain, has_offset = _modifier_indicators(frame)
     modifier_families = 1 + has_gain + has_offset
     frame["I_phase"] = 1
     frame["I_gain"] = has_gain
     frame["I_offset"] = has_offset
-    frame["cat_logits"] = 32 + width * depth
+    frame["residual_logits"] = _flattened_residual_logits(width, depth, topology_conditioned)
+    frame["cat_logits"] = 32 + frame["residual_logits"]
     frame["scalar_outputs"] = (depth + 1) * modifier_families
     frame["head_outputs"] = frame["cat_logits"] + frame["scalar_outputs"]
     frame["optional_modifier_outputs"] = (depth + 1) * (has_gain + has_offset)
@@ -889,16 +905,16 @@ The size screen strongly favors depth. The best configurations all use high `D`,
 The corrected model-facing output-head size is:
 
 ```text
-head_outputs = 32 + W*D + (D + 1) * (I_phase + I_gain + I_offset)
+head_outputs = 32 + sum(layer_codebook_size) + (D + 1) * (I_phase + I_gain + I_offset)
 ```
 
 For Experiment 8, phase is mandatory:
 
 ```text
-head_outputs = 33 + D(W + 1) + (D + 1)(I_gain + I_offset)
+head_outputs = 32 + sum(layer_codebook_size) + (D + 1) + (D + 1)(I_gain + I_offset)
 ```
 
-This is the intended interface cost: `32` base categorical choices, `W*D` residual categorical choices, and one scalar at the base plus one scalar per residual layer for each enabled modifier family. Optional gain and optional offset each cost `D + 1` outputs. Phase is included in the baseline and is not treated as a free design knob in the Experiment 8 plots.
+For shared residual layers, `layer_codebook_size = W`. For topology-conditioned residual layers, the deployed interface flattens the topology dictionaries and uses `layer_codebook_size = 3W`. There is no separate topology classifier in this accounting; the model emits one categorical code per residual layer. Optional gain and optional offset each cost `D + 1` outputs. Phase is included in the baseline and is not treated as a free design knob in the Experiment 8 plots.
 
 `serialized_fields` is kept only as a storage/decoder count. It is not the neural output-head burden, because a categorical code index is emitted by a softmax over its codebook.
 

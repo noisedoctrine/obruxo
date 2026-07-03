@@ -154,17 +154,22 @@ Report:
 
 ### Experiment 9
 
-Experiment 9 is the next quick fixed-budget screen at `W8D16`. It is meant to
-answer questions that Experiment 8 exposed rather than expanding the size grid:
+Experiment 9 is the next quick screen. Its main decoder/modifier jobs stay fixed
+at `W8D16`, and it adds a small equivalent-output-budget check for narrow
+residual widths rather than expanding the full size grid:
 
 - where gain/offset should apply: base, residuals, or both;
 - whether residual range normalization makes those scalars useful;
 - which synth-style decoder hygiene policy is the best cheap baseline;
 - whether data-derived snap anchors help final output cheaply.
+- whether W4/W6 narrow-deep stacks are more parameter-efficient than reused W8
+  reference budgets from Experiment 8.
 
 Experiment 9 should record both train and validation metrics, because worse
 validation under more degrees of freedom may reflect the construction/decoder
-objective rather than normal overfitting.
+objective rather than normal overfitting. Alongside median and P95 RMSE, it
+tracks `perfect_lfo_rate_eps_0.02`: the share of LFOs whose entire sampled curve
+has `max_abs_error <= 0.02`.
 
 Report:
 [experiment-09-findings.md](./reports/experiment-09-findings.md).
@@ -207,13 +212,18 @@ categorical code index means the model emits a softmax over that codebook.
 Use:
 
 ```text
-head_outputs = 32 + W*D + (D + 1) * (I_phase + I_gain + I_offset)
+head_outputs = 32 + sum(layer_codebook_size) + (D + 1) * (I_phase + I_gain + I_offset)
 ```
+
+For shared residual layers, `layer_codebook_size = W`. For topology-conditioned
+residual layers, deployment should flatten the topology-specific dictionaries
+and use `layer_codebook_size = 3W`; the model predicts one categorical code, not
+a topology label plus a second code.
 
 In the current experiments phase is assumed enabled:
 
 ```text
-phase-only baseline = 33 + D(W + 1)
+phase-only baseline = 32 + sum(layer_codebook_size) + (D + 1)
 optional gain       = +(D + 1)
 optional offset     = +(D + 1)
 ```

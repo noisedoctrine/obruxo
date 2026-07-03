@@ -501,11 +501,17 @@ def _experiment9_head_scalars(policy: Experiment7Policy, stage_count: int) -> in
 
 
 def _experiment9_phase_head_outputs(width: int, residual_depth: int) -> int:
-    return 33 + int(residual_depth) * (int(width) + 1)
+    width = int(width)
+    residual_depth = int(residual_depth)
+    shared_layers = (residual_depth + 1) // 2
+    topology_layers = residual_depth // 2
+    residual_logits = width * (shared_layers + len(TOPOLOGY_NAMES) * topology_layers)
+    phase_scalars = residual_depth + 1
+    return int(32 + residual_logits + phase_scalars)
 
 
 def _closest_even_depth_for_head_budget(*, width: int, target_head_outputs: int) -> int:
-    raw_depth = max(2.0, (float(target_head_outputs) - 33.0) / float(int(width) + 1))
+    raw_depth = max(2.0, (float(target_head_outputs) - 33.0) / float(2 * int(width) + 1))
     lower = max(2, int(np.floor(raw_depth / 2.0)) * 2)
     upper = max(2, int(np.ceil(raw_depth / 2.0)) * 2)
     candidates = sorted({lower, upper})
@@ -820,7 +826,7 @@ def _inflight_cache_path(cache_output_dir: Path | None, cache_key: str | None, n
 
 def _write_npz_atomic(path: Path, **arrays: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp = path.with_suffix(path.suffix + f".{os.getpid()}.tmp")
     with tmp.open("wb") as handle:
         np.savez(handle, **arrays)
     tmp.replace(path)
@@ -840,28 +846,26 @@ def _load_encoding_progress(
     if cache_path is None or not cache_path.exists():
         return None
     try:
-        cached = np.load(cache_path)
-        if (
-            int(cached["n"]) != n
-            or int(cached["stage_count"]) != stage_count
-            or int(cached["batch_size"]) != batch_size
-        ):
-            return None
-        completed = min(n, int(cached["completed"]))
-        stage_indices = cached["stage_indices"]
-        stage_phases = cached["stage_phases"]
-        stage_gains = cached["stage_gains"]
-        if stage_indices.shape != (stage_count, n):
-            return None
+        with np.load(cache_path) as cached:
+            if (
+                int(cached["n"]) != n
+                or int(cached["stage_count"]) != stage_count
+                or int(cached["batch_size"]) != batch_size
+            ):
+                return None
+            completed = min(n, int(cached["completed"]))
+            stage_indices = cached["stage_indices"]
+            stage_phases = cached["stage_phases"]
+            stage_gains = cached["stage_gains"]
+            if stage_indices.shape != (stage_count, n):
+                return None
+            base_indices = cached["base_indices"].astype(np.int16, copy=True)
+            base_phases = cached["base_phases"].astype(np.float32, copy=True)
+            stage_indices_out = [stage_indices[i].astype(np.int16, copy=True) for i in range(stage_count)]
+            stage_phases_out = [stage_phases[i].astype(np.float32, copy=True) for i in range(stage_count)]
+            stage_gains_out = [stage_gains[i].astype(np.float32, copy=True) for i in range(stage_count)]
         _log_progress(f"Resuming cached validation encoding {cache_path.parent.name}: {completed:,}/{n:,}")
-        return (
-            completed,
-            cached["base_indices"].astype(np.int16, copy=False),
-            cached["base_phases"].astype(np.float32, copy=False),
-            [stage_indices[i].astype(np.int16, copy=False) for i in range(stage_count)],
-            [stage_phases[i].astype(np.float32, copy=False) for i in range(stage_count)],
-            [stage_gains[i].astype(np.float32, copy=False) for i in range(stage_count)],
-        )
+        return completed, base_indices, base_phases, stage_indices_out, stage_phases_out, stage_gains_out
     except Exception as exc:
         _log_progress(f"Ignoring invalid validation encoding cache {cache_path}: {exc}")
         return None
@@ -894,6 +898,31 @@ def _write_encoding_progress(
         stage_phases=np.stack(out_phases) if out_phases else np.empty((0, n), dtype=np.float32),
         stage_gains=np.stack(out_gains) if out_gains else np.empty((0, n), dtype=np.float32),
     )
+
+
+def _load_training_apply_progress(
+    cache_path: Path | None,
+    *,
+    prefix_shape: tuple[int, ...],
+    target_count: int,
+) -> tuple[int, np.ndarray, np.ndarray, np.ndarray, np.ndarray] | None:
+    if cache_path is None or not cache_path.exists():
+        return None
+    try:
+        with np.load(cache_path) as cached:
+            if tuple(cached["updated"].shape) != prefix_shape or int(cached["target_count"]) != target_count:
+                return None
+            completed = min(target_count, int(cached["completed"]))
+            updated = cached["updated"][:completed].astype(np.float32, copy=True)
+            choices = cached["choices"][:completed].astype(np.int16, copy=True)
+            phases = cached["phases"][:completed].astype(np.float32, copy=True)
+            gains = cached["gains"][:completed].astype(np.float32, copy=True)
+        if completed:
+            _log_progress(f"Resuming cached training apply {cache_path.name}: {completed:,}/{target_count:,}")
+        return completed, updated, choices, phases, gains
+    except Exception as exc:
+        _log_progress(f"Ignoring invalid training apply cache {cache_path}: {exc}")
+        return None
 
 
 def _estimate_peak_memory_mb(
@@ -1288,7 +1317,6 @@ def _encode_final_clip_beam_torch(
                     aligned,
                     shifted,
                     additions,
-                    candidate_raw,
                     candidate_state,
                     candidate_recon,
                     mse,
@@ -1806,20 +1834,17 @@ def _score_training_stage_cpu(
     choices = np.empty(len(targets), dtype=np.int16)
     phases = np.empty(len(targets), dtype=np.float32)
     gains = np.empty(len(targets), dtype=np.float32)
-    if cache_path is not None and cache_path.exists():
-        try:
-            cached = np.load(cache_path)
-            if tuple(cached["updated"].shape) == tuple(prefix.shape) and int(cached["target_count"]) == len(targets):
-                completed = min(len(targets), int(cached["completed"]))
-                updated[:completed] = cached["updated"][:completed]
-                choices[:completed] = cached["choices"][:completed]
-                phases[:completed] = cached["phases"][:completed]
-                gains[:completed] = cached["gains"][:completed]
-                if completed:
-                    _log_progress(f"Resuming cached training apply {cache_path.name}: {completed:,}/{len(targets):,}")
-        except Exception as exc:
-            _log_progress(f"Ignoring invalid training apply cache {cache_path}: {exc}")
-            completed = 0
+    cached_progress = _load_training_apply_progress(
+        cache_path,
+        prefix_shape=tuple(prefix.shape),
+        target_count=len(targets),
+    )
+    if cached_progress is not None:
+        completed, cached_updated, cached_choices, cached_phases, cached_gains = cached_progress
+        updated[:completed] = cached_updated
+        choices[:completed] = cached_choices
+        phases[:completed] = cached_phases
+        gains[:completed] = cached_gains
     cache_every = _cache_every()
     rows_cache: dict[int, np.ndarray] = {}
     for chunk_index, start in enumerate(range(0, len(targets), train_batch), start=1):
@@ -1887,20 +1912,17 @@ def _apply_training_stage_torch(
     choices = np.empty(len(targets), dtype=np.int16)
     phases = np.empty(len(targets), dtype=np.float32)
     gains = np.empty(len(targets), dtype=np.float32)
-    if cache_path is not None and cache_path.exists():
-        try:
-            cached = np.load(cache_path)
-            if tuple(cached["updated"].shape) == tuple(prefix.shape) and int(cached["target_count"]) == len(targets):
-                completed = min(len(targets), int(cached["completed"]))
-                updated[:completed] = cached["updated"][:completed]
-                choices[:completed] = cached["choices"][:completed]
-                phases[:completed] = cached["phases"][:completed]
-                gains[:completed] = cached["gains"][:completed]
-                if completed:
-                    _log_progress(f"Resuming cached training apply {cache_path.name}: {completed:,}/{len(targets):,}")
-        except Exception as exc:
-            _log_progress(f"Ignoring invalid training apply cache {cache_path}: {exc}")
-            completed = 0
+    cached_progress = _load_training_apply_progress(
+        cache_path,
+        prefix_shape=tuple(prefix.shape),
+        target_count=len(targets),
+    )
+    if cached_progress is not None:
+        completed, cached_updated, cached_choices, cached_phases, cached_gains = cached_progress
+        updated[:completed] = cached_updated
+        choices[:completed] = cached_choices
+        phases[:completed] = cached_phases
+        gains[:completed] = cached_gains
     cache_every = _cache_every()
     codes_t = torch.as_tensor(codes, dtype=torch.float32, device=device)
     codes_roll_bank = _roll_bank_torch(codes_t)
@@ -1962,7 +1984,6 @@ def _apply_training_stage_torch(
                 residual,
                 aligned,
                 shifted,
-                score_raw,
                 score_state,
                 score,
                 previous,
@@ -2038,20 +2059,17 @@ def _apply_training_stage_experiment9(
     choices = np.empty(len(targets), dtype=np.int16)
     phases = np.empty(len(targets), dtype=np.float32)
     gains = np.empty(len(targets), dtype=np.float32)
-    if cache_path is not None and cache_path.exists():
-        try:
-            cached = np.load(cache_path)
-            if tuple(cached["updated"].shape) == tuple(prefix.shape) and int(cached["target_count"]) == len(targets):
-                completed = min(len(targets), int(cached["completed"]))
-                updated[:completed] = cached["updated"][:completed]
-                choices[:completed] = cached["choices"][:completed]
-                phases[:completed] = cached["phases"][:completed]
-                gains[:completed] = cached["gains"][:completed]
-                if completed:
-                    _log_progress(f"Resuming cached training apply {cache_path.name}: {completed:,}/{len(targets):,}")
-        except Exception as exc:
-            _log_progress(f"Ignoring invalid training apply cache {cache_path}: {exc}")
-            completed = 0
+    cached_progress = _load_training_apply_progress(
+        cache_path,
+        prefix_shape=tuple(prefix.shape),
+        target_count=len(targets),
+    )
+    if cached_progress is not None:
+        completed, cached_updated, cached_choices, cached_phases, cached_gains = cached_progress
+        updated[:completed] = cached_updated
+        choices[:completed] = cached_choices
+        phases[:completed] = cached_phases
+        gains[:completed] = cached_gains
     cache_every = _cache_every()
     gain_enabled = _gain_enabled(policy, "residual")
     offset_enabled = _offset_enabled(policy, "residual")

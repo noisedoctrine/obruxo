@@ -13,6 +13,7 @@ import torch
 import experiment8
 import lfo_experiment.experiment7 as experiment7_module
 from lfo_experiment.alignment5 import circular_shift_torch, exact_align_cpu
+from lfo_experiment.experiment6 import summarize_results
 from lfo_experiment.experiment7 import (
     _apply_training_stage,
     _apply_training_stage_torch,
@@ -21,9 +22,11 @@ from lfo_experiment.experiment7 import (
     _encode_final_clip_beam_torch,
     _estimate_peak_memory_mb,
     _experiment8_size_pairs,
+    _experiment9_phase_head_outputs,
     _load_trained_cache,
     _roll_bank_torch,
     _make_experiment8_screen_jobs,
+    _make_experiment9_screen_jobs,
     _make_7a_jobs,
     _make_7b_jobs,
     _training_cache_key,
@@ -245,6 +248,79 @@ class Experiment7OptimizationTests(unittest.TestCase):
         anchor = [job for job in jobs if job.k == 12 and job.residual_depth == 16 and job.policy.residual_clip_policy == "final_only"]
         self.assertEqual({job.modifier_label for job in anchor}, {"phase_only", "phase_gain", "phase_offset", "phase_gain_offset"})
         self.assertEqual({job.policy.modifier_policy for job in anchor}, {"none", "base_gain", "global_offset", "base_gain_global_offset"})
+
+    def test_experiment9_scheduler_includes_budget_equivalence_jobs(self) -> None:
+        jobs = _make_experiment9_screen_jobs(beam_width=4, seed=7267)
+        self.assertEqual(len(jobs), 39)
+        self.assertEqual({job.beam_width for job in jobs}, {4})
+        self.assertEqual(sum(job.experiment9_section == "9A" for job in jobs), 18)
+        self.assertEqual(sum(job.experiment9_section == "9B" for job in jobs), 8)
+        self.assertEqual(sum(job.experiment9_section == "9C" for job in jobs), 5)
+        budget_jobs = [job for job in jobs if job.experiment9_section == "9D"]
+        self.assertEqual(len(budget_jobs), 8)
+        self.assertEqual({job.k for job in budget_jobs}, {4, 6})
+        self.assertEqual({job.policy.residual_clip_policy for job in budget_jobs}, {"final_only"})
+        for job in budget_jobs:
+            self.assertIn(job.budget_anchor_depth, {24, 32, 48, 64})
+            self.assertEqual(job.budget_anchor_width, 8)
+            self.assertEqual(
+                job.budget_anchor_head_outputs,
+                _experiment9_phase_head_outputs(8, job.budget_anchor_depth),
+            )
+            self.assertEqual(
+                job.budget_actual_head_outputs,
+                _experiment9_phase_head_outputs(job.k, job.residual_depth),
+            )
+
+    def test_summary_reports_strict_sampled_curve_perfection_rate(self) -> None:
+        base = {
+            "configuration": "cfg",
+            "family": "test",
+            "candidate": "fixture",
+            "depth": 1,
+            "eval_resolution": 120,
+            "training_feature_grid": 120,
+            "dense_outputs": 1,
+            "categorical_logits": 1,
+            "continuous_scalars": 0,
+            "effective_index_bits": 0.0,
+            "stored_codes": 1,
+            "stored_floats": 0,
+            "stored_bytes_float32": 0,
+            "decoder_branches": 1,
+            "topology_dependency": "none",
+            "stage_widths": "1",
+            "topology": "none",
+            "rmse": 0.01,
+            "derivative_rmse": 0.0,
+            "node_max_error": 0.0,
+            "duplicate_x_probe_count": 0,
+            "elapsed_seconds_total": 0.0,
+        }
+        results = pd.DataFrame(
+            [
+                {**base, "dataset_index": 0, "max_abs_error": 0.019},
+                {**base, "dataset_index": 1, "max_abs_error": 0.021},
+            ]
+        )
+        subsets = pd.DataFrame(
+            {
+                "dataset_index": [0, 1],
+                "configuration": ["cfg", "cfg"],
+                "subset_all": [True, True],
+                "subset_custom_ish": [True, True],
+                "subset_gate_pulse_heavy": [False, False],
+            }
+        )
+        summary, thresholds, _ = summarize_results(results, subsets)
+        self.assertEqual(float(summary.loc[0, "all_eval_points_under_0.02"]), 0.5)
+        row = thresholds[
+            (thresholds["configuration"] == "cfg")
+            & (thresholds["subset"] == "all")
+            & (thresholds["metric"] == "all_eval_points")
+            & (thresholds["threshold"] == 0.02)
+        ].iloc[0]
+        self.assertEqual(float(row.coverage), 0.5)
 
     def test_training_cache_key_includes_sample_and_clipping_when_needed(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
