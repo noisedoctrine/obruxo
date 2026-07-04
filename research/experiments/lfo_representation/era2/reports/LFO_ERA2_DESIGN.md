@@ -27,10 +27,25 @@ residual-layer phases
 
 Later experiments may add gain or offset, but they are not part of the first Era 2 baseline.
 
+Era 2 uses a fixed uniform x lattice for LFO curve representation:
+
+```text
+control_point_count = 97
+```
+
+This is now a settled decoder-side choice. Experiment 10 showed that a
+97-control-point uniform lattice is the best valid high-end uniform row under
+Vital's 100-point limit. Its derived 96 subdivisions align with the corpus's
+dominant dyadic x-position structure while also supporting factor-3
+subdivisions. The deployed model should not predict x positions, grid spacing,
+or per-LFO grid parameters.
+
 The model must not:
 
 - receive topology as input;
+- receive x-grid locations as input;
 - predict topology as an auxiliary target;
+- predict control-point x positions or grid spacing;
 - use topology-conditioned masks;
 - use topology-conditioned losses;
 - write topology into the model-facing artifact schema;
@@ -303,6 +318,7 @@ base code + base phase + residual-layer atom index + residual-layer phase
 
 The first baseline uses:
 
+- fixed uniform `control_point_count=97`;
 - constant `W`;
 - actual `D` residual layers;
 - per-residual-layer flat dictionaries;
@@ -315,6 +331,12 @@ The first baseline uses:
 - no topology-dependent masks or losses;
 - no topology field in the model-facing artifact schema;
 - no topology term in model prediction head accounting.
+
+The fixed x lattice is decoder-owned. It does not add model prediction head
+outputs. The derived subdivision count is 96, which matters for grid-alignment
+discussion, but the vector-shape parameter is the 97 control-point count. The
+model spends its LFO budget on base selection, residual-layer atom selection,
+and phase scalars.
 
 For phase-only accounting:
 
@@ -387,6 +409,17 @@ residual_layer_D_phase
 ```
 
 No target, mask, loss, artifact column, decoder lookup, or model prediction head formula should depend on topology.
+
+The first run should also hold the x lattice fixed:
+
+```text
+control_point_count = 97
+```
+
+No row should spend model prediction head budget on x-coordinate prediction,
+grid selection, or variable grid spacing. Discussion may refer to the derived
+96 subdivisions when explaining lattice alignment, but row configuration should
+use the control-point count.
 
 The first screen should compare by matched model prediction head budget. Existing topology-conditioned rows can provide budget anchors:
 

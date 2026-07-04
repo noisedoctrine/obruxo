@@ -30,6 +30,18 @@ future experiment records the parameters needed to estimate model prediction
 head budget under different runtime choice methods while keeping the oracle path
 independent.
 
+Experiment 10 settles the x-grid assumption for this plan:
+
+```text
+control_point_count = 97
+```
+
+Experiment 11 should treat this as fixed decoder geometry. The derived
+subdivision count is 96 and can be discussed when explaining lattice alignment,
+but the row parameter is the control-point count because it determines vector
+shapes. The deployed model does not predict x positions, grid spacing, or
+per-LFO grid parameters.
+
 ## Core Design Rule
 
 Every row must separate three identities:
@@ -88,6 +100,7 @@ categorical_outputs
 continuous_outputs
 head_outputs_formula
 head_outputs_actual
+lfo_control_point_count
 dictionary_scope
 codebook_storage_count
 oracle_construction_time
@@ -237,6 +250,7 @@ It should validate:
 
 - the manifest fields;
 - the no-runtime-topology contract;
+- the fixed 97-control-point lattice contract;
 - clean `head_outputs` accounting;
 - oracle/runtime separation;
 - report tables and plots.
@@ -253,6 +267,9 @@ Use phase-only flat categorical residual layers:
 ```text
 head_outputs = 32 + D * W + (D + 1)
 ```
+
+The fixed 97-control-point x lattice is not part of this formula. It is decoder-owned
+geometry, so it adds zero model prediction head outputs.
 
 Model-facing targets:
 
@@ -285,6 +302,13 @@ W8 reference rows
 Exact row values should be chosen so `head_outputs_actual` lands near those
 budget bands and all rows share the same runtime contract.
 
+Every row should log:
+
+```text
+lfo_control_point_count = 97
+x_grid_predicted_by_model = false
+```
+
 ## What Experiment 11 Should Not Do
 
 Experiment 11 should not:
@@ -295,6 +319,7 @@ Experiment 11 should not:
 - treat Era 1 W/D names as baselines;
 - promote gain or offset into the first screen;
 - include snap as a default decoder policy;
+- predict x positions or variable grid spacing;
 - treat basis coefficients, path addressing, or continuous address as mature
   reconstruction contenders before the flat baseline is audited.
 

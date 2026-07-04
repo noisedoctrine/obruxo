@@ -99,43 +99,112 @@ def _failures(run_dir: Path) -> list[dict[str, Any]]:
 def _run_report(run_dir: Path, rows: list[dict[str, Any]]) -> str:
     manifest_path = run_dir / "run_manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() else {}
+    completed = len(rows)
+    best_p95 = _best_row(rows, "validation_p95_rmse")
+    best_median = _best_row(rows, "validation_median_rmse")
+    frontier = _frontier(rows)
+    bands = _budget_band_summary(rows)
+    topology_pass_count = sum(1 for row in rows if str(row.get("topology_contract_pass", "")).lower() == "true")
+    lattice_values = sorted({str(row.get("lfo_control_point_count", "")) for row in rows if row.get("lfo_control_point_count", "") != ""})
     lines = [
         "# Experiment 11 Run Report",
         "",
-        f"- Run id: `{manifest.get('run_id', run_dir.name)}`",
-        f"- Screen: `{manifest.get('screen', '')}`",
-        f"- Profile: `{manifest.get('profile', '')}`",
-        f"- Completed rows: `{len(rows)}`",
+        "## Main Findings",
         "",
-        "This report summarizes topology-free flat-categorical Experiment 11 rows. "
-        "Any topology bucket metrics are analysis-only and do not participate in runtime targets, loss, decoder lookup, or model prediction head budget.",
+        f"This run completed `{completed}` topology-free flat-categorical rows for `{manifest.get('profile', '')}`.",
+        f"The LFO vector shape recorded by completed rows is `{', '.join(lattice_values) if lattice_values else 'not recorded'}` control points.",
+        f"Topology contract passed for `{topology_pass_count}/{completed}` completed rows.",
+        "",
+        _best_row_sentence("Best validation P95", best_p95, "validation_p95_rmse"),
+        _best_row_sentence("Best validation median", best_median, "validation_median_rmse"),
+        f"The Pareto frontier has `{len(frontier)}` row(s) when sorting by model prediction head budget and validation P95.",
         "",
         "## Best Rows By Validation P95",
         "",
-        "| row | budget band | head outputs | validation p95 RMSE | validation median RMSE |",
-        "| --- | --- | ---: | ---: | ---: |",
+        "| row | budget band | head outputs | validation p95 RMSE | validation median RMSE | elapsed seconds |",
+        "| --- | --- | ---: | ---: | ---: | ---: |",
     ]
     ordered = sorted(rows, key=lambda row: _float(row.get("validation_p95_rmse")) or float("inf"))
     for row in ordered[:10]:
         lines.append(
-            "| {row_id} | {band} | {heads} | {p95} | {median} |".format(
+            "| {row_id} | {band} | {heads} | {p95} | {median} | {elapsed} |".format(
                 row_id=row.get("row_id", ""),
                 band=row.get("budget_band", ""),
                 heads=row.get("head_outputs_actual", ""),
                 p95=row.get("validation_p95_rmse", ""),
                 median=row.get("validation_median_rmse", ""),
+                elapsed=row.get("row_elapsed_seconds", ""),
             )
         )
     lines.extend(
         [
             "",
-            "## Notes",
+            "## Budget Band Read",
             "",
-            "- Valid comparisons are inside the topology-free flat-categorical family unless later screens add other runtime interfaces.",
-            "- The primary capacity axis is `head_outputs_actual`, the model prediction head budget.",
+            "| budget band | rows | best validation P95 | min head outputs | max head outputs |",
+            "| --- | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    for row in bands:
+        lines.append(
+            "| {band} | {count} | {p95} | {min_heads} | {max_heads} |".format(
+                band=row.get("budget_band", ""),
+                count=row.get("row_count", ""),
+                p95=row.get("best_validation_p95_rmse", ""),
+                min_heads=row.get("min_head_outputs_actual", ""),
+                max_heads=row.get("max_head_outputs_actual", ""),
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "## Frontier Read",
+            "",
+            "Lower validation P95 is better. `head_outputs_actual` is the model prediction head budget; the fixed x lattice is decoder-owned and does not add outputs.",
+            "",
+            "| row | head outputs | validation p95 RMSE | budget band |",
+            "| --- | ---: | ---: | --- |",
+        ]
+    )
+    for row in frontier[:10]:
+        lines.append(
+            "| {row_id} | {heads} | {p95} | {band} |".format(
+                row_id=row.get("row_id", ""),
+                heads=row.get("head_outputs_actual", ""),
+                p95=row.get("validation_p95_rmse", ""),
+                band=row.get("budget_band", ""),
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "## Runtime And Readiness Notes",
+            "",
+            f"- Run id: `{manifest.get('run_id', run_dir.name)}`",
+            f"- Screen: `{manifest.get('screen', '')}`",
+            f"- Profile: `{manifest.get('profile', '')}`",
+            "- Runtime topology is not part of targets, loss, decoder lookup, or model prediction head budget.",
+            "- Any topology bucket metrics are analysis-only.",
+            "- Analytics CSVs and plots are emitted beside this report.",
         ]
     )
     return "\n".join(lines) + "\n"
+
+
+def _best_row(rows: list[dict[str, Any]], metric: str) -> dict[str, Any] | None:
+    candidates = [row for row in rows if _float(row.get(metric)) is not None]
+    if not candidates:
+        return None
+    return min(candidates, key=lambda row: _float(row.get(metric)) or float("inf"))
+
+
+def _best_row_sentence(label: str, row: dict[str, Any] | None, metric: str) -> str:
+    if row is None:
+        return f"{label}: not available."
+    return (
+        f"{label}: `{row.get('row_id', '')}` at `{row.get(metric, '')}` "
+        f"with `{row.get('head_outputs_actual', '')}` head outputs."
+    )
 
 
 def _write_plots(image_dir: Path, rows: list[dict[str, Any]]) -> None:
@@ -174,6 +243,14 @@ def _write_plots(image_dir: Path, rows: list[dict[str, Any]]) -> None:
         title="Runtime vs model prediction head budget",
         plt=plt,
     )
+    _row_bar_plot(
+        image_dir / "validation_p95_by_row.png",
+        rows,
+        y_key="validation_p95_rmse",
+        ylabel="validation p95 RMSE",
+        title="Validation P95 by row",
+        plt=plt,
+    )
 
 
 def _scatter_plot(path: Path, rows: list[dict[str, Any]], *, x_key: str, y_key: str, xlabel: str, ylabel: str, title: str, plt: Any) -> None:
@@ -185,6 +262,30 @@ def _scatter_plot(path: Path, rows: list[dict[str, Any]], *, x_key: str, y_key: 
     plt.figure(figsize=(7, 4.5))
     plt.scatter(x, y)
     plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.tight_layout()
+    plt.savefig(path, dpi=150)
+    plt.close()
+
+
+def _row_bar_plot(path: Path, rows: list[dict[str, Any]], *, y_key: str, ylabel: str, title: str, plt: Any) -> None:
+    ordered = [
+        row
+        for row in sorted(rows, key=lambda item: (str(item.get("budget_band", "")), _float(item.get(y_key)) or float("inf")))
+        if _float(row.get(y_key)) is not None
+    ]
+    if not ordered:
+        return
+    labels = [str(row.get("row_id", "")) for row in ordered]
+    values = [_float(row.get(y_key)) or 0.0 for row in ordered]
+    bands = [str(row.get("budget_band", "")) for row in ordered]
+    palette = {"small": "#4C78A8", "medium": "#F58518", "large": "#54A24B", "tiny": "#7E57C2"}
+    colors = [palette.get(band, "#6B7280") for band in bands]
+    width = max(7.0, 0.55 * len(labels))
+    plt.figure(figsize=(width, 4.8))
+    plt.bar(range(len(values)), values, color=colors)
+    plt.xticks(range(len(labels)), labels, rotation=35, ha="right")
     plt.ylabel(ylabel)
     plt.title(title)
     plt.tight_layout()

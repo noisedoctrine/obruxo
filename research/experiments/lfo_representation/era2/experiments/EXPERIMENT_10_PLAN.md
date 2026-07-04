@@ -17,15 +17,18 @@ points.
 
 ## Naming Contract
 
-Use point counts as the public experiment variable:
+Use subdivision counts as the public experiment variable:
 
 ```text
-grid_point_count = number of inclusive x-grid points
-subdivision_count = grid_point_count - 1
+subdivision_count = number of x-grid subdivisions
+control_point_count = subdivision_count + 1
+grid_point_count = implementation field name for control_point_count
 ```
 
-`subdivision_count` is inferred. Do not use it as the primary row label or CLI
-argument.
+The default sweep covers every even `subdivision_count` from 8 through 100.
+This intentionally includes `subdivision_count = 100`, which implies
+`control_point_count = 101`. That row exceeds Vital's 100-point limit by one
+control point, but it is useful for the requested subdivision-based audit.
 
 `W` is reserved for residual-layer atom choices in Era 2 model experiments.
 Experiment 10 must not use `W` for grid size.
@@ -33,8 +36,8 @@ Experiment 10 must not use `W` for grid size.
 Factor language applies to the inferred subdivision count:
 
 ```text
-grid_point_count = 97
 subdivision_count = 96
+control_point_count = 97
 96 is divisible by 2 and 3
 ```
 
@@ -58,10 +61,10 @@ plots/experiment10_point_count_frequency.png
 
 ### 2. Control-Point X Placement
 
-For each `grid_point_count`, infer:
+For each `subdivision_count`, infer:
 
 ```text
-subdivision_count = grid_point_count - 1
+control_point_count = subdivision_count + 1
 ```
 
 Then score each true ordered control point:
@@ -85,10 +88,10 @@ because endpoints at 0 and 1 are usually fixed and can otherwise make the grid
 look artificially good.
 
 Also report the fraction of LFOs whose maximum control-point x error is at most
-0.01:
+0.001:
 
 ```text
-max_i(abs(x_pred_i - x_true_i)) <= 0.01
+max_i(abs(x_pred_i - x_true_i)) <= 0.001
 ```
 
 Report that fraction two ways:
@@ -100,9 +103,32 @@ Output:
 
 ```text
 control_point_x_summary.csv
+control_point_x_lattice_frequency.csv
+plots/experiment10_control_point_x_lattice_frequency.png
 plots/experiment10_control_point_x_p95.png
-plots/experiment10_lfo_pass_rate_0p01.png
+plots/experiment10_control_point_x_median.png
+plots/experiment10_lfo_pass_rate_0p001.png
+plots/experiment10_nonuniform_delta.png
+plots/experiment10_factor3_checks.png
 ```
+
+The markdown report should be findings-first. It should start from the observed
+periodicity in the plots, then use the x-lattice frequency graph to explain why
+the corpus behaves as mostly dyadic rather than generally factor-3 dominated.
+
+## Decision Carried Forward
+
+Experiment 10 settles the Era 2 default LFO x-grid:
+
+```text
+subdivision_count = 96
+control_point_count = 97
+```
+
+This fixed uniform grid stays under Vital's 100-point limit and performs well
+because it matches the corpus's dominant dyadic x-position structure while also
+supporting factor-3 subdivisions. Future model experiments should not spend
+model prediction head budget on x-position prediction or variable grid spacing.
 
 ### 3. Global Non-Uniform Grid
 
@@ -153,25 +179,40 @@ factor3_grid_point_comparisons.csv
 
 ## Outputs
 
-Experiment 10 writes:
+Experiment 10 writes data artifacts to:
 
 ```text
 research/experiments/lfo_representation/era2/artifacts/experiment_10/control_point_x_grid/
 ```
 
-Expected files:
+Expected artifact files:
 
 - `manifest.json`
 - `point_count_frequency.csv`
+- `control_point_x_lattice_frequency.csv`
 - `control_point_x_summary.csv`
 - `global_nonuniform_grids.json`
 - `factor3_grid_point_comparisons.csv`
 - `summary.csv`
-- `EXPERIMENT_10_CONTROL_POINT_X_GRID_REPORT.md`
 - `plots/experiment10_point_count_frequency.png`
+- `plots/experiment10_control_point_x_lattice_frequency.png`
+- `plots/experiment10_control_point_x_median.png`
 - `plots/experiment10_control_point_x_p95.png`
-- `plots/experiment10_lfo_pass_rate_0p01.png`
+- `plots/experiment10_lfo_pass_rate_0p001.png`
 - `plots/experiment10_nonuniform_delta.png`
+- `plots/experiment10_factor3_checks.png`
+
+Experiment 10 writes the markdown report to:
+
+```text
+research/experiments/lfo_representation/era2/reports/EXPERIMENT_10_CONTROL_POINT_X_GRID_REPORT.md
+```
+
+The report uses local image copies under:
+
+```text
+research/experiments/lfo_representation/era2/reports/images/experiment_10/
+```
 
 ## Non-Goals
 

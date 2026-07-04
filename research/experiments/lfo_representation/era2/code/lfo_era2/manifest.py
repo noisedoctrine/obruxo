@@ -25,6 +25,7 @@ REQUIRED_MANIFEST_FIELDS = (
     "continuous_outputs",
     "head_outputs_formula",
     "head_outputs_actual",
+    "lfo_control_point_count",
     "dictionary_scope",
     "codebook_storage_count",
     "oracle_construction_time",
@@ -51,6 +52,7 @@ class ExperimentRowManifest:
     codebook_storage_count: int
     budget: BudgetBreakdown
     topology_flags: TopologyFlags
+    lfo_control_point_count: int | None = None
     oracle_construction_time: float = 0.0
     oracle_encoding_time: float = 0.0
     method_parameters: dict[str, Any] = field(default_factory=dict)
@@ -71,6 +73,7 @@ class ExperimentRowManifest:
             "residual_atom_selection_outputs": int(self.budget.residual_atom_selection_outputs),
             "head_outputs_formula": self.budget.head_outputs_formula,
             "head_outputs_actual": int(self.budget.head_outputs_actual),
+            "lfo_control_point_count": int(self.lfo_control_point_count) if self.lfo_control_point_count is not None else "",
             "dictionary_scope": self.dictionary_scope,
             "codebook_storage_count": int(self.codebook_storage_count),
             "oracle_construction_time": float(self.oracle_construction_time),
@@ -109,4 +112,3 @@ def _jsonable(value: Any) -> Any:
     if hasattr(value, "item"):
         return value.item()
     return value
-

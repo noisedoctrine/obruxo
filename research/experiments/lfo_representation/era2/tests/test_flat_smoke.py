@@ -35,6 +35,7 @@ class FlatSmokeTests(unittest.TestCase):
 
             self.assertEqual(manifest["head_outputs_actual"], 48)
             self.assertEqual(manifest["head_outputs_formula"], "32 + D * W + (D + 1)")
+            self.assertEqual(manifest["lfo_control_point_count"], 64)
             self.assertTrue(contract["passed"])
             self.assertFalse(manifest["topology_used_at_runtime"])
             self.assertFalse(manifest["topology_used_in_targets"])
@@ -53,4 +54,3 @@ def run_decode(assets, encoding):
 
 if __name__ == "__main__":
     unittest.main()
-

@@ -38,12 +38,14 @@ offline oracle construction -> reconstruction assets -> runtime interface -> dec
 - `ExperimentRowManifest`
   Records the Experiment 11-era row fields: construction identity, runtime
   interface, decoder policy, dictionary scope, output counts, topology flags,
-  storage counts, and method-specific parameters.
+  storage counts, fixed LFO x-grid identity, and method-specific parameters.
 
 - `ReconstructionAssets`
   Stores decoder-side assets: base dictionary, residual-layer dictionaries, and
-  future basis/tree/address assets. Public terminology uses residual layer, not
-  stage.
+  future basis/tree/address assets. Era 2 LFO curves use fixed uniform
+  `control_point_count=97` decoder geometry. The derived 96 subdivisions can be
+  discussed for lattice alignment, but the control-point count determines vector
+  shape. Public terminology uses residual layer, not stage.
 
 - `OracleEncoding`
   Stores model-facing targets only. For the flat smoke path this means base
@@ -114,6 +116,7 @@ The smoke path should prove:
 - the deployed target schema is topology-free;
 - the flat-categorical formula is exactly
   `head_outputs = 32 + D * W + (D + 1)`;
+- the fixed 97-control-point x lattice adds zero model prediction head outputs;
 - artifacts separate `oracle_construction_id`, `runtime_interface_id`, and
   `decoder_policy_id`;
 - topology flags pass the Era 2 contract;

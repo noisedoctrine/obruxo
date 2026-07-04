@@ -5,8 +5,10 @@ from __future__ import annotations
 
 import argparse
 import csv
+from fractions import Fraction
 import json
 from pathlib import Path
+import shutil
 import time
 from typing import Any, Callable
 
@@ -21,53 +23,23 @@ from lfo_era2.processed_corpus import (
 )
 
 
-DEFAULT_GRID_POINT_COUNTS = (
-    24,
-    25,
-    26,
-    32,
-    33,
-    36,
-    37,
-    38,
-    40,
-    41,
-    48,
-    49,
-    50,
-    60,
-    61,
-    62,
-    64,
-    65,
-    72,
-    73,
-    74,
-    80,
-    81,
-    96,
-    97,
-    98,
-    100,
+DEFAULT_SUBDIVISION_COUNTS = tuple(range(8, 101, 2))
+DEFAULT_GRID_POINT_COUNTS = tuple(subdivision_count + 1 for subdivision_count in DEFAULT_SUBDIVISION_COUNTS)
+DEFAULT_FACTOR3_SUBDIVISION_COMPARISONS = tuple(
+    (subdivision_count, subdivision_count + 2)
+    for subdivision_count in DEFAULT_SUBDIVISION_COUNTS
+    if subdivision_count % 3 == 0 and subdivision_count + 2 in DEFAULT_SUBDIVISION_COUNTS
 )
-DEFAULT_FACTOR3_GRID_POINT_COMPARISONS = (
-    (25, 26),
-    (25, 33),
-    (37, 38),
-    (37, 41),
-    (49, 50),
-    (49, 65),
-    (61, 62),
-    (61, 65),
-    (73, 74),
-    (73, 81),
-    (97, 98),
+DEFAULT_FACTOR3_GRID_POINT_COMPARISONS = tuple(
+    (factor3_subdivision_count + 1, higher_subdivision_count + 1)
+    for factor3_subdivision_count, higher_subdivision_count in DEFAULT_FACTOR3_SUBDIVISION_COMPARISONS
 )
 VITAL_MAX_POINTS = 100
 EXACT_TOLERANCE = 1e-6
-CONTROL_POINT_X_PASS_TOLERANCE = 0.01
+CONTROL_POINT_X_PASS_TOLERANCE = 0.001
 ERA2_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT_DIR = ERA2_ROOT / "artifacts" / "experiment_10" / "control_point_x_grid"
+DEFAULT_REPORT_PATH = ERA2_ROOT / "reports" / "EXPERIMENT_10_CONTROL_POINT_X_GRID_REPORT.md"
 
 
 def parser() -> argparse.ArgumentParser:
@@ -75,11 +47,18 @@ def parser() -> argparse.ArgumentParser:
     root.add_argument("--metadata", type=Path, default=DEFAULT_METADATA)
     root.add_argument("--corpus-dir", type=Path, default=DEFAULT_CORPUS_DIR)
     root.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    root.add_argument("--report-path", type=Path, default=DEFAULT_REPORT_PATH)
+    root.add_argument(
+        "--subdivision-counts",
+        dest="subdivision_counts",
+        default=",".join(str(value) for value in DEFAULT_SUBDIVISION_COUNTS),
+        help="comma-separated x-grid subdivision counts; control point count is subdivisions + 1",
+    )
     root.add_argument(
         "--grid-point-counts",
         dest="grid_point_counts",
-        default=",".join(str(value) for value in DEFAULT_GRID_POINT_COUNTS),
-        help="comma-separated inclusive x-grid point counts",
+        default=None,
+        help="optional comma-separated inclusive x-grid point counts; overrides --subdivision-counts",
     )
     root.add_argument("--include-inactive", action="store_true")
     root.add_argument("--no-build-corpus", action="store_true")
@@ -89,11 +68,17 @@ def parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> None:
     args = parser().parse_args(argv)
+    grid_point_counts = (
+        parse_counts(args.grid_point_counts)
+        if args.grid_point_counts is not None
+        else tuple(subdivision_count + 1 for subdivision_count in parse_counts(args.subdivision_counts))
+    )
     result = run_experiment10_grid_audit(
         metadata_path=args.metadata,
         corpus_dir=args.corpus_dir,
         output_dir=args.output_dir,
-        grid_point_counts=parse_counts(args.grid_point_counts),
+        report_path=args.report_path,
+        grid_point_counts=grid_point_counts,
         active_only=not args.include_inactive,
         build_corpus_if_missing=not args.no_build_corpus,
         force_rebuild_corpus=args.force_rebuild_corpus,
@@ -109,6 +94,7 @@ def run_experiment10_grid_audit(
     corpus_dir: Path = DEFAULT_CORPUS_DIR,
     metadata_path: Path = DEFAULT_METADATA,
     output_dir: Path = DEFAULT_OUTPUT_DIR,
+    report_path: Path = DEFAULT_REPORT_PATH,
     grid_point_counts: tuple[int, ...] = DEFAULT_GRID_POINT_COUNTS,
     active_only: bool = True,
     build_corpus_if_missing: bool = True,
@@ -138,11 +124,17 @@ def run_experiment10_grid_audit(
     weights = np.asarray(corpus.active_occurrence_count if active_only else corpus.occurrence_count, dtype=np.float64)
     source_point_counts = np.asarray([len(shape.points) for shape in corpus.shapes], dtype=np.int32)
     point_frequency_rows = _point_count_frequency_rows(source_point_counts, weights)
+    lattice_frequency_rows = _control_point_x_lattice_frequency_rows(corpus.shapes, weights)
     control_rows = []
     learned_grid_records = []
     for index, grid_point_count in enumerate(grid_point_counts, start=1):
+        subdivision_count = int(grid_point_count) - 1
         if progress:
-            progress(f"experiment10: [{index}/{len(grid_point_counts)}] grid_point_count={grid_point_count} starting")
+            progress(
+                "experiment10: "
+                f"[{index}/{len(grid_point_counts)}] subdivision_count={subdivision_count} "
+                f"control_point_count={grid_point_count} starting"
+            )
         uniform_grid = _uniform_grid(grid_point_count)
         rows_for_count = [
             _control_point_x_row(
@@ -166,6 +158,7 @@ def run_experiment10_grid_audit(
                     "grid_kind": "global_quantile",
                     "grid_learning_weighting": weighting,
                     "grid_point_count": int(grid_point_count),
+                    "subdivision_count": int(subdivision_count),
                     "grid_points": [float(value) for value in learned_grid],
                 }
             )
@@ -184,8 +177,8 @@ def run_experiment10_grid_audit(
         if progress:
             progress(
                 "experiment10: "
-                f"[{index}/{len(grid_point_counts)}] grid_point_count={grid_point_count} "
-                f"subdivision_count={uniform_row['subdivision_count']} "
+                f"[{index}/{len(grid_point_counts)}] subdivision_count={uniform_row['subdivision_count']} "
+                f"control_point_count={grid_point_count} "
                 f"uniform_interior_p95={uniform_row['control_point_x_p95_abs_error_interior_occurrence_weighted']:.8f}"
             )
     factor3_rows = _factor3_grid_point_rows(control_rows, comparisons=DEFAULT_FACTOR3_GRID_POINT_COMPARISONS)
@@ -193,6 +186,7 @@ def run_experiment10_grid_audit(
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     _write_csv(output_dir / "point_count_frequency.csv", point_frequency_rows)
+    _write_csv(output_dir / "control_point_x_lattice_frequency.csv", lattice_frequency_rows)
     _write_csv(output_dir / "control_point_x_summary.csv", control_rows)
     _write_csv(output_dir / "factor3_grid_point_comparisons.csv", factor3_rows)
     _write_csv(output_dir / "summary.csv", control_rows)
@@ -203,40 +197,51 @@ def run_experiment10_grid_audit(
     plot_paths = _write_plots(
         output_dir / "plots",
         point_frequency_rows=point_frequency_rows,
+        lattice_frequency_rows=lattice_frequency_rows,
         control_rows=control_rows,
     )
+    report_path = Path(report_path)
+    report_plot_paths = _copy_report_plots(plot_paths, output_dir=output_dir, report_path=report_path)
     report = _report(
         point_frequency_rows=point_frequency_rows,
+        lattice_frequency_rows=lattice_frequency_rows,
         control_rows=control_rows,
         factor3_rows=factor3_rows,
-        plot_paths=plot_paths,
+        plot_paths=report_plot_paths,
     )
-    report_path = output_dir / "EXPERIMENT_10_CONTROL_POINT_X_GRID_REPORT.md"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(report, encoding="utf-8")
     manifest = {
         "experiment_id": "experiment_10",
         "experiment_name": "control_point_x_grid_audit",
         "corpus_dir": str(corpus_dir),
+        "report_path": str(report_path),
         "corpus_manifest": corpus.manifest,
         "grid_point_counts": list(grid_point_counts),
+        "subdivision_counts": [int(grid_point_count) - 1 for grid_point_count in grid_point_counts],
+        "control_point_count_contract": "control_point_count is the number of grid points and equals subdivision_count + 1.",
         "factor3_grid_point_comparisons": [list(pair) for pair in DEFAULT_FACTOR3_GRID_POINT_COMPARISONS],
+        "factor3_subdivision_comparisons": [list(pair) for pair in DEFAULT_FACTOR3_SUBDIVISION_COMPARISONS],
         "active_only": bool(active_only),
         "method": "point_count_frequency_plus_control_point_x_grid_error",
-        "grid_count_contract": "Experiment 10 varies grid_point_count. subdivision_count is inferred as grid_point_count - 1. W is reserved for residual-layer atom choices.",
+        "grid_count_contract": "Experiment 10 varies subdivision_count. control_point_count/grid_point_count is inferred as subdivision_count + 1. W is reserved for residual-layer atom choices.",
         "control_point_x_contract": "Control-point placement is evaluated on x only. For each true ordered control point, the predicted x is the nearest point in the fixed grid; y is not scored and no curve is rendered.",
-        "pass_rate_contract": "lfo_all_points_within_0p01_* is the fraction of LFOs whose maximum control-point x error is <= 0.01.",
+        "pass_rate_contract": "lfo_all_points_within_0p001_* is the fraction of LFOs whose maximum control-point x error is <= 0.001.",
         "nonuniform_grid_contract": "global_quantile grids are fixed offline-learned decoder grids. They do not require the deployed model to predict grid locations.",
         "report_plots": plot_paths,
+        "report_image_paths": report_plot_paths,
         "standalone_note": "Experiment 10 is intentionally outside the shared Era 2 model-runner CLI.",
         "elapsed_seconds": time.perf_counter() - started,
     }
     (output_dir / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     if progress:
-        progress(f"experiment10: wrote summary/report to {output_dir}")
+        progress(f"experiment10: wrote summary artifacts to {output_dir}")
+        progress(f"experiment10: wrote report to {report_path}")
     return {
         "output_dir": str(output_dir),
         "summary": str(output_dir / "summary.csv"),
         "point_count_frequency": str(output_dir / "point_count_frequency.csv"),
+        "control_point_x_lattice_frequency": str(output_dir / "control_point_x_lattice_frequency.csv"),
         "control_point_x_summary": str(output_dir / "control_point_x_summary.csv"),
         "factor3_grid_point_comparisons": str(output_dir / "factor3_grid_point_comparisons.csv"),
         "global_nonuniform_grids": str(output_dir / "global_nonuniform_grids.json"),
@@ -270,6 +275,48 @@ def _point_count_frequency_rows(point_counts: np.ndarray, weights: np.ndarray) -
                 "lfo_corpus_cumulative_fraction": cumulative_occurrence / occurrence_total if occurrence_total else 0.0,
             }
         )
+    return rows
+
+
+def _control_point_x_lattice_frequency_rows(
+    shapes: tuple[LfoShape, ...],
+    weights: np.ndarray,
+) -> list[dict[str, Any]]:
+    occurrence_counts: dict[float, float] = {}
+    deduplicated_counts: dict[float, float] = {}
+    for shape, occurrence_weight in zip(shapes, weights):
+        interior_x = shape.points[:, 0]
+        interior_x = interior_x[(interior_x > 0.0) & (interior_x < 1.0)]
+        for x_value in interior_x:
+            key = round(float(x_value), 12)
+            occurrence_counts[key] = occurrence_counts.get(key, 0.0) + float(occurrence_weight)
+            deduplicated_counts[key] = deduplicated_counts.get(key, 0.0) + 1.0
+
+    occurrence_total = float(sum(occurrence_counts.values()))
+    deduplicated_total = float(sum(deduplicated_counts.values()))
+    rows = []
+    for x_value, occurrence_count in sorted(occurrence_counts.items()):
+        fraction = Fraction(x_value).limit_denominator(128)
+        fraction_value = float(fraction)
+        is_simple_rational = abs(fraction_value - x_value) <= EXACT_TOLERANCE
+        rows.append(
+            {
+                "x_value": float(x_value),
+                "fraction": _format_fraction(fraction) if is_simple_rational else "",
+                "numerator": int(fraction.numerator) if is_simple_rational else "",
+                "denominator": int(fraction.denominator) if is_simple_rational else "",
+                "is_simple_rational": bool(is_simple_rational),
+                "occurrence_point_count": float(occurrence_count),
+                "occurrence_point_fraction": occurrence_count / occurrence_total if occurrence_total else 0.0,
+                "deduplicated_point_count": float(deduplicated_counts.get(x_value, 0.0)),
+                "deduplicated_point_fraction": (
+                    deduplicated_counts.get(x_value, 0.0) / deduplicated_total if deduplicated_total else 0.0
+                ),
+            }
+        )
+    rows.sort(key=lambda row: (-float(row["occurrence_point_count"]), float(row["x_value"])))
+    for rank, row in enumerate(rows, start=1):
+        row["rank"] = rank
     return rows
 
 
@@ -359,7 +406,7 @@ def _control_point_x_row(
     grid_points = np.asarray(grid_points, dtype=np.float64)
     if len(grid_points) != grid_point_count:
         raise ValueError("grid_points length must match grid_point_count")
-    subdivision_count = int(grid_point_count) - 1 if grid_kind == "uniform" else ""
+    subdivision_count = int(grid_point_count) - 1
     all_distances = []
     all_occurrence_weights = []
     all_deduplicated_weights = []
@@ -431,10 +478,10 @@ def _control_point_x_row(
         "control_point_x_p95_abs_error_interior_deduplicated": _weighted_quantile(interior_dx, interior_deduplicated_w, 0.95),
         "control_point_x_p99_abs_error_interior_deduplicated": _weighted_quantile(interior_dx, interior_deduplicated_w, 0.99),
         "control_point_x_max_abs_error_interior": float(np.max(interior_dx)) if len(interior_dx) else 0.0,
-        "lfo_all_points_within_0p01_deduplicated_fraction": float(np.mean(lfo_all_pass_array)) if len(lfo_all_pass_array) else 0.0,
-        "lfo_all_points_within_0p01_occurrence_fraction": _weighted_bool_fraction(lfo_all_pass_array, weights),
-        "lfo_interior_points_within_0p01_deduplicated_fraction": float(np.mean(lfo_interior_pass_array)) if len(lfo_interior_pass_array) else 0.0,
-        "lfo_interior_points_within_0p01_occurrence_fraction": _weighted_bool_fraction(lfo_interior_pass_array, weights),
+        "lfo_all_points_within_0p001_deduplicated_fraction": float(np.mean(lfo_all_pass_array)) if len(lfo_all_pass_array) else 0.0,
+        "lfo_all_points_within_0p001_occurrence_fraction": _weighted_bool_fraction(lfo_all_pass_array, weights),
+        "lfo_interior_points_within_0p001_deduplicated_fraction": float(np.mean(lfo_interior_pass_array)) if len(lfo_interior_pass_array) else 0.0,
+        "lfo_interior_points_within_0p001_occurrence_fraction": _weighted_bool_fraction(lfo_interior_pass_array, weights),
     }
 
 
@@ -543,6 +590,7 @@ def _write_plots(
     plot_dir: Path,
     *,
     point_frequency_rows: list[dict[str, Any]],
+    lattice_frequency_rows: list[dict[str, Any]],
     control_rows: list[dict[str, Any]],
 ) -> dict[str, str]:
     import matplotlib
@@ -553,27 +601,41 @@ def _write_plots(
     plot_dir.mkdir(parents=True, exist_ok=True)
     paths = {
         "point_count_frequency": plot_dir / "experiment10_point_count_frequency.png",
+        "x_lattice_frequency": plot_dir / "experiment10_control_point_x_lattice_frequency.png",
+        "x_error_median": plot_dir / "experiment10_control_point_x_median.png",
         "x_error_p95": plot_dir / "experiment10_control_point_x_p95.png",
-        "lfo_pass_rate_0p01": plot_dir / "experiment10_lfo_pass_rate_0p01.png",
+        "lfo_pass_rate_0p001": plot_dir / "experiment10_lfo_pass_rate_0p001.png",
         "nonuniform_delta": plot_dir / "experiment10_nonuniform_delta.png",
         "factor3_checks": plot_dir / "experiment10_factor3_checks.png",
     }
     _plot_point_count_frequency(plt, paths["point_count_frequency"], point_frequency_rows)
+    _plot_x_lattice_frequency(plt, paths["x_lattice_frequency"], lattice_frequency_rows)
+    _plot_control_metric(
+        plt,
+        paths["x_error_median"],
+        control_rows,
+        metric="control_point_x_median_abs_error_interior_occurrence_weighted",
+        ylabel="Interior median abs x error",
+        title="Typical control-point x placement error",
+        direction_note="Lower is better",
+    )
     _plot_control_metric(
         plt,
         paths["x_error_p95"],
         control_rows,
         metric="control_point_x_p95_abs_error_interior_occurrence_weighted",
         ylabel="Interior P95 abs x error",
-        title="Control-point x placement error by grid type",
+        title="Tail control-point x placement error",
+        direction_note="Lower is better",
     )
     _plot_control_metric(
         plt,
-        paths["lfo_pass_rate_0p01"],
+        paths["lfo_pass_rate_0p001"],
         control_rows,
-        metric="lfo_all_points_within_0p01_occurrence_fraction",
+        metric="lfo_all_points_within_0p001_occurrence_fraction",
         ylabel="Occurrence-weighted LFO fraction",
-        title="LFOs with every control point within 0.01 of grid",
+        title="LFOs with every control point within 0.001 of grid",
+        direction_note="Higher is better",
         y_limits=(0.0, 1.02),
     )
     _plot_nonuniform_delta(plt, paths["nonuniform_delta"], control_rows)
@@ -583,6 +645,19 @@ def _write_plots(
         _factor3_grid_point_rows(control_rows, comparisons=DEFAULT_FACTOR3_GRID_POINT_COMPARISONS),
     )
     return {key: path.relative_to(plot_dir.parent).as_posix() for key, path in paths.items()}
+
+
+def _copy_report_plots(plot_paths: dict[str, str], *, output_dir: Path, report_path: Path) -> dict[str, str]:
+    report_dir = Path(report_path).resolve().parent
+    image_dir = report_dir / "images" / "experiment_10"
+    image_dir.mkdir(parents=True, exist_ok=True)
+    report_paths = {}
+    for key, relative_path in plot_paths.items():
+        source = Path(output_dir, relative_path).resolve()
+        destination = image_dir / source.name
+        shutil.copy2(source, destination)
+        report_paths[key] = destination.relative_to(report_dir).as_posix()
+    return report_paths
 
 
 def _plot_point_count_frequency(plt: Any, path: Path, rows: list[dict[str, Any]]) -> None:
@@ -604,8 +679,8 @@ def _plot_point_count_frequency(plt: Any, path: Path, rows: list[dict[str, Any]]
         gridspec_kw={"height_ratios": [2.0, 1.05]},
     )
     width = 0.42
-    ax.bar(x - width / 2.0, dedup, width=width, label="Deduplicated LFO corpus", color="#4C78A8")
-    ax.bar(x + width / 2.0, occurrence, width=width, label="Occurrence-weighted LFO corpus", color="#F58518")
+    ax.bar(x - width / 2.0, dedup, width=width, label="Deduplicated LFO corpus", color="#7E57C2")
+    ax.bar(x + width / 2.0, occurrence, width=width, label="Occurrence-weighted LFO corpus", color="#4C78A8")
     ax.set_title("Source control-point count frequency: dominant counts plus cumulative tail")
     ax.set_xlabel("Source point count (top counts by occurrence)")
     ax.set_ylabel("Fraction of corpus")
@@ -613,14 +688,60 @@ def _plot_point_count_frequency(plt: Any, path: Path, rows: list[dict[str, Any]]
     ax.grid(axis="y", alpha=0.25)
     ax.legend(frameon=False)
 
-    cdf_ax.plot(all_counts, cumulative_dedup, marker="o", markersize=3.0, linewidth=1.8, label="Deduplicated cumulative", color="#4C78A8")
-    cdf_ax.plot(all_counts, cumulative_occurrence, marker="o", markersize=3.0, linewidth=1.8, label="Occurrence cumulative", color="#F58518")
+    cdf_ax.plot(all_counts, cumulative_dedup, marker="o", markersize=3.0, linewidth=1.8, label="Deduplicated cumulative", color="#7E57C2")
+    cdf_ax.plot(all_counts, cumulative_occurrence, marker="o", markersize=3.0, linewidth=1.8, label="Occurrence cumulative", color="#4C78A8")
     cdf_ax.axhline(0.95, color="#222222", linewidth=1.0, linestyle="--", alpha=0.65)
     cdf_ax.set_xlabel("Source point count")
     cdf_ax.set_ylabel("Cumulative fraction")
     cdf_ax.set_ylim(0.0, 1.02)
     cdf_ax.grid(alpha=0.25)
     cdf_ax.legend(frameon=False, loc="lower right")
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+
+def _plot_x_lattice_frequency(plt: Any, path: Path, rows: list[dict[str, Any]]) -> None:
+    top_rows = sorted(rows, key=lambda row: float(row["occurrence_point_fraction"]), reverse=True)[:18]
+    top_rows = sorted(top_rows, key=lambda row: float(row["x_value"]))
+    denominator_rows = _denominator_family_rows(rows)
+    denominator_rows = sorted(denominator_rows, key=lambda row: float(row["occurrence_point_fraction"]), reverse=True)[:12]
+
+    fig, (position_ax, denominator_ax) = plt.subplots(
+        2,
+        1,
+        figsize=(13.0, 8.0),
+        constrained_layout=True,
+        gridspec_kw={"height_ratios": [1.35, 1.0]},
+    )
+
+    x = np.arange(len(top_rows), dtype=np.float64)
+    labels = [_lattice_row_label(row) for row in top_rows]
+    dedup = np.asarray([float(row["deduplicated_point_fraction"]) for row in top_rows], dtype=np.float64)
+    occurrence = np.asarray([float(row["occurrence_point_fraction"]) for row in top_rows], dtype=np.float64)
+    width = 0.42
+    position_ax.bar(x - width / 2.0, dedup, width=width, label="Deduplicated interior points", color="#7E57C2")
+    position_ax.bar(x + width / 2.0, occurrence, width=width, label="Occurrence-weighted interior points", color="#4C78A8")
+    position_ax.set_title("Top interior control-point x positions")
+    position_ax.set_xlabel("Interior x position")
+    position_ax.set_ylabel("Fraction of interior points")
+    position_ax.set_xticks(x, labels, rotation=35, ha="right")
+    position_ax.grid(axis="y", alpha=0.25)
+    position_ax.legend(frameon=False)
+
+    d_x = np.arange(len(denominator_rows), dtype=np.float64)
+    d_labels = [str(row["denominator_label"]) for row in denominator_rows]
+    d_dedup = np.asarray([float(row["deduplicated_point_fraction"]) for row in denominator_rows], dtype=np.float64)
+    d_occurrence = np.asarray([float(row["occurrence_point_fraction"]) for row in denominator_rows], dtype=np.float64)
+    denominator_ax.bar(d_x - width / 2.0, d_dedup, width=width, label="Deduplicated denominator-family mass", color="#7E57C2")
+    denominator_ax.bar(d_x + width / 2.0, d_occurrence, width=width, label="Occurrence-weighted denominator-family mass", color="#4C78A8")
+    denominator_ax.set_title("Reduced-denominator family mass")
+    denominator_ax.set_xlabel("Reduced denominator of simple rational x")
+    denominator_ax.set_ylabel("Fraction of interior points")
+    denominator_ax.set_xticks(d_x, d_labels)
+    denominator_ax.grid(axis="y", alpha=0.25)
+    denominator_ax.legend(frameon=False)
+
+    fig.suptitle("Interior x-position lattice structure", fontsize=14)
     fig.savefig(path, dpi=150)
     plt.close(fig)
 
@@ -633,33 +754,80 @@ def _plot_control_metric(
     metric: str,
     ylabel: str,
     title: str,
+    direction_note: str,
     y_limits: tuple[float, float] | None = None,
 ) -> None:
-    fig, ax = plt.subplots(figsize=(11.5, 5.8), constrained_layout=True)
-    for label, group in _group_control_rows(rows).items():
-        ordered = sorted(group, key=lambda row: int(row["grid_point_count"]))
-        x = [int(row["grid_point_count"]) for row in ordered]
-        y = [float(row[metric]) for row in ordered]
-        if label == "uniform":
-            ax.plot(x, y, linewidth=2.0, color="#4C78A8", label=label)
-            div3_x = [int(row["grid_point_count"]) for row in ordered if row["subdivision_divisible_by_3"] is True]
-            div3_y = [float(row[metric]) for row in ordered if row["subdivision_divisible_by_3"] is True]
-            non_div3_x = [int(row["grid_point_count"]) for row in ordered if row["subdivision_divisible_by_3"] is not True]
-            non_div3_y = [float(row[metric]) for row in ordered if row["subdivision_divisible_by_3"] is not True]
-            ax.scatter(non_div3_x, non_div3_y, s=35, color="#4C78A8", edgecolors="white", linewidths=0.6)
-            ax.scatter(div3_x, div3_y, s=70, marker="D", color="#54A24B", edgecolors="#222222", linewidths=0.45, label="uniform, subdivision divisible by 3")
+    fig, axes = plt.subplots(
+        1,
+        2,
+        figsize=(14.0, 5.8),
+        constrained_layout=True,
+        gridspec_kw={"width_ratios": [1.08, 1.0]},
+    )
+    zoom_threshold = 54
+    for ax, zoom in zip(axes, (False, True)):
+        _draw_control_metric_axis(ax, rows, metric=metric, zoom=zoom)
+        ax.set_xlabel("Subdivision count (control point count = subdivisions + 1)")
+        ax.set_ylabel(ylabel)
+        ax.axvline(96, color="#222222", linewidth=1.0, linestyle=":", alpha=0.45)
+        if y_limits is not None and not zoom:
+            ax.set_ylim(*y_limits)
+        if zoom:
+            _apply_zoom_limits(ax, rows, metric=metric, min_subdivision=zoom_threshold, y_limits=y_limits)
+            ax.set_title(f"Zoom: subdivisions >= {zoom_threshold}")
         else:
-            ax.plot(x, y, marker="o", linewidth=1.8, markersize=4.0, label=label)
-    ax.set_title(title)
-    ax.set_xlabel("Grid point count (subdivision_count = grid_point_count - 1)")
-    ax.set_ylabel(ylabel)
-    ax.axvline(97, color="#222222", linewidth=1.0, linestyle=":", alpha=0.45)
-    if y_limits is not None:
-        ax.set_ylim(*y_limits)
-    ax.grid(alpha=0.25)
-    ax.legend(frameon=False)
+            ax.set_title("Full sweep")
+        ax.grid(alpha=0.25)
+    fig.suptitle(f"{title} ({direction_note})", fontsize=14)
+    axes[0].legend(frameon=False, loc="best")
     fig.savefig(path, dpi=150)
     plt.close(fig)
+
+
+def _draw_control_metric_axis(ax: Any, rows: list[dict[str, Any]], *, metric: str, zoom: bool) -> None:
+    for label, group in _group_control_rows(rows).items():
+        ordered = sorted(group, key=lambda row: int(row["grid_point_count"]))
+        if zoom:
+            ordered = [row for row in ordered if int(row["subdivision_count"]) >= 54]
+        x = [int(row["subdivision_count"]) for row in ordered]
+        y = [float(row[metric]) for row in ordered]
+        if label == "uniform":
+            ax.plot(x, y, linewidth=2.0, color="#E45756", label=label)
+            div3_x = [int(row["subdivision_count"]) for row in ordered if row["subdivision_divisible_by_3"] is True]
+            div3_y = [float(row[metric]) for row in ordered if row["subdivision_divisible_by_3"] is True]
+            non_div3_x = [int(row["subdivision_count"]) for row in ordered if row["subdivision_divisible_by_3"] is not True]
+            non_div3_y = [float(row[metric]) for row in ordered if row["subdivision_divisible_by_3"] is not True]
+            ax.scatter(non_div3_x, non_div3_y, s=35, color="#E45756", edgecolors="white", linewidths=0.6)
+            ax.scatter(div3_x, div3_y, s=70, marker="D", color="#54A24B", edgecolors="#222222", linewidths=0.45, label="uniform, subdivision divisible by 3")
+        else:
+            ax.plot(x, y, marker="o", linewidth=1.8, markersize=4.0, color=_grid_plot_color(label), label=label)
+
+
+def _apply_zoom_limits(
+    ax: Any,
+    rows: list[dict[str, Any]],
+    *,
+    metric: str,
+    min_subdivision: int,
+    y_limits: tuple[float, float] | None,
+) -> None:
+    ax.set_xlim(min_subdivision - 1, max(int(row["subdivision_count"]) for row in rows) + 1)
+    values = [
+        float(row[metric])
+        for row in rows
+        if int(row["subdivision_count"]) >= min_subdivision
+    ]
+    if not values:
+        return
+    if y_limits is not None:
+        lower = max(y_limits[0], min(values) - 0.05 * max(1e-12, max(values) - min(values)))
+        upper = min(y_limits[1], max(values) + 0.05 * max(1e-12, max(values) - min(values)))
+    else:
+        margin = 0.08 * max(1e-12, max(values) - min(values))
+        lower = max(0.0, min(values) - margin)
+        upper = max(values) + margin
+    if upper > lower:
+        ax.set_ylim(lower, upper)
 
 
 def _plot_nonuniform_delta(plt: Any, path: Path, rows: list[dict[str, Any]]) -> None:
@@ -685,15 +853,16 @@ def _plot_nonuniform_delta(plt: Any, path: Path, rows: list[dict[str, Any]]) -> 
             baseline = uniform_by_points.get(grid_point_count)
             if baseline is None:
                 continue
-            x.append(grid_point_count)
+            x.append(int(row["subdivision_count"]))
             y.append(
                 float(row["control_point_x_p95_abs_error_interior_occurrence_weighted"])
                 - float(baseline["control_point_x_p95_abs_error_interior_occurrence_weighted"])
             )
-        ax.plot(x, y, marker="o", linewidth=2.0, markersize=4.5, label=f"global quantile ({weighting})")
+        label = f"global quantile ({weighting})"
+        ax.plot(x, y, marker="o", linewidth=2.0, markersize=4.5, color=_grid_plot_color(label), label=label)
     ax.axhline(0.0, color="#222222", linewidth=1.0)
     ax.set_title("Global non-uniform grid P95 delta vs uniform")
-    ax.set_xlabel("Grid point count (same count as uniform comparator)")
+    ax.set_xlabel("Subdivision count (same control point count as uniform comparator)")
     ax.set_ylabel("Interior P95 abs x error delta")
     ax.grid(alpha=0.25)
     ax.legend(frameon=False)
@@ -704,23 +873,33 @@ def _plot_nonuniform_delta(plt: Any, path: Path, rows: list[dict[str, Any]]) -> 
 def _plot_factor3_checks(plt: Any, path: Path, rows: list[dict[str, Any]]) -> None:
     fig, ax = plt.subplots(figsize=(11.5, 5.8), constrained_layout=True)
     labels = [
-        f"{row['factor3_grid_point_count']} pts\n{row['factor3_subdivision_count']} subdiv\nvs {row['higher_nonfactor3_grid_point_count']} pts"
+        str(row["factor3_subdivision_count"])
         for row in rows
     ]
     x = np.arange(len(rows), dtype=np.float64)
     factor3 = np.asarray([float(row["factor3_interior_p95_abs_error"]) for row in rows], dtype=np.float64)
     higher = np.asarray([float(row["higher_interior_p95_abs_error"]) for row in rows], dtype=np.float64)
     width = 0.42
-    ax.bar(x - width / 2.0, factor3, width=width, color="#54A24B", label="factor-3 subdivision grid")
-    ax.bar(x + width / 2.0, higher, width=width, color="#E45756", label="higher non-factor-3 comparator")
-    ax.set_title("Factor-3 subdivision checks against higher grid-point counts")
-    ax.set_xlabel("Pair: factor-3 grid point count / subdivision count / comparator")
+    ax.bar(x - width / 2.0, factor3, width=width, color="#E45756", label="factor-3 subdivision grid")
+    ax.bar(x + width / 2.0, higher, width=width, color="#6B7280", label="higher non-factor-3 comparator")
+    ax.set_title("Factor-3 subdivision checks against next higher even non-factor-3 subdivision")
+    ax.set_xlabel("Factor-3 subdivision count")
     ax.set_ylabel("Interior P95 abs x error")
     ax.set_xticks(x, labels, rotation=35, ha="right")
     ax.grid(axis="y", alpha=0.25)
     ax.legend(frameon=False)
     fig.savefig(path, dpi=150)
     plt.close(fig)
+
+
+def _grid_plot_color(label: str) -> str:
+    if label == "uniform":
+        return "#E45756"
+    if "deduplicated" in label:
+        return "#7E57C2"
+    if "occurrence_weighted" in label:
+        return "#4C78A8"
+    return "#6B7280"
 
 
 def _group_control_rows(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
@@ -739,8 +918,100 @@ def _grid_label(row: dict[str, Any]) -> str:
     return f"{row['grid_kind']} ({row['grid_learning_weighting']})"
 
 
+def _format_fraction(value: Fraction) -> str:
+    if value.denominator == 1:
+        return str(value.numerator)
+    return f"{value.numerator}/{value.denominator}"
+
+
+def _lattice_row_label(row: dict[str, Any]) -> str:
+    fraction = str(row.get("fraction", ""))
+    if fraction:
+        return fraction
+    return f"{float(row['x_value']):.4f}"
+
+
+def _denominator_family_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    totals = {
+        "occurrence": sum(float(row["occurrence_point_count"]) for row in rows),
+        "deduplicated": sum(float(row["deduplicated_point_count"]) for row in rows),
+    }
+    grouped: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        denominator = row.get("denominator", "")
+        label = str(int(denominator)) if denominator != "" else "other"
+        group = grouped.setdefault(
+            label,
+            {
+                "denominator_label": label,
+                "denominator": int(denominator) if denominator != "" else "",
+                "occurrence_point_count": 0.0,
+                "deduplicated_point_count": 0.0,
+            },
+        )
+        group["occurrence_point_count"] += float(row["occurrence_point_count"])
+        group["deduplicated_point_count"] += float(row["deduplicated_point_count"])
+    denominator_rows = []
+    for group in grouped.values():
+        occurrence_count = float(group["occurrence_point_count"])
+        deduplicated_count = float(group["deduplicated_point_count"])
+        denominator_rows.append(
+            {
+                **group,
+                "occurrence_point_fraction": occurrence_count / totals["occurrence"] if totals["occurrence"] else 0.0,
+                "deduplicated_point_fraction": (
+                    deduplicated_count / totals["deduplicated"] if totals["deduplicated"] else 0.0
+                ),
+            }
+        )
+    return sorted(
+        denominator_rows,
+        key=lambda row: (-float(row["occurrence_point_fraction"]), _denominator_sort_value(row["denominator"])),
+    )
+
+
+def _denominator_sort_value(value: Any) -> int:
+    return int(value) if value != "" else 10_000
+
+
+def _is_power_of_two(value: int) -> bool:
+    return value > 0 and value & (value - 1) == 0
+
+
+def _sum_denominator_fraction(rows: list[dict[str, Any]], predicate: Callable[[int], bool]) -> float:
+    total = 0.0
+    for row in rows:
+        denominator = row.get("denominator", "")
+        if denominator == "":
+            continue
+        if predicate(int(denominator)):
+            total += float(row["occurrence_point_fraction"])
+    return total
+
+
+def _nonuniform_band_summary(rows: list[dict[str, Any]], *, low: int, high: int) -> dict[str, Any]:
+    band_rows = [row for row in rows if low <= int(row["subdivision_count"]) <= high]
+    if not band_rows:
+        return {
+            "low": low,
+            "high": high,
+            "count": 0,
+            "negative_count": 0,
+            "mean_delta": 0.0,
+        }
+    deltas = np.asarray([float(row["p95_delta"]) for row in band_rows], dtype=np.float64)
+    return {
+        "low": low,
+        "high": high,
+        "count": len(band_rows),
+        "negative_count": int(np.sum(deltas < 0.0)),
+        "mean_delta": float(np.mean(deltas)),
+    }
+
+
 def _report_findings(
     point_frequency_rows: list[dict[str, Any]],
+    lattice_frequency_rows: list[dict[str, Any]],
     control_rows: list[dict[str, Any]],
     factor3_rows: list[dict[str, Any]],
 ) -> dict[str, Any]:
@@ -754,31 +1025,59 @@ def _report_findings(
     cumulative_18 = _point_frequency_at_or_before(point_frequency_rows, 18)
     first_uniform_pass_95 = _first_row_at_or_above(
         uniform_rows,
-        "lfo_all_points_within_0p01_occurrence_fraction",
+        "lfo_all_points_within_0p001_occurrence_fraction",
         0.95,
     )
     first_uniform_p95_le_001 = _first_row_at_or_below(
         uniform_rows,
         "control_point_x_p95_abs_error_interior_occurrence_weighted",
-        0.01,
+        0.001,
     )
     best_uniform_p95 = min(uniform_rows, key=lambda row: float(row["control_point_x_p95_abs_error_interior_occurrence_weighted"]))
+    valid_uniform_rows = [row for row in uniform_rows if int(row["grid_point_count"]) <= VITAL_MAX_POINTS]
+    best_valid_uniform_p95 = min(
+        valid_uniform_rows,
+        key=lambda row: float(row["control_point_x_p95_abs_error_interior_occurrence_weighted"]),
+    )
     best_overall_p95 = min(control_rows, key=lambda row: float(row["control_point_x_p95_abs_error_interior_occurrence_weighted"]))
     nonuniform_delta_rows = _nonuniform_delta_rows(control_rows)
     best_nonuniform_delta = min(nonuniform_delta_rows, key=lambda row: row["p95_delta"]) if nonuniform_delta_rows else None
     worst_nonuniform_delta = max(nonuniform_delta_rows, key=lambda row: row["p95_delta"]) if nonuniform_delta_rows else None
     factor3_wins = sum(1 for row in factor3_rows if row["factor3_beats_or_matches_higher_on_interior_p95"])
+    denominator_rows = _denominator_family_rows(lattice_frequency_rows)
+    uniform_median_zero_subdivisions = [
+        int(row["subdivision_count"])
+        for row in uniform_rows
+        if float(row["control_point_x_median_abs_error_interior_occurrence_weighted"]) <= EXACT_TOLERANCE
+    ]
+    factor3_win_rows = [row for row in factor3_rows if row["factor3_beats_or_matches_higher_on_interior_p95"]]
     return {
         "occurrence_top": occurrence_top,
         "dedup_top": dedup_top,
         "cumulative_5": cumulative_5,
         "cumulative_18": cumulative_18,
+        "top_lattice_rows": lattice_frequency_rows[:8],
+        "denominator_rows": denominator_rows,
+        "dyadic_occurrence_fraction": _sum_denominator_fraction(
+            denominator_rows,
+            lambda denominator: _is_power_of_two(denominator),
+        ),
+        "third_family_occurrence_fraction": _sum_denominator_fraction(
+            denominator_rows,
+            lambda denominator: denominator % 3 == 0,
+        ),
         "first_uniform_pass_95": first_uniform_pass_95,
         "first_uniform_p95_le_001": first_uniform_p95_le_001,
         "best_uniform_p95": best_uniform_p95,
+        "best_valid_uniform_p95": best_valid_uniform_p95,
         "best_overall_p95": best_overall_p95,
         "best_nonuniform_delta": best_nonuniform_delta,
         "worst_nonuniform_delta": worst_nonuniform_delta,
+        "nonuniform_low_band": _nonuniform_band_summary(nonuniform_delta_rows, low=8, high=30),
+        "nonuniform_mid_band": _nonuniform_band_summary(nonuniform_delta_rows, low=32, high=52),
+        "nonuniform_high_band": _nonuniform_band_summary(nonuniform_delta_rows, low=54, high=100),
+        "uniform_median_zero_subdivisions": uniform_median_zero_subdivisions,
+        "factor3_win_rows": factor3_win_rows,
         "factor3_wins": factor3_wins,
         "factor3_total": len(factor3_rows),
     }
@@ -834,26 +1133,25 @@ def _nonuniform_delta_rows(control_rows: list[dict[str, Any]]) -> list[dict[str,
 
 
 def _selected_uniform_rows(control_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    selected_counts = {24, 25, 33, 49, 60, 65, 73, 81, 97, 98, 100}
+    selected_subdivisions = {8, 10, 12, 24, 32, 48, 60, 64, 72, 80, 96, 98, 100}
     return [
         row
         for row in sorted(control_rows, key=lambda item: int(item["grid_point_count"]))
-        if row["grid_kind"] == "uniform" and int(row["grid_point_count"]) in selected_counts
+        if row["grid_kind"] == "uniform" and int(row["subdivision_count"]) in selected_subdivisions
     ]
 
 
 def _format_grid_point_row(row: dict[str, Any] | None) -> str:
     if row is None:
-        return "not reached by the tested grid counts"
+        return "not reached by the tested subdivision counts"
     return (
-        f"`grid_point_count={int(row['grid_point_count'])}` "
-        f"(`subdivision_count={_format_subdivision(row)}`)"
+        f"`subdivision_count={int(row['subdivision_count'])}` "
+        f"(`control_point_count={int(row['grid_point_count'])}`)"
     )
 
 
 def _format_subdivision(row: dict[str, Any]) -> str:
-    value = row.get("subdivision_count", "")
-    return str(value) if value != "" else "n/a fixed non-uniform"
+    return str(row.get("subdivision_count", ""))
 
 
 def _format_bool(value: Any) -> str:
@@ -865,11 +1163,12 @@ def _format_bool(value: Any) -> str:
 def _report(
     *,
     point_frequency_rows: list[dict[str, Any]],
+    lattice_frequency_rows: list[dict[str, Any]],
     control_rows: list[dict[str, Any]],
     factor3_rows: list[dict[str, Any]],
     plot_paths: dict[str, str],
 ) -> str:
-    findings = _report_findings(point_frequency_rows, control_rows, factor3_rows)
+    findings = _report_findings(point_frequency_rows, lattice_frequency_rows, control_rows, factor3_rows)
     occurrence_top = findings["occurrence_top"]
     dedup_top = findings["dedup_top"]
     cumulative_5 = findings["cumulative_5"]
@@ -877,30 +1176,129 @@ def _report(
     first_uniform_pass_95 = findings["first_uniform_pass_95"]
     first_uniform_p95_le_001 = findings["first_uniform_p95_le_001"]
     best_uniform_p95 = findings["best_uniform_p95"]
+    best_valid_uniform_p95 = findings["best_valid_uniform_p95"]
     best_overall_p95 = findings["best_overall_p95"]
     best_nonuniform_delta = findings["best_nonuniform_delta"]
     worst_nonuniform_delta = findings["worst_nonuniform_delta"]
+    top_lattice = ", ".join(
+        f"`{_lattice_row_label(row)}` ({float(row['occurrence_point_fraction']):.2%})"
+        for row in findings["top_lattice_rows"][:6]
+    )
+    denominator_mass = ", ".join(
+        f"`{row['denominator_label']}` ({float(row['occurrence_point_fraction']):.2%})"
+        for row in findings["denominator_rows"][:6]
+    )
+    median_zero = findings["uniform_median_zero_subdivisions"]
+    median_zero_summary = ", ".join(str(value) for value in median_zero[:12])
+    if len(median_zero) > 12:
+        median_zero_summary += ", ..."
+    factor3_win_rows = findings["factor3_win_rows"]
+    if factor3_win_rows:
+        factor3_win_summary = ", ".join(
+            f"`{int(row['factor3_subdivision_count'])}` vs `{int(row['higher_nonfactor3_subdivision_count'])}`"
+            for row in factor3_win_rows
+        )
+    else:
+        factor3_win_summary = "none"
+    low_band = findings["nonuniform_low_band"]
+    mid_band = findings["nonuniform_mid_band"]
+    high_band = findings["nonuniform_high_band"]
     lines = [
         "# Experiment 10: Control-Point X Grid Audit",
         "",
-        "Experiment 10 is a standalone corpus/grid audit, not an Era 2 model-runner experiment. It asks how many source control points real LFOs use, then tests how well inclusive x-grid point counts place those ordered control-point x positions.",
+        "## Main Findings",
+        "",
+        "The main result is not that factor-3 grids are broadly special. The stronger pattern is that this corpus is heavily dyadic. Interior control-point x positions pile up on `1/2`, quarters, eighths, sixteenths, and thirty-seconds. Factor-3 helps only when it lands on top of that dyadic structure instead of competing with it.",
+        "",
+        f"The source corpus is also simple in point count. The most common occurrence-weighted source count is {int(occurrence_top['source_point_count'])} points ({float(occurrence_top['lfo_corpus_occurrence_fraction']):.3%} of LFO occurrences). The most common deduplicated source count is {int(dedup_top['source_point_count'])} points ({float(dedup_top['deduplicated_lfo_fraction']):.3%} of unique LFO shapes). Source LFOs with at most 5 points cover {float(cumulative_5['lfo_corpus_cumulative_fraction']):.3%} of occurrence-weighted usage and {float(cumulative_5['deduplicated_lfo_cumulative_fraction']):.3%} of deduplicated shapes.",
+        "",
+        f"The top occurrence-weighted interior x positions are {top_lattice}. By reduced denominator, the largest families are {denominator_mass}. Summing denominator families, dyadic positions account for {float(findings['dyadic_occurrence_fraction']):.3%} of occurrence-weighted interior point mass, while denominator families divisible by 3 account for {float(findings['third_family_occurrence_fraction']):.3%}. This is why the plots have a sawtooth/periodic look.",
+        "",
+        f"Uniform median error hits zero at subdivision counts `{median_zero_summary}`. That is not an accident: those rows align with enough of the dominant dyadic lattice that more than half of occurrence-weighted interior points are exact hits.",
+        "",
+        f"The P95 curve mostly rewards more subdivisions, but it also has sharp alignment drops at dyadic-friendly rows. The best valid high-end uniform row is {_format_grid_point_row(best_valid_uniform_p95)} with interior P95 x error {float(best_valid_uniform_p95['control_point_x_p95_abs_error_interior_occurrence_weighted']):.8f}. That row matters because `subdivision_count=96` gives 97 control points, stays inside Vital's 100-point limit, and combines dyadic alignment with factor-3 alignment. The absolute best uniform row in the sweep is {_format_grid_point_row(best_uniform_p95)} with P95 {float(best_uniform_p95['control_point_x_p95_abs_error_interior_occurrence_weighted']):.8f}, but rows above 99 control points need to be read against the Vital limit.",
+        "",
+        f"The `0.001` whole-LFO pass-rate check is intentionally strict. Uniform spacing alone would only guarantee every in-range x position is within `0.001` at `subdivision_count >= 500`, because the worst in-range rounding error is `1 / (2 * subdivision_count)`. So in this sweep the `0.001` plot should be read as a lattice-alignment diagnostic, not as a dense-grid acceptability threshold. The first uniform grid where at least 95% of occurrence-weighted LFOs pass that strict whole-LFO check is {_format_grid_point_row(first_uniform_pass_95)}.",
+        "",
+        f"Fixed global non-uniform grids are mixed. At very low subdivision counts they often over-focus the most frequent x positions and leave the tail exposed. In the low band (`8` through `30`), {low_band['negative_count']} of {low_band['count']} non-uniform P95 deltas are negative, with mean delta {float(low_band['mean_delta']):.8f}. In the mid band (`32` through `52`), {mid_band['negative_count']} of {mid_band['count']} are negative, mean delta {float(mid_band['mean_delta']):.8f}. In the high band (`54` through `100`), {high_band['negative_count']} of {high_band['count']} are negative, mean delta {float(high_band['mean_delta']):.8f}. Negative is good, but the high-subdivision margins are small.",
+        "",
+        f"Factor-3 alone is not a general win. It beats or matches the next higher even non-factor-3 comparator in {findings['factor3_wins']} of {findings['factor3_total']} tested pairings. Winning pairings: {factor3_win_summary}. The important case is `96`, because it is also dyadic-friendly.",
+        "",
+        "## Why The Curves Look Periodic",
+        "",
+        f"![Interior x-position lattice structure]({plot_paths['x_lattice_frequency']})",
+        "",
+        "The top subplot shows the actual interior x positions that dominate the corpus. The bottom subplot groups simple rational x positions by reduced denominator. If a uniform grid has `subdivision_count` divisible by one of these denominators, those points become exact hits. If it misses the denominator, the same points produce a visible jump in median, P95, or whole-LFO pass rate.",
+        "",
+        "This is why the uniform median curve has clean zero drops at multiples of 8, and why `subdivision_count=96` is unusually strong: it is divisible by 32 and by 3. A pure factor-3 interpretation would miss the larger dyadic story.",
+        "",
+        "## Plot Notes",
+        "",
+        "### Source Point-Count Frequency",
+        "",
+        f"![Source point-count frequency]({plot_paths['point_count_frequency']})",
+        "",
+        "Higher bars mean more corpus mass at that source control-point count. The occurrence-weighted corpus is even more concentrated than the deduplicated corpus: repeated preset usage strongly favors 3-point shapes. The lower cumulative plot shows that the long tail exists, but most practical coverage is already inside low point counts.",
+        "",
+        "### Median Interior X Error",
+        "",
+        f"![Interior median x error by grid type]({plot_paths['x_error_median']})",
+        "",
+        "Lower is better. The uniform median plot is the clearest periodicity signal: it repeatedly drops to zero at multiples of 8. That means the typical interior control point is not merely close to the grid; it is exactly on the grid for those subdivision counts. Global quantile grids reach near-zero median early because they place grid points directly on frequent corpus positions, but that does not mean the tail is solved.",
+        "",
+        "### P95 Interior X Error",
+        "",
+        f"![Interior P95 x error by grid type]({plot_paths['x_error_p95']})",
+        "",
+        "Lower is better. P95 mostly follows capacity: more subdivisions reduce the worst common rounding errors. The interesting deviations are the dyadic drops. `32`, `64`, and `96` are better than their immediate neighbors because they align with high-mass denominator families. The zoom panel is the useful decision region: it shows why `96` is the clean high-end uniform default under the 100-control-point constraint.",
+        "",
+        "### Whole-LFO Pass Rate At 0.001",
+        "",
+        f"![LFO pass rate at 0.001 tolerance]({plot_paths['lfo_pass_rate_0p001']})",
+        "",
+        "Higher is better. This plot asks a harder question than point-level P95: does every control point in the LFO land within `0.001` of the grid? At this threshold the curve should not saturate inside the tested sweep just because the grid is dense. Peaks are therefore telling us about exact or near-exact rational alignment, especially with the dyadic lattice.",
+        "",
+        "### Global Non-Uniform Delta",
+        "",
+        f"![Non-uniform grid delta versus uniform]({plot_paths['nonuniform_delta']})",
+        "",
+        "Negative is good. This subtracts same-count uniform P95 from global non-uniform P95. The large positive spikes at low subdivision counts are the cost of spending scarce grid slots on the most frequent positions while leaving less common positions exposed. After roughly the low 30s, non-uniform grids are usually slightly better on P95, but the high-subdivision advantage is small enough that it should be treated as a candidate, not a conclusion.",
+        "",
+        "### Factor-3 Subdivision Checks",
+        "",
+        f"![Factor-3 subdivision checks]({plot_paths['factor3_checks']})",
+        "",
+        "Lower is better. Each red bar is a subdivision count divisible by 3; each grey bar is the next higher even subdivision count that is not divisible by 3. Most factor-3 rows lose because the comparator simply has more subdivisions. The exception at `96` is the meaningful one because `96` is also aligned with the dominant dyadic families.",
+        "",
+        "## Practical Takeaways",
+        "",
+        "- Carry forward fixed uniform `subdivision_count=96` as the Era 2 default: `control_point_count=97`, inside Vital's 100-point limit, and aligned with both dyadic and factor-3 structure.",
+        "- Do not describe factor-3 as a general rule. The better rule is: match the corpus x-position lattice, and note that this corpus is mostly dyadic.",
+        "- Use the `0.001` pass-rate plot as a strict lattice diagnostic. It is not an acceptability-style read because the density guarantee is far outside the current sweep.",
+        "- Future model experiments should not spend model prediction head budget on x-coordinate prediction, grid selection, or variable grid spacing.",
+        "- This audit still does not choose atoms, score y values, render segments, or make model prediction head budget claims. It only measures x-position damage from fixed control-point grids.",
+        "",
+        "## Method Notes",
+        "",
+        "Experiment 10 is a standalone corpus/grid audit, not an Era 2 model-runner experiment. It asks how many source control points real LFOs use, then tests how well inclusive x-grid subdivision counts place those ordered control-point x positions.",
         "",
         "Naming contract:",
         "",
         "- `W` is reserved for residual-layer atom choices in Era 2 model experiments.",
-        "- Experiment 10 varies `grid_point_count`.",
-        "- `subdivision_count = grid_point_count - 1`.",
-        "- Factor language applies to the inferred `subdivision_count`, not to `grid_point_count`.",
-        "- Example: `grid_point_count = 97` means `subdivision_count = 96`, which is divisible by 2 and 3.",
+        "- Experiment 10 varies `subdivision_count`.",
+        "- `control_point_count = subdivision_count + 1`.",
+        "- The CSV keeps `grid_point_count` as the implementation field name for the same value as `control_point_count`.",
+        "- Factor language applies to `subdivision_count`, not to `control_point_count`.",
+        "- Example: `subdivision_count = 96` means `control_point_count = 97`, and 96 is divisible by 2 and 3.",
         "",
         "Control-point x contract:",
         "",
         "- For each true ordered control point, predicted x is the nearest point in the fixed grid.",
-        "- For `uniform`, grid points are `k / subdivision_count`.",
+        "- For `uniform`, grid points are `k / subdivision_count` for integer `k` from 0 through `subdivision_count`.",
         "- For `global_quantile`, grid points are fixed offline-learned non-uniform positions.",
         "- Y is ignored, and no line, Bezier, power curve, or other segment is rendered.",
         "- Repeated grid points are allowed because discontinuous LFOs can contain repeated x positions.",
-        "- `lfo_all_points_within_0p01_*` reports the fraction of LFOs whose maximum x error is at most 0.01.",
+        "- `lfo_all_points_within_0p001_*` reports the fraction of LFOs whose maximum x error is at most 0.001.",
         "",
         "Global non-uniform grids:",
         "",
@@ -908,126 +1306,27 @@ def _report(
         "- The deployed model would still predict a grid slot; it would not predict the grid positions.",
         "- Both deduplicated and occurrence-weighted learned grids are reported.",
         "",
-        "## Analytics Read",
+        "Generated artifacts:",
         "",
-        f"- The corpus is heavily concentrated at low source point counts. The most common occurrence-weighted source count is {int(occurrence_top['source_point_count'])} points ({float(occurrence_top['lfo_corpus_occurrence_fraction']):.3%} of LFO occurrences). The most common deduplicated source count is {int(dedup_top['source_point_count'])} points ({float(dedup_top['deduplicated_lfo_fraction']):.3%} of unique LFO shapes).",
-        f"- Source LFOs with at most 5 points cover {float(cumulative_5['lfo_corpus_cumulative_fraction']):.3%} of occurrence-weighted corpus usage and {float(cumulative_5['deduplicated_lfo_cumulative_fraction']):.3%} of deduplicated shapes. At most 18 points covers {float(cumulative_18['lfo_corpus_cumulative_fraction']):.3%} occurrence-weighted and {float(cumulative_18['deduplicated_lfo_cumulative_fraction']):.3%} deduplicated.",
-        f"- The first uniform grid where at least 95% of occurrence-weighted LFOs have every control point within 0.01 is {_format_grid_point_row(first_uniform_pass_95)}.",
-        f"- The first uniform grid where occurrence-weighted interior P95 x error is at most 0.01 is {_format_grid_point_row(first_uniform_p95_le_001)}.",
-        f"- The best uniform P95 row in this sweep is {_format_grid_point_row(best_uniform_p95)} with interior P95 x error {float(best_uniform_p95['control_point_x_p95_abs_error_interior_occurrence_weighted']):.8f}.",
-        f"- The best overall P95 row in this sweep is `{best_overall_p95['grid_kind']}` / `{best_overall_p95['grid_learning_weighting']}` at {_format_grid_point_row(best_overall_p95)} with interior P95 x error {float(best_overall_p95['control_point_x_p95_abs_error_interior_occurrence_weighted']):.8f}.",
-        f"- Factor-3 subdivision counts are not a universal win against higher non-factor-3 point counts on interior P95: {findings['factor3_wins']} of {findings['factor3_total']} tested pairings beat or matched the higher-count comparator.",
+        "- `point_count_frequency.csv`",
+        "- `control_point_x_lattice_frequency.csv`",
+        "- `control_point_x_summary.csv`",
+        "- `factor3_grid_point_comparisons.csv`",
+        "- `global_nonuniform_grids.json`",
+        "- `summary.csv`",
     ]
     if best_nonuniform_delta is not None and worst_nonuniform_delta is not None:
         lines.extend(
             [
-                f"- The strongest fixed global non-uniform P95 improvement versus same-count uniform is `{best_nonuniform_delta['grid_learning_weighting']}` at `grid_point_count={best_nonuniform_delta['grid_point_count']}` (`uniform subdivision_count={best_nonuniform_delta['uniform_subdivision_count']}`), delta {best_nonuniform_delta['p95_delta']:.8f}.",
-                f"- The worst fixed global non-uniform P95 regression versus same-count uniform is `{worst_nonuniform_delta['grid_learning_weighting']}` at `grid_point_count={worst_nonuniform_delta['grid_point_count']}` (`uniform subdivision_count={worst_nonuniform_delta['uniform_subdivision_count']}`), delta {worst_nonuniform_delta['p95_delta']:.8f}.",
+                "",
+                "Numerical anchors:",
+                "",
+                f"- The first uniform grid where occurrence-weighted interior P95 x error is at most `0.001` is {_format_grid_point_row(first_uniform_p95_le_001)}.",
+                f"- The best overall P95 row in this sweep is `{best_overall_p95['grid_kind']}` / `{best_overall_p95['grid_learning_weighting']}` at {_format_grid_point_row(best_overall_p95)} with interior P95 x error {float(best_overall_p95['control_point_x_p95_abs_error_interior_occurrence_weighted']):.8f}.",
+                f"- The strongest fixed global non-uniform P95 improvement versus same-count uniform is `{best_nonuniform_delta['grid_learning_weighting']}` at `subdivision_count={best_nonuniform_delta['uniform_subdivision_count']}` (`control_point_count={best_nonuniform_delta['grid_point_count']}`), delta {best_nonuniform_delta['p95_delta']:.8f}.",
+                f"- The worst fixed global non-uniform P95 regression versus same-count uniform is `{worst_nonuniform_delta['grid_learning_weighting']}` at `subdivision_count={worst_nonuniform_delta['uniform_subdivision_count']}` (`control_point_count={worst_nonuniform_delta['grid_point_count']}`), delta {worst_nonuniform_delta['p95_delta']:.8f}.",
             ]
         )
-    lines.extend(
-        [
-            "",
-            "Practical read:",
-            "",
-            "- `grid_point_count=97` is the clean high-end uniform row in this sweep: it stays under Vital's 100-point limit, has 96 inferred subdivisions, and that subdivision count is divisible by both 2 and 3.",
-            "- `grid_point_count=100` gives 99 subdivisions, which is divisible by 3 but not by 2, and it is weaker than 97 on interior P95 in this run.",
-            "- Fixed global non-uniform grids are useful as a decoder-owned option, but their advantage is metric-dependent. They often reduce mean error and can help low-count pass rates, while uniform factor-friendly grids can still win on the P95 tail.",
-            "- This audit still says nothing about y placement, segment shape, atom reconstruction, or model prediction head budget. It only measures how much x-position damage comes from forcing control points onto a fixed x grid.",
-            "",
-            "## Source Point-Count Frequency",
-            "",
-            f"![Source point-count frequency]({plot_paths['point_count_frequency']})",
-            "",
-            "| source point count | deduplicated LFOs | dedup fraction | LFO corpus occurrences | corpus fraction |",
-            "| ---: | ---: | ---: | ---: | ---: |",
-        ]
-    )
-    for row in point_frequency_rows:
-        lines.append(
-            "| {source_point_count} | {deduplicated_lfo_count} | {deduplicated_lfo_fraction:.6f} | {lfo_corpus_occurrence_count:.0f} | {lfo_corpus_occurrence_fraction:.6f} |".format(
-                **row
-            )
-        )
-    lines.extend(
-        [
-            "",
-            "## Control-Point X Placement",
-            "",
-            f"![Interior P95 x error by grid type]({plot_paths['x_error_p95']})",
-            "",
-            "The P95 plot is where the off-by-one issue matters most. A plotted `grid_point_count` of 97 means 96 subdivisions. Green diamond markers identify uniform rows where the inferred subdivision count is divisible by 3.",
-            "",
-            f"![LFO pass rate at 0.01 tolerance]({plot_paths['lfo_pass_rate_0p01']})",
-            "",
-            "The pass-rate plot asks a stricter operational question than point-level P95: for an entire LFO, are all control-point x positions within 0.01 of some fixed grid position?",
-            "",
-            f"![Non-uniform grid delta versus uniform]({plot_paths['nonuniform_delta']})",
-            "",
-            "The non-uniform delta plot keeps `grid_point_count` fixed and subtracts the same-count uniform P95. Negative values mean the fixed global non-uniform grid beat the uniform grid at the same number of points.",
-            "",
-            "Selected uniform rows:",
-            "",
-            "| grid point count | subdivisions | div by 2 | div by 3 | div by 5 | LFOs <=0.01 corpus | interior mean x error | interior p95 x error |",
-            "| ---: | ---: | :---: | :---: | :---: | ---: | ---: | ---: |",
-        ]
-    )
-    for row in _selected_uniform_rows(control_rows):
-        lines.append(
-            "| {grid_point_count} | {subdivision_count} | {div2} | {div3} | {div5} | {lfo_all_points_within_0p01_occurrence_fraction:.6f} | {control_point_x_mean_abs_error_interior_occurrence_weighted:.8f} | {control_point_x_p95_abs_error_interior_occurrence_weighted:.8f} |".format(
-                div2=_format_bool(row["subdivision_divisible_by_2"]),
-                div3=_format_bool(row["subdivision_divisible_by_3"]),
-                div5=_format_bool(row["subdivision_divisible_by_5"]),
-                **row,
-            )
-        )
-    lines.extend(
-        [
-            "",
-            "All grid rows:",
-            "",
-            "| grid kind | learning weight | grid point count | subdivisions | div by 3 | LFOs <=0.01 dedup | LFOs <=0.01 corpus | interior mean x error | interior p95 x error |",
-            "| --- | --- | ---: | ---: | :---: | ---: | ---: | ---: | ---: |",
-        ]
-    )
-    for row in control_rows:
-        lines.append(
-            "| {grid_kind} | {grid_learning_weighting} | {grid_point_count} | {table_subdivision_count} | {div3} | {lfo_all_points_within_0p01_deduplicated_fraction:.6f} | {lfo_all_points_within_0p01_occurrence_fraction:.6f} | {control_point_x_mean_abs_error_interior_occurrence_weighted:.8f} | {control_point_x_p95_abs_error_interior_occurrence_weighted:.8f} |".format(
-                table_subdivision_count=_format_subdivision(row),
-                div3=_format_bool(row["subdivision_divisible_by_3"]),
-                **row,
-            )
-        )
-    lines.extend(
-        [
-            "",
-            "## Factor-3 Subdivision Checks",
-            "",
-            f"![Factor-3 subdivision checks]({plot_paths['factor3_checks']})",
-            "",
-            "This table tests the specific hypothesis that a factor-3 subdivision grid can beat or match a higher-count non-factor-3 grid. The table always reports both the point count and the inferred subdivision count so the off-by-one is explicit.",
-            "",
-            "| factor-3 grid points | factor-3 subdivisions | higher grid points | higher subdivisions | p95 delta | factor-3 beats/matches higher |",
-            "| ---: | ---: | ---: | ---: | ---: | :---: |",
-        ]
-    )
-    for row in factor3_rows:
-        lines.append(
-            "| {factor3_grid_point_count} | {factor3_subdivision_count} | {higher_nonfactor3_grid_point_count} | {higher_nonfactor3_subdivision_count} | {interior_p95_abs_error_delta_factor3_minus_higher:.8f} | {factor3_beats_or_matches_higher_on_interior_p95} |".format(
-                **row
-            )
-        )
-    lines.extend(
-        [
-            "",
-            "Interpretation notes:",
-            "",
-            "- A negative p95 delta means the factor-3 subdivision grid beat the higher point-count comparator.",
-            "- This is not a reconstruction metric; it ignores y and all segment connection rules.",
-            "- This is not a model prediction head budget claim.",
-            "- Topology remains analysis-only in the processed corpus.",
-        ]
-    )
     return "\n".join(lines) + "\n"
 
 

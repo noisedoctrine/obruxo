@@ -33,7 +33,7 @@ class ExperimentRowSpec:
     budget_band: str
     base_dictionary_size: int = 32
     phase_bins: int = 1
-    resolution: int = 128
+    resolution: int = 97
     train_count: int = 96
     validation_count: int = 64
     seed: int = 20260704
@@ -260,6 +260,7 @@ def _run_row(spec: ExperimentRowSpec, dataset: Era2CurveDataset, row_dir: Path) 
         codebook_storage_count=assets.codebook_storage_count,
         budget=budget,
         topology_flags=flags,
+        lfo_control_point_count=spec.resolution,
         oracle_construction_time=construction_time,
         oracle_encoding_time=validation_encoding_time,
         method_parameters={
@@ -269,6 +270,7 @@ def _run_row(spec: ExperimentRowSpec, dataset: Era2CurveDataset, row_dir: Path) 
             "W_by_residual_layer": assets.residual_widths(),
             "phase_bins": spec.phase_bins,
             "resolution": spec.resolution,
+            "fixed_x_grid_note": "LFO x-grid geometry is decoder-owned and adds zero model prediction head outputs.",
             "train_count": len(dataset.train_indices),
             "validation_count": len(dataset.validation_indices),
             "seed": spec.seed,

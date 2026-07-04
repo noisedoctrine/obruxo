@@ -30,6 +30,18 @@ and later:
 offline oracle construction -> reconstruction assets -> runtime interface -> decoder policy -> accounting/metrics
 ```
 
+Settled LFO-grid choice after Experiment 10:
+
+```text
+control_point_count = 97
+```
+
+This fixed uniform x lattice is decoder-owned. It has 96 derived subdivisions,
+which are useful for alignment discussion, but future row configuration should
+use the 97 control-point count because that determines vector shapes. Era 2
+model rows should not spend model prediction head budget on x-coordinate
+prediction, grid selection, or variable grid spacing.
+
 Run the framework smoke path with:
 
 ```text
@@ -53,22 +65,29 @@ Run Experiment 10, the standalone control-point x-grid audit:
 conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment10_grid_audit.py
 ```
 
-Defaults:
+  Defaults:
 
-```text
-grid_point_counts = 24,25,26,32,33,36,37,38,40,41,48,49,50,60,61,62,64,65,72,73,74,80,81,96,97,98,100
-```
+  ```text
+  subdivision_counts = 8,10,12,...,100
+  control_point_count = subdivision_count + 1
+  ```
 
-This experiment reports source point-count frequency and ordered control-point
-x placement. The public row variable is `grid_point_count`; the inferred
-`subdivision_count` is always `grid_point_count - 1`. The metric scores x-axis
-placement only, so y values and segment connection rules are intentionally out
-of scope. It also reports the fraction of LFOs whose maximum control-point x
-error is at most `0.01`, plus fixed global non-uniform quantile grids learned
-offline from deduplicated and occurrence-weighted corpus x positions. `W`
-remains reserved for residual-layer atom choices in model experiments.
-The generated markdown report embeds plots under
-`era2/artifacts/experiment_10/control_point_x_grid/plots/`.
+  This experiment reports source point-count frequency and ordered control-point
+  x placement against every even `subdivision_count` from 8 through 100. The
+  CSV keeps `grid_point_count` as the implementation field for
+  `control_point_count`. The metric scores x-axis placement only, so y values
+  and segment connection rules are intentionally out of scope. It also reports
+  the fraction of LFOs whose maximum control-point x error is at most `0.001`,
+  plus fixed global non-uniform quantile grids learned offline from
+  deduplicated and occurrence-weighted corpus x positions. Supporting CSV files
+  include point-count frequency, x-lattice frequency, control-point x summary,
+  factor-3 comparisons, and global non-uniform grid definitions. `W` remains
+  reserved for residual-layer atom choices in model experiments. The generated
+  markdown report is written to
+  `era2/reports/EXPERIMENT_10_CONTROL_POINT_X_GRID_REPORT.md` and embeds
+  graph-first local plot copies under `era2/reports/images/experiment_10/`.
+  The same plots are also retained with the CSV artifacts under
+  `era2/artifacts/experiment_10/control_point_x_grid/plots/`.
 
 Run Experiment 11, the topology-free flat-categorical residual screen:
 
@@ -123,3 +142,6 @@ The smoke path writes generated artifacts under
 Experiment 11 runtime paths remain topology-free. Topology labels may appear
 only in analysis-only bucket metrics; they are not model inputs, targets, loss
 fields, decoder lookup keys, or model prediction head budget terms.
+Experiment 11 rows should also keep the fixed 97-control-point x lattice
+constant and spend the model prediction head budget only on base choice,
+residual atom choice, and enabled scalars such as phase.

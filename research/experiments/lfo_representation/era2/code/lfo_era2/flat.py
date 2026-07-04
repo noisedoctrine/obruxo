@@ -244,6 +244,7 @@ def run_flat_smoke(
         codebook_storage_count=assets.codebook_storage_count,
         budget=budget,
         topology_flags=flags,
+        lfo_control_point_count=resolution,
         oracle_construction_time=construction_time,
         oracle_encoding_time=encoding_time,
         method_parameters={

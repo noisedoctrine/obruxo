@@ -11,10 +11,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "code"))
 
 from lfo_era2.analytics import analyze_run  # noqa: E402
 from lfo_era2.dataset import make_tiny_curve_dataset  # noqa: E402
-from lfo_era2.runner import ExperimentRowSpec, run_experiment11_screen, status_text  # noqa: E402
+from lfo_era2.runner import ExperimentRowSpec, experiment11_row_specs, run_experiment11_screen, status_text  # noqa: E402
 
 
 class RunnerTests(unittest.TestCase):
+    def test_builtin_experiment11_specs_use_97_control_points(self) -> None:
+        for profile in ("quick", "screen", "extended"):
+            with self.subTest(profile=profile):
+                self.assertTrue(all(spec.resolution == 97 for spec in experiment11_row_specs(profile, backend="numpy")))
+
     def test_experiment11_tiny_run_writes_status_rows_and_analytics(self) -> None:
         dataset = make_tiny_curve_dataset(resolution=24, row_count=24)
         specs = [
@@ -35,7 +40,16 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(status["current_phase"], "complete")
             self.assertEqual(status["rows"]["tiny_w2_d2"]["status"], "completed")
             self.assertTrue((run_dir / "rows" / "tiny_w2_d2" / "manifest.json").exists())
+            row_manifest = json.loads((run_dir / "rows" / "tiny_w2_d2" / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(row_manifest["lfo_control_point_count"], 24)
+            self.assertEqual(row_manifest["resolution"], 24)
+            self.assertIn("zero model prediction head outputs", row_manifest["fixed_x_grid_note"])
             self.assertTrue((run_dir / "analytics" / "summary.csv").exists())
+            self.assertTrue((run_dir / "analytics" / "images" / "validation_p95_by_row.png").exists())
+            report_text = (run_dir / "analytics" / "run_report.md").read_text(encoding="utf-8")
+            self.assertIn("## Main Findings", report_text)
+            self.assertIn("## Budget Band Read", report_text)
+            self.assertIn("decoder-owned", report_text)
             self.assertIn("completed=2/2", status_text(run_dir))
 
     def test_analyze_run_is_idempotent(self) -> None:
@@ -57,6 +71,8 @@ class RunnerTests(unittest.TestCase):
             second = analyze_run(run_dir)
             self.assertEqual(first["summary"], second["summary"])
             self.assertTrue(Path(first["run_report"]).exists())
+            self.assertTrue((run_dir / "analytics" / "images" / "validation_p95_vs_head_outputs.png").exists())
+            self.assertTrue((run_dir / "analytics" / "images" / "validation_p95_by_row.png").exists())
 
     def test_run_can_emit_monitor_updates(self) -> None:
         dataset = make_tiny_curve_dataset(resolution=16, row_count=18)
