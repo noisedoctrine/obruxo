@@ -3,8 +3,12 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 from pathlib import Path
+import subprocess
+import sys
 import time
+from typing import Callable
 
 from .analytics import analyze_run
 from .flat import run_flat_smoke
@@ -13,7 +17,7 @@ from .processed_corpus import (
     DEFAULT_DENSE_RESOLUTION,
     build_lfo_corpus,
 )
-from .runner import DEFAULT_METADATA, run_experiment11_screen, status_text
+from .runner import DEFAULT_METADATA, DEFAULT_RUN_ROOT, run_experiment11_screen, status_text
 
 
 ERA2_ROOT = Path(__file__).resolve().parents[2]
@@ -41,7 +45,10 @@ def parser() -> argparse.ArgumentParser:
     run_screen.add_argument("--resume", action="store_true")
     run_screen.add_argument("--rerun-failed", action="store_true")
     run_screen.add_argument("--no-analyze", action="store_true")
-    run_screen.add_argument("--no-monitor", action="store_true", help="do not print live status while running")
+    run_screen.add_argument("--async", dest="async_run", action="store_true", help="launch the run in the background and open the monitor")
+    run_screen.add_argument("--no-monitor", action="store_true", help="do not print progress or open a monitor")
+    run_screen.add_argument("--no-monitor-window", action="store_true", help="do not open a separate status monitor window")
+    run_screen.add_argument("--monitor-refresh-seconds", type=int, default=30)
 
     status = subcommands.add_parser("status", help="print run status")
     status.add_argument("--run-dir", type=Path, required=True)
@@ -74,19 +81,30 @@ def main() -> None:
         print(f"head_outputs_actual={result['manifest']['head_outputs_actual']}")
         print(f"topology_contract_pass={result['topology_contract']['passed']}")
     elif args.command == "run-screen":
-        def monitor(run_dir: Path) -> None:
-            print("")
-            print(status_text(run_dir), flush=True)
+        run_dir = _resolve_cli_run_dir(args.run_dir)
+
+        def progress(message: str) -> None:
+            print(f"experiment11 [{time.strftime('%H:%M:%S')}]: {message}", flush=True)
+
+        if args.async_run:
+            result = _launch_async_run_screen(args, run_dir, progress)
+            print(f"Started async Experiment 11 run: {result['run_dir']}")
+            print(f"runner_pid={result['runner_pid']}")
+            print(f"stdout_log={result['stdout_log']}")
+            print(f"stderr_log={result['stderr_log']}")
+            if result["monitor_started"]:
+                print(f"monitor_refresh_seconds={result['monitor_refresh_seconds']}")
+            return
 
         result = run_experiment11_screen(
             profile=args.profile,
             backend=args.backend,
-            run_dir=args.run_dir,
+            run_dir=run_dir,
             resume=args.resume,
             rerun_failed=args.rerun_failed,
             metadata_path=args.metadata,
             analyze=not args.no_analyze,
-            monitor=None if args.no_monitor else monitor,
+            progress=None if args.no_monitor else progress,
         )
         print(f"Wrote run artifacts to {result['run_dir']}")
         if result["analytics"]:
@@ -109,6 +127,101 @@ def main() -> None:
             progress=lambda message: print(message, flush=True),
         )
         print(f"Wrote processed LFO corpus to {result['output_dir']}")
+
+
+def _resolve_cli_run_dir(run_dir: Path | None) -> Path:
+    if run_dir is not None:
+        return Path(run_dir)
+    return DEFAULT_RUN_ROOT / f"run_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
+
+
+def _open_monitor_window(run_dir: Path, refresh_seconds: int, progress: Callable[[str], None]) -> bool:
+    if sys.platform != "win32":
+        progress("monitor_window skipped reason=not_windows")
+        return False
+    script = ERA2_ROOT / "code" / "monitor_era2_run.ps1"
+    if not script.exists():
+        progress(f"monitor_window skipped reason=missing_script path={script}")
+        return False
+    command = [
+        "powershell.exe",
+        "-NoProfile",
+        "-NoExit",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        str(script),
+        "-RunDir",
+        str(run_dir),
+        "-RefreshSeconds",
+        str(max(1, int(refresh_seconds))),
+        "-PythonExe",
+        sys.executable,
+    ]
+    try:
+        subprocess.Popen(command, cwd=ERA2_ROOT, creationflags=subprocess.CREATE_NEW_CONSOLE)
+        progress(f"monitor_window_opened run_dir={run_dir} refresh_seconds={max(1, int(refresh_seconds))}")
+        return True
+    except Exception as exc:
+        progress(f"monitor_window_failed error={exc}")
+        return False
+
+
+def _launch_async_run_screen(args: argparse.Namespace, run_dir: Path, progress: Callable[[str], None]) -> dict[str, object]:
+    log_dir = DEFAULT_RUN_ROOT / "launcher_logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    stdout_log = log_dir / f"{run_dir.name}_stdout.log"
+    stderr_log = log_dir / f"{run_dir.name}_stderr.log"
+    command = _async_runner_command(args, run_dir)
+    progress(f"async_runner_start run_dir={run_dir}")
+    with stdout_log.open("w", encoding="utf-8") as stdout, stderr_log.open("w", encoding="utf-8") as stderr:
+        process = subprocess.Popen(
+            command,
+            cwd=Path.cwd(),
+            stdout=stdout,
+            stderr=stderr,
+            env=None,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+        )
+    monitor_started = False
+    if not args.no_monitor and not args.no_monitor_window:
+        monitor_started = _open_monitor_window(run_dir, args.monitor_refresh_seconds, progress)
+    return {
+        "run_dir": str(run_dir),
+        "runner_pid": process.pid,
+        "stdout_log": str(stdout_log),
+        "stderr_log": str(stderr_log),
+        "monitor_started": monitor_started,
+        "monitor_refresh_seconds": max(1, int(args.monitor_refresh_seconds)),
+    }
+
+
+def _async_runner_command(args: argparse.Namespace, run_dir: Path) -> list[str]:
+    command = [
+        sys.executable,
+        str(ERA2_ROOT / "code" / "run_era2.py"),
+        "run-screen",
+        "--screen",
+        args.screen,
+        "--profile",
+        args.profile,
+        "--backend",
+        args.backend,
+        "--run-dir",
+        str(run_dir),
+        "--metadata",
+        str(args.metadata),
+        "--no-monitor-window",
+    ]
+    if args.resume:
+        command.append("--resume")
+    if args.rerun_failed:
+        command.append("--rerun-failed")
+    if args.no_analyze:
+        command.append("--no-analyze")
+    if args.no_monitor:
+        command.append("--no-monitor")
+    return command
 
 
 if __name__ == "__main__":

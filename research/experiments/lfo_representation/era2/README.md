@@ -92,7 +92,7 @@ conda run --no-capture-output -n py312 python .\research\experiments\lfo_represe
 Run Experiment 11, the topology-free flat-categorical residual screen:
 
 ```text
-conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\run_era2.py --mkl-threading-layer SEQUENTIAL run-screen --screen experiment11 --profile quick --backend auto
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\run_era2.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-screen --async --screen experiment11 --profile quick --backend auto --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv
 ```
 
 The wrapper-level runtime flags are applied before NumPy/SciPy/PyTorch imports.
@@ -100,14 +100,24 @@ The wrapper-level runtime flags are applied before NumPy/SciPy/PyTorch imports.
 `MKL_NUM_THREADS` together. The individual flags are also available:
 `--openblas-threads`, `--omp-threads`, and `--mkl-threads`.
 
-`run-screen` prints live status automatically while it runs. The same is true
-when continuing a run:
+`run-screen --async` starts the runner in the background, opens a monitor
+window, prints a `Started async Experiment 11 run` message with the run
+directory and log paths, then immediately returns to the shell. The monitor
+refreshes every 30 seconds by default. The same is true when continuing a run:
 
 ```text
-conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\run_era2.py run-screen --screen experiment11 --profile quick --backend auto --run-dir <run_dir> --resume
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\run_era2.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-screen --async --screen experiment11 --profile quick --backend auto --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --run-dir <run_dir> --resume
 ```
 
-Use `--no-monitor` only for scripted runs where stdout should stay quiet.
+Use `--monitor-refresh-seconds <seconds>` to change the monitor refresh rate.
+Use `--no-monitor-window` to start the background runner without opening the
+monitor. Foreground `run-screen` remains available by omitting `--async`.
+
+Run the larger Experiment 11 screen on XPU with:
+
+```text
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\run_era2.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-screen --async --screen experiment11 --profile screen --backend xpu --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv
+```
 
 Run artifacts are written under:
 

@@ -10,6 +10,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "code"))
 
 from lfo_era2.analytics import analyze_run  # noqa: E402
+from lfo_era2.cli import _async_runner_command, parser  # noqa: E402
 from lfo_era2.dataset import make_tiny_curve_dataset  # noqa: E402
 from lfo_era2.runner import ExperimentRowSpec, experiment11_row_specs, run_experiment11_screen, status_text  # noqa: E402
 
@@ -19,6 +20,27 @@ class RunnerTests(unittest.TestCase):
         for profile in ("quick", "screen", "extended"):
             with self.subTest(profile=profile):
                 self.assertTrue(all(spec.resolution == 97 for spec in experiment11_row_specs(profile, backend="numpy")))
+
+    def test_run_screen_async_defaults_are_simple_launcher_defaults(self) -> None:
+        args = parser().parse_args(
+            [
+                "run-screen",
+                "--async",
+                "--screen",
+                "experiment11",
+                "--profile",
+                "screen",
+                "--backend",
+                "xpu",
+            ]
+        )
+        self.assertTrue(args.async_run)
+        self.assertEqual(args.monitor_refresh_seconds, 30)
+        command = _async_runner_command(args, Path("run_dir"))
+        self.assertIn("run-screen", command)
+        self.assertIn("--run-dir", command)
+        self.assertIn("--no-monitor-window", command)
+        self.assertNotIn("--async", command)
 
     def test_experiment11_tiny_run_writes_status_rows_and_analytics(self) -> None:
         dataset = make_tiny_curve_dataset(resolution=24, row_count=24)
@@ -51,6 +73,7 @@ class RunnerTests(unittest.TestCase):
             self.assertIn("## Budget Band Read", report_text)
             self.assertIn("decoder-owned", report_text)
             self.assertIn("completed=2/2", status_text(run_dir))
+            self.assertIn("elapsed=", status_text(run_dir))
 
     def test_analyze_run_is_idempotent(self) -> None:
         dataset = make_tiny_curve_dataset(resolution=16, row_count=18)
@@ -97,6 +120,30 @@ class RunnerTests(unittest.TestCase):
             )
             self.assertGreaterEqual(len(seen), 4)
             self.assertTrue(all(path == run_dir for path in seen))
+
+    def test_run_can_emit_readable_progress_events(self) -> None:
+        dataset = make_tiny_curve_dataset(resolution=16, row_count=18)
+        specs = [
+            ExperimentRowSpec(row_id="tiny", D=1, W=2, budget_band="tiny", resolution=16, train_count=6, validation_count=3, backend="numpy"),
+        ]
+        messages = []
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp) / "run_tiny"
+            run_experiment11_screen(
+                profile="quick",
+                backend="numpy",
+                run_dir=run_dir,
+                dataset=dataset,
+                row_specs=specs,
+                analyze=False,
+                progress=messages.append,
+            )
+            self.assertTrue(any(message.startswith("run_prepare") for message in messages))
+            self.assertTrue(any("row_start row=tiny" in message for message in messages))
+            self.assertTrue(any("construction_start" in message for message in messages))
+            self.assertTrue(any("validation_encoding_complete" in message for message in messages))
+            self.assertTrue(any("row_complete row=tiny" in message for message in messages))
+            self.assertTrue((run_dir / "events.jsonl").exists())
 
 
 if __name__ == "__main__":

@@ -111,6 +111,7 @@ def run_experiment11_screen(
     row_specs: list[ExperimentRowSpec] | None = None,
     analyze: bool = True,
     monitor: Callable[[Path], None] | None = None,
+    progress: Callable[[str], None] | None = None,
 ) -> dict[str, Any]:
     specs = row_specs or experiment11_row_specs(profile, backend=backend)
     if not specs:
@@ -125,9 +126,21 @@ def run_experiment11_screen(
     max_train = max(spec.train_count for spec in specs)
     max_validation = max(spec.validation_count for spec in specs)
     resolution = specs[0].resolution
+    _log(
+        progress,
+        "run_prepare "
+        f"profile={profile} backend={backend} rows={len(specs)} "
+        f"run_dir={run_dir} control_point_count={resolution}",
+    )
+    _log(progress, f"dataset_load_start metadata={metadata_path} resolution={resolution}")
     if dataset is None:
-        dataset = load_presetshare_curve_dataset(metadata_path, resolution=resolution)
+        dataset = load_presetshare_curve_dataset(
+            metadata_path,
+            resolution=resolution,
+            progress=lambda message: _log(progress, message),
+        )
     dataset = dataset.subset(train_count=max_train, validation_count=max_validation)
+    _log(progress, "dataset_ready " + _format_dataset_fields(dataset.manifest_fields()))
 
     run_id = run_dir.name
     status = _load_status(run_dir) or _initial_status(run_id, profile, specs)
@@ -142,44 +155,121 @@ def run_experiment11_screen(
         rows=[asdict(spec) for spec in specs],
     )
     write_json(run_dir / "run_manifest.json", asdict(manifest))
-    _event(run_dir, status, "run_start", message=f"profile={profile} rows={len(specs)}", monitor=monitor)
+    _event(
+        run_dir,
+        status,
+        "run_start",
+        message=f"profile={profile} rows={len(specs)} backend={backend}",
+        monitor=monitor,
+        progress=progress,
+    )
 
-    for spec in specs:
+    for row_index, spec in enumerate(specs, start=1):
         row_dir = rows_dir / spec.row_id
         existing = status["rows"].get(spec.row_id, {})
         if existing.get("status") == "completed":
-            _event(run_dir, status, "row_skipped", row_id=spec.row_id, message="already completed", monitor=monitor)
+            _event(
+                run_dir,
+                status,
+                "row_skipped",
+                row_id=spec.row_id,
+                message=f"already completed {row_index}/{len(specs)}",
+                monitor=monitor,
+                progress=progress,
+            )
             continue
         if existing.get("status") == "failed" and not rerun_failed:
-            _event(run_dir, status, "row_skipped", row_id=spec.row_id, message="previously failed", monitor=monitor)
+            _event(
+                run_dir,
+                status,
+                "row_skipped",
+                row_id=spec.row_id,
+                message=f"previously failed {row_index}/{len(specs)}",
+                monitor=monitor,
+                progress=progress,
+            )
             continue
         try:
             status["current_row_id"] = spec.row_id
             status["current_phase"] = "running"
+            status["current_row_number"] = row_index
             status["rows"][spec.row_id] = {"status": "running", "started_at_utc": _now()}
             _write_status(run_dir, status)
-            _event(run_dir, status, "row_start", row_id=spec.row_id, monitor=monitor)
-            summary = _run_row(spec, dataset.subset(train_count=spec.train_count, validation_count=spec.validation_count), row_dir)
+            _event(
+                run_dir,
+                status,
+                "row_start",
+                row_id=spec.row_id,
+                message=_row_start_message(spec, row_index, len(specs)),
+                monitor=monitor,
+                progress=progress,
+            )
+
+            def row_progress(message: str) -> None:
+                status["current_phase"] = message
+                _event(
+                    run_dir,
+                    status,
+                    "row_phase",
+                    row_id=spec.row_id,
+                    message=message,
+                    monitor=monitor,
+                    progress=progress,
+                )
+
+            summary = _run_row(
+                spec,
+                dataset.subset(train_count=spec.train_count, validation_count=spec.validation_count),
+                row_dir,
+                progress=row_progress,
+            )
             status["rows"][spec.row_id] = {
                 "status": "completed",
                 "completed_at_utc": _now(),
                 "head_outputs_actual": summary["head_outputs_actual"],
                 "validation_p95_rmse": summary["validation_p95_rmse"],
+                "row_elapsed_seconds": summary["row_elapsed_seconds"],
             }
-            _event(run_dir, status, "row_complete", row_id=spec.row_id, backend_used=summary.get("backend_used"), monitor=monitor)
+            _event(
+                run_dir,
+                status,
+                "row_complete",
+                row_id=spec.row_id,
+                backend_used=summary.get("backend_used"),
+                message=_row_complete_message(summary, row_index, len(specs)),
+                monitor=monitor,
+                progress=progress,
+            )
         except Exception as exc:
             status["rows"][spec.row_id] = {"status": "failed", "failed_at_utc": _now(), "error": str(exc)}
-            _event(run_dir, status, "row_failed", row_id=spec.row_id, message=str(exc), monitor=monitor)
+            _event(
+                run_dir,
+                status,
+                "row_failed",
+                row_id=spec.row_id,
+                message=str(exc),
+                monitor=monitor,
+                progress=progress,
+            )
             _write_status(run_dir, status)
             raise
         _write_status(run_dir, status)
 
     status["current_row_id"] = ""
     status["current_phase"] = "complete"
+    status["current_row_number"] = ""
     status["completed_at_utc"] = _now()
     _write_status(run_dir, status)
+    _log(progress, "analytics_start" if analyze else "analytics_skipped")
     analytics = analyze_run(run_dir) if analyze else {}
-    _event(run_dir, status, "run_complete", message=str(analytics.get("summary", "")), monitor=monitor)
+    _event(
+        run_dir,
+        status,
+        "run_complete",
+        message=str(analytics.get("summary", "")),
+        monitor=monitor,
+        progress=progress,
+    )
     return {"run_dir": str(run_dir), "status": status, "analytics": analytics}
 
 
@@ -194,20 +284,36 @@ def status_text(run_dir: Path) -> str:
     failed = sum(1 for row in rows.values() if row.get("status") == "failed")
     skipped = sum(1 for row in rows.values() if row.get("status") == "skipped")
     last = _last_event(Path(run_dir))
+    elapsed = _elapsed_since(status.get("started_at_utc", ""))
+    row_order = status.get("row_order", [])
+    pending = [
+        row_id
+        for row_id in row_order
+        if rows.get(row_id, {}).get("status") not in {"completed", "skipped"}
+    ]
     lines = [
         f"run_id={status.get('run_id', Path(run_dir).name)} profile={status.get('profile', '')}",
-        f"rows completed={completed}/{total} failed={failed} skipped={skipped}",
-        f"current_row={status.get('current_row_id', '')} phase={status.get('current_phase', '')}",
+        f"rows completed={completed}/{total} ({_percent(completed, total)}) failed={failed} skipped={skipped}",
+        f"elapsed={_format_duration(elapsed)}",
+        f"current_row={status.get('current_row_id', '')} row_number={status.get('current_row_number', '')} phase={status.get('current_phase', '')}",
         f"started_at_utc={status.get('started_at_utc', '')}",
     ]
     if status.get("completed_at_utc"):
         lines.append(f"completed_at_utc={status['completed_at_utc']}")
     if last:
         lines.append(f"last_event={last.get('event', '')} row={last.get('row_id', '')} message={last.get('message', '')}")
+    if pending:
+        lines.append("next_pending=" + ", ".join(pending[:5]))
     return "\n".join(lines)
 
 
-def _run_row(spec: ExperimentRowSpec, dataset: Era2CurveDataset, row_dir: Path) -> dict[str, Any]:
+def _run_row(
+    spec: ExperimentRowSpec,
+    dataset: Era2CurveDataset,
+    row_dir: Path,
+    *,
+    progress: Callable[[str], None] | None = None,
+) -> dict[str, Any]:
     row_started = time.perf_counter()
     row_dir.mkdir(parents=True, exist_ok=True)
     flags = TopologyFlags()
@@ -216,6 +322,7 @@ def _run_row(spec: ExperimentRowSpec, dataset: Era2CurveDataset, row_dir: Path) 
         raise ValueError(f"topology contract failed: {contract.violations}")
 
     construction_started = time.perf_counter()
+    _log(progress, "construction_start")
     assets = construct_flat_assets_from_curves(
         dataset.train_curves,
         base_dictionary_size=spec.base_dictionary_size,
@@ -223,17 +330,39 @@ def _run_row(spec: ExperimentRowSpec, dataset: Era2CurveDataset, row_dir: Path) 
         width=spec.W,
         backend=spec.backend,
         chunk_size=spec.chunk_size,
+        progress=progress,
     )
     construction_time = time.perf_counter() - construction_started
+    _log(progress, f"construction_complete elapsed={construction_time:.2f}s")
 
     train_started = time.perf_counter()
-    train_encoded = encode_flat(dataset.train_curves, assets, phase_bins=spec.phase_bins, backend=spec.backend, chunk_size=spec.chunk_size)
+    _log(progress, "train_encoding_start")
+    train_encoded = encode_flat(
+        dataset.train_curves,
+        assets,
+        phase_bins=spec.phase_bins,
+        backend=spec.backend,
+        chunk_size=spec.chunk_size,
+        progress=progress,
+        progress_label="train encoding",
+    )
     train_encoding_time = time.perf_counter() - train_started
+    _log(progress, f"train_encoding_complete elapsed={train_encoding_time:.2f}s backend={train_encoded.backend_used}")
     train_reconstructed = decode_flat(assets, train_encoded.encoding, decoder_policy=DecoderPolicy())
 
     validation_started = time.perf_counter()
-    validation_encoded = encode_flat(dataset.validation_curves, assets, phase_bins=spec.phase_bins, backend=spec.backend, chunk_size=spec.chunk_size)
+    _log(progress, "validation_encoding_start")
+    validation_encoded = encode_flat(
+        dataset.validation_curves,
+        assets,
+        phase_bins=spec.phase_bins,
+        backend=spec.backend,
+        chunk_size=spec.chunk_size,
+        progress=progress,
+        progress_label="validation encoding",
+    )
     validation_encoding_time = time.perf_counter() - validation_started
+    _log(progress, f"validation_encoding_complete elapsed={validation_encoding_time:.2f}s backend={validation_encoded.backend_used}")
     validation_reconstructed = decode_flat(assets, validation_encoded.encoding, decoder_policy=DecoderPolicy())
 
     runtime_spec = RuntimeInterfaceSpec(
@@ -248,6 +377,7 @@ def _run_row(spec: ExperimentRowSpec, dataset: Era2CurveDataset, row_dir: Path) 
     if schema_stage_keys:
         raise ValueError(f"target schema uses old stage terminology: {schema_stage_keys}")
 
+    _log(progress, "metrics_start")
     manifest = ExperimentRowManifest(
         experiment_id="experiment_11",
         oracle_construction_id="topology_blind_observed_residual_stack_v1",
@@ -307,6 +437,7 @@ def _run_row(spec: ExperimentRowSpec, dataset: Era2CurveDataset, row_dir: Path) 
     write_json(row_dir / "targets_schema.json", schema)
     write_json(row_dir / "topology_contract.json", contract.as_dict())
     write_summary_csv(row_dir / "summary.csv", summary)
+    _log(progress, "metrics_complete")
     return summary
 
 
@@ -340,7 +471,9 @@ def _initial_status(run_id: str, profile: str, specs: list[ExperimentRowSpec]) -
         "started_at_utc": _now(),
         "completed_at_utc": "",
         "current_row_id": "",
+        "current_row_number": "",
         "current_phase": "created",
+        "row_order": [spec.row_id for spec in specs],
         "rows": {},
     }
 
@@ -354,6 +487,7 @@ def _event(
     backend_used: Any = "",
     message: str = "",
     monitor: Callable[[Path], None] | None = None,
+    progress: Callable[[str], None] | None = None,
 ) -> None:
     payload = {
         "timestamp_utc": _now(),
@@ -367,6 +501,7 @@ def _event(
     with (run_dir / "events.jsonl").open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(payload, sort_keys=True) + "\n")
     _write_status(run_dir, status)
+    _log(progress, _event_line(payload))
     if monitor is not None:
         monitor(run_dir)
 
@@ -430,3 +565,69 @@ def _prefix(prefix: str, values: dict[str, Any]) -> dict[str, Any]:
 
 def _now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+
+
+def _log(progress: Callable[[str], None] | None, message: str) -> None:
+    if progress is not None:
+        progress(message)
+
+
+def _event_line(payload: dict[str, Any]) -> str:
+    row = f" row={payload['row_id']}" if payload.get("row_id") else ""
+    backend = f" backend={payload['backend_used']}" if payload.get("backend_used") else ""
+    message = f" {payload['message']}" if payload.get("message") else ""
+    return f"{payload['event']}{row}{backend}{message}".strip()
+
+
+def _row_start_message(spec: ExperimentRowSpec, row_index: int, total_rows: int) -> str:
+    budget = RuntimeInterfaceSpec(
+        addressing_scheme="flat_categorical",
+        residual_layer_count=spec.D,
+        dictionary_scope="per_residual_layer",
+        parameters={"width": spec.W},
+    ).budget(base_dictionary_size=spec.base_dictionary_size)
+    return (
+        f"{row_index}/{total_rows} D={spec.D} W={spec.W} "
+        f"head_outputs={budget.head_outputs_actual} "
+        f"train={spec.train_count} validation={spec.validation_count}"
+    )
+
+
+def _row_complete_message(summary: dict[str, Any], row_index: int, total_rows: int) -> str:
+    return (
+        f"{row_index}/{total_rows} "
+        f"validation_p95_rmse={summary.get('validation_p95_rmse', '')} "
+        f"elapsed={float(summary.get('row_elapsed_seconds', 0.0)):.2f}s"
+    )
+
+
+def _format_dataset_fields(fields: dict[str, Any]) -> str:
+    return " ".join(f"{key}={value}" for key, value in fields.items())
+
+
+def _elapsed_since(started_at: Any) -> float | None:
+    if not isinstance(started_at, str) or not started_at:
+        return None
+    try:
+        return (datetime.now(timezone.utc) - datetime.fromisoformat(started_at)).total_seconds()
+    except ValueError:
+        return None
+
+
+def _format_duration(seconds: float | None) -> str:
+    if seconds is None:
+        return "n/a"
+    seconds = max(0, int(seconds))
+    minutes, sec = divmod(seconds, 60)
+    hours, minute = divmod(minutes, 60)
+    if hours:
+        return f"{hours}h {minute}m {sec}s"
+    if minute:
+        return f"{minute}m {sec}s"
+    return f"{sec}s"
+
+
+def _percent(done: int, total: int) -> str:
+    if total <= 0:
+        return "0.0%"
+    return f"{100.0 * done / total:.1f}%"

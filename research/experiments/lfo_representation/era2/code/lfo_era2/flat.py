@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 import time
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 
@@ -41,6 +41,7 @@ def construct_flat_assets_from_curves(
     width: int,
     backend: BackendPreference = "auto",
     chunk_size: int = 256,
+    progress: Callable[[str], None] | None = None,
 ) -> ReconstructionAssets:
     """Build a simple topology-free observed residual dictionary stack.
 
@@ -55,6 +56,7 @@ def construct_flat_assets_from_curves(
     if width < 1:
         raise ValueError("width must be positive")
     if base_dictionary is None:
+        _progress(progress, "construction: selecting base dictionary")
         base_dictionary = _select_observed_atoms(
             target_matrix,
             width=base_dictionary_size,
@@ -63,10 +65,14 @@ def construct_flat_assets_from_curves(
             include_zero=False,
         )
 
+    _progress(progress, "construction: assigning base dictionary")
     base_result = nearest_indices(target_matrix, base_dictionary, backend=backend, chunk_size=chunk_size)
     prefix = np.asarray(base_dictionary, dtype=np.float32)[base_result.indices].copy()
     residual_layers: list[np.ndarray] = []
-    for _ in range(residual_layer_count):
+    for residual_layer_index in range(residual_layer_count):
+        layer_number = residual_layer_index + 1
+        if _should_report_layer(layer_number, residual_layer_count):
+            _progress(progress, f"construction: residual layer {layer_number}/{residual_layer_count} selecting atoms")
         residual = target_matrix - prefix
         atoms = _select_observed_atoms(
             residual,
@@ -76,6 +82,8 @@ def construct_flat_assets_from_curves(
             include_zero=True,
         )
         residual_layers.append(atoms)
+        if _should_report_layer(layer_number, residual_layer_count):
+            _progress(progress, f"construction: residual layer {layer_number}/{residual_layer_count} updating prefix")
         layer_result = nearest_indices(residual, atoms, backend=backend, chunk_size=chunk_size)
         prefix = prefix + atoms[layer_result.indices]
     return ReconstructionAssets(
@@ -108,12 +116,15 @@ def encode_flat(
     phase_bins: int = 1,
     backend: BackendPreference = "auto",
     chunk_size: int = 256,
+    progress: Callable[[str], None] | None = None,
+    progress_label: str = "encoding",
 ) -> FlatEncodingResult:
     target_matrix = np.asarray(targets, dtype=np.float32)
     if target_matrix.ndim != 2:
         raise ValueError("targets must have shape [rows, resolution]")
     nearest_reports: list[NearestResult] = []
 
+    _progress(progress, f"{progress_label}: base choice")
     base_index, base_phase, base_values, report = _nearest_shifted(
         target_matrix,
         assets.base_dictionary,
@@ -126,7 +137,11 @@ def encode_flat(
 
     residual_indices: list[np.ndarray] = []
     residual_phases: list[np.ndarray] = []
-    for dictionary in assets.residual_layer_dictionaries:
+    residual_layer_count = len(assets.residual_layer_dictionaries)
+    for residual_layer_index, dictionary in enumerate(assets.residual_layer_dictionaries):
+        layer_number = residual_layer_index + 1
+        if _should_report_layer(layer_number, residual_layer_count):
+            _progress(progress, f"{progress_label}: residual layer {layer_number}/{residual_layer_count}")
         residual = target_matrix - prefix
         index, phase, values, report = _nearest_shifted(
             residual,
@@ -335,3 +350,12 @@ def _select_observed_atoms(
             selected.add(candidate)
             atoms.append(matrix[candidate].astype(np.float32))
     return np.stack(atoms).astype(np.float32)
+
+
+def _progress(progress: Callable[[str], None] | None, message: str) -> None:
+    if progress is not None:
+        progress(message)
+
+
+def _should_report_layer(layer_number: int, total_layers: int) -> bool:
+    return layer_number == 1 or layer_number == total_layers or layer_number % 10 == 0
