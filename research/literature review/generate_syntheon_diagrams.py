@@ -221,10 +221,12 @@ SLAB_LINE = "#7a7a7a"
 
 
 def slab(ax, x, y, w, h, depth=0.45, *, fc, label=None, sublabel=None,
-         fontsize=8, ec=SLAB_EDGE, textcolor="white", lw=0.9, zorder=4):
+         fontsize=8, ec=SLAB_EDGE, textcolor="white", lw=0.9, zorder=2):
     """Draw an extruded 'neural net layer' slab and return its front face rect.
 
     Front face is centered at (x, y). Depth extends up-right for the 3D effect.
+    zorder layout: slab faces (2/3) < connectors (6) < slab labels (8), so
+    cross-lane arrows stay visible above faces but text stays on top.
     """
     # top face (parallelogram toward upper-right)
     top = plt.Polygon([
@@ -253,7 +255,7 @@ def slab(ax, x, y, w, h, depth=0.45, *, fc, label=None, sublabel=None,
     if sublabel:
         txt = f"{label}\n{sublabel}" if label else sublabel
     ax.text(x, y, txt, ha="center", va="center", fontsize=fontsize,
-            color=textcolor, weight="bold", zorder=zorder + 2)
+            color=textcolor, weight="bold", zorder=8)
     return (x, y, w, h)
 
 
@@ -268,7 +270,9 @@ def _shade(hexcolor, factor):
 
 
 def slab_connect(ax, n_from, n_to, *, side_from="right", side_to="left",
-                 color=SLAB_LINE, lw=1.1, rad=0.0, zorder=1):
+                 color=SLAB_LINE, lw=1.1, rad=0.0, zorder=6):
+    """Connector zorder sits above slab faces (zorder 5) but below labels (7+),
+    so cross-lane arrows aren't buried behind intermediate slabs."""
     sf = {"bottom": bottom, "top": top, "left": left, "right": right}[side_from]
     st = {"bottom": bottom, "top": top, "left": left, "right": right}[side_to]
     x0, y0 = sf(n_from)
@@ -415,122 +419,136 @@ def diagram_architecture_nn():
 
 # --- Diagram: WTSv2 architecture (swim-lane flowchart) ----------------------
 def diagram_architecture():
-    fig, ax = plt.subplots(figsize=(15, 12))
-    ax.set_xlim(0, 15)
-    ax.set_ylim(0, 12)
+    """Horizontal left-to-right flow. Three lanes (wavetable top, encoder/noise
+    middle, ADSR bottom) converge at the right. Same topology as the NN-style
+    diagram, plain-box idiom."""
+    fig, ax = plt.subplots(figsize=(18, 9))
+    ax.set_xlim(0, 18)
+    ax.set_ylim(0, 9)
     ax.set_axis_off()
 
-    ax.text(0.1, 11.6, "WTSv2 \u2014 Syntheon's Vital model (forward pass)",
-            fontsize=14, weight="bold", color=INK)
-    ax.text(0.1, 11.2,
+    ax.text(0.1, 8.6, "WTSv2 \u2014 Syntheon's Vital model (forward pass)",
+            fontsize=15, weight="bold", color=INK)
+    ax.text(0.1, 8.2,
             "traced from syntheon/inferencer/vital/models/*.py",
-            fontsize=8.5, color=INK_SOFT, style="italic")
+            fontsize=9, color=INK_SOFT, style="italic")
 
-    # swim lanes
-    lane(ax, 0.3, 1.7, 4.6, 10.4, "ENCODER + NOISE", INK_SOFT)
-    lane(ax, 5.0, 1.7, 10.2, 10.4, "WAVETABLE PATH", ACCENT)
-    lane(ax, 10.6, 3.0, 14.7, 10.4, "ADSR PATH", ADSR_C)
+    # lane bands (subtle)
+    lane(ax, 4.9, 5.9, 16.3, 8.0, "wavetable path", ACCENT)
+    lane(ax, 4.9, 3.4, 16.3, 5.5, "encoder + noise", INK_SOFT)
+    lane(ax, 4.9, 0.9, 16.3, 3.0, "ADSR path", ADSR_C)
 
-    # ---- inputs (top) ----
-    inp_y = 9.7
-    pitch = box(ax, 1.5, inp_y, 1.5, 0.55, "pitch", fc="#fff7e6", ec=INPUT_C,
-                fontsize=8.5, weight="bold")
-    loud = box(ax, 2.9, inp_y, 1.5, 0.55, "loudness", fc="#fff7e6", ec=INPUT_C,
-               fontsize=8.5, weight="bold")
-    mfcc = box(ax, 4.3, inp_y, 1.3, 0.55, "mfcc", fc="#fff7e6", ec=INPUT_C,
-               fontsize=8.5, weight="bold")
-    audio = box(ax, 7.6, inp_y, 2.0, 0.55, "raw audio  y", fc="#fff7e6",
-                ec=INPUT_C, fontsize=8.5, weight="bold")
+    wt_y = 6.95
+    mid_y = 4.45
+    adsr_y = 1.95
 
-    # ---- encoder lane ----
-    enc = box(ax, 2.9, 8.3, 3.6, 0.9,
-              "encoder\nin_mlps \u2192 GRU \u2192 out_mlp",
-              fc="#eef0f2", ec=INK_SOFT, fontsize=8.3)
-    hidden = box(ax, 2.9, 6.9, 2.6, 0.6, "hidden representation",
-                 fc="#e7ecf3", ec=INK_SOFT, fontsize=8.3, weight="bold")
-    noise = box(ax, 2.9, 5.0, 3.8, 1.15,
-                "noise path\nproj_matrices \u2192 scale_function\n"
-                "\u2192 amp_to_IR \u2192 fft_convolve(rand noise)",
-                fc="#f0f0f2", ec=NOISE_C, fontsize=7.8)
-    noise_out = box(ax, 2.9, 3.6, 1.8, 0.5, "filtered noise",
-                    fc="#f4f4f5", ec=NOISE_C, fontsize=8)
+    # ---- inputs (left column, stacked to face the lane they feed) ----
+    xi = 1.5
+    pitch = box(ax, xi, 7.2, 1.5, 0.7, "pitch", fc="#fff7e6", ec=INPUT_C,
+                fontsize=9, weight="bold")
+    audio = box(ax, xi, 5.8, 1.5, 0.7, "audio y", fc="#fff7e6", ec=INPUT_C,
+                fontsize=9, weight="bold")
+    loud = box(ax, xi, 4.4, 1.5, 0.7, "loudness", fc="#fff7e6", ec=INPUT_C,
+               fontsize=9, weight="bold")
+    mfcc = box(ax, xi, 3.0, 1.5, 0.7, "mfcc", fc="#fff7e6", ec=INPUT_C,
+               fontsize=9, weight="bold")
 
-    connect(ax, pitch, enc, side_from="bottom", side_to="top", rad=-0.15)
+    # ---- encoder (shared) ----
+    x = 4.0
+    enc = box(ax, x, mid_y, 1.9, 1.7,
+              "encoder\nin_mlps\u2192GRU\n\u2192out_mlp",
+              fc="#eef0f2", ec=INK_SOFT, fontsize=8.5)
+    connect(ax, pitch, enc, side_from="right", side_to="left", rad=0.18)
     connect(ax, loud, enc, color=INK_SOFT)
-    connect(ax, mfcc, enc, side_from="bottom", side_to="top", rad=0.15)
-    connect(ax, enc, hidden, color=INK_SOFT)
-    connect(ax, hidden, noise, color=NOISE_C)
-    connect(ax, noise, noise_out, color=NOISE_C)
+    connect(ax, mfcc, enc, side_from="right", side_to="left", rad=-0.18)
 
-    # ---- wavetable lane ----
-    extract = box(ax, 7.6, 8.3, 4.4, 1.0,
-                  "wavetable extraction\n"
-                  "infer_wavetables(y, pitch)  [inference]\n"
-                  "wt1_conv1d(y)               [training]",
-                  fc="#eaf1f8", ec=ACCENT, fontsize=7.6)
-    attn = box(ax, 7.6, 6.8, 3.6, 0.7,
-               "attention_wt1 \u2192 softmax\n(mixing weights)",
-               fc="#eaf1f8", ec=ACCENT, fontsize=7.8)
-    synth = box(ax, 7.6, 5.5, 4.2, 0.95,
-                "WavetableSynthV2\nattention-weighted wavetable osc\n"
-                "+ linear interpolation + phase accum.",
-                fc="#dce8f5", ec=ACCENT, fontsize=7.8, lw=1.4)
-    harm = box(ax, 7.6, 4.1, 2.0, 0.55, "harmonic",
-               fc="#dce8f5", ec=ACCENT, fontsize=8.5, weight="bold")
-
-    connect(ax, audio, extract, color=ACCENT)
-    # pitch feeds extraction (curves across lane boundary)
+    # ---- wavetable lane (top, left to right) ----
+    x = 6.8
+    extract = box(ax, x, wt_y, 2.3, 1.1,
+                  "wavetable extraction\ninfer_wavetables(y, pitch)\n"
+                  "[or wt1_conv1d(y) in training]",
+                  fc="#eaf1f8", ec=ACCENT, fontsize=7.8)
+    connect(ax, audio, extract, side_from="right", side_to="left", rad=0.22)
     connect(ax, pitch, extract, side_from="right", side_to="left",
-            color=INPUT_C, lw=1.1, rad=-0.35)
-    ax.text(5.0, 9.15, "pitch", fontsize=7, color=INPUT_C, style="italic")
+            rad=0.08, color=INPUT_C, lw=1.0)
 
+    x = 9.6
+    attn = box(ax, x, wt_y, 1.9, 1.1,
+               "attention\nsoftmax mix",
+               fc="#eaf1f8", ec=ACCENT, fontsize=8.3)
     connect(ax, extract, attn, color=ACCENT)
+
+    x = 12.3
+    synth = box(ax, x, wt_y, 2.2, 1.4,
+                "WavetableSynthV2\nattention-weighted osc\n"
+                "+ linear interp\n+ phase accum.",
+                fc="#dce8f5", ec=ACCENT, fontsize=7.8, lw=1.4)
     connect(ax, attn, synth, color=ACCENT)
-    # loudness -> synth (amplitude) crosses left
-    connect(ax, loud, synth, side_from="right", side_to="left",
-            color=INPUT_C, lw=1.1, rad=-0.25)
-    ax.text(5.6, 5.95, "loudness\n(amplitude)", fontsize=7, color=INPUT_C,
-            style="italic", ha="center")
-    # pitch -> synth oscillator (deep curve)
-    connect(ax, pitch, synth, side_from="right", side_to="left",
-            color=INPUT_C, lw=1.0, rad=-0.5)
+
+    x = 15.2
+    harm = box(ax, x, wt_y, 1.7, 1.1, "harmonic",
+               fc="#dce8f5", ec=ACCENT, fontsize=9, weight="bold")
     connect(ax, synth, harm, color=ACCENT)
 
-    # ---- ADSR lane ----
-    adsr_gru = box(ax, 12.6, 7.4, 3.4, 1.1,
-                   "ADSR: 3\u00d7 bidirectional GRU\n"
-                   "attack_gru / decay_gru / sustain_gru\n"
+    # pitch & loudness also feed the oscillator/amplitude; annotate compactly
+    ax.annotate("pitch + loudness\nfeed osc / amplitude",
+                xy=(synth[0] - synth[2] / 2, synth[1] + 0.15),
+                xytext=(6.6, wt_y + 1.35),
+                fontsize=7.8, color=INPUT_C, style="italic",
+                ha="left", va="center",
+                arrowprops=dict(arrowstyle="-", color=INPUT_C,
+                                lw=0.8, ls=(0, (3, 2))))
+
+    # ---- noise lane (middle, off encoder) ----
+    x = 6.8
+    noise = box(ax, x, mid_y, 2.3, 1.15,
+                "noise path\nproj_matrices\u2192scale_fn\n"
+                "\u2192 amp_to_IR",
+                fc="#f0f0f2", ec=NOISE_C, fontsize=7.8)
+    connect(ax, enc, noise, color=NOISE_C)
+    x = 9.6
+    noise_out = box(ax, x, mid_y, 1.9, 1.15,
+                    "filtered noise\nfft_convolve(rand)",
+                    fc="#f4f4f5", ec=NOISE_C, fontsize=7.8)
+    connect(ax, noise, noise_out, color=NOISE_C)
+
+    # ---- ADSR lane (bottom) ----
+    x = 6.8
+    adsr_gru = box(ax, x, adsr_y, 2.3, 1.15,
+                   "ADSR: 3\u00d7 bidir GRU\nattack/decay/sustain\n"
                    "\u2192 sigmoid heads",
                    fc="#e6f3f2", ec=ADSR_C, fontsize=7.7)
-    adsr_env = box(ax, 12.6, 5.4, 2.8, 0.8,
-                   "ADSR envelope\n(get_amp_shaper: power-fn shaping)",
-                   fc="#d6eceb", ec=ADSR_C, fontsize=7.7)
-    # loudness -> ADSR (curves across all lanes)
     connect(ax, loud, adsr_gru, side_from="right", side_to="left",
-            color=INPUT_C, lw=1.1, rad=-0.2)
-    ax.text(8.7, 8.7, "loudness", fontsize=7, color=INPUT_C, style="italic")
+            rad=-0.22, color=INPUT_C, lw=1.0)
+    x = 9.6
+    adsr_env = box(ax, x, adsr_y, 1.9, 1.15,
+                   "ADSR envelope\npower-fn shaping",
+                   fc="#d6eceb", ec=ADSR_C, fontsize=7.8)
     connect(ax, adsr_gru, adsr_env, color=ADSR_C)
 
-    # ---- convergence ----
-    summ = box(ax, 7.6, 2.7, 4.0, 0.7,
-               "signal  =  harmonic  +  filtered noise",
-               fc="#f3eefe", ec=EXTEND, fontsize=8.6, weight="bold")
-    final = box(ax, 7.6, 1.3, 4.6, 0.7,
-                "final signal  =  signal  \u00d7  ADSR",
-                fc="#ece3fb", ec=EXTEND, fontsize=8.6, weight="bold", lw=1.5)
+    # ---- convergence (right) ----
+    x = 15.2
+    summ = box(ax, x, mid_y, 2.1, 1.0,
+               "signal =\nharmonic + noise",
+               fc="#f3eefe", ec=EXTEND, fontsize=8.5, weight="bold")
+    connect(ax, harm, summ, side_from="bottom", side_to="top", rad=0.18,
+            color=ACCENT)
+    connect(ax, noise_out, summ, side_from="right", side_to="left",
+            rad=0.22, color=NOISE_C)
 
-    connect(ax, harm, summ, color=ACCENT)
-    connect(ax, noise_out, summ, side_from="bottom", side_to="left",
-            color=NOISE_C, rad=0.2)
-    connect(ax, adsr_env, final, side_from="bottom", side_to="right",
-            color=ADSR_C, rad=0.25)
-    connect(ax, summ, final, color=EXTEND)
+    final = box(ax, x, adsr_y, 2.1, 1.0,
+                "final signal =\nsignal \u00d7 ADSR",
+                fc="#ece3fb", ec=EXTEND, fontsize=8.5, weight="bold", lw=1.5)
+    connect(ax, summ, final, side_from="bottom", side_to="top",
+            rad=0.18, color=EXTEND)
+    connect(ax, adsr_env, final, side_from="right", side_to="left",
+            color=ADSR_C)
 
     # reverb note
-    ax.text(0.4, 0.5,
+    ax.text(0.2, 0.3,
             "note: the Reverb module exists in the code but is commented out\n"
             "in forward() \u2014 the shipped model does not apply reverb.",
-            fontsize=7.6, color="#b42318", style="italic", va="bottom")
+            fontsize=8, color="#b42318", style="italic", va="bottom")
 
     fig.tight_layout()
     fig.savefig(OUT / "syntheon_architecture.png", dpi=180, bbox_inches="tight")

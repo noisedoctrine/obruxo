@@ -95,7 +95,7 @@ def flat_categorical_budget(
         W = int(width)  # type: ignore[arg-type]
         widths = [W] * D
         residual_outputs = D * W
-        formula = f"{base_dictionary_size} + D * W + (D + 1)"
+        formula = f"{base_dictionary_size} + D * W + (D + 1)" if scalar_outputs is None else f"{base_dictionary_size} + D * W + {S}"
         params: dict[str, Any] = {"D": D, "W": W, "W_by_residual_layer": widths}
     else:
         widths = [int(value) for value in widths_by_residual_layer]
@@ -222,4 +222,3 @@ def continuous_address_budget(
         head_outputs_formula=f"{base_dictionary_size} + D * E + (D + 1)",
         parameters={"D": D, "E": E, "address_dim": E},
     )
-

@@ -11,7 +11,8 @@ atoms after the codebook exists.
 
 - [experiments/](./experiments/): Era 2 experiment plans, including
   [EXPERIMENT_10_PLAN.md](./experiments/EXPERIMENT_10_PLAN.md),
-  [EXPERIMENT_11_PLAN.md](./experiments/EXPERIMENT_11_PLAN.md), and
+  [EXPERIMENT_11_PLAN.md](./experiments/EXPERIMENT_11_PLAN.md),
+  [EXPERIMENT_12_PLAN.md](./experiments/EXPERIMENT_12_PLAN.md), and
   [ERA2_CORE_FRAMEWORK_PLAN.md](./experiments/ERA2_CORE_FRAMEWORK_PLAN.md).
 - [reports/](./reports/): Era 2 research notes, design contracts, and future
   result writeups.
@@ -164,6 +165,59 @@ This refreshes run-local CSV analytics and rewrites the canonical Experiment 11
 report in `era2/reports/`. Run-local analytics also include
 `budget_projections.csv`, which records formula-only alternate indexing budget
 views such as binary path addressing. These are not reconstruction-quality rows.
+
+Run the standalone W8D16 deviation audit when comparing Era 2 behavior against
+Era 1 W8D16 anchors:
+
+```text
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment11_w8d16_deviation_audit.py --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --output-dir .\research\experiments\lfo_representation\era2\artifacts\experiment_11\w8d16_deviation_audit --backend xpu --corpus-sample-fraction 1.0 --chunk-size 256
+```
+
+This is a diagnostic, not a new Experiment 11 profile. It fixes `W=8`,
+`D=16`, writes supporting CSV artifacts under
+`era2/artifacts/experiment_11/w8d16_deviation_audit/`, and inserts a W8D16
+section into the canonical Experiment 11 report.
+
+Run the RMSE gap forensic audit when investigating why Era 2 reconstruction is
+far worse than Era 1:
+
+```text
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment11_rmse_gap_audit.py --mkl-threading-layer SEQUENTIAL --native-threads 1 --row-limit 256
+```
+
+This is not a screen. It checks same-array metrics, circular shift, phase/gain
+alignment, and replay of an Era 1 W8D16 checkpoint. The report is written to
+`era2/reports/EXPERIMENT_11_RMSE_GAP_FORENSIC_AUDIT.md`, with CSV probes under
+`era2/artifacts/experiment_11/rmse_gap_audit/`.
+
+Run Experiment 12, the W8D16 first-principles component ladder:
+
+```text
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment12_component_ladder.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run --async --backend xpu --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --corpus-sample-fraction 1.0 --monitor-refresh-seconds 30
+```
+
+Experiment 12 is standalone. It fixes `W=8`, `D=16`, and
+`control_point_count=97`, starts from an indices-only baseline, then adds
+phase, residual-layer gain, beam search, and construction policies as explicit
+components. Optimized residual-layer gain is always model-facing and counted.
+Topology-balanced rows use topology only during offline construction.
+
+Run the tiny Experiment 12 smoke path with:
+
+```text
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment12_component_ladder.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run --backend auto --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --smoke
+```
+
+Regenerate Experiment 12 analytics and the canonical report with:
+
+```text
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment12_component_ladder.py --mkl-threading-layer SEQUENTIAL --native-threads 1 analyze --run-dir .\research\experiments\lfo_representation\era2\artifacts\experiment_12\component_ladder
+```
+
+Experiment 12 artifacts are written under
+`era2/artifacts/experiment_12/component_ladder/`. The user-facing report is
+`era2/reports/EXPERIMENT_12_W8D16_COMPONENT_LADDER_REPORT.md`, with plots under
+`era2/reports/images/experiment_12/`.
 
 Run tests with:
 

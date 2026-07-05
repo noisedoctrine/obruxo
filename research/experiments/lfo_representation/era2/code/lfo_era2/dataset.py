@@ -74,6 +74,7 @@ class Era2CurveDataset:
     row_metadata: list[dict[str, Any]]
     source_fingerprint: str
     resolution: int
+    x_grid_mode: str = "inclusive"
     shapes: tuple[LfoShape, ...] = ()
 
     @property
@@ -99,6 +100,7 @@ class Era2CurveDataset:
             row_metadata=self.row_metadata,
             source_fingerprint=self.source_fingerprint,
             resolution=self.resolution,
+            x_grid_mode=self.x_grid_mode,
             shapes=self.shapes,
         )
 
@@ -109,6 +111,7 @@ class Era2CurveDataset:
             "train_count": int(len(self.train_indices)),
             "validation_count": int(len(self.validation_indices)),
             "resolution": int(self.resolution),
+            "x_grid_mode": self.x_grid_mode,
         }
 
 
@@ -118,6 +121,7 @@ def load_presetshare_curve_dataset(
     resolution: int = 128,
     active_only: bool = True,
     metadata_limit: int | None = None,
+    x_grid_mode: str = "inclusive",
     progress: Callable[[str], None] | None = None,
 ) -> Era2CurveDataset:
     metadata_path = Path(metadata_path)
@@ -161,7 +165,7 @@ def load_presetshare_curve_dataset(
                     continue
                 try:
                     shape = LfoShape.from_json(lfos[lfo_index - 1])
-                    curve = sample_shape(shape, resolution=resolution).astype(np.float32)
+                    curve = sample_shape(shape, resolution=resolution, x_grid_mode=x_grid_mode).astype(np.float32)
                 except Exception:
                     errors += 1
                     continue
@@ -192,7 +196,7 @@ def load_presetshare_curve_dataset(
     validation_mask = np.asarray([_author_is_validation(_author_key(row)) for row in rows])
     if not np.any(validation_mask) or np.all(validation_mask):
         raise ValueError("deterministic author split produced an empty partition")
-    fingerprint = _dataset_fingerprint(metadata_path, rows, resolution=resolution, errors=errors)
+    fingerprint = _dataset_fingerprint(metadata_path, rows, resolution=resolution, errors=errors, x_grid_mode=x_grid_mode)
     return Era2CurveDataset(
         curves=curve_array,
         topology=topology_array,
@@ -201,14 +205,20 @@ def load_presetshare_curve_dataset(
         row_metadata=rows,
         source_fingerprint=fingerprint,
         resolution=int(resolution),
+        x_grid_mode=x_grid_mode,
         shapes=tuple(shapes),
     )
 
 
-def sample_shape(shape: LfoShape, resolution: int = 128) -> np.ndarray:
+def sample_shape(shape: LfoShape, resolution: int = 128, *, x_grid_mode: str = "inclusive") -> np.ndarray:
     if resolution < 2:
         raise ValueError("resolution must be at least 2")
-    phase = np.arange(resolution, dtype=np.float64) / resolution
+    if x_grid_mode == "inclusive":
+        phase = np.linspace(0.0, 1.0, int(resolution), dtype=np.float64)
+    elif x_grid_mode == "endpoint_excluded":
+        phase = np.arange(resolution, dtype=np.float64) / float(resolution)
+    else:
+        raise ValueError("x_grid_mode must be 'inclusive' or 'endpoint_excluded'")
     x = shape.points[:, 0]
     y = shape.points[:, 1]
     right = np.searchsorted(x, phase, side="left")
@@ -262,6 +272,7 @@ def make_tiny_curve_dataset(*, resolution: int = 32, row_count: int = 24) -> Era
         row_metadata=rows,
         source_fingerprint=f"tiny_{row_count}_{resolution}",
         resolution=resolution,
+        x_grid_mode="synthetic_endpoint_excluded",
         shapes=(),
     )
 
@@ -308,7 +319,7 @@ def _author_is_validation(key: str) -> bool:
     return int.from_bytes(digest[:8], "big") % 100 < 20
 
 
-def _dataset_fingerprint(metadata_path: Path, rows: list[dict[str, Any]], *, resolution: int, errors: int) -> str:
+def _dataset_fingerprint(metadata_path: Path, rows: list[dict[str, Any]], *, resolution: int, errors: int, x_grid_mode: str) -> str:
     stat = metadata_path.stat()
     payload = {
         "metadata_name": metadata_path.name,
@@ -316,6 +327,7 @@ def _dataset_fingerprint(metadata_path: Path, rows: list[dict[str, Any]], *, res
         "metadata_mtime_ns": stat.st_mtime_ns,
         "row_count": len(rows),
         "resolution": resolution,
+        "x_grid_mode": x_grid_mode,
         "errors": errors,
         "first_signatures": [row.get("shape_signature", "") for row in rows[:64]],
     }

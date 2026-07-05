@@ -38,12 +38,12 @@ def circular_shift(curves: np.ndarray, phases: np.ndarray | float) -> np.ndarray
 
     width = array.shape[-1]
     leading_shape = array.shape[:-1]
-    phase_array = np.asarray(phases, dtype=np.float32)
+    phase_array = np.asarray(phases, dtype=np.float64) % 1.0
     phase_array = np.broadcast_to(phase_array, leading_shape).reshape(-1)
     flat = array.reshape(-1, width)
 
-    positions = (np.arange(width, dtype=np.float32)[None, :] - phase_array[:, None] * width) % width
-    left = np.floor(positions).astype(np.int64)
+    positions = (np.arange(width, dtype=np.float64)[None, :] - phase_array[:, None] * width) % width
+    left = np.floor(positions).astype(np.int64) % width
     right = (left + 1) % width
     frac = positions - left
 
@@ -125,4 +125,3 @@ def synthetic_residual_dictionaries(
             atoms.append(atom.astype(np.float32))
         layers.append(np.stack(atoms).astype(np.float32))
     return layers
-

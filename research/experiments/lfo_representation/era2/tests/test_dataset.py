@@ -25,8 +25,39 @@ class DatasetTests(unittest.TestCase):
         )
         curve = sample_shape(shape, resolution=8)
         self.assertEqual(curve.shape, (8,))
+        self.assertAlmostEqual(float(curve[-1]), 1.0)
         self.assertTrue(np.all(curve >= 0.0))
         self.assertTrue(np.all(curve <= 1.0))
+
+    def test_97_control_points_use_96_subdivisions(self) -> None:
+        shape = LfoShape.from_json(
+            {
+                "name": "line",
+                "num_points": 2,
+                "points": [0.0, 0.0, 1.0, 1.0],
+                "powers": [0.0, 0.0],
+                "smooth": False,
+            }
+        )
+        curve = sample_shape(shape, resolution=97)
+        self.assertEqual(curve.shape, (97,))
+        self.assertAlmostEqual(float(curve[0]), 0.0)
+        self.assertAlmostEqual(float(curve[48]), 0.5)
+        self.assertAlmostEqual(float(curve[-1]), 1.0)
+
+    def test_endpoint_excluded_grid_remains_available_as_legacy_control(self) -> None:
+        shape = LfoShape.from_json(
+            {
+                "name": "line",
+                "num_points": 2,
+                "points": [0.0, 0.0, 1.0, 1.0],
+                "powers": [0.0, 0.0],
+                "smooth": False,
+            }
+        )
+        curve = sample_shape(shape, resolution=97, x_grid_mode="endpoint_excluded")
+        self.assertAlmostEqual(float(curve[0]), 0.0)
+        self.assertAlmostEqual(float(curve[-1]), 96.0 / 97.0)
 
     def test_sample_shape_uses_power_curve(self) -> None:
         shape = LfoShape.from_json(
