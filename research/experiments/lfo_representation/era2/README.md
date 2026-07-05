@@ -89,11 +89,20 @@ conda run --no-capture-output -n py312 python .\research\experiments\lfo_represe
   The same plots are also retained with the CSV artifacts under
   `era2/artifacts/experiment_10/control_point_x_grid/plots/`.
 
-Run Experiment 11, the topology-free flat-categorical residual screen:
+Run Experiment 11, the topology-free flat-categorical residual run. By
+default this uses the full corpus:
 
 ```text
-conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\run_era2.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-screen --async --screen experiment11 --profile quick --backend auto --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\run_era2.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-screen --async --screen experiment11 --backend xpu --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --corpus-sample-fraction 1.0 --oracle-phase-search-policy continuous
 ```
+
+`--oracle-phase-search-policy continuous` is the canonical Experiment 11
+default. It estimates continuous phase targets on the oracle side using the
+FFT/lattice method. The deployed model still emits one continuous phase scalar
+for the base and one per residual layer, so changing oracle search details does
+not change `head_outputs`. Use `--oracle-phase-search-policy grid
+--oracle-phase-candidate-count <N>` only for an explicit discrete phase search
+ablation.
 
 The wrapper-level runtime flags are applied before NumPy/SciPy/PyTorch imports.
 `--native-threads 1` sets `OPENBLAS_NUM_THREADS`, `OMP_NUM_THREADS`, and
@@ -106,24 +115,38 @@ directory and log paths, then immediately returns to the shell. The monitor
 refreshes every 30 seconds by default. The same is true when continuing a run:
 
 ```text
-conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\run_era2.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-screen --async --screen experiment11 --profile quick --backend auto --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --run-dir <run_dir> --resume
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\run_era2.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-screen --async --screen experiment11 --backend xpu --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --corpus-sample-fraction 1.0 --oracle-phase-search-policy continuous --run-dir <run_dir> --resume
 ```
 
 Use `--monitor-refresh-seconds <seconds>` to change the monitor refresh rate.
 Use `--no-monitor-window` to start the background runner without opening the
 monitor. Foreground `run-screen` remains available by omitting `--async`.
 
-Run the larger Experiment 11 screen on XPU with:
+Run the tiny Experiment 11 plumbing check with:
 
 ```text
-conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\run_era2.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-screen --async --screen experiment11 --profile screen --backend xpu --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\run_era2.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-screen --async --screen experiment11 --backend auto --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --smoke --oracle-phase-search-policy continuous
 ```
+
+Use `--corpus-sample-fraction <0..1>` for a deterministic corpus fraction.
+`--smoke` is only a fixed tiny plumbing test and should not be treated as an
+Experiment 11 result.
 
 Run artifacts are written under:
 
 ```text
 era2/artifacts/experiment_11/runs/<run_id>/
 ```
+
+Those run directories are provenance and raw artifact storage. The user-facing
+Experiment 11 writeup is the single canonical report:
+
+```text
+era2/reports/EXPERIMENT_11_FLAT_CATEGORICAL_REPORT.md
+```
+
+Its local plot copies are written under
+`era2/reports/images/experiment_11/`.
 
 Attach to an existing run from another terminal:
 
@@ -136,6 +159,11 @@ Regenerate analytics:
 ```text
 conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\run_era2.py analyze --run-dir <run_dir>
 ```
+
+This refreshes run-local CSV analytics and rewrites the canonical Experiment 11
+report in `era2/reports/`. Run-local analytics also include
+`budget_projections.csv`, which records formula-only alternate indexing budget
+views such as binary path addressing. These are not reconstruction-quality rows.
 
 Run tests with:
 
@@ -155,3 +183,5 @@ fields, decoder lookup keys, or model prediction head budget terms.
 Experiment 11 rows should also keep the fixed 97-control-point x lattice
 constant and spend the model prediction head budget only on base choice,
 residual atom choice, and enabled scalars such as phase.
+Topology may still be used later as an offline construction signal if the
+resulting target schema and decoder lookup stay topology-free.

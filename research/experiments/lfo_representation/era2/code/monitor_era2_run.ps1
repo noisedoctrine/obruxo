@@ -2,7 +2,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$RunDir,
     [int]$RefreshSeconds = 10,
-    [int]$EventTail = 12,
+    [int]$EventTail = 6,
     [string]$PythonExe = "python"
 )
 
@@ -17,6 +17,7 @@ while ($true) {
     Write-Host "LFO Era 2 Monitor" -ForegroundColor Cyan
     Write-Host ("Updated: " + (Get-Date).ToString("yyyy-MM-dd HH:mm:ss"))
     Write-Host ("RunDir: " + $RunDir)
+    Write-Host ("".PadLeft(72, "-")) -ForegroundColor DarkGray
     Write-Host ""
 
     if (Test-Path $Status) {
@@ -33,6 +34,7 @@ while ($true) {
     }
 
     Write-Host ""
+    Write-Host ("".PadLeft(72, "-")) -ForegroundColor DarkGray
     Write-Host "Recent events" -ForegroundColor DarkCyan
     if (Test-Path $Events) {
         Get-Content $Events -Tail $EventTail

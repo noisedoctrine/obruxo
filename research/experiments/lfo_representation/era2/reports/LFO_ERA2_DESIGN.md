@@ -296,6 +296,11 @@ Phase is baseline.
 
 Phase alignment is how residual atoms become reusable corrections. A phase-free representation can exist as an ablation, but it is not the Era 2 baseline.
 
+The deployed phase target is continuous. The oracle can approximate the best
+phase with FFT/lattice search or an explicit grid search, but that search
+resolution is not model-facing capacity. The model still pays one scalar output
+for the base phase and one scalar output per residual layer.
+
 Gain and offset are not baseline.
 
 Gain and offset have not earned default status. Gain may deserve a later targeted follow-up; offset is weaker so far. Both should wait until the topology-free representation contract is clean.
@@ -408,6 +413,19 @@ residual_layer_D_index
 residual_layer_D_phase
 ```
 
+The phase fields above are continuous scalar targets. Rows must record the
+oracle phase-search policy separately from the runtime interface:
+
+```text
+oracle_phase_search_policy
+oracle_phase_candidate_count
+phase_target_kind = continuous_scalar
+```
+
+Changing the oracle phase candidate count does not change the flat-categorical
+budget formula. A row that counts phase scalars while using only one oracle
+phase candidate is a readiness/scaffold run, not the clean baseline.
+
 No target, mask, loss, artifact column, decoder lookup, or model prediction head formula should depend on topology.
 
 The first run should also hold the x lattice fixed:
@@ -465,6 +483,11 @@ head_outputs
 ```
 
 Then compare quality at matched `head_outputs`. This is the point where "equal-capacity codebook" becomes meaningful: equal capacity means equal model prediction head budget, not equal memory size or equal oracle difficulty.
+
+It is useful to write formula-only budget projections for alternate atom
+indexing strategies beside a completed run. Those projections should never be
+presented as quality results unless that runtime interface was actually used to
+produce reconstruction targets and decoded curves.
 
 ## How To Talk About Era 1 From Now On
 

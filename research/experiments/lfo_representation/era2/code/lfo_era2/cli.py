@@ -38,10 +38,18 @@ def parser() -> argparse.ArgumentParser:
 
     run_screen = subcommands.add_parser("run-screen", help="run an Era 2 experiment screen")
     run_screen.add_argument("--screen", choices=("experiment11",), default="experiment11")
-    run_screen.add_argument("--profile", choices=("quick", "screen", "extended"), default="quick")
     run_screen.add_argument("--backend", choices=("auto", "numpy", "xpu"), default="auto")
+    run_screen.add_argument("--smoke", action="store_true", help="run the tiny fixed plumbing test")
+    run_screen.add_argument("--corpus-sample-fraction", type=float, default=1.0, help="fraction of train and validation splits to use; 1.0 means full corpus")
     run_screen.add_argument("--run-dir", type=Path)
     run_screen.add_argument("--metadata", type=Path, default=DEFAULT_METADATA)
+    run_screen.add_argument(
+        "--oracle-phase-search-policy",
+        choices=("continuous", "grid", "disabled", "fft_lattice"),
+        default="continuous",
+        help="continuous uses the default FFT/lattice oracle; grid uses --oracle-phase-candidate-count",
+    )
+    run_screen.add_argument("--oracle-phase-candidate-count", type=int, default=0, help="grid policy only; 0 means use the row control-point count")
     run_screen.add_argument("--resume", action="store_true")
     run_screen.add_argument("--rerun-failed", action="store_true")
     run_screen.add_argument("--no-analyze", action="store_true")
@@ -81,6 +89,7 @@ def main() -> None:
         print(f"head_outputs_actual={result['manifest']['head_outputs_actual']}")
         print(f"topology_contract_pass={result['topology_contract']['passed']}")
     elif args.command == "run-screen":
+        _validate_run_screen_args(args, parser())
         run_dir = _resolve_cli_run_dir(args.run_dir)
 
         def progress(message: str) -> None:
@@ -97,18 +106,22 @@ def main() -> None:
             return
 
         result = run_experiment11_screen(
-            profile=args.profile,
             backend=args.backend,
+            smoke=args.smoke,
+            corpus_sample_fraction=args.corpus_sample_fraction,
             run_dir=run_dir,
             resume=args.resume,
             rerun_failed=args.rerun_failed,
             metadata_path=args.metadata,
+            oracle_phase_search_policy=_phase_policy(args.oracle_phase_search_policy),
+            oracle_phase_candidate_count=_phase_candidate_count(args.oracle_phase_candidate_count),
             analyze=not args.no_analyze,
             progress=None if args.no_monitor else progress,
         )
         print(f"Wrote run artifacts to {result['run_dir']}")
         if result["analytics"]:
-            print(f"Wrote analytics to {result['analytics']['analytics_dir']}")
+            print(f"Wrote analytics CSVs to {result['analytics']['analytics_dir']}")
+            print(f"Wrote Experiment 11 report to {result['analytics']['report']}")
     elif args.command == "status":
         while True:
             print(status_text(args.run_dir))
@@ -117,7 +130,8 @@ def main() -> None:
             time.sleep(max(1.0, float(args.watch)))
     elif args.command == "analyze":
         result = analyze_run(args.run_dir)
-        print(f"Wrote analytics to {result['analytics_dir']}")
+        print(f"Wrote analytics CSVs to {result['analytics_dir']}")
+        print(f"Wrote Experiment 11 report to {result['report']}")
     elif args.command == "build-lfo-corpus":
         result = build_lfo_corpus(
             metadata_path=args.metadata,
@@ -133,6 +147,23 @@ def _resolve_cli_run_dir(run_dir: Path | None) -> Path:
     if run_dir is not None:
         return Path(run_dir)
     return DEFAULT_RUN_ROOT / f"run_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
+
+
+def _validate_run_screen_args(args: argparse.Namespace, root: argparse.ArgumentParser) -> None:
+    if not (0.0 < float(args.corpus_sample_fraction) <= 1.0):
+        root.error("--corpus-sample-fraction must be in (0, 1]")
+    if args.smoke and float(args.corpus_sample_fraction) != 1.0:
+        root.error("--smoke cannot be combined with --corpus-sample-fraction other than 1.0")
+    if int(args.oracle_phase_candidate_count) < 0:
+        root.error("--oracle-phase-candidate-count must be >= 0")
+
+
+def _phase_candidate_count(value: int) -> int | None:
+    return None if int(value) == 0 else int(value)
+
+
+def _phase_policy(value: str) -> str:
+    return "fft_lattice" if value == "continuous" else value
 
 
 def _open_monitor_window(run_dir: Path, refresh_seconds: int, progress: Callable[[str], None]) -> bool:
@@ -203,18 +234,24 @@ def _async_runner_command(args: argparse.Namespace, run_dir: Path) -> list[str]:
         "run-screen",
         "--screen",
         args.screen,
-        "--profile",
-        args.profile,
         "--backend",
         args.backend,
+        "--corpus-sample-fraction",
+        str(args.corpus_sample_fraction),
         "--run-dir",
         str(run_dir),
         "--metadata",
         str(args.metadata),
+        "--oracle-phase-search-policy",
+        args.oracle_phase_search_policy,
         "--no-monitor-window",
     ]
+    if int(args.oracle_phase_candidate_count) > 0:
+        command.extend(["--oracle-phase-candidate-count", str(args.oracle_phase_candidate_count)])
     if args.resume:
         command.append("--resume")
+    if args.smoke:
+        command.append("--smoke")
     if args.rerun_failed:
         command.append("--rerun-failed")
     if args.no_analyze:

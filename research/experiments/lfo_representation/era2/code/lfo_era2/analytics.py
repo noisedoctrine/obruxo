@@ -7,6 +7,14 @@ import json
 from pathlib import Path
 from typing import Any
 
+from .accounting import path_address_budget_for_width
+
+
+ERA2_ROOT = Path(__file__).resolve().parents[2]
+EXPERIMENT11_RUN_ROOT = ERA2_ROOT / "artifacts" / "experiment_11" / "runs"
+EXPERIMENT11_REPORT_PATH = ERA2_ROOT / "reports" / "EXPERIMENT_11_FLAT_CATEGORICAL_REPORT.md"
+EXPERIMENT11_REPORT_IMAGE_DIR = ERA2_ROOT / "reports" / "images" / "experiment_11"
+
 
 def analyze_run(run_dir: Path) -> dict[str, str]:
     run_dir = Path(run_dir)
@@ -19,19 +27,34 @@ def analyze_run(run_dir: Path) -> dict[str, str]:
     _write_csv(budget_path, _budget_band_summary(rows))
     frontier_path = analytics_dir / "frontier.csv"
     _write_csv(frontier_path, _frontier(rows))
+    projections_path = analytics_dir / "budget_projections.csv"
+    projections = _budget_projections(rows)
+    _write_csv(projections_path, projections)
     failures_path = analytics_dir / "failures.csv"
     _write_csv(failures_path, _failures(run_dir))
-    report_path = analytics_dir / "run_report.md"
+    report_path, image_dir = _report_paths(run_dir)
+    report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(_run_report(run_dir, rows), encoding="utf-8")
-    _write_plots(analytics_dir / "images", rows)
+    _write_plots(image_dir, rows)
     return {
         "analytics_dir": str(analytics_dir),
         "summary": str(summary_path),
         "budget_band_summary": str(budget_path),
         "frontier": str(frontier_path),
+        "budget_projections": str(projections_path),
         "failures": str(failures_path),
-        "run_report": str(report_path),
+        "report": str(report_path),
+        "report_image_dir": str(image_dir),
     }
+
+
+def _report_paths(run_dir: Path) -> tuple[Path, Path]:
+    try:
+        run_dir.resolve().relative_to(EXPERIMENT11_RUN_ROOT.resolve())
+    except ValueError:
+        report_path = run_dir / "reports" / "EXPERIMENT_11_FLAT_CATEGORICAL_REPORT.md"
+        return report_path, report_path.parent / "images" / "experiment_11"
+    return EXPERIMENT11_REPORT_PATH, EXPERIMENT11_REPORT_IMAGE_DIR
 
 
 def _load_row_summaries(run_dir: Path) -> list[dict[str, Any]]:
@@ -83,6 +106,49 @@ def _frontier(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return frontier
 
 
+def _budget_projections(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    projections: list[dict[str, Any]] = []
+    for row in rows:
+        row_id = row.get("row_id", "")
+        actual = _int(row.get("head_outputs_actual"))
+        if actual is not None:
+            projections.append(
+                {
+                    "row_id": row_id,
+                    "budget_view_id": "actual_flat_categorical",
+                    "runtime_interface_id": row.get("runtime_interface_id", ""),
+                    "head_outputs_formula": row.get("head_outputs_formula", ""),
+                    "head_outputs_projected": actual,
+                    "is_actual_runtime_interface": True,
+                }
+            )
+        D = _int(row.get("D"))
+        W = _int(row.get("W"))
+        base = _int(row.get("base_dictionary_size")) or 32
+        if D is None or W is None:
+            continue
+        try:
+            binary = path_address_budget_for_width(
+                base_dictionary_size=base,
+                residual_layer_count=D,
+                width=W,
+                branching_factor=2,
+            )
+        except ValueError:
+            continue
+        projections.append(
+            {
+                "row_id": row_id,
+                "budget_view_id": "formula_only_binary_path_same_leaf_capacity",
+                "runtime_interface_id": "formula_only_path_address_per_residual_layer",
+                "head_outputs_formula": binary.head_outputs_formula,
+                "head_outputs_projected": binary.head_outputs_actual,
+                "is_actual_runtime_interface": False,
+            }
+        )
+    return projections
+
+
 def _failures(run_dir: Path) -> list[dict[str, Any]]:
     status_path = run_dir / "run_status.json"
     if not status_path.exists():
@@ -105,20 +171,38 @@ def _run_report(run_dir: Path, rows: list[dict[str, Any]]) -> str:
     frontier = _frontier(rows)
     bands = _budget_band_summary(rows)
     topology_pass_count = sum(1 for row in rows if str(row.get("topology_contract_pass", "")).lower() == "true")
+    active_phase_count = sum(1 for row in rows if _phase_is_active(row))
+    inactive_phase_count = sum(1 for row in rows if _phase_is_counted(row) and not _phase_is_active(row))
     lattice_values = sorted({str(row.get("lfo_control_point_count", "")) for row in rows if row.get("lfo_control_point_count", "") != ""})
+    dataset = manifest.get("dataset", {})
     lines = [
-        "# Experiment 11 Run Report",
+        "# Experiment 11 Flat-Categorical Report",
         "",
         "## Main Findings",
         "",
-        f"This run completed `{completed}` topology-free flat-categorical rows for `{manifest.get('profile', '')}`.",
+        f"This run completed `{completed}` topology-free flat-categorical rows.",
+        f"Corpus mode: smoke=`{manifest.get('smoke', '')}`, requested sample fraction=`{manifest.get('corpus_sample_fraction_requested', '')}`.",
+        f"Effective dataset: train=`{dataset.get('train_count', '')}`, validation=`{dataset.get('validation_count', '')}`, total active LFO rows=`{dataset.get('dataset_row_count', '')}`.",
         f"The LFO vector shape recorded by completed rows is `{', '.join(lattice_values) if lattice_values else 'not recorded'}` control points.",
         f"Topology contract passed for `{topology_pass_count}/{completed}` completed rows.",
+        f"Active oracle phase search was recorded for `{active_phase_count}/{completed}` completed rows.",
         "",
         _best_row_sentence("Best validation P95", best_p95, "validation_p95_rmse"),
         _best_row_sentence("Best validation median", best_median, "validation_median_rmse"),
         f"The Pareto frontier has `{len(frontier)}` row(s) when sorting by model prediction head budget and validation P95.",
         "",
+        "![Validation P95 vs model prediction head budget](./images/experiment_11/validation_p95_vs_head_outputs.png)",
+        "",
+        "![Validation median vs model prediction head budget](./images/experiment_11/validation_median_vs_head_outputs.png)",
+        "",
+        *(
+            [
+                f"Important caveat: `{inactive_phase_count}` row(s) count phase scalar outputs but record only one oracle phase candidate. Treat those rows as framework/readiness runs, not fair quality comparisons against phase-active Era 1 rows.",
+                "",
+            ]
+            if inactive_phase_count
+            else []
+        ),
         "## Best Rows By Validation P95",
         "",
         "| row | budget band | head outputs | validation p95 RMSE | validation median RMSE | elapsed seconds |",
@@ -161,6 +245,9 @@ def _run_report(run_dir: Path, rows: list[dict[str, Any]]) -> str:
             "## Frontier Read",
             "",
             "Lower validation P95 is better. `head_outputs_actual` is the model prediction head budget; the fixed x lattice is decoder-owned and does not add outputs.",
+            "Oracle phase-search resolution is also not part of this budget: the deployed model emits one continuous phase scalar per base/residual layer either way.",
+            "",
+            "![Validation P95 by row](./images/experiment_11/validation_p95_by_row.png)",
             "",
             "| row | head outputs | validation p95 RMSE | budget band |",
             "| --- | ---: | ---: | --- |",
@@ -178,14 +265,22 @@ def _run_report(run_dir: Path, rows: list[dict[str, Any]]) -> str:
     lines.extend(
         [
             "",
+            "## Budget Projection Notes",
+            "",
+            "Run-local `analytics/budget_projections.csv` includes formula-only views for alternate dictionary addressing strategies, currently including binary path addressing over the same residual-layer leaf capacity. These rows are budget views, not quality claims: changing atom indexing changes the learning problem and may require a different dictionary organization.",
+            "",
             "## Runtime And Readiness Notes",
             "",
             f"- Run id: `{manifest.get('run_id', run_dir.name)}`",
             f"- Screen: `{manifest.get('screen', '')}`",
-            f"- Profile: `{manifest.get('profile', '')}`",
-            "- Runtime topology is not part of targets, loss, decoder lookup, or model prediction head budget.",
+            f"- Smoke: `{manifest.get('smoke', '')}`",
+            f"- Corpus sample fraction requested: `{manifest.get('corpus_sample_fraction_requested', '')}`",
+            "- Topology may be used for offline construction, but runtime topology is not part of inputs, targets, loss, decoder lookup, or model prediction head budget.",
             "- Any topology bucket metrics are analysis-only.",
-            "- Analytics CSVs and plots are emitted beside this report.",
+            "- `oracle_phase_search_policy` and `oracle_phase_candidate_count` describe oracle target generation, not deployed head-output cost.",
+            "- CSV analytics remain in the run artifact directory. This markdown file is the canonical Experiment 11 report.",
+            "",
+            "![Runtime vs model prediction head budget](./images/experiment_11/runtime_vs_head_outputs.png)",
         ]
     )
     return "\n".join(lines) + "\n"
@@ -314,3 +409,23 @@ def _float(value: Any) -> float | None:
         return float(value)
     except (TypeError, ValueError):
         return None
+
+
+def _int(value: Any) -> int | None:
+    number = _float(value)
+    if number is None:
+        return None
+    return int(number)
+
+
+def _phase_is_counted(row: dict[str, Any]) -> bool:
+    return "phase" in str(row.get("scalar_families", "")).lower()
+
+
+def _phase_is_active(row: dict[str, Any]) -> bool:
+    if not _phase_is_counted(row):
+        return False
+    candidate_count = _int(row.get("oracle_phase_candidate_count"))
+    if candidate_count is None:
+        candidate_count = _int(row.get("phase_bins"))
+    return candidate_count is not None and candidate_count > 1

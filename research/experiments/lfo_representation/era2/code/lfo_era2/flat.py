@@ -14,6 +14,8 @@ from .accounting import RuntimeInterfaceSpec
 from .assets import DecoderPolicy, OracleEncoding, ReconstructionAssets
 from .contracts import TopologyFlags, find_stage_keys, validate_topology_contract
 from .curve import (
+    as_curve_matrix,
+    circular_shift,
     phase_shift_bank,
     synthetic_base_dictionary,
     synthetic_residual_dictionaries,
@@ -32,6 +34,31 @@ class FlatEncodingResult:
         return sorted({report.backend_used for report in self.nearest_reports})
 
 
+@dataclass(frozen=True)
+class PhaseSearchSpec:
+    """Oracle-only phase search policy for continuous phase targets."""
+
+    policy: str = "fft_lattice"
+    candidate_count: int | None = None
+
+    def resolved_candidate_count(self, resolution: int) -> int:
+        if self.policy == "disabled":
+            return 1
+        if self.policy == "fft_lattice":
+            return int(resolution)
+        if self.policy == "grid":
+            return int(self.candidate_count or resolution)
+        raise ValueError(f"unsupported oracle phase search policy: {self.policy}")
+
+    def as_manifest_fields(self, resolution: int) -> dict[str, Any]:
+        return {
+            "oracle_phase_search_policy": self.policy,
+            "oracle_phase_candidate_count": self.resolved_candidate_count(resolution),
+            "phase_target_kind": "continuous_scalar",
+            "phase_search_cost_note": "Oracle phase search resolution is not part of model prediction head budget.",
+        }
+
+
 def construct_flat_assets_from_curves(
     targets: np.ndarray,
     *,
@@ -41,6 +68,7 @@ def construct_flat_assets_from_curves(
     width: int,
     backend: BackendPreference = "auto",
     chunk_size: int = 256,
+    phase_search: PhaseSearchSpec | None = None,
     progress: Callable[[str], None] | None = None,
 ) -> ReconstructionAssets:
     """Build a simple topology-free observed residual dictionary stack.
@@ -55,6 +83,7 @@ def construct_flat_assets_from_curves(
         raise ValueError("residual_layer_count must be positive")
     if width < 1:
         raise ValueError("width must be positive")
+    phase_spec = phase_search or PhaseSearchSpec()
     if base_dictionary is None:
         _progress(progress, "construction: selecting base dictionary")
         base_dictionary = _select_observed_atoms(
@@ -66,8 +95,14 @@ def construct_flat_assets_from_curves(
         )
 
     _progress(progress, "construction: assigning base dictionary")
-    base_result = nearest_indices(target_matrix, base_dictionary, backend=backend, chunk_size=chunk_size)
-    prefix = np.asarray(base_dictionary, dtype=np.float32)[base_result.indices].copy()
+    _, _, base_values, _ = _nearest_shifted(
+        target_matrix,
+        base_dictionary,
+        phase_search=phase_spec,
+        backend=backend,
+        chunk_size=chunk_size,
+    )
+    prefix = base_values.copy()
     residual_layers: list[np.ndarray] = []
     for residual_layer_index in range(residual_layer_count):
         layer_number = residual_layer_index + 1
@@ -84,8 +119,14 @@ def construct_flat_assets_from_curves(
         residual_layers.append(atoms)
         if _should_report_layer(layer_number, residual_layer_count):
             _progress(progress, f"construction: residual layer {layer_number}/{residual_layer_count} updating prefix")
-        layer_result = nearest_indices(residual, atoms, backend=backend, chunk_size=chunk_size)
-        prefix = prefix + atoms[layer_result.indices]
+        _, _, layer_values, _ = _nearest_shifted(
+            residual,
+            atoms,
+            phase_search=phase_spec,
+            backend=backend,
+            chunk_size=chunk_size,
+        )
+        prefix = prefix + layer_values
     return ReconstructionAssets(
         base_dictionary=np.asarray(base_dictionary, dtype=np.float32),
         residual_layer_dictionaries=residual_layers,
@@ -113,7 +154,7 @@ def encode_flat(
     targets: np.ndarray,
     assets: ReconstructionAssets,
     *,
-    phase_bins: int = 1,
+    phase_search: PhaseSearchSpec | None = None,
     backend: BackendPreference = "auto",
     chunk_size: int = 256,
     progress: Callable[[str], None] | None = None,
@@ -123,12 +164,13 @@ def encode_flat(
     if target_matrix.ndim != 2:
         raise ValueError("targets must have shape [rows, resolution]")
     nearest_reports: list[NearestResult] = []
+    phase_spec = phase_search or PhaseSearchSpec()
 
     _progress(progress, f"{progress_label}: base choice")
     base_index, base_phase, base_values, report = _nearest_shifted(
         target_matrix,
         assets.base_dictionary,
-        phase_bins=phase_bins,
+        phase_search=phase_spec,
         backend=backend,
         chunk_size=chunk_size,
     )
@@ -146,7 +188,7 @@ def encode_flat(
         index, phase, values, report = _nearest_shifted(
             residual,
             dictionary,
-            phase_bins=phase_bins,
+            phase_search=phase_spec,
             backend=backend,
             chunk_size=chunk_size,
         )
@@ -232,7 +274,11 @@ def run_flat_smoke(
     construction_time = time.perf_counter() - start_construction
 
     start_encoding = time.perf_counter()
-    encoded = encode_flat(targets, assets, phase_bins=phase_bins, backend=backend)
+    phase_search = PhaseSearchSpec(
+        policy="disabled" if phase_bins <= 1 else "grid",
+        candidate_count=max(1, int(phase_bins)),
+    )
+    encoded = encode_flat(targets, assets, phase_search=phase_search, backend=backend)
     encoding_time = time.perf_counter() - start_encoding
     reconstructed = decode_flat(assets, encoded.encoding, decoder_policy=DecoderPolicy())
 
@@ -264,7 +310,7 @@ def run_flat_smoke(
         oracle_encoding_time=encoding_time,
         method_parameters={
             "W_by_residual_layer": assets.residual_widths(),
-            "phase_bins": phase_bins,
+            **phase_search.as_manifest_fields(resolution),
             "backend_preference": backend,
             "backend_used": encoded.backend_used,
             "schema_stage_key_violations": schema_stage_keys,
@@ -303,17 +349,76 @@ def _nearest_shifted(
     targets: np.ndarray,
     codes: np.ndarray,
     *,
-    phase_bins: int,
+    phase_search: PhaseSearchSpec,
     backend: BackendPreference,
     chunk_size: int,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, NearestResult]:
-    bank, phases = phase_shift_bank(codes, phase_bins)
+    target_matrix = as_curve_matrix(targets)
+    code_matrix = as_curve_matrix(codes)
+    if target_matrix.shape[1] != code_matrix.shape[1]:
+        raise ValueError("targets and codes must share the same resolution")
+    candidate_count = phase_search.resolved_candidate_count(target_matrix.shape[1])
+    if phase_search.policy == "fft_lattice":
+        return _nearest_fft_lattice(target_matrix, code_matrix, chunk_size=chunk_size)
+    bank, phases = phase_shift_bank(code_matrix, candidate_count)
     flat_bank = bank.reshape(bank.shape[0] * bank.shape[1], bank.shape[2])
     result = nearest_indices(targets, flat_bank, backend=backend, chunk_size=chunk_size)
-    code_index = (result.indices // phase_bins).astype(np.int32)
-    phase_index = (result.indices % phase_bins).astype(np.int32)
+    code_index = (result.indices // candidate_count).astype(np.int32)
+    phase_index = (result.indices % candidate_count).astype(np.int32)
     selected = flat_bank[result.indices]
     return code_index, phases[phase_index].astype(np.float32), selected.astype(np.float32), result
+
+
+def _nearest_fft_lattice(
+    targets: np.ndarray,
+    codes: np.ndarray,
+    *,
+    chunk_size: int,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, NearestResult]:
+    """Find best code and integer-sample phase by circular correlation."""
+    target_matrix = as_curve_matrix(targets)
+    code_matrix = as_curve_matrix(codes)
+    resolution = target_matrix.shape[1]
+    if code_matrix.shape[1] != resolution:
+        raise ValueError("targets and codes must share the same resolution")
+    if len(code_matrix) == 0:
+        raise ValueError("codes cannot be empty")
+
+    chunk_size = max(1, int(chunk_size))
+    code_fft = np.fft.rfft(code_matrix, axis=-1)
+    code_energy = np.sum(code_matrix * code_matrix, axis=1, dtype=np.float64)[None, :, None]
+    indices = np.empty(len(target_matrix), dtype=np.int32)
+    phases = np.empty(len(target_matrix), dtype=np.float32)
+    selected = np.empty_like(target_matrix, dtype=np.float32)
+    losses = np.empty(len(target_matrix), dtype=np.float32)
+
+    for start in range(0, len(target_matrix), chunk_size):
+        stop = min(start + chunk_size, len(target_matrix))
+        batch = target_matrix[start:stop]
+        target_fft = np.fft.rfft(batch, axis=-1)
+        correlations = np.fft.irfft(
+            target_fft[:, None, :] * np.conj(code_fft[None, :, :]),
+            n=resolution,
+            axis=-1,
+        ).real
+        target_energy = np.sum(batch * batch, axis=1, dtype=np.float64)[:, None, None]
+        mse = (target_energy + code_energy - 2.0 * correlations) / float(resolution)
+        flat_choice = np.argmin(mse.reshape(len(batch), -1), axis=1)
+        code_index = (flat_choice // resolution).astype(np.int32)
+        phase_index = (flat_choice % resolution).astype(np.int32)
+        row = np.arange(len(batch))
+        indices[start:stop] = code_index
+        phases[start:stop] = phase_index.astype(np.float32) / float(resolution)
+        losses[start:stop] = np.maximum(mse[row, code_index, phase_index], 0.0).astype(np.float32)
+        selected[start:stop] = circular_shift(code_matrix[code_index], phases[start:stop])
+
+    result = NearestResult(
+        indices=indices,
+        losses=losses,
+        backend_used="fft_lattice",
+        chunk_size=chunk_size,
+    )
+    return indices, phases, selected.astype(np.float32), result
 
 
 def _select_observed_atoms(

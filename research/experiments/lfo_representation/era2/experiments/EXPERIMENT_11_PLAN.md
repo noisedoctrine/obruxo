@@ -241,10 +241,12 @@ nearest_neighbor_margin_p95
 embedding_norm_p95
 ```
 
-## First Screen
+## First Run
 
-The first Experiment 11 screen should be a small, fast, topology-free
-flat-categorical baseline screen.
+Experiment 11 should start with one canonical topology-free flat-categorical
+row set. Corpus size is not a profile category: a normal run uses the full
+corpus, `--corpus-sample-fraction <0..1>` requests a deterministic fraction,
+and `--smoke` is only a tiny plumbing check.
 
 It should validate:
 
@@ -252,15 +254,18 @@ It should validate:
 - the no-runtime-topology contract;
 - the fixed 97-control-point lattice contract;
 - clean `head_outputs` accounting;
+- active continuous-scalar phase targets;
 - oracle/runtime separation;
-- report tables and plots.
+- a canonical findings report in `era2/reports/`, with plots under
+  `era2/reports/images/experiment_11/`;
+- explicit corpus-size reporting in manifests and analytics.
 
 Do not include basis coefficients, path addressing, or continuous address in
-the first screen except as formula-only accounting rows. Full reconstruction
-runs for those methods belong after the flat manifest/accounting path is proven
-clean.
+the first screen except as formula-only accounting rows or budget projections.
+Full reconstruction runs for those methods belong after the flat
+manifest/accounting path is proven clean.
 
-## First-Screen Row Shape
+## First-Run Row Shape
 
 Use phase-only flat categorical residual layers:
 
@@ -270,6 +275,22 @@ head_outputs = 32 + D * W + (D + 1)
 
 The fixed 97-control-point x lattice is not part of this formula. It is decoder-owned
 geometry, so it adds zero model prediction head outputs.
+
+Phase is model-facing, but phase search is not. The model-facing target is one
+continuous phase scalar for the base and one continuous phase scalar for each
+residual layer. The oracle may estimate those scalars with FFT/lattice search
+or an explicit grid search. That search policy and candidate count are recorded
+as oracle metadata:
+
+```text
+oracle_phase_search_policy
+oracle_phase_candidate_count
+phase_target_kind = continuous_scalar
+```
+
+Changing `oracle_phase_candidate_count` must not change `head_outputs_actual`.
+Canonical Experiment 11 rows should fail loudly if phase is counted but the
+oracle has only one phase candidate.
 
 Model-facing targets:
 
@@ -307,7 +328,12 @@ Every row should log:
 ```text
 lfo_control_point_count = 97
 x_grid_predicted_by_model = false
+oracle_phase_search_policy = fft_lattice
+oracle_phase_candidate_count = 97
 ```
+
+The CLI may expose this as `--oracle-phase-search-policy continuous`; manifests
+should record the actual oracle method.
 
 ## What Experiment 11 Should Not Do
 
@@ -315,6 +341,7 @@ Experiment 11 should not:
 
 - reuse topology-conditioned Era 1 target schemas;
 - include topology in decoder lookup;
+- count phase scalars while leaving oracle phase search inactive;
 - compare by codebook storage as the primary capacity axis;
 - treat Era 1 W/D names as baselines;
 - promote gain or offset into the first screen;
@@ -336,3 +363,5 @@ Era 1 rows may be cited as historical context or budget anchors only.
   target generation add more ambiguity.
 - The primary scarce resource is the model prediction head budget, not oracle
   search time, codebook storage, or serialized field count.
+- Topology-balanced construction remains valid future work if it produces the
+  same topology-free runtime interface and `head_outputs` accounting.

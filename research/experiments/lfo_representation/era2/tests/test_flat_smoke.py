@@ -11,7 +11,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "code"))
 
 from lfo_era2.assets import DecoderPolicy  # noqa: E402
 from lfo_era2.contracts import find_stage_keys  # noqa: E402
-from lfo_era2.flat import make_smoke_targets, run_flat_smoke, synthetic_flat_assets  # noqa: E402
+from lfo_era2.curve import circular_shift  # noqa: E402
+from lfo_era2.flat import PhaseSearchSpec, encode_flat, make_smoke_targets, run_flat_smoke, synthetic_flat_assets  # noqa: E402
 
 
 class FlatSmokeTests(unittest.TestCase):
@@ -39,11 +40,28 @@ class FlatSmokeTests(unittest.TestCase):
             self.assertTrue(contract["passed"])
             self.assertFalse(manifest["topology_used_at_runtime"])
             self.assertFalse(manifest["topology_used_in_targets"])
+            self.assertEqual(manifest["oracle_phase_search_policy"], "disabled")
+            self.assertEqual(manifest["oracle_phase_candidate_count"], 1)
+            self.assertEqual(manifest["phase_target_kind"], "continuous_scalar")
             self.assertEqual(find_stage_keys(schema), [])
             field_names = [field["name"] for field in schema["fields"]]
             self.assertIn("residual_layer_1_index", field_names)
             self.assertNotIn("topology", json.dumps(schema))
             self.assertEqual(result["manifest"]["runtime_interface_id"], "flat_categorical_per_residual_layer")
+
+    def test_active_phase_search_recovers_nonzero_phase_target(self) -> None:
+        assets = synthetic_flat_assets(residual_layer_count=1, width=2, resolution=32)
+        source = assets.base_dictionary[4]
+        target = circular_shift(source, 0.25)
+        encoded = encode_flat(
+            target,
+            assets,
+            phase_search=PhaseSearchSpec(policy="fft_lattice"),
+            backend="numpy",
+        )
+        self.assertEqual(int(encoded.encoding.base_index[0]), 4)
+        self.assertAlmostEqual(float(encoded.encoding.base_phase[0]), 0.25, places=6)
+        self.assertGreater(float(encoded.encoding.base_phase[0]), 0.0)
 
 
 def run_decode(assets, encoding):
