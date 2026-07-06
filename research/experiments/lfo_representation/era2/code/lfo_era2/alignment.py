@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .accelerator import BackendPreference, NearestResult, nearest_indices
+from .accelerator import BackendPreference, NearestResult, choose_backend, nearest_indices
 from .curve import as_curve_matrix, circular_shift, phase_shift_bank
 
 
@@ -29,6 +29,7 @@ class AlignmentMatrix:
     losses: np.ndarray
     phases: np.ndarray
     gains: np.ndarray
+    backend_used: str = "numpy"
 
 
 def best_alignment(
@@ -60,6 +61,7 @@ def best_alignment(
         code_matrix,
         phase_policy=phase_policy,
         gain_policy=gain_policy,
+        backend=backend,
         chunk_size=chunk_size,
         phase_candidate_count=phase_candidate_count,
     )
@@ -74,7 +76,7 @@ def best_alignment(
         gains=gains,
         values=values.astype(np.float32),
         losses=matrix.losses[rows, indices].astype(np.float32),
-        backend_used=phase_policy,
+        backend_used=matrix.backend_used,
     )
 
 
@@ -84,6 +86,7 @@ def alignment_matrix(
     *,
     phase_policy: str,
     gain_policy: str = "fixed",
+    backend: BackendPreference = "auto",
     chunk_size: int = 256,
     phase_candidate_count: int | None = None,
 ) -> AlignmentMatrix:
@@ -99,6 +102,7 @@ def alignment_matrix(
             target_matrix,
             code_matrix,
             gain_policy=gain_policy,
+            backend=backend,
             chunk_size=chunk_size,
             phase_candidate_count=phase_candidate_count,
         )
@@ -156,6 +160,7 @@ def exact_alignment_matrix(
         losses=np.maximum(best_error, 0.0).astype(np.float32),
         phases=best_phase.astype(np.float32),
         gains=best_gain.astype(np.float32),
+        backend_used="numpy",
     )
 
 
@@ -164,14 +169,36 @@ def lattice_alignment_matrix(
     codes: np.ndarray,
     *,
     gain_policy: str = "fixed",
+    backend: BackendPreference = "auto",
     chunk_size: int = 256,
     phase_candidate_count: int | None = None,
 ) -> AlignmentMatrix:
     target_matrix = as_curve_matrix(targets)
     code_matrix = as_curve_matrix(codes)
+    if gain_policy not in {"fixed", "optimized"}:
+        raise ValueError("gain_policy must be fixed or optimized")
     phase_count = int(phase_candidate_count or target_matrix.shape[1])
     bank, phase_values = phase_shift_bank(code_matrix, phase_count)
     flat_bank = bank.reshape(bank.shape[0] * bank.shape[1], bank.shape[2]).astype(np.float32)
+    selected = choose_backend(
+        backend,
+        pair_count=int(len(target_matrix) * len(flat_bank)),
+        xpu_min_pairs=131_072,
+    )
+    if selected == "xpu":
+        try:
+            return _lattice_alignment_matrix_torch_xpu(
+                target_matrix,
+                code_matrix,
+                flat_bank,
+                phase_values,
+                gain_policy=gain_policy,
+                chunk_size=chunk_size,
+                phase_count=phase_count,
+            )
+        except RuntimeError:
+            if backend == "xpu":
+                raise
     losses = np.empty((len(target_matrix), len(code_matrix)), dtype=np.float32)
     phases = np.empty_like(losses)
     gains = np.empty_like(losses)
@@ -184,10 +211,8 @@ def lattice_alignment_matrix(
         if gain_policy == "optimized":
             flat_gain = np.divide(dot, flat_energy[None, :], out=np.zeros_like(dot), where=flat_energy[None, :] > EPS64)
             flat_gain = np.clip(flat_gain, *GAIN_BOUNDS)
-        elif gain_policy == "fixed":
-            flat_gain = np.ones_like(dot)
         else:
-            raise ValueError("gain_policy must be fixed or optimized")
+            flat_gain = np.ones_like(dot)
         flat_mse = (target_energy - 2.0 * flat_gain * dot + flat_gain * flat_gain * flat_energy[None, :]) / float(target_matrix.shape[1])
         cube = flat_mse.reshape(len(batch), len(code_matrix), phase_count)
         choice = np.argmin(cube, axis=2)
@@ -202,7 +227,72 @@ def lattice_alignment_matrix(
         losses[:, zero_codes] = np.mean(target_matrix * target_matrix, axis=1)[:, None]
         phases[:, zero_codes] = 0.0
         gains[:, zero_codes] = 0.0
-    return AlignmentMatrix(losses=losses, phases=phases, gains=gains)
+    return AlignmentMatrix(losses=losses, phases=phases, gains=gains, backend_used="numpy")
+
+
+def _lattice_alignment_matrix_torch_xpu(
+    target_matrix: np.ndarray,
+    code_matrix: np.ndarray,
+    flat_bank: np.ndarray,
+    phase_values: np.ndarray,
+    *,
+    gain_policy: str,
+    chunk_size: int,
+    phase_count: int,
+) -> AlignmentMatrix:
+    import torch
+
+    device = "xpu:0"
+    chunk_size = max(1, int(chunk_size))
+    resolution = float(target_matrix.shape[1])
+    code_count = len(code_matrix)
+    losses = np.empty((len(target_matrix), code_count), dtype=np.float32)
+    phases = np.empty_like(losses)
+    gains = np.empty_like(losses)
+    flat_bank_t = torch.as_tensor(flat_bank, dtype=torch.float32, device=device)
+    flat_energy = torch.sum(flat_bank_t * flat_bank_t, dim=1)
+    code_offsets = (torch.arange(code_count, dtype=torch.int64, device=device) * int(phase_count))[None, :]
+    start = 0
+    current_chunk = chunk_size
+    while start < len(target_matrix):
+        stop = min(start + current_chunk, len(target_matrix))
+        try:
+            batch = torch.as_tensor(target_matrix[start:stop], dtype=torch.float32, device=device)
+            dot = batch @ flat_bank_t.T
+            target_energy = torch.sum(batch * batch, dim=1)[:, None]
+            if gain_policy == "optimized":
+                flat_gain = torch.where(
+                    flat_energy[None, :] > EPS64,
+                    dot / flat_energy[None, :],
+                    torch.zeros_like(dot),
+                )
+                flat_gain = torch.clamp(flat_gain, min=GAIN_BOUNDS[0], max=GAIN_BOUNDS[1])
+            else:
+                flat_gain = torch.ones_like(dot)
+            flat_mse = (target_energy - 2.0 * flat_gain * dot + flat_gain * flat_gain * flat_energy[None, :]) / resolution
+            cube = flat_mse.reshape(stop - start, code_count, int(phase_count))
+            best_loss, choice = torch.min(cube, dim=2)
+            flat_choice = code_offsets + choice
+            selected_gain = torch.gather(flat_gain, 1, flat_choice)
+            losses[start:stop] = torch.clamp(best_loss, min=0.0).to("cpu").numpy().astype(np.float32)
+            phases[start:stop] = phase_values[choice.to("cpu").numpy()].astype(np.float32)
+            gains[start:stop] = selected_gain.to("cpu").numpy().astype(np.float32)
+            start = stop
+        except RuntimeError as exc:
+            message = str(exc).lower()
+            if ("out of memory" not in message and "oom" not in message) or current_chunk == 1:
+                raise
+            current_chunk = max(1, current_chunk // 2)
+            if hasattr(torch, "xpu") and hasattr(torch.xpu, "empty_cache"):
+                torch.xpu.empty_cache()
+    zero_codes = np.sum(code_matrix * code_matrix, axis=1) <= EPS64
+    if np.any(zero_codes):
+        losses[:, zero_codes] = np.mean(target_matrix * target_matrix, axis=1)[:, None]
+        phases[:, zero_codes] = 0.0
+        gains[:, zero_codes] = 0.0
+    if hasattr(torch, "xpu"):
+        torch.xpu.synchronize()
+    return AlignmentMatrix(losses=losses, phases=phases, gains=gains, backend_used="xpu")
 
 
 def _best_lattice_fixed(
@@ -302,4 +392,3 @@ def _candidate_deltas_numpy(
                 )
             )
     return candidates
-

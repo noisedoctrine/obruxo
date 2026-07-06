@@ -574,7 +574,7 @@ def _construct_assets(
         if residual_layer == 0 or residual_layer + 1 == D or (residual_layer + 1) % 4 == 0:
             _log(progress, f"construction: residual layer {residual_layer + 1}/{D}")
         residual = targets - prefix
-        atoms = _select_layer_atoms(residual, topology, spec=spec, chunk_size=chunk_size)
+        atoms = _select_layer_atoms(residual, topology, spec=spec, backend=backend, chunk_size=chunk_size)
         layers.append(atoms)
         choice = best_alignment(
             residual,
@@ -599,6 +599,7 @@ def _select_layer_atoms(
     topology: np.ndarray,
     *,
     spec: ComponentRowSpec,
+    backend: BackendPreference,
     chunk_size: int,
 ) -> np.ndarray:
     atoms = _select_repair_atoms(
@@ -606,6 +607,7 @@ def _select_layer_atoms(
         width=W,
         topology=topology if spec.construction_policy == "FamilyBalancedRepair" else None,
         spec=spec,
+        backend=backend,
         chunk_size=chunk_size,
     )
     if spec.construction_policy == "TuneAtomsAfterUse":
@@ -655,6 +657,7 @@ def _select_repair_atoms(
     width: int,
     topology: np.ndarray | None,
     spec: ComponentRowSpec,
+    backend: BackendPreference,
     chunk_size: int,
 ) -> np.ndarray:
     matrix = np.asarray(residual, dtype=np.float32)
@@ -682,6 +685,7 @@ def _select_repair_atoms(
             candidates,
             phase_policy="fft_lattice",
             gain_policy=spec.residual_gain_policy,
+            backend=backend,
             chunk_size=chunk_size,
             phase_candidate_count=phase_count,
         ).losses
@@ -941,7 +945,7 @@ def _encode_beam(
     reconstructed = np.empty_like(targets, dtype=np.float32)
     for start in range(0, rows, max(1, int(chunk_size))):
         stop = min(start + max(1, int(chunk_size)), rows)
-        local_encoding, local_reconstructed = _encode_beam_batch(spec, targets[start:stop], assets, chunk_size=max(1, int(chunk_size)))
+        local_encoding, local_reconstructed = _encode_beam_batch(spec, targets[start:stop], assets, backend=backend, chunk_size=max(1, int(chunk_size)))
         _scatter_encoding(out, local_encoding, np.arange(start, stop))
         reconstructed[start:stop] = local_reconstructed
         if start == 0 or stop == rows:
@@ -954,10 +958,11 @@ def _encode_beam_batch(
     targets: np.ndarray,
     assets: ReconstructionAssets,
     *,
+    backend: BackendPreference,
     chunk_size: int,
 ) -> tuple[ComponentEncoding, np.ndarray]:
     phase_count = _phase_candidate_count(spec, targets.shape[1])
-    base_matrix = alignment_matrix(targets, assets.base_dictionary, phase_policy="fft_lattice", gain_policy="fixed", chunk_size=chunk_size, phase_candidate_count=phase_count)
+    base_matrix = alignment_matrix(targets, assets.base_dictionary, phase_policy="fft_lattice", gain_policy="fixed", backend=backend, chunk_size=chunk_size, phase_candidate_count=phase_count)
     beam = min(max(1, spec.beam_width), base_matrix.losses.shape[1])
     base_choices = np.argsort(base_matrix.losses, axis=1)[:, :beam]
     b = len(targets)
@@ -982,6 +987,7 @@ def _encode_beam_batch(
             dictionary,
             phase_policy="fft_lattice",
             gain_policy=spec.residual_gain_policy,
+            backend=backend,
             chunk_size=chunk_size,
             phase_candidate_count=phase_count,
         )

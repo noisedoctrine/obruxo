@@ -470,9 +470,9 @@ def _select_layer_atoms(
     if spec.construction_policy == "topology_balanced_farthest":
         return _select_farthest_atoms(residual, width=W, include_zero=True, topology=topology)
     if spec.construction_policy == "utility":
-        return _select_utility_atoms(residual, width=W, topology=None, spec=spec, chunk_size=chunk_size)
+        return _select_utility_atoms(residual, width=W, topology=None, spec=spec, backend=backend, chunk_size=chunk_size)
     if spec.construction_policy == "topology_balanced_utility":
-        return _select_utility_atoms(residual, width=W, topology=topology, spec=spec, chunk_size=chunk_size)
+        return _select_utility_atoms(residual, width=W, topology=topology, spec=spec, backend=backend, chunk_size=chunk_size)
     raise ValueError(f"unsupported construction_policy: {spec.construction_policy}")
 
 
@@ -518,6 +518,7 @@ def _select_utility_atoms(
     width: int,
     topology: np.ndarray | None,
     spec: DiagnosticRowSpec,
+    backend: BackendPreference,
     chunk_size: int,
 ) -> np.ndarray:
     matrix = np.asarray(residual, dtype=np.float32)
@@ -535,6 +536,7 @@ def _select_utility_atoms(
             candidates,
             phase_policy=spec.phase_policy,
             gain_policy=spec.residual_gain_policy,
+            backend=backend,
             chunk_size=chunk_size,
         ).losses
         improvement = np.maximum(current_loss[:, None] - losses, 0.0).sum(axis=0)
@@ -674,7 +676,7 @@ def _encode_beam_batch(
     chunk_size: int,
     beam_width: int,
 ) -> tuple[DiagnosticEncoding, np.ndarray]:
-    base_matrix = alignment_matrix(targets, assets.base_dictionary, phase_policy=spec.phase_policy, gain_policy="fixed", chunk_size=chunk_size)
+    base_matrix = alignment_matrix(targets, assets.base_dictionary, phase_policy=spec.phase_policy, gain_policy="fixed", backend=backend, chunk_size=chunk_size)
     beam = min(beam_width, base_matrix.losses.shape[1])
     base_choices = np.argsort(base_matrix.losses, axis=1)[:, :beam]
     b = len(targets)
@@ -699,6 +701,7 @@ def _encode_beam_batch(
             dictionary,
             phase_policy=spec.phase_policy,
             gain_policy=spec.residual_gain_policy,
+            backend=backend,
             chunk_size=chunk_size,
         )
         shifted = circular_shift(
