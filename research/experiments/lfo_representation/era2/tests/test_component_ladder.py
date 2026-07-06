@@ -14,6 +14,10 @@ from lfo_era2.component_ladder import (  # noqa: E402
     D,
     W,
     ComponentEncoding,
+    CONSTRUCTION_POLICY_VALUES,
+    LAYER_NORMALIZATION_POLICY_VALUES,
+    PATH_SEARCH_POLICY_VALUES,
+    SCALAR_SCHEMA_VALUES,
     default_component_specs,
     budget_for_spec,
     run_component_ladder,
@@ -25,33 +29,23 @@ from lfo_era2.dataset import make_tiny_curve_dataset  # noqa: E402
 class ComponentLadderTests(unittest.TestCase):
     def test_default_specs_are_fixed_w8d16_ladder(self) -> None:
         specs = default_component_specs()
-        self.assertEqual(
-            [spec.row_id for spec in specs],
-            [
-                "x12_c0_indices_only",
-                "x12_add_phase",
-                "x12_add_residual_gain",
-                "x12_add_beam4",
-                "x12_add_utility_construction",
-                "x12_add_topology_balanced_utility_construction",
-                "x12_phase_gain",
-                "x12_phase_beam4",
-                "x12_gain_beam4",
-                "x12_phase_gain_beam4",
-                "x12_phase_gain_beam4_utility",
-                "x12_phase_gain_beam4_topology_balanced_utility",
-            ],
-        )
+        self.assertEqual(len(specs), 72)
         self.assertTrue(all(W == 8 and D == 16 for _ in specs))
+        self.assertTrue(all(spec.scalar_schema in SCALAR_SCHEMA_VALUES for spec in specs))
+        self.assertTrue(all(spec.screening_value[:1].isupper() for spec in specs))
+        self.assertEqual([spec.path_search_policy for spec in specs if spec.screening_variable == "path_search_policy"][::2], list(PATH_SEARCH_POLICY_VALUES))
+        self.assertEqual([spec.construction_policy for spec in specs if spec.screening_variable == "construction_policy"][::2], list(CONSTRUCTION_POLICY_VALUES))
+        self.assertEqual([spec.layer_normalization_policy for spec in specs if spec.screening_variable == "layer_normalization_policy"][::2], list(LAYER_NORMALIZATION_POLICY_VALUES))
+        self.assertNotIn("GreedyPath", {spec.path_search_policy for spec in specs})
+        self.assertNotIn("OutlierChaser", {spec.construction_policy for spec in specs})
 
     def test_budget_accounting_matches_component_scalars(self) -> None:
-        specs = {spec.row_id: spec for spec in default_component_specs()}
-        self.assertEqual(budget_for_spec(specs["x12_c0_indices_only"])["head_outputs_actual"], 160)
-        self.assertEqual(budget_for_spec(specs["x12_add_phase"])["head_outputs_actual"], 177)
-        self.assertEqual(budget_for_spec(specs["x12_add_residual_gain"])["head_outputs_actual"], 176)
-        self.assertEqual(budget_for_spec(specs["x12_phase_gain"])["head_outputs_actual"], 193)
-        self.assertEqual(budget_for_spec(specs["x12_add_beam4"])["head_outputs_actual"], 160)
-        self.assertEqual(budget_for_spec(specs["x12_add_utility_construction"])["head_outputs_actual"], 160)
+        indices = _spec("construction_policy", "BestOverallRepair", "IndicesOnly")
+        phase_gain = _spec("construction_policy", "BestOverallRepair", "PhaseAndResidualGain")
+        beam8 = _spec("path_search_policy", "Beam8Path", "IndicesOnly")
+        self.assertEqual(budget_for_spec(indices)["head_outputs_actual"], 160)
+        self.assertEqual(budget_for_spec(phase_gain)["head_outputs_actual"], 193)
+        self.assertEqual(budget_for_spec(beam8)["head_outputs_actual"], 160)
 
     def test_optimized_residual_gain_must_be_model_facing(self) -> None:
         with self.assertRaises(ValueError):
@@ -60,7 +54,7 @@ class ComponentLadderTests(unittest.TestCase):
         validate_residual_gain_contract("fixed", model_facing=False)
 
     def test_phase_disabled_schema_has_no_phase_or_gain_targets(self) -> None:
-        spec = default_component_specs()[0]
+        spec = _spec("construction_policy", "BestOverallRepair", "IndicesOnly")
         encoding = _empty_test_encoding(4)
         schema = encoding.target_schema(spec)
         names = [field["name"] for field in schema["fields"]]
@@ -71,7 +65,7 @@ class ComponentLadderTests(unittest.TestCase):
         self.assertNotIn("residual_layer_1_gain", names)
 
     def test_phase_gain_schema_includes_only_model_facing_scalars(self) -> None:
-        spec = next(item for item in default_component_specs() if item.row_id == "x12_phase_gain")
+        spec = _spec("construction_policy", "BestOverallRepair", "PhaseAndResidualGain")
         schema = _empty_test_encoding(4).target_schema(spec)
         names = [field["name"] for field in schema["fields"]]
         self.assertIn("base_phase", names)
@@ -79,9 +73,9 @@ class ComponentLadderTests(unittest.TestCase):
         self.assertIn("residual_layer_1_gain", names)
 
     def test_topology_balanced_row_is_offline_only(self) -> None:
-        spec = next(item for item in default_component_specs() if item.row_id == "x12_add_topology_balanced_utility_construction")
+        spec = _spec("construction_policy", "FamilyBalancedRepair", "IndicesOnly")
         self.assertTrue(spec.topology_used_in_construction)
-        self.assertEqual(spec.construction_policy, "topology_balanced_utility")
+        self.assertEqual(spec.construction_policy, "FamilyBalancedRepair")
         self.assertEqual(budget_for_spec(spec)["head_outputs_actual"], 160)
 
     def test_smoke_run_writes_report_artifacts_and_schema(self) -> None:
@@ -93,7 +87,7 @@ class ComponentLadderTests(unittest.TestCase):
                 dataset=dataset,
                 backend="numpy",
                 smoke=True,
-                row_ids={"x12_c0_indices_only"},
+                row_ids={"x12_screen_construction_policy_BestOverallRepair_IndicesOnly"},
                 chunk_size=8,
                 report_path=root / "reports" / "EXPERIMENT_12.md",
                 report_image_dir=root / "reports" / "images",
@@ -102,12 +96,44 @@ class ComponentLadderTests(unittest.TestCase):
             self.assertTrue(Path(result["summary"]).exists())
             self.assertTrue(Path(result["component_deltas"]).exists())
             self.assertTrue(Path(result["report"]).exists())
-            self.assertTrue((root / "reports" / "images" / "experiment12_validation_p95_by_row.png").exists())
-            schema = (root / "artifacts" / "rows" / "x12_c0_indices_only" / "targets_schema.json").read_text(encoding="utf-8")
+            schema = (root / "artifacts" / "rows" / "x12_screen_construction_policy_BestOverallRepair_IndicesOnly" / "targets_schema.json").read_text(encoding="utf-8")
             self.assertNotIn("phase", schema)
             text = Path(result["report"]).read_text(encoding="utf-8")
             self.assertIn("## Main Findings", text)
-            self.assertNotIn("| row", text)
+            self.assertIn("## Grouped Results", text)
+            manifest = (root / "artifacts" / "rows" / "x12_screen_construction_policy_BestOverallRepair_IndicesOnly" / "manifest.json").read_text(encoding="utf-8")
+            self.assertIn("NoOpAtom", manifest)
+            self.assertIn("BestOverallRepair", manifest)
+
+    def test_non_default_screening_row_runs_with_pascal_values(self) -> None:
+        dataset = make_tiny_curve_dataset(resolution=17, row_count=30)
+        row_id = "x12_screen_layer_normalization_policy_LayerClipNeg0p1To1p1_PhaseAndResidualGain"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            result = run_component_ladder(
+                output_dir=root / "artifacts",
+                dataset=dataset,
+                backend="numpy",
+                smoke=True,
+                row_ids={row_id},
+                chunk_size=8,
+                report_path=root / "reports" / "EXPERIMENT_12.md",
+                report_image_dir=root / "reports" / "images",
+                progress=None,
+            )
+            self.assertTrue(Path(result["screening_results"]).exists())
+            summary = (root / "artifacts" / "rows" / row_id / "summary.csv").read_text(encoding="utf-8")
+            self.assertIn("LayerClipNeg0p1To1p1", summary)
+            self.assertIn("PhaseAndResidualGain", summary)
+            self.assertIn("validation_overshoot_rate_before_final_clip", summary)
+
+
+def _spec(variable: str, value: str, scalar_schema: str):
+    return next(
+        spec
+        for spec in default_component_specs()
+        if spec.screening_variable == variable and spec.screening_value == value and spec.scalar_schema == scalar_schema
+    )
 
 
 def _empty_test_encoding(row_count: int) -> ComponentEncoding:

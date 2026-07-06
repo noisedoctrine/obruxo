@@ -33,6 +33,57 @@ REPORT_PATH = ERA2_ROOT / "reports" / "EXPERIMENT_12_W8D16_COMPONENT_LADDER_REPO
 REPORT_IMAGE_DIR = ERA2_ROOT / "reports" / "images" / "experiment_12"
 SMOKE_TRAIN_COUNT = 48
 SMOKE_VALIDATION_COUNT = 32
+NO_OP_ATOM_INDEX = 0
+NO_OP_ACTIVE_ATOMS = W - 1
+PERFECT_MAX_ABS_EPS = 1e-5
+NO_DAMAGE_MIN_IMPROVEMENT = 1e-10
+
+SCALAR_SCHEMA_VALUES = ("IndicesOnly", "PhaseAndResidualGain")
+PATH_SEARCH_POLICY_VALUES = ("Beam4Path", "Beam8Path")
+CONSTRUCTION_POLICY_VALUES = (
+    "BestOverallRepair",
+    "FamilyBalancedRepair",
+    "FinishMoreLfos",
+    "FinishAndRepair",
+    "AlternatingFinishRepair",
+    "FinishRepairRescue",
+    "CommonCaseRepair",
+    "HardCaseRepair",
+    "MetricBalancedRepair",
+    "ShapeClusterRepair",
+    "TuneAtomsAfterUse",
+    "PathAwareRepair",
+)
+UTILITY_CANDIDATE_BUDGET_VALUES = ("CandidateBudget8", "CandidateBudget12", "CandidateBudget24", "CandidateBudget48")
+LAYER_NORMALIZATION_POLICY_VALUES = (
+    "FinalClipOnly",
+    "LayerClip0To1",
+    "LayerClipNeg0p1To1p1",
+    "LayerClipNeg1To1",
+    "LayerSoftClip0To1",
+    "LayerSoftClipNeg0p1To1p1",
+    "LayerCenterPreserveClip",
+    "OvershootPenaltyNoClip",
+    "BoundedResidualStep",
+)
+NO_DAMAGE_POLICY_VALUES = (
+    "NoDamageOff",
+    "LateLayerNoDamage",
+    "PerfectLocking",
+    "LateLayerNoDamageAndPerfectLocking",
+)
+ATOM_PREPROCESSING_POLICY_VALUES = ("RawAtoms", "EnergyNormalizedAtoms", "CenteredEnergyNormalizedAtoms")
+DUPLICATE_SUPPRESSION_POLICY_VALUES = ("DuplicateSuppressionOff", "PhaseScaleDuplicateSuppression")
+
+DEFAULT_SCREENING_VALUES = {
+    "path_search_policy": "Beam4Path",
+    "construction_policy": "BestOverallRepair",
+    "utility_candidate_budget": "CandidateBudget24",
+    "layer_normalization_policy": "FinalClipOnly",
+    "no_damage_policy": "NoDamageOff",
+    "atom_preprocessing_policy": "RawAtoms",
+    "duplicate_suppression_policy": "DuplicateSuppressionOff",
+}
 
 
 @dataclass(frozen=True)
@@ -40,12 +91,21 @@ class ComponentRowSpec:
     row_id: str
     components: tuple[str, ...]
     description: str
+    scalar_schema: str = "IndicesOnly"
+    screening_variable: str = "control"
+    screening_value: str = "Control"
     phase_enabled: bool = False
     residual_gain_enabled: bool = False
     beam_width: int = 1
-    construction_policy: str = "farthest"
+    path_search_policy: str = "Beam4Path"
+    construction_policy: str = "BestOverallRepair"
     topology_used_in_construction: bool = False
     max_utility_candidates: int = 24
+    utility_candidate_budget: str = "CandidateBudget24"
+    layer_normalization_policy: str = "FinalClipOnly"
+    no_damage_policy: str = "NoDamageOff"
+    atom_preprocessing_policy: str = "RawAtoms"
+    duplicate_suppression_policy: str = "DuplicateSuppressionOff"
 
     @property
     def path_policy(self) -> str:
@@ -107,100 +167,86 @@ class ComponentEncoding:
 
 
 def default_component_specs() -> list[ComponentRowSpec]:
-    return [
-        ComponentRowSpec(
-            row_id="x12_c0_indices_only",
-            components=(),
-            description="Bare W8D16 flat-categorical baseline: atom indices only.",
-        ),
-        ComponentRowSpec(
-            row_id="x12_add_phase",
-            components=("phase",),
-            description="Add model-facing base and residual-layer phase scalars.",
-            phase_enabled=True,
-        ),
-        ComponentRowSpec(
-            row_id="x12_add_residual_gain",
-            components=("residual_gain",),
-            description="Add model-facing optimized residual-layer gain scalars.",
-            residual_gain_enabled=True,
-        ),
-        ComponentRowSpec(
-            row_id="x12_add_beam4",
-            components=("beam4",),
-            description="Add beam-4 oracle path search with no model prediction head cost.",
-            beam_width=4,
-        ),
-        ComponentRowSpec(
-            row_id="x12_add_utility_construction",
-            components=("utility_construction",),
-            description="Add utility-based offline atom construction.",
-            construction_policy="utility",
-        ),
-        ComponentRowSpec(
-            row_id="x12_add_topology_balanced_utility_construction",
-            components=("topology_balanced_utility_construction",),
-            description="Add topology-balanced utility construction while keeping runtime topology-free.",
-            construction_policy="topology_balanced_utility",
-            topology_used_in_construction=True,
-        ),
-        ComponentRowSpec(
-            row_id="x12_phase_gain",
-            components=("phase", "residual_gain"),
-            description="Add phase and optimized residual-layer gain together.",
-            phase_enabled=True,
-            residual_gain_enabled=True,
-        ),
-        ComponentRowSpec(
-            row_id="x12_phase_beam4",
-            components=("phase", "beam4"),
-            description="Add phase and beam-4 path search together.",
-            phase_enabled=True,
-            beam_width=4,
-        ),
-        ComponentRowSpec(
-            row_id="x12_gain_beam4",
-            components=("residual_gain", "beam4"),
-            description="Add optimized residual-layer gain and beam-4 path search together.",
-            residual_gain_enabled=True,
-            beam_width=4,
-        ),
-        ComponentRowSpec(
-            row_id="x12_phase_gain_beam4",
-            components=("phase", "residual_gain", "beam4"),
-            description="Add phase, optimized residual-layer gain, and beam-4 path search together.",
-            phase_enabled=True,
-            residual_gain_enabled=True,
-            beam_width=4,
-        ),
-        ComponentRowSpec(
-            row_id="x12_phase_gain_beam4_utility",
-            components=("phase", "residual_gain", "beam4", "utility_construction"),
-            description="Cumulative row with phase, residual gain, beam-4, and utility construction.",
-            phase_enabled=True,
-            residual_gain_enabled=True,
-            beam_width=4,
-            construction_policy="utility",
-        ),
-        ComponentRowSpec(
-            row_id="x12_phase_gain_beam4_topology_balanced_utility",
-            components=("phase", "residual_gain", "beam4", "topology_balanced_utility_construction"),
-            description="Cumulative row with topology-balanced utility construction and topology-free runtime.",
-            phase_enabled=True,
-            residual_gain_enabled=True,
-            beam_width=4,
-            construction_policy="topology_balanced_utility",
-            topology_used_in_construction=True,
-        ),
+    specs: list[ComponentRowSpec] = []
+    screening_grid = [
+        ("path_search_policy", PATH_SEARCH_POLICY_VALUES),
+        ("construction_policy", CONSTRUCTION_POLICY_VALUES),
+        ("utility_candidate_budget", UTILITY_CANDIDATE_BUDGET_VALUES),
+        ("layer_normalization_policy", LAYER_NORMALIZATION_POLICY_VALUES),
+        ("no_damage_policy", NO_DAMAGE_POLICY_VALUES),
+        ("atom_preprocessing_policy", ATOM_PREPROCESSING_POLICY_VALUES),
+        ("duplicate_suppression_policy", DUPLICATE_SUPPRESSION_POLICY_VALUES),
     ]
+    for variable, values in screening_grid:
+        for value in values:
+            for scalar_schema in SCALAR_SCHEMA_VALUES:
+                specs.append(_screening_spec(variable, value, scalar_schema))
+    return specs
+
+
+def _screening_spec(variable: str, value: str, scalar_schema: str) -> ComponentRowSpec:
+    values = {**DEFAULT_SCREENING_VALUES, variable: value}
+    phase_enabled = scalar_schema == "PhaseAndResidualGain"
+    residual_gain_enabled = scalar_schema == "PhaseAndResidualGain"
+    beam_width = _beam_width(values["path_search_policy"])
+    max_utility_candidates = _candidate_budget(values["utility_candidate_budget"])
+    construction_policy = values["construction_policy"]
+    components = tuple(
+        item
+        for item, enabled in [
+            ("phase", phase_enabled),
+            ("residual_gain", residual_gain_enabled),
+            (values["path_search_policy"], True),
+            (construction_policy, True),
+            (values["layer_normalization_policy"], True),
+            (values["no_damage_policy"], values["no_damage_policy"] != "NoDamageOff"),
+            (values["atom_preprocessing_policy"], values["atom_preprocessing_policy"] != "RawAtoms"),
+            (values["duplicate_suppression_policy"], values["duplicate_suppression_policy"] != "DuplicateSuppressionOff"),
+        ]
+        if enabled
+    )
+    return ComponentRowSpec(
+        row_id=f"x12_screen_{variable}_{value}_{scalar_schema}",
+        components=components,
+        description=f"Screen {variable}={value} with scalar_schema={scalar_schema}.",
+        scalar_schema=scalar_schema,
+        screening_variable=variable,
+        screening_value=value,
+        phase_enabled=phase_enabled,
+        residual_gain_enabled=residual_gain_enabled,
+        beam_width=beam_width,
+        path_search_policy=values["path_search_policy"],
+        construction_policy=construction_policy,
+        topology_used_in_construction=construction_policy == "FamilyBalancedRepair",
+        max_utility_candidates=max_utility_candidates,
+        utility_candidate_budget=values["utility_candidate_budget"],
+        layer_normalization_policy=values["layer_normalization_policy"],
+        no_damage_policy=values["no_damage_policy"],
+        atom_preprocessing_policy=values["atom_preprocessing_policy"],
+        duplicate_suppression_policy=values["duplicate_suppression_policy"],
+    )
 
 
 def validate_component_spec(spec: ComponentRowSpec) -> None:
     validate_residual_gain_contract(spec.residual_gain_policy, model_facing=spec.residual_gain_enabled)
-    if spec.construction_policy not in {"farthest", "utility", "topology_balanced_utility"}:
+    if spec.scalar_schema not in SCALAR_SCHEMA_VALUES:
+        raise ValueError(f"unsupported scalar_schema: {spec.scalar_schema}")
+    if spec.path_search_policy not in PATH_SEARCH_POLICY_VALUES:
+        raise ValueError(f"unsupported path_search_policy: {spec.path_search_policy}")
+    if spec.construction_policy not in CONSTRUCTION_POLICY_VALUES:
         raise ValueError(f"unsupported construction_policy: {spec.construction_policy}")
-    if spec.topology_used_in_construction and spec.construction_policy != "topology_balanced_utility":
-        raise ValueError("topology_used_in_construction requires topology_balanced_utility construction")
+    if not spec.utility_candidate_budget.startswith("CandidateBudget"):
+        raise ValueError(f"unsupported utility_candidate_budget: {spec.utility_candidate_budget}")
+    if spec.layer_normalization_policy not in LAYER_NORMALIZATION_POLICY_VALUES:
+        raise ValueError(f"unsupported layer_normalization_policy: {spec.layer_normalization_policy}")
+    if spec.no_damage_policy not in NO_DAMAGE_POLICY_VALUES:
+        raise ValueError(f"unsupported no_damage_policy: {spec.no_damage_policy}")
+    if spec.atom_preprocessing_policy not in ATOM_PREPROCESSING_POLICY_VALUES:
+        raise ValueError(f"unsupported atom_preprocessing_policy: {spec.atom_preprocessing_policy}")
+    if spec.duplicate_suppression_policy not in DUPLICATE_SUPPRESSION_POLICY_VALUES:
+        raise ValueError(f"unsupported duplicate_suppression_policy: {spec.duplicate_suppression_policy}")
+    if spec.topology_used_in_construction and spec.construction_policy != "FamilyBalancedRepair":
+        raise ValueError("topology_used_in_construction requires FamilyBalancedRepair construction")
 
 
 def validate_residual_gain_contract(gain_policy: str, *, model_facing: bool) -> None:
@@ -208,6 +254,20 @@ def validate_residual_gain_contract(gain_policy: str, *, model_facing: bool) -> 
         raise ValueError("optimized per-sample residual gain must be model-facing in Experiment 12")
     if gain_policy not in {"fixed", "optimized"}:
         raise ValueError("gain_policy must be fixed or optimized")
+
+
+def _beam_width(value: str) -> int:
+    if value == "Beam4Path":
+        return 4
+    if value == "Beam8Path":
+        return 8
+    raise ValueError(f"unsupported path_search_policy: {value}")
+
+
+def _candidate_budget(value: str) -> int:
+    if not value.startswith("CandidateBudget"):
+        raise ValueError(f"unsupported utility_candidate_budget: {value}")
+    return int(value.removeprefix("CandidateBudget"))
 
 
 def budget_for_spec(spec: ComponentRowSpec) -> dict[str, Any]:
@@ -246,7 +306,13 @@ def run_component_ladder(
     specs = [spec for spec in default_component_specs() if row_ids is None or spec.row_id in row_ids]
     if max_utility_candidates is not None:
         specs = [
-            ComponentRowSpec(**{**asdict(spec), "max_utility_candidates": int(max_utility_candidates)})
+            ComponentRowSpec(
+                **{
+                    **asdict(spec),
+                    "max_utility_candidates": int(max_utility_candidates),
+                    "utility_candidate_budget": f"CandidateBudget{int(max_utility_candidates)}",
+                }
+            )
             for spec in specs
         ]
     if not specs:
@@ -373,12 +439,14 @@ def analyze_component_ladder(
     budget_path = output_dir / "budget_accounting.csv"
     scalar_path = output_dir / "scalar_usage.csv"
     usage_path = output_dir / "atom_usage_diagnostics.csv"
+    screening_path = output_dir / "screening_results.csv"
     failures_path = output_dir / "failures.csv"
     _write_csv(summary_path, rows)
     _write_csv(deltas_path, _component_deltas(rows))
     _write_csv(budget_path, [_budget_row(row) for row in rows])
     _write_csv(scalar_path, [_scalar_row(row) for row in rows])
     _write_csv(usage_path, [_usage_row(row) for row in rows])
+    _write_csv(screening_path, [_screening_row(row) for row in rows])
     _write_csv(failures_path, failures, fieldnames=["row_id", "error"])
     if write_report:
         _write_plots(report_image_dir, rows)
@@ -390,6 +458,7 @@ def analyze_component_ladder(
         "budget_accounting": str(budget_path),
         "scalar_usage": str(scalar_path),
         "atom_usage_diagnostics": str(usage_path),
+        "screening_results": str(screening_path),
         "failures": str(failures_path),
         "report": str(report_path) if write_report else "",
         "report_image_dir": str(report_image_dir) if write_report else "",
@@ -436,7 +505,7 @@ def _run_row(
     construction_time = time.perf_counter() - construction_started
     _log(progress, f"construction_complete elapsed={construction_time:.2f}s")
 
-    train_encoding, train_reconstructed, train_encoding_time = _encode_decode(
+    train_encoding, train_reconstructed, train_raw_reconstructed, train_encoding_time = _encode_decode(
         spec,
         dataset.train_curves,
         assets,
@@ -445,7 +514,7 @@ def _run_row(
         progress=progress,
         progress_label="train",
     )
-    validation_encoding, validation_reconstructed, validation_encoding_time = _encode_decode(
+    validation_encoding, validation_reconstructed, validation_raw_reconstructed, validation_encoding_time = _encode_decode(
         spec,
         dataset.validation_curves,
         assets,
@@ -464,6 +533,9 @@ def _run_row(
         **_prefix("validation", reconstruction_summary(dataset.validation_curves, validation_reconstructed)),
         **_usage_summary(validation_encoding, widths=assets.residual_widths()),
         **_scalar_summary(validation_encoding, spec),
+        **_prefix("train", _overshoot_summary(train_raw_reconstructed)),
+        **_prefix("validation", _overshoot_summary(validation_raw_reconstructed)),
+        **_asset_diagnostics(assets),
         "topology_contract_pass": contract.passed,
         "runtime_contract_valid": contract.passed,
         "train_encoding_time": train_encoding_time,
@@ -513,12 +585,12 @@ def _construct_assets(
             chunk_size=chunk_size,
             phase_candidate_count=phase_count,
         )
-        prefix = prefix + choice.values
+        prefix = _apply_layer_state_policy(prefix, choice.values, spec)
     return ReconstructionAssets(
         base_dictionary=base,
         residual_layer_dictionaries=layers,
         dictionary_scope="per_residual_layer",
-        metadata={"construction_policy": spec.construction_policy},
+        metadata={"construction_policy": spec.construction_policy, "reserved_atom": "NoOpAtom", "active_atoms_per_layer": NO_OP_ACTIVE_ATOMS},
     )
 
 
@@ -529,13 +601,16 @@ def _select_layer_atoms(
     spec: ComponentRowSpec,
     chunk_size: int,
 ) -> np.ndarray:
-    if spec.construction_policy == "farthest":
-        return _select_farthest_atoms(residual, width=W, include_zero=True, topology=None)
-    if spec.construction_policy == "utility":
-        return _select_utility_atoms(residual, width=W, topology=None, spec=spec, chunk_size=chunk_size)
-    if spec.construction_policy == "topology_balanced_utility":
-        return _select_utility_atoms(residual, width=W, topology=topology, spec=spec, chunk_size=chunk_size)
-    raise ValueError(f"unsupported construction_policy: {spec.construction_policy}")
+    atoms = _select_repair_atoms(
+        residual,
+        width=W,
+        topology=topology if spec.construction_policy == "FamilyBalancedRepair" else None,
+        spec=spec,
+        chunk_size=chunk_size,
+    )
+    if spec.construction_policy == "TuneAtomsAfterUse":
+        atoms = _tune_atoms_after_use(residual, atoms, spec=spec, chunk_size=chunk_size)
+    return atoms
 
 
 def _select_farthest_atoms(
@@ -574,7 +649,7 @@ def _select_farthest_atoms(
     return np.stack(atoms).astype(np.float32)
 
 
-def _select_utility_atoms(
+def _select_repair_atoms(
     residual: np.ndarray,
     *,
     width: int,
@@ -588,11 +663,20 @@ def _select_utility_atoms(
     selected: set[int] = set()
     phase_count = _phase_candidate_count(spec, matrix.shape[1])
     while len(atoms) < int(width):
-        pool = _utility_candidate_pool(matrix, current_loss, selected, topology=topology, limit=spec.max_utility_candidates)
+        role = _construction_slot_role(spec.construction_policy, len(atoms))
+        pool = _utility_candidate_pool(
+            matrix,
+            current_loss,
+            selected,
+            topology=topology,
+            limit=spec.max_utility_candidates,
+            role=role,
+        )
+        pool = _filter_duplicate_pool(matrix, pool, atoms, spec)
         if len(pool) == 0:
             atoms.append(np.zeros(matrix.shape[1], dtype=np.float32))
             continue
-        candidates = matrix[pool]
+        candidates = _preprocess_candidates(matrix[pool], matrix, spec)
         losses = alignment_matrix(
             matrix,
             candidates,
@@ -601,11 +685,11 @@ def _select_utility_atoms(
             chunk_size=chunk_size,
             phase_candidate_count=phase_count,
         ).losses
-        improvement = np.maximum(current_loss[:, None] - losses, 0.0).sum(axis=0)
-        chosen_local = int(np.argmax(improvement))
+        improvement = np.maximum(current_loss[:, None] - losses, 0.0)
+        chosen_local = int(np.argmax(_candidate_scores(improvement, current_loss, losses, role)))
         chosen = int(pool[chosen_local])
         selected.add(chosen)
-        atoms.append(matrix[chosen].astype(np.float32))
+        atoms.append(candidates[chosen_local].astype(np.float32))
         current_loss = np.minimum(current_loss, losses[:, chosen_local])
     return np.stack(atoms).astype(np.float32)
 
@@ -617,19 +701,162 @@ def _utility_candidate_pool(
     *,
     topology: np.ndarray | None,
     limit: int,
+    role: str = "overall",
 ) -> np.ndarray:
+    if role == "common":
+        target = -np.abs(current_loss - np.median(current_loss))
+    elif role in {"hard", "rescue"}:
+        target = current_loss
+    elif role == "finish":
+        target = -current_loss
+    elif role == "shape_cluster":
+        target = _shape_cluster_priority(matrix, current_loss)
+    else:
+        target = current_loss
     if topology is None:
-        order = np.argsort(current_loss)[::-1]
+        order = np.argsort(target)[::-1]
         return np.asarray([index for index in order if int(index) not in selected][:limit], dtype=np.int32)
     chosen = []
     per_bucket = max(1, int(np.ceil(limit / len(TOPOLOGY_NAMES))))
     for bucket in range(len(TOPOLOGY_NAMES)):
         members = np.flatnonzero(topology == bucket)
-        ordered = members[np.argsort(current_loss[members])[::-1]]
+        ordered = members[np.argsort(target[members])[::-1]]
         chosen.extend(int(index) for index in ordered if int(index) not in selected)
         if len(chosen) >= per_bucket * (bucket + 1):
             continue
     return np.asarray(chosen[:limit], dtype=np.int32)
+
+
+def _construction_slot_role(policy: str, atom_slot: int) -> str:
+    active_slot = max(1, int(atom_slot))
+    if policy in {"BestOverallRepair", "FamilyBalancedRepair", "TuneAtomsAfterUse"}:
+        return "overall"
+    if policy == "PathAwareRepair":
+        return "path_aware"
+    if policy == "FinishMoreLfos":
+        return "finish"
+    if policy == "CommonCaseRepair":
+        return "common"
+    if policy == "HardCaseRepair":
+        return "hard"
+    if policy == "MetricBalancedRepair":
+        return "balanced"
+    if policy == "ShapeClusterRepair":
+        return "shape_cluster"
+    if policy == "FinishAndRepair":
+        return "finish" if active_slot <= NO_OP_ACTIVE_ATOMS // 2 else "overall"
+    if policy == "AlternatingFinishRepair":
+        return "finish" if active_slot % 2 == 1 else "overall"
+    if policy == "FinishRepairRescue":
+        if active_slot <= 2:
+            return "finish"
+        if active_slot <= 5:
+            return "common"
+        return "hard"
+    raise ValueError(f"unsupported construction_policy: {policy}")
+
+
+def _candidate_scores(improvement: np.ndarray, current_loss: np.ndarray, losses: np.ndarray, role: str) -> np.ndarray:
+    if role == "finish":
+        previous_perfect = current_loss <= PERFECT_MAX_ABS_EPS**2
+        next_perfect = losses <= PERFECT_MAX_ABS_EPS**2
+        return np.sum(next_perfect & ~previous_perfect[:, None], axis=0) * 1_000_000.0 + np.sum(improvement, axis=0)
+    if role == "common":
+        return np.median(improvement, axis=0) * len(current_loss) + np.sum(np.minimum(improvement, np.median(current_loss)), axis=0)
+    if role == "hard":
+        threshold = np.quantile(current_loss, 0.90)
+        mask = current_loss >= threshold
+        return np.sum(improvement[mask], axis=0) if np.any(mask) else np.sum(improvement, axis=0)
+    if role == "balanced":
+        previous_perfect = current_loss <= PERFECT_MAX_ABS_EPS**2
+        next_perfect = losses <= PERFECT_MAX_ABS_EPS**2
+        finish = np.sum(next_perfect & ~previous_perfect[:, None], axis=0).astype(np.float64)
+        median = np.median(improvement, axis=0)
+        capped = np.sum(np.minimum(improvement, np.quantile(current_loss, 0.75)), axis=0)
+        hard = _candidate_scores(improvement, current_loss, losses, "hard")
+        return _normalize_score(finish) + _normalize_score(median) + _normalize_score(capped) + 0.5 * _normalize_score(hard)
+    if role == "path_aware":
+        broad = np.sum(improvement, axis=0)
+        upper_quartile = np.quantile(improvement, 0.75, axis=0)
+        return broad + len(current_loss) * upper_quartile
+    if role == "shape_cluster":
+        return np.sum(improvement, axis=0)
+    return np.sum(improvement, axis=0)
+
+
+def _normalize_score(values: np.ndarray) -> np.ndarray:
+    array = np.asarray(values, dtype=np.float64)
+    span = float(np.max(array) - np.min(array)) if len(array) else 0.0
+    if span <= 1e-15:
+        return np.zeros_like(array, dtype=np.float64)
+    return (array - np.min(array)) / span
+
+
+def _shape_cluster_priority(matrix: np.ndarray, current_loss: np.ndarray) -> np.ndarray:
+    centered = matrix - np.mean(matrix, axis=1, keepdims=True)
+    energy = np.sqrt(np.mean(centered * centered, axis=1))
+    return current_loss + 0.05 * energy
+
+
+def _preprocess_candidates(candidates: np.ndarray, residual_matrix: np.ndarray, spec: ComponentRowSpec) -> np.ndarray:
+    matrix = np.asarray(candidates, dtype=np.float32).copy()
+    if spec.atom_preprocessing_policy == "RawAtoms":
+        return matrix
+    if spec.atom_preprocessing_policy == "CenteredEnergyNormalizedAtoms":
+        matrix = matrix - np.mean(matrix, axis=1, keepdims=True)
+    if spec.atom_preprocessing_policy in {"EnergyNormalizedAtoms", "CenteredEnergyNormalizedAtoms"}:
+        target_rms = float(np.median(np.sqrt(np.mean(residual_matrix * residual_matrix, axis=1))))
+        rms = np.sqrt(np.mean(matrix * matrix, axis=1, keepdims=True))
+        matrix = np.divide(matrix, rms, out=np.zeros_like(matrix), where=rms > 1e-8) * target_rms
+    return matrix.astype(np.float32)
+
+
+def _filter_duplicate_pool(matrix: np.ndarray, pool: np.ndarray, atoms: list[np.ndarray], spec: ComponentRowSpec) -> np.ndarray:
+    if spec.duplicate_suppression_policy == "DuplicateSuppressionOff" or len(atoms) <= 1:
+        return pool
+    kept = [int(index) for index in pool if not _is_phase_scale_duplicate(matrix[int(index)], atoms[1:])]
+    return np.asarray(kept, dtype=np.int32)
+
+
+def _is_phase_scale_duplicate(candidate: np.ndarray, atoms: list[np.ndarray]) -> bool:
+    cand = np.asarray(candidate, dtype=np.float32)
+    cand = cand - float(np.mean(cand))
+    cand_norm = float(np.sqrt(np.sum(cand * cand)))
+    if cand_norm <= 1e-8:
+        return False
+    cand = cand / cand_norm
+    for atom in atoms:
+        other = np.asarray(atom, dtype=np.float32)
+        other = other - float(np.mean(other))
+        other_norm = float(np.sqrt(np.sum(other * other)))
+        if other_norm <= 1e-8:
+            continue
+        other = other / other_norm
+        best = max(abs(float(np.dot(cand, np.roll(other, shift)))) for shift in range(len(cand)))
+        if best >= 0.995:
+            return True
+    return False
+
+
+def _tune_atoms_after_use(residual: np.ndarray, atoms: np.ndarray, *, spec: ComponentRowSpec, chunk_size: int) -> np.ndarray:
+    matrix = np.asarray(residual, dtype=np.float32)
+    tuned = np.asarray(atoms, dtype=np.float32).copy()
+    phase_count = _phase_candidate_count(spec, matrix.shape[1])
+    choice = best_alignment(
+        matrix,
+        tuned,
+        phase_policy="fft_lattice",
+        gain_policy=spec.residual_gain_policy,
+        backend="numpy",
+        chunk_size=chunk_size,
+        phase_candidate_count=phase_count,
+    )
+    for atom_index in range(1, len(tuned)):
+        members = np.flatnonzero(choice.indices == atom_index)
+        if len(members) >= 2:
+            tuned[atom_index] = np.mean(matrix[members], axis=0).astype(np.float32)
+    tuned[0] = 0.0
+    return tuned.astype(np.float32)
 
 
 def _encode_decode(
@@ -641,13 +868,14 @@ def _encode_decode(
     chunk_size: int,
     progress: Callable[[str], None] | None,
     progress_label: str,
-) -> tuple[ComponentEncoding, np.ndarray, float]:
+) -> tuple[ComponentEncoding, np.ndarray, np.ndarray, float]:
     started = time.perf_counter()
     if spec.path_policy == "greedy":
         encoding, reconstructed = _encode_greedy(spec, targets, assets, backend=backend, chunk_size=chunk_size, progress=progress, progress_label=progress_label)
     else:
         encoding, reconstructed = _encode_beam(spec, targets, assets, backend=backend, chunk_size=chunk_size, progress=progress, progress_label=progress_label)
-    return encoding, np.clip(reconstructed, 0.0, 1.0).astype(np.float32), time.perf_counter() - started
+    raw = reconstructed.astype(np.float32)
+    return encoding, np.clip(raw, 0.0, 1.0).astype(np.float32), raw, time.perf_counter() - started
 
 
 def _encode_greedy(
@@ -679,10 +907,22 @@ def _encode_greedy(
             chunk_size=chunk_size,
             phase_candidate_count=phase_count,
         )
-        indices.append(choice.indices)
-        phases.append(choice.phases)
-        gains.append(choice.gains)
-        prefix = prefix + choice.values
+        next_prefix = _apply_layer_state_policy(prefix, choice.values, spec)
+        choice_indices = choice.indices.copy()
+        choice_phases = choice.phases.copy()
+        choice_gains = choice.gains.copy()
+        previous_loss = np.mean((_decoder_view(prefix, spec) - targets) ** 2, axis=1)
+        next_loss = np.mean((_decoder_view(next_prefix, spec) - targets) ** 2, axis=1)
+        force_no_op = _force_no_op_mask(spec, residual_layer, targets, prefix, previous_loss, next_loss)
+        if np.any(force_no_op):
+            next_prefix[force_no_op] = prefix[force_no_op]
+            choice_indices[force_no_op] = NO_OP_ATOM_INDEX
+            choice_phases[force_no_op] = 0.0
+            choice_gains[force_no_op] = 0.0
+        indices.append(choice_indices)
+        phases.append(choice_phases)
+        gains.append(choice_gains)
+        prefix = next_prefix
     return ComponentEncoding(base.indices, base.phases, base.gains, indices, phases, gains), prefix
 
 
@@ -750,10 +990,20 @@ def _encode_beam_batch(
             matrix.phases.reshape(-1),
         ).reshape(b, current_beam, len(dictionary), targets.shape[1])
         additions = shifted * matrix.gains.reshape(b, current_beam, len(dictionary), 1)
-        candidate_state = prefix[:, :, None, :] + additions
-        candidate_recon = np.clip(candidate_state, 0.0, 1.0)
+        candidate_state = _apply_layer_state_policy(prefix[:, :, None, :], additions, spec)
+        candidate_recon = _decoder_view(candidate_state, spec)
         mse = np.mean((targets[:, None, None, :] - candidate_recon) ** 2, axis=3)
-        previous = np.mean((targets[:, None, :] - np.clip(prefix, 0.0, 1.0)) ** 2, axis=2)
+        previous = np.mean((targets[:, None, :] - _decoder_view(prefix, spec)) ** 2, axis=2)
+        mse = _apply_overshoot_penalty(mse, candidate_state, spec)
+        if spec.no_damage_policy in {"LateLayerNoDamage", "LateLayerNoDamageAndPerfectLocking"} and residual_layer >= D // 2:
+            no_damage = mse > (previous[:, :, None] - NO_DAMAGE_MIN_IMPROVEMENT)
+            no_damage[:, :, NO_OP_ATOM_INDEX] = False
+            mse[no_damage] = np.inf
+        if spec.no_damage_policy in {"PerfectLocking", "LateLayerNoDamageAndPerfectLocking"}:
+            locked = np.max(np.abs(_decoder_view(prefix, spec) - targets[:, None, :]), axis=2) <= PERFECT_MAX_ABS_EPS
+            locked_mask = np.broadcast_to(locked[:, :, None], mse.shape).copy()
+            locked_mask[:, :, NO_OP_ATOM_INDEX] = False
+            mse[locked_mask] = np.inf
         mse[:, :, 0] = np.minimum(mse[:, :, 0], previous)
         candidate_state[:, :, 0, :] = prefix
         matrix.phases[:, 0] = 0.0
@@ -792,6 +1042,80 @@ def _encode_beam_batch(
     return encoding, prefix[:, 0, :].astype(np.float32)
 
 
+def _apply_layer_state_policy(prefix: np.ndarray, addition: np.ndarray, spec: ComponentRowSpec) -> np.ndarray:
+    if spec.layer_normalization_policy == "BoundedResidualStep":
+        state = _bounded_residual_step(prefix, addition, lower=0.0, upper=1.0)
+    else:
+        state = np.asarray(prefix, dtype=np.float32) + np.asarray(addition, dtype=np.float32)
+    policy = spec.layer_normalization_policy
+    if policy in {"FinalClipOnly", "OvershootPenaltyNoClip", "BoundedResidualStep"}:
+        return state.astype(np.float32)
+    if policy == "LayerClip0To1":
+        return np.clip(state, 0.0, 1.0).astype(np.float32)
+    if policy == "LayerClipNeg0p1To1p1":
+        return np.clip(state, -0.1, 1.1).astype(np.float32)
+    if policy == "LayerClipNeg1To1":
+        return np.clip(state, -1.0, 1.0).astype(np.float32)
+    if policy == "LayerSoftClip0To1":
+        return _soft_clip(state, 0.0, 1.0).astype(np.float32)
+    if policy == "LayerSoftClipNeg0p1To1p1":
+        return _soft_clip(state, -0.1, 1.1).astype(np.float32)
+    if policy == "LayerCenterPreserveClip":
+        clipped = np.clip(state, 0.0, 1.0)
+        delta = np.mean(state, axis=-1, keepdims=True) - np.mean(clipped, axis=-1, keepdims=True)
+        return np.clip(clipped + delta, 0.0, 1.0).astype(np.float32)
+    raise ValueError(f"unsupported layer_normalization_policy: {policy}")
+
+
+def _decoder_view(state: np.ndarray, spec: ComponentRowSpec) -> np.ndarray:
+    if spec.layer_normalization_policy == "OvershootPenaltyNoClip":
+        return np.asarray(state, dtype=np.float32)
+    return np.clip(state, 0.0, 1.0).astype(np.float32)
+
+
+def _apply_overshoot_penalty(mse: np.ndarray, state: np.ndarray, spec: ComponentRowSpec) -> np.ndarray:
+    if spec.layer_normalization_policy != "OvershootPenaltyNoClip":
+        return mse
+    below = np.maximum(0.0, -state)
+    above = np.maximum(0.0, state - 1.0)
+    penalty = np.mean(below * below + above * above, axis=-1)
+    return mse + 0.25 * penalty
+
+
+def _soft_clip(state: np.ndarray, lower: float, upper: float) -> np.ndarray:
+    width = upper - lower
+    mid = lower + width / 2.0
+    return lower + width / (1.0 + np.exp(-8.0 * (np.asarray(state, dtype=np.float32) - mid) / width))
+
+
+def _bounded_residual_step(prefix: np.ndarray, addition: np.ndarray, *, lower: float, upper: float) -> np.ndarray:
+    prefix_array = np.asarray(prefix, dtype=np.float32)
+    addition_array = np.asarray(addition, dtype=np.float32)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        positive_limit = np.divide(upper - prefix_array, addition_array, out=np.ones_like(addition_array), where=addition_array > 0.0)
+        negative_limit = np.divide(lower - prefix_array, addition_array, out=np.ones_like(addition_array), where=addition_array < 0.0)
+    limit = np.where(addition_array > 0.0, positive_limit, np.where(addition_array < 0.0, negative_limit, 1.0))
+    alpha = np.min(np.clip(limit, 0.0, 1.0), axis=-1, keepdims=True)
+    return (prefix_array + alpha * addition_array).astype(np.float32)
+
+
+def _force_no_op_mask(
+    spec: ComponentRowSpec,
+    residual_layer: int,
+    targets: np.ndarray,
+    prefix: np.ndarray,
+    previous_loss: np.ndarray,
+    next_loss: np.ndarray,
+) -> np.ndarray:
+    mask = np.zeros(len(targets), dtype=bool)
+    if spec.no_damage_policy in {"LateLayerNoDamage", "LateLayerNoDamageAndPerfectLocking"} and residual_layer >= D // 2:
+        mask |= next_loss > (previous_loss - NO_DAMAGE_MIN_IMPROVEMENT)
+    if spec.no_damage_policy in {"PerfectLocking", "LateLayerNoDamageAndPerfectLocking"}:
+        max_abs = np.max(np.abs(_decoder_view(prefix, spec) - targets), axis=1)
+        mask |= max_abs <= PERFECT_MAX_ABS_EPS
+    return mask
+
+
 def _manifest(
     spec: ComponentRowSpec,
     assets: ReconstructionAssets,
@@ -806,12 +1130,18 @@ def _manifest(
         "row_id": spec.row_id,
         "components": list(spec.components),
         "description": spec.description,
+        "screening_variable": spec.screening_variable,
+        "screening_value": spec.screening_value,
+        "scalar_schema": spec.scalar_schema,
         "oracle_construction_id": spec.construction_policy,
         "runtime_interface_id": "flat_categorical_per_residual_layer",
-        "decoder_policy_id": "final_clip",
+        "decoder_policy_id": spec.layer_normalization_policy,
         "base_dictionary_size": BASE_DICTIONARY_SIZE,
         "W": W,
         "D": D,
+        "reserved_atom": "NoOpAtom",
+        "reserved_atom_index": NO_OP_ATOM_INDEX,
+        "active_atoms_per_layer": NO_OP_ACTIVE_ATOMS,
         "scalar_families": spec.scalar_families,
         "scalar_outputs": spec.scalar_outputs,
         "categorical_outputs": budget["categorical_outputs"],
@@ -832,9 +1162,15 @@ def _manifest(
         "residual_gain_policy": spec.residual_gain_policy,
         "residual_gain_model_facing": spec.residual_gain_enabled,
         "path_policy": spec.path_policy,
+        "path_search_policy": spec.path_search_policy,
         "beam_width": spec.beam_width,
         "construction_policy": spec.construction_policy,
+        "utility_candidate_budget": spec.utility_candidate_budget,
         "max_utility_candidates": spec.max_utility_candidates,
+        "layer_normalization_policy": spec.layer_normalization_policy,
+        "no_damage_policy": spec.no_damage_policy,
+        "atom_preprocessing_policy": spec.atom_preprocessing_policy,
+        "duplicate_suppression_policy": spec.duplicate_suppression_policy,
         "fixed_x_grid_note": "LFO x-grid geometry is decoder-owned and adds zero model prediction head outputs.",
         **flags.as_dict(),
         **dataset.manifest_fields(),
@@ -853,7 +1189,38 @@ def _usage_summary(encoding: ComponentEncoding, *, widths: list[int]) -> dict[st
     usage["residual_layer_dead_atom_rate_median"] = float(np.median(dead)) if dead else 0.0
     usage["residual_layer_dominant_atom_share_median"] = float(np.median(dominant)) if dominant else 0.0
     usage["residual_layer_usage_entropy_median"] = float(np.median(entropy)) if entropy else 0.0
+    no_op_rates = []
+    for residual_layer, values in enumerate(encoding.residual_layer_indices, start=1):
+        rate = float(np.mean(np.asarray(values, dtype=np.int32) == NO_OP_ATOM_INDEX)) if len(values) else 0.0
+        usage[f"residual_layer_{residual_layer}_no_op_usage_rate"] = rate
+        no_op_rates.append(rate)
+    usage["residual_layer_no_op_usage_rate_median"] = float(np.median(no_op_rates)) if no_op_rates else 0.0
     return usage
+
+
+def _overshoot_summary(raw_reconstructed: np.ndarray) -> dict[str, float]:
+    raw = np.asarray(raw_reconstructed, dtype=np.float32)
+    outside = (raw < 0.0) | (raw > 1.0)
+    amount = np.maximum(0.0, -raw) + np.maximum(0.0, raw - 1.0)
+    return {
+        "overshoot_rate_before_final_clip": float(np.mean(outside)),
+        "overshoot_abs_p95_before_final_clip": float(np.quantile(amount, 0.95)),
+    }
+
+
+def _asset_diagnostics(assets: ReconstructionAssets) -> dict[str, float]:
+    duplicate_rates = []
+    for layer in assets.residual_layer_dictionaries:
+        active = [layer[index] for index in range(1, len(layer))]
+        pairs = 0
+        duplicates = 0
+        for left in range(len(active)):
+            for right in range(left + 1, len(active)):
+                pairs += 1
+                if _is_phase_scale_duplicate(active[left], [active[right]]):
+                    duplicates += 1
+        duplicate_rates.append(float(duplicates / pairs) if pairs else 0.0)
+    return {"duplicate_atom_rate": float(np.median(duplicate_rates)) if duplicate_rates else 0.0}
 
 
 def _scalar_summary(encoding: ComponentEncoding, spec: ComponentRowSpec) -> dict[str, Any]:
@@ -869,22 +1236,30 @@ def _scalar_summary(encoding: ComponentEncoding, spec: ComponentRowSpec) -> dict
 
 
 def _component_deltas(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    baseline = _row_by_id(rows, "x12_c0_indices_only")
-    baseline_p95 = _float(baseline.get("validation_p95_rmse")) if baseline else None
-    baseline_median = _float(baseline.get("validation_median_rmse")) if baseline else None
+    baselines = {
+        str(row.get("scalar_schema", "")): row
+        for row in rows
+        if row.get("screening_variable") == "construction_policy" and row.get("screening_value") == "BestOverallRepair"
+    }
     result = []
     for row in rows:
+        baseline = baselines.get(str(row.get("scalar_schema", "")))
+        baseline_p95 = _float(baseline.get("validation_p95_rmse")) if baseline else None
+        baseline_median = _float(baseline.get("validation_median_rmse")) if baseline else None
         p95 = _float(row.get("validation_p95_rmse"))
         median = _float(row.get("validation_median_rmse"))
         result.append(
             {
                 "row_id": row.get("row_id", ""),
+                "screening_variable": row.get("screening_variable", ""),
+                "screening_value": row.get("screening_value", ""),
+                "scalar_schema": row.get("scalar_schema", ""),
                 "components": row.get("components", ""),
                 "head_outputs_actual": row.get("head_outputs_actual", ""),
                 "validation_p95_rmse": row.get("validation_p95_rmse", ""),
                 "validation_median_rmse": row.get("validation_median_rmse", ""),
-                "p95_delta_vs_indices_only": "" if p95 is None or baseline_p95 is None else p95 - baseline_p95,
-                "median_delta_vs_indices_only": "" if median is None or baseline_median is None else median - baseline_median,
+                "p95_delta_vs_scalar_default": "" if p95 is None or baseline_p95 is None else p95 - baseline_p95,
+                "median_delta_vs_scalar_default": "" if median is None or baseline_median is None else median - baseline_median,
             }
         )
     return result
@@ -893,9 +1268,14 @@ def _component_deltas(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def _budget_row(row: dict[str, Any]) -> dict[str, Any]:
     return {
         "row_id": row.get("row_id", ""),
+        "screening_variable": row.get("screening_variable", ""),
+        "screening_value": row.get("screening_value", ""),
+        "scalar_schema": row.get("scalar_schema", ""),
         "components": row.get("components", ""),
         "W": row.get("W", ""),
         "D": row.get("D", ""),
+        "reserved_atom": row.get("reserved_atom", ""),
+        "active_atoms_per_layer": row.get("active_atoms_per_layer", ""),
         "scalar_families": row.get("scalar_families", ""),
         "scalar_outputs": row.get("scalar_outputs", ""),
         "categorical_outputs": row.get("categorical_outputs", ""),
@@ -907,6 +1287,9 @@ def _budget_row(row: dict[str, Any]) -> dict[str, Any]:
 def _scalar_row(row: dict[str, Any]) -> dict[str, Any]:
     keys = [
         "row_id",
+        "screening_variable",
+        "screening_value",
+        "scalar_schema",
         "phase_enabled",
         "residual_gain_enabled",
         "base_phase_abs_median",
@@ -921,9 +1304,43 @@ def _scalar_row(row: dict[str, Any]) -> dict[str, Any]:
 def _usage_row(row: dict[str, Any]) -> dict[str, Any]:
     keys = [
         "row_id",
+        "screening_variable",
+        "screening_value",
+        "scalar_schema",
         "residual_layer_dead_atom_rate_median",
         "residual_layer_dominant_atom_share_median",
         "residual_layer_usage_entropy_median",
+        "residual_layer_no_op_usage_rate_median",
+        "duplicate_atom_rate",
+        "validation_overshoot_rate_before_final_clip",
+    ]
+    return {key: row.get(key, "") for key in keys}
+
+
+def _screening_row(row: dict[str, Any]) -> dict[str, Any]:
+    keys = [
+        "row_id",
+        "screening_variable",
+        "screening_value",
+        "scalar_schema",
+        "path_search_policy",
+        "construction_policy",
+        "utility_candidate_budget",
+        "layer_normalization_policy",
+        "no_damage_policy",
+        "atom_preprocessing_policy",
+        "duplicate_suppression_policy",
+        "head_outputs_actual",
+        "validation_median_rmse",
+        "validation_strict_perfect_lfo_rate",
+        "validation_p95_rmse",
+        "validation_node_max_error_p95",
+        "oracle_construction_time",
+        "validation_encoding_time",
+        "residual_layer_no_op_usage_rate_median",
+        "residual_layer_usage_entropy_median",
+        "duplicate_atom_rate",
+        "validation_overshoot_rate_before_final_clip",
     ]
     return {key: row.get(key, "") for key in keys}
 
@@ -955,91 +1372,91 @@ def _write_report(report_path: Path, rows: list[dict[str, Any]]) -> None:
 
 
 def _report_text(rows: list[dict[str, Any]]) -> str:
-    baseline = _row_by_id(rows, "x12_c0_indices_only")
-    best = min(rows, key=lambda row: _float(row.get("validation_p95_rmse")) or float("inf")) if rows else None
-    gain = _row_by_id(rows, "x12_add_residual_gain")
-    phase = _row_by_id(rows, "x12_add_phase")
-    beam = _row_by_id(rows, "x12_add_beam4")
-    cumulative = _row_by_id(rows, "x12_phase_gain_beam4_topology_balanced_utility")
     lines = [
-        "# Experiment 12: W8D16 First-Principles Component Ladder",
+        "# Experiment 12: Fixed-W8D16 Screening Grid",
         "",
         "## Main Findings",
         "",
+        "Experiment 12 is now a screening run. It does not auto-rank winners because median RMSE, perfect-LFO rate, P95 RMSE, and max-point error can disagree. Read the grouped tables and manually choose the top candidates for Experiment 13.",
+        "",
+        f"The run contains `{len(rows)}` rows. Every row keeps `W=8`, `D=16`, `control_point_count=97`, flat-categorical per-residual-layer addressing, and one required `NoOpAtom` per residual layer.",
+        "",
+        "Every screened value is tested in both scalar contexts: `IndicesOnly` and `PhaseAndResidualGain`.",
+        "",
+        "## Fixed Contract",
+        "",
+        "| Variable | Fixed Value |",
+        "|---|---|",
+        "| `base_dictionary_size` | `32` |",
+        "| `residual_width` | `8` |",
+        "| `reserved_atom` | `NoOpAtom` |",
+        "| `active_atoms_per_layer` | `7` |",
+        "| `residual_depth` | `16` |",
+        "| `control_point_count` | `97` |",
+        "| `runtime_interface` | `FlatCategoricalPerResidualLayer` |",
+        "| `dictionary_scope` | `PerResidualLayer` |",
+        "| `runtime_topology` | `None` |",
+        "",
+        "## Screening Variables",
+        "",
+        "| Variable | Values |",
+        "|---|---|",
+        f"| `path_search_policy` | `{_join_values(PATH_SEARCH_POLICY_VALUES)}` |",
+        f"| `construction_policy` | `{_join_values(CONSTRUCTION_POLICY_VALUES)}` |",
+        f"| `utility_candidate_budget` | `{_join_values(UTILITY_CANDIDATE_BUDGET_VALUES)}` |",
+        f"| `layer_normalization_policy` | `{_join_values(LAYER_NORMALIZATION_POLICY_VALUES)}` |",
+        f"| `no_damage_policy` | `{_join_values(NO_DAMAGE_POLICY_VALUES)}` |",
+        f"| `atom_preprocessing_policy` | `{_join_values(ATOM_PREPROCESSING_POLICY_VALUES)}` |",
+        f"| `duplicate_suppression_policy` | `{_join_values(DUPLICATE_SUPPRESSION_POLICY_VALUES)}` |",
+        "",
+        "## Grouped Results",
+        "",
+        "Co-primary metrics: `validation_median_rmse`, `validation_strict_perfect_lfo_rate`, `validation_p95_rmse`, and `validation_node_max_error_p95`.",
+        "",
     ]
-    if baseline and best:
-        lines.append(
-            f"The indices-only W8D16 baseline lands at validation P95 `{_fmt(baseline.get('validation_p95_rmse'))}`. "
-            f"The best row in this run is `{best.get('row_id')}` at `{_fmt(best.get('validation_p95_rmse'))}`."
-        )
-    if gain and baseline:
-        lines.append(
-            f"Residual-layer gain is the component to watch first: by itself it moves P95 from "
-            f"`{_fmt(baseline.get('validation_p95_rmse'))}` to `{_fmt(gain.get('validation_p95_rmse'))}` while adding 16 model-facing scalar outputs."
-        )
-    if phase and baseline:
-        lines.append(
-            f"Phase is measured as its own component, not assumed into the baseline. Its single-component row lands at "
-            f"`{_fmt(phase.get('validation_p95_rmse'))}` P95."
-        )
-    if beam:
-        lines.append(
-            f"Beam-4 is an oracle/path-search component with zero model prediction head cost. Its single-component row lands at "
-            f"`{_fmt(beam.get('validation_p95_rmse'))}` P95."
-        )
-    if cumulative:
-        lines.append(
-            f"The cumulative clean row with phase, residual gain, beam-4, and topology-balanced utility construction lands at "
-            f"`{_fmt(cumulative.get('validation_p95_rmse'))}` P95 with `{cumulative.get('head_outputs_actual')}` head outputs."
-        )
+    for variable in [
+        "path_search_policy",
+        "construction_policy",
+        "utility_candidate_budget",
+        "layer_normalization_policy",
+        "no_damage_policy",
+        "atom_preprocessing_policy",
+        "duplicate_suppression_policy",
+    ]:
+        group = [row for row in rows if row.get("screening_variable") == variable]
+        if not group:
+            continue
+        lines.extend(_screening_table(variable, group))
     lines.extend(
         [
             "",
-            "## Why The Components Behave This Way",
-            "",
-            "This ladder deliberately separates model-facing degrees of freedom from oracle-side search. Beam search and offline construction can improve the selected path without changing `head_outputs`; phase and residual gain change what the deployed model must emit.",
-            "",
-            "The key guardrail is residual gain. If a per-sample residual gain is optimized during oracle encoding, it is a reconstruction scalar and must appear in the model-facing target schema. Experiment 12 treats that as a real component rather than repeating the Era 1 free-gain ambiguity.",
-            "",
-            "Topology-balanced construction is allowed only as offline atom construction. The runtime target schema, loss schema, decoder lookup, and head accounting remain topology-free.",
-            "",
             "## Plot Notes",
             "",
-            "Lower is better for validation P95, validation median, P95 delta, and runtime.",
+            "Lower is better for validation P95, validation median, max-point error, overshoot, and runtime. Higher is better for strict perfect-LFO rate.",
             "",
             "![Validation P95](./images/experiment_12/experiment12_validation_p95_by_row.png)",
             "",
-            "The P95 plot shows which components move the difficult tail. Read this before budget scatterplots; Experiment 12 is primarily about RMSE behavior and component interaction.",
+            "The P95 plot shows which values move hard cases, but it is not the only priority.",
             "",
             "![Validation median](./images/experiment_12/experiment12_validation_median_by_row.png)",
             "",
-            "The median plot shows whether a component helps typical LFOs or mainly repairs tail cases.",
-            "",
-            "![Delta vs indices-only](./images/experiment_12/experiment12_delta_vs_indices_only.png)",
-            "",
-            "Negative delta is good. This plot keeps the first-principles baseline visible and avoids treating Era 1 labels as the comparison target.",
+            "The median plot is co-primary because typical-case compactness is critical.",
             "",
             "![P95 vs head outputs](./images/experiment_12/experiment12_p95_vs_head_outputs.png)",
             "",
-            "This plot records model prediction head budget, but it is not the main explanation. Rows with the same head count can differ because beam search and construction are oracle-side components.",
-            "",
-            "![Scalar usage](./images/experiment_12/experiment12_scalar_usage.png)",
-            "",
-            "Residual gain usage is shown separately so gain magnitude is not confused with metric improvement.",
+            "This plot records model prediction head budget. Process variables remain prediction-head-free.",
             "",
             "![Atom usage](./images/experiment_12/experiment12_atom_usage.png)",
             "",
-            "Dead-atom rate is diagnostic. Lower is usually healthier, but quality remains the primary decision metric.",
+            "Atom usage includes the required no-op atom, so no-op usage should be read as a stopping/safety diagnostic rather than dead capacity.",
             "",
             "![Runtime](./images/experiment_12/experiment12_runtime_by_row.png)",
             "",
             "Runtime shows oracle cost, not deployed model prediction cost.",
             "",
-            "## Practical Takeaways",
+            "## Experiment 13 Selection",
             "",
-            "Use Experiment 12 to decide which components deserve full-size follow-up rows. Do not promote a component because it matches an Era 1 label; promote it because it improves the W8D16 ladder under the Era 2 runtime contract.",
-            "",
-            "The next report should discuss component interactions directly. If phase plus gain behaves differently from either single-component row, that interaction is the finding.",
+            "Manually choose the top candidates from these grouped results. Stack the selected values in Experiment 13 instead of relying on automatic ranking.",
             "",
             "## Method Notes",
             "",
@@ -1047,13 +1464,48 @@ def _report_text(rows: list[dict[str, Any]]) -> str:
             "- `D=16` means sixteen residual layers.",
             "- `control_point_count=97` is fixed decoder geometry.",
             "- The indices-only baseline has `head_outputs = 32 + 16 * 8 = 160`.",
-            "- Phase adds `D + 1 = 17` model-facing scalar outputs.",
-            "- Residual gain adds `D = 16` model-facing scalar outputs.",
-            "- Beam and construction policies add zero model prediction head outputs.",
+            "- `PhaseAndResidualGain` has `head_outputs = 32 + 16 * 8 + 17 phase_scalars + 16 residual_gain_scalars = 193`.",
+            "- Every residual layer reserves `Atom0 = NoOpAtom`, leaving seven active repair atoms.",
+            "- PascalCase is used for variable values in reports and artifacts; variable field names remain implementation-friendly.",
             "- CSV artifacts live under `research/experiments/lfo_representation/era2/artifacts/experiment_12/component_ladder/`.",
         ]
     )
     return "\n".join(lines) + "\n"
+
+
+def _join_values(values: tuple[str, ...]) -> str:
+    return "`, `".join(values)
+
+
+def _screening_table(variable: str, rows: list[dict[str, Any]]) -> list[str]:
+    lines = [
+        f"### `{variable}`",
+        "",
+        "| Value | ScalarSchema | Median RMSE | Perfect Rate | P95 RMSE | Node Max P95 | Construct s | Encode s | NoOp Median | Overshoot Rate |",
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|",
+    ]
+    ordered = sorted(rows, key=lambda row: (str(row.get("screening_value", "")), str(row.get("scalar_schema", ""))))
+    for row in ordered:
+        lines.append(
+            "| "
+            + " | ".join(
+                [
+                    f"`{row.get('screening_value', '')}`",
+                    f"`{row.get('scalar_schema', '')}`",
+                    _fmt(row.get("validation_median_rmse")),
+                    _fmt(row.get("validation_strict_perfect_lfo_rate")),
+                    _fmt(row.get("validation_p95_rmse")),
+                    _fmt(row.get("validation_node_max_error_p95")),
+                    _fmt(row.get("oracle_construction_time")),
+                    _fmt(row.get("validation_encoding_time")),
+                    _fmt(row.get("residual_layer_no_op_usage_rate_median")),
+                    _fmt(row.get("validation_overshoot_rate_before_final_clip")),
+                ]
+            )
+            + " |"
+        )
+    lines.append("")
+    return lines
 
 
 def _bar_plot(path: Path, rows: list[dict[str, Any]], metric: str, ylabel: str, title: str, plt: Any) -> None:

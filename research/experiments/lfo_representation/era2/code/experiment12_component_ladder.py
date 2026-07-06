@@ -72,7 +72,7 @@ def main() -> None:
     if args.command == "run":
         if args.async_run:
             result = _launch_async(args)
-            print(f"Started async Experiment 12 run: {result['output_dir']}", flush=True)
+            print(f"Started async Experiment 12 screening run: {result['output_dir']}", flush=True)
             print(f"runner_pid={result['runner_pid']}", flush=True)
             print(f"stdout_log={result['stdout_log']}", flush=True)
             print(f"stderr_log={result['stderr_log']}", flush=True)
@@ -102,10 +102,10 @@ def main() -> None:
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Run Experiment 12 W8D16 component ladder.")
+    parser = argparse.ArgumentParser(description="Run Experiment 12 fixed-W8D16 screening grid.")
     subcommands = parser.add_subparsers(dest="command", required=True)
 
-    run = subcommands.add_parser("run", help="run the Experiment 12 component ladder")
+    run = subcommands.add_parser("run", help="run the Experiment 12 screening grid")
     run.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     run.add_argument("--metadata", type=Path, default=DEFAULT_METADATA)
     run.add_argument("--backend", choices=["auto", "numpy", "xpu"], default="auto")
@@ -120,7 +120,7 @@ def _parser() -> argparse.ArgumentParser:
     run.add_argument("--monitor-refresh-seconds", type=int, default=30)
     run.add_argument("--no-monitor-window", action="store_true")
 
-    analyze = subcommands.add_parser("analyze", help="regenerate Experiment 12 analytics and report")
+    analyze = subcommands.add_parser("analyze", help="regenerate Experiment 12 screening analytics and report")
     analyze.add_argument("--run-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     analyze.add_argument("--no-report", action="store_true")
 
@@ -208,7 +208,7 @@ def _open_monitor(run_dir: Path, refresh_seconds: int) -> bool:
 
 
 def _print_result(result: dict[str, str]) -> None:
-    print("Wrote Experiment 12 component ladder artifacts", flush=True)
+    print("Wrote Experiment 12 screening-grid artifacts", flush=True)
     for key, value in result.items():
         print(f"{key}={value}", flush=True)
 

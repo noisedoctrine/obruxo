@@ -12,7 +12,8 @@ atoms after the codebook exists.
 - [experiments/](./experiments/): Era 2 experiment plans, including
   [EXPERIMENT_10_PLAN.md](./experiments/EXPERIMENT_10_PLAN.md),
   [EXPERIMENT_11_PLAN.md](./experiments/EXPERIMENT_11_PLAN.md),
-  [EXPERIMENT_12_PLAN.md](./experiments/EXPERIMENT_12_PLAN.md), and
+  [EXPERIMENT_12_PLAN.md](./experiments/EXPERIMENT_12_PLAN.md),
+  [EXPERIMENT_13_PLAN.md](./experiments/EXPERIMENT_13_PLAN.md), and
   [ERA2_CORE_FRAMEWORK_PLAN.md](./experiments/ERA2_CORE_FRAMEWORK_PLAN.md).
 - [reports/](./reports/): Era 2 research notes, design contracts, and future
   result writeups.
@@ -190,17 +191,18 @@ alignment, and replay of an Era 1 W8D16 checkpoint. The report is written to
 `era2/reports/EXPERIMENT_11_RMSE_GAP_FORENSIC_AUDIT.md`, with CSV probes under
 `era2/artifacts/experiment_11/rmse_gap_audit/`.
 
-Run Experiment 12, the W8D16 first-principles component ladder:
+Run Experiment 12, the fixed-W8D16 screening grid:
 
 ```text
 conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment12_component_ladder.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run --async --backend xpu --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --corpus-sample-fraction 1.0 --monitor-refresh-seconds 30
 ```
 
 Experiment 12 is standalone. It fixes `W=8`, `D=16`, and
-`control_point_count=97`, starts from an indices-only baseline, then adds
-phase, residual-layer gain, beam search, and construction policies as explicit
-components. Optimized residual-layer gain is always model-facing and counted.
-Topology-balanced rows use topology only during offline construction.
+`control_point_count=97`, reserves `Atom0 = NoOpAtom` in every residual layer,
+and screens prediction-head-free process variables one at a time. Variable
+values are PascalCase in docs, reports, and artifacts. Every screened value is
+tested under `IndicesOnly` and `PhaseAndResidualGain` scalar schemas. The
+screening report is grouped by variable and does not auto-rank winners.
 
 Run the tiny Experiment 12 smoke path with:
 
@@ -218,6 +220,11 @@ Experiment 12 artifacts are written under
 `era2/artifacts/experiment_12/component_ladder/`. The user-facing report is
 `era2/reports/EXPERIMENT_12_W8D16_COMPONENT_LADDER_REPORT.md`, with plots under
 `era2/reports/images/experiment_12/`.
+
+Experiment 13 is the planned stacked-grid follow-up. After reading the
+Experiment 12 grouped report, manually choose the top candidate values and use
+[EXPERIMENT_13_PLAN.md](./experiments/EXPERIMENT_13_PLAN.md) as the grid
+contract.
 
 Run tests with:
 
