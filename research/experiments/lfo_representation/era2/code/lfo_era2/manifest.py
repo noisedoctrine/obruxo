@@ -5,7 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import csv
 import json
+import os
 from pathlib import Path
+import time
 from typing import Any
 
 from .accounting import BudgetBreakdown
@@ -93,9 +95,21 @@ class ExperimentRowManifest:
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     text = json.dumps(_jsonable(payload), indent=2, sort_keys=True)
-    tmp_path = path.with_name(f".{path.name}.tmp")
+    tmp_path = path.with_name(f".{path.name}.{os.getpid()}.tmp")
     tmp_path.write_text(text, encoding="utf-8")
-    tmp_path.replace(path)
+    last_error: OSError | None = None
+    for attempt in range(50):
+        try:
+            tmp_path.replace(path)
+            return
+        except PermissionError as exc:
+            last_error = exc
+            time.sleep(min(0.05 * (attempt + 1), 0.5))
+    try:
+        tmp_path.unlink(missing_ok=True)
+    except OSError:
+        pass
+    raise last_error or PermissionError(f"could not replace JSON file: {path}")
 
 
 def write_summary_csv(path: Path, row: dict[str, Any]) -> None:
