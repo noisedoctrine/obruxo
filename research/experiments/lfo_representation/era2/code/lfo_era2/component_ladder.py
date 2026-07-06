@@ -7,6 +7,7 @@ from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+import re
 import time
 from typing import Any, Callable
 
@@ -31,15 +32,19 @@ CONTROL_POINT_COUNT = 97
 DEFAULT_OUTPUT_DIR = ERA2_ROOT / "artifacts" / "experiment_12" / "component_ladder"
 REPORT_PATH = ERA2_ROOT / "reports" / "EXPERIMENT_12_W8D16_COMPONENT_LADDER_REPORT.md"
 REPORT_IMAGE_DIR = ERA2_ROOT / "reports" / "images" / "experiment_12"
+PHASE_GAIN_REPORT_PATH = ERA2_ROOT / "reports" / "EXPERIMENT_12_W8D16_PHASE_AND_RESIDUAL_GAIN_REPORT.md"
+PHASE_GAIN_REPORT_IMAGE_DIR = ERA2_ROOT / "reports" / "images" / "experiment_12_phase_gain"
 SMOKE_TRAIN_COUNT = 48
 SMOKE_VALIDATION_COUNT = 32
 NO_OP_ATOM_INDEX = 0
 NO_OP_ACTIVE_ATOMS = W - 1
 PERFECT_MAX_ABS_EPS = 1e-5
 NO_DAMAGE_MIN_IMPROVEMENT = 1e-10
+EFFECTIVE_NO_OP_GAIN_EPS = 1e-4
 
 SCALAR_SCHEMA_VALUES = ("IndicesOnly", "PhaseAndResidualGain")
-PATH_SEARCH_POLICY_VALUES = ("Beam4Path", "Beam8Path")
+PATH_SEARCH_POLICY_VALUES = ("GreedyPath", "Beam4Path", "Beam8Path")
+PATH_SEARCH_BEAM_CANDIDATE_VALUES = ("Beam4Path", "Beam8Path")
 CONSTRUCTION_POLICY_VALUES = (
     "BestOverallRepair",
     "FamilyBalancedRepair",
@@ -84,6 +89,18 @@ DEFAULT_SCREENING_VALUES = {
     "atom_preprocessing_policy": "RawAtoms",
     "duplicate_suppression_policy": "DuplicateSuppressionOff",
 }
+
+
+@dataclass(frozen=True)
+class ReportMode:
+    name: str
+    title: str
+    report_path: Path
+    image_dir: Path
+    image_relative_dir: str
+    scalar_schema_filter: str | None
+    include_scalar_comparison: bool
+    expected_row_count: int
 
 
 @dataclass(frozen=True)
@@ -257,6 +274,8 @@ def validate_residual_gain_contract(gain_policy: str, *, model_facing: bool) -> 
 
 
 def _beam_width(value: str) -> int:
+    if value == "GreedyPath":
+        return 1
     if value == "Beam4Path":
         return 4
     if value == "Beam8Path":
@@ -430,13 +449,15 @@ def analyze_component_ladder(
     report_image_dir: Path = REPORT_IMAGE_DIR,
 ) -> dict[str, str]:
     output_dir = Path(output_dir)
-    current_row_ids = {spec.row_id for spec in default_component_specs()}
+    current_specs = default_component_specs()
+    current_row_ids = {spec.row_id for spec in current_specs}
+    current_order = {spec.row_id: index for index, spec in enumerate(current_specs)}
     if rows is None:
         rows = [row for row in _load_row_summaries(output_dir) if str(row.get("row_id", "")) in current_row_ids]
     else:
         rows = [row for row in rows if str(row.get("row_id", "")) in current_row_ids]
     failures = [] if failures is None else failures
-    rows = sorted(rows, key=lambda row: int(float(row.get("row_number", 0) or 0)))
+    rows = sorted(rows, key=lambda row: current_order.get(str(row.get("row_id", "")), 9999))
     summary_path = output_dir / "summary.csv"
     deltas_path = output_dir / "component_deltas.csv"
     budget_path = output_dir / "budget_accounting.csv"
@@ -451,9 +472,35 @@ def analyze_component_ladder(
     _write_csv(usage_path, [_usage_row(row) for row in rows])
     _write_csv(screening_path, [_screening_row(row) for row in rows])
     _write_csv(failures_path, failures, fieldnames=["row_id", "error"])
+    phase_gain_report_path = report_path.parent / PHASE_GAIN_REPORT_PATH.name
+    phase_gain_image_dir = report_image_dir.parent / PHASE_GAIN_REPORT_IMAGE_DIR.name
+    report_modes = [
+        ReportMode(
+            name="AllRows",
+            title="Experiment 12: Fixed-W8D16 Screening Grid",
+            report_path=report_path,
+            image_dir=report_image_dir,
+            image_relative_dir="./images/experiment_12",
+            scalar_schema_filter=None,
+            include_scalar_comparison=True,
+            expected_row_count=len(current_specs),
+        ),
+        ReportMode(
+            name="PhaseAndResidualGainOnly",
+            title="Experiment 12: PhaseAndResidualGain Screening Read",
+            report_path=phase_gain_report_path,
+            image_dir=phase_gain_image_dir,
+            image_relative_dir="./images/experiment_12_phase_gain",
+            scalar_schema_filter="PhaseAndResidualGain",
+            include_scalar_comparison=False,
+            expected_row_count=sum(1 for spec in current_specs if spec.scalar_schema == "PhaseAndResidualGain"),
+        ),
+    ]
     if write_report:
-        _write_plots(report_image_dir, rows)
-        _write_report(report_path, rows)
+        for mode in report_modes:
+            mode_rows = _rows_for_report_mode(rows, mode)
+            _write_plots(mode.image_dir, mode_rows, mode)
+            _write_report(mode, mode_rows)
     return {
         "output_dir": str(output_dir),
         "summary": str(summary_path),
@@ -465,6 +512,8 @@ def analyze_component_ladder(
         "failures": str(failures_path),
         "report": str(report_path) if write_report else "",
         "report_image_dir": str(report_image_dir) if write_report else "",
+        "phase_gain_report": str(phase_gain_report_path) if write_report else "",
+        "phase_gain_report_image_dir": str(phase_gain_image_dir) if write_report else "",
     }
 
 
@@ -1199,11 +1248,18 @@ def _usage_summary(encoding: ComponentEncoding, *, widths: list[int]) -> dict[st
     usage["residual_layer_dominant_atom_share_median"] = float(np.median(dominant)) if dominant else 0.0
     usage["residual_layer_usage_entropy_median"] = float(np.median(entropy)) if entropy else 0.0
     no_op_rates = []
+    effective_no_op_rates = []
     for residual_layer, values in enumerate(encoding.residual_layer_indices, start=1):
-        rate = float(np.mean(np.asarray(values, dtype=np.int32) == NO_OP_ATOM_INDEX)) if len(values) else 0.0
+        indices = np.asarray(values, dtype=np.int32)
+        gains = np.asarray(encoding.residual_layer_gains[residual_layer - 1], dtype=np.float32)
+        explicit = indices == NO_OP_ATOM_INDEX
+        effective = explicit | (np.abs(gains) <= EFFECTIVE_NO_OP_GAIN_EPS)
+        rate = float(np.mean(explicit)) if len(indices) else 0.0
         usage[f"residual_layer_{residual_layer}_no_op_usage_rate"] = rate
         no_op_rates.append(rate)
+        effective_no_op_rates.append(float(np.mean(effective)) if len(indices) else 0.0)
     usage["residual_layer_no_op_usage_rate_median"] = float(np.median(no_op_rates)) if no_op_rates else 0.0
+    usage["residual_layer_effective_no_op_usage_rate_median"] = float(np.median(effective_no_op_rates)) if effective_no_op_rates else 0.0
     return usage
 
 
@@ -1320,6 +1376,7 @@ def _usage_row(row: dict[str, Any]) -> dict[str, Any]:
         "residual_layer_dominant_atom_share_median",
         "residual_layer_usage_entropy_median",
         "residual_layer_no_op_usage_rate_median",
+        "residual_layer_effective_no_op_usage_rate_median",
         "duplicate_atom_rate",
         "validation_overshoot_rate_before_final_clip",
     ]
@@ -1347,6 +1404,7 @@ def _screening_row(row: dict[str, Any]) -> dict[str, Any]:
         "oracle_construction_time",
         "validation_encoding_time",
         "residual_layer_no_op_usage_rate_median",
+        "residual_layer_effective_no_op_usage_rate_median",
         "residual_layer_usage_entropy_median",
         "duplicate_atom_rate",
         "validation_overshoot_rate_before_final_clip",
@@ -1354,7 +1412,7 @@ def _screening_row(row: dict[str, Any]) -> dict[str, Any]:
     return {key: row.get(key, "") for key in keys}
 
 
-def _write_plots(image_dir: Path, rows: list[dict[str, Any]]) -> None:
+def _write_plots(image_dir: Path, rows: list[dict[str, Any]], mode: ReportMode) -> None:
     try:
         import matplotlib
 
@@ -1368,7 +1426,8 @@ def _write_plots(image_dir: Path, rows: list[dict[str, Any]]) -> None:
         return
     _bar_plot(image_dir / "experiment12_validation_p95_by_row.png", ordered, "validation_p95_rmse", "validation P95 RMSE", "Experiment 12 validation P95 by row", plt)
     _bar_plot(image_dir / "experiment12_validation_median_by_row.png", ordered, "validation_median_rmse", "validation median RMSE", "Experiment 12 validation median by row", plt)
-    _delta_plot(image_dir / "experiment12_delta_vs_indices_only.png", ordered, "x12_c0_indices_only", "validation_p95_rmse", "P95 RMSE delta vs indices-only baseline", "Experiment 12 P95 delta vs indices-only", plt)
+    if mode.include_scalar_comparison:
+        _delta_plot(image_dir / "experiment12_delta_vs_indices_only.png", ordered, "x12_screen_construction_policy_BestOverallRepair_IndicesOnly", "validation_p95_rmse", "P95 RMSE delta vs indices-only baseline", "Experiment 12 P95 delta vs indices-only", plt)
     _scatter_plot(image_dir / "experiment12_p95_vs_head_outputs.png", ordered, "head_outputs_actual", "validation_p95_rmse", "model prediction head outputs", "validation P95 RMSE", "Experiment 12 P95 vs model prediction head budget", plt)
     _bar_plot(image_dir / "experiment12_scalar_usage.png", ordered, "residual_gain_abs_p95", "residual gain abs P95", "Experiment 12 residual gain usage", plt)
     _bar_plot(image_dir / "experiment12_atom_usage.png", ordered, "residual_layer_dead_atom_rate_median", "median residual-layer dead atom rate", "Experiment 12 atom usage", plt)
@@ -1376,40 +1435,27 @@ def _write_plots(image_dir: Path, rows: list[dict[str, Any]]) -> None:
     for variable in _screening_variables():
         group = [row for row in rows if row.get("screening_variable") == variable]
         if group:
-            _variable_panel_plot(
-                image_dir / f"experiment12_{variable}_co_primary.png",
+            _variable_family_plot(
+                image_dir / f"experiment12_{variable}_family.png",
                 group,
                 variable,
-                [
-                    ("validation_median_rmse", "median RMSE", "lower better"),
-                    ("validation_strict_perfect_lfo_rate", "strict perfect rate", "higher better"),
-                    ("validation_p95_rmse", "P95 RMSE", "lower better"),
-                    ("validation_node_max_error_p95", "node max P95", "lower better"),
-                ],
-                f"Experiment 12 {variable} co-primary metrics",
-                plt,
-            )
-            _variable_panel_plot(
-                image_dir / f"experiment12_{variable}_diagnostics.png",
-                group,
-                variable,
-                [
-                    ("oracle_construction_time", "construction seconds", "lower faster"),
-                    ("validation_encoding_time", "validation encoding seconds", "lower faster"),
-                    ("residual_layer_no_op_usage_rate_median", "median no-op usage", "diagnostic"),
-                    ("validation_overshoot_rate_before_final_clip", "overshoot rate before final clip", "lower cleaner"),
-                ],
-                f"Experiment 12 {variable} runtime and diagnostics",
+                mode,
                 plt,
             )
 
 
-def _write_report(report_path: Path, rows: list[dict[str, Any]]) -> None:
-    report_path.parent.mkdir(parents=True, exist_ok=True)
-    report_path.write_text(_report_text(rows), encoding="utf-8")
+def _write_report(mode: ReportMode, rows: list[dict[str, Any]]) -> None:
+    mode.report_path.parent.mkdir(parents=True, exist_ok=True)
+    mode.report_path.write_text(_report_text(rows, mode), encoding="utf-8")
 
 
-def _report_text(rows: list[dict[str, Any]]) -> str:
+def _rows_for_report_mode(rows: list[dict[str, Any]], mode: ReportMode) -> list[dict[str, Any]]:
+    if mode.scalar_schema_filter is None:
+        return list(rows)
+    return [row for row in rows if row.get("scalar_schema") == mode.scalar_schema_filter]
+
+
+def _report_text(rows: list[dict[str, Any]], mode: ReportMode) -> str:
     default_indices = _report_row(rows, "construction_policy", "BestOverallRepair", "IndicesOnly")
     default_phase_gain = _report_row(rows, "construction_policy", "BestOverallRepair", "PhaseAndResidualGain")
     common_case = _report_row(rows, "construction_policy", "CommonCaseRepair", "PhaseAndResidualGain")
@@ -1419,11 +1465,11 @@ def _report_text(rows: list[dict[str, Any]]) -> str:
     beam4 = _report_row(rows, "path_search_policy", "Beam4Path", "PhaseAndResidualGain")
     beam8 = _report_row(rows, "path_search_policy", "Beam8Path", "PhaseAndResidualGain")
     lines = [
-        "# Experiment 12: Fixed-W8D16 Screening Grid",
+        f"# {mode.title}",
         "",
         "## Main Findings",
         "",
-        f"The main result is that `PhaseAndResidualGain` is the dominant quality unlock for fixed `W=8,D=16`. Under the default construction policy, median RMSE moves from `{_metric(default_indices, 'validation_median_rmse')}` to `{_metric(default_phase_gain, 'validation_median_rmse')}`, validation P95 moves from `{_metric(default_indices, 'validation_p95_rmse')}` to `{_metric(default_phase_gain, 'validation_p95_rmse')}`, and node-max P95 moves from `{_metric(default_indices, 'validation_node_max_error_p95')}` to `{_metric(default_phase_gain, 'validation_node_max_error_p95')}`. That gain costs model prediction head budget: `IndicesOnly` uses `160` heads, while `PhaseAndResidualGain` uses `193`.",
+        _main_scalar_finding(default_indices, default_phase_gain, mode),
         "",
         f"Construction policy is the most important process-like variable in the run. `CommonCaseRepair` is the median and strict-perfect outlier: with `PhaseAndResidualGain`, it reaches median RMSE `{_metric(common_case, 'validation_median_rmse')}` and strict perfect-LFO rate `{_metric(common_case, 'validation_strict_perfect_lfo_rate')}`, but its P95 is `{_metric(common_case, 'validation_p95_rmse')}`. `FinishRepairRescue` is the cleaner balanced construction candidate: median `{_metric(finish_rescue, 'validation_median_rmse')}`, strict perfect rate `{_metric(finish_rescue, 'validation_strict_perfect_lfo_rate')}`, P95 `{_metric(finish_rescue, 'validation_p95_rmse')}`, and node-max P95 `{_metric(finish_rescue, 'validation_node_max_error_p95')}`.",
         "",
@@ -1431,23 +1477,27 @@ def _report_text(rows: list[dict[str, Any]]) -> str:
         "",
         "`no_damage_policy` and duplicate suppression are mostly flat. They do not move quality enough to justify treating them as primary Experiment 13 axes unless the grid has spare room. Duplicate suppression is especially weak here: quality is identical to the default row while construction time is higher.",
         "",
-        f"The run contains `{len(rows)}` rows. Every row keeps `W=8`, `D=16`, `control_point_count=97`, flat-categorical per-residual-layer addressing, and one required `NoOpAtom` per residual layer. This is still a screening run, not an automatic winner selection: median RMSE, strict perfect-LFO rate, P95 RMSE, and node-max P95 disagree in meaningful ways.",
+        f"The report contains `{len(rows)}` rows from the current `{mode.expected_row_count}`-row `{mode.name}` view. Every row keeps `W=8`, `D=16`, `control_point_count=97`, flat-categorical per-residual-layer addressing, and one required `NoOpAtom` per residual layer. This is still a screening read, not an automatic winner selection: median RMSE, strict perfect-LFO rate, P95 RMSE, and node-max P95 disagree in meaningful ways.",
         "",
         "## Why This Happens",
         "",
         "The scalar result is expected. Residual atoms need phase and scale invariance: a useful residual shape may be shifted in cycle phase or appear at a different amplitude. `IndicesOnly` can only choose an atom slot, so it often needs later layers to compensate for a phase or amplitude mismatch. `PhaseAndResidualGain` gives the decoder the missing alignment degrees of freedom directly.",
         "",
-        "`NoOpAtom` changes how atom usage should be read. High no-op usage can mean a layer has stopped doing useful repair, but it is also the safety valve that prevents a residual layer from damaging an already-good reconstruction. The no-op atom is therefore not dead capacity in the usual sense; it is a required stopping action inside the residual ladder.",
+        "`NoOpAtom` changes how atom usage should be read. Explicit no-op handling appears correctly applied in the encoder: atom index `0` keeps the prefix unchanged and resets phase/gain to `0`. The apparent no-op collapse under `PhaseAndResidualGain` is probably not a broken no-op path. An active atom can receive a near-zero optimized gain, which behaves like an implicit no-op while not counting as `NoOpAtom`. For that reason the report now tracks both explicit no-op usage and effective no-op usage, where effective no-op means explicit no-op or `abs(gain) <= 1e-4`.",
         "",
         "The construction-policy split is a finish-vs-repair tradeoff. `CommonCaseRepair` spends atoms on residuals that many LFOs share, so it strongly improves the median and creates many exact reconstructions. It leaves some hard cases under-repaired, which is why its P95 stays high. `FinishRepairRescue` mixes finishing behavior with broader repair and later hard-case rescue, so it gives up some perfect-rate upside for a much better tail.",
         "",
+        "`utility_candidate_budget` is an offline construction knob. Each residual layer needs seven active atoms plus the required no-op. For each active atom slot, the constructor does not score every possible residual in the corpus as a candidate atom. `CandidateBudgetN` is the number of candidate residual shapes it pulls into that scoring round before choosing the next atom. It changes oracle construction work and atom quality; it is not model prediction head budget and does not change deployed runtime outputs.",
+        "",
         "Layer clipping helps because residual additions can overshoot the legal LFO y range before the final decoder clip. Hard clipping after each layer can stop overshoot from propagating through later residual choices. This is a decoder/free policy: it changes deterministic reconstruction behavior and adds zero model prediction head outputs. It should not be confused with oracle/offline construction work or with deployed runtime inputs.",
+        "",
+        "Soft clipping is different from hard clipping because the sigmoid-style transform is not identity-preserving inside the valid range. It slightly compresses values even when they were already good, which is hostile to perfect reconstruction. That explains why `LayerSoftClip0To1` and `LayerSoftClipNeg0p1To1p1` show high no-op/dead-usage behavior and poor perfect reconstruction despite reducing boundary violations.",
         "",
         "## Experiment 13 Candidate Read",
         "",
         "This section is manual selection guidance, not an automatic ranking. The right Experiment 13 grid should preserve candidates that win different co-primary metrics.",
         "",
-        "- `path_search_policy`: keep both `Beam4Path` and `Beam8Path` unless grid size must shrink. `Beam8Path` is modestly better on P95 (`" + _metric(beam8, "validation_p95_rmse") + "` vs `" + _metric(beam4, "validation_p95_rmse") + "`) but costs more encoding time.",
+        "- `path_search_policy`: keep `GreedyPath` as the no-beam control, then keep both `Beam4Path` and `Beam8Path` unless grid size must shrink. `Beam8Path` is modestly better on P95 (`" + _metric(beam8, "validation_p95_rmse") + "` vs `" + _metric(beam4, "validation_p95_rmse") + "`) but costs more encoding time.",
         "- `construction_policy`: shortlist `FinishRepairRescue`, `CommonCaseRepair`, and `FamilyBalancedRepair` or `ShapeClusterRepair`. `FinishRepairRescue` is the balanced choice; `CommonCaseRepair` is the median/perfect-rate stress test.",
         "- `utility_candidate_budget`: shortlist `CandidateBudget48`, `CandidateBudget24`, and `CandidateBudget12`. `CandidateBudget8` is cheap, but under `PhaseAndResidualGain` it is less compelling on tail quality.",
         "- `layer_normalization_policy`: shortlist `LayerClip0To1`, `LayerCenterPreserveClip`, and `LayerClipNeg0p1To1p1`. Treat soft clips, `BoundedResidualStep`, and `OvershootPenaltyNoClip` as weak unless a later run gives them a different role.",
@@ -1456,58 +1506,53 @@ def _report_text(rows: list[dict[str, Any]]) -> str:
         "- `duplicate_suppression_policy`: keep both only if Experiment 13 budget allows. Current quality metrics are identical, while duplicate suppression costs more construction time.",
         "",
     ]
-    lines.extend(_independent_variable_chapters())
+    lines.extend(_independent_variable_chapters(rows, mode))
     lines.extend(
         [
         "## Global Plot Notes",
         "",
-        "Lower is better for validation P95, validation median, max-point error, overshoot, and runtime. Higher is better for strict perfect-LFO rate.",
+        "Lower is better for validation P95, validation median, max-point error, overshoot, and runtime. Higher is better for strict perfect-LFO rate. In family plots, bars marked with `// value` are clipped outliers: the visible axis is capped so the rest of the family remains readable, and the annotation gives the true value.",
         "",
         "### Validation P95 By Row",
         "",
-        "![Validation P95](./images/experiment_12/experiment12_validation_p95_by_row.png)",
+        f"![Validation P95]({mode.image_relative_dir}/experiment12_validation_p95_by_row.png)",
         "",
-        "The x-axis is the screened row; the y-axis is validation P95 RMSE, where lower is better. The visible split is that most `PhaseAndResidualGain` rows sit far below their `IndicesOnly` partners. The best rows are mostly layer-normalization and balanced-construction variants, which supports carrying clipping and construction-policy candidates into Experiment 13.",
-        "",
-        "### P95 Delta Vs Indices-Only Baseline",
-        "",
-        "![P95 delta vs indices-only](./images/experiment_12/experiment12_delta_vs_indices_only.png)",
-        "",
-        "The x-axis is the screened row; the y-axis is P95 RMSE minus the default `IndicesOnly` baseline, so negative is better. Almost every row improves on the baseline, which says the fixed `W8D16` contract has enough room for free process improvements. The few positive bars are the warning cases: finish-only construction can make the tail worse even when it is trying to complete more LFOs.",
+        _global_p95_note(mode),
         "",
         "### Validation Median By Row",
         "",
-        "![Validation median](./images/experiment_12/experiment12_validation_median_by_row.png)",
+        f"![Validation median]({mode.image_relative_dir}/experiment12_validation_median_by_row.png)",
         "",
         "The x-axis is the screened row; the y-axis is validation median RMSE, where lower is better. The plot has a small cluster near zero plus a broader band of ordinary rows. `CommonCaseRepair` creates the clearest near-zero median bar, while finish-only and soft-clip rows remain visibly high. This is why median remains co-primary instead of being folded into P95.",
         "",
         "### P95 Vs Model Prediction Head Budget",
         "",
-        "![P95 vs head outputs](./images/experiment_12/experiment12_p95_vs_head_outputs.png)",
+        f"![P95 vs head outputs]({mode.image_relative_dir}/experiment12_p95_vs_head_outputs.png)",
         "",
-        "The x-axis is deployed model prediction head budget; the y-axis is validation P95 RMSE. The plot should be read as two vertical clusters, not as individual labels: `160`-head `IndicesOnly` rows and `193`-head `PhaseAndResidualGain` rows. Most of the best tail rows are in the `193`-head cluster, but the vertical spread inside each cluster proves that process and decoder policies matter even when head budget is fixed.",
+        _head_budget_note(mode),
         "",
         "### Residual Gain Usage",
         "",
-        "![Scalar usage](./images/experiment_12/experiment12_scalar_usage.png)",
+        f"![Scalar usage]({mode.image_relative_dir}/experiment12_scalar_usage.png)",
         "",
         "The x-axis is the screened row; the y-axis is residual-gain absolute P95. Higher is not automatically better here: it means the optimized residual scalar is being used more strongly. Most `PhaseAndResidualGain` rows form a moderate band, while a few construction/normalization rows spike close to the gain bounds. Those spikes are diagnostics for aggressive correction or overshoot compensation, not quality wins by themselves.",
         "",
         "### Atom Usage",
         "",
-        "![Atom usage](./images/experiment_12/experiment12_atom_usage.png)",
+        f"![Atom usage]({mode.image_relative_dir}/experiment12_atom_usage.png)",
         "",
         "The x-axis is the screened row; the y-axis is median residual-layer dead-atom rate. Lower means more dictionary slots are used, but this is diagnostic rather than a direct objective. The tallest spikes line up with policies that collapse much of the residual ladder into no-op or unused active atoms, especially finish-heavy and soft/bounded normalization variants. That pattern helps explain why some policies look safe but do not repair the tail well.",
         "",
         "### Runtime",
         "",
-        "![Runtime](./images/experiment_12/experiment12_runtime_by_row.png)",
+        f"![Runtime]({mode.image_relative_dir}/experiment12_runtime_by_row.png)",
         "",
         "The x-axis is the screened row; the y-axis is row elapsed seconds, where lower is faster. Most rows sit in a broad middle band, but a few construction-heavy rows stand out as clear runtime outliers. This is oracle construction and encoding runtime on the current implementation, not deployed model runtime. It matters for experiment velocity and for sizing Experiment 13, but not for the model prediction head budget.",
         "",
         "## Grouped Evidence Tables",
         "",
-        "Co-primary metrics: `validation_median_rmse`, `validation_strict_perfect_lfo_rate`, `validation_p95_rmse`, and `validation_node_max_error_p95`. The tables are grouped by screened variable and show both scalar contexts side by side.",
+        "Co-primary metrics: `validation_median_rmse`, `validation_strict_perfect_lfo_rate`, `validation_p95_rmse`, and `validation_node_max_error_p95`. The tables are grouped by screened variable."
+        + (" Both scalar contexts are shown side by side." if mode.include_scalar_comparison else " This report shows only `PhaseAndResidualGain` rows."),
         "",
         ]
     )
@@ -1523,7 +1568,7 @@ def _report_text(rows: list[dict[str, Any]]) -> str:
         group = [row for row in rows if row.get("screening_variable") == variable]
         if not group:
             continue
-        lines.extend(_screening_table(variable, group))
+        lines.extend(_screening_table(variable, group, include_scalar_schema=mode.include_scalar_comparison))
     lines.extend(
         [
             "",
@@ -1579,9 +1624,9 @@ def _report_text(rows: list[dict[str, Any]]) -> str:
             r"conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment12_component_ladder.py --mkl-threading-layer SEQUENTIAL --native-threads 1 analyze --run-dir .\research\experiments\lfo_representation\era2\artifacts\experiment_12\component_ladder",
             "```",
             "",
-            f"- Completed rows: `{len(rows)}/72`.",
+            f"- Completed rows in this report view: `{len(rows)}/{mode.expected_row_count}`.",
             "- CSV artifacts live under `research/experiments/lfo_representation/era2/artifacts/experiment_12/component_ladder/`.",
-            "- Report images live under `research/experiments/lfo_representation/era2/reports/images/experiment_12/`.",
+            f"- Report images live under `{mode.image_dir}`.",
             "- XPU acceleration was added for optimized phase/gain lattice alignment during the run work. Treat that as workflow/runtime context only; it is not a model-quality variable.",
             "",
         ]
@@ -1589,18 +1634,20 @@ def _report_text(rows: list[dict[str, Any]]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def _independent_variable_chapters() -> list[str]:
+def _independent_variable_chapters(rows: list[dict[str, Any]], mode: ReportMode) -> list[str]:
     reads = {
-        "path_search_policy": "This family asks whether the decoder should keep a wider path beam while choosing atom sequences. The per-family plots show `Beam8Path` buys a small P95 improvement over `Beam4Path`, but the diagnostic panel shows the expected encoding-time cost. It is worth keeping both only if Experiment 13 can afford the extra rows.",
-        "construction_policy": "This is the most important process-like family. The co-primary plot shows why there is no single automatic winner: `CommonCaseRepair` dominates median and strict-perfect behavior, while `FinishRepairRescue` gives the better balanced tail and node-max result. This family should get real width in Experiment 13.",
-        "utility_candidate_budget": "This family tests how many candidate residuals the offline construction policy considers before choosing a repair atom. The plots show diminishing returns rather than a clean monotonic curve. `CandidateBudget48` is the best quality candidate under `PhaseAndResidualGain`, but `CandidateBudget24` and `CandidateBudget12` remain useful cost controls.",
-        "layer_normalization_policy": "This family tests decoder/free end-of-layer state policies. The metric plot shows hard clipping is genuinely useful for the tail: `LayerClip0To1` and `LayerCenterPreserveClip` are the clean candidates. The diagnostic plot separates those wins from policies that merely suppress overshoot while leaving reconstruction quality worse.",
-        "no_damage_policy": "This family tests whether late layers should be prevented from making an already-good reconstruction worse. The family plots are mostly flat, which means the required `NoOpAtom` already handles much of the safety behavior. Keep this axis small in Experiment 13.",
+        "path_search_policy": "This family asks whether the decoder should keep a wider path beam while choosing atom sequences. `GreedyPath` is the no-beam control; `Beam4Path` and `Beam8Path` are the actual beam candidates. The family plot shows whether beam search is buying quality beyond the control and how much encoding time it costs. It is worth keeping both beam widths only if Experiment 13 can afford the extra rows.",
+        "construction_policy": "This is the most important process-like family. The family plot shows why there is no single automatic winner: `CommonCaseRepair` dominates median and strict-perfect behavior, while `FinishRepairRescue` gives the better balanced tail and node-max result. This family should get real width in Experiment 13.",
+        "utility_candidate_budget": "In plain language, this is how many residual-shape candidates the offline constructor bothers to score before choosing the next atom. The family plot shows diminishing returns rather than a clean monotonic curve. `CandidateBudget48` is the best quality candidate under `PhaseAndResidualGain`, but `CandidateBudget24` and `CandidateBudget12` remain useful cost controls.",
+        "layer_normalization_policy": "This family tests decoder/free end-of-layer state policies. The family plot shows hard clipping is genuinely useful for the tail: `LayerClip0To1` and `LayerCenterPreserveClip` are the clean candidates. The soft-clipping rows are visibly poor because the transform compresses already-valid values instead of preserving exact reconstructions.",
+        "no_damage_policy": "This family tests whether late layers should be prevented from making an already-good reconstruction worse. The family plot is mostly flat, which means the required `NoOpAtom` already handles much of the safety behavior. Keep this axis small in Experiment 13.",
         "atom_preprocessing_policy": "This family tests whether residual atoms should be normalized before being put into layer dictionaries. `EnergyNormalizedAtoms` is a plausible keeper because it is competitive under `PhaseAndResidualGain`; `CenteredEnergyNormalizedAtoms` is riskier because the `IndicesOnly` plot shows a clear degradation.",
         "duplicate_suppression_policy": "This family tests whether phase/scale-near-duplicate atoms should be removed during construction. The quality plot is essentially unchanged, while the diagnostic plot shows extra construction cost. Keep both only if Experiment 13 has room; otherwise this is a lower-priority axis.",
     }
     lines = ["## Independent Variable Chapters", ""]
     for variable in _screening_variables():
+        if not any(row.get("screening_variable") == variable for row in rows):
+            continue
         title = _screening_title(variable)
         lines.extend(
             [
@@ -1608,9 +1655,7 @@ def _independent_variable_chapters() -> list[str]:
                 "",
                 reads[variable],
                 "",
-                f"![{title} co-primary metrics](./images/experiment_12/experiment12_{variable}_co_primary.png)",
-                "",
-                f"![{title} runtime and diagnostics](./images/experiment_12/experiment12_{variable}_diagnostics.png)",
+                f"![{title} metrics and diagnostics]({mode.image_relative_dir}/experiment12_{variable}_family.png)",
                 "",
             ]
         )
@@ -1630,6 +1675,35 @@ def _report_row(rows: list[dict[str, Any]], variable: str, value: str, scalar_sc
     )
 
 
+def _main_scalar_finding(default_indices: dict[str, Any] | None, default_phase_gain: dict[str, Any] | None, mode: ReportMode) -> str:
+    if not mode.include_scalar_comparison:
+        return (
+            "This report filters Experiment 12 to the `PhaseAndResidualGain` rows. "
+            "`IndicesOnly` remains useful as a diagnostic baseline in the full report, but it is poor enough that it visually crowds the decision read for Experiment 13. "
+            f"Under the default construction policy, `PhaseAndResidualGain` reaches median RMSE `{_metric(default_phase_gain, 'validation_median_rmse')}`, "
+            f"validation P95 `{_metric(default_phase_gain, 'validation_p95_rmse')}`, and node-max P95 `{_metric(default_phase_gain, 'validation_node_max_error_p95')}` at `193` model prediction head outputs."
+        )
+    return (
+        f"The main result is that `PhaseAndResidualGain` is the dominant quality unlock for fixed `W=8,D=16`. "
+        f"Under the default construction policy, median RMSE moves from `{_metric(default_indices, 'validation_median_rmse')}` to `{_metric(default_phase_gain, 'validation_median_rmse')}`, "
+        f"validation P95 moves from `{_metric(default_indices, 'validation_p95_rmse')}` to `{_metric(default_phase_gain, 'validation_p95_rmse')}`, "
+        f"and node-max P95 moves from `{_metric(default_indices, 'validation_node_max_error_p95')}` to `{_metric(default_phase_gain, 'validation_node_max_error_p95')}`. "
+        "That gain costs model prediction head budget: `IndicesOnly` uses `160` heads, while `PhaseAndResidualGain` uses `193`."
+    )
+
+
+def _global_p95_note(mode: ReportMode) -> str:
+    if mode.include_scalar_comparison:
+        return "The x-axis is the screened row; the y-axis is validation P95 RMSE, where lower is better. The visible split is that most `PhaseAndResidualGain` rows sit far below their `IndicesOnly` partners. The best rows are mostly layer-normalization and balanced-construction variants, which supports carrying clipping and construction-policy candidates into Experiment 13."
+    return "The x-axis is the screened `PhaseAndResidualGain` row; the y-axis is validation P95 RMSE, where lower is better. With the weak `IndicesOnly` rows removed, the important structure is the spread among process variables: hard layer clipping and balanced construction sit at the low end, while finish-only and soft-clipping policies remain visibly weak."
+
+
+def _head_budget_note(mode: ReportMode) -> str:
+    if mode.include_scalar_comparison:
+        return "The x-axis is deployed model prediction head budget; the y-axis is validation P95 RMSE. The plot should be read as two vertical clusters, not as individual labels: `160`-head `IndicesOnly` rows and `193`-head `PhaseAndResidualGain` rows. Most of the best tail rows are in the `193`-head cluster, but the vertical spread inside each cluster proves that process and decoder policies matter even when head budget is fixed."
+    return "The x-axis is deployed model prediction head budget; the y-axis is validation P95 RMSE. All rows in this report use the same `193`-head scalar schema, so the vertical spread is the point: process variables and decoder/free policies still move quality even when model prediction head budget is fixed."
+
+
 def _metric(row: dict[str, Any] | None, key: str) -> str:
     if row is None:
         return "n/a"
@@ -1640,31 +1714,40 @@ def _join_values(values: tuple[str, ...]) -> str:
     return "`, `".join(values)
 
 
-def _screening_table(variable: str, rows: list[dict[str, Any]]) -> list[str]:
+def _screening_table(variable: str, rows: list[dict[str, Any]], *, include_scalar_schema: bool = True) -> list[str]:
+    headers = ["Value"]
+    if include_scalar_schema:
+        headers.append("ScalarSchema")
+    headers.extend(["Median RMSE", "Perfect Rate", "P95 RMSE", "Node Max P95", "Construct s", "Encode s", "NoOp Median", "Effective NoOp", "Overshoot Rate"])
     lines = [
         f"### `{variable}`",
         "",
-        "| Value | ScalarSchema | Median RMSE | Perfect Rate | P95 RMSE | Node Max P95 | Construct s | Encode s | NoOp Median | Overshoot Rate |",
-        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| " + " | ".join(headers) + " |",
+        "|---" + "|---" * (len(headers) - 1) + "|",
     ]
-    ordered = sorted(rows, key=lambda row: (str(row.get("screening_value", "")), str(row.get("scalar_schema", ""))))
+    value_order = _screening_value_order(variable)
+    order_index = {value: index for index, value in enumerate(value_order)}
+    ordered = sorted(rows, key=lambda row: (order_index.get(str(row.get("screening_value", "")), 999), str(row.get("scalar_schema", ""))))
     for row in ordered:
+        cells = [f"`{row.get('screening_value', '')}`"]
+        if include_scalar_schema:
+            cells.append(f"`{row.get('scalar_schema', '')}`")
+        cells.extend(
+            [
+                _fmt(row.get("validation_median_rmse")),
+                _fmt(row.get("validation_strict_perfect_lfo_rate")),
+                _fmt(row.get("validation_p95_rmse")),
+                _fmt(row.get("validation_node_max_error_p95")),
+                _fmt(row.get("oracle_construction_time")),
+                _fmt(row.get("validation_encoding_time")),
+                _fmt(row.get("residual_layer_no_op_usage_rate_median")),
+                _fmt(row.get("residual_layer_effective_no_op_usage_rate_median")),
+                _fmt(row.get("validation_overshoot_rate_before_final_clip")),
+            ]
+        )
         lines.append(
             "| "
-            + " | ".join(
-                [
-                    f"`{row.get('screening_value', '')}`",
-                    f"`{row.get('scalar_schema', '')}`",
-                    _fmt(row.get("validation_median_rmse")),
-                    _fmt(row.get("validation_strict_perfect_lfo_rate")),
-                    _fmt(row.get("validation_p95_rmse")),
-                    _fmt(row.get("validation_node_max_error_p95")),
-                    _fmt(row.get("oracle_construction_time")),
-                    _fmt(row.get("validation_encoding_time")),
-                    _fmt(row.get("residual_layer_no_op_usage_rate_median")),
-                    _fmt(row.get("validation_overshoot_rate_before_final_clip")),
-                ]
-            )
+            + " | ".join(cells)
             + " |"
         )
     lines.append("")
@@ -1686,9 +1769,32 @@ def _screening_variables() -> list[str]:
 def _screening_value_order(variable: str) -> list[str]:
     values_by_variable = {
         "path_search_policy": PATH_SEARCH_POLICY_VALUES,
-        "construction_policy": CONSTRUCTION_POLICY_VALUES,
+        "construction_policy": (
+            "BestOverallRepair",
+            "CommonCaseRepair",
+            "HardCaseRepair",
+            "FamilyBalancedRepair",
+            "ShapeClusterRepair",
+            "FinishMoreLfos",
+            "FinishAndRepair",
+            "AlternatingFinishRepair",
+            "FinishRepairRescue",
+            "MetricBalancedRepair",
+            "TuneAtomsAfterUse",
+            "PathAwareRepair",
+        ),
         "utility_candidate_budget": UTILITY_CANDIDATE_BUDGET_VALUES,
-        "layer_normalization_policy": LAYER_NORMALIZATION_POLICY_VALUES,
+        "layer_normalization_policy": (
+            "FinalClipOnly",
+            "LayerClip0To1",
+            "LayerClipNeg0p1To1p1",
+            "LayerClipNeg1To1",
+            "LayerCenterPreserveClip",
+            "LayerSoftClip0To1",
+            "LayerSoftClipNeg0p1To1p1",
+            "OvershootPenaltyNoClip",
+            "BoundedResidualStep",
+        ),
         "no_damage_policy": NO_DAMAGE_POLICY_VALUES,
         "atom_preprocessing_policy": ATOM_PREPROCESSING_POLICY_VALUES,
         "duplicate_suppression_policy": DUPLICATE_SUPPRESSION_POLICY_VALUES,
@@ -1735,6 +1841,191 @@ def _variable_panel_plot(
     figure.tight_layout(rect=(0, 0, 1, 0.96))
     figure.savefig(path, dpi=150)
     plt.close(figure)
+
+
+def _variable_family_plot(path: Path, rows: list[dict[str, Any]], variable: str, mode: ReportMode, plt: Any) -> None:
+    ordered = _ordered_family_rows(rows, variable, mode)
+    if not ordered:
+        return
+    x = np.arange(len(ordered), dtype=np.float32)
+    values = [str(row.get("screening_value", "")) for row in ordered]
+    colors_by_value = _candidate_colors(_screening_value_order(variable), plt)
+    colors = [colors_by_value.get(value, "#4C78A8") for value in values]
+    labels = [_wrapped_plot_label(row, mode) for row in ordered]
+    figure_width = max(13.0, 1.05 * len(ordered))
+    figure, axes = plt.subplots(4, 1, figsize=(figure_width, 8.6), squeeze=False)
+    figure.suptitle(f"Experiment 12 {variable}: metrics and diagnostics", fontsize=14)
+    top_axis = axes[0][0]
+    top_metrics = [
+        (top_axis, "validation_median_rmse", "Median RMSE", x - 0.28, 0.26, 0.88, None, None, False),
+        (top_axis.twinx(), "validation_p95_rmse", "P95 RMSE", x, 0.26, 0.42, "//", "#111827", False),
+    ]
+    node_axis = top_axis.twinx()
+    node_axis.spines["right"].set_position(("outward", 48))
+    top_metrics.append((node_axis, "validation_node_max_error_p95", "Node max P95", x + 0.28, 0.26, 0.28, "xx", "#111827", False))
+    top_axis.grid(axis="y", alpha=0.22)
+    for metric_axis, metric_key, metric_label, positions, bar_width, alpha, hatch, edgecolor, invert_axis in top_metrics:
+        values_for_metric = [_float(row.get(metric_key)) or 0.0 for row in ordered]
+        plotted_values, cap = _clip_outlier_values(values_for_metric)
+        metric_axis.bar(
+            positions,
+            plotted_values,
+            width=bar_width,
+            color=colors,
+            alpha=alpha,
+            hatch=hatch,
+            edgecolor=edgecolor,
+            linewidth=0.35 if edgecolor else 0.0,
+        )
+        metric_axis.set_ylabel(metric_label)
+        if invert_axis:
+            if cap is not None:
+                metric_axis.set_ylim(cap, 0.0)
+            else:
+                metric_axis.invert_yaxis()
+        elif cap is not None:
+            metric_axis.set_ylim(0.0, cap)
+        if cap is not None:
+            _annotate_clipped_bars(metric_axis, positions, values_for_metric, plotted_values, cap, inverted=invert_axis)
+
+    strict_axis = axes[1][0]
+    strict_values = [_float(row.get("validation_strict_perfect_lfo_rate")) or 0.0 for row in ordered]
+    strict_plot, strict_cap = _clip_outlier_values(strict_values)
+    strict_axis.bar(x, strict_plot, width=0.56, color=colors, alpha=0.88)
+    strict_axis.set_ylabel("Strict perfect rate")
+    strict_axis.grid(axis="y", alpha=0.22)
+    if strict_cap is not None:
+        strict_axis.set_ylim(0.0, strict_cap)
+        _annotate_clipped_bars(strict_axis, x, strict_values, strict_plot, strict_cap, inverted=False)
+
+    panels = [
+        ("oracle_construction_time", "validation_encoding_time", "Construction seconds", "Validation encoding seconds", False),
+        ("residual_layer_no_op_usage_rate_median", "validation_overshoot_rate_before_final_clip", "Explicit no-op usage", "Overshoot rate", False),
+    ]
+    for axis, (left_key, right_key, left_label, right_label, invert_right) in zip(axes[2:].reshape(-1), panels):
+        left = [_float(row.get(left_key)) or 0.0 for row in ordered]
+        right = [_float(row.get(right_key)) or 0.0 for row in ordered]
+        left_plot, left_cap = _clip_outlier_values(left)
+        right_plot, right_cap = _clip_outlier_values(right)
+        bar_width = 0.38
+        axis.bar(x - bar_width / 2.0, left_plot, width=bar_width, color=colors, alpha=0.88, label=left_label)
+        axis.set_ylabel(left_label)
+        axis.grid(axis="y", alpha=0.22)
+        if left_cap is not None:
+            axis.set_ylim(0.0, left_cap)
+            _annotate_clipped_bars(axis, x - bar_width / 2.0, left, left_plot, left_cap, inverted=False)
+        right_axis = axis.twinx()
+        right_axis.bar(
+            x + bar_width / 2.0,
+            right_plot,
+            width=bar_width,
+            color=colors,
+            alpha=0.42,
+            hatch="//",
+            edgecolor="#111827",
+            linewidth=0.35,
+            label=right_label,
+        )
+        right_axis.set_ylabel(right_label)
+        if invert_right:
+            if right_cap is not None:
+                right_axis.set_ylim(right_cap, 0.0)
+            else:
+                right_axis.invert_yaxis()
+        elif right_cap is not None:
+            right_axis.set_ylim(0.0, right_cap)
+        if right_cap is not None:
+            _annotate_clipped_bars(right_axis, x + bar_width / 2.0, right, right_plot, right_cap, inverted=invert_right)
+    axes[0][0].set_xticks(x)
+    axes[0][0].set_xticklabels(labels, rotation=0, ha="center", fontsize=8)
+    axes[0][0].tick_params(axis="x", labeltop=True, labelbottom=False, pad=2)
+    axes[-1][0].set_xticks(x)
+    axes[-1][0].set_xticklabels(labels, rotation=0, ha="center", fontsize=8)
+    for axis in axes[1:-1].reshape(-1):
+        axis.set_xticks(x)
+        axis.set_xticklabels([])
+    figure.tight_layout(rect=(0, 0, 1, 0.965))
+    figure.savefig(path, dpi=150)
+    plt.close(figure)
+
+
+def _clip_outlier_values(values: list[float]) -> tuple[list[float], float | None]:
+    finite = sorted(float(value) for value in values if np.isfinite(value))
+    if len(finite) < 3:
+        return values, None
+    largest = finite[-1]
+    second = finite[-2]
+    median = float(np.median(finite))
+    if largest <= 0.0 or second <= 0.0:
+        return values, None
+    if largest < max(second * 2.2, median * 3.0):
+        return values, None
+    cap = max(second * 1.25, median * 1.5, 0.05 if largest <= 1.0 else 0.0)
+    if cap >= largest:
+        return values, None
+    clipped = [min(float(value), cap) if np.isfinite(value) else value for value in values]
+    return clipped, cap
+
+
+def _annotate_clipped_bars(axis: Any, positions: np.ndarray, values: list[float], plotted: list[float], cap: float, *, inverted: bool) -> None:
+    for xpos, actual, visible in zip(positions, values, plotted):
+        if not np.isfinite(actual) or actual <= visible:
+            continue
+        y_text = cap * (0.94 if not inverted else 0.08)
+        va = "top" if not inverted else "bottom"
+        axis.text(float(xpos), y_text, f"// {_fmt(actual)}", ha="center", va=va, fontsize=7, rotation=90)
+
+
+def _ordered_family_rows(rows: list[dict[str, Any]], variable: str, mode: ReportMode) -> list[dict[str, Any]]:
+    value_order = _screening_value_order(variable)
+    value_index = {value: index for index, value in enumerate(value_order)}
+    schema_order = {"IndicesOnly": 0, "PhaseAndResidualGain": 1}
+    ordered = sorted(
+        rows,
+        key=lambda row: (
+            value_index.get(str(row.get("screening_value", "")), 999),
+            schema_order.get(str(row.get("scalar_schema", "")), 99),
+        ),
+    )
+    if mode.scalar_schema_filter is None:
+        return ordered
+    return [row for row in ordered if row.get("scalar_schema") == mode.scalar_schema_filter]
+
+
+def _candidate_colors(values: list[str], plt: Any) -> dict[str, str]:
+    palette = list(plt.get_cmap("tab20").colors)
+    return {value: palette[index % len(palette)] for index, value in enumerate(values)}
+
+
+def _wrapped_plot_label(row: dict[str, Any], mode: ReportMode) -> str:
+    value = _wrap_pascal_label(str(row.get("screening_value", "")))
+    if not mode.include_scalar_comparison:
+        return value
+    schema = "Indices\nOnly" if row.get("scalar_schema") == "IndicesOnly" else "Phase+\nGain"
+    return f"{value}\n{schema}"
+
+
+def _wrap_pascal_label(value: str) -> str:
+    if not value:
+        return ""
+    budget = re.fullmatch(r"CandidateBudget(\d+)", value)
+    if budget:
+        return f"Budget\n{budget.group(1)}"
+    parts = re.findall(r"[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)|\d+p?\d*", value)
+    if not parts:
+        return value
+    lines = []
+    current = ""
+    for part in parts:
+        candidate = part if not current else f"{current} {part}"
+        if len(candidate) > 12 and current:
+            lines.append(current)
+            current = part
+        else:
+            current = candidate
+    if current:
+        lines.append(current)
+    return "\n".join(lines)
 
 
 def _bar_plot(path: Path, rows: list[dict[str, Any]], metric: str, ylabel: str, title: str, plt: Any) -> None:
