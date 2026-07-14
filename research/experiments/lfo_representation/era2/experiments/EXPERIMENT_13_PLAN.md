@@ -18,6 +18,19 @@ common-case quality, strict-perfect coverage, and tail quality. Experiment 13
 therefore treats construction strategy as the primary axis rather than crossing
 all Experiment 12 process variables equally.
 
+Experiment 13 must run in two ordered phases:
+
+1. **Experiment 13A — unfiltered construction and calibration.** Run the 90
+   `AllResiduals` rows. Candidate eligibility thresholds are observational only
+   and must not change construction.
+2. **Experiment 13B — filtered construction.** Select one global eligibility
+   epsilon from completed 13A training artifacts, freeze it, and run the 90 paired
+   `UnresolvedOnly` rows.
+
+**Experiment 13B must not begin until Experiment 13A has completed and written a
+valid threshold-selection artifact.** The paired phases are sequential, not one
+simultaneous 180-row run.
+
 The fixed runtime contract remains:
 
 ```text
@@ -42,25 +55,40 @@ selects one atom from that layer. The construction order of the seven active
 atoms affects the greedy codebook-building process, but it does not make the
 decoder apply all seven atoms sequentially.
 
-For one residual layer and LFO `i`, let:
+For LFO `i` entering residual layer `d`, let:
 
 ```text
-r_i = target_i - prefix_i
+r_i,d = target_i - prefix_i,d-1
 ```
 
-Let `A_s = {a_0, ..., a_s}` be the partial codebook after slot `s`, where
-`a_0 = 0` is the no-op atom. Let `S_phi(a)` circularly phase-shift atom `a` by
+Let `A_d,s = {a_d,0, ..., a_d,s}` be the partial codebook after slot `s`, where
+`a_d,0 = 0` is the no-op atom. Let `S_phi(a)` circularly phase-shift atom `a` by
 `phi`. The current best layer reconstruction error is:
 
 ```text
-E_i(A_s) = min over a in A_s, phi, g of
-           max_abs(r_i - g * S_phi(a))
+E_i,d,s = min over a in A_d,s, phi, g of
+          max_abs(r_i,d - g * S_phi(a))
 ```
 
 The implementation may also retain the corresponding RMSE or MSE for utility
-scoring, but epsilon membership must use complete-curve maximum absolute error.
-Later atom slots should focus on residual patterns that remain poorly covered by
-the partial codebook.
+scoring, but eligibility membership and finish membership must use
+complete-curve maximum absolute error. Later atom slots should focus on residual
+patterns that remain poorly covered by the partial codebook.
+
+Experiment 13 uses two deliberately separate thresholds:
+
+```text
+finish_threshold
+    fixed construction threshold used by finish-oriented atom objectives
+
+eligibility_epsilon
+    threshold selected from Experiment 13A and used only by the Experiment 13B
+    UnresolvedOnly population mask
+```
+
+Candidate eligibility epsilons must not alter 13A construction. Separating these
+thresholds avoids making finish-oriented 13A rows depend on the value that 13A is
+supposed to calibrate.
 
 Broad atoms may be synthesized from many residuals. They are not required to
 equal any observed training residual. Repair atoms remain observed residual
@@ -80,7 +108,8 @@ path_search_policy = Beam4Path
 no_damage_policy = NoDamageOff
 atom_preprocessing_policy = RawAtoms
 duplicate_suppression_policy = DuplicateSuppressionOff
-main_epsilon = 0.02
+finish_threshold = 1e-5
+eligibility_epsilon = selected_after_experiment_13a
 ```
 
 The fixed W8D16 prediction-head budget is:
@@ -99,8 +128,8 @@ Experiment 13 should answer:
 1. Do synthesized broad atoms improve reconstruction over atoms copied only from
    observed residuals?
 2. Is an interleaved broad/repair schedule better than a two-phase schedule?
-3. Should construction use all residuals or hard-exclude LFOs already within
-   epsilon?
+3. Does excluding LFOs already within the calibrated eligibility epsilon improve
+   later atom construction?
 4. Which broad prototype family works best: aligned mean, trimmed mean, aligned
    median, cluster mean, dominant direction, or diversity-aware coverage?
 5. Which repair objective pairs best with broad prototypes: global improvement,
@@ -108,7 +137,8 @@ Experiment 13 should answer:
 6. Does `LayerClip0To1` help these strategy families consistently?
 7. Does increasing repair candidate breadth from 24 to 48 still matter once
    broad atoms are synthesized?
-8. How sensitive is unresolved-only construction to the epsilon threshold?
+8. How quickly does unfiltered construction move the training population through
+   candidate eligibility thresholds?
 
 ## Residual Population Policies
 
@@ -126,7 +156,8 @@ policies.
 
 All training residuals remain eligible during atom construction. Policy-specific
 weights may depend on current error, but no residual is hard-excluded because it
-is already within epsilon.
+is already within a candidate eligibility epsilon. In Experiment 13A, every
+candidate eligibility epsilon is observational only.
 
 **Mathematical formulation**
 
@@ -145,20 +176,22 @@ for every residual `i` and active atom slot `s`.
 
 **Technical description**
 
-Only LFOs whose current best reconstruction is outside epsilon remain eligible.
-The mask must be recomputed after every active atom slot because a newly added
-atom can resolve additional LFOs.
+Only LFOs whose current best reconstruction is outside the globally selected
+`eligibility_epsilon` remain eligible. Experiment 13B loads that frozen value
+from the completed Experiment 13A selection artifact. The mask must be
+recomputed after every active atom slot because a newly added atom can resolve
+additional LFOs.
 
 **Mathematical formulation**
 
 ```text
-resolved_i^(s) = E_i(A_s) <= epsilon
-eligible_i^(s) = 1 - resolved_i^(s)
+resolved_i,d,s = E_i,d,s <= eligibility_epsilon
+eligible_i,d,s = 1 - resolved_i,d,s
 ```
 
-The main grid uses `epsilon = 0.02`. If no eligible residuals remain, the
-remaining active atom slots should be filled with no-op atoms and recorded as
-early completion rather than treated as a failure.
+All Experiment 13B rows use the same frozen `eligibility_epsilon`. If no
+eligible residuals remain, the remaining active atom slots should be filled with
+no-op atoms and recorded as early completion rather than treated as a failure.
 
 ## Shared Alignment and Utility Definitions
 
@@ -179,8 +212,11 @@ Delta_i(a) = max(0, L_i^(s) - L_i(a))
 ```
 
 The scalar loss used by a utility policy should be recorded. The default should
-match the Experiment 12 construction loss so comparisons remain grounded. The
-strict perfect test remains `E_i <= epsilon`, independent of that scalar loss.
+match the Experiment 12 construction loss so comparisons remain grounded.
+Eligibility remains a maximum-error test against `eligibility_epsilon`, while
+finish-oriented construction remains a separate maximum-error test against the
+fixed `finish_threshold`. Neither test may be implemented by comparing MSE with
+a squared maximum-error threshold.
 
 ## Reusable Broad-Atom Builders
 
@@ -438,22 +474,25 @@ a* = argmax_{a in C} sum_i eligible_i * w_i * Delta_i(a)
 **Common intuitive description**
 
 > Use the repair slot to push as many almost-correct curves as possible across
-> the epsilon finish line.
+> the fixed strict-finish threshold.
 
 **Technical description**
 
-For every observed residual candidate, count eligible LFOs that are outside
-epsilon before the candidate and within epsilon after adding it to the partial
-codebook. Maximize that newly resolved count first. Break ties with weighted
-total scalar-loss improvement, then deterministic candidate order.
+For every observed residual candidate, count eligible LFOs that are outside the
+fixed `finish_threshold` before the candidate and within it after adding the
+candidate to the partial codebook. Maximize that newly finished count first.
+Break ties with weighted total scalar-loss improvement, then deterministic
+candidate order.
 
-This policy must compute finishing with maximum absolute error, not MSE compared
-with `epsilon^2`.
+This construction objective is identical in 13A and its paired 13B row. It must
+compute finishing with maximum absolute error, not MSE compared with
+`finish_threshold^2`.
 
 **Mathematical formulation**
 
 ```text
-finish_i(a) = 1[E_i(A_s) > epsilon and E_i(A_s union {a}) <= epsilon]
+finish_i(a) = 1[E_i(A_s) > finish_threshold
+                  and E_i(A_s union {a}) <= finish_threshold]
 ```
 
 Choose lexicographically:
@@ -547,9 +586,10 @@ without changing the broad/repair ratio.
 ### Existing Experiment 12 anchors
 
 Keep these observed-residual policies as historical anchors. Their exact
-Experiment 12 implementation semantics should be preserved, except that the
-`UnresolvedOnly` variant applies the dynamic eligibility mask defined above and
-strict finishing must use complete-curve maximum absolute error.
+Experiment 12 role schedules and aggregation semantics should be preserved,
+except that the `UnresolvedOnly` variant applies the dynamic eligibility mask
+defined above and every finish test must be corrected to use complete-curve
+maximum absolute error against the fixed `finish_threshold`.
 
 #### `CommonCaseRepair`
 
@@ -655,13 +695,15 @@ Repair slot: maximize sum_i eligible_i * w_i * Delta_i(a)
 **Common intuitive description**
 
 > Make broad progress, then use concrete repairs to push near-correct curves
-> inside epsilon.
+> inside the fixed strict-finish threshold.
 
 **Technical description**
 
 Broad slots use `BroadMean`. Repair slots use `FinishRepair`. This policy tests
 whether broad prototypes create a large population of almost-solved residuals
-that targeted finishing can convert into strict-perfect reconstructions.
+that targeted finishing can convert into strict-perfect reconstructions. The
+finish objective uses the fixed `finish_threshold`, not the calibrated eligibility
+epsilon.
 
 **Mathematical formulation**
 
@@ -929,7 +971,7 @@ path_search_policy = Beam4Path
 no_damage_policy = NoDamageOff
 atom_preprocessing_policy = RawAtoms
 duplicate_suppression_policy = DuplicateSuppressionOff
-epsilon = 0.02
+finish_threshold = 1e-5
 ```
 
 Crossed axes:
@@ -940,6 +982,20 @@ residual_population_policy = AllResiduals | UnresolvedOnly
 utility_candidate_budget = CandidateBudget24 | CandidateBudget48 | Null
 layer_normalization_policy = FinalClipOnly | LayerClip0To1
 ```
+
+The logical design remains paired across the population-policy axis, but
+execution is ordered:
+
+```text
+Experiment 13A = 90 AllResiduals rows
+Experiment 13B = 90 paired UnresolvedOnly rows
+```
+
+Every pair must share a stable `pair_id`. Paired rows must match on construction
+policy, slot schedule, repair candidate budget, layer normalization, fixed
+settings, seed rules, and `finish_threshold`. They differ only in experiment
+phase, residual-population behavior, and the presence of the frozen
+`eligibility_epsilon` mask.
 
 The 21 policies containing repair slots receive:
 
@@ -1245,7 +1301,9 @@ Experiment 13 does not:
 - add runtime topology;
 - predict the x grid;
 - train the audio-to-patch model;
-- establish that epsilon 0.02 is uniquely correct;
+- establish a perceptually final eligibility epsilon;
+- use validation results to select the eligibility epsilon;
+- allow strategy-, layer-, or slot-specific eligibility epsilons;
 - treat oracle construction time or codebook storage as model prediction-head
   cost.
 
