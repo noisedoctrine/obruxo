@@ -55,20 +55,22 @@ selects one atom from that layer. The construction order of the seven active
 atoms affects the greedy codebook-building process, but it does not make the
 decoder apply all seven atoms sequentially.
 
-For LFO `i` entering residual layer `d`, let:
+For LFO $i$ entering residual layer $d$, let:
 
-```text
-r_i,d = target_i - prefix_i,d-1
-```
+$$
+r_{i,d}=y_i-\hat y_{i,d-1}.
+$$
 
-Let `A_d,s = {a_d,0, ..., a_d,s}` be the partial codebook after slot `s`, where
-`a_d,0 = 0` is the no-op atom. Let `S_phi(a)` circularly phase-shift atom `a` by
-`phi`. The current best layer reconstruction error is:
+Let $A_{d,s}=\{a_{d,0},\ldots,a_{d,s}\}$ be the partial codebook after
+slot $s$, where $a_{d,0}=0$ is the no-op atom. Let $S_\phi(a)$ circularly
+phase-shift atom $a$ by $\phi$. The current best layer reconstruction error is:
 
-```text
-E_i,d,s = min over a in A_d,s, phi, g of
-          max_abs(r_i,d - g * S_phi(a))
-```
+$$
+E_{i,d,s}
+=
+\min_{a\in A_{d,s},\,\phi,\,g}
+\left\|r_{i,d}-gS_\phi(a)\right\|_\infty.
+$$
 
 The implementation may also retain the corresponding RMSE or MSE for utility
 scoring, but eligibility membership and finish membership must use
@@ -88,8 +90,8 @@ eligibility_epsilon
 
 Candidate eligibility epsilons must not alter 13A construction. Separating these
 thresholds avoids making finish-oriented 13A rows depend on the value that 13A is
-supposed to calibrate. In formulas, `tau_finish` denotes the fixed
-`finish_threshold` and `epsilon_star` denotes the selected
+supposed to calibrate. In formulas, $\tau_{\mathrm{finish}}$ denotes the fixed
+`finish_threshold` and $\epsilon^*$ denotes the selected
 `eligibility_epsilon`.
 
 Broad atoms may be synthesized from many residuals. They are not required to
@@ -121,10 +123,9 @@ the report's joint strict-perfect metric.
 
 The fixed W8D16 prediction-head budget is:
 
-```text
-head_outputs = 32 + 16 * 8 + 17 phase_scalars + 16 residual_gain_scalars
-head_outputs = 193
-```
+$$
+H=32+16\cdot8+17+16=193.
+$$
 
 Every main-grid row must preserve this budget.
 
@@ -168,11 +169,11 @@ candidate eligibility epsilon is observational only.
 
 **Mathematical formulation**
 
-```text
-eligible_i^(s) = 1
-```
+$$
+\operatorname{eligible}^{13A}_{i,d,s}=1
+$$
 
-for every residual `i` and active atom slot `s`.
+for every residual $i$, residual layer $d$, and active atom slot $s$.
 
 ### `UnresolvedOnly`
 
@@ -191,10 +192,17 @@ additional LFOs.
 
 **Mathematical formulation**
 
-```text
-resolved_i,d,s = E_i,d,s <= eligibility_epsilon
-eligible_i,d,s = 1 - resolved_i,d,s
-```
+$$
+\operatorname{resolved}^{13B}_{i,d,s}
+=
+\mathbf{1}\!\left[E_{i,d,s}\leq\epsilon^*\right],
+$$
+
+$$
+\operatorname{eligible}^{13B}_{i,d,s}
+=
+1-\operatorname{resolved}^{13B}_{i,d,s}.
+$$
 
 All Experiment 13B rows use the same frozen `eligibility_epsilon`. If no
 eligible residuals remain, the remaining active atom slots should be filled with
@@ -202,21 +210,22 @@ no-op atoms and recorded as early completion rather than treated as a failure.
 
 ## Shared Alignment and Utility Definitions
 
-For an atom proposal `a` and residual `r_i`, define its best fitted phase and
+For an atom proposal $a$ and residual $r_i$, define its best fitted phase and
 gain as:
 
-```text
-(phi_i(a), g_i(a)) = argmin over phi, g of
-                     loss(r_i, g * S_phi(a))
-```
+$$
+(\phi_i(a),g_i(a))
+=
+\arg\min_{\phi,g}
+\ell\!\left(r_i,gS_\phi(a)\right).
+$$
 
-For utility scoring, let:
+For utility scoring, let $L_i^{(s)}$ be the current scalar loss before slot $s$
+and $L_i(a)$ the best scalar loss using proposal $a$. Define:
 
-```text
-L_i^(s) = current scalar loss for residual i before slot s
-L_i(a)  = best scalar loss using proposal a
-Delta_i(a) = max(0, L_i^(s) - L_i(a))
-```
+$$
+\Delta_i(a)=\max\!\left(0,L_i^{(s)}-L_i(a)\right).
+$$
 
 The scalar loss used by a utility policy should be recorded. The default should
 match the Experiment 12 construction loss so comparisons remain grounded.
@@ -249,18 +258,25 @@ seed rule, iteration count, and convergence status.
 
 **Mathematical formulation**
 
-For fixed assignments `(phi_i, g_i)` and nonnegative weights `w_i`, solve:
+For fixed assignments $(\phi_i,g_i)$ and nonnegative weights $w_i$, solve:
 
-```text
-min_a sum_i eligible_i * w_i * ||r_i - g_i S_phi_i(a)||_2^2
-```
+$$
+\min_a
+\sum_i e_iw_i
+\left\|r_i-g_iS_{\phi_i}(a)\right\|_2^2,
+$$
 
-The least-squares update is:
+where $e_i$ is the current eligibility indicator. The least-squares update is:
 
-```text
-a = [sum_i eligible_i * w_i * g_i * S_-phi_i(r_i)]
-    / [sum_i eligible_i * w_i * g_i^2]
-```
+$$
+a
+=
+\frac{
+\sum_i e_iw_ig_iS_{-\phi_i}(r_i)
+}{
+\sum_i e_iw_ig_i^2
+}.
+$$
 
 Then refit `(phi_i, g_i)` against the updated atom and alternate.
 
@@ -283,18 +299,30 @@ at the trimming boundary should be resolved deterministically.
 
 **Mathematical formulation**
 
-Let `T` be the retained set containing the lowest 90% of aligned losses:
+Let $T$ be the retained set containing the lowest 90% of aligned losses:
 
-```text
-T = lowest_90_percent_i loss(r_i, g_i S_phi_i(a))
-```
+$$
+T
+=
+\operatorname{Lowest}_{90\%}
+\left\{
+ i:e_i=1
+ \;\middle|\;
+ \ell\!\left(r_i,g_iS_{\phi_i}(a)\right)
+\right\}.
+$$
 
 Then update:
 
-```text
-a = [sum_{i in T} w_i * g_i * S_-phi_i(r_i)]
-    / [sum_{i in T} w_i * g_i^2]
-```
+$$
+a
+=
+\frac{
+\sum_{i\in T}w_ig_iS_{-\phi_i}(r_i)
+}{
+\sum_{i\in T}w_ig_i^2
+}.
+$$
 
 ### `AlignedMedian`
 
@@ -317,15 +345,20 @@ not amplify noise when residuals are normalized back into prototype space.
 
 Let:
 
-```text
-z_i = S_-phi_i(r_i) / max(|g_i|, gain_floor)
-```
+$$
+z_i
+=
+\frac{S_{-\phi_i}(r_i)}{\max(|g_i|,g_{\min})}.
+$$
 
-For each control point `t`:
+For each control point $t$:
 
-```text
-a[t] = weighted_median_i(z_i[t], weight = eligible_i * w_i)
-```
+$$
+a[t]
+=
+\operatorname{WeightedMedian}_i
+\!\left(z_i[t];\,e_iw_i\right).
+$$
 
 A deterministic global sign convention must be applied before the next
 alignment iteration.
@@ -352,25 +385,32 @@ check internal to this builder.
 
 **Mathematical formulation**
 
-Using phase/gain-invariant distance:
+Using the phase/gain-invariant distance:
 
-```text
-d(r_i, r_j) = min over phi, g ||r_i - g S_phi(r_j)||_2^2
-```
+$$
+d(r_i,r_j)
+=
+\min_{\phi,g}
+\left\|r_i-gS_\phi(r_j)\right\|_2^2,
+$$
 
-partition eligible residuals into clusters `C_1, ..., C_K`. For each cluster,
+partition eligible residuals into clusters $C_1,\ldots,C_K$. For each cluster,
 solve:
 
-```text
-a_k = argmin_a sum_{i in C_k} w_i * min_{phi,g}
-                    ||r_i - g S_phi(a)||_2^2
-```
+$$
+a_k
+=
+\arg\min_a
+\sum_{i\in C_k}w_i
+\min_{\phi,g}
+\left\|r_i-gS_\phi(a)\right\|_2^2.
+$$
 
 Then choose:
 
-```text
-a* = argmax_{a_k} Utility(a_k)
-```
+$$
+a^*=\arg\max_{a_k}\operatorname{Utility}(a_k).
+$$
 
 ### `DominantDirection`
 
@@ -393,17 +433,20 @@ weighted energy and convergence.
 
 **Mathematical formulation**
 
-For canonicalized residuals `z_i = S_-phi_i(r_i)`, form:
+For canonicalized residuals $z_i=S_{-\phi_i}(r_i)$, form:
 
-```text
-C = sum_i eligible_i * w_i * z_i z_i^T
-```
+$$
+C=\sum_i e_iw_i z_i z_i^\top.
+$$
 
 Choose:
 
-```text
-a = argmax_{||a||_2 = 1} a^T C a
-```
+$$
+a
+=
+\arg\max_{\|a\|_2=1}
+a^\top Ca.
+$$
 
 which is the leading eigenvector of `C`. Choose the sign using a deterministic
 rule such as positive correlation with the highest-weight canonical residual.
@@ -431,20 +474,37 @@ be fixed in the plan implementation, not crossed as `utility_candidate_budget`.
 
 Define:
 
-```text
-coverage(a) = sum_i eligible_i * 1[Delta_i(a) >= delta_min]
-improvement(a) = sum_i eligible_i * w_i * Delta_i(a)
-similarity(a, b) = max over phi of
-                   |<a, S_phi(b)>| / (||a||_2 ||b||_2)
-```
+$$
+\operatorname{coverage}(a)
+=
+\sum_i e_i\mathbf{1}\!\left[\Delta_i(a)\geq\delta_{\min}\right],
+$$
 
-For previously selected broad atoms `B`, score:
+$$
+\operatorname{improvement}(a)
+=
+\sum_i e_iw_i\Delta_i(a),
+$$
 
-```text
-score(a) = alpha * coverage(a)
-         + beta  * improvement(a)
-         - lambda * max_{b in B} similarity(a, b)
-```
+and
+
+$$
+\operatorname{similarity}(a,b)
+=
+\max_\phi
+\frac{|\langle a,S_\phi(b)\rangle|}
+{\|a\|_2\|b\|_2}.
+$$
+
+For previously selected broad atoms $B$, score:
+
+$$
+\operatorname{score}(a)
+=
+\alpha\operatorname{coverage}(a)
++\beta\operatorname{improvement}(a)
+-\lambda\max_{b\in B}\operatorname{similarity}(a,b).
+$$
 
 Choose the highest-scoring proposal with deterministic tie-breaking.
 
@@ -470,11 +530,14 @@ shortlisting and final utility evaluation must remain separate and be recorded.
 
 **Mathematical formulation**
 
-For candidate set `C`:
+For candidate set $\mathcal C$:
 
-```text
-a* = argmax_{a in C} sum_i eligible_i * w_i * Delta_i(a)
-```
+$$
+a^*
+=
+\arg\max_{a\in\mathcal C}
+\sum_i e_iw_i\Delta_i(a).
+$$
 
 ### `FinishRepair`
 
@@ -497,19 +560,36 @@ compute finishing with maximum absolute error, not MSE compared with
 
 **Mathematical formulation**
 
-```text
-finish_i(a) = 1[E_i(A_s) > finish_threshold
-                  and E_i(A_s union {a}) <= finish_threshold]
-```
+For candidate $a$, define the candidate-after error
+
+$$
+E^+_{i,d,s}(a)
+=
+\min_{b\in A_{d,s}\cup\{a\},\,\phi,\,g}
+\left\|r_{i,d}-gS_\phi(b)\right\|_\infty.
+$$
+
+Then define
+
+$$
+\operatorname{finish}_{i,d,s}(a)
+=
+\mathbf{1}\!\left[
+E_{i,d,s}>\tau_{\mathrm{finish}}
+\;\land\;
+E^+_{i,d,s}(a)\leq\tau_{\mathrm{finish}}
+\right].
+$$
 
 Choose lexicographically:
 
-```text
-argmax_a (
-    sum_i eligible_i * finish_i(a),
-    sum_i eligible_i * w_i * Delta_i(a)
-)
-```
+$$
+\arg\max_a
+\left(
+\sum_i e_i\operatorname{finish}_{i,d,s}(a),
+\sum_i e_iw_i\Delta_i(a)
+\right).
+$$
 
 ### `HardRepair`
 
@@ -527,15 +607,16 @@ every repair slot. Break ties with improvement over the full eligible population
 
 **Mathematical formulation**
 
-Let `H_s` be the eligible residuals at or above the 90th percentile of current
-loss. Choose lexicographically:
+Let $H_s$ be the eligible residuals at or above the 90th percentile of
+current loss. Choose lexicographically:
 
-```text
-argmax_a (
-    sum_{i in H_s} w_i * Delta_i(a),
-    sum_i eligible_i * w_i * Delta_i(a)
-)
-```
+$$
+\arg\max_a
+\left(
+\sum_{i\in H_s}w_i\Delta_i(a),
+\sum_i e_iw_i\Delta_i(a)
+\right).
+$$
 
 ## Mixed Slot Schedules
 
@@ -616,9 +697,11 @@ aggregation and tie-breaking rules so the row remains a valid anchor.
 Use the exact Experiment 12 score. If that implementation is median-oriented,
 record it explicitly as a robust central utility such as:
 
-```text
-score(a) = median over eligible i of Delta_i(a)
-```
+$$
+\operatorname{score}(a)
+=
+\operatorname{Median}_{i:e_i=1}\Delta_i(a).
+$$
 
 Do not silently substitute this illustrative form for the actual existing score.
 
@@ -639,9 +722,11 @@ sets after each slot.
 
 Represent the existing schedule as slot-specific utility functions:
 
-```text
-a_s = argmax_{a in C_s} U_role(s)(a)
-```
+$$
+a_s
+=
+\arg\max_{a\in\mathcal C_s}U_{\operatorname{role}(s)}(a).
+$$
 
 where `U_role(s)` is the Experiment 12 finish, common-case, or rescue score for
 that slot. The implementation must document the exact slot-to-role mapping.
@@ -661,12 +746,17 @@ population while keeping the family definition itself stable.
 
 **Mathematical formulation**
 
-If families are `F_1, ..., F_K`, use the exact existing score. A representative
-form is:
+If families are $F_1,\ldots,F_K$, use the exact existing score. A
+representative form is:
 
-```text
-score(a) = aggregate_k [ mean_{i in F_k and eligible} Delta_i(a) ]
-```
+$$
+\operatorname{score}(a)
+=
+\operatorname{Aggregate}_k
+\left[
+\operatorname{Mean}_{i\in F_k,\,e_i=1}\Delta_i(a)
+\right].
+$$
 
 where `aggregate_k` is the Experiment 12 balancing operator. Record the actual
 operator rather than replacing it with an undocumented mean.
@@ -708,7 +798,7 @@ Repair slot: maximize sum_i eligible_i * w_i * Delta_i(a)
 
 Broad slots use `BroadMean`. Repair slots use `FinishRepair`. This policy tests
 whether broad prototypes create a large population of almost-solved residuals
-that targeted finishing can convert into strict-perfect reconstructions. The
+that targeted finishing can move across the construction finish criterion. The
 finish objective uses the fixed `finish_threshold`, not the calibrated eligibility
 epsilon.
 
@@ -882,12 +972,16 @@ layer residuals.
 
 **Mathematical formulation**
 
-For every slot `s = 1..7`:
+For every slot $s=1,\ldots,7$:
 
-```text
-a_s = argmin_a sum_i eligible_i^(s) * w_i^(s)
-                 * min_{phi,g} ||r_i - g S_phi(a)||_2^2
-```
+$$
+a_s
+=
+\arg\min_a
+\sum_i e_i^{(s)}w_i^{(s)}
+\min_{\phi,g}
+\left\|r_i-gS_\phi(a)\right\|_2^2.
+$$
 
 using the alternating `BroadMean` solver.
 
@@ -1051,9 +1145,11 @@ behavior.
 After the base dictionary and after every completed residual layer, record the
 maximum-absolute full-curve error:
 
-```text
-G_i,d = max_abs(target_i - reconstruction_i,d)
-```
+$$
+G_{i,d}
+=
+\left\|y_i-\hat y_{i,d}\right\|_\infty.
+$$
 
 Layer `d = 0` is the base-dictionary reconstruction before any residual layer.
 Record completed-layer distributions for both training and validation splits.
@@ -1077,9 +1173,11 @@ that layer can be affected by retiring a residual after slot 7.
 
 For each residual, also retain the best fitted unexplained residual vector:
 
-```text
-u_i,d,s = r_i,d - g_i,d,s * S_phi_i,d,s(a_i,d,s)
-```
+$$
+u_{i,d,s}
+=
+r_{i,d}-g_{i,d,s}S_{\phi_{i,d,s}}(a_{i,d,s}).
+$$
 
 where the atom, phase, and gain are the minimizers used to compute `E_i,d,s`.
 
@@ -1099,14 +1197,25 @@ For every relevant `G_i,d` and `E_i,d,s` distribution, record:
 
 Interpretation:
 
-```text
-Q_global(d, p) = quantile_i(G_i,d, p)
-Q_slot(d, s, p) = quantile_i(E_i,d,s, p)
+For percentile $p$, define the completed-layer and slot-level quantiles:
 
-Q_slot(d, s, 0.10)
-    eligibility epsilon that would classify approximately 10% of the training
-    residuals as resolved at layer d, slot s on the unfiltered 13A trajectory
-```
+$$
+Q^{\mathrm{global}}_d(p)
+=
+\operatorname{Quantile}_i\!\left(G_{i,d},p\right),
+$$
+
+and
+
+$$
+Q^{\mathrm{slot}}_{d,s}(p)
+=
+\operatorname{Quantile}_i\!\left(E_{i,d,s},p\right).
+$$
+
+Thus $Q^{\mathrm{slot}}_{d,s}(0.10)$ is the eligibility epsilon that would
+classify approximately 10% of training residuals as resolved at layer $d$, slot
+$s$, on the unfiltered 13A trajectory.
 
 ### Candidate epsilon coverage
 
@@ -1122,20 +1231,25 @@ Measure at least these fixed candidate values:
 
 For each candidate epsilon and checkpoint, record:
 
-```text
-resolved_fraction(d, s, epsilon)
-    = count_i[E_i,d,s <= epsilon] / sample_count
+$$
+F_{d,s}(\epsilon)
+=
+\frac{1}{N}
+\sum_{i=1}^{N}
+\mathbf{1}\!\left[E_{i,d,s}\leq\epsilon\right],
+$$
 
-counterfactual_eligible_fraction(d, s, epsilon)
-    = 1 - resolved_fraction(d, s, epsilon)
-```
+and the counterfactual eligible fraction $1-F_{d,s}(\epsilon)$.
 
 Also record completed-layer coverage:
 
-```text
-global_resolved_fraction(d, epsilon)
-    = count_i[G_i,d <= epsilon] / sample_count
-```
+$$
+F^{\mathrm{global}}_d(\epsilon)
+=
+\frac{1}{N}
+\sum_{i=1}^{N}
+\mathbf{1}\!\left[G_{i,d}\leq\epsilon\right].
+$$
 
 These statistics describe what filtering would have done; they do not change
 13A construction.
@@ -1147,19 +1261,27 @@ and candidate epsilon.
 
 Incoming residual-energy share:
 
-```text
-incoming_retired_energy_fraction(d, s, epsilon)
-    = sum_{i:E_i,d,s <= epsilon} ||r_i,d||_2^2
-      / sum_i ||r_i,d||_2^2
-```
+$$
+M^{\mathrm{incoming}}_{d,s}(\epsilon)
+=
+\frac{
+\sum_{i:E_{i,d,s}\leq\epsilon}\|r_{i,d}\|_2^2
+}{
+\sum_i\|r_{i,d}\|_2^2
+}.
+$$
 
 Current unexplained-error-energy share:
 
-```text
-unexplained_retired_energy_fraction(d, s, epsilon)
-    = sum_{i:E_i,d,s <= epsilon} ||u_i,d,s||_2^2
-      / sum_i ||u_i,d,s||_2^2
-```
+$$
+M^{\mathrm{unexplained}}_{d,s}(\epsilon)
+=
+\frac{
+\sum_{i:E_{i,d,s}\leq\epsilon}\|u_{i,d,s}\|_2^2
+}{
+\sum_i\|u_{i,d,s}\|_2^2
+}.
+$$
 
 The incoming-energy view is diagnostic. Epsilon selection must use the
 unexplained-error view because it measures error that would actually stop
@@ -1188,10 +1310,11 @@ decision slots 0 through 6
 ```
 
 Slot 7 and all validation measurements are excluded from selection. Let
-`S_valid` denote the subset of these checkpoints with nonzero unexplained-error
-energy, and let `R_13A` denote the 90 completed 13A rows.
+$\mathcal{S}_{\mathrm{valid}}$ denote the subset of this row/layer/slot set with
+nonzero unexplained-error energy, and let $\mathcal{R}_{13A}$ denote the 90
+completed 13A rows.
 
-Define `S_early_middle` as:
+Define $\mathcal{S}_{\mathrm{early\text{-}middle}}$ as:
 
 ```text
 residual layers 1 through 12
@@ -1203,16 +1326,32 @@ slots 0 through 5
 Evaluate the candidate epsilons in ascending order and choose the largest value
 that satisfies all three conditions:
 
-```text
-1. median unexplained_retired_energy_fraction
-   across S_valid <= 0.01
+1. The median unexplained retired-error fraction across all selection rows and
+   checkpoints satisfies
 
-2. P95 unexplained_retired_energy_fraction
-   across S_valid <= 0.05
+$$
+\operatorname{Median}_{(\rho,d,s)\in\mathcal{S}_{\mathrm{valid}}}
+M^{\mathrm{unexplained}}_{\rho,d,s}(\epsilon)
+\leq0.01.
+$$
 
-3. at least one checkpoint in S_early_middle has
-   median retired_lfo_fraction across R_13A >= 0.05
-```
+2. Its 95th percentile satisfies
+
+$$
+\operatorname{Quantile}_{0.95,
+(\rho,d,s)\in\mathcal{S}_{\mathrm{valid}}}
+\!\left(M^{\mathrm{unexplained}}_{\rho,d,s}(\epsilon)\right)
+\leq0.05.
+$$
+
+3. At least one early-or-middle checkpoint satisfies
+
+$$
+\exists(d,s)\in\mathcal{S}_{\mathrm{early\text{-}middle}}:
+\operatorname{Median}_{\rho\in\mathcal{R}_{13A}}
+F_{\rho,d,s}(\epsilon)
+\geq0.05.
+$$
 
 This rule is an operational calibration policy, not a claim of theoretical or
 perceptual optimality. Do not choose an epsilon by visual inspection.
