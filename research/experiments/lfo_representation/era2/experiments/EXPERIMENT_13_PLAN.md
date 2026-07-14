@@ -88,7 +88,9 @@ eligibility_epsilon
 
 Candidate eligibility epsilons must not alter 13A construction. Separating these
 thresholds avoids making finish-oriented 13A rows depend on the value that 13A is
-supposed to calibrate.
+supposed to calibrate. In formulas, `tau_finish` denotes the fixed
+`finish_threshold` and `epsilon_star` denotes the selected
+`eligibility_epsilon`.
 
 Broad atoms may be synthesized from many residuals. They are not required to
 equal any observed training residual. Repair atoms remain observed residual
@@ -111,6 +113,11 @@ duplicate_suppression_policy = DuplicateSuppressionOff
 finish_threshold = 1e-5
 eligibility_epsilon = selected_after_experiment_13a
 ```
+
+The fixed finish threshold carries forward Experiment 12's intended
+maximum-error finishing boundary while correcting its MSE-versus-maximum-error
+implementation mismatch. It is a construction objective and does not redefine
+the report's joint strict-perfect metric.
 
 The fixed W8D16 prediction-head budget is:
 
@@ -1031,9 +1038,193 @@ The 21 repair-containing policies are:
 = 21
 ```
 
-## Epsilon Sensitivity Aside
+## Experiment 13A Calibration and Epsilon Selection
 
-Do not multiply the full grid by epsilon. Run a focused aside using:
+Experiment 13A performs unfiltered construction and measures the natural error
+trajectory. Candidate eligibility epsilons are counterfactual measurements only.
+They must not alter candidate generation, candidate scoring, prototype fitting,
+clustering, residual weights, early termination, or any other construction
+behavior.
+
+### Completed-layer full-curve error
+
+After the base dictionary and after every completed residual layer, record the
+maximum-absolute full-curve error:
+
+```text
+G_i,d = max_abs(target_i - reconstruction_i,d)
+```
+
+Layer `d = 0` is the base-dictionary reconstruction before any residual layer.
+Record completed-layer distributions for both training and validation splits.
+Validation data is report-only and must not influence epsilon selection.
+
+### Slot-level partial-codebook error
+
+Inside each residual layer, record `E_i,d,s` after:
+
+```text
+slot 0 = NoOpAtom only
+slot 1 = first active atom
+...
+slot 7 = all active atoms
+```
+
+Slot-level training measurements are the primary calibration data because
+`UnresolvedOnly` changes the population inside a layer. Slot 7 is retained for
+diagnostics, but it is not a decision checkpoint because no later active slot in
+that layer can be affected by retiring a residual after slot 7.
+
+For each residual, also retain the best fitted unexplained residual vector:
+
+```text
+u_i,d,s = r_i,d - g_i,d,s * S_phi_i,d,s(a_i,d,s)
+```
+
+where the atom, phase, and gain are the minimizers used to compute `E_i,d,s`.
+
+### Required quantiles
+
+For every relevant `G_i,d` and `E_i,d,s` distribution, record:
+
+```text
+50th percentile
+25th percentile
+10th percentile
+5th percentile
+2nd percentile
+1st percentile
+0.1st percentile when sample_count >= 1000
+```
+
+Interpretation:
+
+```text
+Q_global(d, p) = quantile_i(G_i,d, p)
+Q_slot(d, s, p) = quantile_i(E_i,d,s, p)
+
+Q_slot(d, s, 0.10)
+    eligibility epsilon that would classify approximately 10% of the training
+    residuals as resolved at layer d, slot s on the unfiltered 13A trajectory
+```
+
+### Candidate epsilon coverage
+
+Measure at least these fixed candidate values:
+
+```text
+0.001
+0.0025
+0.005
+0.01
+0.02
+```
+
+For each candidate epsilon and checkpoint, record:
+
+```text
+resolved_fraction(d, s, epsilon)
+    = count_i[E_i,d,s <= epsilon] / sample_count
+
+counterfactual_eligible_fraction(d, s, epsilon)
+    = 1 - resolved_fraction(d, s, epsilon)
+```
+
+Also record completed-layer coverage:
+
+```text
+global_resolved_fraction(d, epsilon)
+    = count_i[G_i,d <= epsilon] / sample_count
+```
+
+These statistics describe what filtering would have done; they do not change
+13A construction.
+
+### Retired error mass
+
+Count alone is insufficient. Record two energy views for every slot checkpoint
+and candidate epsilon.
+
+Incoming residual-energy share:
+
+```text
+incoming_retired_energy_fraction(d, s, epsilon)
+    = sum_{i:E_i,d,s <= epsilon} ||r_i,d||_2^2
+      / sum_i ||r_i,d||_2^2
+```
+
+Current unexplained-error-energy share:
+
+```text
+unexplained_retired_energy_fraction(d, s, epsilon)
+    = sum_{i:E_i,d,s <= epsilon} ||u_i,d,s||_2^2
+      / sum_i ||u_i,d,s||_2^2
+```
+
+The incoming-energy view is diagnostic. Epsilon selection must use the
+unexplained-error view because it measures error that would actually stop
+influencing later atom construction. A curve may have a large incoming residual
+while already being fitted almost exactly by the partial codebook.
+
+When an energy denominator is zero, define the corresponding retired-energy
+fraction as `0.0`, record `zero_total_energy = true`, and exclude that checkpoint
+from quantile aggregation rather than producing `NaN` or infinity.
+
+Also record the corresponding retained fractions. The desired regime is:
+
+```text
+high retired-LFO fraction
+low retired unexplained-error-energy fraction
+```
+
+### Deterministic selection checkpoint set
+
+The selection calculation uses training data only and aggregates over:
+
+```text
+all 90 completed Experiment 13A rows
+residual layers 1 through 16
+decision slots 0 through 6
+```
+
+Slot 7 and all validation measurements are excluded from selection. Let
+`S_valid` denote the subset of these checkpoints with nonzero unexplained-error
+energy, and let `R_13A` denote the 90 completed 13A rows.
+
+Define `S_early_middle` as:
+
+```text
+residual layers 1 through 12
+slots 0 through 5
+```
+
+### Deterministic selection rule
+
+Evaluate the candidate epsilons in ascending order and choose the largest value
+that satisfies all three conditions:
+
+```text
+1. median unexplained_retired_energy_fraction
+   across S_valid <= 0.01
+
+2. P95 unexplained_retired_energy_fraction
+   across S_valid <= 0.05
+
+3. at least one checkpoint in S_early_middle has
+   median retired_lfo_fraction across R_13A >= 0.05
+```
+
+This rule is an operational calibration policy, not a claim of theoretical or
+perceptual optimality. Do not choose an epsilon by visual inspection.
+
+Write the selected value, exact supporting statistics, checkpoint definition,
+candidate set, and selection-rule version to `epsilon_selection.json` before any
+full Experiment 13B run begins.
+
+If no candidate satisfies all three conditions:
+
+1. write `selection_passed = false` and do not silently relax the rule;
+2. run a limited 13B pilot at `0.001` and `0.0025` using:
 
 ```text
 BroadMeanGlobalRepairInterleaved
@@ -1042,31 +1233,25 @@ ClusterMeanHardRepairTwoPhase
 FinishRepairRescue
 ```
 
-Fixed aside settings:
+3. require an explicit documented threshold decision before launching all 90
+   Experiment 13B rows. The decision must update `epsilon_selection.json` with
+   the selected epsilon, `selection_override = true`, the pilot evidence,
+   rationale, decision timestamp, and `selection_passed = true`.
 
-```text
-residual_population_policy = UnresolvedOnly
-utility_candidate_budget = CandidateBudget48
-layer_normalization_policy = LayerClip0To1
-scalar_schema = PhaseAndResidualGain
-path_search_policy = Beam4Path
-no_damage_policy = NoDamageOff
-atom_preprocessing_policy = RawAtoms
-duplicate_suppression_policy = DuplicateSuppressionOff
-```
+### Required calibration plots
 
-Test:
+The Experiment 13A calibration report must contain at least:
 
-```text
-epsilon = 0.01
-epsilon = 0.02
-epsilon = 0.04
-```
+1. completed-layer epsilon quantiles for layers `0..16`;
+2. slot-level epsilon quantiles for slots `0..7`;
+3. completed-layer reconstructed fractions for each candidate epsilon;
+4. slot-level reconstructed fractions for each candidate epsilon;
+5. retired-LFO fraction versus retired unexplained-error-energy fraction;
+6. incoming-energy and unexplained-energy retirement shown separately.
 
-This defines 12 comparison rows. The four `epsilon = 0.02` rows may reuse exact
-main-grid rows, so only eight additional executions are required. The aside
-should be reported separately and should not determine the main strategy
-ranking.
+Detailed per-row and per-layer values must remain available in artifacts even
+when the report shows median curves, percentile bands, or strategy-family
+aggregations.
 
 ## Co-Primary Metrics
 
