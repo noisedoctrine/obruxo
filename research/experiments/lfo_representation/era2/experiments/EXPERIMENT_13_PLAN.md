@@ -55,20 +55,22 @@ selects one atom from that layer. The construction order of the seven active
 atoms affects the greedy codebook-building process, but it does not make the
 decoder apply all seven atoms sequentially.
 
-For LFO `i` entering residual layer `d`, let:
+For LFO $i$ entering residual layer $d$, let:
 
-```text
-r_i,d = target_i - prefix_i,d-1
-```
+$$
+r_{i,d}=y_i-\hat y_{i,d-1}.
+$$
 
-Let `A_d,s = {a_d,0, ..., a_d,s}` be the partial codebook after slot `s`, where
-`a_d,0 = 0` is the no-op atom. Let `S_phi(a)` circularly phase-shift atom `a` by
-`phi`. The current best layer reconstruction error is:
+Let $A_{d,s}=\{a_{d,0},\ldots,a_{d,s}\}$ be the partial codebook after
+slot $s$, where $a_{d,0}=0$ is the no-op atom. Let $S_\phi(a)$ circularly
+phase-shift atom $a$ by $\phi$. The current best layer reconstruction error is:
 
-```text
-E_i,d,s = min over a in A_d,s, phi, g of
-          max_abs(r_i,d - g * S_phi(a))
-```
+$$
+E_{i,d,s}
+=
+\min_{a\in A_{d,s},\,\phi,\,g}
+\left\|r_{i,d}-gS_\phi(a)\right\|_\infty.
+$$
 
 The implementation may also retain the corresponding RMSE or MSE for utility
 scoring, but eligibility membership and finish membership must use
@@ -88,7 +90,9 @@ eligibility_epsilon
 
 Candidate eligibility epsilons must not alter 13A construction. Separating these
 thresholds avoids making finish-oriented 13A rows depend on the value that 13A is
-supposed to calibrate.
+supposed to calibrate. In formulas, $\tau_{\mathrm{finish}}$ denotes the fixed
+`finish_threshold` and $\epsilon^*$ denotes the selected
+`eligibility_epsilon`.
 
 Broad atoms may be synthesized from many residuals. They are not required to
 equal any observed training residual. Repair atoms remain observed residual
@@ -112,12 +116,16 @@ finish_threshold = 1e-5
 eligibility_epsilon = selected_after_experiment_13a
 ```
 
+The fixed finish threshold carries forward Experiment 12's intended
+maximum-error finishing boundary while correcting its MSE-versus-maximum-error
+implementation mismatch. It is a construction objective and does not redefine
+the report's joint strict-perfect metric.
+
 The fixed W8D16 prediction-head budget is:
 
-```text
-head_outputs = 32 + 16 * 8 + 17 phase_scalars + 16 residual_gain_scalars
-head_outputs = 193
-```
+$$
+H=32+16\cdot8+17+16=193.
+$$
 
 Every main-grid row must preserve this budget.
 
@@ -161,11 +169,11 @@ candidate eligibility epsilon is observational only.
 
 **Mathematical formulation**
 
-```text
-eligible_i^(s) = 1
-```
+$$
+\operatorname{eligible}^{13A}_{i,d,s}=1
+$$
 
-for every residual `i` and active atom slot `s`.
+for every residual $i$, residual layer $d$, and active atom slot $s$.
 
 ### `UnresolvedOnly`
 
@@ -184,10 +192,17 @@ additional LFOs.
 
 **Mathematical formulation**
 
-```text
-resolved_i,d,s = E_i,d,s <= eligibility_epsilon
-eligible_i,d,s = 1 - resolved_i,d,s
-```
+$$
+\operatorname{resolved}^{13B}_{i,d,s}
+=
+\mathbf{1}\!\left[E_{i,d,s}\leq\epsilon^*\right],
+$$
+
+$$
+\operatorname{eligible}^{13B}_{i,d,s}
+=
+1-\operatorname{resolved}^{13B}_{i,d,s}.
+$$
 
 All Experiment 13B rows use the same frozen `eligibility_epsilon`. If no
 eligible residuals remain, the remaining active atom slots should be filled with
@@ -195,21 +210,22 @@ no-op atoms and recorded as early completion rather than treated as a failure.
 
 ## Shared Alignment and Utility Definitions
 
-For an atom proposal `a` and residual `r_i`, define its best fitted phase and
+For an atom proposal $a$ and residual $r_i$, define its best fitted phase and
 gain as:
 
-```text
-(phi_i(a), g_i(a)) = argmin over phi, g of
-                     loss(r_i, g * S_phi(a))
-```
+$$
+(\phi_i(a),g_i(a))
+=
+\arg\min_{\phi,g}
+\ell\!\left(r_i,gS_\phi(a)\right).
+$$
 
-For utility scoring, let:
+For utility scoring, let $L_i^{(s)}$ be the current scalar loss before slot $s$
+and $L_i(a)$ the best scalar loss using proposal $a$. Define:
 
-```text
-L_i^(s) = current scalar loss for residual i before slot s
-L_i(a)  = best scalar loss using proposal a
-Delta_i(a) = max(0, L_i^(s) - L_i(a))
-```
+$$
+\Delta_i(a)=\max\!\left(0,L_i^{(s)}-L_i(a)\right).
+$$
 
 The scalar loss used by a utility policy should be recorded. The default should
 match the Experiment 12 construction loss so comparisons remain grounded.
@@ -242,18 +258,25 @@ seed rule, iteration count, and convergence status.
 
 **Mathematical formulation**
 
-For fixed assignments `(phi_i, g_i)` and nonnegative weights `w_i`, solve:
+For fixed assignments $(\phi_i,g_i)$ and nonnegative weights $w_i$, solve:
 
-```text
-min_a sum_i eligible_i * w_i * ||r_i - g_i S_phi_i(a)||_2^2
-```
+$$
+\min_a
+\sum_i e_iw_i
+\left\|r_i-g_iS_{\phi_i}(a)\right\|_2^2,
+$$
 
-The least-squares update is:
+where $e_i$ is the current eligibility indicator. The least-squares update is:
 
-```text
-a = [sum_i eligible_i * w_i * g_i * S_-phi_i(r_i)]
-    / [sum_i eligible_i * w_i * g_i^2]
-```
+$$
+a
+=
+\frac{
+\sum_i e_iw_ig_iS_{-\phi_i}(r_i)
+}{
+\sum_i e_iw_ig_i^2
+}.
+$$
 
 Then refit `(phi_i, g_i)` against the updated atom and alternate.
 
@@ -276,18 +299,30 @@ at the trimming boundary should be resolved deterministically.
 
 **Mathematical formulation**
 
-Let `T` be the retained set containing the lowest 90% of aligned losses:
+Let $T$ be the retained set containing the lowest 90% of aligned losses:
 
-```text
-T = lowest_90_percent_i loss(r_i, g_i S_phi_i(a))
-```
+$$
+T
+=
+\operatorname{Lowest}_{90\%}
+\left\{
+ i:e_i=1
+ \;\middle|\;
+ \ell\!\left(r_i,g_iS_{\phi_i}(a)\right)
+\right\}.
+$$
 
 Then update:
 
-```text
-a = [sum_{i in T} w_i * g_i * S_-phi_i(r_i)]
-    / [sum_{i in T} w_i * g_i^2]
-```
+$$
+a
+=
+\frac{
+\sum_{i\in T}w_ig_iS_{-\phi_i}(r_i)
+}{
+\sum_{i\in T}w_ig_i^2
+}.
+$$
 
 ### `AlignedMedian`
 
@@ -310,15 +345,20 @@ not amplify noise when residuals are normalized back into prototype space.
 
 Let:
 
-```text
-z_i = S_-phi_i(r_i) / max(|g_i|, gain_floor)
-```
+$$
+z_i
+=
+\frac{S_{-\phi_i}(r_i)}{\max(|g_i|,g_{\min})}.
+$$
 
-For each control point `t`:
+For each control point $t$:
 
-```text
-a[t] = weighted_median_i(z_i[t], weight = eligible_i * w_i)
-```
+$$
+a[t]
+=
+\operatorname{WeightedMedian}_i
+\!\left(z_i[t];\,e_iw_i\right).
+$$
 
 A deterministic global sign convention must be applied before the next
 alignment iteration.
@@ -345,25 +385,32 @@ check internal to this builder.
 
 **Mathematical formulation**
 
-Using phase/gain-invariant distance:
+Using the phase/gain-invariant distance:
 
-```text
-d(r_i, r_j) = min over phi, g ||r_i - g S_phi(r_j)||_2^2
-```
+$$
+d(r_i,r_j)
+=
+\min_{\phi,g}
+\left\|r_i-gS_\phi(r_j)\right\|_2^2,
+$$
 
-partition eligible residuals into clusters `C_1, ..., C_K`. For each cluster,
+partition eligible residuals into clusters $C_1,\ldots,C_K$. For each cluster,
 solve:
 
-```text
-a_k = argmin_a sum_{i in C_k} w_i * min_{phi,g}
-                    ||r_i - g S_phi(a)||_2^2
-```
+$$
+a_k
+=
+\arg\min_a
+\sum_{i\in C_k}w_i
+\min_{\phi,g}
+\left\|r_i-gS_\phi(a)\right\|_2^2.
+$$
 
 Then choose:
 
-```text
-a* = argmax_{a_k} Utility(a_k)
-```
+$$
+a^*=\arg\max_{a_k}\operatorname{Utility}(a_k).
+$$
 
 ### `DominantDirection`
 
@@ -386,17 +433,20 @@ weighted energy and convergence.
 
 **Mathematical formulation**
 
-For canonicalized residuals `z_i = S_-phi_i(r_i)`, form:
+For canonicalized residuals $z_i=S_{-\phi_i}(r_i)$, form:
 
-```text
-C = sum_i eligible_i * w_i * z_i z_i^T
-```
+$$
+C=\sum_i e_iw_i z_i z_i^\top.
+$$
 
 Choose:
 
-```text
-a = argmax_{||a||_2 = 1} a^T C a
-```
+$$
+a
+=
+\arg\max_{\|a\|_2=1}
+a^\top Ca.
+$$
 
 which is the leading eigenvector of `C`. Choose the sign using a deterministic
 rule such as positive correlation with the highest-weight canonical residual.
@@ -424,20 +474,37 @@ be fixed in the plan implementation, not crossed as `utility_candidate_budget`.
 
 Define:
 
-```text
-coverage(a) = sum_i eligible_i * 1[Delta_i(a) >= delta_min]
-improvement(a) = sum_i eligible_i * w_i * Delta_i(a)
-similarity(a, b) = max over phi of
-                   |<a, S_phi(b)>| / (||a||_2 ||b||_2)
-```
+$$
+\operatorname{coverage}(a)
+=
+\sum_i e_i\mathbf{1}\!\left[\Delta_i(a)\geq\delta_{\min}\right],
+$$
 
-For previously selected broad atoms `B`, score:
+$$
+\operatorname{improvement}(a)
+=
+\sum_i e_iw_i\Delta_i(a),
+$$
 
-```text
-score(a) = alpha * coverage(a)
-         + beta  * improvement(a)
-         - lambda * max_{b in B} similarity(a, b)
-```
+and
+
+$$
+\operatorname{similarity}(a,b)
+=
+\max_\phi
+\frac{|\langle a,S_\phi(b)\rangle|}
+{\|a\|_2\|b\|_2}.
+$$
+
+For previously selected broad atoms $B$, score:
+
+$$
+\operatorname{score}(a)
+=
+\alpha\operatorname{coverage}(a)
++\beta\operatorname{improvement}(a)
+-\lambda\max_{b\in B}\operatorname{similarity}(a,b).
+$$
 
 Choose the highest-scoring proposal with deterministic tie-breaking.
 
@@ -463,11 +530,14 @@ shortlisting and final utility evaluation must remain separate and be recorded.
 
 **Mathematical formulation**
 
-For candidate set `C`:
+For candidate set $\mathcal C$:
 
-```text
-a* = argmax_{a in C} sum_i eligible_i * w_i * Delta_i(a)
-```
+$$
+a^*
+=
+\arg\max_{a\in\mathcal C}
+\sum_i e_iw_i\Delta_i(a).
+$$
 
 ### `FinishRepair`
 
@@ -490,19 +560,36 @@ compute finishing with maximum absolute error, not MSE compared with
 
 **Mathematical formulation**
 
-```text
-finish_i(a) = 1[E_i(A_s) > finish_threshold
-                  and E_i(A_s union {a}) <= finish_threshold]
-```
+For candidate $a$, define the candidate-after error
+
+$$
+E^+_{i,d,s}(a)
+=
+\min_{b\in A_{d,s}\cup\{a\},\,\phi,\,g}
+\left\|r_{i,d}-gS_\phi(b)\right\|_\infty.
+$$
+
+Then define
+
+$$
+\operatorname{finish}_{i,d,s}(a)
+=
+\mathbf{1}\!\left[
+E_{i,d,s}>\tau_{\mathrm{finish}}
+\;\land\;
+E^+_{i,d,s}(a)\leq\tau_{\mathrm{finish}}
+\right].
+$$
 
 Choose lexicographically:
 
-```text
-argmax_a (
-    sum_i eligible_i * finish_i(a),
-    sum_i eligible_i * w_i * Delta_i(a)
-)
-```
+$$
+\arg\max_a
+\left(
+\sum_i e_i\operatorname{finish}_{i,d,s}(a),
+\sum_i e_iw_i\Delta_i(a)
+\right).
+$$
 
 ### `HardRepair`
 
@@ -520,15 +607,16 @@ every repair slot. Break ties with improvement over the full eligible population
 
 **Mathematical formulation**
 
-Let `H_s` be the eligible residuals at or above the 90th percentile of current
-loss. Choose lexicographically:
+Let $H_s$ be the eligible residuals at or above the 90th percentile of
+current loss. Choose lexicographically:
 
-```text
-argmax_a (
-    sum_{i in H_s} w_i * Delta_i(a),
-    sum_i eligible_i * w_i * Delta_i(a)
-)
-```
+$$
+\arg\max_a
+\left(
+\sum_{i\in H_s}w_i\Delta_i(a),
+\sum_i e_iw_i\Delta_i(a)
+\right).
+$$
 
 ## Mixed Slot Schedules
 
@@ -609,9 +697,11 @@ aggregation and tie-breaking rules so the row remains a valid anchor.
 Use the exact Experiment 12 score. If that implementation is median-oriented,
 record it explicitly as a robust central utility such as:
 
-```text
-score(a) = median over eligible i of Delta_i(a)
-```
+$$
+\operatorname{score}(a)
+=
+\operatorname{Median}_{i:e_i=1}\Delta_i(a).
+$$
 
 Do not silently substitute this illustrative form for the actual existing score.
 
@@ -632,9 +722,11 @@ sets after each slot.
 
 Represent the existing schedule as slot-specific utility functions:
 
-```text
-a_s = argmax_{a in C_s} U_role(s)(a)
-```
+$$
+a_s
+=
+\arg\max_{a\in\mathcal C_s}U_{\operatorname{role}(s)}(a).
+$$
 
 where `U_role(s)` is the Experiment 12 finish, common-case, or rescue score for
 that slot. The implementation must document the exact slot-to-role mapping.
@@ -654,12 +746,17 @@ population while keeping the family definition itself stable.
 
 **Mathematical formulation**
 
-If families are `F_1, ..., F_K`, use the exact existing score. A representative
-form is:
+If families are $F_1,\ldots,F_K$, use the exact existing score. A
+representative form is:
 
-```text
-score(a) = aggregate_k [ mean_{i in F_k and eligible} Delta_i(a) ]
-```
+$$
+\operatorname{score}(a)
+=
+\operatorname{Aggregate}_k
+\left[
+\operatorname{Mean}_{i\in F_k,\,e_i=1}\Delta_i(a)
+\right].
+$$
 
 where `aggregate_k` is the Experiment 12 balancing operator. Record the actual
 operator rather than replacing it with an undocumented mean.
@@ -701,7 +798,7 @@ Repair slot: maximize sum_i eligible_i * w_i * Delta_i(a)
 
 Broad slots use `BroadMean`. Repair slots use `FinishRepair`. This policy tests
 whether broad prototypes create a large population of almost-solved residuals
-that targeted finishing can convert into strict-perfect reconstructions. The
+that targeted finishing can move across the construction finish criterion. The
 finish objective uses the fixed `finish_threshold`, not the calibrated eligibility
 epsilon.
 
@@ -875,12 +972,16 @@ layer residuals.
 
 **Mathematical formulation**
 
-For every slot `s = 1..7`:
+For every slot $s=1,\ldots,7$:
 
-```text
-a_s = argmin_a sum_i eligible_i^(s) * w_i^(s)
-                 * min_{phi,g} ||r_i - g S_phi(a)||_2^2
-```
+$$
+a_s
+=
+\arg\min_a
+\sum_i e_i^{(s)}w_i^{(s)}
+\min_{\phi,g}
+\left\|r_i-gS_\phi(a)\right\|_2^2.
+$$
 
 using the alternating `BroadMean` solver.
 
@@ -1031,9 +1132,238 @@ The 21 repair-containing policies are:
 = 21
 ```
 
-## Epsilon Sensitivity Aside
+## Experiment 13A Calibration and Epsilon Selection
 
-Do not multiply the full grid by epsilon. Run a focused aside using:
+Experiment 13A performs unfiltered construction and measures the natural error
+trajectory. Candidate eligibility epsilons are counterfactual measurements only.
+They must not alter candidate generation, candidate scoring, prototype fitting,
+clustering, residual weights, early termination, or any other construction
+behavior.
+
+### Completed-layer full-curve error
+
+After the base dictionary and after every completed residual layer, record the
+maximum-absolute full-curve error:
+
+$$
+G_{i,d}
+=
+\left\|y_i-\hat y_{i,d}\right\|_\infty.
+$$
+
+Layer `d = 0` is the base-dictionary reconstruction before any residual layer.
+Record completed-layer distributions for both training and validation splits.
+Validation data is report-only and must not influence epsilon selection.
+
+### Slot-level partial-codebook error
+
+Inside each residual layer, record `E_i,d,s` after:
+
+```text
+slot 0 = NoOpAtom only
+slot 1 = first active atom
+...
+slot 7 = all active atoms
+```
+
+Slot-level training measurements are the primary calibration data because
+`UnresolvedOnly` changes the population inside a layer. Slot 7 is retained for
+diagnostics, but it is not a decision checkpoint because no later active slot in
+that layer can be affected by retiring a residual after slot 7.
+
+For each residual, also retain the best fitted unexplained residual vector:
+
+$$
+u_{i,d,s}
+=
+r_{i,d}-g_{i,d,s}S_{\phi_{i,d,s}}(a_{i,d,s}).
+$$
+
+where the atom, phase, and gain are the minimizers used to compute `E_i,d,s`.
+
+### Required quantiles
+
+For every relevant `G_i,d` and `E_i,d,s` distribution, record:
+
+```text
+50th percentile
+25th percentile
+10th percentile
+5th percentile
+2nd percentile
+1st percentile
+0.1st percentile when sample_count >= 1000
+```
+
+Interpretation:
+
+For percentile $p$, define the completed-layer and slot-level quantiles:
+
+$$
+Q^{\mathrm{global}}_d(p)
+=
+\operatorname{Quantile}_i\!\left(G_{i,d},p\right),
+$$
+
+and
+
+$$
+Q^{\mathrm{slot}}_{d,s}(p)
+=
+\operatorname{Quantile}_i\!\left(E_{i,d,s},p\right).
+$$
+
+Thus $Q^{\mathrm{slot}}_{d,s}(0.10)$ is the eligibility epsilon that would
+classify approximately 10% of training residuals as resolved at layer $d$, slot
+$s$, on the unfiltered 13A trajectory.
+
+### Candidate epsilon coverage
+
+Measure at least these fixed candidate values:
+
+```text
+0.001
+0.0025
+0.005
+0.01
+0.02
+```
+
+For each candidate epsilon and checkpoint, record:
+
+$$
+F_{d,s}(\epsilon)
+=
+\frac{1}{N}
+\sum_{i=1}^{N}
+\mathbf{1}\!\left[E_{i,d,s}\leq\epsilon\right],
+$$
+
+and the counterfactual eligible fraction $1-F_{d,s}(\epsilon)$.
+
+Also record completed-layer coverage:
+
+$$
+F^{\mathrm{global}}_d(\epsilon)
+=
+\frac{1}{N}
+\sum_{i=1}^{N}
+\mathbf{1}\!\left[G_{i,d}\leq\epsilon\right].
+$$
+
+These statistics describe what filtering would have done; they do not change
+13A construction.
+
+### Retired error mass
+
+Count alone is insufficient. Record two energy views for every slot checkpoint
+and candidate epsilon.
+
+Incoming residual-energy share:
+
+$$
+M^{\mathrm{incoming}}_{d,s}(\epsilon)
+=
+\frac{
+\sum_{i:E_{i,d,s}\leq\epsilon}\|r_{i,d}\|_2^2
+}{
+\sum_i\|r_{i,d}\|_2^2
+}.
+$$
+
+Current unexplained-error-energy share:
+
+$$
+M^{\mathrm{unexplained}}_{d,s}(\epsilon)
+=
+\frac{
+\sum_{i:E_{i,d,s}\leq\epsilon}\|u_{i,d,s}\|_2^2
+}{
+\sum_i\|u_{i,d,s}\|_2^2
+}.
+$$
+
+The incoming-energy view is diagnostic. Epsilon selection must use the
+unexplained-error view because it measures error that would actually stop
+influencing later atom construction. A curve may have a large incoming residual
+while already being fitted almost exactly by the partial codebook.
+
+When an energy denominator is zero, define the corresponding retired-energy
+fraction as `0.0`, record `zero_total_energy = true`, and exclude that checkpoint
+from quantile aggregation rather than producing `NaN` or infinity.
+
+Also record the corresponding retained fractions. The desired regime is:
+
+```text
+high retired-LFO fraction
+low retired unexplained-error-energy fraction
+```
+
+### Deterministic selection checkpoint set
+
+The selection calculation uses training data only and aggregates over:
+
+```text
+all 90 completed Experiment 13A rows
+residual layers 1 through 16
+decision slots 0 through 6
+```
+
+Slot 7 and all validation measurements are excluded from selection. Let
+$\mathcal{S}_{\mathrm{valid}}$ denote the subset of this row/layer/slot set with
+nonzero unexplained-error energy, and let $\mathcal{R}_{13A}$ denote the 90
+completed 13A rows.
+
+Define $\mathcal{S}_{\mathrm{early\text{-}middle}}$ as:
+
+```text
+residual layers 1 through 12
+slots 0 through 5
+```
+
+### Deterministic selection rule
+
+Evaluate the candidate epsilons in ascending order and choose the largest value
+that satisfies all three conditions:
+
+1. The median unexplained retired-error fraction across all selection rows and
+   checkpoints satisfies
+
+$$
+\operatorname{Median}_{(\rho,d,s)\in\mathcal{S}_{\mathrm{valid}}}
+M^{\mathrm{unexplained}}_{\rho,d,s}(\epsilon)
+\leq0.01.
+$$
+
+2. Its 95th percentile satisfies
+
+$$
+\operatorname{Quantile}_{0.95,
+(\rho,d,s)\in\mathcal{S}_{\mathrm{valid}}}
+\!\left(M^{\mathrm{unexplained}}_{\rho,d,s}(\epsilon)\right)
+\leq0.05.
+$$
+
+3. At least one early-or-middle checkpoint satisfies
+
+$$
+\exists(d,s)\in\mathcal{S}_{\mathrm{early\text{-}middle}}:
+\operatorname{Median}_{\rho\in\mathcal{R}_{13A}}
+F_{\rho,d,s}(\epsilon)
+\geq0.05.
+$$
+
+This rule is an operational calibration policy, not a claim of theoretical or
+perceptual optimality. Do not choose an epsilon by visual inspection.
+
+Write the selected value, exact supporting statistics, checkpoint definition,
+candidate set, and selection-rule version to `epsilon_selection.json` before any
+full Experiment 13B run begins.
+
+If no candidate satisfies all three conditions:
+
+1. write `selection_passed = false` and do not silently relax the rule;
+2. run a limited 13B pilot at `0.001` and `0.0025` using:
 
 ```text
 BroadMeanGlobalRepairInterleaved
@@ -1042,31 +1372,25 @@ ClusterMeanHardRepairTwoPhase
 FinishRepairRescue
 ```
 
-Fixed aside settings:
+3. require an explicit documented threshold decision before launching all 90
+   Experiment 13B rows. The decision must update `epsilon_selection.json` with
+   the selected epsilon, `selection_override = true`, the pilot evidence,
+   rationale, decision timestamp, and `selection_passed = true`.
 
-```text
-residual_population_policy = UnresolvedOnly
-utility_candidate_budget = CandidateBudget48
-layer_normalization_policy = LayerClip0To1
-scalar_schema = PhaseAndResidualGain
-path_search_policy = Beam4Path
-no_damage_policy = NoDamageOff
-atom_preprocessing_policy = RawAtoms
-duplicate_suppression_policy = DuplicateSuppressionOff
-```
+### Required calibration plots
 
-Test:
+The Experiment 13A calibration report must contain at least:
 
-```text
-epsilon = 0.01
-epsilon = 0.02
-epsilon = 0.04
-```
+1. completed-layer epsilon quantiles for layers `0..16`;
+2. slot-level epsilon quantiles for slots `0..7`;
+3. completed-layer reconstructed fractions for each candidate epsilon;
+4. slot-level reconstructed fractions for each candidate epsilon;
+5. retired-LFO fraction versus retired unexplained-error-energy fraction;
+6. incoming-energy and unexplained-energy retirement shown separately.
 
-This defines 12 comparison rows. The four `epsilon = 0.02` rows may reuse exact
-main-grid rows, so only eight additional executions are required. The aside
-should be reported separately and should not determine the main strategy
-ranking.
+Detailed per-row and per-layer values must remain available in artifacts even
+when the report shows median curves, percentile bands, or strategy-family
+aggregations.
 
 ## Co-Primary Metrics
 
@@ -1094,14 +1418,23 @@ Experiment 13 must record enough information to explain why a policy works.
 Per row and per active atom slot:
 
 ```text
+experiment_phase
+row_id
+pair_id
+residual_layer
 slot_index
 slot_role
 atom_source_kind
 effective_candidate_budget
+finish_threshold
+selected_eligibility_epsilon
+eligibility_selection_rule_version
 eligible_residual_count_before
 eligible_residual_count_after
 resolved_lfo_rate_before
 resolved_lfo_rate_after
+newly_eligibility_resolved_lfo_count
+newly_finish_threshold_lfo_count
 training_median_rmse_before
 training_median_rmse_after
 training_p95_rmse_before
@@ -1121,7 +1454,21 @@ explained_weighted_energy
 repair_source_dataset_index
 repair_shortlist_rule
 repair_utility_score
+counterfactual_resolved_fraction_by_candidate_epsilon
+counterfactual_incoming_retired_energy_fraction_by_candidate_epsilon
+counterfactual_unexplained_retired_energy_fraction_by_candidate_epsilon
 ```
+
+For 13A, `eligible_residual_count_before` and
+`eligible_residual_count_after` must describe the actual unfiltered construction
+population. Counterfactual filtered counts and fractions must use separate fields
+and must never be presented as actual 13A eligibility.
+
+`newly_finish_threshold_lfo_count` records the fixed construction finish
+criterion. `newly_eligibility_resolved_lfo_count` records crossings of the frozen
+13B eligibility epsilon. Preserve `newly_resolved_lfo_count` as a compatibility
+field, but define it as an alias of `newly_eligibility_resolved_lfo_count` in 13B
+and `0` in unfiltered 13A; do not use it for finish-objective accounting.
 
 For partial-codebook validation, evaluate the row using:
 
@@ -1135,6 +1482,11 @@ NoOpAtom + all 7 active atoms per layer
 Write:
 
 ```text
+experiment_phase
+row_id
+pair_id
+finish_threshold
+selected_eligibility_epsilon
 active_atom_count
 validation_median_rmse
 validation_strict_perfect_lfo_rate
@@ -1147,16 +1499,23 @@ strategies reduce error quickly with the earliest codebook slots.
 
 ## Report Requirements
 
-The report should be findings-first and focus on paired comparisons:
+The report should be findings-first and follow the actual execution order:
 
-1. prototype-containing policies versus observed-residual anchors;
-2. `Interleaved` versus `TwoPhase`;
-3. `AllResiduals` versus `UnresolvedOnly`;
-4. `CandidateBudget24` versus `CandidateBudget48`;
-5. `FinalClipOnly` versus `LayerClip0To1`;
-6. broad-builder families;
-7. repair objectives;
-8. partial-codebook progression from one through seven active atoms.
+1. Experiment 13A unfiltered construction results;
+2. Experiment 13A epsilon calibration;
+3. the selected eligibility epsilon and exact supporting training statistics;
+4. Experiment 13B paired filtered results;
+5. `AllResiduals` versus `UnresolvedOnly` paired effects;
+6. prototype-containing policies versus observed-residual anchors;
+7. `Interleaved` versus `TwoPhase`;
+8. `CandidateBudget24` versus `CandidateBudget48`;
+9. `FinalClipOnly` versus `LayerClip0To1`;
+10. broad-builder and repair-objective interactions;
+11. partial-codebook progression from one through seven active atoms.
+
+The report must state that 13A completed first, the eligibility epsilon was
+selected from training calibration data and frozen, and 13B then used that
+value. It must not imply that the two phases ran simultaneously.
 
 The report should not collapse the result into one automatic scalar ranking. It
 should identify Pareto candidates across the co-primary metrics and explain the
@@ -1181,7 +1540,13 @@ partial_codebook_validation.csv
 atom_construction.csv
 atom_assignments.csv
 candidate_search_diagnostics.csv
-epsilon_sensitivity.csv
+layer_epsilon_quantiles.csv
+slot_epsilon_quantiles.csv
+epsilon_coverage.csv
+retired_error_mass.csv
+epsilon_selection.json
+experiment13a_status.json
+experiment13b_status.json
 budget_accounting.csv
 failures.csv
 run_status.json
@@ -1200,19 +1565,116 @@ Local report images should be written under:
 era2/reports/images/experiment_13/
 ```
 
+
+### Calibration artifact schemas
+
+`layer_epsilon_quantiles.csv` must contain:
+
+```text
+experiment_phase
+row_id
+pair_id
+dataset_split
+residual_layer
+percentile
+epsilon_value
+sample_count
+```
+
+`slot_epsilon_quantiles.csv` must contain:
+
+```text
+experiment_phase
+row_id
+pair_id
+residual_layer
+active_atom_slot
+percentile
+epsilon_value
+sample_count
+```
+
+For completed-layer records in `epsilon_coverage.csv`, set
+`active_atom_slot = Null`. Slot-level records use slots `0..7`.
+
+`epsilon_coverage.csv` must contain:
+
+```text
+experiment_phase
+row_id
+pair_id
+dataset_split
+residual_layer
+active_atom_slot
+epsilon
+resolved_count
+resolved_fraction
+counterfactual_eligible_count
+counterfactual_eligible_fraction
+```
+
+`retired_error_mass.csv` must contain:
+
+```text
+experiment_phase
+row_id
+pair_id
+residual_layer
+active_atom_slot
+epsilon
+retired_lfo_count
+retired_lfo_fraction
+incoming_retired_energy
+incoming_retired_energy_fraction
+unexplained_retired_energy
+unexplained_retired_energy_fraction
+retained_unexplained_energy_fraction
+zero_total_energy
+```
+
+When automatic selection fails, `selected_epsilon` must be `Null` until an
+explicit pilot-based override is documented.
+
+`epsilon_selection.json` must contain at least:
+
+```text
+candidate_epsilons
+selection_rule_version
+selection_checkpoint_definition
+selected_epsilon
+training_statistics_used
+median_unexplained_retired_energy_fraction
+p95_unexplained_retired_energy_fraction
+retired_lfo_fraction_summary
+selection_timestamp
+experiment13a_run_identity
+selection_passed
+selection_override
+selection_override_rationale
+selection_override_timestamp
+pilot_evidence
+selection_notes
+```
+
 ## Manifest Fields
 
 Preserve the Experiment 12 fields and add strategy-specific fields:
 
 ```text
 experiment_id
+experiment_phase
+row_id
+pair_id
+experiment13a_run_identity
 scalar_schema
 path_search_policy
 construction_policy
 construction_family
 slot_schedule
 residual_population_policy
-epsilon
+finish_threshold
+eligibility_epsilon
+eligibility_selection_rule_version
 utility_candidate_budget
 effective_candidate_budget_by_slot
 layer_normalization_policy
@@ -1228,18 +1690,50 @@ runtime_topology
 head_outputs_actual
 ```
 
-## Run Command
+## Run Commands
 
-Experiment 13 requires a dedicated runner. The intended command shape is:
+Experiment 13 requires a dedicated runner with explicit phase commands.
+
+Run Experiment 13A:
 
 ```powershell
-conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run --async --backend xpu --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --corpus-sample-fraction 1.0 --monitor-refresh-seconds 30
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13a --async --backend xpu --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --corpus-sample-fraction 1.0 --monitor-refresh-seconds 30
 ```
 
-Tiny plumbing check:
+Generate calibration analytics and the selection artifact:
 
 ```powershell
-conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run --backend auto --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --smoke
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 select-epsilon --run-dir .\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid
+```
+
+If automatic selection fails, the runner may execute only the prespecified pilot
+rows and candidate epsilons through a dedicated command:
+
+```powershell
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b-pilot --backend xpu --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --epsilon-selection .\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid\epsilon_selection.json --candidate-epsilons 0.001 0.0025
+```
+
+`run-13b-pilot` must reject any row outside the four prespecified pilot policies,
+any epsilon outside the two tightest candidates, or any selection artifact that
+does not record `selection_passed = false` for the matching completed 13A run.
+It must not mutate the selection artifact automatically.
+
+Run Experiment 13B only after selection passes, either automatically or through
+a documented pilot-based override:
+
+```powershell
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b --async --backend xpu --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --epsilon-selection .\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid\epsilon_selection.json --monitor-refresh-seconds 30
+```
+
+The 13B command must fail when the selection artifact is absent, malformed,
+records `selection_passed = false`, references an incomplete 13A run, uses an
+incompatible candidate set or selection-rule version, or does not match the
+current Experiment 13 configuration.
+
+Tiny 13A plumbing check:
+
+```powershell
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13a --backend auto --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --smoke
 ```
 
 Regenerate analytics and the canonical report:
@@ -1257,18 +1751,34 @@ Tests should verify:
 - the fixed W8D16 runtime contract and 193-head accounting;
 - `Atom0 = NoOpAtom` for every residual layer;
 - exact seven-slot `Interleaved` and `TwoPhase` schedules;
+- exactly 90 13A `AllResiduals` rows and 90 paired 13B `UnresolvedOnly` rows;
+- the complete design still contains exactly 180 rows;
+- every 13A row has exactly one 13B row with identical paired settings;
 - `AllResiduals` and `UnresolvedOnly` mask behavior;
-- epsilon uses complete-curve maximum absolute error;
-- the unresolved mask is recomputed after every slot;
+- candidate eligibility epsilons never change 13A construction;
+- finish and eligibility thresholds are separate and use maximum absolute error;
+- validation data cannot affect eligibility-epsilon selection;
+- the unresolved mask is recomputed after every active atom slot;
 - broad atoms can differ from every observed residual;
 - phase/gain-aligned prototype updates do not raw-average shifted residuals;
 - each broad builder follows its documented objective and deterministic tie rules;
 - repair candidate budgets apply only to repair slots;
-- finish scoring uses maximum absolute epsilon rather than MSE `<= epsilon^2`;
+- finish scoring uses maximum absolute error against `finish_threshold` rather
+  than MSE `<= finish_threshold^2`;
+- finish-threshold crossings and eligibility-epsilon crossings are recorded in
+  separate diagnostic fields;
+- layer and slot quantiles match direct NumPy calculations;
+- coverage fractions, incoming energy shares, and unexplained energy shares are
+  correct, including zero-denominator handling;
+- the selection checkpoint set excludes slot 7 and validation data;
+- epsilon selection is deterministic and all 13B rows use one identical value;
+- the pilot command is restricted to the prespecified rows and two tightest
+  candidate epsilons;
+- 13B cannot start without a valid completed 13A selection artifact or documented
+  pilot-based override;
 - pure-prototype rows require `Null`;
 - deterministic construction under a fixed seed;
 - empty unresolved populations terminate with remaining no-op atoms;
-- the main grid contains exactly 180 rows;
 - partial-codebook validation covers active atom counts 1 through 7;
 - no topology appears in runtime targets, decoder lookup, loss, or head accounting.
 
