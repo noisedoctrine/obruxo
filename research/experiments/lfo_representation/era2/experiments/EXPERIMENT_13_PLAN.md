@@ -135,7 +135,7 @@ Experiment 13 should answer:
 
 1. Do synthesized broad atoms improve reconstruction over atoms copied only from
    observed residuals?
-2. Is an interleaved broad/repair schedule better than a two-phase schedule?
+2. Is an interleaved broad/repair layer schedule better than a two-phase layer schedule?
 3. Does excluding LFOs already within the calibrated eligibility epsilon improve
    later atom construction?
 4. Which broad prototype family works best: aligned mean, trimmed mean, aligned
@@ -618,56 +618,70 @@ $$
 \right).
 $$
 
-## Mixed Slot Schedules
+## Mixed Layer Schedules
 
-Every new broad-plus-repair recipe is tested with both schedules below.
+Every new broad-plus-repair recipe is tested with both layer schedules below.
+The schedule assigns one construction role to each of the 16 residual layers.
+Within a Broad layer, all seven active atom slots use the recipe's broad builder.
+Within a Repair layer, all seven active atom slots use the recipe's repair
+builder. `Atom0` remains `NoOpAtom` in every layer and is not part of the
+Broad/Repair schedule.
+
+Active atoms are still constructed sequentially. Every active atom slot uses the
+residual state and eligible population produced by all preceding layers and by
+all preceding active atom slots in the current layer.
 
 ### `Interleaved`
 
 **Common intuitive description**
 
-> Alternate a broad population-level fix with targeted cleanup.
+> Alternate broad population-level layers with targeted repair layers throughout
+> the residual stack.
 
 **Technical description**
 
-Construct slots in this order:
+Assign residual-layer roles in this order:
 
 ```text
-slot 1 = Broad
-slot 2 = Repair
-slot 3 = Broad
-slot 4 = Repair
-slot 5 = Broad
-slot 6 = Repair
-slot 7 = Broad
+residual layer 1  = Broad
+residual layer 2  = Repair
+residual layer 3  = Broad
+residual layer 4  = Repair
+residual layer 5  = Broad
+residual layer 6  = Repair
+residual layer 7  = Broad
+residual layer 8  = Repair
+residual layer 9  = Broad
+residual layer 10 = Repair
+residual layer 11 = Broad
+residual layer 12 = Repair
+residual layer 13 = Broad
+residual layer 14 = Repair
+residual layer 15 = Broad
+residual layer 16 = Repair
 ```
-
-Every slot uses the residual state and eligible population produced by all
-previous slots.
 
 ### `TwoPhase`
 
 **Common intuitive description**
 
-> Establish broad coverage first, then spend the remaining slots cleaning up
-> what broad prototypes could not solve.
+> Establish broad coverage throughout the first half of the residual stack, then
+> use the second half for targeted repair.
 
 **Technical description**
 
-Construct slots in this order:
+Assign residual-layer roles in this order:
 
 ```text
-slot 1 = Broad
-slot 2 = Broad
-slot 3 = Broad
-slot 4 = Broad
-slot 5 = Repair
-slot 6 = Repair
-slot 7 = Repair
+residual layers 1 through 8  = Broad
+residual layers 9 through 16 = Repair
 ```
 
-Both schedules use four broad slots and three repair slots. This isolates order
-without changing the broad/repair ratio.
+Both schedules use eight Broad layers and eight Repair layers. Because each
+layer contains seven active atom slots, both schedules allocate 56 active atom
+construction positions to Broad builders and 56 to Repair builders. This
+isolates role ordering across residual depth without changing the Broad/Repair
+allocation.
 
 ## Construction Policies
 
@@ -678,6 +692,10 @@ Experiment 12 role schedules and aggregation semantics should be preserved,
 except that the `UnresolvedOnly` variant applies the dynamic eligibility mask
 defined above and every finish test must be corrected to use complete-curve
 maximum absolute error against the fixed `finish_threshold`.
+
+These anchors use `layer_schedule = AnchorNative`. They do not inherit the mixed
+`Interleaved` or `TwoPhase` layer schedules. Their existing Experiment 12
+slot-role schedules remain active inside every residual layer.
 
 #### `CommonCaseRepair`
 
@@ -764,8 +782,9 @@ operator rather than replacing it with an undocumented mean.
 ### New mixed prototype/repair recipes
 
 Each recipe below receives both `Interleaved` and `TwoPhase` variants. The
-schedule determines which builder runs in each slot; the builder definitions
-above determine the actual optimization.
+layer schedule determines which builder runs in each residual layer; the builder
+definitions above determine the optimization used for all seven active atom slots
+in that layer.
 
 #### `BroadMeanGlobalRepair`
 
@@ -776,15 +795,16 @@ above determine the actual optimization.
 
 **Technical description**
 
-Broad slots use `BroadMean`. Repair slots use `GlobalRepair`. This is the most
-direct test of whether smooth population-level corrections and sharp observed
-examples complement one another.
+In Broad-designated layers, all seven active atom slots use `BroadMean`. In
+Repair-designated layers, all seven active atom slots use `GlobalRepair`. This is
+the most direct test of whether smooth population-level corrections and sharp
+observed examples complement one another.
 
 **Mathematical formulation**
 
 ```text
-Broad slot:  solve weighted aligned least squares for a
-Repair slot: maximize sum_i eligible_i * w_i * Delta_i(a)
+Broad-layer active slot:  solve weighted aligned least squares for a
+Repair-layer active slot: maximize sum_i eligible_i * w_i * Delta_i(a)
 ```
 
 #### `BroadMeanFinishRepair`
@@ -796,17 +816,18 @@ Repair slot: maximize sum_i eligible_i * w_i * Delta_i(a)
 
 **Technical description**
 
-Broad slots use `BroadMean`. Repair slots use `FinishRepair`. This policy tests
-whether broad prototypes create a large population of almost-solved residuals
-that targeted finishing can move across the construction finish criterion. The
-finish objective uses the fixed `finish_threshold`, not the calibrated eligibility
-epsilon.
+In Broad-designated layers, all seven active atom slots use `BroadMean`. In
+Repair-designated layers, all seven active atom slots use `FinishRepair`. This
+policy tests whether broad prototypes create a large population of almost-solved
+residuals that targeted finishing can move across the construction finish
+criterion. The finish objective uses the fixed `finish_threshold`, not the
+calibrated eligibility epsilon.
 
 **Mathematical formulation**
 
 ```text
-Broad slot:  solve weighted aligned least squares for a
-Repair slot: lexicographically maximize newly_resolved_count, total_improvement
+Broad-layer active slot:  solve weighted aligned least squares for a
+Repair-layer active slot: lexicographically maximize newly_resolved_count, total_improvement
 ```
 
 #### `BroadMeanHardRepair`
@@ -818,14 +839,15 @@ Repair slot: lexicographically maximize newly_resolved_count, total_improvement
 
 **Technical description**
 
-Broad slots use `BroadMean`. Repair slots use `HardRepair`. This separates broad
-central coverage from explicit tail control.
+In Broad-designated layers, all seven active atom slots use `BroadMean`. In
+Repair-designated layers, all seven active atom slots use `HardRepair`. This
+separates broad central coverage from explicit tail control.
 
 **Mathematical formulation**
 
 ```text
-Broad slot:  solve weighted aligned least squares for a
-Repair slot: maximize improvement over current worst-loss decile
+Broad-layer active slot:  solve weighted aligned least squares for a
+Repair-layer active slot: maximize improvement over current worst-loss decile
 ```
 
 #### `TrimmedMeanGlobalRepair`
@@ -837,15 +859,16 @@ Repair slot: maximize improvement over current worst-loss decile
 
 **Technical description**
 
-Broad slots use `TrimmedMean`. Repair slots use `GlobalRepair`. This tests
-whether ordinary aligned means are being distorted by a small number of unusual
-residuals.
+In Broad-designated layers, all seven active atom slots use `TrimmedMean`. In
+Repair-designated layers, all seven active atom slots use `GlobalRepair`. This
+tests whether ordinary aligned means are being distorted by a small number of
+unusual residuals.
 
 **Mathematical formulation**
 
 ```text
-Broad slot:  aligned least squares over retained lowest-loss 90%
-Repair slot: maximize weighted summed Delta_i(a)
+Broad-layer active slot:  aligned least squares over retained lowest-loss 90%
+Repair-layer active slot: maximize weighted summed Delta_i(a)
 ```
 
 #### `AlignedMedianGlobalRepair`
@@ -857,15 +880,16 @@ Repair slot: maximize weighted summed Delta_i(a)
 
 **Technical description**
 
-Broad slots use `AlignedMedian`. Repair slots use `GlobalRepair`. This is a
-stronger robustness test than trimming because each control point uses a median
-rather than a mean.
+In Broad-designated layers, all seven active atom slots use `AlignedMedian`. In
+Repair-designated layers, all seven active atom slots use `GlobalRepair`. This is
+a stronger robustness test than trimming because each control point uses a
+median rather than a mean.
 
 **Mathematical formulation**
 
 ```text
-Broad slot:  coordinate-wise weighted median in canonical phase/gain frame
-Repair slot: maximize weighted summed Delta_i(a)
+Broad-layer active slot:  coordinate-wise weighted median in canonical phase/gain frame
+Repair-layer active slot: maximize weighted summed Delta_i(a)
 ```
 
 #### `ClusterMeanGlobalRepair`
@@ -877,14 +901,16 @@ Repair slot: maximize weighted summed Delta_i(a)
 
 **Technical description**
 
-Broad slots use `ClusterMean`. Repair slots use `GlobalRepair`. Clustering is
-recomputed before every broad slot from the current eligible residuals.
+In Broad-designated layers, all seven active atom slots use `ClusterMean`. In
+Repair-designated layers, all seven active atom slots use `GlobalRepair`.
+Clustering is recomputed before every active atom slot in a Broad-designated
+layer from the current eligible residuals.
 
 **Mathematical formulation**
 
 ```text
-Broad slot:  choose highest-utility aligned cluster prototype a_k
-Repair slot: maximize weighted summed Delta_i(a)
+Broad-layer active slot:  choose highest-utility aligned cluster prototype a_k
+Repair-layer active slot: maximize weighted summed Delta_i(a)
 ```
 
 #### `ClusterMeanHardRepair`
@@ -896,14 +922,16 @@ Repair slot: maximize weighted summed Delta_i(a)
 
 **Technical description**
 
-Broad slots use `ClusterMean`. Repair slots use `HardRepair`. This policy tests a
-coarse family-coverage phase combined with explicit tail protection.
+In Broad-designated layers, all seven active atom slots use `ClusterMean`. In
+Repair-designated layers, all seven active atom slots use `HardRepair`. This
+policy tests a coarse family-coverage phase combined with explicit tail
+protection.
 
 **Mathematical formulation**
 
 ```text
-Broad slot:  choose highest-utility aligned cluster prototype a_k
-Repair slot: maximize improvement over current worst-loss decile
+Broad-layer active slot:  choose highest-utility aligned cluster prototype a_k
+Repair-layer active slot: maximize improvement over current worst-loss decile
 ```
 
 #### `DominantDirectionGlobalRepair`
@@ -915,34 +943,37 @@ Repair slot: maximize improvement over current worst-loss decile
 
 **Technical description**
 
-Broad slots use `DominantDirection`. Repair slots use `GlobalRepair`. The broad
-atom may not resemble any single residual; it represents a high-energy shared
-correction direction.
+In Broad-designated layers, all seven active atom slots use
+`DominantDirection`. In Repair-designated layers, all seven active atom slots use
+`GlobalRepair`. The broad atom may not resemble any single residual; it
+represents a high-energy shared correction direction.
 
 **Mathematical formulation**
 
 ```text
-Broad slot:  leading eigenvector of weighted canonical residual covariance
-Repair slot: maximize weighted summed Delta_i(a)
+Broad-layer active slot:  leading eigenvector of weighted canonical residual covariance
+Repair-layer active slot: maximize weighted summed Delta_i(a)
 ```
 
 #### `DiverseCoverageHardRepair`
 
 **Common intuitive description**
 
-> Spend broad slots on several different widely useful corrections, then spend
-> repair slots on the worst cases still left.
+> Spend Broad layers on several different widely useful corrections, then use
+> Repair layers for the worst cases still left.
 
 **Technical description**
 
-Broad slots use `DiverseCoverage`. Repair slots use `HardRepair`. The broad score
-must penalize phase/scale similarity to earlier broad atoms in the same layer.
+In Broad-designated layers, all seven active atom slots use `DiverseCoverage`.
+In Repair-designated layers, all seven active atom slots use `HardRepair`. The
+broad score must penalize phase/scale similarity to earlier broad atoms in the
+same layer.
 
 **Mathematical formulation**
 
 ```text
-Broad slot:  maximize alpha*coverage + beta*improvement - lambda*similarity
-Repair slot: maximize improvement over current worst-loss decile
+Broad-layer active slot:  maximize alpha*coverage + beta*improvement - lambda*similarity
+Repair-layer active slot: maximize improvement over current worst-loss decile
 ```
 
 PascalCase row identifiers append the schedule, for example:
@@ -955,6 +986,10 @@ ClusterMeanHardRepairTwoPhase
 ```
 
 ### Pure-prototype controls
+
+These controls use `layer_schedule = AllBroad`. All 16 residual layers are
+Broad-designated, and all seven active atom slots in every layer use the
+control's broad builder.
 
 #### `AllBroadAlignedMeans`
 
@@ -1032,20 +1067,30 @@ CandidateBudget48
 Null
 ```
 
-`CandidateBudget24` and `CandidateBudget48` apply only to repair slots that
-select observed residual examples. Broad synthesized slots always use `Null`.
-Artifacts must record both the row-level budget and the effective budget for
-each slot.
+`CandidateBudget24` and `CandidateBudget48` apply to every active atom slot in
+a Repair-designated layer. Every active atom slot in a Broad-designated layer
+uses `Null`. For the Experiment 12 anchors, the row-level candidate budget
+applies wherever the preserved native slot role selects an observed residual
+example. Pure-prototype policies always use `Null`.
 
-For example:
+Artifacts must record the row-level budget, a 16-element
+effective-candidate-budget vector by residual layer, and a nested `16 x 7`
+effective-candidate-budget matrix by active atom slot. For example, the
+16-element effective layer budgets for `CandidateBudget48` are:
 
 ```text
-Interleaved, CandidateBudget48:
-[Null, 48, Null, 48, Null, 48, Null]
+Interleaved:
+[Null, 48, Null, 48, Null, 48, Null, 48,
+ Null, 48, Null, 48, Null, 48, Null, 48]
 
-TwoPhase, CandidateBudget48:
-[Null, Null, Null, Null, 48, 48, 48]
+TwoPhase:
+[Null, Null, Null, Null, Null, Null, Null, Null,
+ 48, 48, 48, 48, 48, 48, 48, 48]
 ```
+
+Within each Repair-designated layer, all seven active atom slots use the listed
+budget. Within each Broad-designated layer, all seven active atom slots use
+`Null`.
 
 ## Layer Normalization
 
@@ -1093,12 +1138,12 @@ Experiment 13B = 90 paired UnresolvedOnly rows
 ```
 
 Every pair must share a stable `pair_id`. Paired rows must match on construction
-policy, slot schedule, repair candidate budget, layer normalization, fixed
+policy, layer schedule, repair candidate budget, layer normalization, fixed
 settings, seed rules, and `finish_threshold`. They differ only in experiment
 phase, residual-population behavior, and the presence of the frozen
 `eligibility_epsilon` mask.
 
-The 21 policies containing repair slots receive:
+The 21 repair-containing construction policies receive:
 
 ```text
 21 construction policies
@@ -1423,6 +1468,7 @@ row_id
 pair_id
 residual_layer
 slot_index
+layer_role
 slot_role
 atom_source_kind
 effective_candidate_budget
@@ -1459,6 +1505,12 @@ counterfactual_incoming_retired_energy_fraction_by_candidate_epsilon
 counterfactual_unexplained_retired_energy_fraction_by_candidate_epsilon
 ```
 
+For mixed recipes, `layer_role` is `Broad` or `Repair` and is shared by all
+seven active atom slots in the residual layer. The Experiment 12 anchors use
+`AnchorNative` as the layer role and preserve their native per-slot roles.
+Pure-prototype controls use `Broad` for every residual layer. `slot_role` records
+the builder-specific or preserved anchor role used for that active atom slot.
+
 For 13A, `eligible_residual_count_before` and
 `eligible_residual_count_after` must describe the actual unfiltered construction
 population. Counterfactual filtered counts and fractions must use separate fields
@@ -1494,8 +1546,9 @@ validation_p95_rmse
 validation_node_max_error_p95
 ```
 
-This progression is required because a central hypothesis is that broad-first
-strategies reduce error quickly with the earliest codebook slots.
+This progression is required to distinguish stack-level effects of early
+Broad-designated layers from within-layer efficiency as each codebook grows from
+one through seven active atoms.
 
 ## Report Requirements
 
@@ -1670,12 +1723,13 @@ scalar_schema
 path_search_policy
 construction_policy
 construction_family
-slot_schedule
+layer_schedule
 residual_population_policy
 finish_threshold
 eligibility_epsilon
 eligibility_selection_rule_version
 utility_candidate_budget
+effective_candidate_budget_by_layer
 effective_candidate_budget_by_slot
 layer_normalization_policy
 no_damage_policy
@@ -1750,7 +1804,15 @@ Tests should verify:
 
 - the fixed W8D16 runtime contract and 193-head accounting;
 - `Atom0 = NoOpAtom` for every residual layer;
-- exact seven-slot `Interleaved` and `TwoPhase` schedules;
+- the exact 16-layer `Interleaved` and `TwoPhase` schedules;
+- `Interleaved` assigns Broad to odd-numbered layers and Repair to even-numbered
+  layers;
+- `TwoPhase` assigns Broad to layers 1 through 8 and Repair to layers 9 through
+  16;
+- both mixed schedules contain exactly eight Broad layers and eight Repair
+  layers;
+- all seven active atom slots in a mixed-policy layer inherit that layer's Broad
+  or Repair role;
 - exactly 90 13A `AllResiduals` rows and 90 paired 13B `UnresolvedOnly` rows;
 - the complete design still contains exactly 180 rows;
 - every 13A row has exactly one 13B row with identical paired settings;
@@ -1762,7 +1824,11 @@ Tests should verify:
 - broad atoms can differ from every observed residual;
 - phase/gain-aligned prototype updates do not raw-average shifted residuals;
 - each broad builder follows its documented objective and deterministic tie rules;
-- repair candidate budgets apply only to repair slots;
+- repair candidate budgets apply to all seven active atom slots in
+  Repair-designated layers, while Broad-designated layers use `Null`;
+- Experiment 12 anchors preserve their native slot-role schedules under the
+  `AnchorNative` layer schedule;
+- pure-prototype controls use the `AllBroad` layer schedule;
 - finish scoring uses maximum absolute error against `finish_threshold` rather
   than MSE `<= finish_threshold^2`;
 - finish-threshold crossings and eligibility-epsilon crossings are recorded in
