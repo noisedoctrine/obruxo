@@ -1279,14 +1279,23 @@ Experiment 13 must record enough information to explain why a policy works.
 Per row and per active atom slot:
 
 ```text
+experiment_phase
+row_id
+pair_id
+residual_layer
 slot_index
 slot_role
 atom_source_kind
 effective_candidate_budget
+finish_threshold
+selected_eligibility_epsilon
+eligibility_selection_rule_version
 eligible_residual_count_before
 eligible_residual_count_after
 resolved_lfo_rate_before
 resolved_lfo_rate_after
+newly_eligibility_resolved_lfo_count
+newly_finish_threshold_lfo_count
 training_median_rmse_before
 training_median_rmse_after
 training_p95_rmse_before
@@ -1306,7 +1315,21 @@ explained_weighted_energy
 repair_source_dataset_index
 repair_shortlist_rule
 repair_utility_score
+counterfactual_resolved_fraction_by_candidate_epsilon
+counterfactual_incoming_retired_energy_fraction_by_candidate_epsilon
+counterfactual_unexplained_retired_energy_fraction_by_candidate_epsilon
 ```
+
+For 13A, `eligible_residual_count_before` and
+`eligible_residual_count_after` must describe the actual unfiltered construction
+population. Counterfactual filtered counts and fractions must use separate fields
+and must never be presented as actual 13A eligibility.
+
+`newly_finish_threshold_lfo_count` records the fixed construction finish
+criterion. `newly_eligibility_resolved_lfo_count` records crossings of the frozen
+13B eligibility epsilon. Preserve `newly_resolved_lfo_count` as a compatibility
+field, but define it as an alias of `newly_eligibility_resolved_lfo_count` in 13B
+and `0` in unfiltered 13A; do not use it for finish-objective accounting.
 
 For partial-codebook validation, evaluate the row using:
 
@@ -1320,6 +1343,11 @@ NoOpAtom + all 7 active atoms per layer
 Write:
 
 ```text
+experiment_phase
+row_id
+pair_id
+finish_threshold
+selected_eligibility_epsilon
 active_atom_count
 validation_median_rmse
 validation_strict_perfect_lfo_rate
@@ -1332,16 +1360,23 @@ strategies reduce error quickly with the earliest codebook slots.
 
 ## Report Requirements
 
-The report should be findings-first and focus on paired comparisons:
+The report should be findings-first and follow the actual execution order:
 
-1. prototype-containing policies versus observed-residual anchors;
-2. `Interleaved` versus `TwoPhase`;
-3. `AllResiduals` versus `UnresolvedOnly`;
-4. `CandidateBudget24` versus `CandidateBudget48`;
-5. `FinalClipOnly` versus `LayerClip0To1`;
-6. broad-builder families;
-7. repair objectives;
-8. partial-codebook progression from one through seven active atoms.
+1. Experiment 13A unfiltered construction results;
+2. Experiment 13A epsilon calibration;
+3. the selected eligibility epsilon and exact supporting training statistics;
+4. Experiment 13B paired filtered results;
+5. `AllResiduals` versus `UnresolvedOnly` paired effects;
+6. prototype-containing policies versus observed-residual anchors;
+7. `Interleaved` versus `TwoPhase`;
+8. `CandidateBudget24` versus `CandidateBudget48`;
+9. `FinalClipOnly` versus `LayerClip0To1`;
+10. broad-builder and repair-objective interactions;
+11. partial-codebook progression from one through seven active atoms.
+
+The report must state that 13A completed first, the eligibility epsilon was
+selected from training calibration data and frozen, and 13B then used that
+value. It must not imply that the two phases ran simultaneously.
 
 The report should not collapse the result into one automatic scalar ranking. It
 should identify Pareto candidates across the co-primary metrics and explain the
@@ -1366,7 +1401,13 @@ partial_codebook_validation.csv
 atom_construction.csv
 atom_assignments.csv
 candidate_search_diagnostics.csv
-epsilon_sensitivity.csv
+layer_epsilon_quantiles.csv
+slot_epsilon_quantiles.csv
+epsilon_coverage.csv
+retired_error_mass.csv
+epsilon_selection.json
+experiment13a_status.json
+experiment13b_status.json
 budget_accounting.csv
 failures.csv
 run_status.json
@@ -1385,19 +1426,116 @@ Local report images should be written under:
 era2/reports/images/experiment_13/
 ```
 
+
+### Calibration artifact schemas
+
+`layer_epsilon_quantiles.csv` must contain:
+
+```text
+experiment_phase
+row_id
+pair_id
+dataset_split
+residual_layer
+percentile
+epsilon_value
+sample_count
+```
+
+`slot_epsilon_quantiles.csv` must contain:
+
+```text
+experiment_phase
+row_id
+pair_id
+residual_layer
+active_atom_slot
+percentile
+epsilon_value
+sample_count
+```
+
+For completed-layer records in `epsilon_coverage.csv`, set
+`active_atom_slot = Null`. Slot-level records use slots `0..7`.
+
+`epsilon_coverage.csv` must contain:
+
+```text
+experiment_phase
+row_id
+pair_id
+dataset_split
+residual_layer
+active_atom_slot
+epsilon
+resolved_count
+resolved_fraction
+counterfactual_eligible_count
+counterfactual_eligible_fraction
+```
+
+`retired_error_mass.csv` must contain:
+
+```text
+experiment_phase
+row_id
+pair_id
+residual_layer
+active_atom_slot
+epsilon
+retired_lfo_count
+retired_lfo_fraction
+incoming_retired_energy
+incoming_retired_energy_fraction
+unexplained_retired_energy
+unexplained_retired_energy_fraction
+retained_unexplained_energy_fraction
+zero_total_energy
+```
+
+When automatic selection fails, `selected_epsilon` must be `Null` until an
+explicit pilot-based override is documented.
+
+`epsilon_selection.json` must contain at least:
+
+```text
+candidate_epsilons
+selection_rule_version
+selection_checkpoint_definition
+selected_epsilon
+training_statistics_used
+median_unexplained_retired_energy_fraction
+p95_unexplained_retired_energy_fraction
+retired_lfo_fraction_summary
+selection_timestamp
+experiment13a_run_identity
+selection_passed
+selection_override
+selection_override_rationale
+selection_override_timestamp
+pilot_evidence
+selection_notes
+```
+
 ## Manifest Fields
 
 Preserve the Experiment 12 fields and add strategy-specific fields:
 
 ```text
 experiment_id
+experiment_phase
+row_id
+pair_id
+experiment13a_run_identity
 scalar_schema
 path_search_policy
 construction_policy
 construction_family
 slot_schedule
 residual_population_policy
-epsilon
+finish_threshold
+eligibility_epsilon
+eligibility_selection_rule_version
 utility_candidate_budget
 effective_candidate_budget_by_slot
 layer_normalization_policy
@@ -1413,18 +1551,50 @@ runtime_topology
 head_outputs_actual
 ```
 
-## Run Command
+## Run Commands
 
-Experiment 13 requires a dedicated runner. The intended command shape is:
+Experiment 13 requires a dedicated runner with explicit phase commands.
+
+Run Experiment 13A:
 
 ```powershell
-conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run --async --backend xpu --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --corpus-sample-fraction 1.0 --monitor-refresh-seconds 30
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13a --async --backend xpu --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --corpus-sample-fraction 1.0 --monitor-refresh-seconds 30
 ```
 
-Tiny plumbing check:
+Generate calibration analytics and the selection artifact:
 
 ```powershell
-conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run --backend auto --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --smoke
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 select-epsilon --run-dir .\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid
+```
+
+If automatic selection fails, the runner may execute only the prespecified pilot
+rows and candidate epsilons through a dedicated command:
+
+```powershell
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b-pilot --backend xpu --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --epsilon-selection .\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid\epsilon_selection.json --candidate-epsilons 0.001 0.0025
+```
+
+`run-13b-pilot` must reject any row outside the four prespecified pilot policies,
+any epsilon outside the two tightest candidates, or any selection artifact that
+does not record `selection_passed = false` for the matching completed 13A run.
+It must not mutate the selection artifact automatically.
+
+Run Experiment 13B only after selection passes, either automatically or through
+a documented pilot-based override:
+
+```powershell
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b --async --backend xpu --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --epsilon-selection .\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid\epsilon_selection.json --monitor-refresh-seconds 30
+```
+
+The 13B command must fail when the selection artifact is absent, malformed,
+records `selection_passed = false`, references an incomplete 13A run, uses an
+incompatible candidate set or selection-rule version, or does not match the
+current Experiment 13 configuration.
+
+Tiny 13A plumbing check:
+
+```powershell
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13a --backend auto --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --smoke
 ```
 
 Regenerate analytics and the canonical report:
@@ -1442,18 +1612,34 @@ Tests should verify:
 - the fixed W8D16 runtime contract and 193-head accounting;
 - `Atom0 = NoOpAtom` for every residual layer;
 - exact seven-slot `Interleaved` and `TwoPhase` schedules;
+- exactly 90 13A `AllResiduals` rows and 90 paired 13B `UnresolvedOnly` rows;
+- the complete design still contains exactly 180 rows;
+- every 13A row has exactly one 13B row with identical paired settings;
 - `AllResiduals` and `UnresolvedOnly` mask behavior;
-- epsilon uses complete-curve maximum absolute error;
-- the unresolved mask is recomputed after every slot;
+- candidate eligibility epsilons never change 13A construction;
+- finish and eligibility thresholds are separate and use maximum absolute error;
+- validation data cannot affect eligibility-epsilon selection;
+- the unresolved mask is recomputed after every active atom slot;
 - broad atoms can differ from every observed residual;
 - phase/gain-aligned prototype updates do not raw-average shifted residuals;
 - each broad builder follows its documented objective and deterministic tie rules;
 - repair candidate budgets apply only to repair slots;
-- finish scoring uses maximum absolute epsilon rather than MSE `<= epsilon^2`;
+- finish scoring uses maximum absolute error against `finish_threshold` rather
+  than MSE `<= finish_threshold^2`;
+- finish-threshold crossings and eligibility-epsilon crossings are recorded in
+  separate diagnostic fields;
+- layer and slot quantiles match direct NumPy calculations;
+- coverage fractions, incoming energy shares, and unexplained energy shares are
+  correct, including zero-denominator handling;
+- the selection checkpoint set excludes slot 7 and validation data;
+- epsilon selection is deterministic and all 13B rows use one identical value;
+- the pilot command is restricted to the prespecified rows and two tightest
+  candidate epsilons;
+- 13B cannot start without a valid completed 13A selection artifact or documented
+  pilot-based override;
 - pure-prototype rows require `Null`;
 - deterministic construction under a fixed seed;
 - empty unresolved populations terminate with remaining no-op atoms;
-- the main grid contains exactly 180 rows;
 - partial-codebook validation covers active atom counts 1 through 7;
 - no topology appears in runtime targets, decoder lookup, loss, or head accounting.
 
