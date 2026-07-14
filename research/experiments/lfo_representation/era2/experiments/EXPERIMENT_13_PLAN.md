@@ -42,16 +42,25 @@ selects one atom from that layer. The construction order of the seven active
 atoms affects the greedy codebook-building process, but it does not make the
 decoder apply all seven atoms sequentially.
 
-For one residual layer:
+For one residual layer and LFO `i`, let:
 
 ```text
-layer_residual_i = target_i - prefix_i
+r_i = target_i - prefix_i
 ```
 
-After each active atom slot is constructed, the current per-LFO error is the
-best error available from the no-op plus all atoms selected so far in that
-layer. Later atom slots should therefore focus on residual patterns that remain
-poorly covered by the partial codebook.
+Let `A_s = {a_0, ..., a_s}` be the partial codebook after slot `s`, where
+`a_0 = 0` is the no-op atom. Let `S_phi(a)` circularly phase-shift atom `a` by
+`phi`. The current best layer reconstruction error is:
+
+```text
+E_i(A_s) = min over a in A_s, phi, g of
+           max_abs(r_i - g * S_phi(a))
+```
+
+The implementation may also retain the corresponding RMSE or MSE for utility
+scoring, but epsilon membership must use complete-curve maximum absolute error.
+Later atom slots should focus on residual patterns that remain poorly covered by
+the partial codebook.
 
 Broad atoms may be synthesized from many residuals. They are not required to
 equal any observed training residual. Repair atoms remain observed residual
@@ -108,160 +117,393 @@ policies.
 
 ### `AllResiduals`
 
-All training residuals remain eligible during atom construction. Policy-specific
-weights may depend on current error, but no residual is hard-excluded because it
-is already within epsilon.
-
-Plain-language interpretation:
+**Common intuitive description**
 
 > Keep learning from the full population, including curves that are already
 > reconstructed well.
 
-### `UnresolvedOnly`
+**Technical description**
 
-Only LFOs whose current best reconstruction is outside epsilon remain eligible:
+All training residuals remain eligible during atom construction. Policy-specific
+weights may depend on current error, but no residual is hard-excluded because it
+is already within epsilon.
+
+**Mathematical formulation**
 
 ```text
-resolved_i = max(abs(target_i - current_reconstruction_i)) <= epsilon
-eligible_i = not resolved_i
+eligible_i^(s) = 1
 ```
 
-The mask is recomputed after every active atom slot.
+for every residual `i` and active atom slot `s`.
 
-Plain-language interpretation:
+### `UnresolvedOnly`
+
+**Common intuitive description**
 
 > Once a curve is good enough, stop allowing it to consume later codebook
 > capacity.
 
-The main grid uses:
+**Technical description**
+
+Only LFOs whose current best reconstruction is outside epsilon remain eligible.
+The mask must be recomputed after every active atom slot because a newly added
+atom can resolve additional LFOs.
+
+**Mathematical formulation**
 
 ```text
-epsilon = 0.02
+resolved_i^(s) = E_i(A_s) <= epsilon
+eligible_i^(s) = 1 - resolved_i^(s)
 ```
 
-The epsilon test uses maximum absolute error across the complete sampled curve,
-not RMSE or MSE.
+The main grid uses `epsilon = 0.02`. If no eligible residuals remain, the
+remaining active atom slots should be filled with no-op atoms and recorded as
+early completion rather than treated as a failure.
 
-If no eligible residuals remain, the remaining active atom slots should be
-filled with no-op atoms and recorded as early completion rather than treated as
-a failure.
+## Shared Alignment and Utility Definitions
+
+For an atom proposal `a` and residual `r_i`, define its best fitted phase and
+gain as:
+
+```text
+(phi_i(a), g_i(a)) = argmin over phi, g of
+                     loss(r_i, g * S_phi(a))
+```
+
+For utility scoring, let:
+
+```text
+L_i^(s) = current scalar loss for residual i before slot s
+L_i(a)  = best scalar loss using proposal a
+Delta_i(a) = max(0, L_i^(s) - L_i(a))
+```
+
+The scalar loss used by a utility policy should be recorded. The default should
+match the Experiment 12 construction loss so comparisons remain grounded. The
+strict perfect test remains `E_i <= epsilon`, independent of that scalar loss.
 
 ## Reusable Broad-Atom Builders
 
 ### `BroadMean`
 
-Start from a deterministic seed, align the eligible residuals to the current
-prototype with the existing phase-and-residual-gain oracle, undo those fitted
-transformations, and update the prototype with the aligned least-squares mean.
-Repeat for a fixed small number of iterations or until convergence.
+**Common intuitive description**
 
-With fixed phase and gain assignments, the update is:
+> Line up the remaining mistakes, undo their fitted sizes, and average the shared
+> correction.
+
+**Technical description**
+
+Start from a deterministic seed atom. Repeatedly align every eligible residual
+to the current atom with the phase-and-residual-gain oracle, map each residual
+back into the atom's canonical phase frame, and compute the weighted
+least-squares prototype. Use current reconstruction error as a soft weight so
+later broad slots emphasize residuals that remain poorly represented. Stop at a
+fixed iteration cap or when atom change falls below a recorded tolerance.
+
+The seed should be deterministic, for example the highest-weight eligible
+residual after canonical phase normalization. The implementation must record the
+seed rule, iteration count, and convergence status.
+
+**Mathematical formulation**
+
+For fixed assignments `(phi_i, g_i)` and nonnegative weights `w_i`, solve:
 
 ```text
-atom = sum_i(weight_i * gain_i * inverse_shift(residual_i, phase_i))
-       / sum_i(weight_i * gain_i^2)
+min_a sum_i eligible_i * w_i * ||r_i - g_i S_phi_i(a)||_2^2
 ```
 
-The implementation should use current reconstruction error as a soft weight so
-later broad slots emphasize residuals that remain poorly represented.
+The least-squares update is:
 
-Plain-language interpretation:
+```text
+a = [sum_i eligible_i * w_i * g_i * S_-phi_i(r_i)]
+    / [sum_i eligible_i * w_i * g_i^2]
+```
 
-> Average the shared correction after lining the residuals up properly.
+Then refit `(phi_i, g_i)` against the updated atom and alternate.
 
 ### `TrimmedMean`
 
-Build an aligned mean, discard the 10% of eligible residuals with the largest
-alignment error to the current prototype, and recompute the aligned mean.
+**Common intuitive description**
 
-Plain-language interpretation:
+> Build the shared average, but do not let a small number of unusual residuals
+> drag it away from the common pattern.
 
-> Learn the common broad correction without letting a few unusual residuals
-> pull the average too far.
+**Technical description**
+
+Run the `BroadMean` alignment step, calculate each eligible residual's fitted
+error to the current prototype, exclude the worst 10% by that fitted error, and
+recompute the weighted least-squares mean from the retained 90%. Repeat the
+align-trim-update cycle until convergence or the iteration cap.
+
+Trimming must occur after phase/gain fitting, not on raw residual distance. Ties
+at the trimming boundary should be resolved deterministically.
+
+**Mathematical formulation**
+
+Let `T` be the retained set containing the lowest 90% of aligned losses:
+
+```text
+T = lowest_90_percent_i loss(r_i, g_i S_phi_i(a))
+```
+
+Then update:
+
+```text
+a = [sum_{i in T} w_i * g_i * S_-phi_i(r_i)]
+    / [sum_{i in T} w_i * g_i^2]
+```
 
 ### `AlignedMedian`
 
-After phase/gain alignment, compute a coordinate-wise weighted median in the
-prototype frame, then refit the prototype scale.
+**Common intuitive description**
 
-Plain-language interpretation:
+> At each curve position, use the middle aligned correction rather than the
+> average, so isolated extremes have less influence.
 
-> Use the middle correction at each point so outliers have less influence than
-> they do in an average.
+**Technical description**
+
+Align eligible residuals into a common prototype frame. Undo fitted phase and,
+where numerically safe, fitted gain. Compute a coordinate-wise weighted median
+across the canonicalized residuals. Refit the prototype scale through the normal
+gain oracle and repeat alignment plus median update until stable.
+
+The implementation must define gain-floor handling so very small fitted gains do
+not amplify noise when residuals are normalized back into prototype space.
+
+**Mathematical formulation**
+
+Let:
+
+```text
+z_i = S_-phi_i(r_i) / max(|g_i|, gain_floor)
+```
+
+For each control point `t`:
+
+```text
+a[t] = weighted_median_i(z_i[t], weight = eligible_i * w_i)
+```
+
+A deterministic global sign convention must be applied before the next
+alignment iteration.
 
 ### `ClusterMean`
 
-Form deterministic phase/gain-invariant residual clusters, construct an aligned
-mean for each cluster, and choose the cluster prototype with the greatest
-remaining corpus utility. Recompute clustering after each broad slot.
+**Common intuitive description**
 
-Plain-language interpretation:
+> Find one major family of remaining mistakes, average that family into a broad
+> fix, then look for another family at the next broad slot.
 
-> Find a common family of mistakes, make one representative correction for that
-> family, then repeat for the remaining families.
+**Technical description**
+
+Construct deterministic phase/gain-invariant clusters over the eligible
+residuals. Each cluster receives an aligned-mean prototype. Evaluate every
+cluster prototype against the complete eligible population and choose the
+prototype with the highest configured broad-slot utility. Recompute clustering
+from the updated residual state at every broad slot.
+
+The implementation should use a fixed cluster count rule or deterministic model
+selection rule, record cluster sizes, reject clusters below a minimum size, and
+avoid selecting the same cluster prototype repeatedly through a similarity
+check internal to this builder.
+
+**Mathematical formulation**
+
+Using phase/gain-invariant distance:
+
+```text
+d(r_i, r_j) = min over phi, g ||r_i - g S_phi(r_j)||_2^2
+```
+
+partition eligible residuals into clusters `C_1, ..., C_K`. For each cluster,
+solve:
+
+```text
+a_k = argmin_a sum_{i in C_k} w_i * min_{phi,g}
+                    ||r_i - g S_phi(a)||_2^2
+```
+
+Then choose:
+
+```text
+a* = argmax_{a_k} Utility(a_k)
+```
 
 ### `DominantDirection`
 
-Phase-canonicalize the eligible residuals, compute the leading weighted
-principal direction, choose its sign deterministically, and fit its useful
-scale through the existing gain oracle.
+**Common intuitive description**
 
-Plain-language interpretation:
+> Find the strongest recurring direction in which many current reconstructions
+> are wrong, even when no single residual is a perfect representative.
 
-> Find the strongest recurring direction in which the current reconstruction is
-> wrong.
+**Technical description**
+
+Canonicalize eligible residuals into a common phase and sign frame. Centering is
+not applied unless explicitly required by the chosen PCA formulation, because
+the zero vector has semantic meaning as no correction. Compute the leading
+weighted principal direction, choose its sign deterministically, normalize it,
+and let the residual-gain oracle determine per-LFO magnitude during evaluation.
+
+Because phase canonicalization and principal-direction estimation depend on one
+another, alternate them for a fixed number of iterations. Record explained
+weighted energy and convergence.
+
+**Mathematical formulation**
+
+For canonicalized residuals `z_i = S_-phi_i(r_i)`, form:
+
+```text
+C = sum_i eligible_i * w_i * z_i z_i^T
+```
+
+Choose:
+
+```text
+a = argmax_{||a||_2 = 1} a^T C a
+```
+
+which is the leading eigenvector of `C`. Choose the sign using a deterministic
+rule such as positive correlation with the highest-weight canonical residual.
 
 ### `DiverseCoverage`
 
-Generate several synthesized prototype proposals from deterministic residual
-partitions. Score each proposal by the number of eligible LFOs it improves by a
-meaningful amount, total improvement, and a penalty for phase/scale similarity
-to already selected atoms.
+**Common intuitive description**
 
-Plain-language interpretation:
+> Help many remaining curves, but avoid spending several broad slots on nearly
+> the same kind of correction.
 
-> Help many curves, but avoid spending several atom slots on nearly the same
-> broad correction.
+**Technical description**
 
-The internal prototype proposal count is part of this algorithm, not
-`utility_candidate_budget`. Its effective utility candidate budget is `Null`.
+Generate a deterministic set of synthesized proposals from partitions or seeds
+of the eligible residual population. Score each proposal by coverage, total
+improvement, and dissimilarity from broad atoms already selected in the layer.
+Coverage means the number or weighted share of eligible residuals improved by at
+least a configured meaningful-improvement threshold. Similarity must be
+phase-and-scale invariant.
+
+The proposal count and partition rule are internal algorithm parameters and must
+be fixed in the plan implementation, not crossed as `utility_candidate_budget`.
+
+**Mathematical formulation**
+
+Define:
+
+```text
+coverage(a) = sum_i eligible_i * 1[Delta_i(a) >= delta_min]
+improvement(a) = sum_i eligible_i * w_i * Delta_i(a)
+similarity(a, b) = max over phi of
+                   |<a, S_phi(b)>| / (||a||_2 ||b||_2)
+```
+
+For previously selected broad atoms `B`, score:
+
+```text
+score(a) = alpha * coverage(a)
+         + beta  * improvement(a)
+         - lambda * max_{b in B} similarity(a, b)
+```
+
+Choose the highest-scoring proposal with deterministic tie-breaking.
 
 ## Reusable Repair-Atom Builders
 
-Repair atoms are selected from observed residuals.
+Repair atoms are selected from observed eligible residuals. A repair candidate
+may be phase-canonicalized for storage only if that canonicalization preserves
+the same runtime phase/gain semantics and is applied consistently.
 
 ### `GlobalRepair`
 
-Choose the observed residual candidate with the greatest summed improvement
-across the eligible population.
+**Common intuitive description**
 
-Plain-language interpretation:
+> Pick the concrete residual example that removes the most total error across
+> the remaining population.
 
-> Pick the concrete correction that removes the most error overall.
+**Technical description**
+
+Build a deterministic shortlist of 24 or 48 observed eligible residuals. Evaluate
+each candidate against every eligible target residual with best phase and gain.
+Choose the candidate with the greatest weighted summed improvement. Candidate
+shortlisting and final utility evaluation must remain separate and be recorded.
+
+**Mathematical formulation**
+
+For candidate set `C`:
+
+```text
+a* = argmax_{a in C} sum_i eligible_i * w_i * Delta_i(a)
+```
 
 ### `FinishRepair`
 
-First maximize the number of eligible LFOs moved from outside epsilon to within
-epsilon. Break ties with total improvement.
+**Common intuitive description**
 
-Plain-language interpretation:
+> Use the repair slot to push as many almost-correct curves as possible across
+> the epsilon finish line.
 
-> Spend the repair slot finishing curves that are already close.
+**Technical description**
+
+For every observed residual candidate, count eligible LFOs that are outside
+epsilon before the candidate and within epsilon after adding it to the partial
+codebook. Maximize that newly resolved count first. Break ties with weighted
+total scalar-loss improvement, then deterministic candidate order.
+
+This policy must compute finishing with maximum absolute error, not MSE compared
+with `epsilon^2`.
+
+**Mathematical formulation**
+
+```text
+finish_i(a) = 1[E_i(A_s) > epsilon and E_i(A_s union {a}) <= epsilon]
+```
+
+Choose lexicographically:
+
+```text
+argmax_a (
+    sum_i eligible_i * finish_i(a),
+    sum_i eligible_i * w_i * Delta_i(a)
+)
+```
 
 ### `HardRepair`
 
-Choose the candidate with the greatest summed improvement over the worst 10% of
-current eligible reconstruction losses.
+**Common intuitive description**
 
-Plain-language interpretation:
+> Spend the repair slot on the worst remaining curves instead of letting easy
+> cases dominate the decision.
 
-> Spend the repair slot on the difficult tail.
+**Technical description**
+
+Rank eligible residuals by their current reconstruction loss, define the hard
+tail as the worst 10%, and choose the observed residual candidate with the
+largest weighted summed improvement on that tail. Recompute the hard-tail set at
+every repair slot. Break ties with improvement over the full eligible population.
+
+**Mathematical formulation**
+
+Let `H_s` be the eligible residuals at or above the 90th percentile of current
+loss. Choose lexicographically:
+
+```text
+argmax_a (
+    sum_{i in H_s} w_i * Delta_i(a),
+    sum_i eligible_i * w_i * Delta_i(a)
+)
+```
 
 ## Mixed Slot Schedules
 
 Every new broad-plus-repair recipe is tested with both schedules below.
 
 ### `Interleaved`
+
+**Common intuitive description**
+
+> Alternate a broad population-level fix with targeted cleanup.
+
+**Technical description**
+
+Construct slots in this order:
 
 ```text
 slot 1 = Broad
@@ -273,11 +515,19 @@ slot 6 = Repair
 slot 7 = Broad
 ```
 
-Plain-language interpretation:
-
-> Alternate broad coverage with targeted cleanup.
+Every slot uses the residual state and eligible population produced by all
+previous slots.
 
 ### `TwoPhase`
+
+**Common intuitive description**
+
+> Establish broad coverage first, then spend the remaining slots cleaning up
+> what broad prototypes could not solve.
+
+**Technical description**
+
+Construct slots in this order:
 
 ```text
 slot 1 = Broad
@@ -289,10 +539,6 @@ slot 6 = Repair
 slot 7 = Repair
 ```
 
-Plain-language interpretation:
-
-> Establish broad coverage first, then use the remaining slots for cleanup.
-
 Both schedules use four broad slots and three repair slots. This isolates order
 without changing the broad/repair ratio.
 
@@ -300,34 +546,267 @@ without changing the broad/repair ratio.
 
 ### Existing Experiment 12 anchors
 
-Keep these observed-residual policies as historical anchors:
+Keep these observed-residual policies as historical anchors. Their exact
+Experiment 12 implementation semantics should be preserved, except that the
+`UnresolvedOnly` variant applies the dynamic eligibility mask defined above and
+strict finishing must use complete-curve maximum absolute error.
+
+#### `CommonCaseRepair`
+
+**Common intuitive description**
+
+> Prefer atoms that improve the typical residual, even if they do not target the
+> worst outliers.
+
+**Technical description**
+
+Select each observed residual atom by the existing Experiment 12 common-case
+utility, applied to the current eligible population. Preserve its original
+aggregation and tie-breaking rules so the row remains a valid anchor.
+
+**Mathematical formulation**
+
+Use the exact Experiment 12 score. If that implementation is median-oriented,
+record it explicitly as a robust central utility such as:
 
 ```text
-CommonCaseRepair
-FinishRepairRescue
-FamilyBalancedRepair
+score(a) = median over eligible i of Delta_i(a)
 ```
 
-Each anchor is crossed with both residual-population policies, both repair
-candidate budgets, and both layer-normalization values.
+Do not silently substitute this illustrative form for the actual existing score.
+
+#### `FinishRepairRescue`
+
+**Common intuitive description**
+
+> Finish easy near-perfect cases first, improve common cases in the middle, and
+> reserve late capacity for difficult leftovers.
+
+**Technical description**
+
+Preserve the exact Experiment 12 role schedule and role-specific scoring. Apply
+roles to the current eligible population and recompute all masks and hard-tail
+sets after each slot.
+
+**Mathematical formulation**
+
+Represent the existing schedule as slot-specific utility functions:
+
+```text
+a_s = argmax_{a in C_s} U_role(s)(a)
+```
+
+where `U_role(s)` is the Experiment 12 finish, common-case, or rescue score for
+that slot. The implementation must document the exact slot-to-role mapping.
+
+#### `FamilyBalancedRepair`
+
+**Common intuitive description**
+
+> Avoid letting a large residual family dominate; choose atoms that improve
+> several families more evenly.
+
+**Technical description**
+
+Preserve the Experiment 12 family construction or grouping and its family-level
+utility aggregation. Recompute family statistics over the current eligible
+population while keeping the family definition itself stable.
+
+**Mathematical formulation**
+
+If families are `F_1, ..., F_K`, use the exact existing score. A representative
+form is:
+
+```text
+score(a) = aggregate_k [ mean_{i in F_k and eligible} Delta_i(a) ]
+```
+
+where `aggregate_k` is the Experiment 12 balancing operator. Record the actual
+operator rather than replacing it with an undocumented mean.
 
 ### New mixed prototype/repair recipes
 
-Each recipe below receives both `Interleaved` and `TwoPhase` variants:
+Each recipe below receives both `Interleaved` and `TwoPhase` variants. The
+schedule determines which builder runs in each slot; the builder definitions
+above determine the actual optimization.
 
-| Recipe | Broad builder | Repair builder | Simple interpretation |
-|---|---|---|---|
-| `BroadMeanGlobalRepair` | `BroadMean` | `GlobalRepair` | Make a broad shared correction, then remove the largest remaining error. |
-| `BroadMeanFinishRepair` | `BroadMean` | `FinishRepair` | Make broad progress, then finish curves near epsilon. |
-| `BroadMeanHardRepair` | `BroadMean` | `HardRepair` | Make broad progress, then rescue the difficult tail. |
-| `TrimmedMeanGlobalRepair` | `TrimmedMean` | `GlobalRepair` | Use a robust broad average, then optimize total cleanup. |
-| `AlignedMedianGlobalRepair` | `AlignedMedian` | `GlobalRepair` | Use a robust middle-shaped prototype, then optimize total cleanup. |
-| `ClusterMeanGlobalRepair` | `ClusterMean` | `GlobalRepair` | Cover common residual families, then remove the largest remaining error. |
-| `ClusterMeanHardRepair` | `ClusterMean` | `HardRepair` | Cover common residual families, then rescue difficult leftovers. |
-| `DominantDirectionGlobalRepair` | `DominantDirection` | `GlobalRepair` | Remove the largest shared error direction, then clean up globally. |
-| `DiverseCoverageHardRepair` | `DiverseCoverage` | `HardRepair` | Cover several distinct broad problems, then repair the tail. |
+#### `BroadMeanGlobalRepair`
 
-PascalCase row identifiers should append the schedule, for example:
+**Common intuitive description**
+
+> Repeatedly combine a shared average correction with a concrete example that
+> removes the most total remaining error.
+
+**Technical description**
+
+Broad slots use `BroadMean`. Repair slots use `GlobalRepair`. This is the most
+direct test of whether smooth population-level corrections and sharp observed
+examples complement one another.
+
+**Mathematical formulation**
+
+```text
+Broad slot:  solve weighted aligned least squares for a
+Repair slot: maximize sum_i eligible_i * w_i * Delta_i(a)
+```
+
+#### `BroadMeanFinishRepair`
+
+**Common intuitive description**
+
+> Make broad progress, then use concrete repairs to push near-correct curves
+> inside epsilon.
+
+**Technical description**
+
+Broad slots use `BroadMean`. Repair slots use `FinishRepair`. This policy tests
+whether broad prototypes create a large population of almost-solved residuals
+that targeted finishing can convert into strict-perfect reconstructions.
+
+**Mathematical formulation**
+
+```text
+Broad slot:  solve weighted aligned least squares for a
+Repair slot: lexicographically maximize newly_resolved_count, total_improvement
+```
+
+#### `BroadMeanHardRepair`
+
+**Common intuitive description**
+
+> Use broad averages for general progress, then use concrete examples to rescue
+> the worst remaining cases.
+
+**Technical description**
+
+Broad slots use `BroadMean`. Repair slots use `HardRepair`. This separates broad
+central coverage from explicit tail control.
+
+**Mathematical formulation**
+
+```text
+Broad slot:  solve weighted aligned least squares for a
+Repair slot: maximize improvement over current worst-loss decile
+```
+
+#### `TrimmedMeanGlobalRepair`
+
+**Common intuitive description**
+
+> Use an outlier-resistant broad average, then choose the concrete correction
+> that removes the most total residual error.
+
+**Technical description**
+
+Broad slots use `TrimmedMean`. Repair slots use `GlobalRepair`. This tests
+whether ordinary aligned means are being distorted by a small number of unusual
+residuals.
+
+**Mathematical formulation**
+
+```text
+Broad slot:  aligned least squares over retained lowest-loss 90%
+Repair slot: maximize weighted summed Delta_i(a)
+```
+
+#### `AlignedMedianGlobalRepair`
+
+**Common intuitive description**
+
+> Build a very robust middle-shaped prototype, then use concrete examples for
+> global cleanup.
+
+**Technical description**
+
+Broad slots use `AlignedMedian`. Repair slots use `GlobalRepair`. This is a
+stronger robustness test than trimming because each control point uses a median
+rather than a mean.
+
+**Mathematical formulation**
+
+```text
+Broad slot:  coordinate-wise weighted median in canonical phase/gain frame
+Repair slot: maximize weighted summed Delta_i(a)
+```
+
+#### `ClusterMeanGlobalRepair`
+
+**Common intuitive description**
+
+> Cover one common family of mistakes at a time, then choose concrete corrections
+> that remove the most error left across all families.
+
+**Technical description**
+
+Broad slots use `ClusterMean`. Repair slots use `GlobalRepair`. Clustering is
+recomputed before every broad slot from the current eligible residuals.
+
+**Mathematical formulation**
+
+```text
+Broad slot:  choose highest-utility aligned cluster prototype a_k
+Repair slot: maximize weighted summed Delta_i(a)
+```
+
+#### `ClusterMeanHardRepair`
+
+**Common intuitive description**
+
+> Cover the main residual families broadly, then use concrete examples to rescue
+> the difficult leftovers.
+
+**Technical description**
+
+Broad slots use `ClusterMean`. Repair slots use `HardRepair`. This policy tests a
+coarse family-coverage phase combined with explicit tail protection.
+
+**Mathematical formulation**
+
+```text
+Broad slot:  choose highest-utility aligned cluster prototype a_k
+Repair slot: maximize improvement over current worst-loss decile
+```
+
+#### `DominantDirectionGlobalRepair`
+
+**Common intuitive description**
+
+> Remove the strongest shared direction of error, then clean up with the best
+> concrete residual examples.
+
+**Technical description**
+
+Broad slots use `DominantDirection`. Repair slots use `GlobalRepair`. The broad
+atom may not resemble any single residual; it represents a high-energy shared
+correction direction.
+
+**Mathematical formulation**
+
+```text
+Broad slot:  leading eigenvector of weighted canonical residual covariance
+Repair slot: maximize weighted summed Delta_i(a)
+```
+
+#### `DiverseCoverageHardRepair`
+
+**Common intuitive description**
+
+> Spend broad slots on several different widely useful corrections, then spend
+> repair slots on the worst cases still left.
+
+**Technical description**
+
+Broad slots use `DiverseCoverage`. Repair slots use `HardRepair`. The broad score
+must penalize phase/scale similarity to earlier broad atoms in the same layer.
+
+**Mathematical formulation**
+
+```text
+Broad slot:  maximize alpha*coverage + beta*improvement - lambda*similarity
+Repair slot: maximize improvement over current worst-loss decile
+```
+
+PascalCase row identifiers append the schedule, for example:
 
 ```text
 BroadMeanGlobalRepairInterleaved
@@ -338,16 +817,67 @@ ClusterMeanHardRepairTwoPhase
 
 ### Pure-prototype controls
 
-Test whether observed-residual repair atoms are needed at all:
+#### `AllBroadAlignedMeans`
+
+**Common intuitive description**
+
+> Build the entire active codebook from broad aligned averages and never copy an
+> individual residual as an atom.
+
+**Technical description**
+
+All seven active slots run `BroadMean` sequentially. The eligible population and
+current losses are updated after every slot. Each new mean must be constructed
+against the current partial codebook, not precomputed once from the original
+layer residuals.
+
+**Mathematical formulation**
+
+For every slot `s = 1..7`:
 
 ```text
-AllBroadAlignedMeans
-AllClusterMeans
-AllDominantDirections
+a_s = argmin_a sum_i eligible_i^(s) * w_i^(s)
+                 * min_{phi,g} ||r_i - g S_phi(a)||_2^2
 ```
 
-All seven active slots are synthesized. These policies use
-`utility_candidate_budget = Null`.
+using the alternating `BroadMean` solver.
+
+#### `AllClusterMeans`
+
+**Common intuitive description**
+
+> Fill the whole codebook with representative prototypes of residual families.
+
+**Technical description**
+
+All seven active slots use `ClusterMean`. Recluster the current eligible
+residual population at every slot and select the highest-utility cluster
+prototype not already adequately represented by the partial codebook.
+
+**Mathematical formulation**
+
+For every slot, form clusters `C_k`, solve aligned prototype `a_k` for each, and
+choose `argmax_k Utility(a_k)`.
+
+#### `AllDominantDirections`
+
+**Common intuitive description**
+
+> Fill the whole codebook with successive shared directions of residual error.
+
+**Technical description**
+
+All seven active slots use `DominantDirection`. After selecting each direction,
+update current best reconstruction losses before estimating the next direction.
+This is not a one-shot seven-component PCA decomposition unless that produces
+identical greedy semantics.
+
+**Mathematical formulation**
+
+For every slot, recompute the weighted canonical residual covariance under the
+current partial codebook and select its leading direction.
+
+All pure-prototype policies use `utility_candidate_budget = Null`.
 
 ## Utility Candidate Budget
 
@@ -360,28 +890,19 @@ Null
 ```
 
 `CandidateBudget24` and `CandidateBudget48` apply only to repair slots that
-select observed residual examples.
-
-For a mixed row:
-
-```text
-row utility_candidate_budget = CandidateBudget48
-effective slot budgets = [Null, 48, Null, 48, Null, 48, Null]
-```
-
-for the interleaved schedule, or:
-
-```text
-effective slot budgets = [Null, Null, Null, Null, 48, 48, 48]
-```
-
-for the two-phase schedule.
-
-Broad synthesized slots always use `Null`. Pure-prototype rows use `Null` for
-all seven slots.
-
+select observed residual examples. Broad synthesized slots always use `Null`.
 Artifacts must record both the row-level budget and the effective budget for
 each slot.
+
+For example:
+
+```text
+Interleaved, CandidateBudget48:
+[Null, 48, Null, 48, Null, 48, Null]
+
+TwoPhase, CandidateBudget48:
+[Null, Null, Null, Null, 48, 48, 48]
+```
 
 ## Layer Normalization
 
@@ -391,8 +912,6 @@ Only two values remain in the main grid:
 FinalClipOnly
 LayerClip0To1
 ```
-
-Interpretation:
 
 - `FinalClipOnly`: no per-layer clipping;
 - `LayerClip0To1`: clip the running reconstruction to `[0, 1]` after each layer.
@@ -489,10 +1008,9 @@ epsilon = 0.04
 ```
 
 This defines 12 comparison rows. The four `epsilon = 0.02` rows may reuse exact
-main-grid rows, so only eight additional executions are required.
-
-The aside should be reported separately and should not determine the main
-strategy ranking.
+main-grid rows, so only eight additional executions are required. The aside
+should be reported separately and should not determine the main strategy
+ranking.
 
 ## Co-Primary Metrics
 
@@ -538,7 +1056,15 @@ atom_phase_scale_similarity_to_previous_max
 prototype_iteration_count
 prototype_converged
 prototype_population_size
+prototype_objective_before
+prototype_objective_after
+prototype_seed_rule
+cluster_count
+cluster_size
+explained_weighted_energy
 repair_source_dataset_index
+repair_shortlist_rule
+repair_utility_score
 ```
 
 For partial-codebook validation, evaluate the row using:
@@ -576,21 +1102,9 @@ The report should be findings-first and focus on paired comparisons:
 7. repair objectives;
 8. partial-codebook progression from one through seven active atoms.
 
-The report should not collapse the result into one automatic scalar ranking.
-It should identify Pareto candidates across the co-primary metrics and explain
-the tradeoffs.
-
-The report must clearly distinguish:
-
-```text
-observed residual atom
-aligned mean prototype
-trimmed mean prototype
-aligned median prototype
-cluster mean prototype
-dominant direction prototype
-diversity-aware coverage prototype
-```
+The report should not collapse the result into one automatic scalar ranking. It
+should identify Pareto candidates across the co-primary metrics and explain the
+tradeoffs.
 
 ## Outputs
 
@@ -687,12 +1201,14 @@ Tests should verify:
 - the fixed W8D16 runtime contract and 193-head accounting;
 - `Atom0 = NoOpAtom` for every residual layer;
 - exact seven-slot `Interleaved` and `TwoPhase` schedules;
-- AllResiduals and UnresolvedOnly mask behavior;
+- `AllResiduals` and `UnresolvedOnly` mask behavior;
 - epsilon uses complete-curve maximum absolute error;
 - the unresolved mask is recomputed after every slot;
 - broad atoms can differ from every observed residual;
 - phase/gain-aligned prototype updates do not raw-average shifted residuals;
+- each broad builder follows its documented objective and deterministic tie rules;
 - repair candidate budgets apply only to repair slots;
+- finish scoring uses maximum absolute epsilon rather than MSE `<= epsilon^2`;
 - pure-prototype rows require `Null`;
 - deterministic construction under a fixed seed;
 - empty unresolved populations terminate with remaining no-op atoms;
