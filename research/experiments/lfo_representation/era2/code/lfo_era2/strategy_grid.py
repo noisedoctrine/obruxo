@@ -37,6 +37,16 @@ HEAD_OUTPUTS = 193
 RUNTIME_TOPOLOGY = None
 CANDIDATE_EPSILONS = (0.001, 0.0025, 0.005, 0.01, 0.02)
 PILOT_EPSILONS = (0.001, 0.0025)
+SELECTION_CHECKPOINT_DEFINITION = {
+    "experiment_phase": "13A",
+    "dataset_split": "training",
+    "row_count": 90,
+    "residual_layers": tuple(range(1, D + 1)),
+    "decision_slots": tuple(range(0, 7)),
+    "excluded_decision_slots": (7,),
+    "early_middle_residual_layers": tuple(range(1, 13)),
+    "early_middle_decision_slots": tuple(range(0, 6)),
+}
 PILOT_POLICIES = (
     "BroadMeanGlobalRepairInterleaved",
     "BroadMeanGlobalRepairTwoPhase",
@@ -66,6 +76,8 @@ REQUIRED_ANALYSIS_FILES = (
     "slot_progression.csv",
     "partial_codebook_validation.csv",
     "atom_construction.csv",
+    "atom_assignments.csv",
+    "candidate_search_diagnostics.csv",
     "budget_accounting.csv",
     *REQUIRED_CALIBRATION_FILES,
     "epsilon_selection.json",
@@ -216,13 +228,19 @@ class EpsilonSelection:
         missing = [key for key in REQUIRED_SELECTION_FIELDS if key not in payload]
         if missing:
             raise SelectionArtifactError("epsilon selection artifact missing fields: " + ", ".join(missing))
-        try:
-            candidates = tuple(float(value) for value in payload["candidate_epsilons"])
-            selected = None if payload["selected_epsilon"] is None else float(payload["selected_epsilon"])
-        except (TypeError, ValueError) as exc:
-            raise SelectionArtifactError("epsilon selection values must be numeric") from exc
+        candidate_values = payload["candidate_epsilons"]
+        if not isinstance(candidate_values, list) or not candidate_values or any(
+            not _is_json_number(value) for value in candidate_values
+        ):
+            raise SelectionArtifactError("candidate_epsilons must be a non-empty JSON array of finite numbers")
+        candidates = tuple(float(value) for value in candidate_values)
+        selected_value = payload["selected_epsilon"]
+        if selected_value is not None and not _is_json_number(selected_value):
+            raise SelectionArtifactError("selected_epsilon must be null or a finite JSON number")
+        selected = None if selected_value is None else float(selected_value)
         if type(payload["selection_passed"]) is not bool or type(payload["selection_override"]) is not bool:
             raise SelectionArtifactError("selection_passed and selection_override must be booleans")
+        _validate_selection_metadata(payload)
         return cls(
             candidate_epsilons=candidates,
             selection_rule_version=str(payload["selection_rule_version"]),
@@ -381,6 +399,7 @@ def configuration_fingerprint() -> str:
         "schema_version": SCHEMA_VERSION,
         "selection_rule_version": SELECTION_RULE_VERSION,
         "candidate_epsilons": CANDIDATE_EPSILONS,
+        "selection_checkpoint_definition": SELECTION_CHECKPOINT_DEFINITION,
         "pairs": [row.paired_settings for row in experiment13a_specs()],
     }
     return hashlib.sha256(_canonical_json(payload).encode()).hexdigest()
@@ -536,12 +555,16 @@ def run_13b_pilot(
     epsilons = tuple(_validate_epsilon(value) for value in candidate_epsilons)
     if not epsilons or any(value not in PILOT_EPSILONS for value in epsilons):
         raise PhaseGateError("pilot epsilons are restricted to 0.001 and 0.0025")
+    if len(set(epsilons)) != len(epsilons):
+        raise PhaseGateError("pilot candidate epsilons must not contain duplicates")
     rows = [row for row in experiment13b_specs(PILOT_EPSILONS[0]) if row.construction_policy in PILOT_POLICIES]
     if row_ids is not None:
         invalid = row_ids - {row.row_id for row in rows}
         if invalid:
             raise PhaseGateError("pilot row filter contains non-pilot rows: " + ", ".join(sorted(invalid)))
         rows = [row for row in rows if row.row_id in row_ids]
+    if not rows:
+        raise PhaseGateError("pilot execution requires at least one prespecified row")
     _write_json(
         output_dir / "experiment13b_pilot_manifest.json",
         {
@@ -611,9 +634,10 @@ def load_epsilon_selection(
         if epsilon not in CANDIDATE_EPSILONS:
             raise SelectionArtifactError("selected_epsilon is not in the configured candidate set")
         if selection.selection_override and not (
-            str(selection.selection_override_rationale or "").strip()
-            and str(selection.selection_override_timestamp or "").strip()
-            and selection.pilot_evidence
+            _is_nonempty_string(selection.selection_override_rationale)
+            and _is_nonempty_string(selection.selection_override_timestamp)
+            and isinstance(selection.pilot_evidence, (dict, list))
+            and bool(selection.pilot_evidence)
         ):
             raise SelectionArtifactError("selection override requires rationale, timestamp, and pilot evidence")
     elif selection.selected_epsilon is not None:
@@ -630,18 +654,42 @@ def validate_completed_13a(run_dir: Path) -> tuple[dict[str, Any], dict[str, Any
     status = read_phase_status(run_dir, "13A")
     if not isinstance(phase, dict) or status["state"] != "complete":
         raise PhaseGateError(f"Experiment 13A is not complete: state={status['state']}")
+    if manifest.get("schema_version") != SCHEMA_VERSION or manifest.get("experiment_id") != EXPERIMENT_ID:
+        raise PhaseGateError("Experiment 13A manifest schema or experiment identity is incompatible")
+    if (
+        status.get("schema_version") != SCHEMA_VERSION
+        or status.get("experiment_id") != EXPERIMENT_ID
+        or status.get("experiment_phase") != "13A"
+    ):
+        raise PhaseGateError("Experiment 13A status schema or experiment identity is incompatible")
     if status.get("experiment13a_run_identity") != manifest.get("experiment13a_run_identity"):
         raise PhaseGateError("Experiment 13A status does not match the manifest run identity")
     if status.get("smoke") or status.get("filtered"):
         raise PhaseGateError("smoke and filtered 13A runs cannot satisfy the completion gate")
-    if status.get("completed_rows") != 90 or status.get("expected_row_count") != 90:
+    if (
+        status.get("row_count") != 90
+        or status.get("completed_rows") != 90
+        or status.get("failed_rows") != 0
+        or status.get("expected_row_count") != 90
+        or not str(status.get("completed_at_utc") or "").strip()
+    ):
         raise PhaseGateError("Experiment 13A completion gate requires all 90 rows")
-    if not phase.get("complete_design") or phase.get("row_count") != 90:
+    if (
+        not phase.get("complete_design")
+        or phase.get("smoke")
+        or phase.get("filtered")
+        or phase.get("row_count") != 90
+        or phase.get("expected_row_count") != 90
+    ):
         raise PhaseGateError("Experiment 13A manifest does not represent the complete 90-row design")
-    if {row.get("pair_id") for row in phase.get("rows", [])} != {row.pair_id for row in experiment13a_specs()}:
-        raise PhaseGateError("Experiment 13A manifest pair set is incomplete or incompatible")
-    if manifest.get("configuration_fingerprint") != configuration_fingerprint():
+    fingerprint = configuration_fingerprint()
+    if manifest.get("configuration_fingerprint") != fingerprint:
         raise PhaseGateError("Experiment 13A manifest uses an incompatible configuration fingerprint")
+    _validate_completed_13a_rows(
+        phase.get("rows"),
+        run_identity=str(manifest.get("experiment13a_run_identity") or ""),
+        fingerprint=fingerprint,
+    )
     return manifest, status
 
 
@@ -834,6 +882,78 @@ def _validate_epsilon(value: float | None) -> float:
     return epsilon
 
 
+def _is_json_number(value: Any) -> bool:
+    return type(value) in {int, float} and math.isfinite(float(value))
+
+
+def _validate_selection_metadata(payload: dict[str, Any]) -> None:
+    checkpoint = payload["selection_checkpoint_definition"]
+    if not isinstance(checkpoint, dict) or not _json_equivalent(checkpoint, SELECTION_CHECKPOINT_DEFINITION):
+        raise SelectionArtifactError("selection checkpoint definition is incompatible with Experiment 13")
+    statistics = payload["training_statistics_used"]
+    if (
+        not isinstance(statistics, dict)
+        or statistics.get("dataset_split") != "training"
+        or type(statistics.get("row_count")) is not int
+        or statistics["row_count"] != 90
+    ):
+        raise SelectionArtifactError("selection statistics must cover all 90 Experiment 13A training rows")
+    for field in (
+        "median_unexplained_retired_energy_fraction",
+        "p95_unexplained_retired_energy_fraction",
+    ):
+        value = payload[field]
+        if not _is_json_number(value) or not 0.0 <= float(value) <= 1.0:
+            raise SelectionArtifactError(f"{field} must be a finite fraction in [0, 1]")
+    retired_summary = payload["retired_lfo_fraction_summary"]
+    if not isinstance(retired_summary, dict) or not retired_summary:
+        raise SelectionArtifactError("retired_lfo_fraction_summary must be a non-empty JSON object")
+    if (
+        not isinstance(payload["experiment13a_run_identity"], str)
+        or not payload["experiment13a_run_identity"].strip()
+        or not isinstance(payload["configuration_fingerprint"], str)
+        or not payload["configuration_fingerprint"].strip()
+    ):
+        raise SelectionArtifactError("selection artifact run identity and configuration fingerprint are required")
+    if not isinstance(payload["selection_notes"], str):
+        raise SelectionArtifactError("selection_notes must be a string")
+    if payload["selection_passed"] and not _is_nonempty_string(payload["selection_timestamp"]):
+        raise SelectionArtifactError("a passed selection requires selection_timestamp")
+    if not payload["selection_passed"] and payload["selection_timestamp"] is not None:
+        raise SelectionArtifactError("selection_timestamp must be null while selection_passed=false")
+    if payload["selection_override"] and not payload["selection_passed"]:
+        raise SelectionArtifactError("selection_override=true requires selection_passed=true")
+    if payload["selection_passed"] and not payload["selection_override"]:
+        if float(payload["median_unexplained_retired_energy_fraction"]) > 0.01 or float(
+            payload["p95_unexplained_retired_energy_fraction"]
+        ) > 0.05:
+            raise SelectionArtifactError("automatic selection statistics do not satisfy the configured thresholds")
+
+
+def _validate_completed_13a_rows(rows: Any, *, run_identity: str, fingerprint: str) -> None:
+    if not isinstance(rows, list) or len(rows) != 90:
+        raise PhaseGateError("Experiment 13A manifest must contain exactly 90 row manifests")
+    expected_specs = experiment13a_specs()
+    expected_by_id = {row.row_id: row.manifest_dict(run_identity, fingerprint) for row in expected_specs}
+    actual_by_id: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        if not isinstance(row, dict) or not isinstance(row.get("row_id"), str):
+            raise PhaseGateError("Experiment 13A manifest contains a malformed row entry")
+        row_id = row["row_id"]
+        if row_id in actual_by_id:
+            raise PhaseGateError(f"Experiment 13A manifest contains duplicate row_id: {row_id}")
+        actual_by_id[row_id] = row
+    if set(actual_by_id) != set(expected_by_id):
+        raise PhaseGateError("Experiment 13A manifest row set is incomplete or incompatible")
+    for row_id, expected in expected_by_id.items():
+        actual = actual_by_id[row_id]
+        mismatched = [key for key, value in expected.items() if not _json_equivalent(actual.get(key), value)]
+        if mismatched:
+            raise PhaseGateError(
+                f"Experiment 13A row manifest is incompatible for {row_id}: {', '.join(mismatched)}"
+            )
+
+
 def _status_line(label: str, status: dict[str, Any]) -> str:
     return (
         f"{label}: state={status.get('state')} completed_rows={status.get('completed_rows', 0)}/"
@@ -906,6 +1026,17 @@ def _nonempty(path: Path) -> bool:
 
 def _canonical_json(payload: Any) -> str:
     return json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False)
+
+
+def _json_equivalent(left: Any, right: Any) -> bool:
+    try:
+        return _canonical_json(left) == _canonical_json(right)
+    except (TypeError, ValueError):
+        return False
+
+
+def _is_nonempty_string(value: Any) -> bool:
+    return isinstance(value, str) and bool(value.strip())
 
 
 def _now() -> str:

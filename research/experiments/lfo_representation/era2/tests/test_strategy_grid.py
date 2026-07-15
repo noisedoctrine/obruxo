@@ -127,6 +127,27 @@ class StrategyGridGateTests(unittest.TestCase):
             with self.assertRaisesRegex(grid.PhaseGateError, "run identity"):
                 grid.validate_completed_13a(run_dir)
 
+    def test_completed_13a_rejects_inconsistent_status_and_rows(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp)
+            _write_completed_13a(run_dir)
+            status_path = run_dir / grid.PHASE_STATUS_FILES["13A"]
+            status = json.loads(status_path.read_text())
+            status["failed_rows"] = 1
+            status_path.write_text(json.dumps(status))
+            with self.assertRaisesRegex(grid.PhaseGateError, "all 90 rows"):
+                grid.validate_completed_13a(run_dir)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp)
+            _write_completed_13a(run_dir)
+            manifest_path = run_dir / "manifest.json"
+            manifest = json.loads(manifest_path.read_text())
+            manifest["phases"]["13A"]["rows"][0]["finish_threshold"] = 0.001
+            manifest_path.write_text(json.dumps(manifest))
+            with self.assertRaisesRegex(grid.PhaseGateError, "row manifest is incompatible"):
+                grid.validate_completed_13a(run_dir)
+
     def test_missing_partial_stale_and_incompatible_selection_block_13b(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             run_dir = Path(tmp)
@@ -155,6 +176,40 @@ class StrategyGridGateTests(unittest.TestCase):
             with self.assertRaises(grid.SelectionArtifactError):
                 grid.load_epsilon_selection(path, expected_run_identity=identity, expected_configuration_fingerprint=fingerprint, require_passed=True)
 
+    def test_semantically_malformed_selection_artifacts_are_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp)
+            identity, fingerprint = _write_completed_13a(run_dir)
+            path = run_dir / "epsilon_selection.json"
+            cases = []
+
+            numeric_strings = _selection_payload(identity, fingerprint)
+            numeric_strings["candidate_epsilons"] = [str(value) for value in grid.CANDIDATE_EPSILONS]
+            cases.append((numeric_strings, "finite numbers"))
+
+            wrong_checkpoints = _selection_payload(identity, fingerprint)
+            wrong_checkpoints["selection_checkpoint_definition"]["decision_slots"].append(7)
+            cases.append((wrong_checkpoints, "checkpoint definition"))
+
+            missing_timestamp = _selection_payload(identity, fingerprint)
+            missing_timestamp["selection_timestamp"] = None
+            cases.append((missing_timestamp, "selection_timestamp"))
+
+            invalid_override = _selection_payload(identity, fingerprint, passed=False, selected=None)
+            invalid_override["selection_override"] = True
+            cases.append((invalid_override, "requires selection_passed=true"))
+
+            for payload, message in cases:
+                with self.subTest(message=message):
+                    path.write_text(json.dumps(payload))
+                    with self.assertRaisesRegex(grid.SelectionArtifactError, message):
+                        grid.load_epsilon_selection(
+                            path,
+                            expected_run_identity=identity,
+                            expected_configuration_fingerprint=fingerprint,
+                            require_passed=False,
+                        )
+
     def test_valid_selection_freezes_one_epsilon_and_dataset_identity(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             run_dir = Path(tmp)
@@ -182,6 +237,10 @@ class StrategyGridGateTests(unittest.TestCase):
             non_pilot = next(row.row_id for row in grid.experiment13b_specs(0.001) if row.construction_policy not in grid.PILOT_POLICIES)
             with self.assertRaisesRegex(grid.PhaseGateError, "non-pilot"):
                 grid.run_13b_pilot(output_dir=run_dir, epsilon_selection_path=path, candidate_epsilons=[0.001], row_ids={non_pilot})
+            with self.assertRaisesRegex(grid.PhaseGateError, "at least one"):
+                grid.run_13b_pilot(output_dir=run_dir, epsilon_selection_path=path, candidate_epsilons=[0.001], row_ids=set())
+            with self.assertRaisesRegex(grid.PhaseGateError, "duplicates"):
+                grid.run_13b_pilot(output_dir=run_dir, epsilon_selection_path=path, candidate_epsilons=[0.001, 0.001])
             with self.assertRaises(grid.ConstructionNotImplementedError):
                 grid.run_13b_pilot(output_dir=run_dir, epsilon_selection_path=path, candidate_epsilons=[0.001, 0.0025])
             pilot = json.loads((run_dir / "experiment13b_pilot_manifest.json").read_text())
@@ -194,6 +253,8 @@ class StrategyGridGateTests(unittest.TestCase):
                 grid.analyze_strategy_grid(run_dir=Path(tmp))
         self.assertTrue(set(grid.REQUIRED_CALIBRATION_FILES).issubset(grid.REQUIRED_ANALYSIS_FILES))
         self.assertIn("epsilon_selection.json", grid.REQUIRED_ANALYSIS_FILES)
+        self.assertIn("atom_assignments.csv", grid.REQUIRED_ANALYSIS_FILES)
+        self.assertIn("candidate_search_diagnostics.csv", grid.REQUIRED_ANALYSIS_FILES)
 
 
 class StrategyGridCliTests(unittest.TestCase):
@@ -243,9 +304,9 @@ def _selection_payload(identity: str, fingerprint: str, passed: bool = True, sel
     return {
         "candidate_epsilons": list(grid.CANDIDATE_EPSILONS),
         "selection_rule_version": grid.SELECTION_RULE_VERSION,
-        "selection_checkpoint_definition": {"layers": [1, 16], "slots": [0, 6], "dataset_split": "training"},
+        "selection_checkpoint_definition": json.loads(json.dumps(grid.SELECTION_CHECKPOINT_DEFINITION)),
         "selected_epsilon": selected,
-        "training_statistics_used": {"row_count": 90},
+        "training_statistics_used": {"dataset_split": "training", "row_count": 90},
         "median_unexplained_retired_energy_fraction": 0.001,
         "p95_unexplained_retired_energy_fraction": 0.01,
         "retired_lfo_fraction_summary": {"max": 0.1},
