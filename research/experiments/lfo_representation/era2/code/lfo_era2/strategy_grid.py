@@ -1,4 +1,4 @@
-"""Experiment 13 execution scaffold for the fixed-W8D16 strategy grid."""
+"""Experiment 13 execution for the fixed-W8D16 strategy grid."""
 
 from __future__ import annotations
 
@@ -12,11 +12,11 @@ import os
 from pathlib import Path
 import re
 import time
-from typing import Any, Literal, Sequence
+from typing import Any, Callable, Literal, Sequence
 from uuid import uuid4
 
 ExperimentPhase = Literal["13A", "13B"]
-PhaseState = Literal["not_started", "partial", "blocked", "failed", "complete"]
+PhaseState = Literal["not_started", "running", "partial", "blocked", "failed", "complete"]
 
 EXPERIMENT_ID = "experiment_13"
 SCHEMA_VERSION = "experiment13_strategy_grid_v1"
@@ -112,10 +112,6 @@ class PhaseGateError(Experiment13Error):
 
 
 class SelectionArtifactError(PhaseGateError):
-    pass
-
-
-class ConstructionNotImplementedError(Experiment13Error):
     pass
 
 
@@ -414,45 +410,16 @@ def run_13a(
     corpus_sample_fraction: float = 1.0,
     resume: bool = False,
     row_ids: set[str] | None = None,
+    chunk_size: int = 256,
+    dataset: Any | None = None,
+    progress: Callable[[str], None] | None = None,
 ) -> dict[str, str]:
-    _validate_run_options(smoke, corpus_sample_fraction, backend)
-    full_rows = experiment13a_specs()
-    rows = _filter_rows(full_rows, row_ids)
-    partial = smoke or row_ids is not None or len(rows) != 90
-    output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    run_identity = _run_identity(output_dir, resume)
-    fingerprint = configuration_fingerprint()
-    _write_phase_manifest(
-        output_dir=output_dir,
-        phase="13A",
-        specs=rows,
-        run_identity=run_identity,
-        fingerprint=fingerprint,
-        metadata_path=metadata_path,
-        backend=backend,
-        smoke=smoke,
-        corpus_sample_fraction=corpus_sample_fraction,
-        complete_design=not partial,
+    return _run_phase(
+        phase="13A", specs=experiment13a_specs(), output_dir=output_dir,
+        metadata_path=metadata_path, backend=backend, smoke=smoke,
+        corpus_sample_fraction=corpus_sample_fraction, resume=resume,
+        row_ids=row_ids, chunk_size=chunk_size, dataset=dataset, progress=progress,
     )
-    status = _phase_status(
-        phase="13A",
-        state="partial",
-        run_identity=run_identity,
-        row_count=len(rows),
-        expected_row_count=90,
-        smoke=smoke,
-        filtered=row_ids is not None,
-        reason="preflight complete; numerical construction has not started",
-    )
-    _write_phase_status(output_dir, status)
-    _event(output_dir, "13A", "preflight_complete", status["reason"])
-    error = ConstructionNotImplementedError("Experiment 13A construction strategies are not implemented")
-    status.update(state="partial" if partial else "failed", failed_at_utc=_now(), reason=str(error), error=str(error))
-    _write_phase_status(output_dir, status)
-    _failure(output_dir, "13A", str(error))
-    _event(output_dir, "13A", "construction_not_implemented", str(error))
-    raise error
 
 
 def select_epsilon(*, run_dir: Path = DEFAULT_OUTPUT_DIR) -> EpsilonSelection:
@@ -464,10 +431,72 @@ def select_epsilon(*, run_dir: Path = DEFAULT_OUTPUT_DIR) -> EpsilonSelection:
         _write_json(run_dir / "epsilon_selection_status.json", {"state": "blocked", "reason": reason})
         _failure(run_dir, "select-epsilon", reason)
         raise PhaseGateError(reason)
-    reason = "epsilon-selection computation is not implemented"
-    _write_json(run_dir / "epsilon_selection_status.json", {"state": "failed", "reason": reason})
-    _failure(run_dir, "select-epsilon", reason)
-    raise ConstructionNotImplementedError(reason)
+    payload = _compute_epsilon_selection(run_dir)
+    _write_json(run_dir / "epsilon_selection.json", payload)
+    _write_json(
+        run_dir / "epsilon_selection_status.json",
+        {"state": "complete" if payload["selection_passed"] else "not_passed", "reason": payload["selection_notes"]},
+    )
+    _event(run_dir, "select-epsilon", "selection_complete", payload["selection_notes"])
+    return EpsilonSelection.from_dict(payload)
+
+
+def override_epsilon(
+    *,
+    run_dir: Path = DEFAULT_OUTPUT_DIR,
+    selected_epsilon: float,
+    rationale: str,
+) -> EpsilonSelection:
+    """Record the explicit, pilot-backed threshold decision required by the plan."""
+    run_dir = Path(run_dir)
+    manifest, _ = validate_completed_13a(run_dir)
+    selection_path = run_dir / "epsilon_selection.json"
+    selection = load_epsilon_selection(
+        selection_path,
+        expected_run_identity=manifest["experiment13a_run_identity"],
+        expected_configuration_fingerprint=manifest["configuration_fingerprint"],
+        require_passed=False,
+    )
+    if selection.selection_passed:
+        raise PhaseGateError("epsilon selection has already passed")
+    epsilon = _validate_epsilon(selected_epsilon)
+    if epsilon not in PILOT_EPSILONS:
+        raise PhaseGateError("pilot override epsilon must be 0.001 or 0.0025")
+    if not isinstance(rationale, str) or not rationale.strip():
+        raise PhaseGateError("pilot override requires a non-empty rationale")
+    pilot_manifest_path = run_dir / "experiment13b_pilot_manifest.json"
+    pilot_results_path = run_dir / "experiment13b_pilot_results.csv"
+    if not pilot_manifest_path.exists() or not pilot_results_path.exists():
+        raise PhaseGateError("pilot override requires completed pilot artifacts")
+    pilot_manifest = _read_json(pilot_manifest_path)
+    if not pilot_manifest.get("complete") or epsilon not in tuple(float(value) for value in pilot_manifest.get("candidate_epsilons", [])):
+        raise PhaseGateError("pilot override epsilon is not covered by the completed pilot")
+    with pilot_results_path.open(encoding="utf-8", newline="") as handle:
+        pilot_rows = list(csv.DictReader(handle))
+    matching = [row for row in pilot_rows if math.isclose(float(row.get("epsilon", "nan")), epsilon)]
+    if not matching:
+        raise PhaseGateError("pilot override has no matching result rows")
+    timestamp = _now()
+    payload = dict(selection.payload)
+    payload.update(
+        selected_epsilon=epsilon,
+        selection_passed=True,
+        selection_override=True,
+        selection_override_rationale=rationale.strip(),
+        selection_override_timestamp=timestamp,
+        selection_timestamp=timestamp,
+        pilot_evidence={
+            "pilot_manifest": pilot_manifest_path.name,
+            "pilot_results": pilot_results_path.name,
+            "selected_epsilon_result_row_count": len(matching),
+            "construction_policies": sorted({str(row.get("construction_policy", "")) for row in matching}),
+        },
+        selection_notes="explicit pilot-backed epsilon override",
+    )
+    _write_json(selection_path, payload)
+    _write_json(run_dir / "epsilon_selection_status.json", {"state": "complete", "reason": payload["selection_notes"]})
+    _event(run_dir, "override-epsilon", "selection_override", rationale.strip())
+    return EpsilonSelection.from_dict(payload)
 
 
 def run_13b(
@@ -480,8 +509,10 @@ def run_13b(
     corpus_sample_fraction: float = 1.0,
     resume: bool = False,
     row_ids: set[str] | None = None,
+    chunk_size: int = 256,
+    dataset: Any | None = None,
+    progress: Callable[[str], None] | None = None,
 ) -> dict[str, str]:
-    del resume
     _validate_run_options(smoke, corpus_sample_fraction, backend)
     output_dir = Path(output_dir)
     selection_path = Path(epsilon_selection_path or output_dir / "epsilon_selection.json")
@@ -498,37 +529,14 @@ def run_13b(
         _blocked_13b(output_dir, str(exc))
         raise
     assert selection.selected_epsilon is not None
-    full_rows = experiment13b_specs(selection.selected_epsilon)
-    rows = _filter_rows(full_rows, row_ids)
-    partial = smoke or row_ids is not None or len(rows) != 90
-    _write_phase_manifest(
-        output_dir=output_dir,
-        phase="13B",
-        specs=rows,
+    return _run_phase(
+        phase="13B", specs=experiment13b_specs(selection.selected_epsilon), output_dir=output_dir,
+        metadata_path=metadata_path, backend=backend, smoke=smoke,
+        corpus_sample_fraction=corpus_sample_fraction, resume=resume, row_ids=row_ids,
+        chunk_size=chunk_size, dataset=dataset, progress=progress,
         run_identity=selection.experiment13a_run_identity,
         fingerprint=selection.configuration_fingerprint,
-        metadata_path=metadata_path,
-        backend=backend,
-        smoke=smoke,
-        corpus_sample_fraction=corpus_sample_fraction,
-        complete_design=not partial,
     )
-    status = _phase_status(
-        phase="13B",
-        state="partial",
-        run_identity=selection.experiment13a_run_identity,
-        row_count=len(rows),
-        expected_row_count=90,
-        smoke=smoke,
-        filtered=row_ids is not None,
-        reason="selection gate passed; numerical construction has not started",
-    )
-    _write_phase_status(output_dir, status)
-    error = ConstructionNotImplementedError("Experiment 13B construction strategies are not implemented")
-    status.update(state="partial" if partial else "failed", failed_at_utc=_now(), reason=str(error), error=str(error))
-    _write_phase_status(output_dir, status)
-    _failure(output_dir, "13B", str(error))
-    raise error
 
 
 def run_13b_pilot(
@@ -539,6 +547,9 @@ def run_13b_pilot(
     row_ids: set[str] | None = None,
     metadata_path: Path = DEFAULT_METADATA,
     backend: str = "auto",
+    chunk_size: int = 256,
+    dataset: Any | None = None,
+    progress: Callable[[str], None] | None = None,
 ) -> dict[str, str]:
     _validate_run_options(False, 1.0, backend)
     output_dir = Path(output_dir)
@@ -565,25 +576,40 @@ def run_13b_pilot(
         rows = [row for row in rows if row.row_id in row_ids]
     if not rows:
         raise PhaseGateError("pilot execution requires at least one prespecified row")
+    pilot_manifest = {
+        "schema_version": SCHEMA_VERSION,
+        "experiment_id": EXPERIMENT_ID,
+        "experiment_phase": "13B-pilot",
+        "experiment13a_run_identity": selection.experiment13a_run_identity,
+        "configuration_fingerprint": selection.configuration_fingerprint,
+        "candidate_epsilons": list(epsilons),
+        "allowed_construction_policies": list(PILOT_POLICIES),
+        "row_ids": [row.row_id for row in rows],
+        "metadata_path": str(Path(metadata_path)),
+        "backend": backend,
+        "complete": False,
+    }
     _write_json(
         output_dir / "experiment13b_pilot_manifest.json",
-        {
-            "schema_version": SCHEMA_VERSION,
-            "experiment_id": EXPERIMENT_ID,
-            "experiment_phase": "13B-pilot",
-            "experiment13a_run_identity": selection.experiment13a_run_identity,
-            "configuration_fingerprint": selection.configuration_fingerprint,
-            "candidate_epsilons": list(epsilons),
-            "allowed_construction_policies": list(PILOT_POLICIES),
-            "row_ids": [row.row_id for row in rows],
-            "metadata_path": str(Path(metadata_path)),
-            "backend": backend,
-            "complete": False,
-        },
+        pilot_manifest,
     )
-    reason = "Experiment 13B pilot construction is not implemented"
-    _failure(output_dir, "13B-pilot", reason)
-    raise ConstructionNotImplementedError(reason)
+    from .dataset import load_presetshare_curve_dataset
+    from .strategy_grid_runtime import run_strategy_row, write_csv
+    if dataset is None:
+        dataset = load_presetshare_curve_dataset(metadata_path, resolution=CONTROL_POINT_COUNT, x_grid_mode="inclusive", progress=progress)
+    evidence: list[dict[str, Any]] = []
+    for epsilon in epsilons:
+        specs = {row.pair_id: row for row in experiment13b_specs(epsilon)}
+        for template in rows:
+            spec = specs[template.pair_id]
+            pilot_dir = output_dir / "pilot" / f"epsilon_{epsilon:g}" / "rows" / spec.row_id
+            result = run_strategy_row(spec, dataset, pilot_dir, run_identity=selection.experiment13a_run_identity, configuration_fingerprint=selection.configuration_fingerprint, backend=backend, chunk_size=chunk_size, progress=progress)
+            evidence.append({"epsilon": epsilon, **result.summary})
+    write_csv(output_dir / "experiment13b_pilot_results.csv", evidence)
+    pilot_manifest.update(complete=True, completed_at_utc=_now(), result_row_count=len(evidence))
+    _write_json(output_dir / "experiment13b_pilot_manifest.json", pilot_manifest)
+    _event(output_dir, "13B-pilot", "pilot_complete", f"rows={len(evidence)}")
+    return {"pilot_manifest": str(output_dir / "experiment13b_pilot_manifest.json"), "pilot_results": str(output_dir / "experiment13b_pilot_results.csv")}
 
 
 def analyze_strategy_grid(*, run_dir: Path = DEFAULT_OUTPUT_DIR) -> dict[str, str]:
@@ -596,7 +622,458 @@ def analyze_strategy_grid(*, run_dir: Path = DEFAULT_OUTPUT_DIR) -> dict[str, st
     missing = [name for name in REQUIRED_ANALYSIS_FILES if not _nonempty(run_dir / name)]
     if missing:
         raise AnalysisNotReadyError("analysis inputs are incomplete: " + ", ".join(missing))
-    raise ConstructionNotImplementedError("Experiment 13 report generation is not implemented")
+    return _write_strategy_analysis(run_dir)
+
+
+def _run_phase(
+    *,
+    phase: ExperimentPhase,
+    specs: Sequence[StrategyRowSpec],
+    output_dir: Path,
+    metadata_path: Path,
+    backend: str,
+    smoke: bool,
+    corpus_sample_fraction: float,
+    resume: bool,
+    row_ids: set[str] | None,
+    chunk_size: int,
+    dataset: Any | None,
+    progress: Callable[[str], None] | None,
+    run_identity: str | None = None,
+    fingerprint: str | None = None,
+) -> dict[str, str]:
+    _validate_run_options(smoke, corpus_sample_fraction, backend)
+    if int(chunk_size) < 1:
+        raise ValueError("chunk_size must be positive")
+    rows = _filter_rows(specs, row_ids)
+    partial = smoke or row_ids is not None or len(rows) != 90
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    if phase == "13A" and not resume:
+        _reset_run_outputs(output_dir)
+    identity = run_identity or _run_identity(output_dir, resume)
+    config = fingerprint or configuration_fingerprint()
+    _write_phase_manifest(
+        output_dir=output_dir, phase=phase, specs=rows, run_identity=identity,
+        fingerprint=config, metadata_path=metadata_path, backend=backend,
+        smoke=smoke, corpus_sample_fraction=corpus_sample_fraction,
+        complete_design=not partial,
+    )
+    status = _phase_status(phase, "running", identity, len(rows), 90, smoke, row_ids is not None, "loading dataset")
+    status.update(
+        rows={row.row_id: {"status": "pending"} for row in rows},
+        current_row_id="", current_row_number=0, current_task_phase="dataset_load",
+        current_task_percent=0.0, overall_tasks_completed=0, overall_tasks_total=len(rows),
+        overall_tasks_percent=0.0,
+    )
+    _write_phase_status(output_dir, status)
+    _event(output_dir, phase, "run_start", f"rows={len(rows)} backend={backend} smoke={smoke}")
+    if not (output_dir / "failures.csv").exists():
+        _write_csv(output_dir / "failures.csv", [], ("experiment_phase", "row_id", "error", "timestamp_utc"))
+
+    from . import component_ladder as x12
+    from .dataset import load_presetshare_curve_dataset
+    from .strategy_grid_runtime import read_one_csv, run_strategy_row
+
+    if dataset is None:
+        dataset = load_presetshare_curve_dataset(
+            metadata_path, resolution=CONTROL_POINT_COUNT, x_grid_mode="inclusive", progress=progress,
+        )
+    dataset = x12._subset_dataset(dataset, smoke=smoke, corpus_sample_fraction=corpus_sample_fraction)
+    completed = 0
+    for index, spec in enumerate(rows, start=1):
+        row_dir = output_dir / "rows" / spec.row_id
+        try:
+            if resume and (row_dir / "summary.csv").exists():
+                read_one_csv(row_dir / "summary.csv")
+                required_row_files = (
+                    "atom_construction.csv", "atom_assignments.csv", "candidate_search_diagnostics.csv",
+                    "slot_progression.csv", "partial_codebook_validation.csv", "layer_epsilon_quantiles.csv",
+                    "slot_epsilon_quantiles.csv", "epsilon_coverage.csv", "retired_error_mass.csv", "codebooks.npz",
+                )
+                missing = [name for name in required_row_files if not (row_dir / name).exists()]
+                if missing:
+                    raise Experiment13Error(f"cannot resume incomplete row {spec.row_id}: {', '.join(missing)}")
+                event = "row_skipped"
+            else:
+                status.update(
+                    current_row_id=spec.row_id, current_row_number=index,
+                    current_task_phase="starting", current_task_percent=0.0,
+                    reason=f"running row {index}/{len(rows)}",
+                )
+                status["rows"][spec.row_id] = {"status": "running", "started_at_utc": _now()}
+                _write_phase_status(output_dir, status)
+                _event(output_dir, phase, "row_start", f"{index}/{len(rows)} {spec.row_id}")
+
+                def row_progress(message: str) -> None:
+                    status["current_task_phase"] = message
+                    status["current_task_percent"] = _strategy_progress_percent(message)
+                    _write_phase_status(output_dir, status)
+                    if progress is not None:
+                        progress(f"experiment13: {spec.row_id}: {message}")
+
+                run_strategy_row(
+                    spec, dataset, row_dir, run_identity=identity,
+                    configuration_fingerprint=config, backend=backend,
+                    chunk_size=chunk_size, progress=row_progress,
+                )
+                event = "row_complete"
+            completed += 1
+            status["rows"][spec.row_id] = {"status": "completed", "completed_at_utc": _now()}
+            status.update(
+                completed_rows=completed, overall_tasks_completed=completed,
+                overall_tasks_percent=100.0 * completed / len(rows),
+                current_task_percent=100.0,
+            )
+            _write_phase_status(output_dir, status)
+            _event(output_dir, phase, event, f"{index}/{len(rows)} {spec.row_id}")
+        except Exception as exc:
+            status["rows"][spec.row_id] = {"status": "failed", "failed_at_utc": _now(), "error": str(exc)}
+            status.update(state="failed", failed_rows=int(status.get("failed_rows", 0)) + 1, reason=str(exc), failed_at_utc=_now())
+            _write_phase_status(output_dir, status)
+            _failure(output_dir, phase, str(exc), row_id=spec.row_id)
+            _event(output_dir, phase, "row_failed", f"{spec.row_id}: {exc}")
+            raise
+
+    status.update(
+        state="partial" if partial else "complete",
+        completed_rows=completed,
+        current_row_id="", current_row_number=0,
+        current_task_phase="complete", current_task_percent=100.0,
+        completed_at_utc=_now(),
+        reason="selected diagnostic rows completed" if partial else f"all {phase} rows completed",
+    )
+    _write_phase_status(output_dir, status)
+    outputs = _aggregate_strategy_artifacts(output_dir)
+    _event(output_dir, phase, "run_complete", status["reason"])
+    return outputs
+
+
+def _aggregate_strategy_artifacts(run_dir: Path) -> dict[str, str]:
+    from .strategy_grid_runtime import merge_csv_files, read_one_csv, write_csv
+
+    run_dir = Path(run_dir)
+    manifest = _read_json(run_dir / "manifest.json")
+    allowed_ids = {
+        str(row["row_id"])
+        for phase_payload in manifest.get("phases", {}).values()
+        for row in phase_payload.get("rows", [])
+        if isinstance(row, dict) and row.get("row_id")
+    }
+    row_dirs = [
+        row_dir for row_dir in sorted((run_dir / "rows").glob("x13*/"))
+        if row_dir.name in allowed_ids and (row_dir / "summary.csv").exists()
+    ]
+    filenames = (
+        "atom_construction.csv", "atom_assignments.csv", "candidate_search_diagnostics.csv",
+        "slot_progression.csv", "partial_codebook_validation.csv", "layer_epsilon_quantiles.csv",
+        "slot_epsilon_quantiles.csv", "epsilon_coverage.csv", "retired_error_mass.csv",
+    )
+    summaries = [read_one_csv(row_dir / "summary.csv") for row_dir in row_dirs]
+    write_csv(run_dir / "summary.csv", summaries)
+    write_csv(run_dir / "strategy_results.csv", summaries)
+    for filename in filenames:
+        merge_csv_files(run_dir / filename, [row_dir / filename for row_dir in row_dirs])
+    budget_rows = [
+        {
+            "experiment_phase": row.get("experiment_phase", ""), "row_id": row.get("row_id", ""),
+            "pair_id": row.get("pair_id", ""), "W": row.get("residual_width", W),
+            "D": row.get("residual_depth", D), "reserved_atom": row.get("reserved_atom", RESERVED_ATOM),
+            "active_atoms_per_layer": row.get("active_atoms_per_layer", ACTIVE_ATOMS_PER_LAYER),
+            "categorical_outputs": BASE_DICTIONARY_SIZE + D * W,
+            "continuous_outputs": D + 1 + D,
+            "head_outputs_formula": "32 + 16*8 + 17 + 16",
+            "head_outputs_actual": row.get("head_outputs_actual", HEAD_OUTPUTS),
+        }
+        for row in summaries
+    ]
+    write_csv(run_dir / "budget_accounting.csv", budget_rows)
+    return {
+        "output_dir": str(run_dir), "summary": str(run_dir / "summary.csv"),
+        "strategy_results": str(run_dir / "strategy_results.csv"),
+        "atom_construction": str(run_dir / "atom_construction.csv"),
+        "epsilon_coverage": str(run_dir / "epsilon_coverage.csv"),
+        "retired_error_mass": str(run_dir / "retired_error_mass.csv"),
+    }
+
+
+def _compute_epsilon_selection(run_dir: Path) -> dict[str, Any]:
+    from .strategy_grid_runtime import read_csv
+
+    manifest, _ = validate_completed_13a(run_dir)
+    retired = read_csv(run_dir / "retired_error_mass.csv")
+    coverage = read_csv(run_dir / "epsilon_coverage.csv")
+    statistics: dict[float, dict[str, Any]] = {}
+    passing: list[float] = []
+    for epsilon in CANDIDATE_EPSILONS:
+        values = [
+            float(row["unexplained_retired_energy_fraction"])
+            for row in retired
+            if row.get("experiment_phase") == "13A"
+            and int(float(row["residual_layer"])) in range(1, 17)
+            and int(float(row["active_atom_slot"])) in range(0, 7)
+            and math.isclose(float(row["epsilon"]), epsilon)
+            and str(row.get("zero_total_energy", "")).lower() not in {"true", "1"}
+        ]
+        if not values:
+            raise PhaseGateError(f"no valid retired-error checkpoints for epsilon {epsilon}")
+        median = _quantile(values, 0.50)
+        p95 = _quantile(values, 0.95)
+        checkpoint_fractions: dict[tuple[int, int], list[float]] = {}
+        for row in coverage:
+            slot = row.get("active_atom_slot")
+            if (
+                row.get("experiment_phase") == "13A" and row.get("dataset_split") == "training"
+                and slot not in {None, "", "None"}
+                and math.isclose(float(row["epsilon"]), epsilon)
+            ):
+                layer_i, slot_i = int(float(row["residual_layer"])), int(float(slot))
+                if layer_i in range(1, 13) and slot_i in range(0, 6):
+                    checkpoint_fractions.setdefault((layer_i, slot_i), []).append(float(row["resolved_fraction"]))
+        early_middle_max = max((_quantile(values_, 0.50) for values_ in checkpoint_fractions.values()), default=0.0)
+        retired_lfo = [
+            float(row["retired_lfo_fraction"]) for row in retired
+            if row.get("experiment_phase") == "13A" and math.isclose(float(row["epsilon"]), epsilon)
+        ]
+        result = {
+            "median_unexplained_retired_energy_fraction": median,
+            "p95_unexplained_retired_energy_fraction": p95,
+            "max_early_middle_median_retired_lfo_fraction": early_middle_max,
+            "median_retired_lfo_fraction": _quantile(retired_lfo, 0.50),
+            "checkpoint_count": len(values),
+        }
+        statistics[epsilon] = result
+        if median <= 0.01 and p95 <= 0.05 and early_middle_max >= 0.05:
+            passing.append(epsilon)
+    selected = max(passing) if passing else None
+    reported = statistics[selected if selected is not None else CANDIDATE_EPSILONS[0]]
+    passed = selected is not None
+    note = (
+        f"selected largest passing candidate epsilon {selected:g}"
+        if passed else "no candidate epsilon satisfied all automatic selection conditions; restricted pilot required"
+    )
+    return {
+        "candidate_epsilons": list(CANDIDATE_EPSILONS),
+        "selection_rule_version": SELECTION_RULE_VERSION,
+        "selection_checkpoint_definition": SELECTION_CHECKPOINT_DEFINITION,
+        "selected_epsilon": selected,
+        "training_statistics_used": {"dataset_split": "training", "row_count": 90, "candidate_statistics": {str(key): value for key, value in statistics.items()}},
+        "median_unexplained_retired_energy_fraction": reported["median_unexplained_retired_energy_fraction"],
+        "p95_unexplained_retired_energy_fraction": reported["p95_unexplained_retired_energy_fraction"],
+        "retired_lfo_fraction_summary": {str(key): value["median_retired_lfo_fraction"] for key, value in statistics.items()},
+        "selection_timestamp": _now() if passed else None,
+        "experiment13a_run_identity": manifest["experiment13a_run_identity"],
+        "configuration_fingerprint": manifest["configuration_fingerprint"],
+        "selection_passed": passed,
+        "selection_override": False,
+        "selection_override_rationale": None,
+        "selection_override_timestamp": None,
+        "pilot_evidence": None,
+        "selection_notes": note,
+    }
+
+
+def _write_strategy_analysis(run_dir: Path) -> dict[str, str]:
+    from .strategy_grid_runtime import read_csv, write_csv
+
+    run_dir = Path(run_dir)
+    rows = read_csv(run_dir / "summary.csv")
+    by_phase_pair = {(row.get("experiment_phase"), row.get("pair_id")): row for row in rows}
+    paired = []
+    for pair_id in sorted({row.get("pair_id") for row in rows}):
+        left, right = by_phase_pair.get(("13A", pair_id)), by_phase_pair.get(("13B", pair_id))
+        if not left or not right:
+            continue
+        paired.append({
+            "pair_id": pair_id,
+            "construction_policy": left.get("construction_policy", ""),
+            "utility_candidate_budget": left.get("utility_candidate_budget", ""),
+            "layer_normalization_policy": left.get("layer_normalization_policy", ""),
+            "experiment13a_validation_median_rmse": left.get("validation_median_rmse", ""),
+            "experiment13b_validation_median_rmse": right.get("validation_median_rmse", ""),
+            "median_rmse_delta_13b_minus_13a": float(right["validation_median_rmse"]) - float(left["validation_median_rmse"]),
+            "experiment13a_validation_p95_rmse": left.get("validation_p95_rmse", ""),
+            "experiment13b_validation_p95_rmse": right.get("validation_p95_rmse", ""),
+            "p95_rmse_delta_13b_minus_13a": float(right["validation_p95_rmse"]) - float(left["validation_p95_rmse"]),
+        })
+    paired_path = run_dir / "paired_strategy_deltas.csv"
+    write_csv(paired_path, paired)
+    report_path = ERA2_ROOT / "reports" / "EXPERIMENT_13_W8D16_STRATEGY_GRID_REPORT.md"
+    image_dir = ERA2_ROOT / "reports" / "images" / "experiment_13"
+    _write_calibration_plots(run_dir, image_dir)
+    selection = _read_json(run_dir / "epsilon_selection.json")
+    ordered_a = sorted((row for row in rows if row.get("experiment_phase") == "13A"), key=lambda row: float(row["validation_p95_rmse"]))
+    ordered_b = sorted((row for row in rows if row.get("experiment_phase") == "13B"), key=lambda row: float(row["validation_p95_rmse"]))
+    lines = [
+        "# Experiment 13: Fixed-W8D16 Strategy Grid", "", "## Main Findings", "",
+        "Experiment 13A completed first using `AllResiduals`. The eligibility epsilon was then selected only from the completed 13A training calibration artifacts, frozen, and used by Experiment 13B's paired `UnresolvedOnly` rows.", "",
+        f"The frozen eligibility epsilon is `{selection.get('selected_epsilon')}` under `{selection.get('selection_rule_version')}`. Median retired unexplained-error energy was `{selection.get('median_unexplained_retired_energy_fraction')}` and P95 was `{selection.get('p95_unexplained_retired_energy_fraction')}`.", "",
+        _best_row_sentence("13A", ordered_a), "", _best_row_sentence("13B", ordered_b), "",
+        "The tables and plots retain the co-primary metrics separately; no automatic scalar ranking is applied.", "",
+        "## Experiment 13A Unfiltered Results", "", *_top_rows_table(ordered_a), "",
+        "## Experiment 13A Calibration and Frozen Epsilon", "",
+        "![Completed-layer epsilon quantiles](./images/experiment_13/layer_epsilon_quantiles.png)", "",
+        "![Slot epsilon quantiles](./images/experiment_13/slot_epsilon_quantiles.png)", "",
+        "![Completed-layer coverage](./images/experiment_13/completed_layer_coverage.png)", "",
+        "![Slot coverage](./images/experiment_13/slot_coverage.png)", "",
+        "![Retired LFO and unexplained energy](./images/experiment_13/retired_fraction_vs_energy.png)", "",
+        "![Incoming and unexplained retired energy](./images/experiment_13/incoming_vs_unexplained_energy.png)", "",
+        "## Experiment 13B Filtered Results", "", *_top_rows_table(ordered_b), "",
+        "## AllResiduals Versus UnresolvedOnly", "",
+        f"Paired deltas for all `{len(paired)}` stable pairs are available in `{paired_path.name}`. Negative RMSE deltas favor the filtered Experiment 13B construction.", "",
+        _paired_delta_sentence(paired), "",
+        "## Prototype Policies Versus Observed-Residual Anchors", "", *_factor_table(rows, "construction_family"), "",
+        "## Interleaved Versus TwoPhase", "", *_factor_table(rows, "layer_schedule"), "",
+        "## CandidateBudget24 Versus CandidateBudget48", "", *_factor_table(rows, "utility_candidate_budget"), "",
+        "## FinalClipOnly Versus LayerClip0To1", "", *_factor_table(rows, "layer_normalization_policy"), "",
+        "## Broad-Builder and Repair-Objective Interactions", "", *_factor_table(rows, "broad_atom_builder"), "", *_factor_table(rows, "repair_atom_builder"), "",
+        "## Partial-Codebook Progression", "",
+        "`partial_codebook_validation.csv` reports each row with one through seven active atoms per layer, retaining median RMSE, strict-perfect rate, P95 RMSE, and node-max P95 separately.", "",
+        "## Reproducibility", "",
+        f"Configuration fingerprint: `{selection.get('configuration_fingerprint')}`.", "",
+        "All rows preserve W8D16, Atom0 as `NoOpAtom`, Beam4 encoding, phase and residual gain, the 193-output head contract, and topology-free runtime behavior.", "",
+    ]
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("\n".join(lines), encoding="utf-8")
+    return {"output_dir": str(run_dir), "summary": str(run_dir / "summary.csv"), "paired_strategy_deltas": str(paired_path), "report": str(report_path), "report_image_dir": str(image_dir)}
+
+
+def _write_calibration_plots(run_dir: Path, image_dir: Path) -> None:
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+    except Exception:
+        return
+    from .strategy_grid_runtime import read_csv
+    image_dir.mkdir(parents=True, exist_ok=True)
+    layer = read_csv(run_dir / "layer_epsilon_quantiles.csv")
+    slot = read_csv(run_dir / "slot_epsilon_quantiles.csv")
+    coverage = read_csv(run_dir / "epsilon_coverage.csv")
+    retired = read_csv(run_dir / "retired_error_mass.csv")
+    _median_line_plot(plt, image_dir / "layer_epsilon_quantiles.png", layer, "residual_layer", "epsilon_value", "Completed-layer epsilon quantiles", "residual layer", "epsilon")
+    _median_line_plot(plt, image_dir / "slot_epsilon_quantiles.png", slot, "active_atom_slot", "epsilon_value", "Slot epsilon quantiles", "active atom slot", "epsilon")
+    figure, axis = plt.subplots(figsize=(7, 5))
+    for epsilon in CANDIDATE_EPSILONS:
+        selected = [row for row in retired if math.isclose(float(row["epsilon"]), epsilon)]
+        if selected:
+            axis.scatter([float(row["retired_lfo_fraction"]) for row in selected], [float(row["unexplained_retired_energy_fraction"]) for row in selected], s=5, alpha=0.2, label=f"{epsilon:g}")
+    axis.set(xlabel="retired LFO fraction", ylabel="retired unexplained-error energy fraction", title="Retired population versus unexplained energy")
+    axis.legend(); figure.tight_layout(); figure.savefig(image_dir / "retired_fraction_vs_energy.png", dpi=160); plt.close(figure)
+    _coverage_plot(plt, image_dir / "completed_layer_coverage.png", coverage, completed=True)
+    _coverage_plot(plt, image_dir / "slot_coverage.png", coverage, completed=False)
+    figure, axis = plt.subplots(figsize=(7, 5))
+    incoming = [float(row["incoming_retired_energy_fraction"]) for row in retired]
+    unexplained = [float(row["unexplained_retired_energy_fraction"]) for row in retired]
+    axis.scatter(incoming, unexplained, s=5, alpha=0.2)
+    axis.plot([0.0, 1.0], [0.0, 1.0], linestyle="--", color="gray", linewidth=1)
+    axis.set(xlabel="incoming retired-energy fraction", ylabel="unexplained retired-energy fraction", title="Incoming versus unexplained retired energy")
+    figure.tight_layout(); figure.savefig(image_dir / "incoming_vs_unexplained_energy.png", dpi=160); plt.close(figure)
+
+
+def _median_line_plot(plt: Any, path: Path, rows: list[dict[str, Any]], x_key: str, y_key: str, title: str, xlabel: str, ylabel: str) -> None:
+    grouped: dict[int, list[float]] = {}
+    for row in rows:
+        if row.get("experiment_phase") == "13A" and row.get("dataset_split", "training") == "training" and math.isclose(float(row.get("percentile", 0.0)), 0.5):
+            grouped.setdefault(int(float(row[x_key])), []).append(float(row[y_key]))
+    x = sorted(grouped); y = [_quantile(grouped[value], 0.5) for value in x]
+    figure, axis = plt.subplots(figsize=(7, 4)); axis.plot(x, y, marker="o"); axis.set(xlabel=xlabel, ylabel=ylabel, title=title); figure.tight_layout(); figure.savefig(path, dpi=160); plt.close(figure)
+
+
+def _coverage_plot(plt: Any, path: Path, rows: list[dict[str, Any]], *, completed: bool) -> None:
+    figure, axis = plt.subplots(figsize=(7, 4))
+    for epsilon in CANDIDATE_EPSILONS:
+        grouped: dict[int, list[float]] = {}
+        for row in rows:
+            slot = row.get("active_atom_slot")
+            is_completed = slot in {None, "", "None"}
+            if row.get("experiment_phase") != "13A" or row.get("dataset_split") != "training" or is_completed != completed or not math.isclose(float(row["epsilon"]), epsilon):
+                continue
+            key = int(float(row["residual_layer"] if completed else slot))
+            grouped.setdefault(key, []).append(float(row["resolved_fraction"]))
+        x = sorted(grouped)
+        if x:
+            axis.plot(x, [_quantile(grouped[value], 0.5) for value in x], marker="o", label=f"{epsilon:g}")
+    axis.set(
+        xlabel="residual layer" if completed else "active atom slot",
+        ylabel="median reconstructed fraction",
+        title="Completed-layer reconstructed fraction" if completed else "Slot-level reconstructed fraction",
+    )
+    axis.legend(); figure.tight_layout(); figure.savefig(path, dpi=160); plt.close(figure)
+
+
+def _best_row_sentence(phase: str, rows: list[dict[str, Any]]) -> str:
+    if not rows:
+        return f"No completed {phase} rows were available."
+    row = rows[0]
+    return f"The lowest validation P95 RMSE in {phase} is `{row.get('validation_p95_rmse')}` from `{row.get('construction_policy')}` with `{row.get('utility_candidate_budget')}` and `{row.get('layer_normalization_policy')}`; its validation median is `{row.get('validation_median_rmse')}`."
+
+
+def _top_rows_table(rows: list[dict[str, Any]]) -> list[str]:
+    lines = ["| Policy | Budget | Normalization | Median RMSE | Strict perfect | P95 RMSE | Node-max P95 |", "|---|---|---|---:|---:|---:|---:|"]
+    for row in rows[:10]:
+        lines.append(
+            f"| {row.get('construction_policy', '')} | {row.get('utility_candidate_budget', '')} | {row.get('layer_normalization_policy', '')} | "
+            f"{row.get('validation_median_rmse', '')} | {row.get('validation_strict_perfect_lfo_rate', '')} | {row.get('validation_p95_rmse', '')} | {row.get('validation_node_max_error_p95', '')} |"
+        )
+    return lines
+
+
+def _factor_table(rows: list[dict[str, Any]], field: str) -> list[str]:
+    grouped: dict[tuple[str, str], list[float]] = {}
+    for row in rows:
+        value = str(row.get(field, "Null") or "Null")
+        grouped.setdefault((str(row.get("experiment_phase", "")), value), []).append(float(row["validation_p95_rmse"]))
+    lines = [f"| Phase | {field} | Median validation P95 RMSE | Rows |", "|---|---|---:|---:|"]
+    for (phase, value), metrics in sorted(grouped.items()):
+        lines.append(f"| {phase} | {value} | {_quantile(metrics, 0.5):.8g} | {len(metrics)} |")
+    return lines
+
+
+def _paired_delta_sentence(rows: list[dict[str, Any]]) -> str:
+    if not rows:
+        return "No complete stable pairs were available."
+    median = _quantile([float(row["median_rmse_delta_13b_minus_13a"]) for row in rows], 0.5)
+    p95 = _quantile([float(row["p95_rmse_delta_13b_minus_13a"]) for row in rows], 0.5)
+    return f"Across stable pairs, the median 13B-minus-13A change is `{median:.8g}` for validation median RMSE and `{p95:.8g}` for validation P95 RMSE."
+
+
+def _quantile(values: Sequence[float], q: float) -> float:
+    ordered = sorted(float(value) for value in values)
+    if not ordered:
+        return 0.0
+    position = (len(ordered) - 1) * float(q)
+    lower, upper = int(math.floor(position)), int(math.ceil(position))
+    if lower == upper:
+        return ordered[lower]
+    return ordered[lower] + (ordered[upper] - ordered[lower]) * (position - lower)
+
+
+def _strategy_progress_percent(message: str) -> float:
+    match = re.search(r"residual layer (\d+)/16", message)
+    if match:
+        return min(70.0, 70.0 * int(match.group(1)) / 16.0)
+    if message.startswith("train encoding"):
+        return 82.0
+    if message.startswith("validation encoding"):
+        return 92.0
+    if message.startswith("partial_validation"):
+        return 96.0
+    return 1.0
+
+
+def _reset_run_outputs(output_dir: Path) -> None:
+    names = {
+        "manifest.json", "summary.csv", "strategy_results.csv", "slot_progression.csv",
+        "partial_codebook_validation.csv", "atom_construction.csv", "atom_assignments.csv",
+        "candidate_search_diagnostics.csv", "layer_epsilon_quantiles.csv", "slot_epsilon_quantiles.csv",
+        "epsilon_coverage.csv", "retired_error_mass.csv", "epsilon_selection.json",
+        "epsilon_selection_status.json", "experiment13a_status.json", "experiment13b_status.json",
+        "budget_accounting.csv", "failures.csv", "run_status.json", "run_events.jsonl",
+        "paired_strategy_deltas.csv", "experiment13b_pilot_manifest.json", "experiment13b_pilot_results.csv",
+    }
+    for name in names:
+        (Path(output_dir) / name).unlink(missing_ok=True)
 
 
 def load_epsilon_selection(
@@ -698,7 +1175,7 @@ def read_phase_status(run_dir: Path, phase: ExperimentPhase) -> dict[str, Any]:
     if not path.exists():
         return _phase_status(phase, "not_started", "", 0, 90, False, False, "phase has not started")
     payload = _read_json(path)
-    if payload.get("state") not in {"not_started", "partial", "blocked", "failed", "complete"}:
+    if payload.get("state") not in {"not_started", "running", "partial", "blocked", "failed", "complete"}:
         raise Experiment13Error(f"invalid phase state in {path}")
     return payload
 
@@ -723,6 +1200,12 @@ def status_text(run_dir: Path = DEFAULT_OUTPUT_DIR) -> str:
     ]
     if status_a["state"] != "complete" and status_b["state"] == "not_started":
         lines.append("13B_gate=blocked until a complete full 13A run and valid epsilon_selection.json exist")
+    active = status_a if status_a.get("state") == "running" else status_b if status_b.get("state") == "running" else None
+    if active is not None:
+        lines.append(
+            f"Current: {active.get('current_row_id') or 'starting'} "
+            f"{float(active.get('current_task_percent', 0.0)):.1f}% - {active.get('current_task_phase', 'waiting')}"
+        )
     return "\n".join(lines)
 
 
@@ -961,13 +1444,13 @@ def _status_line(label: str, status: dict[str, Any]) -> str:
     )
 
 
-def _failure(output_dir: Path, phase: str, error: str) -> None:
+def _failure(output_dir: Path, phase: str, error: str, *, row_id: str = "") -> None:
     path = Path(output_dir) / "failures.csv"
     rows: list[dict[str, str]] = []
     if path.exists():
         with path.open(encoding="utf-8", newline="") as handle:
             rows.extend(csv.DictReader(handle))
-    rows.append({"experiment_phase": phase, "row_id": "", "error": error, "timestamp_utc": _now()})
+    rows.append({"experiment_phase": phase, "row_id": row_id, "error": error, "timestamp_utc": _now()})
     _write_csv(path, rows, ("experiment_phase", "row_id", "error", "timestamp_utc"))
 
 

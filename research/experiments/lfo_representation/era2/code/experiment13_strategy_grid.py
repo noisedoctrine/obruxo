@@ -63,6 +63,7 @@ from lfo_era2.strategy_grid import (  # noqa: E402
     DEFAULT_OUTPUT_DIR,
     Experiment13Error,
     analyze_strategy_grid,
+    override_epsilon,
     run_13a,
     run_13b,
     run_13b_pilot,
@@ -92,6 +93,8 @@ def main() -> None:
                 corpus_sample_fraction=args.corpus_sample_fraction,
                 resume=args.resume,
                 row_ids=_row_ids(args.rows),
+                chunk_size=args.chunk_size,
+                progress=_progress,
             )
         elif args.command == "select-epsilon":
             selection = select_epsilon(run_dir=args.run_dir)
@@ -104,7 +107,16 @@ def main() -> None:
                 row_ids=_row_ids(args.rows),
                 metadata_path=args.metadata,
                 backend=args.backend,
+                chunk_size=args.chunk_size,
+                progress=_progress,
             )
+        elif args.command == "override-epsilon":
+            selection = override_epsilon(
+                run_dir=args.run_dir,
+                selected_epsilon=args.selected_epsilon,
+                rationale=args.rationale,
+            )
+            print(f"selected_epsilon={selection.selected_epsilon}", flush=True)
         elif args.command == "run-13b":
             run_13b(
                 output_dir=args.output_dir,
@@ -115,6 +127,8 @@ def main() -> None:
                 corpus_sample_fraction=args.corpus_sample_fraction,
                 resume=args.resume,
                 row_ids=_row_ids(args.rows),
+                chunk_size=args.chunk_size,
+                progress=_progress,
             )
         elif args.command == "analyze":
             result = analyze_strategy_grid(run_dir=args.run_dir)
@@ -128,27 +142,33 @@ def main() -> None:
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Run the Experiment 13 fixed-W8D16 strategy-grid scaffold.")
+    parser = argparse.ArgumentParser(description="Run the Experiment 13 fixed-W8D16 strategy grid.")
     subcommands = parser.add_subparsers(dest="command", required=True)
 
-    run_a = subcommands.add_parser("run-13a", help="preflight the 90-row Experiment 13A phase")
+    run_a = subcommands.add_parser("run-13a", help="run the 90-row Experiment 13A phase")
     _add_run_arguments(run_a, include_selection=False)
 
     select = subcommands.add_parser("select-epsilon", help="validate completed 13A calibration inputs and select epsilon")
     select.add_argument("--run-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
 
-    pilot = subcommands.add_parser("run-13b-pilot", help="preflight the restricted Experiment 13B pilot")
+    pilot = subcommands.add_parser("run-13b-pilot", help="run the restricted Experiment 13B pilot")
     pilot.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     pilot.add_argument("--metadata", type=Path, default=DEFAULT_METADATA)
     pilot.add_argument("--backend", choices=["auto", "numpy", "xpu"], default="auto")
     pilot.add_argument("--epsilon-selection", type=Path, default=None)
     pilot.add_argument("--candidate-epsilons", nargs="+", type=float, required=True)
     pilot.add_argument("--rows", default="", help="optional comma-separated 13B row ids; only pilot policies are accepted")
+    pilot.add_argument("--chunk-size", type=int, default=256)
 
-    run_b = subcommands.add_parser("run-13b", help="preflight the gated 90-row Experiment 13B phase")
+    override = subcommands.add_parser("override-epsilon", help="record an explicit pilot-backed epsilon decision")
+    override.add_argument("--run-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    override.add_argument("--selected-epsilon", type=float, required=True)
+    override.add_argument("--rationale", required=True)
+
+    run_b = subcommands.add_parser("run-13b", help="run the gated 90-row Experiment 13B phase")
     _add_run_arguments(run_b, include_selection=True)
 
-    analyze = subcommands.add_parser("analyze", help="refuse incomplete analysis and later generate Experiment 13 outputs")
+    analyze = subcommands.add_parser("analyze", help="validate complete phases and generate Experiment 13 outputs")
     analyze.add_argument("--run-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
 
     status = subcommands.add_parser("status", help="print Experiment 13 phase and gate status")
@@ -167,6 +187,7 @@ def _add_run_arguments(parser: argparse.ArgumentParser, *, include_selection: bo
     parser.add_argument("--async", dest="async_run", action="store_true")
     parser.add_argument("--monitor-refresh-seconds", type=int, default=30)
     parser.add_argument("--no-monitor-window", action="store_true")
+    parser.add_argument("--chunk-size", type=int, default=256)
     if include_selection:
         parser.add_argument("--epsilon-selection", type=Path, default=None)
 
@@ -211,6 +232,7 @@ def _async_command(args: argparse.Namespace) -> list[str]:
     command.extend(["--metadata", str(args.metadata)])
     command.extend(["--backend", args.backend])
     command.extend(["--corpus-sample-fraction", str(args.corpus_sample_fraction)])
+    command.extend(["--chunk-size", str(args.chunk_size)])
     if args.smoke:
         command.append("--smoke")
     if args.resume:
@@ -250,6 +272,10 @@ def _open_monitor(run_dir: Path, refresh_seconds: int) -> bool:
         return True
     except Exception:
         return False
+
+
+def _progress(message: str) -> None:
+    print(message, flush=True)
 
 
 if __name__ == "__main__":
