@@ -170,7 +170,7 @@ candidate eligibility epsilon is observational only.
 **Mathematical formulation**
 
 $$
-\operatorname{eligible}^{13A}_{i,d,s}=1
+\mathrm{eligible}^{13A}_{i,d,s}=1
 $$
 
 for every residual $i$, residual layer $d$, and active atom slot $s$.
@@ -193,15 +193,15 @@ additional LFOs.
 **Mathematical formulation**
 
 $$
-\operatorname{resolved}^{13B}_{i,d,s}
+\mathrm{resolved}^{13B}_{i,d,s}
 =
 \mathbf{1}\!\left[E_{i,d,s}\leq\epsilon^*\right],
 $$
 
 $$
-\operatorname{eligible}^{13B}_{i,d,s}
+\mathrm{eligible}^{13B}_{i,d,s}
 =
-1-\operatorname{resolved}^{13B}_{i,d,s}.
+1-\mathrm{resolved}^{13B}_{i,d,s}.
 $$
 
 All Experiment 13B rows use the same frozen `eligibility_epsilon`. If no
@@ -304,7 +304,7 @@ Let $T$ be the retained set containing the lowest 90% of aligned losses:
 $$
 T
 =
-\operatorname{Lowest}_{90\%}
+\mathrm{Lowest}_{90\%}
 \left\{
  i:e_i=1
  \;\middle|\;
@@ -356,7 +356,7 @@ For each control point $t$:
 $$
 a[t]
 =
-\operatorname{WeightedMedian}_i
+\mathrm{WeightedMedian}_i
 \!\left(z_i[t];\,e_iw_i\right).
 $$
 
@@ -409,7 +409,7 @@ $$
 Then choose:
 
 $$
-a^*=\arg\max_{a_k}\operatorname{Utility}(a_k).
+a^*=\arg\max_{a_k}\mathrm{Utility}(a_k).
 $$
 
 ### `DominantDirection`
@@ -475,13 +475,13 @@ be fixed in the plan implementation, not crossed as `utility_candidate_budget`.
 Define:
 
 $$
-\operatorname{coverage}(a)
+\mathrm{coverage}(a)
 =
 \sum_i e_i\mathbf{1}\!\left[\Delta_i(a)\geq\delta_{\min}\right],
 $$
 
 $$
-\operatorname{improvement}(a)
+\mathrm{improvement}(a)
 =
 \sum_i e_iw_i\Delta_i(a),
 $$
@@ -489,7 +489,7 @@ $$
 and
 
 $$
-\operatorname{similarity}(a,b)
+\mathrm{similarity}(a,b)
 =
 \max_\phi
 \frac{|\langle a,S_\phi(b)\rangle|}
@@ -499,11 +499,11 @@ $$
 For previously selected broad atoms $B$, score:
 
 $$
-\operatorname{score}(a)
+\mathrm{score}(a)
 =
-\alpha\operatorname{coverage}(a)
-+\beta\operatorname{improvement}(a)
--\lambda\max_{b\in B}\operatorname{similarity}(a,b).
+\alpha\mathrm{coverage}(a)
++\beta\mathrm{improvement}(a)
+-\lambda\max_{b\in B}\mathrm{similarity}(a,b).
 $$
 
 Choose the highest-scoring proposal with deterministic tie-breaking.
@@ -572,7 +572,7 @@ $$
 Then define
 
 $$
-\operatorname{finish}_{i,d,s}(a)
+\mathrm{finish}_{i,d,s}(a)
 =
 \mathbf{1}\!\left[
 E_{i,d,s}>\tau_{\mathrm{finish}}
@@ -586,7 +586,7 @@ Choose lexicographically:
 $$
 \arg\max_a
 \left(
-\sum_i e_i\operatorname{finish}_{i,d,s}(a),
+\sum_i e_i\mathrm{finish}_{i,d,s}(a),
 \sum_i e_iw_i\Delta_i(a)
 \right).
 $$
@@ -716,9 +716,9 @@ Use the exact Experiment 12 score. If that implementation is median-oriented,
 record it explicitly as a robust central utility such as:
 
 $$
-\operatorname{score}(a)
+\mathrm{score}(a)
 =
-\operatorname{Median}_{i:e_i=1}\Delta_i(a).
+\mathrm{Median}_{i:e_i=1}\Delta_i(a).
 $$
 
 Do not silently substitute this illustrative form for the actual existing score.
@@ -743,7 +743,7 @@ Represent the existing schedule as slot-specific utility functions:
 $$
 a_s
 =
-\arg\max_{a\in\mathcal C_s}U_{\operatorname{role}(s)}(a).
+\arg\max_{a\in\mathcal C_s}U_{\mathrm{role}(s)}(a).
 $$
 
 where `U_role(s)` is the Experiment 12 finish, common-case, or rescue score for
@@ -768,11 +768,11 @@ If families are $F_1,\ldots,F_K$, use the exact existing score. A
 representative form is:
 
 $$
-\operatorname{score}(a)
+\mathrm{score}(a)
 =
-\operatorname{Aggregate}_k
+\mathrm{Aggregate}_k
 \left[
-\operatorname{Mean}_{i\in F_k,\,e_i=1}\Delta_i(a)
+\mathrm{Mean}_{i\in F_k,\,e_i=1}\Delta_i(a)
 \right].
 $$
 
@@ -1247,7 +1247,7 @@ For percentile $p$, define the completed-layer and slot-level quantiles:
 $$
 Q^{\mathrm{global}}_d(p)
 =
-\operatorname{Quantile}_i\!\left(G_{i,d},p\right),
+\mathrm{Quantile}_i\!\left(G_{i,d},p\right),
 $$
 
 and
@@ -1255,7 +1255,7 @@ and
 $$
 Q^{\mathrm{slot}}_{d,s}(p)
 =
-\operatorname{Quantile}_i\!\left(E_{i,d,s},p\right).
+\mathrm{Quantile}_i\!\left(E_{i,d,s},p\right).
 $$
 
 Thus $Q^{\mathrm{slot}}_{d,s}(0.10)$ is the eligibility epsilon that would
@@ -1375,7 +1375,7 @@ that satisfies all three conditions:
    checkpoints satisfies
 
 $$
-\operatorname{Median}_{(\rho,d,s)\in\mathcal{S}_{\mathrm{valid}}}
+\mathrm{Median}_{(\rho,d,s)\in\mathcal{S}_{\mathrm{valid}}}
 M^{\mathrm{unexplained}}_{\rho,d,s}(\epsilon)
 \leq0.01.
 $$
@@ -1383,7 +1383,7 @@ $$
 2. Its 95th percentile satisfies
 
 $$
-\operatorname{Quantile}_{0.95,
+\mathrm{Quantile}_{0.95,
 (\rho,d,s)\in\mathcal{S}_{\mathrm{valid}}}
 \!\left(M^{\mathrm{unexplained}}_{\rho,d,s}(\epsilon)\right)
 \leq0.05.
@@ -1393,7 +1393,7 @@ $$
 
 $$
 \exists(d,s)\in\mathcal{S}_{\mathrm{early\text{-}middle}}:
-\operatorname{Median}_{\rho\in\mathcal{R}_{13A}}
+\mathrm{Median}_{\rho\in\mathcal{R}_{13A}}
 F_{\rho,d,s}(\epsilon)
 \geq0.05.
 $$
