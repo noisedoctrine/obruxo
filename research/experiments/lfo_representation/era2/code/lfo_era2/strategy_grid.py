@@ -43,6 +43,11 @@ PILOT_POLICIES = (
     "ClusterMeanHardRepairTwoPhase",
     "FinishRepairRescue",
 )
+ANCHOR_SLOT_ROLES = {
+    "CommonCaseRepair": ("common",) * ACTIVE_ATOMS_PER_LAYER,
+    "FinishRepairRescue": ("finish", "finish", "common", "common", "common", "hard", "hard"),
+    "FamilyBalancedRepair": ("overall",) * ACTIVE_ATOMS_PER_LAYER,
+}
 
 ERA2_ROOT = Path(__file__).resolve().parents[2]
 REPO_ROOT = ERA2_ROOT.parents[3]
@@ -62,6 +67,8 @@ REQUIRED_ANALYSIS_FILES = (
     "partial_codebook_validation.csv",
     "atom_construction.csv",
     "budget_accounting.csv",
+    *REQUIRED_CALIBRATION_FILES,
+    "epsilon_selection.json",
 )
 REQUIRED_SELECTION_FIELDS = (
     "candidate_epsilons",
@@ -129,6 +136,8 @@ class StrategyRowSpec:
     broad_atom_builder: str | None
     repair_atom_builder: str | None
     prototype_uses_observed_residual_value: bool
+    native_slot_roles: tuple[str, ...] | None = None
+    topology_used_in_construction: bool = False
     eligibility_epsilon: float | None = None
     eligibility_selection_rule_version: str | None = None
     finish_threshold: float = FINISH_THRESHOLD
@@ -304,6 +313,8 @@ def _phase_specs(phase: ExperimentPhase, epsilon: float | None) -> list[Strategy
                     broad_atom_builder=policy.broad_builder,
                     repair_atom_builder=policy.repair_builder,
                     prototype_uses_observed_residual_value=policy.observed_residual_value,
+                    native_slot_roles=ANCHOR_SLOT_ROLES.get(policy.name),
+                    topology_used_in_construction=policy.name == "FamilyBalancedRepair",
                     eligibility_epsilon=epsilon,
                     eligibility_selection_rule_version=SELECTION_RULE_VERSION if phase == "13B" else None,
                 )
@@ -325,6 +336,13 @@ def validate_row_spec(row: StrategyRowSpec) -> None:
         raise ValueError("Experiment 13 finish threshold and head accounting are fixed")
     if row.runtime_topology is not None:
         raise ValueError("runtime_topology must remain absent")
+    if row.layer_schedule == "AnchorNative":
+        if row.native_slot_roles != ANCHOR_SLOT_ROLES.get(row.construction_policy):
+            raise ValueError("Experiment 12 anchors must preserve their native slot-role schedule")
+        if row.topology_used_in_construction != (row.construction_policy == "FamilyBalancedRepair"):
+            raise ValueError("only FamilyBalancedRepair may preserve construction-only topology")
+    elif row.native_slot_roles is not None or row.topology_used_in_construction:
+        raise ValueError("non-anchor rows cannot carry Experiment 12 native construction semantics")
     if row.layer_schedule == "AllBroad" and row.utility_candidate_budget is not None:
         raise ValueError("pure-prototype rows require a Null utility candidate budget")
     if row.layer_schedule != "AllBroad" and row.utility_candidate_budget not in {
@@ -612,6 +630,8 @@ def validate_completed_13a(run_dir: Path) -> tuple[dict[str, Any], dict[str, Any
     status = read_phase_status(run_dir, "13A")
     if not isinstance(phase, dict) or status["state"] != "complete":
         raise PhaseGateError(f"Experiment 13A is not complete: state={status['state']}")
+    if status.get("experiment13a_run_identity") != manifest.get("experiment13a_run_identity"):
+        raise PhaseGateError("Experiment 13A status does not match the manifest run identity")
     if status.get("smoke") or status.get("filtered"):
         raise PhaseGateError("smoke and filtered 13A runs cannot satisfy the completion gate")
     if status.get("completed_rows") != 90 or status.get("expected_row_count") != 90:
