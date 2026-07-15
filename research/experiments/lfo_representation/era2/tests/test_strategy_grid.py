@@ -67,6 +67,15 @@ class StrategyGridEnumerationTests(unittest.TestCase):
         self.assertTrue(all(row.layer_schedule == "AllBroad" for row in pure))
         self.assertTrue(all(row.utility_candidate_budget is None for row in pure))
         self.assertTrue(all(value is None for row in pure for value in row.effective_candidate_budget_by_layer))
+        for row in anchors:
+            self.assertEqual(row.native_slot_roles, grid.ANCHOR_SLOT_ROLES[row.construction_policy])
+            self.assertEqual(row.topology_used_in_construction, row.construction_policy == "FamilyBalancedRepair")
+        self.assertEqual(
+            grid.ANCHOR_SLOT_ROLES["FinishRepairRescue"],
+            ("finish", "finish", "common", "common", "common", "hard", "hard"),
+        )
+        self.assertTrue(all(row.native_slot_roles is None for row in pure))
+        self.assertTrue(all(not row.topology_used_in_construction for row in pure))
 
 
 class StrategyGridGateTests(unittest.TestCase):
@@ -106,6 +115,17 @@ class StrategyGridGateTests(unittest.TestCase):
                 grid.select_epsilon(run_dir=run_dir)
             self.assertTrue(identity and fingerprint)
             self.assertFalse((run_dir / "epsilon_selection.json").exists())
+
+    def test_completed_13a_status_must_match_manifest_identity(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp)
+            _write_completed_13a(run_dir)
+            status_path = run_dir / grid.PHASE_STATUS_FILES["13A"]
+            status = json.loads(status_path.read_text())
+            status["experiment13a_run_identity"] = "x13a_stale_status"
+            status_path.write_text(json.dumps(status))
+            with self.assertRaisesRegex(grid.PhaseGateError, "run identity"):
+                grid.validate_completed_13a(run_dir)
 
     def test_missing_partial_stale_and_incompatible_selection_block_13b(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -172,6 +192,8 @@ class StrategyGridGateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             with self.assertRaises(grid.AnalysisNotReadyError):
                 grid.analyze_strategy_grid(run_dir=Path(tmp))
+        self.assertTrue(set(grid.REQUIRED_CALIBRATION_FILES).issubset(grid.REQUIRED_ANALYSIS_FILES))
+        self.assertIn("epsilon_selection.json", grid.REQUIRED_ANALYSIS_FILES)
 
 
 class StrategyGridCliTests(unittest.TestCase):
