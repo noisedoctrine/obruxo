@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - agent/fix-experiment-13-math-rendering
+  pull_request:
+    branches:
+      - main
+    types:
+      - synchronize
 
 permissions:
   contents: write
@@ -56,7 +61,6 @@ jobs:
           if r"\operatorname" in updated:
               raise SystemExit("Unsupported \\operatorname remains")
 
-          # Ensure the transformation changed only the 86 delimiter lines.
           before = original.splitlines()
           after = updated.splitlines()
           changed = [i for i, (left, right) in enumerate(zip(before, after), start=1) if left != right]
