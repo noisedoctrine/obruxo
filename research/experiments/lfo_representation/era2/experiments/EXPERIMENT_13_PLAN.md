@@ -1355,8 +1355,8 @@ decision slots 0 through 6
 ```
 
 Slot 7 and all validation measurements are excluded from selection. Let
-$\mathcal{S}_{\mathrm{valid}}$ denote the subset of this row/layer/slot set with
-nonzero unexplained-error energy, and let $\mathcal{R}_{13A}$ denote the 90
+$`\mathcal{S}_{\mathrm{valid}}`$ denote the subset of this row/layer/slot set with
+nonzero unexplained-error energy, and let $`\mathcal{R}_{13A}`$ denote the 90
 completed 13A rows.
 
 Define $\mathcal{S}_{\mathrm{early\text{-}middle}}$ as:
