@@ -1,13 +1,11 @@
 name: Fix Experiment 13 math rendering
 
 on:
-  push:
-    branches:
-      - agent/fix-experiment-13-math-rendering
   pull_request:
     branches:
-      - main
+      - agent/fix-experiment-13-math-rendering
     types:
+      - opened
       - synchronize
 
 permissions:
@@ -17,7 +15,7 @@ jobs:
   fix-math:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out branch
+      - name: Check out fix branch
         uses: actions/checkout@v4
         with:
           ref: agent/fix-experiment-13-math-rendering
