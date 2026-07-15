@@ -1,0 +1,90 @@
+name: Fix Experiment 13 math rendering
+
+on:
+  pull_request:
+    branches:
+      - agent/fix-experiment-13-math-rendering
+    types:
+      - opened
+      - synchronize
+
+permissions:
+  contents: write
+
+jobs:
+  fix-math:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out fix branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/fix-experiment-13-math-rendering
+          fetch-depth: 0
+
+      - name: Convert multiline display math to fenced math
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("research/experiments/lfo_representation/era2/experiments/EXPERIMENT_13_PLAN.md")
+          original = path.read_text(encoding="utf-8")
+          lines = original.splitlines(keepends=True)
+
+          delimiter_indexes = [
+              index for index, line in enumerate(lines)
+              if line.rstrip("\r\n") == "$$"
+          ]
+          if not delimiter_indexes:
+              print("No standalone display-math delimiters remain")
+              raise SystemExit(0)
+          if len(delimiter_indexes) != 86:
+              raise SystemExit(
+                  f"Expected 86 standalone $$ lines (43 blocks), found {len(delimiter_indexes)}"
+              )
+          if len(delimiter_indexes) % 2:
+              raise SystemExit("Unbalanced standalone display-math delimiters")
+
+          opening = True
+          for index in delimiter_indexes:
+              newline = "\r\n" if lines[index].endswith("\r\n") else "\n"
+              lines[index] = ("```math" if opening else "```") + newline
+              opening = not opening
+
+          updated = "".join(lines)
+          if any(line.rstrip("\r\n") == "$$" for line in updated.splitlines(keepends=True)):
+              raise SystemExit("Standalone $$ delimiter remains")
+          if updated.count("```math") != 43:
+              raise SystemExit("Expected 43 fenced math blocks")
+          if r"\operatorname" in updated:
+              raise SystemExit("Unsupported \\operatorname remains")
+
+          before = original.splitlines()
+          after = updated.splitlines()
+          changed = [i for i, (left, right) in enumerate(zip(before, after), start=1) if left != right]
+          if len(before) != len(after) or len(changed) != 86:
+              raise SystemExit(
+                  f"Unexpected transformation scope: lines={len(before)}->{len(after)}, changed={len(changed)}"
+              )
+          for line_number in changed:
+              left = before[line_number - 1]
+              right = after[line_number - 1]
+              if left != "$$" or right not in {"```math", "```"}:
+                  raise SystemExit(f"Unexpected change at line {line_number}: {left!r} -> {right!r}")
+
+          path.write_text(updated, encoding="utf-8", newline="")
+          print("Converted 43 multiline display expressions to fenced math blocks")
+          PY
+
+      - name: Commit corrected document
+        shell: bash
+        run: |
+          if git diff --quiet -- research/experiments/lfo_representation/era2/experiments/EXPERIMENT_13_PLAN.md; then
+            echo "No document changes to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/experiments/lfo_representation/era2/experiments/EXPERIMENT_13_PLAN.md
+          git commit -m "Fix Experiment 13 multiline math rendering"
+          git push origin HEAD:agent/fix-experiment-13-math-rendering
