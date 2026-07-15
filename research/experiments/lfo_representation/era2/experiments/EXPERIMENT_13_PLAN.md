@@ -31,6 +31,161 @@ Experiment 13 must run in two ordered phases:
 valid threshold-selection artifact.** The paired phases are sequential, not one
 simultaneous 180-row run.
 
+## Operator Quick Start
+
+Run these commands from the repository root in PowerShell. Experiment 13A,
+epsilon selection, and Experiment 13B are an ordered workflow; do not start 13B
+until selection has passed or a completed restricted pilot has supported an
+explicit override.
+
+Define the paths once for the current shell:
+
+```powershell
+$runner = ".\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py"
+$metadata = ".\datasets\presetshare\raw\presetshare_vital_metadata.csv"
+$runDir = ".\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid"
+$selection = "$runDir\epsilon_selection.json"
+```
+
+### 1. Run the tests
+
+Set conservative native-thread limits before importing NumPy, then run either
+the Experiment 13 tests or the complete Era 2 suite:
+
+```powershell
+$env:MKL_THREADING_LAYER = "SEQUENTIAL"
+$env:OPENBLAS_NUM_THREADS = "1"
+$env:OMP_NUM_THREADS = "1"
+$env:MKL_NUM_THREADS = "1"
+
+# Experiment 13 only
+conda run --no-capture-output -n py312 python -B -m unittest discover -v -s .\research\experiments\lfo_representation\era2\tests -p 'test_strategy_grid.py'
+
+# Complete Era 2 suite
+conda run --no-capture-output -n py312 python -B -m unittest discover -v -s .\research\experiments\lfo_representation\era2\tests -p 'test_*.py'
+```
+
+### 2. Run a safe smoke check
+
+Use a dedicated smoke directory. A fresh non-resume 13A run resets aggregate
+state in its output directory, so a smoke check must not target `$runDir`.
+
+```powershell
+$smokeDir = ".\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid_smoke"
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13a --output-dir $smokeDir --backend auto --metadata $metadata --smoke
+```
+
+### 3. Run Experiment 13A
+
+`--async` starts the runner in the background, writes stdout and stderr under
+`era2/artifacts/experiment_13/launcher_logs/`, opens the Windows monitor, and
+returns control to the current shell.
+
+```powershell
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13a --output-dir $runDir --async --backend xpu --metadata $metadata --corpus-sample-fraction 1.0 --monitor-refresh-seconds 30
+```
+
+Resume the same 13A run after an interruption:
+
+```powershell
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13a --output-dir $runDir --async --backend xpu --metadata $metadata --corpus-sample-fraction 1.0 --monitor-refresh-seconds 30 --resume
+```
+
+Omit `--async` to run in the foreground. Add `--no-monitor-window` to keep the
+background runner but suppress the separate Windows monitor.
+
+### 4. Check status and events
+
+The async command opens a live monitor automatically. For a one-time status
+check from any shell, run:
+
+```powershell
+conda run --no-capture-output -n py312 python $runner status --run-dir $runDir
+```
+
+For a simple in-terminal monitor, press Ctrl+C to stop this loop:
+
+```powershell
+while ($true) {
+    Clear-Host
+    conda run --no-capture-output -n py312 python $runner status --run-dir $runDir
+    Start-Sleep -Seconds 30
+}
+```
+
+The status command reports `not_started`, `running`, `partial`, `blocked`,
+`failed`, or `complete` for each phase and shows recent structured events.
+
+### 5. Select the global epsilon
+
+Run selection only after 13A is complete:
+
+```powershell
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 select-epsilon --run-dir $runDir
+```
+
+If automatic selection passes, skip to step 7. If it records
+`selection_passed = false`, complete the restricted fallback in step 6.
+
+### 6. Run and record the restricted fallback pilot when required
+
+The pilot is allowed only after automatic selection fails. It accepts only the
+four prespecified pilot policies and candidate epsilons `0.001` and `0.0025`:
+
+```powershell
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b-pilot --output-dir $runDir --backend xpu --metadata $metadata --epsilon-selection $selection --candidate-epsilons 0.001 0.0025
+```
+
+Review `experiment13b_pilot_results.csv`, choose one of the two evaluated
+values, and record the evidence-backed decision. Replace the example value and
+rationale with the actual decision:
+
+```powershell
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 override-epsilon --run-dir $runDir --selected-epsilon 0.001 --rationale "Pilot evidence favored 0.001 because ..."
+```
+
+The pilot command must reject any row outside the prespecified pilot policies,
+any other epsilon, or an artifact that does not record a failed automatic
+selection for the matching completed 13A run. It never mutates the selection
+artifact automatically; only `override-epsilon` records the explicit decision.
+
+### 7. Run Experiment 13B
+
+```powershell
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b --output-dir $runDir --async --backend xpu --metadata $metadata --corpus-sample-fraction 1.0 --epsilon-selection $selection --monitor-refresh-seconds 30
+```
+
+Resume the same 13B run after an interruption:
+
+```powershell
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b --output-dir $runDir --async --backend xpu --metadata $metadata --corpus-sample-fraction 1.0 --epsilon-selection $selection --monitor-refresh-seconds 30 --resume
+```
+
+The 13B command fails closed when the selection artifact is missing, malformed,
+does not match the completed 13A run and current configuration, records a failed
+selection without a valid pilot-backed override, or uses an incompatible
+candidate set or selection-rule version.
+
+### 8. Generate analytics and the canonical report
+
+Run this after both phases complete. It can also be rerun to regenerate the
+derived CSVs, plots, and report from the retained run artifacts.
+
+```powershell
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 analyze --run-dir $runDir
+```
+
+### Useful diagnostic controls
+
+- `--rows <comma-separated-row-ids>` limits 13A or 13B to named rows for a
+  diagnostic run; do not treat a partial run as phase completion.
+- `--chunk-size <count>` changes scoring batch size; the default is `256`.
+- `--backend auto|numpy|xpu` chooses the numerical backend.
+- `--corpus-sample-fraction <fraction>` subsamples the corpus; production uses
+  `1.0`.
+- Run `conda run --no-capture-output -n py312 python $runner <command> --help`
+  for the complete options of any subcommand.
+
 The fixed runtime contract remains:
 
 ```text
@@ -1746,57 +1901,10 @@ head_outputs_actual
 
 ## Run Commands
 
-Experiment 13 requires a dedicated runner with explicit phase commands.
-
-Run Experiment 13A:
-
-```powershell
-conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13a --async --backend xpu --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --corpus-sample-fraction 1.0 --monitor-refresh-seconds 30
-```
-
-Generate calibration analytics and the selection artifact:
-
-```powershell
-conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 select-epsilon --run-dir .\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid
-```
-
-If automatic selection fails, the runner may execute only the prespecified pilot
-rows and candidate epsilons through a dedicated command:
-
-```powershell
-conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b-pilot --backend xpu --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --epsilon-selection .\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid\epsilon_selection.json --candidate-epsilons 0.001 0.0025
-```
-
-`run-13b-pilot` must reject any row outside the four prespecified pilot policies,
-any epsilon outside the two tightest candidates, or any selection artifact that
-does not record `selection_passed = false` for the matching completed 13A run.
-It must not mutate the selection artifact automatically.
-
-Run Experiment 13B only after selection passes, either automatically or through
-a documented pilot-based override:
-
-```powershell
-conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b --async --backend xpu --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --epsilon-selection .\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid\epsilon_selection.json --monitor-refresh-seconds 30
-```
-
-The 13B command must fail when the selection artifact is absent, malformed,
-records `selection_passed = false`, references an incomplete 13A run, uses an
-incompatible candidate set or selection-rule version, or does not match the
-current Experiment 13 configuration.
-
-Tiny 13A plumbing check:
-
-```powershell
-conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13a --backend auto --metadata .\datasets\presetshare\raw\presetshare_vital_metadata.csv --smoke
-```
-
-Regenerate analytics and the canonical report:
-
-```powershell
-conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py --mkl-threading-layer SEQUENTIAL --native-threads 1 analyze --run-dir .\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid
-```
-
-The runner is not implemented by this plan.
+The implemented runner and complete ordered command sequence are documented in
+[Operator Quick Start](#operator-quick-start) near the top of this plan. That
+section is the canonical operator runbook; command examples should be maintained
+there rather than duplicated here.
 
 ## Test Requirements
 
