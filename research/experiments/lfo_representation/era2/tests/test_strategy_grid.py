@@ -1,17 +1,21 @@
 from __future__ import annotations
 
 import json
+import importlib.util
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ERA2_ROOT = Path(__file__).resolve().parents[1]
 CODE_DIR = ERA2_ROOT / "code"
 sys.path.insert(0, str(CODE_DIR))
 
 from lfo_era2 import strategy_grid as grid  # noqa: E402
+from lfo_era2 import strategy_grid_runtime as runtime  # noqa: E402
+from lfo_era2.dataset import make_tiny_curve_dataset  # noqa: E402
 
 
 class StrategyGridEnumerationTests(unittest.TestCase):
@@ -83,8 +87,14 @@ class StrategyGridGateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             run_dir = Path(tmp)
             row_id = grid.experiment13a_specs()[0].row_id
-            with self.assertRaises(grid.ConstructionNotImplementedError):
-                grid.run_13a(output_dir=run_dir, backend="numpy", smoke=True, row_ids={row_id})
+            result = grid.run_13a(
+                output_dir=run_dir,
+                backend="numpy",
+                smoke=True,
+                row_ids={row_id},
+                dataset=make_tiny_curve_dataset(resolution=16, row_count=8),
+                chunk_size=8,
+            )
             status = grid.read_phase_status(run_dir, "13A")
             manifest = json.loads((run_dir / "manifest.json").read_text())
             self.assertEqual(status["state"], "partial")
@@ -92,18 +102,44 @@ class StrategyGridGateTests(unittest.TestCase):
             self.assertEqual(manifest["phases"]["13A"]["row_count"], 1)
             self.assertFalse(manifest["phases"]["13A"]["complete_design"])
             self.assertTrue((run_dir / "rows" / row_id / "manifest.json").exists())
-            self.assertFalse(any((run_dir / name).exists() for name in ("summary.csv", "strategy_results.csv", "epsilon_selection.json")))
+            self.assertTrue(Path(result["summary"]).exists())
+            self.assertTrue((run_dir / "strategy_results.csv").exists())
+            self.assertTrue((run_dir / "rows" / row_id / "codebooks.npz").exists())
+            for name in (
+                "slot_progression.csv", "partial_codebook_validation.csv", "atom_construction.csv",
+                "atom_assignments.csv", "candidate_search_diagnostics.csv", "layer_epsilon_quantiles.csv",
+                "slot_epsilon_quantiles.csv", "epsilon_coverage.csv", "retired_error_mass.csv", "budget_accounting.csv",
+            ):
+                self.assertTrue((run_dir / name).exists(), name)
+            diagnostics = runtime.read_csv(run_dir / "atom_construction.csv")
+            self.assertEqual(len(diagnostics), 16 * 7)
+            required_fields = {
+                "experiment_phase", "row_id", "pair_id", "residual_layer", "slot_index", "layer_role", "slot_role",
+                "eligible_residual_count_before", "eligible_residual_count_after", "newly_finish_threshold_lfo_count",
+                "counterfactual_resolved_fraction_by_candidate_epsilon",
+                "counterfactual_incoming_retired_energy_fraction_by_candidate_epsilon",
+                "counterfactual_unexplained_retired_energy_fraction_by_candidate_epsilon",
+            }
+            self.assertTrue(required_fields.issubset(diagnostics[0]))
+            self.assertTrue(all(row["eligible_residual_count_before"] == "6" for row in diagnostics))
+            self.assertFalse((run_dir / "epsilon_selection.json").exists())
             with self.assertRaises(grid.PhaseGateError):
                 grid.validate_completed_13a(run_dir)
 
-    def test_full_preflight_is_failed_not_complete(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            run_dir = Path(tmp)
-            with self.assertRaises(grid.ConstructionNotImplementedError):
-                grid.run_13a(output_dir=run_dir, backend="numpy")
-            status = grid.read_phase_status(run_dir, "13A")
-            self.assertEqual((status["state"], status["completed_rows"], status["expected_row_count"]), ("failed", 0, 90))
-            self.assertIn("failed", grid.status_text(run_dir))
+    def test_numerical_builders_are_deterministic_and_finite(self) -> None:
+        import numpy as np
+
+        values = np.random.default_rng(13).normal(size=(12, 16)).astype(np.float32)
+        eligible = np.ones(12, dtype=bool)
+        loss = np.mean(values * values, axis=1)
+        for builder in ("BroadMean", "TrimmedMean", "AlignedMedian", "ClusterMean", "DominantDirection", "DiverseCoverage"):
+            with self.subTest(builder=builder):
+                left, detail = runtime._build_broad_atom(builder, values, eligible, loss, [], backend="numpy", chunk_size=8)
+                right, _ = runtime._build_broad_atom(builder, values, eligible, loss, [], backend="numpy", chunk_size=8)
+                self.assertEqual(left.shape, (16,))
+                self.assertTrue(np.all(np.isfinite(left)))
+                np.testing.assert_allclose(left, right)
+                self.assertGreater(detail["prototype_population_size"], 0)
 
     def test_select_epsilon_requires_complete_13a_and_calibration(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -221,10 +257,21 @@ class StrategyGridGateTests(unittest.TestCase):
             with self.assertRaisesRegex(grid.PhaseGateError, "metadata path"):
                 grid.run_13b(output_dir=run_dir, epsilon_selection_path=path, metadata_path=run_dir / "other.csv", backend="numpy")
             self.assertEqual(grid.read_phase_status(run_dir, "13B")["state"], "blocked")
-            with self.assertRaises(grid.ConstructionNotImplementedError):
-                grid.run_13b(output_dir=run_dir, epsilon_selection_path=path, backend="numpy")
-            self.assertEqual(grid.read_phase_status(run_dir, "13B")["state"], "failed")
-            self.assertFalse((run_dir / "summary.csv").exists())
+            row_id = grid.experiment13b_specs(0.005)[0].row_id
+            grid.run_13b(
+                output_dir=run_dir,
+                epsilon_selection_path=path,
+                backend="numpy",
+                smoke=True,
+                row_ids={row_id},
+                dataset=make_tiny_curve_dataset(resolution=16, row_count=8),
+                chunk_size=8,
+            )
+            self.assertEqual(grid.read_phase_status(run_dir, "13B")["state"], "partial")
+            self.assertTrue((run_dir / "summary.csv").exists())
+            diagnostics = runtime.read_csv(run_dir / "rows" / row_id / "atom_construction.csv")
+            self.assertTrue(diagnostics)
+            self.assertTrue(all(float(row["selected_eligibility_epsilon"]) == 0.005 for row in diagnostics))
 
     def test_pilot_restrictions(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -241,11 +288,53 @@ class StrategyGridGateTests(unittest.TestCase):
                 grid.run_13b_pilot(output_dir=run_dir, epsilon_selection_path=path, candidate_epsilons=[0.001], row_ids=set())
             with self.assertRaisesRegex(grid.PhaseGateError, "duplicates"):
                 grid.run_13b_pilot(output_dir=run_dir, epsilon_selection_path=path, candidate_epsilons=[0.001, 0.001])
-            with self.assertRaises(grid.ConstructionNotImplementedError):
-                grid.run_13b_pilot(output_dir=run_dir, epsilon_selection_path=path, candidate_epsilons=[0.001, 0.0025])
+            pilot_row = next(row.row_id for row in grid.experiment13b_specs(0.001) if row.construction_policy == "FinishRepairRescue")
+            result = grid.run_13b_pilot(
+                output_dir=run_dir,
+                epsilon_selection_path=path,
+                candidate_epsilons=[0.001],
+                row_ids={pilot_row},
+                backend="numpy",
+                dataset=make_tiny_curve_dataset(resolution=16, row_count=8),
+                chunk_size=8,
+            )
             pilot = json.loads((run_dir / "experiment13b_pilot_manifest.json").read_text())
             self.assertEqual(set(pilot["allowed_construction_policies"]), set(grid.PILOT_POLICIES))
-            self.assertFalse(pilot["complete"])
+            self.assertTrue(pilot["complete"])
+            self.assertTrue(Path(result["pilot_results"]).exists())
+            override = grid.override_epsilon(run_dir=run_dir, selected_epsilon=0.001, rationale="pilot tail metrics are acceptable")
+            self.assertTrue(override.selection_passed and override.selection_override)
+            self.assertEqual(override.selected_epsilon, 0.001)
+            loaded = grid.load_epsilon_selection(
+                path,
+                expected_run_identity=identity,
+                expected_configuration_fingerprint=fingerprint,
+                require_passed=True,
+            )
+            self.assertEqual(loaded.pilot_evidence["selected_epsilon_result_row_count"], 1)
+
+    def test_epsilon_selection_uses_training_checkpoint_rule(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp)
+            _write_completed_13a(run_dir)
+            _write_selection_calibration(run_dir)
+            selection = grid.select_epsilon(run_dir=run_dir)
+            self.assertTrue(selection.selection_passed)
+            self.assertEqual(selection.selected_epsilon, 0.005)
+            payload = json.loads((run_dir / "epsilon_selection.json").read_text())
+            self.assertEqual(payload["training_statistics_used"]["dataset_split"], "training")
+            self.assertEqual(payload["selection_checkpoint_definition"]["excluded_decision_slots"], [7])
+
+    def test_resume_skips_complete_row_and_preserves_outputs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp)
+            row_id = grid.experiment13a_specs()[0].row_id
+            dataset = make_tiny_curve_dataset(resolution=16, row_count=8)
+            grid.run_13a(output_dir=run_dir, backend="numpy", smoke=True, row_ids={row_id}, dataset=dataset, chunk_size=8)
+            with mock.patch("lfo_era2.strategy_grid_runtime.run_strategy_row", side_effect=AssertionError("row reran")):
+                grid.run_13a(output_dir=run_dir, backend="numpy", smoke=True, row_ids={row_id}, dataset=dataset, chunk_size=8, resume=True)
+            self.assertEqual(grid.read_phase_status(run_dir, "13A")["completed_rows"], 1)
+            self.assertTrue((run_dir / "rows" / row_id / "summary.csv").exists())
 
     def test_analyze_refuses_incomplete_artifacts(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -262,7 +351,7 @@ class StrategyGridCliTests(unittest.TestCase):
         script = CODE_DIR / "experiment13_strategy_grid.py"
         help_result = subprocess.run([sys.executable, str(script), "--help"], capture_output=True, text=True, check=False)
         self.assertEqual(help_result.returncode, 0, help_result.stderr)
-        for command in ("run-13a", "select-epsilon", "run-13b-pilot", "run-13b", "analyze", "status"):
+        for command in ("run-13a", "select-epsilon", "run-13b-pilot", "override-epsilon", "run-13b", "analyze", "status"):
             self.assertIn(command, help_result.stdout)
         with tempfile.TemporaryDirectory() as tmp:
             result = subprocess.run(
@@ -274,6 +363,17 @@ class StrategyGridCliTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("13A: state=not_started", result.stdout)
             self.assertIn("13B_gate=blocked", result.stdout)
+
+    def test_async_command_does_not_recurse_and_preserves_runtime_options(self) -> None:
+        module_spec = importlib.util.spec_from_file_location("experiment13_strategy_grid_test", CODE_DIR / "experiment13_strategy_grid.py")
+        assert module_spec is not None and module_spec.loader is not None
+        module = importlib.util.module_from_spec(module_spec)
+        module_spec.loader.exec_module(module)
+        args = module._parser().parse_args(["run-13a", "--async", "--backend", "numpy", "--chunk-size", "32", "--resume"])
+        command = module._async_command(args)
+        self.assertNotIn("--async", command)
+        self.assertIn("--resume", command)
+        self.assertEqual(command[command.index("--chunk-size") + 1], "32")
 
 
 def _row(policy: str, budget: str | None, normalization: str) -> grid.StrategyRowSpec:
@@ -320,6 +420,43 @@ def _selection_payload(identity: str, fingerprint: str, passed: bool = True, sel
         "pilot_evidence": None,
         "selection_notes": "test fixture",
     }
+
+
+def _write_selection_calibration(run_dir: Path) -> None:
+    runtime.write_csv(
+        run_dir / "layer_epsilon_quantiles.csv",
+        [{"experiment_phase": "13A", "row_id": "row", "pair_id": "pair", "dataset_split": "training", "residual_layer": 0, "percentile": 0.5, "epsilon_value": 0.001, "sample_count": 10}],
+    )
+    runtime.write_csv(
+        run_dir / "slot_epsilon_quantiles.csv",
+        [{"experiment_phase": "13A", "row_id": "row", "pair_id": "pair", "residual_layer": 1, "active_atom_slot": 0, "percentile": 0.5, "epsilon_value": 0.001, "sample_count": 10}],
+    )
+    retired = []
+    coverage = []
+    for epsilon in grid.CANDIDATE_EPSILONS:
+        passing = epsilon <= 0.005
+        retired.append(
+            {
+                "experiment_phase": "13A", "row_id": "row", "pair_id": "pair",
+                "residual_layer": 1, "active_atom_slot": 0, "epsilon": epsilon,
+                "retired_lfo_count": 1, "retired_lfo_fraction": 0.1 if passing else 0.2,
+                "incoming_retired_energy": 0.1, "incoming_retired_energy_fraction": 0.01,
+                "unexplained_retired_energy": 0.001 if passing else 0.2,
+                "unexplained_retired_energy_fraction": 0.005 if passing else 0.1,
+                "retained_unexplained_energy_fraction": 0.995 if passing else 0.9,
+                "zero_total_energy": False,
+            }
+        )
+        coverage.append(
+            {
+                "experiment_phase": "13A", "row_id": "row", "pair_id": "pair",
+                "dataset_split": "training", "residual_layer": 1, "active_atom_slot": 0,
+                "epsilon": epsilon, "resolved_count": 1, "resolved_fraction": 0.1,
+                "counterfactual_eligible_count": 9, "counterfactual_eligible_fraction": 0.9,
+            }
+        )
+    runtime.write_csv(run_dir / "retired_error_mass.csv", retired)
+    runtime.write_csv(run_dir / "epsilon_coverage.csv", coverage)
 
 
 if __name__ == "__main__":

@@ -221,15 +221,22 @@ Experiment 12 artifacts are written under
 `era2/reports/EXPERIMENT_12_W8D16_COMPONENT_LADDER_REPORT.md`, with plots under
 `era2/reports/images/experiment_12/`.
 
-Experiment 13 now has an execution scaffold at
-`era2/code/experiment13_strategy_grid.py`. It enumerates the paired 90-row 13A
-and 90-row 13B grids, writes manifests and phase status, and enforces the
-sequential epsilon-selection gates from
-[EXPERIMENT_13_PLAN.md](./experiments/EXPERIMENT_13_PLAN.md). The numerical broad-
-and repair-atom construction algorithms remain deliberately unimplemented, so
-run commands stop after preflight with an explicit error and do not write result
-metrics or mark a phase complete. Use `status` to inspect `not_started`,
-`partial`, `blocked`, `failed`, and `complete` phase states.
+Experiment 13 is implemented at `era2/code/experiment13_strategy_grid.py`. It
+executes the paired 90-row 13A and 90-row 13B grids, including synthesized broad
+atoms, observed-residual repair atoms, resumable row artifacts, phase/slot
+calibration, deterministic epsilon selection, the restricted fallback pilot,
+paired analysis, and the canonical report required by
+[EXPERIMENT_13_PLAN.md](./experiments/EXPERIMENT_13_PLAN.md). The Windows
+`--async` path launches a background runner, captures stdout/stderr under the
+Experiment 13 `launcher_logs` directory, and opens a live status/event monitor.
+Use `status` to inspect `not_started`, `running`, `partial`, `blocked`, `failed`,
+and `complete` phase states.
+
+If automatic epsilon selection does not pass, run the restricted pilot and then
+record the explicit decision with `override-epsilon --selected-epsilon 0.001
+--rationale "..."`. The override command validates that the chosen value is
+covered by completed pilot artifacts before it updates the frozen selection and
+unblocks `run-13b`.
 
 Run tests with:
 
