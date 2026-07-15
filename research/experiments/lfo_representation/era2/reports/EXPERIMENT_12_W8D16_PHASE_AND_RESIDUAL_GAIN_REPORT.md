@@ -10,7 +10,7 @@ End-of-layer normalization is a real free decoder-policy lever. `LayerClip0To1` 
 
 `no_damage_policy` and duplicate suppression are mostly flat. They do not move quality enough to justify treating them as primary Experiment 13 axes unless the grid has spare room. Duplicate suppression is especially weak here: quality is identical to the default row while construction time is higher.
 
-The report contains `36` rows from the current `36`-row `PhaseAndResidualGainOnly` view. Every row keeps `W=8`, `D=16`, `control_point_count=97`, flat-categorical per-residual-layer addressing, and one required `NoOpAtom` per residual layer. This is still a screening read, not an automatic winner selection: median RMSE, strict perfect-LFO rate, P95 RMSE, and node-max P95 disagree in meaningful ways.
+The report contains `37` rows from the current `37`-row `PhaseAndResidualGainOnly` view. Every row keeps `W=8`, `D=16`, `control_point_count=97`, flat-categorical per-residual-layer addressing, and one required `NoOpAtom` per residual layer. This is still a screening read, not an automatic winner selection: median RMSE, strict perfect-LFO rate, P95 RMSE, and node-max P95 disagree in meaningful ways.
 
 ## Why This Happens
 
@@ -30,7 +30,9 @@ Soft clipping is different from hard clipping because the sigmoid-style transfor
 
 This section is manual selection guidance, not an automatic ranking. The right Experiment 13 grid should preserve candidates that win different co-primary metrics.
 
-- `path_search_policy`: keep both `Beam4Path` and `Beam8Path` unless grid size must shrink. `Beam8Path` is modestly better on P95 (`0.0567` vs `0.0580`) but costs more encoding time.
+Every independent-variable family plot includes its stable default/control setting. For `path_search_policy`, `GreedyPath` is included as the no-beam control while `Beam4Path` and `Beam8Path` remain the beam-search candidates.
+
+- `path_search_policy`: keep `GreedyPath` as the no-beam control, then keep both `Beam4Path` and `Beam8Path` unless grid size must shrink. `Beam8Path` is modestly better on P95 (`0.0567` vs `0.0580`) but costs more encoding time.
 - `construction_policy`: shortlist `FinishRepairRescue`, `CommonCaseRepair`, and `FamilyBalancedRepair` or `ShapeClusterRepair`. `FinishRepairRescue` is the balanced choice; `CommonCaseRepair` is the median/perfect-rate stress test.
 - `utility_candidate_budget`: shortlist `CandidateBudget48`, `CandidateBudget24`, and `CandidateBudget12`. `CandidateBudget8` is cheap, but under `PhaseAndResidualGain` it is less compelling on tail quality.
 - `layer_normalization_policy`: shortlist `LayerClip0To1`, `LayerCenterPreserveClip`, and `LayerClipNeg0p1To1p1`. Treat soft clips, `BoundedResidualStep`, and `OvershootPenaltyNoClip` as weak unless a later run gives them a different role.
@@ -42,7 +44,7 @@ This section is manual selection guidance, not an automatic ranking. The right E
 
 ### Path Search Policy
 
-This family asks whether the decoder should keep a wider path beam while choosing atom sequences. The family plot shows `Beam8Path` buys a small P95 improvement over `Beam4Path`, but the duration row shows the expected encoding-time cost. It is worth keeping both only if Experiment 13 can afford the extra rows.
+This family asks whether the decoder should keep a wider path beam while choosing atom sequences. `GreedyPath` is the no-beam control; `Beam4Path` and `Beam8Path` are the actual beam candidates. The family plot shows whether beam search is buying quality beyond the control and how much encoding time it costs. It is worth keeping both beam widths only if Experiment 13 can afford the extra rows.
 
 ![Path Search Policy metrics and diagnostics](./images/experiment_12_phase_gain/experiment12_path_search_policy_family.png)
 
@@ -84,7 +86,7 @@ This family tests whether phase/scale-near-duplicate atoms should be removed dur
 
 ## Global Plot Notes
 
-Lower is better for validation P95, validation median, max-point error, overshoot, and runtime. Higher is better for strict perfect-LFO rate.
+Lower is better for validation P95, validation median, max-point error, overshoot, and runtime. Higher is better for strict perfect-LFO rate. In family plots, bars marked with `// value` are clipped outliers: the visible axis is capped so the rest of the family remains readable, and the annotation gives the true value.
 
 ### Validation P95 By Row
 
@@ -130,6 +132,7 @@ Co-primary metrics: `validation_median_rmse`, `validation_strict_perfect_lfo_rat
 
 | Value | Median RMSE | Perfect Rate | P95 RMSE | Node Max P95 | Construct s | Encode s | NoOp Median | Effective NoOp | Overshoot Rate |
 |---|---|---|---|---|---|---|---|---|---|
+| `GreedyPath` | 0.0462 | 0.0087 | 0.0717 | 0.2291 | 25.8928 | 1.0090 | 0.0044 | 0.0087 | 0.1212 |
 | `Beam4Path` | 0.0409 | 0.0087 | 0.0580 | 0.1830 | 22.5015 | 6.0689 | 0.0087 | n/a | 0.1779 |
 | `Beam8Path` | 0.0406 | 0.0087 | 0.0567 | 0.1970 | 17.5831 | 11.8806 | 0.0087 | n/a | 0.1772 |
 
@@ -216,7 +219,7 @@ Co-primary metrics: `validation_median_rmse`, `validation_strict_perfect_lfo_rat
 
 | Variable | Values |
 |---|---|
-| `path_search_policy` | `Beam4Path`, `Beam8Path` |
+| `path_search_policy` | `GreedyPath`, `Beam4Path`, `Beam8Path` |
 | `construction_policy` | `BestOverallRepair`, `FamilyBalancedRepair`, `FinishMoreLfos`, `FinishAndRepair`, `AlternatingFinishRepair`, `FinishRepairRescue`, `CommonCaseRepair`, `HardCaseRepair`, `MetricBalancedRepair`, `ShapeClusterRepair`, `TuneAtomsAfterUse`, `PathAwareRepair` |
 | `utility_candidate_budget` | `CandidateBudget8`, `CandidateBudget12`, `CandidateBudget24`, `CandidateBudget48` |
 | `layer_normalization_policy` | `FinalClipOnly`, `LayerClip0To1`, `LayerClipNeg0p1To1p1`, `LayerClipNeg1To1`, `LayerSoftClip0To1`, `LayerSoftClipNeg0p1To1p1`, `LayerCenterPreserveClip`, `OvershootPenaltyNoClip`, `BoundedResidualStep` |
@@ -250,7 +253,7 @@ Regenerate this report from completed artifacts:
 conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment12_component_ladder.py --mkl-threading-layer SEQUENTIAL --native-threads 1 analyze --run-dir .\research\experiments\lfo_representation\era2\artifacts\experiment_12\component_ladder
 ```
 
-- Completed rows in this report view: `36/36`.
+- Completed rows in this report view: `37/37`.
 - CSV artifacts live under `research/experiments/lfo_representation/era2/artifacts/experiment_12/component_ladder/`.
 - Report images live under `C:\Users\angert\Documents\projects\OBRUXO\research\experiments\lfo_representation\era2\reports\images\experiment_12_phase_gain`.
 - XPU acceleration was added for optimized phase/gain lattice alignment during the run work. Treat that as workflow/runtime context only; it is not a model-quality variable.
