@@ -49,6 +49,21 @@ $legacyRun = ".\research\experiments\lfo_representation\era2\artifacts\experimen
 $selection = "$runDir\epsilon_selection.json"
 ```
 
+### Build the provisional report from the preserved fragment
+
+This command reads the immutable 39-row legacy Experiment 13A archive and
+writes all derived CSVs, plots, and markdown outside that source directory. The
+result is explicitly provisional: it cannot select the eligibility epsilon or
+stand in for the canonical report from completed 13A and 13B phases.
+
+```powershell
+conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py analyze-partial `
+  --run-dir .\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid_train100_val100_interrupted_39rows_20260716 `
+  --analysis-output-dir .\research\experiments\lfo_representation\era2\artifacts\experiment_13\analysis_legacy39_provisional `
+  --report-path .\research\experiments\lfo_representation\era2\reports\EXPERIMENT_13_W8D16_STRATEGY_GRID_PROVISIONAL.md `
+  --image-dir .\research\experiments\lfo_representation\era2\reports\images\experiment_13\provisional
+```
+
 ### 1. Run the tests
 
 Set conservative native-thread limits before importing NumPy, then run either
@@ -60,8 +75,8 @@ $env:OPENBLAS_NUM_THREADS = "1"
 $env:OMP_NUM_THREADS = "1"
 $env:MKL_NUM_THREADS = "1"
 
-# Experiment 13 only
-conda run --no-capture-output -n py312 python -B -m unittest discover -v -s .\research\experiments\lfo_representation\era2\tests -p 'test_strategy_grid.py'
+# Experiment 13 execution and reporting
+conda run --no-capture-output -n py312 python -B -m unittest discover -v -s .\research\experiments\lfo_representation\era2\tests -p 'test_strategy_grid*.py'
 
 # Complete Era 2 suite
 conda run --no-capture-output -n py312 python -B -m unittest discover -v -s .\research\experiments\lfo_representation\era2\tests -p 'test_*.py'
