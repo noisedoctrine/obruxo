@@ -421,6 +421,14 @@ class StrategyGridCliTests(unittest.TestCase):
             "analyze", "analyze-partial", "analyze-scaling", "verify-equivalence", "cancel", "status", "monitor",
         ):
             self.assertIn(command, help_result.stdout)
+        partial_help = subprocess.run(
+            [sys.executable, str(script), "analyze-partial", "--help"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(partial_help.returncode, 0, partial_help.stderr)
+        self.assertIn("--html-report-path", partial_help.stdout)
         with tempfile.TemporaryDirectory() as tmp:
             result = subprocess.run(
                 [sys.executable, str(script), "--mkl-threading-layer", "SEQUENTIAL", "--native-threads", "1", "status", "--run-dir", tmp],

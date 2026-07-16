@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
 import re
 import sys
@@ -27,17 +28,20 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             before = _fingerprint(source)
             analysis = root / "analysis"
             report = root / "reports" / "EXPERIMENT_13_PROVISIONAL.md"
+            html_report = root / "reports" / "EXPERIMENT_13_PROVISIONAL.html"
             images = root / "reports" / "images" / "experiment_13" / "provisional"
 
             result = strategy_report.analyze_partial_strategy_grid(
                 run_dir=source,
                 analysis_output_dir=analysis,
                 report_path=report,
+                html_report_path=html_report,
                 image_dir=images,
             )
 
             self.assertEqual(_fingerprint(source), before)
             self.assertEqual(Path(result["report"]), report.resolve())
+            self.assertEqual(Path(result["html_report"]), html_report.resolve())
             self.assertFalse((source / "summary.csv").exists())
             text = report.read_text(encoding="utf-8")
             self.assertIn("Provisional evidence only", text)
@@ -45,6 +49,35 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             self.assertIn("no eligibility epsilon has been selected", text)
             self.assertIn("Zero completed rows are available", text)
             self.assertNotIn("The frozen eligibility epsilon is", text)
+
+            html = html_report.read_text(encoding="utf-8")
+            self.assertIn("PROVISIONAL ·", html)
+            self.assertIn("Source coverage", html)
+            self.assertIn("Layer normalization", html)
+            self.assertIn("Candidate budget", html)
+            self.assertIn("Layer schedule", html)
+            self.assertIn("Construction families", html)
+            self.assertIn("Partial codebook", html)
+            self.assertIn("Eligibility calibration", html)
+            self.assertIn("Legacy runtime", html)
+            self.assertIn("historical only", html)
+            self.assertIn("https://cdn.jsdelivr.net/npm/echarts@6.1.0/dist/echarts.min.js", html)
+            self.assertNotIn(str(root.resolve()), html)
+            self.assertLess(html_report.stat().st_size, 1_000_000)
+            payload_match = re.search(r'<script id="report-data" type="application/json">(.*?)</script>', html, re.DOTALL)
+            self.assertIsNotNone(payload_match)
+            payload = json.loads(payload_match.group(1))
+            self.assertEqual(payload["schema_version"], "experiment13_interactive_report_v1")
+            self.assertEqual(payload["meta"]["completed_rows"], 8)
+            self.assertEqual(payload["meta"]["expected_rows"], 90)
+            self.assertFalse(payload["meta"]["epsilon_selected"])
+            self.assertFalse(payload["meta"]["experiment13b_started"])
+            self.assertEqual(len(payload["tables"]["metrics"]), 8)
+            self.assertEqual(len(payload["tables"]["coverage"]), 90)
+            self.assertEqual(len(payload["tables"]["matched_deltas"]), 12)
+            self.assertEqual(len(payload["tables"]["partial_codebook"]), 56)
+            element_ids = re.findall(r'\bid="([^"]+)"', html)
+            self.assertEqual(len(element_ids), len(set(element_ids)))
 
             self.assertEqual(len(runtime.read_csv(analysis / "completed_row_coverage.csv")), 90)
             self.assertEqual(len(runtime.read_csv(analysis / "co_primary_metrics.csv")), 8)
@@ -61,14 +94,17 @@ class StrategyGridPartialReportTests(unittest.TestCase):
                 self.assertTrue((report.parent / relative).is_file(), relative)
 
             first_text = text
+            first_html = html_report.read_bytes()
             first_deltas = (analysis / "matched_factor_deltas.csv").read_bytes()
             strategy_report.analyze_partial_strategy_grid(
                 run_dir=source,
                 analysis_output_dir=analysis,
                 report_path=report,
+                html_report_path=html_report,
                 image_dir=images,
             )
             self.assertEqual(report.read_text(encoding="utf-8"), first_text)
+            self.assertEqual(html_report.read_bytes(), first_html)
             self.assertEqual((analysis / "matched_factor_deltas.csv").read_bytes(), first_deltas)
             self.assertEqual(_fingerprint(source), before)
 
@@ -81,6 +117,14 @@ class StrategyGridPartialReportTests(unittest.TestCase):
                     run_dir=source,
                     analysis_output_dir=source / "analysis",
                     report_path=Path(tmp) / "report.md",
+                    image_dir=Path(tmp) / "images",
+                )
+            with self.assertRaisesRegex(ValueError, "outside the immutable source run"):
+                strategy_report.analyze_partial_strategy_grid(
+                    run_dir=source,
+                    analysis_output_dir=Path(tmp) / "analysis",
+                    report_path=Path(tmp) / "report.md",
+                    html_report_path=source / "report.html",
                     image_dir=Path(tmp) / "images",
                 )
 

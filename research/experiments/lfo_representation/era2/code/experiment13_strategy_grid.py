@@ -170,6 +170,7 @@ def _execute(args: argparse.Namespace) -> None:
                 run_dir=args.run_dir,
                 analysis_output_dir=args.analysis_output_dir,
                 report_path=args.report_path,
+                html_report_path=args.html_report_path,
                 image_dir=args.image_dir,
             )
             for key, value in result.items():
@@ -235,6 +236,7 @@ def _parser() -> argparse.ArgumentParser:
     partial.add_argument("--run-dir", type=Path, required=True)
     partial.add_argument("--analysis-output-dir", type=Path, required=True)
     partial.add_argument("--report-path", type=Path, required=True)
+    partial.add_argument("--html-report-path", type=Path)
     partial.add_argument("--image-dir", type=Path, required=True)
 
     status = subcommands.add_parser("status", help="print Experiment 13 phase and gate status")

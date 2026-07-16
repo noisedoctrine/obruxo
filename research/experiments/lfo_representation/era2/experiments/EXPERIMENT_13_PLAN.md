@@ -52,17 +52,31 @@ $selection = "$runDir\epsilon_selection.json"
 ### Build the provisional report from the preserved fragment
 
 This command reads the immutable 39-row legacy Experiment 13A archive and
-writes all derived CSVs, plots, and markdown outside that source directory. The
-result is explicitly provisional: it cannot select the eligibility epsilon or
-stand in for the canonical report from completed 13A and 13B phases.
+writes all derived CSVs, plots, Markdown, and the self-contained interactive
+HTML report outside that source directory. The result is explicitly
+provisional: it cannot select the eligibility epsilon or stand in for the
+canonical report from completed 13A and 13B phases.
 
 ```powershell
 conda run --no-capture-output -n py312 python .\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py analyze-partial `
   --run-dir .\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid_train100_val100_interrupted_39rows_20260716 `
   --analysis-output-dir .\research\experiments\lfo_representation\era2\artifacts\experiment_13\analysis_legacy39_provisional `
   --report-path .\research\experiments\lfo_representation\era2\reports\EXPERIMENT_13_W8D16_STRATEGY_GRID_PROVISIONAL.md `
+  --html-report-path .\research\experiments\lfo_representation\era2\reports\EXPERIMENT_13_W8D16_STRATEGY_GRID_PROVISIONAL.html `
   --image-dir .\research\experiments\lfo_representation\era2\reports\images\experiment_13\provisional
 ```
+
+Preview the interactive report without a build step:
+
+```powershell
+conda run --no-capture-output -n py312 python -m http.server 8765 `
+  --directory .\research\experiments\lfo_representation\era2\reports
+```
+
+Then open
+`http://localhost:8765/EXPERIMENT_13_W8D16_STRATEGY_GRID_PROVISIONAL.html`.
+The report is one HTML file with inline CSS, JavaScript, and compact data; only
+the pinned ECharts renderer is loaded from jsDelivr.
 
 ### 1. Run the tests
 

@@ -31,6 +31,8 @@ CALIBRATION_TABLES = (
     "epsilon_coverage.csv",
     "retired_error_mass.csv",
 )
+INTERACTIVE_REPORT_SCHEMA = "experiment13_interactive_report_v1"
+INTERACTIVE_TEMPLATE = Path(__file__).with_name("templates") / "experiment_13_provisional.html"
 
 
 @dataclass(frozen=True)
@@ -50,6 +52,7 @@ def analyze_partial_strategy_grid(
     analysis_output_dir: Path,
     report_path: Path,
     image_dir: Path,
+    html_report_path: Path | None = None,
 ) -> dict[str, str]:
     """Generate a provisional report from completed, sharded 13A rows."""
     from .strategy_grid import experiment13a_specs
@@ -58,6 +61,7 @@ def analyze_partial_strategy_grid(
         source_run=Path(run_dir),
         analysis_output_dir=Path(analysis_output_dir),
         report_path=Path(report_path),
+        html_report_path=Path(html_report_path) if html_report_path is not None else None,
         image_dir=Path(image_dir),
         expected_rows=[asdict(spec) for spec in experiment13a_specs()],
     )
@@ -134,20 +138,25 @@ def write_provisional_report(
     report_path: Path,
     image_dir: Path,
     expected_rows: Sequence[Mapping[str, Any]],
+    html_report_path: Path | None = None,
 ) -> dict[str, str]:
     """Generate a findings-first report from an immutable partial 13A run."""
     source_run = Path(source_run).resolve()
     analysis_output_dir = Path(analysis_output_dir).resolve()
     report_path = Path(report_path).resolve()
+    html_report_path = Path(html_report_path or report_path.with_suffix(".html")).resolve()
     image_dir = Path(image_dir).resolve()
     for path, label in (
         (analysis_output_dir, "analysis output directory"),
         (report_path, "report path"),
+        (html_report_path, "HTML report path"),
         (image_dir, "image directory"),
     ):
         _require_outside_source(source_run, path, label)
     if report_path.suffix.lower() != ".md":
         raise ValueError("provisional report path must end in .md")
+    if html_report_path.suffix.lower() != ".html":
+        raise ValueError("interactive report path must end in .html")
 
     bundle = prepare_analysis_artifacts(
         source_run=source_run,
@@ -168,16 +177,31 @@ def write_provisional_report(
     report_path.parent.mkdir(parents=True, exist_ok=True)
     _atomic_text(report_path, report_text)
 
+    source_fingerprint = _directory_fingerprint(source_run)
+    interactive_payload = _interactive_payload(
+        bundle,
+        source_run=source_run,
+        html_report_path=html_report_path,
+        expected_count=expected_count,
+        source_fingerprint=source_fingerprint,
+    )
+    interactive_text = _interactive_html(interactive_payload)
+    _atomic_text(html_report_path, interactive_text)
+    interactive_sha256 = hashlib.sha256(interactive_text.encode("utf-8")).hexdigest()
+
     manifest = {
         "schema_version": "experiment13_provisional_report_v1",
         "source_run": str(source_run),
-        "source_archive_sha256": _directory_fingerprint(source_run),
+        "source_archive_sha256": source_fingerprint,
         "completed_13a_rows": len(bundle.summaries),
         "expected_13a_rows": expected_count,
         "report_status": "provisional_incomplete_13a",
         "epsilon_selected": False,
         "runtime_comparison_allowed": False,
         "report_path": str(report_path),
+        "html_report_path": str(html_report_path),
+        "interactive_payload_schema": INTERACTIVE_REPORT_SCHEMA,
+        "interactive_report_sha256": interactive_sha256,
         "image_dir": str(image_dir),
     }
     manifest_path = analysis_output_dir / "provisional_report_manifest.json"
@@ -185,6 +209,7 @@ def write_provisional_report(
     return {
         "analysis_output_dir": str(analysis_output_dir),
         "report": str(report_path),
+        "html_report": str(html_report_path),
         "report_image_dir": str(image_dir),
         "manifest": str(manifest_path),
         **{key: str(path) for key, path in bundle.paths.items()},
@@ -482,6 +507,217 @@ def _plot_energy(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> Non
     axis.plot([0.0, maximum], [0.0, maximum], linestyle="--", color="gray", linewidth=1)
     axis.set(xlabel="incoming retired-energy fraction", ylabel="unexplained retired-energy fraction (lower is safer)", title="Incoming versus unexplained retired energy")
     _save(plt, figure, path)
+
+
+def _interactive_payload(
+    bundle: AnalysisBundle,
+    *,
+    source_run: Path,
+    html_report_path: Path,
+    expected_count: int,
+    source_fingerprint: str,
+) -> dict[str, Any]:
+    """Build the compact, deterministic payload embedded in the HTML report."""
+    completed = len(bundle.summaries)
+    best = min(bundle.summaries, key=lambda row: _number(row, "validation_p95_rmse"))
+    normalization = _comparison_summary(bundle.matched_deltas, "layer_normalization_policy")
+    budget = _comparison_summary(bundle.matched_deltas, "utility_candidate_budget")
+    schedule = _comparison_summary(bundle.matched_deltas, "layer_schedule")
+    pareto = [row for row in bundle.co_primary if _truth(row.get("pareto_candidate"))]
+    family_by_row = {
+        str(row.get("row_id")): str(row.get("construction_family", "Unknown"))
+        for row in bundle.summaries
+    }
+    partial_rows = [
+        {**row, "construction_family": family_by_row.get(str(row.get("row_id")), "Unknown")}
+        for row in bundle.partial_codebook
+    ]
+
+    coverage_by_family: list[dict[str, Any]] = []
+    for family in sorted({str(row.get("construction_family", "")) for row in bundle.coverage}):
+        planned = [row for row in bundle.coverage if row.get("construction_family") == family]
+        coverage_by_family.append({
+            "construction_family": family,
+            "completed": sum(_truth(row.get("completed")) for row in planned),
+            "planned": len(planned),
+        })
+    absent_families = [row["construction_family"] for row in coverage_by_family if row["completed"] == 0]
+    incomplete_families = [row for row in coverage_by_family if row["completed"] < row["planned"]]
+    runtime_rows = sorted(
+        bundle.summaries,
+        key=lambda row: _number(row, "oracle_construction_time"),
+        reverse=True,
+    )
+    calibration = _compact_calibration(bundle.calibration)
+    source_display = os.path.relpath(source_run, html_report_path.parent).replace("\\", "/")
+
+    return {
+        "schema_version": INTERACTIVE_REPORT_SCHEMA,
+        "meta": {
+            "title": "Experiment 13 — Provisional W8D16 Strategy Grid",
+            "status": "provisional_incomplete_13a",
+            "completed_rows": completed,
+            "expected_rows": expected_count,
+            "source_run": source_display,
+            "source_archive_sha256": source_fingerprint,
+            "epsilon_selected": False,
+            "experiment13b_started": False,
+            "runtime_comparison_allowed": False,
+            "contract": {
+                "window_width": 8,
+                "residual_layers": 16,
+                "control_points": 97,
+                "base_choices": 32,
+                "atom_choices": 8,
+                "path_search": "Beam4",
+                "scalar_context": "PhaseAndResidualGain",
+                "model_outputs": 193,
+            },
+        },
+        "findings": {
+            "normalization": normalization,
+            "candidate_budget": budget,
+            "schedule": schedule,
+            "best_row": dict(best),
+            "pareto_count": len(pareto),
+            "absent_families": absent_families,
+            "incomplete_families": incomplete_families,
+            "coverage_by_family": coverage_by_family,
+            "runtime_outliers": [
+                {
+                    "row_id": row.get("row_id", ""),
+                    "oracle_construction_time": _number(row, "oracle_construction_time"),
+                }
+                for row in runtime_rows[:15]
+            ],
+        },
+        "tables": {
+            "metrics": bundle.co_primary,
+            "coverage": bundle.coverage,
+            "matched_deltas": bundle.matched_deltas,
+            "partial_codebook": partial_rows,
+        },
+        "calibration": calibration,
+    }
+
+
+def _compact_calibration(calibration: Mapping[str, Sequence[Mapping[str, Any]]]) -> dict[str, Any]:
+    layer_quantiles: dict[tuple[int, float], list[float]] = {}
+    for row in calibration["layer_epsilon_quantiles.csv"]:
+        if row.get("dataset_split", "training") != "training":
+            continue
+        key = (int(_number(row, "residual_layer")), _number(row, "percentile"))
+        layer_quantiles.setdefault(key, []).append(_number(row, "epsilon_value"))
+
+    slot_quantiles: dict[tuple[int, float], list[float]] = {}
+    for row in calibration["slot_epsilon_quantiles.csv"]:
+        if row.get("dataset_split", "training") != "training":
+            continue
+        key = (int(_number(row, "active_atom_slot")), _number(row, "percentile"))
+        slot_quantiles.setdefault(key, []).append(_number(row, "epsilon_value"))
+
+    layer_coverage: dict[tuple[int, float], list[float]] = {}
+    slot_coverage: dict[tuple[int, float], list[float]] = {}
+    for row in calibration["epsilon_coverage.csv"]:
+        if row.get("dataset_split") != "training":
+            continue
+        slot = row.get("active_atom_slot")
+        epsilon = _number(row, "epsilon")
+        if slot in {None, "", "None"}:
+            key = (int(_number(row, "residual_layer")), epsilon)
+            layer_coverage.setdefault(key, []).append(_number(row, "resolved_fraction"))
+        else:
+            key = (int(_number(row, "active_atom_slot")), epsilon)
+            slot_coverage.setdefault(key, []).append(_number(row, "resolved_fraction"))
+
+    retired_rows = list(calibration["retired_error_mass.csv"])
+    retired_by_epsilon: dict[float, list[Mapping[str, Any]]] = {}
+    for row in retired_rows:
+        retired_by_epsilon.setdefault(_number(row, "epsilon"), []).append(row)
+    retired_summary = []
+    retired_sample = []
+    for epsilon, rows in sorted(retired_by_epsilon.items()):
+        retired = [_number(row, "retired_lfo_fraction") for row in rows]
+        incoming = [_number(row, "incoming_retired_energy_fraction") for row in rows]
+        unexplained = [_number(row, "unexplained_retired_energy_fraction") for row in rows]
+        retired_summary.append({
+            "epsilon": epsilon,
+            "count": len(rows),
+            "retired_q25": _percentile(retired, 0.25),
+            "retired_median": _percentile(retired, 0.5),
+            "retired_q75": _percentile(retired, 0.75),
+            "unexplained_q25": _percentile(unexplained, 0.25),
+            "unexplained_median": _percentile(unexplained, 0.5),
+            "unexplained_q75": _percentile(unexplained, 0.75),
+            "unexplained_p95": _percentile(unexplained, 0.95),
+            "incoming_median": _percentile(incoming, 0.5),
+            "incoming_p95": _percentile(incoming, 0.95),
+        })
+        ordered = sorted(
+            rows,
+            key=lambda row: (
+                str(row.get("row_id", "")),
+                int(_number(row, "residual_layer")),
+                int(_number(row, "active_atom_slot")),
+            ),
+        )
+        if len(ordered) <= 150:
+            sampled = ordered
+        else:
+            indexes = sorted({round(index * (len(ordered) - 1) / 149) for index in range(150)})
+            sampled = [ordered[index] for index in indexes]
+        retired_sample.extend({
+            "epsilon": epsilon,
+            "retired_lfo_fraction": _number(row, "retired_lfo_fraction"),
+            "incoming_retired_energy_fraction": _number(row, "incoming_retired_energy_fraction"),
+            "unexplained_retired_energy_fraction": _number(row, "unexplained_retired_energy_fraction"),
+            "residual_layer": int(_number(row, "residual_layer")),
+            "active_atom_slot": int(_number(row, "active_atom_slot")),
+        } for row in sampled)
+
+    return {
+        "layer_quantiles": _median_records(layer_quantiles, "residual_layer", "percentile", "epsilon_value"),
+        "slot_quantiles": _median_records(slot_quantiles, "active_atom_slot", "percentile", "epsilon_value"),
+        "layer_coverage": _median_records(layer_coverage, "residual_layer", "epsilon", "resolved_fraction"),
+        "slot_coverage": _median_records(slot_coverage, "active_atom_slot", "epsilon", "resolved_fraction"),
+        "retired_summary": retired_summary,
+        "retired_sample": retired_sample,
+    }
+
+
+def _median_records(
+    grouped: Mapping[tuple[int, float], Sequence[float]],
+    x_key: str,
+    series_key: str,
+    value_key: str,
+) -> list[dict[str, float | int]]:
+    return [
+        {x_key: key[0], series_key: key[1], value_key: median(values)}
+        for key, values in sorted(grouped.items())
+    ]
+
+
+def _percentile(values: Sequence[float], quantile: float) -> float:
+    ordered = sorted(values)
+    if not ordered:
+        return math.nan
+    position = (len(ordered) - 1) * quantile
+    lower = math.floor(position)
+    upper = math.ceil(position)
+    if lower == upper:
+        return ordered[lower]
+    weight = position - lower
+    return ordered[lower] * (1.0 - weight) + ordered[upper] * weight
+
+
+def _interactive_html(payload: Mapping[str, Any]) -> str:
+    template = INTERACTIVE_TEMPLATE.read_text(encoding="utf-8")
+    marker = "__REPORT_DATA_JSON__"
+    if template.count(marker) != 1:
+        raise RuntimeError(f"interactive report template must contain exactly one {marker} marker")
+    data = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    data = data.replace("</", "<\\/")
+    return template.replace(marker, data)
 
 
 def _provisional_markdown(
