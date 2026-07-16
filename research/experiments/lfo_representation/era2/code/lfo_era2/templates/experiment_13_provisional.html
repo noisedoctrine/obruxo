@@ -493,15 +493,21 @@
     const truthy = value => value === true || ["true","1","yes"].includes(String(value).toLowerCase());
     const COLORS = {accent:"#147e67", blue:"#286db7", warn:"#a86100", danger:"#b63b34", blocked:"#7741a5"};
     const STATUS = {
-      "strong provisional": {color: COLORS.accent}, "strong 13A": {color: COLORS.accent}, complete: {color: COLORS.accent}, mixed: {color: COLORS.warn}, unresolved: {color: COLORS.warn}, blocked: {color: COLORS.blocked}, "pilot required": {color: COLORS.blocked}, "bounded ablation": {color: COLORS.blue}, "same-run only": {color: COLORS.blue}, "historical only": {color: COLORS.danger}
+      "strong provisional": {color: COLORS.accent}, "strong 13A": {color: COLORS.accent}, complete: {color: COLORS.accent}, diagnostic: {color: COLORS.blue}, mixed: {color: COLORS.warn}, unresolved: {color: COLORS.warn}, blocked: {color: COLORS.blocked}, "pilot required": {color: COLORS.blocked}, "bounded ablation": {color: COLORS.blue}, "same-run only": {color: COLORS.blue}, "historical only": {color: COLORS.danger}
     };
     const findings = DATA.findings;
     const metrics = DATA.tables.metrics;
     const coverage = DATA.tables.coverage;
     const deltas = DATA.tables.matched_deltas;
-    const partial = DATA.tables.partial_codebook;
+    const deep = DATA.deep_analysis || {row_ids:[],marginal_atoms:[],layer_progression:[],mechanisms:[]};
+    const partial = (DATA.tables.partial_codebook || []).map(row => Array.isArray(row) ? {row_id:deep.row_ids[row[0]],construction_family:metrics.find(item=>item.row_id===deep.row_ids[row[0]])?.construction_family,active_atom_count:row[1],validation_median_rmse:row[2],validation_strict_perfect_lfo_rate:row[3],validation_p95_rmse:row[4],validation_node_max_error_p95:row[5]} : row);
     const scaling = DATA.tables.scaling || [];
+    const diagnostics = (DATA.tables.diagnostics || []).map(row => ({...metrics.find(item=>item.row_id===row.row_id),...row}));
+    const rankings = (DATA.tables.rankings || []).map(row => ({...metrics.find(item=>item.row_id===row.row_id),...row}));
+    const interactions = DATA.tables.factor_interactions || [];
     const metricById = new Map(metrics.map(row => [row.row_id, row]));
+    const diagnosticById = new Map(diagnostics.map(row => [row.row_id, row]));
+    const deepRowId = index => deep.row_ids?.[index];
     const calibrationRowIds = DATA.calibration.row_ids || [];
     const CO_PRIMARY = [
       {key:"validation_median_rmse", delta:"delta_validation_median_rmse", label:"Median RMSE", axis:"Median\nRMSE ↓", short:"Median", higher:false, format:value=>fmt(value, 7)},
@@ -637,7 +643,23 @@
         limitation:"Strict-perfect rate has only two observed levels, so it is a coarse discriminator despite remaining co-primary.", charts:["pareto"]
       },
       {
-        id:"normalization", number:3, zone:"Strategy levers", status:"strong 13A", title:"Layer normalization", stat:comparisonText(findings.normalization),
+        id:"metric-agreement", number:3, zone:"Quality frontier", status:"complete", title:"Metric agreement and tension", stat:`P95 ↔ node-max ρ ${fmt(findings.metric_correlations?.[2]?.[3],2)}`,
+        question:"Do the four co-primary metrics rank strategies the same way?",
+        mechanism:"Rank correlation separates shared quality signal from objective-specific behavior. Continuous RMSE metrics can agree strongly while the thresholded strict-perfect rate detects a different finishing regime.",
+        evidence:"Median RMSE, P95 RMSE, and node-max P95 share substantial rank information. Strict-perfect rate has only two observed levels and weak rank agreement with the tail metrics, so it cannot be inferred from lower RMSE.",
+        recommendation:"Keep the four-objective Pareto frontier and inspect high rank-spread rows; do not collapse the experiment to validation P95 alone.",
+        limitation:"Rank agreement describes ordering, not effect size or causality.", charts:["metric-map"]
+      },
+      {
+        id:"generalization", number:4, zone:"Quality frontier", status:"complete", title:"Train-to-validation stability", stat:`P95 median gap ${fmt(findings.generalization?.generalization_gap_p95_rmse?.median,6)}`,
+        question:"Does held-out validation preserve the ordering and scale seen during construction?",
+        mechanism:"Every codebook is constructed on the fixed train-50% subset and evaluated on all validation rows. Plotting train against validation exposes overfit, sample difficulty, and objective-specific shifts.",
+        evidence:"Validation median RMSE is slightly higher on the median strategy, while validation P95 is often lower. Train and validation P95 still rank strategies very similarly.",
+        recommendation:"Use training diagnostics to explain mechanisms, but keep validation metrics authoritative for strategy choice.",
+        limitation:"This is one deterministic split and does not estimate resampling uncertainty.", charts:["generalization"]
+      },
+      {
+        id:"normalization", number:5, zone:"Strategy levers", status:"strong 13A", title:"Layer normalization", stat:comparisonText(findings.normalization),
         question:"Does decoder-free LayerClip0To1 suppress tail error across the complete strategy grid?",
         mechanism:"LayerClip0To1 constrains every residual-layer output to the physical signal range, preventing overshoot from compounding before later corrections.",
         evidence:comparisonEvidence("layer_normalization_policy", "LayerClip0To1", "FinalClipOnly"),
@@ -645,7 +667,7 @@
         limitation:"The effect is authoritative for AllResiduals construction; its interaction with UnresolvedOnly still requires 13B.", charts:["normalization"]
       },
       {
-        id:"budget", number:4, zone:"Strategy levers", status:"mixed", title:"Candidate budget", stat:comparisonText(findings.candidate_budget),
+        id:"budget", number:6, zone:"Strategy levers", status:"mixed", title:"Candidate budget", stat:comparisonText(findings.candidate_budget),
         question:"Does doubling the offline repair shortlist reliably improve complete-13A quality?",
         mechanism:"CandidateBudget48 expands offline search opportunity, but later atom slots and Beam4 encoding can compensate for locally weaker CandidateBudget24 choices.",
         evidence:comparisonEvidence("utility_candidate_budget", "CandidateBudget48", "CandidateBudget24"),
@@ -653,7 +675,7 @@
         limitation:"Budget is not defined for pure-prototype rows, so matched evidence covers repair-containing policies only.", charts:["budget"]
       },
       {
-        id:"schedule", number:5, zone:"Strategy levers", status:"mixed", title:"Layer schedule", stat:comparisonText(findings.schedule),
+        id:"schedule", number:7, zone:"Strategy levers", status:"mixed", title:"Layer schedule", stat:comparisonText(findings.schedule),
         question:"Should broad and repair residual layers be interleaved or separated into two phases?",
         mechanism:"The schedules reorder broad and repair layers without changing W8D16 or the deployed runtime interface. Their value depends on the residual structures each construction family leaves for later correction.",
         evidence:comparisonEvidence("layer_schedule", "TwoPhase", "Interleaved"),
@@ -661,17 +683,41 @@
         limitation:"AnchorNative and AllBroad controls do not participate in this matched comparison.", charts:["schedule"]
       },
       {
-        id:"partial", number:6, zone:"Model behavior", status:"complete", title:"Partial codebook", stat:"Early gains, late separation",
+        id:"interactions", number:8, zone:"Strategy levers", status:"mixed", title:"Family-specific interactions", stat:"Effects change sign by family",
+        question:"Which construction mechanisms change the direction of budget and schedule effects?",
+        mechanism:"Matched deltas are aggregated within construction family rather than across the whole grid. This keeps the parent mechanism visible when a policy lever helps one family and hurts another.",
+        evidence:"LayerClip0To1 is consistently favorable across families. Candidate budget and schedule effects change sign: TwoPhase helps several robust or diversity-aware families but hurts AlignedMedian and DominantDirection variants.",
+        recommendation:"Choose budget and schedule jointly with construction family; keep clipping as the global default.",
+        limitation:"Family medians summarize only the matched cells available for each lever; pure controls do not define every comparison.", charts:["interactions"]
+      },
+      {
+        id:"partial", number:9, zone:"Model behavior", status:"complete", title:"Partial codebook", stat:"Early gains, late separation",
         question:"How much quality arrives in the first few active atom slots, and where do families continue separating?",
         mechanism:"Re-evaluating validation quality after atom 1 through atom 7 shows whether a construction family captures reusable structure early or depends on later specialized repairs.",
         motivation:"This is a capacity-efficiency diagnostic. A steep early drop means the first atoms capture reusable structure; a flat segment means diminishing returns.",
         reading:["Move left to right as one active atom is added per residual layer.","Move downward as validation P95 improves.","Compare curve shape before endpoint rank: early slope shows efficiency and late separation shows specialization."],
         evidence:"Most quality arrives in the first few atom choices, but family curves continue to separate through the seventh active atom.",
         recommendation:"Retain per-slot progression in the final paired analysis; endpoint metrics alone hide mechanism and ordering quality.",
-        limitation:"This fixed-W8 experiment does not test a smaller deployed head budget.", charts:["partial"]
+        limitation:"This fixed-W8 experiment does not test a smaller deployed head budget.", charts:["partial","marginal"]
       },
       {
-        id:"calibration", number:7, zone:"Eligibility", status:"pilot required", title:"Eligibility calibration", stat:`best early/middle ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,2)}`,
+        id:"layers", number:10, zone:"Model behavior", status:"complete", title:"Residual-layer progression", stat:"Diminishing, still positive",
+        question:"Do later residual layers continue reducing tail error after their seventh active atom?",
+        mechanism:"The end-of-layer trace records training error after slot seven for each residual layer. It distinguishes within-layer atom capacity from depth-wise correction.",
+        evidence:"Median training P95 drops monotonically from layer 1 through layer 16. Marginal reductions shrink with depth but remain material at the final layer.",
+        recommendation:"Retain D16 for 13B; a smaller depth would require a dedicated head-budget experiment.",
+        limitation:"The curve shows benefit, not a complete cost-optimality proof.", charts:["layers"]
+      },
+      {
+        id:"diagnostics", number:11, zone:"Model behavior", status:"diagnostic", title:"Decoder and dictionary behavior", stat:`gain-use ρ ${fmt(findings.diagnostic_correlations_with_validation_p95?.residual_gain_nonzero_rate,2)}`,
+        question:"Which internal behaviors accompany good or bad validation tails?",
+        mechanism:"Overshoot, effective no-op use, dead atoms, residual-gain activity, duplicate proposals, and prototype convergence reveal how each dictionary is actually used.",
+        evidence:"Overshoot, effective no-op use, and dead atoms track worse P95; frequent non-zero residual gains track better P95. Construction time itself has almost no rank relationship with quality.",
+        recommendation:"Use these diagnostics to explain matched quality results and flag pathological rows, not as replacement objectives.",
+        limitation:"These are cross-strategy associations with design confounding; only matched interventions support stronger causal language.", charts:["diagnostics"]
+      },
+      {
+        id:"calibration", number:12, zone:"Eligibility", status:"pilot required", title:"Eligibility calibration", stat:`best early/middle ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,2)}`,
         question:"Did any candidate epsilon satisfy the frozen automatic selection rule?",
         mechanism:"Eligibility would retire already-resolved LFOs from later atom construction. The selector requires safe unexplained-energy retirement and at least 5% median early/middle coverage.",
         motivation:"The threshold should release meaningful codebook capacity without abandoning meaningful unexplained residual energy.",
@@ -681,7 +727,7 @@
         limitation:"No epsilon is selected and this report cannot make an AllResiduals-versus-UnresolvedOnly claim.", charts:["calibration","retirement"]
       },
       {
-        id:"scaling", number:8, zone:"Ablations", status:"bounded ablation", title:"Training-data scaling", stat:`${findings.scaling_matched_row_count} matched rows`,
+        id:"scaling", number:13, zone:"Ablations", status:"bounded ablation", title:"Training-data scaling", stat:`${findings.scaling_matched_row_count} matched rows`,
         question:"What changes when construction uses 50% rather than 100% of the training split?",
         mechanism:"The comparison holds validation membership and row definitions fixed, then subtracts the preserved full-training result from the optimized 50%-training result for each matched row.",
         evidence:"The 50%-training run is modestly worse on median and P95 RMSE, while strict-perfect rate and node-max P95 improve on most matched rows.",
@@ -689,7 +735,15 @@
         limitation:"The full-training source is a non-random 39-row prefix, and runtime comparisons are invalid because execution implementations and host conditions differ.", charts:["scaling"]
       },
       {
-        id:"runtime", number:9, zone:"Diagnostics", status:"same-run only", title:"Optimized 13A runtime", stat:`${fmt(findings.runtime_outliers[0]?.oracle_construction_time,1)} s max`,
+        id:"work", number:14, zone:"Diagnostics", status:"same-run only", title:"Offline work efficiency", stat:"193 heads for every row",
+        question:"Does additional construction work buy better validation quality?",
+        mechanism:"Candidate evaluations, oracle construction, and train/validation encoding are experiment-time work. The deployed prediction interface remains fixed for every strategy.",
+        evidence:"CandidateBudget48 doubles repair-search evaluations but gives a small mixed quality effect. Construction time has essentially no monotonic relationship with validation P95.",
+        recommendation:"Keep work and quality as separate axes; spend CandidateBudget48 only where its family interaction justifies it.",
+        limitation:"These are same-run offline timings, not deployed inference latency and not a legacy speedup estimate.", charts:["work"]
+      },
+      {
+        id:"runtime", number:15, zone:"Diagnostics", status:"same-run only", title:"Optimized 13A runtime", stat:`${fmt(findings.runtime_outliers[0]?.oracle_construction_time,1)} s max`,
         question:"Which strategy rows are expensive within the completed optimized run?",
         mechanism:"Same-run oracle construction timings share the implementation, sample, cache policy, and host conditions. They can expose relative cost without importing the legacy host-sleep artifacts.",
         evidence:"The 90-row optimized run has a continuous timing distribution with no Modern Standby outliers. Pure cluster prototypes and several repair-heavy rows occupy the slow end.",
@@ -895,6 +949,21 @@
       return rows.filter(row => allowed.has(calibrationRowIds[row[0]]));
     }
 
+    function filteredDeepRows(rows, forChart = false) {
+      if (forChart && !globalState.applyCharts) return rows;
+      return rows.filter(row => rowMatchesGlobal(metricById.get(deepRowId(row[0]))));
+    }
+
+    function filteredDiagnosticRows(forChart = false) {
+      if (forChart && !globalState.applyCharts) return diagnostics;
+      return diagnostics.filter(row => rowMatchesGlobal(metricById.get(row.row_id)));
+    }
+
+    function filteredRankingRows(forChart = false) {
+      if (forChart && !globalState.applyCharts) return rankings;
+      return rankings.filter(row => rowMatchesGlobal(metricById.get(row.row_id)));
+    }
+
     function rerenderVisibleCharts() {
       if (currentView === "report") renderFullReportCharts();
       if (currentView === "compare") renderCompare();
@@ -908,7 +977,7 @@
       qs("#page-title").textContent = isComplete13A ? "Experiment 13A — Complete Strategy Grid" : "Experiment 13 — Provisional Strategy Grid";
       qs("#hero-title").textContent = isComplete13A ? "A complete unfiltered strategy map." : "Evidence before a winner.";
       qs("#hero-summary").textContent = isComplete13A
-        ? "All 90 AllResiduals strategies are now available. Explore the four-metric frontier, matched design effects, construction mechanisms, codebook progression, calibration gate, and bounded training-data ablation."
+        ? "All 90 AllResiduals strategies are now available. Explore metric tension, train-to-validation stability, family interactions, layer and atom learning curves, dictionary diagnostics, calibration, and offline work."
         : "This report turns the interrupted Experiment 13A prefix into bounded, inspectable evidence. It separates repeatable matched effects from missing-grid uncertainty and keeps calibration descriptive until all 90 rows exist.";
       qs("#status-label").textContent = isComplete13A ? "13A COMPLETE" : "PROVISIONAL";
       qs(".status-card").classList.toggle("complete", isComplete13A);
@@ -927,7 +996,7 @@
       qs("#metrics-summary").textContent = isComplete13A
         ? "No single validation metric is authoritative. Each card names the best row across the complete 90-row 13A grid."
         : "No single validation metric is authoritative. Each card shows the best observed value in this incomplete prefix and names its winning row.";
-      qs("#evidence-help").textContent = `Choose a node or press 1–${NODES.length}. Use ← and → to move between nodes; Escape closes the detail view.`;
+      qs("#evidence-help").textContent = "Choose a node. Number keys 1–9 open the first nine; use ← and → to move through the full evidence map. Escape closes detail.";
       qs("#full-report-title").textContent = isComplete13A ? "Full Experiment 13A report" : "Full provisional report";
       qs("#compare-summary").textContent = isComplete13A
         ? "Radar values are normalized within the complete 90-row 13A grid. The exact table is authoritative; the radar is a visual aid, not a scalar ranking."
@@ -1082,10 +1151,17 @@
         budget:"Each cell prints the exact CandidateBudget48 − CandidateBudget24 delta. Green favors CandidateBudget48; coral favors CandidateBudget24.",
         schedule:"Each cell prints the exact TwoPhase − Interleaved delta. Green favors TwoPhase; coral favors Interleaved; mixed signs mean there is no global schedule winner.",
         pareto:"Median and P95 set the coordinates; the tooltip reports strict-perfect and node-max P95 too. Outlined points are non-dominated across all four co-primary metrics.",
+        "metric-map":"Exact Spearman rank correlations show which objectives order strategies similarly. Values near +1 agree; values near 0 carry distinct ordering information.",
+        generalization:"The dashed diagonal means equal train and validation error. Points above it are worse on validation; points below it are better on validation.",
+        interactions:"Each cell is a within-family matched median. Negative RMSE deltas favor LayerClip0To1, CandidateBudget48, or TwoPhase; filters recompute cells from in-scope matched pairs.",
         partial:"Read left to right as codebook capacity is added. A steep downward step means the new atom materially improves tail reconstruction; a flat segment means diminishing returns. Lines are family medians, not individual rows.",
+        marginal:"Each bar is the median change from adding one more active atom per layer. Negative is better; the label gives the number of in-scope strategies improved.",
+        layers:"Each line shows family-median training P95 after slot seven of each residual layer. A descending line means depth is still buying tail-error reduction.",
+        diagnostics:"These panels relate internal behavior to validation P95. The displayed ρ is descriptive across strategy designs; it is not a causal effect estimate.",
         calibration:isComplete13A ? "The complete calibration shows convergence, but the automatic selector still fails the 5% early/middle coverage gate." : "Each line asks how small the reconstruction-error threshold is at a chosen percentile as residual layers accumulate. Lower is closer. The shape explains convergence but cannot select epsilon from an incomplete run.",
         retirement:"Lower-right is useful: more LFOs retired with less unexplained energy abandoned. Energy safety passes, but coverage is too low to freeze epsilon automatically.",
         scaling:"Each cell prints the exact 50%-training minus 100%-training validation delta. Green favors 50%; coral favors 100%. Runtime is intentionally excluded.",
+        work:"Candidate evaluations and same-run construction time are offline work. All rows retain 193 deployed heads, so this is not an inference-latency chart.",
         runtime:isComplete13A ? "Continuous same-run timing keeps the optimized 13A cost pattern readable. Lower is faster; these are offline construction seconds, not deployed inference cost." : "The main linear axis exposes ordinary legacy timing differences. The separate red segment retains the two host-sleep artifacts without flattening the other bars."
       };
       return captions[name];
@@ -1098,10 +1174,38 @@
         return simpleTable(filteredDeltaRows(key, false), ["match_key","left_value","right_value","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
       }
       if (node.id === "families") return simpleTable([...filteredMetricRows(false)].sort((a,b) => num(a.validation_p95_rmse)-num(b.validation_p95_rmse)), ["row_id","construction_family","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"]);
-      if (node.id === "partial") return simpleTable(filteredPartialRows(false), ["row_id","construction_family","active_atom_count","validation_median_rmse","validation_p95_rmse","validation_node_max_error_p95"]);
+      if (node.id === "metric-agreement") return simpleTable(filteredRankingRows(false), ["row_id","construction_family","rank_validation_median_rmse","rank_validation_strict_perfect_lfo_rate","rank_validation_p95_rmse","rank_validation_node_max_error_p95","mean_co_primary_rank","rank_spread"]);
+      if (node.id === "generalization") return simpleTable(filteredDiagnosticRows(false), ["row_id","construction_family","generalization_gap_median_rmse","generalization_gap_strict_perfect_lfo_rate","generalization_gap_p95_rmse","generalization_gap_node_max_error_p95"]);
+      if (node.id === "interactions") return simpleTable(interactions.filter(row => !globalState.family.size || globalState.family.has(String(row.construction_family))), ["comparison","construction_family","pair_count","median_delta_validation_median_rmse","median_delta_validation_strict_perfect_lfo_rate","median_delta_validation_p95_rmse","median_delta_validation_node_max_error_p95"]);
+      if (node.id === "partial") return simpleTable(marginalRows(false), ["row_id","construction_family","active_atom_count","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
+      if (node.id === "layers") return simpleTable(layerRows(false), ["row_id","construction_family","residual_layer","layer_role","training_median_rmse","training_p95_rmse","training_max_abs_error_p95"]);
+      if (node.id === "diagnostics") return simpleTable(filteredDiagnosticRows(false), ["row_id","construction_family","validation_overshoot_rate_before_final_clip","residual_layer_effective_no_op_usage_rate_median","residual_layer_dead_atom_rate_median","residual_gain_nonzero_rate","duplicate_atom_rate","validation_p95_rmse"]);
       if (node.id === "calibration") return simpleTable(DATA.calibration.retired_summary, ["epsilon","count","retired_median","unexplained_median","unexplained_p95","incoming_median","incoming_p95"]);
       if (node.id === "scaling") return simpleTable(filteredScalingRows(false), ["row_id","construction_family","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
+      if (node.id === "work") return simpleTable(mechanismRows(false), ["row_id","construction_family","candidate_evaluations","median_slot_p95_improvement","prototype_convergence_rate","prototype_iterations_median","exact_duplicate_alignment_reuse_rate","oracle_construction_time"]);
       return simpleTable(findings.runtime_outliers.filter(row => rowMatchesGlobal(metricById.get(row.row_id))), ["row_id","oracle_construction_time"]);
+    }
+
+    function marginalRows(forChart = false) {
+      return filteredDeepRows(deep.marginal_atoms || [], forChart).map(row => {
+        const metric = metricById.get(deepRowId(row[0])) || {};
+        return {row_id:deepRowId(row[0]),construction_family:metric.construction_family,active_atom_count:row[1],delta_validation_median_rmse:row[2],delta_validation_strict_perfect_lfo_rate:row[3],delta_validation_p95_rmse:row[4],delta_validation_node_max_error_p95:row[5]};
+      });
+    }
+
+    function layerRows(forChart = false) {
+      return filteredDeepRows(deep.layer_progression || [], forChart).map(row => {
+        const metric = metricById.get(deepRowId(row[0])) || {};
+        return {row_id:deepRowId(row[0]),construction_family:metric.construction_family,residual_layer:row[1],layer_role:row[2],training_median_rmse:row[3],training_p95_rmse:row[4],training_max_abs_error_p95:row[5]};
+      });
+    }
+
+    function mechanismRows(forChart = false) {
+      return filteredDeepRows(deep.mechanisms || [], forChart).map(row => {
+        const metric = metricById.get(deepRowId(row[0])) || {};
+        const diagnostic = diagnosticById.get(deepRowId(row[0])) || {};
+        return {row_id:deepRowId(row[0]),construction_family:metric.construction_family,construction_policy:metric.construction_policy,utility_candidate_budget:metric.utility_candidate_budget,atom_count:row[1],broad_atom_count:row[2],repair_atom_count:row[3],synthesized_prototype_count:row[4],observed_residual_count:row[5],median_slot_p95_improvement:row[6],exact_duplicate_alignment_reuse_rate:row[7],prototype_convergence_rate:row[8],prototype_iterations_median:row[9],candidate_search_event_count:row[10],candidate_evaluations:row[11],oracle_construction_time:diagnostic.oracle_construction_time,validation_p95_rmse:metric.validation_p95_rmse};
+      });
     }
 
     function simpleTable(rows, columns, limit = 500) {
@@ -1177,6 +1281,12 @@
 
     function renderDataTabs() {
       const labels = {metrics:"Completed strategies",coverage:"Coverage grid",matched_deltas:"Matched effects",partial_codebook:"Partial codebook"};
+      if (diagnostics.length) labels.diagnostics = "Diagnostics";
+      if (rankings.length) labels.rankings = "Metric ranks";
+      if (interactions.length) labels.interactions = "Factor interactions";
+      if (deep.marginal_atoms?.length) labels.marginal_atoms = "Marginal atoms";
+      if (deep.layer_progression?.length) labels.layer_progression = "Residual layers";
+      if (deep.mechanisms?.length) labels.mechanisms = "Construction audit";
       if (scaling.length) labels.scaling = "Training scaling";
       qs("#data-tabs").innerHTML = Object.entries(labels).map(([key,label]) => `<button class="tab-button" type="button" role="tab" data-data-kind="${key}" aria-selected="${key === dataKind}">${label}</button>`).join("");
       qsa("[data-data-kind]").forEach(button => {
@@ -1193,6 +1303,12 @@
       if (dataKind === "partial_codebook") rows = filteredPartialRows(false);
       if (dataKind === "matched_deltas") rows = deltas.filter(row => filteredDeltaRows(row.comparison, false).includes(row));
       if (dataKind === "scaling") rows = filteredScalingRows(false);
+      if (dataKind === "diagnostics") rows = filteredDiagnosticRows(false);
+      if (dataKind === "rankings") rows = filteredRankingRows(false);
+      if (dataKind === "interactions") rows = interactions.filter(row => !globalState.family.size || globalState.family.has(String(row.construction_family)));
+      if (dataKind === "marginal_atoms") rows = marginalRows(false);
+      if (dataKind === "layer_progression") rows = layerRows(false);
+      if (dataKind === "mechanisms") rows = mechanismRows(false);
       rows = rows.filter(row => !query || JSON.stringify(row).toLowerCase().includes(query));
       const completion = qs("#data-completion")?.value;
       if (dataKind === "coverage" && completion && completion !== "all") rows = rows.filter(row => truthy(row.completed) === (completion === "complete"));
@@ -1203,7 +1319,7 @@
     }
 
     function dataColumns(kind) {
-      return ({metrics:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"],coverage:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","completed"],matched_deltas:["comparison","match_key","left_value","right_value","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"],partial_codebook:["row_id","construction_family","active_atom_count","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95"],scaling:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]})[kind];
+      return ({metrics:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"],coverage:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","completed"],matched_deltas:["comparison","construction_family","match_key","left_value","right_value","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"],partial_codebook:["row_id","construction_family","active_atom_count","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95"],scaling:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"],diagnostics:["row_id","construction_family","generalization_gap_median_rmse","generalization_gap_p95_rmse","validation_overshoot_rate_before_final_clip","residual_layer_effective_no_op_usage_rate_median","residual_layer_dead_atom_rate_median","residual_gain_nonzero_rate","duplicate_atom_rate","offline_analysis_time"],rankings:["row_id","construction_family","rank_validation_median_rmse","rank_validation_strict_perfect_lfo_rate","rank_validation_p95_rmse","rank_validation_node_max_error_p95","mean_co_primary_rank","rank_spread"],interactions:["comparison","construction_family","pair_count","median_delta_validation_median_rmse","median_delta_validation_strict_perfect_lfo_rate","median_delta_validation_p95_rmse","median_delta_validation_node_max_error_p95"],marginal_atoms:["row_id","construction_family","active_atom_count","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"],layer_progression:["row_id","construction_family","residual_layer","layer_role","training_median_rmse","training_p95_rmse","training_max_abs_error_p95"],mechanisms:["row_id","construction_family","atom_count","broad_atom_count","repair_atom_count","median_slot_p95_improvement","prototype_convergence_rate","prototype_iterations_median","exact_duplicate_alignment_reuse_rate","candidate_evaluations","oracle_construction_time"]})[kind];
     }
 
     function exportCsv() {
@@ -1217,7 +1333,7 @@
 
     function renderChart(name, element) {
       if (!element) return;
-      const renderers = {coverage:chartCoverage,normalization:el => chartDelta(el,"layer_normalization_policy","FinalClipOnly","LayerClip0To1"),budget:el => chartDelta(el,"utility_candidate_budget","CandidateBudget24","CandidateBudget48"),schedule:el => chartDelta(el,"layer_schedule","Interleaved","TwoPhase"),pareto:chartPareto,partial:chartPartial,calibration:chartCalibration,retirement:chartRetirement,scaling:chartScaling,runtime:chartRuntime};
+      const renderers = {coverage:chartCoverage,normalization:el => chartDelta(el,"layer_normalization_policy","FinalClipOnly","LayerClip0To1"),budget:el => chartDelta(el,"utility_candidate_budget","CandidateBudget24","CandidateBudget48"),schedule:el => chartDelta(el,"layer_schedule","Interleaved","TwoPhase"),pareto:chartPareto,"metric-map":chartMetricMap,generalization:chartGeneralization,interactions:chartInteractions,partial:chartPartial,marginal:chartMarginal,layers:chartLayers,diagnostics:chartDiagnostics,calibration:chartCalibration,retirement:chartRetirement,scaling:chartScaling,work:chartWork,runtime:chartRuntime};
       renderers[name](element);
     }
 
@@ -1268,6 +1384,17 @@
     function chartText() { return getComputedStyle(document.documentElement).getPropertyValue("--muted").trim(); }
     function chartGrid() { return getComputedStyle(document.documentElement).getPropertyValue("--border").trim(); }
     function baseAxes() { return {axisLine:{lineStyle:{color:chartGrid()}},axisLabel:{color:chartText()},splitLine:{lineStyle:{color:chartGrid(),opacity:.45}},nameTextStyle:{color:chartText()}}; }
+    function medianNum(values) { const ordered=values.map(num).sort((a,b)=>a-b); if (!ordered.length) return null; const mid=Math.floor(ordered.length/2); return ordered.length%2?ordered[mid]:(ordered[mid-1]+ordered[mid])/2; }
+    function averageRanks(values) {
+      const ordered=values.map((value,index)=>({value:num(value),index})).sort((a,b)=>a.value-b.value);
+      const result=Array(values.length).fill(0); let start=0;
+      while(start<ordered.length){let end=start+1;while(end<ordered.length&&ordered[end].value===ordered[start].value)end++;const rank=((start+1)+end)/2;for(let i=start;i<end;i++)result[ordered[i].index]=rank;start=end;}
+      return result;
+    }
+    function spearmanValues(left,right) {
+      if(left.length<2||left.length!==right.length)return null; const a=averageRanks(left),b=averageRanks(right); const am=a.reduce((x,y)=>x+y,0)/a.length,bm=b.reduce((x,y)=>x+y,0)/b.length;
+      const numerator=a.reduce((total,value,index)=>total+(value-am)*(b[index]-bm),0); const as=Math.sqrt(a.reduce((total,value)=>total+(value-am)**2,0)); const bs=Math.sqrt(b.reduce((total,value)=>total+(value-bm)**2,0)); return as&&bs?numerator/(as*bs):null;
+    }
 
     function chartCoverage(element) {
       const rows = filteredCoverageRows(true);
@@ -1318,6 +1445,33 @@
       setChart(element,{tooltip:{formatter:params => `${esc(short(params.data.row.row_id))}<br>Median RMSE ${fmt(params.value[0],6)}<br>P95 RMSE ${fmt(params.value[1],6)}<br>Strict-perfect ${pct(params.data.row.validation_strict_perfect_lfo_rate,3)}<br>Node-max P95 ${fmt(params.data.row.validation_node_max_error_p95,6)}`},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:30,top:25,bottom:95,containLabel:true},xAxis:{type:"value",name:"Median RMSE ↓",nameLocation:"middle",nameGap:42,...baseAxes()},yAxis:{type:"value",name:"P95 RMSE ↓",nameLocation:"middle",nameGap:58,...baseAxes()},series:families.map(family=>({name:family,type:"scatter",data:rows.filter(row=>row.construction_family===family).map(row=>({value:[num(row.validation_median_rmse),num(row.validation_p95_rmse)],row,symbolSize:truthy(row.pareto_candidate)?15:8,itemStyle:{borderColor:truthy(row.pareto_candidate)?"#52656d":"transparent",borderWidth:truthy(row.pareto_candidate)?2:0}})),emphasis:{focus:"series"}}))});
     }
 
+    function chartMetricMap(element) {
+      const rows=filteredMetricRows(true); if(rows.length<2)return chartEmpty(element);
+      const cells=[]; CO_PRIMARY.forEach((left,y)=>CO_PRIMARY.forEach((right,x)=>cells.push([x,y,spearmanValues(rows.map(row=>row[left.key]),rows.map(row=>row[right.key]))])));
+      element.style.height="500px";
+      setChart(element,{tooltip:{formatter:params=>`${esc(CO_PRIMARY[params.value[1]].label)} vs ${esc(CO_PRIMARY[params.value[0]].label)}<br>${Number.isFinite(params.value[2])?`Spearman rho ${fmt(params.value[2],3)}`:"Rank correlation is undefined in this slice"}`},grid:{left:150,right:45,top:40,bottom:95},xAxis:{type:"category",data:CO_PRIMARY.map(metric=>metric.short),axisLabel:{color:chartText(),rotate:18},axisLine:{lineStyle:{color:chartGrid()}}},yAxis:{type:"category",data:CO_PRIMARY.map(metric=>metric.short),axisLabel:{color:chartText()},axisLine:{lineStyle:{color:chartGrid()}}},visualMap:{min:-1,max:1,orient:"horizontal",left:"center",bottom:20,text:["same ordering","opposite ordering"],textStyle:{color:chartText()},inRange:{color:["#e7b1ad","#eef2f1","#95cfbd"]}},series:[{type:"heatmap",data:cells,label:{show:true,color:"#66757b",fontWeight:700,formatter:params=>Number.isFinite(params.value[2])?fmt(params.value[2],2):"n/a"},itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2}}]});
+    }
+
+    function chartGeneralization(element) {
+      const rows=filteredDiagnosticRows(true); if(!rows.length)return chartEmpty(element);
+      const specs=[{name:"Median RMSE",train:"train_median_rmse",validation:"validation_median_rmse"},{name:"P95 RMSE",train:"train_p95_rmse",validation:"validation_p95_rmse"}];
+      element.style.height="500px";
+      const xAxis=specs.map((spec,index)=>({type:"value",gridIndex:index,name:`Training ${spec.name}`,nameLocation:"middle",nameGap:38,...baseAxes()}));
+      const yAxis=specs.map((spec,index)=>({type:"value",gridIndex:index,name:`Validation ${spec.name}`,nameLocation:"middle",nameGap:52,...baseAxes()}));
+      const series=[];
+      specs.forEach((spec,index)=>{const values=rows.flatMap(row=>[num(row[spec.train]),num(row[spec.validation])]);const lower=Math.min(...values),upper=Math.max(...values);series.push({name:spec.name,type:"scatter",xAxisIndex:index,yAxisIndex:index,symbolSize:8,data:rows.map(row=>({value:[num(row[spec.train]),num(row[spec.validation])],row})),itemStyle:{color:index?COLORS.accent:COLORS.blue}});series.push({name:`${spec.name} equality`,type:"line",xAxisIndex:index,yAxisIndex:index,data:[[lower,lower],[upper,upper]],symbol:"none",silent:true,lineStyle:{type:"dashed",color:chartText(),width:1}});});
+      setChart(element,{tooltip:{formatter:params=>params.data?.row?`${esc(short(params.data.row.row_id))}<br>Train ${fmt(params.value[0],7)}<br>Validation ${fmt(params.value[1],7)}<br>Gap ${fmt(params.value[1]-params.value[0],7)}`:"train = validation"},grid:[{left:70,right:"55%",top:35,bottom:70},{left:"58%",right:25,top:35,bottom:70}],xAxis,yAxis,series});
+    }
+
+    function chartInteractions(element) {
+      const comparisons=[{key:"layer_normalization_policy",label:"LayerClip - FinalClip",left:"FinalClipOnly",right:"LayerClip0To1"},{key:"utility_candidate_budget",label:"Budget48 - Budget24",left:"CandidateBudget24",right:"CandidateBudget48"},{key:"layer_schedule",label:"TwoPhase - Interleaved",left:"Interleaved",right:"TwoPhase"}];
+      const selected=comparisons.flatMap(item=>filteredDeltaRows(item.key,true)); if(!selected.length)return chartEmpty(element);
+      const families=unique(selected.map(row=>row.construction_family)); const cells=[];
+      families.forEach((family,y)=>comparisons.forEach((comparison,x)=>{const values=selected.filter(row=>row.construction_family===family&&row.comparison===comparison.key).map(row=>row.delta_validation_p95_rmse);if(values.length){const value=medianNum(values);cells.push({value:[x,y,value],count:values.length,family,comparison:comparison.label,favored:value===0?"tie":value<0?comparison.right:comparison.left});}}));
+      const scale=Math.max(...cells.map(cell=>Math.abs(num(cell.value[2]))),1e-9); element.style.height=`${Math.max(500,210+families.length*26)}px`;
+      setChart(element,{tooltip:{formatter:params=>`${esc(params.data.family)}<br>${esc(params.data.comparison)}<br>Median validation P95 delta ${fmt(params.value[2],8)}<br>${params.data.count} matched pairs<br><strong>${esc(params.data.favored==="tie"?"Tie":`${params.data.favored} favored`)}</strong>`},grid:{left:190,right:35,top:35,bottom:90},xAxis:{type:"category",data:comparisons.map(item=>item.label),axisLabel:{color:chartText(),rotate:12},axisLine:{lineStyle:{color:chartGrid()}}},yAxis:{type:"category",data:families,axisLabel:{color:chartText()},axisLine:{lineStyle:{color:chartGrid()}}},visualMap:{min:-scale,max:scale,dimension:2,orient:"horizontal",left:"center",bottom:18,text:["positive delta","negative delta"],textStyle:{color:chartText()},inRange:{color:["#a9dcca","#eef2f1","#e9b0aa"]}},series:[{type:"heatmap",data:cells,label:{show:true,color:"#66757b",formatter:params=>deltaCellLabel(CO_PRIMARY[2],params.value[2])},itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2}}]});
+    }
+
     function chartPartial(element) {
       const rows = filteredPartialRows(true);
       if (!rows.length) return chartEmpty(element);
@@ -1325,6 +1479,31 @@
       const medianValue = values => { const ordered=values.map(num).sort((a,b)=>a-b); if (!ordered.length) return null; const mid=Math.floor(ordered.length/2); return ordered.length%2?ordered[mid]:(ordered[mid-1]+ordered[mid])/2; };
       element.style.height = "520px";
       setChart(element,{tooltip:{trigger:"axis",valueFormatter:value=>fmt(value,7)},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:25,bottom:85,containLabel:true},xAxis:{type:"category",name:"Active atoms added per residual layer →",data:[1,2,3,4,5,6,7],...baseAxes()},yAxis:{type:"value",name:"Family-median validation P95 RMSE ↓",nameLocation:"middle",nameGap:56,...baseAxes()},series:families.map(family=>({name:family,type:"line",symbol:"circle",data:[1,2,3,4,5,6,7].map(active=>medianValue(rows.filter(row=>row.construction_family===family&&num(row.active_atom_count)===active).map(row=>row.validation_p95_rmse))),connectNulls:true}))});
+    }
+
+    function chartMarginal(element) {
+      const rows=marginalRows(true); if(!rows.length)return chartEmpty(element);
+      const slots=unique(rows.map(row=>row.active_atom_count)).map(Number).sort((a,b)=>a-b); const values=slots.map(slot=>medianNum(rows.filter(row=>num(row.active_atom_count)===slot).map(row=>row.delta_validation_p95_rmse))); const counts=slots.map(slot=>{const selected=rows.filter(row=>num(row.active_atom_count)===slot);return `${selected.filter(row=>num(row.delta_validation_p95_rmse)<0).length}/${selected.length}`;});
+      element.style.height="430px";setChart(element,{tooltip:{formatter:params=>`Added atom ${params.name}<br>Median validation P95 delta ${fmt(params.value,8)}<br>${counts[params.dataIndex]} strategies improve`},grid:{left:25,right:25,top:35,bottom:70,containLabel:true},xAxis:{type:"category",name:"New active atom count",data:slots,...baseAxes()},yAxis:{type:"value",name:"Median P95 delta (lower is better)",nameLocation:"middle",nameGap:55,...baseAxes()},series:[{type:"bar",data:values,itemStyle:{color:params=>params.value<=0?COLORS.accent:COLORS.danger},label:{show:true,position:"inside",color:"#ffffff",formatter:params=>counts[params.dataIndex]}}]});
+    }
+
+    function chartLayers(element) {
+      const rows=layerRows(true); if(!rows.length)return chartEmpty(element);
+      const families=unique(rows.map(row=>row.construction_family));const layers=unique(rows.map(row=>row.residual_layer)).map(Number).sort((a,b)=>a-b);element.style.height="540px";
+      setChart(element,{tooltip:{trigger:"axis",valueFormatter:value=>fmt(value,7)},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:25,bottom:85,containLabel:true},xAxis:{type:"category",name:"Residual layer completed",data:layers,...baseAxes()},yAxis:{type:"value",name:"Family-median training P95 RMSE",nameLocation:"middle",nameGap:60,...baseAxes()},series:families.map(family=>({name:family,type:"line",symbol:"circle",symbolSize:4,data:layers.map(layer=>medianNum(rows.filter(row=>row.construction_family===family&&num(row.residual_layer)===layer).map(row=>row.training_p95_rmse))),connectNulls:true}))});
+    }
+
+    function chartDiagnostics(element) {
+      const rows=filteredDiagnosticRows(true); if(!rows.length)return chartEmpty(element);
+      const specs=[{key:"validation_overshoot_rate_before_final_clip",label:"Overshoot rate"},{key:"residual_layer_effective_no_op_usage_rate_median",label:"Effective no-op"},{key:"residual_gain_nonzero_rate",label:"Non-zero gain rate"}];
+      const grids=[{left:62,right:"70%",top:52,bottom:68},{left:"37%",right:"37%",top:52,bottom:68},{left:"70%",right:25,top:52,bottom:68}]; const xAxis=specs.map((spec,index)=>({type:"value",gridIndex:index,name:spec.label,nameLocation:"middle",nameGap:38,...baseAxes()}));const yAxis=specs.map((spec,index)=>({type:"value",gridIndex:index,name:index===0?"Validation P95 RMSE":"",nameLocation:"middle",nameGap:50,...baseAxes()}));
+      element.style.height="470px";setChart(element,{title:specs.map((spec,index)=>{const rho=spearmanValues(rows.map(row=>row[spec.key]),rows.map(row=>row.validation_p95_rmse));return {text:Number.isFinite(rho)?`rho ${rho.toFixed(2)}`:"rho n/a",left:["16%","49%","82%"][index],top:12,textAlign:"center",textStyle:{fontSize:12,color:chartText()}};}),tooltip:{formatter:params=>`${esc(short(params.data.row.row_id))}<br>${esc(params.seriesName)} ${fmt(params.value[0],6)}<br>Validation P95 ${fmt(params.value[1],7)}`},grid:grids,xAxis,yAxis,series:specs.map((spec,index)=>({name:spec.label,type:"scatter",xAxisIndex:index,yAxisIndex:index,symbolSize:7,data:rows.map(row=>({value:[num(row[spec.key]),num(row.validation_p95_rmse)],row})),itemStyle:{color:[COLORS.danger,COLORS.warn,COLORS.accent][index]}}))});
+    }
+
+    function chartWork(element) {
+      const mechanisms=mechanismRows(true);const rows=filteredDiagnosticRows(true);if(!rows.length)return chartEmpty(element);
+      const candidate=mechanisms.filter(row=>num(row.candidate_evaluations)>0);element.style.height="490px";
+      setChart(element,{legend:{bottom:0,textStyle:{color:chartText()}},tooltip:{formatter:params=>`${esc(short(params.data.row.row_id))}<br>${esc(params.seriesName)} ${fmt(params.value[0],2)}<br>Validation P95 ${fmt(params.value[1],7)}`},grid:[{left:72,right:"55%",top:38,bottom:72},{left:"59%",right:28,top:38,bottom:72}],xAxis:[{type:"value",name:"Candidate evaluations",nameLocation:"middle",nameGap:40,...baseAxes()},{type:"value",gridIndex:1,name:"Oracle construction seconds",nameLocation:"middle",nameGap:40,...baseAxes()}],yAxis:[{type:"value",name:"Validation P95 RMSE",nameLocation:"middle",nameGap:55,...baseAxes()},{type:"value",gridIndex:1,...baseAxes()}],series:[{name:"CandidateBudget24",type:"scatter",data:candidate.filter(row=>row.utility_candidate_budget==="CandidateBudget24").map(row=>({value:[num(row.candidate_evaluations),num(row.validation_p95_rmse)],row})),itemStyle:{color:COLORS.blue}},{name:"CandidateBudget48",type:"scatter",data:candidate.filter(row=>row.utility_candidate_budget==="CandidateBudget48").map(row=>({value:[num(row.candidate_evaluations),num(row.validation_p95_rmse)],row})),itemStyle:{color:COLORS.accent}},{name:"Same-run construction",type:"scatter",xAxisIndex:1,yAxisIndex:1,data:rows.map(row=>({value:[num(row.oracle_construction_time),num(row.validation_p95_rmse)],row})),itemStyle:{color:COLORS.warn}}]});
     }
 
     function chartCalibration(element) {

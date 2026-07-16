@@ -121,7 +121,7 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             payload_match = re.search(r'<script id="report-data" type="application/json">(.*?)</script>', html, re.DOTALL)
             self.assertIsNotNone(payload_match)
             payload = json.loads(payload_match.group(1))
-            self.assertEqual(payload["schema_version"], "experiment13_interactive_report_v2")
+            self.assertEqual(payload["schema_version"], "experiment13_interactive_report_v3")
             self.assertEqual(payload["meta"]["completed_rows"], 8)
             self.assertEqual(payload["meta"]["expected_rows"], 90)
             self.assertFalse(payload["meta"]["epsilon_selected"])
@@ -217,6 +217,13 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             self.assertIn("reducing 13B from 90 to 45 rows", text)
             self.assertIn("Lock Experiment 13B to the 45 `LayerClip0To1` counterparts", text)
             self.assertIn("Training-Data Scaling Ablation", text)
+            self.assertIn("Metric agreement and disagreement", text)
+            self.assertIn("Train-to-Validation Stability", text)
+            self.assertIn("Factor interactions by construction family", text)
+            self.assertIn("Residual-Layer Learning Curve", text)
+            self.assertIn("Decoder and Dictionary Diagnostics", text)
+            self.assertIn("Offline work efficiency", text)
+            self.assertIn("Audit boundaries", text)
             self.assertNotIn("The frozen eligibility epsilon is", text)
 
             html = html_report.read_text(encoding="utf-8")
@@ -226,6 +233,19 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             self.assertIn("pilot required", html)
             self.assertIn("45 LayerClip0To1-only rows", html)
             self.assertIn("chartScaling", html)
+            self.assertIn("Metric agreement and tension", html)
+            self.assertIn("Train-to-validation stability", html)
+            self.assertIn("Family-specific interactions", html)
+            self.assertIn("Residual-layer progression", html)
+            self.assertIn("Decoder and dictionary behavior", html)
+            self.assertIn("Offline work efficiency", html)
+            self.assertIn("chartMetricMap", html)
+            self.assertIn("chartGeneralization", html)
+            self.assertIn("chartInteractions", html)
+            self.assertIn("chartMarginal", html)
+            self.assertIn("chartLayers", html)
+            self.assertIn("chartDiagnostics", html)
+            self.assertIn("chartWork", html)
             self.assertNotIn(str(root.resolve()), html)
             self.assertLess(html_report.stat().st_size, 1_000_000)
             marker = 'application/json">'
@@ -239,7 +259,18 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             self.assertEqual(len(payload["tables"]["coverage"]), 90)
             self.assertEqual(len(payload["tables"]["partial_codebook"]), 630)
             self.assertEqual(len(payload["tables"]["scaling"]), 4)
+            self.assertEqual(len(payload["tables"]["diagnostics"]), 90)
+            self.assertEqual(len(payload["tables"]["rankings"]), 90)
+            self.assertEqual(len(payload["deep_analysis"]["marginal_atoms"]), 540)
+            self.assertEqual(len(payload["deep_analysis"]["layer_progression"]), 1440)
+            self.assertEqual(len(payload["deep_analysis"]["mechanisms"]), 90)
             self.assertEqual(len(runtime.read_csv(analysis / "training_data_scaling_ablation.csv")), 4)
+            self.assertEqual(len(runtime.read_csv(analysis / "strategy_diagnostics.csv")), 90)
+            self.assertEqual(len(runtime.read_csv(analysis / "metric_rankings.csv")), 90)
+            self.assertEqual(len(runtime.read_csv(analysis / "marginal_atom_value.csv")), 540)
+            self.assertEqual(len(runtime.read_csv(analysis / "residual_layer_progression.csv")), 1440)
+            self.assertEqual(len(runtime.read_csv(analysis / "construction_mechanism_diagnostics.csv")), 90)
+            self.assertGreater(len(runtime.read_csv(analysis / "factor_interaction_summary.csv")), 0)
             with self.assertRaisesRegex(grid.AnalysisNotReadyError, "complete 13A and 13B"):
                 grid.analyze_strategy_grid(run_dir=source)
 
@@ -269,6 +300,9 @@ def _write_complete_13a_report_fixture(
     slot_quantiles: list[dict[str, object]] = []
     coverage: list[dict[str, object]] = []
     retired: list[dict[str, object]] = []
+    slot_progression: list[dict[str, object]] = []
+    atom_construction: list[dict[str, object]] = []
+    candidate_search: list[dict[str, object]] = []
     for index, spec in enumerate(specs):
         clip = -0.01 if spec.layer_normalization_policy == "LayerClip0To1" else 0.0
         budget = -0.001 if spec.utility_candidate_budget == "CandidateBudget48" else 0.0
@@ -283,6 +317,22 @@ def _write_complete_13a_report_fixture(
             "validation_p99_rmse": p95 * 1.1,
             "validation_max_rmse": p95 * 1.2,
             "validation_max_abs_error_p95": p95 * 2.0,
+            "train_median_rmse": p95 / 2.0 - 0.0005,
+            "train_strict_perfect_lfo_rate": 0.02,
+            "train_p95_rmse": p95 + 0.001,
+            "train_node_max_error_p95": p95 * 2.0 + 0.002,
+            "validation_overshoot_rate_before_final_clip": 0.0 if spec.layer_normalization_policy == "LayerClip0To1" else 0.1,
+            "validation_overshoot_abs_p95_before_final_clip": 0.0 if spec.layer_normalization_policy == "LayerClip0To1" else 0.02,
+            "residual_layer_dead_atom_rate_median": 0.01,
+            "residual_layer_dominant_atom_share_median": 0.3,
+            "residual_layer_usage_entropy_median": 2.0,
+            "residual_layer_no_op_usage_rate_median": 0.01,
+            "residual_layer_effective_no_op_usage_rate_median": 0.02,
+            "residual_gain_median": 0.05,
+            "residual_gain_abs_p95": 0.3,
+            "residual_gain_nonzero_rate": 0.98,
+            "duplicate_atom_rate": 0.0,
+            "head_outputs_actual": 193,
             "oracle_construction_time": 20.0 + index,
             "train_encoding_time": 2.0,
             "validation_encoding_time": 1.0,
@@ -317,12 +367,49 @@ def _write_complete_13a_report_fixture(
             "incoming_retired_energy_fraction": 0.001,
             "unexplained_retired_energy_fraction": 0.0001,
         })
+        for layer in range(1, 17):
+            slot_progression.append({
+                "experiment_phase": "13A",
+                "row_id": spec.row_id,
+                "pair_id": spec.pair_id,
+                "residual_layer": layer,
+                "active_atom_slot": 7,
+                "eligible_residual_count": 100,
+                "training_median_rmse": p95 / (layer + 1),
+                "training_p95_rmse": p95 / (1.0 + layer * 0.2),
+                "training_max_abs_error_p95": p95 * 2.0,
+            })
+            atom_construction.append({
+                "experiment_phase": "13A",
+                "row_id": spec.row_id,
+                "pair_id": spec.pair_id,
+                "residual_layer": layer,
+                "slot_index": 1,
+                "layer_role": "Repair" if layer % 2 == 0 else "Broad",
+                "atom_source_kind": "observed_residual" if layer % 2 == 0 else "synthesized_prototype",
+                "training_p95_rmse_before": p95 + 0.002,
+                "training_p95_rmse_after": p95,
+                "exact_duplicate_alignment_reused": False,
+                "prototype_converged": layer % 2 == 1,
+                "prototype_iterations_executed": 1,
+            })
+            candidate_search.append({
+                "experiment_phase": "13A",
+                "row_id": spec.row_id,
+                "pair_id": spec.pair_id,
+                "residual_layer": layer,
+                "slot_index": 1,
+                "candidate_count": 48 if spec.utility_candidate_budget == "CandidateBudget48" else 24 if spec.utility_candidate_budget == "CandidateBudget24" else 0,
+            })
     runtime.write_csv(source / "summary.csv", summaries)
     runtime.write_csv(source / "partial_codebook_validation.csv", partial)
     runtime.write_csv(source / "layer_epsilon_quantiles.csv", layer_quantiles)
     runtime.write_csv(source / "slot_epsilon_quantiles.csv", slot_quantiles)
     runtime.write_csv(source / "epsilon_coverage.csv", coverage)
     runtime.write_csv(source / "retired_error_mass.csv", retired)
+    runtime.write_csv(source / "slot_progression.csv", slot_progression)
+    runtime.write_csv(source / "atom_construction.csv", atom_construction)
+    runtime.write_csv(source / "candidate_search_diagnostics.csv", candidate_search)
 
     matched = summaries[:4]
     for sampled_summary in matched:

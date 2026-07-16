@@ -31,9 +31,9 @@ CALIBRATION_TABLES = (
     "epsilon_coverage.csv",
     "retired_error_mass.csv",
 )
-INTERACTIVE_REPORT_SCHEMA = "experiment13_interactive_report_v2"
+INTERACTIVE_REPORT_SCHEMA = "experiment13_interactive_report_v3"
 INTERACTIVE_TEMPLATE = Path(__file__).with_name("templates") / "experiment_13_provisional.html"
-COMPLETE_13A_REPORT_SCHEMA = "experiment13_complete_13a_report_v1"
+COMPLETE_13A_REPORT_SCHEMA = "experiment13_complete_13a_report_v2"
 
 
 @dataclass(frozen=True)
@@ -43,6 +43,12 @@ class AnalysisBundle:
     co_primary: list[dict[str, Any]]
     matched_deltas: list[dict[str, Any]]
     partial_codebook: list[dict[str, Any]]
+    diagnostics: list[dict[str, Any]]
+    rankings: list[dict[str, Any]]
+    marginal_atoms: list[dict[str, Any]]
+    layer_progression: list[dict[str, Any]]
+    mechanism_diagnostics: list[dict[str, Any]]
+    factor_interactions: list[dict[str, Any]]
     calibration: dict[str, list[dict[str, Any]]]
     paths: dict[str, Path]
 
@@ -142,6 +148,19 @@ def prepare_analysis_artifacts(
     if phase is not None:
         partial = [row for row in partial if row.get("experiment_phase") == phase]
     partial = sorted(partial, key=lambda row: (str(row.get("row_id", "")), _number(row, "active_atom_count")))
+    slot_progression = _load_table(source_run, "slot_progression.csv")
+    atom_construction = _load_table(source_run, "atom_construction.csv")
+    candidate_search = _load_table(source_run, "candidate_search_diagnostics.csv")
+    if phase is not None:
+        slot_progression = [row for row in slot_progression if row.get("experiment_phase") == phase]
+        atom_construction = [row for row in atom_construction if row.get("experiment_phase") == phase]
+        candidate_search = [row for row in candidate_search if row.get("experiment_phase") == phase]
+    diagnostics = _strategy_diagnostic_rows(summaries)
+    rankings = _metric_ranking_rows(summaries)
+    marginal_atoms = _marginal_atom_rows(partial, summaries)
+    layer_progression = _layer_progression_rows(slot_progression, atom_construction, summaries)
+    mechanism_diagnostics = _mechanism_diagnostic_rows(atom_construction, candidate_search, summaries)
+    factor_interactions = _factor_interaction_rows(matched)
     calibration = {name: _load_table(source_run, name) for name in CALIBRATION_TABLES}
     if phase is not None:
         calibration = {
@@ -155,16 +174,42 @@ def prepare_analysis_artifacts(
         "co_primary": analysis_output_dir / "co_primary_metrics.csv",
         "matched_deltas": analysis_output_dir / "matched_factor_deltas.csv",
         "partial_codebook": analysis_output_dir / "partial_codebook_progression.csv",
+        "diagnostics": analysis_output_dir / "strategy_diagnostics.csv",
+        "rankings": analysis_output_dir / "metric_rankings.csv",
+        "marginal_atoms": analysis_output_dir / "marginal_atom_value.csv",
+        "layer_progression": analysis_output_dir / "residual_layer_progression.csv",
+        "mechanism_diagnostics": analysis_output_dir / "construction_mechanism_diagnostics.csv",
+        "factor_interactions": analysis_output_dir / "factor_interaction_summary.csv",
     }
     write_csv(paths["coverage"], coverage)
     write_csv(paths["co_primary"], co_primary)
     write_csv(paths["matched_deltas"], matched)
     write_csv(paths["partial_codebook"], partial)
+    write_csv(paths["diagnostics"], diagnostics)
+    write_csv(paths["rankings"], rankings)
+    write_csv(paths["marginal_atoms"], marginal_atoms)
+    write_csv(paths["layer_progression"], layer_progression)
+    write_csv(paths["mechanism_diagnostics"], mechanism_diagnostics)
+    write_csv(paths["factor_interactions"], factor_interactions)
     for name, rows in calibration.items():
         key = f"aggregated_{Path(name).stem}"
         paths[key] = analysis_output_dir / f"aggregated_{name}"
         write_csv(paths[key], rows)
-    return AnalysisBundle(summaries, coverage, co_primary, matched, partial, calibration, paths)
+    return AnalysisBundle(
+        summaries,
+        coverage,
+        co_primary,
+        matched,
+        partial,
+        diagnostics,
+        rankings,
+        marginal_atoms,
+        layer_progression,
+        mechanism_diagnostics,
+        factor_interactions,
+        calibration,
+        paths,
+    )
 
 
 def write_provisional_report(
@@ -308,7 +353,7 @@ def write_complete_13a_report(
         scaling_path = analysis_output_dir / "training_data_scaling_ablation.csv"
         write_csv(scaling_path, scaling_rows)
 
-    plot_paths = _write_plots(bundle, image_dir, historical_runtime=False)
+    plot_paths = _write_plots(bundle, image_dir, historical_runtime=False, deep_analysis=True)
     report_text = _complete_13a_markdown(
         bundle,
         source_run=source_run,
@@ -445,6 +490,9 @@ def _analysis_source_fingerprint(source_run: Path) -> str:
     names = (
         "summary.csv",
         "partial_codebook_validation.csv",
+        "slot_progression.csv",
+        "atom_construction.csv",
+        "candidate_search_diagnostics.csv",
         "layer_epsilon_quantiles.csv",
         "slot_epsilon_quantiles.csv",
         "epsilon_coverage.csv",
@@ -555,6 +603,11 @@ def _matched_factor_deltas(summaries: Sequence[Mapping[str, Any]]) -> list[dict[
                 "match_key": " | ".join(key),
                 "left_row_id": left.get("row_id", ""),
                 "right_row_id": right.get("row_id", ""),
+                "construction_family": left.get("construction_family", ""),
+                "construction_policy": left.get("construction_policy", ""),
+                "layer_schedule": left.get("layer_schedule", ""),
+                "utility_candidate_budget": left.get("utility_candidate_budget", ""),
+                "layer_normalization_policy": left.get("layer_normalization_policy", ""),
             }
             for metric in CO_PRIMARY_METRICS:
                 left_metric, right_metric = _number(left, metric), _number(right, metric)
@@ -565,11 +618,271 @@ def _matched_factor_deltas(summaries: Sequence[Mapping[str, Any]]) -> list[dict[
     return result
 
 
+def _strategy_diagnostic_rows(summaries: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Retain the bounded train/validation, decoder, dictionary, and work audit."""
+    fields = (
+        "experiment_phase", "row_id", "construction_policy", "construction_family",
+        "layer_schedule", "utility_candidate_budget", "layer_normalization_policy",
+        "train_median_rmse", "train_strict_perfect_lfo_rate", "train_p95_rmse",
+        "train_node_max_error_p95", *CO_PRIMARY_METRICS,
+        "validation_overshoot_rate_before_final_clip",
+        "validation_overshoot_abs_p95_before_final_clip",
+        "residual_layer_dead_atom_rate_median",
+        "residual_layer_dominant_atom_share_median",
+        "residual_layer_usage_entropy_median",
+        "residual_layer_no_op_usage_rate_median",
+        "residual_layer_effective_no_op_usage_rate_median",
+        "residual_gain_median", "residual_gain_abs_p95", "residual_gain_nonzero_rate",
+        "duplicate_atom_rate", "oracle_construction_time", "train_encoding_time",
+        "validation_encoding_time", "head_outputs_actual",
+    )
+    rows: list[dict[str, Any]] = []
+    for source in summaries:
+        row = {field: source.get(field, "") for field in fields}
+        for train_metric, validation_metric, gap_name in (
+            ("train_median_rmse", "validation_median_rmse", "generalization_gap_median_rmse"),
+            ("train_strict_perfect_lfo_rate", "validation_strict_perfect_lfo_rate", "generalization_gap_strict_perfect_lfo_rate"),
+            ("train_p95_rmse", "validation_p95_rmse", "generalization_gap_p95_rmse"),
+            ("train_node_max_error_p95", "validation_node_max_error_p95", "generalization_gap_node_max_error_p95"),
+        ):
+            row[gap_name] = _number(source, validation_metric) - _number(source, train_metric)
+        row["offline_analysis_time"] = sum(
+            _number(source, name)
+            for name in ("oracle_construction_time", "train_encoding_time", "validation_encoding_time")
+        )
+        rows.append(row)
+    return rows
+
+
+def _metric_ranking_rows(summaries: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Rank each strategy on every co-primary metric while preserving ties."""
+    metric_specs = (
+        ("validation_median_rmse", False),
+        ("validation_strict_perfect_lfo_rate", True),
+        ("validation_p95_rmse", False),
+        ("validation_node_max_error_p95", False),
+    )
+    rank_maps: dict[str, dict[str, float]] = {}
+    for metric, higher_is_better in metric_specs:
+        values = [(str(row.get("row_id", "")), _number(row, metric)) for row in summaries]
+        rank_maps[metric] = _average_ranks(values, reverse=higher_is_better)
+    rows: list[dict[str, Any]] = []
+    for source in summaries:
+        row_id = str(source.get("row_id", ""))
+        row: dict[str, Any] = {
+            "row_id": row_id,
+            "construction_family": source.get("construction_family", ""),
+            "construction_policy": source.get("construction_policy", ""),
+            "layer_schedule": source.get("layer_schedule", ""),
+            "utility_candidate_budget": source.get("utility_candidate_budget", ""),
+            "layer_normalization_policy": source.get("layer_normalization_policy", ""),
+        }
+        ranks = []
+        for metric, _ in metric_specs:
+            rank = rank_maps[metric][row_id]
+            row[f"rank_{metric}"] = rank
+            ranks.append(rank)
+        row["mean_co_primary_rank"] = sum(ranks) / len(ranks)
+        row["rank_spread"] = max(ranks) - min(ranks)
+        rows.append(row)
+    return sorted(rows, key=lambda row: (_number(row, "mean_co_primary_rank"), str(row.get("row_id", ""))))
+
+
+def _average_ranks(values: Sequence[tuple[str, float]], *, reverse: bool = False) -> dict[str, float]:
+    ordered = sorted(values, key=lambda item: item[1], reverse=reverse)
+    ranks: dict[str, float] = {}
+    index = 0
+    while index < len(ordered):
+        end = index + 1
+        while end < len(ordered) and math.isclose(ordered[end][1], ordered[index][1], rel_tol=0.0, abs_tol=1e-15):
+            end += 1
+        average = ((index + 1) + end) / 2.0
+        for row_id, _ in ordered[index:end]:
+            ranks[row_id] = average
+        index = end
+    return ranks
+
+
+def _marginal_atom_rows(
+    partial_rows: Sequence[Mapping[str, Any]],
+    summaries: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    metadata = {str(row.get("row_id", "")): row for row in summaries}
+    grouped: dict[str, list[Mapping[str, Any]]] = {}
+    for row in partial_rows:
+        grouped.setdefault(str(row.get("row_id", "")), []).append(row)
+    result: list[dict[str, Any]] = []
+    for row_id, rows in sorted(grouped.items()):
+        ordered = sorted(rows, key=lambda row: _number(row, "active_atom_count"))
+        previous: Mapping[str, Any] | None = None
+        for current in ordered:
+            if previous is None:
+                previous = current
+                continue
+            source = metadata.get(row_id, {})
+            row: dict[str, Any] = {
+                "row_id": row_id,
+                "construction_family": source.get("construction_family", ""),
+                "construction_policy": source.get("construction_policy", ""),
+                "layer_schedule": source.get("layer_schedule", ""),
+                "utility_candidate_budget": source.get("utility_candidate_budget", ""),
+                "layer_normalization_policy": source.get("layer_normalization_policy", ""),
+                "active_atom_count": int(_number(current, "active_atom_count")),
+                "previous_active_atom_count": int(_number(previous, "active_atom_count")),
+            }
+            for metric in CO_PRIMARY_METRICS:
+                delta = _number(current, metric) - _number(previous, metric)
+                row[f"delta_{metric}"] = delta
+                row[f"current_{metric}"] = _number(current, metric)
+            result.append(row)
+            previous = current
+    return result
+
+
+def _layer_progression_rows(
+    slot_rows: Sequence[Mapping[str, Any]],
+    atom_rows: Sequence[Mapping[str, Any]],
+    summaries: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    metadata = {str(row.get("row_id", "")): row for row in summaries}
+    roles: dict[tuple[str, int], str] = {}
+    for row in atom_rows:
+        roles.setdefault(
+            (str(row.get("row_id", "")), int(_number(row, "residual_layer"))),
+            str(row.get("layer_role", "")),
+        )
+    grouped: dict[tuple[str, int], list[Mapping[str, Any]]] = {}
+    for row in slot_rows:
+        grouped.setdefault(
+            (str(row.get("row_id", "")), int(_number(row, "residual_layer"))),
+            [],
+        ).append(row)
+    result: list[dict[str, Any]] = []
+    for (row_id, layer), rows in sorted(grouped.items()):
+        source = max(rows, key=lambda row: _number(row, "active_atom_slot"))
+        summary = metadata.get(row_id, {})
+        result.append({
+            "row_id": row_id,
+            "construction_family": summary.get("construction_family", ""),
+            "construction_policy": summary.get("construction_policy", ""),
+            "layer_schedule": summary.get("layer_schedule", ""),
+            "utility_candidate_budget": summary.get("utility_candidate_budget", ""),
+            "layer_normalization_policy": summary.get("layer_normalization_policy", ""),
+            "residual_layer": layer,
+            "layer_role": roles.get((row_id, layer), ""),
+            "active_atom_slot": int(_number(source, "active_atom_slot")),
+            "eligible_residual_count": int(_number(source, "eligible_residual_count")),
+            "training_median_rmse": _number(source, "training_median_rmse"),
+            "training_p95_rmse": _number(source, "training_p95_rmse"),
+            "training_max_abs_error_p95": _number(source, "training_max_abs_error_p95"),
+        })
+    return result
+
+
+def _mechanism_diagnostic_rows(
+    atom_rows: Sequence[Mapping[str, Any]],
+    candidate_rows: Sequence[Mapping[str, Any]],
+    summaries: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    atoms_by_id: dict[str, list[Mapping[str, Any]]] = {}
+    candidates_by_id: dict[str, list[Mapping[str, Any]]] = {}
+    for row in atom_rows:
+        atoms_by_id.setdefault(str(row.get("row_id", "")), []).append(row)
+    for row in candidate_rows:
+        candidates_by_id.setdefault(str(row.get("row_id", "")), []).append(row)
+    result: list[dict[str, Any]] = []
+    for summary in summaries:
+        row_id = str(summary.get("row_id", ""))
+        atoms = atoms_by_id.get(row_id, [])
+        candidates = candidates_by_id.get(row_id, [])
+        improvements = [
+            _number(row, "training_p95_rmse_before") - _number(row, "training_p95_rmse_after")
+            for row in atoms
+        ]
+        prototype = [row for row in atoms if str(row.get("atom_source_kind", "")) == "synthesized_prototype"]
+        observed = [row for row in atoms if str(row.get("atom_source_kind", "")) == "observed_residual"]
+        result.append({
+            "row_id": row_id,
+            "construction_family": summary.get("construction_family", ""),
+            "construction_policy": summary.get("construction_policy", ""),
+            "layer_schedule": summary.get("layer_schedule", ""),
+            "utility_candidate_budget": summary.get("utility_candidate_budget", ""),
+            "layer_normalization_policy": summary.get("layer_normalization_policy", ""),
+            "atom_count": len(atoms),
+            "broad_atom_count": sum(str(row.get("layer_role", "")) == "Broad" for row in atoms),
+            "repair_atom_count": sum(str(row.get("layer_role", "")) == "Repair" for row in atoms),
+            "synthesized_prototype_count": len(prototype),
+            "observed_residual_count": len(observed),
+            "median_slot_p95_improvement": median(improvements) if improvements else "",
+            "mean_slot_p95_improvement": sum(improvements) / len(improvements) if improvements else "",
+            "exact_duplicate_alignment_reuse_rate": (
+                sum(_truth(row.get("exact_duplicate_alignment_reused")) for row in atoms) / len(atoms)
+                if atoms else ""
+            ),
+            "prototype_convergence_rate": (
+                sum(_truth(row.get("prototype_converged")) for row in prototype) / len(prototype)
+                if prototype else ""
+            ),
+            "prototype_iterations_median": (
+                median([_number(row, "prototype_iterations_executed") for row in prototype])
+                if prototype else ""
+            ),
+            "candidate_search_event_count": sum(_number(row, "candidate_count") > 0 for row in candidates),
+            "candidate_evaluations": sum(_number(row, "candidate_count") for row in candidates),
+            "validation_p95_rmse": _number(summary, "validation_p95_rmse"),
+            "oracle_construction_time": _number(summary, "oracle_construction_time"),
+        })
+    return result
+
+
+def _factor_interaction_rows(matched_rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    grouped: dict[tuple[str, str], list[Mapping[str, Any]]] = {}
+    for row in matched_rows:
+        grouped.setdefault(
+            (str(row.get("comparison", "")), str(row.get("construction_family", ""))),
+            [],
+        ).append(row)
+    result: list[dict[str, Any]] = []
+    for (comparison, family), rows in sorted(grouped.items()):
+        record: dict[str, Any] = {
+            "comparison": comparison,
+            "construction_family": family,
+            "pair_count": len(rows),
+            "left_value": rows[0].get("left_value", ""),
+            "right_value": rows[0].get("right_value", ""),
+        }
+        for metric in CO_PRIMARY_METRICS:
+            values = [_number(row, f"delta_{metric}") for row in rows]
+            record[f"median_delta_{metric}"] = median(values)
+            higher = metric == "validation_strict_perfect_lfo_rate"
+            record[f"right_policy_wins_{metric}"] = sum(value > 0 if higher else value < 0 for value in values)
+            record[f"left_policy_wins_{metric}"] = sum(value < 0 if higher else value > 0 for value in values)
+            record[f"ties_{metric}"] = sum(value == 0 for value in values)
+        result.append(record)
+    return result
+
+
+def _spearman(left: Sequence[float], right: Sequence[float]) -> float:
+    if len(left) != len(right) or len(left) < 2:
+        return math.nan
+    left_map = _average_ranks([(str(index), value) for index, value in enumerate(left)])
+    left_ranks = [left_map[str(index)] for index in range(len(left))]
+    right_map = _average_ranks([(str(index), value) for index, value in enumerate(right)])
+    right_ranks = [right_map[str(index)] for index in range(len(right))]
+    left_mean = sum(left_ranks) / len(left_ranks)
+    right_mean = sum(right_ranks) / len(right_ranks)
+    numerator = sum((a - left_mean) * (b - right_mean) for a, b in zip(left_ranks, right_ranks))
+    left_scale = math.sqrt(sum((a - left_mean) ** 2 for a in left_ranks))
+    right_scale = math.sqrt(sum((b - right_mean) ** 2 for b in right_ranks))
+    return numerator / (left_scale * right_scale) if left_scale and right_scale else math.nan
+
+
 def _write_plots(
     bundle: AnalysisBundle,
     image_dir: Path,
     *,
     historical_runtime: bool = True,
+    deep_analysis: bool = False,
 ) -> dict[str, Path]:
     try:
         import matplotlib
@@ -594,6 +907,16 @@ def _write_plots(
         "retired": image_dir / "retired_fraction_vs_energy.png",
         "energy": image_dir / "incoming_vs_unexplained_energy.png",
     }
+    if deep_analysis:
+        paths.update({
+            "metric_agreement": image_dir / "metric_rank_agreement.png",
+            "generalization": image_dir / "train_validation_stability.png",
+            "interactions": image_dir / "factor_interactions.png",
+            "layers": image_dir / "residual_layer_progression.png",
+            "marginal_atoms": image_dir / "marginal_atom_value.png",
+            "diagnostics": image_dir / "strategy_diagnostics.png",
+            "work": image_dir / "offline_work_efficiency.png",
+        })
     _plot_pareto(plt, paths["pareto"], bundle.co_primary)
     _plot_delta(plt, paths["normalization"], bundle.matched_deltas, "layer_normalization_policy", "LayerClip0To1 minus FinalClipOnly")
     _plot_delta(plt, paths["budget"], bundle.matched_deltas, "utility_candidate_budget", "CandidateBudget48 minus CandidateBudget24")
@@ -609,6 +932,14 @@ def _write_plots(
     _plot_coverage(plt, paths["slot_coverage"], bundle.calibration["epsilon_coverage.csv"], completed=False)
     _plot_retired(plt, paths["retired"], bundle.calibration["retired_error_mass.csv"])
     _plot_energy(plt, paths["energy"], bundle.calibration["retired_error_mass.csv"])
+    if deep_analysis:
+        _plot_metric_agreement(plt, paths["metric_agreement"], bundle.summaries)
+        _plot_generalization(plt, paths["generalization"], bundle.diagnostics)
+        _plot_factor_interactions(plt, paths["interactions"], bundle.factor_interactions)
+        _plot_layer_progression(plt, paths["layers"], bundle.layer_progression)
+        _plot_marginal_atoms(plt, paths["marginal_atoms"], bundle.marginal_atoms)
+        _plot_strategy_diagnostics(plt, paths["diagnostics"], bundle.diagnostics)
+        _plot_offline_work(plt, paths["work"], bundle.mechanism_diagnostics, bundle.summaries)
     return paths
 
 
@@ -651,7 +982,7 @@ def _plot_delta(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]], compari
         for row in selected
     ]
     axis.set_yticks(positions, labels, fontsize=7)
-    axis.set(xlabel="validation P95 RMSE delta (negative favors right-hand policy)", ylabel="matched pair", title=title)
+    axis.set(xlabel="validation P95 RMSE delta (negative favors first-named policy)", ylabel="matched pair", title=title)
     _save(plt, figure, path)
 
 
@@ -810,6 +1141,176 @@ def _plot_energy(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> Non
     _save(plt, figure, path)
 
 
+def _plot_metric_agreement(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
+    labels = ("Median RMSE", "Strict-perfect", "P95 RMSE", "Node-max P95")
+    correlations = [
+        [
+            _spearman(
+                [_number(row, left) for row in rows],
+                [_number(row, right) for row in rows],
+            )
+            for right in CO_PRIMARY_METRICS
+        ]
+        for left in CO_PRIMARY_METRICS
+    ]
+    figure, axis = plt.subplots(figsize=(7.4, 6.2))
+    image = axis.imshow(correlations, vmin=-1.0, vmax=1.0, cmap="RdBu_r")
+    axis.set_xticks(range(4), labels, rotation=28, ha="right")
+    axis.set_yticks(range(4), labels)
+    for y, row in enumerate(correlations):
+        for x, value in enumerate(row):
+            axis.text(x, y, f"{value:.2f}", ha="center", va="center", color="white" if abs(value) > 0.55 else "#34444A")
+    axis.set_title("Co-primary metric rank agreement (Spearman ρ)")
+    figure.colorbar(image, ax=axis, fraction=0.046, pad=0.04, label="rank correlation")
+    _save(plt, figure, path)
+
+
+def _plot_generalization(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
+    figure, axes = plt.subplots(1, 2, figsize=(11.0, 4.8))
+    specs = (
+        ("train_median_rmse", "validation_median_rmse", "Median RMSE"),
+        ("train_p95_rmse", "validation_p95_rmse", "P95 RMSE"),
+    )
+    for axis, (train_key, validation_key, label) in zip(axes, specs):
+        train = [_number(row, train_key) for row in rows]
+        validation = [_number(row, validation_key) for row in rows]
+        axis.scatter(train, validation, s=24, alpha=0.72, color="#286DB7")
+        if train and validation:
+            lower, upper = min([*train, *validation]), max([*train, *validation])
+            axis.plot([lower, upper], [lower, upper], linestyle="--", linewidth=1, color="#60757E")
+        axis.set(xlabel=f"training {label}", ylabel=f"validation {label}", title=f"{label}: train vs validation")
+    figure.suptitle("Generalization stability on the fixed train-50% / validation-100% split")
+    _save(plt, figure, path)
+
+
+def _plot_factor_interactions(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
+    comparisons = (
+        ("layer_normalization_policy", "LayerClip − FinalClip"),
+        ("utility_candidate_budget", "Budget48 − Budget24"),
+        ("layer_schedule", "TwoPhase − Interleaved"),
+    )
+    families = sorted({str(row.get("construction_family", "")) for row in rows if row.get("construction_family")})
+    lookup = {
+        (str(row.get("construction_family", "")), str(row.get("comparison", ""))): _number(row, "median_delta_validation_p95_rmse")
+        for row in rows
+    }
+    matrix = [[lookup.get((family, comparison), math.nan) for comparison, _ in comparisons] for family in families]
+    limit = max((abs(value) for value in lookup.values()), default=0.01)
+    figure, axis = plt.subplots(figsize=(8.6, max(5.0, 0.37 * len(families) + 1.8)))
+    image = axis.imshow(matrix, aspect="auto", cmap="RdYlGn_r", vmin=-limit, vmax=limit)
+    axis.set_xticks(range(len(comparisons)), [label for _, label in comparisons], rotation=18, ha="right")
+    axis.set_yticks(range(len(families)), families, fontsize=8)
+    for y, family in enumerate(families):
+        for x, (comparison, _) in enumerate(comparisons):
+            value = lookup.get((family, comparison))
+            axis.text(x, y, "—" if value is None else f"{value:+.4f}", ha="center", va="center", color="#606A6F", fontsize=7)
+    axis.set_title("Family-specific matched P95 policy deltas")
+    figure.colorbar(image, ax=axis, fraction=0.035, pad=0.03, label="validation P95 RMSE delta; negative favors first-named policy")
+    _save(plt, figure, path)
+
+
+def _plot_layer_progression(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
+    grouped: dict[tuple[str, int], list[float]] = {}
+    for row in rows:
+        grouped.setdefault(
+            (str(row.get("construction_family", "Unknown")), int(_number(row, "residual_layer"))),
+            [],
+        ).append(_number(row, "training_p95_rmse"))
+    figure, axis = plt.subplots(figsize=(9.2, 5.4))
+    for family in sorted({key[0] for key in grouped}):
+        layers = sorted(key[1] for key in grouped if key[0] == family)
+        axis.plot(layers, [median(grouped[(family, layer)]) for layer in layers], marker="o", markersize=2.8, linewidth=1.25, label=family)
+    axis.set(
+        xlabel="completed residual layer",
+        ylabel="family-median training P95 RMSE (lower is better)",
+        title="Residual-layer learning curves after slot 7",
+    )
+    if grouped:
+        axis.legend(fontsize=6.7, ncol=2, loc="best")
+    _save(plt, figure, path)
+
+
+def _plot_marginal_atoms(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
+    grouped: dict[int, list[float]] = {}
+    for row in rows:
+        grouped.setdefault(int(_number(row, "active_atom_count")), []).append(_number(row, "delta_validation_p95_rmse"))
+    slots = sorted(grouped)
+    medians = [median(grouped[slot]) for slot in slots]
+    improved = [sum(value < 0 for value in grouped[slot]) for slot in slots]
+    figure, axis = plt.subplots(figsize=(8.6, 4.9))
+    bars = axis.bar(slots, medians, color="#147E67", alpha=0.85)
+    axis.axhline(0.0, color="#60757E", linewidth=0.9)
+    for slot, count in zip(slots, improved):
+        axis.text(slot, -0.00018, f"{count}/{len(grouped[slot])} improve", ha="center", va="top", color="#34444A", fontsize=8)
+    axis.set(
+        xlabel="new active atom count (delta from previous count)",
+        ylabel="median validation P95 RMSE delta",
+        title="Marginal value of each additional active atom",
+    )
+    _save(plt, figure, path)
+
+
+def _plot_strategy_diagnostics(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
+    specs = (
+        ("validation_overshoot_rate_before_final_clip", "overshoot rate before final clip"),
+        ("residual_layer_effective_no_op_usage_rate_median", "effective no-op usage"),
+        ("residual_gain_nonzero_rate", "non-zero residual-gain rate"),
+    )
+    figure, axes = plt.subplots(1, 3, figsize=(13.4, 4.4), sharey=True)
+    p95 = [_number(row, "validation_p95_rmse") for row in rows]
+    for axis, (key, label) in zip(axes, specs):
+        values = [_number(row, key) for row in rows]
+        rho = _spearman(values, p95)
+        axis.scatter(values, p95, s=22, alpha=0.7, color="#286DB7")
+        axis.set(xlabel=label, title=f"ρ = {rho:+.2f}")
+    axes[0].set_ylabel("validation P95 RMSE")
+    figure.suptitle("Decoder and dictionary diagnostics versus tail quality")
+    _save(plt, figure, path)
+
+
+def _plot_offline_work(
+    plt: Any,
+    path: Path,
+    mechanism_rows: Sequence[Mapping[str, Any]],
+    summaries: Sequence[Mapping[str, Any]],
+) -> None:
+    figure, axes = plt.subplots(1, 3, figsize=(14.2, 4.6))
+    budget_rows = [row for row in mechanism_rows if _number(row, "candidate_evaluations") > 0]
+    for budget, color in (("CandidateBudget24", "#286DB7"), ("CandidateBudget48", "#147E67")):
+        selected = [row for row in budget_rows if str(row.get("utility_candidate_budget", "")) == budget]
+        axes[0].scatter(
+            [_number(row, "candidate_evaluations") for row in selected],
+            [_number(row, "validation_p95_rmse") for row in selected],
+            label=budget,
+            color=color,
+            s=25,
+            alpha=0.72,
+        )
+    axes[0].set(xlabel="candidate evaluations", ylabel="validation P95 RMSE", title="Search work vs tail quality")
+    axes[0].legend(fontsize=7)
+    axes[1].scatter(
+        [_number(row, "oracle_construction_time") for row in summaries],
+        [_number(row, "validation_p95_rmse") for row in summaries],
+        s=25,
+        alpha=0.72,
+        color="#A86100",
+    )
+    axes[1].set(xlabel="oracle construction seconds", ylabel="validation P95 RMSE", title="Construction time vs quality")
+    families = sorted({str(row.get("construction_family", "")) for row in summaries})
+    construction = [median([_number(row, "oracle_construction_time") for row in summaries if row.get("construction_family") == family]) for family in families]
+    train = [median([_number(row, "train_encoding_time") for row in summaries if row.get("construction_family") == family]) for family in families]
+    validation = [median([_number(row, "validation_encoding_time") for row in summaries if row.get("construction_family") == family]) for family in families]
+    positions = list(range(len(families)))
+    axes[2].barh(positions, construction, label="construct", color="#286DB7")
+    axes[2].barh(positions, train, left=construction, label="train encode", color="#147E67")
+    axes[2].barh(positions, validation, left=[a + b for a, b in zip(construction, train)], label="validation encode", color="#A86100")
+    axes[2].set_yticks(positions, families, fontsize=6.5)
+    axes[2].set(xlabel="family-median seconds", title="Offline work decomposition")
+    axes[2].legend(fontsize=7)
+    figure.suptitle("Experiment-work efficiency (all rows retain 193 deployed heads)")
+    _save(plt, figure, path)
+
+
 def _interactive_payload(
     bundle: AnalysisBundle,
     *,
@@ -829,17 +1330,16 @@ def _interactive_payload(
     budget = _comparison_summary(bundle.matched_deltas, "utility_candidate_budget")
     schedule = _comparison_summary(bundle.matched_deltas, "layer_schedule")
     pareto = [row for row in bundle.co_primary if _truth(row.get("pareto_candidate"))]
-    family_by_row = {
-        str(row.get("row_id")): str(row.get("construction_family", "Unknown"))
-        for row in bundle.summaries
-    }
-    partial_fields = ("row_id", "active_atom_count", *CO_PRIMARY_METRICS)
+    payload_row_ids = [str(row.get("row_id", "")) for row in bundle.summaries]
+    payload_row_index = {row_id: index for index, row_id in enumerate(payload_row_ids)}
     partial_rows = [
-        {
-            **{field: row.get(field, "") for field in partial_fields},
-            "construction_family": family_by_row.get(str(row.get("row_id")), "Unknown"),
-        }
+        [
+            payload_row_index[str(row.get("row_id", ""))],
+            int(_number(row, "active_atom_count")),
+            *[_number(row, metric) for metric in CO_PRIMARY_METRICS],
+        ]
         for row in bundle.partial_codebook
+        if str(row.get("row_id", "")) in payload_row_index
     ]
 
     coverage_by_family: list[dict[str, Any]] = []
@@ -865,6 +1365,17 @@ def _interactive_payload(
         # make global UI filters look scientifically meaningful when they are not.
         calibration["layer_quantiles_by_row"] = []
         calibration["retired_sample_by_row"] = []
+        compact_retired: list[dict[str, Any]] = []
+        retired_by_epsilon: dict[float, list[dict[str, Any]]] = {}
+        for row in calibration["retired_sample"]:
+            retired_by_epsilon.setdefault(float(row["epsilon"]), []).append(row)
+        for rows in retired_by_epsilon.values():
+            if len(rows) <= 60:
+                compact_retired.extend(rows)
+            else:
+                indexes = sorted({round(index * (len(rows) - 1) / 59) for index in range(60)})
+                compact_retired.extend(rows[index] for index in indexes)
+        calibration["retired_sample"] = compact_retired
     selection_payload = dict(selection or {})
     candidate_statistics = selection_payload.get("training_statistics_used", {}).get("candidate_statistics", {})
     max_early_middle = max(
@@ -874,6 +1385,61 @@ def _interactive_payload(
         ),
         default=0.0,
     )
+    metric_correlations_raw = [
+        [
+            _spearman(
+                [_number(row, left) for row in bundle.summaries],
+                [_number(row, right) for row in bundle.summaries],
+            )
+            for right in CO_PRIMARY_METRICS
+        ]
+        for left in CO_PRIMARY_METRICS
+    ]
+    metric_correlations = [
+        [value if math.isfinite(value) else None for value in row]
+        for row in metric_correlations_raw
+    ]
+    generalization = {}
+    for key in (
+        "generalization_gap_median_rmse",
+        "generalization_gap_strict_perfect_lfo_rate",
+        "generalization_gap_p95_rmse",
+        "generalization_gap_node_max_error_p95",
+    ):
+        values = [_number(row, key) for row in bundle.diagnostics]
+        generalization[key] = {
+            "minimum": min(values) if values else math.nan,
+            "q25": _percentile(values, 0.25),
+            "median": _percentile(values, 0.5),
+            "q75": _percentile(values, 0.75),
+            "maximum": max(values) if values else math.nan,
+        }
+    diagnostic_correlations = {}
+    validation_p95 = [_number(row, "validation_p95_rmse") for row in bundle.diagnostics]
+    for key in (
+        "train_p95_rmse", "validation_median_rmse", "validation_node_max_error_p95",
+        "validation_overshoot_rate_before_final_clip",
+        "residual_layer_effective_no_op_usage_rate_median",
+        "residual_layer_dead_atom_rate_median", "residual_gain_nonzero_rate",
+        "duplicate_atom_rate", "oracle_construction_time",
+    ):
+        correlation = _spearman(
+            [_number(row, key) for row in bundle.diagnostics],
+            validation_p95,
+        )
+        diagnostic_correlations[key] = correlation if math.isfinite(correlation) else None
+    marginal_summary = []
+    for active_count in sorted({int(_number(row, "active_atom_count")) for row in bundle.marginal_atoms}):
+        selected = [row for row in bundle.marginal_atoms if int(_number(row, "active_atom_count")) == active_count]
+        values = [_number(row, "delta_validation_p95_rmse") for row in selected]
+        marginal_summary.append({
+            "active_atom_count": active_count,
+            "pair_count": len(values),
+            "median_delta_validation_p95_rmse": median(values) if values else math.nan,
+            "p95_improved_count": sum(value < 0 for value in values),
+        })
+    deep_row_ids = payload_row_ids
+    deep_row_index = payload_row_index
 
     return {
         "schema_version": INTERACTIVE_REPORT_SCHEMA,
@@ -934,6 +1500,10 @@ def _interactive_payload(
                 "candidate_statistics": candidate_statistics,
             },
             "scaling_matched_row_count": len(scaling_rows),
+            "metric_correlations": metric_correlations,
+            "generalization": generalization,
+            "diagnostic_correlations_with_validation_p95": diagnostic_correlations,
+            "marginal_atom_summary": marginal_summary,
         },
         "tables": {
             "metrics": [
@@ -942,7 +1512,8 @@ def _interactive_payload(
                     for field in (
                         "row_id", "construction_policy", "construction_family", "layer_schedule",
                         "utility_candidate_budget", "layer_normalization_policy", *CO_PRIMARY_METRICS,
-                        "oracle_construction_time", "pareto_candidate",
+                        "oracle_construction_time", "train_encoding_time", "validation_encoding_time",
+                        "pareto_candidate",
                     )
                 }
                 for row in bundle.co_primary
@@ -953,11 +1524,45 @@ def _interactive_payload(
                     field: row.get(field, "")
                     for field in (
                         "comparison", "left_value", "right_value", "match_key", "left_row_id", "right_row_id",
+                        "construction_family",
                         *(f"delta_{metric}" for metric in CO_PRIMARY_METRICS),
                     )
                 }
                 for row in bundle.matched_deltas
             ],
+            "diagnostics": [
+                {
+                    field: row.get(field, "")
+                    for field in (
+                        "row_id", "train_median_rmse", "train_strict_perfect_lfo_rate",
+                        "train_p95_rmse", "train_node_max_error_p95",
+                        "generalization_gap_median_rmse", "generalization_gap_strict_perfect_lfo_rate",
+                        "generalization_gap_p95_rmse", "generalization_gap_node_max_error_p95",
+                        "validation_overshoot_rate_before_final_clip",
+                        "validation_overshoot_abs_p95_before_final_clip",
+                        "residual_layer_dead_atom_rate_median",
+                        "residual_layer_dominant_atom_share_median",
+                        "residual_layer_usage_entropy_median",
+                        "residual_layer_no_op_usage_rate_median",
+                        "residual_layer_effective_no_op_usage_rate_median",
+                        "residual_gain_median", "residual_gain_abs_p95", "residual_gain_nonzero_rate",
+                        "duplicate_atom_rate", "oracle_construction_time", "train_encoding_time",
+                        "validation_encoding_time", "offline_analysis_time",
+                    )
+                }
+                for row in bundle.diagnostics
+            ],
+            "rankings": [
+                {
+                    field: row.get(field, "")
+                    for field in (
+                        "row_id", *(f"rank_{metric}" for metric in CO_PRIMARY_METRICS),
+                        "mean_co_primary_rank", "rank_spread",
+                    )
+                }
+                for row in bundle.rankings
+            ],
+            "factor_interactions": bundle.factor_interactions,
             "partial_codebook": partial_rows,
             "scaling": [
                 {
@@ -969,6 +1574,48 @@ def _interactive_payload(
                     )
                 }
                 for row in scaling_rows
+            ],
+        },
+        "deep_analysis": {
+            "row_ids": deep_row_ids,
+            "marginal_atoms": [
+                [
+                    deep_row_index[str(row.get("row_id", ""))],
+                    int(_number(row, "active_atom_count")),
+                    *[_number(row, f"delta_{metric}") for metric in CO_PRIMARY_METRICS],
+                ]
+                for row in bundle.marginal_atoms
+                if str(row.get("row_id", "")) in deep_row_index
+            ],
+            "layer_progression": [
+                [
+                    deep_row_index[str(row.get("row_id", ""))],
+                    int(_number(row, "residual_layer")),
+                    str(row.get("layer_role", "")),
+                    _number(row, "training_median_rmse"),
+                    _number(row, "training_p95_rmse"),
+                    _number(row, "training_max_abs_error_p95"),
+                ]
+                for row in bundle.layer_progression
+                if str(row.get("row_id", "")) in deep_row_index
+            ],
+            "mechanisms": [
+                [
+                    deep_row_index[str(row.get("row_id", ""))],
+                    int(_number(row, "atom_count")),
+                    int(_number(row, "broad_atom_count")),
+                    int(_number(row, "repair_atom_count")),
+                    int(_number(row, "synthesized_prototype_count")),
+                    int(_number(row, "observed_residual_count")),
+                    _number(row, "median_slot_p95_improvement"),
+                    _number(row, "exact_duplicate_alignment_reuse_rate"),
+                    _number(row, "prototype_convergence_rate"),
+                    _number(row, "prototype_iterations_median"),
+                    int(_number(row, "candidate_search_event_count")),
+                    int(_number(row, "candidate_evaluations")),
+                ]
+                for row in bundle.mechanism_diagnostics
+                if str(row.get("row_id", "")) in deep_row_index
             ],
         },
         "calibration": calibration,
@@ -1190,6 +1837,146 @@ def _complete_13a_markdown(
         value_text = f"{value:.3%}" if higher else f"{value:.8g}"
         metric_leaders.append(f"| {label} | {'higher' if higher else 'lower'} | {value_text} | `{row.get('row_id')}` |")
 
+    metric_agreement_table = [
+        "| Metric pair | Spearman ρ | Interpretation |",
+        "| --- | ---: | --- |",
+    ]
+    for left_index, (left, left_label, _) in enumerate(metric_specs):
+        for right, right_label, _ in metric_specs[left_index + 1:]:
+            correlation = _spearman(
+                [_number(row, left) for row in bundle.summaries],
+                [_number(row, right) for row in bundle.summaries],
+            )
+            strength = "strong agreement" if abs(correlation) >= 0.8 else "partial agreement" if abs(correlation) >= 0.5 else "weak / distinct signal"
+            metric_agreement_table.append(f"| {left_label} vs {right_label} | {correlation:+.3f} | {strength} |")
+
+    rank_disagreement_table = [
+        "| High-disagreement strategy row | Family | Median rank | Strict-perfect rank | P95 rank | Node-max rank | Rank spread |",
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for row in sorted(bundle.rankings, key=lambda item: _number(item, "rank_spread"), reverse=True)[:8]:
+        rank_disagreement_table.append(
+            f"| `{row.get('row_id')}` | {row.get('construction_family')} | "
+            f"{_number(row, 'rank_validation_median_rmse'):.1f} | "
+            f"{_number(row, 'rank_validation_strict_perfect_lfo_rate'):.1f} | "
+            f"{_number(row, 'rank_validation_p95_rmse'):.1f} | "
+            f"{_number(row, 'rank_validation_node_max_error_p95'):.1f} | "
+            f"{_number(row, 'rank_spread'):.1f} |"
+        )
+
+    generalization_table = [
+        "| Metric | Validation − training median gap | Range | Rows where validation is better |",
+        "| --- | ---: | ---: | ---: |",
+    ]
+    for train_key, validation_key, label, higher in (
+        ("train_median_rmse", "validation_median_rmse", "Median RMSE", False),
+        ("train_strict_perfect_lfo_rate", "validation_strict_perfect_lfo_rate", "Strict-perfect rate", True),
+        ("train_p95_rmse", "validation_p95_rmse", "P95 RMSE", False),
+        ("train_node_max_error_p95", "validation_node_max_error_p95", "Node-max P95", False),
+    ):
+        values = [_number(row, validation_key) - _number(row, train_key) for row in bundle.summaries]
+        better = sum(value > 0 if higher else value < 0 for value in values)
+        suffix = " pp" if higher else ""
+        scale = 100.0 if higher else 1.0
+        generalization_table.append(
+            f"| {label} | {median(values) * scale:+.6g}{suffix} | "
+            f"{min(values) * scale:+.6g} to {max(values) * scale:+.6g}{suffix} | {better}/{len(values)} |"
+        )
+
+    interaction_table = [
+        "| Construction family | LayerClip − FinalClip | Budget48 − Budget24 | TwoPhase − Interleaved |",
+        "| --- | ---: | ---: | ---: |",
+    ]
+    interaction_lookup = {
+        (str(row.get("construction_family", "")), str(row.get("comparison", ""))): _number(row, "median_delta_validation_p95_rmse")
+        for row in bundle.factor_interactions
+    }
+    interaction_families = sorted({str(row.get("construction_family", "")) for row in bundle.factor_interactions if row.get("construction_family")})
+    for family in interaction_families:
+        values = []
+        for comparison in ("layer_normalization_policy", "utility_candidate_budget", "layer_schedule"):
+            value = interaction_lookup.get((family, comparison))
+            values.append("—" if value is None else f"{value:+.6g}")
+        interaction_table.append(f"| {family} | {' | '.join(values)} |")
+
+    marginal_table = [
+        "| Added active atom | Median validation P95 delta | Rows improved | Median validation median-RMSE delta |",
+        "| ---: | ---: | ---: | ---: |",
+    ]
+    for active_count in sorted({int(_number(row, "active_atom_count")) for row in bundle.marginal_atoms}):
+        selected = [row for row in bundle.marginal_atoms if int(_number(row, "active_atom_count")) == active_count]
+        p95_values = [_number(row, "delta_validation_p95_rmse") for row in selected]
+        median_values = [_number(row, "delta_validation_median_rmse") for row in selected]
+        marginal_table.append(
+            f"| {active_count} | {median(p95_values):+.8g} | {sum(value < 0 for value in p95_values)}/{len(p95_values)} | {median(median_values):+.8g} |"
+        )
+
+    layer_table = [
+        "| Residual layer completed | Median training P95 RMSE | Median layer-to-layer change |",
+        "| ---: | ---: | ---: |",
+    ]
+    layer_medians: dict[int, float] = {}
+    for layer in sorted({int(_number(row, "residual_layer")) for row in bundle.layer_progression}):
+        values = [_number(row, "training_p95_rmse") for row in bundle.layer_progression if int(_number(row, "residual_layer")) == layer]
+        layer_medians[layer] = median(values)
+        delta = "—" if layer - 1 not in layer_medians else f"{layer_medians[layer] - layer_medians[layer - 1]:+.8g}"
+        layer_table.append(f"| {layer} | {layer_medians[layer]:.8g} | {delta} |")
+
+    diagnostic_specs = (
+        ("train_p95_rmse", "Training P95 RMSE"),
+        ("validation_node_max_error_p95", "Validation node-max P95"),
+        ("validation_median_rmse", "Validation median RMSE"),
+        ("validation_overshoot_rate_before_final_clip", "Pre-final-clip overshoot rate"),
+        ("residual_layer_effective_no_op_usage_rate_median", "Effective no-op usage"),
+        ("residual_layer_dead_atom_rate_median", "Dead-atom rate"),
+        ("residual_gain_nonzero_rate", "Non-zero residual-gain rate"),
+        ("duplicate_atom_rate", "Duplicate-atom rate"),
+        ("oracle_construction_time", "Oracle construction time"),
+    )
+    diagnostic_table = [
+        "| Diagnostic | Spearman ρ with validation P95 | Reading |",
+        "| --- | ---: | --- |",
+    ]
+    validation_p95_values = [_number(row, "validation_p95_rmse") for row in bundle.diagnostics]
+    for key, label in diagnostic_specs:
+        correlation = _spearman([_number(row, key) for row in bundle.diagnostics], validation_p95_values)
+        diagnostic_table.append(
+            f"| {label} | {correlation:+.3f} | {'higher tracks worse tail quality' if correlation > 0 else 'higher tracks better tail quality'} |"
+        )
+
+    family_table = [
+        "| Construction family | Rows | Median RMSE | Median P95 RMSE | Median node-max P95 | Best P95 row |",
+        "| --- | ---: | ---: | ---: | ---: | --- |",
+    ]
+    for family in sorted({str(row.get("construction_family", "")) for row in bundle.summaries}):
+        rows = [row for row in bundle.summaries if row.get("construction_family") == family]
+        best_family = min(rows, key=lambda row: _number(row, "validation_p95_rmse"))
+        family_table.append(
+            f"| {family} | {len(rows)} | {median([_number(row, 'validation_median_rmse') for row in rows]):.8g} | "
+            f"{median([_number(row, 'validation_p95_rmse') for row in rows]):.8g} | "
+            f"{median([_number(row, 'validation_node_max_error_p95') for row in rows]):.8g} | `{best_family.get('row_id')}` |"
+        )
+
+    mechanism_table = [
+        "| Construction family | Median slot P95 gain | Prototype convergence | Prototype iterations | Duplicate-alignment reuse | Candidate evaluations |",
+        "| --- | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for family in sorted({str(row.get("construction_family", "")) for row in bundle.mechanism_diagnostics}):
+        rows = [row for row in bundle.mechanism_diagnostics if row.get("construction_family") == family]
+        present = lambda key: [_number(row, key) for row in rows if row.get(key) not in {None, "", "None"}]
+        gains = present("median_slot_p95_improvement")
+        convergence = present("prototype_convergence_rate")
+        iterations = present("prototype_iterations_median")
+        duplicate = present("exact_duplicate_alignment_reuse_rate")
+        candidates = present("candidate_evaluations")
+        mechanism_table.append(
+            f"| {family} | {'—' if not gains else f'{median(gains):.8g}'} | "
+            f"{'—' if not convergence else f'{median(convergence):.1%}'} | "
+            f"{'—' if not iterations else f'{median(iterations):.1f}'} | "
+            f"{'—' if not duplicate else f'{median(duplicate):.1%}'} | "
+            f"{'—' if not candidates else f'{median(candidates):.0f}'} |"
+        )
+
     matched_table = [
         "| Matched factor | Metric | Right wins / left wins / ties | Median right-minus-left delta |",
         "| --- | --- | ---: | ---: |",
@@ -1252,6 +2039,10 @@ def _complete_13a_markdown(
         "",
         f"The automatic epsilon rule did not pass. All candidates satisfy the retired unexplained-energy limits, but the best early/middle median reconstructed fraction is only `{max_early_middle:.3%}`, below the required `5%`. The prescribed `0.001` versus `0.0025` restricted pilot is therefore required before 13B.",
         "",
+        "## Research Questions",
+        "",
+        "This complete 13A analysis asks seven questions: which strategies occupy the four-objective quality frontier; whether validation behavior tracks training behavior; which policy effects survive matched controls; where those effects interact with construction family; how quickly residual layers and atom slots earn their capacity; what decoder and dictionary diagnostics explain failure modes; and how much offline work each strategy consumes under the fixed 193-head deployed contract.",
+        "",
         image("pareto", "Experiment 13A co-primary quality frontier"),
         "",
         "The x-axis is validation median RMSE and the y-axis is validation P95 RMSE; lower-left is better. Outlined points remain non-dominated after strict-perfect rate and node-max P95 are also considered. The plot is navigation across tradeoffs, not a scalar leaderboard.",
@@ -1263,6 +2054,26 @@ def _complete_13a_markdown(
         *pareto_table,
         "",
         "Strict-perfect rate has only two observed values across the 90 rows. RMSE improvements therefore must not be described as automatically improving exact finishes at the fixed `1e-5` threshold.",
+        "",
+        "### Metric agreement and disagreement",
+        "",
+        image("metric_agreement", "Co-primary metric rank agreement"),
+        "",
+        *metric_agreement_table,
+        "",
+        *rank_disagreement_table,
+        "",
+        "Median RMSE, P95 RMSE, and node-max P95 share substantial ordering information, but they are not interchangeable. Strict-perfect rate is nearly orthogonal to the tail metrics because it is both thresholded and coarse: only two observed values split the grid. This is why the frontier retains all four objectives instead of reporting one synthetic score.",
+        "",
+        "The rows with the largest rank spread are particularly useful audit cases: they are strong on one objective and weak on another. The generated `metric_rankings.csv` retains tied ranks, mean co-primary rank, and rank spread for every strategy.",
+        "",
+        "## Train-to-Validation Stability",
+        "",
+        image("generalization", "Training versus validation stability"),
+        "",
+        *generalization_table,
+        "",
+        "The train/validation relationship is stable but not a conventional overfitting story. Validation median RMSE is slightly higher on the median row, while validation P95 is often lower. The fixed 50% construction sample is therefore not simply an easier subset than validation. Strong train-P95 versus validation-P95 rank agreement supports using training construction diagnostics, but the non-zero gaps prohibit substituting training metrics for held-out quality.",
         "",
         "## Matched Policy Effects",
         "",
@@ -1288,9 +2099,19 @@ def _complete_13a_markdown(
         "",
         "The signs remain mixed. TwoPhase works especially well for some diversity-aware and robust prototype families, while other families benefit from earlier repair interleaving.",
         "",
+        "### Factor interactions by construction family",
+        "",
+        image("interactions", "Family-specific matched policy interactions"),
+        "",
+        *interaction_table,
+        "",
+        "Each cell is a within-family median of matched validation-P95 deltas. The normalization column is consistently negative, so clipping generalizes across construction mechanisms. Budget and schedule change sign by family. Aggregating those signs into one global winner would erase the main design interaction.",
+        "",
         "## Construction-Family Interpretation",
         "",
         "Pure cluster prototypes are competitive at the tail: `AllClusterMeans + LayerClip0To1` is the P95 leader. The best median and node-max row instead combines diverse broad coverage with hard-tail repair, supporting a mechanism in which dissimilar population prototypes remove reusable structure before observed examples address the remaining difficult cases. The CommonCaseRepair anchor retains the strict-perfect lead, showing that finishing behavior is not captured by aggregate RMSE alone.",
+        "",
+        *family_table,
         "",
         "The ten lowest-P95 rows are:",
         "",
@@ -1309,6 +2130,32 @@ def _complete_13a_markdown(
         image("partial", "Partial-codebook progression"),
         "",
         "Move left to right as each residual layer gains another active atom; lower validation P95 is better. The early slope measures capacity efficiency, while late flattening shows diminishing returns. The first few atoms carry most of the quality gain, but family curves continue to separate through slot seven, so this fixed-W8 design does not support removing late slots without a separate head-budget experiment.",
+        "",
+        image("marginal_atoms", "Marginal value of each additional active atom"),
+        "",
+        *marginal_table,
+        "",
+        "The second atom produces the largest typical improvement, and the next two still remove substantial tail error. Later atoms have smaller median gains but remain beneficial for most strategies: the seventh improves validation P95 in the majority of rows. Strict-perfect rate has a median marginal change of zero at every slot, another indication that thresholded finishes and continuous reconstruction quality answer different questions.",
+        "",
+        "## Residual-Layer Learning Curve",
+        "",
+        image("layers", "Residual-layer progression after active slot seven"),
+        "",
+        *layer_table,
+        "",
+        "This view follows the completed seven-atom codebook after every residual layer. Tail error falls monotonically from layer 1 through layer 16, with diminishing but still material reductions late in the stack. The result supports D16 for this experiment: it does not prove that every layer is cost-optimal, but it rules out the claim that the later layers are doing nothing.",
+        "",
+        "## Decoder and Dictionary Diagnostics",
+        "",
+        image("diagnostics", "Decoder and dictionary diagnostics versus validation P95"),
+        "",
+        *diagnostic_table,
+        "",
+        "Overshoot, effective no-op usage, and dead atoms all track worse tail quality, while frequent non-zero residual gains track better tail quality. These are associations across deliberately different strategy families, not isolated causal effects. The matched clipping result supplies the stronger causal design evidence for overshoot: LayerClip0To1 removes overshoot and improves every matched P95 pair.",
+        "",
+        *mechanism_table,
+        "",
+        "Broad and repair atoms solve different problems. Synthesized prototypes seek reusable population structure; observed residuals perform concrete cleanup. Several iterative prototype builders reach their iteration cap rather than declaring convergence, while one-shot cluster/diversity builders are structurally different. Duplicate-alignment reuse is a small but non-zero signal of redundant atom proposals and is retained as an audit diagnostic rather than treated as a failure by itself.",
         "",
         "## Eligibility Calibration and Gate Result",
         "",
@@ -1342,11 +2189,17 @@ def _complete_13a_markdown(
         "",
         f"This chart compares rows only inside the optimized train-50% run. Median oracle construction time is `{median([_number(row, 'oracle_construction_time') for row in runtime]):.3f}` seconds and the maximum is `{_number(runtime[-1], 'oracle_construction_time'):.3f}` seconds. The scale is continuous because this run contains no host-sleep outliers. These timings support within-run cost comparisons only.",
         "",
+        image("work", "Offline work efficiency"),
+        "",
+        "CandidateBudget48 exactly doubles deterministic repair-candidate evaluation relative to CandidateBudget24 wherever repair search applies, yet its median quality gain is small and the sign is mixed. Oracle construction time has essentially no monotonic relationship with validation P95, so spending longer is not evidence of a better dictionary. The timing decomposition separates construction, training encoding, and validation encoding; all three are offline experiment costs. Every row still emits the same 193 deployed prediction heads, so none of these charts is an inference-latency comparison.",
+        "",
         "## Practical Takeaways",
         "",
         "- Lock Experiment 13B to the 45 `LayerClip0To1` counterparts; do not rerun `FinalClipOnly`.",
         "- Carry all three Pareto strategies into the 13B interpretation; no scalar winner represents all four quality objectives.",
         "- Treat CandidateBudget48 and TwoPhase as interaction-dependent choices, not unconditional defaults.",
+        "- Preserve all seven active atoms and all 16 residual layers for 13B; 13A shows diminishing returns, not dead capacity.",
+        "- Use overshoot, no-op, gain-use, duplicate, and convergence diagnostics to explain results, not to replace matched quality evidence.",
         "- Run the prescribed restricted epsilon pilot before any full Experiment 13B launch.",
         "- Do not compare legacy and optimized wall-clock timings or claim a general 50%-training scaling law from the 39-row prefix.",
         "",
@@ -1354,7 +2207,13 @@ def _complete_13a_markdown(
         "",
         f"The completed source run is `{source_display}` relative to this report. The scaling baseline is `{baseline_display}`. Derived analysis tables, report images, and the interactive payload are written outside both source runs.",
         "",
+        "The audit artifacts now include `strategy_diagnostics.csv`, `metric_rankings.csv`, `factor_interaction_summary.csv`, `marginal_atom_value.csv`, `residual_layer_progression.csv`, and `construction_mechanism_diagnostics.csv` in addition to the original coverage, frontier, matched-effect, partial-codebook, and calibration tables.",
+        "",
         "All rows preserve W8D16, 32 base choices, one no-op plus seven active atoms per residual layer, 97 control points, PhaseAndResidualGain scalars, Beam4 encoding, and 193 model prediction outputs. Codebook construction is offline/oracle work; topology is not a deployed runtime input.",
+        "",
+        "### Audit boundaries",
+        "",
+        "This report does not claim an eligibility benefit, a selected epsilon, a complete Experiment 13 winner, deployed runtime differences, or a general training-data scaling law. It reports complete 13A AllResiduals evidence, a bounded 39-row scaling ablation, and same-run offline timing diagnostics. Those boundaries mirror the more forensic reporting standard used in Experiments 8–12.",
         "",
     ])
     return "\n".join(lines)
