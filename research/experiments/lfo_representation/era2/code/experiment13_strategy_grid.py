@@ -62,7 +62,6 @@ from lfo_era2.strategy_grid import (  # noqa: E402
     DEFAULT_METADATA,
     DEFAULT_OUTPUT_DIR,
     Experiment13Error,
-    analyze_partial_strategy_grid,
     analyze_scaling_ablation,
     analyze_strategy_grid,
     override_epsilon,
@@ -74,6 +73,7 @@ from lfo_era2.strategy_grid import (  # noqa: E402
     status_text,
     verify_equivalence,
 )
+from lfo_era2.strategy_grid_report import analyze_partial_strategy_grid  # noqa: E402
 from lfo_era2.strategy_grid_execution import KeepAwakeError, scoped_system_required  # noqa: E402
 
 

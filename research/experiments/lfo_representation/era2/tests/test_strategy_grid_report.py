@@ -14,6 +14,7 @@ if str(CODE_DIR) not in sys.path:
     sys.path.insert(0, str(CODE_DIR))
 
 from lfo_era2 import strategy_grid as grid  # noqa: E402
+from lfo_era2 import strategy_grid_report as strategy_report  # noqa: E402
 from lfo_era2 import strategy_grid_runtime as runtime  # noqa: E402
 
 
@@ -28,7 +29,7 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             report = root / "reports" / "EXPERIMENT_13_PROVISIONAL.md"
             images = root / "reports" / "images" / "experiment_13" / "provisional"
 
-            result = grid.analyze_partial_strategy_grid(
+            result = strategy_report.analyze_partial_strategy_grid(
                 run_dir=source,
                 analysis_output_dir=analysis,
                 report_path=report,
@@ -61,7 +62,7 @@ class StrategyGridPartialReportTests(unittest.TestCase):
 
             first_text = text
             first_deltas = (analysis / "matched_factor_deltas.csv").read_bytes()
-            grid.analyze_partial_strategy_grid(
+            strategy_report.analyze_partial_strategy_grid(
                 run_dir=source,
                 analysis_output_dir=analysis,
                 report_path=report,
@@ -76,7 +77,7 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             source = Path(tmp) / "legacy_fragment"
             _write_partial_fixture(source)
             with self.assertRaisesRegex(ValueError, "outside the immutable source run"):
-                grid.analyze_partial_strategy_grid(
+                strategy_report.analyze_partial_strategy_grid(
                     run_dir=source,
                     analysis_output_dir=source / "analysis",
                     report_path=Path(tmp) / "report.md",

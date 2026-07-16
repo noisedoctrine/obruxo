@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 import hashlib
 import json
 import math
@@ -42,6 +42,25 @@ class AnalysisBundle:
     partial_codebook: list[dict[str, Any]]
     calibration: dict[str, list[dict[str, Any]]]
     paths: dict[str, Path]
+
+
+def analyze_partial_strategy_grid(
+    *,
+    run_dir: Path,
+    analysis_output_dir: Path,
+    report_path: Path,
+    image_dir: Path,
+) -> dict[str, str]:
+    """Generate a provisional report from completed, sharded 13A rows."""
+    from .strategy_grid import experiment13a_specs
+
+    return write_provisional_report(
+        source_run=Path(run_dir),
+        analysis_output_dir=Path(analysis_output_dir),
+        report_path=Path(report_path),
+        image_dir=Path(image_dir),
+        expected_rows=[asdict(spec) for spec in experiment13a_specs()],
+    )
 
 
 def prepare_analysis_artifacts(

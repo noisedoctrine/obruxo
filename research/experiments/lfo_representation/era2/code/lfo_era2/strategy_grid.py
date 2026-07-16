@@ -709,25 +709,6 @@ def analyze_strategy_grid(*, run_dir: Path = DEFAULT_OUTPUT_DIR) -> dict[str, st
     return _write_strategy_analysis(run_dir)
 
 
-def analyze_partial_strategy_grid(
-    *,
-    run_dir: Path,
-    analysis_output_dir: Path,
-    report_path: Path,
-    image_dir: Path,
-) -> dict[str, str]:
-    """Generate a provisional report from completed, sharded 13A rows."""
-    from .strategy_grid_report import write_provisional_report
-
-    return write_provisional_report(
-        source_run=Path(run_dir),
-        analysis_output_dir=Path(analysis_output_dir),
-        report_path=Path(report_path),
-        image_dir=Path(image_dir),
-        expected_rows=[asdict(spec) for spec in experiment13a_specs()],
-    )
-
-
 def verify_equivalence(
     *,
     baseline_run: Path,
@@ -1187,20 +1168,9 @@ def _compute_epsilon_selection(run_dir: Path) -> dict[str, Any]:
 
 def _write_strategy_analysis(run_dir: Path) -> dict[str, str]:
     from .strategy_grid_runtime import read_csv, write_csv
-    from .strategy_grid_report import prepare_analysis_artifacts
 
     run_dir = Path(run_dir)
     rows = read_csv(run_dir / "summary.csv")
-    selection = _read_json(run_dir / "epsilon_selection.json")
-    selected_epsilon = float(selection["selected_epsilon"])
-    prepare_analysis_artifacts(
-        source_run=run_dir,
-        analysis_output_dir=run_dir,
-        expected_rows=[
-            *(asdict(spec) for spec in experiment13a_specs()),
-            *(asdict(spec) for spec in experiment13b_specs(selected_epsilon)),
-        ],
-    )
     by_phase_pair = {(row.get("experiment_phase"), row.get("pair_id")): row for row in rows}
     paired = []
     for pair_id in sorted({row.get("pair_id") for row in rows}):
@@ -1224,6 +1194,7 @@ def _write_strategy_analysis(run_dir: Path) -> dict[str, str]:
     report_path = ERA2_ROOT / "reports" / "EXPERIMENT_13_W8D16_STRATEGY_GRID_REPORT.md"
     image_dir = ERA2_ROOT / "reports" / "images" / "experiment_13"
     _write_calibration_plots(run_dir, image_dir)
+    selection = _read_json(run_dir / "epsilon_selection.json")
     ordered_a = sorted((row for row in rows if row.get("experiment_phase") == "13A"), key=lambda row: float(row["validation_p95_rmse"]))
     ordered_b = sorted((row for row in rows if row.get("experiment_phase") == "13B"), key=lambda row: float(row["validation_p95_rmse"]))
     lines = [
