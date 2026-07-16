@@ -214,6 +214,8 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             self.assertIn("13A complete · 90/90 rows", text)
             self.assertIn("automatic epsilon selector did not pass", text)
             self.assertIn("restricted pilot", text)
+            self.assertIn("reducing 13B from 90 to 45 rows", text)
+            self.assertIn("Lock Experiment 13B to the 45 `LayerClip0To1` counterparts", text)
             self.assertIn("Training-Data Scaling Ablation", text)
             self.assertNotIn("The frozen eligibility epsilon is", text)
 
@@ -222,6 +224,7 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             self.assertIn("Complete grid coverage", html)
             self.assertIn("Training-data scaling", html)
             self.assertIn("pilot required", html)
+            self.assertIn("45 LayerClip0To1-only rows", html)
             self.assertIn("chartScaling", html)
             self.assertNotIn(str(root.resolve()), html)
             self.assertLess(html_report.stat().st_size, 1_000_000)

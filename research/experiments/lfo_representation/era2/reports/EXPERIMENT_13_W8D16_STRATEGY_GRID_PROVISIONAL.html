@@ -641,7 +641,7 @@
         question:"Does decoder-free LayerClip0To1 suppress tail error across the complete strategy grid?",
         mechanism:"LayerClip0To1 constrains every residual-layer output to the physical signal range, preventing overshoot from compounding before later corrections.",
         evidence:comparisonEvidence("layer_normalization_policy", "LayerClip0To1", "FinalClipOnly"),
-        recommendation:"Keep LayerClip0To1 as the default normalization candidate for the paired analysis.",
+        recommendation:"Lock Experiment 13B to the 45 LayerClip0To1 counterparts. Retain every construction, schedule, and applicable budget cell; do not rerun FinalClipOnly.",
         limitation:"The effect is authoritative for AllResiduals construction; its interaction with UnresolvedOnly still requires 13B.", charts:["normalization"]
       },
       {
@@ -677,7 +677,7 @@
         motivation:"The threshold should release meaningful codebook capacity without abandoning meaningful unexplained residual energy.",
         reading:["Later layers should move reconstruction-error quantiles downward.","Moving right in retirement coverage releases more capacity; moving down abandons less unexplained energy.","The selector applies all three numerical gates; visual elbows cannot override them."],
         evidence:`All candidates satisfy the retired unexplained-energy limits, but the maximum early/middle median reconstructed fraction is ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,3)}, below the required ${pct(findings.selection.required_early_middle_fraction,0)}.`,
-        recommendation:"Run the prescribed 0.001 versus 0.0025 restricted pilot before freezing epsilon or launching full 13B.",
+        recommendation:"Run the prescribed 0.001 versus 0.0025 restricted pilot before freezing epsilon or launching the 45-row LayerClip0To1-only 13B phase.",
         limitation:"No epsilon is selected and this report cannot make an AllResiduals-versus-UnresolvedOnly claim.", charts:["calibration","retirement"]
       },
       {
@@ -918,7 +918,7 @@
         ? "of the planned Experiment 13A AllResiduals grid completed"
         : "of Experiment 13A rows completed in a non-random execution-order prefix";
       qs("#warning-strip").innerHTML = isComplete13A
-        ? `<strong>13B is still gated.</strong> Automatic epsilon selection did not pass: best early/middle coverage is ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,3)} versus the required ${pct(findings.selection.required_early_middle_fraction,0)}. Run the restricted pilot before freezing epsilon.`
+        ? `<strong>13B is still gated.</strong> Automatic epsilon selection did not pass: best early/middle coverage is ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,3)} versus the required ${pct(findings.selection.required_early_middle_fraction,0)}. Run the restricted pilot before freezing epsilon; the subsequent phase contains 45 LayerClip0To1-only rows.`
         : `<strong>Do not select epsilon from this report.</strong> Experiment 13A is incomplete, no eligibility epsilon has been frozen, and Experiment 13B has not run. Legacy runtime is historical diagnostic evidence only.`;
       qs("#findings-title").textContent = isComplete13A ? "What the complete 13A grid supports" : "What the fragment actually supports";
       qs("#findings-summary").textContent = isComplete13A
@@ -932,7 +932,7 @@
       qs("#compare-summary").textContent = isComplete13A
         ? "Radar values are normalized within the complete 90-row 13A grid. The exact table is authoritative; the radar is a visual aid, not a scalar ranking."
         : "Radar values are normalized only within this fragment. The exact table is authoritative; the radar is a visual aid, not a scalar ranking.";
-      qs("#footer-status").textContent = isComplete13A ? "Experiment 13A · Complete AllResiduals evidence; 13B pending." : "Experiment 13 · Provisional evidence only.";
+      qs("#footer-status").textContent = isComplete13A ? "Experiment 13A · Complete AllResiduals evidence; 45-row LayerClip0To1-only 13B pending." : "Experiment 13 · Provisional evidence only.";
       const contract = meta.contract;
       const chips = [`W${contract.window_width}D${contract.residual_layers}`, `${contract.control_points} control points`, `${contract.base_choices} base choices`, `${contract.atom_choices} atom choices`, contract.path_search, contract.scalar_context, `${contract.model_outputs} outputs`];
       qs("#contract-row").innerHTML = chips.map(value => `<span class="chip">${esc(value)}</span>`).join("");

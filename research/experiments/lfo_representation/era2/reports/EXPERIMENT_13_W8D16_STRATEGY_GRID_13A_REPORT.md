@@ -5,6 +5,7 @@
 ## Main Findings
 
 Layer-wise clipping is the clearest global result. `LayerClip0To1` improves validation P95 RMSE in `45/45` matched pairs, with median delta `-0.0069147758` and range `-0.020405114` to `-0.00089984387`. It is a decoder-free constraint and changes no model prediction heads.
+This complete 13A result fixes Experiment 13B at `LayerClip0To1`. The filtered phase retains every construction, schedule, and applicable candidate-budget cell while omitting the 45 losing `FinalClipOnly` counterparts, reducing 13B from 90 to 45 rows.
 
 A larger repair shortlist is a secondary, mixed lever. `CandidateBudget48` improves `25/42`, worsens `13`, and ties `4` P95 comparisons; its median effect is only `-0.00043479912`. More offline search is not a guaranteed quality win.
 
@@ -134,7 +135,7 @@ This chart compares rows only inside the optimized train-50% run. Median oracle 
 
 ## Practical Takeaways
 
-- Keep `LayerClip0To1` as the default normalization candidate for the eventual paired analysis.
+- Lock Experiment 13B to the 45 `LayerClip0To1` counterparts; do not rerun `FinalClipOnly`.
 - Carry all three Pareto strategies into the 13B interpretation; no scalar winner represents all four quality objectives.
 - Treat CandidateBudget48 and TwoPhase as interaction-dependent choices, not unconditional defaults.
 - Run the prescribed restricted epsilon pilot before any full Experiment 13B launch.

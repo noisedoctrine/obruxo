@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import importlib.util
+from dataclasses import replace
 from pathlib import Path
 import subprocess
 import sys
@@ -24,17 +25,22 @@ from lfo_era2 import strategy_grid_execution as execution  # noqa: E402
 class StrategyGridEnumerationTests(unittest.TestCase):
     def test_counts_ids_and_pairing(self) -> None:
         rows_a, rows_b = grid.experiment13a_specs(), grid.experiment13b_specs(0.001)
-        self.assertEqual((len(rows_a), len(rows_b), len(rows_a + rows_b)), (90, 90, 180))
-        self.assertEqual(len({row.row_id for row in rows_a + rows_b}), 180)
+        self.assertEqual((len(rows_a), len(rows_b), len(rows_a + rows_b)), (90, 45, 135))
+        self.assertEqual(len({row.row_id for row in rows_a + rows_b}), 135)
         self.assertEqual(len({row.pair_id for row in rows_a + rows_b}), 90)
+        self.assertEqual({row.layer_normalization_policy for row in rows_b}, {"LayerClip0To1"})
         grid.validate_pairing(rows_a, rows_b)
+        with self.assertRaisesRegex(ValueError, "13B must use LayerClip0To1"):
+            grid.validate_row_spec(replace(rows_b[0], layer_normalization_policy="FinalClipOnly"))
         self.assertEqual(rows_a[0].row_id, "x13a_common_case_repair_candidate_budget24_final_clip_only")
         self.assertEqual(rows_a[-1].pair_id, "x13_pair_all_dominant_directions_null_layer_clip0_to1")
         self.assertEqual([row.row_id for row in rows_a], [row.row_id for row in grid.experiment13a_specs()])
 
     def test_pairs_differ_only_by_phase_population_and_epsilon(self) -> None:
         rows = grid.all_strategy_specs(0.0025)
-        for pair_id in {row.pair_id for row in rows}:
+        paired_ids = {row.pair_id for row in rows if row.experiment_phase == "13B"}
+        self.assertEqual(len(paired_ids), 45)
+        for pair_id in paired_ids:
             pair = [row for row in rows if row.pair_id == pair_id]
             self.assertEqual(len(pair), 2)
             a = next(row for row in pair if row.experiment_phase == "13A")
@@ -43,6 +49,13 @@ class StrategyGridEnumerationTests(unittest.TestCase):
             self.assertEqual((a.residual_population_policy, b.residual_population_policy), ("AllResiduals", "UnresolvedOnly"))
             self.assertIsNone(a.eligibility_epsilon)
             self.assertEqual(b.eligibility_epsilon, 0.0025)
+            self.assertEqual(b.layer_normalization_policy, "LayerClip0To1")
+        unpaired_a = [
+            row for row in rows
+            if row.experiment_phase == "13A" and row.pair_id not in paired_ids
+        ]
+        self.assertEqual(len(unpaired_a), 45)
+        self.assertEqual({row.layer_normalization_policy for row in unpaired_a}, {"FinalClipOnly"})
 
     def test_fixed_contract_and_distinct_thresholds(self) -> None:
         rows_a, rows_b = grid.experiment13a_specs(), grid.experiment13b_specs(0.02)
@@ -275,6 +288,13 @@ class StrategyGridGateTests(unittest.TestCase):
                 chunk_size=8,
             )
             self.assertEqual(grid.read_phase_status(run_dir, "13B")["state"], "partial")
+            self.assertEqual(grid.read_phase_status(run_dir, "13B")["expected_row_count"], 45)
+            manifest = json.loads((run_dir / "manifest.json").read_text())
+            self.assertEqual(manifest["phases"]["13B"]["expected_row_count"], 45)
+            self.assertEqual(
+                {row["layer_normalization_policy"] for row in manifest["phases"]["13B"]["rows"]},
+                {"LayerClip0To1"},
+            )
             self.assertTrue((run_dir / "summary.csv").exists())
             diagnostics = runtime.read_csv(run_dir / "rows" / row_id / "atom_construction.csv")
             self.assertTrue(diagnostics)
@@ -421,6 +441,7 @@ class StrategyGridCliTests(unittest.TestCase):
             "analyze", "analyze-13a", "analyze-partial", "analyze-scaling", "verify-equivalence", "cancel", "status", "monitor",
         ):
             self.assertIn(command, help_result.stdout)
+        self.assertIn("45-row LayerClip0To1-only", help_result.stdout)
         partial_help = subprocess.run(
             [sys.executable, str(script), "analyze-partial", "--help"],
             capture_output=True,
@@ -438,6 +459,7 @@ class StrategyGridCliTests(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("13A: state=not_started", result.stdout)
+            self.assertIn("13B: state=not_started completed_rows=0/45", result.stdout)
             self.assertIn("13B_gate=blocked", result.stdout)
 
     def test_async_command_does_not_recurse_and_preserves_runtime_options(self) -> None:

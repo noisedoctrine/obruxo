@@ -40,6 +40,11 @@ D = 16
 CONTROL_POINT_COUNT = 97
 RESERVED_ATOM = "NoOpAtom"
 ACTIVE_ATOMS_PER_LAYER = 7
+PHASE_EXPECTED_ROW_COUNTS = {"13A": 90, "13B": 45}
+PHASE_NORMALIZATION_POLICIES = {
+    "13A": ("FinalClipOnly", "LayerClip0To1"),
+    "13B": ("LayerClip0To1",),
+}
 SCALAR_SCHEMA = "PhaseAndResidualGain"
 PATH_SEARCH_POLICY = "Beam4Path"
 NO_DAMAGE_POLICY = "NoDamageOff"
@@ -348,7 +353,7 @@ def _phase_specs(phase: ExperimentPhase, epsilon: float | None) -> list[Strategy
     for policy in construction_policies():
         budgets = ("CandidateBudget24", "CandidateBudget48") if policy.repair_budget else (None,)
         for budget in budgets:
-            for normalization in ("FinalClipOnly", "LayerClip0To1"):
+            for normalization in PHASE_NORMALIZATION_POLICIES[phase]:
                 pair_id = _pair_id(policy.name, budget, normalization)
                 row = StrategyRowSpec(
                     experiment_phase=phase,
@@ -370,8 +375,9 @@ def _phase_specs(phase: ExperimentPhase, epsilon: float | None) -> list[Strategy
                 )
                 validate_row_spec(row)
                 rows.append(row)
-    if len(rows) != 90 or len({row.row_id for row in rows}) != 90 or len({row.pair_id for row in rows}) != 90:
-        raise AssertionError(f"Experiment {phase} grid must contain 90 unique rows and pairs")
+    expected = PHASE_EXPECTED_ROW_COUNTS[phase]
+    if len(rows) != expected or len({row.row_id for row in rows}) != expected or len({row.pair_id for row in rows}) != expected:
+        raise AssertionError(f"Experiment {phase} grid must contain {expected} unique rows and pairs")
     return rows
 
 
@@ -406,6 +412,8 @@ def validate_row_spec(row: StrategyRowSpec) -> None:
     elif row.experiment_phase == "13B":
         if row.residual_population_policy != "UnresolvedOnly":
             raise ValueError("13B must use UnresolvedOnly")
+        if row.layer_normalization_policy != "LayerClip0To1":
+            raise ValueError("13B must use LayerClip0To1")
         _validate_epsilon(row.eligibility_epsilon)
         if row.eligibility_selection_rule_version != SELECTION_RULE_VERSION:
             raise ValueError("13B must carry the frozen selection-rule version")
@@ -416,10 +424,16 @@ def validate_row_spec(row: StrategyRowSpec) -> None:
 def validate_pairing(rows_a: Sequence[StrategyRowSpec], rows_b: Sequence[StrategyRowSpec]) -> None:
     pairs_a = {row.pair_id: row for row in rows_a}
     pairs_b = {row.pair_id: row for row in rows_b}
-    if set(pairs_a) != set(pairs_b) or len(pairs_a) != 90:
-        raise ValueError("Experiment 13 requires exactly 90 stable pairs")
-    for pair_id, left in pairs_a.items():
-        right = pairs_b[pair_id]
+    expected_b = {
+        pair_id for pair_id, row in pairs_a.items()
+        if row.layer_normalization_policy == "LayerClip0To1"
+    }
+    if len(rows_a) != 90 or len(pairs_a) != 90:
+        raise ValueError("Experiment 13A requires exactly 90 unique rows")
+    if len(rows_b) != 45 or len(pairs_b) != 45 or set(pairs_b) != expected_b:
+        raise ValueError("Experiment 13B requires the 45 LayerClip0To1 counterparts from Experiment 13A")
+    for pair_id, right in pairs_b.items():
+        left = pairs_a[pair_id]
         if left.paired_settings != right.paired_settings:
             raise ValueError(f"paired settings differ for {pair_id}")
         if left.residual_population_policy != "AllResiduals" or right.residual_population_policy != "UnresolvedOnly":
@@ -863,7 +877,8 @@ def _run_phase(
     if int(chunk_size) < 1:
         raise ValueError("chunk_size must be positive")
     rows = _filter_rows(specs, row_ids)
-    partial = smoke or row_ids is not None or len(rows) != 90
+    expected_row_count = PHASE_EXPECTED_ROW_COUNTS[phase]
+    partial = smoke or row_ids is not None or len(rows) != expected_row_count
     provenance = _git_provenance()
     if not partial and provenance.get("dirty"):
         raise Experiment13Error("production Experiment 13 runs require a clean git worktree")
@@ -881,7 +896,10 @@ def _run_phase(
             raise Experiment13Error("resume run identity does not match the existing manifest")
         if existing_manifest.get("configuration_fingerprint") != config:
             raise Experiment13Error("resume implementation/configuration fingerprint does not match the existing run")
-    status = _phase_status(phase, "running", identity, len(rows), 90, smoke, row_ids is not None, "loading dataset")
+    status = _phase_status(
+        phase, "running", identity, len(rows), expected_row_count,
+        smoke, row_ids is not None, "loading dataset",
+    )
     status.update(
         rows={row.row_id: {"status": "pending"} for row in rows},
         current_row_id="", current_row_number=0, current_task_phase="dataset_load",
@@ -1199,7 +1217,7 @@ def _write_strategy_analysis(run_dir: Path) -> dict[str, str]:
     ordered_b = sorted((row for row in rows if row.get("experiment_phase") == "13B"), key=lambda row: float(row["validation_p95_rmse"]))
     lines = [
         "# Experiment 13: Fixed-W8D16 Strategy Grid", "", "## Main Findings", "",
-        "Experiment 13A completed first using `AllResiduals`. The eligibility epsilon was then selected only from the completed 13A training calibration artifacts, frozen, and used by Experiment 13B's paired `UnresolvedOnly` rows.", "",
+        "Experiment 13A completed first using `AllResiduals`. The eligibility epsilon was then selected only from the completed 13A training calibration artifacts, frozen, and used by Experiment 13B's 45 paired `UnresolvedOnly` + `LayerClip0To1` rows.", "",
         f"The frozen eligibility epsilon is `{selection.get('selected_epsilon')}` under `{selection.get('selection_rule_version')}`. Median retired unexplained-error energy was `{selection.get('median_unexplained_retired_energy_fraction')}` and P95 was `{selection.get('p95_unexplained_retired_energy_fraction')}`.", "",
         _best_row_sentence("13A", ordered_a), "", _best_row_sentence("13B", ordered_b), "",
         "The tables and plots retain the co-primary metrics separately; no automatic scalar ranking is applied.", "",
@@ -1218,7 +1236,8 @@ def _write_strategy_analysis(run_dir: Path) -> dict[str, str]:
         "## Prototype Policies Versus Observed-Residual Anchors", "", *_factor_table(rows, "construction_family"), "",
         "## Interleaved Versus TwoPhase", "", *_factor_table(rows, "layer_schedule"), "",
         "## CandidateBudget24 Versus CandidateBudget48", "", *_factor_table(rows, "utility_candidate_budget"), "",
-        "## FinalClipOnly Versus LayerClip0To1", "", *_factor_table(rows, "layer_normalization_policy"), "",
+        "## Experiment 13A FinalClipOnly Versus LayerClip0To1", "",
+        *_factor_table([row for row in rows if row.get("experiment_phase") == "13A"], "layer_normalization_policy"), "",
         "## Broad-Builder and Repair-Objective Interactions", "", *_factor_table(rows, "broad_atom_builder"), "", *_factor_table(rows, "repair_atom_builder"), "",
         "## Partial-Codebook Progression", "",
         "`partial_codebook_validation.csv` reports each row with one through seven active atoms per layer, retaining median RMSE, strict-perfect rate, P95 RMSE, and node-max P95 separately.", "",
@@ -1535,7 +1554,10 @@ def validate_completed_13a(run_dir: Path) -> tuple[dict[str, Any], dict[str, Any
 def read_phase_status(run_dir: Path, phase: ExperimentPhase) -> dict[str, Any]:
     path = Path(run_dir) / PHASE_STATUS_FILES[phase]
     if not path.exists():
-        return _phase_status(phase, "not_started", "", 0, 90, False, False, "phase has not started")
+        return _phase_status(
+            phase, "not_started", "", 0, PHASE_EXPECTED_ROW_COUNTS[phase],
+            False, False, "phase has not started",
+        )
     payload = _read_json(path)
     if payload.get("state") not in {"not_started", "running", "partial", "blocked", "failed", "cancelled", "complete"}:
         raise Experiment13Error(f"invalid phase state in {path}")
@@ -1607,13 +1629,14 @@ def _write_phase_manifest(
     manifest["experiment13a_run_identity"] = run_identity
     manifest["configuration_fingerprint"] = fingerprint
     rows = [row.manifest_dict(run_identity, fingerprint) for row in specs]
+    expected_row_count = PHASE_EXPECTED_ROW_COUNTS[phase]
     manifest["phases"][phase] = {
         "experiment_phase": phase,
         "row_count": len(rows),
-        "expected_row_count": 90,
+        "expected_row_count": expected_row_count,
         "complete_design": complete_design,
         "smoke": smoke,
-        "filtered": len(rows) != 90,
+        "filtered": len(rows) != expected_row_count,
         "metadata_path": str(Path(metadata_path)),
         "backend": backend,
         "train_sample_fraction": float(train_sample_fraction),
@@ -1695,7 +1718,10 @@ def _validate_13b_invocation(
 
 
 def _blocked_13b(output_dir: Path, reason: str) -> None:
-    status = _phase_status("13B", "blocked", "", 0, 90, False, False, reason)
+    status = _phase_status(
+        "13B", "blocked", "", 0, PHASE_EXPECTED_ROW_COUNTS["13B"],
+        False, False, reason,
+    )
     _write_phase_status(output_dir, status)
     _failure(output_dir, "13B", reason)
 

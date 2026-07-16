@@ -24,12 +24,14 @@ Experiment 13 must run in two ordered phases:
    `AllResiduals` rows. Candidate eligibility thresholds are observational only
    and must not change construction.
 2. **Experiment 13B — filtered construction.** Select one global eligibility
-   epsilon from completed 13A training artifacts, freeze it, and run the 90 paired
-   `UnresolvedOnly` rows.
+   epsilon from completed 13A training artifacts, freeze it, and run the 45
+   `UnresolvedOnly` rows paired to the 13A `LayerClip0To1` strategies. The
+   `FinalClipOnly` variants are not repeated in 13B because 13A favored
+   layer-wise clipping in all 45 matched P95 comparisons.
 
 **Experiment 13B must not begin until Experiment 13A has completed and written a
 valid threshold-selection artifact.** The paired phases are sequential, not one
-simultaneous 180-row run.
+simultaneous 135-row run.
 
 ## Operator Quick Start
 
@@ -228,6 +230,10 @@ selection for the matching completed 13A run. It never mutates the selection
 artifact automatically; only `override-epsilon` records the explicit decision.
 
 ### 7. Run Experiment 13B
+
+Experiment 13B contains 45 rows and is locked to `LayerClip0To1`. The command
+does not schedule `FinalClipOnly` variants; all construction policies,
+schedules, and applicable candidate budgets remain represented.
 
 ```powershell
 conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b --output-dir $runDir --cache-dir $cacheDir --async --backend xpu --metadata $metadata --train-sample-fraction 0.5 --validation-sample-fraction 1.0 --sample-seed 13 --verify-optimized-kernels first-use --epsilon-selection $selection --chunk-size 256 --monitor-refresh-seconds 30
@@ -1333,7 +1339,7 @@ budget. Within each Broad-designated layer, all seven active atom slots use
 
 ## Layer Normalization
 
-Only two values remain in the main grid:
+Experiment 13A evaluates both values:
 
 ```text
 FinalClipOnly
@@ -1344,7 +1350,10 @@ LayerClip0To1
 - `LayerClip0To1`: clip the running reconstruction to `[0, 1]` after each layer.
 
 This is the only secondary process axis retained because `LayerClip0To1`
-performed strongly in Experiment 12 and remains simple to interpret.
+performed strongly in Experiment 12 and remains simple to interpret. The
+completed 13A grid then found a P95 improvement in all 45 matched comparisons,
+so Experiment 13B is locked to `LayerClip0To1` and does not repeat
+`FinalClipOnly`.
 
 ## Main Grid
 
@@ -1359,13 +1368,15 @@ duplicate_suppression_policy = DuplicateSuppressionOff
 finish_threshold = 1e-5
 ```
 
-Crossed axes:
+Phase-specific crossed axes:
 
 ```text
 construction_policy
 residual_population_policy = AllResiduals | UnresolvedOnly
 utility_candidate_budget = CandidateBudget24 | CandidateBudget48 | Null
-layer_normalization_policy = FinalClipOnly | LayerClip0To1
+layer_normalization_policy =
+  13A: FinalClipOnly | LayerClip0To1
+  13B: LayerClip0To1
 ```
 
 The logical design remains paired across the population-policy axis, but
@@ -1373,39 +1384,37 @@ execution is ordered:
 
 ```text
 Experiment 13A = 90 AllResiduals rows
-Experiment 13B = 90 paired UnresolvedOnly rows
+Experiment 13B = 45 paired UnresolvedOnly + LayerClip0To1 rows
 ```
 
-Every pair must share a stable `pair_id`. Paired rows must match on construction
+Every 13B row must share a stable `pair_id` with its clipped 13A counterpart.
+Paired rows must match on construction
 policy, layer schedule, repair candidate budget, layer normalization, fixed
 settings, seed rules, and `finish_threshold`. They differ only in experiment
 phase, residual-population behavior, and the presence of the frozen
-`eligibility_epsilon` mask.
+`eligibility_epsilon` mask. The 45 `FinalClipOnly` rows remain 13A-only
+normalization controls.
 
 The 21 repair-containing construction policies receive:
 
 ```text
-21 construction policies
-* 2 residual-population policies
-* 2 repair candidate budgets
-* 2 layer-normalization policies
-= 168 rows
+13A: 21 policies * 2 repair budgets * 2 normalization policies = 84 rows
+13B: 21 policies * 2 repair budgets * 1 normalization policy = 42 rows
+= 126 rows
 ```
 
 The three pure-prototype policies receive:
 
 ```text
-3 construction policies
-* 2 residual-population policies
-* 1 Null candidate budget
-* 2 layer-normalization policies
-= 12 rows
+13A: 3 policies * 1 Null budget * 2 normalization policies = 6 rows
+13B: 3 policies * 1 Null budget * 1 normalization policy = 3 rows
+= 9 rows
 ```
 
 Main-grid total:
 
 ```text
-168 + 12 = 180 rows
+126 + 9 = 135 rows
 ```
 
 The 21 repair-containing policies are:
@@ -1801,7 +1810,8 @@ The report should be findings-first and follow the actual execution order:
 6. prototype-containing policies versus observed-residual anchors;
 7. `Interleaved` versus `TwoPhase`;
 8. `CandidateBudget24` versus `CandidateBudget48`;
-9. `FinalClipOnly` versus `LayerClip0To1`;
+9. the completed 13A `FinalClipOnly` versus `LayerClip0To1` evidence that fixed
+   13B to `LayerClip0To1`;
 10. broad-builder and repair-objective interactions;
 11. partial-codebook progression from one through seven active atoms.
 
@@ -2005,9 +2015,12 @@ Tests should verify:
   layers;
 - all seven active atom slots in a mixed-policy layer inherit that layer's Broad
   or Repair role;
-- exactly 90 13A `AllResiduals` rows and 90 paired 13B `UnresolvedOnly` rows;
-- the complete design still contains exactly 180 rows;
-- every 13A row has exactly one 13B row with identical paired settings;
+- exactly 90 13A `AllResiduals` rows and 45 paired 13B `UnresolvedOnly` rows;
+- the complete executed design contains exactly 135 rows;
+- every 13B row uses `LayerClip0To1` and has exactly one 13A counterpart with
+  identical paired settings;
+- the 45 `FinalClipOnly` rows remain 13A-only normalization controls and are not
+  scheduled in 13B;
 - `AllResiduals` and `UnresolvedOnly` mask behavior;
 - candidate eligibility epsilons never change 13A construction;
 - finish and eligibility thresholds are separate and use maximum absolute error;

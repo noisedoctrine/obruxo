@@ -237,7 +237,9 @@ def _parser() -> argparse.ArgumentParser:
     override.add_argument("--selected-epsilon", type=float, required=True)
     override.add_argument("--rationale", required=True)
 
-    run_b = subcommands.add_parser("run-13b", help="run the gated 90-row Experiment 13B phase")
+    run_b = subcommands.add_parser(
+        "run-13b", help="run the gated 45-row LayerClip0To1-only Experiment 13B phase"
+    )
     _add_run_arguments(run_b, include_selection=True)
 
     analyze = subcommands.add_parser("analyze", help="validate complete phases and generate Experiment 13 outputs")
