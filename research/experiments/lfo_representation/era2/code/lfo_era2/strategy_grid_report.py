@@ -31,7 +31,7 @@ CALIBRATION_TABLES = (
     "epsilon_coverage.csv",
     "retired_error_mass.csv",
 )
-INTERACTIVE_REPORT_SCHEMA = "experiment13_interactive_report_v1"
+INTERACTIVE_REPORT_SCHEMA = "experiment13_interactive_report_v2"
 INTERACTIVE_TEMPLATE = Path(__file__).with_name("templates") / "experiment_13_provisional.html"
 
 
@@ -431,16 +431,53 @@ def _plot_partial(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]], summa
 
 
 def _plot_runtime(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
-    selected = sorted(rows, key=lambda row: _number(row, "oracle_construction_time"), reverse=True)[:15]
-    figure, axis = plt.subplots(figsize=(10.5, 6.8))
-    values = [_number(row, "oracle_construction_time") for row in selected]
-    axis.barh(range(len(selected)), values, color="#4C78A8", alpha=0.85)
-    axis.set_xscale("log")
-    labels = [str(row.get("row_id", "")).removeprefix("x13a_") for row in selected]
-    axis.set_yticks(range(len(selected)), labels, fontsize=7)
-    axis.invert_yaxis()
-    axis.set(xlabel="legacy oracle construction seconds (log scale; lower is faster)", ylabel="15 slowest completed rows", title="Historical legacy construction runtime")
-    _save(plt, figure, path)
+    ordered = sorted(rows, key=lambda row: _number(row, "oracle_construction_time"), reverse=True)
+    sleep_rows = ordered[:2]
+    ordinary_rows = ordered[2:17]
+    selected = ordinary_rows + sleep_rows
+    figure, (ordinary_axis, sleep_axis) = plt.subplots(
+        1,
+        2,
+        sharey=True,
+        figsize=(12.0, 8.8),
+        gridspec_kw={"width_ratios": (4.5, 1.25), "wspace": 0.05},
+    )
+    y = range(len(selected))
+    ordinary_values = [
+        0.0 if row in sleep_rows else _number(row, "oracle_construction_time")
+        for row in selected
+    ]
+    sleep_values = [
+        _number(row, "oracle_construction_time") if row in sleep_rows else 0.0
+        for row in selected
+    ]
+    ordinary_axis.barh(y, ordinary_values, color="#4C78A8", alpha=0.85)
+    sleep_axis.barh(y, sleep_values, color="#B63B34", alpha=0.88)
+    labels = [
+        f"{row.get('construction_policy', '')} · "
+        f"{str(row.get('utility_candidate_budget', '')).replace('CandidateBudget', 'B')} · "
+        f"{str(row.get('layer_normalization_policy', '')).replace('LayerClip0To1', 'LayerClip').replace('FinalClipOnly', 'FinalClip')}"
+        for row in selected
+    ]
+    ordinary_axis.set_yticks(list(y), labels, fontsize=7)
+    ordinary_axis.invert_yaxis()
+    ordinary_max = max(ordinary_values, default=1.0)
+    sleep_nonzero = [value for value in sleep_values if value > 0]
+    ordinary_axis.set_xlim(0.0, ordinary_max * 1.08)
+    if sleep_nonzero:
+        sleep_axis.set_xlim(min(sleep_nonzero) * 0.96, max(sleep_nonzero) * 1.04)
+    ordinary_axis.spines["right"].set_visible(False)
+    sleep_axis.spines["left"].set_visible(False)
+    sleep_axis.tick_params(axis="y", left=False, labelleft=False)
+    sleep_axis.yaxis.tick_right()
+    slash = {"marker": [(-1, -0.8), (1, 0.8)], "markersize": 9, "linestyle": "none", "color": "#60757E", "mec": "#60757E", "clip_on": False}
+    ordinary_axis.plot([1, 1], [0, 1], transform=ordinary_axis.transAxes, **slash)
+    sleep_axis.plot([0, 0], [0, 1], transform=sleep_axis.transAxes, **slash)
+    ordinary_axis.set(xlabel="ordinary legacy construction seconds (lower is faster)", ylabel="15 slowest ordinary rows + 2 sleep artifacts")
+    sleep_axis.set(xlabel="host-sleep-inflated seconds")
+    figure.suptitle("Historical legacy construction runtime — broken axis isolates host sleep")
+    figure.subplots_adjust(left=0.32, right=0.98, top=0.91, bottom=0.1, wspace=0.05)
+    _save(plt, figure, path, tight=False)
 
 
 def _plot_quantiles(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]], x_key: str, title: str) -> None:
@@ -602,12 +639,30 @@ def _interactive_payload(
 
 
 def _compact_calibration(calibration: Mapping[str, Sequence[Mapping[str, Any]]]) -> dict[str, Any]:
+    row_ids = sorted({
+        str(row.get("row_id", ""))
+        for table in calibration.values()
+        for row in table
+        if row.get("row_id")
+    })
+    row_index = {row_id: index for index, row_id in enumerate(row_ids)}
+
     layer_quantiles: dict[tuple[int, float], list[float]] = {}
+    layer_quantiles_by_row: list[list[float | int]] = []
     for row in calibration["layer_epsilon_quantiles.csv"]:
         if row.get("dataset_split", "training") != "training":
             continue
-        key = (int(_number(row, "residual_layer")), _number(row, "percentile"))
-        layer_quantiles.setdefault(key, []).append(_number(row, "epsilon_value"))
+        residual_layer = int(_number(row, "residual_layer"))
+        percentile = _number(row, "percentile")
+        epsilon_value = _number(row, "epsilon_value")
+        key = (residual_layer, percentile)
+        layer_quantiles.setdefault(key, []).append(epsilon_value)
+        layer_quantiles_by_row.append([
+            row_index[str(row.get("row_id", ""))],
+            residual_layer,
+            percentile,
+            epsilon_value,
+        ])
 
     slot_quantiles: dict[tuple[int, float], list[float]] = {}
     for row in calibration["slot_epsilon_quantiles.csv"]:
@@ -636,6 +691,7 @@ def _compact_calibration(calibration: Mapping[str, Sequence[Mapping[str, Any]]])
         retired_by_epsilon.setdefault(_number(row, "epsilon"), []).append(row)
     retired_summary = []
     retired_sample = []
+    retired_sample_by_row: list[list[float | int]] = []
     for epsilon, rows in sorted(retired_by_epsilon.items()):
         retired = [_number(row, "retired_lfo_fraction") for row in rows]
         incoming = [_number(row, "incoming_retired_energy_fraction") for row in rows]
@@ -675,13 +731,39 @@ def _compact_calibration(calibration: Mapping[str, Sequence[Mapping[str, Any]]])
             "active_atom_slot": int(_number(row, "active_atom_slot")),
         } for row in sampled)
 
+        rows_by_id: dict[str, list[Mapping[str, Any]]] = {}
+        for row in rows:
+            rows_by_id.setdefault(str(row.get("row_id", "")), []).append(row)
+        for row_id, row_group in sorted(rows_by_id.items()):
+            ordered_group = sorted(
+                row_group,
+                key=lambda row: (
+                    int(_number(row, "residual_layer")),
+                    int(_number(row, "active_atom_slot")),
+                ),
+            )
+            if len(ordered_group) <= 4:
+                filtered_sample = ordered_group
+            else:
+                indexes = sorted({round(index * (len(ordered_group) - 1) / 3) for index in range(4)})
+                filtered_sample = [ordered_group[index] for index in indexes]
+            retired_sample_by_row.extend([
+                row_index[row_id],
+                epsilon,
+                _number(row, "retired_lfo_fraction"),
+                _number(row, "unexplained_retired_energy_fraction"),
+            ] for row in filtered_sample)
+
     return {
+        "row_ids": row_ids,
         "layer_quantiles": _median_records(layer_quantiles, "residual_layer", "percentile", "epsilon_value"),
+        "layer_quantiles_by_row": layer_quantiles_by_row,
         "slot_quantiles": _median_records(slot_quantiles, "active_atom_slot", "percentile", "epsilon_value"),
         "layer_coverage": _median_records(layer_coverage, "residual_layer", "epsilon", "resolved_fraction"),
         "slot_coverage": _median_records(slot_coverage, "active_atom_slot", "epsilon", "resolved_fraction"),
         "retired_summary": retired_summary,
         "retired_sample": retired_sample,
+        "retired_sample_by_row": retired_sample_by_row,
     }
 
 
@@ -834,7 +916,7 @@ def _provisional_markdown(
         "",
         "### Matched Effects Across All Four Co-Primary Metrics",
         "",
-        "The table below prevents the P95-focused static plots from standing in for the complete outcome set. For RMSE and node-max errors, negative deltas favor the right policy; for strict-perfect rate, positive deltas favor the right policy.",
+        "The table below prevents the P95-focused static plots from standing in for the complete outcome set. The comparison label names both policies explicitly: negative RMSE and node-max deltas favor the policy named after `vs`, while positive strict-perfect deltas favor that same policy.",
         "",
         *matched_metric_table,
         "",
@@ -874,8 +956,8 @@ def _provisional_markdown(
         "",
         "### Historical Oracle Runtime",
         "",
-        "Lower is faster. The x-axis is legacy oracle construction time on a logarithmic scale and the y-axis ranks the completed rows. The two largest observations are "
-        f"`{_number(runtime_rows[0], 'oracle_construction_time'):.8g}` and `{_number(runtime_rows[1], 'oracle_construction_time'):.8g}` seconds. These measurements include the superseded implementation and Modern Standby effects, so they diagnose the aborted run but must not be compared with optimized-run timing.",
+        "Lower is faster. A broken x-axis separates ordinary legacy construction timings from the two host-sleep-inflated observations, so the ordinary pattern remains readable while the artifacts stay visible. The two separated observations are "
+        f"`{_number(runtime_rows[0], 'oracle_construction_time'):.8g}` and `{_number(runtime_rows[1], 'oracle_construction_time'):.8g}` seconds. These measurements diagnose the aborted run but must not be compared with optimized-run timing.",
         "",
         image("runtime", "Historical legacy construction runtime"),
         "",
@@ -1012,8 +1094,9 @@ def _atomic_text(path: Path, text: str) -> None:
     temporary.replace(path)
 
 
-def _save(plt: Any, figure: Any, path: Path) -> None:
-    figure.tight_layout()
+def _save(plt: Any, figure: Any, path: Path, *, tight: bool = True) -> None:
+    if tight:
+        figure.tight_layout()
     temporary = path.with_name(f".{path.name}.tmp")
     figure.savefig(temporary, dpi=160, format="png", metadata={"Software": "OBRUXO Experiment 13 report generator"})
     plt.close(figure)

@@ -31,7 +31,7 @@ Experiment 13 defines quality using four co-primary outcomes. Each row below rep
 
 ### Matched Effects Across All Four Co-Primary Metrics
 
-The table below prevents the P95-focused static plots from standing in for the complete outcome set. For RMSE and node-max errors, negative deltas favor the right policy; for strict-perfect rate, positive deltas favor the right policy.
+The table below prevents the P95-focused static plots from standing in for the complete outcome set. The comparison label names both policies explicitly: negative RMSE and node-max deltas favor the policy named after `vs`, while positive strict-perfect deltas favor that same policy.
 
 | Matched factor | Co-primary metric | Right / left / ties | Median right-minus-left delta |
 | --- | --- | ---: | ---: |
@@ -84,7 +84,7 @@ The x-axis is the number of active atoms retained per residual layer and the y-a
 
 ### Historical Oracle Runtime
 
-Lower is faster. The x-axis is legacy oracle construction time on a logarithmic scale and the y-axis ranks the completed rows. The two largest observations are `41678.422` and `10435.226` seconds. These measurements include the superseded implementation and Modern Standby effects, so they diagnose the aborted run but must not be compared with optimized-run timing.
+Lower is faster. A broken x-axis separates ordinary legacy construction timings from the two host-sleep-inflated observations, so the ordinary pattern remains readable while the artifacts stay visible. The two separated observations are `41678.422` and `10435.226` seconds. These measurements diagnose the aborted run but must not be compared with optimized-run timing.
 
 ![Historical legacy construction runtime](images/experiment_13/provisional/legacy_oracle_runtime.png)
 

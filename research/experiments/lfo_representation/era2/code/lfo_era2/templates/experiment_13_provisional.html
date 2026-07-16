@@ -1,31 +1,12 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="dark light">
+  <meta name="color-scheme" content="light">
   <title>Experiment 13 — Provisional W8D16 Strategy Grid</title>
   <style>
     :root {
-      --bg: #09111a;
-      --surface: #111d29;
-      --surface-2: #162534;
-      --surface-3: #1c2e3e;
-      --text: #edf5f7;
-      --muted: #9eb2bd;
-      --border: #294252;
-      --accent: #69d4b2;
-      --accent-2: #7db7ff;
-      --warn: #ffc768;
-      --danger: #ff8b7d;
-      --blocked: #d3a4ff;
-      --good: #69d4b2;
-      --shadow: 0 18px 50px rgba(0, 0, 0, .28);
-      --radius: 18px;
-      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    :root[data-theme="light"] {
       --bg: #f4f7f6;
       --surface: #ffffff;
       --surface-2: #edf3f2;
@@ -40,6 +21,9 @@
       --blocked: #7741a5;
       --good: #147e67;
       --shadow: 0 16px 42px rgba(20, 48, 56, .12);
+      --radius: 18px;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -62,7 +46,7 @@
     .shell { width: min(1480px, calc(100% - 32px)); margin: 0 auto; }
     .topbar {
       position: sticky;
-      z-index: 50;
+      z-index: 60;
       top: 0;
       border-bottom: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
       background: color-mix(in srgb, var(--bg) 88%, transparent);
@@ -95,6 +79,43 @@
       border-color: var(--accent);
       background: color-mix(in srgb, var(--accent) 14%, var(--surface));
     }
+    .global-filter-bar {
+      position: sticky;
+      z-index: 50;
+      top: 72px;
+      padding: 10px 0;
+      pointer-events: none;
+    }
+    .global-filter-panel {
+      display: grid;
+      grid-template-columns: auto repeat(6, minmax(120px, 1fr)) auto auto;
+      gap: 8px;
+      align-items: end;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--surface) 94%, transparent);
+      box-shadow: 0 12px 32px rgba(20, 48, 56, .15);
+      backdrop-filter: blur(18px);
+      pointer-events: auto;
+    }
+    .global-filter-title { align-self: center; min-width: 110px; }
+    .global-filter-title strong { display: block; font-size: .82rem; }
+    .global-filter-title span, .filter-field span { color: var(--muted); font-size: .68rem; }
+    .filter-field { display: grid; gap: 4px; min-width: 0; }
+    .filter-field select {
+      width: 100%;
+      min-width: 0;
+      height: 38px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface-2);
+      padding: 7px 9px;
+    }
+    .filter-toggle { display: flex; align-items: center; gap: 7px; align-self: center; color: var(--muted); font-size: .75rem; white-space: nowrap; }
+    .filter-toggle input { width: 17px; height: 17px; accent-color: var(--accent); }
+    .filter-summary { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; min-height: 20px; color: var(--muted); font-size: .72rem; }
+    .filter-summary strong { color: var(--accent); }
     button:focus-visible, input:focus-visible, select:focus-visible {
       outline: 3px solid color-mix(in srgb, var(--accent-2) 55%, transparent);
       outline-offset: 2px;
@@ -200,6 +221,25 @@
     .chart.delta-chart { height: 620px; }
     .chart.compact { height: 330px; }
     .chart-caption { margin: 10px 8px 4px; color: var(--muted); font-size: .82rem; }
+    .reading-guide { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 16px 0; }
+    .reading-step { padding: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--muted); font-size: .84rem; }
+    .reading-step strong { display: block; margin-bottom: 4px; color: var(--text); }
+    .motivation { padding: 16px 18px; border-radius: 12px; background: color-mix(in srgb, var(--accent-2) 8%, var(--surface-2)); color: var(--muted); }
+    .mechanism-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
+    .mechanism-card { padding: 18px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+    .mechanism-card h4 { margin: 6px 0 8px; font-size: 1rem; }
+    .mechanism-card p { margin: 0 0 14px; color: var(--muted); font-size: .83rem; }
+    .mechanism-meta { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; color: var(--muted); font: 700 .68rem/1 var(--mono); }
+    .mechanism-flow { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; align-items: center; margin: 12px 0; }
+    .mechanism-box { min-width: 0; padding: 9px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface-2); text-align: center; font-size: .72rem; }
+    .mechanism-box.broad { border-color: color-mix(in srgb, var(--accent-2) 55%, var(--border)); }
+    .mechanism-box.repair { border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); }
+    .mechanism-arrow { color: var(--muted); font-weight: 800; }
+    .layer-strip { display: grid; grid-template-columns: repeat(16, minmax(5px, 1fr)); gap: 2px; margin-top: 7px; }
+    .layer-cell { display: grid; place-items: center; height: 14px; border-radius: 3px; background: color-mix(in srgb, var(--accent-2) 65%, white); color: #244b68; font: 800 .48rem/1 var(--mono); }
+    .layer-cell.repair { background: color-mix(in srgb, var(--accent) 65%, white); }
+    .slot-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin: 10px 0; }
+    .slot-cell { padding: 7px 2px; border-radius: 5px; background: var(--surface-2); color: var(--muted); text-align: center; font: 700 .61rem/1 var(--mono); }
     .chart-fallback { display: grid; place-items: center; min-height: 260px; padding: 26px; text-align: center; color: var(--warn); border: 1px dashed var(--warn); border-radius: 12px; }
     .table-wrap { overflow: auto; max-width: 100%; border: 1px solid var(--border); border-radius: 12px; }
     table { width: 100%; border-collapse: collapse; font-size: .83rem; }
@@ -229,10 +269,13 @@
     @media (max-width: 1100px) {
       .finding-grid, .evidence-grid, .primary-metric-grid { grid-template-columns: repeat(2, 1fr); }
       .hero-grid, .compare-layout { grid-template-columns: 1fr; }
+      .global-filter-panel { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .global-filter-title, .filter-toggle { grid-column: auto; }
     }
     @media (max-width: 720px) {
       .shell { width: min(100% - 20px, 1480px); }
       .topbar-inner { min-height: 62px; }
+      .global-filter-bar { top: 62px; }
       .brand .eyebrow { display: none; }
       .top-actions .label { display: none; }
       .hero { padding-top: 22px; }
@@ -243,9 +286,14 @@
       .chart { height: 420px; }
       .chart.delta-chart { height: 620px; }
       .controls > *, .data-controls > * { width: 100%; }
+      .global-filter-panel { display: flex; overflow-x: auto; align-items: end; }
+      .global-filter-title { min-width: 120px; }
+      .filter-field { min-width: 155px; }
+      .filter-summary { display: none; }
+      .reading-guide, .mechanism-grid { grid-template-columns: 1fr; }
     }
     @media print {
-      .topbar, .report-nav, .controls, .data-controls, #interactive-view, #compare-view, #data-view { display: none !important; }
+      .topbar, .global-filter-bar, .report-nav, .controls, .data-controls, #interactive-view, #compare-view, #data-view { display: none !important; }
       #report-view { display: block !important; }
       body { background: white; color: black; }
       .report-section { break-inside: avoid; box-shadow: none; }
@@ -263,11 +311,25 @@
         <h1>Experiment 13 — Provisional Strategy Grid</h1>
       </div>
       <div class="top-actions">
-        <button id="theme-toggle" class="icon-button" type="button" aria-label="Toggle theme"><span aria-hidden="true">◐</span> <span class="label">Theme</span></button>
         <button id="scroll-top" class="icon-button" type="button" aria-label="Scroll to top"><span aria-hidden="true">↑</span> <span class="label">Top</span></button>
       </div>
     </div>
   </header>
+
+  <aside class="global-filter-bar" aria-label="Global strategy filters">
+    <div class="shell global-filter-panel">
+      <div class="global-filter-title"><strong>Global filters</strong><span>All report views</span></div>
+      <label class="filter-field"><span>Construction family</span><select id="global-family"></select></label>
+      <label class="filter-field"><span>Construction policy</span><select id="global-policy"></select></label>
+      <label class="filter-field"><span>Layer schedule</span><select id="global-schedule"></select></label>
+      <label class="filter-field"><span>Candidate budget</span><select id="global-budget"></select></label>
+      <label class="filter-field"><span>Normalization</span><select id="global-normalization"></select></label>
+      <label class="filter-field"><span>Pareto membership</span><select id="global-pareto"></select></label>
+      <label class="filter-toggle"><input id="global-apply-charts" type="checkbox" checked> Apply to every chart</label>
+      <button id="global-reset" class="small-button" type="button">Reset</button>
+      <div id="global-filter-summary" class="filter-summary" aria-live="polite"></div>
+    </div>
+  </aside>
 
   <div class="shell">
     <section class="hero" aria-labelledby="hero-title">
@@ -393,7 +455,7 @@
     const short = value => String(value || "").replace(/^x13a_/, "").replaceAll("_", " · ");
     const unique = values => [...new Set(values.filter(value => value !== undefined && value !== null && value !== ""))].sort();
     const truthy = value => value === true || ["true","1","yes"].includes(String(value).toLowerCase());
-    const COLORS = {accent:"#69d4b2", blue:"#7db7ff", warn:"#ffc768", danger:"#ff8b7d", blocked:"#d3a4ff"};
+    const COLORS = {accent:"#147e67", blue:"#286db7", warn:"#a86100", danger:"#b63b34", blocked:"#7741a5"};
     const STATUS = {
       "strong provisional": {color: COLORS.accent}, mixed: {color: COLORS.warn}, unresolved: {color: COLORS.warn}, blocked: {color: COLORS.blocked}, "historical only": {color: COLORS.danger}
     };
@@ -402,11 +464,37 @@
     const coverage = DATA.tables.coverage;
     const deltas = DATA.tables.matched_deltas;
     const partial = DATA.tables.partial_codebook;
+    const metricById = new Map(metrics.map(row => [row.row_id, row]));
+    const calibrationRowIds = DATA.calibration.row_ids || [];
     const CO_PRIMARY = [
       {key:"validation_median_rmse", delta:"delta_validation_median_rmse", label:"Median RMSE", axis:"Median\nRMSE ↓", short:"Median", higher:false, format:value=>fmt(value, 7)},
       {key:"validation_strict_perfect_lfo_rate", delta:"delta_validation_strict_perfect_lfo_rate", label:"Strict-perfect LFO rate", axis:"Strict-perfect\nrate ↑", short:"Strict-perfect", higher:true, format:value=>pct(value, 3)},
       {key:"validation_p95_rmse", delta:"delta_validation_p95_rmse", label:"P95 RMSE", axis:"P95\nRMSE ↓", short:"P95", higher:false, format:value=>fmt(value, 7)},
       {key:"validation_node_max_error_p95", delta:"delta_validation_node_max_error_p95", label:"Node-max error P95", axis:"Node-max\nP95 ↓", short:"Node-max", higher:false, format:value=>fmt(value, 7)}
+    ];
+    const GLOBAL_FIELDS = [
+      ["family","construction_family","All families"],
+      ["policy","construction_policy","All policies"],
+      ["schedule","layer_schedule","All schedules"],
+      ["budget","utility_candidate_budget","All budgets"],
+      ["normalization","layer_normalization_policy","All normalization"]
+    ];
+    const CONSTRUCTION_GUIDE = [
+      {policy:"CommonCaseRepair",family:"Experiment12Anchor",kind:"anchor",roles:["common","common","common","common","common","common","common"],description:"Selects observed residuals that improve the typical eligible curve. It is deliberately median-oriented, so hard outliers can receive less capacity."},
+      {policy:"FinishRepairRescue",family:"Experiment12Anchor",kind:"anchor",roles:["finish","finish","common","common","common","hard","hard"],description:"Finishes nearly solved curves first, improves common residuals in the middle, then reserves the last slots for difficult leftovers."},
+      {policy:"FamilyBalancedRepair",family:"Experiment12Anchor",kind:"anchor",roles:["family","family","family","family","family","family","family"],description:"Balances improvement across stable residual families so the largest family cannot dominate every atom choice."},
+      {policy:"BroadMeanGlobalRepair",family:"BroadMeanGlobalRepair",kind:"mixed",broad:"BroadMean",repair:"GlobalRepair",description:"Alternates a shared aligned average correction with the observed residual that removes the most total remaining error."},
+      {policy:"BroadMeanFinishRepair",family:"BroadMeanFinishRepair",kind:"mixed",broad:"BroadMean",repair:"FinishRepair",description:"Makes broad population progress, then targets concrete residuals that push almost-correct curves across the fixed finish threshold."},
+      {policy:"BroadMeanHardRepair",family:"BroadMeanHardRepair",kind:"mixed",broad:"BroadMean",repair:"HardRepair",description:"Uses aligned averages for common structure and observed examples for the current worst-loss decile."},
+      {policy:"TrimmedMeanGlobalRepair",family:"TrimmedMeanGlobalRepair",kind:"mixed",broad:"TrimmedMean",repair:"GlobalRepair",description:"Builds the broad prototype from the best-aligned 90%, limiting outlier pull before global observed-residual cleanup."},
+      {policy:"AlignedMedianGlobalRepair",family:"AlignedMedianGlobalRepair",kind:"mixed",broad:"AlignedMedian",repair:"GlobalRepair",description:"Uses a coordinate-wise aligned median for a strongly robust middle shape, then applies globally useful concrete repairs."},
+      {policy:"ClusterMeanGlobalRepair",family:"ClusterMeanGlobalRepair",kind:"mixed",broad:"ClusterMean",repair:"GlobalRepair",description:"Builds a prototype for one residual cluster at a time, then chooses concrete corrections with the largest total benefit."},
+      {policy:"ClusterMeanHardRepair",family:"ClusterMeanHardRepair",kind:"mixed",broad:"ClusterMean",repair:"HardRepair",description:"Covers major residual clusters broadly, then directs repair layers toward difficult leftovers."},
+      {policy:"DominantDirectionGlobalRepair",family:"DominantDirectionGlobalRepair",kind:"mixed",broad:"DominantDirection",repair:"GlobalRepair",description:"Removes the highest-energy shared residual direction before using the most globally useful observed examples."},
+      {policy:"DiverseCoverageHardRepair",family:"DiverseCoverageHardRepair",kind:"mixed",broad:"DiverseCoverage",repair:"HardRepair",description:"Rewards broadly useful but dissimilar corrections, then spends repair capacity on the remaining hard tail."},
+      {policy:"AllBroadAlignedMeans",family:"PurePrototype",kind:"pure",broad:"BroadMean",description:"Fills every residual layer with successive aligned population means; no observed residual is copied as an atom."},
+      {policy:"AllClusterMeans",family:"PurePrototype",kind:"pure",broad:"ClusterMean",description:"Fills the codebook with repeatedly recomputed cluster prototypes, covering one residual family at a time."},
+      {policy:"AllDominantDirections",family:"PurePrototype",kind:"pure",broad:"DominantDirection",description:"Fills the codebook with successive leading shared residual directions, updating losses after every chosen atom."}
     ];
 
     const comparisonText = summary => `${summary.improved}/${summary.count} improve · median Δ ${fmt(summary.median, 6)}`;
@@ -419,10 +507,10 @@
       const median = !ordered.length ? 0 : ordered.length % 2 ? ordered[middle] : (ordered[middle - 1] + ordered[middle]) / 2;
       return {count:values.length, improved, worsened, tied, median};
     };
-    const comparisonEvidence = (comparison, rightPolicy) => `Across the four co-primary metrics, ${CO_PRIMARY.map(metric => {
+    const comparisonEvidence = (comparison, favoredPolicy, otherPolicy) => `Across the four co-primary metrics, ${CO_PRIMARY.map(metric => {
       const summary = metricDeltaSummary(comparison, metric);
-      return `${metric.short}: ${summary.improved} right / ${summary.worsened} left / ${summary.tied} ties`;
-    }).join("; ")}. The chart preserves every exact delta and each metric's better direction for ${rightPolicy}.`;
+      return `${metric.short}: ${favoredPolicy} ${summary.improved} / ${otherPolicy} ${summary.worsened} / ${summary.tied} ties`;
+    }).join("; ")}. The chart preserves every exact delta and labels the policy favored in each cell.`;
     const NODES = [
       {
         id:"coverage", number:1, zone:"Integrity", status:"blocked", title:"Source coverage", stat:`${DATA.meta.completed_rows}/${DATA.meta.expected_rows} rows`,
@@ -436,7 +524,7 @@
         id:"normalization", number:2, zone:"Strategy levers", status:"strong provisional", title:"Layer normalization", stat:comparisonText(findings.normalization),
         question:"Does decoder-free layer clipping suppress tail error consistently across the covered strategies?",
         mechanism:"LayerClip0To1 constrains every residual-layer output to the physical signal range. It prevents overshoot from compounding before later residual corrections.",
-        evidence:comparisonEvidence("layer_normalization_policy", "LayerClip0To1"),
+        evidence:comparisonEvidence("layer_normalization_policy", "LayerClip0To1", "FinalClipOnly"),
         recommendation:"Keep LayerClip0To1 as the strongest provisional zero-head-cost policy candidate for the canonical grid.",
         limitation:"The statement is strong within the represented matched cells, but absent construction families could still alter the global effect distribution.", charts:["normalization"]
       },
@@ -444,7 +532,7 @@
         id:"budget", number:3, zone:"Strategy levers", status:"mixed", title:"Candidate budget", stat:comparisonText(findings.candidate_budget),
         question:"Does doubling the offline candidate shortlist from 24 to 48 reliably improve reconstruction?",
         mechanism:"A larger shortlist increases offline search opportunity, but later atoms and Beam4 encoding can compensate for locally weaker selections. More candidates do not guarantee a better final codebook.",
-        evidence:comparisonEvidence("utility_candidate_budget", "CandidateBudget48"),
+        evidence:comparisonEvidence("utility_candidate_budget", "CandidateBudget48", "CandidateBudget24"),
         recommendation:"Retain both budgets until the complete grid exposes family interactions; do not promote 48 as a universal default.",
         limitation:"Legacy construction times are invalid for comparing budget efficiency against the optimized runner.", charts:["budget"]
       },
@@ -452,14 +540,14 @@
         id:"schedule", number:4, zone:"Strategy levers", status:"unresolved", title:"Layer schedule", stat:comparisonText(findings.schedule),
         question:"Should broad and repair layers be interleaved or separated into two phases?",
         mechanism:"The schedules reorder broad and repair residual layers without changing the deployed W8D16 interface. Their value depends on which residual structures a family leaves for later correction.",
-        evidence:comparisonEvidence("layer_schedule", "TwoPhase"),
+        evidence:comparisonEvidence("layer_schedule", "TwoPhase", "Interleaved"),
         recommendation:"Keep schedule as an interaction term. Do not choose a global schedule from this fragment.",
         limitation:"Only represented construction families contribute matched schedule pairs; the split cannot be generalized to absent families.", charts:["schedule"]
       },
       {
         id:"families", number:5, zone:"Strategy levers", status:"blocked", title:"Construction families", stat:`${findings.pareto_count} Pareto candidates`,
         question:"Which construction family offers the best quality tradeoff across median, tail, strict-perfect, and node-max metrics?",
-        mechanism:"Construction policy changes which residual structures receive dictionary capacity. Common-case and repair-heavy objectives can trade median quality against tail safety.",
+        mechanism:"Construction policy decides what kind of residual pattern becomes each offline dictionary atom. Broad builders synthesize population-level prototypes; repair builders copy strategically chosen observed residuals; anchors preserve Experiment 12 slot roles; pure controls use prototypes only.",
         evidence:`The lowest observed P95 is ${fmt(findings.best_row.validation_p95_rmse, 8)}, but ${findings.absent_families.length} planned families are entirely absent. ${findings.pareto_count} observed rows remain non-dominated across the four co-primary metrics.`,
         recommendation:"Use the observed Pareto set to prioritize scrutiny, not to select the canonical construction family.",
         limitation:"A best-in-prefix row is not a full-grid winner. Missing families are the dominant uncertainty.", charts:["pareto"]
@@ -467,7 +555,9 @@
       {
         id:"partial", number:6, zone:"Model behavior", status:"mixed", title:"Partial codebook", stat:"Largest gain at 1→2 atoms",
         question:"How much of the final quality arrives in the first few active atom slots?",
-        mechanism:"Early atoms capture high-mass residual structure. Later slots target progressively narrower residuals, so quality gains should diminish if the dictionary is behaving coherently.",
+        mechanism:"A residual layer can select up to seven active atoms. Re-evaluating validation quality after atom 1, then 2, and so on reveals whether the codebook earns its complexity early or depends on late, narrow repairs.",
+        motivation:"This is a capacity-efficiency diagnostic. A steep early drop means the first atoms capture reusable structure; a flat or erratic curve can reveal redundant choices, weak ordering, or a family that needs many specialized atoms.",
+        reading:["Move left to right: each step adds one active atom per residual layer.","Move downward: lower validation P95 RMSE means the partial codebook handles tail cases better.","Compare curve shape before endpoint rank: early slope shows efficiency; late flattening shows diminishing returns."],
         evidence:"Every covered family improves sharply from one to two active atoms, then generally flattens. BroadMeanGlobalRepair and BroadMeanHardRepair form the lowest observed family medians.",
         recommendation:"Preserve per-slot progression in the canonical analysis; it is more diagnostic than final-row metrics alone.",
         limitation:"Progression is descriptive for covered families and cannot establish the optimal active-atom count outside the fixed contract.", charts:["partial"]
@@ -476,6 +566,8 @@
         id:"calibration", number:7, zone:"Eligibility", status:"blocked", title:"Eligibility calibration", stat:"ε selection blocked",
         question:"What counterfactual retirement coverage and unexplained-energy risk appear as epsilon increases?",
         mechanism:"Eligibility would stop already-resolved LFOs from consuming later codebook capacity. The safe threshold must balance retired coverage against unexplained residual energy using all 90 unfiltered 13A rows.",
+        motivation:"Without eligibility, curves that are already reconstructed well can keep competing for later atoms. Epsilon is the proposed stopping threshold: larger values retire more curves sooner, but can also retire curves that still carry meaningful unexplained energy.",
+        reading:["In the quantile chart, later layers should move epsilon downward as reconstruction improves; lower curves mean closer fits.","In the retirement plot, moving right means more LFOs would stop consuming capacity; moving down means less unexplained energy is being abandoned.","The desirable direction is toward the lower-right, but no point is selectable until all 90 rows contribute to the frozen calibration artifact."],
         evidence:"Completed-layer epsilon quantiles fall rapidly in early layers and then flatten. Larger candidate epsilons expand both retirement coverage and the upper tail of unexplained retired energy.",
         recommendation:"Use these curves only to understand mechanism and sensitivity. Freeze no epsilon until complete 13A artifacts satisfy the deterministic selector.",
         limitation:"The fragment cannot produce a valid epsilon, apparent elbow, or Experiment 13B gate artifact.", charts:["calibration","retirement"]
@@ -483,8 +575,8 @@
       {
         id:"runtime", number:8, zone:"Diagnostics", status:"historical only", title:"Legacy runtime", stat:`${fmt(findings.runtime_outliers[0]?.oracle_construction_time, 1)} s max`,
         question:"What made the interrupted legacy run impractically slow?",
-        mechanism:"The archived timings include the superseded implementation, repeated invariant work, pathological candidate calculations, and host sleep behavior.",
-        evidence:`The two largest observed oracle construction times are ${fmt(findings.runtime_outliers[0]?.oracle_construction_time, 1)} and ${fmt(findings.runtime_outliers[1]?.oracle_construction_time, 1)} seconds.`,
+        mechanism:"The archived timings include the superseded implementation and repeated invariant work. The two extreme wall-clock observations were inflated by host sleep and are separated from the ordinary timing scale.",
+        evidence:`The two sleep-affected rows are ${fmt(findings.runtime_outliers[0]?.oracle_construction_time, 1)} and ${fmt(findings.runtime_outliers[1]?.oracle_construction_time, 1)} seconds. A broken axis keeps them visible without flattening the remaining legacy timing pattern.`,
         recommendation:"Keep these values as historical diagnostics only. Measure optimized-run performance independently with the new layer/slot timing instrumentation.",
         limitation:"No legacy-versus-optimized speedup claim is valid because implementation and operating conditions differ.", charts:["runtime"]
       }
@@ -496,12 +588,14 @@
     let compareSelection = [];
     let dataKind = "metrics";
     let currentDataRows = [];
+    const globalState = {family:"all",policy:"all",schedule:"all",budget:"all",normalization:"all",pareto:"all",applyCharts:true};
     const chartInstances = new Map();
     const chartResizeObserver = "ResizeObserver" in window ? new ResizeObserver(entries => {
       entries.forEach(entry => chartInstances.get(entry.target)?.resize());
     }) : null;
 
     function initialize() {
+      renderGlobalFilters();
       renderMeta();
       renderFindings();
       renderPrimaryMetrics();
@@ -514,6 +608,99 @@
       renderDataTabs();
       renderData();
       bindGlobalEvents();
+    }
+
+    function renderGlobalFilters() {
+      GLOBAL_FIELDS.forEach(([id,key,label]) => {
+        const select = qs(`#global-${id}`);
+        select.innerHTML = `<option value="all">${esc(label)}</option>${unique(coverage.map(row => row[key])).map(value => `<option value="${esc(value)}">${esc(value)}</option>`).join("")}`;
+        select.value = globalState[id];
+      });
+      qs("#global-pareto").innerHTML = `<option value="all">All Pareto states</option><option value="pareto">Pareto candidates</option><option value="non-pareto">Non-Pareto rows</option>`;
+      qs("#global-pareto").value = globalState.pareto;
+      qs("#global-apply-charts").checked = globalState.applyCharts;
+      [...GLOBAL_FIELDS.map(([id]) => qs(`#global-${id}`)), qs("#global-pareto"), qs("#global-apply-charts")].forEach(control => control.addEventListener("input", updateGlobalFilters));
+      qs("#global-reset").addEventListener("click", resetGlobalFilters);
+      updateGlobalFilterSummary();
+    }
+
+    function updateGlobalFilters() {
+      GLOBAL_FIELDS.forEach(([id]) => { globalState[id] = qs(`#global-${id}`).value; });
+      globalState.pareto = qs("#global-pareto").value;
+      globalState.applyCharts = qs("#global-apply-charts").checked;
+      updateGlobalFilterSummary();
+      renderPrimaryMetrics();
+      renderCompare();
+      renderData();
+      rerenderVisibleCharts();
+    }
+
+    function resetGlobalFilters() {
+      GLOBAL_FIELDS.forEach(([id]) => { globalState[id] = "all"; qs(`#global-${id}`).value = "all"; });
+      globalState.pareto = "all";
+      globalState.applyCharts = true;
+      qs("#global-pareto").value = "all";
+      qs("#global-apply-charts").checked = true;
+      updateGlobalFilters();
+    }
+
+    function updateGlobalFilterSummary() {
+      const selected = GLOBAL_FIELDS.filter(([id]) => globalState[id] !== "all").map(([id,,label]) => `${label.replace("All ","")}: ${globalState[id]}`);
+      if (globalState.pareto !== "all") selected.push(`Pareto: ${globalState.pareto}`);
+      const count = filteredMetricRows(false).length;
+      qs("#global-filter-summary").innerHTML = `<strong>${count}/${metrics.length} completed rows in scope</strong><span>${selected.length ? esc(selected.join(" · ")) : "No factor filters active"}</span><span>Charts: ${globalState.applyCharts ? "filtered" : "showing full fragment"}</span>`;
+    }
+
+    function rowMatchesGlobal(row, ignoreKey = null) {
+      if (!row) return false;
+      const factorsMatch = GLOBAL_FIELDS.every(([id,key]) => key === ignoreKey || globalState[id] === "all" || String(row[key]) === globalState[id]);
+      if (!factorsMatch) return false;
+      if (globalState.pareto === "all" || ignoreKey === "pareto_candidate") return true;
+      return truthy(row.pareto_candidate) === (globalState.pareto === "pareto");
+    }
+
+    function filteredMetricRows(forChart = false) {
+      if (forChart && !globalState.applyCharts) return metrics;
+      return metrics.filter(row => rowMatchesGlobal(row));
+    }
+
+    function filteredCoverageRows(forChart = false) {
+      if (forChart && !globalState.applyCharts) return coverage;
+      return coverage.filter(row => {
+        if (!rowMatchesGlobal(row, "pareto_candidate")) return false;
+        if (globalState.pareto === "all") return true;
+        const completed = metricById.get(row.row_id);
+        return completed && truthy(completed.pareto_candidate) === (globalState.pareto === "pareto");
+      });
+    }
+
+    function filteredDeltaRows(comparison, forChart = false) {
+      const rows = deltas.filter(row => row.comparison === comparison);
+      if (forChart && !globalState.applyCharts) return rows;
+      return rows.filter(row => {
+        const left = metricById.get(row.left_row_id);
+        const right = metricById.get(row.right_row_id);
+        return rowMatchesGlobal(left, comparison) || rowMatchesGlobal(right, comparison);
+      });
+    }
+
+    function filteredPartialRows(forChart = false) {
+      if (forChart && !globalState.applyCharts) return partial;
+      return partial.filter(row => rowMatchesGlobal(metricById.get(row.row_id)));
+    }
+
+    function filteredCalibrationRows(key, forChart = false) {
+      const rows = DATA.calibration[key] || [];
+      if (forChart && !globalState.applyCharts) return rows;
+      const allowed = new Set(filteredMetricRows(false).map(row => row.row_id));
+      return rows.filter(row => allowed.has(calibrationRowIds[row[0]]));
+    }
+
+    function rerenderVisibleCharts() {
+      if (currentView === "report") renderFullReportCharts();
+      if (currentView === "compare") renderCompare();
+      if (activeNode && activeTab === "evidence") renderDetailTab(NODES.find(node => node.id === activeNode));
+      requestAnimationFrame(() => requestAnimationFrame(resizeVisibleCharts));
     }
 
     function renderMeta() {
@@ -538,14 +725,21 @@
     }
 
     function primaryMetricMarkup() {
+      const visibleMetrics = filteredMetricRows(false);
+      if (!visibleMetrics.length) return `<div class="empty" style="grid-column:1/-1">No completed rows match the global filters.</div>`;
       return CO_PRIMARY.map(metric => {
-        const ordered = [...metrics].sort((left, right) => (metric.higher ? -1 : 1) * (num(left[metric.key]) - num(right[metric.key])));
+        const ordered = [...visibleMetrics].sort((left, right) => (metric.higher ? -1 : 1) * (num(left[metric.key]) - num(right[metric.key])));
         const best = ordered[0];
         return `<article class="primary-metric-card"><div class="metric-name">${esc(metric.label)}</div><div class="metric-value">${esc(metric.format(best[metric.key]))}</div><div class="metric-direction">${metric.higher ? "higher is better ↑" : "lower is better ↓"}</div><code title="${esc(best.row_id)}">${esc(short(best.row_id))}</code></article>`;
       }).join("");
     }
 
-    function renderPrimaryMetrics() { qs("#primary-metric-grid").innerHTML = primaryMetricMarkup(); }
+    function renderPrimaryMetrics() {
+      const markup = primaryMetricMarkup();
+      qs("#primary-metric-grid").innerHTML = markup;
+      const reportGrid = qs("#report-co-primary .primary-metric-grid");
+      if (reportGrid) reportGrid.innerHTML = markup;
+    }
 
     function renderNodeFilters() {
       const zone = qs("#zone-filter");
@@ -603,9 +797,9 @@
         button.tabIndex = selected ? 0 : -1;
       });
       const target = qs("#detail-tab-panel");
-      if (activeTab === "mechanism") target.innerHTML = `<h3>Mechanism</h3><p>${esc(node.mechanism)}</p>`;
+      if (activeTab === "mechanism") target.innerHTML = `<h3>Mechanism</h3><p>${esc(node.mechanism)}</p>${node.motivation ? `<div class="motivation"><strong>Why this matters:</strong> ${esc(node.motivation)}</div>` : ""}${node.id === "families" ? constructionGuideMarkup() : ""}`;
       if (activeTab === "evidence") {
-        target.innerHTML = `<h3>Evidence</h3><p>${esc(node.evidence)}</p>${chartMarkup(node, "detail")}`;
+        target.innerHTML = `<h3>Evidence</h3><p>${esc(node.evidence)}</p>${readingMarkup(node)}${chartMarkup(node, "detail")}`;
         requestAnimationFrame(() => node.charts.forEach(name => renderChart(name, qs(`#detail-chart-${name}`))));
       }
       if (activeTab === "metrics") target.innerHTML = `<h3>Exact metrics</h3>${metricsForNode(node)}`;
@@ -623,22 +817,47 @@
 
     function closeDetail() { activeNode = null; qs("#detail-panel").hidden = true; renderEvidenceMap(); }
     function titleCase(value) { return value.charAt(0).toUpperCase() + value.slice(1); }
+    function readingMarkup(node) {
+      if (!node.reading) return "";
+      return `<div class="reading-guide" aria-label="How to read this evidence">${node.reading.map((step,index) => `<div class="reading-step"><strong>${index + 1}. ${["Trace the x-axis","Read the outcome","Interpret the shape"][index]}</strong>${esc(step)}</div>`).join("")}</div>`;
+    }
+
+    function constructionGuideMarkup() {
+      return `<div class="mechanism-grid">${CONSTRUCTION_GUIDE.map(guide => {
+        const planned = coverage.filter(row => guide.kind === "mixed" ? row.construction_family === guide.family : row.construction_policy === guide.policy);
+        const completed = planned.filter(row => truthy(row.completed)).length;
+        let visual;
+        if (guide.kind === "anchor") {
+          visual = `<div class="slot-strip" aria-label="Seven native atom-slot roles">${guide.roles.map(role => `<span class="slot-cell">${esc(role)}</span>`).join("")}</div><div class="mechanism-meta"><span>7 native roles per layer</span><span>·</span><span>AnchorNative schedule</span></div>`;
+        } else if (guide.kind === "pure") {
+          visual = `<div class="mechanism-flow"><span class="mechanism-box broad">Every layer<br><strong>${esc(guide.broad)}</strong></span><span class="mechanism-arrow">→</span><span class="mechanism-box">7 prototype atoms<br>per layer</span></div>${layerStrip("AllBroad")}`;
+        } else {
+          visual = `<div class="mechanism-flow"><span class="mechanism-box broad">Broad layer<br><strong>${esc(guide.broad)}</strong></span><span class="mechanism-arrow">⇄</span><span class="mechanism-box repair">Repair layer<br><strong>${esc(guide.repair)}</strong></span></div>${layerStrip("Interleaved")}${layerStrip("TwoPhase")}`;
+        }
+        return `<article class="mechanism-card"><div class="mechanism-meta"><span>${esc(guide.kind === "mixed" ? "MIXED FAMILY" : guide.kind === "anchor" ? "EXPERIMENT 12 ANCHOR" : "PURE CONTROL")}</span><span>·</span><span>${completed}/${planned.length} rows observed</span></div><h4>${esc(guide.policy)}</h4><p>${esc(guide.description)}</p>${visual}</article>`;
+      }).join("")}</div>`;
+    }
+
+    function layerStrip(schedule) {
+      const roles = schedule === "Interleaved" ? Array.from({length:16},(_,index)=>index % 2 ? "repair" : "broad") : schedule === "TwoPhase" ? Array.from({length:16},(_,index)=>index < 8 ? "broad" : "repair") : Array(16).fill("broad");
+      return `<div class="mechanism-meta" style="margin-top:8px"><span>${esc(schedule)}</span><span>B = broad · R = repair</span></div><div class="layer-strip" aria-label="${esc(schedule)} layer sequence">${roles.map((role,index) => `<span class="layer-cell ${role}" title="Layer ${index + 1}: ${role}">${role === "repair" ? "R" : "B"}</span>`).join("")}</div>`;
+    }
     function chartMarkup(node, prefix) { return `<div class="chart-grid">${node.charts.map(name => `<div class="chart-card"><div id="${prefix}-chart-${name}" class="chart ${["normalization","budget","schedule"].includes(name) ? "delta-chart" : ""}" aria-label="${esc(node.title)} chart"></div><p class="chart-caption">${esc(chartCaption(name))}</p></div>`).join("")}</div>`; }
 
     function chartCaption(name) {
-      return ({coverage:"Filled cells are completed; outlined cells remain absent. Coverage follows execution order, not random sampling.", normalization:"All four co-primary deltas are shown. Green favors LayerClip0To1; coral favors FinalClipOnly. Color strength is normalized within each metric; tooltips retain exact values.", budget:"All four co-primary deltas are shown. Green favors CandidateBudget48; coral favors CandidateBudget24. Mixed colors expose non-monotonic quality effects.", schedule:"All four co-primary deltas are shown. Green favors TwoPhase; coral favors Interleaved. The matrix keeps schedule interactions visible without declaring a global winner.", pareto:"Median and P95 set the coordinates; the tooltip reports strict-perfect and node-max P95 too. Outlined points are non-dominated across all four co-primary metrics.", partial:"Lower is better. Lines show family-median P95 by active atom count.", calibration:"Lower epsilon is closer reconstruction. Curves are descriptive only and cannot select epsilon.", retirement:"Lower unexplained energy is safer. Points are a deterministic compact sample; summaries retain median and P95 tails.", runtime:"Lower is faster. Log-scaled values describe the superseded legacy implementation only."})[name];
+      return ({coverage:"Filled cells are completed; outlined cells remain absent. Coverage follows execution order, not random sampling.", normalization:"Each cell prints the exact LayerClip0To1 − FinalClipOnly delta. Green favors LayerClip0To1; coral favors FinalClipOnly; neutral cells are ties.", budget:"Each cell prints the exact CandidateBudget48 − CandidateBudget24 delta. Green favors CandidateBudget48; coral favors CandidateBudget24.", schedule:"Each cell prints the exact TwoPhase − Interleaved delta. Green favors TwoPhase; coral favors Interleaved; mixed signs mean there is no global schedule winner.", pareto:"Median and P95 set the coordinates; the tooltip reports strict-perfect and node-max P95 too. Outlined points are non-dominated across all four co-primary metrics.", partial:"Read left to right as codebook capacity is added. A steep downward step means the new atom materially improves tail reconstruction; a flat segment means diminishing returns. Lines are family medians, not individual rows.", calibration:"Each line asks how small the reconstruction-error threshold is at a chosen percentile as residual layers accumulate. Lower is closer. The shape explains convergence but cannot select epsilon from an incomplete run.", retirement:"Lower-right is the useful direction: more LFOs retired with less unexplained energy abandoned. Each point is a deterministic compact diagnostic sample; epsilon selection remains blocked.", runtime:"The main linear axis exposes ordinary legacy timing differences. The separate red segment retains the two host-sleep artifacts without letting them flatten the other bars; neither segment estimates optimized runtime."})[name];
     }
 
     function metricsForNode(node) {
-      if (node.id === "coverage") return simpleTable(findings.coverage_by_family, ["construction_family","completed","planned"]);
+      if (node.id === "coverage") return simpleTable(filteredCoverageRows(false), ["row_id","construction_family","construction_policy","layer_schedule","utility_candidate_budget","layer_normalization_policy","completed"]);
       if (["normalization","budget","schedule"].includes(node.id)) {
         const key = {normalization:"layer_normalization_policy",budget:"utility_candidate_budget",schedule:"layer_schedule"}[node.id];
-        return simpleTable(deltas.filter(row => row.comparison === key), ["match_key","left_value","right_value","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
+        return simpleTable(filteredDeltaRows(key, false), ["match_key","left_value","right_value","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
       }
-      if (node.id === "families") return simpleTable([...metrics].sort((a,b) => num(a.validation_p95_rmse)-num(b.validation_p95_rmse)), ["row_id","construction_family","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"]);
-      if (node.id === "partial") return simpleTable(partial, ["row_id","construction_family","active_atom_count","validation_median_rmse","validation_p95_rmse","validation_node_max_error_p95"]);
+      if (node.id === "families") return simpleTable([...filteredMetricRows(false)].sort((a,b) => num(a.validation_p95_rmse)-num(b.validation_p95_rmse)), ["row_id","construction_family","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"]);
+      if (node.id === "partial") return simpleTable(filteredPartialRows(false), ["row_id","construction_family","active_atom_count","validation_median_rmse","validation_p95_rmse","validation_node_max_error_p95"]);
       if (node.id === "calibration") return simpleTable(DATA.calibration.retired_summary, ["epsilon","count","retired_median","unexplained_median","unexplained_p95","incoming_median","incoming_p95"]);
-      return simpleTable(findings.runtime_outliers, ["row_id","oracle_construction_time"]);
+      return simpleTable(findings.runtime_outliers.filter(row => rowMatchesGlobal(metricById.get(row.row_id))), ["row_id","oracle_construction_time"]);
     }
 
     function simpleTable(rows, columns, limit = 500) {
@@ -655,7 +874,7 @@
 
     function renderFullReport() {
       const coPrimary = `<article class="report-section" id="report-co-primary"><div class="eyebrow">Co-primary outcomes</div><h3>Four metrics define validation quality</h3><p>No single validation metric is authoritative. These are the best observed values in the incomplete 39-row prefix; each can come from a different strategy row.</p><div class="primary-metric-grid">${primaryMetricMarkup()}</div></article>`;
-      qs("#report-stack").innerHTML = coPrimary + NODES.map(node => `<article class="report-section" id="report-${node.id}"><div class="report-meta"><span class="node-number">${node.number}</span><span class="confidence" style="color:${STATUS[node.status].color}">${esc(node.zone)} · ${esc(node.status)}</span></div><h3>${esc(node.title)}</h3><p><strong>${esc(node.question)}</strong></p><p>${esc(node.mechanism)}</p><div class="takeaway"><strong>Evidence:</strong> ${esc(node.evidence)}</div><div style="margin-top:18px">${chartMarkup(node, `full-${node.id}`)}</div><p><strong>Recommendation:</strong> ${esc(node.recommendation)}</p><div class="limitation"><strong>Limitation:</strong> ${esc(node.limitation)}</div></article>`).join("");
+      qs("#report-stack").innerHTML = coPrimary + NODES.map(node => `<article class="report-section" id="report-${node.id}"><div class="report-meta"><span class="node-number">${node.number}</span><span class="confidence" style="color:${STATUS[node.status].color}">${esc(node.zone)} · ${esc(node.status)}</span></div><h3>${esc(node.title)}</h3><p><strong>${esc(node.question)}</strong></p><p>${esc(node.mechanism)}</p>${node.motivation ? `<div class="motivation"><strong>Why this matters:</strong> ${esc(node.motivation)}</div>` : ""}${node.id === "families" ? constructionGuideMarkup() : ""}<div class="takeaway" style="margin-top:18px"><strong>Evidence:</strong> ${esc(node.evidence)}</div>${readingMarkup(node)}<div style="margin-top:18px">${chartMarkup(node, `full-${node.id}`)}</div><p><strong>Recommendation:</strong> ${esc(node.recommendation)}</p><div class="limitation"><strong>Limitation:</strong> ${esc(node.limitation)}</div></article>`).join("");
     }
 
     function renderFullReportCharts() {
@@ -663,15 +882,14 @@
     }
 
     function renderFilterControls(root, prefix) {
-      root.innerHTML = `<label class="sr-only" for="${prefix}-search">Search rows</label><input id="${prefix}-search" type="search" placeholder="Search strategy rows…">${filterSelect(`${prefix}-family`, "All families", unique(metrics.map(row => row.construction_family)))}${filterSelect(`${prefix}-schedule`, "All schedules", unique(metrics.map(row => row.layer_schedule)))}${filterSelect(`${prefix}-budget`, "All budgets", unique(metrics.map(row => row.utility_candidate_budget)))}${filterSelect(`${prefix}-normalization`, "All normalization", unique(metrics.map(row => row.layer_normalization_policy)))}${prefix === "data" ? filterSelect(`${prefix}-completion`, "All completion states", ["complete","missing"]) + filterSelect(`${prefix}-pareto`, "All Pareto states", ["pareto","non-pareto"]) : ""}`;
+      root.innerHTML = `<label class="sr-only" for="${prefix}-search">Search rows</label><input id="${prefix}-search" type="search" placeholder="Search within globally filtered rows…">${prefix === "data" ? filterSelect(`${prefix}-completion`, "All completion states", ["complete","missing"]) : ""}`;
       qsa("input,select", root).forEach(control => control.addEventListener("input", prefix === "compare" ? renderCompare : renderData));
     }
     function filterSelect(id, label, values) { return `<label class="sr-only" for="${id}">${esc(label)}</label><select id="${id}"><option value="all">${esc(label)}</option>${values.map(value => `<option value="${esc(value)}">${esc(value)}</option>`).join("")}</select>`; }
 
     function filteredMetrics(prefix) {
       const query = qs(`#${prefix}-search`)?.value.trim().toLowerCase() || "";
-      const values = {construction_family:qs(`#${prefix}-family`)?.value,layer_schedule:qs(`#${prefix}-schedule`)?.value,utility_candidate_budget:qs(`#${prefix}-budget`)?.value,layer_normalization_policy:qs(`#${prefix}-normalization`)?.value};
-      return metrics.filter(row => (!query || JSON.stringify(row).toLowerCase().includes(query)) && Object.entries(values).every(([key,value]) => !value || value === "all" || row[key] === value));
+      return filteredMetricRows(false).filter(row => !query || JSON.stringify(row).toLowerCase().includes(query));
     }
 
     function renderCompare() {
@@ -681,7 +899,9 @@
         return `<label class="selection-row"><input type="checkbox" data-compare-row="${esc(row.row_id)}" ${checked ? "checked" : ""}><span><code title="${esc(row.row_id)}">${esc(short(row.row_id))}</code><br><small>${esc(row.construction_family)}</small></span><strong>${fmt(row.validation_p95_rmse, 5)}</strong></label>`;
       }).join("") || `<div class="empty">No completed rows match these filters.</div>`;
       qsa("[data-compare-row]", qs("#compare-list")).forEach(input => input.addEventListener("change", event => updateComparison(event.currentTarget)));
-      const selected = compareSelection.map(id => metrics.find(row => row.row_id === id)).filter(Boolean);
+      const visibleIds = new Set(rows.map(row => row.row_id));
+      compareSelection = compareSelection.filter(id => visibleIds.has(id));
+      const selected = compareSelection.map(id => metricById.get(id)).filter(Boolean);
       qs("#selected-chips").innerHTML = selected.map(row => `<span class="selected-chip" title="${esc(row.row_id)}">${esc(short(row.row_id))}</span>`).join("") || `<span style="color:var(--muted)">Select two to four rows.</span>`;
       renderComparisonChart(selected);
       qs("#compare-table").innerHTML = selected.length ? simpleTable(selected, ["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"], 4) : "";
@@ -704,7 +924,7 @@
         ["Node-max quality","validation_node_max_error_p95",false]
       ];
       const normalized = definitions.map(([,key,higher]) => {
-        const all = metrics.map(row => num(row[key])); const min = Math.min(...all); const max = Math.max(...all);
+        const all = filteredMetricRows(false).map(row => num(row[key])); const min = Math.min(...all); const max = Math.max(...all);
         return value => max === min ? 100 : (higher ? (num(value)-min)/(max-min) : (max-num(value))/(max-min)) * 100;
       });
       setChart(element, {tooltip:{},legend:{bottom:0,textStyle:{color:chartText()}},radar:{indicator:definitions.map(([name]) => ({name,max:100})),axisName:{color:chartText()},splitLine:{lineStyle:{color:chartGrid()}},splitArea:{areaStyle:{color:["transparent"]}},axisLine:{lineStyle:{color:chartGrid()}}},series:[{type:"radar",data:rows.map(row => ({name:short(row.row_id),value:definitions.map(([,key],index) => normalized[index](row[key]))}))}]});
@@ -721,13 +941,14 @@
 
     function renderData() {
       const query = qs("#data-search")?.value.trim().toLowerCase() || "";
-      let rows = DATA.tables[dataKind];
-      const factorValues = {construction_family:qs("#data-family")?.value,layer_schedule:qs("#data-schedule")?.value,utility_candidate_budget:qs("#data-budget")?.value,layer_normalization_policy:qs("#data-normalization")?.value};
-      rows = rows.filter(row => (!query || JSON.stringify(row).toLowerCase().includes(query)) && Object.entries(factorValues).every(([key,value]) => !value || value === "all" || !(key in row) || row[key] === value));
+      let rows;
+      if (dataKind === "metrics") rows = filteredMetricRows(false);
+      if (dataKind === "coverage") rows = filteredCoverageRows(false);
+      if (dataKind === "partial_codebook") rows = filteredPartialRows(false);
+      if (dataKind === "matched_deltas") rows = deltas.filter(row => filteredDeltaRows(row.comparison, false).includes(row));
+      rows = rows.filter(row => !query || JSON.stringify(row).toLowerCase().includes(query));
       const completion = qs("#data-completion")?.value;
       if (dataKind === "coverage" && completion && completion !== "all") rows = rows.filter(row => truthy(row.completed) === (completion === "complete"));
-      const pareto = qs("#data-pareto")?.value;
-      if (dataKind === "metrics" && pareto && pareto !== "all") rows = rows.filter(row => truthy(row.pareto_candidate) === (pareto === "pareto"));
       currentDataRows = rows;
       const columns = dataColumns(dataKind);
       qs("#data-count").textContent = `${rows.length} visible rows`;
@@ -765,6 +986,7 @@
       option.backgroundColor = "transparent"; option.animationDuration = 250; instance.setOption(option, true);
       requestAnimationFrame(() => instance.resize());
     }
+    function chartEmpty(element, message = "No rows match the global filters.") { disposeChart(element); element.style.height = "260px"; element.innerHTML = `<div class="empty">${esc(message)}</div>`; }
     function disposeChart(element) { const instance = chartInstances.get(element); if (instance) { chartResizeObserver?.unobserve(element); instance.dispose(); chartInstances.delete(element); } }
     function resizeVisibleCharts() { chartInstances.forEach((instance, element) => { if (element.offsetParent !== null) instance.resize(); }); }
     function chartText() { return getComputedStyle(document.documentElement).getPropertyValue("--muted").trim(); }
@@ -772,59 +994,100 @@
     function baseAxes() { return {axisLine:{lineStyle:{color:chartGrid()}},axisLabel:{color:chartText()},splitLine:{lineStyle:{color:chartGrid(),opacity:.45}},nameTextStyle:{color:chartText()}}; }
 
     function chartCoverage(element) {
-      const families = unique(coverage.map(row => row.construction_family));
-      const cells = coverage.map(row => [families.indexOf(row.construction_family), coverage.filter(item => item.construction_family === row.construction_family).findIndex(item => item.row_id === row.row_id), truthy(row.completed) ? 1 : 0, short(row.row_id)]);
-      const maxY = Math.max(...families.map(family => coverage.filter(row => row.construction_family === family).length));
+      const rows = filteredCoverageRows(true);
+      if (!rows.length) return chartEmpty(element);
+      const families = unique(rows.map(row => row.construction_family));
+      const cells = rows.map(row => [families.indexOf(row.construction_family), rows.filter(item => item.construction_family === row.construction_family).findIndex(item => item.row_id === row.row_id), truthy(row.completed) ? 1 : 0, short(row.row_id)]);
+      const maxY = Math.max(...families.map(family => rows.filter(row => row.construction_family === family).length));
+      element.style.height = `${Math.max(400, Math.min(650, 210 + maxY * 24))}px`;
       setChart(element,{tooltip:{formatter:params => `${esc(params.data[3])}<br>${params.data[2] ? "✓ completed" : "□ missing"}`},grid:{left:150,right:20,top:30,bottom:45},xAxis:{type:"category",data:families,axisLabel:{color:chartText(),rotate:28,formatter:value => value.replace("Repair","")},axisLine:{lineStyle:{color:chartGrid()}}},yAxis:{type:"category",data:Array.from({length:maxY},(_,i)=>i+1),...baseAxes()},visualMap:{show:false,min:0,max:1,inRange:{color:[chartGrid(),COLORS.accent]}},series:[{type:"heatmap",data:cells.map(([x,y,v,label]) => [x,y,v,label]),itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2}}]});
     }
 
     function chartDelta(element, comparison, leftPolicy, rightPolicy) {
-      const rows = deltas.filter(row => row.comparison === comparison).sort((a,b) => num(a.delta_validation_p95_rmse)-num(b.delta_validation_p95_rmse));
+      const rows = filteredDeltaRows(comparison, true).sort((a,b) => num(a.delta_validation_p95_rmse)-num(b.delta_validation_p95_rmse));
+      if (!rows.length) return chartEmpty(element, "No complete matched pairs remain under these filters.");
       const scales = CO_PRIMARY.map(metric => Math.max(...rows.map(row => Math.abs(num(row[metric.delta]))), 1e-15));
       const cells = rows.flatMap((row, rowIndex) => CO_PRIMARY.map((metric, metricIndex) => {
         const raw = num(row[metric.delta]);
         const rightBenefit = metric.higher ? raw : -raw;
         return {value:[metricIndex,rowIndex,rightBenefit / scales[metricIndex]],raw,metric,row};
       }));
+      element.style.height = `${Math.max(390, Math.min(760, 190 + rows.length * 27))}px`;
       setChart(element,{
-        title:{text:`${rightPolicy} vs ${leftPolicy} · four co-primary metrics`,left:"center",textStyle:{color:chartText(),fontSize:13}},
+        title:{text:`${rightPolicy} vs ${leftPolicy} · ${rows.length} matched pairs`,left:"center",textStyle:{color:chartText(),fontSize:13}},
         tooltip:{formatter:params => {
           const item=params.data; const favors=item.raw===0?"tie":((item.metric.higher?item.raw>0:item.raw<0)?rightPolicy:leftPolicy);
-          return `${esc(item.row.match_key)}<br><strong>${esc(item.metric.label)}</strong><br>right − left Δ: ${fmt(item.raw,8)}<br>${esc(favors)} favored`;
+          return `${esc(item.row.match_key)}<br><strong>${esc(item.metric.label)}</strong><br>${esc(rightPolicy)} − ${esc(leftPolicy)} Δ: ${fmt(item.raw,8)}<br><strong>${esc(favors === "tie" ? "Tie" : `${favors} favored`)}</strong>`;
         }},
         grid:{left:215,right:35,top:72,bottom:92},
         xAxis:{type:"category",position:"top",data:CO_PRIMARY.map(metric=>metric.axis),axisLabel:{color:chartText(),interval:0,lineHeight:17,fontWeight:700},axisLine:{lineStyle:{color:chartGrid()}},axisTick:{show:false}},
         yAxis:{type:"category",data:rows.map(row => row.match_key),axisLabel:{color:chartText(),width:195,overflow:"truncate"},axisLine:{lineStyle:{color:chartGrid()}},axisTick:{show:false}},
-        visualMap:{min:-1,max:1,dimension:2,orient:"horizontal",left:"center",bottom:18,calculable:false,text:["right policy favored","left policy favored"],textStyle:{color:chartText()},inRange:{color:[COLORS.danger,getComputedStyle(document.documentElement).getPropertyValue("--surface-3").trim(),COLORS.accent]}},
-        series:[{type:"heatmap",data:cells,itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2},emphasis:{itemStyle:{borderColor:"#fff",borderWidth:2}}}]
+        visualMap:{min:-1,max:1,dimension:2,orient:"horizontal",left:"center",bottom:18,calculable:false,text:[`${rightPolicy} favored`,`${leftPolicy} favored`],textStyle:{color:chartText()},inRange:{color:["#e9b0aa","#eef2f1","#a9dcca"]}},
+        series:[{type:"heatmap",data:cells,label:{show:true,color:"#66757b",fontSize:11,fontWeight:650,formatter:params=>deltaCellLabel(params.data.metric,params.data.raw)},itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2},emphasis:{itemStyle:{borderColor:"#52656d",borderWidth:2}}}]
       });
     }
 
+    function deltaCellLabel(metric, value) {
+      if (metric.higher) return `${value > 0 ? "+" : ""}${(value * 100).toFixed(2)}pp`;
+      if (value === 0) return "0";
+      if (Math.abs(value) < .0001) return value.toExponential(1);
+      return `${value > 0 ? "+" : ""}${value.toFixed(4)}`;
+    }
+
     function chartPareto(element) {
-      const families = unique(metrics.map(row => row.construction_family));
-      setChart(element,{tooltip:{formatter:params => `${esc(short(params.data.row.row_id))}<br>Median RMSE ${fmt(params.value[0],6)}<br>P95 RMSE ${fmt(params.value[1],6)}<br>Strict-perfect ${pct(params.data.row.validation_strict_perfect_lfo_rate,3)}<br>Node-max P95 ${fmt(params.data.row.validation_node_max_error_p95,6)}`},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:30,top:25,bottom:95,containLabel:true},xAxis:{type:"value",name:"Median RMSE ↓",nameLocation:"middle",nameGap:42,...baseAxes()},yAxis:{type:"value",name:"P95 RMSE ↓",nameLocation:"middle",nameGap:58,...baseAxes()},series:families.map((family,index)=>({name:family,type:"scatter",data:metrics.filter(row=>row.construction_family===family).map(row=>({value:[num(row.validation_median_rmse),num(row.validation_p95_rmse)],row,symbolSize:truthy(row.pareto_candidate)?15:8,itemStyle:{borderColor:truthy(row.pareto_candidate)?"#fff":"transparent",borderWidth:truthy(row.pareto_candidate)?2:0}})),emphasis:{focus:"series"}}))});
+      const rows = filteredMetricRows(true);
+      if (!rows.length) return chartEmpty(element);
+      const families = unique(rows.map(row => row.construction_family));
+      element.style.height = "520px";
+      setChart(element,{tooltip:{formatter:params => `${esc(short(params.data.row.row_id))}<br>Median RMSE ${fmt(params.value[0],6)}<br>P95 RMSE ${fmt(params.value[1],6)}<br>Strict-perfect ${pct(params.data.row.validation_strict_perfect_lfo_rate,3)}<br>Node-max P95 ${fmt(params.data.row.validation_node_max_error_p95,6)}`},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:30,top:25,bottom:95,containLabel:true},xAxis:{type:"value",name:"Median RMSE ↓",nameLocation:"middle",nameGap:42,...baseAxes()},yAxis:{type:"value",name:"P95 RMSE ↓",nameLocation:"middle",nameGap:58,...baseAxes()},series:families.map(family=>({name:family,type:"scatter",data:rows.filter(row=>row.construction_family===family).map(row=>({value:[num(row.validation_median_rmse),num(row.validation_p95_rmse)],row,symbolSize:truthy(row.pareto_candidate)?15:8,itemStyle:{borderColor:truthy(row.pareto_candidate)?"#52656d":"transparent",borderWidth:truthy(row.pareto_candidate)?2:0}})),emphasis:{focus:"series"}}))});
     }
 
     function chartPartial(element) {
-      const families = unique(partial.map(row => row.construction_family));
-      const medianValue = values => { const ordered=values.map(num).sort((a,b)=>a-b); const mid=Math.floor(ordered.length/2); return ordered.length%2?ordered[mid]:(ordered[mid-1]+ordered[mid])/2; };
-      setChart(element,{tooltip:{trigger:"axis"},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:65,right:25,top:25,bottom:80},xAxis:{type:"category",name:"Active atoms",data:[1,2,3,4,5,6,7],...baseAxes()},yAxis:{type:"value",name:"Family-median P95 · lower is better",...baseAxes()},series:families.map(family=>({name:family,type:"line",symbol:"circle",data:[1,2,3,4,5,6,7].map(active=>medianValue(partial.filter(row=>row.construction_family===family&&num(row.active_atom_count)===active).map(row=>row.validation_p95_rmse))),connectNulls:true}))});
+      const rows = filteredPartialRows(true);
+      if (!rows.length) return chartEmpty(element);
+      const families = unique(rows.map(row => row.construction_family));
+      const medianValue = values => { const ordered=values.map(num).sort((a,b)=>a-b); if (!ordered.length) return null; const mid=Math.floor(ordered.length/2); return ordered.length%2?ordered[mid]:(ordered[mid-1]+ordered[mid])/2; };
+      element.style.height = "520px";
+      setChart(element,{tooltip:{trigger:"axis",valueFormatter:value=>fmt(value,7)},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:25,bottom:85,containLabel:true},xAxis:{type:"category",name:"Active atoms added per residual layer →",data:[1,2,3,4,5,6,7],...baseAxes()},yAxis:{type:"value",name:"Family-median validation P95 RMSE ↓",nameLocation:"middle",nameGap:56,...baseAxes()},series:families.map(family=>({name:family,type:"line",symbol:"circle",data:[1,2,3,4,5,6,7].map(active=>medianValue(rows.filter(row=>row.construction_family===family&&num(row.active_atom_count)===active).map(row=>row.validation_p95_rmse))),connectNulls:true}))});
     }
 
     function chartCalibration(element) {
-      const rows = DATA.calibration.layer_quantiles; const percentiles = unique(rows.map(row => row.percentile)).map(Number).sort((a,b)=>b-a);
-      const layers = unique(rows.map(row => row.residual_layer)).map(Number).sort((a,b)=>a-b);
-      setChart(element,{tooltip:{trigger:"axis"},legend:{bottom:0,textStyle:{color:chartText()}},grid:{left:65,right:25,top:25,bottom:70},xAxis:{type:"category",name:"Residual layer",data:layers,...baseAxes()},yAxis:{type:"value",name:"Median epsilon · lower is closer",...baseAxes()},series:percentiles.map(percentile=>({name:`q=${percentile}`,type:"line",symbol:"circle",symbolSize:5,data:layers.map(layer=>rows.find(row=>num(row.percentile)===percentile&&num(row.residual_layer)===layer)?.epsilon_value ?? null),connectNulls:true}))});
+      const rows = filteredCalibrationRows("layer_quantiles_by_row", true);
+      if (!rows.length) return chartEmpty(element);
+      const percentiles = unique(rows.map(row => row[2])).map(Number).sort((a,b)=>b-a);
+      const layers = unique(rows.map(row => row[1])).map(Number).sort((a,b)=>a-b);
+      const medianValue = values => { const ordered=values.map(num).sort((a,b)=>a-b); const mid=Math.floor(ordered.length/2); return ordered.length%2?ordered[mid]:(ordered[mid-1]+ordered[mid])/2; };
+      element.style.height = "520px";
+      setChart(element,{tooltip:{trigger:"axis",valueFormatter:value=>fmt(value,7)},legend:{bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:25,bottom:75,containLabel:true},xAxis:{type:"category",name:"Residual layers completed →",data:layers,...baseAxes()},yAxis:{type:"value",name:"Median reconstruction-error threshold ε ↓",nameLocation:"middle",nameGap:60,...baseAxes()},series:percentiles.map(percentile=>({name:`curve percentile q=${percentile}`,type:"line",symbol:"circle",symbolSize:5,data:layers.map(layer=>medianValue(rows.filter(row=>num(row[2])===percentile&&num(row[1])===layer).map(row=>row[3]))),connectNulls:true}))});
     }
 
     function chartRetirement(element) {
-      const rows = DATA.calibration.retired_sample; const epsilons = unique(rows.map(row=>row.epsilon)).map(Number).sort((a,b)=>a-b);
-      setChart(element,{tooltip:{formatter:params=>`ε ${params.seriesName}<br>Retired ${pct(params.value[0],2)}<br>Unexplained energy ${pct(params.value[1],3)}`},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:70,right:25,top:25,bottom:75},xAxis:{type:"value",name:"Retired LFO fraction · higher covers more",...baseAxes()},yAxis:{type:"value",name:"Unexplained retired energy · lower is safer",...baseAxes()},series:epsilons.map(epsilon=>({name:String(epsilon),type:"scatter",symbolSize:6,data:rows.filter(row=>num(row.epsilon)===epsilon).map(row=>[num(row.retired_lfo_fraction),num(row.unexplained_retired_energy_fraction)]),itemStyle:{opacity:.42}}))});
+      const rows = filteredCalibrationRows("retired_sample_by_row", true);
+      if (!rows.length) return chartEmpty(element);
+      const epsilons = unique(rows.map(row=>row[1])).map(Number).sort((a,b)=>a-b);
+      element.style.height = "520px";
+      setChart(element,{tooltip:{formatter:params=>`ε ${params.seriesName}<br>Retired ${pct(params.value[0],2)}<br>Unexplained energy ${pct(params.value[1],3)}<br><strong>Better direction: lower-right</strong>`},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:25,bottom:80,containLabel:true},xAxis:{type:"value",name:"Retired LFO fraction → more capacity released",nameLocation:"middle",nameGap:42,...baseAxes()},yAxis:{type:"value",name:"Unexplained retired energy ↓ safer",nameLocation:"middle",nameGap:56,...baseAxes()},series:epsilons.map(epsilon=>({name:String(epsilon),type:"scatter",symbolSize:7,data:rows.filter(row=>num(row[1])===epsilon).map(row=>[num(row[2]),num(row[3])]),itemStyle:{opacity:.48}}))});
     }
 
     function chartRuntime(element) {
-      const rows = [...findings.runtime_outliers].reverse();
-      setChart(element,{tooltip:{trigger:"axis",axisPointer:{type:"shadow"},formatter:params=>`${esc(params[0].name)}<br>${fmt(params[0].value,2)} seconds`},grid:{left:190,right:25,top:25,bottom:45},xAxis:{type:"log",name:"Legacy oracle construction seconds · lower is faster",...baseAxes()},yAxis:{type:"category",data:rows.map(row=>short(row.row_id)),axisLabel:{color:chartText(),width:175,overflow:"truncate"},axisLine:{lineStyle:{color:chartGrid()}}},series:[{type:"bar",data:rows.map(row=>num(row.oracle_construction_time)),itemStyle:{color:COLORS.danger}}]});
+      const rows = [...filteredMetricRows(true)].sort((a,b)=>num(a.oracle_construction_time)-num(b.oracle_construction_time));
+      if (!rows.length) return chartEmpty(element);
+      const sleepIds = new Set(findings.runtime_outliers.slice(0,2).map(row=>row.row_id));
+      const ordinary = rows.filter(row=>!sleepIds.has(row.row_id));
+      const sleep = rows.filter(row=>sleepIds.has(row.row_id));
+      const labels = rows.map(row=>short(row.row_id));
+      const ordinaryMax = Math.max(...ordinary.map(row=>num(row.oracle_construction_time)),1);
+      const sleepMin = Math.min(...sleep.map(row=>num(row.oracle_construction_time)), ordinaryMax * 1.2);
+      const sleepMax = Math.max(...sleep.map(row=>num(row.oracle_construction_time)), sleepMin * 1.05);
+      element.style.height = `${Math.max(520, Math.min(980, 170 + rows.length * 21))}px`;
+      setChart(element,{
+        tooltip:{trigger:"item",formatter:params=>`${esc(params.name)}<br>${fmt(params.value,2)} seconds${params.seriesName === "Host sleep artifact" ? "<br><strong>Host sleep inflated wall-clock time</strong>" : ""}`},
+        graphic:[{type:"text",right:"20.3%",top:27,style:{text:"//",fill:chartText(),font:"800 18px sans-serif"}}],
+        grid:[{left:235,right:"27%",top:55,bottom:58},{left:"78%",right:25,top:55,bottom:58}],
+        xAxis:[{type:"value",name:"Ordinary legacy construction seconds",max:ordinaryMax*1.08,...baseAxes()},{type:"value",gridIndex:1,name:"Sleep-affected seconds",min:sleepMin*.96,max:sleepMax*1.04,...baseAxes()}],
+        yAxis:[{type:"category",data:labels,axisLabel:{color:chartText(),width:215,overflow:"truncate"},axisLine:{lineStyle:{color:chartGrid()}}},{type:"category",gridIndex:1,data:labels,axisLabel:{show:false},axisTick:{show:false},axisLine:{show:false}}],
+        series:[{name:"Ordinary legacy timing",type:"bar",xAxisIndex:0,yAxisIndex:0,data:rows.map(row=>sleepIds.has(row.row_id)?null:num(row.oracle_construction_time)),itemStyle:{color:COLORS.blue},label:{show:true,position:"right",color:"#66757b",formatter:params=>fmt(params.value,1)}},{name:"Host sleep artifact",type:"bar",xAxisIndex:1,yAxisIndex:1,data:rows.map(row=>sleepIds.has(row.row_id)?num(row.oracle_construction_time):null),itemStyle:{color:COLORS.danger},label:{show:true,position:"insideRight",color:"#ffffff",fontWeight:700,formatter:params=>fmt(params.value,0)}}]
+      });
     }
 
     function switchView(view) {
@@ -838,13 +1101,6 @@
 
     function bindGlobalEvents() {
       qsa("[data-view]").forEach(button => button.addEventListener("click", () => switchView(button.dataset.view)));
-      qs("#theme-toggle").addEventListener("click", () => {
-        document.documentElement.dataset.theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-        [...chartInstances.keys()].forEach(disposeChart);
-        if (currentView === "report") renderFullReportCharts();
-        if (currentView === "compare") renderCompare();
-        if (activeNode && activeTab === "evidence") renderDetailTab(NODES.find(node=>node.id===activeNode));
-      });
       qs("#scroll-top").addEventListener("click", () => window.scrollTo({top:0,behavior:"smooth"}));
       qs("#compare-clear").addEventListener("click", () => { compareSelection=[]; renderCompare(); });
       qs("#export-csv").addEventListener("click", exportCsv);
