@@ -73,6 +73,7 @@ from lfo_era2.strategy_grid import (  # noqa: E402
     status_text,
     verify_equivalence,
 )
+from lfo_era2.strategy_grid_report import analyze_partial_strategy_grid  # noqa: E402
 from lfo_era2.strategy_grid_execution import KeepAwakeError, scoped_system_required  # noqa: E402
 
 
@@ -164,6 +165,15 @@ def _execute(args: argparse.Namespace) -> None:
             result = analyze_strategy_grid(run_dir=args.run_dir)
             for key, value in result.items():
                 print(f"{key}={value}", flush=True)
+        elif args.command == "analyze-partial":
+            result = analyze_partial_strategy_grid(
+                run_dir=args.run_dir,
+                analysis_output_dir=args.analysis_output_dir,
+                report_path=args.report_path,
+                image_dir=args.image_dir,
+            )
+            for key, value in result.items():
+                print(f"{key}={value}", flush=True)
         elif args.command == "status":
             print(status_text(args.run_dir), flush=True)
         elif args.command == "monitor":
@@ -220,6 +230,12 @@ def _parser() -> argparse.ArgumentParser:
 
     analyze = subcommands.add_parser("analyze", help="validate complete phases and generate Experiment 13 outputs")
     analyze.add_argument("--run-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+
+    partial = subcommands.add_parser("analyze-partial", help="generate a provisional report from completed 13A row shards")
+    partial.add_argument("--run-dir", type=Path, required=True)
+    partial.add_argument("--analysis-output-dir", type=Path, required=True)
+    partial.add_argument("--report-path", type=Path, required=True)
+    partial.add_argument("--image-dir", type=Path, required=True)
 
     status = subcommands.add_parser("status", help="print Experiment 13 phase and gate status")
     status.add_argument("--run-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
