@@ -98,10 +98,16 @@
     .global-filter-title { min-width: 0; }
     .global-filter-title strong { font-size: .82rem; }
     .global-filter-title span { margin-left: 8px; color: var(--muted); font-size: .7rem; }
-    .global-filter-body { grid-column: 1 / -1; display: grid; gap: 8px; }
-    .filter-groups { display: flex; flex-wrap: wrap; gap: 7px 14px; align-items: flex-start; }
-    .filter-fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
-    .filter-fieldset legend { float: left; margin: 6px 6px 0 0; color: var(--muted); font: 750 .66rem/1 var(--mono); text-transform: uppercase; }
+    .global-filter-body { grid-column: 1 / -1; display: grid; gap: 9px; }
+    .filter-intro { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; color: var(--muted); font-size: .7rem; }
+    .filter-intro strong { color: var(--text); }
+    .filter-intro .coverage-key { margin-left: auto; font-family: var(--mono); }
+    .filter-groups { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; align-items: start; }
+    .filter-fieldset { min-width: 0; margin: 0; padding: 9px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); }
+    .filter-fieldset[data-stage="construction"] { grid-column: 1 / -1; background: color-mix(in srgb, var(--accent-2) 4%, var(--surface-2)); }
+    .filter-fieldset legend { display: flex; align-items: center; gap: 6px; width: auto; margin: 0 0 7px; padding: 0 4px; color: var(--muted); font: 750 .66rem/1 var(--mono); text-transform: uppercase; }
+    .filter-step { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-2); color: white; font: 800 .62rem/1 var(--sans); }
+    .filter-hint { margin-left: 3px; color: var(--muted); font: 500 .65rem/1.25 var(--sans); text-transform: none; }
     .filter-pills { display: flex; flex-wrap: wrap; gap: 4px; }
     .filter-pill {
       min-height: 28px;
@@ -119,12 +125,19 @@
       background: color-mix(in srgb, var(--accent) 14%, var(--surface));
       color: var(--accent);
     }
+    .filter-pill:disabled { cursor: not-allowed; opacity: .38; border-style: dashed; }
+    .filter-pill.zero-complete:not([aria-pressed="true"]) { border-style: dashed; }
+    .facet-count { display: inline-flex; align-items: baseline; gap: 1px; margin-left: 5px; padding-left: 5px; border-left: 1px solid currentColor; opacity: .72; font: 650 .58rem/1 var(--mono); }
+    .facet-count b { color: var(--accent); }
+    .filter-dependent-empty { display: flex; align-items: center; gap: 8px; min-height: 32px; padding: 6px 9px; border: 1px dashed var(--border); border-radius: 8px; color: var(--muted); font-size: .72rem; }
+    .filter-dependent-empty::before { content: "1"; display: grid; place-items: center; width: 19px; height: 19px; flex: 0 0 auto; border-radius: 50%; background: var(--accent-2); color: white; font-weight: 800; }
     .filter-toggle { display: flex; align-items: center; gap: 7px; align-self: center; color: var(--muted); font-size: .75rem; white-space: nowrap; }
     .filter-toggle input { width: 17px; height: 17px; accent-color: var(--accent); }
     .filter-summary { display: flex; min-width: 0; align-items: center; gap: 8px; color: var(--muted); font-size: .72rem; }
     .filter-summary strong { color: var(--accent); }
     .filter-summary span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .filter-collapse { min-width: 92px; }
+    .filter-collapse { justify-self: end; width: auto; min-width: 92px; }
+    #global-reset { justify-self: start; }
     .global-filter-bar.collapsed { padding: 5px 0; }
     .global-filter-bar.collapsed .global-filter-panel { min-height: 42px; padding-block: 6px; box-shadow: 0 7px 20px rgba(20, 48, 56, .12); }
     .global-filter-bar.collapsed .global-filter-body,
@@ -286,6 +299,7 @@
       .global-filter-panel { grid-template-columns: minmax(0, 1fr) auto; }
       .filter-summary { grid-column: 1 / -1; grid-row: 2; }
       .global-filter-body { grid-column: 1 / -1; }
+      .filter-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 720px) {
       .shell { width: min(100% - 20px, 1480px); }
@@ -302,10 +316,12 @@
       .controls > *, .data-controls > * { width: 100%; }
       .global-filter-panel { width: calc(100% - 12px); grid-template-columns: minmax(0, 1fr) auto; }
       .global-filter-title span { display: none; }
-      .filter-groups { display: grid; gap: 8px; }
-      .filter-fieldset legend { float: none; display: block; margin: 0 0 5px; }
+      .filter-groups { display: grid; grid-template-columns: 1fr; gap: 8px; }
+      .filter-fieldset[data-stage="construction"] { grid-column: auto; }
+      .filter-fieldset legend { display: flex; margin: 0 0 6px; }
       .filter-pills { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 3px; }
       .filter-summary span { display: none; }
+      .filter-intro .coverage-key { width: 100%; margin-left: 0; }
       .reading-guide, .mechanism-grid { grid-template-columns: 1fr; }
     }
     @media print {
@@ -341,6 +357,7 @@
       <label class="filter-toggle"><input id="global-apply-charts" type="checkbox" checked> Apply to every chart</label>
       <button id="global-collapse" class="small-button filter-collapse" type="button" aria-expanded="true" aria-controls="global-filter-body">Minimize</button>
       <div id="global-filter-body" class="global-filter-body">
+        <div class="filter-intro"><strong>Build a valid slice:</strong><span>family → construction variant → run settings</span><span class="coverage-key"><b>completed</b>/planned rows</span></div>
         <div id="global-filter-groups" class="filter-groups"></div>
         <button id="global-reset" class="small-button" type="button">Clear selections</button>
       </div>
@@ -629,26 +646,80 @@
     }
 
     function renderGlobalFilters() {
-      const groups = [
-        ...GLOBAL_FIELDS.map(([id,key,label]) => [id,label.replace("All ",""),unique(coverage.map(row => row[key]))]),
-        ["pareto","Pareto",["Pareto candidates","Non-Pareto rows"]]
-      ];
-      qs("#global-filter-groups").innerHTML = groups.map(([id,label,values]) => `<fieldset id="global-${esc(id)}" class="filter-fieldset"><legend>${esc(label)}</legend><div class="filter-pills" aria-label="${esc(label)} multi-select">${values.map(value => {
-        const stateValue = id === "pareto" ? (value === "Pareto candidates" ? "pareto" : "non-pareto") : String(value);
-        return `<button class="filter-pill" type="button" data-global-field="${esc(id)}" data-global-value="${esc(stateValue)}" aria-pressed="false">${esc(value)}</button>`;
-      }).join("")}</div></fieldset>`).join("");
-      qsa("[data-global-field]").forEach(button => button.addEventListener("click", () => {
-        const selected = globalState[button.dataset.globalField];
-        const value = button.dataset.globalValue;
-        selected.has(value) ? selected.delete(value) : selected.add(value);
-        button.setAttribute("aria-pressed", String(selected.has(value)));
-        updateGlobalFilters();
-      }));
       qs("#global-apply-charts").checked = globalState.applyCharts;
       qs("#global-apply-charts").addEventListener("input", updateGlobalFilters);
       qs("#global-reset").addEventListener("click", resetGlobalFilters);
       qs("#global-collapse").addEventListener("click", toggleGlobalFilters);
+      renderReactiveFilterGroups();
       updateGlobalFilterSummary();
+    }
+
+    function renderReactiveFilterGroups() {
+      const selectedFamilies = globalState.family;
+      const groups = [
+        {id:"family",label:"Families",step:1,stage:"construction",hint:"Choose one or more parent families",values:unique(coverage.map(row => row.construction_family))},
+        {id:"policy",label:"Construction variants",step:2,stage:"construction",hint:"Only variants belonging to the chosen families",values:selectedFamilies.size ? unique(coverage.filter(row => selectedFamilies.has(String(row.construction_family))).map(row => row.construction_policy)) : []},
+        {id:"schedule",label:"Schedules",values:unique(coverage.map(row => row.layer_schedule))},
+        {id:"budget",label:"Budgets",values:unique(coverage.map(row => row.utility_candidate_budget))},
+        {id:"normalization",label:"Normalization",values:unique(coverage.map(row => row.layer_normalization_policy))},
+        {id:"pareto",label:"Pareto",values:["pareto","non-pareto"]}
+      ];
+      qs("#global-filter-groups").innerHTML = groups.map(group => {
+        const legend = `${group.step ? `<span class="filter-step">${group.step}</span>` : ""}${esc(group.label)}${group.hint ? `<span class="filter-hint">${esc(group.hint)}</span>` : ""}`;
+        const pills = group.id === "policy" && !selectedFamilies.size
+          ? `<div class="filter-dependent-empty">Select at least one family; its valid construction variants will appear here.</div>`
+          : `<div class="filter-pills" aria-label="${esc(group.label)} multi-select">${group.values.map(value => filterPillMarkup(group.id, String(value))).join("")}</div>`;
+        return `<fieldset id="global-${esc(group.id)}" class="filter-fieldset"${group.stage ? ` data-stage="${group.stage}"` : ""}><legend>${legend}</legend>${pills}</fieldset>`;
+      }).join("");
+      qsa("[data-global-field]").forEach(button => button.addEventListener("click", () => {
+        const id = button.dataset.globalField;
+        const value = button.dataset.globalValue;
+        const selected = globalState[id];
+        selected.has(value) ? selected.delete(value) : selected.add(value);
+        if (id === "family") prunePolicySelections();
+        renderReactiveFilterGroups();
+        updateGlobalFilters();
+      }));
+    }
+
+    function filterPillMarkup(id, value) {
+      const stats = facetStats(id, value);
+      const selected = globalState[id].has(value);
+      const enabled = stats.planned > 0 || selected;
+      const label = id === "pareto" ? (value === "pareto" ? "Pareto candidates" : "Non-Pareto rows") : value;
+      const count = id === "pareto" ? `${stats.completed}` : `<b>${stats.completed}</b>/${stats.planned}`;
+      const title = id === "pareto"
+        ? `${stats.completed} completed rows; Pareto membership is undefined for uncompleted rows`
+        : `${stats.completed} completed of ${stats.planned} planned rows after the other active filters`;
+      return `<button class="filter-pill${stats.completed === 0 && stats.planned > 0 ? " zero-complete" : ""}" type="button" data-global-field="${esc(id)}" data-global-value="${esc(value)}" aria-pressed="${selected}" title="${esc(title)}" ${enabled ? "" : "disabled"}>${esc(label)}<span class="facet-count">${count}</span></button>`;
+    }
+
+    function facetStats(targetId, targetValue) {
+      const candidates = coverage.filter(row => facetRowMatches(row, targetId, targetValue));
+      return {planned:candidates.length,completed:candidates.filter(row => metricById.has(row.row_id)).length};
+    }
+
+    function facetRowMatches(row, targetId, targetValue) {
+      for (const [id,key] of GLOBAL_FIELDS) {
+        if (id === targetId) {
+          if (String(row[key]) !== targetValue) return false;
+          continue;
+        }
+        if (globalState[id].size && !globalState[id].has(String(row[key]))) return false;
+      }
+      const completed = metricById.get(row.row_id);
+      if (targetId === "pareto") return Boolean(completed) && (truthy(completed.pareto_candidate) ? "pareto" : "non-pareto") === targetValue;
+      if (globalState.pareto.size) return Boolean(completed) && globalState.pareto.has(truthy(completed.pareto_candidate) ? "pareto" : "non-pareto");
+      return true;
+    }
+
+    function prunePolicySelections() {
+      if (!globalState.family.size) {
+        globalState.policy.clear();
+        return;
+      }
+      const allowed = new Set(coverage.filter(row => globalState.family.has(String(row.construction_family))).map(row => String(row.construction_policy)));
+      [...globalState.policy].filter(value => !allowed.has(value)).forEach(value => globalState.policy.delete(value));
     }
 
     function updateGlobalFilters() {
@@ -664,7 +735,7 @@
       [...GLOBAL_FIELDS.map(([id]) => id), "pareto"].forEach(id => globalState[id].clear());
       globalState.applyCharts = true;
       qs("#global-apply-charts").checked = true;
-      qsa("[data-global-field]").forEach(button => button.setAttribute("aria-pressed", "false"));
+      renderReactiveFilterGroups();
       updateGlobalFilters();
     }
 
@@ -680,8 +751,9 @@
     function updateGlobalFilterSummary() {
       const selected = GLOBAL_FIELDS.filter(([id]) => globalState[id].size).map(([id,,label]) => `${label.replace("All ","")}: ${[...globalState[id]].join(", ")}`);
       if (globalState.pareto.size) selected.push(`Pareto: ${[...globalState.pareto].join(", ")}`);
-      const count = filteredMetricRows(false).length;
-      qs("#global-filter-summary").innerHTML = `<strong>${count}/${metrics.length} rows</strong><span>${selected.length ? esc(selected.join(" · ")) : "All factors"}</span><span>Charts: ${globalState.applyCharts ? "filtered" : "full fragment"}</span>`;
+      const completed = filteredMetricRows(false).length;
+      const planned = filteredCoverageRows(false).length;
+      qs("#global-filter-summary").innerHTML = `<strong>${completed} completed</strong><span>${planned} planned in slice</span><span>${selected.length ? esc(selected.join(" · ")) : "All factors"}</span><span>Charts: ${globalState.applyCharts ? "filtered" : "full fragment"}</span>`;
     }
 
     function rowMatchesGlobal(row, ignoreKey = null) {
