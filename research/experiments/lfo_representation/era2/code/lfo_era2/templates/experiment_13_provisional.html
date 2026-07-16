@@ -45,12 +45,8 @@
     code { font-family: var(--mono); }
     .shell { width: min(1480px, calc(100% - 32px)); margin: 0 auto; }
     .topbar {
-      position: sticky;
-      z-index: 60;
-      top: 0;
       border-bottom: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
-      background: color-mix(in srgb, var(--bg) 88%, transparent);
-      backdrop-filter: blur(18px);
+      background: var(--bg);
     }
     .topbar-inner {
       display: flex;
@@ -81,41 +77,59 @@
     }
     .global-filter-bar {
       position: sticky;
-      z-index: 50;
-      top: 72px;
-      padding: 10px 0;
-      pointer-events: none;
+      z-index: 70;
+      top: 0;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
     }
     .global-filter-panel {
       display: grid;
-      grid-template-columns: auto repeat(6, minmax(120px, 1fr)) auto auto;
-      gap: 8px;
-      align-items: end;
-      padding: 12px;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 9px 12px;
+      align-items: center;
+      padding: 10px 12px;
       border: 1px solid var(--border);
-      border-radius: 16px;
-      background: color-mix(in srgb, var(--surface) 94%, transparent);
+      border-radius: 13px;
+      background: var(--surface);
       box-shadow: 0 12px 32px rgba(20, 48, 56, .15);
-      backdrop-filter: blur(18px);
-      pointer-events: auto;
     }
-    .global-filter-title { align-self: center; min-width: 110px; }
-    .global-filter-title strong { display: block; font-size: .82rem; }
-    .global-filter-title span, .filter-field span { color: var(--muted); font-size: .68rem; }
-    .filter-field { display: grid; gap: 4px; min-width: 0; }
-    .filter-field select {
-      width: 100%;
-      min-width: 0;
-      height: 38px;
+    .global-filter-heading { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .global-filter-title { min-width: 0; }
+    .global-filter-title strong { font-size: .82rem; }
+    .global-filter-title span { margin-left: 8px; color: var(--muted); font-size: .7rem; }
+    .global-filter-body { grid-column: 1 / -1; display: grid; gap: 8px; }
+    .filter-groups { display: flex; flex-wrap: wrap; gap: 7px 14px; align-items: flex-start; }
+    .filter-fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+    .filter-fieldset legend { float: left; margin: 6px 6px 0 0; color: var(--muted); font: 750 .66rem/1 var(--mono); text-transform: uppercase; }
+    .filter-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+    .filter-pill {
+      min-height: 28px;
+      padding: 5px 8px;
       border: 1px solid var(--border);
-      border-radius: 9px;
+      border-radius: 999px;
       background: var(--surface-2);
-      padding: 7px 9px;
+      color: var(--muted);
+      font: 700 .67rem/1 var(--sans);
+      white-space: nowrap;
+    }
+    .filter-pill:hover { border-color: var(--accent); color: var(--text); }
+    .filter-pill[aria-pressed="true"] {
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+      color: var(--accent);
     }
     .filter-toggle { display: flex; align-items: center; gap: 7px; align-self: center; color: var(--muted); font-size: .75rem; white-space: nowrap; }
     .filter-toggle input { width: 17px; height: 17px; accent-color: var(--accent); }
-    .filter-summary { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; min-height: 20px; color: var(--muted); font-size: .72rem; }
+    .filter-summary { display: flex; min-width: 0; align-items: center; gap: 8px; color: var(--muted); font-size: .72rem; }
     .filter-summary strong { color: var(--accent); }
+    .filter-summary span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .filter-collapse { min-width: 92px; }
+    .global-filter-bar.collapsed { padding: 5px 0; }
+    .global-filter-bar.collapsed .global-filter-panel { min-height: 42px; padding-block: 6px; box-shadow: 0 7px 20px rgba(20, 48, 56, .12); }
+    .global-filter-bar.collapsed .global-filter-body,
+    .global-filter-bar.collapsed .filter-toggle,
+    .global-filter-bar.collapsed #global-reset { display: none; }
     button:focus-visible, input:focus-visible, select:focus-visible {
       outline: 3px solid color-mix(in srgb, var(--accent-2) 55%, transparent);
       outline-offset: 2px;
@@ -269,13 +283,13 @@
     @media (max-width: 1100px) {
       .finding-grid, .evidence-grid, .primary-metric-grid { grid-template-columns: repeat(2, 1fr); }
       .hero-grid, .compare-layout { grid-template-columns: 1fr; }
-      .global-filter-panel { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .global-filter-title, .filter-toggle { grid-column: auto; }
+      .global-filter-panel { grid-template-columns: minmax(0, 1fr) auto; }
+      .filter-summary { grid-column: 1 / -1; grid-row: 2; }
+      .global-filter-body { grid-column: 1 / -1; }
     }
     @media (max-width: 720px) {
       .shell { width: min(100% - 20px, 1480px); }
       .topbar-inner { min-height: 62px; }
-      .global-filter-bar { top: 62px; }
       .brand .eyebrow { display: none; }
       .top-actions .label { display: none; }
       .hero { padding-top: 22px; }
@@ -286,10 +300,12 @@
       .chart { height: 420px; }
       .chart.delta-chart { height: 620px; }
       .controls > *, .data-controls > * { width: 100%; }
-      .global-filter-panel { display: flex; overflow-x: auto; align-items: end; }
-      .global-filter-title { min-width: 120px; }
-      .filter-field { min-width: 155px; }
-      .filter-summary { display: none; }
+      .global-filter-panel { width: calc(100% - 12px); grid-template-columns: minmax(0, 1fr) auto; }
+      .global-filter-title span { display: none; }
+      .filter-groups { display: grid; gap: 8px; }
+      .filter-fieldset legend { float: none; display: block; margin: 0 0 5px; }
+      .filter-pills { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 3px; }
+      .filter-summary span { display: none; }
       .reading-guide, .mechanism-grid { grid-template-columns: 1fr; }
     }
     @media print {
@@ -318,16 +334,16 @@
 
   <aside class="global-filter-bar" aria-label="Global strategy filters">
     <div class="shell global-filter-panel">
-      <div class="global-filter-title"><strong>Global filters</strong><span>All report views</span></div>
-      <label class="filter-field"><span>Construction family</span><select id="global-family"></select></label>
-      <label class="filter-field"><span>Construction policy</span><select id="global-policy"></select></label>
-      <label class="filter-field"><span>Layer schedule</span><select id="global-schedule"></select></label>
-      <label class="filter-field"><span>Candidate budget</span><select id="global-budget"></select></label>
-      <label class="filter-field"><span>Normalization</span><select id="global-normalization"></select></label>
-      <label class="filter-field"><span>Pareto membership</span><select id="global-pareto"></select></label>
+      <div class="global-filter-heading">
+        <div class="global-filter-title"><strong>Global filters</strong><span>Multi-select · all report views</span></div>
+        <div id="global-filter-summary" class="filter-summary" aria-live="polite"></div>
+      </div>
       <label class="filter-toggle"><input id="global-apply-charts" type="checkbox" checked> Apply to every chart</label>
-      <button id="global-reset" class="small-button" type="button">Reset</button>
-      <div id="global-filter-summary" class="filter-summary" aria-live="polite"></div>
+      <button id="global-collapse" class="small-button filter-collapse" type="button" aria-expanded="true" aria-controls="global-filter-body">Minimize</button>
+      <div id="global-filter-body" class="global-filter-body">
+        <div id="global-filter-groups" class="filter-groups"></div>
+        <button id="global-reset" class="small-button" type="button">Clear selections</button>
+      </div>
     </div>
   </aside>
 
@@ -588,10 +604,12 @@
     let compareSelection = [];
     let dataKind = "metrics";
     let currentDataRows = [];
-    const globalState = {family:"all",policy:"all",schedule:"all",budget:"all",normalization:"all",pareto:"all",applyCharts:true};
+    const globalState = {family:new Set(),policy:new Set(),schedule:new Set(),budget:new Set(),normalization:new Set(),pareto:new Set(),applyCharts:true};
     const chartInstances = new Map();
     const chartResizeObserver = "ResizeObserver" in window ? new ResizeObserver(entries => {
-      entries.forEach(entry => chartInstances.get(entry.target)?.resize());
+      entries.forEach(entry => {
+        if (entry.contentRect.width > 0 && entry.contentRect.height > 0) chartInstances.get(entry.target)?.resize();
+      });
     }) : null;
 
     function initialize() {
@@ -611,22 +629,29 @@
     }
 
     function renderGlobalFilters() {
-      GLOBAL_FIELDS.forEach(([id,key,label]) => {
-        const select = qs(`#global-${id}`);
-        select.innerHTML = `<option value="all">${esc(label)}</option>${unique(coverage.map(row => row[key])).map(value => `<option value="${esc(value)}">${esc(value)}</option>`).join("")}`;
-        select.value = globalState[id];
-      });
-      qs("#global-pareto").innerHTML = `<option value="all">All Pareto states</option><option value="pareto">Pareto candidates</option><option value="non-pareto">Non-Pareto rows</option>`;
-      qs("#global-pareto").value = globalState.pareto;
+      const groups = [
+        ...GLOBAL_FIELDS.map(([id,key,label]) => [id,label.replace("All ",""),unique(coverage.map(row => row[key]))]),
+        ["pareto","Pareto",["Pareto candidates","Non-Pareto rows"]]
+      ];
+      qs("#global-filter-groups").innerHTML = groups.map(([id,label,values]) => `<fieldset id="global-${esc(id)}" class="filter-fieldset"><legend>${esc(label)}</legend><div class="filter-pills" aria-label="${esc(label)} multi-select">${values.map(value => {
+        const stateValue = id === "pareto" ? (value === "Pareto candidates" ? "pareto" : "non-pareto") : String(value);
+        return `<button class="filter-pill" type="button" data-global-field="${esc(id)}" data-global-value="${esc(stateValue)}" aria-pressed="false">${esc(value)}</button>`;
+      }).join("")}</div></fieldset>`).join("");
+      qsa("[data-global-field]").forEach(button => button.addEventListener("click", () => {
+        const selected = globalState[button.dataset.globalField];
+        const value = button.dataset.globalValue;
+        selected.has(value) ? selected.delete(value) : selected.add(value);
+        button.setAttribute("aria-pressed", String(selected.has(value)));
+        updateGlobalFilters();
+      }));
       qs("#global-apply-charts").checked = globalState.applyCharts;
-      [...GLOBAL_FIELDS.map(([id]) => qs(`#global-${id}`)), qs("#global-pareto"), qs("#global-apply-charts")].forEach(control => control.addEventListener("input", updateGlobalFilters));
+      qs("#global-apply-charts").addEventListener("input", updateGlobalFilters);
       qs("#global-reset").addEventListener("click", resetGlobalFilters);
+      qs("#global-collapse").addEventListener("click", toggleGlobalFilters);
       updateGlobalFilterSummary();
     }
 
     function updateGlobalFilters() {
-      GLOBAL_FIELDS.forEach(([id]) => { globalState[id] = qs(`#global-${id}`).value; });
-      globalState.pareto = qs("#global-pareto").value;
       globalState.applyCharts = qs("#global-apply-charts").checked;
       updateGlobalFilterSummary();
       renderPrimaryMetrics();
@@ -636,27 +661,35 @@
     }
 
     function resetGlobalFilters() {
-      GLOBAL_FIELDS.forEach(([id]) => { globalState[id] = "all"; qs(`#global-${id}`).value = "all"; });
-      globalState.pareto = "all";
+      [...GLOBAL_FIELDS.map(([id]) => id), "pareto"].forEach(id => globalState[id].clear());
       globalState.applyCharts = true;
-      qs("#global-pareto").value = "all";
       qs("#global-apply-charts").checked = true;
+      qsa("[data-global-field]").forEach(button => button.setAttribute("aria-pressed", "false"));
       updateGlobalFilters();
     }
 
+    function toggleGlobalFilters() {
+      const bar = qs(".global-filter-bar");
+      const collapsed = bar.classList.toggle("collapsed");
+      const button = qs("#global-collapse");
+      button.setAttribute("aria-expanded", String(!collapsed));
+      button.textContent = collapsed ? "Filters" : "Minimize";
+      requestAnimationFrame(resizeVisibleCharts);
+    }
+
     function updateGlobalFilterSummary() {
-      const selected = GLOBAL_FIELDS.filter(([id]) => globalState[id] !== "all").map(([id,,label]) => `${label.replace("All ","")}: ${globalState[id]}`);
-      if (globalState.pareto !== "all") selected.push(`Pareto: ${globalState.pareto}`);
+      const selected = GLOBAL_FIELDS.filter(([id]) => globalState[id].size).map(([id,,label]) => `${label.replace("All ","")}: ${[...globalState[id]].join(", ")}`);
+      if (globalState.pareto.size) selected.push(`Pareto: ${[...globalState.pareto].join(", ")}`);
       const count = filteredMetricRows(false).length;
-      qs("#global-filter-summary").innerHTML = `<strong>${count}/${metrics.length} completed rows in scope</strong><span>${selected.length ? esc(selected.join(" · ")) : "No factor filters active"}</span><span>Charts: ${globalState.applyCharts ? "filtered" : "showing full fragment"}</span>`;
+      qs("#global-filter-summary").innerHTML = `<strong>${count}/${metrics.length} rows</strong><span>${selected.length ? esc(selected.join(" · ")) : "All factors"}</span><span>Charts: ${globalState.applyCharts ? "filtered" : "full fragment"}</span>`;
     }
 
     function rowMatchesGlobal(row, ignoreKey = null) {
       if (!row) return false;
-      const factorsMatch = GLOBAL_FIELDS.every(([id,key]) => key === ignoreKey || globalState[id] === "all" || String(row[key]) === globalState[id]);
+      const factorsMatch = GLOBAL_FIELDS.every(([id,key]) => key === ignoreKey || !globalState[id].size || globalState[id].has(String(row[key])));
       if (!factorsMatch) return false;
-      if (globalState.pareto === "all" || ignoreKey === "pareto_candidate") return true;
-      return truthy(row.pareto_candidate) === (globalState.pareto === "pareto");
+      if (!globalState.pareto.size || ignoreKey === "pareto_candidate") return true;
+      return globalState.pareto.has(truthy(row.pareto_candidate) ? "pareto" : "non-pareto");
     }
 
     function filteredMetricRows(forChart = false) {
@@ -668,9 +701,9 @@
       if (forChart && !globalState.applyCharts) return coverage;
       return coverage.filter(row => {
         if (!rowMatchesGlobal(row, "pareto_candidate")) return false;
-        if (globalState.pareto === "all") return true;
+        if (!globalState.pareto.size) return true;
         const completed = metricById.get(row.row_id);
-        return completed && truthy(completed.pareto_candidate) === (globalState.pareto === "pareto");
+        return completed && globalState.pareto.has(truthy(completed.pareto_candidate) ? "pareto" : "non-pareto");
       });
     }
 
@@ -680,6 +713,11 @@
       return rows.filter(row => {
         const left = metricById.get(row.left_row_id);
         const right = metricById.get(row.right_row_id);
+        const comparedField = GLOBAL_FIELDS.find(([,key]) => key === comparison);
+        if (comparedField) {
+          const [id,key] = comparedField;
+          if (globalState[id].size && ![left,right].some(item => item && globalState[id].has(String(item[key])))) return false;
+        }
         return rowMatchesGlobal(left, comparison) || rowMatchesGlobal(right, comparison);
       });
     }
@@ -916,7 +954,7 @@
 
     function renderComparisonChart(rows) {
       const element = qs("#compare-radar");
-      if (rows.length < 2) { disposeChart(element); element.innerHTML = `<div class="empty">Select at least two rows to render the normalized comparison.</div>`; return; }
+      if (rows.length < 2) return chartEmpty(element, "Select at least two rows to render the normalized comparison.");
       const definitions = [
         ["Median quality","validation_median_rmse",false],
         ["Strict-perfect","validation_strict_perfect_lfo_rate",true],
@@ -927,6 +965,7 @@
         const all = filteredMetricRows(false).map(row => num(row[key])); const min = Math.min(...all); const max = Math.max(...all);
         return value => max === min ? 100 : (higher ? (num(value)-min)/(max-min) : (max-num(value))/(max-min)) * 100;
       });
+      element.style.height = "330px";
       setChart(element, {tooltip:{},legend:{bottom:0,textStyle:{color:chartText()}},radar:{indicator:definitions.map(([name]) => ({name,max:100})),axisName:{color:chartText()},splitLine:{lineStyle:{color:chartGrid()}},splitArea:{areaStyle:{color:["transparent"]}},axisLine:{lineStyle:{color:chartGrid()}}},series:[{type:"radar",data:rows.map(row => ({name:short(row.row_id),value:definitions.map(([,key],index) => normalized[index](row[key]))}))}]});
     }
 
@@ -976,19 +1015,48 @@
 
     function setChart(element, option) {
       if (!window.echarts || window.__echartsFailed) { disposeChart(element); element.innerHTML = `<div class="chart-fallback"><div><strong>Interactive chart unavailable.</strong><br>The findings and exact data remain available. Connect to the internet to load pinned ECharts from jsDelivr.</div></div>`; return; }
-      element.innerHTML = "";
-      let instance = chartInstances.get(element);
+      pruneChartInstances();
+      let instance = chartInstances.get(element) || echarts.getInstanceByDom(element);
       if (!instance) {
+        element.replaceChildren();
         instance = echarts.init(element, null, {renderer:"canvas"});
         chartInstances.set(element, instance);
         chartResizeObserver?.observe(element);
+      } else {
+        chartInstances.set(element, instance);
       }
-      option.backgroundColor = "transparent"; option.animationDuration = 250; instance.setOption(option, true);
-      requestAnimationFrame(() => instance.resize());
+      element.dataset.chartState = "rendered";
+      option.backgroundColor = "transparent";
+      option.animationDuration = 250;
+      instance.clear();
+      instance.setOption(option, true);
+      scheduleChartResize(element, instance);
     }
-    function chartEmpty(element, message = "No rows match the global filters.") { disposeChart(element); element.style.height = "260px"; element.innerHTML = `<div class="empty">${esc(message)}</div>`; }
-    function disposeChart(element) { const instance = chartInstances.get(element); if (instance) { chartResizeObserver?.unobserve(element); instance.dispose(); chartInstances.delete(element); } }
-    function resizeVisibleCharts() { chartInstances.forEach((instance, element) => { if (element.offsetParent !== null) instance.resize(); }); }
+    function scheduleChartResize(element, instance) {
+      const resize = () => {
+        if (!element.isConnected || element.offsetParent === null) return;
+        const rect = element.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) instance.resize({width:Math.floor(rect.width),height:Math.floor(rect.height)});
+      };
+      requestAnimationFrame(() => requestAnimationFrame(resize));
+      window.setTimeout(resize, 120);
+    }
+    function chartEmpty(element, message = "No rows match the global filters.") {
+      disposeChart(element);
+      element.dataset.chartState = "empty";
+      element.style.height = "260px";
+      element.innerHTML = `<div class="empty">${esc(message)}</div>`;
+    }
+    function disposeChart(element) {
+      const instance = chartInstances.get(element) || (window.echarts ? echarts.getInstanceByDom(element) : null);
+      if (instance) instance.dispose();
+      chartResizeObserver?.unobserve(element);
+      chartInstances.delete(element);
+    }
+    function pruneChartInstances() {
+      [...chartInstances.keys()].filter(element => !element.isConnected).forEach(disposeChart);
+    }
+    function resizeVisibleCharts() { chartInstances.forEach((instance, element) => { if (element.isConnected && element.offsetParent !== null) scheduleChartResize(element, instance); }); }
     function chartText() { return getComputedStyle(document.documentElement).getPropertyValue("--muted").trim(); }
     function chartGrid() { return getComputedStyle(document.documentElement).getPropertyValue("--border").trim(); }
     function baseAxes() { return {axisLine:{lineStyle:{color:chartGrid()}},axisLabel:{color:chartText()},splitLine:{lineStyle:{color:chartGrid(),opacity:.45}},nameTextStyle:{color:chartText()}}; }
