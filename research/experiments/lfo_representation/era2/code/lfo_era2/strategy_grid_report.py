@@ -748,6 +748,54 @@ def _provisional_markdown(
     top = sorted(bundle.summaries, key=lambda row: _number(row, "validation_p95_rmse"))[:5]
     runtime_rows = sorted(bundle.summaries, key=lambda row: _number(row, "oracle_construction_time"), reverse=True)
     source_display = os.path.relpath(source_run, report_path.parent).replace("\\", "/")
+    metric_specs = (
+        ("validation_median_rmse", "Median RMSE", False),
+        ("validation_strict_perfect_lfo_rate", "Strict-perfect LFO rate", True),
+        ("validation_p95_rmse", "P95 RMSE", False),
+        ("validation_node_max_error_p95", "Node-max error P95", False),
+    )
+
+    def metric_value(metric: str, value: float) -> str:
+        return f"{value:.3%}" if metric == "validation_strict_perfect_lfo_rate" else f"{value:.8g}"
+
+    primary_metric_table = [
+        "| Co-primary metric | Better direction | Best observed value | Best observed row |",
+        "| --- | --- | ---: | --- |",
+    ]
+    for metric, label, higher_is_better in metric_specs:
+        best_metric_row = (max if higher_is_better else min)(
+            bundle.summaries,
+            key=lambda row, key=metric: _number(row, key),
+        )
+        primary_metric_table.append(
+            f"| {label} | {'higher' if higher_is_better else 'lower'} | "
+            f"{metric_value(metric, _number(best_metric_row, metric))} | "
+            f"`{best_metric_row.get('row_id')}` |"
+        )
+
+    comparison_labels = (
+        ("layer_normalization_policy", "LayerClip0To1 vs FinalClipOnly"),
+        ("utility_candidate_budget", "CandidateBudget48 vs CandidateBudget24"),
+        ("layer_schedule", "TwoPhase vs Interleaved"),
+    )
+    matched_metric_table = [
+        "| Matched factor | Co-primary metric | Right / left / ties | Median right-minus-left delta |",
+        "| --- | --- | ---: | ---: |",
+    ]
+    for comparison, comparison_label in comparison_labels:
+        for metric, label, higher_is_better in metric_specs:
+            summary = _comparison_metric_summary(
+                bundle.matched_deltas,
+                comparison,
+                metric,
+                higher_is_better=higher_is_better,
+            )
+            delta = float(summary["median"])
+            delta_text = f"{delta * 100:+.5f} pp" if higher_is_better else f"{delta:+.8g}"
+            matched_metric_table.append(
+                f"| {comparison_label} | {label} | {summary['improved']} / {summary['worsened']} / "
+                f"{summary['tied']} | {delta_text} |"
+            )
 
     def image(name: str, alt: str) -> str:
         relative = os.path.relpath(plot_paths[name], report_path.parent).replace("\\", "/")
@@ -777,6 +825,18 @@ def _provisional_markdown(
         image("pareto", "Provisional co-primary quality tradeoffs"),
         "",
         "The scatter's x-axis is validation median RMSE and its y-axis is validation P95 RMSE; lower-left is better on both. Color identifies the covered construction family. Larger black-outlined points are provisional Pareto candidates after also accounting for strict-perfect rate and node-max P95, so no single point is declared the automatic winner.",
+        "",
+        "### All Four Co-Primary Validation Metrics",
+        "",
+        "Experiment 13 defines quality using four co-primary outcomes. Each row below reports the best observed value in the incomplete prefix; different metrics can select different strategy rows.",
+        "",
+        *primary_metric_table,
+        "",
+        "### Matched Effects Across All Four Co-Primary Metrics",
+        "",
+        "The table below prevents the P95-focused static plots from standing in for the complete outcome set. For RMSE and node-max errors, negative deltas favor the right policy; for strict-perfect rate, positive deltas favor the right policy.",
+        "",
+        *matched_metric_table,
         "",
         "## Why These Patterns Appear",
         "",
@@ -878,16 +938,41 @@ def _provisional_markdown(
 
 
 def _comparison_summary(rows: Sequence[Mapping[str, Any]], comparison: str) -> dict[str, float | int]:
+    return _comparison_metric_summary(
+        rows,
+        comparison,
+        "validation_p95_rmse",
+        higher_is_better=False,
+    )
+
+
+def _comparison_metric_summary(
+    rows: Sequence[Mapping[str, Any]],
+    comparison: str,
+    metric: str,
+    *,
+    higher_is_better: bool,
+) -> dict[str, float | int]:
     values = [
-        _number(row, "delta_validation_p95_rmse")
+        _number(row, f"delta_{metric}")
         for row in rows
         if row.get("comparison") == comparison
     ]
     if not values:
-        return {"count": 0, "improved": 0, "median": math.nan, "minimum": math.nan, "maximum": math.nan}
+        return {
+            "count": 0,
+            "improved": 0,
+            "worsened": 0,
+            "tied": 0,
+            "median": math.nan,
+            "minimum": math.nan,
+            "maximum": math.nan,
+        }
     return {
         "count": len(values),
-        "improved": sum(value < 0 for value in values),
+        "improved": sum(value > 0 if higher_is_better else value < 0 for value in values),
+        "worsened": sum(value < 0 if higher_is_better else value > 0 for value in values),
+        "tied": sum(value == 0 for value in values),
         "median": median(values),
         "minimum": min(values),
         "maximum": max(values),

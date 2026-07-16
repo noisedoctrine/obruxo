@@ -135,6 +135,12 @@
     .finding-label { color: var(--muted); font: 700 .72rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
     .finding-value { margin: 18px 0 8px; font-size: 1.75rem; font-weight: 800; letter-spacing: -.035em; }
     .finding-card p { margin: 0; color: var(--muted); font-size: .9rem; }
+    .primary-metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+    .primary-metric-card { min-width: 0; padding: 16px 18px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+    .primary-metric-card .metric-name { color: var(--muted); font: 750 .7rem/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+    .primary-metric-card .metric-value { margin: 11px 0 6px; font: 800 1.35rem/1.1 var(--mono); letter-spacing: -.03em; }
+    .primary-metric-card .metric-direction { color: var(--accent); font-size: .76rem; }
+    .primary-metric-card code { display: block; margin-top: 9px; overflow: hidden; color: var(--muted); font-size: .68rem; text-overflow: ellipsis; white-space: nowrap; }
     .controls, .data-controls {
       display: flex;
       flex-wrap: wrap;
@@ -188,9 +194,10 @@
     .tab-panel p, .tab-panel li { color: var(--muted); }
     .takeaway { padding: 18px; border-left: 4px solid var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface-2)); border-radius: 0 12px 12px 0; }
     .limitation { padding: 18px; border-left: 4px solid var(--warn); background: color-mix(in srgb, var(--warn) 8%, var(--surface-2)); border-radius: 0 12px 12px 0; }
-    .chart-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-    .chart-card { border: 1px solid var(--border); border-radius: 14px; background: var(--surface-2); padding: 12px; }
-    .chart { width: 100%; height: 440px; }
+    .chart-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    .chart-card { min-width: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-2); padding: 12px; }
+    .chart { width: 100%; min-width: 0; height: 500px; }
+    .chart.delta-chart { height: 620px; }
     .chart.compact { height: 330px; }
     .chart-caption { margin: 10px 8px 4px; color: var(--muted); font-size: .82rem; }
     .chart-fallback { display: grid; place-items: center; min-height: 260px; padding: 26px; text-align: center; color: var(--warn); border: 1px dashed var(--warn); border-radius: 12px; }
@@ -220,7 +227,7 @@
     footer { padding: 28px 0 50px; border-top: 1px solid var(--border); color: var(--muted); font-size: .8rem; }
     footer code { overflow-wrap: anywhere; }
     @media (max-width: 1100px) {
-      .finding-grid, .evidence-grid { grid-template-columns: repeat(2, 1fr); }
+      .finding-grid, .evidence-grid, .primary-metric-grid { grid-template-columns: repeat(2, 1fr); }
       .hero-grid, .compare-layout { grid-template-columns: 1fr; }
     }
     @media (max-width: 720px) {
@@ -230,10 +237,11 @@
       .top-actions .label { display: none; }
       .hero { padding-top: 22px; }
       .hero-copy, .status-card { border-radius: 18px; }
-      .finding-grid, .evidence-grid, .chart-grid { grid-template-columns: 1fr; }
+      .finding-grid, .evidence-grid, .primary-metric-grid, .chart-grid { grid-template-columns: 1fr; }
       .section-heading { align-items: flex-start; flex-direction: column; }
       .detail-header { flex-direction: column; }
-      .chart { height: 350px; }
+      .chart { height: 420px; }
+      .chart.delta-chart { height: 620px; }
       .controls > *, .data-controls > * { width: 100%; }
     }
     @media print {
@@ -294,6 +302,13 @@
           <p>Matched comparisons carry more weight than incomplete rankings. The cards below distinguish strong provisional effects, mixed evidence, unresolved choices, and blocked decisions.</p>
         </div>
         <div id="finding-grid" class="finding-grid"></div>
+        <section aria-labelledby="co-primary-title">
+          <div class="section-heading" style="margin-top:28px">
+            <div><div class="eyebrow">Co-primary outcomes</div><h2 id="co-primary-title">Four metrics define quality</h2></div>
+            <p>No single validation metric is authoritative. Each card shows the best observed value in this incomplete prefix and names its winning row.</p>
+          </div>
+          <div id="primary-metric-grid" class="primary-metric-grid"></div>
+        </section>
 
         <div class="section-heading">
           <div><div class="eyebrow">Interactive evidence map</div><h2 id="evidence-map-title">Eight questions, not one leaderboard</h2></div>
@@ -387,8 +402,27 @@
     const coverage = DATA.tables.coverage;
     const deltas = DATA.tables.matched_deltas;
     const partial = DATA.tables.partial_codebook;
+    const CO_PRIMARY = [
+      {key:"validation_median_rmse", delta:"delta_validation_median_rmse", label:"Median RMSE", axis:"Median\nRMSE ↓", short:"Median", higher:false, format:value=>fmt(value, 7)},
+      {key:"validation_strict_perfect_lfo_rate", delta:"delta_validation_strict_perfect_lfo_rate", label:"Strict-perfect LFO rate", axis:"Strict-perfect\nrate ↑", short:"Strict-perfect", higher:true, format:value=>pct(value, 3)},
+      {key:"validation_p95_rmse", delta:"delta_validation_p95_rmse", label:"P95 RMSE", axis:"P95\nRMSE ↓", short:"P95", higher:false, format:value=>fmt(value, 7)},
+      {key:"validation_node_max_error_p95", delta:"delta_validation_node_max_error_p95", label:"Node-max error P95", axis:"Node-max\nP95 ↓", short:"Node-max", higher:false, format:value=>fmt(value, 7)}
+    ];
 
     const comparisonText = summary => `${summary.improved}/${summary.count} improve · median Δ ${fmt(summary.median, 6)}`;
+    const metricDeltaSummary = (comparison, metric) => {
+      const values = deltas.filter(row => row.comparison === comparison).map(row => num(row[metric.delta]));
+      const improved = values.filter(value => metric.higher ? value > 0 : value < 0).length;
+      const worsened = values.filter(value => metric.higher ? value < 0 : value > 0).length;
+      const tied = values.filter(value => value === 0).length;
+      const ordered = [...values].sort((a,b)=>a-b); const middle = Math.floor(ordered.length / 2);
+      const median = !ordered.length ? 0 : ordered.length % 2 ? ordered[middle] : (ordered[middle - 1] + ordered[middle]) / 2;
+      return {count:values.length, improved, worsened, tied, median};
+    };
+    const comparisonEvidence = (comparison, rightPolicy) => `Across the four co-primary metrics, ${CO_PRIMARY.map(metric => {
+      const summary = metricDeltaSummary(comparison, metric);
+      return `${metric.short}: ${summary.improved} right / ${summary.worsened} left / ${summary.tied} ties`;
+    }).join("; ")}. The chart preserves every exact delta and each metric's better direction for ${rightPolicy}.`;
     const NODES = [
       {
         id:"coverage", number:1, zone:"Integrity", status:"blocked", title:"Source coverage", stat:`${DATA.meta.completed_rows}/${DATA.meta.expected_rows} rows`,
@@ -402,7 +436,7 @@
         id:"normalization", number:2, zone:"Strategy levers", status:"strong provisional", title:"Layer normalization", stat:comparisonText(findings.normalization),
         question:"Does decoder-free layer clipping suppress tail error consistently across the covered strategies?",
         mechanism:"LayerClip0To1 constrains every residual-layer output to the physical signal range. It prevents overshoot from compounding before later residual corrections.",
-        evidence:`LayerClip0To1 improves validation P95 RMSE in ${findings.normalization.improved}/${findings.normalization.count} available matched pairs. The median right-minus-left delta is ${fmt(findings.normalization.median, 8)}.`,
+        evidence:comparisonEvidence("layer_normalization_policy", "LayerClip0To1"),
         recommendation:"Keep LayerClip0To1 as the strongest provisional zero-head-cost policy candidate for the canonical grid.",
         limitation:"The statement is strong within the represented matched cells, but absent construction families could still alter the global effect distribution.", charts:["normalization"]
       },
@@ -410,7 +444,7 @@
         id:"budget", number:3, zone:"Strategy levers", status:"mixed", title:"Candidate budget", stat:comparisonText(findings.candidate_budget),
         question:"Does doubling the offline candidate shortlist from 24 to 48 reliably improve reconstruction?",
         mechanism:"A larger shortlist increases offline search opportunity, but later atoms and Beam4 encoding can compensate for locally weaker selections. More candidates do not guarantee a better final codebook.",
-        evidence:`CandidateBudget48 improves ${findings.candidate_budget.improved}/${findings.candidate_budget.count} matched pairs. Its median P95 effect is only ${fmt(findings.candidate_budget.median, 8)} and signs occur on both sides of zero.`,
+        evidence:comparisonEvidence("utility_candidate_budget", "CandidateBudget48"),
         recommendation:"Retain both budgets until the complete grid exposes family interactions; do not promote 48 as a universal default.",
         limitation:"Legacy construction times are invalid for comparing budget efficiency against the optimized runner.", charts:["budget"]
       },
@@ -418,7 +452,7 @@
         id:"schedule", number:4, zone:"Strategy levers", status:"unresolved", title:"Layer schedule", stat:comparisonText(findings.schedule),
         question:"Should broad and repair layers be interleaved or separated into two phases?",
         mechanism:"The schedules reorder broad and repair residual layers without changing the deployed W8D16 interface. Their value depends on which residual structures a family leaves for later correction.",
-        evidence:`TwoPhase improves ${findings.schedule.improved}/${findings.schedule.count} matched comparisons. The remaining pairs favor Interleaved, with median delta ${fmt(findings.schedule.median, 8)}.`,
+        evidence:comparisonEvidence("layer_schedule", "TwoPhase"),
         recommendation:"Keep schedule as an interaction term. Do not choose a global schedule from this fragment.",
         limitation:"Only represented construction families contribute matched schedule pairs; the split cannot be generalized to absent families.", charts:["schedule"]
       },
@@ -463,10 +497,14 @@
     let dataKind = "metrics";
     let currentDataRows = [];
     const chartInstances = new Map();
+    const chartResizeObserver = "ResizeObserver" in window ? new ResizeObserver(entries => {
+      entries.forEach(entry => chartInstances.get(entry.target)?.resize());
+    }) : null;
 
     function initialize() {
       renderMeta();
       renderFindings();
+      renderPrimaryMetrics();
       renderNodeFilters();
       renderEvidenceMap();
       renderFullReport();
@@ -498,6 +536,16 @@
       ];
       qs("#finding-grid").innerHTML = cards.map(card => `<article class="finding-card"><div class="finding-label">${esc(card[0])}</div><div class="finding-value">${esc(card[1])}</div><p>${esc(card[2])}</p></article>`).join("");
     }
+
+    function primaryMetricMarkup() {
+      return CO_PRIMARY.map(metric => {
+        const ordered = [...metrics].sort((left, right) => (metric.higher ? -1 : 1) * (num(left[metric.key]) - num(right[metric.key])));
+        const best = ordered[0];
+        return `<article class="primary-metric-card"><div class="metric-name">${esc(metric.label)}</div><div class="metric-value">${esc(metric.format(best[metric.key]))}</div><div class="metric-direction">${metric.higher ? "higher is better ↑" : "lower is better ↓"}</div><code title="${esc(best.row_id)}">${esc(short(best.row_id))}</code></article>`;
+      }).join("");
+    }
+
+    function renderPrimaryMetrics() { qs("#primary-metric-grid").innerHTML = primaryMetricMarkup(); }
 
     function renderNodeFilters() {
       const zone = qs("#zone-filter");
@@ -575,17 +623,17 @@
 
     function closeDetail() { activeNode = null; qs("#detail-panel").hidden = true; renderEvidenceMap(); }
     function titleCase(value) { return value.charAt(0).toUpperCase() + value.slice(1); }
-    function chartMarkup(node, prefix) { return `<div class="chart-grid">${node.charts.map(name => `<div class="chart-card"><div id="${prefix}-chart-${name}" class="chart" aria-label="${esc(node.title)} chart"></div><p class="chart-caption">${esc(chartCaption(name))}</p></div>`).join("")}</div>`; }
+    function chartMarkup(node, prefix) { return `<div class="chart-grid">${node.charts.map(name => `<div class="chart-card"><div id="${prefix}-chart-${name}" class="chart ${["normalization","budget","schedule"].includes(name) ? "delta-chart" : ""}" aria-label="${esc(node.title)} chart"></div><p class="chart-caption">${esc(chartCaption(name))}</p></div>`).join("")}</div>`; }
 
     function chartCaption(name) {
-      return ({coverage:"Filled cells are completed; outlined cells remain absent. Coverage follows execution order, not random sampling.", normalization:"Negative P95 deltas favor LayerClip0To1. Every available bar is below zero.", budget:"Negative P95 deltas favor CandidateBudget48. Mixed signs show that more offline search is not an automatic quality win.", schedule:"Negative P95 deltas favor TwoPhase. Balanced signs leave schedule unresolved.", pareto:"Lower-left is better for median and P95. Outlined points are non-dominated after strict-perfect and node-max metrics are also considered.", partial:"Lower is better. Lines show family-median P95 by active atom count.", calibration:"Lower epsilon is closer reconstruction. Curves are descriptive only and cannot select epsilon.", retirement:"Lower unexplained energy is safer. Points are a deterministic compact sample; summaries retain median and P95 tails.", runtime:"Lower is faster. Log-scaled values describe the superseded legacy implementation only."})[name];
+      return ({coverage:"Filled cells are completed; outlined cells remain absent. Coverage follows execution order, not random sampling.", normalization:"All four co-primary deltas are shown. Green favors LayerClip0To1; coral favors FinalClipOnly. Color strength is normalized within each metric; tooltips retain exact values.", budget:"All four co-primary deltas are shown. Green favors CandidateBudget48; coral favors CandidateBudget24. Mixed colors expose non-monotonic quality effects.", schedule:"All four co-primary deltas are shown. Green favors TwoPhase; coral favors Interleaved. The matrix keeps schedule interactions visible without declaring a global winner.", pareto:"Median and P95 set the coordinates; the tooltip reports strict-perfect and node-max P95 too. Outlined points are non-dominated across all four co-primary metrics.", partial:"Lower is better. Lines show family-median P95 by active atom count.", calibration:"Lower epsilon is closer reconstruction. Curves are descriptive only and cannot select epsilon.", retirement:"Lower unexplained energy is safer. Points are a deterministic compact sample; summaries retain median and P95 tails.", runtime:"Lower is faster. Log-scaled values describe the superseded legacy implementation only."})[name];
     }
 
     function metricsForNode(node) {
       if (node.id === "coverage") return simpleTable(findings.coverage_by_family, ["construction_family","completed","planned"]);
       if (["normalization","budget","schedule"].includes(node.id)) {
         const key = {normalization:"layer_normalization_policy",budget:"utility_candidate_budget",schedule:"layer_schedule"}[node.id];
-        return simpleTable(deltas.filter(row => row.comparison === key), ["match_key","left_value","right_value","delta_validation_median_rmse","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
+        return simpleTable(deltas.filter(row => row.comparison === key), ["match_key","left_value","right_value","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
       }
       if (node.id === "families") return simpleTable([...metrics].sort((a,b) => num(a.validation_p95_rmse)-num(b.validation_p95_rmse)), ["row_id","construction_family","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"]);
       if (node.id === "partial") return simpleTable(partial, ["row_id","construction_family","active_atom_count","validation_median_rmse","validation_p95_rmse","validation_node_max_error_p95"]);
@@ -606,7 +654,8 @@
     }
 
     function renderFullReport() {
-      qs("#report-stack").innerHTML = NODES.map(node => `<article class="report-section" id="report-${node.id}"><div class="report-meta"><span class="node-number">${node.number}</span><span class="confidence" style="color:${STATUS[node.status].color}">${esc(node.zone)} · ${esc(node.status)}</span></div><h3>${esc(node.title)}</h3><p><strong>${esc(node.question)}</strong></p><p>${esc(node.mechanism)}</p><div class="takeaway"><strong>Evidence:</strong> ${esc(node.evidence)}</div><div style="margin-top:18px">${chartMarkup(node, `full-${node.id}`)}</div><p><strong>Recommendation:</strong> ${esc(node.recommendation)}</p><div class="limitation"><strong>Limitation:</strong> ${esc(node.limitation)}</div></article>`).join("");
+      const coPrimary = `<article class="report-section" id="report-co-primary"><div class="eyebrow">Co-primary outcomes</div><h3>Four metrics define validation quality</h3><p>No single validation metric is authoritative. These are the best observed values in the incomplete 39-row prefix; each can come from a different strategy row.</p><div class="primary-metric-grid">${primaryMetricMarkup()}</div></article>`;
+      qs("#report-stack").innerHTML = coPrimary + NODES.map(node => `<article class="report-section" id="report-${node.id}"><div class="report-meta"><span class="node-number">${node.number}</span><span class="confidence" style="color:${STATUS[node.status].color}">${esc(node.zone)} · ${esc(node.status)}</span></div><h3>${esc(node.title)}</h3><p><strong>${esc(node.question)}</strong></p><p>${esc(node.mechanism)}</p><div class="takeaway"><strong>Evidence:</strong> ${esc(node.evidence)}</div><div style="margin-top:18px">${chartMarkup(node, `full-${node.id}`)}</div><p><strong>Recommendation:</strong> ${esc(node.recommendation)}</p><div class="limitation"><strong>Limitation:</strong> ${esc(node.limitation)}</div></article>`).join("");
     }
 
     function renderFullReportCharts() {
@@ -700,7 +749,7 @@
 
     function renderChart(name, element) {
       if (!element) return;
-      const renderers = {coverage:chartCoverage,normalization:el => chartDelta(el,"layer_normalization_policy","LayerClip0To1 − FinalClipOnly"),budget:el => chartDelta(el,"utility_candidate_budget","CandidateBudget48 − CandidateBudget24"),schedule:el => chartDelta(el,"layer_schedule","TwoPhase − Interleaved"),pareto:chartPareto,partial:chartPartial,calibration:chartCalibration,retirement:chartRetirement,runtime:chartRuntime};
+      const renderers = {coverage:chartCoverage,normalization:el => chartDelta(el,"layer_normalization_policy","FinalClipOnly","LayerClip0To1"),budget:el => chartDelta(el,"utility_candidate_budget","CandidateBudget24","CandidateBudget48"),schedule:el => chartDelta(el,"layer_schedule","Interleaved","TwoPhase"),pareto:chartPareto,partial:chartPartial,calibration:chartCalibration,retirement:chartRetirement,runtime:chartRuntime};
       renderers[name](element);
     }
 
@@ -708,10 +757,16 @@
       if (!window.echarts || window.__echartsFailed) { disposeChart(element); element.innerHTML = `<div class="chart-fallback"><div><strong>Interactive chart unavailable.</strong><br>The findings and exact data remain available. Connect to the internet to load pinned ECharts from jsDelivr.</div></div>`; return; }
       element.innerHTML = "";
       let instance = chartInstances.get(element);
-      if (!instance) { instance = echarts.init(element, null, {renderer:"canvas"}); chartInstances.set(element, instance); }
+      if (!instance) {
+        instance = echarts.init(element, null, {renderer:"canvas"});
+        chartInstances.set(element, instance);
+        chartResizeObserver?.observe(element);
+      }
       option.backgroundColor = "transparent"; option.animationDuration = 250; instance.setOption(option, true);
+      requestAnimationFrame(() => instance.resize());
     }
-    function disposeChart(element) { const instance = chartInstances.get(element); if (instance) { instance.dispose(); chartInstances.delete(element); } }
+    function disposeChart(element) { const instance = chartInstances.get(element); if (instance) { chartResizeObserver?.unobserve(element); instance.dispose(); chartInstances.delete(element); } }
+    function resizeVisibleCharts() { chartInstances.forEach((instance, element) => { if (element.offsetParent !== null) instance.resize(); }); }
     function chartText() { return getComputedStyle(document.documentElement).getPropertyValue("--muted").trim(); }
     function chartGrid() { return getComputedStyle(document.documentElement).getPropertyValue("--border").trim(); }
     function baseAxes() { return {axisLine:{lineStyle:{color:chartGrid()}},axisLabel:{color:chartText()},splitLine:{lineStyle:{color:chartGrid(),opacity:.45}},nameTextStyle:{color:chartText()}}; }
@@ -723,14 +778,31 @@
       setChart(element,{tooltip:{formatter:params => `${esc(params.data[3])}<br>${params.data[2] ? "✓ completed" : "□ missing"}`},grid:{left:150,right:20,top:30,bottom:45},xAxis:{type:"category",data:families,axisLabel:{color:chartText(),rotate:28,formatter:value => value.replace("Repair","")},axisLine:{lineStyle:{color:chartGrid()}}},yAxis:{type:"category",data:Array.from({length:maxY},(_,i)=>i+1),...baseAxes()},visualMap:{show:false,min:0,max:1,inRange:{color:[chartGrid(),COLORS.accent]}},series:[{type:"heatmap",data:cells.map(([x,y,v,label]) => [x,y,v,label]),itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2}}]});
     }
 
-    function chartDelta(element, comparison, title) {
+    function chartDelta(element, comparison, leftPolicy, rightPolicy) {
       const rows = deltas.filter(row => row.comparison === comparison).sort((a,b) => num(a.delta_validation_p95_rmse)-num(b.delta_validation_p95_rmse));
-      setChart(element,{title:{text:title,left:"center",textStyle:{color:chartText(),fontSize:13}},tooltip:{trigger:"axis",axisPointer:{type:"shadow"},formatter:params => `${esc(params[0].name)}<br>Δ P95: ${fmt(params[0].value,8)}`},grid:{left:180,right:25,top:55,bottom:35},xAxis:{type:"value",name:"P95 delta · negative favors right policy",...baseAxes()},yAxis:{type:"category",data:rows.map(row => row.match_key),axisLabel:{color:chartText(),width:165,overflow:"truncate"},axisLine:{lineStyle:{color:chartGrid()}}},series:[{type:"bar",data:rows.map(row => ({value:num(row.delta_validation_p95_rmse),itemStyle:{color:num(row.delta_validation_p95_rmse)<0?COLORS.accent:COLORS.danger}})),markLine:{silent:true,symbol:"none",lineStyle:{color:chartText()},data:[{xAxis:0}]}}]});
+      const scales = CO_PRIMARY.map(metric => Math.max(...rows.map(row => Math.abs(num(row[metric.delta]))), 1e-15));
+      const cells = rows.flatMap((row, rowIndex) => CO_PRIMARY.map((metric, metricIndex) => {
+        const raw = num(row[metric.delta]);
+        const rightBenefit = metric.higher ? raw : -raw;
+        return {value:[metricIndex,rowIndex,rightBenefit / scales[metricIndex]],raw,metric,row};
+      }));
+      setChart(element,{
+        title:{text:`${rightPolicy} vs ${leftPolicy} · four co-primary metrics`,left:"center",textStyle:{color:chartText(),fontSize:13}},
+        tooltip:{formatter:params => {
+          const item=params.data; const favors=item.raw===0?"tie":((item.metric.higher?item.raw>0:item.raw<0)?rightPolicy:leftPolicy);
+          return `${esc(item.row.match_key)}<br><strong>${esc(item.metric.label)}</strong><br>right − left Δ: ${fmt(item.raw,8)}<br>${esc(favors)} favored`;
+        }},
+        grid:{left:215,right:35,top:72,bottom:92},
+        xAxis:{type:"category",position:"top",data:CO_PRIMARY.map(metric=>metric.axis),axisLabel:{color:chartText(),interval:0,lineHeight:17,fontWeight:700},axisLine:{lineStyle:{color:chartGrid()}},axisTick:{show:false}},
+        yAxis:{type:"category",data:rows.map(row => row.match_key),axisLabel:{color:chartText(),width:195,overflow:"truncate"},axisLine:{lineStyle:{color:chartGrid()}},axisTick:{show:false}},
+        visualMap:{min:-1,max:1,dimension:2,orient:"horizontal",left:"center",bottom:18,calculable:false,text:["right policy favored","left policy favored"],textStyle:{color:chartText()},inRange:{color:[COLORS.danger,getComputedStyle(document.documentElement).getPropertyValue("--surface-3").trim(),COLORS.accent]}},
+        series:[{type:"heatmap",data:cells,itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2},emphasis:{itemStyle:{borderColor:"#fff",borderWidth:2}}}]
+      });
     }
 
     function chartPareto(element) {
       const families = unique(metrics.map(row => row.construction_family));
-      setChart(element,{tooltip:{formatter:params => `${esc(short(params.data.row.row_id))}<br>Median ${fmt(params.value[0],6)}<br>P95 ${fmt(params.value[1],6)}<br>Strict-perfect ${pct(params.data.row.validation_strict_perfect_lfo_rate,2)}`},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:65,right:25,top:25,bottom:80},xAxis:{type:"value",name:"Median RMSE · lower is better",...baseAxes()},yAxis:{type:"value",name:"P95 RMSE · lower is better",...baseAxes()},series:families.map((family,index)=>({name:family,type:"scatter",data:metrics.filter(row=>row.construction_family===family).map(row=>({value:[num(row.validation_median_rmse),num(row.validation_p95_rmse)],row,symbolSize:truthy(row.pareto_candidate)?15:8,itemStyle:{borderColor:truthy(row.pareto_candidate)?"#fff":"transparent",borderWidth:truthy(row.pareto_candidate)?2:0}})),emphasis:{focus:"series"}}))});
+      setChart(element,{tooltip:{formatter:params => `${esc(short(params.data.row.row_id))}<br>Median RMSE ${fmt(params.value[0],6)}<br>P95 RMSE ${fmt(params.value[1],6)}<br>Strict-perfect ${pct(params.data.row.validation_strict_perfect_lfo_rate,3)}<br>Node-max P95 ${fmt(params.data.row.validation_node_max_error_p95,6)}`},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:30,top:25,bottom:95,containLabel:true},xAxis:{type:"value",name:"Median RMSE ↓",nameLocation:"middle",nameGap:42,...baseAxes()},yAxis:{type:"value",name:"P95 RMSE ↓",nameLocation:"middle",nameGap:58,...baseAxes()},series:families.map((family,index)=>({name:family,type:"scatter",data:metrics.filter(row=>row.construction_family===family).map(row=>({value:[num(row.validation_median_rmse),num(row.validation_p95_rmse)],row,symbolSize:truthy(row.pareto_candidate)?15:8,itemStyle:{borderColor:truthy(row.pareto_candidate)?"#fff":"transparent",borderWidth:truthy(row.pareto_candidate)?2:0}})),emphasis:{focus:"series"}}))});
     }
 
     function chartPartial(element) {
@@ -759,8 +831,8 @@
       currentView = view;
       qsa(".view").forEach(section => section.classList.toggle("active", section.id === `${view}-view`));
       qsa("[data-view]").forEach(button => button.setAttribute("aria-current", button.dataset.view === view ? "page" : "false"));
-      if (view === "report") requestAnimationFrame(renderFullReportCharts);
-      if (view === "compare") requestAnimationFrame(renderCompare);
+      if (view === "report") requestAnimationFrame(() => requestAnimationFrame(() => { renderFullReportCharts(); resizeVisibleCharts(); }));
+      if (view === "compare") requestAnimationFrame(() => requestAnimationFrame(() => { renderCompare(); resizeVisibleCharts(); }));
       window.scrollTo({top:0,behavior:"smooth"});
     }
 
@@ -768,7 +840,7 @@
       qsa("[data-view]").forEach(button => button.addEventListener("click", () => switchView(button.dataset.view)));
       qs("#theme-toggle").addEventListener("click", () => {
         document.documentElement.dataset.theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-        chartInstances.forEach(instance => instance.dispose()); chartInstances.clear();
+        [...chartInstances.keys()].forEach(disposeChart);
         if (currentView === "report") renderFullReportCharts();
         if (currentView === "compare") renderCompare();
         if (activeNode && activeTab === "evidence") renderDetailTab(NODES.find(node=>node.id===activeNode));
@@ -776,7 +848,7 @@
       qs("#scroll-top").addEventListener("click", () => window.scrollTo({top:0,behavior:"smooth"}));
       qs("#compare-clear").addEventListener("click", () => { compareSelection=[]; renderCompare(); });
       qs("#export-csv").addEventListener("click", exportCsv);
-      window.addEventListener("resize", () => chartInstances.forEach(instance => instance.resize()));
+      window.addEventListener("resize", resizeVisibleCharts);
       document.addEventListener("keydown", event => {
         if (["INPUT","SELECT","TEXTAREA"].includes(document.activeElement.tagName)) return;
         if (/^[1-8]$/.test(event.key)) { switchView("interactive"); openNode(NODES[num(event.key)-1].id); }

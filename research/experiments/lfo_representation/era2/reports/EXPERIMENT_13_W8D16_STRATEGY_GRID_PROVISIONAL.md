@@ -18,6 +18,36 @@ There are `5` provisional Pareto candidates across validation median RMSE, stric
 
 The scatter's x-axis is validation median RMSE and its y-axis is validation P95 RMSE; lower-left is better on both. Color identifies the covered construction family. Larger black-outlined points are provisional Pareto candidates after also accounting for strict-perfect rate and node-max P95, so no single point is declared the automatic winner.
 
+### All Four Co-Primary Validation Metrics
+
+Experiment 13 defines quality using four co-primary outcomes. Each row below reports the best observed value in the incomplete prefix; different metrics can select different strategy rows.
+
+| Co-primary metric | Better direction | Best observed value | Best observed row |
+| --- | --- | ---: | --- |
+| Median RMSE | lower | 0.01711541 | `x13a_broad_mean_global_repair_interleaved_candidate_budget48_layer_clip0_to1` |
+| Strict-perfect LFO rate | higher | 1.059% | `x13a_family_balanced_repair_candidate_budget48_final_clip_only` |
+| P95 RMSE | lower | 0.040208414 | `x13a_broad_mean_global_repair_interleaved_candidate_budget48_layer_clip0_to1` |
+| Node-max error P95 | lower | 0.12179944 | `x13a_broad_mean_global_repair_interleaved_candidate_budget48_layer_clip0_to1` |
+
+### Matched Effects Across All Four Co-Primary Metrics
+
+The table below prevents the P95-focused static plots from standing in for the complete outcome set. For RMSE and node-max errors, negative deltas favor the right policy; for strict-perfect rate, positive deltas favor the right policy.
+
+| Matched factor | Co-primary metric | Right / left / ties | Median right-minus-left delta |
+| --- | --- | ---: | ---: |
+| LayerClip0To1 vs FinalClipOnly | Median RMSE | 16 / 3 / 0 | -0.0024333 |
+| LayerClip0To1 vs FinalClipOnly | Strict-perfect LFO rate | 1 / 4 / 14 | +0.00000 pp |
+| LayerClip0To1 vs FinalClipOnly | P95 RMSE | 19 / 0 / 0 | -0.0070837811 |
+| LayerClip0To1 vs FinalClipOnly | Node-max error P95 | 19 / 0 / 0 | -0.026897132 |
+| CandidateBudget48 vs CandidateBudget24 | Median RMSE | 13 / 2 / 4 | -0.00022921897 |
+| CandidateBudget48 vs CandidateBudget24 | Strict-perfect LFO rate | 6 / 0 / 13 | +0.00000 pp |
+| CandidateBudget48 vs CandidateBudget24 | P95 RMSE | 12 / 3 / 4 | -0.0011559017 |
+| CandidateBudget48 vs CandidateBudget24 | Node-max error P95 | 12 / 3 / 4 | -0.0015844554 |
+| TwoPhase vs Interleaved | Median RMSE | 2 / 10 / 0 | +0.00075542834 |
+| TwoPhase vs Interleaved | Strict-perfect LFO rate | 0 / 2 / 10 | +0.00000 pp |
+| TwoPhase vs Interleaved | P95 RMSE | 6 / 6 / 0 | +0.00047237426 |
+| TwoPhase vs Interleaved | Node-max error P95 | 6 / 6 / 0 | -0.0038753971 |
+
 ## Why These Patterns Appear
 
 `LayerClip0To1` applies a decoder-free physical range constraint after every residual layer. In the covered rows it consistently suppresses accumulated overshoot, so its P95 benefit is both larger and more stable than the changes caused by shortlist size or layer schedule.
