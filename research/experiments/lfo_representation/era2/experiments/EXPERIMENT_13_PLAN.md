@@ -78,6 +78,31 @@ Then open
 The report is one HTML file with inline CSS, JavaScript, and compact data; only
 the pinned ECharts renderer is loaded from jsDelivr.
 
+### Build the complete Experiment 13A report
+
+After all 90 Experiment 13A rows complete, record the official automatic
+epsilon-selection result and generate the complete AllResiduals report. This
+report is authoritative for 13A but remains separate from the canonical paired
+report, which is still gated on a frozen epsilon and complete 13B.
+
+```powershell
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 select-epsilon --run-dir $runDir
+
+conda run --no-capture-output -n py312 python $runner analyze-13a `
+  --run-dir $runDir `
+  --analysis-output-dir .\research\experiments\lfo_representation\era2\artifacts\experiment_13\analysis_train50_val100_13a_complete `
+  --report-path .\research\experiments\lfo_representation\era2\reports\EXPERIMENT_13_W8D16_STRATEGY_GRID_13A_REPORT.md `
+  --html-report-path .\research\experiments\lfo_representation\era2\reports\EXPERIMENT_13_W8D16_STRATEGY_GRID_13A_REPORT.html `
+  --image-dir .\research\experiments\lfo_representation\era2\reports\images\experiment_13\13a `
+  --scaling-baseline-run $legacyRun
+```
+
+Preview it with the same local HTTP server command above, then open
+`http://localhost:8765/EXPERIMENT_13_W8D16_STRATEGY_GRID_13A_REPORT.html`.
+The training-data scaling section uses only quality metrics from the 39 matched
+legacy rows with identical validation membership. It never compares legacy and
+optimized runtime.
+
 ### 1. Run the tests
 
 Set conservative native-thread limits before importing NumPy, then run either

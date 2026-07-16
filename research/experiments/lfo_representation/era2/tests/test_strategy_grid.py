@@ -418,7 +418,7 @@ class StrategyGridCliTests(unittest.TestCase):
         self.assertEqual(help_result.returncode, 0, help_result.stderr)
         for command in (
             "run-13a", "select-epsilon", "run-13b-pilot", "override-epsilon", "run-13b",
-            "analyze", "analyze-partial", "analyze-scaling", "verify-equivalence", "cancel", "status", "monitor",
+            "analyze", "analyze-13a", "analyze-partial", "analyze-scaling", "verify-equivalence", "cancel", "status", "monitor",
         ):
             self.assertIn(command, help_result.stdout)
         partial_help = subprocess.run(

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <title>Experiment 13 — Provisional W8D16 Strategy Grid</title>
+  <title>Experiment 13 Strategy Grid Report</title>
   <style>
     :root {
       --bg: #f4f7f6;
@@ -160,6 +160,8 @@
     .status-card { display: flex; flex-direction: column; justify-content: space-between; padding: 28px; border-radius: 26px; }
     .status-badge { display: inline-flex; align-items: center; align-self: flex-start; gap: 9px; padding: 8px 12px; border: 1px solid var(--warn); border-radius: 999px; color: var(--warn); font: 800 .77rem/1 var(--mono); letter-spacing: .08em; }
     .status-badge::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--warn); box-shadow: 0 0 14px var(--warn); }
+    .status-card.complete .status-badge { border-color: var(--accent); color: var(--accent); }
+    .status-card.complete .status-badge::before { background: var(--accent); box-shadow: 0 0 14px var(--accent); }
     .coverage-number { margin: 30px 0 4px; font-size: clamp(3rem, 6vw, 5.6rem); font-weight: 850; line-height: .9; letter-spacing: -.06em; }
     .coverage-caption { color: var(--muted); }
     .warning-strip {
@@ -340,7 +342,7 @@
     <div class="shell topbar-inner">
       <div class="brand">
         <div class="eyebrow">LFO ERA 2 · RESEARCH NOTE</div>
-        <h1>Experiment 13 — Provisional Strategy Grid</h1>
+        <h1 id="page-title">Experiment 13 Strategy Grid</h1>
       </div>
       <div class="top-actions">
         <button id="scroll-top" class="icon-button" type="button" aria-label="Scroll to top"><span aria-hidden="true">↑</span> <span class="label">Top</span></button>
@@ -370,18 +372,18 @@
         <div class="hero-copy">
           <div class="eyebrow">Fixed W8D16 · Strategy Grid</div>
           <h2 id="hero-title">Evidence before a winner.</h2>
-          <p>This report turns the interrupted Experiment 13A prefix into bounded, inspectable evidence. It separates repeatable matched effects from missing-grid uncertainty and keeps calibration descriptive until all 90 rows exist.</p>
+          <p id="hero-summary">Inspect matched effects, quality tradeoffs, codebook progression, and eligibility calibration.</p>
           <div id="contract-row" class="contract-row" aria-label="Fixed experiment contract"></div>
         </div>
-        <aside class="status-card" aria-label="Provisional report status">
-          <div class="status-badge">PROVISIONAL · <span id="status-count">39/90</span></div>
+        <aside class="status-card" aria-label="Report status">
+          <div class="status-badge"><span id="status-label">STATUS</span> · <span id="status-count">0/90</span></div>
           <div>
             <div id="coverage-number" class="coverage-number">43.3%</div>
-            <div class="coverage-caption">of Experiment 13A rows completed in a non-random execution-order prefix</div>
+            <div id="coverage-caption" class="coverage-caption">of Experiment 13A rows represented</div>
           </div>
         </aside>
       </div>
-      <div class="warning-strip"><strong>Do not select epsilon from this report.</strong> Experiment 13A is incomplete, no eligibility epsilon has been frozen, and Experiment 13B has not run. Legacy runtime is historical diagnostic evidence only.</div>
+      <div id="warning-strip" class="warning-strip"></div>
       <nav class="report-nav" aria-label="Report views">
         <button class="nav-button" type="button" data-view="interactive" aria-current="page">Evidence map</button>
         <button class="nav-button" type="button" data-view="report">Full report</button>
@@ -393,21 +395,21 @@
     <main>
       <section id="interactive-view" class="view active" aria-labelledby="evidence-map-title">
         <div class="section-heading">
-          <div><div class="eyebrow">Main findings</div><h2>What the fragment actually supports</h2></div>
-          <p>Matched comparisons carry more weight than incomplete rankings. The cards below distinguish strong provisional effects, mixed evidence, unresolved choices, and blocked decisions.</p>
+          <div><div class="eyebrow">Main findings</div><h2 id="findings-title">What the evidence supports</h2></div>
+          <p id="findings-summary">Matched comparisons carry more weight than an unqualified leaderboard.</p>
         </div>
         <div id="finding-grid" class="finding-grid"></div>
         <section aria-labelledby="co-primary-title">
           <div class="section-heading" style="margin-top:28px">
             <div><div class="eyebrow">Co-primary outcomes</div><h2 id="co-primary-title">Four metrics define quality</h2></div>
-            <p>No single validation metric is authoritative. Each card shows the best observed value in this incomplete prefix and names its winning row.</p>
+            <p id="metrics-summary">No single validation metric is authoritative. Each card shows the best observed value and names its winning row.</p>
           </div>
           <div id="primary-metric-grid" class="primary-metric-grid"></div>
         </section>
 
         <div class="section-heading">
-          <div><div class="eyebrow">Interactive evidence map</div><h2 id="evidence-map-title">Eight questions, not one leaderboard</h2></div>
-          <p>Choose a node or press 1–8. Use ← and → to move between nodes; Escape closes the detail view.</p>
+          <div><div class="eyebrow">Interactive evidence map</div><h2 id="evidence-map-title">Questions, not one leaderboard</h2></div>
+          <p id="evidence-help">Choose a node or use the number keys. Use arrow keys to move between nodes; Escape closes the detail view.</p>
         </div>
         <div class="controls">
           <label class="sr-only" for="node-search">Search evidence nodes</label>
@@ -423,7 +425,7 @@
 
       <section id="report-view" class="view" aria-labelledby="full-report-title">
         <div class="section-heading">
-          <div><div class="eyebrow">Sequential reading view</div><h2 id="full-report-title">Full provisional report</h2></div>
+          <div><div class="eyebrow">Sequential reading view</div><h2 id="full-report-title">Full report</h2></div>
           <p>Each section pairs a mechanism claim with evidence, a decision, and the limitation that prevents overreach.</p>
         </div>
         <div id="report-stack" class="report-stack"></div>
@@ -432,7 +434,7 @@
       <section id="compare-view" class="view" aria-labelledby="compare-title">
         <div class="section-heading">
           <div><div class="eyebrow">Strategy workspace</div><h2 id="compare-title">Compare up to four completed rows</h2></div>
-          <p>Radar values are normalized only within this 39-row fragment. The exact table is authoritative; the radar is a visual aid, not a scalar ranking.</p>
+          <p id="compare-summary">Radar values are normalized within the rows in this report. The exact table is authoritative; the radar is a visual aid, not a scalar ranking.</p>
         </div>
         <div id="compare-filters" class="data-controls"></div>
         <div class="compare-layout" style="margin-top:16px">
@@ -467,7 +469,7 @@
 
   <footer>
     <div class="shell">
-      <strong>Experiment 13 · Provisional evidence only.</strong><br>
+      <strong id="footer-status">Experiment 13 report.</strong><br>
       Source archive: <code id="source-run"></code><br>
       Source fingerprint: <code id="source-hash"></code>
     </div>
@@ -479,6 +481,7 @@
   (() => {
     "use strict";
     const DATA = JSON.parse(document.getElementById("report-data").textContent);
+    const isComplete13A = DATA.meta.report_mode === "complete_13a";
     const qs = (selector, root = document) => root.querySelector(selector);
     const qsa = (selector, root = document) => [...root.querySelectorAll(selector)];
     const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
@@ -490,13 +493,14 @@
     const truthy = value => value === true || ["true","1","yes"].includes(String(value).toLowerCase());
     const COLORS = {accent:"#147e67", blue:"#286db7", warn:"#a86100", danger:"#b63b34", blocked:"#7741a5"};
     const STATUS = {
-      "strong provisional": {color: COLORS.accent}, mixed: {color: COLORS.warn}, unresolved: {color: COLORS.warn}, blocked: {color: COLORS.blocked}, "historical only": {color: COLORS.danger}
+      "strong provisional": {color: COLORS.accent}, "strong 13A": {color: COLORS.accent}, complete: {color: COLORS.accent}, mixed: {color: COLORS.warn}, unresolved: {color: COLORS.warn}, blocked: {color: COLORS.blocked}, "pilot required": {color: COLORS.blocked}, "bounded ablation": {color: COLORS.blue}, "same-run only": {color: COLORS.blue}, "historical only": {color: COLORS.danger}
     };
     const findings = DATA.findings;
     const metrics = DATA.tables.metrics;
     const coverage = DATA.tables.coverage;
     const deltas = DATA.tables.matched_deltas;
     const partial = DATA.tables.partial_codebook;
+    const scaling = DATA.tables.scaling || [];
     const metricById = new Map(metrics.map(row => [row.row_id, row]));
     const calibrationRowIds = DATA.calibration.row_ids || [];
     const CO_PRIMARY = [
@@ -544,7 +548,7 @@
       const summary = metricDeltaSummary(comparison, metric);
       return `${metric.short}: ${favoredPolicy} ${summary.improved} / ${otherPolicy} ${summary.worsened} / ${summary.tied} ties`;
     }).join("; ")}. The chart preserves every exact delta and labels the policy favored in each cell.`;
-    const NODES = [
+    const PROVISIONAL_NODES = [
       {
         id:"coverage", number:1, zone:"Integrity", status:"blocked", title:"Source coverage", stat:`${DATA.meta.completed_rows}/${DATA.meta.expected_rows} rows`,
         question:"Which parts of the planned policy grid are present—and which conclusions are structurally unavailable?",
@@ -614,6 +618,86 @@
         limitation:"No legacy-versus-optimized speedup claim is valid because implementation and operating conditions differ.", charts:["runtime"]
       }
     ];
+
+    const COMPLETE_13A_NODES = [
+      {
+        id:"coverage", number:1, zone:"Integrity", status:"complete", title:"Complete grid coverage", stat:`${DATA.meta.completed_rows}/${DATA.meta.expected_rows} rows`,
+        question:"Does the report cover every planned Experiment 13A strategy cell?",
+        mechanism:"The complete phase contains every planned construction family, construction variant, schedule, repair budget, and normalization cell. This removes the execution-prefix bias that constrained the legacy report.",
+        evidence:"All 90 planned Experiment 13A rows completed with no failed rows. Filters now describe complete slices of the design rather than gaps in an interrupted prefix.",
+        recommendation:"Use matched effects and the four-metric Pareto frontier as the authoritative 13A evidence. Reserve AllResiduals-versus-UnresolvedOnly claims for 13B.",
+        limitation:"Complete 13A coverage does not answer whether eligibility filtering improves construction; 13B is still pending.", charts:["coverage"]
+      },
+      {
+        id:"families", number:2, zone:"Quality frontier", status:"complete", title:"Construction-family tradeoffs", stat:`${findings.pareto_count} Pareto strategies`,
+        question:"Which construction mechanisms occupy the complete 13A quality frontier?",
+        mechanism:"Broad builders synthesize population-level corrections; repair builders copy strategically chosen observed residuals; anchors preserve Experiment 12 slot roles; pure controls use prototypes only. Different mechanisms optimize different parts of the error distribution.",
+        evidence:`AllClusterMeans + LayerClip0To1 has the lowest P95. DiverseCoverageHardRepairTwoPhase + CandidateBudget48 + LayerClip0To1 has the best median and node-max P95. CommonCaseRepair preserves the best strict-perfect rate. ${findings.pareto_count} rows remain non-dominated across all four metrics.`,
+        recommendation:"Carry all three Pareto strategies into the paired 13B interpretation instead of declaring a scalar winner.",
+        limitation:"Strict-perfect rate has only two observed levels, so it is a coarse discriminator despite remaining co-primary.", charts:["pareto"]
+      },
+      {
+        id:"normalization", number:3, zone:"Strategy levers", status:"strong 13A", title:"Layer normalization", stat:comparisonText(findings.normalization),
+        question:"Does decoder-free LayerClip0To1 suppress tail error across the complete strategy grid?",
+        mechanism:"LayerClip0To1 constrains every residual-layer output to the physical signal range, preventing overshoot from compounding before later corrections.",
+        evidence:comparisonEvidence("layer_normalization_policy", "LayerClip0To1", "FinalClipOnly"),
+        recommendation:"Keep LayerClip0To1 as the default normalization candidate for the paired analysis.",
+        limitation:"The effect is authoritative for AllResiduals construction; its interaction with UnresolvedOnly still requires 13B.", charts:["normalization"]
+      },
+      {
+        id:"budget", number:4, zone:"Strategy levers", status:"mixed", title:"Candidate budget", stat:comparisonText(findings.candidate_budget),
+        question:"Does doubling the offline repair shortlist reliably improve complete-13A quality?",
+        mechanism:"CandidateBudget48 expands offline search opportunity, but later atom slots and Beam4 encoding can compensate for locally weaker CandidateBudget24 choices.",
+        evidence:comparisonEvidence("utility_candidate_budget", "CandidateBudget48", "CandidateBudget24"),
+        recommendation:"Treat CandidateBudget48 as family-dependent rather than a universal default.",
+        limitation:"Budget is not defined for pure-prototype rows, so matched evidence covers repair-containing policies only.", charts:["budget"]
+      },
+      {
+        id:"schedule", number:5, zone:"Strategy levers", status:"mixed", title:"Layer schedule", stat:comparisonText(findings.schedule),
+        question:"Should broad and repair residual layers be interleaved or separated into two phases?",
+        mechanism:"The schedules reorder broad and repair layers without changing W8D16 or the deployed runtime interface. Their value depends on the residual structures each construction family leaves for later correction.",
+        evidence:comparisonEvidence("layer_schedule", "TwoPhase", "Interleaved"),
+        recommendation:"Keep schedule as an interaction term; the small aggregate TwoPhase edge is not universal.",
+        limitation:"AnchorNative and AllBroad controls do not participate in this matched comparison.", charts:["schedule"]
+      },
+      {
+        id:"partial", number:6, zone:"Model behavior", status:"complete", title:"Partial codebook", stat:"Early gains, late separation",
+        question:"How much quality arrives in the first few active atom slots, and where do families continue separating?",
+        mechanism:"Re-evaluating validation quality after atom 1 through atom 7 shows whether a construction family captures reusable structure early or depends on later specialized repairs.",
+        motivation:"This is a capacity-efficiency diagnostic. A steep early drop means the first atoms capture reusable structure; a flat segment means diminishing returns.",
+        reading:["Move left to right as one active atom is added per residual layer.","Move downward as validation P95 improves.","Compare curve shape before endpoint rank: early slope shows efficiency and late separation shows specialization."],
+        evidence:"Most quality arrives in the first few atom choices, but family curves continue to separate through the seventh active atom.",
+        recommendation:"Retain per-slot progression in the final paired analysis; endpoint metrics alone hide mechanism and ordering quality.",
+        limitation:"This fixed-W8 experiment does not test a smaller deployed head budget.", charts:["partial"]
+      },
+      {
+        id:"calibration", number:7, zone:"Eligibility", status:"pilot required", title:"Eligibility calibration", stat:`best early/middle ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,2)}`,
+        question:"Did any candidate epsilon satisfy the frozen automatic selection rule?",
+        mechanism:"Eligibility would retire already-resolved LFOs from later atom construction. The selector requires safe unexplained-energy retirement and at least 5% median early/middle coverage.",
+        motivation:"The threshold should release meaningful codebook capacity without abandoning meaningful unexplained residual energy.",
+        reading:["Later layers should move reconstruction-error quantiles downward.","Moving right in retirement coverage releases more capacity; moving down abandons less unexplained energy.","The selector applies all three numerical gates; visual elbows cannot override them."],
+        evidence:`All candidates satisfy the retired unexplained-energy limits, but the maximum early/middle median reconstructed fraction is ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,3)}, below the required ${pct(findings.selection.required_early_middle_fraction,0)}.`,
+        recommendation:"Run the prescribed 0.001 versus 0.0025 restricted pilot before freezing epsilon or launching full 13B.",
+        limitation:"No epsilon is selected and this report cannot make an AllResiduals-versus-UnresolvedOnly claim.", charts:["calibration","retirement"]
+      },
+      {
+        id:"scaling", number:8, zone:"Ablations", status:"bounded ablation", title:"Training-data scaling", stat:`${findings.scaling_matched_row_count} matched rows`,
+        question:"What changes when construction uses 50% rather than 100% of the training split?",
+        mechanism:"The comparison holds validation membership and row definitions fixed, then subtracts the preserved full-training result from the optimized 50%-training result for each matched row.",
+        evidence:"The 50%-training run is modestly worse on median and P95 RMSE, while strict-perfect rate and node-max P95 improve on most matched rows.",
+        recommendation:"Treat the result as a mixed, method-level sensitivity check—not a universal scaling law.",
+        limitation:"The full-training source is a non-random 39-row prefix, and runtime comparisons are invalid because execution implementations and host conditions differ.", charts:["scaling"]
+      },
+      {
+        id:"runtime", number:9, zone:"Diagnostics", status:"same-run only", title:"Optimized 13A runtime", stat:`${fmt(findings.runtime_outliers[0]?.oracle_construction_time,1)} s max`,
+        question:"Which strategy rows are expensive within the completed optimized run?",
+        mechanism:"Same-run oracle construction timings share the implementation, sample, cache policy, and host conditions. They can expose relative cost without importing the legacy host-sleep artifacts.",
+        evidence:"The 90-row optimized run has a continuous timing distribution with no Modern Standby outliers. Pure cluster prototypes and several repair-heavy rows occupy the slow end.",
+        recommendation:"Use these values for within-run cost diagnostics only; keep quality and cost visible as separate axes.",
+        limitation:"Do not interpret these timings as a legacy-to-optimized speedup or deployed inference cost.", charts:["runtime"]
+      }
+    ];
+    const NODES = isComplete13A ? COMPLETE_13A_NODES : PROVISIONAL_NODES;
 
     let activeNode = null;
     let activeTab = "mechanism";
@@ -799,6 +883,11 @@
       return partial.filter(row => rowMatchesGlobal(metricById.get(row.row_id)));
     }
 
+    function filteredScalingRows(forChart = false) {
+      if (forChart && !globalState.applyCharts) return scaling;
+      return scaling.filter(row => rowMatchesGlobal({...row, pareto_candidate:metricById.get(row.row_id)?.pareto_candidate}));
+    }
+
     function filteredCalibrationRows(key, forChart = false) {
       const rows = DATA.calibration[key] || [];
       if (forChart && !globalState.applyCharts) return rows;
@@ -815,8 +904,35 @@
 
     function renderMeta() {
       const meta = DATA.meta;
+      document.title = meta.display_title || meta.title;
+      qs("#page-title").textContent = isComplete13A ? "Experiment 13A — Complete Strategy Grid" : "Experiment 13 — Provisional Strategy Grid";
+      qs("#hero-title").textContent = isComplete13A ? "A complete unfiltered strategy map." : "Evidence before a winner.";
+      qs("#hero-summary").textContent = isComplete13A
+        ? "All 90 AllResiduals strategies are now available. Explore the four-metric frontier, matched design effects, construction mechanisms, codebook progression, calibration gate, and bounded training-data ablation."
+        : "This report turns the interrupted Experiment 13A prefix into bounded, inspectable evidence. It separates repeatable matched effects from missing-grid uncertainty and keeps calibration descriptive until all 90 rows exist.";
+      qs("#status-label").textContent = isComplete13A ? "13A COMPLETE" : "PROVISIONAL";
+      qs(".status-card").classList.toggle("complete", isComplete13A);
       qs("#status-count").textContent = `${meta.completed_rows}/${meta.expected_rows}`;
       qs("#coverage-number").textContent = `${(meta.completed_rows / meta.expected_rows * 100).toFixed(1)}%`;
+      qs("#coverage-caption").textContent = isComplete13A
+        ? "of the planned Experiment 13A AllResiduals grid completed"
+        : "of Experiment 13A rows completed in a non-random execution-order prefix";
+      qs("#warning-strip").innerHTML = isComplete13A
+        ? `<strong>13B is still gated.</strong> Automatic epsilon selection did not pass: best early/middle coverage is ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,3)} versus the required ${pct(findings.selection.required_early_middle_fraction,0)}. Run the restricted pilot before freezing epsilon.`
+        : `<strong>Do not select epsilon from this report.</strong> Experiment 13A is incomplete, no eligibility epsilon has been frozen, and Experiment 13B has not run. Legacy runtime is historical diagnostic evidence only.`;
+      qs("#findings-title").textContent = isComplete13A ? "What the complete 13A grid supports" : "What the fragment actually supports";
+      qs("#findings-summary").textContent = isComplete13A
+        ? "Matched effects, the four-metric Pareto frontier, and the failed automatic eligibility gate are now complete for AllResiduals construction."
+        : "Matched comparisons carry more weight than incomplete rankings. The cards distinguish provisional effects, mixed evidence, unresolved choices, and blocked decisions.";
+      qs("#metrics-summary").textContent = isComplete13A
+        ? "No single validation metric is authoritative. Each card names the best row across the complete 90-row 13A grid."
+        : "No single validation metric is authoritative. Each card shows the best observed value in this incomplete prefix and names its winning row.";
+      qs("#evidence-help").textContent = `Choose a node or press 1–${NODES.length}. Use ← and → to move between nodes; Escape closes the detail view.`;
+      qs("#full-report-title").textContent = isComplete13A ? "Full Experiment 13A report" : "Full provisional report";
+      qs("#compare-summary").textContent = isComplete13A
+        ? "Radar values are normalized within the complete 90-row 13A grid. The exact table is authoritative; the radar is a visual aid, not a scalar ranking."
+        : "Radar values are normalized only within this fragment. The exact table is authoritative; the radar is a visual aid, not a scalar ranking.";
+      qs("#footer-status").textContent = isComplete13A ? "Experiment 13A · Complete AllResiduals evidence; 13B pending." : "Experiment 13 · Provisional evidence only.";
       const contract = meta.contract;
       const chips = [`W${contract.window_width}D${contract.residual_layers}`, `${contract.control_points} control points`, `${contract.base_choices} base choices`, `${contract.atom_choices} atom choices`, contract.path_search, contract.scalar_context, `${contract.model_outputs} outputs`];
       qs("#contract-row").innerHTML = chips.map(value => `<span class="chip">${esc(value)}</span>`).join("");
@@ -825,7 +941,12 @@
     }
 
     function renderFindings() {
-      const cards = [
+      const cards = isComplete13A ? [
+        ["Strongest repeatable effect", `${findings.normalization.improved}/${findings.normalization.count}`, "matched normalization pairs favor LayerClip0To1"],
+        ["Quality frontier", `${findings.pareto_count} strategies`, "remain non-dominated across all four co-primary metrics"],
+        ["Schedule effect", `${findings.schedule.improved}/${findings.schedule.count}`, "matched P95 pairs favor TwoPhase; family interactions remain"],
+        ["Eligibility gate", pct(findings.selection.max_early_middle_median_retired_lfo_fraction,2), `best early/middle coverage versus ${pct(findings.selection.required_early_middle_fraction,0)} required`]
+      ] : [
         ["Strongest repeatable effect", `${findings.normalization.improved}/${findings.normalization.count}`, "matched normalization pairs favor LayerClip0To1"],
         ["Budget effect", `${findings.candidate_budget.improved}/${findings.candidate_budget.count}`, "matched pairs favor CandidateBudget48; effect is mixed"],
         ["Schedule result", `${findings.schedule.improved}/${findings.schedule.count}`, "matched pairs favor TwoPhase; no global winner"],
@@ -955,7 +1076,19 @@
     function chartMarkup(node, prefix) { return `<div class="chart-grid">${node.charts.map(name => `<div class="chart-card"><div id="${prefix}-chart-${name}" class="chart ${["normalization","budget","schedule"].includes(name) ? "delta-chart" : ""}" aria-label="${esc(node.title)} chart"></div><p class="chart-caption">${esc(chartCaption(name))}</p></div>`).join("")}</div>`; }
 
     function chartCaption(name) {
-      return ({coverage:"Filled cells are completed; outlined cells remain absent. Coverage follows execution order, not random sampling.", normalization:"Each cell prints the exact LayerClip0To1 − FinalClipOnly delta. Green favors LayerClip0To1; coral favors FinalClipOnly; neutral cells are ties.", budget:"Each cell prints the exact CandidateBudget48 − CandidateBudget24 delta. Green favors CandidateBudget48; coral favors CandidateBudget24.", schedule:"Each cell prints the exact TwoPhase − Interleaved delta. Green favors TwoPhase; coral favors Interleaved; mixed signs mean there is no global schedule winner.", pareto:"Median and P95 set the coordinates; the tooltip reports strict-perfect and node-max P95 too. Outlined points are non-dominated across all four co-primary metrics.", partial:"Read left to right as codebook capacity is added. A steep downward step means the new atom materially improves tail reconstruction; a flat segment means diminishing returns. Lines are family medians, not individual rows.", calibration:"Each line asks how small the reconstruction-error threshold is at a chosen percentile as residual layers accumulate. Lower is closer. The shape explains convergence but cannot select epsilon from an incomplete run.", retirement:"Lower-right is the useful direction: more LFOs retired with less unexplained energy abandoned. Each point is a deterministic compact diagnostic sample; epsilon selection remains blocked.", runtime:"The main linear axis exposes ordinary legacy timing differences. The separate red segment retains the two host-sleep artifacts without letting them flatten the other bars; neither segment estimates optimized runtime."})[name];
+      const captions = {
+        coverage:isComplete13A ? "Every planned Experiment 13A cell is complete. Filter the grid to inspect valid family, construction, schedule, budget, and normalization slices." : "Filled cells are completed; outlined cells remain absent. Coverage follows execution order, not random sampling.",
+        normalization:"Each cell prints the exact LayerClip0To1 − FinalClipOnly delta. Green favors LayerClip0To1; coral favors FinalClipOnly; neutral cells are ties.",
+        budget:"Each cell prints the exact CandidateBudget48 − CandidateBudget24 delta. Green favors CandidateBudget48; coral favors CandidateBudget24.",
+        schedule:"Each cell prints the exact TwoPhase − Interleaved delta. Green favors TwoPhase; coral favors Interleaved; mixed signs mean there is no global schedule winner.",
+        pareto:"Median and P95 set the coordinates; the tooltip reports strict-perfect and node-max P95 too. Outlined points are non-dominated across all four co-primary metrics.",
+        partial:"Read left to right as codebook capacity is added. A steep downward step means the new atom materially improves tail reconstruction; a flat segment means diminishing returns. Lines are family medians, not individual rows.",
+        calibration:isComplete13A ? "The complete calibration shows convergence, but the automatic selector still fails the 5% early/middle coverage gate." : "Each line asks how small the reconstruction-error threshold is at a chosen percentile as residual layers accumulate. Lower is closer. The shape explains convergence but cannot select epsilon from an incomplete run.",
+        retirement:"Lower-right is useful: more LFOs retired with less unexplained energy abandoned. Energy safety passes, but coverage is too low to freeze epsilon automatically.",
+        scaling:"Each cell prints the exact 50%-training minus 100%-training validation delta. Green favors 50%; coral favors 100%. Runtime is intentionally excluded.",
+        runtime:isComplete13A ? "Continuous same-run timing keeps the optimized 13A cost pattern readable. Lower is faster; these are offline construction seconds, not deployed inference cost." : "The main linear axis exposes ordinary legacy timing differences. The separate red segment retains the two host-sleep artifacts without flattening the other bars."
+      };
+      return captions[name];
     }
 
     function metricsForNode(node) {
@@ -967,6 +1100,7 @@
       if (node.id === "families") return simpleTable([...filteredMetricRows(false)].sort((a,b) => num(a.validation_p95_rmse)-num(b.validation_p95_rmse)), ["row_id","construction_family","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"]);
       if (node.id === "partial") return simpleTable(filteredPartialRows(false), ["row_id","construction_family","active_atom_count","validation_median_rmse","validation_p95_rmse","validation_node_max_error_p95"]);
       if (node.id === "calibration") return simpleTable(DATA.calibration.retired_summary, ["epsilon","count","retired_median","unexplained_median","unexplained_p95","incoming_median","incoming_p95"]);
+      if (node.id === "scaling") return simpleTable(filteredScalingRows(false), ["row_id","construction_family","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
       return simpleTable(findings.runtime_outliers.filter(row => rowMatchesGlobal(metricById.get(row.row_id))), ["row_id","oracle_construction_time"]);
     }
 
@@ -983,7 +1117,7 @@
     }
 
     function renderFullReport() {
-      const coPrimary = `<article class="report-section" id="report-co-primary"><div class="eyebrow">Co-primary outcomes</div><h3>Four metrics define validation quality</h3><p>No single validation metric is authoritative. These are the best observed values in the incomplete 39-row prefix; each can come from a different strategy row.</p><div class="primary-metric-grid">${primaryMetricMarkup()}</div></article>`;
+      const coPrimary = `<article class="report-section" id="report-co-primary"><div class="eyebrow">Co-primary outcomes</div><h3>Four metrics define validation quality</h3><p>${isComplete13A ? "These are the best values across the complete 90-row Experiment 13A grid; each can come from a different strategy row." : "These are the best observed values in the incomplete prefix; each can come from a different strategy row."}</p><div class="primary-metric-grid">${primaryMetricMarkup()}</div></article>`;
       qs("#report-stack").innerHTML = coPrimary + NODES.map(node => `<article class="report-section" id="report-${node.id}"><div class="report-meta"><span class="node-number">${node.number}</span><span class="confidence" style="color:${STATUS[node.status].color}">${esc(node.zone)} · ${esc(node.status)}</span></div><h3>${esc(node.title)}</h3><p><strong>${esc(node.question)}</strong></p><p>${esc(node.mechanism)}</p>${node.motivation ? `<div class="motivation"><strong>Why this matters:</strong> ${esc(node.motivation)}</div>` : ""}${node.id === "families" ? constructionGuideMarkup() : ""}<div class="takeaway" style="margin-top:18px"><strong>Evidence:</strong> ${esc(node.evidence)}</div>${readingMarkup(node)}<div style="margin-top:18px">${chartMarkup(node, `full-${node.id}`)}</div><p><strong>Recommendation:</strong> ${esc(node.recommendation)}</p><div class="limitation"><strong>Limitation:</strong> ${esc(node.limitation)}</div></article>`).join("");
     }
 
@@ -1043,6 +1177,7 @@
 
     function renderDataTabs() {
       const labels = {metrics:"Completed strategies",coverage:"Coverage grid",matched_deltas:"Matched effects",partial_codebook:"Partial codebook"};
+      if (scaling.length) labels.scaling = "Training scaling";
       qs("#data-tabs").innerHTML = Object.entries(labels).map(([key,label]) => `<button class="tab-button" type="button" role="tab" data-data-kind="${key}" aria-selected="${key === dataKind}">${label}</button>`).join("");
       qsa("[data-data-kind]").forEach(button => {
         button.addEventListener("click", () => { dataKind = button.dataset.dataKind; renderDataTabs(); renderData(); });
@@ -1057,6 +1192,7 @@
       if (dataKind === "coverage") rows = filteredCoverageRows(false);
       if (dataKind === "partial_codebook") rows = filteredPartialRows(false);
       if (dataKind === "matched_deltas") rows = deltas.filter(row => filteredDeltaRows(row.comparison, false).includes(row));
+      if (dataKind === "scaling") rows = filteredScalingRows(false);
       rows = rows.filter(row => !query || JSON.stringify(row).toLowerCase().includes(query));
       const completion = qs("#data-completion")?.value;
       if (dataKind === "coverage" && completion && completion !== "all") rows = rows.filter(row => truthy(row.completed) === (completion === "complete"));
@@ -1067,7 +1203,7 @@
     }
 
     function dataColumns(kind) {
-      return ({metrics:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"],coverage:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","completed"],matched_deltas:["comparison","match_key","left_value","right_value","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"],partial_codebook:["row_id","construction_family","active_atom_count","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95"]})[kind];
+      return ({metrics:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"],coverage:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","completed"],matched_deltas:["comparison","match_key","left_value","right_value","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"],partial_codebook:["row_id","construction_family","active_atom_count","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95"],scaling:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]})[kind];
     }
 
     function exportCsv() {
@@ -1081,7 +1217,7 @@
 
     function renderChart(name, element) {
       if (!element) return;
-      const renderers = {coverage:chartCoverage,normalization:el => chartDelta(el,"layer_normalization_policy","FinalClipOnly","LayerClip0To1"),budget:el => chartDelta(el,"utility_candidate_budget","CandidateBudget24","CandidateBudget48"),schedule:el => chartDelta(el,"layer_schedule","Interleaved","TwoPhase"),pareto:chartPareto,partial:chartPartial,calibration:chartCalibration,retirement:chartRetirement,runtime:chartRuntime};
+      const renderers = {coverage:chartCoverage,normalization:el => chartDelta(el,"layer_normalization_policy","FinalClipOnly","LayerClip0To1"),budget:el => chartDelta(el,"utility_candidate_budget","CandidateBudget24","CandidateBudget48"),schedule:el => chartDelta(el,"layer_schedule","Interleaved","TwoPhase"),pareto:chartPareto,partial:chartPartial,calibration:chartCalibration,retirement:chartRetirement,scaling:chartScaling,runtime:chartRuntime};
       renderers[name](element);
     }
 
@@ -1192,7 +1328,9 @@
     }
 
     function chartCalibration(element) {
-      const rows = filteredCalibrationRows("layer_quantiles_by_row", true);
+      const rows = isComplete13A
+        ? DATA.calibration.layer_quantiles.map(row => [0,row.residual_layer,row.percentile,row.epsilon_value])
+        : filteredCalibrationRows("layer_quantiles_by_row", true);
       if (!rows.length) return chartEmpty(element);
       const percentiles = unique(rows.map(row => row[2])).map(Number).sort((a,b)=>b-a);
       const layers = unique(rows.map(row => row[1])).map(Number).sort((a,b)=>a-b);
@@ -1202,16 +1340,51 @@
     }
 
     function chartRetirement(element) {
-      const rows = filteredCalibrationRows("retired_sample_by_row", true);
+      const rows = isComplete13A
+        ? DATA.calibration.retired_sample.map(row => [0,row.epsilon,row.retired_lfo_fraction,row.unexplained_retired_energy_fraction])
+        : filteredCalibrationRows("retired_sample_by_row", true);
       if (!rows.length) return chartEmpty(element);
       const epsilons = unique(rows.map(row=>row[1])).map(Number).sort((a,b)=>a-b);
       element.style.height = "520px";
       setChart(element,{tooltip:{formatter:params=>`ε ${params.seriesName}<br>Retired ${pct(params.value[0],2)}<br>Unexplained energy ${pct(params.value[1],3)}<br><strong>Better direction: lower-right</strong>`},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:25,bottom:80,containLabel:true},xAxis:{type:"value",name:"Retired LFO fraction → more capacity released",nameLocation:"middle",nameGap:42,...baseAxes()},yAxis:{type:"value",name:"Unexplained retired energy ↓ safer",nameLocation:"middle",nameGap:56,...baseAxes()},series:epsilons.map(epsilon=>({name:String(epsilon),type:"scatter",symbolSize:7,data:rows.filter(row=>num(row[1])===epsilon).map(row=>[num(row[2]),num(row[3])]),itemStyle:{opacity:.48}}))});
     }
 
+    function chartScaling(element) {
+      const rows = filteredScalingRows(true).sort((a,b)=>num(a.delta_validation_p95_rmse)-num(b.delta_validation_p95_rmse));
+      if (!rows.length) return chartEmpty(element, "No matched scaling rows remain under these filters.");
+      const scales = CO_PRIMARY.map(metric => Math.max(...rows.map(row => Math.abs(num(row[`delta_${metric.key}`]))), 1e-15));
+      const cells = rows.flatMap((row,rowIndex)=>CO_PRIMARY.map((metric,metricIndex)=>{
+        const raw=num(row[`delta_${metric.key}`]);
+        const sampledBenefit=metric.higher?raw:-raw;
+        return {value:[metricIndex,rowIndex,sampledBenefit/scales[metricIndex]],raw,metric,row};
+      }));
+      element.style.height = `${Math.max(500, Math.min(920, 210 + rows.length * 23))}px`;
+      setChart(element,{
+        title:{text:`50% vs 100% training · ${rows.length} matched rows`,left:"center",textStyle:{color:chartText(),fontSize:13}},
+        tooltip:{formatter:params=>{const item=params.data;const favors=item.raw===0?"tie":((item.metric.higher?item.raw>0:item.raw<0)?"50% training":"100% training");return `${esc(short(item.row.row_id))}<br><strong>${esc(item.metric.label)}</strong><br>50% − 100% Δ: ${fmt(item.raw,8)}<br><strong>${esc(favors === "tie" ? "Tie" : `${favors} favored`)}</strong>`;}},
+        grid:{left:215,right:35,top:72,bottom:92},
+        xAxis:{type:"category",position:"top",data:CO_PRIMARY.map(metric=>metric.axis),axisLabel:{color:chartText(),interval:0,lineHeight:17,fontWeight:700},axisLine:{lineStyle:{color:chartGrid()}},axisTick:{show:false}},
+        yAxis:{type:"category",data:rows.map(row=>short(row.row_id)),axisLabel:{color:chartText(),width:195,overflow:"truncate"},axisLine:{lineStyle:{color:chartGrid()}},axisTick:{show:false}},
+        visualMap:{min:-1,max:1,dimension:2,orient:"horizontal",left:"center",bottom:18,text:["50% training favored","100% training favored"],textStyle:{color:chartText()},inRange:{color:["#e9b0aa","#eef2f1","#a9dcca"]}},
+        series:[{type:"heatmap",data:cells,label:{show:true,color:"#66757b",fontSize:11,fontWeight:650,formatter:params=>deltaCellLabel(params.data.metric,params.data.raw)},itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2}}]
+      });
+    }
+
     function chartRuntime(element) {
       const rows = [...filteredMetricRows(true)].sort((a,b)=>num(a.oracle_construction_time)-num(b.oracle_construction_time));
       if (!rows.length) return chartEmpty(element);
+      if (isComplete13A) {
+        const selected = rows.slice(-30);
+        element.style.height = `${Math.max(520, Math.min(900, 170 + selected.length * 23))}px`;
+        setChart(element,{
+          tooltip:{formatter:params=>`${esc(params.name)}<br>${fmt(params.value,2)} oracle construction seconds<br><strong>Same-run offline timing</strong>`},
+          grid:{left:235,right:45,top:35,bottom:58},
+          xAxis:{type:"value",name:"Oracle construction seconds ↓",...baseAxes()},
+          yAxis:{type:"category",data:selected.map(row=>short(row.row_id)),axisLabel:{color:chartText(),width:215,overflow:"truncate"},axisLine:{lineStyle:{color:chartGrid()}}},
+          series:[{name:"Optimized 13A timing",type:"bar",data:selected.map(row=>num(row.oracle_construction_time)),itemStyle:{color:COLORS.blue},label:{show:true,position:"right",color:"#66757b",formatter:params=>fmt(params.value,1)}}]
+        });
+        return;
+      }
       const sleepIds = new Set(findings.runtime_outliers.slice(0,2).map(row=>row.row_id));
       const ordinary = rows.filter(row=>!sleepIds.has(row.row_id));
       const sleep = rows.filter(row=>sleepIds.has(row.row_id));
@@ -1247,7 +1420,7 @@
       window.addEventListener("resize", resizeVisibleCharts);
       document.addEventListener("keydown", event => {
         if (["INPUT","SELECT","TEXTAREA"].includes(document.activeElement.tagName)) return;
-        if (/^[1-8]$/.test(event.key)) { switchView("interactive"); openNode(NODES[num(event.key)-1].id); }
+        if (/^[1-9]$/.test(event.key) && num(event.key) <= NODES.length) { switchView("interactive"); openNode(NODES[num(event.key)-1].id); }
         if (event.key === "Escape" && activeNode) closeDetail();
         if (["ArrowLeft","ArrowRight"].includes(event.key) && activeNode && !event.target.closest("[role=tablist]")) {
           const index=NODES.findIndex(node=>node.id===activeNode); const next=(index+(event.key==="ArrowRight"?1:-1)+NODES.length)%NODES.length; openNode(NODES[next].id);

@@ -33,6 +33,7 @@ CALIBRATION_TABLES = (
 )
 INTERACTIVE_REPORT_SCHEMA = "experiment13_interactive_report_v2"
 INTERACTIVE_TEMPLATE = Path(__file__).with_name("templates") / "experiment_13_provisional.html"
+COMPLETE_13A_REPORT_SCHEMA = "experiment13_complete_13a_report_v1"
 
 
 @dataclass(frozen=True)
@@ -64,6 +65,41 @@ def analyze_partial_strategy_grid(
         html_report_path=Path(html_report_path) if html_report_path is not None else None,
         image_dir=Path(image_dir),
         expected_rows=[asdict(spec) for spec in experiment13a_specs()],
+    )
+
+
+def analyze_13a_strategy_grid(
+    *,
+    run_dir: Path,
+    analysis_output_dir: Path,
+    report_path: Path,
+    image_dir: Path,
+    html_report_path: Path | None = None,
+    scaling_baseline_run: Path | None = None,
+) -> dict[str, str]:
+    """Generate the complete Experiment 13A report without weakening final-analysis gates."""
+    from .strategy_grid import experiment13a_specs, load_epsilon_selection, validate_completed_13a
+
+    source_run = Path(run_dir).resolve()
+    manifest, _ = validate_completed_13a(source_run)
+    selection_path = source_run / "epsilon_selection.json"
+    if not selection_path.is_file():
+        raise ValueError("complete 13A reporting requires epsilon selection to be attempted first")
+    selection = load_epsilon_selection(
+        selection_path,
+        expected_run_identity=str(manifest["experiment13a_run_identity"]),
+        expected_configuration_fingerprint=str(manifest["configuration_fingerprint"]),
+        require_passed=False,
+    )
+    return write_complete_13a_report(
+        source_run=source_run,
+        analysis_output_dir=Path(analysis_output_dir),
+        report_path=Path(report_path),
+        html_report_path=Path(html_report_path) if html_report_path is not None else None,
+        image_dir=Path(image_dir),
+        expected_rows=[asdict(spec) for spec in experiment13a_specs()],
+        selection=dict(selection.payload),
+        scaling_baseline_run=Path(scaling_baseline_run) if scaling_baseline_run is not None else None,
     )
 
 
@@ -216,6 +252,126 @@ def write_provisional_report(
     }
 
 
+def write_complete_13a_report(
+    *,
+    source_run: Path,
+    analysis_output_dir: Path,
+    report_path: Path,
+    image_dir: Path,
+    expected_rows: Sequence[Mapping[str, Any]],
+    selection: Mapping[str, Any],
+    html_report_path: Path | None = None,
+    scaling_baseline_run: Path | None = None,
+) -> dict[str, str]:
+    """Write a complete-13A snapshot while keeping canonical 13A/13B analysis separate."""
+    from .strategy_grid import read_phase_status
+
+    source_run = Path(source_run).resolve()
+    analysis_output_dir = Path(analysis_output_dir).resolve()
+    report_path = Path(report_path).resolve()
+    html_report_path = Path(html_report_path or report_path.with_suffix(".html")).resolve()
+    image_dir = Path(image_dir).resolve()
+    scaling_baseline_run = Path(scaling_baseline_run).resolve() if scaling_baseline_run is not None else None
+    for path, label in (
+        (analysis_output_dir, "analysis output directory"),
+        (report_path, "report path"),
+        (html_report_path, "HTML report path"),
+        (image_dir, "image directory"),
+    ):
+        _require_outside_source(source_run, path, label)
+    if report_path.suffix.lower() != ".md":
+        raise ValueError("complete 13A report path must end in .md")
+    if html_report_path.suffix.lower() != ".html":
+        raise ValueError("interactive report path must end in .html")
+
+    bundle = prepare_analysis_artifacts(
+        source_run=source_run,
+        analysis_output_dir=analysis_output_dir,
+        expected_rows=expected_rows,
+        phase="13A",
+        forbid_source_writes=True,
+    )
+    expected_count = len([row for row in expected_rows if row.get("experiment_phase") == "13A"])
+    if expected_count != 90 or len(bundle.summaries) != expected_count:
+        raise ValueError(f"complete 13A report requires 90/90 rows; got {len(bundle.summaries)}/{expected_count}")
+    if bool(selection.get("selection_passed")):
+        raise ValueError("complete 13A snapshot expects the automatic selector result before a pilot override")
+
+    scaling_rows: list[dict[str, Any]] = []
+    scaling_path: Path | None = None
+    scaling_validation_sha256: str | None = None
+    if scaling_baseline_run is not None:
+        scaling_rows, scaling_validation_sha256 = _training_scaling_rows(
+            baseline_run=scaling_baseline_run,
+            sampled_run=source_run,
+        )
+        scaling_path = analysis_output_dir / "training_data_scaling_ablation.csv"
+        write_csv(scaling_path, scaling_rows)
+
+    plot_paths = _write_plots(bundle, image_dir, historical_runtime=False)
+    report_text = _complete_13a_markdown(
+        bundle,
+        source_run=source_run,
+        report_path=report_path,
+        plot_paths=plot_paths,
+        selection=selection,
+        scaling_rows=scaling_rows,
+        scaling_baseline_run=scaling_baseline_run,
+    )
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    _atomic_text(report_path, report_text)
+
+    source_fingerprint = _analysis_source_fingerprint(source_run)
+    phase_b_status = read_phase_status(source_run, "13B")
+    interactive_payload = _interactive_payload(
+        bundle,
+        source_run=source_run,
+        html_report_path=html_report_path,
+        expected_count=expected_count,
+        source_fingerprint=source_fingerprint,
+        report_mode="complete_13a",
+        selection=selection,
+        scaling_rows=scaling_rows,
+        experiment13b_state=str(phase_b_status.get("state", "not_started")),
+    )
+    interactive_text = _interactive_html(interactive_payload)
+    _atomic_text(html_report_path, interactive_text)
+    interactive_sha256 = hashlib.sha256(interactive_text.encode("utf-8")).hexdigest()
+
+    manifest = {
+        "schema_version": COMPLETE_13A_REPORT_SCHEMA,
+        "source_run": str(source_run),
+        "source_analysis_sha256": source_fingerprint,
+        "completed_13a_rows": len(bundle.summaries),
+        "expected_13a_rows": expected_count,
+        "report_status": "complete_13a_pending_13b",
+        "epsilon_selection_passed": bool(selection.get("selection_passed")),
+        "epsilon_selection_notes": selection.get("selection_notes"),
+        "experiment13b_state": phase_b_status.get("state", "not_started"),
+        "runtime_comparison_allowed": False,
+        "scaling_matched_row_count": len(scaling_rows),
+        "scaling_validation_membership_sha256": scaling_validation_sha256,
+        "report_path": str(report_path),
+        "html_report_path": str(html_report_path),
+        "interactive_payload_schema": INTERACTIVE_REPORT_SCHEMA,
+        "interactive_report_sha256": interactive_sha256,
+        "image_dir": str(image_dir),
+    }
+    manifest_path = analysis_output_dir / "complete_13a_report_manifest.json"
+    _atomic_text(manifest_path, json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+    result = {
+        "analysis_output_dir": str(analysis_output_dir),
+        "report": str(report_path),
+        "html_report": str(html_report_path),
+        "report_image_dir": str(image_dir),
+        "manifest": str(manifest_path),
+        **{key: str(path) for key, path in bundle.paths.items()},
+    }
+    if scaling_path is not None:
+        result["training_data_scaling_ablation"] = str(scaling_path)
+    return result
+
+
 def _load_table(run_dir: Path, name: str) -> list[dict[str, Any]]:
     aggregate = run_dir / name
     if aggregate.is_file() and aggregate.stat().st_size > 0:
@@ -228,6 +384,84 @@ def _load_table(run_dir: Path, name: str) -> list[dict[str, Any]]:
                 row["row_id"] = source.parent.name
         rows.extend(shard)
     return rows
+
+
+def _training_scaling_rows(
+    *,
+    baseline_run: Path,
+    sampled_run: Path,
+) -> tuple[list[dict[str, Any]], str]:
+    """Return the bounded 100%- versus 50%-training quality ablation."""
+    from .strategy_grid import _completed_row_summaries, _validation_membership_sha256
+
+    baseline_run = Path(baseline_run).resolve()
+    sampled_run = Path(sampled_run).resolve()
+    baseline = _completed_row_summaries(baseline_run, "13A")
+    sampled = _completed_row_summaries(sampled_run, "13A")
+    matched = sorted(set(baseline) & set(sampled))
+    if not matched:
+        raise ValueError("training-data scaling ablation has no matched completed 13A rows")
+    baseline_validation = _validation_membership_sha256(
+        baseline_run / "rows" / matched[0] / "atom_assignments.csv"
+    )
+    sampled_validation = _validation_membership_sha256(
+        sampled_run / "rows" / matched[0] / "atom_assignments.csv"
+    )
+    if baseline_validation != sampled_validation:
+        raise ValueError("training-data scaling ablation requires identical validation membership")
+    metrics = (
+        "validation_median_rmse",
+        "validation_strict_perfect_lfo_rate",
+        "validation_p95_rmse",
+        "validation_node_max_error_p95",
+    )
+    rows: list[dict[str, Any]] = []
+    for row_id in matched:
+        sampled_row = sampled[row_id]
+        row: dict[str, Any] = {
+            "row_id": row_id,
+            "construction_family": sampled_row.get("construction_family", ""),
+            "construction_policy": sampled_row.get("construction_policy", ""),
+            "layer_schedule": sampled_row.get("layer_schedule", ""),
+            "utility_candidate_budget": sampled_row.get("utility_candidate_budget", ""),
+            "layer_normalization_policy": sampled_row.get("layer_normalization_policy", ""),
+            "full_train_fraction": 1.0,
+            "sampled_train_fraction": 0.5,
+            "validation_fraction": 1.0,
+            "runtime_comparison_allowed": False,
+        }
+        for metric in metrics:
+            full_value = float(baseline[row_id][metric])
+            sampled_value = float(sampled_row[metric])
+            row[f"full_{metric}"] = full_value
+            row[f"sampled_{metric}"] = sampled_value
+            row[f"delta_{metric}"] = sampled_value - full_value
+        rows.append(row)
+    return rows, baseline_validation
+
+
+def _analysis_source_fingerprint(source_run: Path) -> str:
+    """Hash only the retained inputs consumed by the complete-13A report."""
+    names = (
+        "summary.csv",
+        "partial_codebook_validation.csv",
+        "layer_epsilon_quantiles.csv",
+        "slot_epsilon_quantiles.csv",
+        "epsilon_coverage.csv",
+        "retired_error_mass.csv",
+        "execution_timing.csv",
+        "experiment13a_status.json",
+        "run_status.json",
+        "epsilon_selection.json",
+        "epsilon_selection_status.json",
+    )
+    digest = hashlib.sha256()
+    for name in names:
+        path = Path(source_run) / name
+        if not path.is_file():
+            continue
+        digest.update(f"{name}\t{hashlib.sha256(path.read_bytes()).hexdigest()}\n".encode("utf-8"))
+    return digest.hexdigest()
 
 
 def _coverage_rows(expected_rows: Sequence[Mapping[str, Any]], completed: set[str]) -> list[dict[str, Any]]:
@@ -331,7 +565,12 @@ def _matched_factor_deltas(summaries: Sequence[Mapping[str, Any]]) -> list[dict[
     return result
 
 
-def _write_plots(bundle: AnalysisBundle, image_dir: Path) -> dict[str, Path]:
+def _write_plots(
+    bundle: AnalysisBundle,
+    image_dir: Path,
+    *,
+    historical_runtime: bool = True,
+) -> dict[str, Path]:
     try:
         import matplotlib
 
@@ -347,7 +586,7 @@ def _write_plots(bundle: AnalysisBundle, image_dir: Path) -> dict[str, Path]:
         "budget": image_dir / "candidate_budget_p95_deltas.png",
         "schedule": image_dir / "schedule_p95_deltas.png",
         "partial": image_dir / "partial_codebook_progression.png",
-        "runtime": image_dir / "legacy_oracle_runtime.png",
+        "runtime": image_dir / ("legacy_oracle_runtime.png" if historical_runtime else "oracle_runtime.png"),
         "layer_quantiles": image_dir / "layer_epsilon_quantiles.png",
         "slot_quantiles": image_dir / "slot_epsilon_quantiles.png",
         "layer_coverage": image_dir / "completed_layer_coverage.png",
@@ -360,7 +599,10 @@ def _write_plots(bundle: AnalysisBundle, image_dir: Path) -> dict[str, Path]:
     _plot_delta(plt, paths["budget"], bundle.matched_deltas, "utility_candidate_budget", "CandidateBudget48 minus CandidateBudget24")
     _plot_delta(plt, paths["schedule"], bundle.matched_deltas, "layer_schedule", "TwoPhase minus Interleaved")
     _plot_partial(plt, paths["partial"], bundle.partial_codebook, bundle.summaries)
-    _plot_runtime(plt, paths["runtime"], bundle.summaries)
+    if historical_runtime:
+        _plot_runtime(plt, paths["runtime"], bundle.summaries)
+    else:
+        _plot_current_runtime(plt, paths["runtime"], bundle.summaries)
     _plot_quantiles(plt, paths["layer_quantiles"], bundle.calibration["layer_epsilon_quantiles.csv"], "residual_layer", "Completed-layer epsilon quantiles")
     _plot_quantiles(plt, paths["slot_quantiles"], bundle.calibration["slot_epsilon_quantiles.csv"], "active_atom_slot", "Slot-level epsilon quantiles")
     _plot_coverage(plt, paths["layer_coverage"], bundle.calibration["epsilon_coverage.csv"], completed=True)
@@ -385,7 +627,7 @@ def _plot_pareto(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> Non
             edgecolors=["black" if _truth(row.get("pareto_candidate")) else "none" for row in selected],
             alpha=0.82,
         )
-    axis.set(xlabel="validation median RMSE (lower is better)", ylabel="validation P95 RMSE (lower is better)", title="Provisional co-primary quality tradeoffs")
+    axis.set(xlabel="validation median RMSE (lower is better)", ylabel="validation P95 RMSE (lower is better)", title="Experiment 13A co-primary quality tradeoffs")
     axis.legend(fontsize=7, loc="best")
     _save(plt, figure, path)
 
@@ -425,7 +667,7 @@ def _plot_partial(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]], summa
         x = sorted(key[1] for key in grouped if key[0] == family)
         if x:
             axis.plot(x, [median(grouped[(family, value)]) for value in x], marker="o", label=family)
-    axis.set(xlabel="active atoms per residual layer", ylabel="median validation P95 RMSE (lower is better)", title="Partial-codebook progression by covered family")
+    axis.set(xlabel="active atoms per residual layer", ylabel="median validation P95 RMSE (lower is better)", title="Partial-codebook progression by construction family")
     axis.legend(fontsize=7, loc="best")
     _save(plt, figure, path)
 
@@ -478,6 +720,28 @@ def _plot_runtime(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> No
     figure.suptitle("Historical legacy construction runtime — broken axis isolates host sleep")
     figure.subplots_adjust(left=0.32, right=0.98, top=0.91, bottom=0.1, wspace=0.05)
     _save(plt, figure, path, tight=False)
+
+
+def _plot_current_runtime(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
+    selected = sorted(rows, key=lambda row: _number(row, "oracle_construction_time"), reverse=True)[:20]
+    figure, axis = plt.subplots(figsize=(11.0, 7.8))
+    y = range(len(selected))
+    values = [_number(row, "oracle_construction_time") for row in selected]
+    labels = [
+        f"{row.get('construction_policy', '')} · "
+        f"{str(row.get('utility_candidate_budget', '')).replace('CandidateBudget', 'B')} · "
+        f"{str(row.get('layer_normalization_policy', '')).replace('LayerClip0To1', 'LayerClip').replace('FinalClipOnly', 'FinalClip')}"
+        for row in selected
+    ]
+    axis.barh(y, values, color="#4C78A8", alpha=0.86)
+    axis.set_yticks(list(y), labels, fontsize=7)
+    axis.invert_yaxis()
+    axis.set(
+        xlabel="oracle construction seconds (lower is faster)",
+        ylabel="20 slowest rows in the optimized 13A run",
+        title="Experiment 13A same-run construction timing",
+    )
+    _save(plt, figure, path)
 
 
 def _plot_quantiles(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]], x_key: str, title: str) -> None:
@@ -553,6 +817,10 @@ def _interactive_payload(
     html_report_path: Path,
     expected_count: int,
     source_fingerprint: str,
+    report_mode: str = "provisional",
+    selection: Mapping[str, Any] | None = None,
+    scaling_rows: Sequence[Mapping[str, Any]] = (),
+    experiment13b_state: str = "not_started",
 ) -> dict[str, Any]:
     """Build the compact, deterministic payload embedded in the HTML report."""
     completed = len(bundle.summaries)
@@ -565,8 +833,12 @@ def _interactive_payload(
         str(row.get("row_id")): str(row.get("construction_family", "Unknown"))
         for row in bundle.summaries
     }
+    partial_fields = ("row_id", "active_atom_count", *CO_PRIMARY_METRICS)
     partial_rows = [
-        {**row, "construction_family": family_by_row.get(str(row.get("row_id")), "Unknown")}
+        {
+            **{field: row.get(field, "") for field in partial_fields},
+            "construction_family": family_by_row.get(str(row.get("row_id")), "Unknown"),
+        }
         for row in bundle.partial_codebook
     ]
 
@@ -587,18 +859,38 @@ def _interactive_payload(
     )
     calibration = _compact_calibration(bundle.calibration)
     source_display = os.path.relpath(source_run, html_report_path.parent).replace("\\", "/")
+    complete_13a = report_mode == "complete_13a"
+    if complete_13a:
+        # The selector is defined over all 90 rows. Per-row calibration arrays would
+        # make global UI filters look scientifically meaningful when they are not.
+        calibration["layer_quantiles_by_row"] = []
+        calibration["retired_sample_by_row"] = []
+    selection_payload = dict(selection or {})
+    candidate_statistics = selection_payload.get("training_statistics_used", {}).get("candidate_statistics", {})
+    max_early_middle = max(
+        (
+            float(value.get("max_early_middle_median_retired_lfo_fraction", 0.0))
+            for value in candidate_statistics.values()
+        ),
+        default=0.0,
+    )
 
     return {
         "schema_version": INTERACTIVE_REPORT_SCHEMA,
         "meta": {
-            "title": "Experiment 13 — Provisional W8D16 Strategy Grid",
-            "status": "provisional_incomplete_13a",
+            "report_mode": report_mode,
+            "display_title": "Experiment 13A — Complete W8D16 Strategy Grid" if complete_13a else "Experiment 13 — Provisional W8D16 Strategy Grid",
+            "title": "Experiment 13A — Complete W8D16 Strategy Grid" if complete_13a else "Experiment 13 — Provisional W8D16 Strategy Grid",
+            "status": "complete_13a_pending_13b" if complete_13a else "provisional_incomplete_13a",
             "completed_rows": completed,
             "expected_rows": expected_count,
             "source_run": source_display,
             "source_archive_sha256": source_fingerprint,
-            "epsilon_selected": False,
-            "experiment13b_started": False,
+            "epsilon_selected": bool(selection_payload.get("selection_passed")),
+            "epsilon_selection_attempted": bool(selection_payload),
+            "epsilon_selection_notes": selection_payload.get("selection_notes"),
+            "experiment13b_started": experiment13b_state != "not_started",
+            "experiment13b_state": experiment13b_state,
             "runtime_comparison_allowed": False,
             "contract": {
                 "window_width": 8,
@@ -615,7 +907,13 @@ def _interactive_payload(
             "normalization": normalization,
             "candidate_budget": budget,
             "schedule": schedule,
-            "best_row": dict(best),
+            "best_row": {
+                field: best.get(field, "")
+                for field in (
+                    "row_id", "construction_policy", "construction_family", "layer_schedule",
+                    "utility_candidate_budget", "layer_normalization_policy", *CO_PRIMARY_METRICS,
+                )
+            },
             "pareto_count": len(pareto),
             "absent_families": absent_families,
             "incomplete_families": incomplete_families,
@@ -627,12 +925,51 @@ def _interactive_payload(
                 }
                 for row in runtime_rows[:15]
             ],
+            "selection": {
+                "selection_passed": bool(selection_payload.get("selection_passed")),
+                "selection_notes": selection_payload.get("selection_notes", "not attempted"),
+                "selected_epsilon": selection_payload.get("selected_epsilon"),
+                "max_early_middle_median_retired_lfo_fraction": max_early_middle,
+                "required_early_middle_fraction": 0.05,
+                "candidate_statistics": candidate_statistics,
+            },
+            "scaling_matched_row_count": len(scaling_rows),
         },
         "tables": {
-            "metrics": bundle.co_primary,
+            "metrics": [
+                {
+                    field: row.get(field, "")
+                    for field in (
+                        "row_id", "construction_policy", "construction_family", "layer_schedule",
+                        "utility_candidate_budget", "layer_normalization_policy", *CO_PRIMARY_METRICS,
+                        "oracle_construction_time", "pareto_candidate",
+                    )
+                }
+                for row in bundle.co_primary
+            ],
             "coverage": bundle.coverage,
-            "matched_deltas": bundle.matched_deltas,
+            "matched_deltas": [
+                {
+                    field: row.get(field, "")
+                    for field in (
+                        "comparison", "left_value", "right_value", "match_key", "left_row_id", "right_row_id",
+                        *(f"delta_{metric}" for metric in CO_PRIMARY_METRICS),
+                    )
+                }
+                for row in bundle.matched_deltas
+            ],
             "partial_codebook": partial_rows,
+            "scaling": [
+                {
+                    field: row.get(field, "")
+                    for field in (
+                        "row_id", "construction_policy", "construction_family", "layer_schedule",
+                        "utility_candidate_budget", "layer_normalization_policy",
+                        *(f"delta_{metric}" for metric in CO_PRIMARY_METRICS),
+                    )
+                }
+                for row in scaling_rows
+            ],
         },
         "calibration": calibration,
     }
@@ -800,6 +1137,226 @@ def _interactive_html(payload: Mapping[str, Any]) -> str:
     data = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     data = data.replace("</", "<\\/")
     return template.replace(marker, data)
+
+
+def _complete_13a_markdown(
+    bundle: AnalysisBundle,
+    *,
+    source_run: Path,
+    report_path: Path,
+    plot_paths: Mapping[str, Path],
+    selection: Mapping[str, Any],
+    scaling_rows: Sequence[Mapping[str, Any]],
+    scaling_baseline_run: Path | None,
+) -> str:
+    normalization = _comparison_summary(bundle.matched_deltas, "layer_normalization_policy")
+    budget = _comparison_summary(bundle.matched_deltas, "utility_candidate_budget")
+    schedule = _comparison_summary(bundle.matched_deltas, "layer_schedule")
+    pareto = [row for row in bundle.co_primary if _truth(row.get("pareto_candidate"))]
+    top = sorted(bundle.summaries, key=lambda row: _number(row, "validation_p95_rmse"))[:10]
+    runtime = sorted(bundle.summaries, key=lambda row: _number(row, "oracle_construction_time"))
+    candidate_statistics = selection.get("training_statistics_used", {}).get("candidate_statistics", {})
+    max_early_middle = max(
+        (
+            float(value.get("max_early_middle_median_retired_lfo_fraction", 0.0))
+            for value in candidate_statistics.values()
+        ),
+        default=0.0,
+    )
+    source_display = os.path.relpath(source_run, report_path.parent).replace("\\", "/")
+    baseline_display = (
+        os.path.relpath(scaling_baseline_run, report_path.parent).replace("\\", "/")
+        if scaling_baseline_run is not None
+        else None
+    )
+
+    def image(name: str, alt: str) -> str:
+        relative = os.path.relpath(plot_paths[name], report_path.parent).replace("\\", "/")
+        return f"![{alt}]({relative})"
+
+    metric_specs = (
+        ("validation_median_rmse", "Median RMSE", False),
+        ("validation_strict_perfect_lfo_rate", "Strict-perfect LFO rate", True),
+        ("validation_p95_rmse", "P95 RMSE", False),
+        ("validation_node_max_error_p95", "Node-max error P95", False),
+    )
+    metric_leaders = [
+        "| Co-primary metric | Better | Best value | Strategy row |",
+        "| --- | --- | ---: | --- |",
+    ]
+    for metric, label, higher in metric_specs:
+        row = (max if higher else min)(bundle.summaries, key=lambda item, key=metric: _number(item, key))
+        value = _number(row, metric)
+        value_text = f"{value:.3%}" if higher else f"{value:.8g}"
+        metric_leaders.append(f"| {label} | {'higher' if higher else 'lower'} | {value_text} | `{row.get('row_id')}` |")
+
+    matched_table = [
+        "| Matched factor | Metric | Right wins / left wins / ties | Median right-minus-left delta |",
+        "| --- | --- | ---: | ---: |",
+    ]
+    comparison_labels = (
+        ("layer_normalization_policy", "LayerClip0To1 vs FinalClipOnly"),
+        ("utility_candidate_budget", "CandidateBudget48 vs CandidateBudget24"),
+        ("layer_schedule", "TwoPhase vs Interleaved"),
+    )
+    for comparison, comparison_label in comparison_labels:
+        for metric, label, higher in metric_specs:
+            summary = _comparison_metric_summary(bundle.matched_deltas, comparison, metric, higher_is_better=higher)
+            delta = float(summary["median"])
+            delta_text = f"{delta * 100:+.5f} pp" if higher else f"{delta:+.8g}"
+            matched_table.append(
+                f"| {comparison_label} | {label} | {summary['improved']} / {summary['worsened']} / {summary['tied']} | {delta_text} |"
+            )
+
+    pareto_table = [
+        "| Pareto strategy | Median RMSE ↓ | Strict-perfect ↑ | P95 RMSE ↓ | Node-max P95 ↓ |",
+        "| --- | ---: | ---: | ---: | ---: |",
+    ]
+    for row in sorted(pareto, key=lambda item: _number(item, "validation_p95_rmse")):
+        pareto_table.append(
+            f"| `{row.get('row_id')}` | {_number(row, 'validation_median_rmse'):.8g} | "
+            f"{_number(row, 'validation_strict_perfect_lfo_rate'):.3%} | "
+            f"{_number(row, 'validation_p95_rmse'):.8g} | {_number(row, 'validation_node_max_error_p95'):.8g} |"
+        )
+
+    scaling_table = [
+        "| Co-primary metric | Median 50%-minus-100% delta | 50% better / 100% better / ties |",
+        "| --- | ---: | ---: |",
+    ]
+    for metric, label, higher in metric_specs:
+        values = [_number(row, f"delta_{metric}") for row in scaling_rows]
+        if not values:
+            continue
+        scaling_table.append(
+            f"| {label} | {median(values) * (100 if higher else 1):+.8g}{' pp' if higher else ''} | "
+            f"{sum(value > 0 if higher else value < 0 for value in values)} / "
+            f"{sum(value < 0 if higher else value > 0 for value in values)} / {sum(value == 0 for value in values)} |"
+        )
+
+    lines = [
+        "# Experiment 13A: Complete Fixed-W8D16 Strategy Grid",
+        "",
+        "> **13A complete · 90/90 rows.** This report is authoritative for the unfiltered `AllResiduals` strategy grid. "
+        "The automatic epsilon selector did not pass, no epsilon is frozen, and Experiment 13B has not run; therefore this is not the final AllResiduals-versus-UnresolvedOnly report.",
+        "",
+        "## Main Findings",
+        "",
+        f"Layer-wise clipping is the clearest global result. `LayerClip0To1` improves validation P95 RMSE in `{normalization['improved']}/{normalization['count']}` matched pairs, with median delta `{normalization['median']:.8g}` and range `{normalization['minimum']:.8g}` to `{normalization['maximum']:.8g}`. It is a decoder-free constraint and changes no model prediction heads.",
+        "",
+        f"A larger repair shortlist is a secondary, mixed lever. `CandidateBudget48` improves `{budget['improved']}/{budget['count']}`, worsens `{budget['worsened']}`, and ties `{budget['tied']}` P95 comparisons; its median effect is only `{budget['median']:.8g}`. More offline search is not a guaranteed quality win.",
+        "",
+        f"`TwoPhase` improves `{schedule['improved']}/{schedule['count']}` schedule pairs with median P95 delta `{schedule['median']:.8g}`. The slight aggregate edge remains family-dependent, so schedule should remain an interaction rather than a universal default.",
+        "",
+        "The quality frontier has three distinct jobs rather than one universal winner: `AllClusterMeans + LayerClip0To1` gives the lowest P95 RMSE; `DiverseCoverageHardRepairTwoPhase + CandidateBudget48 + LayerClip0To1` gives the best median RMSE and node-max P95; and the clipped `CommonCaseRepair + CandidateBudget24` anchor preserves the highest strict-perfect rate.",
+        "",
+        f"The automatic epsilon rule did not pass. All candidates satisfy the retired unexplained-energy limits, but the best early/middle median reconstructed fraction is only `{max_early_middle:.3%}`, below the required `5%`. The prescribed `0.001` versus `0.0025` restricted pilot is therefore required before 13B.",
+        "",
+        image("pareto", "Experiment 13A co-primary quality frontier"),
+        "",
+        "The x-axis is validation median RMSE and the y-axis is validation P95 RMSE; lower-left is better. Outlined points remain non-dominated after strict-perfect rate and node-max P95 are also considered. The plot is navigation across tradeoffs, not a scalar leaderboard.",
+        "",
+        "## Four Co-Primary Validation Metrics",
+        "",
+        *metric_leaders,
+        "",
+        *pareto_table,
+        "",
+        "Strict-perfect rate has only two observed values across the 90 rows. RMSE improvements therefore must not be described as automatically improving exact finishes at the fixed `1e-5` threshold.",
+        "",
+        "## Matched Policy Effects",
+        "",
+        *matched_table,
+        "",
+        "Negative RMSE and node-max deltas favor the policy named before `vs`; positive strict-perfect deltas favor it. These matched comparisons isolate one design factor while holding the others fixed.",
+        "",
+        "### Layer normalization",
+        "",
+        image("normalization", "Matched normalization P95 deltas"),
+        "",
+        "Every bar is below zero: clipping after each residual layer consistently prevents physical-range overshoot from accumulating into the validation tail.",
+        "",
+        "### Candidate budget",
+        "",
+        image("budget", "Matched candidate-budget P95 deltas"),
+        "",
+        "Bars fall on both sides of zero. CandidateBudget48 can find better observed repairs, but later slots and Beam4 encoding frequently compensate for the smaller shortlist.",
+        "",
+        "### Layer schedule",
+        "",
+        image("schedule", "Matched schedule P95 deltas"),
+        "",
+        "The signs remain mixed. TwoPhase works especially well for some diversity-aware and robust prototype families, while other families benefit from earlier repair interleaving.",
+        "",
+        "## Construction-Family Interpretation",
+        "",
+        "Pure cluster prototypes are competitive at the tail: `AllClusterMeans + LayerClip0To1` is the P95 leader. The best median and node-max row instead combines diverse broad coverage with hard-tail repair, supporting a mechanism in which dissimilar population prototypes remove reusable structure before observed examples address the remaining difficult cases. The CommonCaseRepair anchor retains the strict-perfect lead, showing that finishing behavior is not captured by aggregate RMSE alone.",
+        "",
+        "The ten lowest-P95 rows are:",
+        "",
+    ]
+    for index, row in enumerate(top, start=1):
+        lines.append(
+            f"{index}. `{row.get('row_id')}` — P95 `{_number(row, 'validation_p95_rmse'):.8g}`, median "
+            f"`{_number(row, 'validation_median_rmse'):.8g}`, strict-perfect "
+            f"`{_number(row, 'validation_strict_perfect_lfo_rate'):.3%}`, node-max P95 "
+            f"`{_number(row, 'validation_node_max_error_p95'):.8g}`."
+        )
+    lines.extend([
+        "",
+        "## Partial-Codebook Progression",
+        "",
+        image("partial", "Partial-codebook progression"),
+        "",
+        "Move left to right as each residual layer gains another active atom; lower validation P95 is better. The early slope measures capacity efficiency, while late flattening shows diminishing returns. The first few atoms carry most of the quality gain, but family curves continue to separate through slot seven, so this fixed-W8 design does not support removing late slots without a separate head-budget experiment.",
+        "",
+        "## Eligibility Calibration and Gate Result",
+        "",
+        "Completed-layer and slot quantiles show how the reconstruction-error threshold required to cover a fixed curve percentile falls as codebook construction proceeds. Coverage plots invert the question: higher reconstructed fraction means more training curves would be retired at a fixed epsilon.",
+        "",
+        image("layer_quantiles", "Completed-layer epsilon quantiles"),
+        "",
+        image("slot_quantiles", "Slot-level epsilon quantiles"),
+        "",
+        image("layer_coverage", "Completed-layer reconstructed fractions"),
+        "",
+        image("slot_coverage", "Slot-level reconstructed fractions"),
+        "",
+        "The retirement plots ask whether excluding more LFOs would abandon meaningful unexplained residual energy. The desired direction is lower-right: more LFOs retired with less unexplained energy. The energy safety criteria pass, but the coverage criterion does not, so these plots motivate the pilot rather than an epsilon override.",
+        "",
+        image("retired", "Retired fraction versus unexplained energy"),
+        "",
+        image("energy", "Incoming versus unexplained retired energy"),
+        "",
+        "## Training-Data Scaling Ablation",
+        "",
+        f"The preserved full-training prefix supplies `{len(scaling_rows)}` matched rows with identical validation membership. It is a non-random execution-order prefix, so this is a bounded method-level ablation rather than a balanced estimate over all construction families.",
+        "",
+        *scaling_table,
+        "",
+        "The 50%-training run has modestly worse median and P95 RMSE on the matched prefix, while strict-perfect rate and node-max P95 improve on most rows. This mixed direction argues against describing the sample reduction as uniformly harmful or uniformly beneficial. Runtime is excluded because the legacy fragment includes Modern Standby and a superseded execution implementation.",
+        "",
+        "## Same-Run Runtime Diagnostics",
+        "",
+        image("runtime", "Experiment 13A same-run oracle construction time"),
+        "",
+        f"This chart compares rows only inside the optimized train-50% run. Median oracle construction time is `{median([_number(row, 'oracle_construction_time') for row in runtime]):.3f}` seconds and the maximum is `{_number(runtime[-1], 'oracle_construction_time'):.3f}` seconds. The scale is continuous because this run contains no host-sleep outliers. These timings support within-run cost comparisons only.",
+        "",
+        "## Practical Takeaways",
+        "",
+        "- Keep `LayerClip0To1` as the default normalization candidate for the eventual paired analysis.",
+        "- Carry all three Pareto strategies into the 13B interpretation; no scalar winner represents all four quality objectives.",
+        "- Treat CandidateBudget48 and TwoPhase as interaction-dependent choices, not unconditional defaults.",
+        "- Run the prescribed restricted epsilon pilot before any full Experiment 13B launch.",
+        "- Do not compare legacy and optimized wall-clock timings or claim a general 50%-training scaling law from the 39-row prefix.",
+        "",
+        "## Method Notes and Generated Artifacts",
+        "",
+        f"The completed source run is `{source_display}` relative to this report. The scaling baseline is `{baseline_display}`. Derived analysis tables, report images, and the interactive payload are written outside both source runs.",
+        "",
+        "All rows preserve W8D16, 32 base choices, one no-op plus seven active atoms per residual layer, 97 control points, PhaseAndResidualGain scalars, Beam4 encoding, and 193 model prediction outputs. Codebook construction is offline/oracle work; topology is not a deployed runtime input.",
+        "",
+    ])
+    return "\n".join(lines)
 
 
 def _provisional_markdown(

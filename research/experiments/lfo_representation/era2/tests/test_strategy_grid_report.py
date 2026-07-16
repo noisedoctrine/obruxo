@@ -55,7 +55,7 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             self.assertIn("Node-max error P95", text)
 
             html = html_report.read_text(encoding="utf-8")
-            self.assertIn("PROVISIONAL ·", html)
+            self.assertIn('qs("#status-label").textContent = isComplete13A ? "13A COMPLETE" : "PROVISIONAL"', html)
             self.assertIn("Source coverage", html)
             self.assertIn("Layer normalization", html)
             self.assertIn("Candidate budget", html)
@@ -184,6 +184,176 @@ class StrategyGridPartialReportTests(unittest.TestCase):
                     html_report_path=source / "report.html",
                     image_dir=Path(tmp) / "images",
                 )
+
+    def test_complete_13a_report_keeps_final_analysis_gated(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "complete_13a"
+            baseline = root / "legacy_prefix"
+            expected, selection = _write_complete_13a_report_fixture(source, baseline)
+            before = _fingerprint(source)
+            analysis = root / "analysis"
+            report = root / "reports" / "EXPERIMENT_13A.md"
+            html_report = root / "reports" / "EXPERIMENT_13A.html"
+            images = root / "reports" / "images" / "13a"
+
+            result = strategy_report.write_complete_13a_report(
+                source_run=source,
+                analysis_output_dir=analysis,
+                report_path=report,
+                html_report_path=html_report,
+                image_dir=images,
+                expected_rows=expected,
+                selection=selection,
+                scaling_baseline_run=baseline,
+            )
+
+            self.assertEqual(_fingerprint(source), before)
+            self.assertEqual(Path(result["report"]), report.resolve())
+            text = report.read_text(encoding="utf-8")
+            self.assertIn("13A complete · 90/90 rows", text)
+            self.assertIn("automatic epsilon selector did not pass", text)
+            self.assertIn("restricted pilot", text)
+            self.assertIn("Training-Data Scaling Ablation", text)
+            self.assertNotIn("The frozen eligibility epsilon is", text)
+
+            html = html_report.read_text(encoding="utf-8")
+            self.assertIn("13A COMPLETE", html)
+            self.assertIn("Complete grid coverage", html)
+            self.assertIn("Training-data scaling", html)
+            self.assertIn("pilot required", html)
+            self.assertIn("chartScaling", html)
+            self.assertNotIn(str(root.resolve()), html)
+            self.assertLess(html_report.stat().st_size, 1_000_000)
+            marker = 'application/json">'
+            start = html.index(marker) + len(marker)
+            payload = json.loads(html[start:html.index("</script>", start)])
+            self.assertEqual(payload["meta"]["status"], "complete_13a_pending_13b")
+            self.assertEqual(payload["meta"]["completed_rows"], 90)
+            self.assertTrue(payload["meta"]["epsilon_selection_attempted"])
+            self.assertFalse(payload["meta"]["epsilon_selected"])
+            self.assertEqual(len(payload["tables"]["metrics"]), 90)
+            self.assertEqual(len(payload["tables"]["coverage"]), 90)
+            self.assertEqual(len(payload["tables"]["partial_codebook"]), 630)
+            self.assertEqual(len(payload["tables"]["scaling"]), 4)
+            self.assertEqual(len(runtime.read_csv(analysis / "training_data_scaling_ablation.csv")), 4)
+            with self.assertRaisesRegex(grid.AnalysisNotReadyError, "complete 13A and 13B"):
+                grid.analyze_strategy_grid(run_dir=source)
+
+            first_html = html_report.read_bytes()
+            strategy_report.write_complete_13a_report(
+                source_run=source,
+                analysis_output_dir=analysis,
+                report_path=report,
+                html_report_path=html_report,
+                image_dir=images,
+                expected_rows=expected,
+                selection=selection,
+                scaling_baseline_run=baseline,
+            )
+            self.assertEqual(html_report.read_bytes(), first_html)
+            self.assertEqual(_fingerprint(source), before)
+
+
+def _write_complete_13a_report_fixture(
+    source: Path,
+    baseline: Path,
+) -> tuple[list[dict[str, object]], dict[str, object]]:
+    specs = grid.experiment13a_specs()
+    summaries: list[dict[str, object]] = []
+    partial: list[dict[str, object]] = []
+    layer_quantiles: list[dict[str, object]] = []
+    slot_quantiles: list[dict[str, object]] = []
+    coverage: list[dict[str, object]] = []
+    retired: list[dict[str, object]] = []
+    for index, spec in enumerate(specs):
+        clip = -0.01 if spec.layer_normalization_policy == "LayerClip0To1" else 0.0
+        budget = -0.001 if spec.utility_candidate_budget == "CandidateBudget48" else 0.0
+        schedule = -0.002 if spec.layer_schedule == "TwoPhase" else 0.0
+        p95 = 0.08 + (index % 9) * 0.0005 + clip + budget + schedule
+        summary = {
+            **spec.manifest_dict("fixture", "fixture"),
+            "validation_median_rmse": p95 / 2.0,
+            "validation_strict_perfect_lfo_rate": 0.02 if spec.construction_policy == "CommonCaseRepair" else 0.01,
+            "validation_p95_rmse": p95,
+            "validation_node_max_error_p95": p95 * 2.0,
+            "validation_p99_rmse": p95 * 1.1,
+            "validation_max_rmse": p95 * 1.2,
+            "validation_max_abs_error_p95": p95 * 2.0,
+            "oracle_construction_time": 20.0 + index,
+            "train_encoding_time": 2.0,
+            "validation_encoding_time": 1.0,
+        }
+        summaries.append(summary)
+        partial.extend(
+            {
+                "experiment_phase": "13A",
+                "row_id": spec.row_id,
+                "pair_id": spec.pair_id,
+                "active_atom_count": active,
+                "validation_median_rmse": p95 / 2.0 + (7 - active) * 0.001,
+                "validation_strict_perfect_lfo_rate": summary["validation_strict_perfect_lfo_rate"],
+                "validation_p95_rmse": p95 + (7 - active) * 0.002,
+                "validation_node_max_error_p95": p95 * 2.0,
+            }
+            for active in range(1, 8)
+        )
+        common = {"experiment_phase": "13A", "row_id": spec.row_id, "pair_id": spec.pair_id, "dataset_split": "training"}
+        layer_quantiles.append({**common, "residual_layer": 1, "percentile": 0.5, "epsilon_value": 0.01})
+        slot_quantiles.append({**common, "residual_layer": 1, "active_atom_slot": 1, "percentile": 0.5, "epsilon_value": 0.01})
+        coverage.extend([
+            {**common, "residual_layer": 1, "active_atom_slot": "", "epsilon": 0.001, "resolved_fraction": 0.02},
+            {**common, "residual_layer": 1, "active_atom_slot": 1, "epsilon": 0.001, "resolved_fraction": 0.02},
+        ])
+        retired.append({
+            **common,
+            "residual_layer": 1,
+            "active_atom_slot": 1,
+            "epsilon": 0.001,
+            "retired_lfo_fraction": 0.02,
+            "incoming_retired_energy_fraction": 0.001,
+            "unexplained_retired_energy_fraction": 0.0001,
+        })
+    runtime.write_csv(source / "summary.csv", summaries)
+    runtime.write_csv(source / "partial_codebook_validation.csv", partial)
+    runtime.write_csv(source / "layer_epsilon_quantiles.csv", layer_quantiles)
+    runtime.write_csv(source / "slot_epsilon_quantiles.csv", slot_quantiles)
+    runtime.write_csv(source / "epsilon_coverage.csv", coverage)
+    runtime.write_csv(source / "retired_error_mass.csv", retired)
+
+    matched = summaries[:4]
+    for sampled_summary in matched:
+        row_id = str(sampled_summary["row_id"])
+        runtime.write_csv(source / "rows" / row_id / "summary.csv", [sampled_summary])
+        baseline_summary = dict(sampled_summary)
+        baseline_summary["validation_median_rmse"] = float(sampled_summary["validation_median_rmse"]) - 0.001
+        baseline_summary["validation_p95_rmse"] = float(sampled_summary["validation_p95_rmse"]) - 0.001
+        runtime.write_csv(baseline / "rows" / row_id / "summary.csv", [baseline_summary])
+    assignments = [
+        {"dataset_split": "training", "dataset_index": 1},
+        {"dataset_split": "validation", "dataset_index": 10},
+        {"dataset_split": "validation", "dataset_index": 11},
+    ]
+    for sampled_summary in matched:
+        row_id = str(sampled_summary["row_id"])
+        runtime.write_csv(source / "rows" / row_id / "atom_assignments.csv", assignments)
+        runtime.write_csv(baseline / "rows" / row_id / "atom_assignments.csv", assignments)
+
+    selection = {
+        "selection_passed": False,
+        "selected_epsilon": None,
+        "selection_notes": "no candidate epsilon satisfied all automatic selection conditions; restricted pilot required",
+        "training_statistics_used": {
+            "candidate_statistics": {
+                "0.001": {
+                    "max_early_middle_median_retired_lfo_fraction": 0.02,
+                    "median_unexplained_retired_energy_fraction": 0.0001,
+                    "p95_unexplained_retired_energy_fraction": 0.001,
+                }
+            }
+        },
+    }
+    return [dict(spec.manifest_dict("fixture", "fixture")) for spec in specs], selection
 
 
 def _write_partial_fixture(source: Path) -> None:

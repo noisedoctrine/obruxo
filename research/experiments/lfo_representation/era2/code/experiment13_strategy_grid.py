@@ -73,7 +73,7 @@ from lfo_era2.strategy_grid import (  # noqa: E402
     status_text,
     verify_equivalence,
 )
-from lfo_era2.strategy_grid_report import analyze_partial_strategy_grid  # noqa: E402
+from lfo_era2.strategy_grid_report import analyze_13a_strategy_grid, analyze_partial_strategy_grid  # noqa: E402
 from lfo_era2.strategy_grid_execution import KeepAwakeError, scoped_system_required  # noqa: E402
 
 
@@ -175,6 +175,17 @@ def _execute(args: argparse.Namespace) -> None:
             )
             for key, value in result.items():
                 print(f"{key}={value}", flush=True)
+        elif args.command == "analyze-13a":
+            result = analyze_13a_strategy_grid(
+                run_dir=args.run_dir,
+                analysis_output_dir=args.analysis_output_dir,
+                report_path=args.report_path,
+                html_report_path=args.html_report_path,
+                image_dir=args.image_dir,
+                scaling_baseline_run=args.scaling_baseline_run,
+            )
+            for key, value in result.items():
+                print(f"{key}={value}", flush=True)
         elif args.command == "status":
             print(status_text(args.run_dir), flush=True)
         elif args.command == "monitor":
@@ -238,6 +249,14 @@ def _parser() -> argparse.ArgumentParser:
     partial.add_argument("--report-path", type=Path, required=True)
     partial.add_argument("--html-report-path", type=Path)
     partial.add_argument("--image-dir", type=Path, required=True)
+
+    complete_a = subcommands.add_parser("analyze-13a", help="generate the complete Experiment 13A report")
+    complete_a.add_argument("--run-dir", type=Path, required=True)
+    complete_a.add_argument("--analysis-output-dir", type=Path, required=True)
+    complete_a.add_argument("--report-path", type=Path, required=True)
+    complete_a.add_argument("--html-report-path", type=Path)
+    complete_a.add_argument("--image-dir", type=Path, required=True)
+    complete_a.add_argument("--scaling-baseline-run", type=Path)
 
     status = subcommands.add_parser("status", help="print Experiment 13 phase and gate status")
     status.add_argument("--run-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
