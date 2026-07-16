@@ -43,7 +43,9 @@ Define the paths once for the current shell:
 ```powershell
 $runner = ".\research\experiments\lfo_representation\era2\code\experiment13_strategy_grid.py"
 $metadata = ".\datasets\presetshare\raw\presetshare_vital_metadata.csv"
-$runDir = ".\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid"
+$runDir = ".\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid_train50_val100_exactopt_v1"
+$cacheDir = ".\research\experiments\lfo_representation\era2\artifacts\experiment_13\cache_exactopt_v1"
+$legacyRun = ".\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid_train100_val100_interrupted_39rows_20260716"
 $selection = "$runDir\epsilon_selection.json"
 ```
 
@@ -71,24 +73,46 @@ Use a dedicated smoke directory. A fresh non-resume 13A run resets aggregate
 state in its output directory, so a smoke check must not target `$runDir`.
 
 ```powershell
-$smokeDir = ".\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid_smoke"
-conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13a --output-dir $smokeDir --backend auto --metadata $metadata --smoke
+$smokeDir = ".\research\experiments\lfo_representation\era2\artifacts\experiment_13\strategy_grid_exactopt_smoke"
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13a --output-dir $smokeDir --cache-dir $cacheDir --backend auto --metadata $metadata --smoke
+```
+
+The runner acquires a scoped Windows system-required execution state for every
+compute command and restores it on exit. PowerToys Awake may remain enabled as
+an independent safeguard; the runner never controls PowerToys.
+
+Before launching the long run, verify representative optimized rows against
+the frozen 100%-training legacy artifacts:
+
+```powershell
+$equivalenceDir = ".\research\experiments\lfo_representation\era2\artifacts\experiment_13\equivalence_exactopt_v1"
+$equivalenceRows = "x13a_finish_repair_rescue_candidate_budget24_final_clip_only,x13a_broad_mean_finish_repair_interleaved_candidate_budget24_final_clip_only,x13a_broad_mean_hard_repair_two_phase_candidate_budget48_final_clip_only,x13a_trimmed_mean_global_repair_interleaved_candidate_budget24_final_clip_only"
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 verify-equivalence --baseline-run $legacyRun --output-dir $equivalenceDir --cache-dir $cacheDir --metadata $metadata --backend xpu --rows $equivalenceRows --chunk-size 256
 ```
 
 ### 3. Run Experiment 13A
 
-`--async` starts the runner in the background, writes stdout and stderr under
-`era2/artifacts/experiment_13/launcher_logs/`, opens the Windows monitor, and
-returns control to the current shell.
+The primary run uses a deterministic, topology-stratified 50% training sample
+and the complete validation split. `--async` starts the worker in the
+background. The command below suppresses the automatic monitor so it can be
+opened explicitly ten seconds after the worker starts.
 
 ```powershell
-conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13a --output-dir $runDir --async --backend xpu --metadata $metadata --corpus-sample-fraction 1.0 --monitor-refresh-seconds 30
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13a --output-dir $runDir --cache-dir $cacheDir --async --no-monitor-window --backend xpu --metadata $metadata --train-sample-fraction 0.5 --validation-sample-fraction 1.0 --sample-seed 13 --verify-optimized-kernels first-use --chunk-size 256
+Start-Sleep -Seconds 10
+conda run --no-capture-output -n py312 python $runner monitor --run-dir $runDir --monitor-refresh-seconds 30
 ```
 
 Resume the same 13A run after an interruption:
 
 ```powershell
-conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13a --output-dir $runDir --async --backend xpu --metadata $metadata --corpus-sample-fraction 1.0 --monitor-refresh-seconds 30 --resume
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13a --output-dir $runDir --cache-dir $cacheDir --async --backend xpu --metadata $metadata --train-sample-fraction 0.5 --validation-sample-fraction 1.0 --sample-seed 13 --verify-optimized-kernels first-use --chunk-size 256 --monitor-refresh-seconds 30 --resume
+```
+
+Request a safe cancellation at the next layer or slot checkpoint:
+
+```powershell
+conda run --no-capture-output -n py312 python $runner cancel --run-dir $runDir --reason "operator-requested safe cancellation"
 ```
 
 Omit `--async` to run in the foreground. Add `--no-monitor-window` to keep the
@@ -133,7 +157,7 @@ The pilot is allowed only after automatic selection fails. It accepts only the
 four prespecified pilot policies and candidate epsilons `0.001` and `0.0025`:
 
 ```powershell
-conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b-pilot --output-dir $runDir --backend xpu --metadata $metadata --epsilon-selection $selection --candidate-epsilons 0.001 0.0025
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b-pilot --output-dir $runDir --cache-dir $cacheDir --backend xpu --metadata $metadata --epsilon-selection $selection --candidate-epsilons 0.001 0.0025 --verify-optimized-kernels first-use
 ```
 
 Review `experiment13b_pilot_results.csv`, choose one of the two evaluated
@@ -152,13 +176,13 @@ artifact automatically; only `override-epsilon` records the explicit decision.
 ### 7. Run Experiment 13B
 
 ```powershell
-conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b --output-dir $runDir --async --backend xpu --metadata $metadata --corpus-sample-fraction 1.0 --epsilon-selection $selection --monitor-refresh-seconds 30
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b --output-dir $runDir --cache-dir $cacheDir --async --backend xpu --metadata $metadata --train-sample-fraction 0.5 --validation-sample-fraction 1.0 --sample-seed 13 --verify-optimized-kernels first-use --epsilon-selection $selection --chunk-size 256 --monitor-refresh-seconds 30
 ```
 
 Resume the same 13B run after an interruption:
 
 ```powershell
-conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b --output-dir $runDir --async --backend xpu --metadata $metadata --corpus-sample-fraction 1.0 --epsilon-selection $selection --monitor-refresh-seconds 30 --resume
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b --output-dir $runDir --cache-dir $cacheDir --async --backend xpu --metadata $metadata --train-sample-fraction 0.5 --validation-sample-fraction 1.0 --sample-seed 13 --verify-optimized-kernels first-use --epsilon-selection $selection --chunk-size 256 --monitor-refresh-seconds 30 --resume
 ```
 
 The 13B command fails closed when the selection artifact is missing, malformed,
@@ -173,6 +197,8 @@ derived CSVs, plots, and report from the retained run artifacts.
 
 ```powershell
 conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 analyze --run-dir $runDir
+
+conda run --no-capture-output -n py312 python $runner analyze-scaling --full-run $legacyRun --sampled-run $runDir --output-dir "$runDir\training_data_scaling_ablation"
 ```
 
 ### Useful diagnostic controls
@@ -181,8 +207,12 @@ conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQU
   diagnostic run; do not treat a partial run as phase completion.
 - `--chunk-size <count>` changes scoring batch size; the default is `256`.
 - `--backend auto|numpy|xpu` chooses the numerical backend.
-- `--corpus-sample-fraction <fraction>` subsamples the corpus; production uses
-  `1.0`.
+- `--train-sample-fraction` and `--validation-sample-fraction` control the two
+  splits independently. The primary run uses `0.5` and `1.0` respectively.
+- `--corpus-sample-fraction` remains a deprecated compatibility alias that sets
+  both split fractions and cannot be mixed with the split-specific flags.
+- `--sample-seed 13` freezes deterministic hash-ranked sample membership.
+- `--cache-dir` caches the parsed dataset, base dictionary, and base alignments.
 - Run `conda run --no-capture-output -n py312 python $runner <command> --help`
   for the complete options of any subcommand.
 

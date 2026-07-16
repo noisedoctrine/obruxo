@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from datetime import datetime, timezone
 import csv
 import hashlib
@@ -11,12 +11,25 @@ import math
 import os
 from pathlib import Path
 import re
+import shutil
+import subprocess
 import time
 from typing import Any, Callable, Literal, Sequence
 from uuid import uuid4
 
+from .strategy_grid_execution import (
+    OPTIMIZATION_VERSION,
+    SampleProvenance,
+    deterministic_sample,
+    implementation_fingerprint,
+    load_dataset_cached,
+    load_or_build_base_stage,
+    sample_manifest_matches,
+    write_sample_artifacts,
+)
+
 ExperimentPhase = Literal["13A", "13B"]
-PhaseState = Literal["not_started", "running", "partial", "blocked", "failed", "complete"]
+PhaseState = Literal["not_started", "running", "partial", "blocked", "failed", "cancelled", "complete"]
 
 EXPERIMENT_ID = "experiment_13"
 SCHEMA_VERSION = "experiment13_strategy_grid_v1"
@@ -35,6 +48,8 @@ DUPLICATE_SUPPRESSION_POLICY = "DuplicateSuppressionOff"
 FINISH_THRESHOLD = 1e-5
 HEAD_OUTPUTS = 193
 RUNTIME_TOPOLOGY = None
+DEFAULT_SAMPLE_SEED = 13
+OPTIMIZED_KERNEL_MODES = ("off", "first-use")
 CANDIDATE_EPSILONS = (0.001, 0.0025, 0.005, 0.01, 0.02)
 PILOT_EPSILONS = (0.001, 0.0025)
 SELECTION_CHECKPOINT_DEFINITION = {
@@ -82,6 +97,23 @@ REQUIRED_ANALYSIS_FILES = (
     *REQUIRED_CALIBRATION_FILES,
     "epsilon_selection.json",
 )
+REQUIRED_ROW_FILES = (
+    "manifest.json",
+    "targets_schema.json",
+    "summary.csv",
+    "atom_construction.csv",
+    "atom_assignments.csv",
+    "candidate_search_diagnostics.csv",
+    "slot_progression.csv",
+    "partial_codebook_validation.csv",
+    "layer_epsilon_quantiles.csv",
+    "slot_epsilon_quantiles.csv",
+    "epsilon_coverage.csv",
+    "retired_error_mass.csv",
+    "codebooks.npz",
+    "execution_timing.jsonl",
+    "execution_timing.csv",
+)
 REQUIRED_SELECTION_FIELDS = (
     "candidate_epsilons",
     "selection_rule_version",
@@ -116,6 +148,10 @@ class SelectionArtifactError(PhaseGateError):
 
 
 class AnalysisNotReadyError(PhaseGateError):
+    pass
+
+
+class RunCancelled(Experiment13Error):
     pass
 
 
@@ -393,6 +429,8 @@ def validate_pairing(rows_a: Sequence[StrategyRowSpec], rows_b: Sequence[Strateg
 def configuration_fingerprint() -> str:
     payload = {
         "schema_version": SCHEMA_VERSION,
+        "optimization_version": OPTIMIZATION_VERSION,
+        "implementation_fingerprint": implementation_fingerprint(),
         "selection_rule_version": SELECTION_RULE_VERSION,
         "candidate_epsilons": CANDIDATE_EPSILONS,
         "selection_checkpoint_definition": SELECTION_CHECKPOINT_DEFINITION,
@@ -407,17 +445,28 @@ def run_13a(
     metadata_path: Path = DEFAULT_METADATA,
     backend: str = "auto",
     smoke: bool = False,
-    corpus_sample_fraction: float = 1.0,
+    corpus_sample_fraction: float | None = None,
+    train_sample_fraction: float = 1.0,
+    validation_sample_fraction: float = 1.0,
+    sample_seed: int = DEFAULT_SAMPLE_SEED,
+    cache_dir: Path | None = None,
+    rebuild_cache: bool = False,
+    verify_optimized_kernels: str = "off",
     resume: bool = False,
     row_ids: set[str] | None = None,
     chunk_size: int = 256,
     dataset: Any | None = None,
     progress: Callable[[str], None] | None = None,
 ) -> dict[str, str]:
+    train_fraction, validation_fraction = _resolve_sample_fractions(
+        corpus_sample_fraction, train_sample_fraction, validation_sample_fraction
+    )
     return _run_phase(
         phase="13A", specs=experiment13a_specs(), output_dir=output_dir,
         metadata_path=metadata_path, backend=backend, smoke=smoke,
-        corpus_sample_fraction=corpus_sample_fraction, resume=resume,
+        train_sample_fraction=train_fraction, validation_sample_fraction=validation_fraction,
+        sample_seed=sample_seed, cache_dir=cache_dir, rebuild_cache=rebuild_cache,
+        verify_optimized_kernels=verify_optimized_kernels, resume=resume,
         row_ids=row_ids, chunk_size=chunk_size, dataset=dataset, progress=progress,
     )
 
@@ -506,14 +555,23 @@ def run_13b(
     metadata_path: Path = DEFAULT_METADATA,
     backend: str = "auto",
     smoke: bool = False,
-    corpus_sample_fraction: float = 1.0,
+    corpus_sample_fraction: float | None = None,
+    train_sample_fraction: float = 1.0,
+    validation_sample_fraction: float = 1.0,
+    sample_seed: int = DEFAULT_SAMPLE_SEED,
+    cache_dir: Path | None = None,
+    rebuild_cache: bool = False,
+    verify_optimized_kernels: str = "off",
     resume: bool = False,
     row_ids: set[str] | None = None,
     chunk_size: int = 256,
     dataset: Any | None = None,
     progress: Callable[[str], None] | None = None,
 ) -> dict[str, str]:
-    _validate_run_options(smoke, corpus_sample_fraction, backend)
+    train_fraction, validation_fraction = _resolve_sample_fractions(
+        corpus_sample_fraction, train_sample_fraction, validation_sample_fraction
+    )
+    _validate_run_options(smoke, train_fraction, validation_fraction, backend, verify_optimized_kernels)
     output_dir = Path(output_dir)
     selection_path = Path(epsilon_selection_path or output_dir / "epsilon_selection.json")
     try:
@@ -524,7 +582,7 @@ def run_13b(
             expected_configuration_fingerprint=manifest["configuration_fingerprint"],
             require_passed=True,
         )
-        _validate_13b_invocation(manifest, metadata_path, corpus_sample_fraction)
+        _validate_13b_invocation(manifest, metadata_path, train_fraction, validation_fraction, sample_seed)
     except PhaseGateError as exc:
         _blocked_13b(output_dir, str(exc))
         raise
@@ -532,7 +590,9 @@ def run_13b(
     return _run_phase(
         phase="13B", specs=experiment13b_specs(selection.selected_epsilon), output_dir=output_dir,
         metadata_path=metadata_path, backend=backend, smoke=smoke,
-        corpus_sample_fraction=corpus_sample_fraction, resume=resume, row_ids=row_ids,
+        train_sample_fraction=train_fraction, validation_sample_fraction=validation_fraction,
+        sample_seed=sample_seed, cache_dir=cache_dir, rebuild_cache=rebuild_cache,
+        verify_optimized_kernels=verify_optimized_kernels, resume=resume, row_ids=row_ids,
         chunk_size=chunk_size, dataset=dataset, progress=progress,
         run_identity=selection.experiment13a_run_identity,
         fingerprint=selection.configuration_fingerprint,
@@ -548,10 +608,13 @@ def run_13b_pilot(
     metadata_path: Path = DEFAULT_METADATA,
     backend: str = "auto",
     chunk_size: int = 256,
+    cache_dir: Path | None = None,
+    rebuild_cache: bool = False,
+    verify_optimized_kernels: str = "off",
     dataset: Any | None = None,
     progress: Callable[[str], None] | None = None,
 ) -> dict[str, str]:
-    _validate_run_options(False, 1.0, backend)
+    _validate_run_options(False, 1.0, 1.0, backend, verify_optimized_kernels)
     output_dir = Path(output_dir)
     manifest, _ = validate_completed_13a(output_dir)
     selection = load_epsilon_selection(
@@ -560,7 +623,11 @@ def run_13b_pilot(
         expected_configuration_fingerprint=manifest["configuration_fingerprint"],
         require_passed=False,
     )
-    _validate_13b_invocation(manifest, metadata_path, 1.0)
+    phase_a = manifest.get("phases", {}).get("13A", {})
+    train_fraction = float(phase_a.get("train_sample_fraction", 1.0))
+    validation_fraction = float(phase_a.get("validation_sample_fraction", 1.0))
+    sample_seed = int(phase_a.get("sample_seed", DEFAULT_SAMPLE_SEED))
+    _validate_13b_invocation(manifest, metadata_path, train_fraction, validation_fraction, sample_seed)
     if selection.selection_passed:
         raise PhaseGateError("run-13b-pilot requires selection_passed=false")
     epsilons = tuple(_validate_epsilon(value) for value in candidate_epsilons)
@@ -587,23 +654,40 @@ def run_13b_pilot(
         "row_ids": [row.row_id for row in rows],
         "metadata_path": str(Path(metadata_path)),
         "backend": backend,
+        "sample_fingerprint": phase_a.get("sample_fingerprint"),
         "complete": False,
     }
     _write_json(
         output_dir / "experiment13b_pilot_manifest.json",
         pilot_manifest,
     )
-    from .dataset import load_presetshare_curve_dataset
     from .strategy_grid_runtime import run_strategy_row, write_csv
     if dataset is None:
-        dataset = load_presetshare_curve_dataset(metadata_path, resolution=CONTROL_POINT_COUNT, x_grid_mode="inclusive", progress=progress)
+        dataset, _ = load_dataset_cached(
+            metadata_path, cache_dir=cache_dir, resolution=CONTROL_POINT_COUNT,
+            x_grid_mode="inclusive", rebuild=rebuild_cache, progress=progress,
+        )
+    dataset, sample = deterministic_sample(
+        dataset, train_fraction=train_fraction, validation_fraction=validation_fraction, seed=sample_seed,
+    )
+    if not sample_manifest_matches(output_dir / "sample_manifest.json", sample):
+        raise PhaseGateError("pilot sample identity does not match completed 13A")
+    base_stage = load_or_build_base_stage(
+        dataset, sample, backend=backend, chunk_size=chunk_size, cache_dir=cache_dir,
+        rebuild=rebuild_cache, progress=progress,
+    )
     evidence: list[dict[str, Any]] = []
     for epsilon in epsilons:
         specs = {row.pair_id: row for row in experiment13b_specs(epsilon)}
         for template in rows:
             spec = specs[template.pair_id]
             pilot_dir = output_dir / "pilot" / f"epsilon_{epsilon:g}" / "rows" / spec.row_id
-            result = run_strategy_row(spec, dataset, pilot_dir, run_identity=selection.experiment13a_run_identity, configuration_fingerprint=selection.configuration_fingerprint, backend=backend, chunk_size=chunk_size, progress=progress)
+            result = run_strategy_row(
+                spec, dataset, pilot_dir, run_identity=selection.experiment13a_run_identity,
+                configuration_fingerprint=selection.configuration_fingerprint, backend=backend,
+                chunk_size=chunk_size, progress=progress, base_stage=base_stage,
+                sample_provenance=sample, verify_optimized_kernels=verify_optimized_kernels == "first-use",
+            )
             evidence.append({"epsilon": epsilon, **result.summary})
     write_csv(output_dir / "experiment13b_pilot_results.csv", evidence)
     pilot_manifest.update(complete=True, completed_at_utc=_now(), result_row_count=len(evidence))
@@ -625,6 +709,132 @@ def analyze_strategy_grid(*, run_dir: Path = DEFAULT_OUTPUT_DIR) -> dict[str, st
     return _write_strategy_analysis(run_dir)
 
 
+def verify_equivalence(
+    *,
+    baseline_run: Path,
+    output_dir: Path,
+    metadata_path: Path = DEFAULT_METADATA,
+    cache_dir: Path | None = None,
+    backend: str = "auto",
+    row_ids: set[str] | None = None,
+    chunk_size: int = 256,
+    progress: Callable[[str], None] | None = None,
+) -> dict[str, Any]:
+    """Rerun completed legacy rows and require exact scientific artifacts."""
+    baseline_run, output_dir = Path(baseline_run), Path(output_dir)
+    _require_fresh_output_dir(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    baseline_manifest = _read_json(baseline_run / "manifest.json")
+    identity = str(baseline_manifest.get("experiment13a_run_identity") or "equivalence")
+    fingerprint = str(baseline_manifest.get("configuration_fingerprint") or configuration_fingerprint())
+    available = {
+        path.parent.name for path in (baseline_run / "rows").glob("*/summary.csv") if path.is_file()
+    }
+    requested = row_ids or available
+    unknown = requested - available
+    if unknown:
+        raise Experiment13Error("equivalence baseline lacks completed rows: " + ", ".join(sorted(unknown)))
+    specs = [spec for spec in experiment13a_specs() if spec.row_id in requested]
+    if not specs:
+        raise Experiment13Error("equivalence verification requires at least one completed row")
+    dataset, dataset_cache = load_dataset_cached(
+        metadata_path, cache_dir=cache_dir, resolution=CONTROL_POINT_COUNT,
+        x_grid_mode="inclusive", progress=progress,
+    )
+    dataset, sample = deterministic_sample(
+        dataset, train_fraction=1.0, validation_fraction=1.0, seed=DEFAULT_SAMPLE_SEED,
+    )
+    base_stage = load_or_build_base_stage(
+        dataset, sample, backend=backend, chunk_size=chunk_size, cache_dir=cache_dir, progress=progress,
+    )
+    from .strategy_grid_runtime import run_strategy_row
+
+    results: list[dict[str, Any]] = []
+    for index, spec in enumerate(specs, start=1):
+        if progress:
+            progress(f"equivalence {index}/{len(specs)}: {spec.row_id}")
+        candidate = output_dir / "rows" / spec.row_id
+        run_strategy_row(
+            spec, dataset, candidate, run_identity=identity, configuration_fingerprint=fingerprint,
+            backend=backend, chunk_size=chunk_size, progress=progress,
+            base_stage=replace(base_stage, cache_hit=base_stage.cache_hit or index > 1),
+            sample_provenance=sample, verify_optimized_kernels=True,
+        )
+        mismatches = _compare_scientific_row(baseline_run / "rows" / spec.row_id, candidate)
+        results.append({"row_id": spec.row_id, "mismatches": mismatches, "passed": not mismatches})
+    report = {
+        "schema_version": "experiment13_equivalence_v1",
+        "baseline_run": str(baseline_run),
+        "output_dir": str(output_dir),
+        "backend": backend,
+        "dataset_cache": dataset_cache,
+        "sample_fingerprint": sample.sample_fingerprint,
+        "row_count": len(results),
+        "passed": all(row["passed"] for row in results),
+        "rows": results,
+        "completed_at_utc": _now(),
+    }
+    _write_json(output_dir / "equivalence_report.json", report)
+    if not report["passed"]:
+        raise Experiment13Error("scientific equivalence failed; see equivalence_report.json")
+    return report
+
+
+def analyze_scaling_ablation(*, full_run: Path, sampled_run: Path, output_dir: Path) -> dict[str, str]:
+    """Compare matched 13A methods while explicitly excluding historical runtime."""
+    full_run, sampled_run, output_dir = Path(full_run), Path(sampled_run), Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    full_rows = _completed_row_summaries(full_run, "13A")
+    sampled_rows = _completed_row_summaries(sampled_run, "13A")
+    matched = sorted(set(full_rows) & set(sampled_rows))
+    if not matched:
+        raise AnalysisNotReadyError("scaling analysis has no matched completed 13A rows")
+    full_validation = _validation_membership_sha256(full_run / "rows" / matched[0] / "atom_assignments.csv")
+    sampled_validation = _validation_membership_sha256(sampled_run / "rows" / matched[0] / "atom_assignments.csv")
+    if full_validation != sampled_validation:
+        raise AnalysisNotReadyError("scaling analysis requires identical validation membership")
+    metrics = (
+        "validation_median_rmse",
+        "validation_p95_rmse",
+        "validation_strict_perfect_lfo_rate",
+        "validation_node_max_error_p95",
+        "validation_max_abs_error_p95",
+    )
+    rows: list[dict[str, Any]] = []
+    for row_id in matched:
+        row: dict[str, Any] = {
+            "row_id": row_id,
+            "experiment_phase": "13A",
+            "full_train_fraction": 1.0,
+            "sampled_train_fraction": 0.5,
+            "validation_fraction": 1.0,
+            "runtime_comparison_allowed": False,
+        }
+        for metric in metrics:
+            left, right = float(full_rows[row_id][metric]), float(sampled_rows[row_id][metric])
+            row[f"full_{metric}"] = left
+            row[f"sampled_{metric}"] = right
+            row[f"delta_{metric}"] = right - left
+        rows.append(row)
+    from .strategy_grid_runtime import write_csv
+
+    csv_path = output_dir / "training_data_scaling_ablation.csv"
+    write_csv(csv_path, rows)
+    report = {
+        "schema_version": "experiment13_training_scaling_ablation_v1",
+        "matched_row_count": len(rows),
+        "validation_membership_sha256": full_validation,
+        "full_run": str(full_run),
+        "sampled_run": str(sampled_run),
+        "runtime_comparison_allowed": False,
+        "runtime_exclusion_reason": "legacy timings include Modern Standby and use a different execution implementation",
+        "completed_at_utc": _now(),
+    }
+    report_path = output_dir / "training_data_scaling_ablation.json"
+    _write_json(report_path, report)
+    return {"scaling_csv": str(csv_path), "scaling_report": str(report_path)}
+
+
 def _run_phase(
     *,
     phase: ExperimentPhase,
@@ -633,7 +843,12 @@ def _run_phase(
     metadata_path: Path,
     backend: str,
     smoke: bool,
-    corpus_sample_fraction: float,
+    train_sample_fraction: float,
+    validation_sample_fraction: float,
+    sample_seed: int,
+    cache_dir: Path | None,
+    rebuild_cache: bool,
+    verify_optimized_kernels: str,
     resume: bool,
     row_ids: set[str] | None,
     chunk_size: int,
@@ -642,23 +857,30 @@ def _run_phase(
     run_identity: str | None = None,
     fingerprint: str | None = None,
 ) -> dict[str, str]:
-    _validate_run_options(smoke, corpus_sample_fraction, backend)
+    _validate_run_options(
+        smoke, train_sample_fraction, validation_sample_fraction, backend, verify_optimized_kernels
+    )
     if int(chunk_size) < 1:
         raise ValueError("chunk_size must be positive")
     rows = _filter_rows(specs, row_ids)
     partial = smoke or row_ids is not None or len(rows) != 90
+    provenance = _git_provenance()
+    if not partial and provenance.get("dirty"):
+        raise Experiment13Error("production Experiment 13 runs require a clean git worktree")
     output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
     if phase == "13A" and not resume:
-        _reset_run_outputs(output_dir)
+        _require_fresh_output_dir(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    if resume:
+        _archive_cancel_request(output_dir)
     identity = run_identity or _run_identity(output_dir, resume)
     config = fingerprint or configuration_fingerprint()
-    _write_phase_manifest(
-        output_dir=output_dir, phase=phase, specs=rows, run_identity=identity,
-        fingerprint=config, metadata_path=metadata_path, backend=backend,
-        smoke=smoke, corpus_sample_fraction=corpus_sample_fraction,
-        complete_design=not partial,
-    )
+    if resume:
+        existing_manifest = _read_json(output_dir / "manifest.json")
+        if existing_manifest.get("experiment13a_run_identity") != identity:
+            raise Experiment13Error("resume run identity does not match the existing manifest")
+        if existing_manifest.get("configuration_fingerprint") != config:
+            raise Experiment13Error("resume implementation/configuration fingerprint does not match the existing run")
     status = _phase_status(phase, "running", identity, len(rows), 90, smoke, row_ids is not None, "loading dataset")
     status.update(
         rows={row.row_id: {"status": "pending"} for row in rows},
@@ -671,31 +893,82 @@ def _run_phase(
     if not (output_dir / "failures.csv").exists():
         _write_csv(output_dir / "failures.csv", [], ("experiment_phase", "row_id", "error", "timestamp_utc"))
 
-    from . import component_ladder as x12
-    from .dataset import load_presetshare_curve_dataset
     from .strategy_grid_runtime import read_one_csv, run_strategy_row
 
     if dataset is None:
-        dataset = load_presetshare_curve_dataset(
-            metadata_path, resolution=CONTROL_POINT_COUNT, x_grid_mode="inclusive", progress=progress,
+        dataset, dataset_cache = load_dataset_cached(
+            metadata_path, cache_dir=cache_dir, resolution=CONTROL_POINT_COUNT,
+            x_grid_mode="inclusive", rebuild=rebuild_cache, progress=progress,
         )
-    dataset = x12._subset_dataset(dataset, smoke=smoke, corpus_sample_fraction=corpus_sample_fraction)
+    else:
+        dataset_cache = {"cache_key": "injected", "cache_hit": False, "cache_path": None}
+    if smoke:
+        from . import component_ladder as x12
+        dataset = x12._subset_dataset(dataset, smoke=True, corpus_sample_fraction=1.0)
+        dataset, sample = deterministic_sample(
+            dataset, train_fraction=1.0, validation_fraction=1.0, seed=sample_seed,
+        )
+    else:
+        dataset, sample = deterministic_sample(
+            dataset, train_fraction=train_sample_fraction,
+            validation_fraction=validation_sample_fraction, seed=sample_seed,
+        )
+    sample_path = output_dir / "sample_manifest.json"
+    if sample_path.exists() and not sample_manifest_matches(sample_path, sample):
+        raise Experiment13Error("run sample identity does not match the existing sample manifest")
+    if not sample_path.exists():
+        write_sample_artifacts(output_dir, dataset, sample)
+    base_stage = load_or_build_base_stage(
+        dataset, sample, backend=backend, chunk_size=chunk_size, cache_dir=cache_dir,
+        rebuild=rebuild_cache, progress=progress,
+    )
+    _write_phase_manifest(
+        output_dir=output_dir, phase=phase, specs=rows, run_identity=identity,
+        fingerprint=config, metadata_path=metadata_path, backend=backend,
+        smoke=smoke,
+        train_sample_fraction=train_sample_fraction,
+        validation_sample_fraction=validation_sample_fraction,
+        sample_seed=sample_seed, sample=sample, dataset_cache=dataset_cache,
+        base_stage_cache_key=base_stage.cache_key,
+        complete_design=not partial, resume=resume,
+    )
+    status.update(
+        train_count=len(dataset.train_indices), validation_count=len(dataset.validation_indices),
+        sample_fingerprint=sample.sample_fingerprint,
+        train_sample_fraction=train_sample_fraction,
+        validation_sample_fraction=validation_sample_fraction,
+        sample_seed=sample_seed,
+        current_task_phase="base_stage_ready", current_task_percent=0.0,
+    )
+    _write_phase_status(output_dir, status)
+    _event(
+        output_dir, phase, "dataset_ready",
+        f"train={len(dataset.train_indices)} validation={len(dataset.validation_indices)} sample={sample.sample_fingerprint[:12]}",
+    )
     completed = 0
+    rows_root = output_dir / "rows"
+    staging_root = output_dir / ".in_progress"
+    interrupted_root = output_dir / "interrupted_rows"
+    rows_root.mkdir(parents=True, exist_ok=True)
+    staging_root.mkdir(parents=True, exist_ok=True)
     for index, spec in enumerate(rows, start=1):
-        row_dir = output_dir / "rows" / spec.row_id
+        row_dir = rows_root / spec.row_id
+        staging_dir = staging_root / spec.row_id
         try:
-            if resume and (row_dir / "summary.csv").exists():
-                read_one_csv(row_dir / "summary.csv")
-                required_row_files = (
-                    "atom_construction.csv", "atom_assignments.csv", "candidate_search_diagnostics.csv",
-                    "slot_progression.csv", "partial_codebook_validation.csv", "layer_epsilon_quantiles.csv",
-                    "slot_epsilon_quantiles.csv", "epsilon_coverage.csv", "retired_error_mass.csv", "codebooks.npz",
-                )
-                missing = [name for name in required_row_files if not (row_dir / name).exists()]
-                if missing:
-                    raise Experiment13Error(f"cannot resume incomplete row {spec.row_id}: {', '.join(missing)}")
+            if resume and _row_is_complete(row_dir):
+                completed_summary = read_one_csv(row_dir / "summary.csv")
+                if completed_summary.get("configuration_fingerprint") != config:
+                    raise Experiment13Error(f"completed row fingerprint mismatch during resume: {spec.row_id}")
+                if completed_summary.get("sample_fingerprint") != sample.sample_fingerprint:
+                    raise Experiment13Error(f"completed row sample mismatch during resume: {spec.row_id}")
                 event = "row_skipped"
             else:
+                if row_dir.exists():
+                    _archive_incomplete_row(row_dir, interrupted_root, "incomplete_final")
+                if staging_dir.exists():
+                    _archive_incomplete_row(staging_dir, interrupted_root, "interrupted_staging")
+                staging_dir.mkdir(parents=True, exist_ok=False)
+                _check_cancel_requested(output_dir)
                 status.update(
                     current_row_id=spec.row_id, current_row_number=index,
                     current_task_phase="starting", current_task_percent=0.0,
@@ -713,10 +986,19 @@ def _run_phase(
                         progress(f"experiment13: {spec.row_id}: {message}")
 
                 run_strategy_row(
-                    spec, dataset, row_dir, run_identity=identity,
+                    spec, dataset, staging_dir, run_identity=identity,
                     configuration_fingerprint=config, backend=backend,
                     chunk_size=chunk_size, progress=row_progress,
+                    base_stage=replace(base_stage, cache_hit=base_stage.cache_hit or index > 1),
+                    sample_provenance=sample, cancel_check=lambda: _check_cancel_requested(output_dir),
+                    verify_optimized_kernels=verify_optimized_kernels == "first-use",
                 )
+                if not _row_is_complete(staging_dir):
+                    missing = _missing_row_files(staging_dir)
+                    raise Experiment13Error(
+                        f"row staging did not produce a complete artifact set for {spec.row_id}: {', '.join(missing)}"
+                    )
+                staging_dir.replace(row_dir)
                 event = "row_complete"
             completed += 1
             status["rows"][spec.row_id] = {"status": "completed", "completed_at_utc": _now()}
@@ -727,7 +1009,17 @@ def _run_phase(
             )
             _write_phase_status(output_dir, status)
             _event(output_dir, phase, event, f"{index}/{len(rows)} {spec.row_id}")
+        except RunCancelled as exc:
+            if staging_dir.exists():
+                _archive_incomplete_row(staging_dir, interrupted_root, "cancelled")
+            status["rows"][spec.row_id] = {"status": "cancelled", "cancelled_at_utc": _now()}
+            status.update(state="cancelled", reason=str(exc), cancelled_at_utc=_now())
+            _write_phase_status(output_dir, status)
+            _event(output_dir, phase, "run_cancelled", f"{spec.row_id}: {exc}")
+            raise
         except Exception as exc:
+            if staging_dir.exists():
+                _archive_incomplete_row(staging_dir, interrupted_root, "failed")
             status["rows"][spec.row_id] = {"status": "failed", "failed_at_utc": _now(), "error": str(exc)}
             status.update(state="failed", failed_rows=int(status.get("failed_rows", 0)) + 1, reason=str(exc), failed_at_utc=_now())
             _write_phase_status(output_dir, status)
@@ -768,6 +1060,7 @@ def _aggregate_strategy_artifacts(run_dir: Path) -> dict[str, str]:
         "atom_construction.csv", "atom_assignments.csv", "candidate_search_diagnostics.csv",
         "slot_progression.csv", "partial_codebook_validation.csv", "layer_epsilon_quantiles.csv",
         "slot_epsilon_quantiles.csv", "epsilon_coverage.csv", "retired_error_mass.csv",
+        "execution_timing.csv",
     )
     summaries = [read_one_csv(row_dir / "summary.csv") for row_dir in row_dirs]
     write_csv(run_dir / "summary.csv", summaries)
@@ -1076,6 +1369,75 @@ def _reset_run_outputs(output_dir: Path) -> None:
         (Path(output_dir) / name).unlink(missing_ok=True)
 
 
+def _require_fresh_output_dir(output_dir: Path) -> None:
+    output_dir = Path(output_dir)
+    if output_dir.exists() and any(output_dir.iterdir()):
+        raise Experiment13Error(
+            f"fresh 13A output directory must be absent or empty; use --resume or a new path: {output_dir}"
+        )
+
+
+def _missing_row_files(row_dir: Path) -> list[str]:
+    row_dir = Path(row_dir)
+    return [name for name in REQUIRED_ROW_FILES if not (row_dir / name).is_file() or (row_dir / name).stat().st_size == 0]
+
+
+def _row_is_complete(row_dir: Path) -> bool:
+    return Path(row_dir).is_dir() and not _missing_row_files(row_dir)
+
+
+def _archive_incomplete_row(row_dir: Path, archive_root: Path, reason: str) -> Path:
+    row_dir = Path(row_dir)
+    archive_root = Path(archive_root)
+    archive_root.mkdir(parents=True, exist_ok=True)
+    target = archive_root / f"{row_dir.name}_{reason}_{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}_{uuid4().hex[:6]}"
+    shutil.move(str(row_dir), str(target))
+    return target
+
+
+def request_cancel(run_dir: Path, *, reason: str) -> dict[str, Any]:
+    run_dir = Path(run_dir)
+    if not run_dir.exists():
+        raise Experiment13Error(f"run directory does not exist: {run_dir}")
+    payload = {"requested_at_utc": _now(), "reason": str(reason).strip() or "operator requested cancellation"}
+    _write_json(run_dir / "cancel_request.json", payload)
+    return payload
+
+
+def _check_cancel_requested(output_dir: Path) -> None:
+    path = Path(output_dir) / "cancel_request.json"
+    if path.exists():
+        payload = _read_json(path)
+        raise RunCancelled(str(payload.get("reason") or "operator requested cancellation"))
+
+
+def _archive_cancel_request(output_dir: Path) -> None:
+    path = Path(output_dir) / "cancel_request.json"
+    if not path.exists():
+        return
+    root = Path(output_dir) / "cancel_requests"
+    root.mkdir(parents=True, exist_ok=True)
+    target = root / f"cancel_request_{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}_{uuid4().hex[:6]}.json"
+    path.replace(target)
+
+
+def _git_provenance() -> dict[str, Any]:
+    def command(*args: str) -> str:
+        try:
+            return subprocess.check_output(
+                ["git", *args], cwd=REPO_ROOT, text=True, stderr=subprocess.DEVNULL, timeout=10
+            ).strip()
+        except (OSError, subprocess.SubprocessError):
+            return ""
+
+    status = command("status", "--porcelain")
+    return {
+        "commit": command("rev-parse", "HEAD"),
+        "branch": command("branch", "--show-current"),
+        "dirty": bool(status),
+    }
+
+
 def load_epsilon_selection(
     path: Path,
     *,
@@ -1175,7 +1537,7 @@ def read_phase_status(run_dir: Path, phase: ExperimentPhase) -> dict[str, Any]:
     if not path.exists():
         return _phase_status(phase, "not_started", "", 0, 90, False, False, "phase has not started")
     payload = _read_json(path)
-    if payload.get("state") not in {"not_started", "running", "partial", "blocked", "failed", "complete"}:
+    if payload.get("state") not in {"not_started", "running", "partial", "blocked", "failed", "cancelled", "complete"}:
         raise Experiment13Error(f"invalid phase state in {path}")
     return payload
 
@@ -1219,8 +1581,14 @@ def _write_phase_manifest(
     metadata_path: Path,
     backend: str,
     smoke: bool,
-    corpus_sample_fraction: float,
+    train_sample_fraction: float,
+    validation_sample_fraction: float,
+    sample_seed: int,
+    sample: SampleProvenance,
+    dataset_cache: dict[str, Any],
+    base_stage_cache_key: str,
     complete_design: bool,
+    resume: bool,
 ) -> None:
     output_dir = Path(output_dir)
     manifest_path = output_dir / "manifest.json"
@@ -1248,12 +1616,26 @@ def _write_phase_manifest(
         "filtered": len(rows) != 90,
         "metadata_path": str(Path(metadata_path)),
         "backend": backend,
-        "corpus_sample_fraction": float(corpus_sample_fraction),
+        "train_sample_fraction": float(train_sample_fraction),
+        "validation_sample_fraction": float(validation_sample_fraction),
+        "sample_seed": int(sample_seed),
+        "sample_fingerprint": sample.sample_fingerprint,
+        "sample_policy_version": sample.policy_version,
+        "source_fingerprint": sample.source_fingerprint,
+        "dataset_cache": dataset_cache,
+        "base_stage_cache_key": base_stage_cache_key,
+        "optimization_version": OPTIMIZATION_VERSION,
+        "implementation_fingerprint": implementation_fingerprint(),
+        "keep_awake": {
+            "runner_scoped_system_required": os.name == "nt",
+            "power_toys_controlled_by_runner": False,
+            "power_toys_awake_enabled_externally": True,
+        },
+        "git_provenance": _git_provenance(),
+        "resumed": bool(resume),
         "rows": rows,
     }
     _write_json(manifest_path, manifest)
-    for spec, row in zip(specs, rows, strict=True):
-        _write_json(output_dir / "rows" / spec.row_id / "manifest.json", row)
 
 
 def _phase_status(
@@ -1292,12 +1674,24 @@ def _write_phase_status(output_dir: Path, status: dict[str, Any]) -> None:
     _write_json(run_path, run)
 
 
-def _validate_13b_invocation(manifest: dict[str, Any], metadata_path: Path, fraction: float) -> None:
+def _validate_13b_invocation(
+    manifest: dict[str, Any],
+    metadata_path: Path,
+    train_fraction: float,
+    validation_fraction: float,
+    sample_seed: int,
+) -> None:
     phase = manifest.get("phases", {}).get("13A", {})
     if Path(str(phase.get("metadata_path", ""))).resolve(strict=False) != Path(metadata_path).resolve(strict=False):
         raise PhaseGateError("13B metadata path does not match the completed 13A run")
-    if float(phase.get("corpus_sample_fraction", -1.0)) != float(fraction):
-        raise PhaseGateError("13B corpus sample fraction does not match the completed 13A run")
+    expected = (
+        float(phase.get("train_sample_fraction", -1.0)),
+        float(phase.get("validation_sample_fraction", -1.0)),
+        int(phase.get("sample_seed", -1)),
+    )
+    actual = (float(train_fraction), float(validation_fraction), int(sample_seed))
+    if expected != actual:
+        raise PhaseGateError("13B sample fractions or seed do not match the completed 13A run")
 
 
 def _blocked_13b(output_dir: Path, reason: str) -> None:
@@ -1319,13 +1713,37 @@ def _filter_rows(rows: Sequence[StrategyRowSpec], row_ids: set[str] | None) -> l
     return selected
 
 
-def _validate_run_options(smoke: bool, fraction: float, backend: str) -> None:
+def _validate_run_options(
+    smoke: bool,
+    train_fraction: float,
+    validation_fraction: float,
+    backend: str,
+    verify_optimized_kernels: str = "off",
+) -> None:
     if backend not in {"auto", "numpy", "xpu"}:
         raise ValueError(f"unsupported backend: {backend}")
-    if smoke and fraction != 1.0:
-        raise ValueError("smoke cannot be combined with a corpus sample fraction")
-    if not 0.0 < float(fraction) <= 1.0:
-        raise ValueError("corpus_sample_fraction must be in (0, 1]")
+    if smoke and (train_fraction != 1.0 or validation_fraction != 1.0):
+        raise ValueError("smoke cannot be combined with sample fractions")
+    for name, value in (
+        ("train_sample_fraction", train_fraction),
+        ("validation_sample_fraction", validation_fraction),
+    ):
+        if not 0.0 < float(value) <= 1.0:
+            raise ValueError(f"{name} must be in (0, 1]")
+    if verify_optimized_kernels not in OPTIMIZED_KERNEL_MODES:
+        raise ValueError("verify_optimized_kernels must be 'off' or 'first-use'")
+
+
+def _resolve_sample_fractions(
+    corpus_fraction: float | None,
+    train_fraction: float,
+    validation_fraction: float,
+) -> tuple[float, float]:
+    if corpus_fraction is None:
+        return float(train_fraction), float(validation_fraction)
+    if float(train_fraction) != 1.0 or float(validation_fraction) != 1.0:
+        raise ValueError("--corpus-sample-fraction cannot be mixed with split-specific sample fractions")
+    return float(corpus_fraction), float(corpus_fraction)
 
 
 def _run_identity(output_dir: Path, resume: bool) -> str:
@@ -1505,6 +1923,83 @@ def _read_json(path: Path) -> dict[str, Any]:
 
 def _nonempty(path: Path) -> bool:
     return path.is_file() and path.stat().st_size > 0
+
+
+def _compare_scientific_row(baseline: Path, candidate: Path) -> list[str]:
+    import numpy as np
+
+    mismatches: list[str] = []
+    baseline_npz, candidate_npz = baseline / "codebooks.npz", candidate / "codebooks.npz"
+    with np.load(baseline_npz, allow_pickle=False) as left, np.load(candidate_npz, allow_pickle=False) as right:
+        if left.files != right.files:
+            mismatches.append("codebooks.npz: array names differ")
+        else:
+            for name in left.files:
+                if not np.array_equal(left[name], right[name]):
+                    mismatches.append(f"codebooks.npz:{name}")
+    if _read_json(baseline / "targets_schema.json") != _read_json(candidate / "targets_schema.json"):
+        mismatches.append("targets_schema.json")
+    assignments = "atom_assignments.csv"
+    if _file_sha256(baseline / assignments) != _file_sha256(candidate / assignments):
+        mismatches.append(assignments)
+    ignored = {"oracle_construction_time", "train_encoding_time", "validation_encoding_time"}
+    csv_names = (
+        "summary.csv", "atom_construction.csv", "candidate_search_diagnostics.csv",
+        "slot_progression.csv", "partial_codebook_validation.csv", "layer_epsilon_quantiles.csv",
+        "slot_epsilon_quantiles.csv", "epsilon_coverage.csv", "retired_error_mass.csv",
+    )
+    for name in csv_names:
+        with (baseline / name).open(encoding="utf-8", newline="") as handle:
+            left_rows = list(csv.DictReader(handle))
+        with (candidate / name).open(encoding="utf-8", newline="") as handle:
+            right_rows = list(csv.DictReader(handle))
+        if len(left_rows) != len(right_rows):
+            mismatches.append(f"{name}: row count")
+            continue
+        for index, (left, right) in enumerate(zip(left_rows, right_rows, strict=True)):
+            differing = [
+                key for key, value in left.items()
+                if key not in ignored and (key not in right or right[key] != value)
+            ]
+            if differing:
+                mismatches.append(f"{name}: row {index + 1}: {', '.join(differing[:8])}")
+                break
+    return mismatches
+
+
+def _completed_row_summaries(run_dir: Path, phase: str) -> dict[str, dict[str, str]]:
+    rows: dict[str, dict[str, str]] = {}
+    for path in (Path(run_dir) / "rows").glob("*/summary.csv"):
+        try:
+            with path.open(encoding="utf-8", newline="") as handle:
+                values = list(csv.DictReader(handle))
+        except OSError:
+            continue
+        if len(values) == 1 and values[0].get("experiment_phase") == phase:
+            rows[path.parent.name] = values[0]
+    return rows
+
+
+def _validation_membership_sha256(path: Path) -> str:
+    indices: list[int] = []
+    seen: set[int] = set()
+    with Path(path).open(encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle):
+            if row.get("dataset_split") != "validation":
+                continue
+            index = int(row["dataset_index"])
+            if index not in seen:
+                indices.append(index)
+                seen.add(index)
+    return hashlib.sha256(_canonical_json(indices).encode()).hexdigest()
+
+
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def _canonical_json(payload: Any) -> str:

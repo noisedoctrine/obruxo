@@ -9,7 +9,9 @@ from __future__ import annotations
 
 import csv
 from dataclasses import dataclass
+from datetime import datetime, timezone
 import json
+import os
 from pathlib import Path
 import time
 from typing import Any, Callable, Sequence
@@ -24,6 +26,7 @@ from .curve import circular_shift
 from .dataset import Era2CurveDataset
 from .manifest import write_json, write_summary_csv
 from .metrics import max_abs_error_per_curve, reconstruction_summary
+from .strategy_grid_execution import BaseStage, OPTIMIZATION_VERSION, SampleProvenance
 
 
 PROTOTYPE_ITERATIONS = 8
@@ -32,6 +35,8 @@ PROTOTYPE_GAIN_FLOOR = 1e-3
 CLUSTER_COUNT = 4
 DIVERSE_PROPOSAL_COUNT = 6
 MEANINGFUL_IMPROVEMENT = 1e-8
+FINISH_VECTOR_CANDIDATE_CHUNK = 8
+_FINISH_KERNEL_VERIFIED = False
 
 
 @dataclass
@@ -46,6 +51,51 @@ class RowArtifacts:
     slot_epsilon_quantiles: list[dict[str, Any]]
     epsilon_coverage: list[dict[str, Any]]
     retired_error_mass: list[dict[str, Any]]
+
+
+class ExecutionRecorder:
+    """Append interruption-safe stage timings and emit a completed CSV."""
+
+    def __init__(self, row_dir: Path, spec: Any) -> None:
+        self.path = Path(row_dir) / "execution_timing.jsonl"
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.spec = spec
+        self.rows: list[dict[str, Any]] = []
+
+    def start(self, stage: str, *, layer: int | None = None, slot: int | None = None) -> tuple[str, float, float]:
+        return _now_utc(), time.perf_counter(), time.process_time()
+
+    def finish(
+        self,
+        stage: str,
+        token: tuple[str, float, float],
+        *,
+        layer: int | None = None,
+        slot: int | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        started_at, wall_started, cpu_started = token
+        row = {
+            "experiment_phase": self.spec.experiment_phase,
+            "row_id": self.spec.row_id,
+            "stage": stage,
+            "residual_layer": "" if layer is None else int(layer),
+            "active_atom_slot": "" if slot is None else int(slot),
+            "started_at_utc": started_at,
+            "completed_at_utc": _now_utc(),
+            "wall_elapsed_seconds": time.perf_counter() - wall_started,
+            "process_cpu_seconds": time.process_time() - cpu_started,
+            **(metadata or {}),
+        }
+        self.rows.append(row)
+        with self.path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(row, sort_keys=True) + "\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        return row
+
+    def write_csv(self) -> None:
+        write_csv(self.path.with_name("execution_timing.csv"), self.rows)
 
 
 def component_spec(spec: Any) -> x12.ComponentRowSpec:
@@ -82,19 +132,34 @@ def run_strategy_row(
     backend: BackendPreference,
     chunk_size: int = 256,
     progress: Callable[[str], None] | None = None,
+    base_stage: BaseStage | None = None,
+    sample_provenance: SampleProvenance | None = None,
+    cancel_check: Callable[[], None] | None = None,
+    verify_optimized_kernels: bool = False,
 ) -> RowArtifacts:
     """Construct, encode, score, and persist one Experiment 13 row."""
     started = time.perf_counter()
     row_dir = Path(row_dir)
     row_dir.mkdir(parents=True, exist_ok=True)
+    recorder = ExecutionRecorder(row_dir, spec)
+    row_timer = recorder.start("row")
     train, validation = dataset.train_curves, dataset.validation_curves
     if not len(train) or not len(validation):
         raise ValueError("Experiment 13 requires non-empty training and validation splits")
     runtime_spec = component_spec(spec)
     phase_count = train.shape[1]
-    base = x12._select_farthest_atoms(train, width=32, include_zero=False, topology=None)
-    train_base = best_alignment(train, base, phase_policy="fft_lattice", gain_policy="fixed", backend=backend, chunk_size=chunk_size, phase_candidate_count=phase_count)
-    validation_base = best_alignment(validation, base, phase_policy="fft_lattice", gain_policy="fixed", backend=backend, chunk_size=chunk_size, phase_candidate_count=phase_count)
+    if base_stage is None:
+        base = x12._select_farthest_atoms(train, width=32, include_zero=False, topology=None)
+        train_base = best_alignment(train, base, phase_policy="fft_lattice", gain_policy="fixed", backend=backend, chunk_size=chunk_size, phase_candidate_count=phase_count)
+        validation_base = best_alignment(validation, base, phase_policy="fft_lattice", gain_policy="fixed", backend=backend, chunk_size=chunk_size, phase_candidate_count=phase_count)
+        base_cache_hit = False
+        base_cache_key = ""
+    else:
+        base = np.asarray(base_stage.base_dictionary, dtype=np.float32).copy()
+        train_base = base_stage.train_alignment
+        validation_base = base_stage.validation_alignment
+        base_cache_hit = bool(base_stage.cache_hit)
+        base_cache_key = base_stage.cache_key
     train_prefix = train_base.values.copy()
     validation_prefix = validation_base.values.copy()
 
@@ -111,11 +176,17 @@ def run_strategy_row(
     _record_layer_calibration(spec, 0, "validation", validation, validation_prefix, layer_quantiles, coverage_rows)
 
     for layer_index in range(16):
+        if cancel_check is not None:
+            cancel_check()
+        layer_timer = recorder.start("residual_layer", layer=layer_index + 1)
         _log(progress, f"construction: residual layer {layer_index + 1}/16")
         incoming = train - train_prefix
         atoms: list[np.ndarray] = [np.zeros(train.shape[1], dtype=np.float32)]
         previous_broad: list[np.ndarray] = []
         for slot_index in range(0, 8):
+            if cancel_check is not None:
+                cancel_check()
+            slot_timer = recorder.start("active_atom_slot", layer=layer_index + 1, slot=slot_index)
             partial = np.stack(atoms).astype(np.float32)
             choice = best_alignment(incoming, partial, phase_policy="fft_lattice", gain_policy="optimized", backend=backend, chunk_size=chunk_size, phase_candidate_count=phase_count)
             unexplained = incoming - choice.values
@@ -124,6 +195,7 @@ def run_strategy_row(
             eligible = _eligibility_mask(spec, max_error)
             _record_slot_calibration(spec, layer_index + 1, slot_index, incoming, unexplained, max_error, slot_quantiles, coverage_rows, retired_rows)
             if slot_index == 7:
+                recorder.finish("layer_final_evaluation", slot_timer, layer=layer_index + 1)
                 break
             before = _slot_snapshot(current_loss, max_error, eligible, spec)
             if not np.any(eligible):
@@ -144,9 +216,11 @@ def run_strategy_row(
                         topology=dataset.topology[dataset.train_indices],
                         budget=spec.effective_candidate_budget_by_slot[layer_index][slot_index],
                         finish_threshold=float(spec.finish_threshold), backend=backend, chunk_size=chunk_size,
+                        verify_optimized_kernel=verify_optimized_kernels,
                     )
             atoms.append(atom.astype(np.float32))
-            next_choice = best_alignment(incoming, np.stack(atoms), phase_policy="fft_lattice", gain_policy="optimized", backend=backend, chunk_size=chunk_size, phase_candidate_count=phase_count)
+            exact_duplicate = any(np.array_equal(atoms[-1], previous) for previous in atoms[:-1])
+            next_choice = choice if exact_duplicate else best_alignment(incoming, np.stack(atoms), phase_policy="fft_lattice", gain_policy="optimized", backend=backend, chunk_size=chunk_size, phase_candidate_count=phase_count)
             next_unexplained = incoming - next_choice.values
             next_max = np.max(np.abs(next_unexplained), axis=1)
             next_loss = np.mean(next_unexplained * next_unexplained, axis=1)
@@ -173,6 +247,7 @@ def run_strategy_row(
                 "training_p95_rmse_before": before["p95_rmse"], "training_p95_rmse_after": after["p95_rmse"],
                 "assigned_residual_count": int(np.sum(next_choice.indices == slot_index + 1)),
                 "atom_phase_scale_similarity_to_previous_max": _max_similarity(atom, atoms[1:-1]),
+                "exact_duplicate_alignment_reused": exact_duplicate,
                 **_counterfactual_slot(max_error, incoming, unexplained),
                 **detail,
             }
@@ -198,6 +273,10 @@ def run_strategy_row(
                 "training_median_rmse": after["median_rmse"], "training_p95_rmse": after["p95_rmse"],
                 "training_max_abs_error_p95": float(np.quantile(next_max, 0.95)),
             })
+            recorder.finish(
+                "active_atom_slot", slot_timer, layer=layer_index + 1, slot=slot_index + 1,
+                metadata={"exact_duplicate_alignment_reused": exact_duplicate},
+            )
         dictionary = np.stack(atoms).astype(np.float32)
         dictionaries.append(dictionary)
         train_choice = best_alignment(incoming, dictionary, phase_policy="fft_lattice", gain_policy="optimized", backend=backend, chunk_size=chunk_size, phase_candidate_count=phase_count)
@@ -207,11 +286,18 @@ def run_strategy_row(
         validation_prefix = x12._apply_layer_state_policy(validation_prefix, validation_choice.values, runtime_spec)
         _record_layer_calibration(spec, layer_index + 1, "training", train, train_prefix, layer_quantiles, coverage_rows)
         _record_layer_calibration(spec, layer_index + 1, "validation", validation, validation_prefix, layer_quantiles, coverage_rows)
+        recorder.finish("residual_layer", layer_timer, layer=layer_index + 1)
 
     assets = ReconstructionAssets(base, dictionaries, metadata={"experiment_id": "experiment_13", "row_id": spec.row_id})
+    train_timer = recorder.start("train_encoding")
     train_encoding, train_reconstructed, train_raw, train_encoding_time = x12._encode_decode(runtime_spec, train, assets, backend=backend, chunk_size=chunk_size, progress=progress, progress_label="train")
+    recorder.finish("train_encoding", train_timer)
+    validation_timer = recorder.start("validation_encoding")
     validation_encoding, validation_reconstructed, validation_raw, validation_encoding_time = x12._encode_decode(runtime_spec, validation, assets, backend=backend, chunk_size=chunk_size, progress=progress, progress_label="validation")
+    recorder.finish("validation_encoding", validation_timer)
+    partial_timer = recorder.start("partial_validation")
     partial_rows = _partial_codebook_rows(spec, runtime_spec, dataset, assets, backend=backend, chunk_size=chunk_size)
+    recorder.finish("partial_validation", partial_timer)
     manifest = {
         **spec.manifest_dict(run_identity, configuration_fingerprint),
         **dataset.manifest_fields(),
@@ -220,6 +306,10 @@ def run_strategy_row(
         "train_encoding_time": train_encoding_time,
         "validation_encoding_time": validation_encoding_time,
         "backend_preference": backend,
+        "optimization_version": OPTIMIZATION_VERSION,
+        "base_stage_cache_key": base_cache_key,
+        "base_stage_cache_hit": base_cache_hit,
+        **(sample_provenance.as_dict() if sample_provenance is not None else {}),
     }
     summary = {
         **manifest,
@@ -246,6 +336,8 @@ def run_strategy_row(
     for name, rows in tables.items():
         write_csv(row_dir / name, rows)
     _write_assignment_csv(row_dir / "atom_assignments.csv", spec, dataset, train_encoding, validation_encoding)
+    recorder.finish("row", row_timer, metadata={"base_stage_cache_hit": base_cache_hit})
+    recorder.write_csv()
     return RowArtifacts(summary, construction_rows, [], candidate_rows, slot_rows, partial_rows, layer_quantiles, slot_quantiles, coverage_rows, retired_rows)
 
 
@@ -302,24 +394,29 @@ def _build_broad_atom(
         atom, score, _ = _best_proposal(matrix, proposals, weights, previous, diverse=True, backend=backend, chunk_size=chunk_size)
         detail = _prototype_detail(len(matrix), 1, True, "deterministic_weight_quantile_partition", score)
         return atom, detail
-    atom, iterations, converged, objective_before, objective_after = _alternating_prototype(
+    atom, iterations, converged, objective_before, objective_after, executed = _alternating_prototype(
         matrix, weights, builder, backend=backend, chunk_size=chunk_size,
     )
     detail = _prototype_detail(len(matrix), iterations, converged, "highest_weight_canonical_residual", objective_after)
     detail["prototype_objective_before"] = objective_before
     detail["explained_weighted_energy"] = max(0.0, 1.0 - objective_after / objective_before) if objective_before > 0.0 else 0.0
+    detail["prototype_iterations_executed"] = executed
     return atom, detail
 
 
 def _alternating_prototype(
     matrix: np.ndarray, weights: np.ndarray, builder: str, *, backend: BackendPreference, chunk_size: int,
-) -> tuple[np.ndarray, int, bool, float, float]:
+) -> tuple[np.ndarray, int, bool, float, float, int]:
     seed = int(np.argmax(weights))
     atom = _canonical_sign(matrix[seed].copy())
     objective_before = float(np.average(np.mean(matrix * matrix, axis=1), weights=weights))
     objective_after = objective_before
     converged = False
+    states = [atom.copy()]
+    objectives_by_state: list[float] = []
+    executed = 0
     for iteration in range(1, PROTOTYPE_ITERATIONS + 1):
+        executed += 1
         fit = best_alignment(matrix, np.stack([atom]), phase_policy="fft_lattice", gain_policy="optimized", backend=backend, chunk_size=chunk_size, phase_candidate_count=matrix.shape[1])
         canonical = circular_shift(matrix, -fit.phases)
         use = np.arange(len(matrix))
@@ -347,10 +444,25 @@ def _alternating_prototype(
         change = float(np.sqrt(np.mean((updated - atom) ** 2)))
         atom = updated
         objective_after = float(np.average(fit.losses, weights=weights))
+        objectives_by_state.append(objective_after)
         if change <= PROTOTYPE_TOLERANCE:
             converged = True
             break
-    return atom.astype(np.float32), iteration, converged, objective_before, objective_after
+        repeated = next((index for index, state in enumerate(states) if np.array_equal(updated, state)), None)
+        states.append(updated.copy())
+        if repeated is not None and iteration < PROTOTYPE_ITERATIONS:
+            cycle = iteration - repeated
+
+            def mapped_state(target: int) -> int:
+                if target < repeated:
+                    return target
+                return repeated + ((target - repeated) % cycle)
+
+            atom = states[mapped_state(PROTOTYPE_ITERATIONS)].copy()
+            objective_after = objectives_by_state[mapped_state(PROTOTYPE_ITERATIONS - 1)]
+            iteration = PROTOTYPE_ITERATIONS
+            break
+    return atom.astype(np.float32), iteration, converged, objective_before, objective_after, executed
 
 
 def _cluster_prototypes(matrix: np.ndarray, weights: np.ndarray, *, backend: BackendPreference, chunk_size: int) -> tuple[list[np.ndarray], list[int]]:
@@ -409,7 +521,7 @@ def _best_proposal(
 def _build_repair_atom(
     builder: str, slot_role: str, residual: np.ndarray, eligible: np.ndarray, current_loss: np.ndarray,
     current_max: np.ndarray, *, topology: np.ndarray, budget: int | None, finish_threshold: float,
-    backend: BackendPreference, chunk_size: int,
+    backend: BackendPreference, chunk_size: int, verify_optimized_kernel: bool = False,
 ) -> tuple[np.ndarray, dict[str, Any]]:
     eligible_indices = np.flatnonzero(eligible)
     limit = max(1, int(budget or 24))
@@ -425,11 +537,18 @@ def _build_repair_atom(
     masked = improvement * eligible[:, None] * weights[:, None]
     role = slot_role.lower()
     if builder == "FinishRepair" or role == "finish":
-        finish_counts = np.zeros(len(candidates), dtype=np.int64)
-        for candidate in range(len(candidates)):
-            values = circular_shift(np.repeat(candidates[candidate][None, :], len(target), axis=0), fit.phases[:, candidate]) * fit.gains[:, candidate, None]
-            candidate_max = np.max(np.abs(target - values), axis=1)
-            finish_counts[candidate] = int(np.sum(eligible & (current_max > finish_threshold) & (candidate_max <= finish_threshold)))
+        finish_counts = _finish_counts_vectorized(
+            target, candidates, fit.phases, fit.gains, eligible, current_max, finish_threshold,
+            candidate_chunk=FINISH_VECTOR_CANDIDATE_CHUNK,
+        )
+        global _FINISH_KERNEL_VERIFIED
+        if verify_optimized_kernel and not _FINISH_KERNEL_VERIFIED:
+            legacy = _finish_counts_legacy(
+                target, candidates, fit.phases, fit.gains, eligible, current_max, finish_threshold,
+            )
+            if not np.array_equal(finish_counts, legacy):
+                raise RuntimeError("vectorized FinishRepair failed exact first-use verification")
+            _FINISH_KERNEL_VERIFIED = True
         total = np.sum(masked, axis=0)
         choice = int(max(range(len(candidates)), key=lambda index: (finish_counts[index], total[index], -index)))
         score = float(finish_counts[choice] * 1_000_000.0 + total[choice])
@@ -461,6 +580,53 @@ def _build_repair_atom(
         candidate_count=len(candidates), prototype_population_size=0,
     )
     return candidates[choice].astype(np.float32), detail
+
+
+def _finish_counts_legacy(
+    target: np.ndarray,
+    candidates: np.ndarray,
+    phases: np.ndarray,
+    gains: np.ndarray,
+    eligible: np.ndarray,
+    current_max: np.ndarray,
+    finish_threshold: float,
+) -> np.ndarray:
+    counts = np.zeros(len(candidates), dtype=np.int64)
+    finishable = eligible & (current_max > finish_threshold)
+    for candidate in range(len(candidates)):
+        values = circular_shift(
+            np.repeat(candidates[candidate][None, :], len(target), axis=0), phases[:, candidate]
+        ) * gains[:, candidate, None]
+        candidate_max = np.max(np.abs(target - values), axis=1)
+        counts[candidate] = int(np.sum(finishable & (candidate_max <= finish_threshold)))
+    return counts
+
+
+def _finish_counts_vectorized(
+    target: np.ndarray,
+    candidates: np.ndarray,
+    phases: np.ndarray,
+    gains: np.ndarray,
+    eligible: np.ndarray,
+    current_max: np.ndarray,
+    finish_threshold: float,
+    *,
+    candidate_chunk: int = FINISH_VECTOR_CANDIDATE_CHUNK,
+) -> np.ndarray:
+    counts = np.zeros(len(candidates), dtype=np.int64)
+    finishable = eligible & (current_max > finish_threshold)
+    for start in range(0, len(candidates), max(1, int(candidate_chunk))):
+        stop = min(len(candidates), start + max(1, int(candidate_chunk)))
+        code_block = np.broadcast_to(
+            candidates[None, start:stop, :], (len(target), stop - start, target.shape[1])
+        )
+        shifted = circular_shift(code_block, phases[:, start:stop])
+        values = shifted * gains[:, start:stop, None]
+        candidate_max = np.max(np.abs(target[:, None, :] - values), axis=2)
+        counts[start:stop] = np.sum(
+            finishable[:, None] & (candidate_max <= finish_threshold), axis=0, dtype=np.int64
+        )
+    return counts
 
 
 def _record_layer_calibration(spec: Any, layer: int, split: str, targets: np.ndarray, reconstructed: np.ndarray, quantiles: list[dict[str, Any]], coverage: list[dict[str, Any]]) -> None:
@@ -543,7 +709,7 @@ def _slot_snapshot(loss: np.ndarray, max_error: np.ndarray, eligible: np.ndarray
 
 def _prototype_detail(population: int, iterations: int, converged: bool, seed_rule: str, objective: float) -> dict[str, Any]:
     detail = _empty_builder_detail("")
-    detail.update(prototype_iteration_count=iterations, prototype_converged=converged, prototype_population_size=population, prototype_objective_after=objective, prototype_seed_rule=seed_rule)
+    detail.update(prototype_iteration_count=iterations, prototype_iterations_executed=iterations, prototype_converged=converged, prototype_population_size=population, prototype_objective_after=objective, prototype_seed_rule=seed_rule)
     return detail
 
 
@@ -567,7 +733,7 @@ def _counterfactual_slot(max_error: np.ndarray, incoming: np.ndarray, unexplaine
 
 
 def _empty_builder_detail(reason: str) -> dict[str, Any]:
-    return {"prototype_iteration_count": 0, "prototype_converged": False, "prototype_population_size": 0, "prototype_objective_before": "", "prototype_objective_after": "", "prototype_seed_rule": reason, "cluster_count": 0, "cluster_size": 0, "explained_weighted_energy": "", "repair_source_dataset_index": "", "repair_shortlist_rule": "", "repair_utility_score": "", "source_index": None, "candidate_count": 0}
+    return {"prototype_iteration_count": 0, "prototype_iterations_executed": 0, "prototype_converged": False, "prototype_population_size": 0, "prototype_objective_before": "", "prototype_objective_after": "", "prototype_seed_rule": reason, "cluster_count": 0, "cluster_size": 0, "explained_weighted_energy": "", "repair_source_dataset_index": "", "repair_shortlist_rule": "", "repair_utility_score": "", "source_index": None, "candidate_count": 0}
 
 
 def _weighted_median_matrix(values: np.ndarray, weights: np.ndarray) -> np.ndarray:
@@ -678,3 +844,7 @@ def _fieldnames(rows: Sequence[dict[str, Any]]) -> list[str]:
 def _log(progress: Callable[[str], None] | None, message: str) -> None:
     if progress is not None:
         progress(message)
+
+
+def _now_utc() -> str:
+    return datetime.now(timezone.utc).isoformat()

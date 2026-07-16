@@ -9,6 +9,8 @@ import tempfile
 import unittest
 from unittest import mock
 
+import numpy as np
+
 ERA2_ROOT = Path(__file__).resolve().parents[1]
 CODE_DIR = ERA2_ROOT / "code"
 sys.path.insert(0, str(CODE_DIR))
@@ -16,6 +18,7 @@ sys.path.insert(0, str(CODE_DIR))
 from lfo_era2 import strategy_grid as grid  # noqa: E402
 from lfo_era2 import strategy_grid_runtime as runtime  # noqa: E402
 from lfo_era2.dataset import make_tiny_curve_dataset  # noqa: E402
+from lfo_era2 import strategy_grid_execution as execution  # noqa: E402
 
 
 class StrategyGridEnumerationTests(unittest.TestCase):
@@ -105,6 +108,10 @@ class StrategyGridGateTests(unittest.TestCase):
             self.assertTrue(Path(result["summary"]).exists())
             self.assertTrue((run_dir / "strategy_results.csv").exists())
             self.assertTrue((run_dir / "rows" / row_id / "codebooks.npz").exists())
+            timing = runtime.read_csv(run_dir / "rows" / row_id / "execution_timing.csv")
+            self.assertEqual(sum(row["stage"] == "residual_layer" for row in timing), 16)
+            self.assertEqual(sum(row["stage"] == "active_atom_slot" for row in timing), 16 * 7)
+            self.assertTrue(all(float(row["wall_elapsed_seconds"]) >= 0.0 for row in timing))
             for name in (
                 "slot_progression.csv", "partial_codebook_validation.csv", "atom_construction.csv",
                 "atom_assignments.csv", "candidate_search_diagnostics.csv", "layer_epsilon_quantiles.csv",
@@ -331,10 +338,68 @@ class StrategyGridGateTests(unittest.TestCase):
             row_id = grid.experiment13a_specs()[0].row_id
             dataset = make_tiny_curve_dataset(resolution=16, row_count=8)
             grid.run_13a(output_dir=run_dir, backend="numpy", smoke=True, row_ids={row_id}, dataset=dataset, chunk_size=8)
+            manifest_path = run_dir / "rows" / row_id / "manifest.json"
+            before = manifest_path.read_bytes()
             with mock.patch("lfo_era2.strategy_grid_runtime.run_strategy_row", side_effect=AssertionError("row reran")):
                 grid.run_13a(output_dir=run_dir, backend="numpy", smoke=True, row_ids={row_id}, dataset=dataset, chunk_size=8, resume=True)
             self.assertEqual(grid.read_phase_status(run_dir, "13A")["completed_rows"], 1)
             self.assertTrue((run_dir / "rows" / row_id / "summary.csv").exists())
+            self.assertEqual(manifest_path.read_bytes(), before)
+
+    def test_sampling_is_deterministic_stratified_and_preserves_full_validation(self) -> None:
+        dataset = make_tiny_curve_dataset(resolution=16, row_count=40)
+        left, left_provenance = execution.deterministic_sample(
+            dataset, train_fraction=0.5, validation_fraction=1.0, seed=13,
+        )
+        right, right_provenance = execution.deterministic_sample(
+            dataset, train_fraction=0.5, validation_fraction=1.0, seed=13,
+        )
+        self.assertEqual(len(left.train_indices), int(len(dataset.train_indices) * 0.5))
+        np.testing.assert_array_equal(left.validation_indices, dataset.validation_indices)
+        np.testing.assert_array_equal(left.train_indices, right.train_indices)
+        self.assertEqual(left_provenance, right_provenance)
+        self.assertTrue(np.all(left.train_indices[:-1] < left.train_indices[1:]))
+
+    def test_finish_repair_vectorization_is_exact(self) -> None:
+        rng = np.random.default_rng(13)
+        target = rng.normal(size=(33, 16)).astype(np.float32)
+        candidates = rng.normal(size=(13, 16)).astype(np.float32)
+        phases = rng.random((33, 13), dtype=np.float32)
+        gains = rng.normal(size=(33, 13)).astype(np.float32)
+        eligible = rng.random(33) > 0.2
+        current = np.max(np.abs(target), axis=1)
+        legacy = runtime._finish_counts_legacy(target, candidates, phases, gains, eligible, current, 0.25)
+        optimized = runtime._finish_counts_vectorized(
+            target, candidates, phases, gains, eligible, current, 0.25, candidate_chunk=4,
+        )
+        np.testing.assert_array_equal(optimized, legacy)
+
+    def test_dataset_and_base_stage_cache_round_trip_exactly(self) -> None:
+        dataset = make_tiny_curve_dataset(resolution=16, row_count=20)
+        sampled, provenance = execution.deterministic_sample(
+            dataset, train_fraction=0.5, validation_fraction=1.0, seed=13,
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            first = execution.load_or_build_base_stage(
+                sampled, provenance, backend="numpy", chunk_size=8, cache_dir=Path(tmp),
+            )
+            second = execution.load_or_build_base_stage(
+                sampled, provenance, backend="numpy", chunk_size=8, cache_dir=Path(tmp),
+            )
+            self.assertFalse(first.cache_hit)
+            self.assertTrue(second.cache_hit)
+            np.testing.assert_array_equal(first.base_dictionary, second.base_dictionary)
+            np.testing.assert_array_equal(first.train_alignment.values, second.train_alignment.values)
+            np.testing.assert_array_equal(first.validation_alignment.values, second.validation_alignment.values)
+
+    def test_cancel_request_is_archived_on_resume(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp)
+            grid.request_cancel(run_dir, reason="test stop")
+            self.assertTrue((run_dir / "cancel_request.json").exists())
+            grid._archive_cancel_request(run_dir)
+            self.assertFalse((run_dir / "cancel_request.json").exists())
+            self.assertEqual(len(list((run_dir / "cancel_requests").glob("*.json"))), 1)
 
     def test_analyze_refuses_incomplete_artifacts(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -351,7 +416,10 @@ class StrategyGridCliTests(unittest.TestCase):
         script = CODE_DIR / "experiment13_strategy_grid.py"
         help_result = subprocess.run([sys.executable, str(script), "--help"], capture_output=True, text=True, check=False)
         self.assertEqual(help_result.returncode, 0, help_result.stderr)
-        for command in ("run-13a", "select-epsilon", "run-13b-pilot", "override-epsilon", "run-13b", "analyze", "status"):
+        for command in (
+            "run-13a", "select-epsilon", "run-13b-pilot", "override-epsilon", "run-13b",
+            "analyze", "analyze-scaling", "verify-equivalence", "cancel", "status", "monitor",
+        ):
             self.assertIn(command, help_result.stdout)
         with tempfile.TemporaryDirectory() as tmp:
             result = subprocess.run(
@@ -369,11 +437,17 @@ class StrategyGridCliTests(unittest.TestCase):
         assert module_spec is not None and module_spec.loader is not None
         module = importlib.util.module_from_spec(module_spec)
         module_spec.loader.exec_module(module)
-        args = module._parser().parse_args(["run-13a", "--async", "--backend", "numpy", "--chunk-size", "32", "--resume"])
+        args = module._parser().parse_args([
+            "run-13a", "--async", "--backend", "numpy", "--chunk-size", "32", "--resume",
+            "--train-sample-fraction", "0.5", "--validation-sample-fraction", "1.0",
+            "--sample-seed", "13", "--cache-dir", "cache", "--verify-optimized-kernels", "first-use",
+        ])
         command = module._async_command(args)
         self.assertNotIn("--async", command)
         self.assertIn("--resume", command)
         self.assertEqual(command[command.index("--chunk-size") + 1], "32")
+        self.assertEqual(command[command.index("--train-sample-fraction") + 1], "0.5")
+        self.assertEqual(command[command.index("--cache-dir") + 1], "cache")
 
 
 def _row(policy: str, budget: str | None, normalization: str) -> grid.StrategyRowSpec:
@@ -382,6 +456,13 @@ def _row(policy: str, budget: str | None, normalization: str) -> grid.StrategyRo
 
 def _write_completed_13a(run_dir: Path) -> tuple[str, str]:
     identity, fingerprint = "x13a_test_complete", grid.configuration_fingerprint()
+    dataset, sample = execution.deterministic_sample(
+        make_tiny_curve_dataset(resolution=16, row_count=8),
+        train_fraction=1.0,
+        validation_fraction=1.0,
+        seed=13,
+    )
+    execution.write_sample_artifacts(run_dir, dataset, sample)
     grid._write_phase_manifest(
         output_dir=run_dir,
         phase="13A",
@@ -391,8 +472,14 @@ def _write_completed_13a(run_dir: Path) -> tuple[str, str]:
         metadata_path=grid.DEFAULT_METADATA,
         backend="numpy",
         smoke=False,
-        corpus_sample_fraction=1.0,
+        train_sample_fraction=1.0,
+        validation_sample_fraction=1.0,
+        sample_seed=13,
+        sample=sample,
+        dataset_cache={"cache_key": "test", "cache_hit": False, "cache_path": None},
+        base_stage_cache_key="test",
         complete_design=True,
+        resume=False,
     )
     status = grid._phase_status("13A", "complete", identity, 90, 90, False, False, "complete")
     status.update(completed_rows=90, completed_at_utc="2026-07-15T00:00:00+00:00")

@@ -229,8 +229,13 @@ paired analysis, and the canonical report required by
 [EXPERIMENT_13_PLAN.md](./experiments/EXPERIMENT_13_PLAN.md). The Windows
 `--async` path launches a background runner, captures stdout/stderr under the
 Experiment 13 `launcher_logs` directory, and opens a live status/event monitor.
-Use `status` to inspect `not_started`, `running`, `partial`, `blocked`, `failed`,
-and `complete` phase states.
+Experiment 13 also supports independent deterministic train/validation sample
+fractions, a versioned dataset/base-stage cache, exact optimized kernels,
+slot/layer wall and CPU timings, safe `cancel`, standalone `monitor`, legacy
+`verify-equivalence`, and matched `analyze-scaling` commands. Compute workers
+hold a scoped Windows system-required execution state without controlling
+PowerToys Awake. Use `status` to inspect `not_started`, `running`, `partial`,
+`blocked`, `failed`, `cancelled`, and `complete` phase states.
 
 If automatic epsilon selection does not pass, run the restricted pilot and then
 record the explicit decision with `override-epsilon --selected-epsilon 0.001

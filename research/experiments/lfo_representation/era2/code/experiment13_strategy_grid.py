@@ -62,14 +62,18 @@ from lfo_era2.strategy_grid import (  # noqa: E402
     DEFAULT_METADATA,
     DEFAULT_OUTPUT_DIR,
     Experiment13Error,
+    analyze_scaling_ablation,
     analyze_strategy_grid,
     override_epsilon,
     run_13a,
     run_13b,
     run_13b_pilot,
+    request_cancel,
     select_epsilon,
     status_text,
+    verify_equivalence,
 )
+from lfo_era2.strategy_grid_execution import KeepAwakeError, scoped_system_required  # noqa: E402
 
 
 def main() -> None:
@@ -84,6 +88,17 @@ def main() -> None:
             if result["monitor_started"]:
                 print(f"monitor_refresh_seconds={result['monitor_refresh_seconds']}", flush=True)
             return
+        if args.command in {"run-13a", "run-13b", "run-13b-pilot", "verify-equivalence"}:
+            with scoped_system_required(strict=True):
+                _execute(args)
+        else:
+            _execute(args)
+    except (Experiment13Error, KeepAwakeError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr, flush=True)
+        raise SystemExit(2) from exc
+
+
+def _execute(args: argparse.Namespace) -> None:
         if args.command == "run-13a":
             run_13a(
                 output_dir=args.output_dir,
@@ -91,6 +106,12 @@ def main() -> None:
                 backend=args.backend,
                 smoke=args.smoke,
                 corpus_sample_fraction=args.corpus_sample_fraction,
+                train_sample_fraction=args.train_sample_fraction,
+                validation_sample_fraction=args.validation_sample_fraction,
+                sample_seed=args.sample_seed,
+                cache_dir=args.cache_dir,
+                rebuild_cache=args.rebuild_cache,
+                verify_optimized_kernels=args.verify_optimized_kernels,
                 resume=args.resume,
                 row_ids=_row_ids(args.rows),
                 chunk_size=args.chunk_size,
@@ -108,6 +129,9 @@ def main() -> None:
                 metadata_path=args.metadata,
                 backend=args.backend,
                 chunk_size=args.chunk_size,
+                cache_dir=args.cache_dir,
+                rebuild_cache=args.rebuild_cache,
+                verify_optimized_kernels=args.verify_optimized_kernels,
                 progress=_progress,
             )
         elif args.command == "override-epsilon":
@@ -125,6 +149,12 @@ def main() -> None:
                 backend=args.backend,
                 smoke=args.smoke,
                 corpus_sample_fraction=args.corpus_sample_fraction,
+                train_sample_fraction=args.train_sample_fraction,
+                validation_sample_fraction=args.validation_sample_fraction,
+                sample_seed=args.sample_seed,
+                cache_dir=args.cache_dir,
+                rebuild_cache=args.rebuild_cache,
+                verify_optimized_kernels=args.verify_optimized_kernels,
                 resume=args.resume,
                 row_ids=_row_ids(args.rows),
                 chunk_size=args.chunk_size,
@@ -136,9 +166,28 @@ def main() -> None:
                 print(f"{key}={value}", flush=True)
         elif args.command == "status":
             print(status_text(args.run_dir), flush=True)
-    except (Experiment13Error, ValueError) as exc:
-        print(f"error: {exc}", file=sys.stderr, flush=True)
-        raise SystemExit(2) from exc
+        elif args.command == "monitor":
+            started = _open_monitor(args.run_dir, args.monitor_refresh_seconds)
+            if not started:
+                raise Experiment13Error("monitor window could not be started on this platform")
+            print(f"monitor_started=true refresh_seconds={args.monitor_refresh_seconds}", flush=True)
+        elif args.command == "cancel":
+            payload = request_cancel(args.run_dir, reason=args.reason)
+            print(f"cancel_requested_at_utc={payload['requested_at_utc']}", flush=True)
+        elif args.command == "verify-equivalence":
+            result = verify_equivalence(
+                baseline_run=args.baseline_run, output_dir=args.output_dir,
+                metadata_path=args.metadata, cache_dir=args.cache_dir,
+                backend=args.backend, row_ids=_row_ids(args.rows),
+                chunk_size=args.chunk_size, progress=_progress,
+            )
+            print(f"passed={result['passed']} row_count={result['row_count']}", flush=True)
+        elif args.command == "analyze-scaling":
+            result = analyze_scaling_ablation(
+                full_run=args.full_run, sampled_run=args.sampled_run, output_dir=args.output_dir,
+            )
+            for key, value in result.items():
+                print(f"{key}={value}", flush=True)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -159,6 +208,7 @@ def _parser() -> argparse.ArgumentParser:
     pilot.add_argument("--candidate-epsilons", nargs="+", type=float, required=True)
     pilot.add_argument("--rows", default="", help="optional comma-separated 13B row ids; only pilot policies are accepted")
     pilot.add_argument("--chunk-size", type=int, default=256)
+    _add_cache_arguments(pilot)
 
     override = subcommands.add_parser("override-epsilon", help="record an explicit pilot-backed epsilon decision")
     override.add_argument("--run-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
@@ -173,6 +223,28 @@ def _parser() -> argparse.ArgumentParser:
 
     status = subcommands.add_parser("status", help="print Experiment 13 phase and gate status")
     status.add_argument("--run-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+
+    monitor = subcommands.add_parser("monitor", help="open the Windows live monitor for an existing run")
+    monitor.add_argument("--run-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    monitor.add_argument("--monitor-refresh-seconds", type=int, default=30)
+
+    cancel = subcommands.add_parser("cancel", help="request cancellation at the next safe checkpoint")
+    cancel.add_argument("--run-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    cancel.add_argument("--reason", required=True)
+
+    verify = subcommands.add_parser("verify-equivalence", help="compare optimized rows with a legacy baseline")
+    verify.add_argument("--baseline-run", type=Path, required=True)
+    verify.add_argument("--output-dir", type=Path, required=True)
+    verify.add_argument("--metadata", type=Path, default=DEFAULT_METADATA)
+    verify.add_argument("--backend", choices=["auto", "numpy", "xpu"], default="auto")
+    verify.add_argument("--rows", required=True)
+    verify.add_argument("--chunk-size", type=int, default=256)
+    verify.add_argument("--cache-dir", type=Path, default=None)
+
+    scaling = subcommands.add_parser("analyze-scaling", help="compare matched full- and sampled-training rows")
+    scaling.add_argument("--full-run", type=Path, required=True)
+    scaling.add_argument("--sampled-run", type=Path, required=True)
+    scaling.add_argument("--output-dir", type=Path, required=True)
     return parser
 
 
@@ -181,15 +253,25 @@ def _add_run_arguments(parser: argparse.ArgumentParser, *, include_selection: bo
     parser.add_argument("--metadata", type=Path, default=DEFAULT_METADATA)
     parser.add_argument("--backend", choices=["auto", "numpy", "xpu"], default="auto")
     parser.add_argument("--smoke", action="store_true")
-    parser.add_argument("--corpus-sample-fraction", type=float, default=1.0)
+    parser.add_argument("--corpus-sample-fraction", type=float, default=None)
+    parser.add_argument("--train-sample-fraction", type=float, default=1.0)
+    parser.add_argument("--validation-sample-fraction", type=float, default=1.0)
+    parser.add_argument("--sample-seed", type=int, default=13)
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--rows", default="", help="optional comma-separated row ids for partial diagnostic runs")
     parser.add_argument("--async", dest="async_run", action="store_true")
     parser.add_argument("--monitor-refresh-seconds", type=int, default=30)
     parser.add_argument("--no-monitor-window", action="store_true")
     parser.add_argument("--chunk-size", type=int, default=256)
+    _add_cache_arguments(parser)
     if include_selection:
         parser.add_argument("--epsilon-selection", type=Path, default=None)
+
+
+def _add_cache_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--cache-dir", type=Path, default=None)
+    parser.add_argument("--rebuild-cache", action="store_true")
+    parser.add_argument("--verify-optimized-kernels", choices=["off", "first-use"], default="off")
 
 
 def _row_ids(value: str) -> set[str] | None:
@@ -231,8 +313,17 @@ def _async_command(args: argparse.Namespace) -> list[str]:
     command.extend(["--output-dir", str(args.output_dir)])
     command.extend(["--metadata", str(args.metadata)])
     command.extend(["--backend", args.backend])
-    command.extend(["--corpus-sample-fraction", str(args.corpus_sample_fraction)])
+    if args.corpus_sample_fraction is not None:
+        command.extend(["--corpus-sample-fraction", str(args.corpus_sample_fraction)])
+    command.extend(["--train-sample-fraction", str(args.train_sample_fraction)])
+    command.extend(["--validation-sample-fraction", str(args.validation_sample_fraction)])
+    command.extend(["--sample-seed", str(args.sample_seed)])
     command.extend(["--chunk-size", str(args.chunk_size)])
+    if args.cache_dir is not None:
+        command.extend(["--cache-dir", str(args.cache_dir)])
+    if args.rebuild_cache:
+        command.append("--rebuild-cache")
+    command.extend(["--verify-optimized-kernels", args.verify_optimized_kernels])
     if args.smoke:
         command.append("--smoke")
     if args.resume:
