@@ -252,7 +252,7 @@ def _parser() -> argparse.ArgumentParser:
     override.add_argument("--rationale", required=True)
 
     run_b = subcommands.add_parser(
-        "run-13b", help="run the gated 45-row LayerClip0To1-only Experiment 13B phase"
+        "run-13b", help="run the gated 135-row LayerClip0To1 three-epsilon Experiment 13B phase"
     )
     _add_run_arguments(run_b, include_selection=True)
 

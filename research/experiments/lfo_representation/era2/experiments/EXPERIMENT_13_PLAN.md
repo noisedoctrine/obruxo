@@ -23,22 +23,23 @@ Experiment 13 must run in two ordered phases:
 1. **Experiment 13A — unfiltered construction and calibration.** Run the 90
    `AllResiduals` rows. Candidate eligibility thresholds are observational only
    and must not change construction.
-2. **Experiment 13B — filtered construction.** Select one global eligibility
-   epsilon from completed 13A training artifacts, freeze it, and run the 45
-   `UnresolvedOnly` rows paired to the 13A `LayerClip0To1` strategies. The
-   `FinalClipOnly` variants are not repeated in 13B because 13A favored
-   layer-wise clipping in all 45 matched P95 comparisons.
+2. **Experiment 13B — filtered construction and epsilon sweep.** Run each of
+   the 45 `UnresolvedOnly` rows paired to the 13A `LayerClip0To1` strategies at
+   eligibility epsilons `1e-2`, `1e-3`, and `1e-4`, producing 135 rows. The
+   `FinalClipOnly` variants are not repeated because 13A favored layer-wise
+   clipping in all 45 matched P95 comparisons.
 
 **Experiment 13B must not begin until Experiment 13A has completed and written a
-valid threshold-selection artifact.** The paired phases are sequential, not one
-simultaneous 135-row run.
+valid threshold-selection artifact.** The artifact records the completed 13A
+calibration result, but it no longer needs to select one passing epsilon. The
+three-value 13B sweep is exploratory and was fixed after 13A completed; `1e-4`
+was not part of the original 13A calibration candidate set.
 
 ## Operator Quick Start
 
 Run these commands from the repository root in PowerShell. Experiment 13A,
-epsilon selection, and Experiment 13B are an ordered workflow; do not start 13B
-until selection has passed or a completed restricted pilot has supported an
-explicit override.
+epsilon calibration, and Experiment 13B are ordered; do not start 13B until 13A
+is complete and the matching `epsilon_selection.json` has been written.
 
 Define the paths once for the current shell:
 
@@ -85,7 +86,7 @@ the pinned ECharts renderer is loaded from jsDelivr.
 After all 90 Experiment 13A rows complete, record the official automatic
 epsilon-selection result and generate the complete AllResiduals report. This
 report is authoritative for 13A but remains separate from the canonical paired
-report, which is still gated on a frozen epsilon and complete 13B.
+report, which is still gated on the complete fixed epsilon sweep in 13B.
 
 ```powershell
 conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 select-epsilon --run-dir $runDir
@@ -211,7 +212,7 @@ while ($true) {
 The status command reports `not_started`, `running`, `partial`, `blocked`,
 `failed`, or `complete` for each phase and shows recent structured events.
 
-### 5. Select the global epsilon
+### 5. Record the completed 13A epsilon calibration
 
 Run selection only after 13A is complete:
 
@@ -219,53 +220,32 @@ Run selection only after 13A is complete:
 conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 select-epsilon --run-dir $runDir
 ```
 
-If automatic selection passes, skip to step 7. If it records
-`selection_passed = false`, complete the restricted fallback in step 6.
+The command may legitimately record `selection_passed = false`. That result is
+retained as calibration provenance and does not block the fixed three-epsilon
+13B sweep.
 
-### 6. Run and record the restricted fallback pilot when required
+### 6. Run Experiment 13B
 
-The pilot is allowed only after automatic selection fails. It accepts only the
-four prespecified pilot policies and candidate epsilons `0.001` and `0.0025`:
-
-```powershell
-conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b-pilot --output-dir $runDir --cache-dir $cacheDir --backend xpu --metadata $metadata --epsilon-selection $selection --candidate-epsilons 0.001 0.0025 --verify-optimized-kernels first-use
-```
-
-Review `experiment13b_pilot_results.csv`, choose one of the two evaluated
-values, and record the evidence-backed decision. Replace the example value and
-rationale with the actual decision:
-
-```powershell
-conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 override-epsilon --run-dir $runDir --selected-epsilon 0.001 --rationale "Pilot evidence favored 0.001 because ..."
-```
-
-The pilot command must reject any row outside the prespecified pilot policies,
-any other epsilon, or an artifact that does not record a failed automatic
-selection for the matching completed 13A run. It never mutates the selection
-artifact automatically; only `override-epsilon` records the explicit decision.
-
-### 7. Run Experiment 13B
-
-Experiment 13B contains 45 rows and is locked to `LayerClip0To1`. The command
-does not schedule `FinalClipOnly` variants; all construction policies,
-schedules, and applicable candidate budgets remain represented.
+Experiment 13B contains 135 rows: the 45 `LayerClip0To1` strategies at `1e-2`,
+`1e-3`, and `1e-4`. The command does not schedule `FinalClipOnly` variants. The
+three thresholds are fixed by the implementation and need no CLI argument.
 
 ```powershell
 conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b --output-dir $runDir --cache-dir $cacheDir --async --backend xpu --metadata $metadata --train-sample-fraction 0.5 --validation-sample-fraction 1.0 --sample-seed 13 --verify-optimized-kernels first-use --epsilon-selection $selection --chunk-size 256 --monitor-refresh-seconds 30
 ```
 
-Resume the same 13B run after an interruption:
+Resume the same 13B sweep after an interruption:
 
 ```powershell
 conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 run-13b --output-dir $runDir --cache-dir $cacheDir --async --backend xpu --metadata $metadata --train-sample-fraction 0.5 --validation-sample-fraction 1.0 --sample-seed 13 --verify-optimized-kernels first-use --epsilon-selection $selection --chunk-size 256 --monitor-refresh-seconds 30 --resume
 ```
 
-The 13B command fails closed when the selection artifact is missing, malformed,
-does not match the completed 13A run and current configuration, records a failed
-selection without a valid pilot-backed override, or uses an incompatible
-candidate set or selection-rule version.
+The 13B command fails closed when the calibration artifact is missing,
+malformed, stale, or incompatible with the completed 13A run. A valid
+`selection_passed = false` result is accepted because epsilon is now an
+explicit sweep axis rather than a selected scalar.
 
-### 8. Generate analytics and the canonical report
+### 7. Generate analytics and the canonical report
 
 Run this after both phases complete. It can also be rerun to regenerate the
 derived CSVs, plots, and report from the retained run artifacts.
@@ -455,7 +435,7 @@ additional LFOs.
 ```math
 \mathrm{resolved}^{13B}_{i,d,s}
 =
-\mathbf{1}\!\left[E_{i,d,s}\leq\epsilon^*\right],
+\mathbf{1}\!\left[E_{i,d,s}\leq\epsilon_j\right],
 ```
 
 ```math
@@ -464,7 +444,8 @@ additional LFOs.
 1-\mathrm{resolved}^{13B}_{i,d,s}.
 ```
 
-All Experiment 13B rows use the same frozen `eligibility_epsilon`. If no
+For each clipped strategy, Experiment 13B runs independent rows at
+`eligibility_epsilon` values `1e-2`, `1e-3`, and `1e-4`. If no
 eligible residuals remain, the remaining active atom slots should be filled with
 no-op atoms and recorded as early completion rather than treated as a failure.
 
@@ -1399,14 +1380,15 @@ execution is ordered:
 
 ```text
 Experiment 13A = 90 AllResiduals rows
-Experiment 13B = 45 paired UnresolvedOnly + LayerClip0To1 rows
+Experiment 13B = 45 paired UnresolvedOnly + LayerClip0To1 strategies * 3 epsilons = 135 rows
 ```
 
-Every 13B row must share a stable `pair_id` with its clipped 13A counterpart.
+Every 13B row must share a stable `pair_id` with its clipped 13A counterpart;
+`row_id` additionally encodes its epsilon and remains unique.
 Paired rows must match on construction
 policy, layer schedule, repair candidate budget, layer normalization, fixed
 settings, seed rules, and `finish_threshold`. They differ only in experiment
-phase, residual-population behavior, and the presence of the frozen
+phase, residual-population behavior, and the fixed experimental
 `eligibility_epsilon` mask. The 45 `FinalClipOnly` rows remain 13A-only
 normalization controls.
 
@@ -1414,22 +1396,22 @@ The 21 repair-containing construction policies receive:
 
 ```text
 13A: 21 policies * 2 repair budgets * 2 normalization policies = 84 rows
-13B: 21 policies * 2 repair budgets * 1 normalization policy = 42 rows
-= 126 rows
+13B: 21 policies * 2 repair budgets * 1 normalization policy * 3 epsilons = 126 rows
+= 210 rows
 ```
 
 The three pure-prototype policies receive:
 
 ```text
 13A: 3 policies * 1 Null budget * 2 normalization policies = 6 rows
-13B: 3 policies * 1 Null budget * 1 normalization policy = 3 rows
-= 9 rows
+13B: 3 policies * 1 Null budget * 1 normalization policy * 3 epsilons = 9 rows
+= 15 rows
 ```
 
 Main-grid total:
 
 ```text
-126 + 9 = 135 rows
+210 + 15 = 225 rows
 ```
 
 The 21 repair-containing policies are:
@@ -1664,26 +1646,17 @@ F_{\rho,d,s}(\epsilon)
 This rule is an operational calibration policy, not a claim of theoretical or
 perceptual optimality. Do not choose an epsilon by visual inspection.
 
-Write the selected value, exact supporting statistics, checkpoint definition,
-candidate set, and selection-rule version to `epsilon_selection.json` before any
-full Experiment 13B run begins.
+Write the automatic result, exact supporting statistics, checkpoint definition,
+candidate set, and selection-rule version to `epsilon_selection.json` before
+Experiment 13B begins. This preserves the 13A calibration decision even when it
+does not select a passing value.
 
-If no candidate satisfies all three conditions:
-
-1. write `selection_passed = false` and do not silently relax the rule;
-2. run a limited 13B pilot at `0.001` and `0.0025` using:
-
-```text
-BroadMeanGlobalRepairInterleaved
-BroadMeanGlobalRepairTwoPhase
-ClusterMeanHardRepairTwoPhase
-FinishRepairRescue
-```
-
-3. require an explicit documented threshold decision before launching all 90
-   Experiment 13B rows. The decision must update `epsilon_selection.json` with
-   the selected epsilon, `selection_override = true`, the pilot evidence,
-   rationale, decision timestamp, and `selection_passed = true`.
+If no candidate satisfies all three conditions, write
+`selection_passed = false` and do not silently relax the rule. The fixed 13B
+sweep may still proceed because it evaluates three explicit thresholds rather
+than claiming that the calibration selected one. The legacy restricted-pilot
+and override interfaces remain available for compatibility, but they are not
+part of the main sweep workflow.
 
 ### Required calibration plots
 
@@ -1819,7 +1792,8 @@ The report should be findings-first and follow the actual execution order:
 
 1. Experiment 13A unfiltered construction results;
 2. Experiment 13A epsilon calibration;
-3. the selected eligibility epsilon and exact supporting training statistics;
+3. the automatic eligibility-calibration result, fixed 13B epsilon sweep, and
+   exact supporting training statistics;
 4. Experiment 13B paired filtered results;
 5. `AllResiduals` versus `UnresolvedOnly` paired effects;
 6. prototype-containing policies versus observed-residual anchors;
@@ -1949,8 +1923,9 @@ retained_unexplained_energy_fraction
 zero_total_energy
 ```
 
-When automatic selection fails, `selected_epsilon` must be `Null` until an
-explicit pilot-based override is documented.
+When automatic selection fails, `selected_epsilon` remains `Null`. The 13B
+sweep values are recorded separately and must not be represented as a selection
+override.
 
 `epsilon_selection.json` must contain at least:
 
@@ -1992,6 +1967,8 @@ residual_population_policy
 finish_threshold
 eligibility_epsilon
 eligibility_selection_rule_version
+eligibility_epsilon_sweep
+eligibility_epsilon_sweep_version
 utility_candidate_budget
 effective_candidate_budget_by_layer
 effective_candidate_budget_by_slot
@@ -2030,10 +2007,10 @@ Tests should verify:
   layers;
 - all seven active atom slots in a mixed-policy layer inherit that layer's Broad
   or Repair role;
-- exactly 90 13A `AllResiduals` rows and 45 paired 13B `UnresolvedOnly` rows;
-- the complete executed design contains exactly 135 rows;
-- every 13B row uses `LayerClip0To1` and has exactly one 13A counterpart with
-  identical paired settings;
+- exactly 90 13A `AllResiduals` rows and 135 paired 13B `UnresolvedOnly` rows;
+- the complete executed design contains exactly 225 rows;
+- every 13B row uses `LayerClip0To1`, carries one of the three fixed epsilon
+  values, and has exactly one 13A counterpart with identical paired settings;
 - the 45 `FinalClipOnly` rows remain 13A-only normalization controls and are not
   scheduled in 13B;
 - `AllResiduals` and `UnresolvedOnly` mask behavior;
@@ -2057,11 +2034,12 @@ Tests should verify:
 - coverage fractions, incoming energy shares, and unexplained energy shares are
   correct, including zero-denominator handling;
 - the selection checkpoint set excludes slot 7 and validation data;
-- epsilon selection is deterministic and all 13B rows use one identical value;
+- epsilon selection is deterministic, while 13B independently covers all 45
+  clipped strategies at `1e-2`, `1e-3`, and `1e-4`;
 - the pilot command is restricted to the prespecified rows and two tightest
   candidate epsilons;
-- 13B cannot start without a valid completed 13A selection artifact or documented
-  pilot-based override;
+- 13B cannot start without a valid completed 13A calibration artifact, but a
+  matching artifact with `selection_passed = false` is accepted;
 - pure-prototype rows require `Null`;
 - deterministic construction under a fixed seed;
 - empty unresolved populations terminate with remaining no-op atoms;

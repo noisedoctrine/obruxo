@@ -40,11 +40,13 @@ D = 16
 CONTROL_POINT_COUNT = 97
 RESERVED_ATOM = "NoOpAtom"
 ACTIVE_ATOMS_PER_LAYER = 7
-PHASE_EXPECTED_ROW_COUNTS = {"13A": 90, "13B": 45}
+PHASE_EXPECTED_ROW_COUNTS = {"13A": 90, "13B": 135}
 PHASE_NORMALIZATION_POLICIES = {
     "13A": ("FinalClipOnly", "LayerClip0To1"),
     "13B": ("LayerClip0To1",),
 }
+EXPERIMENT13B_ELIGIBILITY_EPSILONS = (0.01, 0.001, 0.0001)
+EXPERIMENT13B_SWEEP_VERSION = "experiment13b_fixed_epsilon_sweep_v1"
 SCALAR_SCHEMA = "PhaseAndResidualGain"
 PATH_SEARCH_POLICY = "Beam4Path"
 NO_DAMAGE_POLICY = "NoDamageOff"
@@ -340,12 +342,34 @@ def experiment13a_specs() -> list[StrategyRowSpec]:
     return _phase_specs("13A", None)
 
 
-def experiment13b_specs(eligibility_epsilon: float) -> list[StrategyRowSpec]:
-    return _phase_specs("13B", _validate_epsilon(eligibility_epsilon))
+def experiment13b_specs(
+    eligibility_epsilons: float | Sequence[float] = EXPERIMENT13B_ELIGIBILITY_EPSILONS,
+) -> list[StrategyRowSpec]:
+    values = (
+        (_validate_epsilon(eligibility_epsilons),)
+        if isinstance(eligibility_epsilons, (int, float))
+        else tuple(_validate_epsilon(value) for value in eligibility_epsilons)
+    )
+    if not values:
+        raise ValueError("Experiment 13B requires at least one eligibility epsilon")
+    if len(set(values)) != len(values):
+        raise ValueError("Experiment 13B eligibility epsilons must be unique")
+    rows_by_epsilon = [_phase_specs("13B", epsilon) for epsilon in values]
+    rows = [
+        rows_by_epsilon[epsilon_index][strategy_index]
+        for strategy_index in range(45)
+        for epsilon_index in range(len(values))
+    ]
+    expected = 45 * len(values)
+    if len(rows) != expected or len({row.row_id for row in rows}) != expected:
+        raise AssertionError(f"Experiment 13B sweep must contain {expected} unique rows")
+    return rows
 
 
-def all_strategy_specs(eligibility_epsilon: float) -> list[StrategyRowSpec]:
-    return experiment13a_specs() + experiment13b_specs(eligibility_epsilon)
+def all_strategy_specs(
+    eligibility_epsilons: float | Sequence[float] = EXPERIMENT13B_ELIGIBILITY_EPSILONS,
+) -> list[StrategyRowSpec]:
+    return experiment13a_specs() + experiment13b_specs(eligibility_epsilons)
 
 
 def _phase_specs(phase: ExperimentPhase, epsilon: float | None) -> list[StrategyRowSpec]:
@@ -357,7 +381,7 @@ def _phase_specs(phase: ExperimentPhase, epsilon: float | None) -> list[Strategy
                 pair_id = _pair_id(policy.name, budget, normalization)
                 row = StrategyRowSpec(
                     experiment_phase=phase,
-                    row_id=_row_id(phase, pair_id),
+                    row_id=_row_id(phase, pair_id, epsilon),
                     pair_id=pair_id,
                     construction_policy=policy.name,
                     construction_family=policy.family,
@@ -371,11 +395,11 @@ def _phase_specs(phase: ExperimentPhase, epsilon: float | None) -> list[Strategy
                     native_slot_roles=ANCHOR_SLOT_ROLES.get(policy.name),
                     topology_used_in_construction=policy.name == "FamilyBalancedRepair",
                     eligibility_epsilon=epsilon,
-                    eligibility_selection_rule_version=SELECTION_RULE_VERSION if phase == "13B" else None,
+                    eligibility_selection_rule_version=EXPERIMENT13B_SWEEP_VERSION if phase == "13B" else None,
                 )
                 validate_row_spec(row)
                 rows.append(row)
-    expected = PHASE_EXPECTED_ROW_COUNTS[phase]
+    expected = PHASE_EXPECTED_ROW_COUNTS["13A"] if phase == "13A" else 45
     if len(rows) != expected or len({row.row_id for row in rows}) != expected or len({row.pair_id for row in rows}) != expected:
         raise AssertionError(f"Experiment {phase} grid must contain {expected} unique rows and pairs")
     return rows
@@ -415,24 +439,31 @@ def validate_row_spec(row: StrategyRowSpec) -> None:
         if row.layer_normalization_policy != "LayerClip0To1":
             raise ValueError("13B must use LayerClip0To1")
         _validate_epsilon(row.eligibility_epsilon)
-        if row.eligibility_selection_rule_version != SELECTION_RULE_VERSION:
-            raise ValueError("13B must carry the frozen selection-rule version")
+        if row.eligibility_selection_rule_version != EXPERIMENT13B_SWEEP_VERSION:
+            raise ValueError("13B must carry the fixed epsilon-sweep version")
     else:
         raise ValueError(f"unsupported experiment phase: {row.experiment_phase}")
 
 
 def validate_pairing(rows_a: Sequence[StrategyRowSpec], rows_b: Sequence[StrategyRowSpec]) -> None:
     pairs_a = {row.pair_id: row for row in rows_a}
-    pairs_b = {row.pair_id: row for row in rows_b}
     expected_b = {
         pair_id for pair_id, row in pairs_a.items()
         if row.layer_normalization_policy == "LayerClip0To1"
     }
     if len(rows_a) != 90 or len(pairs_a) != 90:
         raise ValueError("Experiment 13A requires exactly 90 unique rows")
-    if len(rows_b) != 45 or len(pairs_b) != 45 or set(pairs_b) != expected_b:
-        raise ValueError("Experiment 13B requires the 45 LayerClip0To1 counterparts from Experiment 13A")
-    for pair_id, right in pairs_b.items():
+    expected_keys = {
+        (pair_id, epsilon)
+        for pair_id in expected_b
+        for epsilon in EXPERIMENT13B_ELIGIBILITY_EPSILONS
+    }
+    pairs_b = {(row.pair_id, _validate_epsilon(row.eligibility_epsilon)): row for row in rows_b}
+    if len(rows_b) != 135 or len(pairs_b) != 135 or set(pairs_b) != expected_keys:
+        raise ValueError(
+            "Experiment 13B requires all 45 LayerClip0To1 counterparts at each of the three fixed epsilons"
+        )
+    for (pair_id, _epsilon), right in pairs_b.items():
         left = pairs_a[pair_id]
         if left.paired_settings != right.paired_settings:
             raise ValueError(f"paired settings differ for {pair_id}")
@@ -594,15 +625,14 @@ def run_13b(
             selection_path,
             expected_run_identity=manifest["experiment13a_run_identity"],
             expected_configuration_fingerprint=manifest["configuration_fingerprint"],
-            require_passed=True,
+            require_passed=False,
         )
         _validate_13b_invocation(manifest, metadata_path, train_fraction, validation_fraction, sample_seed)
     except PhaseGateError as exc:
         _blocked_13b(output_dir, str(exc))
         raise
-    assert selection.selected_epsilon is not None
     return _run_phase(
-        phase="13B", specs=experiment13b_specs(selection.selected_epsilon), output_dir=output_dir,
+        phase="13B", specs=experiment13b_specs(), output_dir=output_dir,
         metadata_path=metadata_path, backend=backend, smoke=smoke,
         train_sample_fraction=train_fraction, validation_sample_fraction=validation_fraction,
         sample_seed=sample_seed, cache_dir=cache_dir, rebuild_cache=rebuild_cache,
@@ -717,6 +747,7 @@ def analyze_strategy_grid(*, run_dir: Path = DEFAULT_OUTPUT_DIR) -> dict[str, st
         raise AnalysisNotReadyError(
             f"analysis requires complete 13A and 13B phases; got 13A={status_a['state']} 13B={status_b['state']}"
         )
+    validate_completed_13b(run_dir)
     missing = [name for name in REQUIRED_ANALYSIS_FILES if not _nonempty(run_dir / name)]
     if missing:
         raise AnalysisNotReadyError("analysis inputs are incomplete: " + ", ".join(missing))
@@ -900,6 +931,11 @@ def _run_phase(
         phase, "running", identity, len(rows), expected_row_count,
         smoke, row_ids is not None, "loading dataset",
     )
+    if phase == "13B":
+        status.update(
+            eligibility_epsilon_sweep=list(EXPERIMENT13B_ELIGIBILITY_EPSILONS),
+            eligibility_epsilon_sweep_version=EXPERIMENT13B_SWEEP_VERSION,
+        )
     status.update(
         rows={row.row_id: {"status": "pending"} for row in rows},
         current_row_id="", current_row_number=0, current_task_phase="dataset_load",
@@ -1189,14 +1225,23 @@ def _write_strategy_analysis(run_dir: Path) -> dict[str, str]:
 
     run_dir = Path(run_dir)
     rows = read_csv(run_dir / "summary.csv")
-    by_phase_pair = {(row.get("experiment_phase"), row.get("pair_id")): row for row in rows}
+    phase_a_by_pair = {
+        str(row.get("pair_id")): row for row in rows if row.get("experiment_phase") == "13A"
+    }
     paired = []
-    for pair_id in sorted({row.get("pair_id") for row in rows}):
-        left, right = by_phase_pair.get(("13A", pair_id)), by_phase_pair.get(("13B", pair_id))
-        if not left or not right:
+    phase_b_rows = sorted(
+        (row for row in rows if row.get("experiment_phase") == "13B"),
+        key=lambda row: (str(row.get("pair_id")), float(row.get("eligibility_epsilon") or 0.0)),
+    )
+    for right in phase_b_rows:
+        pair_id = str(right.get("pair_id"))
+        left = phase_a_by_pair.get(pair_id)
+        if not left:
             continue
         paired.append({
             "pair_id": pair_id,
+            "experiment13b_row_id": right.get("row_id", ""),
+            "eligibility_epsilon": right.get("eligibility_epsilon", ""),
             "construction_policy": left.get("construction_policy", ""),
             "utility_candidate_budget": left.get("utility_candidate_budget", ""),
             "layer_normalization_policy": left.get("layer_normalization_policy", ""),
@@ -1217,8 +1262,8 @@ def _write_strategy_analysis(run_dir: Path) -> dict[str, str]:
     ordered_b = sorted((row for row in rows if row.get("experiment_phase") == "13B"), key=lambda row: float(row["validation_p95_rmse"]))
     lines = [
         "# Experiment 13: Fixed-W8D16 Strategy Grid", "", "## Main Findings", "",
-        "Experiment 13A completed first using `AllResiduals`. The eligibility epsilon was then selected only from the completed 13A training calibration artifacts, frozen, and used by Experiment 13B's 45 paired `UnresolvedOnly` + `LayerClip0To1` rows.", "",
-        f"The frozen eligibility epsilon is `{selection.get('selected_epsilon')}` under `{selection.get('selection_rule_version')}`. Median retired unexplained-error energy was `{selection.get('median_unexplained_retired_energy_fraction')}` and P95 was `{selection.get('p95_unexplained_retired_energy_fraction')}`.", "",
+        "Experiment 13A completed first using `AllResiduals`. Experiment 13B then evaluated every clipped strategy independently at eligibility epsilons `1e-2`, `1e-3`, and `1e-4`, producing 135 `UnresolvedOnly` + `LayerClip0To1` rows.", "",
+        f"The automatic 13A selector recorded `selection_passed={selection.get('selection_passed')}`. It is retained as calibration provenance, not used to label one threshold as selected; the 13B sweep is exploratory and was fixed after 13A completed under `{EXPERIMENT13B_SWEEP_VERSION}`.", "",
         _best_row_sentence("13A", ordered_a), "", _best_row_sentence("13B", ordered_b), "",
         "The tables and plots retain the co-primary metrics separately; no automatic scalar ranking is applied.", "",
         "## Experiment 13A Unfiltered Results", "", *_top_rows_table(ordered_a), "",
@@ -1231,7 +1276,7 @@ def _write_strategy_analysis(run_dir: Path) -> dict[str, str]:
         "![Incoming and unexplained retired energy](./images/experiment_13/incoming_vs_unexplained_energy.png)", "",
         "## Experiment 13B Filtered Results", "", *_top_rows_table(ordered_b), "",
         "## AllResiduals Versus UnresolvedOnly", "",
-        f"Paired deltas for all `{len(paired)}` stable pairs are available in `{paired_path.name}`. Negative RMSE deltas favor the filtered Experiment 13B construction.", "",
+        f"Paired deltas for all `{len(paired)}` strategy-by-epsilon comparisons are available in `{paired_path.name}`. Negative RMSE deltas favor the filtered Experiment 13B construction.", "",
         _paired_delta_sentence(paired), "",
         "## Prototype Policies Versus Observed-Residual Anchors", "", *_factor_table(rows, "construction_family"), "",
         "## Interleaved Versus TwoPhase", "", *_factor_table(rows, "layer_schedule"), "",
@@ -1318,14 +1363,16 @@ def _best_row_sentence(phase: str, rows: list[dict[str, Any]]) -> str:
     if not rows:
         return f"No completed {phase} rows were available."
     row = rows[0]
-    return f"The lowest validation P95 RMSE in {phase} is `{row.get('validation_p95_rmse')}` from `{row.get('construction_policy')}` with `{row.get('utility_candidate_budget')}` and `{row.get('layer_normalization_policy')}`; its validation median is `{row.get('validation_median_rmse')}`."
+    epsilon = f" at epsilon `{row.get('eligibility_epsilon')}`" if phase == "13B" else ""
+    return f"The lowest validation P95 RMSE in {phase} is `{row.get('validation_p95_rmse')}` from `{row.get('construction_policy')}` with `{row.get('utility_candidate_budget')}` and `{row.get('layer_normalization_policy')}`{epsilon}; its validation median is `{row.get('validation_median_rmse')}`."
 
 
 def _top_rows_table(rows: list[dict[str, Any]]) -> list[str]:
-    lines = ["| Policy | Budget | Normalization | Median RMSE | Strict perfect | P95 RMSE | Node-max P95 |", "|---|---|---|---:|---:|---:|---:|"]
+    lines = ["| Policy | Budget | Normalization | Eligibility epsilon | Median RMSE | Strict perfect | P95 RMSE | Node-max P95 |", "|---|---|---|---:|---:|---:|---:|---:|"]
     for row in rows[:10]:
         lines.append(
             f"| {row.get('construction_policy', '')} | {row.get('utility_candidate_budget', '')} | {row.get('layer_normalization_policy', '')} | "
+            f"{row.get('eligibility_epsilon', '')} | "
             f"{row.get('validation_median_rmse', '')} | {row.get('validation_strict_perfect_lfo_rate', '')} | {row.get('validation_p95_rmse', '')} | {row.get('validation_node_max_error_p95', '')} |"
         )
     return lines
@@ -1551,6 +1598,58 @@ def validate_completed_13a(run_dir: Path) -> tuple[dict[str, Any], dict[str, Any
     return manifest, status
 
 
+def validate_completed_13b(run_dir: Path) -> tuple[dict[str, Any], dict[str, Any]]:
+    manifest, _ = validate_completed_13a(run_dir)
+    status = read_phase_status(run_dir, "13B")
+    phase = manifest.get("phases", {}).get("13B")
+    if not isinstance(phase, dict) or status["state"] != "complete":
+        raise PhaseGateError(f"Experiment 13B is not complete: state={status['state']}")
+    if (
+        status.get("experiment13a_run_identity") != manifest.get("experiment13a_run_identity")
+        or status.get("row_count") != 135
+        or status.get("expected_row_count") != 135
+        or status.get("completed_rows") != 135
+        or status.get("failed_rows") != 0
+        or status.get("smoke")
+        or status.get("filtered")
+        or not str(status.get("completed_at_utc") or "").strip()
+    ):
+        raise PhaseGateError("Experiment 13B completion gate requires all 135 sweep rows")
+    if (
+        not phase.get("complete_design")
+        or phase.get("row_count") != 135
+        or phase.get("expected_row_count") != 135
+        or phase.get("smoke")
+        or phase.get("filtered")
+        or phase.get("eligibility_epsilon_sweep_version") != EXPERIMENT13B_SWEEP_VERSION
+        or not _json_equivalent(
+            phase.get("eligibility_epsilon_sweep"), list(EXPERIMENT13B_ELIGIBILITY_EPSILONS)
+        )
+    ):
+        raise PhaseGateError("Experiment 13B manifest does not represent the complete fixed epsilon sweep")
+    run_identity = str(manifest.get("experiment13a_run_identity") or "")
+    fingerprint = str(manifest.get("configuration_fingerprint") or "")
+    expected_by_id = {
+        row.row_id: row.manifest_dict(run_identity, fingerprint) for row in experiment13b_specs()
+    }
+    rows = phase.get("rows")
+    if not isinstance(rows, list) or len(rows) != 135:
+        raise PhaseGateError("Experiment 13B manifest must contain exactly 135 row manifests")
+    actual_by_id = {
+        str(row.get("row_id")): row for row in rows if isinstance(row, dict) and row.get("row_id")
+    }
+    if len(actual_by_id) != 135 or set(actual_by_id) != set(expected_by_id):
+        raise PhaseGateError("Experiment 13B manifest row set is incomplete or incompatible")
+    for row_id, expected in expected_by_id.items():
+        actual = actual_by_id[row_id]
+        mismatched = [key for key, value in expected.items() if not _json_equivalent(actual.get(key), value)]
+        if mismatched:
+            raise PhaseGateError(
+                f"Experiment 13B row manifest is incompatible for {row_id}: {', '.join(mismatched)}"
+            )
+    return manifest, status
+
+
 def read_phase_status(run_dir: Path, phase: ExperimentPhase) -> dict[str, Any]:
     path = Path(run_dir) / PHASE_STATUS_FILES[phase]
     if not path.exists():
@@ -1630,7 +1729,7 @@ def _write_phase_manifest(
     manifest["configuration_fingerprint"] = fingerprint
     rows = [row.manifest_dict(run_identity, fingerprint) for row in specs]
     expected_row_count = PHASE_EXPECTED_ROW_COUNTS[phase]
-    manifest["phases"][phase] = {
+    phase_manifest = {
         "experiment_phase": phase,
         "row_count": len(rows),
         "expected_row_count": expected_row_count,
@@ -1658,6 +1757,13 @@ def _write_phase_manifest(
         "resumed": bool(resume),
         "rows": rows,
     }
+    if phase == "13B":
+        phase_manifest.update(
+            eligibility_epsilon_sweep=list(EXPERIMENT13B_ELIGIBILITY_EPSILONS),
+            eligibility_epsilon_sweep_version=EXPERIMENT13B_SWEEP_VERSION,
+            epsilon_axis_kind="exploratory_fixed_sweep",
+        )
+    manifest["phases"][phase] = phase_manifest
     _write_json(manifest_path, manifest)
 
 
@@ -1783,8 +1889,12 @@ def _pair_id(policy: str, budget: str | None, normalization: str) -> str:
     return f"x13_pair_{_slug(policy)}_{_slug(budget or 'Null')}_{_slug(normalization)}"
 
 
-def _row_id(phase: ExperimentPhase, pair_id: str) -> str:
-    return f"{'x13a' if phase == '13A' else 'x13b'}_{pair_id.removeprefix('x13_pair_')}"
+def _row_id(phase: ExperimentPhase, pair_id: str, epsilon: float | None = None) -> str:
+    prefix = f"{'x13a' if phase == '13A' else 'x13b'}_{pair_id.removeprefix('x13_pair_')}"
+    if phase == "13A":
+        return prefix
+    value = f"{_validate_epsilon(epsilon):.0e}".replace("-", "_").replace("+", "")
+    return f"{prefix}_epsilon_{value}"
 
 
 def _slug(value: str) -> str:

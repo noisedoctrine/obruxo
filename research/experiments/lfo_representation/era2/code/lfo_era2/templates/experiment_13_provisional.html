@@ -499,7 +499,7 @@
     const truthy = value => value === true || ["true","1","yes"].includes(String(value).toLowerCase());
     const COLORS = {accent:"#147e67", blue:"#286db7", warn:"#a86100", danger:"#b63b34", blocked:"#7741a5"};
     const STATUS = {
-      "strong provisional": {color: COLORS.accent}, "strong 13A": {color: COLORS.accent}, complete: {color: COLORS.accent}, diagnostic: {color: COLORS.blue}, mixed: {color: COLORS.warn}, unresolved: {color: COLORS.warn}, blocked: {color: COLORS.blocked}, "pilot required": {color: COLORS.blocked}, "bounded ablation": {color: COLORS.blue}, "same-run only": {color: COLORS.blue}, "historical only": {color: COLORS.danger}
+      "strong provisional": {color: COLORS.accent}, "strong 13A": {color: COLORS.accent}, complete: {color: COLORS.accent}, diagnostic: {color: COLORS.blue}, mixed: {color: COLORS.warn}, unresolved: {color: COLORS.warn}, blocked: {color: COLORS.blocked}, "sweep planned": {color: COLORS.blue}, "bounded ablation": {color: COLORS.blue}, "same-run only": {color: COLORS.blue}, "historical only": {color: COLORS.danger}
     };
     const findings = DATA.findings;
     const metrics = DATA.tables.metrics;
@@ -671,7 +671,7 @@
         question:"Does decoder-free LayerClip0To1 suppress tail error across the complete strategy grid?",
         mechanism:"LayerClip0To1 constrains every residual-layer output to the physical signal range, preventing overshoot from compounding before later corrections.",
         evidence:comparisonEvidence("layer_normalization_policy", "LayerClip0To1", "FinalClipOnly"),
-        recommendation:"Lock Experiment 13B to the 45 LayerClip0To1 counterparts. Retain every construction, schedule, and applicable budget cell; do not rerun FinalClipOnly.",
+        recommendation:"Lock Experiment 13B to the 45 LayerClip0To1 counterparts, then run each at 1e-2, 1e-3, and 1e-4. Retain every construction, schedule, and applicable budget cell; do not rerun FinalClipOnly.",
         limitation:"The effect is authoritative for AllResiduals construction; its interaction with UnresolvedOnly still requires 13B.", charts:["normalization"]
       },
       {
@@ -725,13 +725,13 @@
         limitation:"These are cross-strategy associations with design confounding; only matched interventions support stronger causal language.", charts:["diagnostics"]
       },
       {
-        id:"calibration", number:12, zone:"Eligibility", status:"pilot required", title:"Eligibility calibration", stat:`best early/middle ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,2)}`,
+        id:"calibration", number:12, zone:"Eligibility", status:isComplete13A ? "sweep planned" : "blocked", title:"Eligibility calibration", stat:`best early/middle ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,2)}`,
         question:"How many LFOs can stop consuming later construction capacity, at what depth, and at what tolerance?",
         mechanism:"An LFO whose reconstruction error is below ε becomes eligible to retire from later atom construction. The LFO-reduction percentage is therefore the share of the construction population freed from competing for later codebook capacity.",
         motivation:"Depth determines the value of retirement. Retiring 5% after layer 8 removes that 5% from layers 9–16; reaching 5% only at layer 16 proves endpoint accuracy but frees no remaining layers. The selector also checks that retired LFOs carry little unexplained energy.",
         reading:["The layer-8 plot measures useful mid-run population reduction; higher means more later construction work can focus on unresolved LFOs.","The layer-16 plot measures endpoint eligibility. Compare it with layer 8 to see whether a family solves LFOs early or only near the end.","In the tolerance matrices, each column is a plain-language retirement target and each cell is the exact ε required to reach it.","Global filters recompute every family median from only the in-scope strategy rows."],
         evidence:`All candidates satisfy the retired unexplained-energy limits, but the maximum early/middle median reconstructed fraction is ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,3)}, below the required ${pct(findings.selection.required_early_middle_fraction,0)}.`,
-        recommendation:"Run the prescribed 0.001 versus 0.0025 restricted pilot before freezing epsilon or launching the 45-row LayerClip0To1-only 13B phase.",
+        recommendation:isComplete13A ? "Run all 45 clipped strategies independently at 1e-2, 1e-3, and 1e-4. Treat the resulting 135 rows as an exploratory epsilon sweep, not as evidence that 13A selected one threshold." : "Complete all 90 Experiment 13A rows before using the fixed three-epsilon 13B sweep.",
         limitation:"These are counterfactual 13A training calibrations, not measured 13B savings. No epsilon is selected and the endpoint layer-16 percentage should not be described as capacity saved.", charts:["capacity-8","capacity-16","capacity-matrix","tolerance-matrix-8","tolerance-matrix-16","retirement"]
       },
       {
@@ -1016,7 +1016,7 @@
         ? "of the planned Experiment 13A AllResiduals grid completed"
         : "of Experiment 13A rows completed in a non-random execution-order prefix";
       qs("#warning-strip").innerHTML = isComplete13A
-        ? `<strong>13B is still gated.</strong> Automatic epsilon selection did not pass: best early/middle coverage is ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,3)} versus the required ${pct(findings.selection.required_early_middle_fraction,0)}. Run the restricted pilot before freezing epsilon; the subsequent phase contains 45 LayerClip0To1-only rows.`
+        ? `<strong>13B is ready for the fixed sweep.</strong> Automatic epsilon selection did not pass: best early/middle coverage is ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,3)} versus the required ${pct(findings.selection.required_early_middle_fraction,0)}. The next phase therefore evaluates 45 LayerClip0To1 strategies independently at 1e-2, 1e-3, and 1e-4 for 135 rows.`
         : `<strong>Do not select epsilon from this report.</strong> Experiment 13A is incomplete, no eligibility epsilon has been frozen, and Experiment 13B has not run. Legacy runtime is historical diagnostic evidence only.`;
       qs("#findings-title").textContent = isComplete13A ? "What the complete 13A grid supports" : "What the fragment actually supports";
       qs("#findings-summary").textContent = isComplete13A
@@ -1030,7 +1030,7 @@
       qs("#compare-summary").textContent = isComplete13A
         ? "Radar values are normalized within the complete 90-row 13A grid. The exact table is authoritative; the radar is a visual aid, not a scalar ranking."
         : "Radar values are normalized only within this fragment. The exact table is authoritative; the radar is a visual aid, not a scalar ranking.";
-      qs("#footer-status").textContent = isComplete13A ? "Experiment 13A · Complete AllResiduals evidence; 45-row LayerClip0To1-only 13B pending." : "Experiment 13 · Provisional evidence only.";
+      qs("#footer-status").textContent = isComplete13A ? "Experiment 13A · Complete AllResiduals evidence; 135-row LayerClip0To1 epsilon sweep pending." : "Experiment 13 · Provisional evidence only.";
       const contract = meta.contract;
       const chips = [`W${contract.window_width}D${contract.residual_layers}`, `${contract.control_points} control points`, `${contract.base_choices} base choices`, `${contract.atom_choices} atom choices`, contract.path_search, contract.scalar_context, `${contract.model_outputs} outputs`];
       qs("#contract-row").innerHTML = chips.map(value => `<span class="chip">${esc(value)}</span>`).join("");

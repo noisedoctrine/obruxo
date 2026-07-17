@@ -5,7 +5,7 @@
 ## Main Findings
 
 Layer-wise clipping is the clearest global result. `LayerClip0To1` improves validation P95 RMSE in `45/45` matched pairs, with median delta `-0.0069147758` and range `-0.020405114` to `-0.00089984387`. It is a decoder-free constraint and changes no model prediction heads.
-This complete 13A result fixes Experiment 13B at `LayerClip0To1`. The filtered phase retains every construction, schedule, and applicable candidate-budget cell while omitting the 45 losing `FinalClipOnly` counterparts, reducing 13B from 90 to 45 rows.
+This complete 13A result fixes Experiment 13B at `LayerClip0To1`. The filtered phase retains the 45 clipped construction, schedule, and applicable candidate-budget cells, then evaluates each independently at eligibility epsilons `1e-2`, `1e-3`, and `1e-4` for 135 rows. The sweep is exploratory because it was fixed after 13A completed and `1e-4` was not in the original calibration candidate set.
 
 A larger repair shortlist is a secondary, mixed lever. `CandidateBudget48` improves `25/42`, worsens `13`, and ties `4` P95 comparisons; its median effect is only `-0.00043479912`. More offline search is not a guaranteed quality win.
 
@@ -13,7 +13,7 @@ A larger repair shortlist is a secondary, mixed lever. `CandidateBudget48` impro
 
 The quality frontier has three distinct jobs rather than one universal winner: `AllClusterMeans + LayerClip0To1` gives the lowest P95 RMSE; `DiverseCoverageHardRepairTwoPhase + CandidateBudget48 + LayerClip0To1` gives the best median RMSE and node-max P95; and the clipped `CommonCaseRepair + CandidateBudget24` anchor preserves the highest strict-perfect rate.
 
-The automatic epsilon rule did not pass. All candidates satisfy the retired unexplained-energy limits, but the best early/middle median reconstructed fraction is only `2.054%`, below the required `5%`. The prescribed `0.001` versus `0.0025` restricted pilot is therefore required before 13B.
+The automatic epsilon rule did not pass. All candidates satisfy the retired unexplained-energy limits, but the best early/middle median reconstructed fraction is only `2.054%`, below the required `5%`. Experiment 13B therefore treats epsilon as an exploratory sweep axis at `1e-2`, `1e-3`, and `1e-4` rather than claiming one selected threshold.
 
 ## Research Questions
 
@@ -272,7 +272,7 @@ Eligibility is framed as LFO population reduction: the percentage of already-sol
 
 ![Slot-level reconstructed fractions](images/experiment_13/13a/slot_coverage.png)
 
-The retirement plots ask whether excluding more LFOs would abandon meaningful unexplained residual energy. The desired direction is lower-right: more LFOs retired with less unexplained energy. The energy safety criteria pass, but the coverage criterion does not, so these plots motivate the pilot rather than an epsilon override.
+The retirement plots ask whether excluding more LFOs would abandon meaningful unexplained residual energy. The desired direction is lower-right: more LFOs retired with less unexplained energy. The energy safety criteria pass, but the coverage criterion does not, so these plots motivate measuring a threshold sweep rather than declaring an epsilon winner.
 
 ![Retired fraction versus unexplained energy](images/experiment_13/13a/retired_fraction_vs_energy.png)
 
@@ -303,12 +303,12 @@ CandidateBudget48 exactly doubles deterministic repair-candidate evaluation rela
 
 ## Practical Takeaways
 
-- Lock Experiment 13B to the 45 `LayerClip0To1` counterparts; do not rerun `FinalClipOnly`.
+- Lock Experiment 13B to the 45 `LayerClip0To1` counterparts and evaluate each at `1e-2`, `1e-3`, and `1e-4` for 135 rows; do not rerun `FinalClipOnly`.
 - Carry all three Pareto strategies into the 13B interpretation; no scalar winner represents all four quality objectives.
 - Treat CandidateBudget48 and TwoPhase as interaction-dependent choices, not unconditional defaults.
 - Preserve all seven active atoms and all 16 residual layers for 13B; 13A shows diminishing returns, not dead capacity.
 - Use overshoot, no-op, gain-use, duplicate, and convergence diagnostics to explain results, not to replace matched quality evidence.
-- Run the prescribed restricted epsilon pilot before any full Experiment 13B launch.
+- Run the fixed 135-row Experiment 13B sweep and interpret epsilon as an explicit factor, not a selected scalar.
 - Do not compare legacy and optimized wall-clock timings or claim a general 50%-training scaling law from the 39-row prefix.
 
 ## Method Notes and Generated Artifacts

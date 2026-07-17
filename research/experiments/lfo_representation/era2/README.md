@@ -222,10 +222,10 @@ Experiment 12 artifacts are written under
 `era2/reports/images/experiment_12/`.
 
 Experiment 13 is implemented at `era2/code/experiment13_strategy_grid.py`. It
-executes the paired 90-row 13A and 90-row 13B grids, including synthesized broad
-atoms, observed-residual repair atoms, resumable row artifacts, phase/slot
-calibration, deterministic epsilon selection, the restricted fallback pilot,
-paired analysis, and the canonical report required by
+executes the 90-row 13A grid followed by 135 clipped-only 13B rows spanning the
+45 paired strategies at eligibility epsilons `1e-2`, `1e-3`, and `1e-4`,
+including synthesized broad atoms, observed-residual repair atoms, resumable row
+artifacts, phase/slot calibration, paired analysis, and the canonical report required by
 [EXPERIMENT_13_PLAN.md](./experiments/EXPERIMENT_13_PLAN.md). The Windows
 `--async` path launches a background runner, captures stdout/stderr under the
 Experiment 13 `launcher_logs` directory, and opens a live status/event monitor.
@@ -237,11 +237,11 @@ hold a scoped Windows system-required execution state without controlling
 PowerToys Awake. Use `status` to inspect `not_started`, `running`, `partial`,
 `blocked`, `failed`, `cancelled`, and `complete` phase states.
 
-If automatic epsilon selection does not pass, run the restricted pilot and then
-record the explicit decision with `override-epsilon --selected-epsilon 0.001
---rationale "..."`. The override command validates that the chosen value is
-covered by completed pilot artifacts before it updates the frozen selection and
-unblocks `run-13b`.
+Automatic epsilon selection remains a recorded 13A calibration diagnostic. A
+matching artifact with `selection_passed=false` does not block `run-13b`, because
+13B evaluates the three fixed thresholds as an explicit experimental axis rather
+than claiming one selected value. Legacy pilot and override commands remain for
+backward compatibility but are not part of the main runbook.
 
 Run tests with:
 
