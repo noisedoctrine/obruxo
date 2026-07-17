@@ -121,7 +121,7 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             payload_match = re.search(r'<script id="report-data" type="application/json">(.*?)</script>', html, re.DOTALL)
             self.assertIsNotNone(payload_match)
             payload = json.loads(payload_match.group(1))
-            self.assertEqual(payload["schema_version"], "experiment13_interactive_report_v4")
+            self.assertEqual(payload["schema_version"], "experiment13_interactive_report_v5")
             self.assertEqual(payload["meta"]["completed_rows"], 8)
             self.assertEqual(payload["meta"]["expected_rows"], 90)
             self.assertFalse(payload["meta"]["epsilon_selected"])
@@ -275,6 +275,10 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             self.assertEqual(payload["strict_thresholds"]["tolerances"], ["1e-2", "1e-3", "1e-4", "1e-5"])
             self.assertEqual(len(payload["strict_thresholds"]["rates_by_row"]), 90)
             self.assertIn("chartStrictThresholds", html)
+            self.assertIn("chartCapacityDepth", html)
+            self.assertIn("chartCapacityMatrix", html)
+            self.assertIn("chartToleranceMatrix", html)
+            self.assertIn("layer_coverage_by_row", payload["calibration"])
             self.assertIn("strict_perfect_threshold_sensitivity.png", text)
             self.assertEqual(len(runtime.read_csv(analysis / "training_data_scaling_ablation.csv")), 4)
             self.assertEqual(len(runtime.read_csv(analysis / "strategy_diagnostics.csv")), 90)
@@ -365,12 +369,17 @@ def _write_complete_13a_report_fixture(
             for active in range(1, 8)
         )
         common = {"experiment_phase": "13A", "row_id": spec.row_id, "pair_id": spec.pair_id, "dataset_split": "training"}
-        layer_quantiles.append({**common, "residual_layer": 1, "percentile": 0.5, "epsilon_value": 0.01})
+        for depth in (8, 16):
+            for target in (0.1, 0.5):
+                layer_quantiles.append({**common, "residual_layer": depth, "percentile": target, "epsilon_value": 0.01 / depth + target * 0.001})
         slot_quantiles.append({**common, "residual_layer": 1, "active_atom_slot": 1, "percentile": 0.5, "epsilon_value": 0.01})
         coverage.extend([
             {**common, "residual_layer": 1, "active_atom_slot": "", "epsilon": 0.001, "resolved_fraction": 0.02},
             {**common, "residual_layer": 1, "active_atom_slot": 1, "epsilon": 0.001, "resolved_fraction": 0.02},
         ])
+        for depth in (8, 16):
+            for epsilon in (0.001, 0.0025):
+                coverage.append({**common, "residual_layer": depth, "active_atom_slot": "", "epsilon": epsilon, "resolved_fraction": 0.02 + depth * epsilon})
         retired.append({
             **common,
             "residual_layer": 1,

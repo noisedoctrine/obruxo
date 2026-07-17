@@ -31,9 +31,9 @@ CALIBRATION_TABLES = (
     "epsilon_coverage.csv",
     "retired_error_mass.csv",
 )
-INTERACTIVE_REPORT_SCHEMA = "experiment13_interactive_report_v4"
+INTERACTIVE_REPORT_SCHEMA = "experiment13_interactive_report_v5"
 INTERACTIVE_TEMPLATE = Path(__file__).with_name("templates") / "experiment_13_provisional.html"
-COMPLETE_13A_REPORT_SCHEMA = "experiment13_complete_13a_report_v3"
+COMPLETE_13A_REPORT_SCHEMA = "experiment13_complete_13a_report_v4"
 
 
 @dataclass(frozen=True)
@@ -954,9 +954,19 @@ def _write_plots(
         _plot_runtime(plt, paths["runtime"], bundle.summaries)
     else:
         _plot_current_runtime(plt, paths["runtime"], bundle.summaries)
-    _plot_quantiles(plt, paths["layer_quantiles"], bundle.calibration["layer_epsilon_quantiles.csv"], "residual_layer", "Completed-layer epsilon quantiles")
+    _plot_family_tolerance_depths(
+        plt,
+        paths["layer_quantiles"],
+        bundle.calibration["layer_epsilon_quantiles.csv"],
+        bundle.summaries,
+    )
     _plot_quantiles(plt, paths["slot_quantiles"], bundle.calibration["slot_epsilon_quantiles.csv"], "active_atom_slot", "Slot-level epsilon quantiles")
-    _plot_coverage(plt, paths["layer_coverage"], bundle.calibration["epsilon_coverage.csv"], completed=True)
+    _plot_family_coverage_depths(
+        plt,
+        paths["layer_coverage"],
+        bundle.calibration["epsilon_coverage.csv"],
+        bundle.summaries,
+    )
     _plot_coverage(plt, paths["slot_coverage"], bundle.calibration["epsilon_coverage.csv"], completed=False)
     _plot_retired(plt, paths["retired"], bundle.calibration["retired_error_mass.csv"])
     _plot_energy(plt, paths["energy"], bundle.calibration["retired_error_mass.csv"])
@@ -1114,8 +1124,8 @@ def _plot_quantiles(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]], x_k
     figure, axis = plt.subplots(figsize=(8.2, 4.8))
     for percentile in sorted({key[0] for key in grouped}, reverse=True):
         x = sorted(key[1] for key in grouped if key[0] == percentile)
-        axis.plot(x, [median(grouped[(percentile, value)]) for value in x], marker="o", markersize=3, label=f"q={percentile:g}")
-    axis.set(xlabel=x_key.replace("_", " "), ylabel="median epsilon value", title=title)
+        axis.plot(x, [median(grouped[(percentile, value)]) for value in x], marker="o", markersize=3, label=f"retire {percentile:.1%} of LFOs")
+    axis.set(xlabel=x_key.replace("_", " "), ylabel="median tolerance required", title=title)
     axis.legend(fontsize=7, ncol=2)
     _save(plt, figure, path)
 
@@ -1137,10 +1147,99 @@ def _plot_coverage(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]], *, c
         axis.plot(x, [median(grouped[(epsilon, value)]) for value in x], marker="o", markersize=3, label=f"{epsilon:g}")
     axis.set(
         xlabel="residual layer" if completed else "active atom slot",
-        ylabel="median reconstructed fraction (higher means more curves below epsilon)",
-        title="Completed-layer reconstructed fractions" if completed else "Slot-level reconstructed fractions",
+        ylabel="median LFO reduction (higher means more curves retired)",
+        title="Completed-layer LFO reduction" if completed else "Slot-level LFO reduction",
     )
     axis.legend(fontsize=7, ncol=3)
+    _save(plt, figure, path)
+
+
+def _plot_family_coverage_depths(
+    plt: Any,
+    path: Path,
+    rows: Sequence[Mapping[str, Any]],
+    summaries: Sequence[Mapping[str, Any]],
+) -> None:
+    """Show how much of the construction population each tested tolerance removes."""
+    family_by_row = {str(row.get("row_id", "")): str(row.get("construction_family", "")) for row in summaries}
+    figure, axes = plt.subplots(1, 2, figsize=(14.8, 6.0), sharey=True)
+    families = sorted(set(family_by_row.values()))
+    colors = {family: plt.cm.tab20(index % 20) for index, family in enumerate(families)}
+    for axis, depth in zip(axes, (8, 16)):
+        depth_rows = [
+            row for row in rows
+            if row.get("dataset_split") == "training"
+            and row.get("active_atom_slot") in {None, "", "None"}
+            and int(_number(row, "residual_layer")) == depth
+        ]
+        epsilons = sorted({_number(row, "epsilon") for row in depth_rows})
+        for family in families:
+            family_rows = [row for row in depth_rows if family_by_row.get(str(row.get("row_id", ""))) == family]
+            family_epsilons = [epsilon for epsilon in epsilons if any(_number(row, "epsilon") == epsilon for row in family_rows)]
+            values = [
+                median(_number(row, "resolved_fraction") for row in family_rows if _number(row, "epsilon") == epsilon)
+                for epsilon in family_epsilons
+            ]
+            if values:
+                axis.plot(family_epsilons, values, marker="o", markersize=3, linewidth=1.2, label=family, color=colors[family])
+        axis.set_xscale("log")
+        axis.yaxis.set_major_formatter(plt.matplotlib.ticker.PercentFormatter(1.0))
+        axis.set(
+            xlabel="tested eligibility tolerance ε (log scale)",
+            title=(
+                "Layer 8: LFOs removed before layers 9–16"
+                if depth == 8 else
+                "Layer 16: endpoint LFOs meeting tolerance"
+            ),
+        )
+        axis.grid(True, alpha=0.25)
+    axes[0].set_ylabel("median LFO population reduction")
+    handles, labels = axes[0].get_legend_handles_labels()
+    if handles:
+        figure.legend(handles, labels, loc="center left", bbox_to_anchor=(0.83, 0.5), fontsize=8, frameon=False)
+    figure.suptitle("Eligibility capacity released at two construction depths")
+    figure.tight_layout(rect=(0, 0, 0.82, 0.96))
+    _save(plt, figure, path, tight=False)
+
+
+def _plot_family_tolerance_depths(
+    plt: Any,
+    path: Path,
+    rows: Sequence[Mapping[str, Any]],
+    summaries: Sequence[Mapping[str, Any]],
+) -> None:
+    """Show the exact tolerance required to retire each target fraction by family."""
+    family_by_row = {str(row.get("row_id", "")): str(row.get("construction_family", "")) for row in summaries}
+    families = sorted(set(family_by_row.values()))
+    targets = sorted({_number(row, "percentile") for row in rows if row.get("dataset_split") == "training"})
+    figure, axes = plt.subplots(2, 1, figsize=(13.8, 10.5), sharex=True)
+    for axis, depth in zip(axes, (8, 16)):
+        matrix: list[list[float]] = []
+        for family in families:
+            family_rows = [
+                row for row in rows
+                if row.get("dataset_split") == "training"
+                and int(_number(row, "residual_layer")) == depth
+                and family_by_row.get(str(row.get("row_id", ""))) == family
+            ]
+            matrix.append([
+                median(_number(row, "epsilon_value") for row in family_rows if _number(row, "percentile") == target)
+                if any(_number(row, "percentile") == target for row in family_rows) else math.nan
+                for target in targets
+            ])
+        finite = [value for matrix_row in matrix for value in matrix_row if math.isfinite(value) and value > 0]
+        if finite:
+            image = axis.imshow(matrix, aspect="auto", cmap="YlGnBu", norm=plt.matplotlib.colors.LogNorm(vmin=min(finite), vmax=max(finite)))
+            for y, matrix_row in enumerate(matrix):
+                for x, value in enumerate(matrix_row):
+                    if math.isfinite(value):
+                        axis.text(x, y, f"{value:.2g}", ha="center", va="center", fontsize=7, color="#59676D")
+            figure.colorbar(image, ax=axis, fraction=0.02, pad=0.015, label="required tolerance ε")
+        axis.set_yticks(range(len(families)), families, fontsize=8)
+        axis.set_title(f"After residual layer {depth}: tolerance required for each LFO-reduction target")
+    axes[-1].set_xticks(range(len(targets)), [f"retire {target:.1%}" for target in targets], rotation=25, ha="right")
+    figure.suptitle("Exact eligibility tolerance by construction family")
+    figure.tight_layout(rect=(0, 0, 1, 0.97))
     _save(plt, figure, path)
 
 
@@ -1434,9 +1533,11 @@ def _interactive_payload(
     source_display = os.path.relpath(source_run, html_report_path.parent).replace("\\", "/")
     complete_13a = report_mode == "complete_13a"
     if complete_13a:
-        # The selector is defined over all 90 rows. Per-row calibration arrays would
-        # make global UI filters look scientifically meaningful when they are not.
-        calibration["layer_quantiles_by_row"] = []
+        # Keep only the two decision depths needed for filter-reactive family
+        # comparisons. The frozen selector itself remains defined over all rows.
+        calibration["layer_quantiles_by_row"] = [
+            row for row in calibration["layer_quantiles_by_row"] if int(row[1]) in {8, 16}
+        ]
         calibration["retired_sample_by_row"] = []
         compact_retired: list[dict[str, Any]] = []
         retired_by_epsilon: dict[float, list[dict[str, Any]]] = {}
@@ -1731,14 +1832,23 @@ def _compact_calibration(calibration: Mapping[str, Sequence[Mapping[str, Any]]])
 
     layer_coverage: dict[tuple[int, float], list[float]] = {}
     slot_coverage: dict[tuple[int, float], list[float]] = {}
+    layer_coverage_by_row: list[list[float | int]] = []
     for row in calibration["epsilon_coverage.csv"]:
         if row.get("dataset_split") != "training":
             continue
         slot = row.get("active_atom_slot")
         epsilon = _number(row, "epsilon")
         if slot in {None, "", "None"}:
-            key = (int(_number(row, "residual_layer")), epsilon)
+            residual_layer = int(_number(row, "residual_layer"))
+            key = (residual_layer, epsilon)
             layer_coverage.setdefault(key, []).append(_number(row, "resolved_fraction"))
+            if residual_layer in {8, 16}:
+                layer_coverage_by_row.append([
+                    row_index[str(row.get("row_id", ""))],
+                    residual_layer,
+                    epsilon,
+                    _number(row, "resolved_fraction"),
+                ])
         else:
             key = (int(_number(row, "active_atom_slot")), epsilon)
             slot_coverage.setdefault(key, []).append(_number(row, "resolved_fraction"))
@@ -1818,6 +1928,7 @@ def _compact_calibration(calibration: Mapping[str, Sequence[Mapping[str, Any]]])
         "layer_quantiles_by_row": layer_quantiles_by_row,
         "slot_quantiles": _median_records(slot_quantiles, "active_atom_slot", "percentile", "epsilon_value"),
         "layer_coverage": _median_records(layer_coverage, "residual_layer", "epsilon", "resolved_fraction"),
+        "layer_coverage_by_row": layer_coverage_by_row,
         "slot_coverage": _median_records(slot_coverage, "active_atom_slot", "epsilon", "resolved_fraction"),
         "retired_summary": retired_summary,
         "retired_sample": retired_sample,
@@ -2260,13 +2371,13 @@ def _complete_13a_markdown(
         "",
         "## Eligibility Calibration and Gate Result",
         "",
-        "Completed-layer and slot quantiles show how the reconstruction-error threshold required to cover a fixed curve percentile falls as codebook construction proceeds. Coverage plots invert the question: higher reconstructed fraction means more training curves would be retired at a fixed epsilon.",
+        "Eligibility is framed as LFO population reduction: the percentage of already-solved LFOs that can stop competing for later construction capacity. Layer 8 is the useful mid-run checkpoint—an LFO retired there is absent from layers 9–16. Layer 16 is an endpoint accuracy check and does not itself save later-layer work.",
         "",
-        image("layer_quantiles", "Completed-layer epsilon quantiles"),
+        image("layer_quantiles", "Exact tolerance required for each LFO-reduction target at layers 8 and 16"),
         "",
         image("slot_quantiles", "Slot-level epsilon quantiles"),
         "",
-        image("layer_coverage", "Completed-layer reconstructed fractions"),
+        image("layer_coverage", "Family-level LFO population reduction at layers 8 and 16"),
         "",
         image("slot_coverage", "Slot-level reconstructed fractions"),
         "",

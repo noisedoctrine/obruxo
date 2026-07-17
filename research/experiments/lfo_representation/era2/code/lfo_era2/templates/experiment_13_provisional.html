@@ -492,6 +492,7 @@
     const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
     const num = value => Number(value || 0);
     const fmt = (value, digits = 4) => Number.isFinite(num(value)) ? num(value).toLocaleString(undefined, {maximumFractionDigits: digits}) : "—";
+    const fmtTolerance = value => num(value) === 0 ? "0" : Math.abs(num(value)) < 0.001 ? num(value).toExponential(2) : fmt(value, 6);
     const pct = (value, digits = 1) => `${(num(value) * 100).toFixed(digits)}%`;
     const short = value => String(value || "").replace(/^x13a_/, "").replaceAll("_", " · ");
     const unique = values => [...new Set(values.filter(value => value !== undefined && value !== null && value !== ""))].sort();
@@ -725,13 +726,13 @@
       },
       {
         id:"calibration", number:12, zone:"Eligibility", status:"pilot required", title:"Eligibility calibration", stat:`best early/middle ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,2)}`,
-        question:"Did any candidate epsilon satisfy the frozen automatic selection rule?",
-        mechanism:"Eligibility would retire already-resolved LFOs from later atom construction. The selector requires safe unexplained-energy retirement and at least 5% median early/middle coverage.",
-        motivation:"The threshold should release meaningful codebook capacity without abandoning meaningful unexplained residual energy.",
-        reading:["Later layers should move reconstruction-error quantiles downward.","Moving right in retirement coverage releases more capacity; moving down abandons less unexplained energy.","The selector applies all three numerical gates; visual elbows cannot override them."],
+        question:"How many LFOs can stop consuming later construction capacity, at what depth, and at what tolerance?",
+        mechanism:"An LFO whose reconstruction error is below ε becomes eligible to retire from later atom construction. The LFO-reduction percentage is therefore the share of the construction population freed from competing for later codebook capacity.",
+        motivation:"Depth determines the value of retirement. Retiring 5% after layer 8 removes that 5% from layers 9–16; reaching 5% only at layer 16 proves endpoint accuracy but frees no remaining layers. The selector also checks that retired LFOs carry little unexplained energy.",
+        reading:["The layer-8 plot measures useful mid-run population reduction; higher means more later construction work can focus on unresolved LFOs.","The layer-16 plot measures endpoint eligibility. Compare it with layer 8 to see whether a family solves LFOs early or only near the end.","In the tolerance matrices, each column is a plain-language retirement target and each cell is the exact ε required to reach it.","Global filters recompute every family median from only the in-scope strategy rows."],
         evidence:`All candidates satisfy the retired unexplained-energy limits, but the maximum early/middle median reconstructed fraction is ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,3)}, below the required ${pct(findings.selection.required_early_middle_fraction,0)}.`,
         recommendation:"Run the prescribed 0.001 versus 0.0025 restricted pilot before freezing epsilon or launching the 45-row LayerClip0To1-only 13B phase.",
-        limitation:"No epsilon is selected and this report cannot make an AllResiduals-versus-UnresolvedOnly claim.", charts:["calibration","retirement"]
+        limitation:"These are counterfactual 13A training calibrations, not measured 13B savings. No epsilon is selected and the endpoint layer-16 percentage should not be described as capacity saved.", charts:["capacity-8","capacity-16","capacity-matrix","tolerance-matrix-8","tolerance-matrix-16","retirement"]
       },
       {
         id:"scaling", number:13, zone:"Ablations", status:"bounded ablation", title:"Training-data scaling", stat:`${findings.scaling_matched_row_count} matched rows`,
@@ -1200,7 +1201,11 @@
         marginal:"Each bar is the median change from adding one more active atom per layer. Negative is better; the label gives the number of in-scope strategies improved.",
         layers:"Each line shows family-median training P95 after slot seven of each residual layer. A descending line means depth is still buying tail-error reduction.",
         diagnostics:"These panels relate internal behavior to validation P95. The displayed ρ is descriptive across strategy designs; it is not a causal effect estimate.",
-        calibration:isComplete13A ? "The complete calibration shows convergence, but the automatic selector still fails the 5% early/middle coverage gate." : "Each line asks how small the reconstruction-error threshold is at a chosen percentile as residual layers accumulate. Lower is closer. The shape explains convergence but cannot select epsilon from an incomplete run.",
+        "capacity-8":"At layer 8, the y-axis is the median percentage of LFOs that would be removed from layers 9–16 at each tested ε. Lines are construction-family medians and all global filters apply.",
+        "capacity-16":"At layer 16, the y-axis is the median percentage meeting each tested ε at the endpoint. This shows eventual solvability, not later-layer capacity saved. Lines are construction-family medians and all global filters apply.",
+        "capacity-matrix":"Each cell prints the exact median LFO reduction for one construction family, tested ε, and depth. Layer-8 columns measure population removed before layers 9–16; layer-16 columns are endpoint coverage only.",
+        "tolerance-matrix-8":"Rows are construction families; columns are explicit LFO-reduction targets such as “retire 10%.” Every cell prints the median ε required after layer 8. Smaller ε means the target is reached more accurately.",
+        "tolerance-matrix-16":"The same exact-tolerance matrix at layer 16. Comparing it with layer 8 separates families that solve LFOs early from those that catch up only near the endpoint.",
         retirement:"Lower-right is useful: more LFOs retired with less unexplained energy abandoned. Energy safety passes, but coverage is too low to freeze epsilon automatically.",
         scaling:"Each cell prints the exact 50%-training minus 100%-training validation delta using the original 1e-5 strict-perfect definition. Green favors 50%; coral favors 100%. Runtime is intentionally excluded.",
         work:"Candidate evaluations and same-run construction time are offline work. All rows retain 193 deployed heads, so this is not an inference-latency chart.",
@@ -1222,7 +1227,7 @@
       if (node.id === "partial") return simpleTable(marginalRows(false), ["row_id","construction_family","active_atom_count","delta_validation_median_rmse","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
       if (node.id === "layers") return simpleTable(layerRows(false), ["row_id","construction_family","residual_layer","layer_role","training_median_rmse","training_p95_rmse","training_max_abs_error_p95"]);
       if (node.id === "diagnostics") return simpleTable(filteredDiagnosticRows(false), ["row_id","construction_family","validation_overshoot_rate_before_final_clip","residual_layer_effective_no_op_usage_rate_median","residual_layer_dead_atom_rate_median","residual_gain_nonzero_rate","duplicate_atom_rate","validation_p95_rmse"]);
-      if (node.id === "calibration") return simpleTable(DATA.calibration.retired_summary, ["epsilon","count","retired_median","unexplained_median","unexplained_p95","incoming_median","incoming_p95"]);
+      if (node.id === "calibration") return simpleTable(calibrationToleranceTable(), ["residual_layer","construction_family","target_lfo_reduction","required_tolerance"]);
       if (node.id === "scaling") return simpleTable(filteredScalingRows(false), ["row_id","construction_family","delta_validation_median_rmse","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
       if (node.id === "work") return simpleTable(mechanismRows(false), ["row_id","construction_family","candidate_evaluations","median_slot_p95_improvement","prototype_convergence_rate","prototype_iterations_median","exact_duplicate_alignment_reuse_rate","oracle_construction_time"]);
       return simpleTable(findings.runtime_outliers.filter(row => rowMatchesGlobal(metricById.get(row.row_id))), ["row_id","oracle_construction_time"]);
@@ -1381,7 +1386,7 @@
 
     function renderChart(name, element) {
       if (!element) return;
-      const renderers = {coverage:chartCoverage,normalization:el => chartDelta(el,"layer_normalization_policy","FinalClipOnly","LayerClip0To1"),budget:el => chartDelta(el,"utility_candidate_budget","CandidateBudget24","CandidateBudget48"),schedule:el => chartDelta(el,"layer_schedule","Interleaved","TwoPhase"),pareto:chartPareto,"metric-map":chartMetricMap,"strict-thresholds":chartStrictThresholds,generalization:chartGeneralization,interactions:chartInteractions,partial:chartPartial,marginal:chartMarginal,layers:chartLayers,diagnostics:chartDiagnostics,calibration:chartCalibration,retirement:chartRetirement,scaling:chartScaling,work:chartWork,runtime:chartRuntime};
+      const renderers = {coverage:chartCoverage,normalization:el => chartDelta(el,"layer_normalization_policy","FinalClipOnly","LayerClip0To1"),budget:el => chartDelta(el,"utility_candidate_budget","CandidateBudget24","CandidateBudget48"),schedule:el => chartDelta(el,"layer_schedule","Interleaved","TwoPhase"),pareto:chartPareto,"metric-map":chartMetricMap,"strict-thresholds":chartStrictThresholds,generalization:chartGeneralization,interactions:chartInteractions,partial:chartPartial,marginal:chartMarginal,layers:chartLayers,diagnostics:chartDiagnostics,calibration:chartCalibration,"capacity-8":el=>chartCapacityDepth(el,8),"capacity-16":el=>chartCapacityDepth(el,16),"capacity-matrix":chartCapacityMatrix,"tolerance-matrix-8":el=>chartToleranceMatrix(el,8),"tolerance-matrix-16":el=>chartToleranceMatrix(el,16),retirement:chartRetirement,scaling:chartScaling,work:chartWork,runtime:chartRuntime};
       renderers[name](element);
     }
 
@@ -1613,6 +1618,45 @@
       setChart(element,{legend:{bottom:0,textStyle:{color:chartText()}},tooltip:{formatter:params=>`${esc(short(params.data.row.row_id))}<br>${esc(params.seriesName)} ${fmt(params.value[0],2)}<br>Validation P95 ${fmt(params.value[1],7)}`},grid:[{left:72,right:"55%",top:38,bottom:72},{left:"59%",right:28,top:38,bottom:72}],xAxis:[{type:"value",name:"Candidate evaluations",nameLocation:"middle",nameGap:40,...baseAxes()},{type:"value",gridIndex:1,name:"Oracle construction seconds",nameLocation:"middle",nameGap:40,...baseAxes()}],yAxis:[{type:"value",name:"Validation P95 RMSE",nameLocation:"middle",nameGap:55,...baseAxes()},{type:"value",gridIndex:1,...baseAxes()}],series:[{name:"CandidateBudget24",type:"scatter",data:candidate.filter(row=>row.utility_candidate_budget==="CandidateBudget24").map(row=>({value:[num(row.candidate_evaluations),num(row.validation_p95_rmse)],row})),itemStyle:{color:COLORS.blue}},{name:"CandidateBudget48",type:"scatter",data:candidate.filter(row=>row.utility_candidate_budget==="CandidateBudget48").map(row=>({value:[num(row.candidate_evaluations),num(row.validation_p95_rmse)],row})),itemStyle:{color:COLORS.accent}},{name:"Same-run construction",type:"scatter",xAxisIndex:1,yAxisIndex:1,data:rows.map(row=>({value:[num(row.oracle_construction_time),num(row.validation_p95_rmse)],row})),itemStyle:{color:COLORS.warn}}]});
     }
 
+    function calibrationFamily(row) { return metricById.get(calibrationRowIds[row[0]])?.construction_family || "Unknown"; }
+
+    function calibrationToleranceTable() {
+      const rows=filteredCalibrationRows("layer_quantiles_by_row",false);
+      const output=[];
+      [8,16].forEach(depth=>unique(rows.filter(row=>num(row[1])===depth).map(calibrationFamily)).forEach(family=>unique(rows.filter(row=>num(row[1])===depth&&calibrationFamily(row)===family).map(row=>num(row[2]))).sort((a,b)=>a-b).forEach(target=>output.push({residual_layer:depth,construction_family:family,target_lfo_reduction:target,required_tolerance:medianNum(rows.filter(row=>num(row[1])===depth&&calibrationFamily(row)===family&&num(row[2])===target).map(row=>row[3]))}))));
+      return output;
+    }
+
+    function chartCapacityDepth(element, depth) {
+      const rows=filteredCalibrationRows("layer_coverage_by_row",true).filter(row=>num(row[1])===depth);
+      if(!rows.length)return chartEmpty(element,"No calibration rows match the global filters.");
+      const families=unique(rows.map(calibrationFamily));
+      const epsilons=unique(rows.map(row=>num(row[2]))).sort((a,b)=>a-b);
+      element.style.height="500px";
+      setChart(element,{title:{text:depth===8?"Layer 8 · population removed before layers 9–16":"Layer 16 · endpoint population meeting tolerance",left:"center",textStyle:{color:chartText(),fontSize:13}},tooltip:{trigger:"axis",formatter:params=>`Tested tolerance ε ${fmt(params[0]?.value?.[0],6)}<br>${params.map(item=>`${esc(item.seriesName)}: <strong>${pct(item.value[1],2)} LFO reduction</strong>`).join("<br>")}`},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:55,bottom:95,containLabel:true},xAxis:{type:"log",logBase:10,name:"Tested eligibility tolerance ε → looser",nameLocation:"middle",nameGap:42,axisLabel:{color:chartText(),formatter:value=>Number(value).toExponential(1)},axisLine:{lineStyle:{color:chartGrid()}},splitLine:{show:true,lineStyle:{color:chartGrid(),opacity:.45}}},yAxis:{type:"value",name:"Median LFO population reduction ↑",nameLocation:"middle",nameGap:60,axisLabel:{color:chartText(),formatter:value=>pct(value,1)},...baseAxes()},series:families.map(family=>({name:family,type:"line",symbol:"circle",symbolSize:5,data:epsilons.map(epsilon=>[epsilon,medianNum(rows.filter(row=>calibrationFamily(row)===family&&num(row[2])===epsilon).map(row=>row[3]))]),connectNulls:true}))});
+    }
+
+    function chartToleranceMatrix(element, depth) {
+      const rows=filteredCalibrationRows("layer_quantiles_by_row",true).filter(row=>num(row[1])===depth);
+      if(!rows.length)return chartEmpty(element,"No calibration rows match the global filters.");
+      const families=unique(rows.map(calibrationFamily));
+      const targets=unique(rows.map(row=>num(row[2]))).sort((a,b)=>a-b);
+      const cells=families.flatMap((family,y)=>targets.map((target,x)=>{const raw=medianNum(rows.filter(row=>calibrationFamily(row)===family&&num(row[2])===target).map(row=>row[3]));return {value:[x,y,Math.log10(Math.max(raw,1e-12))],raw,family,target};}));
+      const logs=cells.map(cell=>cell.value[2]).filter(Number.isFinite);
+      element.style.height=`${Math.max(500,260+families.length*28)}px`;
+      setChart(element,{title:{text:`Layer ${depth} · exact tolerance needed for each reduction target`,left:"center",textStyle:{color:chartText(),fontSize:13}},tooltip:{formatter:params=>`${esc(params.data.family)}<br>Target: retire ${pct(params.data.target,1)} of LFOs<br><strong>Required ε: ${fmtTolerance(params.data.raw)}</strong>`},grid:{left:215,right:35,top:65,bottom:95},xAxis:{type:"category",position:"top",data:targets.map(target=>`retire ${pct(target,target<.01?1:0)}`),axisLabel:{color:chartText(),interval:0,rotate:20},axisLine:{lineStyle:{color:chartGrid()}}},yAxis:{type:"category",data:families,axisLabel:{color:chartText(),width:195,overflow:"truncate"},axisLine:{lineStyle:{color:chartGrid()}}},visualMap:{min:Math.min(...logs),max:Math.max(...logs),dimension:2,orient:"horizontal",left:"center",bottom:18,text:["looser ε","stricter ε"],textStyle:{color:chartText()},inRange:{color:["#eef2f1","#95cfbd"]}},series:[{type:"heatmap",data:cells,label:{show:true,color:"#66757b",fontWeight:650,formatter:params=>fmtTolerance(params.data.raw)},itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2}}]});
+    }
+
+    function chartCapacityMatrix(element) {
+      const rows=filteredCalibrationRows("layer_coverage_by_row",true);
+      if(!rows.length)return chartEmpty(element,"No calibration rows match the global filters.");
+      const families=unique(rows.map(calibrationFamily));
+      const columns=[8,16].flatMap(depth=>unique(rows.filter(row=>num(row[1])===depth).map(row=>num(row[2]))).sort((a,b)=>a-b).map(epsilon=>({depth,epsilon,label:`L${depth} · ε ${fmtTolerance(epsilon)}`})));
+      const cells=families.flatMap((family,y)=>columns.map((column,x)=>{const raw=medianNum(rows.filter(row=>calibrationFamily(row)===family&&num(row[1])===column.depth&&num(row[2])===column.epsilon).map(row=>row[3]));return {value:[x,y,raw],raw,family,...column};}));
+      element.style.height=`${Math.max(520,280+families.length*28)}px`;
+      setChart(element,{title:{text:"Exact LFO population reduction at layers 8 and 16",left:"center",textStyle:{color:chartText(),fontSize:13}},tooltip:{formatter:params=>`${esc(params.data.family)}<br>Layer ${params.data.depth} · tested ε ${fmtTolerance(params.data.epsilon)}<br><strong>${pct(params.data.raw,2)} LFO reduction</strong>${params.data.depth===8?"<br>removed before layers 9–16":"<br>endpoint coverage only"}`},grid:{left:215,right:35,top:65,bottom:105},xAxis:{type:"category",position:"top",data:columns.map(column=>column.label),axisLabel:{color:chartText(),interval:0,rotate:28},axisLine:{lineStyle:{color:chartGrid()}}},yAxis:{type:"category",data:families,axisLabel:{color:chartText(),width:195,overflow:"truncate"},axisLine:{lineStyle:{color:chartGrid()}}},visualMap:{min:0,max:Math.max(...cells.map(cell=>cell.raw)),dimension:2,orient:"horizontal",left:"center",bottom:18,text:["more LFOs removed","fewer LFOs removed"],textStyle:{color:chartText()},inRange:{color:["#eef2f1","#73c7aa"]}},series:[{type:"heatmap",data:cells,label:{show:true,color:"#66757b",fontWeight:650,formatter:params=>pct(params.data.raw,1)},itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2}}]});
+    }
+
     function chartCalibration(element) {
       const rows = isComplete13A
         ? DATA.calibration.layer_quantiles.map(row => [0,row.residual_layer,row.percentile,row.epsilon_value])
@@ -1622,7 +1666,7 @@
       const layers = unique(rows.map(row => row[1])).map(Number).sort((a,b)=>a-b);
       const medianValue = values => { const ordered=values.map(num).sort((a,b)=>a-b); const mid=Math.floor(ordered.length/2); return ordered.length%2?ordered[mid]:(ordered[mid-1]+ordered[mid])/2; };
       element.style.height = "520px";
-      setChart(element,{tooltip:{trigger:"axis",valueFormatter:value=>fmt(value,7)},legend:{bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:25,bottom:75,containLabel:true},xAxis:{type:"category",name:"Residual layers completed →",data:layers,...baseAxes()},yAxis:{type:"value",name:"Median reconstruction-error threshold ε ↓",nameLocation:"middle",nameGap:60,...baseAxes()},series:percentiles.map(percentile=>({name:`curve percentile q=${percentile}`,type:"line",symbol:"circle",symbolSize:5,data:layers.map(layer=>medianValue(rows.filter(row=>num(row[2])===percentile&&num(row[1])===layer).map(row=>row[3]))),connectNulls:true}))});
+      setChart(element,{tooltip:{trigger:"axis",valueFormatter:value=>fmt(value,7)},legend:{bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:25,bottom:75,containLabel:true},xAxis:{type:"category",name:"Residual layers completed →",data:layers,...baseAxes()},yAxis:{type:"value",name:"Median reconstruction-error threshold ε ↓",nameLocation:"middle",nameGap:60,...baseAxes()},series:percentiles.map(percentile=>({name:`retire ${pct(percentile,1)} of LFOs`,type:"line",symbol:"circle",symbolSize:5,data:layers.map(layer=>medianValue(rows.filter(row=>num(row[2])===percentile&&num(row[1])===layer).map(row=>row[3]))),connectNulls:true}))});
     }
 
     function chartRetirement(element) {

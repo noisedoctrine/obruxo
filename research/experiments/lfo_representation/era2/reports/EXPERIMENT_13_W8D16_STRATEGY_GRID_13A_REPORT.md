@@ -262,13 +262,13 @@ Broad and repair atoms solve different problems. Synthesized prototypes seek reu
 
 ## Eligibility Calibration and Gate Result
 
-Completed-layer and slot quantiles show how the reconstruction-error threshold required to cover a fixed curve percentile falls as codebook construction proceeds. Coverage plots invert the question: higher reconstructed fraction means more training curves would be retired at a fixed epsilon.
+Eligibility is framed as LFO population reduction: the percentage of already-solved LFOs that can stop competing for later construction capacity. Layer 8 is the useful mid-run checkpoint—an LFO retired there is absent from layers 9–16. Layer 16 is an endpoint accuracy check and does not itself save later-layer work.
 
-![Completed-layer epsilon quantiles](images/experiment_13/13a/layer_epsilon_quantiles.png)
+![Exact tolerance required for each LFO-reduction target at layers 8 and 16](images/experiment_13/13a/layer_epsilon_quantiles.png)
 
 ![Slot-level epsilon quantiles](images/experiment_13/13a/slot_epsilon_quantiles.png)
 
-![Completed-layer reconstructed fractions](images/experiment_13/13a/completed_layer_coverage.png)
+![Family-level LFO population reduction at layers 8 and 16](images/experiment_13/13a/completed_layer_coverage.png)
 
 ![Slot-level reconstructed fractions](images/experiment_13/13a/slot_coverage.png)
 
