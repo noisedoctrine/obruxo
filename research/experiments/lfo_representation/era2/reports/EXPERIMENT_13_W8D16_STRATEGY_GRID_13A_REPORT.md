@@ -40,6 +40,19 @@ The x-axis is validation median RMSE and the y-axis is validation P95 RMSE; lowe
 
 Strict-perfect rate has only two observed values across the 90 rows. RMSE improvements therefore must not be described as automatically improving exact finishes at the fixed `1e-5` threshold.
 
+### Strict-perfect threshold sensitivity
+
+| Max-absolute tolerance | RMSE tolerance | Best validation strict-perfect rate | Median row rate | Distinct rates | Pareto rows |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| `1e-2` | `1e-03` | 34.330% | 0.872% | 6 | 4 |
+| `1e-3` | `1e-04` | 9.844% | 0.872% | 4 | 2 |
+| `1e-4` | `1e-05` | 1.246% | 0.810% | 2 | 3 |
+| `1e-5` | `1e-06` | 1.246% | 0.810% | 2 | 3 |
+
+![Strict-perfect rate across logarithmically spaced tolerance tuples](images/experiment_13/13a/strict_perfect_threshold_sensitivity.png)
+
+The tolerance parameter preserves the original two-condition definition: per-LFO RMSE must be at most one tenth of the selected tolerance and maximum absolute point error must be at most the selected tolerance. The interactive report recomputes the strict-perfect leader, four-objective Pareto membership, ranks, correlations, and matched strict-perfect deltas when the tolerance changes. Continuous RMSE and node-max metrics do not change.
+
 ### Metric agreement and disagreement
 
 ![Co-primary metric rank agreement](images/experiment_13/13a/metric_rank_agreement.png)

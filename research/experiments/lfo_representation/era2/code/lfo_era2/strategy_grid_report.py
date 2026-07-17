@@ -31,9 +31,9 @@ CALIBRATION_TABLES = (
     "epsilon_coverage.csv",
     "retired_error_mass.csv",
 )
-INTERACTIVE_REPORT_SCHEMA = "experiment13_interactive_report_v3"
+INTERACTIVE_REPORT_SCHEMA = "experiment13_interactive_report_v4"
 INTERACTIVE_TEMPLATE = Path(__file__).with_name("templates") / "experiment_13_provisional.html"
-COMPLETE_13A_REPORT_SCHEMA = "experiment13_complete_13a_report_v2"
+COMPLETE_13A_REPORT_SCHEMA = "experiment13_complete_13a_report_v3"
 
 
 @dataclass(frozen=True)
@@ -82,6 +82,7 @@ def analyze_13a_strategy_grid(
     image_dir: Path,
     html_report_path: Path | None = None,
     scaling_baseline_run: Path | None = None,
+    strict_thresholds_path: Path | None = None,
 ) -> dict[str, str]:
     """Generate the complete Experiment 13A report without weakening final-analysis gates."""
     from .strategy_grid import experiment13a_specs, load_epsilon_selection, validate_completed_13a
@@ -106,6 +107,7 @@ def analyze_13a_strategy_grid(
         expected_rows=[asdict(spec) for spec in experiment13a_specs()],
         selection=dict(selection.payload),
         scaling_baseline_run=Path(scaling_baseline_run) if scaling_baseline_run is not None else None,
+        strict_thresholds_path=Path(strict_thresholds_path) if strict_thresholds_path is not None else None,
     )
 
 
@@ -307,6 +309,7 @@ def write_complete_13a_report(
     selection: Mapping[str, Any],
     html_report_path: Path | None = None,
     scaling_baseline_run: Path | None = None,
+    strict_thresholds_path: Path | None = None,
 ) -> dict[str, str]:
     """Write a complete-13A snapshot while keeping canonical 13A/13B analysis separate."""
     from .strategy_grid import read_phase_status
@@ -317,6 +320,7 @@ def write_complete_13a_report(
     html_report_path = Path(html_report_path or report_path.with_suffix(".html")).resolve()
     image_dir = Path(image_dir).resolve()
     scaling_baseline_run = Path(scaling_baseline_run).resolve() if scaling_baseline_run is not None else None
+    strict_thresholds_path = Path(strict_thresholds_path).resolve() if strict_thresholds_path is not None else None
     for path, label in (
         (analysis_output_dir, "analysis output directory"),
         (report_path, "report path"),
@@ -342,6 +346,15 @@ def write_complete_13a_report(
     if bool(selection.get("selection_passed")):
         raise ValueError("complete 13A snapshot expects the automatic selector result before a pilot override")
 
+    strict_thresholds: dict[str, Any] | None = None
+    if strict_thresholds_path is not None:
+        from .strategy_grid_thresholds import load_strict_threshold_sweep
+
+        strict_thresholds = load_strict_threshold_sweep(
+            strict_thresholds_path,
+            expected_row_ids=[str(row.get("row_id", "")) for row in bundle.summaries],
+        )
+
     scaling_rows: list[dict[str, Any]] = []
     scaling_path: Path | None = None
     scaling_validation_sha256: str | None = None
@@ -353,7 +366,13 @@ def write_complete_13a_report(
         scaling_path = analysis_output_dir / "training_data_scaling_ablation.csv"
         write_csv(scaling_path, scaling_rows)
 
-    plot_paths = _write_plots(bundle, image_dir, historical_runtime=False, deep_analysis=True)
+    plot_paths = _write_plots(
+        bundle,
+        image_dir,
+        historical_runtime=False,
+        deep_analysis=True,
+        strict_thresholds=strict_thresholds,
+    )
     report_text = _complete_13a_markdown(
         bundle,
         source_run=source_run,
@@ -362,6 +381,7 @@ def write_complete_13a_report(
         selection=selection,
         scaling_rows=scaling_rows,
         scaling_baseline_run=scaling_baseline_run,
+        strict_thresholds=strict_thresholds,
     )
     report_path.parent.mkdir(parents=True, exist_ok=True)
     _atomic_text(report_path, report_text)
@@ -378,6 +398,7 @@ def write_complete_13a_report(
         selection=selection,
         scaling_rows=scaling_rows,
         experiment13b_state=str(phase_b_status.get("state", "not_started")),
+        strict_thresholds=strict_thresholds,
     )
     interactive_text = _interactive_html(interactive_payload)
     _atomic_text(html_report_path, interactive_text)
@@ -396,6 +417,8 @@ def write_complete_13a_report(
         "runtime_comparison_allowed": False,
         "scaling_matched_row_count": len(scaling_rows),
         "scaling_validation_membership_sha256": scaling_validation_sha256,
+        "strict_thresholds_path": str(strict_thresholds_path) if strict_thresholds_path is not None else None,
+        "strict_thresholds_sha256": strict_thresholds.get("source_sha256") if strict_thresholds else None,
         "report_path": str(report_path),
         "html_report_path": str(html_report_path),
         "interactive_payload_schema": INTERACTIVE_REPORT_SCHEMA,
@@ -414,6 +437,8 @@ def write_complete_13a_report(
     }
     if scaling_path is not None:
         result["training_data_scaling_ablation"] = str(scaling_path)
+    if strict_thresholds_path is not None:
+        result["strict_thresholds"] = str(strict_thresholds_path)
     return result
 
 
@@ -883,6 +908,7 @@ def _write_plots(
     *,
     historical_runtime: bool = True,
     deep_analysis: bool = False,
+    strict_thresholds: Mapping[str, Any] | None = None,
 ) -> dict[str, Path]:
     try:
         import matplotlib
@@ -917,6 +943,8 @@ def _write_plots(
             "diagnostics": image_dir / "strategy_diagnostics.png",
             "work": image_dir / "offline_work_efficiency.png",
         })
+    if strict_thresholds:
+        paths["strict_thresholds"] = image_dir / "strict_perfect_threshold_sensitivity.png"
     _plot_pareto(plt, paths["pareto"], bundle.co_primary)
     _plot_delta(plt, paths["normalization"], bundle.matched_deltas, "layer_normalization_policy", "LayerClip0To1 minus FinalClipOnly")
     _plot_delta(plt, paths["budget"], bundle.matched_deltas, "utility_candidate_budget", "CandidateBudget48 minus CandidateBudget24")
@@ -940,6 +968,8 @@ def _write_plots(
         _plot_marginal_atoms(plt, paths["marginal_atoms"], bundle.marginal_atoms)
         _plot_strategy_diagnostics(plt, paths["diagnostics"], bundle.diagnostics)
         _plot_offline_work(plt, paths["work"], bundle.mechanism_diagnostics, bundle.summaries)
+    if strict_thresholds:
+        _plot_strict_thresholds(plt, paths["strict_thresholds"], bundle.summaries, strict_thresholds)
     return paths
 
 
@@ -1165,6 +1195,48 @@ def _plot_metric_agreement(plt: Any, path: Path, rows: Sequence[Mapping[str, Any
     _save(plt, figure, path)
 
 
+def _plot_strict_thresholds(
+    plt: Any,
+    path: Path,
+    rows: Sequence[Mapping[str, Any]],
+    strict_thresholds: Mapping[str, Any],
+) -> None:
+    """Plot family-level strict-perfect sensitivity on a logarithmic tolerance axis."""
+    tolerances = [float(value) for value in strict_thresholds["tolerances"]]
+    rates_by_row = strict_thresholds["rates_by_row"]
+    families = sorted({str(row.get("construction_family", "")) for row in rows})
+    figure, axis = plt.subplots(figsize=(9.4, 5.8))
+    colors = {family: plt.cm.tab20(index % 20) for index, family in enumerate(families)}
+    for family in families:
+        family_ids = [str(row.get("row_id", "")) for row in rows if row.get("construction_family") == family]
+        medians = [
+            median(float(rates_by_row[row_id][_compact_exponent(tolerance)]) for row_id in family_ids)
+            for tolerance in tolerances
+        ]
+        axis.plot(tolerances, medians, marker="o", linewidth=1.25, markersize=4, label=family, color=colors[family], alpha=0.85)
+    all_ids = [str(row.get("row_id", "")) for row in rows]
+    overall_medians = [median(float(rates_by_row[row_id][_compact_exponent(tolerance)]) for row_id in all_ids) for tolerance in tolerances]
+    best_rates = [max(float(rates_by_row[row_id][_compact_exponent(tolerance)]) for row_id in all_ids) for tolerance in tolerances]
+    axis.plot(tolerances, overall_medians, marker="D", linewidth=2.4, color="#26383F", label="All-strategy median")
+    axis.plot(tolerances, best_rates, marker="s", linewidth=2.0, linestyle="--", color="#B45309", label="Best observed row")
+    axis.set_xscale("log")
+    axis.set_xticks(tolerances, [f"{value:.0e}\n({value / 10:.0e} RMSE)" for value in tolerances])
+    axis.set(
+        xlabel="maximum-absolute tolerance (paired RMSE tolerance in parentheses; logarithmic scale)",
+        ylabel="validation strict-perfect LFO rate",
+        title="Strict-perfect sensitivity across tolerance tuples",
+    )
+    axis.yaxis.set_major_formatter(plt.matplotlib.ticker.PercentFormatter(1.0))
+    axis.grid(True, axis="both", alpha=0.25)
+    axis.legend(loc="upper left", bbox_to_anchor=(1.02, 1.0), fontsize=8, frameon=False)
+    figure.tight_layout()
+    _save(plt, figure, path)
+
+
+def _compact_exponent(value: float) -> str:
+    return f"{value:.0e}".replace("e-0", "e-").replace("e+0", "e+")
+
+
 def _plot_generalization(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
     figure, axes = plt.subplots(1, 2, figsize=(11.0, 4.8))
     specs = (
@@ -1322,6 +1394,7 @@ def _interactive_payload(
     selection: Mapping[str, Any] | None = None,
     scaling_rows: Sequence[Mapping[str, Any]] = (),
     experiment13b_state: str = "not_started",
+    strict_thresholds: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build the compact, deterministic payload embedded in the HTML report."""
     completed = len(bundle.summaries)
@@ -1619,6 +1692,7 @@ def _interactive_payload(
             ],
         },
         "calibration": calibration,
+        "strict_thresholds": dict(strict_thresholds) if strict_thresholds is not None else None,
     }
 
 
@@ -1795,6 +1869,7 @@ def _complete_13a_markdown(
     selection: Mapping[str, Any],
     scaling_rows: Sequence[Mapping[str, Any]],
     scaling_baseline_run: Path | None,
+    strict_thresholds: Mapping[str, Any] | None,
 ) -> str:
     normalization = _comparison_summary(bundle.matched_deltas, "layer_normalization_policy")
     budget = _comparison_summary(bundle.matched_deltas, "utility_candidate_budget")
@@ -1836,6 +1911,24 @@ def _complete_13a_markdown(
         value = _number(row, metric)
         value_text = f"{value:.3%}" if higher else f"{value:.8g}"
         metric_leaders.append(f"| {label} | {'higher' if higher else 'lower'} | {value_text} | `{row.get('row_id')}` |")
+
+    threshold_sensitivity = [
+        "| Max-absolute tolerance | RMSE tolerance | Best validation strict-perfect rate | Median row rate | Distinct rates | Pareto rows |",
+        "| ---: | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    if strict_thresholds:
+        rates_by_row = strict_thresholds["rates_by_row"]
+        for tolerance in strict_thresholds["tolerances"]:
+            rates = [float(rates_by_row[str(row.get("row_id", ""))][tolerance]) for row in bundle.summaries]
+            threshold_rows = []
+            for source, rate in zip(bundle.summaries, rates):
+                record = dict(source)
+                record["validation_strict_perfect_lfo_rate"] = rate
+                threshold_rows.append(record)
+            threshold_sensitivity.append(
+                f"| `{tolerance}` | `{float(tolerance) / 10:.0e}` | {max(rates):.3%} | "
+                f"{median(rates):.3%} | {len(set(rates))} | {len(_pareto_ids(threshold_rows))} |"
+            )
 
     metric_agreement_table = [
         "| Metric pair | Spearman ρ | Interpretation |",
@@ -2054,6 +2147,14 @@ def _complete_13a_markdown(
         *pareto_table,
         "",
         "Strict-perfect rate has only two observed values across the 90 rows. RMSE improvements therefore must not be described as automatically improving exact finishes at the fixed `1e-5` threshold.",
+        "",
+        "### Strict-perfect threshold sensitivity",
+        "",
+        *(threshold_sensitivity if strict_thresholds else ["Threshold sensitivity was not replayed for this report build."]),
+        "",
+        *( [image("strict_thresholds", "Strict-perfect rate across logarithmically spaced tolerance tuples")] if strict_thresholds else [] ),
+        "",
+        "The tolerance parameter preserves the original two-condition definition: per-LFO RMSE must be at most one tenth of the selected tolerance and maximum absolute point error must be at most the selected tolerance. The interactive report recomputes the strict-perfect leader, four-objective Pareto membership, ranks, correlations, and matched strict-perfect deltas when the tolerance changes. Continuous RMSE and node-max metrics do not change.",
         "",
         "### Metric agreement and disagreement",
         "",

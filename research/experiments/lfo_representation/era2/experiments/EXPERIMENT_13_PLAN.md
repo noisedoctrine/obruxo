@@ -90,14 +90,29 @@ report, which is still gated on a frozen epsilon and complete 13B.
 ```powershell
 conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 select-epsilon --run-dir $runDir
 
+conda run --no-capture-output -n py312 python $runner --mkl-threading-layer SEQUENTIAL --native-threads 1 replay-strict-thresholds `
+  --run-dir $runDir `
+  --output-dir .\research\experiments\lfo_representation\era2\artifacts\experiment_13\analysis_train50_val100_13a_complete `
+  --cache-dir .\research\experiments\lfo_representation\era2\artifacts\experiment_13\cache_exactopt_v1 `
+  --backend xpu
+
 conda run --no-capture-output -n py312 python $runner analyze-13a `
   --run-dir $runDir `
   --analysis-output-dir .\research\experiments\lfo_representation\era2\artifacts\experiment_13\analysis_train50_val100_13a_complete `
   --report-path .\research\experiments\lfo_representation\era2\reports\EXPERIMENT_13_W8D16_STRATEGY_GRID_13A_REPORT.md `
   --html-report-path .\research\experiments\lfo_representation\era2\reports\EXPERIMENT_13_W8D16_STRATEGY_GRID_13A_REPORT.html `
   --image-dir .\research\experiments\lfo_representation\era2\reports\images\experiment_13\13a `
-  --scaling-baseline-run $legacyRun
+  --scaling-baseline-run $legacyRun `
+  --strict-thresholds-path .\research\experiments\lfo_representation\era2\artifacts\experiment_13\analysis_train50_val100_13a_complete\strict_perfect_threshold_sweep.csv
 ```
+
+The threshold replay uses the saved codebooks and deterministic validation
+sample only. It does not reconstruct dictionaries, repeat candidate search, or
+rerun training encoding. The report exposes `1e-2`, `1e-3`, `1e-4`, and `1e-5` controls;
+each requires RMSE at most one tenth of the selected tolerance and maximum
+absolute point error at most the selected tolerance. `1e-5` is the original
+strict-perfect definition. A log-scale sensitivity plot shows construction-family
+median and in-scope envelope behavior across all four tolerance tuples.
 
 Preview it with the same local HTTP server command above, then open
 `http://localhost:8765/EXPERIMENT_13_W8D16_STRATEGY_GRID_13A_REPORT.html`.

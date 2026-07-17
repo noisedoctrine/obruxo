@@ -121,7 +121,7 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             payload_match = re.search(r'<script id="report-data" type="application/json">(.*?)</script>', html, re.DOTALL)
             self.assertIsNotNone(payload_match)
             payload = json.loads(payload_match.group(1))
-            self.assertEqual(payload["schema_version"], "experiment13_interactive_report_v3")
+            self.assertEqual(payload["schema_version"], "experiment13_interactive_report_v4")
             self.assertEqual(payload["meta"]["completed_rows"], 8)
             self.assertEqual(payload["meta"]["expected_rows"], 90)
             self.assertFalse(payload["meta"]["epsilon_selected"])
@@ -191,6 +191,8 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             source = root / "complete_13a"
             baseline = root / "legacy_prefix"
             expected, selection = _write_complete_13a_report_fixture(source, baseline)
+            thresholds = root / "strict_perfect_threshold_sweep.csv"
+            _write_threshold_fixture(thresholds, expected)
             before = _fingerprint(source)
             analysis = root / "analysis"
             report = root / "reports" / "EXPERIMENT_13A.md"
@@ -206,6 +208,7 @@ class StrategyGridPartialReportTests(unittest.TestCase):
                 expected_rows=expected,
                 selection=selection,
                 scaling_baseline_run=baseline,
+                strict_thresholds_path=thresholds,
             )
 
             self.assertEqual(_fingerprint(source), before)
@@ -224,6 +227,8 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             self.assertIn("Decoder and Dictionary Diagnostics", text)
             self.assertIn("Offline work efficiency", text)
             self.assertIn("Audit boundaries", text)
+            self.assertIn("Strict-perfect threshold sensitivity", text)
+            self.assertIn("`1e-3`", text)
             self.assertNotIn("The frozen eligibility epsilon is", text)
 
             html = html_report.read_text(encoding="utf-8")
@@ -246,6 +251,9 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             self.assertIn("chartLayers", html)
             self.assertIn("chartDiagnostics", html)
             self.assertIn("chartWork", html)
+            self.assertIn("Strict-perfect tolerance", html)
+            self.assertIn("data-strict-tolerance", html)
+            self.assertIn("applyStrictTolerance", html)
             self.assertNotIn(str(root.resolve()), html)
             self.assertLess(html_report.stat().st_size, 1_000_000)
             marker = 'application/json">'
@@ -264,6 +272,10 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             self.assertEqual(len(payload["deep_analysis"]["marginal_atoms"]), 540)
             self.assertEqual(len(payload["deep_analysis"]["layer_progression"]), 1440)
             self.assertEqual(len(payload["deep_analysis"]["mechanisms"]), 90)
+            self.assertEqual(payload["strict_thresholds"]["tolerances"], ["1e-2", "1e-3", "1e-4", "1e-5"])
+            self.assertEqual(len(payload["strict_thresholds"]["rates_by_row"]), 90)
+            self.assertIn("chartStrictThresholds", html)
+            self.assertIn("strict_perfect_threshold_sensitivity.png", text)
             self.assertEqual(len(runtime.read_csv(analysis / "training_data_scaling_ablation.csv")), 4)
             self.assertEqual(len(runtime.read_csv(analysis / "strategy_diagnostics.csv")), 90)
             self.assertEqual(len(runtime.read_csv(analysis / "metric_rankings.csv")), 90)
@@ -284,6 +296,7 @@ class StrategyGridPartialReportTests(unittest.TestCase):
                 expected_rows=expected,
                 selection=selection,
                 scaling_baseline_run=baseline,
+                strict_thresholds_path=thresholds,
             )
             self.assertEqual(html_report.read_bytes(), first_html)
             self.assertEqual(_fingerprint(source), before)
@@ -516,6 +529,24 @@ def _write_partial_fixture(source: Path) -> None:
             row_dir / "retired_error_mass.csv",
             [{"experiment_phase": "13A", "row_id": spec.row_id, "epsilon": 0.001, "retired_lfo_fraction": 0.1, "incoming_retired_energy_fraction": 0.02, "unexplained_retired_energy_fraction": 0.01}],
         )
+
+
+def _write_threshold_fixture(path: Path, expected: list[dict[str, object]]) -> None:
+    rows = []
+    for index, spec in enumerate(expected):
+        for tolerance, base in ((1e-2, 0.80), (1e-3, 0.45), (1e-4, 0.12), (1e-5, 0.02 if spec["construction_policy"] == "CommonCaseRepair" else 0.01)):
+            rate = base + (index % 5) * (0.001 if tolerance != 1e-5 else 0.0)
+            rows.append({
+                "schema_version": "experiment13_strict_threshold_sweep_v1",
+                "row_id": spec["row_id"],
+                "dataset_split": "validation",
+                "max_abs_tolerance": tolerance,
+                "rmse_tolerance": tolerance / 10,
+                "strict_perfect_lfo_count": round(rate * 1605),
+                "row_count": 1605,
+                "strict_perfect_lfo_rate": rate,
+            })
+    runtime.write_csv(path, rows)
 
 
 def _fingerprint(root: Path) -> str:

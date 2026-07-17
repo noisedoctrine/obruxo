@@ -75,6 +75,7 @@ from lfo_era2.strategy_grid import (  # noqa: E402
 )
 from lfo_era2.strategy_grid_report import analyze_13a_strategy_grid, analyze_partial_strategy_grid  # noqa: E402
 from lfo_era2.strategy_grid_execution import KeepAwakeError, scoped_system_required  # noqa: E402
+from lfo_era2.strategy_grid_thresholds import replay_strict_perfect_thresholds  # noqa: E402
 
 
 def main() -> None:
@@ -183,6 +184,19 @@ def _execute(args: argparse.Namespace) -> None:
                 html_report_path=args.html_report_path,
                 image_dir=args.image_dir,
                 scaling_baseline_run=args.scaling_baseline_run,
+                strict_thresholds_path=args.strict_thresholds_path,
+            )
+            for key, value in result.items():
+                print(f"{key}={value}", flush=True)
+        elif args.command == "replay-strict-thresholds":
+            result = replay_strict_perfect_thresholds(
+                run_dir=args.run_dir,
+                output_dir=args.output_dir,
+                metadata_path=args.metadata,
+                cache_dir=args.cache_dir,
+                backend=args.backend,
+                chunk_size=args.chunk_size,
+                progress=_progress,
             )
             for key, value in result.items():
                 print(f"{key}={value}", flush=True)
@@ -259,6 +273,18 @@ def _parser() -> argparse.ArgumentParser:
     complete_a.add_argument("--html-report-path", type=Path)
     complete_a.add_argument("--image-dir", type=Path, required=True)
     complete_a.add_argument("--scaling-baseline-run", type=Path)
+    complete_a.add_argument("--strict-thresholds-path", type=Path)
+
+    thresholds = subcommands.add_parser(
+        "replay-strict-thresholds",
+        help="replay saved 13A codebooks on validation and calculate strict-perfect threshold sensitivity",
+    )
+    thresholds.add_argument("--run-dir", type=Path, required=True)
+    thresholds.add_argument("--output-dir", type=Path, required=True)
+    thresholds.add_argument("--metadata", type=Path, default=DEFAULT_METADATA)
+    thresholds.add_argument("--cache-dir", type=Path, default=None)
+    thresholds.add_argument("--backend", choices=["auto", "numpy", "xpu"], default="auto")
+    thresholds.add_argument("--chunk-size", type=int, default=256)
 
     status = subcommands.add_parser("status", help="print Experiment 13 phase and gate status")
     status.add_argument("--run-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
