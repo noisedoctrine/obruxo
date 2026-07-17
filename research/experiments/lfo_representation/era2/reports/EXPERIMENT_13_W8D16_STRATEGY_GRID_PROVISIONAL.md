@@ -18,6 +18,36 @@ There are `5` provisional Pareto candidates across validation median RMSE, stric
 
 The scatter's x-axis is validation median RMSE and its y-axis is validation P95 RMSE; lower-left is better on both. Color identifies the covered construction family. Larger black-outlined points are provisional Pareto candidates after also accounting for strict-perfect rate and node-max P95, so no single point is declared the automatic winner.
 
+### All Four Co-Primary Validation Metrics
+
+Experiment 13 defines quality using four co-primary outcomes. Each row below reports the best observed value in the incomplete prefix; different metrics can select different strategy rows.
+
+| Co-primary metric | Better direction | Best observed value | Best observed row |
+| --- | --- | ---: | --- |
+| Median RMSE | lower | 0.01711541 | `x13a_broad_mean_global_repair_interleaved_candidate_budget48_layer_clip0_to1` |
+| Strict-perfect LFO rate | higher | 1.059% | `x13a_family_balanced_repair_candidate_budget48_final_clip_only` |
+| P95 RMSE | lower | 0.040208414 | `x13a_broad_mean_global_repair_interleaved_candidate_budget48_layer_clip0_to1` |
+| Node-max error P95 | lower | 0.12179944 | `x13a_broad_mean_global_repair_interleaved_candidate_budget48_layer_clip0_to1` |
+
+### Matched Effects Across All Four Co-Primary Metrics
+
+The table below prevents the P95-focused static plots from standing in for the complete outcome set. The comparison label names both policies explicitly: negative RMSE and node-max deltas favor the policy named after `vs`, while positive strict-perfect deltas favor that same policy.
+
+| Matched factor | Co-primary metric | Right / left / ties | Median right-minus-left delta |
+| --- | --- | ---: | ---: |
+| LayerClip0To1 vs FinalClipOnly | Median RMSE | 16 / 3 / 0 | -0.0024333 |
+| LayerClip0To1 vs FinalClipOnly | Strict-perfect LFO rate | 1 / 4 / 14 | +0.00000 pp |
+| LayerClip0To1 vs FinalClipOnly | P95 RMSE | 19 / 0 / 0 | -0.0070837811 |
+| LayerClip0To1 vs FinalClipOnly | Node-max error P95 | 19 / 0 / 0 | -0.026897132 |
+| CandidateBudget48 vs CandidateBudget24 | Median RMSE | 13 / 2 / 4 | -0.00022921897 |
+| CandidateBudget48 vs CandidateBudget24 | Strict-perfect LFO rate | 6 / 0 / 13 | +0.00000 pp |
+| CandidateBudget48 vs CandidateBudget24 | P95 RMSE | 12 / 3 / 4 | -0.0011559017 |
+| CandidateBudget48 vs CandidateBudget24 | Node-max error P95 | 12 / 3 / 4 | -0.0015844554 |
+| TwoPhase vs Interleaved | Median RMSE | 2 / 10 / 0 | +0.00075542834 |
+| TwoPhase vs Interleaved | Strict-perfect LFO rate | 0 / 2 / 10 | +0.00000 pp |
+| TwoPhase vs Interleaved | P95 RMSE | 6 / 6 / 0 | +0.00047237426 |
+| TwoPhase vs Interleaved | Node-max error P95 | 6 / 6 / 0 | -0.0038753971 |
+
 ## Why These Patterns Appear
 
 `LayerClip0To1` applies a decoder-free physical range constraint after every residual layer. In the covered rows it consistently suppresses accumulated overshoot, so its P95 benefit is both larger and more stable than the changes caused by shortlist size or layer schedule.
@@ -54,7 +84,7 @@ The x-axis is the number of active atoms retained per residual layer and the y-a
 
 ### Historical Oracle Runtime
 
-Lower is faster. The x-axis is legacy oracle construction time on a logarithmic scale and the y-axis ranks the completed rows. The two largest observations are `41678.422` and `10435.226` seconds. These measurements include the superseded implementation and Modern Standby effects, so they diagnose the aborted run but must not be compared with optimized-run timing.
+Lower is faster. A broken x-axis separates ordinary legacy construction timings from the two host-sleep-inflated observations, so the ordinary pattern remains readable while the artifacts stay visible. The two separated observations are `41678.422` and `10435.226` seconds. These measurements diagnose the aborted run but must not be compared with optimized-run timing.
 
 ![Historical legacy construction runtime](images/experiment_13/provisional/legacy_oracle_runtime.png)
 

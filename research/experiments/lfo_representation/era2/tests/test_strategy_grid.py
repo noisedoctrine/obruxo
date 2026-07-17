@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import importlib.util
+from dataclasses import replace
 from pathlib import Path
 import subprocess
 import sys
@@ -23,32 +24,60 @@ from lfo_era2 import strategy_grid_execution as execution  # noqa: E402
 
 class StrategyGridEnumerationTests(unittest.TestCase):
     def test_counts_ids_and_pairing(self) -> None:
-        rows_a, rows_b = grid.experiment13a_specs(), grid.experiment13b_specs(0.001)
-        self.assertEqual((len(rows_a), len(rows_b), len(rows_a + rows_b)), (90, 90, 180))
-        self.assertEqual(len({row.row_id for row in rows_a + rows_b}), 180)
+        rows_a, rows_b = grid.experiment13a_specs(), grid.experiment13b_specs()
+        self.assertEqual((len(rows_a), len(rows_b), len(rows_a + rows_b)), (90, 135, 225))
+        self.assertEqual(len({row.row_id for row in rows_a + rows_b}), 225)
         self.assertEqual(len({row.pair_id for row in rows_a + rows_b}), 90)
+        self.assertEqual({row.layer_normalization_policy for row in rows_b}, {"LayerClip0To1"})
+        self.assertEqual(
+            {row.eligibility_epsilon for row in rows_b},
+            set(grid.EXPERIMENT13B_ELIGIBILITY_EPSILONS),
+        )
+        self.assertEqual(len({row.pair_id for row in rows_b[:3]}), 1)
+        self.assertEqual(
+            tuple(row.eligibility_epsilon for row in rows_b[:3]),
+            grid.EXPERIMENT13B_ELIGIBILITY_EPSILONS,
+        )
         grid.validate_pairing(rows_a, rows_b)
+        with self.assertRaisesRegex(ValueError, "13B must use LayerClip0To1"):
+            grid.validate_row_spec(replace(rows_b[0], layer_normalization_policy="FinalClipOnly"))
         self.assertEqual(rows_a[0].row_id, "x13a_common_case_repair_candidate_budget24_final_clip_only")
         self.assertEqual(rows_a[-1].pair_id, "x13_pair_all_dominant_directions_null_layer_clip0_to1")
         self.assertEqual([row.row_id for row in rows_a], [row.row_id for row in grid.experiment13a_specs()])
 
     def test_pairs_differ_only_by_phase_population_and_epsilon(self) -> None:
-        rows = grid.all_strategy_specs(0.0025)
-        for pair_id in {row.pair_id for row in rows}:
+        rows = grid.all_strategy_specs()
+        paired_ids = {row.pair_id for row in rows if row.experiment_phase == "13B"}
+        self.assertEqual(len(paired_ids), 45)
+        for pair_id in paired_ids:
             pair = [row for row in rows if row.pair_id == pair_id]
-            self.assertEqual(len(pair), 2)
+            self.assertEqual(len(pair), 4)
             a = next(row for row in pair if row.experiment_phase == "13A")
-            b = next(row for row in pair if row.experiment_phase == "13B")
-            self.assertEqual(a.paired_settings, b.paired_settings)
-            self.assertEqual((a.residual_population_policy, b.residual_population_policy), ("AllResiduals", "UnresolvedOnly"))
+            b_rows = [row for row in pair if row.experiment_phase == "13B"]
+            self.assertTrue(all(a.paired_settings == b.paired_settings for b in b_rows))
+            self.assertTrue(all(b.residual_population_policy == "UnresolvedOnly" for b in b_rows))
+            self.assertEqual(a.residual_population_policy, "AllResiduals")
             self.assertIsNone(a.eligibility_epsilon)
-            self.assertEqual(b.eligibility_epsilon, 0.0025)
+            self.assertEqual(
+                {b.eligibility_epsilon for b in b_rows},
+                set(grid.EXPERIMENT13B_ELIGIBILITY_EPSILONS),
+            )
+            self.assertTrue(all(b.layer_normalization_policy == "LayerClip0To1" for b in b_rows))
+        unpaired_a = [
+            row for row in rows
+            if row.experiment_phase == "13A" and row.pair_id not in paired_ids
+        ]
+        self.assertEqual(len(unpaired_a), 45)
+        self.assertEqual({row.layer_normalization_policy for row in unpaired_a}, {"FinalClipOnly"})
 
     def test_fixed_contract_and_distinct_thresholds(self) -> None:
-        rows_a, rows_b = grid.experiment13a_specs(), grid.experiment13b_specs(0.02)
+        rows_a, rows_b = grid.experiment13a_specs(), grid.experiment13b_specs()
         rows = rows_a + rows_b
         self.assertTrue(all(row.finish_threshold == 1e-5 for row in rows))
-        self.assertEqual({row.eligibility_epsilon for row in rows_b}, {0.02})
+        self.assertEqual(
+            {row.eligibility_epsilon for row in rows_b},
+            set(grid.EXPERIMENT13B_ELIGIBILITY_EPSILONS),
+        )
         self.assertTrue(all(row.head_outputs_actual == 193 for row in rows))
         self.assertTrue(all((row.residual_width, row.residual_depth) == (8, 16) for row in rows))
         self.assertTrue(all((row.reserved_atom, row.active_atoms_per_layer) == ("NoOpAtom", 7) for row in rows))
@@ -191,6 +220,46 @@ class StrategyGridGateTests(unittest.TestCase):
             with self.assertRaisesRegex(grid.PhaseGateError, "row manifest is incompatible"):
                 grid.validate_completed_13a(run_dir)
 
+    def test_completed_13b_requires_all_three_epsilon_sweeps(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp)
+            identity, fingerprint = _write_completed_13a(run_dir)
+            manifest_path = run_dir / "manifest.json"
+            manifest = json.loads(manifest_path.read_text())
+            manifest["phases"]["13B"] = {
+                "experiment_phase": "13B",
+                "row_count": 135,
+                "expected_row_count": 135,
+                "complete_design": True,
+                "smoke": False,
+                "filtered": False,
+                "eligibility_epsilon_sweep": list(grid.EXPERIMENT13B_ELIGIBILITY_EPSILONS),
+                "eligibility_epsilon_sweep_version": grid.EXPERIMENT13B_SWEEP_VERSION,
+                "rows": [row.manifest_dict(identity, fingerprint) for row in grid.experiment13b_specs()],
+            }
+            manifest_path.write_text(json.dumps(manifest))
+            status = {
+                "schema_version": grid.SCHEMA_VERSION,
+                "experiment_id": grid.EXPERIMENT_ID,
+                "experiment_phase": "13B",
+                "state": "complete",
+                "experiment13a_run_identity": identity,
+                "row_count": 135,
+                "expected_row_count": 135,
+                "completed_rows": 135,
+                "failed_rows": 0,
+                "smoke": False,
+                "filtered": False,
+                "completed_at_utc": "2026-07-17T00:00:00+00:00",
+            }
+            status_path = run_dir / grid.PHASE_STATUS_FILES["13B"]
+            status_path.write_text(json.dumps(status))
+            grid.validate_completed_13b(run_dir)
+            status["completed_rows"] = 134
+            status_path.write_text(json.dumps(status))
+            with self.assertRaisesRegex(grid.PhaseGateError, "all 135"):
+                grid.validate_completed_13b(run_dir)
+
     def test_missing_partial_stale_and_incompatible_selection_block_13b(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             run_dir = Path(tmp)
@@ -253,18 +322,28 @@ class StrategyGridGateTests(unittest.TestCase):
                             require_passed=False,
                         )
 
-    def test_valid_selection_freezes_one_epsilon_and_dataset_identity(self) -> None:
+    def test_valid_failed_selection_allows_fixed_sweep_and_preserves_dataset_identity(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             run_dir = Path(tmp)
             identity, fingerprint = _write_completed_13a(run_dir)
             path = run_dir / "epsilon_selection.json"
-            path.write_text(json.dumps(_selection_payload(identity, fingerprint, selected=0.005)))
-            selection = grid.load_epsilon_selection(path, expected_run_identity=identity, expected_configuration_fingerprint=fingerprint, require_passed=True)
-            self.assertEqual({row.eligibility_epsilon for row in grid.experiment13b_specs(selection.selected_epsilon or -1)}, {0.005})
+            path.write_text(json.dumps(_selection_payload(identity, fingerprint, passed=False, selected=None)))
+            selection = grid.load_epsilon_selection(
+                path,
+                expected_run_identity=identity,
+                expected_configuration_fingerprint=fingerprint,
+                require_passed=False,
+            )
+            self.assertFalse(selection.selection_passed)
+            self.assertEqual(
+                {row.eligibility_epsilon for row in grid.experiment13b_specs()},
+                set(grid.EXPERIMENT13B_ELIGIBILITY_EPSILONS),
+            )
             with self.assertRaisesRegex(grid.PhaseGateError, "metadata path"):
                 grid.run_13b(output_dir=run_dir, epsilon_selection_path=path, metadata_path=run_dir / "other.csv", backend="numpy")
             self.assertEqual(grid.read_phase_status(run_dir, "13B")["state"], "blocked")
-            row_id = grid.experiment13b_specs(0.005)[0].row_id
+            row = grid.experiment13b_specs()[0]
+            row_id = row.row_id
             grid.run_13b(
                 output_dir=run_dir,
                 epsilon_selection_path=path,
@@ -275,10 +354,23 @@ class StrategyGridGateTests(unittest.TestCase):
                 chunk_size=8,
             )
             self.assertEqual(grid.read_phase_status(run_dir, "13B")["state"], "partial")
+            self.assertEqual(grid.read_phase_status(run_dir, "13B")["expected_row_count"], 135)
+            manifest = json.loads((run_dir / "manifest.json").read_text())
+            self.assertEqual(manifest["phases"]["13B"]["expected_row_count"], 135)
+            self.assertEqual(
+                manifest["phases"]["13B"]["eligibility_epsilon_sweep"],
+                list(grid.EXPERIMENT13B_ELIGIBILITY_EPSILONS),
+            )
+            self.assertEqual(
+                {row["layer_normalization_policy"] for row in manifest["phases"]["13B"]["rows"]},
+                {"LayerClip0To1"},
+            )
             self.assertTrue((run_dir / "summary.csv").exists())
             diagnostics = runtime.read_csv(run_dir / "rows" / row_id / "atom_construction.csv")
             self.assertTrue(diagnostics)
-            self.assertTrue(all(float(row["selected_eligibility_epsilon"]) == 0.005 for row in diagnostics))
+            self.assertTrue(
+                all(float(item["selected_eligibility_epsilon"]) == row.eligibility_epsilon for item in diagnostics)
+            )
 
     def test_pilot_restrictions(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -418,9 +510,18 @@ class StrategyGridCliTests(unittest.TestCase):
         self.assertEqual(help_result.returncode, 0, help_result.stderr)
         for command in (
             "run-13a", "select-epsilon", "run-13b-pilot", "override-epsilon", "run-13b",
-            "analyze", "analyze-partial", "analyze-scaling", "verify-equivalence", "cancel", "status", "monitor",
+            "analyze", "analyze-13a", "analyze-partial", "analyze-scaling", "verify-equivalence", "cancel", "status", "monitor",
         ):
             self.assertIn(command, help_result.stdout)
+        self.assertIn("135-row LayerClip0To1 three-epsilon", help_result.stdout)
+        partial_help = subprocess.run(
+            [sys.executable, str(script), "analyze-partial", "--help"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(partial_help.returncode, 0, partial_help.stderr)
+        self.assertIn("--html-report-path", partial_help.stdout)
         with tempfile.TemporaryDirectory() as tmp:
             result = subprocess.run(
                 [sys.executable, str(script), "--mkl-threading-layer", "SEQUENTIAL", "--native-threads", "1", "status", "--run-dir", tmp],
@@ -430,6 +531,7 @@ class StrategyGridCliTests(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("13A: state=not_started", result.stdout)
+            self.assertIn("13B: state=not_started completed_rows=0/135", result.stdout)
             self.assertIn("13B_gate=blocked", result.stdout)
 
     def test_async_command_does_not_recurse_and_preserves_runtime_options(self) -> None:

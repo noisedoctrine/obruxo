@@ -1,0 +1,1772 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Experiment 13 Strategy Grid Report</title>
+  <style>
+    :root {
+      --bg: #f4f7f6;
+      --surface: #ffffff;
+      --surface-2: #edf3f2;
+      --surface-3: #e4eeec;
+      --text: #13232a;
+      --muted: #60757e;
+      --border: #cbdad7;
+      --accent: #147e67;
+      --accent-2: #286db7;
+      --warn: #a86100;
+      --danger: #b63b34;
+      --blocked: #7741a5;
+      --good: #147e67;
+      --shadow: 0 16px 42px rgba(20, 48, 56, .12);
+      --radius: 18px;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(circle at 12% -10%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 32rem),
+        radial-gradient(circle at 90% 8%, color-mix(in srgb, var(--accent-2) 13%, transparent), transparent 30rem),
+        var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.55;
+    }
+    button, input, select { font: inherit; }
+    button, select { color: inherit; }
+    button { cursor: pointer; }
+    a { color: var(--accent-2); }
+    code { font-family: var(--mono); }
+    .shell { width: min(1480px, calc(100% - 32px)); margin: 0 auto; }
+    .topbar {
+      border-bottom: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+      background: var(--bg);
+    }
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      min-height: 72px;
+    }
+    .brand { min-width: 0; flex: 1; }
+    .eyebrow { color: var(--accent); font: 700 .72rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; }
+    .brand h1 { margin: 6px 0 0; font-size: clamp(1rem, 2.2vw, 1.45rem); line-height: 1.15; }
+    .top-actions { display: flex; align-items: center; gap: 8px; }
+    .icon-button, .nav-button, .small-button, .tab-button, .filter-button {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      padding: 9px 12px;
+      color: var(--muted);
+      transition: border-color .18s ease, color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .icon-button:hover, .nav-button:hover, .small-button:hover, .tab-button:hover, .filter-button:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+    .nav-button[aria-current="page"], .tab-button[aria-selected="true"], .filter-button.active {
+      color: var(--text);
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+    }
+    .global-filter-bar {
+      position: sticky;
+      z-index: 70;
+      top: 0;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .global-filter-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 9px 12px;
+      align-items: center;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: var(--surface);
+      box-shadow: 0 12px 32px rgba(20, 48, 56, .15);
+    }
+    .global-filter-heading { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .global-filter-title { min-width: 0; }
+    .global-filter-title strong { font-size: .82rem; }
+    .global-filter-title span { margin-left: 8px; color: var(--muted); font-size: .7rem; }
+    .global-filter-body { grid-column: 1 / -1; display: grid; gap: 9px; }
+    .filter-intro { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; color: var(--muted); font-size: .7rem; }
+    .filter-intro strong { color: var(--text); }
+    .filter-intro .coverage-key { margin-left: auto; font-family: var(--mono); }
+    .filter-groups { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; align-items: start; }
+    .strict-threshold-control { display: flex; flex-wrap: wrap; align-items: center; gap: 7px 12px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 10px; background: color-mix(in srgb, var(--accent) 5%, var(--surface-2)); }
+    .strict-threshold-control strong { font: 750 .68rem/1 var(--mono); text-transform: uppercase; }
+    .strict-threshold-control .threshold-note { flex: 1 1 360px; color: var(--muted); font-size: .68rem; }
+    .strict-threshold-control .filter-pills { flex: 0 0 auto; }
+    .filter-fieldset { min-width: 0; margin: 0; padding: 9px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); }
+    .filter-fieldset[data-stage="construction"] { grid-column: 1 / -1; background: color-mix(in srgb, var(--accent-2) 4%, var(--surface-2)); }
+    .filter-fieldset legend { display: flex; align-items: center; gap: 6px; width: auto; margin: 0 0 7px; padding: 0 4px; color: var(--muted); font: 750 .66rem/1 var(--mono); text-transform: uppercase; }
+    .filter-step { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-2); color: white; font: 800 .62rem/1 var(--sans); }
+    .filter-hint { margin-left: 3px; color: var(--muted); font: 500 .65rem/1.25 var(--sans); text-transform: none; }
+    .filter-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+    .filter-pill {
+      min-height: 28px;
+      padding: 5px 8px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font: 700 .67rem/1 var(--sans);
+      white-space: nowrap;
+    }
+    .filter-pill:hover { border-color: var(--accent); color: var(--text); }
+    .filter-pill[aria-pressed="true"] {
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+      color: var(--accent);
+    }
+    .filter-pill:disabled { cursor: not-allowed; opacity: .38; border-style: dashed; }
+    .filter-pill.zero-complete:not([aria-pressed="true"]) { border-style: dashed; }
+    .facet-count { display: inline-flex; align-items: baseline; gap: 1px; margin-left: 5px; padding-left: 5px; border-left: 1px solid currentColor; opacity: .72; font: 650 .58rem/1 var(--mono); }
+    .facet-count b { color: var(--accent); }
+    .filter-dependent-empty { display: flex; align-items: center; gap: 8px; min-height: 32px; padding: 6px 9px; border: 1px dashed var(--border); border-radius: 8px; color: var(--muted); font-size: .72rem; }
+    .filter-dependent-empty::before { content: "1"; display: grid; place-items: center; width: 19px; height: 19px; flex: 0 0 auto; border-radius: 50%; background: var(--accent-2); color: white; font-weight: 800; }
+    .filter-toggle { display: flex; align-items: center; gap: 7px; align-self: center; color: var(--muted); font-size: .75rem; white-space: nowrap; }
+    .filter-toggle input { width: 17px; height: 17px; accent-color: var(--accent); }
+    .filter-summary { display: flex; min-width: 0; align-items: center; gap: 8px; color: var(--muted); font-size: .72rem; }
+    .filter-summary strong { color: var(--accent); }
+    .filter-summary span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .filter-collapse { justify-self: end; width: auto; min-width: 92px; }
+    #global-reset { justify-self: start; }
+    .global-filter-bar.collapsed { padding: 5px 0; }
+    .global-filter-bar.collapsed .global-filter-panel { min-height: 42px; padding-block: 6px; box-shadow: 0 7px 20px rgba(20, 48, 56, .12); }
+    .global-filter-bar.collapsed .global-filter-body,
+    .global-filter-bar.collapsed .filter-toggle,
+    .global-filter-bar.collapsed #global-reset { display: none; }
+    button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--accent-2) 55%, transparent);
+      outline-offset: 2px;
+    }
+    .hero { padding: 52px 0 26px; }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(300px, .55fr); gap: 24px; align-items: stretch; }
+    .hero-copy, .status-card, .panel, .finding-card, .evidence-card, .detail-panel, .report-section {
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--surface) 94%, transparent);
+      box-shadow: var(--shadow);
+    }
+    .hero-copy { padding: clamp(26px, 4vw, 48px); border-radius: 26px; }
+    .hero-copy h2 { margin: 10px 0 14px; max-width: 900px; font-size: clamp(2rem, 5vw, 4.7rem); line-height: .98; letter-spacing: -.045em; }
+    .hero-copy p { margin: 0; max-width: 820px; color: var(--muted); font-size: 1.05rem; }
+    .status-card { display: flex; flex-direction: column; justify-content: space-between; padding: 28px; border-radius: 26px; }
+    .status-badge { display: inline-flex; align-items: center; align-self: flex-start; gap: 9px; padding: 8px 12px; border: 1px solid var(--warn); border-radius: 999px; color: var(--warn); font: 800 .77rem/1 var(--mono); letter-spacing: .08em; }
+    .status-badge::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--warn); box-shadow: 0 0 14px var(--warn); }
+    .status-card.complete .status-badge { border-color: var(--accent); color: var(--accent); }
+    .status-card.complete .status-badge::before { background: var(--accent); box-shadow: 0 0 14px var(--accent); }
+    .coverage-number { margin: 30px 0 4px; font-size: clamp(3rem, 6vw, 5.6rem); font-weight: 850; line-height: .9; letter-spacing: -.06em; }
+    .coverage-caption { color: var(--muted); }
+    .warning-strip {
+      margin-top: 18px;
+      padding: 14px 18px;
+      border: 1px solid color-mix(in srgb, var(--warn) 55%, var(--border));
+      border-radius: 13px;
+      background: color-mix(in srgb, var(--warn) 8%, var(--surface));
+      color: color-mix(in srgb, var(--warn) 70%, var(--text));
+    }
+    .contract-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+    .chip { padding: 7px 10px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface-2); color: var(--muted); font: 650 .76rem/1 var(--mono); }
+    .report-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0; }
+    .view { display: none; padding-bottom: 80px; }
+    .view.active { display: block; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin: 42px 0 18px; }
+    .section-heading h2 { margin: 0; font-size: clamp(1.5rem, 3vw, 2.4rem); letter-spacing: -.03em; }
+    .section-heading p { margin: 0; max-width: 650px; color: var(--muted); }
+    .finding-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .finding-card { min-height: 170px; padding: 20px; border-radius: var(--radius); }
+    .finding-label { color: var(--muted); font: 700 .72rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+    .finding-value { margin: 18px 0 8px; font-size: 1.75rem; font-weight: 800; letter-spacing: -.035em; }
+    .finding-card p { margin: 0; color: var(--muted); font-size: .9rem; }
+    .primary-metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+    .primary-metric-card { min-width: 0; padding: 16px 18px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+    .primary-metric-card .metric-name { color: var(--muted); font: 750 .7rem/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+    .primary-metric-card .metric-value { margin: 11px 0 6px; font: 800 1.35rem/1.1 var(--mono); letter-spacing: -.03em; }
+    .primary-metric-card .metric-direction { color: var(--accent); font-size: .76rem; }
+    .primary-metric-card code { display: block; margin-top: 9px; overflow: hidden; color: var(--muted); font-size: .68rem; text-overflow: ellipsis; white-space: nowrap; }
+    .controls, .data-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+    }
+    .controls input, .controls select, .data-controls input, .data-controls select {
+      min-height: 42px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface-2);
+      color: var(--text);
+      padding: 9px 11px;
+    }
+    .controls input, .data-controls input { min-width: min(320px, 100%); flex: 1; }
+    .zone-group { margin-top: 22px; }
+    .zone-title { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; color: var(--muted); font: 750 .75rem/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+    .zone-title::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+    .evidence-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .evidence-card {
+      position: relative;
+      min-height: 205px;
+      padding: 20px;
+      border-radius: var(--radius);
+      text-align: left;
+      color: var(--text);
+      overflow: hidden;
+    }
+    .evidence-card::after { content: ""; position: absolute; inset: auto -30% -60% 35%; height: 140px; border-radius: 50%; background: color-mix(in srgb, var(--node-color, var(--accent)) 15%, transparent); filter: blur(18px); }
+    .evidence-card:hover { transform: translateY(-2px); border-color: var(--node-color, var(--accent)); }
+    .evidence-card.active { border-color: var(--node-color, var(--accent)); box-shadow: 0 0 0 2px color-mix(in srgb, var(--node-color, var(--accent)) 22%, transparent), var(--shadow); }
+    .node-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+    .node-number { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 9px; background: color-mix(in srgb, var(--node-color, var(--accent)) 18%, var(--surface-2)); color: var(--node-color, var(--accent)); font: 800 .85rem/1 var(--mono); }
+    .confidence { display: inline-flex; gap: 6px; align-items: center; color: var(--node-color, var(--muted)); font: 750 .66rem/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+    .confidence::before { content: ""; width: 7px; height: 7px; border: 1px solid currentColor; border-radius: 2px; background: color-mix(in srgb, currentColor 30%, transparent); }
+    .evidence-card h3 { position: relative; z-index: 1; margin: 22px 0 8px; font-size: 1.08rem; }
+    .evidence-card p { position: relative; z-index: 1; margin: 0; color: var(--muted); font-size: .9rem; }
+    .node-stat { position: relative; z-index: 1; margin-top: 18px; font: 780 1.05rem/1 var(--mono); color: var(--node-color, var(--accent)); }
+    .detail-panel { margin-top: 22px; border-radius: 22px; overflow: hidden; }
+    .detail-panel[hidden] { display: none; }
+    .detail-header { display: flex; gap: 18px; justify-content: space-between; padding: 24px; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+    .detail-header h2 { margin: 5px 0 4px; font-size: clamp(1.4rem, 3vw, 2.3rem); }
+    .detail-header p { margin: 0; color: var(--muted); }
+    .detail-body { padding: 24px; }
+    .tab-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+    .tab-panel h3 { margin: 0 0 12px; font-size: 1.2rem; }
+    .tab-panel p, .tab-panel li { color: var(--muted); }
+    .takeaway { padding: 18px; border-left: 4px solid var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface-2)); border-radius: 0 12px 12px 0; }
+    .limitation { padding: 18px; border-left: 4px solid var(--warn); background: color-mix(in srgb, var(--warn) 8%, var(--surface-2)); border-radius: 0 12px 12px 0; }
+    .chart-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    .chart-card { min-width: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-2); padding: 12px; }
+    .chart { width: 100%; min-width: 0; height: 500px; }
+    .chart.delta-chart { height: 620px; }
+    .chart.compact { height: 330px; }
+    .chart-caption { margin: 10px 8px 4px; color: var(--muted); font-size: .82rem; }
+    .reading-guide { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 16px 0; }
+    .reading-step { padding: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--muted); font-size: .84rem; }
+    .reading-step strong { display: block; margin-bottom: 4px; color: var(--text); }
+    .motivation { padding: 16px 18px; border-radius: 12px; background: color-mix(in srgb, var(--accent-2) 8%, var(--surface-2)); color: var(--muted); }
+    .mechanism-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
+    .mechanism-card { padding: 18px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+    .mechanism-card h4 { margin: 6px 0 8px; font-size: 1rem; }
+    .mechanism-card p { margin: 0 0 14px; color: var(--muted); font-size: .83rem; }
+    .mechanism-meta { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; color: var(--muted); font: 700 .68rem/1 var(--mono); }
+    .mechanism-flow { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; align-items: center; margin: 12px 0; }
+    .mechanism-box { min-width: 0; padding: 9px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface-2); text-align: center; font-size: .72rem; }
+    .mechanism-box.broad { border-color: color-mix(in srgb, var(--accent-2) 55%, var(--border)); }
+    .mechanism-box.repair { border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); }
+    .mechanism-arrow { color: var(--muted); font-weight: 800; }
+    .layer-strip { display: grid; grid-template-columns: repeat(16, minmax(5px, 1fr)); gap: 2px; margin-top: 7px; }
+    .layer-cell { display: grid; place-items: center; height: 14px; border-radius: 3px; background: color-mix(in srgb, var(--accent-2) 65%, white); color: #244b68; font: 800 .48rem/1 var(--mono); }
+    .layer-cell.repair { background: color-mix(in srgb, var(--accent) 65%, white); }
+    .slot-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin: 10px 0; }
+    .slot-cell { padding: 7px 2px; border-radius: 5px; background: var(--surface-2); color: var(--muted); text-align: center; font: 700 .61rem/1 var(--mono); }
+    .chart-fallback { display: grid; place-items: center; min-height: 260px; padding: 26px; text-align: center; color: var(--warn); border: 1px dashed var(--warn); border-radius: 12px; }
+    .table-wrap { overflow: auto; max-width: 100%; border: 1px solid var(--border); border-radius: 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; white-space: nowrap; }
+    th { position: sticky; top: 0; z-index: 2; background: var(--surface-3); color: var(--muted); font: 750 .7rem/1.2 var(--mono); letter-spacing: .04em; text-transform: uppercase; }
+    tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+    td code { font-size: .76rem; }
+    .report-stack { display: grid; gap: 20px; }
+    .report-section { padding: clamp(22px, 4vw, 38px); border-radius: 22px; }
+    .report-section h3 { margin: 7px 0 10px; font-size: 1.65rem; }
+    .report-section > p { color: var(--muted); }
+    .report-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    .compare-layout { display: grid; grid-template-columns: minmax(300px, .8fr) minmax(0, 1.2fr); gap: 18px; }
+    .panel { padding: 20px; border-radius: var(--radius); }
+    .panel h3 { margin: 0 0 12px; }
+    .selection-list { display: grid; gap: 8px; max-height: 570px; overflow: auto; }
+    .selection-row { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); }
+    .selection-row code { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .72rem; }
+    .selection-row small { color: var(--muted); }
+    .selected-chips { display: flex; flex-wrap: wrap; gap: 8px; min-height: 34px; margin-bottom: 12px; }
+    .selected-chip { max-width: 260px; padding: 7px 9px; border: 1px solid var(--accent); border-radius: 999px; overflow: hidden; color: var(--accent); text-overflow: ellipsis; white-space: nowrap; font: 700 .7rem/1 var(--mono); }
+    .data-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+    .empty { padding: 34px; border: 1px dashed var(--border); border-radius: 12px; color: var(--muted); text-align: center; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    footer { padding: 28px 0 50px; border-top: 1px solid var(--border); color: var(--muted); font-size: .8rem; }
+    footer code { overflow-wrap: anywhere; }
+    @media (max-width: 1100px) {
+      .finding-grid, .evidence-grid, .primary-metric-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-grid, .compare-layout { grid-template-columns: 1fr; }
+      .global-filter-panel { grid-template-columns: minmax(0, 1fr) auto; }
+      .filter-summary { grid-column: 1 / -1; grid-row: 2; }
+      .global-filter-body { grid-column: 1 / -1; }
+      .filter-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 720px) {
+      .shell { width: min(100% - 20px, 1480px); }
+      .topbar-inner { min-height: 62px; }
+      .brand .eyebrow { display: none; }
+      .top-actions .label { display: none; }
+      .hero { padding-top: 22px; }
+      .hero-copy, .status-card { border-radius: 18px; }
+      .finding-grid, .evidence-grid, .primary-metric-grid, .chart-grid { grid-template-columns: 1fr; }
+      .section-heading { align-items: flex-start; flex-direction: column; }
+      .detail-header { flex-direction: column; }
+      .chart { height: 420px; }
+      .chart.delta-chart { height: 620px; }
+      .controls > *, .data-controls > * { width: 100%; }
+      .global-filter-panel { width: calc(100% - 12px); grid-template-columns: minmax(0, 1fr) auto; }
+      .global-filter-title span { display: none; }
+      .filter-groups { display: grid; grid-template-columns: 1fr; gap: 8px; }
+      .filter-fieldset[data-stage="construction"] { grid-column: auto; }
+      .filter-fieldset legend { display: flex; margin: 0 0 6px; }
+      .filter-pills { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 3px; }
+      .filter-summary span { display: none; }
+      .filter-intro .coverage-key { width: 100%; margin-left: 0; }
+      .reading-guide, .mechanism-grid { grid-template-columns: 1fr; }
+    }
+    @media print {
+      .topbar, .global-filter-bar, .report-nav, .controls, .data-controls, #interactive-view, #compare-view, #data-view { display: none !important; }
+      #report-view { display: block !important; }
+      body { background: white; color: black; }
+      .report-section { break-inside: avoid; box-shadow: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <div class="brand">
+        <div class="eyebrow">LFO ERA 2 · RESEARCH NOTE</div>
+        <h1 id="page-title">Experiment 13 Strategy Grid</h1>
+      </div>
+      <div class="top-actions">
+        <button id="scroll-top" class="icon-button" type="button" aria-label="Scroll to top"><span aria-hidden="true">↑</span> <span class="label">Top</span></button>
+      </div>
+    </div>
+  </header>
+
+  <aside class="global-filter-bar" aria-label="Global strategy filters">
+    <div class="shell global-filter-panel">
+      <div class="global-filter-heading">
+        <div class="global-filter-title"><strong>Global filters</strong><span>Multi-select · all report views</span></div>
+        <div id="global-filter-summary" class="filter-summary" aria-live="polite"></div>
+      </div>
+      <label class="filter-toggle"><input id="global-apply-charts" type="checkbox" checked> Apply to every chart</label>
+      <button id="global-collapse" class="small-button filter-collapse" type="button" aria-expanded="true" aria-controls="global-filter-body">Minimize</button>
+      <div id="global-filter-body" class="global-filter-body">
+        <div class="filter-intro"><strong>Build a valid slice:</strong><span>family → construction variant → run settings</span><span class="coverage-key"><b>completed</b>/planned rows</span></div>
+        <div id="strict-threshold-control" class="strict-threshold-control" hidden></div>
+        <div id="global-filter-groups" class="filter-groups"></div>
+        <button id="global-reset" class="small-button" type="button">Clear selections</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="shell">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow">Fixed W8D16 · Strategy Grid</div>
+          <h2 id="hero-title">Evidence before a winner.</h2>
+          <p id="hero-summary">Inspect matched effects, quality tradeoffs, codebook progression, and eligibility calibration.</p>
+          <div id="contract-row" class="contract-row" aria-label="Fixed experiment contract"></div>
+        </div>
+        <aside class="status-card" aria-label="Report status">
+          <div class="status-badge"><span id="status-label">STATUS</span> · <span id="status-count">0/90</span></div>
+          <div>
+            <div id="coverage-number" class="coverage-number">43.3%</div>
+            <div id="coverage-caption" class="coverage-caption">of Experiment 13A rows represented</div>
+          </div>
+        </aside>
+      </div>
+      <div id="warning-strip" class="warning-strip"></div>
+      <nav class="report-nav" aria-label="Report views">
+        <button class="nav-button" type="button" data-view="interactive" aria-current="page">Evidence map</button>
+        <button class="nav-button" type="button" data-view="report">Full report</button>
+        <button class="nav-button" type="button" data-view="compare">Compare strategies</button>
+        <button class="nav-button" type="button" data-view="data">Data</button>
+      </nav>
+    </section>
+
+    <main>
+      <section id="interactive-view" class="view active" aria-labelledby="evidence-map-title">
+        <div class="section-heading">
+          <div><div class="eyebrow">Main findings</div><h2 id="findings-title">What the evidence supports</h2></div>
+          <p id="findings-summary">Matched comparisons carry more weight than an unqualified leaderboard.</p>
+        </div>
+        <div id="finding-grid" class="finding-grid"></div>
+        <section aria-labelledby="co-primary-title">
+          <div class="section-heading" style="margin-top:28px">
+            <div><div class="eyebrow">Co-primary outcomes</div><h2 id="co-primary-title">Four metrics define quality</h2></div>
+            <p id="metrics-summary">No single validation metric is authoritative. Each card shows the best observed value and names its winning row.</p>
+          </div>
+          <div id="primary-metric-grid" class="primary-metric-grid"></div>
+        </section>
+
+        <div class="section-heading">
+          <div><div class="eyebrow">Interactive evidence map</div><h2 id="evidence-map-title">Questions, not one leaderboard</h2></div>
+          <p id="evidence-help">Choose a node or use the number keys. Use arrow keys to move between nodes; Escape closes the detail view.</p>
+        </div>
+        <div class="controls">
+          <label class="sr-only" for="node-search">Search evidence nodes</label>
+          <input id="node-search" type="search" placeholder="Search evidence nodes…">
+          <label class="sr-only" for="zone-filter">Filter by zone</label>
+          <select id="zone-filter"><option value="all">All zones</option></select>
+          <label class="sr-only" for="confidence-filter">Filter by evidence status</label>
+          <select id="confidence-filter"><option value="all">All evidence states</option></select>
+        </div>
+        <div id="evidence-map"></div>
+        <article id="detail-panel" class="detail-panel" hidden aria-live="polite"></article>
+      </section>
+
+      <section id="report-view" class="view" aria-labelledby="full-report-title">
+        <div class="section-heading">
+          <div><div class="eyebrow">Sequential reading view</div><h2 id="full-report-title">Full report</h2></div>
+          <p>Each section pairs a mechanism claim with evidence, a decision, and the limitation that prevents overreach.</p>
+        </div>
+        <div id="report-stack" class="report-stack"></div>
+      </section>
+
+      <section id="compare-view" class="view" aria-labelledby="compare-title">
+        <div class="section-heading">
+          <div><div class="eyebrow">Strategy workspace</div><h2 id="compare-title">Compare up to four completed rows</h2></div>
+          <p id="compare-summary">Radar values are normalized within the rows in this report. The exact table is authoritative; the radar is a visual aid, not a scalar ranking.</p>
+        </div>
+        <div id="compare-filters" class="data-controls"></div>
+        <div class="compare-layout" style="margin-top:16px">
+          <section class="panel">
+            <h3>Completed strategies</h3>
+            <div id="compare-list" class="selection-list"></div>
+          </section>
+          <section class="panel">
+            <div class="report-meta"><h3 style="margin-right:auto">Selected evidence</h3><button id="compare-clear" class="small-button" type="button">Clear</button></div>
+            <div id="selected-chips" class="selected-chips"></div>
+            <div id="compare-radar" class="chart compact" aria-label="Normalized multi-metric strategy comparison"></div>
+            <div id="compare-table"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="data-view" class="view" aria-labelledby="data-title">
+        <div class="section-heading">
+          <div><div class="eyebrow">Audit surface</div><h2 id="data-title">Embedded report data</h2></div>
+          <p>The full high-volume calibration CSVs remain outside this HTML. These compact tables contain the rows needed to reproduce every interactive claim.</p>
+        </div>
+        <div id="data-filters" class="data-controls"></div>
+        <div id="data-tabs" class="data-tabs" role="tablist" aria-label="Data tables"></div>
+        <div class="report-meta" style="margin-bottom:12px">
+          <div id="data-count" style="margin-right:auto;color:var(--muted)"></div>
+          <button id="export-csv" class="small-button" type="button">Export filtered CSV</button>
+        </div>
+        <div id="data-table"></div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <div class="shell">
+      <strong id="footer-status">Experiment 13 report.</strong><br>
+      Source archive: <code id="source-run"></code><br>
+      Source fingerprint: <code id="source-hash"></code>
+    </div>
+  </footer>
+
+  <script id="report-data" type="application/json">__REPORT_DATA_JSON__</script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@6.1.0/dist/echarts.min.js" onerror="window.__echartsFailed=true"></script>
+  <script>
+  (() => {
+    "use strict";
+    const DATA = JSON.parse(document.getElementById("report-data").textContent);
+    const isComplete13A = DATA.meta.report_mode === "complete_13a";
+    const qs = (selector, root = document) => root.querySelector(selector);
+    const qsa = (selector, root = document) => [...root.querySelectorAll(selector)];
+    const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+    const num = value => Number(value || 0);
+    const fmt = (value, digits = 4) => Number.isFinite(num(value)) ? num(value).toLocaleString(undefined, {maximumFractionDigits: digits}) : "—";
+    const fmtTolerance = value => num(value) === 0 ? "0" : Math.abs(num(value)) < 0.001 ? num(value).toExponential(2) : fmt(value, 6);
+    const pct = (value, digits = 1) => `${(num(value) * 100).toFixed(digits)}%`;
+    const short = value => String(value || "").replace(/^x13a_/, "").replaceAll("_", " · ");
+    const unique = values => [...new Set(values.filter(value => value !== undefined && value !== null && value !== ""))].sort();
+    const truthy = value => value === true || ["true","1","yes"].includes(String(value).toLowerCase());
+    const COLORS = {accent:"#147e67", blue:"#286db7", warn:"#a86100", danger:"#b63b34", blocked:"#7741a5"};
+    const STATUS = {
+      "strong provisional": {color: COLORS.accent}, "strong 13A": {color: COLORS.accent}, complete: {color: COLORS.accent}, diagnostic: {color: COLORS.blue}, mixed: {color: COLORS.warn}, unresolved: {color: COLORS.warn}, blocked: {color: COLORS.blocked}, "sweep planned": {color: COLORS.blue}, "bounded ablation": {color: COLORS.blue}, "same-run only": {color: COLORS.blue}, "historical only": {color: COLORS.danger}
+    };
+    const findings = DATA.findings;
+    const metrics = DATA.tables.metrics;
+    const strictThresholds = DATA.strict_thresholds;
+    let strictTolerance = strictThresholds?.default_tolerance || "1e-5";
+    const coverage = DATA.tables.coverage;
+    const deltas = DATA.tables.matched_deltas;
+    const deep = DATA.deep_analysis || {row_ids:[],marginal_atoms:[],layer_progression:[],mechanisms:[]};
+    const partial = (DATA.tables.partial_codebook || []).map(row => Array.isArray(row) ? {row_id:deep.row_ids[row[0]],construction_family:metrics.find(item=>item.row_id===deep.row_ids[row[0]])?.construction_family,active_atom_count:row[1],validation_median_rmse:row[2],validation_strict_perfect_lfo_rate:row[3],validation_p95_rmse:row[4],validation_node_max_error_p95:row[5]} : row);
+    const scaling = DATA.tables.scaling || [];
+    const diagnostics = (DATA.tables.diagnostics || []).map(row => ({...metrics.find(item=>item.row_id===row.row_id),...row}));
+    const rankings = (DATA.tables.rankings || []).map(row => ({...metrics.find(item=>item.row_id===row.row_id),...row}));
+    const interactions = DATA.tables.factor_interactions || [];
+    const metricById = new Map(metrics.map(row => [row.row_id, row]));
+    const diagnosticById = new Map(diagnostics.map(row => [row.row_id, row]));
+    const deepRowId = index => deep.row_ids?.[index];
+    const calibrationRowIds = DATA.calibration.row_ids || [];
+    const CO_PRIMARY = [
+      {key:"validation_median_rmse", delta:"delta_validation_median_rmse", label:"Median RMSE", axis:"Median\nRMSE ↓", short:"Median", higher:false, format:value=>fmt(value, 7)},
+      {key:"validation_strict_perfect_lfo_rate", delta:"delta_validation_strict_perfect_lfo_rate", label:"Strict-perfect LFO rate", axis:"Strict-perfect\nrate ↑", short:"Strict-perfect", higher:true, format:value=>pct(value, 3)},
+      {key:"validation_p95_rmse", delta:"delta_validation_p95_rmse", label:"P95 RMSE", axis:"P95\nRMSE ↓", short:"P95", higher:false, format:value=>fmt(value, 7)},
+      {key:"validation_node_max_error_p95", delta:"delta_validation_node_max_error_p95", label:"Node-max error P95", axis:"Node-max\nP95 ↓", short:"Node-max", higher:false, format:value=>fmt(value, 7)}
+    ];
+    const GLOBAL_FIELDS = [
+      ["family","construction_family","All families"],
+      ["policy","construction_policy","All policies"],
+      ["schedule","layer_schedule","All schedules"],
+      ["budget","utility_candidate_budget","All budgets"],
+      ["normalization","layer_normalization_policy","All normalization"]
+    ];
+    const CONSTRUCTION_GUIDE = [
+      {policy:"CommonCaseRepair",family:"Experiment12Anchor",kind:"anchor",roles:["common","common","common","common","common","common","common"],description:"Selects observed residuals that improve the typical eligible curve. It is deliberately median-oriented, so hard outliers can receive less capacity."},
+      {policy:"FinishRepairRescue",family:"Experiment12Anchor",kind:"anchor",roles:["finish","finish","common","common","common","hard","hard"],description:"Finishes nearly solved curves first, improves common residuals in the middle, then reserves the last slots for difficult leftovers."},
+      {policy:"FamilyBalancedRepair",family:"Experiment12Anchor",kind:"anchor",roles:["family","family","family","family","family","family","family"],description:"Balances improvement across stable residual families so the largest family cannot dominate every atom choice."},
+      {policy:"BroadMeanGlobalRepair",family:"BroadMeanGlobalRepair",kind:"mixed",broad:"BroadMean",repair:"GlobalRepair",description:"Alternates a shared aligned average correction with the observed residual that removes the most total remaining error."},
+      {policy:"BroadMeanFinishRepair",family:"BroadMeanFinishRepair",kind:"mixed",broad:"BroadMean",repair:"FinishRepair",description:"Makes broad population progress, then targets concrete residuals that push almost-correct curves across the fixed finish threshold."},
+      {policy:"BroadMeanHardRepair",family:"BroadMeanHardRepair",kind:"mixed",broad:"BroadMean",repair:"HardRepair",description:"Uses aligned averages for common structure and observed examples for the current worst-loss decile."},
+      {policy:"TrimmedMeanGlobalRepair",family:"TrimmedMeanGlobalRepair",kind:"mixed",broad:"TrimmedMean",repair:"GlobalRepair",description:"Builds the broad prototype from the best-aligned 90%, limiting outlier pull before global observed-residual cleanup."},
+      {policy:"AlignedMedianGlobalRepair",family:"AlignedMedianGlobalRepair",kind:"mixed",broad:"AlignedMedian",repair:"GlobalRepair",description:"Uses a coordinate-wise aligned median for a strongly robust middle shape, then applies globally useful concrete repairs."},
+      {policy:"ClusterMeanGlobalRepair",family:"ClusterMeanGlobalRepair",kind:"mixed",broad:"ClusterMean",repair:"GlobalRepair",description:"Builds a prototype for one residual cluster at a time, then chooses concrete corrections with the largest total benefit."},
+      {policy:"ClusterMeanHardRepair",family:"ClusterMeanHardRepair",kind:"mixed",broad:"ClusterMean",repair:"HardRepair",description:"Covers major residual clusters broadly, then directs repair layers toward difficult leftovers."},
+      {policy:"DominantDirectionGlobalRepair",family:"DominantDirectionGlobalRepair",kind:"mixed",broad:"DominantDirection",repair:"GlobalRepair",description:"Removes the highest-energy shared residual direction before using the most globally useful observed examples."},
+      {policy:"DiverseCoverageHardRepair",family:"DiverseCoverageHardRepair",kind:"mixed",broad:"DiverseCoverage",repair:"HardRepair",description:"Rewards broadly useful but dissimilar corrections, then spends repair capacity on the remaining hard tail."},
+      {policy:"AllBroadAlignedMeans",family:"PurePrototype",kind:"pure",broad:"BroadMean",description:"Fills every residual layer with successive aligned population means; no observed residual is copied as an atom."},
+      {policy:"AllClusterMeans",family:"PurePrototype",kind:"pure",broad:"ClusterMean",description:"Fills the codebook with repeatedly recomputed cluster prototypes, covering one residual family at a time."},
+      {policy:"AllDominantDirections",family:"PurePrototype",kind:"pure",broad:"DominantDirection",description:"Fills the codebook with successive leading shared residual directions, updating losses after every chosen atom."}
+    ];
+
+    const comparisonText = summary => `${summary.improved}/${summary.count} improve · median Δ ${fmt(summary.median, 6)}`;
+    const metricDeltaSummary = (comparison, metric) => {
+      const values = deltas.filter(row => row.comparison === comparison).map(row => num(row[metric.delta]));
+      const improved = values.filter(value => metric.higher ? value > 0 : value < 0).length;
+      const worsened = values.filter(value => metric.higher ? value < 0 : value > 0).length;
+      const tied = values.filter(value => value === 0).length;
+      const ordered = [...values].sort((a,b)=>a-b); const middle = Math.floor(ordered.length / 2);
+      const median = !ordered.length ? 0 : ordered.length % 2 ? ordered[middle] : (ordered[middle - 1] + ordered[middle]) / 2;
+      return {count:values.length, improved, worsened, tied, median};
+    };
+    const comparisonEvidence = (comparison, favoredPolicy, otherPolicy) => `Across the four co-primary metrics, ${CO_PRIMARY.map(metric => {
+      const summary = metricDeltaSummary(comparison, metric);
+      return `${metric.short}: ${favoredPolicy} ${summary.improved} / ${otherPolicy} ${summary.worsened} / ${summary.tied} ties`;
+    }).join("; ")}. The chart preserves every exact delta and labels the policy favored in each cell.`;
+    const PROVISIONAL_NODES = [
+      {
+        id:"coverage", number:1, zone:"Integrity", status:"blocked", title:"Source coverage", stat:`${DATA.meta.completed_rows}/${DATA.meta.expected_rows} rows`,
+        question:"Which parts of the planned policy grid are present—and which conclusions are structurally unavailable?",
+        mechanism:"The legacy run stopped after an execution-order prefix, not a random or balanced sample. Coverage therefore follows row ordering and leaves entire construction families unobserved.",
+        evidence:`${findings.absent_families.length} planned families have zero completed rows. ${findings.incomplete_families.length} families are incomplete, so observed rankings cannot stand in for the 90-row grid.`,
+        recommendation:"Use matched comparisons inside represented cells. Treat family rankings and the best observed row as provisional navigation aids only.",
+        limitation:"Coverage imbalance is not repaired by confidence intervals or reweighting; absent policy families contain no evidence.", charts:["coverage"]
+      },
+      {
+        id:"normalization", number:2, zone:"Strategy levers", status:"strong provisional", title:"Layer normalization", stat:comparisonText(findings.normalization),
+        question:"Does decoder-free layer clipping suppress tail error consistently across the covered strategies?",
+        mechanism:"LayerClip0To1 constrains every residual-layer output to the physical signal range. It prevents overshoot from compounding before later residual corrections.",
+        evidence:comparisonEvidence("layer_normalization_policy", "LayerClip0To1", "FinalClipOnly"),
+        recommendation:"Keep LayerClip0To1 as the strongest provisional zero-head-cost policy candidate for the canonical grid.",
+        limitation:"The statement is strong within the represented matched cells, but absent construction families could still alter the global effect distribution.", charts:["normalization"]
+      },
+      {
+        id:"budget", number:3, zone:"Strategy levers", status:"mixed", title:"Candidate budget", stat:comparisonText(findings.candidate_budget),
+        question:"Does doubling the offline candidate shortlist from 24 to 48 reliably improve reconstruction?",
+        mechanism:"A larger shortlist increases offline search opportunity, but later atoms and Beam4 encoding can compensate for locally weaker selections. More candidates do not guarantee a better final codebook.",
+        evidence:comparisonEvidence("utility_candidate_budget", "CandidateBudget48", "CandidateBudget24"),
+        recommendation:"Retain both budgets until the complete grid exposes family interactions; do not promote 48 as a universal default.",
+        limitation:"Legacy construction times are invalid for comparing budget efficiency against the optimized runner.", charts:["budget"]
+      },
+      {
+        id:"schedule", number:4, zone:"Strategy levers", status:"unresolved", title:"Layer schedule", stat:comparisonText(findings.schedule),
+        question:"Should broad and repair layers be interleaved or separated into two phases?",
+        mechanism:"The schedules reorder broad and repair residual layers without changing the deployed W8D16 interface. Their value depends on which residual structures a family leaves for later correction.",
+        evidence:comparisonEvidence("layer_schedule", "TwoPhase", "Interleaved"),
+        recommendation:"Keep schedule as an interaction term. Do not choose a global schedule from this fragment.",
+        limitation:"Only represented construction families contribute matched schedule pairs; the split cannot be generalized to absent families.", charts:["schedule"]
+      },
+      {
+        id:"families", number:5, zone:"Strategy levers", status:"blocked", title:"Construction families", stat:`${findings.pareto_count} Pareto candidates`,
+        question:"Which construction family offers the best quality tradeoff across median, tail, strict-perfect, and node-max metrics?",
+        mechanism:"Construction policy decides what kind of residual pattern becomes each offline dictionary atom. Broad builders synthesize population-level prototypes; repair builders copy strategically chosen observed residuals; anchors preserve Experiment 12 slot roles; pure controls use prototypes only.",
+        evidence:`The lowest observed P95 is ${fmt(findings.best_row.validation_p95_rmse, 8)}, but ${findings.absent_families.length} planned families are entirely absent. ${findings.pareto_count} observed rows remain non-dominated across the four co-primary metrics.`,
+        recommendation:"Use the observed Pareto set to prioritize scrutiny, not to select the canonical construction family.",
+        limitation:"A best-in-prefix row is not a full-grid winner. Missing families are the dominant uncertainty.", charts:["pareto"]
+      },
+      {
+        id:"partial", number:6, zone:"Model behavior", status:"mixed", title:"Partial codebook", stat:"Largest gain at 1→2 atoms",
+        question:"How much of the final quality arrives in the first few active atom slots?",
+        mechanism:"A residual layer can select up to seven active atoms. Re-evaluating validation quality after atom 1, then 2, and so on reveals whether the codebook earns its complexity early or depends on late, narrow repairs.",
+        motivation:"This is a capacity-efficiency diagnostic. A steep early drop means the first atoms capture reusable structure; a flat or erratic curve can reveal redundant choices, weak ordering, or a family that needs many specialized atoms.",
+        reading:["Move left to right: each step adds one active atom per residual layer.","Move downward: lower validation P95 RMSE means the partial codebook handles tail cases better.","Compare curve shape before endpoint rank: early slope shows efficiency; late flattening shows diminishing returns."],
+        evidence:"Every covered family improves sharply from one to two active atoms, then generally flattens. BroadMeanGlobalRepair and BroadMeanHardRepair form the lowest observed family medians.",
+        recommendation:"Preserve per-slot progression in the canonical analysis; it is more diagnostic than final-row metrics alone.",
+        limitation:"Progression is descriptive for covered families and cannot establish the optimal active-atom count outside the fixed contract.", charts:["partial"]
+      },
+      {
+        id:"calibration", number:7, zone:"Eligibility", status:"blocked", title:"Eligibility calibration", stat:"ε selection blocked",
+        question:"What counterfactual retirement coverage and unexplained-energy risk appear as epsilon increases?",
+        mechanism:"Eligibility would stop already-resolved LFOs from consuming later codebook capacity. The safe threshold must balance retired coverage against unexplained residual energy using all 90 unfiltered 13A rows.",
+        motivation:"Without eligibility, curves that are already reconstructed well can keep competing for later atoms. Epsilon is the proposed stopping threshold: larger values retire more curves sooner, but can also retire curves that still carry meaningful unexplained energy.",
+        reading:["In the quantile chart, later layers should move epsilon downward as reconstruction improves; lower curves mean closer fits.","In the retirement plot, moving right means more LFOs would stop consuming capacity; moving down means less unexplained energy is being abandoned.","The desirable direction is toward the lower-right, but no point is selectable until all 90 rows contribute to the frozen calibration artifact."],
+        evidence:"Completed-layer epsilon quantiles fall rapidly in early layers and then flatten. Larger candidate epsilons expand both retirement coverage and the upper tail of unexplained retired energy.",
+        recommendation:"Use these curves only to understand mechanism and sensitivity. Freeze no epsilon until complete 13A artifacts satisfy the deterministic selector.",
+        limitation:"The fragment cannot produce a valid epsilon, apparent elbow, or Experiment 13B gate artifact.", charts:["calibration","retirement"]
+      },
+      {
+        id:"runtime", number:8, zone:"Diagnostics", status:"historical only", title:"Legacy runtime", stat:`${fmt(findings.runtime_outliers[0]?.oracle_construction_time, 1)} s max`,
+        question:"What made the interrupted legacy run impractically slow?",
+        mechanism:"The archived timings include the superseded implementation and repeated invariant work. The two extreme wall-clock observations were inflated by host sleep and are separated from the ordinary timing scale.",
+        evidence:`The two sleep-affected rows are ${fmt(findings.runtime_outliers[0]?.oracle_construction_time, 1)} and ${fmt(findings.runtime_outliers[1]?.oracle_construction_time, 1)} seconds. A broken axis keeps them visible without flattening the remaining legacy timing pattern.`,
+        recommendation:"Keep these values as historical diagnostics only. Measure optimized-run performance independently with the new layer/slot timing instrumentation.",
+        limitation:"No legacy-versus-optimized speedup claim is valid because implementation and operating conditions differ.", charts:["runtime"]
+      }
+    ];
+
+    const COMPLETE_13A_NODES = [
+      {
+        id:"coverage", number:1, zone:"Integrity", status:"complete", title:"Complete grid coverage", stat:`${DATA.meta.completed_rows}/${DATA.meta.expected_rows} rows`,
+        question:"Does the report cover every planned Experiment 13A strategy cell?",
+        mechanism:"The complete phase contains every planned construction family, construction variant, schedule, repair budget, and normalization cell. This removes the execution-prefix bias that constrained the legacy report.",
+        evidence:"All 90 planned Experiment 13A rows completed with no failed rows. Filters now describe complete slices of the design rather than gaps in an interrupted prefix.",
+        recommendation:"Use matched effects and the four-metric Pareto frontier as the authoritative 13A evidence. Reserve AllResiduals-versus-UnresolvedOnly claims for 13B.",
+        limitation:"Complete 13A coverage does not answer whether eligibility filtering improves construction; 13B is still pending.", charts:["coverage"]
+      },
+      {
+        id:"families", number:2, zone:"Quality frontier", status:"complete", title:"Construction-family tradeoffs", stat:`${findings.pareto_count} Pareto strategies`,
+        question:"Which construction mechanisms occupy the complete 13A quality frontier?",
+        mechanism:"Broad builders synthesize population-level corrections; repair builders copy strategically chosen observed residuals; anchors preserve Experiment 12 slot roles; pure controls use prototypes only. Different mechanisms optimize different parts of the error distribution.",
+        evidence:`AllClusterMeans + LayerClip0To1 has the lowest P95. DiverseCoverageHardRepairTwoPhase + CandidateBudget48 + LayerClip0To1 has the best median and node-max P95. CommonCaseRepair preserves the best strict-perfect rate. ${findings.pareto_count} rows remain non-dominated across all four metrics.`,
+        recommendation:"Carry all three Pareto strategies into the paired 13B interpretation instead of declaring a scalar winner.",
+        limitation:"Strict-perfect rate has only two observed levels, so it is a coarse discriminator despite remaining co-primary.", charts:["pareto"]
+      },
+      {
+        id:"metric-agreement", number:3, zone:"Quality frontier", status:"complete", title:"Metric agreement and tension", stat:`P95 ↔ node-max ρ ${fmt(findings.metric_correlations?.[2]?.[3],2)}`,
+        question:"Do the four co-primary metrics rank strategies the same way?",
+        mechanism:"Rank correlation separates shared quality signal from objective-specific behavior. Continuous RMSE metrics can agree strongly while the thresholded strict-perfect rate detects a different finishing regime.",
+        evidence:"Median RMSE, P95 RMSE, and node-max P95 share substantial rank information. Strict-perfect rate has only two observed levels and weak rank agreement with the tail metrics, so it cannot be inferred from lower RMSE.",
+        recommendation:"Keep the four-objective Pareto frontier and inspect high rank-spread rows; do not collapse the experiment to validation P95 alone.",
+        limitation:"Rank agreement describes ordering, not effect size or causality.", charts:["metric-map","strict-thresholds"]
+      },
+      {
+        id:"generalization", number:4, zone:"Quality frontier", status:"complete", title:"Train-to-validation stability", stat:`P95 median gap ${fmt(findings.generalization?.generalization_gap_p95_rmse?.median,6)}`,
+        question:"Does held-out validation preserve the ordering and scale seen during construction?",
+        mechanism:"Every codebook is constructed on the fixed train-50% subset and evaluated on all validation rows. Plotting train against validation exposes overfit, sample difficulty, and objective-specific shifts.",
+        evidence:"Validation median RMSE is slightly higher on the median strategy, while validation P95 is often lower. Train and validation P95 still rank strategies very similarly.",
+        recommendation:"Use training diagnostics to explain mechanisms, but keep validation metrics authoritative for strategy choice.",
+        limitation:"This is one deterministic split and does not estimate resampling uncertainty.", charts:["generalization"]
+      },
+      {
+        id:"normalization", number:5, zone:"Strategy levers", status:"strong 13A", title:"Layer normalization", stat:comparisonText(findings.normalization),
+        question:"Does decoder-free LayerClip0To1 suppress tail error across the complete strategy grid?",
+        mechanism:"LayerClip0To1 constrains every residual-layer output to the physical signal range, preventing overshoot from compounding before later corrections.",
+        evidence:comparisonEvidence("layer_normalization_policy", "LayerClip0To1", "FinalClipOnly"),
+        recommendation:"Lock Experiment 13B to the 45 LayerClip0To1 counterparts, then run each at 1e-2, 1e-3, and 1e-4. Retain every construction, schedule, and applicable budget cell; do not rerun FinalClipOnly.",
+        limitation:"The effect is authoritative for AllResiduals construction; its interaction with UnresolvedOnly still requires 13B.", charts:["normalization"]
+      },
+      {
+        id:"budget", number:6, zone:"Strategy levers", status:"mixed", title:"Candidate budget", stat:comparisonText(findings.candidate_budget),
+        question:"Does doubling the offline repair shortlist reliably improve complete-13A quality?",
+        mechanism:"CandidateBudget48 expands offline search opportunity, but later atom slots and Beam4 encoding can compensate for locally weaker CandidateBudget24 choices.",
+        evidence:comparisonEvidence("utility_candidate_budget", "CandidateBudget48", "CandidateBudget24"),
+        recommendation:"Treat CandidateBudget48 as family-dependent rather than a universal default.",
+        limitation:"Budget is not defined for pure-prototype rows, so matched evidence covers repair-containing policies only.", charts:["budget"]
+      },
+      {
+        id:"schedule", number:7, zone:"Strategy levers", status:"mixed", title:"Layer schedule", stat:comparisonText(findings.schedule),
+        question:"Should broad and repair residual layers be interleaved or separated into two phases?",
+        mechanism:"The schedules reorder broad and repair layers without changing W8D16 or the deployed runtime interface. Their value depends on the residual structures each construction family leaves for later correction.",
+        evidence:comparisonEvidence("layer_schedule", "TwoPhase", "Interleaved"),
+        recommendation:"Keep schedule as an interaction term; the small aggregate TwoPhase edge is not universal.",
+        limitation:"AnchorNative and AllBroad controls do not participate in this matched comparison.", charts:["schedule"]
+      },
+      {
+        id:"interactions", number:8, zone:"Strategy levers", status:"mixed", title:"Family-specific interactions", stat:"Effects change sign by family",
+        question:"Which construction mechanisms change the direction of budget and schedule effects?",
+        mechanism:"Matched deltas are aggregated within construction family rather than across the whole grid. This keeps the parent mechanism visible when a policy lever helps one family and hurts another.",
+        evidence:"LayerClip0To1 is consistently favorable across families. Candidate budget and schedule effects change sign: TwoPhase helps several robust or diversity-aware families but hurts AlignedMedian and DominantDirection variants.",
+        recommendation:"Choose budget and schedule jointly with construction family; keep clipping as the global default.",
+        limitation:"Family medians summarize only the matched cells available for each lever; pure controls do not define every comparison.", charts:["interactions"]
+      },
+      {
+        id:"partial", number:9, zone:"Model behavior", status:"complete", title:"Partial codebook", stat:"Early gains, late separation",
+        question:"How much quality arrives in the first few active atom slots, and where do families continue separating?",
+        mechanism:"Re-evaluating validation quality after atom 1 through atom 7 shows whether a construction family captures reusable structure early or depends on later specialized repairs.",
+        motivation:"This is a capacity-efficiency diagnostic. A steep early drop means the first atoms capture reusable structure; a flat segment means diminishing returns.",
+        reading:["Move left to right as one active atom is added per residual layer.","Move downward as validation P95 improves.","Compare curve shape before endpoint rank: early slope shows efficiency and late separation shows specialization."],
+        evidence:"Most quality arrives in the first few atom choices, but family curves continue to separate through the seventh active atom.",
+        recommendation:"Retain per-slot progression in the final paired analysis; endpoint metrics alone hide mechanism and ordering quality.",
+        limitation:"This fixed-W8 experiment does not test a smaller deployed head budget.", charts:["partial","marginal"]
+      },
+      {
+        id:"layers", number:10, zone:"Model behavior", status:"complete", title:"Residual-layer progression", stat:"Diminishing, still positive",
+        question:"Do later residual layers continue reducing tail error after their seventh active atom?",
+        mechanism:"The end-of-layer trace records training error after slot seven for each residual layer. It distinguishes within-layer atom capacity from depth-wise correction.",
+        evidence:"Median training P95 drops monotonically from layer 1 through layer 16. Marginal reductions shrink with depth but remain material at the final layer.",
+        recommendation:"Retain D16 for 13B; a smaller depth would require a dedicated head-budget experiment.",
+        limitation:"The curve shows benefit, not a complete cost-optimality proof.", charts:["layers"]
+      },
+      {
+        id:"diagnostics", number:11, zone:"Model behavior", status:"diagnostic", title:"Decoder and dictionary behavior", stat:`gain-use ρ ${fmt(findings.diagnostic_correlations_with_validation_p95?.residual_gain_nonzero_rate,2)}`,
+        question:"Which internal behaviors accompany good or bad validation tails?",
+        mechanism:"Overshoot, effective no-op use, dead atoms, residual-gain activity, duplicate proposals, and prototype convergence reveal how each dictionary is actually used.",
+        evidence:"Overshoot, effective no-op use, and dead atoms track worse P95; frequent non-zero residual gains track better P95. Construction time itself has almost no rank relationship with quality.",
+        recommendation:"Use these diagnostics to explain matched quality results and flag pathological rows, not as replacement objectives.",
+        limitation:"These are cross-strategy associations with design confounding; only matched interventions support stronger causal language.", charts:["diagnostics"]
+      },
+      {
+        id:"calibration", number:12, zone:"Eligibility", status:isComplete13A ? "sweep planned" : "blocked", title:"Eligibility calibration", stat:`best early/middle ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,2)}`,
+        question:"How many LFOs can stop consuming later construction capacity, at what depth, and at what tolerance?",
+        mechanism:"An LFO whose reconstruction error is below ε becomes eligible to retire from later atom construction. The LFO-reduction percentage is therefore the share of the construction population freed from competing for later codebook capacity.",
+        motivation:"Depth determines the value of retirement. Retiring 5% after layer 8 removes that 5% from layers 9–16; reaching 5% only at layer 16 proves endpoint accuracy but frees no remaining layers. The selector also checks that retired LFOs carry little unexplained energy.",
+        reading:["The layer-8 plot measures useful mid-run population reduction; higher means more later construction work can focus on unresolved LFOs.","The layer-16 plot measures endpoint eligibility. Compare it with layer 8 to see whether a family solves LFOs early or only near the end.","In the tolerance matrices, each column is a plain-language retirement target and each cell is the exact ε required to reach it.","Global filters recompute every family median from only the in-scope strategy rows."],
+        evidence:`All candidates satisfy the retired unexplained-energy limits, but the maximum early/middle median reconstructed fraction is ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,3)}, below the required ${pct(findings.selection.required_early_middle_fraction,0)}.`,
+        recommendation:isComplete13A ? "Run all 45 clipped strategies independently at 1e-2, 1e-3, and 1e-4. Treat the resulting 135 rows as an exploratory epsilon sweep, not as evidence that 13A selected one threshold." : "Complete all 90 Experiment 13A rows before using the fixed three-epsilon 13B sweep.",
+        limitation:"These are counterfactual 13A training calibrations, not measured 13B savings. No epsilon is selected and the endpoint layer-16 percentage should not be described as capacity saved.", charts:["capacity-8","capacity-16","capacity-matrix","tolerance-matrix-8","tolerance-matrix-16","retirement"]
+      },
+      {
+        id:"scaling", number:13, zone:"Ablations", status:"bounded ablation", title:"Training-data scaling", stat:`${findings.scaling_matched_row_count} matched rows`,
+        question:"What changes when construction uses 50% rather than 100% of the training split?",
+        mechanism:"The comparison holds validation membership and row definitions fixed, then subtracts the preserved full-training result from the optimized 50%-training result for each matched row.",
+        evidence:"The 50%-training run is modestly worse on median and P95 RMSE, while strict-perfect rate and node-max P95 improve on most matched rows.",
+        recommendation:"Treat the result as a mixed, method-level sensitivity check—not a universal scaling law.",
+        limitation:"The full-training source is a non-random 39-row prefix, and runtime comparisons are invalid because execution implementations and host conditions differ.", charts:["scaling"]
+      },
+      {
+        id:"work", number:14, zone:"Diagnostics", status:"same-run only", title:"Offline work efficiency", stat:"193 heads for every row",
+        question:"Does additional construction work buy better validation quality?",
+        mechanism:"Candidate evaluations, oracle construction, and train/validation encoding are experiment-time work. The deployed prediction interface remains fixed for every strategy.",
+        evidence:"CandidateBudget48 doubles repair-search evaluations but gives a small mixed quality effect. Construction time has essentially no monotonic relationship with validation P95.",
+        recommendation:"Keep work and quality as separate axes; spend CandidateBudget48 only where its family interaction justifies it.",
+        limitation:"These are same-run offline timings, not deployed inference latency and not a legacy speedup estimate.", charts:["work"]
+      },
+      {
+        id:"runtime", number:15, zone:"Diagnostics", status:"same-run only", title:"Optimized 13A runtime", stat:`${fmt(findings.runtime_outliers[0]?.oracle_construction_time,1)} s max`,
+        question:"Which strategy rows are expensive within the completed optimized run?",
+        mechanism:"Same-run oracle construction timings share the implementation, sample, cache policy, and host conditions. They can expose relative cost without importing the legacy host-sleep artifacts.",
+        evidence:"The 90-row optimized run has a continuous timing distribution with no Modern Standby outliers. Pure cluster prototypes and several repair-heavy rows occupy the slow end.",
+        recommendation:"Use these values for within-run cost diagnostics only; keep quality and cost visible as separate axes.",
+        limitation:"Do not interpret these timings as a legacy-to-optimized speedup or deployed inference cost.", charts:["runtime"]
+      }
+    ];
+    const NODES = isComplete13A ? COMPLETE_13A_NODES : PROVISIONAL_NODES;
+
+    let activeNode = null;
+    let activeTab = "mechanism";
+    let currentView = "interactive";
+    let compareSelection = [];
+    let dataKind = "metrics";
+    let currentDataRows = [];
+    const globalState = {family:new Set(),policy:new Set(),schedule:new Set(),budget:new Set(),normalization:new Set(),pareto:new Set(),applyCharts:true};
+    const chartInstances = new Map();
+    const chartResizeObserver = "ResizeObserver" in window ? new ResizeObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.contentRect.width > 0 && entry.contentRect.height > 0) chartInstances.get(entry.target)?.resize();
+      });
+    }) : null;
+
+    function initialize() {
+      renderGlobalFilters();
+      renderStrictThresholdControl();
+      renderMeta();
+      renderFindings();
+      renderPrimaryMetrics();
+      renderNodeFilters();
+      renderEvidenceMap();
+      renderFullReport();
+      renderFilterControls(qs("#compare-filters"), "compare");
+      renderFilterControls(qs("#data-filters"), "data");
+      renderCompare();
+      renderDataTabs();
+      renderData();
+      bindGlobalEvents();
+    }
+
+    function renderStrictThresholdControl() {
+      const control = qs("#strict-threshold-control");
+      if (!isComplete13A || !strictThresholds) return;
+      control.hidden = false;
+      control.innerHTML = `<strong>Strict-perfect tolerance</strong><div class="filter-pills" aria-label="Strict-perfect tolerance">${strictThresholds.tolerances.map(value => `<button class="filter-pill" type="button" data-strict-tolerance="${esc(value)}" aria-pressed="${value === strictTolerance}">${esc(value)}</button>`).join("")}</div><span class="threshold-note">Requires RMSE â‰¤ tolerance/10 and max point error â‰¤ tolerance. Updates final-13A leaders, Pareto membership, ranks, correlations, and matched strict-perfect deltas; partial-codebook and scaling evidence remain at the original 1e-5 definition.</span>`;
+      qsa("[data-strict-tolerance]", control).forEach(button => button.addEventListener("click", () => {
+        strictTolerance = button.dataset.strictTolerance;
+        applyStrictTolerance();
+        renderStrictThresholdControl();
+        renderReactiveFilterGroups();
+        renderFindings();
+        renderFullReport();
+        updateGlobalFilters();
+        renderEvidenceMap();
+        if (activeNode) renderDetailTab(NODES.find(node => node.id === activeNode));
+        announce(`Strict-perfect tolerance ${strictTolerance}`);
+      }));
+    }
+
+    function renderGlobalFilters() {
+      qs("#global-apply-charts").checked = globalState.applyCharts;
+      qs("#global-apply-charts").addEventListener("input", updateGlobalFilters);
+      qs("#global-reset").addEventListener("click", resetGlobalFilters);
+      qs("#global-collapse").addEventListener("click", toggleGlobalFilters);
+      renderReactiveFilterGroups();
+      updateGlobalFilterSummary();
+    }
+
+    function renderReactiveFilterGroups() {
+      const selectedFamilies = globalState.family;
+      const groups = [
+        {id:"family",label:"Families",step:1,stage:"construction",hint:"Choose one or more parent families",values:unique(coverage.map(row => row.construction_family))},
+        {id:"policy",label:"Construction variants",step:2,stage:"construction",hint:"Only variants belonging to the chosen families",values:selectedFamilies.size ? unique(coverage.filter(row => selectedFamilies.has(String(row.construction_family))).map(row => row.construction_policy)) : []},
+        {id:"schedule",label:"Schedules",values:unique(coverage.map(row => row.layer_schedule))},
+        {id:"budget",label:"Budgets",values:unique(coverage.map(row => row.utility_candidate_budget))},
+        {id:"normalization",label:"Normalization",values:unique(coverage.map(row => row.layer_normalization_policy))},
+        {id:"pareto",label:"Pareto",values:["pareto","non-pareto"]}
+      ];
+      qs("#global-filter-groups").innerHTML = groups.map(group => {
+        const legend = `${group.step ? `<span class="filter-step">${group.step}</span>` : ""}${esc(group.label)}${group.hint ? `<span class="filter-hint">${esc(group.hint)}</span>` : ""}`;
+        const pills = group.id === "policy" && !selectedFamilies.size
+          ? `<div class="filter-dependent-empty">Select at least one family; its valid construction variants will appear here.</div>`
+          : `<div class="filter-pills" aria-label="${esc(group.label)} multi-select">${group.values.map(value => filterPillMarkup(group.id, String(value))).join("")}</div>`;
+        return `<fieldset id="global-${esc(group.id)}" class="filter-fieldset"${group.stage ? ` data-stage="${group.stage}"` : ""}><legend>${legend}</legend>${pills}</fieldset>`;
+      }).join("");
+      qsa("[data-global-field]").forEach(button => button.addEventListener("click", () => {
+        const id = button.dataset.globalField;
+        const value = button.dataset.globalValue;
+        const selected = globalState[id];
+        selected.has(value) ? selected.delete(value) : selected.add(value);
+        if (id === "family") prunePolicySelections();
+        renderReactiveFilterGroups();
+        updateGlobalFilters();
+      }));
+    }
+
+    function filterPillMarkup(id, value) {
+      const stats = facetStats(id, value);
+      const selected = globalState[id].has(value);
+      const enabled = stats.planned > 0 || selected;
+      const label = id === "pareto" ? (value === "pareto" ? "Pareto candidates" : "Non-Pareto rows") : value;
+      const count = id === "pareto" ? `${stats.completed}` : `<b>${stats.completed}</b>/${stats.planned}`;
+      const title = id === "pareto"
+        ? `${stats.completed} completed rows; Pareto membership is undefined for uncompleted rows`
+        : `${stats.completed} completed of ${stats.planned} planned rows after the other active filters`;
+      return `<button class="filter-pill${stats.completed === 0 && stats.planned > 0 ? " zero-complete" : ""}" type="button" data-global-field="${esc(id)}" data-global-value="${esc(value)}" aria-pressed="${selected}" title="${esc(title)}" ${enabled ? "" : "disabled"}>${esc(label)}<span class="facet-count">${count}</span></button>`;
+    }
+
+    function facetStats(targetId, targetValue) {
+      const candidates = coverage.filter(row => facetRowMatches(row, targetId, targetValue));
+      return {planned:candidates.length,completed:candidates.filter(row => metricById.has(row.row_id)).length};
+    }
+
+    function facetRowMatches(row, targetId, targetValue) {
+      for (const [id,key] of GLOBAL_FIELDS) {
+        if (id === targetId) {
+          if (String(row[key]) !== targetValue) return false;
+          continue;
+        }
+        if (globalState[id].size && !globalState[id].has(String(row[key]))) return false;
+      }
+      const completed = metricById.get(row.row_id);
+      if (targetId === "pareto") return Boolean(completed) && (truthy(completed.pareto_candidate) ? "pareto" : "non-pareto") === targetValue;
+      if (globalState.pareto.size) return Boolean(completed) && globalState.pareto.has(truthy(completed.pareto_candidate) ? "pareto" : "non-pareto");
+      return true;
+    }
+
+    function prunePolicySelections() {
+      if (!globalState.family.size) {
+        globalState.policy.clear();
+        return;
+      }
+      const allowed = new Set(coverage.filter(row => globalState.family.has(String(row.construction_family))).map(row => String(row.construction_policy)));
+      [...globalState.policy].filter(value => !allowed.has(value)).forEach(value => globalState.policy.delete(value));
+    }
+
+    function updateGlobalFilters() {
+      globalState.applyCharts = qs("#global-apply-charts").checked;
+      updateGlobalFilterSummary();
+      renderPrimaryMetrics();
+      renderCompare();
+      renderData();
+      rerenderVisibleCharts();
+    }
+
+    function resetGlobalFilters() {
+      [...GLOBAL_FIELDS.map(([id]) => id), "pareto"].forEach(id => globalState[id].clear());
+      globalState.applyCharts = true;
+      qs("#global-apply-charts").checked = true;
+      renderReactiveFilterGroups();
+      updateGlobalFilters();
+    }
+
+    function toggleGlobalFilters() {
+      const bar = qs(".global-filter-bar");
+      const collapsed = bar.classList.toggle("collapsed");
+      const button = qs("#global-collapse");
+      button.setAttribute("aria-expanded", String(!collapsed));
+      button.textContent = collapsed ? "Filters" : "Minimize";
+      requestAnimationFrame(resizeVisibleCharts);
+    }
+
+    function updateGlobalFilterSummary() {
+      const selected = GLOBAL_FIELDS.filter(([id]) => globalState[id].size).map(([id,,label]) => `${label.replace("All ","")}: ${[...globalState[id]].join(", ")}`);
+      if (globalState.pareto.size) selected.push(`Pareto: ${[...globalState.pareto].join(", ")}`);
+      const completed = filteredMetricRows(false).length;
+      const planned = filteredCoverageRows(false).length;
+      qs("#global-filter-summary").innerHTML = `<strong>${completed} completed</strong><span>${planned} planned in slice</span><span>${selected.length ? esc(selected.join(" · ")) : "All factors"}</span><span>Charts: ${globalState.applyCharts ? "filtered" : "full fragment"}</span>`;
+    }
+
+    function rowMatchesGlobal(row, ignoreKey = null) {
+      if (!row) return false;
+      const factorsMatch = GLOBAL_FIELDS.every(([id,key]) => key === ignoreKey || !globalState[id].size || globalState[id].has(String(row[key])));
+      if (!factorsMatch) return false;
+      if (!globalState.pareto.size || ignoreKey === "pareto_candidate") return true;
+      return globalState.pareto.has(truthy(row.pareto_candidate) ? "pareto" : "non-pareto");
+    }
+
+    function filteredMetricRows(forChart = false) {
+      if (forChart && !globalState.applyCharts) return metrics;
+      return metrics.filter(row => rowMatchesGlobal(row));
+    }
+
+    function filteredCoverageRows(forChart = false) {
+      if (forChart && !globalState.applyCharts) return coverage;
+      return coverage.filter(row => {
+        if (!rowMatchesGlobal(row, "pareto_candidate")) return false;
+        if (!globalState.pareto.size) return true;
+        const completed = metricById.get(row.row_id);
+        return completed && globalState.pareto.has(truthy(completed.pareto_candidate) ? "pareto" : "non-pareto");
+      });
+    }
+
+    function filteredDeltaRows(comparison, forChart = false) {
+      const rows = deltas.filter(row => row.comparison === comparison);
+      if (forChart && !globalState.applyCharts) return rows;
+      return rows.filter(row => {
+        const left = metricById.get(row.left_row_id);
+        const right = metricById.get(row.right_row_id);
+        const comparedField = GLOBAL_FIELDS.find(([,key]) => key === comparison);
+        if (comparedField) {
+          const [id,key] = comparedField;
+          if (globalState[id].size && ![left,right].some(item => item && globalState[id].has(String(item[key])))) return false;
+        }
+        return rowMatchesGlobal(left, comparison) || rowMatchesGlobal(right, comparison);
+      });
+    }
+
+    function filteredPartialRows(forChart = false) {
+      if (forChart && !globalState.applyCharts) return partial;
+      return partial.filter(row => rowMatchesGlobal(metricById.get(row.row_id)));
+    }
+
+    function filteredScalingRows(forChart = false) {
+      if (forChart && !globalState.applyCharts) return scaling;
+      return scaling.filter(row => rowMatchesGlobal({...row, pareto_candidate:metricById.get(row.row_id)?.pareto_candidate}));
+    }
+
+    function filteredCalibrationRows(key, forChart = false) {
+      const rows = DATA.calibration[key] || [];
+      if (forChart && !globalState.applyCharts) return rows;
+      const allowed = new Set(filteredMetricRows(false).map(row => row.row_id));
+      return rows.filter(row => allowed.has(calibrationRowIds[row[0]]));
+    }
+
+    function filteredDeepRows(rows, forChart = false) {
+      if (forChart && !globalState.applyCharts) return rows;
+      return rows.filter(row => rowMatchesGlobal(metricById.get(deepRowId(row[0]))));
+    }
+
+    function filteredDiagnosticRows(forChart = false) {
+      if (forChart && !globalState.applyCharts) return diagnostics;
+      return diagnostics.filter(row => rowMatchesGlobal(metricById.get(row.row_id)));
+    }
+
+    function filteredRankingRows(forChart = false) {
+      const rows = currentRankingRows();
+      if (forChart && !globalState.applyCharts) return rows;
+      return rows.filter(row => rowMatchesGlobal(metricById.get(row.row_id)));
+    }
+
+    function rerenderVisibleCharts() {
+      if (currentView === "report") renderFullReportCharts();
+      if (currentView === "compare") renderCompare();
+      if (activeNode && activeTab === "evidence") renderDetailTab(NODES.find(node => node.id === activeNode));
+      requestAnimationFrame(() => requestAnimationFrame(resizeVisibleCharts));
+    }
+
+    function renderMeta() {
+      const meta = DATA.meta;
+      document.title = meta.display_title || meta.title;
+      qs("#page-title").textContent = isComplete13A ? "Experiment 13A — Complete Strategy Grid" : "Experiment 13 — Provisional Strategy Grid";
+      qs("#hero-title").textContent = isComplete13A ? "A complete unfiltered strategy map." : "Evidence before a winner.";
+      qs("#hero-summary").textContent = isComplete13A
+        ? "All 90 AllResiduals strategies are now available. Explore metric tension, train-to-validation stability, family interactions, layer and atom learning curves, dictionary diagnostics, calibration, and offline work."
+        : "This report turns the interrupted Experiment 13A prefix into bounded, inspectable evidence. It separates repeatable matched effects from missing-grid uncertainty and keeps calibration descriptive until all 90 rows exist.";
+      qs("#status-label").textContent = isComplete13A ? "13A COMPLETE" : "PROVISIONAL";
+      qs(".status-card").classList.toggle("complete", isComplete13A);
+      qs("#status-count").textContent = `${meta.completed_rows}/${meta.expected_rows}`;
+      qs("#coverage-number").textContent = `${(meta.completed_rows / meta.expected_rows * 100).toFixed(1)}%`;
+      qs("#coverage-caption").textContent = isComplete13A
+        ? "of the planned Experiment 13A AllResiduals grid completed"
+        : "of Experiment 13A rows completed in a non-random execution-order prefix";
+      qs("#warning-strip").innerHTML = isComplete13A
+        ? `<strong>13B is ready for the fixed sweep.</strong> Automatic epsilon selection did not pass: best early/middle coverage is ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,3)} versus the required ${pct(findings.selection.required_early_middle_fraction,0)}. The next phase therefore evaluates 45 LayerClip0To1 strategies independently at 1e-2, 1e-3, and 1e-4 for 135 rows.`
+        : `<strong>Do not select epsilon from this report.</strong> Experiment 13A is incomplete, no eligibility epsilon has been frozen, and Experiment 13B has not run. Legacy runtime is historical diagnostic evidence only.`;
+      qs("#findings-title").textContent = isComplete13A ? "What the complete 13A grid supports" : "What the fragment actually supports";
+      qs("#findings-summary").textContent = isComplete13A
+        ? "Matched effects, the four-metric Pareto frontier, and the failed automatic eligibility gate are now complete for AllResiduals construction."
+        : "Matched comparisons carry more weight than incomplete rankings. The cards distinguish provisional effects, mixed evidence, unresolved choices, and blocked decisions.";
+      qs("#metrics-summary").textContent = isComplete13A
+        ? "No single validation metric is authoritative. Each card names the best row across the complete 90-row 13A grid."
+        : "No single validation metric is authoritative. Each card shows the best observed value in this incomplete prefix and names its winning row.";
+      qs("#evidence-help").textContent = "Choose a node. Number keys 1–9 open the first nine; use ← and → to move through the full evidence map. Escape closes detail.";
+      qs("#full-report-title").textContent = isComplete13A ? "Full Experiment 13A report" : "Full provisional report";
+      qs("#compare-summary").textContent = isComplete13A
+        ? "Radar values are normalized within the complete 90-row 13A grid. The exact table is authoritative; the radar is a visual aid, not a scalar ranking."
+        : "Radar values are normalized only within this fragment. The exact table is authoritative; the radar is a visual aid, not a scalar ranking.";
+      qs("#footer-status").textContent = isComplete13A ? "Experiment 13A · Complete AllResiduals evidence; 135-row LayerClip0To1 epsilon sweep pending." : "Experiment 13 · Provisional evidence only.";
+      const contract = meta.contract;
+      const chips = [`W${contract.window_width}D${contract.residual_layers}`, `${contract.control_points} control points`, `${contract.base_choices} base choices`, `${contract.atom_choices} atom choices`, contract.path_search, contract.scalar_context, `${contract.model_outputs} outputs`];
+      qs("#contract-row").innerHTML = chips.map(value => `<span class="chip">${esc(value)}</span>`).join("");
+      qs("#source-run").textContent = meta.source_run;
+      qs("#source-hash").textContent = meta.source_archive_sha256;
+    }
+
+    function renderFindings() {
+      const currentParetoCount = metrics.filter(row => truthy(row.pareto_candidate)).length;
+      const cards = isComplete13A ? [
+        ["Strongest repeatable effect", `${findings.normalization.improved}/${findings.normalization.count}`, "matched normalization pairs favor LayerClip0To1"],
+        ["Quality frontier", `${currentParetoCount} strategies`, `remain non-dominated at strict-perfect tolerance ${strictTolerance}`],
+        ["Schedule effect", `${findings.schedule.improved}/${findings.schedule.count}`, "matched P95 pairs favor TwoPhase; family interactions remain"],
+        ["Eligibility gate", pct(findings.selection.max_early_middle_median_retired_lfo_fraction,2), `best early/middle coverage versus ${pct(findings.selection.required_early_middle_fraction,0)} required`]
+      ] : [
+        ["Strongest repeatable effect", `${findings.normalization.improved}/${findings.normalization.count}`, "matched normalization pairs favor LayerClip0To1"],
+        ["Budget effect", `${findings.candidate_budget.improved}/${findings.candidate_budget.count}`, "matched pairs favor CandidateBudget48; effect is mixed"],
+        ["Schedule result", `${findings.schedule.improved}/${findings.schedule.count}`, "matched pairs favor TwoPhase; no global winner"],
+        ["Coverage gap", `${findings.absent_families.length} absent`, "planned construction families have zero completed rows"]
+      ];
+      qs("#finding-grid").innerHTML = cards.map(card => `<article class="finding-card"><div class="finding-label">${esc(card[0])}</div><div class="finding-value">${esc(card[1])}</div><p>${esc(card[2])}</p></article>`).join("");
+    }
+
+    function primaryMetricMarkup() {
+      const visibleMetrics = filteredMetricRows(false);
+      if (!visibleMetrics.length) return `<div class="empty" style="grid-column:1/-1">No completed rows match the global filters.</div>`;
+      return CO_PRIMARY.map(metric => {
+        const ordered = [...visibleMetrics].sort((left, right) => (metric.higher ? -1 : 1) * (num(left[metric.key]) - num(right[metric.key])));
+        const best = ordered[0];
+        const label = metric.key === "validation_strict_perfect_lfo_rate" && strictThresholds ? `${metric.label} · ${strictTolerance}` : metric.label;
+        return `<article class="primary-metric-card"><div class="metric-name">${esc(label)}</div><div class="metric-value">${esc(metric.format(best[metric.key]))}</div><div class="metric-direction">${metric.higher ? "higher is better ↑" : "lower is better ↓"}</div><code title="${esc(best.row_id)}">${esc(short(best.row_id))}</code></article>`;
+      }).join("");
+    }
+
+    function renderPrimaryMetrics() {
+      const markup = primaryMetricMarkup();
+      qs("#primary-metric-grid").innerHTML = markup;
+      const reportGrid = qs("#report-co-primary .primary-metric-grid");
+      if (reportGrid) reportGrid.innerHTML = markup;
+    }
+
+    function renderNodeFilters() {
+      const zone = qs("#zone-filter");
+      zone.innerHTML += unique(NODES.map(node => node.zone)).map(value => `<option value="${esc(value)}">${esc(value)}</option>`).join("");
+      const confidence = qs("#confidence-filter");
+      confidence.innerHTML += unique(NODES.map(node => node.status)).map(value => `<option value="${esc(value)}">${esc(value)}</option>`).join("");
+      [qs("#node-search"), zone, confidence].forEach(control => control.addEventListener("input", renderEvidenceMap));
+    }
+
+    function renderEvidenceMap() {
+      const query = qs("#node-search").value.trim().toLowerCase();
+      const zone = qs("#zone-filter").value;
+      const confidence = qs("#confidence-filter").value;
+      const visible = NODES.filter(node => (zone === "all" || node.zone === zone) && (confidence === "all" || node.status === confidence) && (!query || `${node.title} ${node.question} ${node.evidence}`.toLowerCase().includes(query)));
+      const groups = [...new Set(visible.map(node => node.zone))];
+      qs("#evidence-map").innerHTML = groups.map(group => {
+        const cards = visible.filter(node => node.zone === group).map(nodeCard).join("");
+        return `<section class="zone-group"><div class="zone-title">${esc(group)}</div><div class="evidence-grid">${cards}</div></section>`;
+      }).join("") || `<div class="empty">No evidence nodes match these filters.</div>`;
+      qsa("[data-node]").forEach(button => button.addEventListener("click", () => openNode(button.dataset.node)));
+    }
+
+    function nodeCard(node) {
+      const color = STATUS[node.status].color;
+      const stat = node.id === "families" && strictThresholds ? `${metrics.filter(row => truthy(row.pareto_candidate)).length} Pareto strategies · ${strictTolerance}` : node.stat;
+      return `<button class="evidence-card${activeNode === node.id ? " active" : ""}" style="--node-color:${color}" type="button" data-node="${node.id}" aria-pressed="${activeNode === node.id}"><div class="node-top"><span class="node-number">${node.number}</span><span class="confidence">${esc(node.status)}</span></div><h3>${esc(node.title)}</h3><p>${esc(node.question)}</p><div class="node-stat">${esc(stat)}</div></button>`;
+    }
+
+    function openNode(id, focusDetail = true) {
+      activeNode = id;
+      activeTab = "mechanism";
+      renderEvidenceMap();
+      renderDetail(focusDetail);
+    }
+
+    function renderDetail(focusDetail) {
+      const panel = qs("#detail-panel");
+      const node = NODES.find(item => item.id === activeNode);
+      if (!node) { panel.hidden = true; return; }
+      panel.hidden = false;
+      const tabs = ["mechanism","evidence","metrics","recommendation","limitations"];
+      panel.innerHTML = `<header class="detail-header"><div><div class="confidence" style="--node-color:${STATUS[node.status].color};color:${STATUS[node.status].color}">${esc(node.zone)} · ${esc(node.status)}</div><h2>${node.number}. ${esc(node.title)}</h2><p>${esc(node.question)}</p></div><button class="icon-button" type="button" id="close-detail" aria-label="Close node detail">Close</button></header><div class="detail-body"><div class="tab-list" role="tablist" aria-label="${esc(node.title)} sections">${tabs.map(tab => `<button class="tab-button" type="button" role="tab" data-detail-tab="${tab}" aria-selected="${tab === activeTab}" tabindex="${tab === activeTab ? 0 : -1}">${titleCase(tab)}</button>`).join("")}</div><div id="detail-tab-panel" class="tab-panel" role="tabpanel"></div></div>`;
+      qs("#close-detail").addEventListener("click", closeDetail);
+      qsa("[data-detail-tab]", panel).forEach(button => {
+        button.addEventListener("click", () => { activeTab = button.dataset.detailTab; renderDetailTab(node); });
+        button.addEventListener("keydown", event => tabKeyNavigation(event, panel));
+      });
+      renderDetailTab(node);
+      if (focusDetail) panel.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+
+    function renderDetailTab(node) {
+      qsa("[data-detail-tab]", qs("#detail-panel")).forEach(button => {
+        const selected = button.dataset.detailTab === activeTab;
+        button.setAttribute("aria-selected", selected);
+        button.tabIndex = selected ? 0 : -1;
+      });
+      const target = qs("#detail-tab-panel");
+      if (activeTab === "mechanism") target.innerHTML = `<h3>Mechanism</h3><p>${esc(node.mechanism)}</p>${node.motivation ? `<div class="motivation"><strong>Why this matters:</strong> ${esc(node.motivation)}</div>` : ""}${node.id === "families" ? constructionGuideMarkup() : ""}`;
+      if (activeTab === "evidence") {
+        target.innerHTML = `<h3>Evidence</h3><p>${esc(nodeEvidence(node))}</p>${readingMarkup(node)}${chartMarkup(node, "detail")}`;
+        requestAnimationFrame(() => node.charts.forEach(name => renderChart(name, qs(`#detail-chart-${name}`))));
+      }
+      if (activeTab === "metrics") target.innerHTML = `<h3>Exact metrics</h3>${metricsForNode(node)}`;
+      if (activeTab === "recommendation") target.innerHTML = `<h3>Recommendation</h3><div class="takeaway">${esc(node.recommendation)}</div>`;
+      if (activeTab === "limitations") target.innerHTML = `<h3>Limitations</h3><div class="limitation">${esc(nodeLimitation(node))}</div>`;
+    }
+
+    function nodeEvidence(node) {
+      if (node.id === "families" && strictThresholds) return `${metrics.filter(row => truthy(row.pareto_candidate)).length} rows remain non-dominated across all four metrics at strict-perfect tolerance ${strictTolerance}. Median RMSE, P95 RMSE, and node-max P95 are unchanged; the selected tolerance changes only the strict-perfect objective and any frontier membership it affects.`;
+      if (node.id === "metric-agreement" && strictThresholds) return `The selected strict-perfect tolerance is ${strictTolerance}. The heatmap recomputes rank agreement from the 90 current rates; continuous RMSE metrics do not change when the tolerance changes.`;
+      return node.evidence;
+    }
+    function nodeLimitation(node) {
+      if (["families","metric-agreement"].includes(node.id) && strictThresholds) return `${node.limitation} Written findings use the original 1e-5 definition; interactive quantitative views use the selected ${strictTolerance} tolerance.`;
+      return node.limitation;
+    }
+
+    function tabKeyNavigation(event, panel) {
+      if (!["ArrowLeft","ArrowRight","Home","End"].includes(event.key)) return;
+      const tabs = qsa("[role=tab]", panel);
+      const current = tabs.indexOf(event.currentTarget);
+      let next = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : (current + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+      event.preventDefault(); tabs[next].focus(); tabs[next].click();
+    }
+
+    function closeDetail() { activeNode = null; qs("#detail-panel").hidden = true; renderEvidenceMap(); }
+    function titleCase(value) { return value.charAt(0).toUpperCase() + value.slice(1); }
+    function readingMarkup(node) {
+      if (!node.reading) return "";
+      return `<div class="reading-guide" aria-label="How to read this evidence">${node.reading.map((step,index) => `<div class="reading-step"><strong>${index + 1}. ${["Trace the x-axis","Read the outcome","Interpret the shape"][index]}</strong>${esc(step)}</div>`).join("")}</div>`;
+    }
+
+    function constructionGuideMarkup() {
+      return `<div class="mechanism-grid">${CONSTRUCTION_GUIDE.map(guide => {
+        const planned = coverage.filter(row => guide.kind === "mixed" ? row.construction_family === guide.family : row.construction_policy === guide.policy);
+        const completed = planned.filter(row => truthy(row.completed)).length;
+        let visual;
+        if (guide.kind === "anchor") {
+          visual = `<div class="slot-strip" aria-label="Seven native atom-slot roles">${guide.roles.map(role => `<span class="slot-cell">${esc(role)}</span>`).join("")}</div><div class="mechanism-meta"><span>7 native roles per layer</span><span>·</span><span>AnchorNative schedule</span></div>`;
+        } else if (guide.kind === "pure") {
+          visual = `<div class="mechanism-flow"><span class="mechanism-box broad">Every layer<br><strong>${esc(guide.broad)}</strong></span><span class="mechanism-arrow">→</span><span class="mechanism-box">7 prototype atoms<br>per layer</span></div>${layerStrip("AllBroad")}`;
+        } else {
+          visual = `<div class="mechanism-flow"><span class="mechanism-box broad">Broad layer<br><strong>${esc(guide.broad)}</strong></span><span class="mechanism-arrow">⇄</span><span class="mechanism-box repair">Repair layer<br><strong>${esc(guide.repair)}</strong></span></div>${layerStrip("Interleaved")}${layerStrip("TwoPhase")}`;
+        }
+        return `<article class="mechanism-card"><div class="mechanism-meta"><span>${esc(guide.kind === "mixed" ? "MIXED FAMILY" : guide.kind === "anchor" ? "EXPERIMENT 12 ANCHOR" : "PURE CONTROL")}</span><span>·</span><span>${completed}/${planned.length} rows observed</span></div><h4>${esc(guide.policy)}</h4><p>${esc(guide.description)}</p>${visual}</article>`;
+      }).join("")}</div>`;
+    }
+
+    function layerStrip(schedule) {
+      const roles = schedule === "Interleaved" ? Array.from({length:16},(_,index)=>index % 2 ? "repair" : "broad") : schedule === "TwoPhase" ? Array.from({length:16},(_,index)=>index < 8 ? "broad" : "repair") : Array(16).fill("broad");
+      return `<div class="mechanism-meta" style="margin-top:8px"><span>${esc(schedule)}</span><span>B = broad · R = repair</span></div><div class="layer-strip" aria-label="${esc(schedule)} layer sequence">${roles.map((role,index) => `<span class="layer-cell ${role}" title="Layer ${index + 1}: ${role}">${role === "repair" ? "R" : "B"}</span>`).join("")}</div>`;
+    }
+    function chartMarkup(node, prefix) { return `<div class="chart-grid">${node.charts.map(name => `<div class="chart-card"><div id="${prefix}-chart-${name}" class="chart ${["normalization","budget","schedule"].includes(name) ? "delta-chart" : ""}" aria-label="${esc(node.title)} chart"></div><p class="chart-caption">${esc(chartCaption(name))}</p></div>`).join("")}</div>`; }
+
+    function chartCaption(name) {
+      const captions = {
+        coverage:isComplete13A ? "Every planned Experiment 13A cell is complete. Filter the grid to inspect valid family, construction, schedule, budget, and normalization slices." : "Filled cells are completed; outlined cells remain absent. Coverage follows execution order, not random sampling.",
+        normalization:"Each cell prints the exact LayerClip0To1 − FinalClipOnly delta. Green favors LayerClip0To1; coral favors FinalClipOnly; neutral cells are ties.",
+        budget:"Each cell prints the exact CandidateBudget48 − CandidateBudget24 delta. Green favors CandidateBudget48; coral favors CandidateBudget24.",
+        schedule:"Each cell prints the exact TwoPhase − Interleaved delta. Green favors TwoPhase; coral favors Interleaved; mixed signs mean there is no global schedule winner.",
+        pareto:`Median and P95 set the coordinates; the tooltip reports strict-perfect at ${strictTolerance} and node-max P95 too. Outlined points are non-dominated across all four co-primary metrics.`,
+        "metric-map":"Exact Spearman rank correlations show which objectives order strategies similarly. Values near +1 agree; values near 0 carry distinct ordering information.",
+        "strict-thresholds":"The logarithmic x-axis shows each (maximum-absolute tolerance, RMSE tolerance) tuple. Lines are construction-family medians for the current global filter slice; the dark median and dashed best-row envelopes summarize all in-scope rows. Move right to relax the definition and upward as more validation LFOs qualify.",
+        generalization:"The dashed diagonal means equal train and validation error. Points above it are worse on validation; points below it are better on validation.",
+        interactions:"Each cell is a within-family matched median. Negative RMSE deltas favor LayerClip0To1, CandidateBudget48, or TwoPhase; filters recompute cells from in-scope matched pairs.",
+        partial:"Read left to right as codebook capacity is added. A steep downward step means the new atom materially improves tail reconstruction; a flat segment means diminishing returns. Lines are family medians, not individual rows.",
+        marginal:"Each bar is the median change from adding one more active atom per layer. Negative is better; the label gives the number of in-scope strategies improved.",
+        layers:"Each line shows family-median training P95 after slot seven of each residual layer. A descending line means depth is still buying tail-error reduction.",
+        diagnostics:"These panels relate internal behavior to validation P95. The displayed ρ is descriptive across strategy designs; it is not a causal effect estimate.",
+        "capacity-8":"At layer 8, the y-axis is the median percentage of LFOs that would be removed from layers 9–16 at each tested ε. Lines are construction-family medians and all global filters apply.",
+        "capacity-16":"At layer 16, the y-axis is the median percentage meeting each tested ε at the endpoint. This shows eventual solvability, not later-layer capacity saved. Lines are construction-family medians and all global filters apply.",
+        "capacity-matrix":"Each cell prints the exact median LFO reduction for one construction family, tested ε, and depth. Layer-8 columns measure population removed before layers 9–16; layer-16 columns are endpoint coverage only.",
+        "tolerance-matrix-8":"Rows are construction families; columns are explicit LFO-reduction targets such as “retire 10%.” Every cell prints the median ε required after layer 8. Smaller ε means the target is reached more accurately.",
+        "tolerance-matrix-16":"The same exact-tolerance matrix at layer 16. Comparing it with layer 8 separates families that solve LFOs early from those that catch up only near the endpoint.",
+        retirement:"Lower-right is useful: more LFOs retired with less unexplained energy abandoned. Energy safety passes, but coverage is too low to freeze epsilon automatically.",
+        scaling:"Each cell prints the exact 50%-training minus 100%-training validation delta using the original 1e-5 strict-perfect definition. Green favors 50%; coral favors 100%. Runtime is intentionally excluded.",
+        work:"Candidate evaluations and same-run construction time are offline work. All rows retain 193 deployed heads, so this is not an inference-latency chart.",
+        runtime:isComplete13A ? "Continuous same-run timing keeps the optimized 13A cost pattern readable. Lower is faster; these are offline construction seconds, not deployed inference cost." : "The main linear axis exposes ordinary legacy timing differences. The separate red segment retains the two host-sleep artifacts without flattening the other bars."
+      };
+      return captions[name];
+    }
+
+    function metricsForNode(node) {
+      if (node.id === "coverage") return simpleTable(filteredCoverageRows(false), ["row_id","construction_family","construction_policy","layer_schedule","utility_candidate_budget","layer_normalization_policy","completed"]);
+      if (["normalization","budget","schedule"].includes(node.id)) {
+        const key = {normalization:"layer_normalization_policy",budget:"utility_candidate_budget",schedule:"layer_schedule"}[node.id];
+        return simpleTable(filteredDeltaRows(key, false), ["match_key","left_value","right_value","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
+      }
+      if (node.id === "families") return simpleTable([...filteredMetricRows(false)].sort((a,b) => num(a.validation_p95_rmse)-num(b.validation_p95_rmse)), ["row_id","construction_family","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"]);
+      if (node.id === "metric-agreement") return simpleTable(filteredRankingRows(false), ["row_id","construction_family","rank_validation_median_rmse","rank_validation_strict_perfect_lfo_rate","rank_validation_p95_rmse","rank_validation_node_max_error_p95","mean_co_primary_rank","rank_spread"]);
+      if (node.id === "generalization") return simpleTable(filteredDiagnosticRows(false), ["row_id","construction_family","generalization_gap_median_rmse","generalization_gap_p95_rmse","generalization_gap_node_max_error_p95"]);
+      if (node.id === "interactions") return simpleTable(interactions.filter(row => !globalState.family.size || globalState.family.has(String(row.construction_family))), ["comparison","construction_family","pair_count","median_delta_validation_median_rmse","median_delta_validation_strict_perfect_lfo_rate","median_delta_validation_p95_rmse","median_delta_validation_node_max_error_p95"]);
+      if (node.id === "partial") return simpleTable(marginalRows(false), ["row_id","construction_family","active_atom_count","delta_validation_median_rmse","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
+      if (node.id === "layers") return simpleTable(layerRows(false), ["row_id","construction_family","residual_layer","layer_role","training_median_rmse","training_p95_rmse","training_max_abs_error_p95"]);
+      if (node.id === "diagnostics") return simpleTable(filteredDiagnosticRows(false), ["row_id","construction_family","validation_overshoot_rate_before_final_clip","residual_layer_effective_no_op_usage_rate_median","residual_layer_dead_atom_rate_median","residual_gain_nonzero_rate","duplicate_atom_rate","validation_p95_rmse"]);
+      if (node.id === "calibration") return simpleTable(calibrationToleranceTable(), ["residual_layer","construction_family","target_lfo_reduction","required_tolerance"]);
+      if (node.id === "scaling") return simpleTable(filteredScalingRows(false), ["row_id","construction_family","delta_validation_median_rmse","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
+      if (node.id === "work") return simpleTable(mechanismRows(false), ["row_id","construction_family","candidate_evaluations","median_slot_p95_improvement","prototype_convergence_rate","prototype_iterations_median","exact_duplicate_alignment_reuse_rate","oracle_construction_time"]);
+      return simpleTable(findings.runtime_outliers.filter(row => rowMatchesGlobal(metricById.get(row.row_id))), ["row_id","oracle_construction_time"]);
+    }
+
+    function marginalRows(forChart = false) {
+      return filteredDeepRows(deep.marginal_atoms || [], forChart).map(row => {
+        const metric = metricById.get(deepRowId(row[0])) || {};
+        return {row_id:deepRowId(row[0]),construction_family:metric.construction_family,active_atom_count:row[1],delta_validation_median_rmse:row[2],delta_validation_strict_perfect_lfo_rate:row[3],delta_validation_p95_rmse:row[4],delta_validation_node_max_error_p95:row[5]};
+      });
+    }
+
+    function layerRows(forChart = false) {
+      return filteredDeepRows(deep.layer_progression || [], forChart).map(row => {
+        const metric = metricById.get(deepRowId(row[0])) || {};
+        return {row_id:deepRowId(row[0]),construction_family:metric.construction_family,residual_layer:row[1],layer_role:row[2],training_median_rmse:row[3],training_p95_rmse:row[4],training_max_abs_error_p95:row[5]};
+      });
+    }
+
+    function mechanismRows(forChart = false) {
+      return filteredDeepRows(deep.mechanisms || [], forChart).map(row => {
+        const metric = metricById.get(deepRowId(row[0])) || {};
+        const diagnostic = diagnosticById.get(deepRowId(row[0])) || {};
+        return {row_id:deepRowId(row[0]),construction_family:metric.construction_family,construction_policy:metric.construction_policy,utility_candidate_budget:metric.utility_candidate_budget,atom_count:row[1],broad_atom_count:row[2],repair_atom_count:row[3],synthesized_prototype_count:row[4],observed_residual_count:row[5],median_slot_p95_improvement:row[6],exact_duplicate_alignment_reuse_rate:row[7],prototype_convergence_rate:row[8],prototype_iterations_median:row[9],candidate_search_event_count:row[10],candidate_evaluations:row[11],oracle_construction_time:diagnostic.oracle_construction_time,validation_p95_rmse:metric.validation_p95_rmse};
+      });
+    }
+
+    function simpleTable(rows, columns, limit = 500) {
+      if (!rows.length) return `<div class="empty">No rows available.</div>`;
+      const visible = rows.slice(0, limit);
+      return `<div class="table-wrap"><table><thead><tr>${columns.map(column => `<th>${esc(columnLabel(column))}</th>`).join("")}</tr></thead><tbody>${visible.map(row => `<tr>${columns.map(column => `<td>${cell(row[column], column)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>${rows.length > limit ? `<p>Showing ${limit} of ${rows.length} rows.</p>` : ""}`;
+    }
+    function columnLabel(column) {
+      const base = column.replaceAll("_", " ");
+      if (!strictThresholds || !column.includes("strict_perfect")) return base;
+      const dynamic = currentView !== "data" || ["metrics","matched_deltas","rankings","interactions"].includes(dataKind);
+      return `${base} · tolerance ${dynamic ? strictTolerance : "1e-5 (original)"}`;
+    }
+    function cell(value, column) {
+      if (column.includes("row_id") || column === "match_key") return `<code title="${esc(value)}">${esc(short(value))}</code>`;
+      if (typeof value === "boolean" || ["true","false"].includes(String(value).toLowerCase())) return truthy(value) ? "✓ yes" : "— no";
+      if (value !== "" && value !== null && Number.isFinite(Number(value))) return column.includes("strict_perfect") ? pct(value, 3) : fmt(value, 7);
+      return esc(value ?? "");
+    }
+
+    function renderFullReport() {
+      const coPrimary = `<article class="report-section" id="report-co-primary"><div class="eyebrow">Co-primary outcomes</div><h3>Four metrics define validation quality</h3><p>${isComplete13A ? `These are the best values across the complete 90-row Experiment 13A grid; strict-perfect uses tolerance ${strictTolerance}, while the other metrics are unchanged.` : "These are the best observed values in the incomplete prefix; each can come from a different strategy row."}</p><div class="primary-metric-grid">${primaryMetricMarkup()}</div></article>`;
+      qs("#report-stack").innerHTML = coPrimary + NODES.map(node => `<article class="report-section" id="report-${node.id}"><div class="report-meta"><span class="node-number">${node.number}</span><span class="confidence" style="color:${STATUS[node.status].color}">${esc(node.zone)} · ${esc(node.status)}</span></div><h3>${esc(node.title)}</h3><p><strong>${esc(node.question)}</strong></p><p>${esc(node.mechanism)}</p>${node.motivation ? `<div class="motivation"><strong>Why this matters:</strong> ${esc(node.motivation)}</div>` : ""}${node.id === "families" ? constructionGuideMarkup() : ""}<div class="takeaway" style="margin-top:18px"><strong>Evidence:</strong> ${esc(nodeEvidence(node))}</div>${readingMarkup(node)}<div style="margin-top:18px">${chartMarkup(node, `full-${node.id}`)}</div><p><strong>Recommendation:</strong> ${esc(node.recommendation)}</p><div class="limitation"><strong>Limitation:</strong> ${esc(nodeLimitation(node))}</div></article>`).join("");
+    }
+
+    function renderFullReportCharts() {
+      NODES.forEach(node => node.charts.forEach(name => renderChart(name, qs(`#full-${node.id}-chart-${name}`))));
+    }
+
+    function renderFilterControls(root, prefix) {
+      root.innerHTML = `<label class="sr-only" for="${prefix}-search">Search rows</label><input id="${prefix}-search" type="search" placeholder="Search within globally filtered rows…">${prefix === "data" ? filterSelect(`${prefix}-completion`, "All completion states", ["complete","missing"]) : ""}`;
+      qsa("input,select", root).forEach(control => control.addEventListener("input", prefix === "compare" ? renderCompare : renderData));
+    }
+    function filterSelect(id, label, values) { return `<label class="sr-only" for="${id}">${esc(label)}</label><select id="${id}"><option value="all">${esc(label)}</option>${values.map(value => `<option value="${esc(value)}">${esc(value)}</option>`).join("")}</select>`; }
+
+    function filteredMetrics(prefix) {
+      const query = qs(`#${prefix}-search`)?.value.trim().toLowerCase() || "";
+      return filteredMetricRows(false).filter(row => !query || JSON.stringify(row).toLowerCase().includes(query));
+    }
+
+    function renderCompare() {
+      const rows = filteredMetrics("compare");
+      qs("#compare-list").innerHTML = rows.map(row => {
+        const checked = compareSelection.includes(row.row_id);
+        return `<label class="selection-row"><input type="checkbox" data-compare-row="${esc(row.row_id)}" ${checked ? "checked" : ""}><span><code title="${esc(row.row_id)}">${esc(short(row.row_id))}</code><br><small>${esc(row.construction_family)}</small></span><strong>${fmt(row.validation_p95_rmse, 5)}</strong></label>`;
+      }).join("") || `<div class="empty">No completed rows match these filters.</div>`;
+      qsa("[data-compare-row]", qs("#compare-list")).forEach(input => input.addEventListener("change", event => updateComparison(event.currentTarget)));
+      const visibleIds = new Set(rows.map(row => row.row_id));
+      compareSelection = compareSelection.filter(id => visibleIds.has(id));
+      const selected = compareSelection.map(id => metricById.get(id)).filter(Boolean);
+      qs("#selected-chips").innerHTML = selected.map(row => `<span class="selected-chip" title="${esc(row.row_id)}">${esc(short(row.row_id))}</span>`).join("") || `<span style="color:var(--muted)">Select two to four rows.</span>`;
+      renderComparisonChart(selected);
+      qs("#compare-table").innerHTML = selected.length ? simpleTable(selected, ["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"], 4) : "";
+    }
+
+    function updateComparison(input) {
+      const id = input.dataset.compareRow;
+      if (input.checked && compareSelection.length >= 4) { input.checked = false; announce("Comparison is limited to four rows."); return; }
+      compareSelection = input.checked ? [...compareSelection, id] : compareSelection.filter(value => value !== id);
+      renderCompare();
+    }
+
+    function renderComparisonChart(rows) {
+      const element = qs("#compare-radar");
+      if (rows.length < 2) return chartEmpty(element, "Select at least two rows to render the normalized comparison.");
+      const definitions = [
+        ["Median quality","validation_median_rmse",false],
+        ["Strict-perfect","validation_strict_perfect_lfo_rate",true],
+        ["P95 quality","validation_p95_rmse",false],
+        ["Node-max quality","validation_node_max_error_p95",false]
+      ];
+      const normalized = definitions.map(([,key,higher]) => {
+        const all = filteredMetricRows(false).map(row => num(row[key])); const min = Math.min(...all); const max = Math.max(...all);
+        return value => max === min ? 100 : (higher ? (num(value)-min)/(max-min) : (max-num(value))/(max-min)) * 100;
+      });
+      element.style.height = "330px";
+      setChart(element, {tooltip:{},legend:{bottom:0,textStyle:{color:chartText()}},radar:{indicator:definitions.map(([name]) => ({name,max:100})),axisName:{color:chartText()},splitLine:{lineStyle:{color:chartGrid()}},splitArea:{areaStyle:{color:["transparent"]}},axisLine:{lineStyle:{color:chartGrid()}}},series:[{type:"radar",data:rows.map(row => ({name:short(row.row_id),value:definitions.map(([,key],index) => normalized[index](row[key]))}))}]});
+    }
+
+    function renderDataTabs() {
+      const labels = {metrics:"Completed strategies",coverage:"Coverage grid",matched_deltas:"Matched effects",partial_codebook:"Partial codebook"};
+      if (diagnostics.length) labels.diagnostics = "Diagnostics";
+      if (rankings.length) labels.rankings = "Metric ranks";
+      if (interactions.length) labels.interactions = "Factor interactions";
+      if (deep.marginal_atoms?.length) labels.marginal_atoms = "Marginal atoms";
+      if (deep.layer_progression?.length) labels.layer_progression = "Residual layers";
+      if (deep.mechanisms?.length) labels.mechanisms = "Construction audit";
+      if (scaling.length) labels.scaling = "Training scaling";
+      qs("#data-tabs").innerHTML = Object.entries(labels).map(([key,label]) => `<button class="tab-button" type="button" role="tab" data-data-kind="${key}" aria-selected="${key === dataKind}">${label}</button>`).join("");
+      qsa("[data-data-kind]").forEach(button => {
+        button.addEventListener("click", () => { dataKind = button.dataset.dataKind; renderDataTabs(); renderData(); });
+        button.addEventListener("keydown", event => tabKeyNavigation(event, qs("#data-tabs")));
+      });
+    }
+
+    function renderData() {
+      const query = qs("#data-search")?.value.trim().toLowerCase() || "";
+      let rows;
+      if (dataKind === "metrics") rows = filteredMetricRows(false);
+      if (dataKind === "coverage") rows = filteredCoverageRows(false);
+      if (dataKind === "partial_codebook") rows = filteredPartialRows(false);
+      if (dataKind === "matched_deltas") rows = deltas.filter(row => filteredDeltaRows(row.comparison, false).includes(row));
+      if (dataKind === "scaling") rows = filteredScalingRows(false);
+      if (dataKind === "diagnostics") rows = filteredDiagnosticRows(false);
+      if (dataKind === "rankings") rows = filteredRankingRows(false);
+      if (dataKind === "interactions") rows = interactions.filter(row => !globalState.family.size || globalState.family.has(String(row.construction_family)));
+      if (dataKind === "marginal_atoms") rows = marginalRows(false);
+      if (dataKind === "layer_progression") rows = layerRows(false);
+      if (dataKind === "mechanisms") rows = mechanismRows(false);
+      rows = rows.filter(row => !query || JSON.stringify(row).toLowerCase().includes(query));
+      const completion = qs("#data-completion")?.value;
+      if (dataKind === "coverage" && completion && completion !== "all") rows = rows.filter(row => truthy(row.completed) === (completion === "complete"));
+      currentDataRows = rows;
+      const columns = dataColumns(dataKind);
+      qs("#data-count").textContent = `${rows.length} visible rows`;
+      qs("#data-table").innerHTML = simpleTable(rows, columns, 500);
+    }
+
+    function dataColumns(kind) {
+      return ({metrics:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"],coverage:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","completed"],matched_deltas:["comparison","construction_family","match_key","left_value","right_value","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"],partial_codebook:["row_id","construction_family","active_atom_count","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95"],scaling:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"],diagnostics:["row_id","construction_family","generalization_gap_median_rmse","generalization_gap_p95_rmse","validation_overshoot_rate_before_final_clip","residual_layer_effective_no_op_usage_rate_median","residual_layer_dead_atom_rate_median","residual_gain_nonzero_rate","duplicate_atom_rate","offline_analysis_time"],rankings:["row_id","construction_family","rank_validation_median_rmse","rank_validation_strict_perfect_lfo_rate","rank_validation_p95_rmse","rank_validation_node_max_error_p95","mean_co_primary_rank","rank_spread"],interactions:["comparison","construction_family","pair_count","median_delta_validation_median_rmse","median_delta_validation_strict_perfect_lfo_rate","median_delta_validation_p95_rmse","median_delta_validation_node_max_error_p95"],marginal_atoms:["row_id","construction_family","active_atom_count","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"],layer_progression:["row_id","construction_family","residual_layer","layer_role","training_median_rmse","training_p95_rmse","training_max_abs_error_p95"],mechanisms:["row_id","construction_family","atom_count","broad_atom_count","repair_atom_count","median_slot_p95_improvement","prototype_convergence_rate","prototype_iterations_median","exact_duplicate_alignment_reuse_rate","candidate_evaluations","oracle_construction_time"]})[kind];
+    }
+
+    function exportCsv() {
+      if (!currentDataRows.length) return;
+      const columns = dataColumns(dataKind);
+      const quote = value => `"${String(value ?? "").replaceAll('"','""')}"`;
+      const csv = [columns.map(quote).join(","), ...currentDataRows.map(row => columns.map(column => quote(row[column])).join(","))].join("\r\n");
+      const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+      const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `experiment13_${dataKind}_filtered.csv`; link.click(); URL.revokeObjectURL(link.href);
+    }
+
+    function renderChart(name, element) {
+      if (!element) return;
+      const renderers = {coverage:chartCoverage,normalization:el => chartDelta(el,"layer_normalization_policy","FinalClipOnly","LayerClip0To1"),budget:el => chartDelta(el,"utility_candidate_budget","CandidateBudget24","CandidateBudget48"),schedule:el => chartDelta(el,"layer_schedule","Interleaved","TwoPhase"),pareto:chartPareto,"metric-map":chartMetricMap,"strict-thresholds":chartStrictThresholds,generalization:chartGeneralization,interactions:chartInteractions,partial:chartPartial,marginal:chartMarginal,layers:chartLayers,diagnostics:chartDiagnostics,calibration:chartCalibration,"capacity-8":el=>chartCapacityDepth(el,8),"capacity-16":el=>chartCapacityDepth(el,16),"capacity-matrix":chartCapacityMatrix,"tolerance-matrix-8":el=>chartToleranceMatrix(el,8),"tolerance-matrix-16":el=>chartToleranceMatrix(el,16),retirement:chartRetirement,scaling:chartScaling,work:chartWork,runtime:chartRuntime};
+      renderers[name](element);
+    }
+
+    function setChart(element, option) {
+      if (!window.echarts || window.__echartsFailed) { disposeChart(element); element.innerHTML = `<div class="chart-fallback"><div><strong>Interactive chart unavailable.</strong><br>The findings and exact data remain available. Connect to the internet to load pinned ECharts from jsDelivr.</div></div>`; return; }
+      pruneChartInstances();
+      let instance = chartInstances.get(element) || echarts.getInstanceByDom(element);
+      if (!instance) {
+        element.replaceChildren();
+        instance = echarts.init(element, null, {renderer:"canvas"});
+        chartInstances.set(element, instance);
+        chartResizeObserver?.observe(element);
+      } else {
+        chartInstances.set(element, instance);
+      }
+      element.dataset.chartState = "rendered";
+      option.backgroundColor = "transparent";
+      option.animationDuration = 250;
+      instance.clear();
+      instance.setOption(option, true);
+      scheduleChartResize(element, instance);
+    }
+    function scheduleChartResize(element, instance) {
+      const resize = () => {
+        if (!element.isConnected || element.offsetParent === null) return;
+        const rect = element.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) instance.resize({width:Math.floor(rect.width),height:Math.floor(rect.height)});
+      };
+      requestAnimationFrame(() => requestAnimationFrame(resize));
+      window.setTimeout(resize, 120);
+    }
+    function chartEmpty(element, message = "No rows match the global filters.") {
+      disposeChart(element);
+      element.dataset.chartState = "empty";
+      element.style.height = "260px";
+      element.innerHTML = `<div class="empty">${esc(message)}</div>`;
+    }
+    function disposeChart(element) {
+      const instance = chartInstances.get(element) || (window.echarts ? echarts.getInstanceByDom(element) : null);
+      if (instance) instance.dispose();
+      chartResizeObserver?.unobserve(element);
+      chartInstances.delete(element);
+    }
+    function pruneChartInstances() {
+      [...chartInstances.keys()].filter(element => !element.isConnected).forEach(disposeChart);
+    }
+    function resizeVisibleCharts() { chartInstances.forEach((instance, element) => { if (element.isConnected && element.offsetParent !== null) scheduleChartResize(element, instance); }); }
+    function chartText() { return getComputedStyle(document.documentElement).getPropertyValue("--muted").trim(); }
+    function chartGrid() { return getComputedStyle(document.documentElement).getPropertyValue("--border").trim(); }
+    function baseAxes() { return {axisLine:{lineStyle:{color:chartGrid()}},axisLabel:{color:chartText()},splitLine:{lineStyle:{color:chartGrid(),opacity:.45}},nameTextStyle:{color:chartText()}}; }
+    function medianNum(values) { const ordered=values.map(num).sort((a,b)=>a-b); if (!ordered.length) return null; const mid=Math.floor(ordered.length/2); return ordered.length%2?ordered[mid]:(ordered[mid-1]+ordered[mid])/2; }
+    function averageRanks(values) {
+      const ordered=values.map((value,index)=>({value:num(value),index})).sort((a,b)=>a.value-b.value);
+      const result=Array(values.length).fill(0); let start=0;
+      while(start<ordered.length){let end=start+1;while(end<ordered.length&&ordered[end].value===ordered[start].value)end++;const rank=((start+1)+end)/2;for(let i=start;i<end;i++)result[ordered[i].index]=rank;start=end;}
+      return result;
+    }
+    function applyStrictTolerance() {
+      if (!strictThresholds) return;
+      metrics.forEach(row => {
+        const rate = strictThresholds.rates_by_row?.[row.row_id]?.[strictTolerance];
+        if (rate !== undefined) row.validation_strict_perfect_lfo_rate = num(rate);
+      });
+      metrics.forEach(row => {
+        row.pareto_candidate = !metrics.some(other => other !== row && dominatesMetrics(other, row));
+      });
+      deltas.forEach(row => {
+        const left = metricById.get(row.left_row_id);
+        const right = metricById.get(row.right_row_id);
+        if (!left || !right) return;
+        row.left_validation_strict_perfect_lfo_rate = num(left.validation_strict_perfect_lfo_rate);
+        row.right_validation_strict_perfect_lfo_rate = num(right.validation_strict_perfect_lfo_rate);
+        row.delta_validation_strict_perfect_lfo_rate = num(right.validation_strict_perfect_lfo_rate) - num(left.validation_strict_perfect_lfo_rate);
+      });
+      interactions.forEach(row => {
+        const values = deltas.filter(item => item.comparison === row.comparison && item.construction_family === row.construction_family).map(item => num(item.delta_validation_strict_perfect_lfo_rate)).sort((a,b)=>a-b);
+        if (!values.length) return;
+        row.median_delta_validation_strict_perfect_lfo_rate = medianNum(values);
+        row.right_policy_wins_validation_strict_perfect_lfo_rate = values.filter(value => value > 0).length;
+        row.left_policy_wins_validation_strict_perfect_lfo_rate = values.filter(value => value < 0).length;
+        row.ties_validation_strict_perfect_lfo_rate = values.filter(value => value === 0).length;
+      });
+    }
+    function dominatesMetrics(left, right) {
+      const comparisons = CO_PRIMARY.map(metric => metric.higher ? num(left[metric.key]) - num(right[metric.key]) : num(right[metric.key]) - num(left[metric.key]));
+      return comparisons.every(value => value >= 0) && comparisons.some(value => value > 0);
+    }
+    function currentRankingRows() {
+      const rankMaps = new Map(CO_PRIMARY.map(metric => {
+        const values = metrics.map(row => metric.higher ? -num(row[metric.key]) : num(row[metric.key]));
+        return [metric.key, averageRanks(values)];
+      }));
+      return metrics.map((row,index) => {
+        const result = {...row};
+        const values = CO_PRIMARY.map(metric => rankMaps.get(metric.key)[index]);
+        CO_PRIMARY.forEach((metric,metricIndex) => { result[`rank_${metric.key}`] = values[metricIndex]; });
+        result.mean_co_primary_rank = values.reduce((total,value)=>total+value,0)/values.length;
+        result.rank_spread = Math.max(...values)-Math.min(...values);
+        return result;
+      }).sort((a,b)=>num(a.mean_co_primary_rank)-num(b.mean_co_primary_rank)||String(a.row_id).localeCompare(String(b.row_id)));
+    }
+    function spearmanValues(left,right) {
+      if(left.length<2||left.length!==right.length)return null; const a=averageRanks(left),b=averageRanks(right); const am=a.reduce((x,y)=>x+y,0)/a.length,bm=b.reduce((x,y)=>x+y,0)/b.length;
+      const numerator=a.reduce((total,value,index)=>total+(value-am)*(b[index]-bm),0); const as=Math.sqrt(a.reduce((total,value)=>total+(value-am)**2,0)); const bs=Math.sqrt(b.reduce((total,value)=>total+(value-bm)**2,0)); return as&&bs?numerator/(as*bs):null;
+    }
+
+    function chartCoverage(element) {
+      const rows = filteredCoverageRows(true);
+      if (!rows.length) return chartEmpty(element);
+      const families = unique(rows.map(row => row.construction_family));
+      const cells = rows.map(row => [families.indexOf(row.construction_family), rows.filter(item => item.construction_family === row.construction_family).findIndex(item => item.row_id === row.row_id), truthy(row.completed) ? 1 : 0, short(row.row_id)]);
+      const maxY = Math.max(...families.map(family => rows.filter(row => row.construction_family === family).length));
+      element.style.height = `${Math.max(400, Math.min(650, 210 + maxY * 24))}px`;
+      setChart(element,{tooltip:{formatter:params => `${esc(params.data[3])}<br>${params.data[2] ? "✓ completed" : "□ missing"}`},grid:{left:150,right:20,top:30,bottom:45},xAxis:{type:"category",data:families,axisLabel:{color:chartText(),rotate:28,formatter:value => value.replace("Repair","")},axisLine:{lineStyle:{color:chartGrid()}}},yAxis:{type:"category",data:Array.from({length:maxY},(_,i)=>i+1),...baseAxes()},visualMap:{show:false,min:0,max:1,inRange:{color:[chartGrid(),COLORS.accent]}},series:[{type:"heatmap",data:cells.map(([x,y,v,label]) => [x,y,v,label]),itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2}}]});
+    }
+
+    function chartDelta(element, comparison, leftPolicy, rightPolicy) {
+      const rows = filteredDeltaRows(comparison, true).sort((a,b) => num(a.delta_validation_p95_rmse)-num(b.delta_validation_p95_rmse));
+      if (!rows.length) return chartEmpty(element, "No complete matched pairs remain under these filters.");
+      const scales = CO_PRIMARY.map(metric => Math.max(...rows.map(row => Math.abs(num(row[metric.delta]))), 1e-15));
+      const cells = rows.flatMap((row, rowIndex) => CO_PRIMARY.map((metric, metricIndex) => {
+        const raw = num(row[metric.delta]);
+        const rightBenefit = metric.higher ? raw : -raw;
+        return {value:[metricIndex,rowIndex,rightBenefit / scales[metricIndex]],raw,metric,row};
+      }));
+      element.style.height = `${Math.max(390, Math.min(760, 190 + rows.length * 27))}px`;
+      setChart(element,{
+        title:{text:`${rightPolicy} vs ${leftPolicy} · ${rows.length} matched pairs`,left:"center",textStyle:{color:chartText(),fontSize:13}},
+        tooltip:{formatter:params => {
+          const item=params.data; const favors=item.raw===0?"tie":((item.metric.higher?item.raw>0:item.raw<0)?rightPolicy:leftPolicy);
+          return `${esc(item.row.match_key)}<br><strong>${esc(item.metric.label)}</strong><br>${esc(rightPolicy)} − ${esc(leftPolicy)} Δ: ${fmt(item.raw,8)}<br><strong>${esc(favors === "tie" ? "Tie" : `${favors} favored`)}</strong>`;
+        }},
+        grid:{left:215,right:35,top:72,bottom:92},
+        xAxis:{type:"category",position:"top",data:CO_PRIMARY.map(metric=>metric.axis),axisLabel:{color:chartText(),interval:0,lineHeight:17,fontWeight:700},axisLine:{lineStyle:{color:chartGrid()}},axisTick:{show:false}},
+        yAxis:{type:"category",data:rows.map(row => row.match_key),axisLabel:{color:chartText(),width:195,overflow:"truncate"},axisLine:{lineStyle:{color:chartGrid()}},axisTick:{show:false}},
+        visualMap:{min:-1,max:1,dimension:2,orient:"horizontal",left:"center",bottom:18,calculable:false,text:[`${rightPolicy} favored`,`${leftPolicy} favored`],textStyle:{color:chartText()},inRange:{color:["#e9b0aa","#eef2f1","#a9dcca"]}},
+        series:[{type:"heatmap",data:cells,label:{show:true,color:"#66757b",fontSize:11,fontWeight:650,formatter:params=>deltaCellLabel(params.data.metric,params.data.raw)},itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2},emphasis:{itemStyle:{borderColor:"#52656d",borderWidth:2}}}]
+      });
+    }
+
+    function deltaCellLabel(metric, value) {
+      if (metric.higher) return `${value > 0 ? "+" : ""}${(value * 100).toFixed(2)}pp`;
+      if (value === 0) return "0";
+      if (Math.abs(value) < .0001) return value.toExponential(1);
+      return `${value > 0 ? "+" : ""}${value.toFixed(4)}`;
+    }
+
+    function chartPareto(element) {
+      const rows = filteredMetricRows(true);
+      if (!rows.length) return chartEmpty(element);
+      const families = unique(rows.map(row => row.construction_family));
+      element.style.height = "520px";
+      setChart(element,{tooltip:{formatter:params => `${esc(short(params.data.row.row_id))}<br>Median RMSE ${fmt(params.value[0],6)}<br>P95 RMSE ${fmt(params.value[1],6)}<br>Strict-perfect (${esc(strictTolerance)}) ${pct(params.data.row.validation_strict_perfect_lfo_rate,3)}<br>Node-max P95 ${fmt(params.data.row.validation_node_max_error_p95,6)}`},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:30,top:25,bottom:95,containLabel:true},xAxis:{type:"value",name:"Median RMSE ↓",nameLocation:"middle",nameGap:42,...baseAxes()},yAxis:{type:"value",name:"P95 RMSE ↓",nameLocation:"middle",nameGap:58,...baseAxes()},series:families.map(family=>({name:family,type:"scatter",data:rows.filter(row=>row.construction_family===family).map(row=>({value:[num(row.validation_median_rmse),num(row.validation_p95_rmse)],row,symbolSize:truthy(row.pareto_candidate)?15:8,itemStyle:{borderColor:truthy(row.pareto_candidate)?"#52656d":"transparent",borderWidth:truthy(row.pareto_candidate)?2:0}})),emphasis:{focus:"series"}}))});
+    }
+
+    function chartMetricMap(element) {
+      const rows=filteredMetricRows(true); if(rows.length<2)return chartEmpty(element);
+      const cells=[]; CO_PRIMARY.forEach((left,y)=>CO_PRIMARY.forEach((right,x)=>cells.push([x,y,spearmanValues(rows.map(row=>row[left.key]),rows.map(row=>row[right.key]))])));
+      element.style.height="500px";
+      setChart(element,{tooltip:{formatter:params=>`${esc(CO_PRIMARY[params.value[1]].label)} vs ${esc(CO_PRIMARY[params.value[0]].label)}<br>${Number.isFinite(params.value[2])?`Spearman rho ${fmt(params.value[2],3)}`:"Rank correlation is undefined in this slice"}`},grid:{left:150,right:45,top:40,bottom:95},xAxis:{type:"category",data:CO_PRIMARY.map(metric=>metric.short),axisLabel:{color:chartText(),rotate:18},axisLine:{lineStyle:{color:chartGrid()}}},yAxis:{type:"category",data:CO_PRIMARY.map(metric=>metric.short),axisLabel:{color:chartText()},axisLine:{lineStyle:{color:chartGrid()}}},visualMap:{min:-1,max:1,orient:"horizontal",left:"center",bottom:20,text:["same ordering","opposite ordering"],textStyle:{color:chartText()},inRange:{color:["#e7b1ad","#eef2f1","#95cfbd"]}},series:[{type:"heatmap",data:cells,label:{show:true,color:"#66757b",fontWeight:700,formatter:params=>Number.isFinite(params.value[2])?fmt(params.value[2],2):"n/a"},itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2}}]});
+    }
+
+    function chartStrictThresholds(element) {
+      const rows = filteredMetricRows(true);
+      if (!strictThresholds || !rows.length) return chartEmpty(element);
+      const tolerances = strictThresholds.tolerances.map(Number).sort((a,b)=>a-b);
+      const families = unique(rows.map(row=>row.construction_family));
+      const rates = (selected,tolerance) => selected.map(row=>num(strictThresholds.rates_by_row?.[row.row_id]?.[tolerance.toExponential(0).replace("+","")])).filter(Number.isFinite);
+      const medianSeries = tolerances.map(tolerance=>medianNum(rates(rows,tolerance)));
+      const bestSeries = tolerances.map(tolerance=>Math.max(...rates(rows,tolerance)));
+      const series = families.map(family=>({name:family,type:"line",symbol:"circle",symbolSize:5,data:tolerances.map(tolerance=>[tolerance,medianNum(rates(rows.filter(row=>row.construction_family===family),tolerance))]),connectNulls:true,lineStyle:{width:1.3,opacity:.72}}));
+      series.push({name:"All in-scope median",type:"line",symbol:"diamond",symbolSize:8,data:tolerances.map((tolerance,index)=>[tolerance,medianSeries[index]]),lineStyle:{width:3,color:"#26383f"},itemStyle:{color:"#26383f"},z:5});
+      series.push({name:"Best in-scope row",type:"line",symbol:"rect",symbolSize:7,data:tolerances.map((tolerance,index)=>[tolerance,bestSeries[index]]),lineStyle:{width:2,type:"dashed",color:COLORS.warn},itemStyle:{color:COLORS.warn},z:4});
+      element.style.height="500px";
+      setChart(element,{tooltip:{trigger:"axis",valueFormatter:value=>pct(value,3)},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:30,bottom:100,containLabel:true},xAxis:{type:"log",logBase:10,name:"Max-absolute tolerance (RMSE tolerance = x/10) · logarithmic scale",nameLocation:"middle",nameGap:48,min:1e-5,max:1e-2,axisLabel:{color:chartText(),formatter:value=>Number(value).toExponential(0).replace("+","")},axisLine:{lineStyle:{color:chartGrid()}},splitLine:{show:true,lineStyle:{color:chartGrid(),opacity:.45}}},yAxis:{type:"value",name:"Validation strict-perfect LFO rate ↑",nameLocation:"middle",nameGap:60,axisLabel:{color:chartText(),formatter:value=>pct(value,1)},...baseAxes()},series});
+    }
+
+    function chartGeneralization(element) {
+      const rows=filteredDiagnosticRows(true); if(!rows.length)return chartEmpty(element);
+      const specs=[{name:"Median RMSE",train:"train_median_rmse",validation:"validation_median_rmse"},{name:"P95 RMSE",train:"train_p95_rmse",validation:"validation_p95_rmse"}];
+      element.style.height="500px";
+      const xAxis=specs.map((spec,index)=>({type:"value",gridIndex:index,name:`Training ${spec.name}`,nameLocation:"middle",nameGap:38,...baseAxes()}));
+      const yAxis=specs.map((spec,index)=>({type:"value",gridIndex:index,name:`Validation ${spec.name}`,nameLocation:"middle",nameGap:52,...baseAxes()}));
+      const series=[];
+      specs.forEach((spec,index)=>{const values=rows.flatMap(row=>[num(row[spec.train]),num(row[spec.validation])]);const lower=Math.min(...values),upper=Math.max(...values);series.push({name:spec.name,type:"scatter",xAxisIndex:index,yAxisIndex:index,symbolSize:8,data:rows.map(row=>({value:[num(row[spec.train]),num(row[spec.validation])],row})),itemStyle:{color:index?COLORS.accent:COLORS.blue}});series.push({name:`${spec.name} equality`,type:"line",xAxisIndex:index,yAxisIndex:index,data:[[lower,lower],[upper,upper]],symbol:"none",silent:true,lineStyle:{type:"dashed",color:chartText(),width:1}});});
+      setChart(element,{tooltip:{formatter:params=>params.data?.row?`${esc(short(params.data.row.row_id))}<br>Train ${fmt(params.value[0],7)}<br>Validation ${fmt(params.value[1],7)}<br>Gap ${fmt(params.value[1]-params.value[0],7)}`:"train = validation"},grid:[{left:70,right:"55%",top:35,bottom:70},{left:"58%",right:25,top:35,bottom:70}],xAxis,yAxis,series});
+    }
+
+    function chartInteractions(element) {
+      const comparisons=[{key:"layer_normalization_policy",label:"LayerClip - FinalClip",left:"FinalClipOnly",right:"LayerClip0To1"},{key:"utility_candidate_budget",label:"Budget48 - Budget24",left:"CandidateBudget24",right:"CandidateBudget48"},{key:"layer_schedule",label:"TwoPhase - Interleaved",left:"Interleaved",right:"TwoPhase"}];
+      const selected=comparisons.flatMap(item=>filteredDeltaRows(item.key,true)); if(!selected.length)return chartEmpty(element);
+      const families=unique(selected.map(row=>row.construction_family)); const cells=[];
+      families.forEach((family,y)=>comparisons.forEach((comparison,x)=>{const values=selected.filter(row=>row.construction_family===family&&row.comparison===comparison.key).map(row=>row.delta_validation_p95_rmse);if(values.length){const value=medianNum(values);cells.push({value:[x,y,value],count:values.length,family,comparison:comparison.label,favored:value===0?"tie":value<0?comparison.right:comparison.left});}}));
+      const scale=Math.max(...cells.map(cell=>Math.abs(num(cell.value[2]))),1e-9); element.style.height=`${Math.max(500,210+families.length*26)}px`;
+      setChart(element,{tooltip:{formatter:params=>`${esc(params.data.family)}<br>${esc(params.data.comparison)}<br>Median validation P95 delta ${fmt(params.value[2],8)}<br>${params.data.count} matched pairs<br><strong>${esc(params.data.favored==="tie"?"Tie":`${params.data.favored} favored`)}</strong>`},grid:{left:190,right:35,top:35,bottom:90},xAxis:{type:"category",data:comparisons.map(item=>item.label),axisLabel:{color:chartText(),rotate:12},axisLine:{lineStyle:{color:chartGrid()}}},yAxis:{type:"category",data:families,axisLabel:{color:chartText()},axisLine:{lineStyle:{color:chartGrid()}}},visualMap:{min:-scale,max:scale,dimension:2,orient:"horizontal",left:"center",bottom:18,text:["positive delta","negative delta"],textStyle:{color:chartText()},inRange:{color:["#a9dcca","#eef2f1","#e9b0aa"]}},series:[{type:"heatmap",data:cells,label:{show:true,color:"#66757b",formatter:params=>deltaCellLabel(CO_PRIMARY[2],params.value[2])},itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2}}]});
+    }
+
+    function chartPartial(element) {
+      const rows = filteredPartialRows(true);
+      if (!rows.length) return chartEmpty(element);
+      const families = unique(rows.map(row => row.construction_family));
+      const medianValue = values => { const ordered=values.map(num).sort((a,b)=>a-b); if (!ordered.length) return null; const mid=Math.floor(ordered.length/2); return ordered.length%2?ordered[mid]:(ordered[mid-1]+ordered[mid])/2; };
+      element.style.height = "520px";
+      setChart(element,{tooltip:{trigger:"axis",valueFormatter:value=>fmt(value,7)},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:25,bottom:85,containLabel:true},xAxis:{type:"category",name:"Active atoms added per residual layer →",data:[1,2,3,4,5,6,7],...baseAxes()},yAxis:{type:"value",name:"Family-median validation P95 RMSE ↓",nameLocation:"middle",nameGap:56,...baseAxes()},series:families.map(family=>({name:family,type:"line",symbol:"circle",data:[1,2,3,4,5,6,7].map(active=>medianValue(rows.filter(row=>row.construction_family===family&&num(row.active_atom_count)===active).map(row=>row.validation_p95_rmse))),connectNulls:true}))});
+    }
+
+    function chartMarginal(element) {
+      const rows=marginalRows(true); if(!rows.length)return chartEmpty(element);
+      const slots=unique(rows.map(row=>row.active_atom_count)).map(Number).sort((a,b)=>a-b); const values=slots.map(slot=>medianNum(rows.filter(row=>num(row.active_atom_count)===slot).map(row=>row.delta_validation_p95_rmse))); const counts=slots.map(slot=>{const selected=rows.filter(row=>num(row.active_atom_count)===slot);return `${selected.filter(row=>num(row.delta_validation_p95_rmse)<0).length}/${selected.length}`;});
+      element.style.height="430px";setChart(element,{tooltip:{formatter:params=>`Added atom ${params.name}<br>Median validation P95 delta ${fmt(params.value,8)}<br>${counts[params.dataIndex]} strategies improve`},grid:{left:25,right:25,top:35,bottom:70,containLabel:true},xAxis:{type:"category",name:"New active atom count",data:slots,...baseAxes()},yAxis:{type:"value",name:"Median P95 delta (lower is better)",nameLocation:"middle",nameGap:55,...baseAxes()},series:[{type:"bar",data:values,itemStyle:{color:params=>params.value<=0?COLORS.accent:COLORS.danger},label:{show:true,position:"inside",color:"#ffffff",formatter:params=>counts[params.dataIndex]}}]});
+    }
+
+    function chartLayers(element) {
+      const rows=layerRows(true); if(!rows.length)return chartEmpty(element);
+      const families=unique(rows.map(row=>row.construction_family));const layers=unique(rows.map(row=>row.residual_layer)).map(Number).sort((a,b)=>a-b);element.style.height="540px";
+      setChart(element,{tooltip:{trigger:"axis",valueFormatter:value=>fmt(value,7)},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:25,bottom:85,containLabel:true},xAxis:{type:"category",name:"Residual layer completed",data:layers,...baseAxes()},yAxis:{type:"value",name:"Family-median training P95 RMSE",nameLocation:"middle",nameGap:60,...baseAxes()},series:families.map(family=>({name:family,type:"line",symbol:"circle",symbolSize:4,data:layers.map(layer=>medianNum(rows.filter(row=>row.construction_family===family&&num(row.residual_layer)===layer).map(row=>row.training_p95_rmse))),connectNulls:true}))});
+    }
+
+    function chartDiagnostics(element) {
+      const rows=filteredDiagnosticRows(true); if(!rows.length)return chartEmpty(element);
+      const specs=[{key:"validation_overshoot_rate_before_final_clip",label:"Overshoot rate"},{key:"residual_layer_effective_no_op_usage_rate_median",label:"Effective no-op"},{key:"residual_gain_nonzero_rate",label:"Non-zero gain rate"}];
+      const grids=[{left:62,right:"70%",top:52,bottom:68},{left:"37%",right:"37%",top:52,bottom:68},{left:"70%",right:25,top:52,bottom:68}]; const xAxis=specs.map((spec,index)=>({type:"value",gridIndex:index,name:spec.label,nameLocation:"middle",nameGap:38,...baseAxes()}));const yAxis=specs.map((spec,index)=>({type:"value",gridIndex:index,name:index===0?"Validation P95 RMSE":"",nameLocation:"middle",nameGap:50,...baseAxes()}));
+      element.style.height="470px";setChart(element,{title:specs.map((spec,index)=>{const rho=spearmanValues(rows.map(row=>row[spec.key]),rows.map(row=>row.validation_p95_rmse));return {text:Number.isFinite(rho)?`rho ${rho.toFixed(2)}`:"rho n/a",left:["16%","49%","82%"][index],top:12,textAlign:"center",textStyle:{fontSize:12,color:chartText()}};}),tooltip:{formatter:params=>`${esc(short(params.data.row.row_id))}<br>${esc(params.seriesName)} ${fmt(params.value[0],6)}<br>Validation P95 ${fmt(params.value[1],7)}`},grid:grids,xAxis,yAxis,series:specs.map((spec,index)=>({name:spec.label,type:"scatter",xAxisIndex:index,yAxisIndex:index,symbolSize:7,data:rows.map(row=>({value:[num(row[spec.key]),num(row.validation_p95_rmse)],row})),itemStyle:{color:[COLORS.danger,COLORS.warn,COLORS.accent][index]}}))});
+    }
+
+    function chartWork(element) {
+      const mechanisms=mechanismRows(true);const rows=filteredDiagnosticRows(true);if(!rows.length)return chartEmpty(element);
+      const candidate=mechanisms.filter(row=>num(row.candidate_evaluations)>0);element.style.height="490px";
+      setChart(element,{legend:{bottom:0,textStyle:{color:chartText()}},tooltip:{formatter:params=>`${esc(short(params.data.row.row_id))}<br>${esc(params.seriesName)} ${fmt(params.value[0],2)}<br>Validation P95 ${fmt(params.value[1],7)}`},grid:[{left:72,right:"55%",top:38,bottom:72},{left:"59%",right:28,top:38,bottom:72}],xAxis:[{type:"value",name:"Candidate evaluations",nameLocation:"middle",nameGap:40,...baseAxes()},{type:"value",gridIndex:1,name:"Oracle construction seconds",nameLocation:"middle",nameGap:40,...baseAxes()}],yAxis:[{type:"value",name:"Validation P95 RMSE",nameLocation:"middle",nameGap:55,...baseAxes()},{type:"value",gridIndex:1,...baseAxes()}],series:[{name:"CandidateBudget24",type:"scatter",data:candidate.filter(row=>row.utility_candidate_budget==="CandidateBudget24").map(row=>({value:[num(row.candidate_evaluations),num(row.validation_p95_rmse)],row})),itemStyle:{color:COLORS.blue}},{name:"CandidateBudget48",type:"scatter",data:candidate.filter(row=>row.utility_candidate_budget==="CandidateBudget48").map(row=>({value:[num(row.candidate_evaluations),num(row.validation_p95_rmse)],row})),itemStyle:{color:COLORS.accent}},{name:"Same-run construction",type:"scatter",xAxisIndex:1,yAxisIndex:1,data:rows.map(row=>({value:[num(row.oracle_construction_time),num(row.validation_p95_rmse)],row})),itemStyle:{color:COLORS.warn}}]});
+    }
+
+    function calibrationFamily(row) { return metricById.get(calibrationRowIds[row[0]])?.construction_family || "Unknown"; }
+
+    function calibrationToleranceTable() {
+      const rows=filteredCalibrationRows("layer_quantiles_by_row",false);
+      const output=[];
+      [8,16].forEach(depth=>unique(rows.filter(row=>num(row[1])===depth).map(calibrationFamily)).forEach(family=>unique(rows.filter(row=>num(row[1])===depth&&calibrationFamily(row)===family).map(row=>num(row[2]))).sort((a,b)=>a-b).forEach(target=>output.push({residual_layer:depth,construction_family:family,target_lfo_reduction:target,required_tolerance:medianNum(rows.filter(row=>num(row[1])===depth&&calibrationFamily(row)===family&&num(row[2])===target).map(row=>row[3]))}))));
+      return output;
+    }
+
+    function chartCapacityDepth(element, depth) {
+      const rows=filteredCalibrationRows("layer_coverage_by_row",true).filter(row=>num(row[1])===depth);
+      if(!rows.length)return chartEmpty(element,"No calibration rows match the global filters.");
+      const families=unique(rows.map(calibrationFamily));
+      const epsilons=unique(rows.map(row=>num(row[2]))).sort((a,b)=>a-b);
+      element.style.height="500px";
+      setChart(element,{title:{text:depth===8?"Layer 8 · population removed before layers 9–16":"Layer 16 · endpoint population meeting tolerance",left:"center",textStyle:{color:chartText(),fontSize:13}},tooltip:{trigger:"axis",formatter:params=>`Tested tolerance ε ${fmt(params[0]?.value?.[0],6)}<br>${params.map(item=>`${esc(item.seriesName)}: <strong>${pct(item.value[1],2)} LFO reduction</strong>`).join("<br>")}`},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:55,bottom:95,containLabel:true},xAxis:{type:"log",logBase:10,name:"Tested eligibility tolerance ε → looser",nameLocation:"middle",nameGap:42,axisLabel:{color:chartText(),formatter:value=>Number(value).toExponential(1)},axisLine:{lineStyle:{color:chartGrid()}},splitLine:{show:true,lineStyle:{color:chartGrid(),opacity:.45}}},yAxis:{type:"value",name:"Median LFO population reduction ↑",nameLocation:"middle",nameGap:60,axisLabel:{color:chartText(),formatter:value=>pct(value,1)},...baseAxes()},series:families.map(family=>({name:family,type:"line",symbol:"circle",symbolSize:5,data:epsilons.map(epsilon=>[epsilon,medianNum(rows.filter(row=>calibrationFamily(row)===family&&num(row[2])===epsilon).map(row=>row[3]))]),connectNulls:true}))});
+    }
+
+    function chartToleranceMatrix(element, depth) {
+      const rows=filteredCalibrationRows("layer_quantiles_by_row",true).filter(row=>num(row[1])===depth);
+      if(!rows.length)return chartEmpty(element,"No calibration rows match the global filters.");
+      const families=unique(rows.map(calibrationFamily));
+      const targets=unique(rows.map(row=>num(row[2]))).sort((a,b)=>a-b);
+      const cells=families.flatMap((family,y)=>targets.map((target,x)=>{const raw=medianNum(rows.filter(row=>calibrationFamily(row)===family&&num(row[2])===target).map(row=>row[3]));return {value:[x,y,Math.log10(Math.max(raw,1e-12))],raw,family,target};}));
+      const logs=cells.map(cell=>cell.value[2]).filter(Number.isFinite);
+      element.style.height=`${Math.max(500,260+families.length*28)}px`;
+      setChart(element,{title:{text:`Layer ${depth} · exact tolerance needed for each reduction target`,left:"center",textStyle:{color:chartText(),fontSize:13}},tooltip:{formatter:params=>`${esc(params.data.family)}<br>Target: retire ${pct(params.data.target,1)} of LFOs<br><strong>Required ε: ${fmtTolerance(params.data.raw)}</strong>`},grid:{left:215,right:35,top:65,bottom:95},xAxis:{type:"category",position:"top",data:targets.map(target=>`retire ${pct(target,target<.01?1:0)}`),axisLabel:{color:chartText(),interval:0,rotate:20},axisLine:{lineStyle:{color:chartGrid()}}},yAxis:{type:"category",data:families,axisLabel:{color:chartText(),width:195,overflow:"truncate"},axisLine:{lineStyle:{color:chartGrid()}}},visualMap:{min:Math.min(...logs),max:Math.max(...logs),dimension:2,orient:"horizontal",left:"center",bottom:18,text:["looser ε","stricter ε"],textStyle:{color:chartText()},inRange:{color:["#eef2f1","#95cfbd"]}},series:[{type:"heatmap",data:cells,label:{show:true,color:"#66757b",fontWeight:650,formatter:params=>fmtTolerance(params.data.raw)},itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2}}]});
+    }
+
+    function chartCapacityMatrix(element) {
+      const rows=filteredCalibrationRows("layer_coverage_by_row",true);
+      if(!rows.length)return chartEmpty(element,"No calibration rows match the global filters.");
+      const families=unique(rows.map(calibrationFamily));
+      const columns=[8,16].flatMap(depth=>unique(rows.filter(row=>num(row[1])===depth).map(row=>num(row[2]))).sort((a,b)=>a-b).map(epsilon=>({depth,epsilon,label:`L${depth} · ε ${fmtTolerance(epsilon)}`})));
+      const cells=families.flatMap((family,y)=>columns.map((column,x)=>{const raw=medianNum(rows.filter(row=>calibrationFamily(row)===family&&num(row[1])===column.depth&&num(row[2])===column.epsilon).map(row=>row[3]));return {value:[x,y,raw],raw,family,...column};}));
+      element.style.height=`${Math.max(520,280+families.length*28)}px`;
+      setChart(element,{title:{text:"Exact LFO population reduction at layers 8 and 16",left:"center",textStyle:{color:chartText(),fontSize:13}},tooltip:{formatter:params=>`${esc(params.data.family)}<br>Layer ${params.data.depth} · tested ε ${fmtTolerance(params.data.epsilon)}<br><strong>${pct(params.data.raw,2)} LFO reduction</strong>${params.data.depth===8?"<br>removed before layers 9–16":"<br>endpoint coverage only"}`},grid:{left:215,right:35,top:65,bottom:105},xAxis:{type:"category",position:"top",data:columns.map(column=>column.label),axisLabel:{color:chartText(),interval:0,rotate:28},axisLine:{lineStyle:{color:chartGrid()}}},yAxis:{type:"category",data:families,axisLabel:{color:chartText(),width:195,overflow:"truncate"},axisLine:{lineStyle:{color:chartGrid()}}},visualMap:{min:0,max:Math.max(...cells.map(cell=>cell.raw)),dimension:2,orient:"horizontal",left:"center",bottom:18,text:["more LFOs removed","fewer LFOs removed"],textStyle:{color:chartText()},inRange:{color:["#eef2f1","#73c7aa"]}},series:[{type:"heatmap",data:cells,label:{show:true,color:"#66757b",fontWeight:650,formatter:params=>pct(params.data.raw,1)},itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2}}]});
+    }
+
+    function chartCalibration(element) {
+      const rows = isComplete13A
+        ? DATA.calibration.layer_quantiles.map(row => [0,row.residual_layer,row.percentile,row.epsilon_value])
+        : filteredCalibrationRows("layer_quantiles_by_row", true);
+      if (!rows.length) return chartEmpty(element);
+      const percentiles = unique(rows.map(row => row[2])).map(Number).sort((a,b)=>b-a);
+      const layers = unique(rows.map(row => row[1])).map(Number).sort((a,b)=>a-b);
+      const medianValue = values => { const ordered=values.map(num).sort((a,b)=>a-b); const mid=Math.floor(ordered.length/2); return ordered.length%2?ordered[mid]:(ordered[mid-1]+ordered[mid])/2; };
+      element.style.height = "520px";
+      setChart(element,{tooltip:{trigger:"axis",valueFormatter:value=>fmt(value,7)},legend:{bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:25,bottom:75,containLabel:true},xAxis:{type:"category",name:"Residual layers completed →",data:layers,...baseAxes()},yAxis:{type:"value",name:"Median reconstruction-error threshold ε ↓",nameLocation:"middle",nameGap:60,...baseAxes()},series:percentiles.map(percentile=>({name:`retire ${pct(percentile,1)} of LFOs`,type:"line",symbol:"circle",symbolSize:5,data:layers.map(layer=>medianValue(rows.filter(row=>num(row[2])===percentile&&num(row[1])===layer).map(row=>row[3]))),connectNulls:true}))});
+    }
+
+    function chartRetirement(element) {
+      const rows = isComplete13A
+        ? DATA.calibration.retired_sample.map(row => [0,row.epsilon,row.retired_lfo_fraction,row.unexplained_retired_energy_fraction])
+        : filteredCalibrationRows("retired_sample_by_row", true);
+      if (!rows.length) return chartEmpty(element);
+      const epsilons = unique(rows.map(row=>row[1])).map(Number).sort((a,b)=>a-b);
+      element.style.height = "520px";
+      setChart(element,{tooltip:{formatter:params=>`ε ${params.seriesName}<br>Retired ${pct(params.value[0],2)}<br>Unexplained energy ${pct(params.value[1],3)}<br><strong>Better direction: lower-right</strong>`},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:25,bottom:80,containLabel:true},xAxis:{type:"value",name:"Retired LFO fraction → more capacity released",nameLocation:"middle",nameGap:42,...baseAxes()},yAxis:{type:"value",name:"Unexplained retired energy ↓ safer",nameLocation:"middle",nameGap:56,...baseAxes()},series:epsilons.map(epsilon=>({name:String(epsilon),type:"scatter",symbolSize:7,data:rows.filter(row=>num(row[1])===epsilon).map(row=>[num(row[2]),num(row[3])]),itemStyle:{opacity:.48}}))});
+    }
+
+    function chartScaling(element) {
+      const rows = filteredScalingRows(true).sort((a,b)=>num(a.delta_validation_p95_rmse)-num(b.delta_validation_p95_rmse));
+      if (!rows.length) return chartEmpty(element, "No matched scaling rows remain under these filters.");
+      const scales = CO_PRIMARY.map(metric => Math.max(...rows.map(row => Math.abs(num(row[`delta_${metric.key}`]))), 1e-15));
+      const cells = rows.flatMap((row,rowIndex)=>CO_PRIMARY.map((metric,metricIndex)=>{
+        const raw=num(row[`delta_${metric.key}`]);
+        const sampledBenefit=metric.higher?raw:-raw;
+        return {value:[metricIndex,rowIndex,sampledBenefit/scales[metricIndex]],raw,metric,row};
+      }));
+      element.style.height = `${Math.max(500, Math.min(920, 210 + rows.length * 23))}px`;
+      setChart(element,{
+        title:{text:`50% vs 100% training · ${rows.length} matched rows`,left:"center",textStyle:{color:chartText(),fontSize:13}},
+        tooltip:{formatter:params=>{const item=params.data;const favors=item.raw===0?"tie":((item.metric.higher?item.raw>0:item.raw<0)?"50% training":"100% training");return `${esc(short(item.row.row_id))}<br><strong>${esc(item.metric.label)}</strong><br>50% − 100% Δ: ${fmt(item.raw,8)}<br><strong>${esc(favors === "tie" ? "Tie" : `${favors} favored`)}</strong>`;}},
+        grid:{left:215,right:35,top:72,bottom:92},
+        xAxis:{type:"category",position:"top",data:CO_PRIMARY.map(metric=>metric.axis),axisLabel:{color:chartText(),interval:0,lineHeight:17,fontWeight:700},axisLine:{lineStyle:{color:chartGrid()}},axisTick:{show:false}},
+        yAxis:{type:"category",data:rows.map(row=>short(row.row_id)),axisLabel:{color:chartText(),width:195,overflow:"truncate"},axisLine:{lineStyle:{color:chartGrid()}},axisTick:{show:false}},
+        visualMap:{min:-1,max:1,dimension:2,orient:"horizontal",left:"center",bottom:18,text:["50% training favored","100% training favored"],textStyle:{color:chartText()},inRange:{color:["#e9b0aa","#eef2f1","#a9dcca"]}},
+        series:[{type:"heatmap",data:cells,label:{show:true,color:"#66757b",fontSize:11,fontWeight:650,formatter:params=>deltaCellLabel(params.data.metric,params.data.raw)},itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2}}]
+      });
+    }
+
+    function chartRuntime(element) {
+      const rows = [...filteredMetricRows(true)].sort((a,b)=>num(a.oracle_construction_time)-num(b.oracle_construction_time));
+      if (!rows.length) return chartEmpty(element);
+      if (isComplete13A) {
+        const selected = rows.slice(-30);
+        element.style.height = `${Math.max(520, Math.min(900, 170 + selected.length * 23))}px`;
+        setChart(element,{
+          tooltip:{formatter:params=>`${esc(params.name)}<br>${fmt(params.value,2)} oracle construction seconds<br><strong>Same-run offline timing</strong>`},
+          grid:{left:235,right:45,top:35,bottom:58},
+          xAxis:{type:"value",name:"Oracle construction seconds ↓",...baseAxes()},
+          yAxis:{type:"category",data:selected.map(row=>short(row.row_id)),axisLabel:{color:chartText(),width:215,overflow:"truncate"},axisLine:{lineStyle:{color:chartGrid()}}},
+          series:[{name:"Optimized 13A timing",type:"bar",data:selected.map(row=>num(row.oracle_construction_time)),itemStyle:{color:COLORS.blue},label:{show:true,position:"right",color:"#66757b",formatter:params=>fmt(params.value,1)}}]
+        });
+        return;
+      }
+      const sleepIds = new Set(findings.runtime_outliers.slice(0,2).map(row=>row.row_id));
+      const ordinary = rows.filter(row=>!sleepIds.has(row.row_id));
+      const sleep = rows.filter(row=>sleepIds.has(row.row_id));
+      const labels = rows.map(row=>short(row.row_id));
+      const ordinaryMax = Math.max(...ordinary.map(row=>num(row.oracle_construction_time)),1);
+      const sleepMin = Math.min(...sleep.map(row=>num(row.oracle_construction_time)), ordinaryMax * 1.2);
+      const sleepMax = Math.max(...sleep.map(row=>num(row.oracle_construction_time)), sleepMin * 1.05);
+      element.style.height = `${Math.max(520, Math.min(980, 170 + rows.length * 21))}px`;
+      setChart(element,{
+        tooltip:{trigger:"item",formatter:params=>`${esc(params.name)}<br>${fmt(params.value,2)} seconds${params.seriesName === "Host sleep artifact" ? "<br><strong>Host sleep inflated wall-clock time</strong>" : ""}`},
+        graphic:[{type:"text",right:"20.3%",top:27,style:{text:"//",fill:chartText(),font:"800 18px sans-serif"}}],
+        grid:[{left:235,right:"27%",top:55,bottom:58},{left:"78%",right:25,top:55,bottom:58}],
+        xAxis:[{type:"value",name:"Ordinary legacy construction seconds",max:ordinaryMax*1.08,...baseAxes()},{type:"value",gridIndex:1,name:"Sleep-affected seconds",min:sleepMin*.96,max:sleepMax*1.04,...baseAxes()}],
+        yAxis:[{type:"category",data:labels,axisLabel:{color:chartText(),width:215,overflow:"truncate"},axisLine:{lineStyle:{color:chartGrid()}}},{type:"category",gridIndex:1,data:labels,axisLabel:{show:false},axisTick:{show:false},axisLine:{show:false}}],
+        series:[{name:"Ordinary legacy timing",type:"bar",xAxisIndex:0,yAxisIndex:0,data:rows.map(row=>sleepIds.has(row.row_id)?null:num(row.oracle_construction_time)),itemStyle:{color:COLORS.blue},label:{show:true,position:"right",color:"#66757b",formatter:params=>fmt(params.value,1)}},{name:"Host sleep artifact",type:"bar",xAxisIndex:1,yAxisIndex:1,data:rows.map(row=>sleepIds.has(row.row_id)?num(row.oracle_construction_time):null),itemStyle:{color:COLORS.danger},label:{show:true,position:"insideRight",color:"#ffffff",fontWeight:700,formatter:params=>fmt(params.value,0)}}]
+      });
+    }
+
+    function switchView(view) {
+      currentView = view;
+      qsa(".view").forEach(section => section.classList.toggle("active", section.id === `${view}-view`));
+      qsa("[data-view]").forEach(button => button.setAttribute("aria-current", button.dataset.view === view ? "page" : "false"));
+      if (view === "report") requestAnimationFrame(() => requestAnimationFrame(() => { renderFullReportCharts(); resizeVisibleCharts(); }));
+      if (view === "compare") requestAnimationFrame(() => requestAnimationFrame(() => { renderCompare(); resizeVisibleCharts(); }));
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+
+    function bindGlobalEvents() {
+      qsa("[data-view]").forEach(button => button.addEventListener("click", () => switchView(button.dataset.view)));
+      qs("#scroll-top").addEventListener("click", () => window.scrollTo({top:0,behavior:"smooth"}));
+      qs("#compare-clear").addEventListener("click", () => { compareSelection=[]; renderCompare(); });
+      qs("#export-csv").addEventListener("click", exportCsv);
+      window.addEventListener("resize", resizeVisibleCharts);
+      document.addEventListener("keydown", event => {
+        if (["INPUT","SELECT","TEXTAREA"].includes(document.activeElement.tagName)) return;
+        if (/^[1-9]$/.test(event.key) && num(event.key) <= NODES.length) { switchView("interactive"); openNode(NODES[num(event.key)-1].id); }
+        if (event.key === "Escape" && activeNode) closeDetail();
+        if (["ArrowLeft","ArrowRight"].includes(event.key) && activeNode && !event.target.closest("[role=tablist]")) {
+          const index=NODES.findIndex(node=>node.id===activeNode); const next=(index+(event.key==="ArrowRight"?1:-1)+NODES.length)%NODES.length; openNode(NODES[next].id);
+        }
+      });
+    }
+
+    function announce(message) {
+      let live = qs("#live-region");
+      if (!live) { live=document.createElement("div"); live.id="live-region"; live.className="sr-only"; live.setAttribute("aria-live","polite"); document.body.append(live); }
+      live.textContent = message;
+    }
+
+    applyStrictTolerance();
+    initialize();
+  })();
+  </script>
+</body>
+</html>
