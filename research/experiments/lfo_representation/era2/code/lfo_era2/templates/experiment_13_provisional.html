@@ -487,6 +487,8 @@
     "use strict";
     const DATA = JSON.parse(document.getElementById("report-data").textContent);
     const isComplete13A = DATA.meta.report_mode === "complete_13a";
+    const isFinal = DATA.meta.report_mode === "complete";
+    const isComplete = isComplete13A || isFinal;
     const qs = (selector, root = document) => root.querySelector(selector);
     const qsa = (selector, root = document) => [...root.querySelectorAll(selector)];
     const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
@@ -494,7 +496,7 @@
     const fmt = (value, digits = 4) => Number.isFinite(num(value)) ? num(value).toLocaleString(undefined, {maximumFractionDigits: digits}) : "—";
     const fmtTolerance = value => num(value) === 0 ? "0" : Math.abs(num(value)) < 0.001 ? num(value).toExponential(2) : fmt(value, 6);
     const pct = (value, digits = 1) => `${(num(value) * 100).toFixed(digits)}%`;
-    const short = value => String(value || "").replace(/^x13a_/, "").replaceAll("_", " · ");
+    const short = value => String(value || "").replace(/^x13[ab]_/, "").replaceAll("_", " · ");
     const unique = values => [...new Set(values.filter(value => value !== undefined && value !== null && value !== ""))].sort();
     const truthy = value => value === true || ["true","1","yes"].includes(String(value).toLowerCase());
     const COLORS = {accent:"#147e67", blue:"#286db7", warn:"#a86100", danger:"#b63b34", blocked:"#7741a5"};
@@ -508,7 +510,9 @@
     const coverage = DATA.tables.coverage;
     const deltas = DATA.tables.matched_deltas;
     const deep = DATA.deep_analysis || {row_ids:[],marginal_atoms:[],layer_progression:[],mechanisms:[]};
-    const partial = (DATA.tables.partial_codebook || []).map(row => Array.isArray(row) ? {row_id:deep.row_ids[row[0]],construction_family:metrics.find(item=>item.row_id===deep.row_ids[row[0]])?.construction_family,active_atom_count:row[1],validation_median_rmse:row[2],validation_strict_perfect_lfo_rate:row[3],validation_p95_rmse:row[4],validation_node_max_error_p95:row[5]} : row);
+    const partial = (DATA.tables.partial_codebook || []).map(row => Array.isArray(row) ? (row.length===3
+      ? {row_id:deep.row_ids[row[0]],construction_family:metrics.find(item=>item.row_id===deep.row_ids[row[0]])?.construction_family,active_atom_count:row[1],validation_p95_rmse:row[2]}
+      : {row_id:deep.row_ids[row[0]],construction_family:metrics.find(item=>item.row_id===deep.row_ids[row[0]])?.construction_family,active_atom_count:row[1],validation_median_rmse:row[2],validation_strict_perfect_lfo_rate:row[3],validation_p95_rmse:row[4],validation_node_max_error_p95:row[5]}) : row);
     const scaling = DATA.tables.scaling || [];
     const diagnostics = (DATA.tables.diagnostics || []).map(row => ({...metrics.find(item=>item.row_id===row.row_id),...row}));
     const rankings = (DATA.tables.rankings || []).map(row => ({...metrics.find(item=>item.row_id===row.row_id),...row}));
@@ -524,6 +528,8 @@
       {key:"validation_node_max_error_p95", delta:"delta_validation_node_max_error_p95", label:"Node-max error P95", axis:"Node-max\nP95 ↓", short:"Node-max", higher:false, format:value=>fmt(value, 7)}
     ];
     const GLOBAL_FIELDS = [
+      ["phase","experiment_phase","All phases"],
+      ["epsilon","eligibility_epsilon","All eligibility epsilons"],
       ["family","construction_family","All families"],
       ["policy","construction_policy","All policies"],
       ["schedule","layer_schedule","All schedules"],
@@ -759,7 +765,81 @@
         limitation:"Do not interpret these timings as a legacy-to-optimized speedup or deployed inference cost.", charts:["runtime"]
       }
     ];
-    const NODES = isComplete13A ? COMPLETE_13A_NODES : PROVISIONAL_NODES;
+    const FINAL_NODES = [
+      {
+        id:"coverage", number:1, zone:"Integrity", status:"complete", title:"Complete paired design", stat:`${DATA.meta.completed_rows}/${DATA.meta.expected_rows} rows`,
+        question:"Is the full Experiment 13 design available for final interpretation?",
+        mechanism:"Experiment 13A contributes 90 AllResiduals rows. Experiment 13B contributes the 45 clipped strategies at three UnresolvedOnly eligibility epsilons, for 135 additional rows.",
+        evidence:"Both phases completed without failed rows. The final report can separate full-grid 13A effects, matched population-policy effects, and the within-13B epsilon sweep.",
+        recommendation:"Use phase and epsilon filters before interpreting a family or policy slice.",
+        limitation:"The training sample is the fixed 50% construction subset; validation remains the complete held-out split.", charts:["coverage"]
+      },
+      {
+        id:"families", number:2, zone:"Quality frontier", status:"complete", title:"13B quality frontier", stat:`${findings.pareto_count} Pareto rows`,
+        question:"Which 13B strategies survive all four co-primary metrics?",
+        mechanism:"Median, strict-perfect, P95, and node-max quality reward different construction behaviors. Pareto membership keeps a row only when no other 13B row is at least as good on all four metrics.",
+        evidence:"AllClusterMeans owns the best P95. DiverseCoverageHardRepairTwoPhase owns the best median and node-max solutions. DiverseCoverageHardRepairInterleaved supplies the strongest balanced strict-perfect rows.",
+        recommendation:"Choose from the frontier according to the deployment objective; do not collapse it to one scalar score.",
+        limitation:"The original strict-perfect threshold is fixed at RMSE 1e-6 and maximum point error 1e-5 in this cross-phase report.", charts:["pareto"]
+      },
+      {
+        id:"population", number:3, zone:"Eligibility", status:"mixed", title:"AllResiduals versus UnresolvedOnly", stat:comparisonText({count:deltas.filter(row=>row.comparison==="residual_population_policy").length,improved:deltas.filter(row=>row.comparison==="residual_population_policy"&&num(row.delta_validation_p95_rmse)<0).length,median:medianNum(deltas.filter(row=>row.comparison==="residual_population_policy").map(row=>row.delta_validation_p95_rmse))}),
+        question:"Does removing already-resolved LFOs from later atom construction improve the matching clipped strategy?",
+        mechanism:"UnresolvedOnly changes which training residuals may define later atoms. It can prevent nearly solved curves from consuming repair capacity, but it can also remove population mass that stabilizes broad prototypes.",
+        evidence:"The median paired P95 effect is effectively zero. Large mean gains come from rescuing BroadMeanFinishRepair, while other families contain both improvements and regressions.",
+        recommendation:"Use UnresolvedOnly selectively where the construction family benefits; do not treat it as a universal free improvement.",
+        limitation:"The comparison is paired only to the 45 LayerClip0To1 13A rows, by design.", charts:["eligibility"]
+      },
+      {
+        id:"epsilon", number:4, zone:"Eligibility", status:"mixed", title:"Three-epsilon sweep", stat:"No global epsilon winner",
+        question:"Does 1e-2, 1e-3, or 1e-4 dominate across construction families?",
+        mechanism:"Epsilon is used during construction. Changing it alters the eligible residual population and therefore changes later dictionary atoms; final quality need not vary monotonically.",
+        evidence:"The across-row P95 medians are very close. The best P95 ties across all three epsilons, while the best median, node-max, and family-specific outcomes occur at different epsilons.",
+        recommendation:"Keep epsilon family-specific. Use 1e-3 for the strongest DiverseCoverage exact-finish candidate and retain 1e-2/1e-4 where their exact frontier rows justify them.",
+        limitation:"Three logarithmically spaced settings reveal sensitivity but do not estimate a continuous optimum.", charts:["epsilon-family"]
+      },
+      {
+        id:"strict-regime", number:5, zone:"Model behavior", status:"diagnostic", title:"Strict-perfect finishing regime", stat:`best ${pct(Math.max(...metrics.filter(row=>row.experiment_phase==="13B").map(row=>num(row.validation_strict_perfect_lfo_rate))),2)}`,
+        question:"Why do seven rows jump to the same 19.5% strict-perfect rate?",
+        mechanism:"A small set of dictionary constructions captures one recurring validation population to numerical precision while retaining different behavior on the rest of the distribution.",
+        evidence:"Seven rows finish the same 313 of 1605 validation LFOs. A saved-codebook replay shows 299 are analysis-labeled continuous curves and 14 discontinuous; the ordinary 13 exact LFOs are a subset.",
+        recommendation:"Treat this as a distinct finishing mechanism, not as a small shift in average RMSE.",
+        limitation:"The complete tolerance replay remains available in the separate 13A report; it was not recomputed for 13B.", charts:["strict-noop"]
+      },
+      {
+        id:"interactions", number:6, zone:"Strategy levers", status:"mixed", title:"Budget and schedule interactions", stat:"Budget48 is more repeatable",
+        question:"Which ordinary policy levers remain useful after eligibility filtering?",
+        mechanism:"Budget changes the offline repair shortlist; schedule changes the order of broad and repair residual layers. Both depend on the parent construction family.",
+        evidence:"CandidateBudget48 improves a majority of matched P95 pairs at each epsilon. TwoPhase improves only 8 of 18 matched schedule pairs at each epsilon despite appearing in several frontier rows.",
+        recommendation:"Prefer Budget48 when offline work is acceptable; choose schedule jointly with family.",
+        limitation:"Pure-prototype and anchor rows do not define every matched lever.", charts:["interactions"]
+      },
+      {
+        id:"partial", number:7, zone:"Model behavior", status:"complete", title:"Partial codebook", stat:"Largest gain at 1→2 atoms",
+        question:"How quickly does each residual layer earn its seven active atom choices?",
+        mechanism:"Validation is replayed with one through seven active atoms per residual layer. The curve separates early reusable structure from late specialized repair.",
+        evidence:"The largest median P95 drop occurs between one and two active atoms. Later atoms continue helping, but their marginal gains diminish.",
+        recommendation:"Use this as motivation for a dedicated head-budget ablation, not as permission to shrink W8 immediately.",
+        limitation:"Every production row still uses the fixed 193-output W8D16 contract.", charts:["partial","marginal"]
+      },
+      {
+        id:"eligibility-depth", number:8, zone:"Eligibility", status:"diagnostic", title:"Eligibility through depth", stat:"Typical retirement ≈ 2%",
+        question:"How much construction population is actually freed as residual depth increases?",
+        mechanism:"At the end of each residual layer, the eligible count measures curves still allowed to influence the next layer. One minus that fraction is the population retired from later construction.",
+        evidence:"The median row retires only about two percent by layer 16, but BroadMeanFinishRepair and DiverseCoverage create much larger family-specific regimes.",
+        recommendation:"Inspect family curves; one aggregate retirement percentage hides the mechanism.",
+        limitation:"Layer-16 retirement is endpoint coverage and frees no later layer, while earlier retirement has more capacity value.", charts:["eligibility-progress"]
+      },
+      {
+        id:"work", number:9, zone:"Diagnostics", status:"same-run only", title:"Offline work", stat:"193 heads for every row",
+        question:"Does extra construction work change the deployed model contract?",
+        mechanism:"Oracle construction, candidate search, and encoding are experiment-time work. The deployed prediction head count and decoder interface are unchanged.",
+        evidence:"13B construction is somewhat faster on the median, and epsilon settings have similar timing distributions. Quality does not reduce to construction time.",
+        recommendation:"Keep offline cost and validation quality as separate decision axes.",
+        limitation:"These timings are not deployed inference latency and not a cross-host speedup estimate.", charts:["work","runtime"]
+      }
+    ];
+    const NODES = isFinal ? FINAL_NODES : (isComplete13A ? COMPLETE_13A_NODES : PROVISIONAL_NODES);
 
     let activeNode = null;
     let activeTab = "mechanism";
@@ -767,7 +847,7 @@
     let compareSelection = [];
     let dataKind = "metrics";
     let currentDataRows = [];
-    const globalState = {family:new Set(),policy:new Set(),schedule:new Set(),budget:new Set(),normalization:new Set(),pareto:new Set(),applyCharts:true};
+    const globalState = {phase:new Set(isFinal?["13B"]:[]),epsilon:new Set(),family:new Set(),policy:new Set(),schedule:new Set(),budget:new Set(),normalization:new Set(),pareto:new Set(),applyCharts:true};
     const chartInstances = new Map();
     const chartResizeObserver = "ResizeObserver" in window ? new ResizeObserver(entries => {
       entries.forEach(entry => {
@@ -823,6 +903,8 @@
     function renderReactiveFilterGroups() {
       const selectedFamilies = globalState.family;
       const groups = [
+        {id:"phase",label:"Experiment phase",values:unique(coverage.map(row => row.experiment_phase))},
+        {id:"epsilon",label:"13B eligibility epsilon",values:unique(coverage.map(row => row.eligibility_epsilon))},
         {id:"family",label:"Families",step:1,stage:"construction",hint:"Choose one or more parent families",values:unique(coverage.map(row => row.construction_family))},
         {id:"policy",label:"Construction variants",step:2,stage:"construction",hint:"Only variants belonging to the chosen families",values:selectedFamilies.size ? unique(coverage.filter(row => selectedFamilies.has(String(row.construction_family))).map(row => row.construction_policy)) : []},
         {id:"schedule",label:"Schedules",values:unique(coverage.map(row => row.layer_schedule))},
@@ -1003,34 +1085,44 @@
     function renderMeta() {
       const meta = DATA.meta;
       document.title = meta.display_title || meta.title;
-      qs("#page-title").textContent = isComplete13A ? "Experiment 13A — Complete Strategy Grid" : "Experiment 13 — Provisional Strategy Grid";
-      qs("#hero-title").textContent = isComplete13A ? "A complete unfiltered strategy map." : "Evidence before a winner.";
-      qs("#hero-summary").textContent = isComplete13A
-        ? "All 90 AllResiduals strategies are now available. Explore metric tension, train-to-validation stability, family interactions, layer and atom learning curves, dictionary diagnostics, calibration, and offline work."
-        : "This report turns the interrupted Experiment 13A prefix into bounded, inspectable evidence. It separates repeatable matched effects from missing-grid uncertainty and keeps calibration descriptive until all 90 rows exist.";
-      qs("#status-label").textContent = isComplete13A ? "13A COMPLETE" : "PROVISIONAL";
-      qs(".status-card").classList.toggle("complete", isComplete13A);
+      qs("#page-title").textContent = isFinal ? "Experiment 13 — Complete Strategy Grid" : (isComplete13A ? "Experiment 13A — Complete Strategy Grid" : "Experiment 13 — Provisional Strategy Grid");
+      qs("#hero-title").textContent = isFinal ? "The full paired strategy map." : (isComplete13A ? "A complete unfiltered strategy map." : "Evidence before a winner.");
+      qs("#hero-summary").textContent = isFinal
+        ? "Explore all 90 AllResiduals rows and all 135 UnresolvedOnly strategy-by-epsilon rows. Separate the quality frontier, paired population-policy effects, epsilon sensitivity, finishing regimes, codebook progression, and offline work."
+        : (isComplete13A
+          ? "All 90 AllResiduals strategies are now available. Explore metric tension, train-to-validation stability, family interactions, layer and atom learning curves, dictionary diagnostics, calibration, and offline work."
+          : "This report turns the interrupted Experiment 13A prefix into bounded, inspectable evidence. It separates repeatable matched effects from missing-grid uncertainty and keeps calibration descriptive until all 90 rows exist.");
+      qs("#status-label").textContent = isFinal ? "EXPERIMENT COMPLETE" : (isComplete13A ? "13A COMPLETE" : "PROVISIONAL");
+      qs(".status-card").classList.toggle("complete", isComplete);
       qs("#status-count").textContent = `${meta.completed_rows}/${meta.expected_rows}`;
       qs("#coverage-number").textContent = `${(meta.completed_rows / meta.expected_rows * 100).toFixed(1)}%`;
-      qs("#coverage-caption").textContent = isComplete13A
+      qs("#coverage-caption").textContent = isFinal ? "of the complete 90-row 13A plus 135-row 13B design" : (isComplete13A
         ? "of the planned Experiment 13A AllResiduals grid completed"
-        : "of Experiment 13A rows completed in a non-random execution-order prefix";
-      qs("#warning-strip").innerHTML = isComplete13A
-        ? `<strong>13B is ready for the fixed sweep.</strong> Automatic epsilon selection did not pass: best early/middle coverage is ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,3)} versus the required ${pct(findings.selection.required_early_middle_fraction,0)}. The next phase therefore evaluates 45 LayerClip0To1 strategies independently at 1e-2, 1e-3, and 1e-4 for 135 rows.`
-        : `<strong>Do not select epsilon from this report.</strong> Experiment 13A is incomplete, no eligibility epsilon has been frozen, and Experiment 13B has not run. Legacy runtime is historical diagnostic evidence only.`;
-      qs("#findings-title").textContent = isComplete13A ? "What the complete 13A grid supports" : "What the fragment actually supports";
-      qs("#findings-summary").textContent = isComplete13A
-        ? "Matched effects, the four-metric Pareto frontier, and the failed automatic eligibility gate are now complete for AllResiduals construction."
-        : "Matched comparisons carry more weight than incomplete rankings. The cards distinguish provisional effects, mixed evidence, unresolved choices, and blocked decisions.";
-      qs("#metrics-summary").textContent = isComplete13A
-        ? "No single validation metric is authoritative. Each card names the best row across the complete 90-row 13A grid."
-        : "No single validation metric is authoritative. Each card shows the best observed value in this incomplete prefix and names its winning row.";
+        : "of Experiment 13A rows completed in a non-random execution-order prefix");
+      qs("#warning-strip").innerHTML = isFinal
+        ? `<strong>No scalar winner.</strong> AllClusterMeans owns the best P95; DiverseCoverage variants own the strongest median, node-max, and balanced strict-perfect tradeoffs. UnresolvedOnly is a family-specific intervention, and none of the three epsilons dominates globally.`
+        : (isComplete13A
+          ? (meta.experiment13b_state === "complete" ? `<strong>13B has completed.</strong> This page remains the 13A-only diagnostic snapshot. Open the final Experiment 13 report for paired AllResiduals-versus-UnresolvedOnly evidence and the three-epsilon sweep.` : `<strong>13B is ready for the fixed sweep.</strong> Automatic epsilon selection did not pass: best early/middle coverage is ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,3)} versus the required ${pct(findings.selection.required_early_middle_fraction,0)}. The next phase therefore evaluates 45 LayerClip0To1 strategies independently at 1e-2, 1e-3, and 1e-4 for 135 rows.`)
+          : `<strong>Do not select epsilon from this report.</strong> Experiment 13A is incomplete, no eligibility epsilon has been frozen, and Experiment 13B has not run. Legacy runtime is historical diagnostic evidence only.`);
+      qs("#findings-title").textContent = isFinal ? "What the complete experiment supports" : (isComplete13A ? "What the complete 13A grid supports" : "What the fragment actually supports");
+      qs("#findings-summary").textContent = isFinal
+        ? "The final evidence separates the four-metric frontier from matched population-policy effects and family-specific epsilon sensitivity."
+        : (isComplete13A
+          ? "Matched effects, the four-metric Pareto frontier, and the failed automatic eligibility gate are now complete for AllResiduals construction."
+          : "Matched comparisons carry more weight than incomplete rankings. The cards distinguish provisional effects, mixed evidence, unresolved choices, and blocked decisions.");
+      qs("#metrics-summary").textContent = isFinal
+        ? "No single validation metric is authoritative. Filter to 13B for the final decision frontier or compare phases explicitly."
+        : (isComplete13A
+          ? "No single validation metric is authoritative. Each card names the best row across the complete 90-row 13A grid."
+          : "No single validation metric is authoritative. Each card shows the best observed value in this incomplete prefix and names its winning row.");
       qs("#evidence-help").textContent = "Choose a node. Number keys 1–9 open the first nine; use ← and → to move through the full evidence map. Escape closes detail.";
-      qs("#full-report-title").textContent = isComplete13A ? "Full Experiment 13A report" : "Full provisional report";
-      qs("#compare-summary").textContent = isComplete13A
-        ? "Radar values are normalized within the complete 90-row 13A grid. The exact table is authoritative; the radar is a visual aid, not a scalar ranking."
-        : "Radar values are normalized only within this fragment. The exact table is authoritative; the radar is a visual aid, not a scalar ranking.";
-      qs("#footer-status").textContent = isComplete13A ? "Experiment 13A · Complete AllResiduals evidence; 135-row LayerClip0To1 epsilon sweep pending." : "Experiment 13 · Provisional evidence only.";
+      qs("#full-report-title").textContent = isFinal ? "Full Experiment 13 report" : (isComplete13A ? "Full Experiment 13A report" : "Full provisional report");
+      qs("#compare-summary").textContent = isFinal
+        ? "Radar values are normalized within the currently filtered complete evidence. The exact table is authoritative; the radar is a visual aid, not a scalar ranking."
+        : (isComplete13A
+          ? "Radar values are normalized within the complete 90-row 13A grid. The exact table is authoritative; the radar is a visual aid, not a scalar ranking."
+          : "Radar values are normalized only within this fragment. The exact table is authoritative; the radar is a visual aid, not a scalar ranking.");
+      qs("#footer-status").textContent = isFinal ? "Experiment 13 · Complete 13A and 13B evidence." : (isComplete13A ? "Experiment 13A · Complete AllResiduals evidence." : "Experiment 13 · Provisional evidence only.");
       const contract = meta.contract;
       const chips = [`W${contract.window_width}D${contract.residual_layers}`, `${contract.control_points} control points`, `${contract.base_choices} base choices`, `${contract.atom_choices} atom choices`, contract.path_search, contract.scalar_context, `${contract.model_outputs} outputs`];
       qs("#contract-row").innerHTML = chips.map(value => `<span class="chip">${esc(value)}</span>`).join("");
@@ -1040,7 +1132,15 @@
 
     function renderFindings() {
       const currentParetoCount = metrics.filter(row => truthy(row.pareto_candidate)).length;
-      const cards = isComplete13A ? [
+      const populationRows = deltas.filter(row => row.comparison === "residual_population_policy");
+      const p95Population = populationRows.map(row => num(row.delta_validation_p95_rmse));
+      const phaseB = metrics.filter(row => row.experiment_phase === "13B");
+      const cards = isFinal ? [
+        ["Complete evidence", "225/225", "90 AllResiduals plus 135 UnresolvedOnly strategy-by-epsilon rows"],
+        ["Population filtering", `${p95Population.filter(value=>value<0).length}/${p95Population.length}`, "paired P95 comparisons improve; the median effect is neutral"],
+        ["Quality frontier", `${phaseB.filter(row=>truthy(row.pareto_candidate)).length} rows`, "remain non-dominated inside Experiment 13B"],
+        ["Best strict-perfect", pct(Math.max(...phaseB.map(row=>num(row.validation_strict_perfect_lfo_rate))),2), "a discrete exact-finish/no-op regime rather than a global RMSE win"]
+      ] : isComplete13A ? [
         ["Strongest repeatable effect", `${findings.normalization.improved}/${findings.normalization.count}`, "matched normalization pairs favor LayerClip0To1"],
         ["Quality frontier", `${currentParetoCount} strategies`, `remain non-dominated at strict-perfect tolerance ${strictTolerance}`],
         ["Schedule effect", `${findings.schedule.improved}/${findings.schedule.count}`, "matched P95 pairs favor TwoPhase; family interactions remain"],
@@ -1209,21 +1309,35 @@
         retirement:"Lower-right is useful: more LFOs retired with less unexplained energy abandoned. Energy safety passes, but coverage is too low to freeze epsilon automatically.",
         scaling:"Each cell prints the exact 50%-training minus 100%-training validation delta using the original 1e-5 strict-perfect definition. Green favors 50%; coral favors 100%. Runtime is intentionally excluded.",
         work:"Candidate evaluations and same-run construction time are offline work. All rows retain 193 deployed heads, so this is not an inference-latency chart.",
-        runtime:isComplete13A ? "Continuous same-run timing keeps the optimized 13A cost pattern readable. Lower is faster; these are offline construction seconds, not deployed inference cost." : "The main linear axis exposes ordinary legacy timing differences. The separate red segment retains the two host-sleep artifacts without flattening the other bars."
+        eligibility:"Each row is a matched strategy-by-epsilon comparison. Cell labels are exact 13B minus 13A deltas; the legend names the policy favored for each co-primary metric.",
+        "epsilon-family":"Each line is a construction-family median across its in-scope 13B strategies. Lower P95 is better; non-monotonic lines are expected because epsilon changes the atoms built later.",
+        "strict-noop":"Moving up means more validation LFOs meet the original strict-perfect tuple; moving left means the same row also controls P95 tail error. The useful corner is upper-left.",
+        "eligibility-progress":"One minus the eligible fraction is the training population no longer competing for later atoms. Earlier retirement frees more future construction depth than layer-16 endpoint retirement.",
+        runtime:isComplete ? "Continuous same-run timing keeps the optimized cost pattern readable. Lower is faster; these are offline construction seconds, not deployed inference cost." : "The main linear axis exposes ordinary legacy timing differences. The separate red segment retains the two host-sleep artifacts without flattening the other bars."
       };
       return captions[name];
     }
 
     function metricsForNode(node) {
       if (node.id === "coverage") return simpleTable(filteredCoverageRows(false), ["row_id","construction_family","construction_policy","layer_schedule","utility_candidate_budget","layer_normalization_policy","completed"]);
-      if (["normalization","budget","schedule"].includes(node.id)) {
-        const key = {normalization:"layer_normalization_policy",budget:"utility_candidate_budget",schedule:"layer_schedule"}[node.id];
+      if (["normalization","budget","schedule","population"].includes(node.id)) {
+        const key = {normalization:"layer_normalization_policy",budget:"utility_candidate_budget",schedule:"layer_schedule",population:"residual_population_policy"}[node.id];
         return simpleTable(filteredDeltaRows(key, false), ["match_key","left_value","right_value","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
       }
+      if (node.id === "epsilon") return simpleTable(filteredMetricRows(false).filter(row=>row.experiment_phase==="13B"), ["row_id","construction_family","eligibility_epsilon","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95"]);
+      if (node.id === "strict-regime") return simpleTable(filteredDiagnosticRows(false).filter(row=>row.experiment_phase==="13B"), ["row_id","construction_family","eligibility_epsilon","validation_strict_perfect_lfo_rate","validation_median_rmse","validation_p95_rmse","validation_node_max_error_p95"]);
+      if (node.id === "eligibility-depth") return simpleTable(layerRows(false).filter(row=>row.experiment_phase==="13B"), ["row_id","construction_family","eligibility_epsilon","residual_layer","eligible_residual_count","training_p95_rmse"]);
       if (node.id === "families") return simpleTable([...filteredMetricRows(false)].sort((a,b) => num(a.validation_p95_rmse)-num(b.validation_p95_rmse)), ["row_id","construction_family","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"]);
       if (node.id === "metric-agreement") return simpleTable(filteredRankingRows(false), ["row_id","construction_family","rank_validation_median_rmse","rank_validation_strict_perfect_lfo_rate","rank_validation_p95_rmse","rank_validation_node_max_error_p95","mean_co_primary_rank","rank_spread"]);
       if (node.id === "generalization") return simpleTable(filteredDiagnosticRows(false), ["row_id","construction_family","generalization_gap_median_rmse","generalization_gap_p95_rmse","generalization_gap_node_max_error_p95"]);
-      if (node.id === "interactions") return simpleTable(interactions.filter(row => !globalState.family.size || globalState.family.has(String(row.construction_family))), ["comparison","construction_family","pair_count","median_delta_validation_median_rmse","median_delta_validation_strict_perfect_lfo_rate","median_delta_validation_p95_rmse","median_delta_validation_node_max_error_p95"]);
+      if (node.id === "interactions" && isFinal) return simpleTable([...
+        filteredDeltaRows("utility_candidate_budget",false), ...filteredDeltaRows("layer_schedule",false)
+      ], ["experiment_phase","eligibility_epsilon","match_key","left_value","right_value","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
+      if (node.id === "interactions") return simpleTable(interactions.filter(row =>
+        (!globalState.family.size || globalState.family.has(String(row.construction_family))) &&
+        (!globalState.phase.size || globalState.phase.has(String(row.experiment_phase))) &&
+        (!globalState.epsilon.size || globalState.epsilon.has(String(row.eligibility_epsilon)))
+      ), ["experiment_phase","eligibility_epsilon","comparison","construction_family","pair_count","median_delta_validation_median_rmse","median_delta_validation_strict_perfect_lfo_rate","median_delta_validation_p95_rmse","median_delta_validation_node_max_error_p95"]);
       if (node.id === "partial") return simpleTable(marginalRows(false), ["row_id","construction_family","active_atom_count","delta_validation_median_rmse","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
       if (node.id === "layers") return simpleTable(layerRows(false), ["row_id","construction_family","residual_layer","layer_role","training_median_rmse","training_p95_rmse","training_max_abs_error_p95"]);
       if (node.id === "diagnostics") return simpleTable(filteredDiagnosticRows(false), ["row_id","construction_family","validation_overshoot_rate_before_final_clip","residual_layer_effective_no_op_usage_rate_median","residual_layer_dead_atom_rate_median","residual_gain_nonzero_rate","duplicate_atom_rate","validation_p95_rmse"]);
@@ -1243,7 +1357,7 @@
     function layerRows(forChart = false) {
       return filteredDeepRows(deep.layer_progression || [], forChart).map(row => {
         const metric = metricById.get(deepRowId(row[0])) || {};
-        return {row_id:deepRowId(row[0]),construction_family:metric.construction_family,residual_layer:row[1],layer_role:row[2],training_median_rmse:row[3],training_p95_rmse:row[4],training_max_abs_error_p95:row[5]};
+        return {row_id:deepRowId(row[0]),experiment_phase:metric.experiment_phase,eligibility_epsilon:metric.eligibility_epsilon,construction_family:metric.construction_family,residual_layer:row[1],layer_role:row[2],eligible_residual_count:row[3],training_median_rmse:row[4],training_p95_rmse:row[5],training_max_abs_error_p95:row[6]};
       });
     }
 
@@ -1274,7 +1388,7 @@
     }
 
     function renderFullReport() {
-      const coPrimary = `<article class="report-section" id="report-co-primary"><div class="eyebrow">Co-primary outcomes</div><h3>Four metrics define validation quality</h3><p>${isComplete13A ? `These are the best values across the complete 90-row Experiment 13A grid; strict-perfect uses tolerance ${strictTolerance}, while the other metrics are unchanged.` : "These are the best observed values in the incomplete prefix; each can come from a different strategy row."}</p><div class="primary-metric-grid">${primaryMetricMarkup()}</div></article>`;
+      const coPrimary = `<article class="report-section" id="report-co-primary"><div class="eyebrow">Co-primary outcomes</div><h3>Four metrics define validation quality</h3><p>${isFinal ? "These leaders update with the phase, epsilon, family, and policy filters. Use the 13B phase for the final decision frontier." : (isComplete13A ? `These are the best values across the complete 90-row Experiment 13A grid; strict-perfect uses tolerance ${strictTolerance}, while the other metrics are unchanged.` : "These are the best observed values in the incomplete prefix; each can come from a different strategy row.")}</p><div class="primary-metric-grid">${primaryMetricMarkup()}</div></article>`;
       qs("#report-stack").innerHTML = coPrimary + NODES.map(node => `<article class="report-section" id="report-${node.id}"><div class="report-meta"><span class="node-number">${node.number}</span><span class="confidence" style="color:${STATUS[node.status].color}">${esc(node.zone)} · ${esc(node.status)}</span></div><h3>${esc(node.title)}</h3><p><strong>${esc(node.question)}</strong></p><p>${esc(node.mechanism)}</p>${node.motivation ? `<div class="motivation"><strong>Why this matters:</strong> ${esc(node.motivation)}</div>` : ""}${node.id === "families" ? constructionGuideMarkup() : ""}<div class="takeaway" style="margin-top:18px"><strong>Evidence:</strong> ${esc(nodeEvidence(node))}</div>${readingMarkup(node)}<div style="margin-top:18px">${chartMarkup(node, `full-${node.id}`)}</div><p><strong>Recommendation:</strong> ${esc(node.recommendation)}</p><div class="limitation"><strong>Limitation:</strong> ${esc(nodeLimitation(node))}</div></article>`).join("");
     }
 
@@ -1386,7 +1500,7 @@
 
     function renderChart(name, element) {
       if (!element) return;
-      const renderers = {coverage:chartCoverage,normalization:el => chartDelta(el,"layer_normalization_policy","FinalClipOnly","LayerClip0To1"),budget:el => chartDelta(el,"utility_candidate_budget","CandidateBudget24","CandidateBudget48"),schedule:el => chartDelta(el,"layer_schedule","Interleaved","TwoPhase"),pareto:chartPareto,"metric-map":chartMetricMap,"strict-thresholds":chartStrictThresholds,generalization:chartGeneralization,interactions:chartInteractions,partial:chartPartial,marginal:chartMarginal,layers:chartLayers,diagnostics:chartDiagnostics,calibration:chartCalibration,"capacity-8":el=>chartCapacityDepth(el,8),"capacity-16":el=>chartCapacityDepth(el,16),"capacity-matrix":chartCapacityMatrix,"tolerance-matrix-8":el=>chartToleranceMatrix(el,8),"tolerance-matrix-16":el=>chartToleranceMatrix(el,16),retirement:chartRetirement,scaling:chartScaling,work:chartWork,runtime:chartRuntime};
+      const renderers = {coverage:chartCoverage,normalization:el => chartDelta(el,"layer_normalization_policy","FinalClipOnly","LayerClip0To1"),budget:el => chartDelta(el,"utility_candidate_budget","CandidateBudget24","CandidateBudget48"),schedule:el => chartDelta(el,"layer_schedule","Interleaved","TwoPhase"),eligibility:el=>chartDelta(el,"residual_population_policy","AllResiduals","UnresolvedOnly"),"epsilon-family":chartEpsilonFamily,"strict-noop":chartStrictNoOp,"eligibility-progress":chartEligibilityProgress,pareto:chartPareto,"metric-map":chartMetricMap,"strict-thresholds":chartStrictThresholds,generalization:chartGeneralization,interactions:chartInteractions,partial:chartPartial,marginal:chartMarginal,layers:chartLayers,diagnostics:chartDiagnostics,calibration:chartCalibration,"capacity-8":el=>chartCapacityDepth(el,8),"capacity-16":el=>chartCapacityDepth(el,16),"capacity-matrix":chartCapacityMatrix,"tolerance-matrix-8":el=>chartToleranceMatrix(el,8),"tolerance-matrix-16":el=>chartToleranceMatrix(el,16),retirement:chartRetirement,scaling:chartScaling,work:chartWork,runtime:chartRuntime};
       renderers[name](element);
     }
 
@@ -1525,6 +1639,33 @@
         visualMap:{min:-1,max:1,dimension:2,orient:"horizontal",left:"center",bottom:18,calculable:false,text:[`${rightPolicy} favored`,`${leftPolicy} favored`],textStyle:{color:chartText()},inRange:{color:["#e9b0aa","#eef2f1","#a9dcca"]}},
         series:[{type:"heatmap",data:cells,label:{show:true,color:"#66757b",fontSize:11,fontWeight:650,formatter:params=>deltaCellLabel(params.data.metric,params.data.raw)},itemStyle:{borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2},emphasis:{itemStyle:{borderColor:"#52656d",borderWidth:2}}}]
       });
+    }
+
+    function chartEpsilonFamily(element) {
+      const rows = filteredMetricRows(true).filter(row=>row.experiment_phase==="13B");
+      if (!rows.length) return chartEmpty(element,"No Experiment 13B rows match the global filters.");
+      const families=unique(rows.map(row=>row.construction_family));
+      const epsilons=unique(rows.map(row=>num(row.eligibility_epsilon))).map(Number).sort((a,b)=>a-b);
+      element.style.height="540px";
+      setChart(element,{tooltip:{trigger:"axis",formatter:params=>`Eligibility epsilon ${fmtTolerance(params[0]?.value?.[0])}<br>${params.map(item=>`${esc(item.seriesName)}: ${fmt(item.value[1],7)} P95`).join("<br>")}`},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:30,bottom:100,containLabel:true},xAxis:{type:"log",logBase:10,name:"Eligibility epsilon · construction threshold",nameLocation:"middle",nameGap:44,axisLabel:{color:chartText(),formatter:value=>Number(value).toExponential(0)},axisLine:{lineStyle:{color:chartGrid()}},splitLine:{show:true,lineStyle:{color:chartGrid(),opacity:.45}}},yAxis:{type:"value",name:"Family-median validation P95 RMSE ↓",nameLocation:"middle",nameGap:60,...baseAxes()},series:families.map(family=>({name:family,type:"line",symbol:"circle",symbolSize:5,data:epsilons.map(epsilon=>[epsilon,medianNum(rows.filter(row=>row.construction_family===family&&num(row.eligibility_epsilon)===epsilon).map(row=>row.validation_p95_rmse))]),connectNulls:true}))});
+    }
+
+    function chartStrictNoOp(element) {
+      const rows=filteredDiagnosticRows(true).filter(row=>row.experiment_phase==="13B");
+      if(!rows.length)return chartEmpty(element,"No Experiment 13B diagnostics match the global filters.");
+      element.style.height="500px";
+      const epsilons=unique(rows.map(row=>num(row.eligibility_epsilon))).map(Number).sort((a,b)=>a-b);
+      const symbols=["circle","rect","triangle"];
+      setChart(element,{tooltip:{formatter:params=>`${esc(short(params.data.row.row_id))}<br>P95 RMSE ${fmt(params.value[0],7)}<br>Strict-perfect ${pct(params.value[1],2)}<br>Epsilon ${fmtTolerance(params.data.row.eligibility_epsilon)}`},legend:{bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:25,bottom:85,containLabel:true},xAxis:{type:"value",name:"Validation P95 RMSE ↓",nameLocation:"middle",nameGap:42,...baseAxes()},yAxis:{type:"value",name:"Strict-perfect LFO rate ↑",nameLocation:"middle",nameGap:60,axisLabel:{color:chartText(),formatter:value=>pct(value,0)},...baseAxes()},series:epsilons.map((epsilon,index)=>({name:`epsilon ${fmtTolerance(epsilon)}`,type:"scatter",symbol:symbols[index%symbols.length],symbolSize:9,data:rows.filter(row=>num(row.eligibility_epsilon)===epsilon).map(row=>({value:[num(row.validation_p95_rmse),num(row.validation_strict_perfect_lfo_rate)],row}))}))});
+    }
+
+    function chartEligibilityProgress(element) {
+      const rows=layerRows(true).filter(row=>row.experiment_phase==="13B");
+      if(!rows.length)return chartEmpty(element,"No Experiment 13B layer progression matches the global filters.");
+      const epsilons=unique(rows.map(row=>num(row.eligibility_epsilon))).map(Number).sort((a,b)=>a-b);
+      const layers=unique(rows.map(row=>num(row.residual_layer))).map(Number).sort((a,b)=>a-b);
+      element.style.height="500px";
+      setChart(element,{tooltip:{trigger:"axis",valueFormatter:value=>pct(value,2)},legend:{bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:25,top:25,bottom:85,containLabel:true},xAxis:{type:"category",name:"Completed residual layer",data:layers,...baseAxes()},yAxis:{type:"value",name:"Median LFO population retired ↑",nameLocation:"middle",nameGap:62,axisLabel:{color:chartText(),formatter:value=>pct(value,1)},...baseAxes()},series:epsilons.map(epsilon=>({name:`epsilon ${fmtTolerance(epsilon)}`,type:"line",symbol:"circle",symbolSize:5,data:layers.map(layer=>medianNum(rows.filter(row=>num(row.eligibility_epsilon)===epsilon&&num(row.residual_layer)===layer).map(row=>1-num(row.eligible_residual_count)/Math.max(1,num(metricById.get(row.row_id)?.train_count))))),connectNulls:true}))});
     }
 
     function deltaCellLabel(metric, value) {
@@ -1703,7 +1844,7 @@
     function chartRuntime(element) {
       const rows = [...filteredMetricRows(true)].sort((a,b)=>num(a.oracle_construction_time)-num(b.oracle_construction_time));
       if (!rows.length) return chartEmpty(element);
-      if (isComplete13A) {
+      if (isComplete) {
         const selected = rows.slice(-30);
         element.style.height = `${Math.max(520, Math.min(900, 170 + selected.length * 23))}px`;
         setChart(element,{
@@ -1711,7 +1852,7 @@
           grid:{left:235,right:45,top:35,bottom:58},
           xAxis:{type:"value",name:"Oracle construction seconds ↓",...baseAxes()},
           yAxis:{type:"category",data:selected.map(row=>short(row.row_id)),axisLabel:{color:chartText(),width:215,overflow:"truncate"},axisLine:{lineStyle:{color:chartGrid()}}},
-          series:[{name:"Optimized 13A timing",type:"bar",data:selected.map(row=>num(row.oracle_construction_time)),itemStyle:{color:COLORS.blue},label:{show:true,position:"right",color:"#66757b",formatter:params=>fmt(params.value,1)}}]
+          series:[{name:isFinal?"Complete-run timing":"Optimized 13A timing",type:"bar",data:selected.map(row=>num(row.oracle_construction_time)),itemStyle:{color:COLORS.blue},label:{show:true,position:"right",color:"#66757b",formatter:params=>fmt(params.value,1)}}]
         });
         return;
       }

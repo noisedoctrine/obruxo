@@ -34,6 +34,7 @@ CALIBRATION_TABLES = (
 INTERACTIVE_REPORT_SCHEMA = "experiment13_interactive_report_v5"
 INTERACTIVE_TEMPLATE = Path(__file__).with_name("templates") / "experiment_13_provisional.html"
 COMPLETE_13A_REPORT_SCHEMA = "experiment13_complete_13a_report_v4"
+COMPLETE_REPORT_SCHEMA = "experiment13_complete_report_v1"
 
 
 @dataclass(frozen=True)
@@ -111,6 +112,43 @@ def analyze_13a_strategy_grid(
     )
 
 
+def analyze_complete_strategy_grid(
+    *,
+    run_dir: Path,
+    analysis_output_dir: Path,
+    report_path: Path,
+    image_dir: Path,
+    html_report_path: Path | None = None,
+) -> dict[str, str]:
+    """Generate the final report after the complete 13A and 13B phases."""
+    from .strategy_grid import (
+        experiment13a_specs,
+        experiment13b_specs,
+        load_epsilon_selection,
+        validate_completed_13a,
+        validate_completed_13b,
+    )
+
+    source_run = Path(run_dir).resolve()
+    manifest, _ = validate_completed_13a(source_run)
+    validate_completed_13b(source_run)
+    selection = load_epsilon_selection(
+        source_run / "epsilon_selection.json",
+        expected_run_identity=str(manifest["experiment13a_run_identity"]),
+        expected_configuration_fingerprint=str(manifest["configuration_fingerprint"]),
+        require_passed=False,
+    )
+    return write_complete_report(
+        source_run=source_run,
+        analysis_output_dir=Path(analysis_output_dir),
+        report_path=Path(report_path),
+        html_report_path=Path(html_report_path) if html_report_path is not None else None,
+        image_dir=Path(image_dir),
+        expected_rows=[asdict(spec) for spec in [*experiment13a_specs(), *experiment13b_specs()]],
+        selection=dict(selection.payload),
+    )
+
+
 def prepare_analysis_artifacts(
     *,
     source_run: Path,
@@ -146,6 +184,9 @@ def prepare_analysis_artifacts(
     coverage = _coverage_rows(expected, set(row_ids))
     co_primary = _co_primary_rows(summaries)
     matched = _matched_factor_deltas(summaries)
+    if phase is None:
+        matched.extend(_paired_population_deltas(summaries))
+        matched.sort(key=lambda row: (str(row.get("comparison", "")), str(row.get("match_key", ""))))
     partial = _load_table(source_run, "partial_codebook_validation.csv")
     if phase is not None:
         partial = [row for row in partial if row.get("experiment_phase") == phase]
@@ -442,6 +483,97 @@ def write_complete_13a_report(
     return result
 
 
+def write_complete_report(
+    *,
+    source_run: Path,
+    analysis_output_dir: Path,
+    report_path: Path,
+    image_dir: Path,
+    expected_rows: Sequence[Mapping[str, Any]],
+    selection: Mapping[str, Any],
+    html_report_path: Path | None = None,
+) -> dict[str, str]:
+    """Write the final 13A+13B findings-first Markdown and interactive reports."""
+    source_run = Path(source_run).resolve()
+    analysis_output_dir = Path(analysis_output_dir).resolve()
+    report_path = Path(report_path).resolve()
+    html_report_path = Path(html_report_path or report_path.with_suffix(".html")).resolve()
+    image_dir = Path(image_dir).resolve()
+    for path, label in (
+        (analysis_output_dir, "analysis output directory"),
+        (report_path, "report path"),
+        (html_report_path, "HTML report path"),
+        (image_dir, "image directory"),
+    ):
+        _require_outside_source(source_run, path, label)
+    if report_path.suffix.lower() != ".md" or html_report_path.suffix.lower() != ".html":
+        raise ValueError("complete report paths must end in .md and .html")
+
+    bundle = prepare_analysis_artifacts(
+        source_run=source_run,
+        analysis_output_dir=analysis_output_dir,
+        expected_rows=expected_rows,
+        phase=None,
+        forbid_source_writes=True,
+    )
+    phase_a = [row for row in bundle.summaries if row.get("experiment_phase") == "13A"]
+    phase_b = [row for row in bundle.summaries if row.get("experiment_phase") == "13B"]
+    if len(phase_a) != 90 or len(phase_b) != 135:
+        raise ValueError(f"complete report requires 90 13A and 135 13B rows; got {len(phase_a)} and {len(phase_b)}")
+
+    plot_paths = _write_final_plots(bundle, image_dir)
+    report_text = _complete_markdown(
+        bundle,
+        source_run=source_run,
+        report_path=report_path,
+        plot_paths=plot_paths,
+        selection=selection,
+    )
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    _atomic_text(report_path, report_text)
+
+    source_fingerprint = _analysis_source_fingerprint(source_run)
+    payload = _interactive_payload(
+        bundle,
+        source_run=source_run,
+        html_report_path=html_report_path,
+        expected_count=len(expected_rows),
+        source_fingerprint=source_fingerprint,
+        report_mode="complete",
+        selection=selection,
+        experiment13b_state="complete",
+    )
+    interactive_text = _interactive_html(payload)
+    _atomic_text(html_report_path, interactive_text)
+    interactive_sha256 = hashlib.sha256(interactive_text.encode("utf-8")).hexdigest()
+    manifest = {
+        "schema_version": COMPLETE_REPORT_SCHEMA,
+        "source_run": str(source_run),
+        "source_analysis_sha256": source_fingerprint,
+        "completed_13a_rows": len(phase_a),
+        "completed_13b_rows": len(phase_b),
+        "expected_rows": len(expected_rows),
+        "report_status": "complete",
+        "epsilon_selection_passed": bool(selection.get("selection_passed")),
+        "eligibility_epsilon_sweep": [0.01, 0.001, 0.0001],
+        "report_path": str(report_path),
+        "html_report_path": str(html_report_path),
+        "interactive_payload_schema": INTERACTIVE_REPORT_SCHEMA,
+        "interactive_report_sha256": interactive_sha256,
+        "image_dir": str(image_dir),
+    }
+    manifest_path = analysis_output_dir / "complete_report_manifest.json"
+    _atomic_text(manifest_path, json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+    return {
+        "analysis_output_dir": str(analysis_output_dir),
+        "report": str(report_path),
+        "html_report": str(html_report_path),
+        "report_image_dir": str(image_dir),
+        "manifest": str(manifest_path),
+        **{key: str(path) for key, path in bundle.paths.items()},
+    }
+
+
 def _load_table(run_dir: Path, name: str) -> list[dict[str, Any]]:
     aggregate = run_dir / name
     if aggregate.is_file() and aggregate.stat().st_size > 0:
@@ -524,6 +656,7 @@ def _analysis_source_fingerprint(source_run: Path) -> str:
         "retired_error_mass.csv",
         "execution_timing.csv",
         "experiment13a_status.json",
+        "experiment13b_status.json",
         "run_status.json",
         "epsilon_selection.json",
         "epsilon_selection_status.json",
@@ -547,6 +680,8 @@ def _coverage_rows(expected_rows: Sequence[Mapping[str, Any]], completed: set[st
         "layer_schedule",
         "utility_candidate_budget",
         "layer_normalization_policy",
+        "residual_population_policy",
+        "eligibility_epsilon",
         "broad_atom_builder",
         "repair_atom_builder",
     )
@@ -559,7 +694,11 @@ def _coverage_rows(expected_rows: Sequence[Mapping[str, Any]], completed: set[st
 
 
 def _co_primary_rows(summaries: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
-    pareto_ids = _pareto_ids(summaries)
+    phases = {str(row.get("experiment_phase", "")) for row in summaries}
+    pareto_ids = set().union(*(
+        _pareto_ids([row for row in summaries if str(row.get("experiment_phase", "")) == phase])
+        for phase in phases
+    ))
     fields = (
         "experiment_phase",
         "row_id",
@@ -569,6 +708,8 @@ def _co_primary_rows(summaries: Sequence[Mapping[str, Any]]) -> list[dict[str, A
         "layer_schedule",
         "utility_candidate_budget",
         "layer_normalization_policy",
+        "residual_population_policy",
+        "eligibility_epsilon",
         *CO_PRIMARY_METRICS,
         *SUPPLEMENTAL_METRICS,
         "oracle_construction_time",
@@ -615,7 +756,11 @@ def _matched_factor_deltas(summaries: Sequence[Mapping[str, Any]]) -> list[dict[
             value = str(row.get(field, ""))
             if value not in {left_value, right_value}:
                 continue
-            key = tuple(str(row.get(name, "")) for name in key_fields)
+            key = (
+                str(row.get("experiment_phase", "")),
+                str(row.get("eligibility_epsilon", "")),
+                *(str(row.get(name, "")) for name in key_fields),
+            )
             grouped.setdefault(key, {})[value] = row
         for key, pair in sorted(grouped.items()):
             if left_value not in pair or right_value not in pair:
@@ -633,6 +778,8 @@ def _matched_factor_deltas(summaries: Sequence[Mapping[str, Any]]) -> list[dict[
                 "layer_schedule": left.get("layer_schedule", ""),
                 "utility_candidate_budget": left.get("utility_candidate_budget", ""),
                 "layer_normalization_policy": left.get("layer_normalization_policy", ""),
+                "experiment_phase": left.get("experiment_phase", ""),
+                "eligibility_epsilon": left.get("eligibility_epsilon", ""),
             }
             for metric in CO_PRIMARY_METRICS:
                 left_metric, right_metric = _number(left, metric), _number(right, metric)
@@ -643,11 +790,53 @@ def _matched_factor_deltas(summaries: Sequence[Mapping[str, Any]]) -> list[dict[
     return result
 
 
+def _paired_population_deltas(summaries: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Pair every 13B epsilon row with its matching clipped 13A strategy."""
+    phase_a = {
+        str(row.get("pair_id", "")): row
+        for row in summaries
+        if row.get("experiment_phase") == "13A"
+        and row.get("layer_normalization_policy") == "LayerClip0To1"
+    }
+    result: list[dict[str, Any]] = []
+    for right in sorted(
+        (row for row in summaries if row.get("experiment_phase") == "13B"),
+        key=lambda row: (str(row.get("pair_id", "")), _number(row, "eligibility_epsilon")),
+    ):
+        left = phase_a.get(str(right.get("pair_id", "")))
+        if left is None:
+            continue
+        epsilon = _number(right, "eligibility_epsilon")
+        row: dict[str, Any] = {
+            "comparison": "residual_population_policy",
+            "left_value": "AllResiduals",
+            "right_value": "UnresolvedOnly",
+            "match_key": f"{right.get('construction_policy', '')} | epsilon {epsilon:g}",
+            "left_row_id": left.get("row_id", ""),
+            "right_row_id": right.get("row_id", ""),
+            "construction_family": right.get("construction_family", ""),
+            "construction_policy": right.get("construction_policy", ""),
+            "layer_schedule": right.get("layer_schedule", ""),
+            "utility_candidate_budget": right.get("utility_candidate_budget", ""),
+            "layer_normalization_policy": "LayerClip0To1",
+            "experiment_phase": "13B",
+            "eligibility_epsilon": epsilon,
+        }
+        for metric in CO_PRIMARY_METRICS:
+            left_metric, right_metric = _number(left, metric), _number(right, metric)
+            row[f"left_{metric}"] = left_metric
+            row[f"right_{metric}"] = right_metric
+            row[f"delta_{metric}"] = right_metric - left_metric
+        result.append(row)
+    return result
+
+
 def _strategy_diagnostic_rows(summaries: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
     """Retain the bounded train/validation, decoder, dictionary, and work audit."""
     fields = (
         "experiment_phase", "row_id", "construction_policy", "construction_family",
         "layer_schedule", "utility_candidate_budget", "layer_normalization_policy",
+        "residual_population_policy", "eligibility_epsilon",
         "train_median_rmse", "train_strict_perfect_lfo_rate", "train_p95_rmse",
         "train_node_max_error_p95", *CO_PRIMARY_METRICS,
         "validation_overshoot_rate_before_final_clip",
@@ -696,11 +885,14 @@ def _metric_ranking_rows(summaries: Sequence[Mapping[str, Any]]) -> list[dict[st
         row_id = str(source.get("row_id", ""))
         row: dict[str, Any] = {
             "row_id": row_id,
+            "experiment_phase": source.get("experiment_phase", ""),
             "construction_family": source.get("construction_family", ""),
             "construction_policy": source.get("construction_policy", ""),
             "layer_schedule": source.get("layer_schedule", ""),
             "utility_candidate_budget": source.get("utility_candidate_budget", ""),
             "layer_normalization_policy": source.get("layer_normalization_policy", ""),
+            "residual_population_policy": source.get("residual_population_policy", ""),
+            "eligibility_epsilon": source.get("eligibility_epsilon", ""),
         }
         ranks = []
         for metric, _ in metric_specs:
@@ -747,11 +939,14 @@ def _marginal_atom_rows(
             source = metadata.get(row_id, {})
             row: dict[str, Any] = {
                 "row_id": row_id,
+                "experiment_phase": source.get("experiment_phase", ""),
                 "construction_family": source.get("construction_family", ""),
                 "construction_policy": source.get("construction_policy", ""),
                 "layer_schedule": source.get("layer_schedule", ""),
                 "utility_candidate_budget": source.get("utility_candidate_budget", ""),
                 "layer_normalization_policy": source.get("layer_normalization_policy", ""),
+                "residual_population_policy": source.get("residual_population_policy", ""),
+                "eligibility_epsilon": source.get("eligibility_epsilon", ""),
                 "active_atom_count": int(_number(current, "active_atom_count")),
                 "previous_active_atom_count": int(_number(previous, "active_atom_count")),
             }
@@ -788,11 +983,14 @@ def _layer_progression_rows(
         summary = metadata.get(row_id, {})
         result.append({
             "row_id": row_id,
+            "experiment_phase": summary.get("experiment_phase", ""),
             "construction_family": summary.get("construction_family", ""),
             "construction_policy": summary.get("construction_policy", ""),
             "layer_schedule": summary.get("layer_schedule", ""),
             "utility_candidate_budget": summary.get("utility_candidate_budget", ""),
             "layer_normalization_policy": summary.get("layer_normalization_policy", ""),
+            "residual_population_policy": summary.get("residual_population_policy", ""),
+            "eligibility_epsilon": summary.get("eligibility_epsilon", ""),
             "residual_layer": layer,
             "layer_role": roles.get((row_id, layer), ""),
             "active_atom_slot": int(_number(source, "active_atom_slot")),
@@ -828,11 +1026,14 @@ def _mechanism_diagnostic_rows(
         observed = [row for row in atoms if str(row.get("atom_source_kind", "")) == "observed_residual"]
         result.append({
             "row_id": row_id,
+            "experiment_phase": summary.get("experiment_phase", ""),
             "construction_family": summary.get("construction_family", ""),
             "construction_policy": summary.get("construction_policy", ""),
             "layer_schedule": summary.get("layer_schedule", ""),
             "utility_candidate_budget": summary.get("utility_candidate_budget", ""),
             "layer_normalization_policy": summary.get("layer_normalization_policy", ""),
+            "residual_population_policy": summary.get("residual_population_policy", ""),
+            "eligibility_epsilon": summary.get("eligibility_epsilon", ""),
             "atom_count": len(atoms),
             "broad_atom_count": sum(str(row.get("layer_role", "")) == "Broad" for row in atoms),
             "repair_atom_count": sum(str(row.get("layer_role", "")) == "Repair" for row in atoms),
@@ -861,17 +1062,22 @@ def _mechanism_diagnostic_rows(
 
 
 def _factor_interaction_rows(matched_rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
-    grouped: dict[tuple[str, str], list[Mapping[str, Any]]] = {}
+    grouped: dict[tuple[str, str, str, str], list[Mapping[str, Any]]] = {}
     for row in matched_rows:
         grouped.setdefault(
-            (str(row.get("comparison", "")), str(row.get("construction_family", ""))),
+            (
+                str(row.get("comparison", "")), str(row.get("construction_family", "")),
+                str(row.get("experiment_phase", "")), str(row.get("eligibility_epsilon", "")),
+            ),
             [],
         ).append(row)
     result: list[dict[str, Any]] = []
-    for (comparison, family), rows in sorted(grouped.items()):
+    for (comparison, family, phase, epsilon), rows in sorted(grouped.items()):
         record: dict[str, Any] = {
             "comparison": comparison,
             "construction_family": family,
+            "experiment_phase": phase,
+            "eligibility_epsilon": epsilon,
             "pair_count": len(rows),
             "left_value": rows[0].get("left_value", ""),
             "right_value": rows[0].get("right_value", ""),
@@ -983,6 +1189,225 @@ def _write_plots(
     return paths
 
 
+def _write_final_plots(bundle: AnalysisBundle, image_dir: Path) -> dict[str, Path]:
+    try:
+        import matplotlib
+
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+    except Exception as exc:  # pragma: no cover
+        raise RuntimeError("matplotlib is required to generate the Experiment 13 report") from exc
+
+    image_dir.mkdir(parents=True, exist_ok=True)
+    paths = {
+        "pareto": image_dir / "experiment13b_quality_frontier.png",
+        "population": image_dir / "unresolved_only_family_effect.png",
+        "epsilon": image_dir / "epsilon_family_sensitivity.png",
+        "strict_noop": image_dir / "strict_perfect_regime.png",
+        "eligibility": image_dir / "eligibility_population_progression.png",
+        "partial": image_dir / "experiment13b_partial_codebook.png",
+        "factors": image_dir / "experiment13b_factor_effects.png",
+        "runtime": image_dir / "complete_run_offline_timing.png",
+    }
+    phase_b = [row for row in bundle.co_primary if row.get("experiment_phase") == "13B"]
+    population = [row for row in bundle.matched_deltas if row.get("comparison") == "residual_population_policy"]
+    _plot_pareto(plt, paths["pareto"], phase_b)
+    _plot_population_effect(plt, paths["population"], population)
+    _plot_epsilon_family(plt, paths["epsilon"], phase_b)
+    _plot_strict_noop(plt, paths["strict_noop"], phase_b, bundle.diagnostics)
+    _plot_eligibility_progression(plt, paths["eligibility"], bundle.layer_progression, bundle.summaries)
+    _plot_partial_by_epsilon(plt, paths["partial"], bundle.partial_codebook, bundle.summaries)
+    _plot_final_factor_effects(plt, paths["factors"], bundle.matched_deltas)
+    _plot_complete_runtime(plt, paths["runtime"], bundle.summaries)
+    return paths
+
+
+def _plot_population_effect(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
+    families = sorted({str(row.get("construction_family", "")) for row in rows})
+    epsilons = (0.01, 0.001, 0.0001)
+    matrix = [
+        [
+            median([
+                _number(row, "delta_validation_p95_rmse")
+                for row in rows
+                if row.get("construction_family") == family
+                and math.isclose(_number(row, "eligibility_epsilon"), epsilon)
+            ])
+            for epsilon in epsilons
+        ]
+        for family in families
+    ]
+    limit = max((abs(value) for line in matrix for value in line), default=0.01)
+    figure, axis = plt.subplots(figsize=(8.4, max(5.2, 0.42 * len(families) + 1.8)))
+    image = axis.imshow(matrix, aspect="auto", cmap="RdYlGn_r", vmin=-limit, vmax=limit)
+    axis.set_xticks(range(3), ["epsilon 1e-2", "epsilon 1e-3", "epsilon 1e-4"])
+    axis.set_yticks(range(len(families)), families, fontsize=8)
+    for y, values in enumerate(matrix):
+        for x, value in enumerate(values):
+            axis.text(x, y, f"{value:+.4f}", ha="center", va="center", color="#5d666a", fontsize=7)
+    axis.set_title("UnresolvedOnly minus AllResiduals: family-median validation P95")
+    figure.colorbar(image, ax=axis, fraction=0.035, pad=0.03, label="P95 RMSE delta; negative favors UnresolvedOnly")
+    _save(plt, figure, path)
+
+
+def _plot_epsilon_family(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
+    families = sorted({str(row.get("construction_family", "")) for row in rows})
+    epsilons = (0.0001, 0.001, 0.01)
+    figure, axes = plt.subplots(1, 2, figsize=(14.2, 5.8))
+    for family in families:
+        selected = [row for row in rows if row.get("construction_family") == family]
+        axes[0].plot(
+            epsilons,
+            [median(_number(row, "validation_p95_rmse") for row in selected if math.isclose(_number(row, "eligibility_epsilon"), epsilon)) for epsilon in epsilons],
+            marker="o", linewidth=1.2, label=family,
+        )
+        axes[1].plot(
+            epsilons,
+            [median(_number(row, "validation_strict_perfect_lfo_rate") for row in selected if math.isclose(_number(row, "eligibility_epsilon"), epsilon)) for epsilon in epsilons],
+            marker="o", linewidth=1.2, label=family,
+        )
+    for axis in axes:
+        axis.set_xscale("log")
+        axis.set_xlabel("eligibility epsilon (log scale)")
+        axis.grid(True, alpha=0.25)
+    axes[0].set_ylabel("family-median validation P95 RMSE (lower is better)")
+    axes[1].set_ylabel("family-median strict-perfect rate (higher is better)")
+    axes[1].yaxis.set_major_formatter(plt.matplotlib.ticker.PercentFormatter(1.0))
+    axes[0].set_title("Tail quality")
+    axes[1].set_title("Exact-finish regime")
+    handles, labels = axes[0].get_legend_handles_labels()
+    figure.legend(handles, labels, loc="center left", bbox_to_anchor=(0.87, 0.5), fontsize=7, frameon=False)
+    figure.suptitle("Experiment 13B epsilon sensitivity is family-specific")
+    figure.tight_layout(rect=(0, 0, 0.86, 0.96))
+    _save(plt, figure, path, tight=False)
+
+
+def _plot_strict_noop(
+    plt: Any,
+    path: Path,
+    rows: Sequence[Mapping[str, Any]],
+    diagnostics: Sequence[Mapping[str, Any]],
+) -> None:
+    figure, axis = plt.subplots(figsize=(7.2, 5.6))
+    for epsilon, marker in ((0.01, "o"), (0.001, "s"), (0.0001, "^")):
+        selected = [row for row in rows if math.isclose(_number(row, "eligibility_epsilon"), epsilon)]
+        axis.scatter(
+            [_number(row, "validation_p95_rmse") for row in selected],
+            [_number(row, "validation_strict_perfect_lfo_rate") for row in selected],
+            label=f"epsilon {epsilon:g}", marker=marker, s=38, alpha=0.72,
+        )
+    axis.set(
+        xlabel="validation P95 RMSE (lower is better)",
+        ylabel="validation strict-perfect LFO rate",
+        title="Strict-perfect gains form a discrete finishing regime",
+    )
+    axis.yaxis.set_major_formatter(plt.matplotlib.ticker.PercentFormatter(1.0))
+    axis.legend(fontsize=8)
+    _save(plt, figure, path)
+
+
+def _plot_eligibility_progression(
+    plt: Any,
+    path: Path,
+    rows: Sequence[Mapping[str, Any]],
+    summaries: Sequence[Mapping[str, Any]],
+) -> None:
+    train_count = {str(row.get("row_id", "")): max(1, int(_number(row, "train_count"))) for row in summaries}
+    selected = [row for row in rows if row.get("experiment_phase") == "13B"]
+    figure, axis = plt.subplots(figsize=(8.8, 5.2))
+    for epsilon in (0.01, 0.001, 0.0001):
+        epsilon_rows = [row for row in selected if math.isclose(_number(row, "eligibility_epsilon"), epsilon)]
+        layers = sorted({int(_number(row, "residual_layer")) for row in epsilon_rows})
+        values = [
+            median(
+                1.0 - _number(row, "eligible_residual_count") / train_count[str(row.get("row_id", ""))]
+                for row in epsilon_rows if int(_number(row, "residual_layer")) == layer
+            )
+            for layer in layers
+        ]
+        axis.plot(layers, values, marker="o", markersize=3, label=f"epsilon {epsilon:g}")
+    axis.set(
+        xlabel="completed residual layer",
+        ylabel="median training LFO population retired from later construction",
+        title="Typical eligibility filtering remains small; a few families create large regimes",
+    )
+    axis.yaxis.set_major_formatter(plt.matplotlib.ticker.PercentFormatter(1.0))
+    axis.legend()
+    _save(plt, figure, path)
+
+
+def _plot_partial_by_epsilon(
+    plt: Any,
+    path: Path,
+    rows: Sequence[Mapping[str, Any]],
+    summaries: Sequence[Mapping[str, Any]],
+) -> None:
+    metadata = {str(row.get("row_id", "")): row for row in summaries}
+    selected = [row for row in rows if metadata.get(str(row.get("row_id", "")), {}).get("experiment_phase") == "13B"]
+    figure, axis = plt.subplots(figsize=(8.5, 5.0))
+    for epsilon in (0.01, 0.001, 0.0001):
+        epsilon_rows = [row for row in selected if math.isclose(_number(metadata[str(row.get("row_id", ""))], "eligibility_epsilon"), epsilon)]
+        slots = sorted({int(_number(row, "active_atom_count")) for row in epsilon_rows})
+        axis.plot(
+            slots,
+            [median(_number(row, "validation_p95_rmse") for row in epsilon_rows if int(_number(row, "active_atom_count")) == slot) for slot in slots],
+            marker="o", label=f"epsilon {epsilon:g}",
+        )
+    axis.set(
+        xlabel="active atoms retained per residual layer",
+        ylabel="median validation P95 RMSE (lower is better)",
+        title="Experiment 13B partial-codebook progression",
+    )
+    axis.legend()
+    _save(plt, figure, path)
+
+
+def _plot_final_factor_effects(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
+    comparisons = (
+        ("utility_candidate_budget", "Budget48 minus Budget24"),
+        ("layer_schedule", "TwoPhase minus Interleaved"),
+    )
+    epsilons = (0.01, 0.001, 0.0001)
+    matrix: list[list[float]] = []
+    labels: list[str] = []
+    for comparison, label in comparisons:
+        for epsilon in epsilons:
+            values = [
+                _number(row, "delta_validation_p95_rmse")
+                for row in rows
+                if row.get("comparison") == comparison
+                and row.get("experiment_phase") == "13B"
+                and math.isclose(_number(row, "eligibility_epsilon"), epsilon)
+            ]
+            matrix.append([median(values), sum(value < 0 for value in values), len(values)])
+            labels.append(f"{label} | epsilon {epsilon:g}")
+    figure, axis = plt.subplots(figsize=(9.2, 4.8))
+    values = [row[0] for row in matrix]
+    axis.barh(range(len(values)), values, color=["#147E67" if value < 0 else "#B63B34" for value in values])
+    axis.axvline(0.0, color="#5d666a", linewidth=0.9)
+    axis.set_yticks(range(len(labels)), labels, fontsize=8)
+    axis.invert_yaxis()
+    for index, (_, wins, count) in enumerate(matrix):
+        axis.text(values[index], index, f" {wins}/{count} improve", va="center", fontsize=8, color="#5d666a")
+    axis.set(xlabel="median validation P95 RMSE delta", title="13B budget and schedule effects by epsilon")
+    _save(plt, figure, path)
+
+
+def _plot_complete_runtime(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
+    grouped: dict[str, list[float]] = {}
+    for row in rows:
+        phase = str(row.get("experiment_phase", ""))
+        epsilon = row.get("eligibility_epsilon", "")
+        label = phase if phase == "13A" else f"13B epsilon {_number(row, 'eligibility_epsilon'):g}"
+        grouped.setdefault(label, []).append(_number(row, "oracle_construction_time"))
+    labels = list(grouped)
+    figure, axis = plt.subplots(figsize=(8.0, 4.8))
+    axis.boxplot([grouped[label] for label in labels], tick_labels=labels, showfliers=True)
+    axis.set(ylabel="oracle construction seconds", title="Same-run offline construction timing")
+    axis.tick_params(axis="x", rotation=18)
+    _save(plt, figure, path)
+
+
 def _plot_pareto(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
     figure, axis = plt.subplots(figsize=(8.2, 5.4))
     families = sorted({str(row.get("construction_family", "")) for row in rows})
@@ -998,7 +1423,9 @@ def _plot_pareto(plt: Any, path: Path, rows: Sequence[Mapping[str, Any]]) -> Non
             edgecolors=["black" if _truth(row.get("pareto_candidate")) else "none" for row in selected],
             alpha=0.82,
         )
-    axis.set(xlabel="validation median RMSE (lower is better)", ylabel="validation P95 RMSE (lower is better)", title="Experiment 13A co-primary quality tradeoffs")
+    phases = sorted({str(row.get("experiment_phase", "")) for row in rows})
+    phase_label = phases[0] if len(phases) == 1 else "Experiment 13"
+    axis.set(xlabel="validation median RMSE (lower is better)", ylabel="validation P95 RMSE (lower is better)", title=f"{phase_label} co-primary quality tradeoffs")
     axis.legend(fontsize=7, loc="best")
     _save(plt, figure, path)
 
@@ -1497,19 +1924,30 @@ def _interactive_payload(
 ) -> dict[str, Any]:
     """Build the compact, deterministic payload embedded in the HTML report."""
     completed = len(bundle.summaries)
-    best = min(bundle.summaries, key=lambda row: _number(row, "validation_p95_rmse"))
+    final_report = report_mode == "complete"
+    decision_rows = [row for row in bundle.summaries if row.get("experiment_phase") == "13B"] if final_report else bundle.summaries
+    best = min(decision_rows, key=lambda row: _number(row, "validation_p95_rmse"))
     normalization = _comparison_summary(bundle.matched_deltas, "layer_normalization_policy")
     budget = _comparison_summary(bundle.matched_deltas, "utility_candidate_budget")
     schedule = _comparison_summary(bundle.matched_deltas, "layer_schedule")
-    pareto = [row for row in bundle.co_primary if _truth(row.get("pareto_candidate"))]
-    payload_row_ids = [str(row.get("row_id", "")) for row in bundle.summaries]
+    pareto = [
+        row for row in bundle.co_primary
+        if _truth(row.get("pareto_candidate"))
+        and (not final_report or row.get("experiment_phase") == "13B")
+    ]
+    payload_summaries = decision_rows if final_report else bundle.summaries
+    payload_row_ids = [str(row.get("row_id", "")) for row in payload_summaries]
     payload_row_index = {row_id: index for index, row_id in enumerate(payload_row_ids)}
     partial_rows = [
-        [
+        ([
+            payload_row_index[str(row.get("row_id", ""))],
+            int(_number(row, "active_atom_count")),
+            _number(row, "validation_p95_rmse"),
+        ] if final_report else [
             payload_row_index[str(row.get("row_id", ""))],
             int(_number(row, "active_atom_count")),
             *[_number(row, metric) for metric in CO_PRIMARY_METRICS],
-        ]
+        ])
         for row in bundle.partial_codebook
         if str(row.get("row_id", "")) in payload_row_index
     ]
@@ -1550,6 +1988,13 @@ def _interactive_payload(
                 indexes = sorted({round(index * (len(rows) - 1) / 59) for index in range(60)})
                 compact_retired.extend(rows[index] for index in indexes)
         calibration["retired_sample"] = compact_retired
+    elif final_report:
+        calibration = {
+            "row_ids": [], "layer_quantiles": [], "layer_quantiles_by_row": [],
+            "slot_quantiles": [], "layer_coverage": [], "layer_coverage_by_row": [],
+            "slot_coverage": [], "retired_summary": [], "retired_sample": [],
+            "retired_sample_by_row": [],
+        }
     selection_payload = dict(selection or {})
     candidate_statistics = selection_payload.get("training_statistics_used", {}).get("candidate_statistics", {})
     max_early_middle = max(
@@ -1619,9 +2064,9 @@ def _interactive_payload(
         "schema_version": INTERACTIVE_REPORT_SCHEMA,
         "meta": {
             "report_mode": report_mode,
-            "display_title": "Experiment 13A — Complete W8D16 Strategy Grid" if complete_13a else "Experiment 13 — Provisional W8D16 Strategy Grid",
-            "title": "Experiment 13A — Complete W8D16 Strategy Grid" if complete_13a else "Experiment 13 — Provisional W8D16 Strategy Grid",
-            "status": "complete_13a_pending_13b" if complete_13a else "provisional_incomplete_13a",
+            "display_title": "Experiment 13 — Complete W8D16 Strategy Grid" if final_report else ("Experiment 13A — Complete W8D16 Strategy Grid" if complete_13a else "Experiment 13 — Provisional W8D16 Strategy Grid"),
+            "title": "Experiment 13 — Complete W8D16 Strategy Grid" if final_report else ("Experiment 13A — Complete W8D16 Strategy Grid" if complete_13a else "Experiment 13 — Provisional W8D16 Strategy Grid"),
+            "status": "complete" if final_report else ("complete_13a_pending_13b" if complete_13a else "provisional_incomplete_13a"),
             "completed_rows": completed,
             "expected_rows": expected_count,
             "source_run": source_display,
@@ -1684,59 +2129,76 @@ def _interactive_payload(
                 {
                     field: row.get(field, "")
                     for field in (
-                        "row_id", "construction_policy", "construction_family", "layer_schedule",
+                        "experiment_phase", "row_id", "construction_policy", "construction_family", "layer_schedule",
                         "utility_candidate_budget", "layer_normalization_policy", *CO_PRIMARY_METRICS,
+                        "residual_population_policy", "eligibility_epsilon",
+                        "train_count", "validation_count",
                         "oracle_construction_time", "train_encoding_time", "validation_encoding_time",
                         "pareto_candidate",
                     )
                 }
                 for row in bundle.co_primary
             ],
-            "coverage": bundle.coverage,
+            "coverage": [
+                {
+                    field: row.get(field, "")
+                    for field in (
+                        "experiment_phase", "row_id", "construction_policy", "construction_family",
+                        "layer_schedule", "utility_candidate_budget", "layer_normalization_policy",
+                        "residual_population_policy", "eligibility_epsilon", "completed",
+                    )
+                }
+                for row in bundle.coverage
+            ] if final_report else bundle.coverage,
             "matched_deltas": [
                 {
                     field: row.get(field, "")
                     for field in (
                         "comparison", "left_value", "right_value", "match_key", "left_row_id", "right_row_id",
-                        "construction_family",
+                        "construction_family", "experiment_phase", "eligibility_epsilon",
                         *(f"delta_{metric}" for metric in CO_PRIMARY_METRICS),
                     )
                 }
                 for row in bundle.matched_deltas
+                if not final_report
+                or row.get("comparison") == "residual_population_policy"
+                or row.get("experiment_phase") == "13B"
             ],
             "diagnostics": [
                 {
                     field: row.get(field, "")
-                    for field in (
-                        "row_id", "train_median_rmse", "train_strict_perfect_lfo_rate",
+                    for field in ((
+                        "experiment_phase", "row_id", "eligibility_epsilon", "oracle_construction_time",
+                        "train_encoding_time", "validation_encoding_time", "offline_analysis_time",
+                    ) if final_report else (
+                        "experiment_phase", "row_id", "eligibility_epsilon", "train_median_rmse", "train_strict_perfect_lfo_rate",
                         "train_p95_rmse", "train_node_max_error_p95",
                         "generalization_gap_median_rmse", "generalization_gap_strict_perfect_lfo_rate",
                         "generalization_gap_p95_rmse", "generalization_gap_node_max_error_p95",
-                        "validation_overshoot_rate_before_final_clip",
-                        "validation_overshoot_abs_p95_before_final_clip",
-                        "residual_layer_dead_atom_rate_median",
-                        "residual_layer_dominant_atom_share_median",
-                        "residual_layer_usage_entropy_median",
-                        "residual_layer_no_op_usage_rate_median",
-                        "residual_layer_effective_no_op_usage_rate_median",
-                        "residual_gain_median", "residual_gain_abs_p95", "residual_gain_nonzero_rate",
-                        "duplicate_atom_rate", "oracle_construction_time", "train_encoding_time",
-                        "validation_encoding_time", "offline_analysis_time",
-                    )
+                        "validation_overshoot_rate_before_final_clip", "validation_overshoot_abs_p95_before_final_clip",
+                        "residual_layer_dead_atom_rate_median", "residual_layer_dominant_atom_share_median",
+                        "residual_layer_usage_entropy_median", "residual_layer_no_op_usage_rate_median",
+                        "residual_layer_effective_no_op_usage_rate_median", "residual_gain_median",
+                        "residual_gain_abs_p95", "residual_gain_nonzero_rate", "duplicate_atom_rate",
+                        "oracle_construction_time", "train_encoding_time", "validation_encoding_time", "offline_analysis_time",
+                    ))
                 }
                 for row in bundle.diagnostics
+                if not final_report or row.get("experiment_phase") == "13B"
             ],
-            "rankings": [
+            "rankings": [] if final_report else [
                 {
                     field: row.get(field, "")
                     for field in (
-                        "row_id", *(f"rank_{metric}" for metric in CO_PRIMARY_METRICS),
+                        "experiment_phase", "row_id", "eligibility_epsilon", *(f"rank_{metric}" for metric in CO_PRIMARY_METRICS),
                         "mean_co_primary_rank", "rank_spread",
                     )
                 }
                 for row in bundle.rankings
             ],
-            "factor_interactions": bundle.factor_interactions,
+            "factor_interactions": [] if final_report else [
+                row for row in bundle.factor_interactions
+            ],
             "partial_codebook": partial_rows,
             "scaling": [
                 {
@@ -1766,6 +2228,7 @@ def _interactive_payload(
                     deep_row_index[str(row.get("row_id", ""))],
                     int(_number(row, "residual_layer")),
                     str(row.get("layer_role", "")),
+                    int(_number(row, "eligible_residual_count")),
                     _number(row, "training_median_rmse"),
                     _number(row, "training_p95_rmse"),
                     _number(row, "training_max_abs_error_p95"),
@@ -1969,6 +2432,213 @@ def _interactive_html(payload: Mapping[str, Any]) -> str:
     data = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     data = data.replace("</", "<\\/")
     return template.replace(marker, data)
+
+
+def _complete_markdown(
+    bundle: AnalysisBundle,
+    *,
+    source_run: Path,
+    report_path: Path,
+    plot_paths: Mapping[str, Path],
+    selection: Mapping[str, Any],
+) -> str:
+    """Render the final findings-first Experiment 13 report."""
+    phase_a = [row for row in bundle.summaries if row.get("experiment_phase") == "13A"]
+    phase_b = [row for row in bundle.summaries if row.get("experiment_phase") == "13B"]
+    population = [row for row in bundle.matched_deltas if row.get("comparison") == "residual_population_policy"]
+    source_display = os.path.relpath(source_run, report_path.parent).replace("\\", "/")
+
+    def image(name: str, alt: str) -> str:
+        relative = os.path.relpath(plot_paths[name], report_path.parent).replace("\\", "/")
+        return f"![{alt}]({relative})"
+
+    metric_specs = (
+        ("validation_median_rmse", "Median RMSE", False),
+        ("validation_strict_perfect_lfo_rate", "Strict-perfect LFO rate", True),
+        ("validation_p95_rmse", "P95 RMSE", False),
+        ("validation_node_max_error_p95", "Node-max error P95", False),
+    )
+    leaders = [
+        "| Co-primary validation metric | Better | Best 13B value | Strategy | Eligibility epsilon |",
+        "| --- | --- | ---: | --- | ---: |",
+    ]
+    for metric, label, higher in metric_specs:
+        row = (max if higher else min)(phase_b, key=lambda item, key=metric: _number(item, key))
+        value = _number(row, metric)
+        value_text = f"{value:.3%}" if higher else f"{value:.8g}"
+        leaders.append(
+            f"| {label} | {'higher' if higher else 'lower'} | "
+            f"{value_text} | `{row.get('row_id')}` | `{_number(row, 'eligibility_epsilon'):g}` |"
+        )
+
+    population_table = [
+        "| Epsilon | P95 improved / tied / worse vs paired 13A | Median P95 delta | Mean P95 delta | Strict-perfect improved / tied / worse |",
+        "| ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for epsilon in (0.01, 0.001, 0.0001):
+        rows = [row for row in population if math.isclose(_number(row, "eligibility_epsilon"), epsilon)]
+        p95 = [_number(row, "delta_validation_p95_rmse") for row in rows]
+        strict = [_number(row, "delta_validation_strict_perfect_lfo_rate") for row in rows]
+        population_table.append(
+            f"| `{epsilon:g}` | {sum(value < 0 for value in p95)} / {sum(value == 0 for value in p95)} / {sum(value > 0 for value in p95)} | "
+            f"{median(p95):+.8g} | {sum(p95) / len(p95):+.8g} | "
+            f"{sum(value > 0 for value in strict)} / {sum(value == 0 for value in strict)} / {sum(value < 0 for value in strict)} |"
+        )
+
+    family_effects = [
+        "| Construction family | Epsilon 1e-2 | Epsilon 1e-3 | Epsilon 1e-4 | Interpretation |",
+        "| --- | ---: | ---: | ---: | --- |",
+    ]
+    families = sorted({str(row.get("construction_family", "")) for row in population})
+    for family in families:
+        values = []
+        wins = []
+        for epsilon in (0.01, 0.001, 0.0001):
+            selected = [
+                _number(row, "delta_validation_p95_rmse")
+                for row in population
+                if row.get("construction_family") == family
+                and math.isclose(_number(row, "eligibility_epsilon"), epsilon)
+            ]
+            values.append(median(selected))
+            wins.append(sum(value < 0 for value in selected))
+        if all(value < -0.01 for value in values):
+            interpretation = "large repeatable rescue"
+        elif all(value < 0 for value in values):
+            interpretation = "consistent but smaller improvement"
+        elif all(value > 0 for value in values):
+            interpretation = "consistent regression"
+        else:
+            interpretation = "mixed or strategy-dependent"
+        family_effects.append(
+            f"| {family} | {values[0]:+.6f} ({wins[0]} wins) | {values[1]:+.6f} ({wins[1]} wins) | "
+            f"{values[2]:+.6f} ({wins[2]} wins) | {interpretation} |"
+        )
+
+    epsilon_table = [
+        "| Eligibility epsilon | Median RMSE | Strict-perfect rate | P95 RMSE | Node-max P95 | Median LFO population retired after layer 16 |",
+        "| ---: | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    train_count = {str(row.get("row_id", "")): max(1, int(_number(row, "train_count"))) for row in bundle.summaries}
+    for epsilon in (0.01, 0.001, 0.0001):
+        rows = [row for row in phase_b if math.isclose(_number(row, "eligibility_epsilon"), epsilon)]
+        end = [
+            row for row in bundle.layer_progression
+            if row.get("experiment_phase") == "13B"
+            and math.isclose(_number(row, "eligibility_epsilon"), epsilon)
+            and int(_number(row, "residual_layer")) == 16
+        ]
+        retired = median(
+            1.0 - _number(row, "eligible_residual_count") / train_count[str(row.get("row_id", ""))]
+            for row in end
+        )
+        epsilon_table.append(
+            f"| `{epsilon:g}` | {median(_number(row, 'validation_median_rmse') for row in rows):.8g} | "
+            f"{median(_number(row, 'validation_strict_perfect_lfo_rate') for row in rows):.3%} | "
+            f"{median(_number(row, 'validation_p95_rmse') for row in rows):.8g} | "
+            f"{median(_number(row, 'validation_node_max_error_p95') for row in rows):.8g} | {retired:.3%} |"
+        )
+
+    factor_table = [
+        "| Lever | Epsilon | Right-hand policy | P95 improves / loses | Median P95 delta |",
+        "| --- | ---: | --- | ---: | ---: |",
+    ]
+    for comparison, right in (("utility_candidate_budget", "CandidateBudget48"), ("layer_schedule", "TwoPhase")):
+        for epsilon in (0.01, 0.001, 0.0001):
+            rows = [
+                row for row in bundle.matched_deltas
+                if row.get("comparison") == comparison
+                and row.get("experiment_phase") == "13B"
+                and math.isclose(_number(row, "eligibility_epsilon"), epsilon)
+            ]
+            values = [_number(row, "delta_validation_p95_rmse") for row in rows]
+            factor_table.append(
+                f"| {comparison.replace('_', ' ')} | `{epsilon:g}` | {right} | "
+                f"{sum(value < 0 for value in values)} / {sum(value > 0 for value in values)} | {median(values):+.8g} |"
+            )
+
+    strict_peak = max(_number(row, "validation_strict_perfect_lfo_rate") for row in phase_b)
+    strict_rows = sorted(
+        [row for row in phase_b if math.isclose(_number(row, "validation_strict_perfect_lfo_rate"), strict_peak)],
+        key=lambda row: (_number(row, "validation_p95_rmse"), str(row.get("row_id", ""))),
+    )
+    strict_table = [
+        "| Strategy | Family | Epsilon | Strict-perfect | Median RMSE | P95 RMSE |",
+        "| --- | --- | ---: | ---: | ---: | ---: |",
+    ]
+    for row in strict_rows:
+        strict_table.append(
+            f"| `{row.get('row_id')}` | {row.get('construction_family')} | `{_number(row, 'eligibility_epsilon'):g}` | "
+            f"{_number(row, 'validation_strict_perfect_lfo_rate'):.3%} | "
+            f"{_number(row, 'validation_median_rmse'):.8g} | {_number(row, 'validation_p95_rmse'):.8g} |"
+        )
+
+    partial_b = [
+        row for row in bundle.partial_codebook
+        if next((item for item in phase_b if item.get("row_id") == row.get("row_id")), None) is not None
+    ]
+    partial_by_slot = {
+        slot: median(
+            _number(row, "validation_p95_rmse")
+            for row in partial_b if int(_number(row, "active_atom_count")) == slot
+        )
+        for slot in range(1, 8)
+    }
+
+    return "\n".join([
+        "# Experiment 13: Fixed-W8D16 Strategy Grid", "",
+        "**Complete evidence · 90/90 Experiment 13A rows · 135/135 Experiment 13B rows · no failures**", "",
+        "## Main Findings", "",
+        "Experiment 13 does not produce one scalar winner. It produces a small, interpretable frontier: `AllClusterMeans` has the best validation P95, while `DiverseCoverageHardRepairTwoPhase` supplies the best median and node-max solutions, and a separate `DiverseCoverageHardRepairInterleaved` regime preserves many more exact reconstructions.", "",
+        f"The best 13B P95 is `{min(_number(row, 'validation_p95_rmse') for row in phase_b):.8g}` from `AllClusterMeans`; all three epsilon variants tie. The best median is `{min(_number(row, 'validation_median_rmse') for row in phase_b):.8g}` at epsilon `1e-2`, and the best node-max P95 is `{min(_number(row, 'validation_node_max_error_p95') for row in phase_b):.8g}` at epsilon `1e-4`, both from `DiverseCoverageHardRepairTwoPhase + CandidateBudget48`.", "",
+        f"`UnresolvedOnly` is a targeted rescue, not a global free win. Across the 45 matched clipped strategies the median P95 change is effectively zero at every epsilon. The negative mean is driven by `BroadMeanFinishRepair`, whose P95 falls from roughly `0.087–0.091` in 13A to `0.046–0.050` in 13B. Other families include both gains and regressions.", "",
+        "No epsilon wins globally. `1e-2` has the lowest across-strategy median P95 by a very small margin, `1e-3` gives the best median P95 inside `DiverseCoverageHardRepair`, and `1e-4` contains the best node-max row. Epsilon changes the population used to build later atoms, so the final quality curves are legitimately non-monotonic.", "",
+        f"{len(strict_rows)} 13B rows share the best strict-perfect rate of `{strict_peak:.3%}`. In the completed run, five are `BroadMeanFinishRepairTwoPhase`; the two scientifically stronger rows are `DiverseCoverageHardRepairInterleaved + CandidateBudget48` at `1e-3` and `1e-4`, because they retain that exact-finish rate with P95 near `0.040–0.041`.", "",
+        *leaders, "",
+        image("pareto", "Experiment 13B co-primary quality frontier"), "",
+        "## Why UnresolvedOnly Helps Some Families", "",
+        "`AllResiduals` lets every training residual continue influencing every later atom. `UnresolvedOnly` removes a curve from later construction after its maximum point error falls below the eligibility epsilon. This is useful when nearly solved curves would otherwise monopolize finish-oriented proposals, but it can remove stabilizing mass from families whose broad prototypes benefit from the full population.", "",
+        "The paired result is therefore skewed rather than uniform. The median strategy is unchanged, while a handful of formerly pathological finish-repair rows improve dramatically. Win/loss counts and family medians are more informative than the overall mean.", "",
+        *population_table, "",
+        image("population", "Family-level UnresolvedOnly versus AllResiduals P95 effects"), "",
+        "### Family-specific paired effects", "",
+        *family_effects, "",
+        "## The Three-Epsilon Sweep", "",
+        "The epsilon value is a construction policy, not a post-hoc scoring threshold. A looser epsilon can retire more curves early, but because the remaining curves then define different atoms, a looser epsilon does not guarantee a monotonic improvement or regression in final validation quality.", "",
+        *epsilon_table, "",
+        image("epsilon", "Family-specific Experiment 13B epsilon sensitivity"), "",
+        image("eligibility", "Eligibility population retired by residual-layer depth"), "",
+        "Typical retirement is modest: the median strategy has only about two percent of training LFOs removed by layer 16. The mean and maximum are much larger because `BroadMeanFinishRepair` and `DiverseCoverageHardRepair` create high-retirement regimes. This is why one aggregate retirement percentage would conceal the mechanism.", "",
+        "## Strict-Perfect Finishing Is a Distinct Regime", "",
+        "The original strict-perfect definition remains RMSE `<= 1e-6` and maximum point error `<= 1e-5`. It is deliberately much stricter than the 13B eligibility epsilons. The 13B jump to 19.5% is not a gentle shift in average RMSE; seven rows land on exactly the same 313-of-1605 validation count.", "",
+        "A validation-only forensic replay of saved codebooks confirmed that a representative `DiverseCoverageHardRepair` row and a representative `BroadMeanFinishRepair` row finish the exact same 313 LFOs. The ordinary 13-of-1605 exact set is a subset. Of the 313, 299 are analysis-labeled `continuous` curves and 14 are `discontinuous`; only seven are bit-exact, while the rest satisfy the strict numerical tolerance. This topology label is post-hoc analysis only and does not enter construction or deployed runtime.", "",
+        *strict_table, "",
+        image("strict_noop", "Strict-perfect finishing regime versus validation tail error"), "",
+        "The separate complete-13A report retains the replayed `1e-2`, `1e-3`, `1e-4`, and `1e-5` strict-perfect tolerance sensitivity. Those toggles are not mixed into this final cross-phase frontier because the replay artifact covers 13A rows only.", "",
+        "## Budget and Schedule", "",
+        "CandidateBudget48 is the more repeatable 13B lever: it improves P95 in 13/21, 15/21, and 16/21 matched pairs as epsilon tightens. TwoPhase is not a global winner; it improves only 8/18 matched schedule pairs at each epsilon and has a slightly worse median P95 delta. Its strong showing in the best `DiverseCoverage` rows is a family interaction, not a universal schedule rule.", "",
+        *factor_table, "",
+        image("factors", "Experiment 13B budget and schedule effects"), "",
+        "## Partial Codebook and Residual Depth", "",
+        f"The first two active atoms do most of the tail work: the across-row median P95 drops from `{partial_by_slot[1]:.6f}` with one active atom to `{partial_by_slot[2]:.6f}` with two. Later atoms still matter, but the median step from six to seven is only `{partial_by_slot[7] - partial_by_slot[6]:+.6f}`. This supports the current ordering logic while also identifying a future head-budget ablation; it does not by itself authorize shrinking W8.", "",
+        image("partial", "Experiment 13B partial-codebook progression by epsilon"), "",
+        "## Runtime and Deployment Boundary", "",
+        "All timings are offline experiment work. Every row preserves the same deployed 193-output W8D16 interface, Beam4 encoding, phase and residual gain, and topology-free runtime contract. The optimized 13B rows are somewhat faster to construct than 13A on the median, but this is descriptive same-run evidence, not a claim that filtering reduces deployed inference cost.", "",
+        image("runtime", "Complete Experiment 13 same-run offline timing"), "",
+        "## Practical Takeaways", "",
+        "1. Keep `LayerClip0To1`; Experiment 13B correctly avoided spending another 45 rows on the inferior clipping branch.",
+        "2. Use `AllClusterMeans` when the primary objective is the lowest P95 with a simple prototype-only construction.",
+        "3. Use `DiverseCoverageHardRepairTwoPhase + CandidateBudget48` as the balanced low-median/low-node-max candidate; retain epsilon as a small family-specific choice rather than a global constant.",
+        "4. Preserve `DiverseCoverageHardRepairInterleaved + CandidateBudget48` at epsilon `1e-3` as the strongest exact-finish candidate: it reaches 19.5% strict-perfect without the large median/tail penalty of finish-repair rows.",
+        "5. Do not generalize `UnresolvedOnly` to every construction family. Its value is largest where the unfiltered family was visibly pathological.",
+        "6. If the deployed head budget must be reduced, run a dedicated atom-count/depth ablation. Partial-codebook curves are motivation, not proof of a smaller contract.", "",
+        "## Method Notes", "",
+        f"Source run: `{source_display}`.", "",
+        f"The automatic 13A selector recorded `selection_passed={selection.get('selection_passed')}`. The three 13B epsilons were an explicit exploratory sweep; none is relabeled as the selector's frozen choice.", "",
+        "The report uses the four co-primary validation metrics separately: median RMSE, strict-perfect LFO rate, P95 RMSE, and node-max error P95. Pareto membership means no other row is at least as good on all four and strictly better on at least one.", "",
+        "`AllResiduals` versus `UnresolvedOnly` comparisons use only the 45 matched `LayerClip0To1` 13A rows. Epsilon comparisons use matched construction strategies inside 13B. Runtime comparisons are limited to same-run offline diagnostics.", "",
+        f"Configuration fingerprint: `{selection.get('configuration_fingerprint')}`.", "",
+    ])
 
 
 def _complete_13a_markdown(
