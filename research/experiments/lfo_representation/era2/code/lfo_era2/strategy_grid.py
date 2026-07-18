@@ -751,7 +751,15 @@ def analyze_strategy_grid(*, run_dir: Path = DEFAULT_OUTPUT_DIR) -> dict[str, st
     missing = [name for name in REQUIRED_ANALYSIS_FILES if not _nonempty(run_dir / name)]
     if missing:
         raise AnalysisNotReadyError("analysis inputs are incomplete: " + ", ".join(missing))
-    return _write_strategy_analysis(run_dir)
+    from .strategy_grid_report import analyze_complete_strategy_grid
+
+    return analyze_complete_strategy_grid(
+        run_dir=run_dir,
+        analysis_output_dir=run_dir.parent / "analysis_train50_val100_complete",
+        report_path=ERA2_ROOT / "reports" / "EXPERIMENT_13_W8D16_STRATEGY_GRID_REPORT.md",
+        html_report_path=ERA2_ROOT / "reports" / "EXPERIMENT_13_W8D16_STRATEGY_GRID_REPORT.html",
+        image_dir=ERA2_ROOT / "reports" / "images" / "experiment_13" / "final",
+    )
 
 
 def verify_equivalence(
