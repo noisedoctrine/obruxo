@@ -55,7 +55,11 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             self.assertIn("Node-max error P95", text)
 
             html = html_report.read_text(encoding="utf-8")
-            self.assertIn('qs("#status-label").textContent = isComplete13A ? "13A COMPLETE" : "PROVISIONAL"', html)
+            self.assertIn(
+                'qs("#status-label").textContent = isFinal ? "EXPERIMENT COMPLETE" : '
+                '(isComplete13A ? "13A COMPLETE" : "PROVISIONAL")',
+                html,
+            )
             self.assertIn("Source coverage", html)
             self.assertIn("Layer normalization", html)
             self.assertIn("Candidate budget", html)
@@ -121,7 +125,7 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             payload_match = re.search(r'<script id="report-data" type="application/json">(.*?)</script>', html, re.DOTALL)
             self.assertIsNotNone(payload_match)
             payload = json.loads(payload_match.group(1))
-            self.assertEqual(payload["schema_version"], "experiment13_interactive_report_v5")
+            self.assertEqual(payload["schema_version"], "experiment13_interactive_report_v6")
             self.assertEqual(payload["meta"]["completed_rows"], 8)
             self.assertEqual(payload["meta"]["expected_rows"], 90)
             self.assertFalse(payload["meta"]["epsilon_selected"])
@@ -164,6 +168,78 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             self.assertEqual(html_report.read_bytes(), first_html)
             self.assertEqual((analysis / "matched_factor_deltas.csv").read_bytes(), first_deltas)
             self.assertEqual(_fingerprint(source), before)
+
+    def test_eligibility_capacity_uses_only_layers_with_future_work(self) -> None:
+        left = {
+            "row_id": "x13a_pair",
+            "experiment_phase": "13A",
+            "pair_id": "pair",
+            "train_count": 100,
+            **{metric: 0.1 for metric in strategy_report.CO_PRIMARY_METRICS},
+        }
+        right = {
+            "row_id": "x13b_pair",
+            "experiment_phase": "13B",
+            "pair_id": "pair",
+            "train_count": 100,
+            "eligibility_epsilon": 0.001,
+            "construction_family": "FixtureFamily",
+            "construction_policy": "FixturePolicy",
+            "layer_schedule": "Interleaved",
+            "utility_candidate_budget": "CandidateBudget24",
+            "layer_normalization_policy": "LayerClip0To1",
+            **{metric: 0.09 for metric in strategy_report.CO_PRIMARY_METRICS},
+        }
+        pair = {
+            "comparison": "residual_population_policy",
+            "left_row_id": left["row_id"],
+            "right_row_id": right["row_id"],
+            "eligibility_epsilon": right["eligibility_epsilon"],
+            "construction_family": right["construction_family"],
+        }
+        for metric in strategy_report.CO_PRIMARY_METRICS:
+            pair[f"left_{metric}"] = left[metric]
+            pair[f"right_{metric}"] = right[metric]
+            pair[f"delta_{metric}"] = right[metric] - left[metric]
+        layers = [
+            {
+                "row_id": right["row_id"],
+                "experiment_phase": "13B",
+                "residual_layer": layer,
+                "eligible_residual_count": 100 - layer,
+            }
+            for layer in range(1, 17)
+        ]
+
+        effects = strategy_report._eligibility_capacity_effect_rows([pair], layers, [left, right])
+        self.assertEqual(len(effects), 1)
+        self.assertAlmostEqual(effects[0]["mean_future_layer_population_freed"], 0.08)
+        self.assertAlmostEqual(effects[0]["layer8_population_freed"], 0.08)
+        self.assertAlmostEqual(effects[0]["layer16_endpoint_coverage"], 0.16)
+        self.assertEqual(effects[0]["baseline_population_policy"], "No eligibility filter (13A)")
+        self.assertNotIn("epsilon 0", json.dumps(effects[0]))
+
+        depth = strategy_report._eligibility_depth_summary_rows(layers, [left, right])
+        self.assertEqual(len(depth), 16)
+        self.assertFalse(depth[14]["endpoint_only"])
+        self.assertTrue(depth[15]["endpoint_only"])
+        self.assertAlmostEqual(depth[7]["median_population_freed"], 0.08)
+
+    def test_final_template_preserves_13a_and_frames_eligibility_against_baseline(self) -> None:
+        html = strategy_report.INTERACTIVE_TEMPLATE.read_text(encoding="utf-8")
+        self.assertIn("13A foundation", html)
+        self.assertIn("13B eligibility intervention", html)
+        self.assertIn("Final cross-phase interpretation", html)
+        self.assertIn("Eligibility versus no filtering", html)
+        self.assertIn("Does freed capacity help?", html)
+        self.assertIn("Capacity released through depth", html)
+        self.assertIn("chartEligibilityEffects", html)
+        self.assertIn("chartCapacityQuality", html)
+        self.assertIn("chartEligibilityDepthFacets", html)
+        self.assertIn("No eligibility filter (13A)", html)
+        self.assertIn("layers 1–15", html)
+        self.assertNotIn("No global epsilon winner", html)
+        self.assertNotIn('phase:new Set(isFinal?["13B"]:[])', html)
 
     def test_partial_report_rejects_source_run_destinations(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

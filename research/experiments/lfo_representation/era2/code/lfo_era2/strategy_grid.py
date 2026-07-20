@@ -747,7 +747,10 @@ def analyze_strategy_grid(*, run_dir: Path = DEFAULT_OUTPUT_DIR) -> dict[str, st
         raise AnalysisNotReadyError(
             f"analysis requires complete 13A and 13B phases; got 13A={status_a['state']} 13B={status_b['state']}"
         )
-    validate_completed_13b(run_dir)
+    # Analysis is read-only: it may inspect a complete immutable run after a
+    # later reporting-only implementation change, but it never makes that run
+    # eligible for resume or for another execution phase.
+    validate_completed_13b(run_dir, allow_historical_configuration=True)
     missing = [name for name in REQUIRED_ANALYSIS_FILES if not _nonempty(run_dir / name)]
     if missing:
         raise AnalysisNotReadyError("analysis inputs are incomplete: " + ", ".join(missing))
@@ -1558,7 +1561,20 @@ def load_epsilon_selection(
     return selection
 
 
-def validate_completed_13a(run_dir: Path) -> tuple[dict[str, Any], dict[str, Any]]:
+def validate_completed_13a(
+    run_dir: Path,
+    *,
+    allow_historical_configuration: bool = False,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Validate a finished 13A run.
+
+    Execution commands require the fingerprint of the currently checked-out
+    implementation.  Read-only reporting can instead validate the immutable
+    manifest against the current 90-row design while retaining the fingerprint
+    recorded with the completed run.  This lets a later reporting-only change
+    inspect a completed experiment without making the run resumable under a
+    different implementation.
+    """
     manifest_path = Path(run_dir) / "manifest.json"
     if not manifest_path.exists():
         raise PhaseGateError(f"missing Experiment 13 manifest: {manifest_path}")
@@ -1595,19 +1611,29 @@ def validate_completed_13a(run_dir: Path) -> tuple[dict[str, Any], dict[str, Any
         or phase.get("expected_row_count") != 90
     ):
         raise PhaseGateError("Experiment 13A manifest does not represent the complete 90-row design")
-    fingerprint = configuration_fingerprint()
-    if manifest.get("configuration_fingerprint") != fingerprint:
+    recorded_fingerprint = str(manifest.get("configuration_fingerprint") or "")
+    current_fingerprint = configuration_fingerprint()
+    if not recorded_fingerprint:
+        raise PhaseGateError("Experiment 13A manifest is missing its configuration fingerprint")
+    if not allow_historical_configuration and recorded_fingerprint != current_fingerprint:
         raise PhaseGateError("Experiment 13A manifest uses an incompatible configuration fingerprint")
     _validate_completed_13a_rows(
         phase.get("rows"),
         run_identity=str(manifest.get("experiment13a_run_identity") or ""),
-        fingerprint=fingerprint,
+        fingerprint=recorded_fingerprint,
     )
     return manifest, status
 
 
-def validate_completed_13b(run_dir: Path) -> tuple[dict[str, Any], dict[str, Any]]:
-    manifest, _ = validate_completed_13a(run_dir)
+def validate_completed_13b(
+    run_dir: Path,
+    *,
+    allow_historical_configuration: bool = False,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    manifest, _ = validate_completed_13a(
+        run_dir,
+        allow_historical_configuration=allow_historical_configuration,
+    )
     status = read_phase_status(run_dir, "13B")
     phase = manifest.get("phases", {}).get("13B")
     if not isinstance(phase, dict) or status["state"] != "complete":

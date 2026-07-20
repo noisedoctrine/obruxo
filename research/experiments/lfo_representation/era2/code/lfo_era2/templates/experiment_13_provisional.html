@@ -503,20 +503,23 @@
     const STATUS = {
       "strong provisional": {color: COLORS.accent}, "strong 13A": {color: COLORS.accent}, complete: {color: COLORS.accent}, diagnostic: {color: COLORS.blue}, mixed: {color: COLORS.warn}, unresolved: {color: COLORS.warn}, blocked: {color: COLORS.blocked}, "sweep planned": {color: COLORS.blue}, "bounded ablation": {color: COLORS.blue}, "same-run only": {color: COLORS.blue}, "historical only": {color: COLORS.danger}
     };
+    const expandRecords = value => Array.isArray(value)
+      ? value
+      : (value?.rows || []).map(row => Object.fromEntries((value.columns || []).map((column,index)=>[column,row[index]])));
     const findings = DATA.findings;
-    const metrics = DATA.tables.metrics;
+    const metrics = expandRecords(DATA.tables.metrics);
     const strictThresholds = DATA.strict_thresholds;
     let strictTolerance = strictThresholds?.default_tolerance || "1e-5";
-    const coverage = DATA.tables.coverage;
-    const deltas = DATA.tables.matched_deltas;
+    const coverage = DATA.tables.coverage?.length ? DATA.tables.coverage : metrics.map(row => ({...row,completed:true}));
+    const deltas = expandRecords(DATA.tables.matched_deltas);
     const deep = DATA.deep_analysis || {row_ids:[],marginal_atoms:[],layer_progression:[],mechanisms:[]};
     const partial = (DATA.tables.partial_codebook || []).map(row => Array.isArray(row) ? (row.length===3
       ? {row_id:deep.row_ids[row[0]],construction_family:metrics.find(item=>item.row_id===deep.row_ids[row[0]])?.construction_family,active_atom_count:row[1],validation_p95_rmse:row[2]}
       : {row_id:deep.row_ids[row[0]],construction_family:metrics.find(item=>item.row_id===deep.row_ids[row[0]])?.construction_family,active_atom_count:row[1],validation_median_rmse:row[2],validation_strict_perfect_lfo_rate:row[3],validation_p95_rmse:row[4],validation_node_max_error_p95:row[5]}) : row);
-    const scaling = DATA.tables.scaling || [];
-    const diagnostics = (DATA.tables.diagnostics || []).map(row => ({...metrics.find(item=>item.row_id===row.row_id),...row}));
-    const rankings = (DATA.tables.rankings || []).map(row => ({...metrics.find(item=>item.row_id===row.row_id),...row}));
-    const interactions = DATA.tables.factor_interactions || [];
+    const scaling = expandRecords(DATA.tables.scaling || []);
+    const diagnostics = expandRecords(DATA.tables.diagnostics || []).map(row => ({...metrics.find(item=>item.row_id===row.row_id),...row}));
+    const rankings = expandRecords(DATA.tables.rankings || []).map(row => ({...metrics.find(item=>item.row_id===row.row_id),...row}));
+    const interactions = expandRecords(DATA.tables.factor_interactions || []);
     const metricById = new Map(metrics.map(row => [row.row_id, row]));
     const diagnosticById = new Map(diagnostics.map(row => [row.row_id, row]));
     const deepRowId = index => deep.row_ids?.[index];
@@ -765,7 +768,7 @@
         limitation:"Do not interpret these timings as a legacy-to-optimized speedup or deployed inference cost.", charts:["runtime"]
       }
     ];
-    const FINAL_NODES = [
+    const FINAL_INTERVENTION_NODES = [
       {
         id:"coverage", number:1, zone:"Integrity", status:"complete", title:"Complete paired design", stat:`${DATA.meta.completed_rows}/${DATA.meta.expected_rows} rows`,
         question:"Is the full Experiment 13 design available for final interpretation?",
@@ -783,20 +786,20 @@
         limitation:"The original strict-perfect threshold is fixed at RMSE 1e-6 and maximum point error 1e-5 in this cross-phase report.", charts:["pareto"]
       },
       {
-        id:"population", number:3, zone:"Eligibility", status:"mixed", title:"AllResiduals versus UnresolvedOnly", stat:comparisonText({count:deltas.filter(row=>row.comparison==="residual_population_policy").length,improved:deltas.filter(row=>row.comparison==="residual_population_policy"&&num(row.delta_validation_p95_rmse)<0).length,median:medianNum(deltas.filter(row=>row.comparison==="residual_population_policy").map(row=>row.delta_validation_p95_rmse))}),
-        question:"Does removing already-resolved LFOs from later atom construction improve the matching clipped strategy?",
-        mechanism:"UnresolvedOnly changes which training residuals may define later atoms. It can prevent nearly solved curves from consuming repair capacity, but it can also remove population mass that stabilizes broad prototypes.",
-        evidence:"The median paired P95 effect is effectively zero. Large mean gains come from rescuing BroadMeanFinishRepair, while other families contain both improvements and regressions.",
-        recommendation:"Use UnresolvedOnly selectively where the construction family benefits; do not treat it as a universal free improvement.",
-        limitation:"The comparison is paired only to the 45 LayerClip0To1 13A rows, by design.", charts:["eligibility"]
+        id:"population", number:3, zone:"13B eligibility intervention", status:"mixed", title:"Eligibility versus no filtering", stat:comparisonText({count:deltas.filter(row=>row.comparison==="residual_population_policy").length,improved:deltas.filter(row=>row.comparison==="residual_population_policy"&&num(row.delta_validation_p95_rmse)<0).length,median:medianNum(deltas.filter(row=>row.comparison==="residual_population_policy").map(row=>row.delta_validation_p95_rmse))}),
+        question:"For the same clipped strategy, does removing already-solved LFOs improve final validation quality?",
+        mechanism:"Every 13B treatment is paired to its exact 13A AllResiduals + LayerClip0To1 row. The three epsilons are treatment intensities; the baseline is no eligibility filter, not epsilon zero.",
+        evidence:"The four co-primary outcomes are mixed by family and epsilon. BroadMeanFinishRepair is rescued strongly, while several broad families gain little or regress.",
+        recommendation:"Use the family-level paired effects to decide whether eligibility belongs in a construction policy; do not choose from absolute 13B scores alone.",
+        limitation:"The treatment universe is exactly the 45 clipped 13A strategies because 13B intentionally omitted FinalClipOnly.", charts:["eligibility-effects"]
       },
       {
-        id:"epsilon", number:4, zone:"Eligibility", status:"mixed", title:"Three-epsilon sweep", stat:"No global epsilon winner",
-        question:"Does 1e-2, 1e-3, or 1e-4 dominate across construction families?",
-        mechanism:"Epsilon is used during construction. Changing it alters the eligible residual population and therefore changes later dictionary atoms; final quality need not vary monotonically.",
-        evidence:"The across-row P95 medians are very close. The best P95 ties across all three epsilons, while the best median, node-max, and family-specific outcomes occur at different epsilons.",
-        recommendation:"Keep epsilon family-specific. Use 1e-3 for the strongest DiverseCoverage exact-finish candidate and retain 1e-2/1e-4 where their exact frontier rows justify them.",
-        limitation:"Three logarithmically spaced settings reveal sensitivity but do not estimate a continuous optimum.", charts:["epsilon-family"]
+        id:"epsilon", number:4, zone:"13B eligibility intervention", status:"mixed", title:"Does freed capacity help?", stat:"Capacity and quality are not monotonic",
+        question:"When eligibility excludes more LFOs from future layers, does the matched validation outcome improve?",
+        mechanism:"The x-axis measures the mean training population removed from layers that still remain to be built. The y-axis is the exact 13B-minus-13A validation change for the same strategy.",
+        evidence:"More population released is not automatically better. The relationship depends on construction family and on which validation objective is examined.",
+        recommendation:"Treat eligibility as a family-specific capacity intervention. Prefer settings that free useful mid-run capacity and improve the required validation objectives relative to no filtering.",
+        limitation:"The paired design isolates the population policy at each strategy, but cross-strategy capacity-to-quality association is still descriptive.", charts:["capacity-quality"]
       },
       {
         id:"strict-regime", number:5, zone:"Model behavior", status:"diagnostic", title:"Strict-perfect finishing regime", stat:`best ${pct(Math.max(...metrics.filter(row=>row.experiment_phase==="13B").map(row=>num(row.validation_strict_perfect_lfo_rate))),2)}`,
@@ -823,12 +826,12 @@
         limitation:"Every production row still uses the fixed 193-output W8D16 contract.", charts:["partial","marginal"]
       },
       {
-        id:"eligibility-depth", number:8, zone:"Eligibility", status:"diagnostic", title:"Eligibility through depth", stat:"Typical retirement ≈ 2%",
+        id:"eligibility-depth", number:8, zone:"13B eligibility intervention", status:"diagnostic", title:"Capacity released through depth", stat:"Layer 16 is endpoint only",
         question:"How much construction population is actually freed as residual depth increases?",
         mechanism:"At the end of each residual layer, the eligible count measures curves still allowed to influence the next layer. One minus that fraction is the population retired from later construction.",
-        evidence:"The median row retires only about two percent by layer 16, but BroadMeanFinishRepair and DiverseCoverage create much larger family-specific regimes.",
-        recommendation:"Inspect family curves; one aggregate retirement percentage hides the mechanism.",
-        limitation:"Layer-16 retirement is endpoint coverage and frees no later layer, while earlier retirement has more capacity value.", charts:["eligibility-progress"]
+        evidence:"Family facets reveal regimes hidden by the nearly flat all-row median. Each panel retains the no-filter 0% baseline and the three measured epsilon trajectories.",
+        recommendation:"Read layers 1–15 as construction capacity released; use layer 16 only to assess endpoint eligibility coverage.",
+        limitation:"Retirement is measured on the training population used to build the codebook; validation deltas are shown separately.", charts:["eligibility-depth-facets"]
       },
       {
         id:"work", number:9, zone:"Diagnostics", status:"same-run only", title:"Offline work", stat:"193 heads for every row",
@@ -839,6 +842,37 @@
         limitation:"These timings are not deployed inference latency and not a cross-host speedup estimate.", charts:["work","runtime"]
       }
     ];
+    const FINAL_FOUNDATION_OVERRIDES = {
+      normalization:"LayerClip0To1 improved all 45 matched 13A P95 pairs and is the fixed normalization policy in 13B.",
+      budget:"Retain CandidateBudget48 only where its family-specific paired evidence justifies the extra offline search.",
+      schedule:"Keep schedule coupled to construction family; 13B confirms there is no universal schedule rule.",
+      calibration:"The automatic gate failed at 2.054% versus the required 5%. The completed 13B sweep therefore remains exploratory rather than a frozen-epsilon confirmation."
+    };
+    const PHASE_A_METRICS = metrics.filter(row=>row.experiment_phase==="13A");
+    const PHASE_A_PARETO_COUNT = paretoRows(PHASE_A_METRICS).length;
+    const PHASE_A_DIAGNOSTICS = diagnostics.filter(row=>row.experiment_phase==="13A");
+    const PHASE_A_NODE_STATS = {
+      families:`${PHASE_A_PARETO_COUNT} Pareto strategies`,
+      "metric-agreement":`P95 ↔ node-max ρ ${fmt(spearmanValues(PHASE_A_METRICS.map(row=>row.validation_p95_rmse),PHASE_A_METRICS.map(row=>row.validation_node_max_error_p95)),2)}`,
+      generalization:`P95 median gap ${fmt(medianNum(PHASE_A_DIAGNOSTICS.map(row=>row.generalization_gap_p95_rmse)),6)}`,
+      runtime:`${fmt(Math.max(...PHASE_A_DIAGNOSTICS.map(row=>num(row.oracle_construction_time))),1)} s max`
+    };
+    const FINAL_FOUNDATION_NODES = COMPLETE_13A_NODES.filter(node=>node.id!=="coverage").map(node=>({
+      ...node,
+      id:`13a-${node.id}`,
+      sourceId:node.id,
+      zone:"13A foundation",
+      status:node.status==="sweep planned"?"complete":node.status,
+      charts:node.charts.filter(name=>name!=="retirement"&&(name!=="strict-thresholds"||strictThresholds)).map(name=>`13a-${name}`),
+      stat:PHASE_A_NODE_STATS[node.id]||node.stat,
+      recommendation:FINAL_FOUNDATION_OVERRIDES[node.id]||node.recommendation
+    }));
+    const FINAL_NODES = [
+      FINAL_INTERVENTION_NODES[0],
+      ...FINAL_FOUNDATION_NODES,
+      ...FINAL_INTERVENTION_NODES.slice(2),
+      FINAL_INTERVENTION_NODES[1]
+    ].map((node,index)=>({...node,number:index+1,zone:node.zone==="Quality frontier"?"Final cross-phase interpretation":node.zone}));
     const NODES = isFinal ? FINAL_NODES : (isComplete13A ? COMPLETE_13A_NODES : PROVISIONAL_NODES);
 
     let activeNode = null;
@@ -847,7 +881,7 @@
     let compareSelection = [];
     let dataKind = "metrics";
     let currentDataRows = [];
-    const globalState = {phase:new Set(isFinal?["13B"]:[]),epsilon:new Set(),family:new Set(),policy:new Set(),schedule:new Set(),budget:new Set(),normalization:new Set(),pareto:new Set(),applyCharts:true};
+    const globalState = {phase:new Set(),epsilon:new Set(),family:new Set(),policy:new Set(),schedule:new Set(),budget:new Set(),normalization:new Set(),pareto:new Set(),applyCharts:true};
     const chartInstances = new Map();
     const chartResizeObserver = "ResizeObserver" in window ? new ResizeObserver(entries => {
       entries.forEach(entry => {
@@ -1049,7 +1083,7 @@
 
     function filteredScalingRows(forChart = false) {
       if (forChart && !globalState.applyCharts) return scaling;
-      return scaling.filter(row => rowMatchesGlobal({...row, pareto_candidate:metricById.get(row.row_id)?.pareto_candidate}));
+      return scaling.filter(row => rowMatchesGlobal({...metricById.get(row.row_id),...row}));
     }
 
     function filteredCalibrationRows(key, forChart = false) {
@@ -1067,6 +1101,51 @@
     function filteredDiagnosticRows(forChart = false) {
       if (forChart && !globalState.applyCharts) return diagnostics;
       return diagnostics.filter(row => rowMatchesGlobal(metricById.get(row.row_id)));
+    }
+
+    function eligibilityTreatmentMatches(row, forChart = false) {
+      if (!row || row.experiment_phase !== "13B") return false;
+      if (forChart && !globalState.applyCharts) return true;
+      return rowMatchesGlobal(row, "experiment_phase");
+    }
+
+    function eligibilityLayerRows(forChart = false) {
+      return (deep.layer_progression || []).map(row => {
+        const metric = metricById.get(deepRowId(row[0])) || {};
+        if (!eligibilityTreatmentMatches(metric, forChart)) return null;
+        return row.length===4
+          ? {row_id:deepRowId(row[0]),experiment_phase:metric.experiment_phase,eligibility_epsilon:metric.eligibility_epsilon,construction_family:metric.construction_family,residual_layer:row[1],eligible_residual_count:row[2],training_p95_rmse:row[3]}
+          : {row_id:deepRowId(row[0]),experiment_phase:metric.experiment_phase,eligibility_epsilon:metric.eligibility_epsilon,construction_family:metric.construction_family,residual_layer:row[1],eligible_residual_count:row[3],training_p95_rmse:row[5]};
+      }).filter(Boolean);
+    }
+
+    function eligibilityCapacityRows(forChart = false) {
+      const layersByRow = new Map();
+      eligibilityLayerRows(forChart).forEach(row => {
+        if (!layersByRow.has(row.row_id)) layersByRow.set(row.row_id, new Map());
+        layersByRow.get(row.row_id).set(num(row.residual_layer), row);
+      });
+      return deltas.filter(row=>row.comparison==="residual_population_policy").map(pair => {
+        const treatment = metricById.get(pair.right_row_id);
+        if (!eligibilityTreatmentMatches(treatment, forChart)) return null;
+        const layers = layersByRow.get(pair.right_row_id);
+        if (!layers || layers.size!==16) return null;
+        const trainCount = Math.max(1,num(treatment.train_count));
+        const freed = layer => 1-num(layers.get(layer)?.eligible_residual_count)/trainCount;
+        return {
+          ...pair,
+          pair_id:treatment.pair_id,
+          no_filter_row_id:pair.left_row_id,
+          eligibility_row_id:pair.right_row_id,
+          construction_policy:treatment.construction_policy,
+          layer_schedule:treatment.layer_schedule,
+          utility_candidate_budget:treatment.utility_candidate_budget,
+          layer_normalization_policy:treatment.layer_normalization_policy,
+          mean_future_layer_population_freed:Array.from({length:15},(_,index)=>freed(index+1)).reduce((a,b)=>a+b,0)/15,
+          layer8_population_freed:freed(8),
+          layer16_endpoint_coverage:freed(16)
+        };
+      }).filter(Boolean);
     }
 
     function filteredRankingRows(forChart = false) {
@@ -1088,7 +1167,7 @@
       qs("#page-title").textContent = isFinal ? "Experiment 13 — Complete Strategy Grid" : (isComplete13A ? "Experiment 13A — Complete Strategy Grid" : "Experiment 13 — Provisional Strategy Grid");
       qs("#hero-title").textContent = isFinal ? "The full paired strategy map." : (isComplete13A ? "A complete unfiltered strategy map." : "Evidence before a winner.");
       qs("#hero-summary").textContent = isFinal
-        ? "Explore all 90 AllResiduals rows and all 135 UnresolvedOnly strategy-by-epsilon rows. Separate the quality frontier, paired population-policy effects, epsilon sensitivity, finishing regimes, codebook progression, and offline work."
+        ? "Start with what the 90-row 13A grid established, then test whether each of 135 eligibility treatments frees useful later-layer capacity and improves its exact no-filter baseline."
         : (isComplete13A
           ? "All 90 AllResiduals strategies are now available. Explore metric tension, train-to-validation stability, family interactions, layer and atom learning curves, dictionary diagnostics, calibration, and offline work."
           : "This report turns the interrupted Experiment 13A prefix into bounded, inspectable evidence. It separates repeatable matched effects from missing-grid uncertainty and keeps calibration descriptive until all 90 rows exist.");
@@ -1100,18 +1179,18 @@
         ? "of the planned Experiment 13A AllResiduals grid completed"
         : "of Experiment 13A rows completed in a non-random execution-order prefix");
       qs("#warning-strip").innerHTML = isFinal
-        ? `<strong>No scalar winner.</strong> AllClusterMeans owns the best P95; DiverseCoverage variants own the strongest median, node-max, and balanced strict-perfect tradeoffs. UnresolvedOnly is a family-specific intervention, and none of the three epsilons dominates globally.`
+        ? `<strong>Eligibility is a capacity intervention, not an epsilon contest.</strong> Every 13B row is compared with its exact clipped 13A no-filter baseline. More population released does not automatically improve validation quality; the effect is family- and metric-specific.`
         : (isComplete13A
           ? (meta.experiment13b_state === "complete" ? `<strong>13B has completed.</strong> This page remains the 13A-only diagnostic snapshot. Open the final Experiment 13 report for paired AllResiduals-versus-UnresolvedOnly evidence and the three-epsilon sweep.` : `<strong>13B is ready for the fixed sweep.</strong> Automatic epsilon selection did not pass: best early/middle coverage is ${pct(findings.selection.max_early_middle_median_retired_lfo_fraction,3)} versus the required ${pct(findings.selection.required_early_middle_fraction,0)}. The next phase therefore evaluates 45 LayerClip0To1 strategies independently at 1e-2, 1e-3, and 1e-4 for 135 rows.`)
           : `<strong>Do not select epsilon from this report.</strong> Experiment 13A is incomplete, no eligibility epsilon has been frozen, and Experiment 13B has not run. Legacy runtime is historical diagnostic evidence only.`);
       qs("#findings-title").textContent = isFinal ? "What the complete experiment supports" : (isComplete13A ? "What the complete 13A grid supports" : "What the fragment actually supports");
       qs("#findings-summary").textContent = isFinal
-        ? "The final evidence separates the four-metric frontier from matched population-policy effects and family-specific epsilon sensitivity."
+        ? "The final evidence preserves the complete 13A strategy findings, then relates measured capacity released in 13B to four paired validation outcomes."
         : (isComplete13A
           ? "Matched effects, the four-metric Pareto frontier, and the failed automatic eligibility gate are now complete for AllResiduals construction."
           : "Matched comparisons carry more weight than incomplete rankings. The cards distinguish provisional effects, mixed evidence, unresolved choices, and blocked decisions.");
       qs("#metrics-summary").textContent = isFinal
-        ? "No single validation metric is authoritative. Filter to 13B for the final decision frontier or compare phases explicitly."
+        ? "No single validation metric is authoritative. The global filters update both the 13A foundation and paired eligibility treatment views; paired charts always retain the required no-filter baseline."
         : (isComplete13A
           ? "No single validation metric is authoritative. Each card names the best row across the complete 90-row 13A grid."
           : "No single validation metric is authoritative. Each card shows the best observed value in this incomplete prefix and names its winning row.");
@@ -1131,15 +1210,17 @@
     }
 
     function renderFindings() {
-      const currentParetoCount = metrics.filter(row => truthy(row.pareto_candidate)).length;
+      const currentParetoCount = paretoRows(metrics).length;
       const populationRows = deltas.filter(row => row.comparison === "residual_population_policy");
       const p95Population = populationRows.map(row => num(row.delta_validation_p95_rmse));
       const phaseB = metrics.filter(row => row.experiment_phase === "13B");
+      const capacity = eligibilityCapacityRows(false).map(row=>num(row.mean_future_layer_population_freed));
       const cards = isFinal ? [
         ["Complete evidence", "225/225", "90 AllResiduals plus 135 UnresolvedOnly strategy-by-epsilon rows"],
-        ["Population filtering", `${p95Population.filter(value=>value<0).length}/${p95Population.length}`, "paired P95 comparisons improve; the median effect is neutral"],
-        ["Quality frontier", `${phaseB.filter(row=>truthy(row.pareto_candidate)).length} rows`, "remain non-dominated inside Experiment 13B"],
-        ["Best strict-perfect", pct(Math.max(...phaseB.map(row=>num(row.validation_strict_perfect_lfo_rate))),2), "a discrete exact-finish/no-op regime rather than a global RMSE win"]
+        ["Paired eligibility effect", `${p95Population.filter(value=>value<0).length}/${p95Population.length}`, "exact 13B-versus-13A P95 comparisons improve; all four metrics remain visible"],
+        ["Future-layer capacity freed", pct(medianNum(capacity)||0,2), "median treatment-average population excluded after layers 1–15"],
+        ["Quality frontier", `${paretoRows(phaseB).length} rows`, "remain non-dominated inside Experiment 13B"],
+        ["Best strict-perfect", pct(Math.max(...phaseB.map(row=>num(row.validation_strict_perfect_lfo_rate))),2), "a discrete finishing regime rather than a global RMSE win"]
       ] : isComplete13A ? [
         ["Strongest repeatable effect", `${findings.normalization.improved}/${findings.normalization.count}`, "matched normalization pairs favor LayerClip0To1"],
         ["Quality frontier", `${currentParetoCount} strategies`, `remain non-dominated at strict-perfect tolerance ${strictTolerance}`],
@@ -1195,7 +1276,7 @@
 
     function nodeCard(node) {
       const color = STATUS[node.status].color;
-      const stat = node.id === "families" && strictThresholds ? `${metrics.filter(row => truthy(row.pareto_candidate)).length} Pareto strategies · ${strictTolerance}` : node.stat;
+      const stat = (node.sourceId === "families" || (!isFinal && node.id === "families")) && strictThresholds ? `${paretoRows(PHASE_A_METRICS).length} Pareto strategies · ${strictTolerance}` : node.stat;
       return `<button class="evidence-card${activeNode === node.id ? " active" : ""}" style="--node-color:${color}" type="button" data-node="${node.id}" aria-pressed="${activeNode === node.id}"><div class="node-top"><span class="node-number">${node.number}</span><span class="confidence">${esc(node.status)}</span></div><h3>${esc(node.title)}</h3><p>${esc(node.question)}</p><div class="node-stat">${esc(stat)}</div></button>`;
     }
 
@@ -1287,6 +1368,7 @@
     function chartMarkup(node, prefix) { return `<div class="chart-grid">${node.charts.map(name => `<div class="chart-card"><div id="${prefix}-chart-${name}" class="chart ${["normalization","budget","schedule"].includes(name) ? "delta-chart" : ""}" aria-label="${esc(node.title)} chart"></div><p class="chart-caption">${esc(chartCaption(name))}</p></div>`).join("")}</div>`; }
 
     function chartCaption(name) {
+      name = name.replace(/^13a-/, "");
       const captions = {
         coverage:isComplete13A ? "Every planned Experiment 13A cell is complete. Filter the grid to inspect valid family, construction, schedule, budget, and normalization slices." : "Filled cells are completed; outlined cells remain absent. Coverage follows execution order, not random sampling.",
         normalization:"Each cell prints the exact LayerClip0To1 − FinalClipOnly delta. Green favors LayerClip0To1; coral favors FinalClipOnly; neutral cells are ties.",
@@ -1309,41 +1391,49 @@
         retirement:"Lower-right is useful: more LFOs retired with less unexplained energy abandoned. Energy safety passes, but coverage is too low to freeze epsilon automatically.",
         scaling:"Each cell prints the exact 50%-training minus 100%-training validation delta using the original 1e-5 strict-perfect definition. Green favors 50%; coral favors 100%. Runtime is intentionally excluded.",
         work:"Candidate evaluations and same-run construction time are offline work. All rows retain 193 deployed heads, so this is not an inference-latency chart.",
-        eligibility:"Each row is a matched strategy-by-epsilon comparison. Cell labels are exact 13B minus 13A deltas; the legend names the policy favored for each co-primary metric.",
-        "epsilon-family":"Each line is a construction-family median across its in-scope 13B strategies. Lower P95 is better; non-monotonic lines are expected because epsilon changes the atoms built later.",
+        "eligibility-effects":"Each panel compares an eligibility treatment with its exact no-filter 13A baseline. Cells are family-median paired deltas; tooltips retain quartiles and win/tie/loss counts.",
+        "capacity-quality":"Move right as more training population is excluded from future construction layers. Move toward the favorable side of zero as the matched validation outcome improves. The origin is the no-filter 13A baseline.",
         "strict-noop":"Moving up means more validation LFOs meet the original strict-perfect tuple; moving left means the same row also controls P95 tail error. The useful corner is upper-left.",
-        "eligibility-progress":"One minus the eligible fraction is the training population no longer competing for later atoms. Earlier retirement frees more future construction depth than layer-16 endpoint retirement.",
+        "eligibility-depth-facets":"Each family has its own depth trajectory. The dashed 0% line is no eligibility filtering; layers 1–15 release future construction capacity, while layer 16 is endpoint coverage only.",
         runtime:isComplete ? "Continuous same-run timing keeps the optimized cost pattern readable. Lower is faster; these are offline construction seconds, not deployed inference cost." : "The main linear axis exposes ordinary legacy timing differences. The separate red segment retains the two host-sleep artifacts without flattening the other bars."
       };
       return captions[name];
     }
 
     function metricsForNode(node) {
-      if (node.id === "coverage") return simpleTable(filteredCoverageRows(false), ["row_id","construction_family","construction_policy","layer_schedule","utility_candidate_budget","layer_normalization_policy","completed"]);
-      if (["normalization","budget","schedule","population"].includes(node.id)) {
-        const key = {normalization:"layer_normalization_policy",budget:"utility_candidate_budget",schedule:"layer_schedule",population:"residual_population_policy"}[node.id];
+      if (!node.sourceId) return metricsForNodeCore(node);
+      const savedPhase=globalState.phase;const savedEpsilon=globalState.epsilon;
+      globalState.phase=new Set(["13A"]);globalState.epsilon=new Set();
+      try{return metricsForNodeCore(node);}finally{globalState.phase=savedPhase;globalState.epsilon=savedEpsilon;}
+    }
+
+    function metricsForNodeCore(node) {
+      const nodeId = node.sourceId || node.id;
+      if (nodeId === "coverage") return simpleTable(filteredCoverageRows(false), ["row_id","construction_family","construction_policy","layer_schedule","utility_candidate_budget","layer_normalization_policy","completed"]);
+      if (["normalization","budget","schedule","population"].includes(nodeId)) {
+        const key = {normalization:"layer_normalization_policy",budget:"utility_candidate_budget",schedule:"layer_schedule",population:"residual_population_policy"}[nodeId];
         return simpleTable(filteredDeltaRows(key, false), ["match_key","left_value","right_value","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
       }
-      if (node.id === "epsilon") return simpleTable(filteredMetricRows(false).filter(row=>row.experiment_phase==="13B"), ["row_id","construction_family","eligibility_epsilon","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95"]);
-      if (node.id === "strict-regime") return simpleTable(filteredDiagnosticRows(false).filter(row=>row.experiment_phase==="13B"), ["row_id","construction_family","eligibility_epsilon","validation_strict_perfect_lfo_rate","validation_median_rmse","validation_p95_rmse","validation_node_max_error_p95"]);
-      if (node.id === "eligibility-depth") return simpleTable(layerRows(false).filter(row=>row.experiment_phase==="13B"), ["row_id","construction_family","eligibility_epsilon","residual_layer","eligible_residual_count","training_p95_rmse"]);
-      if (node.id === "families") return simpleTable([...filteredMetricRows(false)].sort((a,b) => num(a.validation_p95_rmse)-num(b.validation_p95_rmse)), ["row_id","construction_family","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"]);
-      if (node.id === "metric-agreement") return simpleTable(filteredRankingRows(false), ["row_id","construction_family","rank_validation_median_rmse","rank_validation_strict_perfect_lfo_rate","rank_validation_p95_rmse","rank_validation_node_max_error_p95","mean_co_primary_rank","rank_spread"]);
-      if (node.id === "generalization") return simpleTable(filteredDiagnosticRows(false), ["row_id","construction_family","generalization_gap_median_rmse","generalization_gap_p95_rmse","generalization_gap_node_max_error_p95"]);
-      if (node.id === "interactions" && isFinal) return simpleTable([...
+      if (nodeId === "epsilon") return simpleTable(eligibilityCapacityRows(false), ["eligibility_row_id","construction_family","eligibility_epsilon","mean_future_layer_population_freed","layer8_population_freed","layer16_endpoint_coverage","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
+      if (nodeId === "strict-regime") return simpleTable(filteredDiagnosticRows(false).filter(row=>row.experiment_phase==="13B"), ["row_id","construction_family","eligibility_epsilon","validation_strict_perfect_lfo_rate","validation_median_rmse","validation_p95_rmse","validation_node_max_error_p95"]);
+      if (nodeId === "eligibility-depth") return simpleTable(eligibilityLayerRows(false), ["row_id","construction_family","eligibility_epsilon","residual_layer","eligible_residual_count","training_p95_rmse"]);
+      if (nodeId === "families") return simpleTable([...filteredMetricRows(false)].sort((a,b) => num(a.validation_p95_rmse)-num(b.validation_p95_rmse)), ["row_id","construction_family","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"]);
+      if (nodeId === "metric-agreement") return simpleTable(filteredRankingRows(false), ["row_id","construction_family","rank_validation_median_rmse","rank_validation_strict_perfect_lfo_rate","rank_validation_p95_rmse","rank_validation_node_max_error_p95","mean_co_primary_rank","rank_spread"]);
+      if (nodeId === "generalization") return simpleTable(filteredDiagnosticRows(false), ["row_id","construction_family","generalization_gap_median_rmse","generalization_gap_p95_rmse","generalization_gap_node_max_error_p95"]);
+      if (nodeId === "interactions" && isFinal && !node.sourceId) return simpleTable([...
         filteredDeltaRows("utility_candidate_budget",false), ...filteredDeltaRows("layer_schedule",false)
       ], ["experiment_phase","eligibility_epsilon","match_key","left_value","right_value","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
-      if (node.id === "interactions") return simpleTable(interactions.filter(row =>
-        (!globalState.family.size || globalState.family.has(String(row.construction_family))) &&
-        (!globalState.phase.size || globalState.phase.has(String(row.experiment_phase))) &&
-        (!globalState.epsilon.size || globalState.epsilon.has(String(row.eligibility_epsilon)))
-      ), ["experiment_phase","eligibility_epsilon","comparison","construction_family","pair_count","median_delta_validation_median_rmse","median_delta_validation_strict_perfect_lfo_rate","median_delta_validation_p95_rmse","median_delta_validation_node_max_error_p95"]);
-      if (node.id === "partial") return simpleTable(marginalRows(false), ["row_id","construction_family","active_atom_count","delta_validation_median_rmse","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
-      if (node.id === "layers") return simpleTable(layerRows(false), ["row_id","construction_family","residual_layer","layer_role","training_median_rmse","training_p95_rmse","training_max_abs_error_p95"]);
-      if (node.id === "diagnostics") return simpleTable(filteredDiagnosticRows(false), ["row_id","construction_family","validation_overshoot_rate_before_final_clip","residual_layer_effective_no_op_usage_rate_median","residual_layer_dead_atom_rate_median","residual_gain_nonzero_rate","duplicate_atom_rate","validation_p95_rmse"]);
-      if (node.id === "calibration") return simpleTable(calibrationToleranceTable(), ["residual_layer","construction_family","target_lfo_reduction","required_tolerance"]);
-      if (node.id === "scaling") return simpleTable(filteredScalingRows(false), ["row_id","construction_family","delta_validation_median_rmse","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
-      if (node.id === "work") return simpleTable(mechanismRows(false), ["row_id","construction_family","candidate_evaluations","median_slot_p95_improvement","prototype_convergence_rate","prototype_iterations_median","exact_duplicate_alignment_reuse_rate","oracle_construction_time"]);
+      if (nodeId === "interactions") return simpleTable([
+        ...filteredDeltaRows("layer_normalization_policy",false),
+        ...filteredDeltaRows("utility_candidate_budget",false),
+        ...filteredDeltaRows("layer_schedule",false)
+      ], ["experiment_phase","eligibility_epsilon","comparison","construction_family","match_key","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
+      if (nodeId === "partial") return simpleTable(marginalRows(false), ["row_id","construction_family","active_atom_count","delta_validation_median_rmse","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
+      if (nodeId === "layers") return simpleTable(layerRows(false), ["row_id","construction_family","residual_layer","layer_role","training_median_rmse","training_p95_rmse","training_max_abs_error_p95"]);
+      if (nodeId === "diagnostics") return simpleTable(filteredDiagnosticRows(false), ["row_id","construction_family","validation_overshoot_rate_before_final_clip","residual_layer_effective_no_op_usage_rate_median","residual_layer_dead_atom_rate_median","residual_gain_nonzero_rate","duplicate_atom_rate","validation_p95_rmse"]);
+      if (nodeId === "calibration") return simpleTable(calibrationToleranceTable(), ["residual_layer","construction_family","target_lfo_reduction","required_tolerance"]);
+      if (nodeId === "scaling") return simpleTable(filteredScalingRows(false), ["row_id","construction_family","delta_validation_median_rmse","delta_validation_p95_rmse","delta_validation_node_max_error_p95"]);
+      if (nodeId === "work") return simpleTable(mechanismRows(false), ["row_id","construction_family","candidate_evaluations","median_slot_p95_improvement","prototype_convergence_rate","prototype_iterations_median","exact_duplicate_alignment_reuse_rate","oracle_construction_time"]);
       return simpleTable(findings.runtime_outliers.filter(row => rowMatchesGlobal(metricById.get(row.row_id))), ["row_id","oracle_construction_time"]);
     }
 
@@ -1357,7 +1447,9 @@
     function layerRows(forChart = false) {
       return filteredDeepRows(deep.layer_progression || [], forChart).map(row => {
         const metric = metricById.get(deepRowId(row[0])) || {};
-        return {row_id:deepRowId(row[0]),experiment_phase:metric.experiment_phase,eligibility_epsilon:metric.eligibility_epsilon,construction_family:metric.construction_family,residual_layer:row[1],layer_role:row[2],eligible_residual_count:row[3],training_median_rmse:row[4],training_p95_rmse:row[5],training_max_abs_error_p95:row[6]};
+        return row.length===4
+          ? {row_id:deepRowId(row[0]),experiment_phase:metric.experiment_phase,eligibility_epsilon:metric.eligibility_epsilon,construction_family:metric.construction_family,residual_layer:row[1],eligible_residual_count:row[2],training_p95_rmse:row[3]}
+          : {row_id:deepRowId(row[0]),experiment_phase:metric.experiment_phase,eligibility_epsilon:metric.eligibility_epsilon,construction_family:metric.construction_family,residual_layer:row[1],layer_role:row[2],eligible_residual_count:row[3],training_median_rmse:row[4],training_p95_rmse:row[5],training_max_abs_error_p95:row[6]};
       });
     }
 
@@ -1383,7 +1475,7 @@
     function cell(value, column) {
       if (column.includes("row_id") || column === "match_key") return `<code title="${esc(value)}">${esc(short(value))}</code>`;
       if (typeof value === "boolean" || ["true","false"].includes(String(value).toLowerCase())) return truthy(value) ? "✓ yes" : "— no";
-      if (value !== "" && value !== null && Number.isFinite(Number(value))) return column.includes("strict_perfect") ? pct(value, 3) : fmt(value, 7);
+      if (value !== "" && value !== null && Number.isFinite(Number(value))) return column.includes("strict_perfect") ? pct(value, 3) : (column.includes("population_freed")||column.includes("endpoint_coverage") ? pct(value,2) : fmt(value, 7));
       return esc(value ?? "");
     }
 
@@ -1454,6 +1546,8 @@
       if (deep.marginal_atoms?.length) labels.marginal_atoms = "Marginal atoms";
       if (deep.layer_progression?.length) labels.layer_progression = "Residual layers";
       if (deep.mechanisms?.length) labels.mechanisms = "Construction audit";
+      if (isFinal) labels.eligibility_capacity = "Eligibility capacity";
+      if (isFinal) labels.eligibility_depth = "Eligibility depth";
       if (scaling.length) labels.scaling = "Training scaling";
       qs("#data-tabs").innerHTML = Object.entries(labels).map(([key,label]) => `<button class="tab-button" type="button" role="tab" data-data-kind="${key}" aria-selected="${key === dataKind}">${label}</button>`).join("");
       qsa("[data-data-kind]").forEach(button => {
@@ -1476,6 +1570,8 @@
       if (dataKind === "marginal_atoms") rows = marginalRows(false);
       if (dataKind === "layer_progression") rows = layerRows(false);
       if (dataKind === "mechanisms") rows = mechanismRows(false);
+      if (dataKind === "eligibility_capacity") rows = eligibilityCapacityRows(false);
+      if (dataKind === "eligibility_depth") rows = eligibilityLayerRows(false);
       rows = rows.filter(row => !query || JSON.stringify(row).toLowerCase().includes(query));
       const completion = qs("#data-completion")?.value;
       if (dataKind === "coverage" && completion && completion !== "all") rows = rows.filter(row => truthy(row.completed) === (completion === "complete"));
@@ -1486,7 +1582,7 @@
     }
 
     function dataColumns(kind) {
-      return ({metrics:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"],coverage:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","completed"],matched_deltas:["comparison","construction_family","match_key","left_value","right_value","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"],partial_codebook:["row_id","construction_family","active_atom_count","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95"],scaling:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"],diagnostics:["row_id","construction_family","generalization_gap_median_rmse","generalization_gap_p95_rmse","validation_overshoot_rate_before_final_clip","residual_layer_effective_no_op_usage_rate_median","residual_layer_dead_atom_rate_median","residual_gain_nonzero_rate","duplicate_atom_rate","offline_analysis_time"],rankings:["row_id","construction_family","rank_validation_median_rmse","rank_validation_strict_perfect_lfo_rate","rank_validation_p95_rmse","rank_validation_node_max_error_p95","mean_co_primary_rank","rank_spread"],interactions:["comparison","construction_family","pair_count","median_delta_validation_median_rmse","median_delta_validation_strict_perfect_lfo_rate","median_delta_validation_p95_rmse","median_delta_validation_node_max_error_p95"],marginal_atoms:["row_id","construction_family","active_atom_count","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"],layer_progression:["row_id","construction_family","residual_layer","layer_role","training_median_rmse","training_p95_rmse","training_max_abs_error_p95"],mechanisms:["row_id","construction_family","atom_count","broad_atom_count","repair_atom_count","median_slot_p95_improvement","prototype_convergence_rate","prototype_iterations_median","exact_duplicate_alignment_reuse_rate","candidate_evaluations","oracle_construction_time"]})[kind];
+      return ({metrics:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95","pareto_candidate"],coverage:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","completed"],matched_deltas:["comparison","construction_family","match_key","left_value","right_value","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"],partial_codebook:["row_id","construction_family","active_atom_count","validation_median_rmse","validation_strict_perfect_lfo_rate","validation_p95_rmse","validation_node_max_error_p95"],scaling:["row_id","construction_family","layer_schedule","utility_candidate_budget","layer_normalization_policy","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"],diagnostics:["row_id","construction_family","generalization_gap_median_rmse","generalization_gap_p95_rmse","validation_overshoot_rate_before_final_clip","residual_layer_effective_no_op_usage_rate_median","residual_layer_dead_atom_rate_median","residual_gain_nonzero_rate","duplicate_atom_rate","offline_analysis_time"],rankings:["row_id","construction_family","rank_validation_median_rmse","rank_validation_strict_perfect_lfo_rate","rank_validation_p95_rmse","rank_validation_node_max_error_p95","mean_co_primary_rank","rank_spread"],interactions:["comparison","construction_family","pair_count","median_delta_validation_median_rmse","median_delta_validation_strict_perfect_lfo_rate","median_delta_validation_p95_rmse","median_delta_validation_node_max_error_p95"],marginal_atoms:["row_id","construction_family","active_atom_count","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"],layer_progression:["row_id","construction_family","residual_layer","layer_role","training_median_rmse","training_p95_rmse","training_max_abs_error_p95"],mechanisms:["row_id","construction_family","atom_count","broad_atom_count","repair_atom_count","median_slot_p95_improvement","prototype_convergence_rate","prototype_iterations_median","exact_duplicate_alignment_reuse_rate","candidate_evaluations","oracle_construction_time"],eligibility_capacity:["eligibility_row_id","no_filter_row_id","construction_family","construction_policy","eligibility_epsilon","mean_future_layer_population_freed","layer8_population_freed","layer16_endpoint_coverage","delta_validation_median_rmse","delta_validation_strict_perfect_lfo_rate","delta_validation_p95_rmse","delta_validation_node_max_error_p95"],eligibility_depth:["row_id","construction_family","eligibility_epsilon","residual_layer","eligible_residual_count","training_p95_rmse"]})[kind];
     }
 
     function exportCsv() {
@@ -1500,8 +1596,22 @@
 
     function renderChart(name, element) {
       if (!element) return;
-      const renderers = {coverage:chartCoverage,normalization:el => chartDelta(el,"layer_normalization_policy","FinalClipOnly","LayerClip0To1"),budget:el => chartDelta(el,"utility_candidate_budget","CandidateBudget24","CandidateBudget48"),schedule:el => chartDelta(el,"layer_schedule","Interleaved","TwoPhase"),eligibility:el=>chartDelta(el,"residual_population_policy","AllResiduals","UnresolvedOnly"),"epsilon-family":chartEpsilonFamily,"strict-noop":chartStrictNoOp,"eligibility-progress":chartEligibilityProgress,pareto:chartPareto,"metric-map":chartMetricMap,"strict-thresholds":chartStrictThresholds,generalization:chartGeneralization,interactions:chartInteractions,partial:chartPartial,marginal:chartMarginal,layers:chartLayers,diagnostics:chartDiagnostics,calibration:chartCalibration,"capacity-8":el=>chartCapacityDepth(el,8),"capacity-16":el=>chartCapacityDepth(el,16),"capacity-matrix":chartCapacityMatrix,"tolerance-matrix-8":el=>chartToleranceMatrix(el,8),"tolerance-matrix-16":el=>chartToleranceMatrix(el,16),retirement:chartRetirement,scaling:chartScaling,work:chartWork,runtime:chartRuntime};
-      renderers[name](element);
+      const renderers = {coverage:chartCoverage,normalization:el => chartDelta(el,"layer_normalization_policy","FinalClipOnly","LayerClip0To1"),budget:el => chartDelta(el,"utility_candidate_budget","CandidateBudget24","CandidateBudget48"),schedule:el => chartDelta(el,"layer_schedule","Interleaved","TwoPhase"),"eligibility-effects":chartEligibilityEffects,"capacity-quality":chartCapacityQuality,"strict-noop":chartStrictNoOp,"eligibility-depth-facets":chartEligibilityDepthFacets,pareto:chartPareto,"metric-map":chartMetricMap,"strict-thresholds":chartStrictThresholds,generalization:chartGeneralization,interactions:chartInteractions,partial:chartPartial,marginal:chartMarginal,layers:chartLayers,diagnostics:chartDiagnostics,calibration:chartCalibration,"capacity-8":el=>chartCapacityDepth(el,8),"capacity-16":el=>chartCapacityDepth(el,16),"capacity-matrix":chartCapacityMatrix,"tolerance-matrix-8":el=>chartToleranceMatrix(el,8),"tolerance-matrix-16":el=>chartToleranceMatrix(el,16),retirement:chartRetirement,scaling:chartScaling,work:chartWork,runtime:chartRuntime};
+      const foundation = name.startsWith("13a-");
+      const key = foundation ? name.slice(4) : name;
+      const renderer = renderers[key];
+      if (!renderer) return chartEmpty(element, "This chart is not available in the current report mode.");
+      const savedPhase = globalState.phase;
+      const savedEpsilon = globalState.epsilon;
+      if (foundation) {
+        globalState.phase = new Set(["13A"]);
+        globalState.epsilon = new Set();
+      }
+      try { renderer(element); }
+      finally {
+        globalState.phase = savedPhase;
+        globalState.epsilon = savedEpsilon;
+      }
     }
 
     function setChart(element, option) {
@@ -1552,6 +1662,7 @@
     function chartGrid() { return getComputedStyle(document.documentElement).getPropertyValue("--border").trim(); }
     function baseAxes() { return {axisLine:{lineStyle:{color:chartGrid()}},axisLabel:{color:chartText()},splitLine:{lineStyle:{color:chartGrid(),opacity:.45}},nameTextStyle:{color:chartText()}}; }
     function medianNum(values) { const ordered=values.map(num).sort((a,b)=>a-b); if (!ordered.length) return null; const mid=Math.floor(ordered.length/2); return ordered.length%2?ordered[mid]:(ordered[mid-1]+ordered[mid])/2; }
+    function quantileNum(values, q) { const ordered=values.map(num).filter(Number.isFinite).sort((a,b)=>a-b); if (!ordered.length) return null; const position=(ordered.length-1)*q; const lower=Math.floor(position); const upper=Math.ceil(position); return lower===upper?ordered[lower]:ordered[lower]+(ordered[upper]-ordered[lower])*(position-lower); }
     function averageRanks(values) {
       const ordered=values.map((value,index)=>({value:num(value),index})).sort((a,b)=>a.value-b.value);
       const result=Array(values.length).fill(0); let start=0;
@@ -1587,6 +1698,9 @@
     function dominatesMetrics(left, right) {
       const comparisons = CO_PRIMARY.map(metric => metric.higher ? num(left[metric.key]) - num(right[metric.key]) : num(right[metric.key]) - num(left[metric.key]));
       return comparisons.every(value => value >= 0) && comparisons.some(value => value > 0);
+    }
+    function paretoRows(rows) {
+      return rows.filter(row => !rows.some(other => other !== row && dominatesMetrics(other, row)));
     }
     function currentRankingRows() {
       const rankMaps = new Map(CO_PRIMARY.map(metric => {
@@ -1641,6 +1755,66 @@
       });
     }
 
+    function chartEligibilityEffects(element) {
+      const rows=eligibilityCapacityRows(true);
+      if(!rows.length)return chartEmpty(element,"No paired eligibility treatments match the filters. Experiment 13B contains LayerClip0To1 rows only.");
+      const families=unique(rows.map(row=>row.construction_family));
+      const epsilons=unique(rows.map(row=>num(row.eligibility_epsilon))).map(Number).sort((a,b)=>b-a);
+      const panelHeight=Math.max(350,150+families.length*27);
+      element.style.height=`${panelHeight*CO_PRIMARY.length}px`;
+      const grids=[],xAxes=[],yAxes=[],titles=[],series=[];
+      CO_PRIMARY.forEach((metric,index)=>{
+        const top=index*panelHeight+55;
+        const summaries=families.flatMap((family,y)=>epsilons.map((epsilon,x)=>{
+          const values=rows.filter(row=>row.construction_family===family&&num(row.eligibility_epsilon)===epsilon).map(row=>num(row[metric.delta]));
+          const raw=medianNum(values);
+          const improved=values.filter(value=>metric.higher?value>0:value<0).length;
+          const worsened=values.filter(value=>metric.higher?value<0:value>0).length;
+          return {value:[x,y,metric.higher?raw:-raw],raw,family,epsilon,count:values.length,improved,worsened,tied:values.length-improved-worsened,q25:quantileNum(values,.25),q75:quantileNum(values,.75),metric};
+        }));
+        const limit=Math.max(...summaries.map(item=>Math.abs(num(item.value[2]))),1e-12);
+        grids.push({left:220,right:34,top,height:panelHeight-125});
+        xAxes.push({type:"category",gridIndex:index,position:"top",data:epsilons.map(fmtTolerance),axisLabel:{color:chartText()},axisLine:{lineStyle:{color:chartGrid()}},name:index===0?"Eligibility treatment intensity · each column is compared with no filtering":"",nameLocation:"middle",nameGap:34,nameTextStyle:{color:chartText()}});
+        yAxes.push({type:"category",gridIndex:index,data:families,axisLabel:{color:chartText(),width:198,overflow:"truncate"},axisLine:{lineStyle:{color:chartGrid()}},axisTick:{show:false}});
+        titles.push({text:`${metric.label} · eligibility minus matched no-filter 13A`,left:220,top:index*panelHeight+12,textStyle:{color:chartText(),fontSize:13}});
+        series.push({name:metric.label,type:"heatmap",xAxisIndex:index,yAxisIndex:index,data:summaries,label:{show:true,color:"#66757b",fontSize:11,formatter:params=>deltaCellLabel(metric,params.data.raw)},itemStyle:{color:params=>{const value=num(params.data.value[2]);if(Math.abs(value)<1e-15)return "#eef2f1";const alpha=.2+.65*Math.min(1,Math.abs(value)/limit);return value>0?`rgba(20,126,103,${alpha})`:`rgba(182,59,52,${alpha})`;},borderColor:getComputedStyle(document.documentElement).getPropertyValue("--surface").trim(),borderWidth:2}});
+      });
+      setChart(element,{title:titles,tooltip:{formatter:params=>{const item=params.data;return `${esc(item.family)}<br>epsilon ${fmtTolerance(item.epsilon)} versus <strong>No eligibility filter (13A)</strong><br><strong>${esc(item.metric.label)}</strong>: ${esc(deltaCellLabel(item.metric,item.raw))}<br>IQR ${esc(deltaCellLabel(item.metric,item.q25))} to ${esc(deltaCellLabel(item.metric,item.q75))}<br>${item.improved} improve · ${item.tied} tie · ${item.worsened} worsen · n=${item.count}`;}},grid:grids,xAxis:xAxes,yAxis:yAxes,series});
+    }
+
+    function chartCapacityQuality(element) {
+      const rows=eligibilityCapacityRows(true);
+      if(!rows.length)return chartEmpty(element,"No paired eligibility treatments match the filters. The no-filter baseline is retained automatically when a treatment is in scope.");
+      const epsilons=unique(rows.map(row=>num(row.eligibility_epsilon))).map(Number).sort((a,b)=>b-a);
+      const colors={"0.01":COLORS.warn,"0.001":COLORS.blue,"0.0001":COLORS.accent};
+      const panelHeight=310;element.style.height=`${panelHeight*CO_PRIMARY.length}px`;
+      const grids=[],xAxes=[],yAxes=[],titles=[],series=[];
+      CO_PRIMARY.forEach((metric,index)=>{
+        const top=index*panelHeight+52;
+        grids.push({left:92,right:34,top,height:panelHeight-112});
+        xAxes.push({type:"value",gridIndex:index,name:index===CO_PRIMARY.length-1?"Mean training population excluded from future layers (%)":"",nameLocation:"middle",nameGap:38,axisLabel:{color:chartText(),formatter:value=>`${value.toFixed(1)}%`},...baseAxes()});
+        yAxes.push({type:"value",gridIndex:index,name:`Paired ${metric.short} delta${metric.higher?" (pp)":""}`,nameLocation:"middle",nameGap:68,...baseAxes()});
+        titles.push({text:`${metric.label} · favorable is ${metric.higher?"above":"below"} zero`,left:92,top:index*panelHeight+10,textStyle:{color:chartText(),fontSize:13}});
+        epsilons.forEach(epsilon=>series.push({name:`epsilon ${fmtTolerance(epsilon)}`,type:"scatter",xAxisIndex:index,yAxisIndex:index,symbolSize:8,itemStyle:{color:colors[String(epsilon)]||COLORS.blue},data:rows.filter(row=>num(row.eligibility_epsilon)===epsilon).map(row=>({value:[100*num(row.mean_future_layer_population_freed),metric.higher?100*num(row[metric.delta]):num(row[metric.delta])],row,metric})),markLine:{silent:true,symbol:"none",lineStyle:{color:chartGrid(),type:"dashed"},data:[{yAxis:0},{xAxis:0}]},markPoint:{silent:true,symbol:"diamond",symbolSize:14,itemStyle:{color:"#66757b"},label:{show:true,position:"right",color:chartText(),formatter:"No filter (13A)"},data:[{coord:[0,0]}]}}));
+      });
+      setChart(element,{title:titles,legend:{top:4,right:20,textStyle:{color:chartText()}},tooltip:{formatter:params=>{const row=params.data.row;return `${esc(short(row.eligibility_row_id))}<br>${esc(row.construction_family)} · epsilon ${fmtTolerance(row.eligibility_epsilon)}<br><strong>${pct(row.mean_future_layer_population_freed,2)} mean future-layer population freed</strong><br>Layer 8 ${pct(row.layer8_population_freed,2)} · layer 16 endpoint ${pct(row.layer16_endpoint_coverage,2)}<br>${esc(params.data.metric.label)} delta ${esc(deltaCellLabel(params.data.metric,num(row[params.data.metric.delta])))}`;}},grid:grids,xAxis:xAxes,yAxis:yAxes,series});
+    }
+
+    function chartEligibilityDepthFacets(element) {
+      const rows=eligibilityLayerRows(true);
+      if(!rows.length)return chartEmpty(element,"No Experiment 13B depth rows match the filters. Paired eligibility views require the clipped 13B treatment universe.");
+      const families=unique(rows.map(row=>row.construction_family));
+      const epsilons=unique(rows.map(row=>num(row.eligibility_epsilon))).map(Number).sort((a,b)=>b-a);
+      const colors={"0.01":COLORS.warn,"0.001":COLORS.blue,"0.0001":COLORS.accent};
+      const narrow=element.clientWidth<850;const columns=narrow?1:2;const chartRows=Math.ceil(families.length/columns);const panelHeight=260;
+      element.style.height=`${chartRows*panelHeight+70}px`;
+      const layerValues=new Map();rows.forEach(row=>{const metric=metricById.get(row.row_id);const train=Math.max(1,num(metric?.train_count));const key=`${row.construction_family}|${num(row.eligibility_epsilon)}|${num(row.residual_layer)}`;if(!layerValues.has(key))layerValues.set(key,[]);layerValues.get(key).push(1-num(row.eligible_residual_count)/train);});
+      const maximum=Math.max(.01,...[...layerValues.values()].flat());
+      const grids=[],xAxes=[],yAxes=[],titles=[],series=[];const layers=Array.from({length:16},(_,index)=>index+1);
+      families.forEach((family,index)=>{const column=index%columns;const rowIndex=Math.floor(index/columns);const left=narrow?76:(column===0?76:"56%");const right=narrow?28:(column===0?"54%":28);const top=rowIndex*panelHeight+52;grids.push({left,right,top,height:165});xAxes.push({type:"category",gridIndex:index,data:layers,axisLabel:{color:chartText(),interval:1},axisLine:{lineStyle:{color:chartGrid()}},name:rowIndex===chartRows-1?"Completed residual layer · L16 endpoint only":"",nameLocation:"middle",nameGap:34,nameTextStyle:{color:chartText()}});yAxes.push({type:"value",gridIndex:index,min:0,max:maximum,name:column===0?"Training population freed":"",nameLocation:"middle",nameGap:52,axisLabel:{color:chartText(),formatter:value=>pct(value,0)},...baseAxes()});titles.push({text:family,subtext:"No filter baseline = 0%",left,top:rowIndex*panelHeight+8,textStyle:{color:chartText(),fontSize:12},subtextStyle:{color:chartText(),fontSize:10}});series.push({name:"No eligibility filter (13A)",type:"line",xAxisIndex:index,yAxisIndex:index,data:layers.map(()=>0),symbol:"none",lineStyle:{color:"#66757b",type:"dashed",width:1.5}});epsilons.forEach(epsilon=>{const values=layers.map(layer=>layerValues.get(`${family}|${epsilon}|${layer}`)||[]);const q25=values.map(items=>quantileNum(items,.25)||0);const q75=values.map(items=>quantileNum(items,.75)||0);const band=`band-${index}-${epsilon}`;series.push({name:`_${band}-lower`,type:"line",xAxisIndex:index,yAxisIndex:index,data:q25,stack:band,symbol:"none",silent:true,lineStyle:{opacity:0},areaStyle:{opacity:0}});series.push({name:`_${band}-iqr`,type:"line",xAxisIndex:index,yAxisIndex:index,data:q75.map((value,i)=>value-q25[i]),stack:band,symbol:"none",silent:true,lineStyle:{opacity:0},areaStyle:{color:colors[String(epsilon)],opacity:.1}});series.push({name:`epsilon ${fmtTolerance(epsilon)}`,type:"line",xAxisIndex:index,yAxisIndex:index,data:values.map(items=>medianNum(items)||0),symbol:"circle",symbolSize:3,lineStyle:{color:colors[String(epsilon)],width:1.5},itemStyle:{color:colors[String(epsilon)]},markLine:epsilon===epsilons[0]?{silent:true,symbol:"none",label:{show:true,formatter:"L16 endpoint",color:chartText()},lineStyle:{color:chartGrid(),type:"dotted"},data:[{xAxis:15}]}:undefined});});});
+      setChart(element,{title:titles,legend:{top:4,right:20,data:["No eligibility filter (13A)",...epsilons.map(epsilon=>`epsilon ${fmtTolerance(epsilon)}`)],textStyle:{color:chartText()}},tooltip:{trigger:"axis",formatter:params=>{const visible=params.filter(item=>!item.seriesName.startsWith("_")&&item.seriesName!=="No eligibility filter (13A)");const layer=params[0]?.axisValue;return `Completed layer ${layer}${num(layer)===16?" · endpoint only":" · frees later construction"}<br><strong>No eligibility filter (13A): 0%</strong><br>${visible.map(item=>`${esc(item.seriesName)}: ${pct(item.value,2)} median population freed`).join("<br>")}`;}},grid:grids,xAxis:xAxes,yAxis:yAxes,series});
+    }
+
     function chartEpsilonFamily(element) {
       const rows = filteredMetricRows(true).filter(row=>row.experiment_phase==="13B");
       if (!rows.length) return chartEmpty(element,"No Experiment 13B rows match the global filters.");
@@ -1679,8 +1853,9 @@
       const rows = filteredMetricRows(true);
       if (!rows.length) return chartEmpty(element);
       const families = unique(rows.map(row => row.construction_family));
+      const paretoIds = new Set(paretoRows(rows).map(row=>row.row_id));
       element.style.height = "520px";
-      setChart(element,{tooltip:{formatter:params => `${esc(short(params.data.row.row_id))}<br>Median RMSE ${fmt(params.value[0],6)}<br>P95 RMSE ${fmt(params.value[1],6)}<br>Strict-perfect (${esc(strictTolerance)}) ${pct(params.data.row.validation_strict_perfect_lfo_rate,3)}<br>Node-max P95 ${fmt(params.data.row.validation_node_max_error_p95,6)}`},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:30,top:25,bottom:95,containLabel:true},xAxis:{type:"value",name:"Median RMSE ↓",nameLocation:"middle",nameGap:42,...baseAxes()},yAxis:{type:"value",name:"P95 RMSE ↓",nameLocation:"middle",nameGap:58,...baseAxes()},series:families.map(family=>({name:family,type:"scatter",data:rows.filter(row=>row.construction_family===family).map(row=>({value:[num(row.validation_median_rmse),num(row.validation_p95_rmse)],row,symbolSize:truthy(row.pareto_candidate)?15:8,itemStyle:{borderColor:truthy(row.pareto_candidate)?"#52656d":"transparent",borderWidth:truthy(row.pareto_candidate)?2:0}})),emphasis:{focus:"series"}}))});
+      setChart(element,{tooltip:{formatter:params => `${esc(short(params.data.row.row_id))}<br>Median RMSE ${fmt(params.value[0],6)}<br>P95 RMSE ${fmt(params.value[1],6)}<br>Strict-perfect (${esc(strictTolerance)}) ${pct(params.data.row.validation_strict_perfect_lfo_rate,3)}<br>Node-max P95 ${fmt(params.data.row.validation_node_max_error_p95,6)}`},legend:{type:"scroll",bottom:0,textStyle:{color:chartText()}},grid:{left:25,right:30,top:25,bottom:95,containLabel:true},xAxis:{type:"value",name:"Median RMSE ↓",nameLocation:"middle",nameGap:42,...baseAxes()},yAxis:{type:"value",name:"P95 RMSE ↓",nameLocation:"middle",nameGap:58,...baseAxes()},series:families.map(family=>({name:family,type:"scatter",data:rows.filter(row=>row.construction_family===family).map(row=>{const isPareto=paretoIds.has(row.row_id);return {value:[num(row.validation_median_rmse),num(row.validation_p95_rmse)],row,symbolSize:isPareto?15:8,itemStyle:{borderColor:isPareto?"#52656d":"transparent",borderWidth:isPareto?2:0}};}),emphasis:{focus:"series"}}))});
     }
 
     function chartMetricMap(element) {

@@ -2,137 +2,207 @@
 
 **Complete evidence · 90/90 Experiment 13A rows · 135/135 Experiment 13B rows · no failures**
 
-## Main Findings
+## Experiment Question and Answer
 
-Experiment 13 does not produce one scalar winner. It produces a small, interpretable frontier: `AllClusterMeans` has the best validation P95, while `DiverseCoverageHardRepairTwoPhase` supplies the best median and node-max solutions, and a separate `DiverseCoverageHardRepairInterleaved` regime preserves many more exact reconstructions.
+Experiment 13 asks whether removing already-solved LFOs from later dictionary construction frees useful capacity and improves the remaining reconstruction problem. Experiment 13A is the no-filter foundation. Experiment 13B applies three eligibility thresholds to the exact same 45 clipped strategies, so every treatment has a deterministic paired baseline.
 
-The best 13B P95 is `0.037116494` from `AllClusterMeans`; all three epsilon variants tie. The best median is `0.0083231162` at epsilon `1e-2`, and the best node-max P95 is `0.10879421` at epsilon `1e-4`, both from `DiverseCoverageHardRepairTwoPhase + CandidateBudget48`.
+The answer is family-specific. Eligibility releases measurable construction population, but more capacity released does not monotonically produce better validation outcomes. `BroadMeanFinishRepair` receives a large rescue; several other families show small, mixed, or adverse changes. Epsilon is therefore a treatment intensity, not the primary contest and not a globally selected winner.
 
-`UnresolvedOnly` is a targeted rescue, not a global free win. Across the 45 matched clipped strategies the median P95 change is effectively zero at every epsilon. The negative mean is driven by `BroadMeanFinishRepair`, whose P95 falls from roughly `0.087–0.091` in 13A to `0.046–0.050` in 13B. Other families include both gains and regressions.
+## Experiment 13A Foundation: What the Unfiltered Grid Established
 
-No epsilon wins globally. `1e-2` has the lowest across-strategy median P95 by a very small margin, `1e-3` gives the best median P95 inside `DiverseCoverageHardRepair`, and `1e-4` contains the best node-max row. Epsilon changes the population used to build later atoms, so the final quality curves are legitimately non-monotonic.
+Layer-wise clipping is the clearest global result: `LayerClip0To1` improves validation P95 in all `45/45` matched pairs. CandidateBudget48 and TwoPhase have smaller mixed effects whose signs change by construction family. Those conclusions remain part of the final experiment rather than being replaced by 13B.
 
-7 13B rows share the best strict-perfect rate of `19.502%`. In the completed run, five are `BroadMeanFinishRepairTwoPhase`; the two scientifically stronger rows are `DiverseCoverageHardRepairInterleaved + CandidateBudget48` at `1e-3` and `1e-4`, because they retain that exact-finish rate with P95 near `0.040–0.041`.
+| 13A co-primary metric | Better | Best no-filter value | Strategy |
+| --- | --- | ---: | --- |
+| Median RMSE | lower | 0.008189681 | `x13a_diverse_coverage_hard_repair_two_phase_candidate_budget48_layer_clip0_to1` |
+| Strict-perfect LFO rate | higher | 1.246% | `x13a_common_case_repair_candidate_budget24_final_clip_only` |
+| P95 RMSE | lower | 0.037600964 | `x13a_all_cluster_means_null_layer_clip0_to1` |
+| Node-max error P95 | lower | 0.10100925 | `x13a_diverse_coverage_hard_repair_two_phase_candidate_budget48_layer_clip0_to1` |
 
-| Co-primary validation metric | Better | Best 13B value | Strategy | Eligibility epsilon |
+The 13A four-objective frontier contains `3` strategies with distinct jobs: simple cluster prototypes lead P95, diverse-coverage hard repair leads median and node-max quality, and the Experiment 12 anchor family supplies the strongest thresholded finishing behavior.
+
+![Experiment 13A no-filter four-metric quality frontier](images/experiment_13/final/experiment13a_quality_frontier.png)
+
+### Metric tension and strict-tolerance sensitivity
+
+Median RMSE, P95 RMSE, and node-max P95 share substantial ordering information, while strict-perfect rate remains a distinct thresholded signal. The 13A replay at four tolerance tuples is retained below; it changes the strict-perfect definition only and does not alter continuous RMSE metrics.
+
+| 13A max-absolute tolerance | RMSE tolerance | Best strict-perfect rate | Median row rate |
+| ---: | ---: | ---: | ---: |
+| `1e-2` | `1e-03` | 34.330% | 0.872% |
+| `1e-3` | `1e-04` | 9.844% | 0.872% |
+| `1e-4` | `1e-05` | 1.246% | 0.810% |
+| `1e-5` | `1e-06` | 1.246% | 0.810% |
+
+
+![Experiment 13A strict-perfect tolerance sensitivity](images/experiment_13/final/experiment13a_strict_threshold_sensitivity.png)
+
+![Experiment 13A co-primary metric rank agreement](images/experiment_13/final/experiment13a_metric_agreement.png)
+
+### Matched policy effects and construction-family interactions
+
+| 13A matched lever | Metric | Improved / tied / worsened | Median right-minus-left delta |
+| --- | --- | ---: | ---: |
+| LayerClip0To1 vs FinalClipOnly | Median RMSE | 44 / 0 / 1 | -0.0025784886 |
+| LayerClip0To1 vs FinalClipOnly | Strict-perfect LFO rate | 0 / 45 / 0 | +0.000 pp |
+| LayerClip0To1 vs FinalClipOnly | P95 RMSE | 45 / 0 / 0 | -0.0069147758 |
+| LayerClip0To1 vs FinalClipOnly | Node-max error P95 | 45 / 0 / 0 | -0.030743808 |
+| CandidateBudget48 vs CandidateBudget24 | Median RMSE | 30 / 4 / 8 | -0.00059053162 |
+| CandidateBudget48 vs CandidateBudget24 | Strict-perfect LFO rate | 0 / 36 / 6 | +0.000 pp |
+| CandidateBudget48 vs CandidateBudget24 | P95 RMSE | 25 / 4 / 13 | -0.00043479912 |
+| CandidateBudget48 vs CandidateBudget24 | Node-max error P95 | 26 / 4 / 12 | -0.0049522445 |
+| TwoPhase vs Interleaved | Median RMSE | 32 / 0 / 4 | -0.0021913247 |
+| TwoPhase vs Interleaved | Strict-perfect LFO rate | 0 / 36 / 0 | +0.000 pp |
+| TwoPhase vs Interleaved | P95 RMSE | 21 / 0 / 15 | -0.0011320245 |
+| TwoPhase vs Interleaved | Node-max error P95 | 25 / 0 / 11 | -0.0075820833 |
+
+![Experiment 13A family-specific policy interactions](images/experiment_13/final/experiment13a_factor_interactions.png)
+
+| 13A construction family | Rows | Median RMSE | Strict-perfect | P95 RMSE | Node-max P95 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| AlignedMedianGlobalRepair | 8 | 0.022446662 | 0.810% | 0.055761877 | 0.17325836 |
+| BroadMeanFinishRepair | 8 | 0.042417876 | 0.810% | 0.091810528 | 0.333869 |
+| BroadMeanGlobalRepair | 8 | 0.023221108 | 0.810% | 0.050120478 | 0.15693868 |
+| BroadMeanHardRepair | 8 | 0.022763863 | 0.810% | 0.049870443 | 0.15861025 |
+| ClusterMeanGlobalRepair | 8 | 0.014407272 | 0.810% | 0.045683289 | 0.13539042 |
+| ClusterMeanHardRepair | 8 | 0.014380157 | 0.810% | 0.044974005 | 0.13437615 |
+| DiverseCoverageHardRepair | 8 | 0.0097592035 | 0.810% | 0.043419212 | 0.12488288 |
+| DominantDirectionGlobalRepair | 8 | 0.023319611 | 0.810% | 0.061586564 | 0.20333387 |
+| Experiment12Anchor | 12 | 0.036774285 | 1.028% | 0.053392088 | 0.16432059 |
+| PurePrototype | 6 | 0.018899045 | 0.810% | 0.045169635 | 0.13519917 |
+| TrimmedMeanGlobalRepair | 8 | 0.013810951 | 0.810% | 0.047824396 | 0.15417859 |
+
+### Atom capacity, residual depth, and mechanism diagnostics
+
+The largest typical tail gain arrives when moving from one to two active atoms per residual layer. Later atoms have diminishing but still positive value for most rows. Training P95 also continues falling through residual layer 16, so 13A supports the retained W8D16 contract while motivating a separate head-budget ablation.
+
+| Added active atom | Median 13A validation-P95 delta | 13A rows improved |
+| ---: | ---: | ---: |
+| 2 | -0.018925648 | 86/90 |
+| 3 | -0.007343933 | 89/90 |
+| 4 | -0.0029466916 | 80/90 |
+| 5 | -0.0021641478 | 70/90 |
+| 6 | -0.0012801718 | 71/90 |
+| 7 | -0.00083152018 | 72/90 |
+
+![Experiment 13A partial-codebook progression](images/experiment_13/final/experiment13a_partial_codebook.png)
+
+![Experiment 13A residual-layer progression](images/experiment_13/final/experiment13a_residual_layers.png)
+
+Overshoot, effective no-op use, and dead atoms correlate with worse validation tails, while non-zero residual-gain use correlates with better tails. These are mechanism diagnostics, not substitutes for matched interventions.
+
+![Experiment 13A decoder and dictionary diagnostics](images/experiment_13/final/experiment13a_diagnostics.png)
+
+### Eligibility gate and bounded scaling ablation
+
+The automatic 13A eligibility gate did not pass: the best early/middle median reconstructed fraction was about `2.054%`, below the required `5%`, despite satisfying retired-energy limits. That failure is why the three 13B thresholds are exploratory treatments rather than a frozen selector output.
+
+| 50%-minus-100% training comparison | Median delta | 50% better / 100% better / ties |
+| --- | ---: | ---: |
+| Median RMSE | +0.002360452 | 13 / 26 / 0 |
+| Strict-perfect LFO rate | +0.374 pp | 33 / 6 / 0 |
+| P95 RMSE | +0.0011711642 | 17 / 22 / 0 |
+| Node-max error P95 | -0.0025390834 | 27 / 12 / 0 |
+
+
+The scaling comparison remains a non-random 39-row prefix and excludes runtime. It is useful as a bounded sensitivity check, not a general data-scaling law.
+
+## Experiment 13B: How Much Capacity Was Freed?
+
+The no-filter 13A baseline retires no LFOs from construction. For 13B, capacity is measured as the mean training-population fraction excluded after layers 1–15, because those exclusions affect at least one later residual layer. Layer-16 coverage is reported separately: it describes endpoint eligibility but frees no remaining construction.
+
+| Population policy | Treatment epsilon | Mean future-layer population freed | Layer-8 population freed | Layer-16 endpoint coverage |
+| --- | ---: | ---: | ---: | ---: |
+| No eligibility filter (13A) | â€” | 0.000% | 0.000% | 0.000% |
+| UnresolvedOnly | `0.01` | 1.775% | 1.805% | 2.302% |
+| UnresolvedOnly | `0.001` | 1.755% | 1.775% | 2.227% |
+| UnresolvedOnly | `0.0001` | 1.757% | 1.775% | 2.227% |
+
+![Eligibility capacity released through depth by family](images/experiment_13/final/eligibility_capacity_through_depth.png)
+
+Family-specific depth trajectories are essential. The all-row median is nearly flat because many strategies retire few LFOs, while finish-oriented and diversity-aware families create much larger regimes.
+
+## Paired Validation Effects Versus No Filtering
+
+Each cell and count below is 13B minus its exact `AllResiduals + LayerClip0To1` 13A counterpart. Negative deltas improve RMSE metrics; positive deltas improve strict-perfect rate.
+
+| Treatment epsilon | Metric | Improved / tied / worsened vs exact no-filter baseline | Median paired delta |
+| ---: | --- | ---: | ---: |
+| `0.01` | Median RMSE | 27 / 0 / 18 | -7.4505806e-09 |
+| `0.01` | Strict-perfect LFO rate | 6 / 39 / 0 | +0.000 pp |
+| `0.01` | P95 RMSE | 23 / 1 / 21 | -3.7252903e-09 |
+| `0.01` | Node-max error P95 | 25 / 1 / 19 | -5.2154064e-08 |
+| `0.001` | Median RMSE | 14 / 15 / 16 | +0 |
+| `0.001` | Strict-perfect LFO rate | 6 / 39 / 0 | +0.000 pp |
+| `0.001` | P95 RMSE | 18 / 14 / 13 | +0 |
+| `0.001` | Node-max error P95 | 14 / 14 / 17 | +0 |
+| `0.0001` | Median RMSE | 14 / 15 / 16 | +0 |
+| `0.0001` | Strict-perfect LFO rate | 7 / 38 / 0 | +0.000 pp |
+| `0.0001` | P95 RMSE | 16 / 14 / 15 | +0 |
+| `0.0001` | Node-max error P95 | 15 / 14 / 16 | +0 |
+
+![Four-metric eligibility effects versus matched no-filter baselines](images/experiment_13/final/eligibility_paired_effects_all_metrics.png)
+
+## Does Freed Capacity Improve the Rest?
+
+The capacity-to-quality comparison puts the experiment's mechanism on the x-axis and its paired validation consequence on the y-axis. The global rank correlations are descriptive across intentionally different families; the paired point for each strategy remains the stronger unit of evidence.
+
+| Paired validation benefit | Spearman Ï with mean future-layer population freed | Reading |
+| --- | ---: | --- |
+| Median RMSE | -0.003 | little global monotonic relationship; family confounding remains |
+| Strict-perfect LFO rate | +0.489 | more released capacity tends to align with more benefit; family confounding remains |
+| P95 RMSE | +0.239 | more released capacity tends to align with more benefit; family confounding remains |
+| Node-max error P95 | +0.199 | little global monotonic relationship; family confounding remains |
+
+![Future-layer capacity freed versus paired validation benefit](images/experiment_13/final/eligibility_capacity_vs_quality.png)
+
+## Strict-Perfect Regime and Post-Filter Interactions
+
+The best 13B strict-perfect rate is `19.502%`. Seven rows reach the same 313-of-1605 validation count, showing a discrete finishing regime rather than a gentle shift in average error. The strongest balanced exact-finish candidates come from `DiverseCoverageHardRepairInterleaved + CandidateBudget48`; finish-repair rows reach the same rate with much worse median and tail quality.
+
+![Experiment 13B strict-perfect regime versus tail quality](images/experiment_13/final/strict_perfect_regime.png)
+
+CandidateBudget48 remains the more repeatable post-filter lever. TwoPhase still changes sign by family and should not be promoted to a universal schedule rule.
+
+![Experiment 13B candidate-budget and schedule interactions](images/experiment_13/final/experiment13b_factor_effects.png)
+
+The generated interaction audit contains `90` family-by-epsilon summaries.
+
+## Final Cross-Phase Interpretation
+
+| Final co-primary metric | Better | Best 13B value | Strategy | Epsilon |
 | --- | --- | ---: | --- | ---: |
 | Median RMSE | lower | 0.0083231162 | `x13b_diverse_coverage_hard_repair_two_phase_candidate_budget48_layer_clip0_to1_epsilon_1e_02` | `0.01` |
 | Strict-perfect LFO rate | higher | 19.502% | `x13b_broad_mean_finish_repair_two_phase_candidate_budget24_layer_clip0_to1_epsilon_1e_02` | `0.01` |
 | P95 RMSE | lower | 0.037116494 | `x13b_all_cluster_means_null_layer_clip0_to1_epsilon_1e_02` | `0.01` |
 | Node-max error P95 | lower | 0.10879421 | `x13b_diverse_coverage_hard_repair_two_phase_candidate_budget48_layer_clip0_to1_epsilon_1e_04` | `0.0001` |
 
-![Experiment 13B co-primary quality frontier](images/experiment_13/final/experiment13b_quality_frontier.png)
+The 13B four-objective frontier contains `9` rows. `AllClusterMeans` remains the simplest low-P95 option. `DiverseCoverageHardRepairTwoPhase + CandidateBudget48` supplies the strongest median/node-max tradeoff, while the interleaved CandidateBudget48 variant provides the most credible high strict-perfect alternative.
 
-## Why UnresolvedOnly Helps Some Families
+![Experiment 13B four-metric quality frontier](images/experiment_13/final/experiment13b_quality_frontier.png)
 
-`AllResiduals` lets every training residual continue influencing every later atom. `UnresolvedOnly` removes a curve from later construction after its maximum point error falls below the eligibility epsilon. This is useful when nearly solved curves would otherwise monopolize finish-oriented proposals, but it can remove stabilizing mass from families whose broad prototypes benefit from the full population.
+The partial-codebook result remains consistent with 13A: most tail improvement arrives early, but later atoms continue to help enough that shrinking W8 requires a dedicated contract-changing ablation.
 
-The paired result is therefore skewed rather than uniform. The median strategy is unchanged, while a handful of formerly pathological finish-repair rows improve dramatically. Win/loss counts and family medians are more informative than the overall mean.
+![Experiment 13B partial-codebook progression](images/experiment_13/final/experiment13b_partial_codebook.png)
 
-| Epsilon | P95 improved / tied / worse vs paired 13A | Median P95 delta | Mean P95 delta | Strict-perfect improved / tied / worse |
-| ---: | ---: | ---: | ---: | ---: |
-| `0.01` | 23 / 1 / 21 | -3.7252903e-09 | -0.0036046127 | 6 / 39 / 0 |
-| `0.001` | 18 / 14 / 13 | +0 | -0.0034215018 | 6 / 39 / 0 |
-| `0.0001` | 16 / 14 / 15 | +0 | -0.0033634125 | 7 / 38 / 0 |
+## Recommendations
 
-![Family-level UnresolvedOnly versus AllResiduals P95 effects](images/experiment_13/final/unresolved_only_family_effect.png)
+1. Keep `LayerClip0To1`; its 45/45 matched P95 result is the strongest general Experiment 13 conclusion.
+2. Treat eligibility as a family-specific intervention. Use the paired capacity-effect table, not an epsilon-only leaderboard.
+3. Keep `AllClusterMeans` as the simple low-P95 candidate and the `DiverseCoverageHardRepair + CandidateBudget48` variants as the balanced frontier candidates.
+4. Preserve CandidateBudget48 only where its family-specific gain justifies doubled offline search; keep schedule coupled to family.
+5. Do not shrink W8D16 or infer deployed latency changes from these offline construction diagnostics.
 
-### Family-specific paired effects
-
-| Construction family | Epsilon 1e-2 | Epsilon 1e-3 | Epsilon 1e-4 | Interpretation |
-| --- | ---: | ---: | ---: | --- |
-| AlignedMedianGlobalRepair | +0.000070 (2 wins) | +0.000000 (0 wins) | +0.000000 (0 wins) | mixed or strategy-dependent |
-| BroadMeanFinishRepair | -0.041190 (4 wins) | -0.041371 (4 wins) | -0.041141 (4 wins) | large repeatable rescue |
-| BroadMeanGlobalRepair | -0.000000 (3 wins) | +0.000000 (0 wins) | +0.000000 (0 wins) | mixed or strategy-dependent |
-| BroadMeanHardRepair | +0.000034 (2 wins) | +0.000000 (1 wins) | +0.000000 (1 wins) | mixed or strategy-dependent |
-| ClusterMeanGlobalRepair | +0.000000 (1 wins) | +0.000000 (1 wins) | +0.000000 (1 wins) | mixed or strategy-dependent |
-| ClusterMeanHardRepair | +0.000764 (1 wins) | +0.000778 (0 wins) | +0.000778 (0 wins) | consistent regression |
-| DiverseCoverageHardRepair | +0.001105 (0 wins) | +0.000377 (2 wins) | +0.000397 (1 wins) | consistent regression |
-| DominantDirectionGlobalRepair | -0.002772 (3 wins) | -0.000878 (2 wins) | -0.000878 (2 wins) | consistent but smaller improvement |
-| Experiment12Anchor | -0.000458 (5 wins) | -0.000458 (6 wins) | -0.000458 (5 wins) | consistent but smaller improvement |
-| PurePrototype | -0.000024 (2 wins) | +0.000000 (1 wins) | +0.000000 (1 wins) | mixed or strategy-dependent |
-| TrimmedMeanGlobalRepair | +0.003657 (0 wins) | +0.003494 (1 wins) | +0.003494 (1 wins) | consistent regression |
-
-## The Three-Epsilon Sweep
-
-The epsilon value is a construction policy, not a post-hoc scoring threshold. A looser epsilon can retire more curves early, but because the remaining curves then define different atoms, a looser epsilon does not guarantee a monotonic improvement or regression in final validation quality.
-
-| Eligibility epsilon | Median RMSE | Strict-perfect rate | P95 RMSE | Node-max P95 | Median LFO population retired after layer 16 |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| `0.01` | 0.019825101 | 0.810% | 0.046954501 | 0.14125767 | 2.302% |
-| `0.001` | 0.020437574 | 0.810% | 0.047014061 | 0.14065427 | 2.227% |
-| `0.0001` | 0.020436043 | 0.810% | 0.047084909 | 0.14228487 | 2.227% |
-
-![Family-specific Experiment 13B epsilon sensitivity](images/experiment_13/final/epsilon_family_sensitivity.png)
-
-![Eligibility population retired by residual-layer depth](images/experiment_13/final/eligibility_population_progression.png)
-
-Typical retirement is modest: the median strategy has only about two percent of training LFOs removed by layer 16. The mean and maximum are much larger because `BroadMeanFinishRepair` and `DiverseCoverageHardRepair` create high-retirement regimes. This is why one aggregate retirement percentage would conceal the mechanism.
-
-## Strict-Perfect Finishing Is a Distinct Regime
-
-The original strict-perfect definition remains RMSE `<= 1e-6` and maximum point error `<= 1e-5`. It is deliberately much stricter than the 13B eligibility epsilons. The 13B jump to 19.5% is not a gentle shift in average RMSE; seven rows land on exactly the same 313-of-1605 validation count.
-
-A validation-only forensic replay of saved codebooks confirmed that a representative `DiverseCoverageHardRepair` row and a representative `BroadMeanFinishRepair` row finish the exact same 313 LFOs. The ordinary 13-of-1605 exact set is a subset. Of the 313, 299 are analysis-labeled `continuous` curves and 14 are `discontinuous`; only seven are bit-exact, while the rest satisfy the strict numerical tolerance. This topology label is post-hoc analysis only and does not enter construction or deployed runtime.
-
-| Strategy | Family | Epsilon | Strict-perfect | Median RMSE | P95 RMSE |
-| --- | --- | ---: | ---: | ---: | ---: |
-| `x13b_diverse_coverage_hard_repair_interleaved_candidate_budget48_layer_clip0_to1_epsilon_1e_03` | DiverseCoverageHardRepair | `0.001` | 19.502% | 0.010298005 | 0.040146742 |
-| `x13b_diverse_coverage_hard_repair_interleaved_candidate_budget48_layer_clip0_to1_epsilon_1e_04` | DiverseCoverageHardRepair | `0.0001` | 19.502% | 0.010087625 | 0.041154746 |
-| `x13b_broad_mean_finish_repair_two_phase_candidate_budget24_layer_clip0_to1_epsilon_1e_02` | BroadMeanFinishRepair | `0.01` | 19.502% | 0.019825101 | 0.046045594 |
-| `x13b_broad_mean_finish_repair_two_phase_candidate_budget48_layer_clip0_to1_epsilon_1e_02` | BroadMeanFinishRepair | `0.01` | 19.502% | 0.019046294 | 0.046858694 |
-| `x13b_broad_mean_finish_repair_two_phase_candidate_budget48_layer_clip0_to1_epsilon_1e_03` | BroadMeanFinishRepair | `0.001` | 19.502% | 0.020115115 | 0.047441408 |
-| `x13b_broad_mean_finish_repair_two_phase_candidate_budget48_layer_clip0_to1_epsilon_1e_04` | BroadMeanFinishRepair | `0.0001` | 19.502% | 0.020115115 | 0.047441408 |
-| `x13b_broad_mean_finish_repair_two_phase_candidate_budget24_layer_clip0_to1_epsilon_1e_04` | BroadMeanFinishRepair | `0.0001` | 19.502% | 0.020860437 | 0.047693208 |
-
-![Strict-perfect finishing regime versus validation tail error](images/experiment_13/final/strict_perfect_regime.png)
-
-The separate complete-13A report retains the replayed `1e-2`, `1e-3`, `1e-4`, and `1e-5` strict-perfect tolerance sensitivity. Those toggles are not mixed into this final cross-phase frontier because the replay artifact covers 13A rows only.
-
-## Budget and Schedule
-
-CandidateBudget48 is the more repeatable 13B lever: it improves P95 in 13/21, 15/21, and 16/21 matched pairs as epsilon tightens. TwoPhase is not a global winner; it improves only 8/18 matched schedule pairs at each epsilon and has a slightly worse median P95 delta. Its strong showing in the best `DiverseCoverage` rows is a family interaction, not a universal schedule rule.
-
-| Lever | Epsilon | Right-hand policy | P95 improves / loses | Median P95 delta |
-| --- | ---: | --- | ---: | ---: |
-| utility candidate budget | `0.01` | CandidateBudget48 | 13 / 8 | -0.00016926974 |
-| utility candidate budget | `0.001` | CandidateBudget48 | 15 / 6 | -0.00090221688 |
-| utility candidate budget | `0.0001` | CandidateBudget48 | 16 / 5 | -0.00069680437 |
-| layer schedule | `0.01` | TwoPhase | 8 / 10 | +0.00047559105 |
-| layer schedule | `0.001` | TwoPhase | 8 / 10 | +0.00033439882 |
-| layer schedule | `0.0001` | TwoPhase | 8 / 10 | +0.00044621713 |
-
-![Experiment 13B budget and schedule effects](images/experiment_13/final/experiment13b_factor_effects.png)
-
-## Partial Codebook and Residual Depth
-
-The first two active atoms do most of the tail work: the across-row median P95 drops from `0.079035` with one active atom to `0.059828` with two. Later atoms still matter, but the median step from six to seven is only `-0.001250`. This supports the current ordering logic while also identifying a future head-budget ablation; it does not by itself authorize shrinking W8.
-
-![Experiment 13B partial-codebook progression by epsilon](images/experiment_13/final/experiment13b_partial_codebook.png)
-
-## Runtime and Deployment Boundary
-
-All timings are offline experiment work. Every row preserves the same deployed 193-output W8D16 interface, Beam4 encoding, phase and residual gain, and topology-free runtime contract. The optimized 13B rows are somewhat faster to construct than 13A on the median, but this is descriptive same-run evidence, not a claim that filtering reduces deployed inference cost.
-
-![Complete Experiment 13 same-run offline timing](images/experiment_13/final/complete_run_offline_timing.png)
-
-## Practical Takeaways
-
-1. Keep `LayerClip0To1`; Experiment 13B correctly avoided spending another 45 rows on the inferior clipping branch.
-2. Use `AllClusterMeans` when the primary objective is the lowest P95 with a simple prototype-only construction.
-3. Use `DiverseCoverageHardRepairTwoPhase + CandidateBudget48` as the balanced low-median/low-node-max candidate; retain epsilon as a small family-specific choice rather than a global constant.
-4. Preserve `DiverseCoverageHardRepairInterleaved + CandidateBudget48` at epsilon `1e-3` as the strongest exact-finish candidate: it reaches 19.5% strict-perfect without the large median/tail penalty of finish-repair rows.
-5. Do not generalize `UnresolvedOnly` to every construction family. Its value is largest where the unfiltered family was visibly pathological.
-6. If the deployed head budget must be reduced, run a dedicated atom-count/depth ablation. Partial-codebook curves are motivation, not proof of a smaller contract.
-
-## Method Notes
+## Method and Audit Boundaries
 
 Source run: `../artifacts/experiment_13/strategy_grid_train50_val100_exactopt_v1`.
 
-The automatic 13A selector recorded `selection_passed=False`. The three 13B epsilons were an explicit exploratory sweep; none is relabeled as the selector's frozen choice.
+The automatic selector recorded `selection_passed=False`. No tested epsilon is relabeled as a frozen selector choice.
 
-The report uses the four co-primary validation metrics separately: median RMSE, strict-perfect LFO rate, P95 RMSE, and node-max error P95. Pareto membership means no other row is at least as good on all four and strictly better on at least one.
+All paired eligibility comparisons use the exact 45 `LayerClip0To1` 13A rows. The baseline is labeled `No eligibility filter (13A)` and is never represented as epsilon zero. The capacity measure excludes layer 16 from future-layer savings. Validation quality retains four separate co-primary metrics.
 
-`AllResiduals` versus `UnresolvedOnly` comparisons use only the 45 matched `LayerClip0To1` 13A rows. Epsilon comparisons use matched construction strategies inside 13B. Runtime comparisons are limited to same-run offline diagnostics.
+All timing is offline experiment work. Every row preserves Beam4, PhaseAndResidualGain, 97 control points, W8D16, and 193 deployed prediction outputs.
+
+![Complete Experiment 13 same-run offline timing](images/experiment_13/final/complete_run_offline_timing.png)
 
 Configuration fingerprint: `901df3d8ed4e1287a023e2a7a8abe3c05070da1a248f81e205688af13c229dd1`.
