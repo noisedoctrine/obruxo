@@ -89,7 +89,7 @@ def analyze_13a_strategy_grid(
     from .strategy_grid import experiment13a_specs, load_epsilon_selection, validate_completed_13a
 
     source_run = Path(run_dir).resolve()
-    manifest, _ = validate_completed_13a(source_run)
+    manifest, _ = validate_completed_13a(source_run, allow_historical_configuration=True)
     selection_path = source_run / "epsilon_selection.json"
     if not selection_path.is_file():
         raise ValueError("complete 13A reporting requires epsilon selection to be attempted first")
@@ -130,8 +130,8 @@ def analyze_complete_strategy_grid(
     )
 
     source_run = Path(run_dir).resolve()
-    manifest, _ = validate_completed_13a(source_run)
-    validate_completed_13b(source_run)
+    manifest, _ = validate_completed_13a(source_run, allow_historical_configuration=True)
+    validate_completed_13b(source_run, allow_historical_configuration=True)
     selection = load_epsilon_selection(
         source_run / "epsilon_selection.json",
         expected_run_identity=str(manifest["experiment13a_run_identity"]),

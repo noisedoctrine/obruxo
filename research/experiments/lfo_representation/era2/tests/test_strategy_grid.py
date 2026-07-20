@@ -199,6 +199,25 @@ class StrategyGridGateTests(unittest.TestCase):
             with self.assertRaisesRegex(grid.PhaseGateError, "run identity"):
                 grid.validate_completed_13a(run_dir)
 
+    def test_historical_configuration_is_report_only_opt_in(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp)
+            _write_completed_13a(run_dir)
+            manifest_path = run_dir / "manifest.json"
+            manifest = json.loads(manifest_path.read_text())
+            manifest["configuration_fingerprint"] = "historical-fingerprint"
+            for row in manifest["phases"]["13A"]["rows"]:
+                row["configuration_fingerprint"] = "historical-fingerprint"
+            manifest_path.write_text(json.dumps(manifest))
+
+            with self.assertRaisesRegex(grid.PhaseGateError, "configuration fingerprint"):
+                grid.validate_completed_13a(run_dir)
+            validated, _ = grid.validate_completed_13a(
+                run_dir,
+                allow_historical_configuration=True,
+            )
+            self.assertEqual(validated["configuration_fingerprint"], "historical-fingerprint")
+
     def test_completed_13a_rejects_inconsistent_status_and_rows(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             run_dir = Path(tmp)

@@ -55,7 +55,11 @@ class StrategyGridPartialReportTests(unittest.TestCase):
             self.assertIn("Node-max error P95", text)
 
             html = html_report.read_text(encoding="utf-8")
-            self.assertIn('qs("#status-label").textContent = isComplete13A ? "13A COMPLETE" : "PROVISIONAL"', html)
+            self.assertIn(
+                'qs("#status-label").textContent = isFinal ? "EXPERIMENT COMPLETE" : '
+                '(isComplete13A ? "13A COMPLETE" : "PROVISIONAL")',
+                html,
+            )
             self.assertIn("Source coverage", html)
             self.assertIn("Layer normalization", html)
             self.assertIn("Candidate budget", html)
