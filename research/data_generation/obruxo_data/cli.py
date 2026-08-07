@@ -55,6 +55,26 @@ def build_parser() -> argparse.ArgumentParser:
     apply_profile.add_argument("--profile", required=True)
     apply_profile.add_argument("--profiles", default=str(DEFAULT_PROFILES))
     _add_output(apply_profile)
+
+    midi = commands.add_parser("midi", help="author and validate Standard MIDI Files")
+    midi_commands = midi.add_subparsers(dest="midi_command", required=True)
+    midi_validate = midi_commands.add_parser("validate", help="validate a MIDI performance")
+    midi_validate.add_argument("performance")
+    midi_validate.add_argument("--json", action="store_true")
+    create_note = midi_commands.add_parser("create-note", help="create one fixed-tempo note")
+    create_note.add_argument("--pitch", type=int, required=True)
+    create_note.add_argument("--velocity", type=int, required=True)
+    create_note.add_argument("--beats", type=float, required=True)
+    create_note.add_argument("--bpm", type=float, default=120)
+    create_note.add_argument("--ticks-per-beat", type=int, default=480)
+    create_note.add_argument("--end-beats", type=float)
+    _add_output(create_note)
+    midi_profile = midi_commands.add_parser("apply-profile", help="validate or explicitly simplify a MIDI profile")
+    midi_profile.add_argument("performance")
+    midi_profile.add_argument("--profile", required=True)
+    midi_profile.add_argument("--profiles", default=str(DEFAULT_PROFILES))
+    midi_profile.add_argument("--simplify", action="store_true")
+    _add_output(midi_profile)
     return parser
 
 
@@ -106,11 +126,47 @@ def _run_vital(args: argparse.Namespace) -> int:
     raise AssertionError(f"unhandled Vital command {args.vital_command}")
 
 
+def _print_report(report: Any, *, as_json: bool) -> None:
+    if as_json:
+        print(json.dumps(report.to_dict(), indent=2, sort_keys=True))
+        return
+    print("valid" if report.valid else "invalid")
+    for diagnostic in report.diagnostics:
+        location = diagnostic.parameter or diagnostic.pointer or "performance"
+        print(f"{diagnostic.severity.value}: {location}: {diagnostic.message}")
+
+
+def _run_midi(args: argparse.Namespace) -> int:
+    from .midi import Performance, PerformanceProfile
+
+    if args.midi_command == "validate":
+        report = Performance.from_midi(args.performance).validate()
+        _print_report(report, as_json=args.json)
+        return 0 if report.valid else 2
+    if args.midi_command == "create-note":
+        performance = Performance(ticks_per_beat=args.ticks_per_beat, bpm=args.bpm)
+        duration = round(args.beats * args.ticks_per_beat)
+        performance.add_note(pitch=args.pitch, velocity=args.velocity, start_tick=0, duration_ticks=duration)
+        if args.end_beats is not None:
+            performance.end_tick = round(args.end_beats * args.ticks_per_beat)
+        performance.save_midi(_output_path(args.output, args.force))
+        return 0
+    if args.midi_command == "apply-profile":
+        performance = Performance.from_midi(args.performance)
+        profile = PerformanceProfile.load(args.profiles, args.profile)
+        performance.apply_profile(profile, violations="remove" if args.simplify else "error")
+        performance.save_midi(_output_path(args.output, args.force))
+        return 0
+    raise AssertionError(f"unhandled MIDI command {args.midi_command}")
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         if args.command == "vital":
             return _run_vital(args)
+        if args.command == "midi":
+            return _run_midi(args)
         raise AssertionError(f"unhandled command {args.command}")
     except (ObruxoDataError, OSError, ValueError, KeyError) as error:
         if isinstance(error, ValidationError):
