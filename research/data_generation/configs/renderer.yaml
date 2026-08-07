@@ -1,0 +1,14 @@
+version: 1
+renderer_id: vital-vst3-dawdreamer-0.8.3
+backend: dawdreamer
+plugin_path: null
+accepted_plugin_sha256: []
+buffer_size: 128
+capabilities:
+  notes: true
+  polyphony: true
+  tempo_changes: false
+  pitch_bend: false
+  channel_pressure: false
+  control_changes: []
+  max_channels: 16
