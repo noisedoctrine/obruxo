@@ -1,0 +1,72 @@
+{
+  "classified_migration_only": [
+    "compressor_low_band_unused",
+    "filter_1_osc1_input",
+    "filter_1_osc2_input",
+    "filter_1_osc3_input",
+    "filter_1_sample_input",
+    "filter_2_osc1_input",
+    "filter_2_osc2_input",
+    "filter_2_osc3_input",
+    "filter_2_sample_input",
+    "filter_fx_filter_input",
+    "filter_fx_osc1_input",
+    "filter_fx_osc2_input",
+    "filter_fx_osc3_input",
+    "filter_fx_sample_input",
+    "sub_direct_out",
+    "sub_level",
+    "sub_on",
+    "sub_pan",
+    "sub_transpose",
+    "sub_transpose_quantize",
+    "sub_tune",
+    "sub_waveform"
+  ],
+  "default_mismatches": [],
+  "runtime_control_count": 772,
+  "runtime_only": [],
+  "source": {
+    "commit_date": "2022-04-20T16:53:39+01:00",
+    "commit_subject": "Update README.md",
+    "repository": "https://github.com/mtytel/vital",
+    "revision": "636ca0ef517a4db087a6a08a6a8a5e704e21f836"
+  },
+  "source_only": [
+    "compressor_low_band_unused",
+    "filter_1_osc1_input",
+    "filter_1_osc2_input",
+    "filter_1_osc3_input",
+    "filter_1_sample_input",
+    "filter_2_osc1_input",
+    "filter_2_osc2_input",
+    "filter_2_osc3_input",
+    "filter_2_sample_input",
+    "filter_fx_filter_input",
+    "filter_fx_osc1_input",
+    "filter_fx_osc2_input",
+    "filter_fx_osc3_input",
+    "filter_fx_sample_input",
+    "sub_direct_out",
+    "sub_level",
+    "sub_on",
+    "sub_pan",
+    "sub_transpose",
+    "sub_transpose_quantize",
+    "sub_tune",
+    "sub_waveform"
+  ],
+  "source_registered_count": 794,
+  "unexplained_drift": false,
+  "unexplained_source_only": [],
+  "unparsed_defaults": [
+    {
+      "name": "voice_override",
+      "source_default": "VoiceHandler::kKill"
+    },
+    {
+      "name": "voice_priority",
+      "source_default": "VoiceHandler::kRoundRobin"
+    }
+  ]
+}

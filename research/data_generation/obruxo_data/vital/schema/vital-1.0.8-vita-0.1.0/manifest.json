@@ -1,0 +1,17 @@
+{
+  "engine_identity": {
+    "runtime_synth_version": "99999.9.9",
+    "sampler_policy": "fixed deterministic load_init_preset payload committed in init.vital",
+    "vita_revision": "342bc90aca7ab2b6e7a487f8e54a0158a5ccab76",
+    "vita_version": "0.1.0",
+    "vital_source_revision": "636ca0ef517a4db087a6a08a6a8a5e704e21f836"
+  },
+  "init_preset": "init.vital",
+  "init_preset_sha256": "026ce213403d54b3177d2611a32454a961640ff1d7d3465bae73e0bd9e398c41",
+  "modulation_vocab": "modulation_vocab.json",
+  "parameter_atlas": "parameter_inventory.json",
+  "reconciliation_report": "reconciliation.json",
+  "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+  "vita_revision": "342bc90aca7ab2b6e7a487f8e54a0158a5ccab76",
+  "vital_revision": "636ca0ef517a4db087a6a08a6a8a5e704e21f836"
+}
