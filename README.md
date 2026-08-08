@@ -25,6 +25,7 @@ The system is intended to remain fully local and open source: no cloud dependenc
 - [Project brief](research/PROJECT_BRIEF.md)
 - [Modelling research tracker](research/modelling/RESEARCH_TRACKER.md)
 - [Model architecture](research/modelling/MODEL_ARCHITECTURE.md)
+- [Training-data generation foundation](research/data_generation/README.md)
 - [Vital preset schema](research/vital/PRESET_SCHEMA.md)
 
 ## Community

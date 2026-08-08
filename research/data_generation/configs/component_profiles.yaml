@@ -1,0 +1,25 @@
+version: 1
+profiles:
+  one_osc_one_lfo:
+    oscillators: {allow: [1], max_active: 1}
+    sampler: {allow: false}
+    filters: {allow: []}
+    lfos: {allow: [1], max_routed: 1}
+    modulation: {max_active_routes: 1}
+    effects: {allow: []}
+  one_oscillator:
+    oscillators: {allow: [1], max_active: 1}
+    sampler: {allow: false}
+    filters: {allow: []}
+    lfos: {allow: []}
+    modulation: {max_active_routes: 0}
+    effects: {allow: []}
+
+performance_profiles:
+  one_held_note:
+    allowed_event_types: [note, tempo]
+    channels: [0]
+    max_polyphony: 1
+    pitch_range: [48, 72]
+    velocity_range: [1, 127]
+    fixed_tempo_bpm: 120

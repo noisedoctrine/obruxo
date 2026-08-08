@@ -1,0 +1,9 @@
+version: 1
+sample_rate: 44100
+channels: 2
+tail_seconds: 2.0
+qa:
+  silence_rms: 0.000001
+  clipping_threshold: 1.0
+  tail_seconds: 0.25
+  tail_rms_warning: 0.001

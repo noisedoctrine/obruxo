@@ -1,0 +1,613 @@
+{
+  "artifact_schema": "obruxo_vital_reference_results_v1",
+  "cases": [
+    {
+      "audio_float32_sha256": "0ffd53c5561bb5be3a426c9ec2a99c07c839afced4fca3d124a4b127d38cf2a1",
+      "performance": "held_note_with_tail.mid",
+      "preset": "canonical_init.vital",
+      "qa": {
+        "actual_channels": 2,
+        "actual_frames": 55125,
+        "audio_float32_sha256": "0ffd53c5561bb5be3a426c9ec2a99c07c839afced4fca3d124a4b127d38cf2a1",
+        "clipping_count": 0,
+        "dc_offset": [
+          3.529690076006166e-05,
+          3.529690076006166e-05
+        ],
+        "expected_channels": 2,
+        "expected_frames": 55125,
+        "finite": true,
+        "peak": 0.35719019174575806,
+        "rms": 0.09176003191487771,
+        "silence_threshold": 1e-06,
+        "tail_frames": 11025,
+        "tail_rms": 0.0,
+        "tail_rms_warning": 0.001
+      },
+      "repeat_audio_float32_sha256": "0e318b329ee623ada77c6407e9844db94cd5f0255331ade87f42b56f9314f771",
+      "repeatability": {
+        "log_spectral_rmse": 0.06376195418431141,
+        "peak_absolute": 3.904104232788086e-06,
+        "rms_relative": 3.360432126803415e-05,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.8101531636123708,
+        "waveform_rmse": 0.07433968014901028,
+        "within_tolerance": true
+      },
+      "request_id": "5cabb561b0d49b184e3fbd67791d9db392e30878436094b446ad5e56a1ee0e96"
+    },
+    {
+      "audio_float32_sha256": "2d4de5b25b22a16187f47725ccc56f324b08c2671fb82a5005a383c3b9bae0e6",
+      "performance": "sequential_boundary.mid",
+      "preset": "canonical_init.vital",
+      "qa": {
+        "actual_channels": 2,
+        "actual_frames": 55125,
+        "audio_float32_sha256": "2d4de5b25b22a16187f47725ccc56f324b08c2671fb82a5005a383c3b9bae0e6",
+        "clipping_count": 0,
+        "dc_offset": [
+          0.00013221258738613337,
+          0.00013221258738613337
+        ],
+        "expected_channels": 2,
+        "expected_frames": 55125,
+        "finite": true,
+        "peak": 0.4431241452693939,
+        "rms": 0.12955857065433937,
+        "silence_threshold": 1e-06,
+        "tail_frames": 11025,
+        "tail_rms": 0.02840090882316486,
+        "tail_rms_warning": 0.001
+      },
+      "repeat_audio_float32_sha256": "824b4fa7407450e0159b58c78c9d54b0e017dd979a80156169a09a5d7d493033",
+      "repeatability": {
+        "log_spectral_rmse": 0.19399662890446429,
+        "peak_absolute": 0.033351629972457886,
+        "rms_relative": 0.00039701491265090743,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 1.711326401426077,
+        "waveform_rmse": 0.22180506240927467,
+        "within_tolerance": true
+      },
+      "request_id": "934f231bd629c29e3d219a812269c4a8038e5475ecd5727930348091ac336fba"
+    },
+    {
+      "audio_float32_sha256": "fd46ca645428d0015ec0ebbce6a878bdbcaf12c655838e278a024bdd57324ee8",
+      "performance": "overlapping_chord.mid",
+      "preset": "canonical_init.vital",
+      "qa": {
+        "actual_channels": 2,
+        "actual_frames": 66150,
+        "audio_float32_sha256": "fd46ca645428d0015ec0ebbce6a878bdbcaf12c655838e278a024bdd57324ee8",
+        "clipping_count": 0,
+        "dc_offset": [
+          -7.874942066508594e-05,
+          -7.874942066508594e-05
+        ],
+        "expected_channels": 2,
+        "expected_frames": 66150,
+        "finite": true,
+        "peak": 0.8396075367927551,
+        "rms": 0.20491012589795507,
+        "silence_threshold": 1e-06,
+        "tail_frames": 11025,
+        "tail_rms": 0.0,
+        "tail_rms_warning": 0.001
+      },
+      "repeat_audio_float32_sha256": "616a9ea62b63b3863864e1c69b1a75534459069427fec7e27ab04618096ea862",
+      "repeatability": {
+        "log_spectral_rmse": 0.31977577197769014,
+        "peak_absolute": 0.044805169105529785,
+        "rms_relative": 0.006373369312148543,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 1.0616807988743386,
+        "waveform_rmse": 0.21754914616078225,
+        "within_tolerance": true
+      },
+      "request_id": "20c87d11654507fd6fa070b8654b8f0596bf057cb41184d0f51d01dba47e0b59"
+    },
+    {
+      "audio_float32_sha256": "62da3197ca47f46fe546325cc3f50b0025f9ef03a93d26f3459b0b95c7fac270",
+      "performance": "held_note_with_tail.mid",
+      "preset": "oscillator_1.vital",
+      "qa": {
+        "actual_channels": 2,
+        "actual_frames": 55125,
+        "audio_float32_sha256": "62da3197ca47f46fe546325cc3f50b0025f9ef03a93d26f3459b0b95c7fac270",
+        "clipping_count": 0,
+        "dc_offset": [
+          5.7351554495252996e-06,
+          5.7351554495252996e-06
+        ],
+        "expected_channels": 2,
+        "expected_frames": 55125,
+        "finite": true,
+        "peak": 0.35719379782676697,
+        "rms": 0.09187932323356623,
+        "silence_threshold": 1e-06,
+        "tail_frames": 11025,
+        "tail_rms": 0.0,
+        "tail_rms_warning": 0.001
+      },
+      "repeat_audio_float32_sha256": "d191992b291d8b0efd09e34d5aa043c335189305f38a4df8b2bbecf9c23a63d2",
+      "repeatability": {
+        "log_spectral_rmse": 0.005712595920542678,
+        "peak_absolute": 1.6689300537109375e-06,
+        "rms_relative": 2.214964914297369e-06,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.12067330597434558,
+        "waveform_rmse": 0.011087381685279937,
+        "within_tolerance": true
+      },
+      "request_id": "5cabb561b0d49b184e3fbd67791d9db392e30878436094b446ad5e56a1ee0e96"
+    },
+    {
+      "audio_float32_sha256": "a9c59631d599898cff1fcc3563802b311c31f5acb4afe9a37395fc1819ab585d",
+      "performance": "sequential_boundary.mid",
+      "preset": "oscillator_1.vital",
+      "qa": {
+        "actual_channels": 2,
+        "actual_frames": 55125,
+        "audio_float32_sha256": "a9c59631d599898cff1fcc3563802b311c31f5acb4afe9a37395fc1819ab585d",
+        "clipping_count": 0,
+        "dc_offset": [
+          3.111311023793777e-07,
+          3.111311023793777e-07
+        ],
+        "expected_channels": 2,
+        "expected_frames": 55125,
+        "finite": true,
+        "peak": 0.49702537059783936,
+        "rms": 0.12986304929475473,
+        "silence_threshold": 1e-06,
+        "tail_frames": 11025,
+        "tail_rms": 0.028699608359808573,
+        "tail_rms_warning": 0.001
+      },
+      "repeat_audio_float32_sha256": "1c32b8a0358c238ca502068e087af09fe0a1cce7476e95de13274ae78fc4ad46",
+      "repeatability": {
+        "log_spectral_rmse": 0.21310891338990473,
+        "peak_absolute": 0.0032472610473632812,
+        "rms_relative": 0.00036371085677623524,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 1.3385210875306586,
+        "waveform_rmse": 0.1738876748072496,
+        "within_tolerance": true
+      },
+      "request_id": "934f231bd629c29e3d219a812269c4a8038e5475ecd5727930348091ac336fba"
+    },
+    {
+      "audio_float32_sha256": "8c90ca237ba5952a0609fb797c8ece0e57788386c7c80d573d7014f2df4da122",
+      "performance": "overlapping_chord.mid",
+      "preset": "oscillator_1.vital",
+      "qa": {
+        "actual_channels": 2,
+        "actual_frames": 66150,
+        "audio_float32_sha256": "8c90ca237ba5952a0609fb797c8ece0e57788386c7c80d573d7014f2df4da122",
+        "clipping_count": 0,
+        "dc_offset": [
+          -3.226500763957985e-05,
+          -3.226500763957985e-05
+        ],
+        "expected_channels": 2,
+        "expected_frames": 66150,
+        "finite": true,
+        "peak": 0.8914434313774109,
+        "rms": 0.2046051164297439,
+        "silence_threshold": 1e-06,
+        "tail_frames": 11025,
+        "tail_rms": 0.0,
+        "tail_rms_warning": 0.001
+      },
+      "repeat_audio_float32_sha256": "2e9339bed301900602086c567d57d575b28fbe44fa254e1f8d5b18e357a4da72",
+      "repeatability": {
+        "log_spectral_rmse": 0.23365515411448073,
+        "peak_absolute": 0.059289515018463135,
+        "rms_relative": 0.0005926593337813738,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 1.3211732586605298,
+        "waveform_rmse": 0.2703188084121019,
+        "within_tolerance": true
+      },
+      "request_id": "20c87d11654507fd6fa070b8654b8f0596bf057cb41184d0f51d01dba47e0b59"
+    },
+    {
+      "audio_float32_sha256": "b170a4120264245766f074851430ee84b802d1d82fd699360a505e61778fc74a",
+      "performance": "held_note_with_tail.mid",
+      "preset": "oscillator_1_filter_1.vital",
+      "qa": {
+        "actual_channels": 2,
+        "actual_frames": 55125,
+        "audio_float32_sha256": "b170a4120264245766f074851430ee84b802d1d82fd699360a505e61778fc74a",
+        "clipping_count": 0,
+        "dc_offset": [
+          -3.636145641364171e-05,
+          -3.636145641364171e-05
+        ],
+        "expected_channels": 2,
+        "expected_frames": 55125,
+        "finite": true,
+        "peak": 0.3571923077106476,
+        "rms": 0.09187308001073172,
+        "silence_threshold": 1e-06,
+        "tail_frames": 11025,
+        "tail_rms": 0.0,
+        "tail_rms_warning": 0.001
+      },
+      "repeat_audio_float32_sha256": "62b41aab435b2bceacd0de7ff5b99e31e5de1029d89740e53b0244ac030ed28a",
+      "repeatability": {
+        "log_spectral_rmse": 0.06725686983938749,
+        "peak_absolute": 8.046627044677734e-07,
+        "rms_relative": 0.0012648456772769714,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 1.733022251809511,
+        "waveform_rmse": 0.15921809200087367,
+        "within_tolerance": true
+      },
+      "request_id": "9187a1f15e31030c260f2da819f7f8ad898d53a99941bdded72965d7d064ef19"
+    },
+    {
+      "audio_float32_sha256": "b203d3ca6b0032cc2544214346df10878171f5ae3d8a2d68c4211f239750fcc0",
+      "performance": "sequential_boundary.mid",
+      "preset": "oscillator_1_filter_1.vital",
+      "qa": {
+        "actual_channels": 2,
+        "actual_frames": 55125,
+        "audio_float32_sha256": "b203d3ca6b0032cc2544214346df10878171f5ae3d8a2d68c4211f239750fcc0",
+        "clipping_count": 0,
+        "dc_offset": [
+          -4.204893301282557e-05,
+          -4.204893301282557e-05
+        ],
+        "expected_channels": 2,
+        "expected_frames": 55125,
+        "finite": true,
+        "peak": 0.44950854778289795,
+        "rms": 0.12961161387267653,
+        "silence_threshold": 1e-06,
+        "tail_frames": 11025,
+        "tail_rms": 0.02795583179346046,
+        "tail_rms_warning": 0.001
+      },
+      "repeat_audio_float32_sha256": "9e65f212e233996f9b47531022fb5a557e3bf039b3a9c5e36f1273552105b4cb",
+      "repeatability": {
+        "log_spectral_rmse": 0.15324434337169765,
+        "peak_absolute": 0.013010680675506592,
+        "rms_relative": 0.00021152982813019909,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 1.2517739986856948,
+        "waveform_rmse": 0.16224444817350658,
+        "within_tolerance": true
+      },
+      "request_id": "05276779d8c222aa26adc28d93e8da6b55d1c4f0b6bfffc88e1f5965cd724fc5"
+    },
+    {
+      "audio_float32_sha256": "89ab558330a83d6d3ec787a842be77dbe8ebc222a00de31286e61a64622ed75f",
+      "performance": "overlapping_chord.mid",
+      "preset": "oscillator_1_filter_1.vital",
+      "qa": {
+        "actual_channels": 2,
+        "actual_frames": 66150,
+        "audio_float32_sha256": "89ab558330a83d6d3ec787a842be77dbe8ebc222a00de31286e61a64622ed75f",
+        "clipping_count": 0,
+        "dc_offset": [
+          -9.860068818068154e-06,
+          -9.860068818068154e-06
+        ],
+        "expected_channels": 2,
+        "expected_frames": 66150,
+        "finite": true,
+        "peak": 0.9207261204719543,
+        "rms": 0.20481985212494191,
+        "silence_threshold": 1e-06,
+        "tail_frames": 11025,
+        "tail_rms": 0.0,
+        "tail_rms_warning": 0.001
+      },
+      "repeat_audio_float32_sha256": "4b261d1877126775ec4e700a054107b9ba75818821fb52f4818f273dbc01fdb2",
+      "repeatability": {
+        "log_spectral_rmse": 0.23719322747220686,
+        "peak_absolute": 0.044703543186187744,
+        "rms_relative": 0.002398685780828533,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 1.15762990332334,
+        "waveform_rmse": 0.2371055856140973,
+        "within_tolerance": true
+      },
+      "request_id": "0056b8ddd52b4266579f621bced840fc1b31cdd972b1cb609673891ea0b9ef2b"
+    },
+    {
+      "audio_float32_sha256": "e1066cfa51a4f11536a542d029e7e26a07b39bd5a8104ced2b99f1b38fc8a1b6",
+      "performance": "held_note_with_tail.mid",
+      "preset": "lfo_1_to_oscillator_1.vital",
+      "qa": {
+        "actual_channels": 2,
+        "actual_frames": 55125,
+        "audio_float32_sha256": "e1066cfa51a4f11536a542d029e7e26a07b39bd5a8104ced2b99f1b38fc8a1b6",
+        "clipping_count": 0,
+        "dc_offset": [
+          -3.496028355080709e-05,
+          -3.496028355080709e-05
+        ],
+        "expected_channels": 2,
+        "expected_frames": 55125,
+        "finite": true,
+        "peak": 0.35719409584999084,
+        "rms": 0.09177143796620418,
+        "silence_threshold": 1e-06,
+        "tail_frames": 11025,
+        "tail_rms": 0.0,
+        "tail_rms_warning": 0.001
+      },
+      "repeat_audio_float32_sha256": "e450167b78d836e6f1bb10dac3858c9c2798a1f9d39ce3505852fa21048e4a01",
+      "repeatability": {
+        "log_spectral_rmse": 0.04464144296948879,
+        "peak_absolute": 6.854534149169922e-07,
+        "rms_relative": 0.0006043152652396153,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 1.3679148880884275,
+        "waveform_rmse": 0.1256114251969893,
+        "within_tolerance": true
+      },
+      "request_id": "087854ff3d97d59b1eb812b78e88cc07e025232f5c998d8daa6606e14475ca74"
+    },
+    {
+      "audio_float32_sha256": "9260e5a78ec52db8a764baaa1dacde2e0ad438a1a739d56b193ef7ba437fb85e",
+      "performance": "sequential_boundary.mid",
+      "preset": "lfo_1_to_oscillator_1.vital",
+      "qa": {
+        "actual_channels": 2,
+        "actual_frames": 55125,
+        "audio_float32_sha256": "9260e5a78ec52db8a764baaa1dacde2e0ad438a1a739d56b193ef7ba437fb85e",
+        "clipping_count": 0,
+        "dc_offset": [
+          0.00010977039596544721,
+          0.00010977039596544721
+        ],
+        "expected_channels": 2,
+        "expected_frames": 55125,
+        "finite": true,
+        "peak": 0.5294305086135864,
+        "rms": 0.12968662112362442,
+        "silence_threshold": 1e-06,
+        "tail_frames": 11025,
+        "tail_rms": 0.02866259755045264,
+        "tail_rms_warning": 0.001
+      },
+      "repeat_audio_float32_sha256": "539151babe4e7ffcf98e25be702ed652533ff87c01334b857243c27a553c2f13",
+      "repeatability": {
+        "log_spectral_rmse": 0.20675517529562273,
+        "peak_absolute": 0.09143227338790894,
+        "rms_relative": 0.0007935596595595269,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 1.139197633032397,
+        "waveform_rmse": 0.14773869182000218,
+        "within_tolerance": true
+      },
+      "request_id": "17da102f65ea8f071d90cd32d99abccfe768e6d3fec52387fa3dd3f533069aab"
+    },
+    {
+      "audio_float32_sha256": "4be3c053c02e414396ae2cae6e613cf8ce2dec7f7eb4cb97379a781ebfbe2445",
+      "performance": "overlapping_chord.mid",
+      "preset": "lfo_1_to_oscillator_1.vital",
+      "qa": {
+        "actual_channels": 2,
+        "actual_frames": 66150,
+        "audio_float32_sha256": "4be3c053c02e414396ae2cae6e613cf8ce2dec7f7eb4cb97379a781ebfbe2445",
+        "clipping_count": 0,
+        "dc_offset": [
+          1.3133976536434076e-05,
+          1.3133976536434076e-05
+        ],
+        "expected_channels": 2,
+        "expected_frames": 66150,
+        "finite": true,
+        "peak": 0.8555653691291809,
+        "rms": 0.20438103971035884,
+        "silence_threshold": 1e-06,
+        "tail_frames": 11025,
+        "tail_rms": 0.0,
+        "tail_rms_warning": 0.001
+      },
+      "repeat_audio_float32_sha256": "96c0d6f4ce8a76c07271215e8f62633a0b3387071760a9a54dff186757d879f4",
+      "repeatability": {
+        "log_spectral_rmse": 0.25696061208770754,
+        "peak_absolute": 0.013143301010131836,
+        "rms_relative": 0.0022972238583275836,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 1.5364995303972038,
+        "waveform_rmse": 0.3140313715370586,
+        "within_tolerance": true
+      },
+      "request_id": "d4c840fed3fa7fdc52d1cd8a23d3c8137071d9121fce80c910502bca9b0d9c5a"
+    },
+    {
+      "audio_float32_sha256": "e918ba9f82195764975afebf8da1f9a211cd79db69c39acc3cbd7169fb514a92",
+      "performance": "held_note_with_tail.mid",
+      "preset": "reverb_enabled.vital",
+      "qa": {
+        "actual_channels": 2,
+        "actual_frames": 55125,
+        "audio_float32_sha256": "e918ba9f82195764975afebf8da1f9a211cd79db69c39acc3cbd7169fb514a92",
+        "clipping_count": 0,
+        "dc_offset": [
+          -1.941373830881508e-05,
+          -1.941373830881508e-05
+        ],
+        "expected_channels": 2,
+        "expected_frames": 55125,
+        "finite": true,
+        "peak": 0.3571941554546356,
+        "rms": 0.09187947623557648,
+        "silence_threshold": 1e-06,
+        "tail_frames": 11025,
+        "tail_rms": 0.0,
+        "tail_rms_warning": 0.001
+      },
+      "repeat_audio_float32_sha256": "dc1978d3e4130ef1d27a7f38612cec299a703c3e9526e3412663401c1e5e3484",
+      "repeatability": {
+        "log_spectral_rmse": 0.05572431122720452,
+        "peak_absolute": 2.9802322387695312e-08,
+        "rms_relative": 2.1439451075145934e-05,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.9433080394693711,
+        "waveform_rmse": 0.08667064859525432,
+        "within_tolerance": true
+      },
+      "request_id": "780a915db0b117eafd41135461f53dd56f35c64dd19a1147ec217e1228a15b84"
+    },
+    {
+      "audio_float32_sha256": "3f216d703ebdc8bc5b53ad4e579d9722b1fe84f6a39c1784049c8151cb506b4d",
+      "performance": "sequential_boundary.mid",
+      "preset": "reverb_enabled.vital",
+      "qa": {
+        "actual_channels": 2,
+        "actual_frames": 55125,
+        "audio_float32_sha256": "3f216d703ebdc8bc5b53ad4e579d9722b1fe84f6a39c1784049c8151cb506b4d",
+        "clipping_count": 0,
+        "dc_offset": [
+          -5.200876523828462e-05,
+          -5.200876523828462e-05
+        ],
+        "expected_channels": 2,
+        "expected_frames": 55125,
+        "finite": true,
+        "peak": 0.5363724827766418,
+        "rms": 0.1299842244500688,
+        "silence_threshold": 1e-06,
+        "tail_frames": 11025,
+        "tail_rms": 0.028493127191266038,
+        "tail_rms_warning": 0.001
+      },
+      "repeat_audio_float32_sha256": "fd38334b2d7b86a83fea6131e992b6b15cf9b04c103b11978016788250cf4643",
+      "repeatability": {
+        "log_spectral_rmse": 0.21790277234256597,
+        "peak_absolute": 0.014139950275421143,
+        "rms_relative": 0.0001391391257650955,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 1.6242465363666225,
+        "waveform_rmse": 0.21115580637962578,
+        "within_tolerance": true
+      },
+      "request_id": "12e7eb17b4b65518aa475476a780faa26d97fcfc577fce787a7371f0cf8b6295"
+    },
+    {
+      "audio_float32_sha256": "206e5e1de7510be37dacc34efcacc5de0b5edae7b1457f4da13f59dd54512c78",
+      "performance": "overlapping_chord.mid",
+      "preset": "reverb_enabled.vital",
+      "qa": {
+        "actual_channels": 2,
+        "actual_frames": 66150,
+        "audio_float32_sha256": "206e5e1de7510be37dacc34efcacc5de0b5edae7b1457f4da13f59dd54512c78",
+        "clipping_count": 0,
+        "dc_offset": [
+          -5.7724433868833965e-05,
+          -5.7724433868833965e-05
+        ],
+        "expected_channels": 2,
+        "expected_frames": 66150,
+        "finite": true,
+        "peak": 0.9014739990234375,
+        "rms": 0.20464895895207533,
+        "silence_threshold": 1e-06,
+        "tail_frames": 11025,
+        "tail_rms": 0.0,
+        "tail_rms_warning": 0.001
+      },
+      "repeat_audio_float32_sha256": "b2043cd3cc2458f4a9c6f35b384d14125db6522e9d5b85fc4667c6f75985d1bb",
+      "repeatability": {
+        "log_spectral_rmse": 0.26737272539893236,
+        "peak_absolute": 0.0221213698387146,
+        "rms_relative": 0.0004996530441564329,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 1.3342536719134925,
+        "waveform_rmse": 0.27319012521277614,
+        "within_tolerance": true
+      },
+      "request_id": "272c272a064138878308d3582759185b0635a968945aa7c8c281378946ce7594"
+    }
+  ],
+  "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+  "plugin_sha256": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+  "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3",
+  "repeatability_failures": [],
+  "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+  "tolerance": {
+    "log_spectral_rmse": 0.35,
+    "peak_absolute": 0.1,
+    "rms_relative": 0.01
+  },
+  "unsupported_tempo_change": {
+    "diagnostics": [
+      {
+        "code": "midi.capability.tempo_changes",
+        "context": {},
+        "message": "renderer supports one fixed tempo only",
+        "parameter": null,
+        "pointer": null,
+        "severity": "error"
+      }
+    ],
+    "valid": false
+  }
+}

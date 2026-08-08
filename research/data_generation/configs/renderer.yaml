@@ -1,0 +1,21 @@
+version: 1
+renderer_id: vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3
+backend: dawdreamer
+plugin_path: null
+accepted_plugin_sha256:
+  - a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1
+buffer_size: 128
+max_workers: 1
+qa:
+  silence_rms: 0.000001
+  clipping_threshold: 1.0
+  tail_seconds: 0.25
+  tail_rms_warning: 0.001
+capabilities:
+  notes: true
+  polyphony: true
+  tempo_changes: false
+  pitch_bend: false
+  channel_pressure: false
+  control_changes: []
+  max_channels: 1

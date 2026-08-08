@@ -1,0 +1,33 @@
+name: Data generation
+
+on:
+  push:
+    paths:
+      - ".github/workflows/data-generation.yml"
+      - "research/data_generation/**"
+  pull_request:
+    paths:
+      - ".github/workflows/data-generation.yml"
+      - "research/data_generation/**"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: obruxo-data-generation
+          environment-file: research/data_generation/environment.yml
+          miniforge-version: latest
+          use-mamba: true
+      - name: Lint
+        run: ruff check research/data_generation/obruxo_data research/data_generation/tests research/data_generation/run.py
+      - name: Test static and distributable Vita paths
+        run: python -m pytest research/data_generation/tests -m "not reference_plugin"
