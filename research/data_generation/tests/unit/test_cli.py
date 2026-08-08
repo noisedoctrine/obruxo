@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from obruxo_data.cli import main
+from obruxo_data.cli import DEFAULT_SOURCE_ATLAS, main
 from obruxo_data.midi import Performance
 from obruxo_data.vital import VitalPreset
 from obruxo_data.vital.probe import probe_schema
@@ -36,6 +36,7 @@ def test_midi_cli_create_validate_and_explicit_end(tmp_path, capsys) -> None:
 
 
 def test_schema_probe_refuses_overwrite_before_importing_runtime(tmp_path) -> None:
+    assert DEFAULT_SOURCE_ATLAS.is_file()
     output = tmp_path / "schema"
     output.mkdir()
     (output / "reviewed.txt").write_text("keep", encoding="utf-8")

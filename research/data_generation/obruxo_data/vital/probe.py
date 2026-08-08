@@ -71,7 +71,20 @@ def _parse_source_number(value: Any) -> float | None:
 
 def _reconcile(inventory: dict[str, dict[str, Any]], source_atlas_path: Path) -> dict[str, Any]:
     source = json.loads(source_atlas_path.read_text(encoding="utf-8-sig"))
-    source_parameters = {item["name"]: item for item in source["parameters"]}
+    raw_parameters = source["parameters"]
+    if isinstance(raw_parameters, dict):
+        source_parameters = {
+            name: {"name": name, "default": details["default"]} for name, details in raw_parameters.items()
+        }
+        source_parameters.update({name: {"name": name} for name in MIGRATION_ONLY_PARAMETERS})
+        source_identity = {
+            "repository": "https://github.com/mtytel/vital",
+            "revision": VITAL_REVISION,
+            "baseline_kind": "reviewed runtime inventory plus classified migration-only registrations",
+        }
+    else:
+        source_parameters = {item["name"]: item for item in raw_parameters}
+        source_identity = source.get("source", {})
     overrides = {item["name"]: item["default"] for item in source.get("default_overrides", [])}
     runtime_names = set(inventory)
     source_names = set(source_parameters)
@@ -89,7 +102,7 @@ def _reconcile(inventory: dict[str, dict[str, Any]], source_atlas_path: Path) ->
     unexplained_source_only = sorted(set(source_only) - MIGRATION_ONLY_PARAMETERS)
     unexplained = bool(runtime_only or unexplained_source_only or default_mismatches)
     return {
-        "source": source.get("source", {}),
+        "source": source_identity,
         "source_registered_count": len(source_names),
         "runtime_control_count": len(runtime_names),
         "source_only": source_only,

@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+import json
 import math
 from typing import Any
 
 from obruxo_data.errors import Diagnostic, Severity, ValidationReport
+from obruxo_data.hashing import canonical_sha256
 
 from .atlas import VitalSchema
+
+
+CLASSIFIED_RUNTIME_CANONICALIZATIONS = frozenset({"/settings/sample/samples"})
 
 
 def _error(code: str, message: str, *, pointer: str | None = None, parameter: str | None = None,
@@ -99,6 +104,33 @@ def validate_document(document: Any, schema: VitalSchema) -> ValidationReport:
     return ValidationReport(tuple(diagnostics))
 
 
+def _difference_pointers(left: Any, right: Any, pointer: str = "") -> set[str]:
+    if type(left) is not type(right):
+        return {pointer}
+    if isinstance(left, dict):
+        differences = {f"{pointer}/{key}" for key in left.keys() ^ right.keys()}
+        for key in left.keys() & right.keys():
+            escaped = str(key).replace("~", "~0").replace("/", "~1")
+            differences.update(_difference_pointers(left[key], right[key], f"{pointer}/{escaped}"))
+        return differences
+    if isinstance(left, list):
+        if len(left) != len(right):
+            return {pointer}
+        differences = set()
+        for index, (left_item, right_item) in enumerate(zip(left, right, strict=True)):
+            differences.update(_difference_pointers(left_item, right_item, f"{pointer}/{index}"))
+        return differences
+    return set() if left == right else {pointer}
+
+
+def _pointer_value(document: Any, pointer: str) -> Any:
+    value = document
+    for raw_token in pointer.lstrip("/").split("/"):
+        token = raw_token.replace("~1", "/").replace("~0", "~")
+        value = value[int(token)] if isinstance(value, list) else value[token]
+    return value
+
+
 def validate_runtime(document_json: str) -> ValidationReport:
     try:
         import vita
@@ -113,4 +145,43 @@ def validate_runtime(document_json: str) -> ValidationReport:
         return ValidationReport((_error("vital.runtime.exception", "Vita runtime validation failed", context={"error": str(error)}),))
     if not round_trip:
         return ValidationReport((_error("vital.runtime.export", "Vita returned an empty round-trip document"),))
-    return ValidationReport()
+    try:
+        source = json.loads(document_json)
+        exported = json.loads(round_trip)
+    except json.JSONDecodeError as error:
+        return ValidationReport((_error("vital.runtime.export_json", "Vita returned invalid JSON", context={"error": str(error)}),))
+    differences = _difference_pointers(source, exported)
+    numeric_canonicalizations = set()
+    for pointer in differences - CLASSIFIED_RUNTIME_CANONICALIZATIONS:
+        left = _pointer_value(source, pointer)
+        right = _pointer_value(exported, pointer)
+        if (
+            isinstance(left, (int, float)) and not isinstance(left, bool)
+            and isinstance(right, (int, float)) and not isinstance(right, bool)
+            and math.isclose(float(left), float(right), rel_tol=1e-6, abs_tol=1e-7)
+        ):
+            numeric_canonicalizations.add(pointer)
+    unexplained = sorted(differences - CLASSIFIED_RUNTIME_CANONICALIZATIONS - numeric_canonicalizations)
+    diagnostics = []
+    if unexplained:
+        diagnostics.append(_error(
+            "vital.runtime.unclassified_drift", "Vita changed unclassified fields during canonical round trip",
+            context={"pointers": unexplained},
+        ))
+    for pointer in sorted(differences & CLASSIFIED_RUNTIME_CANONICALIZATIONS):
+        diagnostics.append(Diagnostic(
+            "vital.runtime.canonicalization", Severity.WARNING,
+            "Vita re-encoded the deterministic init sampler payload during round trip",
+            pointer=pointer,
+            context={
+                "input_sha256": canonical_sha256(source["settings"]["sample"]["samples"]),
+                "output_sha256": canonical_sha256(exported["settings"]["sample"]["samples"]),
+            },
+        ))
+    if numeric_canonicalizations:
+        diagnostics.append(Diagnostic(
+            "vital.runtime.numeric_canonicalization", Severity.WARNING,
+            "Vita quantized numeric controls within the reviewed float32 round-trip tolerance",
+            context={"pointers": sorted(numeric_canonicalizations), "relative_tolerance": 1e-6, "absolute_tolerance": 1e-7},
+        ))
+    return ValidationReport(tuple(diagnostics))

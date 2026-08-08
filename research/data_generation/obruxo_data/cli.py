@@ -5,12 +5,16 @@ from collections.abc import Sequence
 import json
 from pathlib import Path
 import sys
+from typing import Any
 
 from .errors import ObruxoDataError, OutputExistsError, ValidationError
 
 
 DEFAULT_PROFILES = Path(__file__).resolve().parents[1] / "configs" / "component_profiles.yaml"
-DEFAULT_SOURCE_ATLAS = Path(__file__).resolve().parents[2] / "vital" / "vital_source_parameter_atlas.json"
+DEFAULT_RENDERER = Path(__file__).resolve().parents[1] / "configs" / "renderer.yaml"
+DEFAULT_SOURCE_ATLAS = (
+    Path(__file__).resolve().parent / "vital" / "schema" / "vital-1.0.8-vita-0.1.0" / "parameter_inventory.json"
+)
 
 
 def _output_path(value: str, force: bool) -> Path:
@@ -75,6 +79,25 @@ def build_parser() -> argparse.ArgumentParser:
     midi_profile.add_argument("--profiles", default=str(DEFAULT_PROFILES))
     midi_profile.add_argument("--simplify", action="store_true")
     _add_output(midi_profile)
+
+    render = commands.add_parser("render", help="render one validated Vital/MIDI pair")
+    render.add_argument("preset")
+    render.add_argument("performance")
+    render.add_argument("--sample-rate", type=int, default=44_100)
+    render.add_argument("--tail", type=float, default=2.0)
+    render.add_argument("--renderer-config", default=str(DEFAULT_RENDERER))
+    render.add_argument("--plugin-path")
+    render.add_argument("--output", required=True)
+    render.add_argument("--result", required=True)
+    render.add_argument("--force", action="store_true")
+
+    batch = commands.add_parser("batch", help="run a bounded local JSONL render batch")
+    batch.add_argument("requests")
+    batch.add_argument("--output", required=True)
+    batch.add_argument("--workers", type=int, default=1)
+    batch.add_argument("--renderer-config", default=str(DEFAULT_RENDERER))
+    batch.add_argument("--plugin-path")
+    batch.add_argument("--no-resume", action="store_true")
     return parser
 
 
@@ -160,6 +183,49 @@ def _run_midi(args: argparse.Namespace) -> int:
     raise AssertionError(f"unhandled MIDI command {args.midi_command}")
 
 
+def _renderer(args: argparse.Namespace):
+    from .render import VitalRenderer
+
+    return VitalRenderer.from_config(args.renderer_config, plugin_path=args.plugin_path)
+
+
+def _run_render(args: argparse.Namespace) -> int:
+    from .midi import Performance
+    from .render import RenderRequest
+    from .vital import VitalPreset
+
+    output = _output_path(args.output, args.force)
+    result_path = _output_path(args.result, args.force)
+    preset = VitalPreset.load(args.preset)
+    performance = Performance.from_midi(args.performance)
+    renderer = _renderer(args)
+    request = RenderRequest(
+        preset=preset, performance=performance, sample_rate=args.sample_rate, end_tick=performance.end_tick,
+        tail_seconds=args.tail, renderer_id=renderer.renderer_id,
+    )
+    result = renderer.render(request)
+    errors = [item for item in result.diagnostics if item.severity.value == "error"]
+    if errors:
+        for diagnostic in errors:
+            print(f"error: {diagnostic.message}", file=sys.stderr)
+        return 2
+    result.write_wav(output)
+    result.write_json(result_path)
+    print(json.dumps({"request_id": request.request_id, "qa": result.qa}, indent=2, sort_keys=True))
+    return 0
+
+
+def _run_batch(args: argparse.Namespace) -> int:
+    from .render import load_requests, run_batch
+
+    summary = run_batch(
+        _renderer(args), load_requests(args.requests), args.output,
+        workers=args.workers, resume=not args.no_resume,
+    )
+    print(json.dumps(summary.to_dict(), indent=2, sort_keys=True))
+    return 0
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
@@ -167,6 +233,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _run_vital(args)
         if args.command == "midi":
             return _run_midi(args)
+        if args.command == "render":
+            return _run_render(args)
+        if args.command == "batch":
+            return _run_batch(args)
         raise AssertionError(f"unhandled command {args.command}")
     except (ObruxoDataError, OSError, ValueError, KeyError) as error:
         if isinstance(error, ValidationError):
