@@ -124,9 +124,9 @@ This seam intentionally has no curriculum, remote queue, sharding, bank sampler,
 
 ## QA, fixtures, and repeatability
 
-Every result records expected/actual shape, finiteness, peak and clipping count, RMS and silence threshold, DC offset, tail energy, the canonical float-buffer SHA-256, request ID, DawDreamer version, schema ID, scheduling policy, and the full plugin fingerprint. Audio is never loudness-normalized.
+Every result records expected/actual shape, finiteness, peak and clipping count, RMS and silence threshold, DC offset, tail energy, the canonical float-buffer SHA-256, request ID, DawDreamer version, schema ID, scheduling policy, and the full plugin fingerprint. The complete plugin SHA-256 is also part of `renderer_id` and therefore request identity; a configured build ID that omits it is rejected. Audio is never loudness-normalized.
 
-Vital 1.6.4 is not bit-deterministic even with oscillator random phase disabled. The legally generated 5-preset × 3-performance release matrix therefore enforces numeric repeatability: at most 1% relative RMS difference, 0.10 absolute peak difference, and 0.35 whole-render `log1p` spectral-magnitude RMSE. Calibration measured maxima of 0.64%, 0.092, and 0.320 respectively. Each render keeps its own lossless float-buffer hash; request identity is stable while bit-identical audio is not claimed.
+Vital 1.6.4 is not bit-deterministic even with oscillator random phase disabled. The legally generated 5-preset × 3-performance release matrix therefore records pointwise waveform RMSE and enforces numeric repeatability on stable aggregate/spectral measures: at most 1% relative RMS difference, 0.10 absolute peak difference, and 0.35 whole-render `log1p` spectral-magnitude RMSE. Calibration measured maxima of 0.64%, 0.092, and 0.320 respectively. Each render keeps its own lossless float-buffer hash; request identity is stable while bit-identical audio is not claimed.
 
 Regenerate authored fixtures and reference metrics explicitly:
 

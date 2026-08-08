@@ -44,6 +44,8 @@ def compare_audio(first: "np.ndarray", second: "np.ndarray", *,
     left_rms = float(np.sqrt(np.mean(left * left))) if left.size else 0.0
     right_rms = float(np.sqrt(np.mean(right * right))) if right.size else 0.0
     rms_relative = abs(left_rms - right_rms) / max(left_rms, right_rms, 1e-12)
+    waveform_rmse = float(np.sqrt(np.mean((left - right) ** 2))) if left.size else 0.0
+    waveform_relative_rmse = waveform_rmse / max(left_rms, right_rms, 1e-12)
     peak_absolute = abs(float(np.max(np.abs(left), initial=0.0)) - float(np.max(np.abs(right), initial=0.0)))
     left_spectrum = np.abs(np.fft.rfft(left, axis=0))
     right_spectrum = np.abs(np.fft.rfft(right, axis=0))
@@ -56,6 +58,8 @@ def compare_audio(first: "np.ndarray", second: "np.ndarray", *,
     return {
         "within_tolerance": within,
         "rms_relative": rms_relative,
+        "waveform_rmse": waveform_rmse,
+        "waveform_relative_rmse": waveform_relative_rmse,
         "peak_absolute": peak_absolute,
         "log_spectral_rmse": log_spectral_rmse,
         "tolerance": {

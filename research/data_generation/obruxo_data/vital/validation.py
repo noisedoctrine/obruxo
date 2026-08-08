@@ -11,6 +11,7 @@ from .atlas import VitalSchema
 
 
 CLASSIFIED_RUNTIME_CANONICALIZATIONS = frozenset({"/settings/sample/samples"})
+_MISSING = object()
 
 
 def _error(code: str, message: str, *, pointer: str | None = None, parameter: str | None = None,
@@ -108,7 +109,9 @@ def _difference_pointers(left: Any, right: Any, pointer: str = "") -> set[str]:
     if type(left) is not type(right):
         return {pointer}
     if isinstance(left, dict):
-        differences = {f"{pointer}/{key}" for key in left.keys() ^ right.keys()}
+        differences = {
+            f"{pointer}/{str(key).replace('~', '~0').replace('/', '~1')}" for key in left.keys() ^ right.keys()
+        }
         for key in left.keys() & right.keys():
             escaped = str(key).replace("~", "~0").replace("/", "~1")
             differences.update(_difference_pointers(left[key], right[key], f"{pointer}/{escaped}"))
@@ -125,10 +128,13 @@ def _difference_pointers(left: Any, right: Any, pointer: str = "") -> set[str]:
 
 def _pointer_value(document: Any, pointer: str) -> Any:
     value = document
-    for raw_token in pointer.lstrip("/").split("/"):
-        token = raw_token.replace("~1", "/").replace("~0", "~")
-        value = value[int(token)] if isinstance(value, list) else value[token]
-    return value
+    try:
+        for raw_token in pointer.lstrip("/").split("/"):
+            token = raw_token.replace("~1", "/").replace("~0", "~")
+            value = value[int(token)] if isinstance(value, list) else value[token]
+        return value
+    except (IndexError, KeyError, TypeError, ValueError):
+        return _MISSING
 
 
 def validate_runtime(document_json: str) -> ValidationReport:
@@ -151,8 +157,12 @@ def validate_runtime(document_json: str) -> ValidationReport:
     except json.JSONDecodeError as error:
         return ValidationReport((_error("vital.runtime.export_json", "Vita returned invalid JSON", context={"error": str(error)}),))
     differences = _difference_pointers(source, exported)
+    classified_canonicalizations = {
+        pointer for pointer in differences & CLASSIFIED_RUNTIME_CANONICALIZATIONS
+        if isinstance(_pointer_value(source, pointer), str) and isinstance(_pointer_value(exported, pointer), str)
+    }
     numeric_canonicalizations = set()
-    for pointer in differences - CLASSIFIED_RUNTIME_CANONICALIZATIONS:
+    for pointer in differences - classified_canonicalizations:
         left = _pointer_value(source, pointer)
         right = _pointer_value(exported, pointer)
         if (
@@ -161,21 +171,23 @@ def validate_runtime(document_json: str) -> ValidationReport:
             and math.isclose(float(left), float(right), rel_tol=1e-6, abs_tol=1e-7)
         ):
             numeric_canonicalizations.add(pointer)
-    unexplained = sorted(differences - CLASSIFIED_RUNTIME_CANONICALIZATIONS - numeric_canonicalizations)
+    unexplained = sorted(differences - classified_canonicalizations - numeric_canonicalizations)
     diagnostics = []
     if unexplained:
         diagnostics.append(_error(
             "vital.runtime.unclassified_drift", "Vita changed unclassified fields during canonical round trip",
             context={"pointers": unexplained},
         ))
-    for pointer in sorted(differences & CLASSIFIED_RUNTIME_CANONICALIZATIONS):
+    for pointer in sorted(classified_canonicalizations):
+        input_value = _pointer_value(source, pointer)
+        output_value = _pointer_value(exported, pointer)
         diagnostics.append(Diagnostic(
             "vital.runtime.canonicalization", Severity.WARNING,
             "Vita re-encoded the deterministic init sampler payload during round trip",
             pointer=pointer,
             context={
-                "input_sha256": canonical_sha256(source["settings"]["sample"]["samples"]),
-                "output_sha256": canonical_sha256(exported["settings"]["sample"]["samples"]),
+                "input_sha256": None if input_value is _MISSING else canonical_sha256(input_value),
+                "output_sha256": None if output_value is _MISSING else canonical_sha256(output_value),
             },
         ))
     if numeric_canonicalizations:

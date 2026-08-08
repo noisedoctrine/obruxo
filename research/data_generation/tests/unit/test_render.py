@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import xml.etree.ElementTree as ET
 
@@ -10,7 +11,7 @@ from scipy.io import wavfile
 from obruxo_data.errors import Diagnostic, OutputExistsError, Severity
 from obruxo_data.midi import Performance
 from obruxo_data.render import (
-    RenderProvenance, RenderRequest, RenderResult, Renderer, RendererCapabilities, load_requests, run_batch,
+    RenderProvenance, RenderRequest, RenderResult, Renderer, RendererCapabilities, VitalRenderer, load_requests, run_batch,
     write_requests,
 )
 from obruxo_data.render.qa import AudioQualityConfig, analyze_audio, audio_float32_sha256, compare_audio
@@ -86,7 +87,18 @@ def test_repeatability_uses_numeric_and_spectral_tolerances() -> None:
     second = np.sin(np.linspace(0.1, 20.1, 4096, dtype=np.float64))[:, None].astype(np.float32)
     comparison = compare_audio(first, second)
     assert comparison["within_tolerance"]
+    assert comparison["waveform_rmse"] > 0
     assert comparison["log_spectral_rmse"] <= comparison["tolerance"]["log_spectral_rmse"]
+
+
+def test_renderer_identity_contains_complete_plugin_fingerprint(tmp_path) -> None:
+    plugin = tmp_path / "Vital.vst3"
+    plugin.write_bytes(b"test plugin binary")
+    fingerprint = hashlib.sha256(plugin.read_bytes()).hexdigest()
+    renderer = VitalRenderer(plugin, accepted_plugin_sha256={fingerprint}, renderer_id=f"test-{fingerprint}")
+    assert renderer.engine_fingerprint == fingerprint
+    with pytest.raises(ValueError, match="complete accepted plugin SHA-256"):
+        VitalRenderer(plugin, accepted_plugin_sha256={fingerprint}, renderer_id="incomplete")
 
 
 def test_render_result_writes_atomic_wav_and_json_without_overwrite(tmp_path) -> None:
@@ -138,3 +150,5 @@ def test_jsonl_batch_is_bounded_and_hash_validated_for_resume(tmp_path) -> None:
     assert (first.rendered, first.skipped) == (1, 0)
     assert (second.rendered, second.skipped) == (0, 1)
     assert renderer.calls == 1
+    with pytest.raises(ValueError, match="duplicate request IDs"):
+        run_batch(renderer, [loaded[0], loaded[0]], tmp_path / "duplicate")

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import sys
+from types import SimpleNamespace
 
 import pytest
 
@@ -141,3 +143,25 @@ def test_schema_hash_detects_fixture_tampering(tmp_path) -> None:
     assert manifest["init_preset_sha256"]
     with pytest.raises(ValueError, match="hash mismatch"):
         VitalSchema.load(tmp_path).load_init_document()
+
+
+def test_runtime_round_trip_classifies_numeric_drift_and_reports_missing_fields(monkeypatch) -> None:
+    from obruxo_data.vital.validation import validate_runtime
+
+    class FakeSynth:
+        def load_json(self, document_json: str) -> bool:
+            self.document = json.loads(document_json)
+            return True
+
+        def to_json(self) -> str:
+            document = json.loads(json.dumps(self.document))
+            document["settings"]["level"] = 0.10000000149011612
+            document["settings"].pop("removed")
+            return json.dumps(document)
+
+    monkeypatch.setitem(sys.modules, "vita", SimpleNamespace(Synth=FakeSynth))
+    report = validate_runtime(json.dumps({"settings": {"level": 0.1, "removed": 1}}))
+    assert not report.valid
+    by_code = {item.code: item for item in report.diagnostics}
+    assert by_code["vital.runtime.numeric_canonicalization"].context["pointers"] == ["/settings/level"]
+    assert by_code["vital.runtime.unclassified_drift"].context["pointers"] == ["/settings/removed"]

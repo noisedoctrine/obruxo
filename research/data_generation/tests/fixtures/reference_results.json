@@ -34,9 +34,11 @@
           "peak_absolute": 0.1,
           "rms_relative": 0.01
         },
+        "waveform_relative_rmse": 0.8101531636123708,
+        "waveform_rmse": 0.07433968014901028,
         "within_tolerance": true
       },
-      "request_id": "6fa435bbf28564939e5c313cfafab421f797b50ca9d36f5d508d0cfd90c846bd"
+      "request_id": "5cabb561b0d49b184e3fbd67791d9db392e30878436094b446ad5e56a1ee0e96"
     },
     {
       "audio_float32_sha256": "2d4de5b25b22a16187f47725ccc56f324b08c2671fb82a5005a383c3b9bae0e6",
@@ -71,9 +73,11 @@
           "peak_absolute": 0.1,
           "rms_relative": 0.01
         },
+        "waveform_relative_rmse": 1.711326401426077,
+        "waveform_rmse": 0.22180506240927467,
         "within_tolerance": true
       },
-      "request_id": "0789fe099cdb2aca246786ea90cdfd18616e2d774d009284ed7c9b03ab0bb932"
+      "request_id": "934f231bd629c29e3d219a812269c4a8038e5475ecd5727930348091ac336fba"
     },
     {
       "audio_float32_sha256": "fd46ca645428d0015ec0ebbce6a878bdbcaf12c655838e278a024bdd57324ee8",
@@ -108,9 +112,11 @@
           "peak_absolute": 0.1,
           "rms_relative": 0.01
         },
+        "waveform_relative_rmse": 1.0616807988743386,
+        "waveform_rmse": 0.21754914616078225,
         "within_tolerance": true
       },
-      "request_id": "0c86e5e967afdb60731f2165c0f314ff36b1458eeeb7af2516f961c68ed8602b"
+      "request_id": "20c87d11654507fd6fa070b8654b8f0596bf057cb41184d0f51d01dba47e0b59"
     },
     {
       "audio_float32_sha256": "62da3197ca47f46fe546325cc3f50b0025f9ef03a93d26f3459b0b95c7fac270",
@@ -145,9 +151,11 @@
           "peak_absolute": 0.1,
           "rms_relative": 0.01
         },
+        "waveform_relative_rmse": 0.12067330597434558,
+        "waveform_rmse": 0.011087381685279937,
         "within_tolerance": true
       },
-      "request_id": "6fa435bbf28564939e5c313cfafab421f797b50ca9d36f5d508d0cfd90c846bd"
+      "request_id": "5cabb561b0d49b184e3fbd67791d9db392e30878436094b446ad5e56a1ee0e96"
     },
     {
       "audio_float32_sha256": "a9c59631d599898cff1fcc3563802b311c31f5acb4afe9a37395fc1819ab585d",
@@ -182,9 +190,11 @@
           "peak_absolute": 0.1,
           "rms_relative": 0.01
         },
+        "waveform_relative_rmse": 1.3385210875306586,
+        "waveform_rmse": 0.1738876748072496,
         "within_tolerance": true
       },
-      "request_id": "0789fe099cdb2aca246786ea90cdfd18616e2d774d009284ed7c9b03ab0bb932"
+      "request_id": "934f231bd629c29e3d219a812269c4a8038e5475ecd5727930348091ac336fba"
     },
     {
       "audio_float32_sha256": "8c90ca237ba5952a0609fb797c8ece0e57788386c7c80d573d7014f2df4da122",
@@ -219,9 +229,11 @@
           "peak_absolute": 0.1,
           "rms_relative": 0.01
         },
+        "waveform_relative_rmse": 1.3211732586605298,
+        "waveform_rmse": 0.2703188084121019,
         "within_tolerance": true
       },
-      "request_id": "0c86e5e967afdb60731f2165c0f314ff36b1458eeeb7af2516f961c68ed8602b"
+      "request_id": "20c87d11654507fd6fa070b8654b8f0596bf057cb41184d0f51d01dba47e0b59"
     },
     {
       "audio_float32_sha256": "b170a4120264245766f074851430ee84b802d1d82fd699360a505e61778fc74a",
@@ -256,9 +268,11 @@
           "peak_absolute": 0.1,
           "rms_relative": 0.01
         },
+        "waveform_relative_rmse": 1.733022251809511,
+        "waveform_rmse": 0.15921809200087367,
         "within_tolerance": true
       },
-      "request_id": "83bcc748c90de8e43877609087faf989d01e2ff553bbcae7e9e990e65b382c3c"
+      "request_id": "9187a1f15e31030c260f2da819f7f8ad898d53a99941bdded72965d7d064ef19"
     },
     {
       "audio_float32_sha256": "b203d3ca6b0032cc2544214346df10878171f5ae3d8a2d68c4211f239750fcc0",
@@ -293,9 +307,11 @@
           "peak_absolute": 0.1,
           "rms_relative": 0.01
         },
+        "waveform_relative_rmse": 1.2517739986856948,
+        "waveform_rmse": 0.16224444817350658,
         "within_tolerance": true
       },
-      "request_id": "7307e9c9c59ea56a0d576a50c184a5dff19d5dd78b55cf6e873b5b6cddf24283"
+      "request_id": "05276779d8c222aa26adc28d93e8da6b55d1c4f0b6bfffc88e1f5965cd724fc5"
     },
     {
       "audio_float32_sha256": "89ab558330a83d6d3ec787a842be77dbe8ebc222a00de31286e61a64622ed75f",
@@ -330,9 +346,11 @@
           "peak_absolute": 0.1,
           "rms_relative": 0.01
         },
+        "waveform_relative_rmse": 1.15762990332334,
+        "waveform_rmse": 0.2371055856140973,
         "within_tolerance": true
       },
-      "request_id": "c2618a541004f106e71fb8c15b610d6ab89243bb83bd42ee553dc452adff6577"
+      "request_id": "0056b8ddd52b4266579f621bced840fc1b31cdd972b1cb609673891ea0b9ef2b"
     },
     {
       "audio_float32_sha256": "e1066cfa51a4f11536a542d029e7e26a07b39bd5a8104ced2b99f1b38fc8a1b6",
@@ -367,9 +385,11 @@
           "peak_absolute": 0.1,
           "rms_relative": 0.01
         },
+        "waveform_relative_rmse": 1.3679148880884275,
+        "waveform_rmse": 0.1256114251969893,
         "within_tolerance": true
       },
-      "request_id": "fdb631650d666a15b33fa5c1a92fc7ce87ef536e723ec48448d59645ca86ca12"
+      "request_id": "087854ff3d97d59b1eb812b78e88cc07e025232f5c998d8daa6606e14475ca74"
     },
     {
       "audio_float32_sha256": "9260e5a78ec52db8a764baaa1dacde2e0ad438a1a739d56b193ef7ba437fb85e",
@@ -404,9 +424,11 @@
           "peak_absolute": 0.1,
           "rms_relative": 0.01
         },
+        "waveform_relative_rmse": 1.139197633032397,
+        "waveform_rmse": 0.14773869182000218,
         "within_tolerance": true
       },
-      "request_id": "15045b8b00be084e5f28c439a10c19f27890eddfa949d989891a6d572dc24388"
+      "request_id": "17da102f65ea8f071d90cd32d99abccfe768e6d3fec52387fa3dd3f533069aab"
     },
     {
       "audio_float32_sha256": "4be3c053c02e414396ae2cae6e613cf8ce2dec7f7eb4cb97379a781ebfbe2445",
@@ -441,9 +463,11 @@
           "peak_absolute": 0.1,
           "rms_relative": 0.01
         },
+        "waveform_relative_rmse": 1.5364995303972038,
+        "waveform_rmse": 0.3140313715370586,
         "within_tolerance": true
       },
-      "request_id": "7872eddf0eb27021fbc54ef371f054fc82ecc7c81028b702bf48154419b0afdb"
+      "request_id": "d4c840fed3fa7fdc52d1cd8a23d3c8137071d9121fce80c910502bca9b0d9c5a"
     },
     {
       "audio_float32_sha256": "e918ba9f82195764975afebf8da1f9a211cd79db69c39acc3cbd7169fb514a92",
@@ -478,9 +502,11 @@
           "peak_absolute": 0.1,
           "rms_relative": 0.01
         },
+        "waveform_relative_rmse": 0.9433080394693711,
+        "waveform_rmse": 0.08667064859525432,
         "within_tolerance": true
       },
-      "request_id": "fe9919e26a74248ed5df6f82fcd69c037f548b06ddd15d7b43c088b574b46485"
+      "request_id": "780a915db0b117eafd41135461f53dd56f35c64dd19a1147ec217e1228a15b84"
     },
     {
       "audio_float32_sha256": "3f216d703ebdc8bc5b53ad4e579d9722b1fe84f6a39c1784049c8151cb506b4d",
@@ -515,9 +541,11 @@
           "peak_absolute": 0.1,
           "rms_relative": 0.01
         },
+        "waveform_relative_rmse": 1.6242465363666225,
+        "waveform_rmse": 0.21115580637962578,
         "within_tolerance": true
       },
-      "request_id": "f3e4e0dfbae957e2cb7a24c1d28464de8b5a2409dc66d0ed62b4fc2ae7366d1c"
+      "request_id": "12e7eb17b4b65518aa475476a780faa26d97fcfc577fce787a7371f0cf8b6295"
     },
     {
       "audio_float32_sha256": "206e5e1de7510be37dacc34efcacc5de0b5edae7b1457f4da13f59dd54512c78",
@@ -552,14 +580,16 @@
           "peak_absolute": 0.1,
           "rms_relative": 0.01
         },
+        "waveform_relative_rmse": 1.3342536719134925,
+        "waveform_rmse": 0.27319012521277614,
         "within_tolerance": true
       },
-      "request_id": "9f8d014dca09c4e4d161c1ad36a5eb195fe137be0e0d6d36fc3932c8c8e0db74"
+      "request_id": "272c272a064138878308d3582759185b0635a968945aa7c8c281378946ce7594"
     }
   ],
   "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
   "plugin_sha256": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
-  "renderer_id": "vital-1.6.4-vst3-a622a2c99b40-dawdreamer-0.8.3",
+  "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3",
   "repeatability_failures": [],
   "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
   "tolerance": {

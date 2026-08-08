@@ -64,6 +64,9 @@ def run_batch(renderer: Renderer, requests: Iterable[RenderRequest], output: Pat
     output_path = Path(output)
     output_path.mkdir(parents=True, exist_ok=True)
     ordered = list(requests)
+    request_ids = [request.request_id for request in ordered]
+    if len(request_ids) != len(set(request_ids)):
+        raise ValueError("batch contains duplicate request IDs")
 
     def run(request: RenderRequest) -> tuple[str, bool]:
         wav_path = output_path / f"{request.request_id}.wav"

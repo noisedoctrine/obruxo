@@ -143,6 +143,13 @@ class VitalRenderer(Renderer):
         if not isinstance(buffer_size, int) or isinstance(buffer_size, bool) or buffer_size <= 0:
             raise ValueError("buffer_size must be a positive integer")
         self.accepted_plugin_sha256 = frozenset(value.lower() for value in accepted)
+        if not self.plugin_path.is_file():
+            raise DependencyUnavailableError(f"Vital plugin does not exist: {self.plugin_path}")
+        self.engine_fingerprint = _sha256_file(self.plugin_path)
+        if self.engine_fingerprint not in self.accepted_plugin_sha256:
+            raise DependencyUnavailableError(f"Vital plugin SHA-256 is not accepted: {self.engine_fingerprint}")
+        if self.engine_fingerprint not in renderer_id:
+            raise ValueError("renderer_id must include the complete accepted plugin SHA-256")
         self.buffer_size = buffer_size
         self.renderer_id = renderer_id
         self.qa_config = qa_config or AudioQualityConfig()
@@ -181,11 +188,9 @@ class VitalRenderer(Renderer):
 
     def render(self, request: RenderRequest) -> RenderResult:
         validation_diagnostics = self._validate_request(request)
-        if not self.plugin_path.is_file():
-            raise DependencyUnavailableError(f"Vital plugin does not exist: {self.plugin_path}")
         fingerprint = _sha256_file(self.plugin_path)
-        if self.accepted_plugin_sha256 and fingerprint not in self.accepted_plugin_sha256:
-            raise DependencyUnavailableError(f"Vital plugin SHA-256 is not accepted: {fingerprint}")
+        if fingerprint != self.engine_fingerprint:
+            raise DependencyUnavailableError("Vital plugin binary changed after renderer initialization")
         try:
             import dawdreamer as daw
         except ImportError as error:

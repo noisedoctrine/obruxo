@@ -18,7 +18,10 @@ if TYPE_CHECKING:
     from obruxo_data.midi import Performance
 
 
-DEFAULT_RENDERER_ID = "vital-1.6.4-vst3-a622a2c99b40-dawdreamer-0.8.3"
+DEFAULT_RENDERER_ID = (
+    "vital-1.6.4-vst3-sha256-"
+    "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3"
+)
 
 
 @dataclass(frozen=True, init=False)
