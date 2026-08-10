@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import importlib.metadata
 import json
 import math
 import os
@@ -339,8 +341,34 @@ def _atomic_json_write(path: Path, value: Mapping[str, Any]) -> None:
             temporary.unlink(missing_ok=True)
 
 
-def _validated_vital_renderer() -> Any:
-    data_generation_root = Path(__file__).resolve().parents[4] / "research" / "data_generation"
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _data_generation_root() -> Path:
+    return (Path(__file__).resolve().parents[4] / "research" / "data_generation").resolve()
+
+
+def _default_vital_plugin_path() -> Path | None:
+    configured = os.environ.get("OBRUXO_VITAL_PLUGIN")
+    if configured:
+        return Path(configured)
+    if sys.platform == "win32":
+        program_files = os.environ.get("PROGRAMFILES", r"C:\Program Files")
+        candidates = [Path(program_files) / "Common Files" / "VST3" / "Vital.vst3"]
+    elif sys.platform == "darwin":
+        candidates = [Path("/Library/Audio/Plug-Ins/VST3/Vital.vst3")]
+    else:
+        candidates = [Path("/usr/lib/vst3/Vital.vst3"), Path("/usr/local/lib/vst3/Vital.vst3")]
+    return next((path for path in candidates if path.exists()), None)
+
+
+def _import_data_generation_modules() -> tuple[Any, ...]:
+    data_generation_root = _data_generation_root()
     if not data_generation_root.is_dir():
         raise DerivedRenderUnavailable()
     root_text = str(data_generation_root)
@@ -348,13 +376,23 @@ def _validated_vital_renderer() -> Any:
     if inserted:
         sys.path.insert(0, root_text)
     try:
-        from importlib.util import find_spec
+        from obruxo_data.errors import Severity
+        from obruxo_data.midi import Performance, TempoMap
+        from obruxo_data.render.capabilities import RendererCapabilities
+        from obruxo_data.render.qa import AudioQualityConfig, analyze_audio
+        from obruxo_data.render.vita import VitalVst3StateTemplate
+        from obruxo_data.vital import VitalPreset
 
-        if find_spec("dawdreamer") is None:
-            raise DerivedRenderUnavailable()
-        from obruxo_data.render import VitalRenderer
-
-        return VitalRenderer.from_config(data_generation_root / "configs" / "renderer.yaml")
+        return (
+            Performance,
+            TempoMap,
+            RendererCapabilities,
+            AudioQualityConfig,
+            analyze_audio,
+            VitalVst3StateTemplate,
+            VitalPreset,
+            Severity,
+        )
     except Exception as exc:
         raise DerivedRenderUnavailable() from exc
     finally:
@@ -362,51 +400,236 @@ def _validated_vital_renderer() -> Any:
             sys.path.remove(root_text)
 
 
-def _render_derived_audio(renderer: Any, case: SmokeCase, destination: Path, output_root: Path) -> None:
-    assert case.preset_path is not None
-    data_generation_root = Path(__file__).resolve().parents[4] / "research" / "data_generation"
-    root_text = str(data_generation_root)
-    inserted = root_text not in sys.path
-    if inserted:
-        sys.path.insert(0, root_text)
-    try:
-        from obruxo_data.midi import Performance
-        from obruxo_data.render import RenderRequest
-        from obruxo_data.vital import VitalPreset
+class PedalboardVitalRenderer:
+    """The narrow Vital host authorized for new ignored derived renders."""
 
-        preset = VitalPreset.load(case.preset_path)
-        performance = Performance.from_midi(case.midi_path)
-        request = RenderRequest(
-            preset=preset,
-            performance=performance,
-            sample_rate=44_100,
-            end_tick=performance.end_tick,
-            tail_seconds=2.0,
-            renderer_id=renderer.renderer_id,
-        )
-        output_root.mkdir(parents=True, exist_ok=True)
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        previous_tempdir = tempfile.tempdir
-        tempfile.tempdir = str(output_root)
+    sample_rate = 44_100
+    channels = 2
+    tail_seconds = 2.0
+
+    def __init__(self, *, config_path: Path, plugin_path: Path, vital_sha256: str, buffer_size: int,
+                 capabilities: Any, qa_config: Any, pedalboard_module: Any, state_template: Any,
+                 plugin: Any, pedalboard_version: str):
+        self.config_path = config_path.resolve()
+        self.plugin_path = plugin_path.resolve()
+        self.vital_sha256 = vital_sha256
+        self.buffer_size = buffer_size
+        self.capabilities = capabilities
+        self.qa_config = qa_config
+        self._pedalboard = pedalboard_module
+        self._state_template = state_template
+        self._plugin = plugin
+        self.pedalboard_version = pedalboard_version
+        self.renderer_id = f"vital-{self.vital_sha256}-pedalboard-{self.pedalboard_version}"
+
+    @classmethod
+    def from_config(cls, config_path: str | Path) -> PedalboardVitalRenderer:
+        config = Path(config_path).resolve(strict=True)
         try:
-            result = renderer.render(request)
-        finally:
-            tempfile.tempdir = previous_tempdir
-        if any(getattr(item.severity, "value", None) == "error" for item in result.diagnostics):
+            document = yaml.safe_load(config.read_text(encoding="utf-8"))
+            if not isinstance(document, Mapping) or document.get("version") != 1:
+                raise ValueError("unsupported renderer configuration")
+            accepted = {str(item).lower() for item in document.get("accepted_plugin_sha256", [])}
+            if not accepted:
+                raise ValueError("renderer configuration has no accepted Vital digest")
+            buffer_size = int(document.get("buffer_size", 0))
+            if buffer_size != 128:
+                raise ValueError("the approved Vital buffer size must be 128")
+            configured = document.get("plugin_path")
+            plugin_path = Path(str(configured)) if configured else _default_vital_plugin_path()
+            if plugin_path is None:
+                raise FileNotFoundError("Vital VST3 was not found")
+            plugin_path = plugin_path.resolve(strict=True)
+            if not plugin_path.is_file():
+                raise FileNotFoundError(f"Vital VST3 is not a file: {plugin_path}")
+            vital_sha256 = _sha256_file(plugin_path)
+            if vital_sha256 not in accepted:
+                raise ValueError("Vital VST3 SHA-256 is not accepted by renderer.yaml")
+            capabilities_data = document.get("capabilities", {})
+            qa_data = document.get("qa", {})
+            if not isinstance(capabilities_data, Mapping) or not isinstance(qa_data, Mapping):
+                raise TypeError("renderer configuration sections are invalid")
+            (
+                _, _, renderer_capabilities, audio_quality_config, _, vital_state_template, _, _
+            ) = _import_data_generation_modules()
+            capabilities = renderer_capabilities.from_dict(dict(capabilities_data))
+            qa_config = audio_quality_config(**dict(qa_data))
+            import pedalboard
+
+            load_plugin = getattr(pedalboard, "load_plugin", None)
+            if not callable(load_plugin):
+                raise TypeError("installed Pedalboard has no load_plugin API")
+            pedalboard_version = importlib.metadata.version("pedalboard")
+            plugin = load_plugin(str(plugin_path))
+            if not bool(getattr(plugin, "is_instrument", False)):
+                raise TypeError("Vital VST3 did not load as an instrument")
+            raw_state = getattr(plugin, "raw_state", None)
+            if not isinstance(raw_state, (bytes, bytearray)):
+                raise TypeError("Pedalboard Vital plugin has no byte raw_state")
+            state_template = vital_state_template(bytes(raw_state))
+            if not callable(getattr(plugin, "reset", None)) or not callable(getattr(plugin, "process", None)):
+                raise TypeError("installed Pedalboard Vital plugin lacks reset/process support")
+            return cls(
+                config_path=config,
+                plugin_path=plugin_path,
+                vital_sha256=vital_sha256,
+                buffer_size=buffer_size,
+                capabilities=capabilities,
+                qa_config=qa_config,
+                pedalboard_module=pedalboard,
+                state_template=state_template,
+                plugin=plugin,
+                pedalboard_version=pedalboard_version,
+            )
+        except DerivedRenderUnavailable:
+            raise
+        except Exception as exc:
+            raise DerivedRenderUnavailable() from exc
+
+    def _timestamped_midi(self, performance: Any, tempo_map: Any) -> list[tuple[bytes, float]]:
+        messages: list[tuple[bytes, float]] = []
+        for event in performance.canonical_events():
+            channel = 0 if event.channel is None else int(event.channel)
+            timestamp = float(tempo_map.tick_to_seconds(event.tick))
+            if event.kind.value == "note_on":
+                message = bytes((0x90 | channel, int(event.data[0]), int(event.data[1])))
+            elif event.kind.value == "note_off":
+                message = bytes((0x80 | channel, int(event.data[0]), int(event.data[1])))
+            elif event.kind.value == "pitch_bend":
+                value = int(event.data[0]) + 8192
+                message = bytes((0xE0 | channel, value & 0x7F, (value >> 7) & 0x7F))
+            elif event.kind.value == "control_change":
+                message = bytes((0xB0 | channel, int(event.data[0]), int(event.data[1])))
+            elif event.kind.value == "channel_pressure":
+                message = bytes((0xD0 | channel, int(event.data[0])))
+            elif event.kind.value in {"tempo", "time_signature", "opaque"}:
+                continue
+            else:
+                raise ValueError(f"unsupported MIDI event kind: {event.kind.value}")
+            messages.append((message, timestamp))
+        return messages
+
+    def render(self, preset_path: Path, midi_path: Path, destination: Path, output_root: Path) -> None:
+        if destination.exists():
             raise DerivedRenderUnavailable("derived_render_failed")
-        result.write_wav(destination)
-        sidecar = destination.with_suffix(".json")
-        result.write_json(sidecar)
-        metadata = json.loads(sidecar.read_text(encoding="utf-8"))
-        metadata["audio_source"] = "derived_render"
-        _atomic_json_write(sidecar, metadata)
-    except DerivedRenderUnavailable:
-        raise
-    except Exception as exc:
-        raise DerivedRenderUnavailable("derived_render_failed") from exc
-    finally:
-        if inserted:
-            sys.path.remove(root_text)
+        destination = destination.resolve(strict=False)
+        output_root = output_root.resolve()
+        if destination == output_root or not destination.is_relative_to(output_root):
+            raise BenchmarkInputError("derived_render_destination_invalid", "derived audio destination is outside approved outputs")
+        for source in (preset_path, midi_path):
+            source_root = source.resolve(strict=True).parent
+            if destination == source_root or destination.is_relative_to(source_root):
+                raise BenchmarkInputError("derived_render_destination_invalid", "derived audio destination overlaps a source directory")
+        (
+            Performance, tempo_map_type, _, _, analyze_audio, _, _, Severity
+        ) = _import_data_generation_modules()
+        try:
+            import numpy as np
+            from scipy.io import wavfile
+
+            preset_json = preset_path.read_text(encoding="utf-8-sig")
+            json.loads(preset_json)
+            performance = Performance.from_midi(midi_path)
+            performance.validate().require_valid()
+            timing = tempo_map_type.from_performance(performance)
+            state = self._state_template.build(preset_json)
+            self._plugin.reset()
+            self._plugin.raw_state = state
+            self._plugin.reset()
+            tempo_events = [event for event in performance.canonical_events() if event.kind.value == "tempo"]
+            if tempo_events and hasattr(self._plugin, "beats_per_minute"):
+                self._plugin.beats_per_minute = 60_000_000 / tempo_events[0].data[0]
+            frame_count = timing.render_frame_count(performance.end_tick, self.tail_seconds, self.sample_rate)
+            duration = frame_count / self.sample_rate
+            host_duration = (frame_count + 0.5) / self.sample_rate
+            audio = self._plugin.process(
+                self._timestamped_midi(performance, timing),
+                duration=host_duration,
+                sample_rate=self.sample_rate,
+                num_channels=self.channels,
+                buffer_size=self.buffer_size,
+                reset=True,
+            )
+            channel_first = np.asarray(audio, dtype=np.float32)
+            if channel_first.ndim != 2 or channel_first.shape[0] != self.channels:
+                raise ValueError("Pedalboard returned an unexpected channel layout")
+            rendered = np.ascontiguousarray(channel_first.T)
+            if rendered.shape != (frame_count, self.channels) or not bool(np.isfinite(rendered).all()):
+                raise ValueError("Pedalboard returned invalid Vital audio")
+            qa, diagnostics = analyze_audio(
+                rendered,
+                sample_rate=self.sample_rate,
+                expected_frames=frame_count,
+                expected_channels=self.channels,
+                config=self.qa_config,
+            )
+            if any(item.severity == Severity.ERROR for item in diagnostics):
+                raise ValueError("derived Vital audio failed the existing QA gate")
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            temporary: Path | None = None
+            try:
+                with tempfile.NamedTemporaryFile(dir=destination.parent, prefix=f".{destination.name}.", suffix=".tmp", delete=False) as stream:
+                    temporary = Path(stream.name)
+                wavfile.write(temporary, self.sample_rate, rendered)
+                os.replace(temporary, destination)
+                temporary = None
+            finally:
+                if temporary is not None:
+                    temporary.unlink(missing_ok=True)
+            sidecar = destination.with_suffix(".json")
+            provenance = {
+                "host": "pedalboard",
+                "pedalboard_version": self.pedalboard_version,
+                "vital_plugin_path": str(self.plugin_path),
+                "vital_plugin_sha256": self.vital_sha256,
+                "renderer_config_path": str(self.config_path),
+                "sample_rate": self.sample_rate,
+                "channels": self.channels,
+                "buffer_size": self.buffer_size,
+                "tail_seconds": self.tail_seconds,
+                "duration_seconds": duration,
+                "host_duration_seconds": host_duration,
+                "duration_rounding": "half-frame guard to preserve the exact frame count in Pedalboard",
+                "event_timing": "TempoMap tick-to-second timestamped MIDI",
+                "source_preset_path": str(preset_path.resolve()),
+                "source_midi_path": str(midi_path.resolve()),
+                "audio_label": "derived_render",
+            }
+            _atomic_json_write(
+                sidecar,
+                {
+                    "audio_source": "derived_render",
+                    "sample_rate": self.sample_rate,
+                    "diagnostics": [item.to_dict() for item in diagnostics],
+                    "qa": qa,
+                    "provenance": {
+                        "renderer_id": self.renderer_id,
+                        "backend_version": self.pedalboard_version,
+                        "engine_fingerprint": self.vital_sha256,
+                        "settings": provenance,
+                    },
+                    "derived_render_provenance": provenance,
+                },
+            )
+        except (BenchmarkInputError, DerivedRenderUnavailable):
+            raise
+        except Exception as exc:
+            raise DerivedRenderUnavailable("derived_render_failed") from exc
+
+
+def _validated_vital_renderer() -> PedalboardVitalRenderer:
+    return PedalboardVitalRenderer.from_config(_data_generation_root() / "configs" / "renderer.yaml")
+
+
+def render_derived_vital_audio(renderer: PedalboardVitalRenderer, preset_path: Path, midi_path: Path,
+                               destination: Path, output_root: Path) -> None:
+    """Render one approved derived WAV through the #24 Pedalboard/Vital seam."""
+    renderer.render(preset_path, midi_path, destination, output_root)
+
+
+def _render_derived_audio(renderer: PedalboardVitalRenderer, case: SmokeCase, destination: Path, output_root: Path) -> None:
+    assert case.preset_path is not None
+    render_derived_vital_audio(renderer, case.preset_path, case.midi_path, destination, output_root)
 
 
 def prepare_derived_renders(path: str | Path, config: BenchmarkConfig) -> None:
@@ -546,11 +769,12 @@ def _run_worker(request: Mapping[str, Any]) -> dict[str, Any]:
     worker = Path(__file__).with_name("benchmark_worker.py")
     try:
         completed = subprocess.run(
-            [sys.executable, str(worker)],
+            [sys.executable, "-m", "obruxo_basic_pitch.benchmark_worker"],
             input=json.dumps(request),
             capture_output=True,
             text=True,
             check=False,
+            cwd=worker.parent.parent,
         )
     except OSError:
         return {"status": "runtime_failed", "failure_code": "benchmark_runtime_error"}
@@ -784,10 +1008,10 @@ def run_benchmark(
         },
     }
     for section in ("inference", "training"):
-        for row in report[section]:
-            winner = report["conclusions"][f"{section}_highest_batch_1_audio_throughput"]
-            if winner is not None and winner.get("route") == row.get("route"):
-                report["conclusions"][f"{section}_highest_batch_1_audio_throughput"] = row["route"]
+        key = f"{section}_highest_batch_1_audio_throughput"
+        winner = report["conclusions"][key]
+        if winner is not None:
+            report["conclusions"][key] = winner["route"]
     return report
 
 
