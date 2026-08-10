@@ -1,0 +1,11 @@
+name: obruxo-yourmt3-py312
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12.13
+  - pytorch=2.12.1
+  - numpy=2.4.6
+  - scipy=1.18.0
+  - pyyaml=6.0.3
+  - mir_eval=0.8.2
+# Metadata only. The official Hugging Face executable source is not vendored or installed here.

@@ -17,6 +17,8 @@ research/data_generation/outputs/*
 !research/data_generation/outputs/.gitignore
 research/modelling/basic_pitch/outputs/*
 !research/modelling/basic_pitch/outputs/.gitignore
+research/modelling/performance_transcription_benchmark/outputs/*
+!research/modelling/performance_transcription_benchmark/outputs/.gitignore
 
 # Local agent scratchpad
 .agents/

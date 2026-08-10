@@ -1,0 +1,260 @@
+version: 1
+models:
+  basic_pitch:
+    family: basic_pitch
+    publication_year: 2022
+    output_contract: note_and_frame
+    source:
+      repository: spotify/basic-pitch
+      revision: 9991303bba609a3b93089d13ec80d1d495083596
+    checkpoint:
+      repository: noisedoctrine/obruxo
+      revision: 918a1678465815c6f0a70009910737c164ed5a02
+      path: research/modelling/basic_pitch/artifacts/basic_pitch_icassp_2022.pt
+      sha256: 6c8869af67af45472827bb68b4d1a99e78fe3d5e7b6dd41132ac5df609f0cb55
+      size_bytes: 153383
+    code_license: Apache-2.0
+    weight_license: Apache-2.0
+    environment: environment.yml
+    benchmark_dtype: float32
+    native_sample_rate: 22050
+    native_output_type: note_and_frame
+    native_batch_sizes: [1, 2, 4, 8]
+    differentiable_boundary: native_pytorch_forward
+    source_url: https://github.com/spotify/basic-pitch
+    checkpoint_url: https://github.com/noisedoctrine/obruxo/blob/918a1678465815c6f0a70009910737c164ed5a02/research/modelling/basic_pitch/artifacts/basic_pitch_icassp_2022.pt
+    stock_inference:
+      decoder: landed_basic_pitch_stock_decoder
+      frame_grid: landed_basic_pitch_model_frames
+      quality_source: landed_issue_25_results
+      cost_source: landed_issue_24_results
+    representation:
+      dense: note_posterior_on_model_frames
+      event: stock_polyphonic_decoder
+  timbre_trap_base:
+    family: timbre_trap
+    publication_year: 2024
+    output_contract: frame_pitch
+    source:
+      repository: sony/timbre-trap
+      revision: 7afe7e9b327929c099baeccd4b21973aedb94d9b
+    checkpoint:
+      repository: cwitkowitz/timbre-trap
+      revision: c1112a0
+      path: models/tt-orig.pt
+      sha256: 1c3bafd33a831d61e8ee9051d6c5b4c5d483e6a7669ca9df85ac6ab304cb9fe3
+      size_bytes: 0
+    code_license: MIT
+    weight_license: upstream_space_license_not_separately_declared
+    environment: environments/timbre_trap.yml
+    benchmark_dtype: float32
+    native_sample_rate: 22050
+    native_output_type: native_frame_pitch
+    native_batch_sizes: [1]
+    differentiable_boundary: native_forward_if_upstream_runtime_is_present
+    source_url: https://github.com/sony/timbre-trap
+    checkpoint_url: https://huggingface.co/spaces/cwitkowitz/timbre-trap/blob/main/models/tt-orig.pt
+    availability: unavailable
+    unavailability_reason: pinned checkpoint size is not locally verifiable and the approved py312 runtime has no Timbre-Trap checkout
+    stock_inference:
+      sample_rate: 22050
+      cqt_bins_per_octave: 60
+      cqt_octaves: 9
+      peak_picking: native_frequency
+      activation_threshold: 0.5
+      output_notes: null
+  ymt3_plus:
+    family: yourmt3
+    publication_year: 2024
+    output_contract: note_events
+    source:
+      repository: mimbres/YourMT3-HuggingFace-Space
+      revision: a03c9b4d8c3b97c6a7a556768726794042127628
+    checkpoint:
+      repository: mimbres/YourMT3
+      revision: e45ebd70398682d54b7bb1901a5216e18f3b1824
+      path: logs/2024/notask_all_cross_v6_xk2_amp0811_gm_ext_plus_nops_b72/checkpoints/model.ckpt
+      sha256: 76673d4289aae1a66984b3fee59157d484cda8fdf9b56279251b137321d448e6
+      size_bytes: 542707465
+    code_license: GPL-3.0-only
+    weight_license: Apache-2.0
+    environment: environments/yourmt3.yml
+    benchmark_dtype: float32
+    native_sample_rate: 16000
+    native_output_type: stock_midi_note_events
+    native_batch_sizes: [1]
+    differentiable_boundary: not_exposed_by_stock_inference_path
+    source_url: https://huggingface.co/spaces/mimbres/YourMT3
+    checkpoint_url: https://huggingface.co/mimbres/YourMT3
+    availability: unavailable
+    unavailability_reason: official source and checkpoint are not present in permitted local storage
+    stock_inference:
+      project: 2024
+      precision: float32
+      checkpoint_selection: ymt3_plus
+      decoder: official_space_defaults
+      deterministic: true
+  yptf_multi:
+    family: yourmt3
+    publication_year: 2024
+    output_contract: note_events
+    source:
+      repository: mimbres/YourMT3-HuggingFace-Space
+      revision: a03c9b4d8c3b97c6a7a556768726794042127628
+    checkpoint:
+      repository: mimbres/YourMT3
+      revision: e45ebd70398682d54b7bb1901a5216e18f3b1824
+      path: logs/2024/mc13_256_all_cross_v6_xk5_amp0811_edr005_attend_c_full_plus_2psn_nl26_sb_b26r_800k/checkpoints/model.ckpt
+      sha256: f7ed46a7c61244bd35485143a791b3cf46515ef96239793845ae8e4084865130
+      size_bytes: 541553263
+    code_license: GPL-3.0-only
+    weight_license: Apache-2.0
+    environment: environments/yourmt3.yml
+    benchmark_dtype: float32
+    native_sample_rate: 16000
+    native_output_type: stock_midi_note_events
+    native_batch_sizes: [1]
+    differentiable_boundary: not_exposed_by_stock_inference_path
+    source_url: https://huggingface.co/spaces/mimbres/YourMT3
+    checkpoint_url: https://huggingface.co/mimbres/YourMT3
+    availability: unavailable
+    unavailability_reason: official source and checkpoint are not present in permitted local storage
+    stock_inference:
+      project: 2024
+      precision: float32
+      checkpoint_selection: yptf_multi_ps
+      decoder: official_space_defaults
+      deterministic: true
+  yptf_moe_multi:
+    family: yourmt3
+    publication_year: 2024
+    output_contract: note_events
+    source:
+      repository: mimbres/YourMT3-HuggingFace-Space
+      revision: a03c9b4d8c3b97c6a7a556768726794042127628
+    checkpoint:
+      repository: mimbres/YourMT3
+      revision: e45ebd70398682d54b7bb1901a5216e18f3b1824
+      path: logs/2024/mc13_256_g4_all_v7_mt3f_sqr_rms_moe_wf4_n8k2_silu_rope_rp_b36_nops/checkpoints/last.ckpt
+      sha256: ae38e415c79efd5592dcb9b658cdb99ddb11d4c4e1eaa364cab04a052473fc25
+      size_bytes: 561544628
+    code_license: GPL-3.0-only
+    weight_license: Apache-2.0
+    environment: environments/yourmt3.yml
+    benchmark_dtype: float32
+    native_sample_rate: 16000
+    native_output_type: stock_midi_note_events
+    native_batch_sizes: [1]
+    differentiable_boundary: not_exposed_by_stock_inference_path
+    source_url: https://huggingface.co/spaces/mimbres/YourMT3
+    checkpoint_url: https://huggingface.co/mimbres/YourMT3
+    availability: unavailable
+    unavailability_reason: official source and checkpoint are not present in permitted local storage
+    stock_inference:
+      project: 2024
+      precision: float32
+      checkpoint_selection: yptf_moe_multi_no_ps
+      decoder: official_space_defaults
+      deterministic: true
+  muscriptor_small:
+    family: muscriptor
+    publication_year: 2026
+    output_contract: note_events
+    source:
+      repository: muscriptor/muscriptor
+      revision: c3b82e7
+    checkpoint:
+      repository: MuScriptor/muscriptor-small
+      revision: gated_revision_not_available_locally
+      path: model.safetensors
+      sha256: gated_checkpoint_not_available_locally
+      size_bytes: 0
+    code_license: MIT
+    weight_license: CC-BY-NC-4.0
+    environment: environments/muscriptor.yml
+    benchmark_dtype: float32
+    native_sample_rate: 16000
+    native_output_type: timing_corrected_midi_note_events
+    native_batch_sizes: [1]
+    differentiable_boundary: not_exposed_by_stock_generation_path
+    source_url: https://github.com/muscriptor/muscriptor
+    checkpoint_url: https://huggingface.co/MuScriptor/muscriptor-small
+    availability: unavailable
+    unavailability_reason: checkpoint is gated and no approved credential or local copy is available
+    stock_inference:
+      use_sampling: false
+      temperature: 1.0
+      cfg_coef: 1.0
+      beam_size: 1
+      prelude_forcing: true
+      batch_size: 1
+      detect_tempo: best_effort
+      quality_path: transcribe_to_midi
+  muscriptor_medium:
+    family: muscriptor
+    publication_year: 2026
+    output_contract: note_events
+    source:
+      repository: muscriptor/muscriptor
+      revision: c3b82e7
+    checkpoint:
+      repository: MuScriptor/muscriptor-medium
+      revision: gated_revision_not_available_locally
+      path: model.safetensors
+      sha256: gated_checkpoint_not_available_locally
+      size_bytes: 0
+    code_license: MIT
+    weight_license: CC-BY-NC-4.0
+    environment: environments/muscriptor.yml
+    benchmark_dtype: float32
+    native_sample_rate: 16000
+    native_output_type: timing_corrected_midi_note_events
+    native_batch_sizes: [1]
+    differentiable_boundary: not_exposed_by_stock_generation_path
+    source_url: https://github.com/muscriptor/muscriptor
+    checkpoint_url: https://huggingface.co/MuScriptor/muscriptor-medium
+    availability: unavailable
+    unavailability_reason: checkpoint is gated and no approved credential or local copy is available
+    stock_inference:
+      use_sampling: false
+      temperature: 1.0
+      cfg_coef: 1.0
+      beam_size: 1
+      prelude_forcing: true
+      batch_size: 1
+      detect_tempo: best_effort
+      quality_path: transcribe_to_midi
+  muscriptor_large:
+    family: muscriptor
+    publication_year: 2026
+    output_contract: note_events
+    source:
+      repository: muscriptor/muscriptor
+      revision: c3b82e7
+    checkpoint:
+      repository: MuScriptor/muscriptor-large
+      revision: gated_revision_not_available_locally
+      path: model.safetensors
+      sha256: gated_checkpoint_not_available_locally
+      size_bytes: 0
+    code_license: MIT
+    weight_license: CC-BY-NC-4.0
+    environment: environments/muscriptor.yml
+    benchmark_dtype: float32
+    native_sample_rate: 16000
+    native_output_type: timing_corrected_midi_note_events
+    native_batch_sizes: [1]
+    differentiable_boundary: not_exposed_by_stock_generation_path
+    source_url: https://github.com/muscriptor/muscriptor
+    checkpoint_url: https://huggingface.co/MuScriptor/muscriptor-large
+    availability: unavailable
+    unavailability_reason: checkpoint is gated and no approved credential or local copy is available
+    stock_inference:
+      use_sampling: false
+      temperature: 1.0
+      cfg_coef: 1.0
+      beam_size: 1
+      prelude_forcing: true
+      batch_size: 1
+      detect_tempo: best_effort
+      quality_path: transcribe_to_midi

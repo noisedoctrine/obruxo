@@ -1,0 +1,551 @@
+{
+  "comparison": {
+    "cost_contract": "landed_issue_24_end_to_end_boundary",
+    "no_composite_winner": true,
+    "quality_contract": "landed_issue_25_metrics_and_10000_replicate_seed_0_bootstrap",
+    "quantization_contract": "cpu_dynamic_qint8_ordinary_linear_only"
+  },
+  "conclusion": {
+    "cost": "Cost rows remain separate by route and are unavailable when the fixed smoke input or candidate runtime is unavailable.",
+    "later_integration": "No candidate is promoted without executable common-corpus evidence.",
+    "quality": "No quality score is published for unavailable models or an empty eligible population.",
+    "representation": "Representation and licensing are inventories, not an integration decision."
+  },
+  "format_version": 1,
+  "models": [
+    {
+      "execution": {
+        "failure_code": null,
+        "routes": [
+          {
+            "failure_code": "derived_render_unavailable",
+            "mode": "inference",
+            "route": "pytorch_cpu",
+            "status": "unavailable"
+          },
+          {
+            "failure_code": "derived_render_unavailable",
+            "mode": "inference",
+            "route": "pytorch_xpu",
+            "status": "unavailable"
+          },
+          {
+            "failure_code": "derived_render_unavailable",
+            "mode": "inference",
+            "route": "openvino_cpu",
+            "status": "unavailable"
+          },
+          {
+            "failure_code": "derived_render_unavailable",
+            "mode": "inference",
+            "route": "openvino_gpu",
+            "status": "unavailable"
+          },
+          {
+            "failure_code": "derived_render_unavailable",
+            "mode": "training",
+            "route": "pytorch_cpu",
+            "status": "unavailable"
+          },
+          {
+            "failure_code": "derived_render_unavailable",
+            "mode": "training",
+            "route": "pytorch_xpu",
+            "status": "unavailable"
+          }
+        ],
+        "status": "unavailable",
+        "timing_contract": {
+          "batch_sizes": [
+            1,
+            2,
+            4,
+            8
+          ],
+          "end_to_end_batch_size": 1,
+          "precision": "float32",
+          "process_repetitions": 3,
+          "routes": {
+            "inference": [
+              "pytorch_cpu",
+              "pytorch_xpu",
+              "openvino_cpu",
+              "openvino_gpu"
+            ],
+            "training": [
+              "pytorch_cpu",
+              "pytorch_xpu"
+            ]
+          },
+          "smoke_set": {
+            "coverage": {
+              "duration_classes": [
+                "short",
+                "medium",
+                "long"
+              ],
+              "envelopes": [
+                "transient",
+                "sustained"
+              ],
+              "note_density_classes": [
+                "low",
+                "high"
+              ],
+              "performance": [
+                "monophonic",
+                "polyphonic"
+              ],
+              "roles": [
+                "bass",
+                "lead",
+                "arp_sequence",
+                "pad_sustained",
+                "other"
+              ]
+            },
+            "max_cases": 12,
+            "min_cases": 8
+          },
+          "timed_iterations": 10,
+          "version": 1,
+          "warmup_iterations": 3
+        }
+      },
+      "failure_code": "no_eligible_pairs",
+      "family": "basic_pitch",
+      "identity": {
+        "availability": "available",
+        "benchmark_dtype": "float32",
+        "checkpoint_repository": "noisedoctrine/obruxo",
+        "checkpoint_revision": "918a1678465815c6f0a70009910737c164ed5a02",
+        "checkpoint_sha256": "6c8869af67af45472827bb68b4d1a99e78fe3d5e7b6dd41132ac5df609f0cb55",
+        "checkpoint_size_bytes": 153383,
+        "checkpoint_url": "https://github.com/noisedoctrine/obruxo/blob/918a1678465815c6f0a70009910737c164ed5a02/research/modelling/basic_pitch/artifacts/basic_pitch_icassp_2022.pt",
+        "code_license": "Apache-2.0",
+        "differentiable_boundary": "native_pytorch_forward",
+        "environment": "environment.yml",
+        "family": "basic_pitch",
+        "model_id": "basic_pitch",
+        "native_batch_sizes": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "native_output_type": "note_and_frame",
+        "native_sample_rate": 22050,
+        "output_contract": "note_and_frame",
+        "publication_year": 2022,
+        "representation": {
+          "dense": "note_posterior_on_model_frames",
+          "event": "stock_polyphonic_decoder"
+        },
+        "source_repository": "spotify/basic-pitch",
+        "source_revision": "9991303bba609a3b93089d13ec80d1d495083596",
+        "source_url": "https://github.com/spotify/basic-pitch",
+        "stock_inference": {
+          "cost_source": "landed_issue_24_results",
+          "decoder": "landed_basic_pitch_stock_decoder",
+          "frame_grid": "landed_basic_pitch_model_frames",
+          "quality_source": "landed_issue_25_results"
+        },
+        "unavailability_reason": null,
+        "weight_license": "Apache-2.0"
+      },
+      "landed_baseline": {
+        "cost_failure_code": "the opted-in validated Vital derived-render path was unavailable",
+        "cost_status": "blocked",
+        "eligible_pairs": 0,
+        "quality_coverage": null,
+        "quality_failure_code": "no_eligible_pairs",
+        "quality_status": "unavailable"
+      },
+      "model_id": "basic_pitch",
+      "output_contract": "note_and_frame",
+      "publication_year": 2022,
+      "quality": null,
+      "quantization": null,
+      "representation": {
+        "dense": "note_posterior_on_model_frames",
+        "event": "stock_polyphonic_decoder"
+      },
+      "resources": null,
+      "status": "unavailable"
+    },
+    {
+      "execution": {
+        "failure_code": null,
+        "routes": [],
+        "status": "unavailable",
+        "timing_contract": null
+      },
+      "failure_code": "pinned checkpoint size is not locally verifiable and the approved py312 runtime has no Timbre-Trap checkout",
+      "family": "timbre_trap",
+      "identity": {
+        "availability": "unavailable",
+        "benchmark_dtype": "float32",
+        "checkpoint_repository": "cwitkowitz/timbre-trap",
+        "checkpoint_revision": "c1112a0",
+        "checkpoint_sha256": "1c3bafd33a831d61e8ee9051d6c5b4c5d483e6a7669ca9df85ac6ab304cb9fe3",
+        "checkpoint_size_bytes": 0,
+        "checkpoint_url": "https://huggingface.co/spaces/cwitkowitz/timbre-trap/blob/main/models/tt-orig.pt",
+        "code_license": "MIT",
+        "differentiable_boundary": "native_forward_if_upstream_runtime_is_present",
+        "environment": "environments/timbre_trap.yml",
+        "family": "timbre_trap",
+        "model_id": "timbre_trap_base",
+        "native_batch_sizes": [
+          1
+        ],
+        "native_output_type": "native_frame_pitch",
+        "native_sample_rate": 22050,
+        "output_contract": "frame_pitch",
+        "publication_year": 2024,
+        "representation": {},
+        "source_repository": "sony/timbre-trap",
+        "source_revision": "7afe7e9b327929c099baeccd4b21973aedb94d9b",
+        "source_url": "https://github.com/sony/timbre-trap",
+        "stock_inference": {
+          "activation_threshold": 0.5,
+          "cqt_bins_per_octave": 60,
+          "cqt_octaves": 9,
+          "output_notes": null,
+          "peak_picking": "native_frequency",
+          "sample_rate": 22050
+        },
+        "unavailability_reason": "pinned checkpoint size is not locally verifiable and the approved py312 runtime has no Timbre-Trap checkout",
+        "weight_license": "upstream_space_license_not_separately_declared"
+      },
+      "model_id": "timbre_trap_base",
+      "output_contract": "frame_pitch",
+      "publication_year": 2024,
+      "quality": null,
+      "quantization": null,
+      "representation": {},
+      "resources": null,
+      "status": "unavailable"
+    },
+    {
+      "execution": {
+        "failure_code": null,
+        "routes": [],
+        "status": "unavailable",
+        "timing_contract": null
+      },
+      "failure_code": "official source and checkpoint are not present in permitted local storage",
+      "family": "yourmt3",
+      "identity": {
+        "availability": "unavailable",
+        "benchmark_dtype": "float32",
+        "checkpoint_repository": "mimbres/YourMT3",
+        "checkpoint_revision": "e45ebd70398682d54b7bb1901a5216e18f3b1824",
+        "checkpoint_sha256": "76673d4289aae1a66984b3fee59157d484cda8fdf9b56279251b137321d448e6",
+        "checkpoint_size_bytes": 542707465,
+        "checkpoint_url": "https://huggingface.co/mimbres/YourMT3",
+        "code_license": "GPL-3.0-only",
+        "differentiable_boundary": "not_exposed_by_stock_inference_path",
+        "environment": "environments/yourmt3.yml",
+        "family": "yourmt3",
+        "model_id": "ymt3_plus",
+        "native_batch_sizes": [
+          1
+        ],
+        "native_output_type": "stock_midi_note_events",
+        "native_sample_rate": 16000,
+        "output_contract": "note_events",
+        "publication_year": 2024,
+        "representation": {},
+        "source_repository": "mimbres/YourMT3-HuggingFace-Space",
+        "source_revision": "a03c9b4d8c3b97c6a7a556768726794042127628",
+        "source_url": "https://huggingface.co/spaces/mimbres/YourMT3",
+        "stock_inference": {
+          "checkpoint_selection": "ymt3_plus",
+          "decoder": "official_space_defaults",
+          "deterministic": true,
+          "precision": "float32",
+          "project": 2024
+        },
+        "unavailability_reason": "official source and checkpoint are not present in permitted local storage",
+        "weight_license": "Apache-2.0"
+      },
+      "model_id": "ymt3_plus",
+      "output_contract": "note_events",
+      "publication_year": 2024,
+      "quality": null,
+      "quantization": null,
+      "representation": {},
+      "resources": null,
+      "status": "unavailable"
+    },
+    {
+      "execution": {
+        "failure_code": null,
+        "routes": [],
+        "status": "unavailable",
+        "timing_contract": null
+      },
+      "failure_code": "official source and checkpoint are not present in permitted local storage",
+      "family": "yourmt3",
+      "identity": {
+        "availability": "unavailable",
+        "benchmark_dtype": "float32",
+        "checkpoint_repository": "mimbres/YourMT3",
+        "checkpoint_revision": "e45ebd70398682d54b7bb1901a5216e18f3b1824",
+        "checkpoint_sha256": "f7ed46a7c61244bd35485143a791b3cf46515ef96239793845ae8e4084865130",
+        "checkpoint_size_bytes": 541553263,
+        "checkpoint_url": "https://huggingface.co/mimbres/YourMT3",
+        "code_license": "GPL-3.0-only",
+        "differentiable_boundary": "not_exposed_by_stock_inference_path",
+        "environment": "environments/yourmt3.yml",
+        "family": "yourmt3",
+        "model_id": "yptf_multi",
+        "native_batch_sizes": [
+          1
+        ],
+        "native_output_type": "stock_midi_note_events",
+        "native_sample_rate": 16000,
+        "output_contract": "note_events",
+        "publication_year": 2024,
+        "representation": {},
+        "source_repository": "mimbres/YourMT3-HuggingFace-Space",
+        "source_revision": "a03c9b4d8c3b97c6a7a556768726794042127628",
+        "source_url": "https://huggingface.co/spaces/mimbres/YourMT3",
+        "stock_inference": {
+          "checkpoint_selection": "yptf_multi_ps",
+          "decoder": "official_space_defaults",
+          "deterministic": true,
+          "precision": "float32",
+          "project": 2024
+        },
+        "unavailability_reason": "official source and checkpoint are not present in permitted local storage",
+        "weight_license": "Apache-2.0"
+      },
+      "model_id": "yptf_multi",
+      "output_contract": "note_events",
+      "publication_year": 2024,
+      "quality": null,
+      "quantization": null,
+      "representation": {},
+      "resources": null,
+      "status": "unavailable"
+    },
+    {
+      "execution": {
+        "failure_code": null,
+        "routes": [],
+        "status": "unavailable",
+        "timing_contract": null
+      },
+      "failure_code": "official source and checkpoint are not present in permitted local storage",
+      "family": "yourmt3",
+      "identity": {
+        "availability": "unavailable",
+        "benchmark_dtype": "float32",
+        "checkpoint_repository": "mimbres/YourMT3",
+        "checkpoint_revision": "e45ebd70398682d54b7bb1901a5216e18f3b1824",
+        "checkpoint_sha256": "ae38e415c79efd5592dcb9b658cdb99ddb11d4c4e1eaa364cab04a052473fc25",
+        "checkpoint_size_bytes": 561544628,
+        "checkpoint_url": "https://huggingface.co/mimbres/YourMT3",
+        "code_license": "GPL-3.0-only",
+        "differentiable_boundary": "not_exposed_by_stock_inference_path",
+        "environment": "environments/yourmt3.yml",
+        "family": "yourmt3",
+        "model_id": "yptf_moe_multi",
+        "native_batch_sizes": [
+          1
+        ],
+        "native_output_type": "stock_midi_note_events",
+        "native_sample_rate": 16000,
+        "output_contract": "note_events",
+        "publication_year": 2024,
+        "representation": {},
+        "source_repository": "mimbres/YourMT3-HuggingFace-Space",
+        "source_revision": "a03c9b4d8c3b97c6a7a556768726794042127628",
+        "source_url": "https://huggingface.co/spaces/mimbres/YourMT3",
+        "stock_inference": {
+          "checkpoint_selection": "yptf_moe_multi_no_ps",
+          "decoder": "official_space_defaults",
+          "deterministic": true,
+          "precision": "float32",
+          "project": 2024
+        },
+        "unavailability_reason": "official source and checkpoint are not present in permitted local storage",
+        "weight_license": "Apache-2.0"
+      },
+      "model_id": "yptf_moe_multi",
+      "output_contract": "note_events",
+      "publication_year": 2024,
+      "quality": null,
+      "quantization": null,
+      "representation": {},
+      "resources": null,
+      "status": "unavailable"
+    },
+    {
+      "execution": {
+        "failure_code": null,
+        "routes": [],
+        "status": "unavailable",
+        "timing_contract": null
+      },
+      "failure_code": "checkpoint is gated and no approved credential or local copy is available",
+      "family": "muscriptor",
+      "identity": {
+        "availability": "unavailable",
+        "benchmark_dtype": "float32",
+        "checkpoint_repository": "MuScriptor/muscriptor-small",
+        "checkpoint_revision": "gated_revision_not_available_locally",
+        "checkpoint_sha256": "gated_checkpoint_not_available_locally",
+        "checkpoint_size_bytes": 0,
+        "checkpoint_url": "https://huggingface.co/MuScriptor/muscriptor-small",
+        "code_license": "MIT",
+        "differentiable_boundary": "not_exposed_by_stock_generation_path",
+        "environment": "environments/muscriptor.yml",
+        "family": "muscriptor",
+        "model_id": "muscriptor_small",
+        "native_batch_sizes": [
+          1
+        ],
+        "native_output_type": "timing_corrected_midi_note_events",
+        "native_sample_rate": 16000,
+        "output_contract": "note_events",
+        "publication_year": 2026,
+        "representation": {},
+        "source_repository": "muscriptor/muscriptor",
+        "source_revision": "c3b82e7",
+        "source_url": "https://github.com/muscriptor/muscriptor",
+        "stock_inference": {
+          "batch_size": 1,
+          "beam_size": 1,
+          "cfg_coef": 1.0,
+          "detect_tempo": "best_effort",
+          "prelude_forcing": true,
+          "quality_path": "transcribe_to_midi",
+          "temperature": 1.0,
+          "use_sampling": false
+        },
+        "unavailability_reason": "checkpoint is gated and no approved credential or local copy is available",
+        "weight_license": "CC-BY-NC-4.0"
+      },
+      "model_id": "muscriptor_small",
+      "output_contract": "note_events",
+      "publication_year": 2026,
+      "quality": null,
+      "quantization": null,
+      "representation": {},
+      "resources": null,
+      "status": "unavailable"
+    },
+    {
+      "execution": {
+        "failure_code": null,
+        "routes": [],
+        "status": "unavailable",
+        "timing_contract": null
+      },
+      "failure_code": "checkpoint is gated and no approved credential or local copy is available",
+      "family": "muscriptor",
+      "identity": {
+        "availability": "unavailable",
+        "benchmark_dtype": "float32",
+        "checkpoint_repository": "MuScriptor/muscriptor-medium",
+        "checkpoint_revision": "gated_revision_not_available_locally",
+        "checkpoint_sha256": "gated_checkpoint_not_available_locally",
+        "checkpoint_size_bytes": 0,
+        "checkpoint_url": "https://huggingface.co/MuScriptor/muscriptor-medium",
+        "code_license": "MIT",
+        "differentiable_boundary": "not_exposed_by_stock_generation_path",
+        "environment": "environments/muscriptor.yml",
+        "family": "muscriptor",
+        "model_id": "muscriptor_medium",
+        "native_batch_sizes": [
+          1
+        ],
+        "native_output_type": "timing_corrected_midi_note_events",
+        "native_sample_rate": 16000,
+        "output_contract": "note_events",
+        "publication_year": 2026,
+        "representation": {},
+        "source_repository": "muscriptor/muscriptor",
+        "source_revision": "c3b82e7",
+        "source_url": "https://github.com/muscriptor/muscriptor",
+        "stock_inference": {
+          "batch_size": 1,
+          "beam_size": 1,
+          "cfg_coef": 1.0,
+          "detect_tempo": "best_effort",
+          "prelude_forcing": true,
+          "quality_path": "transcribe_to_midi",
+          "temperature": 1.0,
+          "use_sampling": false
+        },
+        "unavailability_reason": "checkpoint is gated and no approved credential or local copy is available",
+        "weight_license": "CC-BY-NC-4.0"
+      },
+      "model_id": "muscriptor_medium",
+      "output_contract": "note_events",
+      "publication_year": 2026,
+      "quality": null,
+      "quantization": null,
+      "representation": {},
+      "resources": null,
+      "status": "unavailable"
+    },
+    {
+      "execution": {
+        "failure_code": null,
+        "routes": [],
+        "status": "unavailable",
+        "timing_contract": null
+      },
+      "failure_code": "checkpoint is gated and no approved credential or local copy is available",
+      "family": "muscriptor",
+      "identity": {
+        "availability": "unavailable",
+        "benchmark_dtype": "float32",
+        "checkpoint_repository": "MuScriptor/muscriptor-large",
+        "checkpoint_revision": "gated_revision_not_available_locally",
+        "checkpoint_sha256": "gated_checkpoint_not_available_locally",
+        "checkpoint_size_bytes": 0,
+        "checkpoint_url": "https://huggingface.co/MuScriptor/muscriptor-large",
+        "code_license": "MIT",
+        "differentiable_boundary": "not_exposed_by_stock_generation_path",
+        "environment": "environments/muscriptor.yml",
+        "family": "muscriptor",
+        "model_id": "muscriptor_large",
+        "native_batch_sizes": [
+          1
+        ],
+        "native_output_type": "timing_corrected_midi_note_events",
+        "native_sample_rate": 16000,
+        "output_contract": "note_events",
+        "publication_year": 2026,
+        "representation": {},
+        "source_repository": "muscriptor/muscriptor",
+        "source_revision": "c3b82e7",
+        "source_url": "https://github.com/muscriptor/muscriptor",
+        "stock_inference": {
+          "batch_size": 1,
+          "beam_size": 1,
+          "cfg_coef": 1.0,
+          "detect_tempo": "best_effort",
+          "prelude_forcing": true,
+          "quality_path": "transcribe_to_midi",
+          "temperature": 1.0,
+          "use_sampling": false
+        },
+        "unavailability_reason": "checkpoint is gated and no approved credential or local copy is available",
+        "weight_license": "CC-BY-NC-4.0"
+      },
+      "model_id": "muscriptor_large",
+      "output_contract": "note_events",
+      "publication_year": 2026,
+      "quality": null,
+      "quantization": null,
+      "representation": {},
+      "resources": null,
+      "status": "unavailable"
+    }
+  ]
+}
