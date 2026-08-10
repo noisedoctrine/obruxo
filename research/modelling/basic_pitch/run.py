@@ -3,11 +3,19 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
 from obruxo_basic_pitch.benchmark import run_benchmark_cli
+from obruxo_basic_pitch.evaluation.corpus import build_evaluation_manifest
+from obruxo_basic_pitch.evaluation.report import write_sanitized_reports
+from obruxo_basic_pitch.evaluation.runner import (
+    BackendUnavailable,
+    EvaluationInputError,
+    evaluate_corpus,
+)
 from obruxo_basic_pitch.parity import (
     assert_parity,
     audio_to_windows,
@@ -50,6 +58,22 @@ def _parser() -> argparse.ArgumentParser:
         help="opt in to missing-WAV renders from an unambiguous Vital patch and MIDI pair",
     )
     benchmark.add_argument("--force", action="store_true")
+
+    manifest = subparsers.add_parser("build-eval-manifest", help="resolve the local PresetShare evaluation pairs")
+    manifest.add_argument("--corpus-root", type=Path, required=True)
+    manifest.add_argument("--output", type=Path, required=True)
+    manifest.add_argument("--audit", type=Path, required=True)
+    manifest.add_argument(
+        "--allow-derived-render",
+        action="store_true",
+        help="opt in to derived WAVs for unambiguous Vital patch and MIDI pairs",
+    )
+    manifest.add_argument("--force", action="store_true")
+
+    evaluation = subparsers.add_parser("evaluate-corpus", help="evaluate the fixed stock Basic Pitch corpus manifest")
+    evaluation.add_argument("--manifest", type=Path, required=True)
+    evaluation.add_argument("--output", type=Path, required=True)
+    evaluation.add_argument("--force", action="store_true")
     return parser
 
 
@@ -72,6 +96,40 @@ def main() -> int:
             allow_derived_render=args.allow_derived_render,
             force=args.force,
         )
+
+    if args.command == "build-eval-manifest":
+        try:
+            summary = build_evaluation_manifest(
+                args.corpus_root,
+                output=args.output,
+                audit=args.audit,
+                allow_derived_render=args.allow_derived_render,
+                force=args.force,
+            )
+        except (EvaluationInputError, FileExistsError, OSError, ValueError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+        print(f"paired {summary['eligible_count']} of {summary['candidate_count']} candidates")
+        return 0
+
+    if args.command == "evaluate-corpus":
+        try:
+            result = evaluate_corpus(args.manifest, args.output, force=args.force)
+            manifest_path = args.manifest.resolve(strict=True)
+            output_dir = args.output.resolve(strict=False)
+            write_sanitized_reports(
+                manifest_path.with_name("pairing_audit.json"),
+                output_dir / "run.json",
+                output_dir / "aggregates.json",
+                Path(__file__).resolve().parent / "reports" / "presetshare_baseline.json",
+                Path(__file__).resolve().parent / "reports" / "presetshare_baseline.md",
+                force=args.force,
+            )
+        except (BackendUnavailable, EvaluationInputError, FileExistsError, OSError, ValueError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 3 if isinstance(exc, BackendUnavailable) else 2
+        print(f"evaluated {result['successful_pair_count']} of {result['pair_count']} pairs")
+        return 0 if result["status"] == "ok" else 3
 
     public = synthetic_windows()
     local = [audio_to_windows(path) for path in args.audio]

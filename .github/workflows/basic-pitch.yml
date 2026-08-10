@@ -31,6 +31,8 @@ jobs:
         run: ruff check research/modelling/basic_pitch/obruxo_basic_pitch research/modelling/basic_pitch/tests research/modelling/basic_pitch/run.py
       - name: Unit tests
         run: python -m pytest research/modelling/basic_pitch/tests/unit -q
+      - name: Evaluation tests
+        run: python -m pytest research/modelling/basic_pitch/tests/evaluation -q
       - name: Acquire and verify pinned public oracle
         run: |
           mkdir -p research/modelling/basic_pitch/outputs

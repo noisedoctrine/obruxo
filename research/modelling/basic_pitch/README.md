@@ -70,3 +70,38 @@ python research/modelling/basic_pitch/run.py benchmark \
 ```
 
 The opt-in flag defaults to false. Such a private manifest adds `audio_source: "derived_render"` and `preset_path` to a case, points `audio_path` at a new WAV below the approved ignored output root, and leaves the source patch/MIDI untouched. The runner performs a resolved destination check, refuses to overwrite an existing output or source directory, records renderer provenance in the local sidecar, and never publishes source paths or identities. If the validated Vital/DawDreamer runtime is unavailable, the run reports `derived_render_unavailable` rather than falling back or changing the environment. #25 owns the comprehensive PresetShare pairing/evaluation manifest; #24 only consumes its fixed smoke contract.
+
+## PresetShare evaluation
+
+The #25 evaluator first inspects the local PresetShare-derived layout and uses the observed concrete rule: a direct child directory is eligible only when its MIDI/audio relationship is unambiguous under the directory contract. Ambiguities, invalid MIDI, missing MIDI, missing audio, and unavailable derived rendering are retained in a private pairing audit. Legacy audio without a render-QA sidecar remains eligible. The current sanitized report records the observed coverage and does not contain source paths, IDs, filenames, or row-level results.
+
+Build the private manifest from the repository root:
+
+```text
+python research/modelling/basic_pitch/run.py build-eval-manifest \
+  --corpus-root datasets/presetshare/raw/presetshare_files/data \
+  --output research/modelling/basic_pitch/outputs/presetshare_evaluation/manifest.jsonl \
+  --audit research/modelling/basic_pitch/outputs/presetshare_evaluation/pairing_audit.json
+```
+
+When a source directory contains exactly one readable Vital patch and one valid MIDI performance but no WAV, derived rendering is available only behind the explicit, default-off flag:
+
+```text
+python research/modelling/basic_pitch/run.py build-eval-manifest \
+  --corpus-root datasets/presetshare/raw/presetshare_files/data \
+  --output research/modelling/basic_pitch/outputs/presetshare_evaluation/manifest.jsonl \
+  --audit research/modelling/basic_pitch/outputs/presetshare_evaluation/pairing_audit.json \
+  --allow-derived-render
+```
+
+This opt-in exists because the patch and MIDI provide an exact, reproducible local rendering input under the current parent contract. It writes only a labeled `derived_render` WAV and provenance sidecar below the ignored Basic Pitch output root, refuses source overlap/overwrite, and never calls the result an original or historical WAV. Existing WAVs are read-only. If the validated renderer is unavailable, the audit records `pair.derived_render_unavailable`; the environment is not changed and no fallback renderer is used.
+
+Run the fixed stock evaluation with the #24 CPU route and no threshold controls:
+
+```text
+python research/modelling/basic_pitch/run.py evaluate-corpus \
+  --manifest research/modelling/basic_pitch/outputs/presetshare_evaluation/manifest.jsonl \
+  --output research/modelling/basic_pitch/outputs/presetshare_evaluation
+```
+
+The private output stores resumable per-pair metrics, aggregate counts, timing/velocity/pitch diagnostics, frame metrics, failure cases, and source-stat checks. The tracked `reports/presetshare_baseline.json` and `.md` files contain sanitized aggregate evidence only. `mir_eval==0.8.2`, `Performance`, and `TempoMap` define the fixed evaluation semantics; no model, backend, decoder threshold, or corpus pairing rule is tuned from the results.

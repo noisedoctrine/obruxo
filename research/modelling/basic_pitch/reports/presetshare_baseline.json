@@ -1,0 +1,182 @@
+{
+  "aggregate": {
+    "bootstrap": {
+      "cluster_count": 0,
+      "cluster_rule": "known preset grouping; unknown presets are singleton clusters",
+      "metrics": {
+        "frames": {
+          "lower_95": null,
+          "support": 0,
+          "upper_95": null
+        },
+        "onset_pitch": {
+          "lower_95": null,
+          "support": 0,
+          "upper_95": null
+        },
+        "onset_pitch_offset": {
+          "lower_95": null,
+          "support": 0,
+          "upper_95": null
+        }
+      },
+      "replicates": 10000,
+      "seed": 0
+    },
+    "coverage": null,
+    "failed_pair_count": 0,
+    "failure_analysis": {
+      "note": {
+        "additional_offset_false_negatives": 0,
+        "onset_pitch_false_negatives": 0,
+        "onset_pitch_false_positives": 0
+      },
+      "pitch": {
+        "assigned_near_onset_errors": 0,
+        "octave_error_count": 0,
+        "unassigned_near_onset_errors": 0
+      },
+      "timing": {
+        "duration": {
+          "mae": null,
+          "signed_mean": null,
+          "support": 0
+        },
+        "offset": {
+          "mae": null,
+          "signed_mean": null,
+          "support": 0
+        },
+        "onset": {
+          "mae": null,
+          "signed_mean": null,
+          "support": 0
+        }
+      },
+      "velocity": {
+        "mae": null,
+        "signed_mean": null,
+        "support": 0
+      }
+    },
+    "groups": {
+      "duration_class": {},
+      "genre": {},
+      "instrument": {},
+      "note_density_class": {},
+      "pitch_register_class": {},
+      "polyphony_class": {},
+      "type": {},
+      "vital_style": {}
+    },
+    "micro": {
+      "frames": {
+        "count_bias": 0,
+        "f1": null,
+        "false_negative_rate": null,
+        "false_positive_fraction": null,
+        "fn": 0,
+        "fp": 0,
+        "precision": null,
+        "prediction_count": 0,
+        "recall": null,
+        "reference_count": 0,
+        "tp": 0
+      },
+      "onset_pitch": {
+        "count_bias": 0,
+        "f1": null,
+        "false_negative_rate": null,
+        "false_positive_fraction": null,
+        "fn": 0,
+        "fp": 0,
+        "precision": null,
+        "prediction_count": 0,
+        "recall": null,
+        "reference_count": 0,
+        "tp": 0
+      },
+      "onset_pitch_offset": {
+        "count_bias": 0,
+        "f1": null,
+        "false_negative_rate": null,
+        "false_positive_fraction": null,
+        "fn": 0,
+        "fp": 0,
+        "precision": null,
+        "prediction_count": 0,
+        "recall": null,
+        "reference_count": 0,
+        "tp": 0
+      }
+    },
+    "pair_count": 0,
+    "pair_macro": {
+      "frames": {
+        "f1": null,
+        "support": 0
+      },
+      "onset_pitch": {
+        "f1": null,
+        "support": 0
+      },
+      "onset_pitch_offset": {
+        "f1": null,
+        "support": 0
+      }
+    },
+    "polyphony_by_source_role": {},
+    "successful_pair_count": 0
+  },
+  "backend": {
+    "backend_id": "pytorch_cpu",
+    "boundary": "#24_end_to_end_audio_to_note_events_batch_1",
+    "contract_version": 1,
+    "precision": "float32"
+  },
+  "decoder": {
+    "frame_threshold": 0.3,
+    "infer_onsets": true,
+    "maximum_frequency": null,
+    "melodia_trick": true,
+    "minimum_frequency": null,
+    "minimum_note_length_frames": 11,
+    "onset_threshold": 0.5
+  },
+  "failure_code": "no_eligible_pairs",
+  "format_version": 1,
+  "interpretation": {
+    "meaning": "Quality describes the frozen Basic Pitch performance prior; it is not a claim about source audio reconstruction or an OBRUXO training objective.",
+    "measured": "Aggregate values are computed from successful pair results using fixed stock Basic Pitch decoding and no threshold tuning."
+  },
+  "model": {
+    "model_id": "spotify-basic-pitch-icassp-2022-v0.4.0",
+    "source_git_blob_sha1": "c30e5f9438e798604b7177aa26be1fe64482f767"
+  },
+  "pairing": {
+    "ambiguous_count": 14,
+    "candidate_count": 9620,
+    "corpus_layout": "direct child directory with exact one-to-one extensions",
+    "derived_render_opt_in": true,
+    "eligible_count": 0,
+    "excluded_by_reason": {
+      "pair.ambiguous": 14,
+      "pair.derived_render_unavailable": 1770,
+      "pair.empty_reference": 75,
+      "pair.invalid_midi": 23,
+      "pair.missing_midi": 7738
+    },
+    "excluded_count": 9606,
+    "selected_pairing_methods": [
+      "same_directory_exact_one_midi_derived_render"
+    ],
+    "source_stat_mismatches": 0,
+    "source_stat_records": 11518,
+    "spot_check": {
+      "count": 8,
+      "discrepancies": 0,
+      "status": "passed"
+    }
+  },
+  "status": "unavailable"
+}
