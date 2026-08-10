@@ -15,6 +15,8 @@ research/experiments/neural_proxy/generated_midi/
 research/experiments/lfo_representation/era2/artifacts/
 research/data_generation/outputs/*
 !research/data_generation/outputs/.gitignore
+research/modelling/basic_pitch/outputs/*
+!research/modelling/basic_pitch/outputs/.gitignore
 
 # Local agent scratchpad
 .agents/
