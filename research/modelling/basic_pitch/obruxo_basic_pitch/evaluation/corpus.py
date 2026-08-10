@@ -287,6 +287,14 @@ def _derive_audio(renderer: Any, preset_path: Path, midi_path: Path, destination
         result.write_json(sidecar)
         metadata = json.loads(sidecar.read_text(encoding="utf-8"))
         metadata["audio_source"] = "derived_render"
+        metadata["derived_render_provenance"] = {
+            "renderer": "obruxo_data.render.VitalRenderer",
+            "renderer_id": str(getattr(renderer, "renderer_id", "unknown")),
+            "config_path": str(data_generation_root / "configs" / "renderer.yaml"),
+            "python": sys.version.split()[0],
+            "source_preset_path": str(preset_path),
+            "source_midi_path": str(midi_path),
+        }
         _atomic_write(sidecar, json.dumps(metadata, indent=2, sort_keys=True) + "\n")
         return destination
     finally:

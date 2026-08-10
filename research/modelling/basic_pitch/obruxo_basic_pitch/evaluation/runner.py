@@ -82,6 +82,12 @@ def _digest(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _code_identity() -> dict[str, str]:
+    package_root = Path(__file__).resolve().parent
+    names = ("corpus.py", "labels.py", "metrics.py", "aggregate.py", "runner.py", "report.py")
+    return {name: _digest(package_root / name) for name in names}
+
+
 def _runtime_identity(torch: Any) -> dict[str, Any]:
     import numpy as np
     import scipy
@@ -224,6 +230,7 @@ def evaluate_corpus(
         "checkpoint_sha256": _digest(checkpoint_path),
         "model_id": MODEL_ID,
         "source_git_blob_sha1": SPOTIFY_ONNX_GIT_BLOB_SHA1,
+        "evaluation_code": _code_identity(),
         "backend": backend,
         "decoder": {
             "onset_threshold": ONSET_THRESHOLD,
