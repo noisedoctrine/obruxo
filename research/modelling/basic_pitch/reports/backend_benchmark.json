@@ -1,7 +1,7 @@
 {
   "benchmark_spec_version": 1,
   "conclusions": {
-    "reason": "a valid existing local smoke manifest was unavailable",
+    "reason": "the opted-in validated Vital derived-render path was unavailable",
     "status": "blocked"
   },
   "config": {
@@ -64,25 +64,25 @@
   "format_version": 1,
   "inference": [
     {
-      "failure_code": "invalid_smoke_manifest",
+      "failure_code": "derived_render_unavailable",
       "mode": "inference",
       "route": "pytorch_cpu",
       "status": "unavailable"
     },
     {
-      "failure_code": "invalid_smoke_manifest",
+      "failure_code": "derived_render_unavailable",
       "mode": "inference",
       "route": "pytorch_xpu",
       "status": "unavailable"
     },
     {
-      "failure_code": "invalid_smoke_manifest",
+      "failure_code": "derived_render_unavailable",
       "mode": "inference",
       "route": "openvino_cpu",
       "status": "unavailable"
     },
     {
-      "failure_code": "invalid_smoke_manifest",
+      "failure_code": "derived_render_unavailable",
       "mode": "inference",
       "route": "openvino_gpu",
       "status": "unavailable"
@@ -100,21 +100,45 @@
     "torch": "2.12.1+xpu"
   },
   "smoke_set": {
-    "case_count": 0,
-    "coverage": {},
-    "failure_code": "invalid_smoke_manifest",
+    "case_count": 8,
+    "coverage": {
+      "audio_source": {
+        "derived_render": 8
+      },
+      "duration_class": {
+        "long": 6,
+        "medium": 1,
+        "short": 1
+      },
+      "envelope": {
+        "unknown": 8
+      },
+      "note_density_class": {
+        "high": 4,
+        "low": 1,
+        "medium": 3
+      },
+      "performance": {
+        "monophonic": 4,
+        "polyphonic": 4
+      },
+      "role": {
+        "other": 8
+      }
+    },
+    "failure_code": "derived_render_unavailable",
     "status": "unavailable"
   },
   "source_git_blob_sha1": "c30e5f9438e798604b7177aa26be1fe64482f767",
   "training": [
     {
-      "failure_code": "invalid_smoke_manifest",
+      "failure_code": "derived_render_unavailable",
       "mode": "training",
       "route": "pytorch_cpu",
       "status": "unavailable"
     },
     {
-      "failure_code": "invalid_smoke_manifest",
+      "failure_code": "derived_render_unavailable",
       "mode": "training",
       "route": "pytorch_xpu",
       "status": "unavailable"

@@ -44,6 +44,11 @@ def _parser() -> argparse.ArgumentParser:
     benchmark.add_argument("--markdown", type=Path, required=True)
     benchmark.add_argument("--xpu-index", type=int, default=0)
     benchmark.add_argument("--openvino-gpu-device", default="GPU")
+    benchmark.add_argument(
+        "--allow-derived-render",
+        action="store_true",
+        help="opt in to missing-WAV renders from an unambiguous Vital patch and MIDI pair",
+    )
     benchmark.add_argument("--force", action="store_true")
     return parser
 
@@ -64,6 +69,7 @@ def main() -> int:
             args.markdown,
             xpu_index=args.xpu_index,
             openvino_gpu_device=args.openvino_gpu_device,
+            allow_derived_render=args.allow_derived_render,
             force=args.force,
         )
 

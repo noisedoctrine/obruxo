@@ -37,6 +37,9 @@ FAILURE_CODES = (
     "non_finite_training_step",
     "out_of_memory",
     "benchmark_runtime_error",
+    "derived_render_unavailable",
+    "derived_render_failed",
+    "derived_render_destination_invalid",
 )
 
 _PERFORMANCE = ("monophonic", "polyphonic")
@@ -44,6 +47,7 @@ _ROLES = ("bass", "lead", "arp_sequence", "pad_sustained", "keys_pluck", "fx_tex
 _ENVELOPES = ("transient", "sustained", "mixed", "unknown")
 _DURATIONS = ("short", "medium", "long")
 _DENSITIES = ("low", "medium", "high", "unknown")
+_AUDIO_SOURCES = ("existing_audio", "derived_render")
 
 
 class BenchmarkInputError(ValueError):
@@ -58,6 +62,16 @@ class BenchmarkInputError(ValueError):
 
 class SourceMutationError(RuntimeError):
     """An immutable source changed while the benchmark was running."""
+
+
+class DerivedRenderUnavailable(RuntimeError):
+    """The explicitly requested validated Vital rendering path is unavailable."""
+
+    def __init__(self, code: str = "derived_render_unavailable") -> None:
+        if code not in {"derived_render_unavailable", "derived_render_failed"}:
+            raise ValueError(f"unknown derived-render failure code: {code}")
+        super().__init__("the validated Vital derived-render path is unavailable")
+        self.code = code
 
 
 @dataclass(frozen=True)
@@ -99,6 +113,8 @@ class SmokeCase:
     case_index: int
     audio_path: Path
     midi_path: Path
+    audio_source: str
+    preset_path: Path | None
     performance: str
     role: str
     envelope: str
@@ -108,6 +124,7 @@ class SmokeCase:
     def sanitized(self) -> dict[str, Any]:
         return {
             "case_index": self.case_index,
+            "audio_source": self.audio_source,
             "performance": self.performance,
             "role": self.role,
             "envelope": self.envelope,
@@ -165,16 +182,18 @@ def load_config(path: str | Path) -> BenchmarkConfig:
     )
 
 
-def _source_path(manifest_path: Path, value: Any, label: str) -> Path:
+def _source_path(manifest_path: Path, value: Any, label: str, *, allow_missing: bool = False) -> Path:
     if not isinstance(value, str) or not value:
         raise BenchmarkInputError("invalid_smoke_manifest", f"{label} must be a non-empty path")
     candidate = Path(value)
     if not candidate.is_absolute():
         candidate = manifest_path.parent / candidate
     try:
-        resolved = candidate.resolve(strict=True)
+        resolved = candidate.resolve(strict=not allow_missing)
     except OSError as exc:
         raise BenchmarkInputError("invalid_smoke_manifest", f"{label} is missing or unreadable") from exc
+    if allow_missing and not resolved.exists():
+        return resolved
     if not resolved.is_file() or not os.access(resolved, os.R_OK):
         raise BenchmarkInputError("invalid_smoke_manifest", f"{label} is missing or unreadable")
     try:
@@ -185,7 +204,13 @@ def _source_path(manifest_path: Path, value: Any, label: str) -> Path:
     return resolved
 
 
-def load_manifest(path: str | Path, config: BenchmarkConfig) -> tuple[SmokeCase, ...]:
+def load_manifest(
+    path: str | Path,
+    config: BenchmarkConfig,
+    *,
+    allow_derived_render: bool = False,
+    allow_missing_derived_audio: bool = False,
+) -> tuple[SmokeCase, ...]:
     """Read and validate an anonymous local manifest; paths never enter reports."""
     manifest_path = Path(path).resolve(strict=True)
     try:
@@ -211,37 +236,209 @@ def load_manifest(path: str | Path, config: BenchmarkConfig) -> tuple[SmokeCase,
         "duration_class": set(_DURATIONS),
         "note_density_class": set(_DENSITIES),
     }
+    base_fields = {
+        "case_index",
+        "audio_path",
+        "midi_path",
+        "performance",
+        "role",
+        "envelope",
+        "duration_class",
+        "note_density_class",
+    }
+    existing_fields = base_fields | {"audio_source"}
+    derived_fields = existing_fields | {"preset_path"}
     for expected_index, row in enumerate(rows, start=1):
         item = _required_mapping(row, "smoke case")
-        if set(item) != {
-            "case_index",
-            "audio_path",
-            "midi_path",
-            "performance",
-            "role",
-            "envelope",
-            "duration_class",
-            "note_density_class",
-        }:
+        if set(item) == base_fields:
+            audio_source = "existing_audio"
+            preset_path = None
+        elif allow_derived_render and set(item) == existing_fields:
+            audio_source = item["audio_source"]
+            preset_path = None
+        elif allow_derived_render and set(item) == derived_fields:
+            audio_source = item["audio_source"]
+            preset_path = _source_path(manifest_path, item["preset_path"], "preset path")
+        else:
             raise BenchmarkInputError("invalid_smoke_manifest", "smoke case shape is invalid")
+        if audio_source not in _AUDIO_SOURCES:
+            raise BenchmarkInputError("invalid_smoke_manifest", "smoke case has an unsupported audio source")
+        if audio_source == "derived_render" and preset_path is None:
+            raise BenchmarkInputError("invalid_smoke_manifest", "derived render case requires a preset path")
+        if audio_source == "existing_audio" and preset_path is not None:
+            raise BenchmarkInputError("invalid_smoke_manifest", "existing audio case cannot have a preset path")
         if type(item["case_index"]) is not int or item["case_index"] != expected_index:
             raise BenchmarkInputError("invalid_smoke_manifest", "case indexes must be sequential")
         labels = {name: item[name] for name in allowed}
         if any(not isinstance(value, str) or value not in allowed[name] for name, value in labels.items()):
             raise BenchmarkInputError("invalid_smoke_manifest", "smoke case has an unsupported label")
-        audio_path = _source_path(manifest_path, item["audio_path"], "audio path")
+        audio_path = _source_path(
+            manifest_path,
+            item["audio_path"],
+            "audio path",
+            allow_missing=audio_source == "derived_render" and allow_missing_derived_audio,
+        )
         midi_path = _source_path(manifest_path, item["midi_path"], "MIDI path")
         if audio_path in audio_paths or (audio_path, midi_path) in pair_paths:
             raise BenchmarkInputError("invalid_smoke_manifest", "smoke manifest contains a duplicate source pair")
         audio_paths.add(audio_path)
         pair_paths.add((audio_path, midi_path))
-        cases.append(SmokeCase(case_index=expected_index, audio_path=audio_path, midi_path=midi_path, **labels))
+        cases.append(
+            SmokeCase(
+                case_index=expected_index,
+                audio_path=audio_path,
+                midi_path=midi_path,
+                audio_source=audio_source,
+                preset_path=preset_path,
+                **labels,
+            )
+        )
     return tuple(cases)
 
 
 def coverage_summary(cases: Sequence[SmokeCase]) -> dict[str, dict[str, int]]:
-    fields = ("performance", "role", "envelope", "duration_class", "note_density_class")
+    fields = ("audio_source", "performance", "role", "envelope", "duration_class", "note_density_class")
     return {field: dict(sorted(Counter(getattr(case, field) for case in cases).items())) for field in fields}
+
+
+def _approved_derived_output_root() -> Path:
+    return (Path(__file__).resolve().parents[1] / "outputs").resolve()
+
+
+def _validate_derived_destination(case: SmokeCase, output_root: Path) -> Path:
+    destination = case.audio_path.resolve(strict=False)
+    if destination == output_root or not destination.is_relative_to(output_root):
+        raise BenchmarkInputError("derived_render_destination_invalid", "derived audio destination is outside approved outputs")
+    if destination.suffix.lower() != ".wav":
+        raise BenchmarkInputError("derived_render_destination_invalid", "derived audio destination must be a WAV")
+    for source in (case.preset_path, case.midi_path):
+        assert source is not None
+        source_root = source.parent.resolve()
+        if destination == source_root or destination.is_relative_to(source_root):
+            raise BenchmarkInputError("derived_render_destination_invalid", "derived audio destination overlaps a source directory")
+    if destination.exists() and not destination.is_file():
+        raise BenchmarkInputError("derived_render_destination_invalid", "derived audio destination is not a file")
+    return destination
+
+
+def _atomic_json_write(path: Path, value: Mapping[str, Any]) -> None:
+    temporary: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            "w", encoding="utf-8", dir=path.parent, prefix=f".{path.name}.", suffix=".tmp", delete=False
+        ) as handle:
+            temporary = Path(handle.name)
+            json.dump(value, handle, indent=2, sort_keys=True)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+        temporary = None
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
+def _validated_vital_renderer() -> Any:
+    data_generation_root = Path(__file__).resolve().parents[4] / "research" / "data_generation"
+    if not data_generation_root.is_dir():
+        raise DerivedRenderUnavailable()
+    root_text = str(data_generation_root)
+    inserted = root_text not in sys.path
+    if inserted:
+        sys.path.insert(0, root_text)
+    try:
+        from importlib.util import find_spec
+
+        if find_spec("dawdreamer") is None:
+            raise DerivedRenderUnavailable()
+        from obruxo_data.render import VitalRenderer
+
+        return VitalRenderer.from_config(data_generation_root / "configs" / "renderer.yaml")
+    except Exception as exc:
+        raise DerivedRenderUnavailable() from exc
+    finally:
+        if inserted:
+            sys.path.remove(root_text)
+
+
+def _render_derived_audio(renderer: Any, case: SmokeCase, destination: Path, output_root: Path) -> None:
+    assert case.preset_path is not None
+    data_generation_root = Path(__file__).resolve().parents[4] / "research" / "data_generation"
+    root_text = str(data_generation_root)
+    inserted = root_text not in sys.path
+    if inserted:
+        sys.path.insert(0, root_text)
+    try:
+        from obruxo_data.midi import Performance
+        from obruxo_data.render import RenderRequest
+        from obruxo_data.vital import VitalPreset
+
+        preset = VitalPreset.load(case.preset_path)
+        performance = Performance.from_midi(case.midi_path)
+        request = RenderRequest(
+            preset=preset,
+            performance=performance,
+            sample_rate=44_100,
+            end_tick=performance.end_tick,
+            tail_seconds=2.0,
+            renderer_id=renderer.renderer_id,
+        )
+        output_root.mkdir(parents=True, exist_ok=True)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        previous_tempdir = tempfile.tempdir
+        tempfile.tempdir = str(output_root)
+        try:
+            result = renderer.render(request)
+        finally:
+            tempfile.tempdir = previous_tempdir
+        if any(getattr(item.severity, "value", None) == "error" for item in result.diagnostics):
+            raise DerivedRenderUnavailable("derived_render_failed")
+        result.write_wav(destination)
+        sidecar = destination.with_suffix(".json")
+        result.write_json(sidecar)
+        metadata = json.loads(sidecar.read_text(encoding="utf-8"))
+        metadata["audio_source"] = "derived_render"
+        _atomic_json_write(sidecar, metadata)
+    except DerivedRenderUnavailable:
+        raise
+    except Exception as exc:
+        raise DerivedRenderUnavailable("derived_render_failed") from exc
+    finally:
+        if inserted:
+            sys.path.remove(root_text)
+
+
+def prepare_derived_renders(path: str | Path, config: BenchmarkConfig) -> None:
+    """Materialize only explicitly opted-in missing audio under Basic Pitch outputs."""
+    manifest = Path(path).resolve(strict=True)
+    cases = load_manifest(
+        manifest,
+        config,
+        allow_derived_render=True,
+        allow_missing_derived_audio=True,
+    )
+    derived = [case for case in cases if case.audio_source == "derived_render"]
+    if not derived:
+        return
+    output_root = _approved_derived_output_root()
+    renderer = None
+    for case in derived:
+        destination = _validate_derived_destination(case, output_root)
+        sidecar = destination.with_suffix(".json")
+        if destination.exists():
+            try:
+                metadata = json.loads(sidecar.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                raise BenchmarkInputError("derived_render_destination_invalid", "existing derived audio lacks provenance") from exc
+            if metadata.get("audio_source") != "derived_render":
+                raise BenchmarkInputError("derived_render_destination_invalid", "existing audio is not labeled as derived")
+            continue
+        if sidecar.exists():
+            raise BenchmarkInputError("derived_render_destination_invalid", "derived audio provenance exists without audio")
+        if renderer is None:
+            renderer = _validated_vital_renderer()
+        _render_derived_audio(renderer, case, destination, output_root)
 
 
 def aggregate_measurements(values: Sequence[float]) -> dict[str, float]:
@@ -306,7 +503,8 @@ def _source_snapshot(cases: Sequence[SmokeCase]) -> dict[Path, tuple[int, int]]:
     return {
         path: (path.stat().st_size, path.stat().st_mtime_ns)
         for case in cases
-        for path in (case.audio_path, case.midi_path)
+        for path in (case.audio_path, case.midi_path, case.preset_path)
+        if path is not None
     }
 
 
@@ -468,7 +666,19 @@ def _aggregate_route(rows: Sequence[Mapping[str, Any]], route: str, mode: str, c
     return result
 
 
-def _unavailable_report(config: BenchmarkConfig, code: str) -> dict[str, Any]:
+def _unavailable_report(
+    config: BenchmarkConfig,
+    code: str,
+    *,
+    reason: str | None = None,
+    cases: Sequence[SmokeCase] = (),
+) -> dict[str, Any]:
+    if reason is None:
+        reason = {
+            "derived_render_unavailable": "the opted-in validated Vital derived-render path was unavailable",
+            "derived_render_failed": "the opted-in validated Vital derived-render path failed",
+            "derived_render_destination_invalid": "the derived-render destination failed its safety check",
+        }.get(code, "a valid local smoke manifest was unavailable")
     return {
         "format_version": 1,
         "benchmark_spec_version": config.version,
@@ -476,11 +686,16 @@ def _unavailable_report(config: BenchmarkConfig, code: str) -> dict[str, Any]:
         "source_git_blob_sha1": SPOTIFY_ONNX_GIT_BLOB_SHA1,
         "runtime": _runtime_identity(),
         "config": config.as_dict(),
-        "smoke_set": {"status": "unavailable", "failure_code": code, "case_count": 0, "coverage": {}},
+        "smoke_set": {
+            "status": "unavailable",
+            "failure_code": code,
+            "case_count": len(cases),
+            "coverage": coverage_summary(cases) if cases else {},
+        },
         "inference": [_unavailable_route(route, "inference", code) for route in INFERENCE_ROUTES],
         "training": [_unavailable_route(route, "training", code) for route in TRAINING_ROUTES],
         "crossovers": [],
-        "conclusions": {"status": "blocked", "reason": "a valid existing local smoke manifest was unavailable"},
+        "conclusions": {"status": "blocked", "reason": reason},
     }
 
 
@@ -509,10 +724,13 @@ def run_benchmark(
     *,
     xpu_index: int = 0,
     openvino_gpu_device: str = "GPU",
+    allow_derived_render: bool = False,
 ) -> dict[str, Any]:
     """Run the fixed matrix in foreground fresh subprocesses and sanitize it."""
     manifest = Path(manifest_path).resolve(strict=True)
-    cases = load_manifest(manifest, config)
+    if allow_derived_render:
+        prepare_derived_renders(manifest, config)
+    cases = load_manifest(manifest, config, allow_derived_render=allow_derived_render)
     snapshot = _source_snapshot(cases)
     checkpoint = Path(checkpoint_path).resolve(strict=True)
     inference: list[dict[str, Any]] = []
@@ -596,12 +814,15 @@ def write_benchmark_reports(
         raise FileExistsError("refusing to overwrite benchmark reports without force=True")
     inference = report.get("inference", [])
     training = report.get("training", [])
+    smoke = report.get("smoke_set", {})
+    conclusions = report.get("conclusions", {})
     markdown_lines = [
         "# Basic Pitch backend benchmark",
         "",
         f"- Model: `{report.get('model_id', MODEL_ID)}`",
-        f"- Smoke set: `{report.get('smoke_set', {}).get('status', 'unknown')}`",
+        f"- Smoke set: `{smoke.get('status', 'unknown')}` ({smoke.get('case_count', 0)} cases)",
         f"- Runtime: `{report.get('runtime', {}).get('python', 'unknown')}` / float32",
+        "- Missing-WAV derived rendering: opt-in only; source patches and MIDI remain read-only.",
         "",
         "## Inference routes",
         "",
@@ -617,7 +838,10 @@ def write_benchmark_reports(
         rate = row.get("batch_results", {}).get("1", {}).get("audio_seconds_per_second", {}).get("median", "—")
         rate_text = f"{rate:.6g}" if isinstance(rate, (int, float)) else str(rate)
         markdown_lines.append(f"| `{row.get('route', 'unknown')}` | `{row.get('status', 'unknown')}` | {rate_text} |")
-    markdown_lines.extend(["", "The report contains no source paths, filenames, IDs, hashes, or per-source predictions."])
+    markdown_lines.extend(["", "## Scope and caveats", ""])
+    if conclusions.get("reason"):
+        markdown_lines.append(f"- `{conclusions['reason']}`")
+    markdown_lines.append("- The report contains no source paths, filenames, IDs, hashes, or per-source predictions.")
     markdown = "\n".join(markdown_lines) + "\n"
 
     json_temp: Path | None = None
@@ -655,6 +879,7 @@ def run_benchmark_cli(
     *,
     xpu_index: int = 0,
     openvino_gpu_device: str = "GPU",
+    allow_derived_render: bool = False,
     force: bool = False,
 ) -> int:
     try:
@@ -666,7 +891,21 @@ def run_benchmark_cli(
                 checkpoint_path,
                 xpu_index=xpu_index,
                 openvino_gpu_device=openvino_gpu_device,
+                allow_derived_render=allow_derived_render,
             )
+        except DerivedRenderUnavailable as exc:
+            try:
+                cases = load_manifest(
+                    manifest_path,
+                    config,
+                    allow_derived_render=True,
+                    allow_missing_derived_audio=True,
+                )
+            except (BenchmarkInputError, FileNotFoundError, OSError):
+                cases = ()
+            report = _unavailable_report(config, exc.code, cases=cases)
+            write_benchmark_reports(report, json_path, markdown_path, force=force)
+            return 3
         except (BenchmarkInputError, FileNotFoundError, OSError) as exc:
             code = exc.code if isinstance(exc, BenchmarkInputError) else "invalid_smoke_manifest"
             report = _unavailable_report(config, code)

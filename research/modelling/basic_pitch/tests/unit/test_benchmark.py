@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import json
 import os
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 from obruxo_basic_pitch.benchmark import (
     BenchmarkConfig,
     _aggregate_route,
+    _approved_derived_output_root,
+    _validate_derived_destination,
     aggregate_measurements,
     benchmark_exit_code,
     crossover_audio_seconds,
@@ -76,6 +79,68 @@ def test_manifest_validation_and_sanitization() -> None:
         for path in tmp_path.glob("*"):
             path.unlink()
         tmp_path.rmdir()
+
+
+def test_derived_render_manifest_is_opt_in_and_destination_checked() -> None:
+    tmp_path = ROOT / "outputs" / f".test-derived-manifest-{os.getpid()}"
+    target_paths = [ROOT / "outputs" / f".test-derived-target-{os.getpid()}-{index}.wav" for index in range(1, 9)]
+    assert not tmp_path.exists() and all(not path.exists() for path in target_paths)
+    source_dir = tmp_path / "sources"
+    source_dir.mkdir(parents=True)
+    try:
+        cases = []
+        for index, target in enumerate(target_paths, start=1):
+            preset = source_dir / f"preset-{index}.vital"
+            midi = source_dir / f"performance-{index}.mid"
+            preset.write_bytes(b"{}")
+            midi.write_bytes(b"MThd")
+            cases.append(
+                {
+                    "case_index": index,
+                    "audio_path": str(target),
+                    "midi_path": str(midi),
+                    "audio_source": "derived_render",
+                    "preset_path": str(preset),
+                    "performance": "monophonic",
+                    "role": "other",
+                    "envelope": "sustained",
+                    "duration_class": "medium",
+                    "note_density_class": "low",
+                }
+            )
+        manifest_path = tmp_path / "manifest.json"
+        manifest_path.write_text(
+            json.dumps({"format_version": 1, "benchmark_spec_version": 1, "cases": cases}), encoding="utf-8"
+        )
+        config = load_config(CONFIG_PATH)
+        with pytest.raises(ValueError):
+            load_manifest(manifest_path, config)
+        manifest = load_manifest(
+            manifest_path,
+            config,
+            allow_derived_render=True,
+            allow_missing_derived_audio=True,
+        )
+        assert len(manifest) == 8
+        assert manifest[0].audio_source == "derived_render"
+        assert manifest[0].sanitized()["audio_source"] == "derived_render"
+        assert "preset_path" not in manifest[0].sanitized()
+        output_root = _approved_derived_output_root()
+        assert _validate_derived_destination(manifest[0], output_root) == target_paths[0].resolve()
+        unsafe = replace(manifest[0], audio_path=source_dir / "nested.wav")
+        with pytest.raises(ValueError):
+            _validate_derived_destination(unsafe, output_root)
+    finally:
+        for path in sorted(tmp_path.rglob("*"), reverse=True):
+            if path.is_file():
+                path.unlink()
+            elif path.is_dir():
+                path.rmdir()
+        if tmp_path.exists():
+            tmp_path.rmdir()
+        for path in target_paths:
+            if path.exists():
+                path.unlink()
 
 
 def test_aggregate_measurements_and_crossover_formula() -> None:

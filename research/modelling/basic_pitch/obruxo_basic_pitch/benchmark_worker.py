@@ -347,7 +347,7 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
             smoke_max_cases=12,
             coverage={},
         )
-        cases = load_manifest(request["manifest_path"], config)
+        cases = load_manifest(request["manifest_path"], config, allow_derived_render=True)
         checkpoint_path = Path(str(request["checkpoint_path"])).resolve(strict=True)
         model, model_construct_seconds, checkpoint_load_seconds = _load_state(torch, BasicPitchICASSP2022, checkpoint_path)
         model.eval()
