@@ -1,0 +1,50 @@
+name: Basic Pitch
+
+on:
+  push:
+    paths:
+      - ".github/workflows/basic-pitch.yml"
+      - "research/modelling/basic_pitch/**"
+  pull_request:
+    paths:
+      - ".github/workflows/basic-pitch.yml"
+      - "research/modelling/basic_pitch/**"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: obruxo-basic-pitch
+          environment-file: research/modelling/basic_pitch/environment.yml
+          miniforge-version: latest
+          use-mamba: true
+      - name: Lint
+        run: ruff check research/modelling/basic_pitch/obruxo_basic_pitch research/modelling/basic_pitch/tests research/modelling/basic_pitch/run.py
+      - name: Unit tests
+        run: python -m pytest research/modelling/basic_pitch/tests/unit -q
+      - name: Acquire and verify pinned public oracle
+        run: |
+          mkdir -p research/modelling/basic_pitch/outputs
+          curl --fail --location --retry 3 --output research/modelling/basic_pitch/outputs/nmp.onnx \
+            https://raw.githubusercontent.com/spotify/basic-pitch/9991303bba609a3b93089d13ec80d1d495083596/basic_pitch/saved_models/icassp_2022/nmp.onnx
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+
+          path = Path("research/modelling/basic_pitch/outputs/nmp.onnx")
+          content = path.read_bytes()
+          assert len(content) == 230444
+          digest = hashlib.sha1(f"blob {len(content)}\0".encode() + content).hexdigest()
+          assert digest == "c30e5f9438e798604b7177aa26be1fe64482f767"
+          PY
+      - name: Reference parity
+        run: python -m pytest research/modelling/basic_pitch/tests/reference -q
