@@ -38,3 +38,22 @@ python research/modelling/basic_pitch/run.py parity \
 ```
 
 The committed parity report contains aggregate synthetic/public results only. Optional `--audio` validation reads existing local WAVs without modifying or publishing them; only sanitized aggregate counts and errors may be retained. CPU/XPU/OpenVINO cost measurement belongs to #24. PresetShare pairing and transcription evaluation belong to #25.
+
+## Fixed backend benchmark
+
+The #24 benchmark measures the canonical checkpoint on the fixed inference matrix (`pytorch_cpu`, `pytorch_xpu`, `openvino_cpu`, `openvino_gpu`) and the fixed full forward-plus-backward training matrix (`pytorch_cpu`, `pytorch_xpu`). It uses float32, fresh subprocesses, three repetitions, three warmups, ten timed calls, and model-call batches `[1, 2, 4, 8]`. OpenVINO is converted from the native PyTorch module and compiled for the explicitly requested device; it never uses automatic device selection or fallback.
+
+Create the private ignored smoke manifest only from existing paired WAV/MIDI files, then run:
+
+```text
+python research/modelling/basic_pitch/run.py benchmark \
+  --config research/modelling/basic_pitch/configs/backend_benchmark.yaml \
+  --manifest research/modelling/basic_pitch/outputs/smoke_manifest.json \
+  --checkpoint research/modelling/basic_pitch/artifacts/basic_pitch_icassp_2022.pt \
+  --json research/modelling/basic_pitch/reports/backend_benchmark.json \
+  --markdown research/modelling/basic_pitch/reports/backend_benchmark.md \
+  --xpu-index 0 \
+  --openvino-gpu-device GPU
+```
+
+The manifest and all source-derived scratch state remain local and ignored. Reports contain only anonymous labels, sanitized aggregate timings, memory availability, parity summaries, and route statuses. This workspace deliberately does not render or repair missing corpus audio; a missing WAV/MIDI pair is reported as unavailable under the parent issue's immutable-source contract.

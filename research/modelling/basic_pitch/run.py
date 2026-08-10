@@ -7,6 +7,7 @@ from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
+from obruxo_basic_pitch.benchmark import run_benchmark_cli
 from obruxo_basic_pitch.parity import (
     assert_parity,
     audio_to_windows,
@@ -34,6 +35,16 @@ def _parser() -> argparse.ArgumentParser:
     parity.add_argument("--markdown", type=Path, required=True)
     parity.add_argument("--audio", type=Path, action="append", default=[])
     parity.add_argument("--force", action="store_true")
+
+    benchmark = subparsers.add_parser("benchmark", help="run the fixed CPU/XPU/OpenVINO benchmark")
+    benchmark.add_argument("--config", type=Path, required=True)
+    benchmark.add_argument("--manifest", type=Path, required=True)
+    benchmark.add_argument("--checkpoint", type=Path, required=True)
+    benchmark.add_argument("--json", type=Path, required=True)
+    benchmark.add_argument("--markdown", type=Path, required=True)
+    benchmark.add_argument("--xpu-index", type=int, default=0)
+    benchmark.add_argument("--openvino-gpu-device", default="GPU")
+    benchmark.add_argument("--force", action="store_true")
     return parser
 
 
@@ -43,6 +54,18 @@ def main() -> int:
         metadata = write_imported_checkpoint(args.onnx, args.checkpoint, args.metadata, force=args.force)
         print(f"imported {metadata.model_id} from the pinned public artifact")
         return 0
+
+    if args.command == "benchmark":
+        return run_benchmark_cli(
+            args.config,
+            args.manifest,
+            args.checkpoint,
+            args.json,
+            args.markdown,
+            xpu_index=args.xpu_index,
+            openvino_gpu_device=args.openvino_gpu_device,
+            force=args.force,
+        )
 
     public = synthetic_windows()
     local = [audio_to_windows(path) for path in args.audio]

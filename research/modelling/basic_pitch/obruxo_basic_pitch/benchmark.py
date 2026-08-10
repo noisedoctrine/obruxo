@@ -1,0 +1,682 @@
+"""Fixed, sanitized Basic Pitch backend benchmark orchestration."""
+
+from __future__ import annotations
+
+import json
+import math
+import os
+import platform
+import statistics
+import subprocess
+import sys
+import tempfile
+from collections import Counter
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
+from importlib import import_module
+from pathlib import Path
+from typing import Any
+
+import yaml
+
+from .constants import MODEL_ID, SPOTIFY_ONNX_GIT_BLOB_SHA1
+
+INFERENCE_ROUTES = ("pytorch_cpu", "pytorch_xpu", "openvino_cpu", "openvino_gpu")
+TRAINING_ROUTES = ("pytorch_cpu", "pytorch_xpu")
+STATUSES = ("ok", "unavailable", "parity_failed", "runtime_failed", "out_of_memory")
+FAILURE_CODES = (
+    "invalid_smoke_manifest",
+    "checkpoint_load_failed",
+    "torch_xpu_unavailable",
+    "openvino_cpu_unavailable",
+    "openvino_gpu_unavailable",
+    "openvino_gpu_device_ambiguous",
+    "openvino_conversion_failed",
+    "openvino_compile_failed",
+    "parity_failed",
+    "non_finite_training_step",
+    "out_of_memory",
+    "benchmark_runtime_error",
+)
+
+_PERFORMANCE = ("monophonic", "polyphonic")
+_ROLES = ("bass", "lead", "arp_sequence", "pad_sustained", "keys_pluck", "fx_texture", "other", "unknown")
+_ENVELOPES = ("transient", "sustained", "mixed", "unknown")
+_DURATIONS = ("short", "medium", "long")
+_DENSITIES = ("low", "medium", "high", "unknown")
+
+
+class BenchmarkInputError(ValueError):
+    """A sanitized configuration or smoke-manifest error."""
+
+    def __init__(self, code: str, message: str = "invalid benchmark input") -> None:
+        if code not in FAILURE_CODES:
+            raise ValueError(f"unknown benchmark failure code: {code}")
+        super().__init__(message)
+        self.code = code
+
+
+class SourceMutationError(RuntimeError):
+    """An immutable source changed while the benchmark was running."""
+
+
+@dataclass(frozen=True)
+class BenchmarkConfig:
+    version: int
+    precision: str
+    process_repetitions: int
+    warmup_iterations: int
+    timed_iterations: int
+    batch_sizes: tuple[int, ...]
+    end_to_end_batch_size: int
+    smoke_min_cases: int
+    smoke_max_cases: int
+    coverage: dict[str, tuple[str, ...]]
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "version": self.version,
+            "precision": self.precision,
+            "process_repetitions": self.process_repetitions,
+            "warmup_iterations": self.warmup_iterations,
+            "timed_iterations": self.timed_iterations,
+            "batch_sizes": list(self.batch_sizes),
+            "end_to_end_batch_size": self.end_to_end_batch_size,
+            "smoke_set": {
+                "min_cases": self.smoke_min_cases,
+                "max_cases": self.smoke_max_cases,
+                "coverage": {name: list(values) for name, values in self.coverage.items()},
+            },
+            "routes": {
+                "inference": list(INFERENCE_ROUTES),
+                "training": list(TRAINING_ROUTES),
+            },
+        }
+
+
+@dataclass(frozen=True)
+class SmokeCase:
+    case_index: int
+    audio_path: Path
+    midi_path: Path
+    performance: str
+    role: str
+    envelope: str
+    duration_class: str
+    note_density_class: str
+
+    def sanitized(self) -> dict[str, Any]:
+        return {
+            "case_index": self.case_index,
+            "performance": self.performance,
+            "role": self.role,
+            "envelope": self.envelope,
+            "duration_class": self.duration_class,
+            "note_density_class": self.note_density_class,
+        }
+
+
+def _required_mapping(value: Any, label: str) -> Mapping[str, Any]:
+    if not isinstance(value, Mapping):
+        raise BenchmarkInputError("invalid_smoke_manifest", f"{label} must be a mapping")
+    return value
+
+
+def _validate_exact(actual: Any, expected: Any, label: str) -> None:
+    if actual != expected:
+        raise BenchmarkInputError("invalid_smoke_manifest", f"unexpected {label}")
+
+
+def load_config(path: str | Path) -> BenchmarkConfig:
+    """Load the committed fixed experiment configuration without overrides."""
+    config_path = Path(path).resolve(strict=True)
+    try:
+        raw = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as exc:
+        raise BenchmarkInputError("invalid_smoke_manifest", "benchmark config could not be read") from exc
+    data = _required_mapping(raw, "benchmark config")
+    _validate_exact(data.get("version"), 1, "config version")
+    _validate_exact(data.get("precision"), "float32", "precision")
+    _validate_exact(data.get("process_repetitions"), 3, "process repetitions")
+    _validate_exact(data.get("warmup_iterations"), 3, "warmup iterations")
+    _validate_exact(data.get("timed_iterations"), 10, "timed iterations")
+    _validate_exact(data.get("batch_sizes"), [1, 2, 4, 8], "batch sizes")
+    _validate_exact(data.get("end_to_end_batch_size"), 1, "end-to-end batch size")
+    smoke = _required_mapping(data.get("smoke_set"), "smoke_set")
+    _validate_exact(smoke.get("min_cases"), 8, "smoke minimum")
+    _validate_exact(smoke.get("max_cases"), 12, "smoke maximum")
+    routes = _required_mapping(data.get("routes"), "routes")
+    _validate_exact(routes.get("inference"), list(INFERENCE_ROUTES), "inference routes")
+    _validate_exact(routes.get("training"), list(TRAINING_ROUTES), "training routes")
+    coverage = smoke.get("coverage", {})
+    if not isinstance(coverage, Mapping):
+        raise BenchmarkInputError("invalid_smoke_manifest", "smoke coverage must be a mapping")
+    return BenchmarkConfig(
+        version=1,
+        precision="float32",
+        process_repetitions=3,
+        warmup_iterations=3,
+        timed_iterations=10,
+        batch_sizes=(1, 2, 4, 8),
+        end_to_end_batch_size=1,
+        smoke_min_cases=8,
+        smoke_max_cases=12,
+        coverage={name: tuple(str(item) for item in values) for name, values in coverage.items()},
+    )
+
+
+def _source_path(manifest_path: Path, value: Any, label: str) -> Path:
+    if not isinstance(value, str) or not value:
+        raise BenchmarkInputError("invalid_smoke_manifest", f"{label} must be a non-empty path")
+    candidate = Path(value)
+    if not candidate.is_absolute():
+        candidate = manifest_path.parent / candidate
+    try:
+        resolved = candidate.resolve(strict=True)
+    except OSError as exc:
+        raise BenchmarkInputError("invalid_smoke_manifest", f"{label} is missing or unreadable") from exc
+    if not resolved.is_file() or not os.access(resolved, os.R_OK):
+        raise BenchmarkInputError("invalid_smoke_manifest", f"{label} is missing or unreadable")
+    try:
+        with resolved.open("rb"):
+            pass
+    except OSError as exc:
+        raise BenchmarkInputError("invalid_smoke_manifest", f"{label} is unreadable") from exc
+    return resolved
+
+
+def load_manifest(path: str | Path, config: BenchmarkConfig) -> tuple[SmokeCase, ...]:
+    """Read and validate an anonymous local manifest; paths never enter reports."""
+    manifest_path = Path(path).resolve(strict=True)
+    try:
+        raw = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise BenchmarkInputError("invalid_smoke_manifest", "smoke manifest could not be read") from exc
+    data = _required_mapping(raw, "smoke manifest")
+    if set(data) != {"format_version", "benchmark_spec_version", "cases"}:
+        raise BenchmarkInputError("invalid_smoke_manifest", "smoke manifest shape is not version 1")
+    _validate_exact(data.get("format_version"), 1, "manifest format version")
+    _validate_exact(data.get("benchmark_spec_version"), 1, "benchmark spec version")
+    rows = data.get("cases")
+    if not isinstance(rows, list) or not config.smoke_min_cases <= len(rows) <= config.smoke_max_cases:
+        raise BenchmarkInputError("invalid_smoke_manifest", "smoke manifest case count is outside the fixed range")
+
+    cases: list[SmokeCase] = []
+    audio_paths: set[Path] = set()
+    pair_paths: set[tuple[Path, Path]] = set()
+    allowed = {
+        "performance": set(_PERFORMANCE),
+        "role": set(_ROLES),
+        "envelope": set(_ENVELOPES),
+        "duration_class": set(_DURATIONS),
+        "note_density_class": set(_DENSITIES),
+    }
+    for expected_index, row in enumerate(rows, start=1):
+        item = _required_mapping(row, "smoke case")
+        if set(item) != {
+            "case_index",
+            "audio_path",
+            "midi_path",
+            "performance",
+            "role",
+            "envelope",
+            "duration_class",
+            "note_density_class",
+        }:
+            raise BenchmarkInputError("invalid_smoke_manifest", "smoke case shape is invalid")
+        if type(item["case_index"]) is not int or item["case_index"] != expected_index:
+            raise BenchmarkInputError("invalid_smoke_manifest", "case indexes must be sequential")
+        labels = {name: item[name] for name in allowed}
+        if any(not isinstance(value, str) or value not in allowed[name] for name, value in labels.items()):
+            raise BenchmarkInputError("invalid_smoke_manifest", "smoke case has an unsupported label")
+        audio_path = _source_path(manifest_path, item["audio_path"], "audio path")
+        midi_path = _source_path(manifest_path, item["midi_path"], "MIDI path")
+        if audio_path in audio_paths or (audio_path, midi_path) in pair_paths:
+            raise BenchmarkInputError("invalid_smoke_manifest", "smoke manifest contains a duplicate source pair")
+        audio_paths.add(audio_path)
+        pair_paths.add((audio_path, midi_path))
+        cases.append(SmokeCase(case_index=expected_index, audio_path=audio_path, midi_path=midi_path, **labels))
+    return tuple(cases)
+
+
+def coverage_summary(cases: Sequence[SmokeCase]) -> dict[str, dict[str, int]]:
+    fields = ("performance", "role", "envelope", "duration_class", "note_density_class")
+    return {field: dict(sorted(Counter(getattr(case, field) for case in cases).items())) for field in fields}
+
+
+def aggregate_measurements(values: Sequence[float]) -> dict[str, float]:
+    """Return fixed descriptive statistics for a non-empty measurement set."""
+    if not values:
+        raise ValueError("at least one measurement is required")
+    numeric = [float(value) for value in values]
+    if not all(math.isfinite(value) and value >= 0 for value in numeric):
+        raise ValueError("measurements must be finite and non-negative")
+    return {
+        "median": float(statistics.median(numeric)),
+        "min": float(min(numeric)),
+        "max": float(max(numeric)),
+        "total": float(sum(numeric)),
+    }
+
+
+def _aggregate_optional(rows: Sequence[Mapping[str, Any]], field: str) -> dict[str, Any]:
+    values = [row.get(field) for row in rows]
+    present = [float(value) for value in values if value is not None]
+    if not present:
+        return {"value": None, "measurement_status": "not_applicable"}
+    if len(present) != len(values):
+        return {"value": None, "measurement_status": "unavailable"}
+    return {"value": aggregate_measurements(present), "measurement_status": "ok"}
+
+
+def crossover_audio_seconds(startup_a: float, throughput_a: float, startup_b: float, throughput_b: float) -> float | None:
+    """Apply the fixed crossover formula, returning only positive finite results."""
+    if not all(math.isfinite(value) and value > 0 for value in (startup_a, throughput_a, startup_b, throughput_b)):
+        return None
+    if not startup_b > startup_a or not throughput_b > throughput_a:
+        return None
+    denominator = (1.0 / throughput_a) - (1.0 / throughput_b)
+    distance = (startup_b - startup_a) / denominator
+    return float(distance) if math.isfinite(distance) and distance > 0 else None
+
+
+def _runtime_identity() -> dict[str, str | None]:
+    versions: dict[str, str | None] = {"python": platform.python_version()}
+    for name, module_name, attribute in (
+        ("numpy", "numpy", "__version__"),
+        ("scipy", "scipy", "__version__"),
+        ("torch", "torch", "__version__"),
+        ("openvino", "openvino", "__version__"),
+        ("psutil", "psutil", "__version__"),
+        ("onnx", "onnx", "__version__"),
+        ("onnxruntime", "onnxruntime", "__version__"),
+    ):
+        try:
+            versions[name] = str(getattr(import_module(module_name), attribute))
+        except (AttributeError, ImportError, OSError, RuntimeError):
+            versions[name] = None
+    return versions
+
+
+def _unavailable_route(route: str, mode: str, code: str) -> dict[str, Any]:
+    return {"route": route, "mode": mode, "status": "unavailable", "failure_code": code}
+
+
+def _source_snapshot(cases: Sequence[SmokeCase]) -> dict[Path, tuple[int, int]]:
+    return {
+        path: (path.stat().st_size, path.stat().st_mtime_ns)
+        for case in cases
+        for path in (case.audio_path, case.midi_path)
+    }
+
+
+def _verify_source_snapshot(snapshot: Mapping[Path, tuple[int, int]]) -> None:
+    for path, before in snapshot.items():
+        current = path.stat()
+        if (current.st_size, current.st_mtime_ns) != before:
+            raise SourceMutationError("an immutable benchmark source changed during execution")
+
+
+def _worker_request(
+    route: str,
+    mode: str,
+    repetition: int,
+    config: BenchmarkConfig,
+    manifest_path: Path,
+    checkpoint_path: Path,
+    xpu_index: int,
+    openvino_gpu_device: str,
+) -> dict[str, Any]:
+    return {
+        "route": route,
+        "mode": mode,
+        "repetition": repetition,
+        "config": {
+            "warmup_iterations": config.warmup_iterations,
+            "timed_iterations": config.timed_iterations,
+            "batch_sizes": list(config.batch_sizes),
+            "end_to_end_batch_size": config.end_to_end_batch_size,
+        },
+        "manifest_path": str(manifest_path),
+        "checkpoint_path": str(checkpoint_path),
+        "xpu_index": xpu_index,
+        "openvino_gpu_device": openvino_gpu_device,
+    }
+
+
+def _run_worker(request: Mapping[str, Any]) -> dict[str, Any]:
+    worker = Path(__file__).with_name("benchmark_worker.py")
+    try:
+        completed = subprocess.run(
+            [sys.executable, str(worker)],
+            input=json.dumps(request),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return {"status": "runtime_failed", "failure_code": "benchmark_runtime_error"}
+    if completed.returncode != 0:
+        return {"status": "runtime_failed", "failure_code": "benchmark_runtime_error"}
+    try:
+        result = json.loads(completed.stdout)
+    except json.JSONDecodeError:
+        return {"status": "runtime_failed", "failure_code": "benchmark_runtime_error"}
+    if not isinstance(result, dict) or result.get("status") not in STATUSES:
+        return {"status": "runtime_failed", "failure_code": "benchmark_runtime_error"}
+    return result
+
+
+def _aggregate_route(rows: Sequence[Mapping[str, Any]], route: str, mode: str, config: BenchmarkConfig) -> dict[str, Any]:
+    statuses = [row.get("status") for row in rows]
+    if any(status == "parity_failed" for status in statuses):
+        status = "parity_failed"
+    elif any(status == "out_of_memory" for status in statuses):
+        status = "out_of_memory"
+    elif any(status == "runtime_failed" for status in statuses):
+        status = "runtime_failed"
+    elif any(status == "unavailable" for status in statuses):
+        status = "unavailable"
+    else:
+        status = "ok"
+    result: dict[str, Any] = {
+        "route": route,
+        "mode": mode,
+        "status": status,
+        "repetitions": len(rows),
+    }
+    failure_codes = sorted({str(row["failure_code"]) for row in rows if row.get("failure_code")})
+    if failure_codes:
+        result["failure_codes"] = failure_codes
+    if status != "ok":
+        return result
+
+    startup_fields = (
+        "backend_import_seconds",
+        "model_construct_seconds",
+        "checkpoint_load_seconds",
+        "model_device_move_seconds",
+        "openvino_conversion_seconds",
+        "openvino_compile_seconds",
+    )
+    result["startup"] = {field: _aggregate_optional([row["startup"] for row in rows], field) for field in startup_fields}
+    startup_values = [
+        sum(
+            float(row["startup"][field])
+            for field in startup_fields
+            if row["startup"].get(field) is not None
+        )
+        for row in rows
+    ]
+    result["startup"]["total_seconds"] = {"value": aggregate_measurements(startup_values), "measurement_status": "ok"}
+    result["parity"] = {
+        name: max(float(row["parity"][name]) for row in rows)
+        for name in (
+            "contour_max_abs_error",
+            "note_max_abs_error",
+            "onset_max_abs_error",
+            "note_threshold_disagreements",
+            "onset_threshold_disagreements",
+            "event_structure_disagreements",
+            "pitch_bend_element_disagreements",
+        )
+    }
+    result["batch_results"] = {}
+    source_key = "model_only" if mode == "inference" else "training"
+    for batch_size in config.batch_sizes:
+        values = [row[source_key]["batch_sizes"][str(batch_size)] for row in rows]
+        phase_fields = (
+            "first_inference_seconds",
+            "inference_warmup_seconds",
+        ) if mode == "inference" else (
+            "first_training_step_seconds",
+            "training_warmup_seconds",
+        )
+        result["batch_results"][str(batch_size)] = {
+            field: aggregate_measurements([float(value[field]) for value in values])
+            for field in (
+                *phase_fields,
+                "median_seconds",
+                "min_seconds",
+                "max_seconds",
+                "total_seconds",
+            )
+        }
+        result["batch_results"][str(batch_size)]["windows_per_second"] = aggregate_measurements(
+            [float(value["windows_per_second"]) for value in values]
+        )
+        result["batch_results"][str(batch_size)]["audio_seconds_per_second"] = aggregate_measurements(
+            [float(value["audio_seconds_per_second"]) for value in values]
+        )
+    if mode == "inference":
+        result["end_to_end"] = {
+            "audio_seconds": aggregate_measurements([float(row["end_to_end"]["audio_seconds"]) for row in rows]),
+            "wall_seconds": aggregate_measurements([float(row["end_to_end"]["wall_seconds"]) for row in rows]),
+            "audio_seconds_per_wall_second": aggregate_measurements(
+                [float(row["end_to_end"]["audio_seconds_per_wall_second"]) for row in rows]
+            ),
+            "cases": [
+                {
+                    key: row["end_to_end"]["cases"][case_index][key]
+                    for key in ("case_index", "status", "audio_seconds", "wall_seconds", "note_event_count")
+                }
+                for case_index in range(len(rows[0]["end_to_end"]["cases"]))
+                for row in rows[:1]
+            ],
+        }
+    result["memory"] = rows[0].get("memory", {"status": "unavailable"})
+    return result
+
+
+def _unavailable_report(config: BenchmarkConfig, code: str) -> dict[str, Any]:
+    return {
+        "format_version": 1,
+        "benchmark_spec_version": config.version,
+        "model_id": MODEL_ID,
+        "source_git_blob_sha1": SPOTIFY_ONNX_GIT_BLOB_SHA1,
+        "runtime": _runtime_identity(),
+        "config": config.as_dict(),
+        "smoke_set": {"status": "unavailable", "failure_code": code, "case_count": 0, "coverage": {}},
+        "inference": [_unavailable_route(route, "inference", code) for route in INFERENCE_ROUTES],
+        "training": [_unavailable_route(route, "training", code) for route in TRAINING_ROUTES],
+        "crossovers": [],
+        "conclusions": {"status": "blocked", "reason": "a valid existing local smoke manifest was unavailable"},
+    }
+
+
+def _crossover_rows(inference: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for index, left in enumerate(inference):
+        if left.get("status") != "ok":
+            continue
+        for right in inference[index + 1 :]:
+            if right.get("status") != "ok":
+                continue
+            left_start = float(left["startup"]["total_seconds"]["value"]["median"])
+            right_start = float(right["startup"]["total_seconds"]["value"]["median"])
+            left_rate = float(left["batch_results"]["1"]["audio_seconds_per_second"]["median"])
+            right_rate = float(right["batch_results"]["1"]["audio_seconds_per_second"]["median"])
+            distance = crossover_audio_seconds(left_start, left_rate, right_start, right_rate)
+            if distance is not None:
+                rows.append({"route_a": left["route"], "route_b": right["route"], "audio_seconds": distance})
+    return rows
+
+
+def run_benchmark(
+    config: BenchmarkConfig,
+    manifest_path: str | Path,
+    checkpoint_path: str | Path,
+    *,
+    xpu_index: int = 0,
+    openvino_gpu_device: str = "GPU",
+) -> dict[str, Any]:
+    """Run the fixed matrix in foreground fresh subprocesses and sanitize it."""
+    manifest = Path(manifest_path).resolve(strict=True)
+    cases = load_manifest(manifest, config)
+    snapshot = _source_snapshot(cases)
+    checkpoint = Path(checkpoint_path).resolve(strict=True)
+    inference: list[dict[str, Any]] = []
+    training: list[dict[str, Any]] = []
+    try:
+        for mode, routes, destination in (
+            ("inference", INFERENCE_ROUTES, inference),
+            ("training", TRAINING_ROUTES, training),
+        ):
+            for route in routes:
+                rows = [
+                    _run_worker(
+                        _worker_request(
+                            route,
+                            mode,
+                            repetition,
+                            config,
+                            manifest,
+                            checkpoint,
+                            xpu_index,
+                            openvino_gpu_device,
+                        )
+                    )
+                    for repetition in range(config.process_repetitions)
+                ]
+                destination.append(_aggregate_route(rows, route, mode, config))
+    finally:
+        _verify_source_snapshot(snapshot)
+    report = {
+        "format_version": 1,
+        "benchmark_spec_version": config.version,
+        "model_id": MODEL_ID,
+        "source_git_blob_sha1": SPOTIFY_ONNX_GIT_BLOB_SHA1,
+        "runtime": _runtime_identity(),
+        "config": config.as_dict(),
+        "smoke_set": {"status": "ok", "case_count": len(cases), "coverage": coverage_summary(cases), "cases": [case.sanitized() for case in cases]},
+        "inference": inference,
+        "training": training,
+        "crossovers": _crossover_rows(inference),
+        "conclusions": {
+            "inference_highest_batch_1_audio_throughput": max(
+                (row for row in inference if row.get("status") == "ok"),
+                key=lambda row: row["batch_results"]["1"]["audio_seconds_per_second"]["median"],
+                default=None,
+            ),
+            "training_highest_batch_1_audio_throughput": max(
+                (row for row in training if row.get("status") == "ok"),
+                key=lambda row: row["batch_results"]["1"]["audio_seconds_per_second"]["median"],
+                default=None,
+            ),
+        },
+    }
+    for section in ("inference", "training"):
+        for row in report[section]:
+            winner = report["conclusions"][f"{section}_highest_batch_1_audio_throughput"]
+            if winner is not None and winner.get("route") == row.get("route"):
+                report["conclusions"][f"{section}_highest_batch_1_audio_throughput"] = row["route"]
+    return report
+
+
+def _approved_report_paths(json_path: str | Path, markdown_path: str | Path) -> tuple[Path, Path]:
+    reports_root = (Path(__file__).resolve().parents[1] / "reports").resolve()
+    resolved = tuple(Path(path).resolve(strict=False) for path in (json_path, markdown_path))
+    if any(path == reports_root or not path.is_relative_to(reports_root) for path in resolved):
+        raise ValueError("benchmark reports must be inside the approved reports directory")
+    return resolved
+
+
+def write_benchmark_reports(
+    report: Mapping[str, Any],
+    json_path: str | Path,
+    markdown_path: str | Path,
+    *,
+    force: bool = False,
+) -> None:
+    """Atomically write only sanitized aggregate benchmark reports."""
+    json_file, markdown_file = _approved_report_paths(json_path, markdown_path)
+    json_file.parent.mkdir(parents=True, exist_ok=True)
+    markdown_file.parent.mkdir(parents=True, exist_ok=True)
+    if not force and (json_file.exists() or markdown_file.exists()):
+        raise FileExistsError("refusing to overwrite benchmark reports without force=True")
+    inference = report.get("inference", [])
+    training = report.get("training", [])
+    markdown_lines = [
+        "# Basic Pitch backend benchmark",
+        "",
+        f"- Model: `{report.get('model_id', MODEL_ID)}`",
+        f"- Smoke set: `{report.get('smoke_set', {}).get('status', 'unknown')}`",
+        f"- Runtime: `{report.get('runtime', {}).get('python', 'unknown')}` / float32",
+        "",
+        "## Inference routes",
+        "",
+        "| Route | Status | Batch-1 audio seconds/second |",
+        "| --- | --- | ---: |",
+    ]
+    for row in inference:
+        rate = row.get("batch_results", {}).get("1", {}).get("audio_seconds_per_second", {}).get("median", "—")
+        rate_text = f"{rate:.6g}" if isinstance(rate, (int, float)) else str(rate)
+        markdown_lines.append(f"| `{row.get('route', 'unknown')}` | `{row.get('status', 'unknown')}` | {rate_text} |")
+    markdown_lines.extend(["", "## Training routes", "", "| Route | Status | Batch-1 audio seconds/second |", "| --- | --- | ---: |"])
+    for row in training:
+        rate = row.get("batch_results", {}).get("1", {}).get("audio_seconds_per_second", {}).get("median", "—")
+        rate_text = f"{rate:.6g}" if isinstance(rate, (int, float)) else str(rate)
+        markdown_lines.append(f"| `{row.get('route', 'unknown')}` | `{row.get('status', 'unknown')}` | {rate_text} |")
+    markdown_lines.extend(["", "The report contains no source paths, filenames, IDs, hashes, or per-source predictions."])
+    markdown = "\n".join(markdown_lines) + "\n"
+
+    json_temp: Path | None = None
+    markdown_temp: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=json_file.parent, prefix=".backend-", suffix=".json.tmp", delete=False) as handle:
+            json_temp = Path(handle.name)
+            json.dump(report, handle, indent=2, sort_keys=True)
+            handle.write("\n")
+        with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=markdown_file.parent, prefix=".backend-", suffix=".md.tmp", delete=False) as handle:
+            markdown_temp = Path(handle.name)
+            handle.write(markdown)
+        os.replace(json_temp, json_file)
+        json_temp = None
+        os.replace(markdown_temp, markdown_file)
+        markdown_temp = None
+    finally:
+        for temporary in (json_temp, markdown_temp):
+            if temporary is not None and temporary.exists():
+                temporary.unlink()
+
+
+def benchmark_exit_code(report: Mapping[str, Any]) -> int:
+    """Return 0 for successful/unavailable route rows and 3 for route failures."""
+    rows = list(report.get("inference", [])) + list(report.get("training", []))
+    return 0 if all(row.get("status") in {"ok", "unavailable"} for row in rows) else 3
+
+
+def run_benchmark_cli(
+    config_path: str | Path,
+    manifest_path: str | Path,
+    checkpoint_path: str | Path,
+    json_path: str | Path,
+    markdown_path: str | Path,
+    *,
+    xpu_index: int = 0,
+    openvino_gpu_device: str = "GPU",
+    force: bool = False,
+) -> int:
+    try:
+        config = load_config(config_path)
+        try:
+            report = run_benchmark(
+                config,
+                manifest_path,
+                checkpoint_path,
+                xpu_index=xpu_index,
+                openvino_gpu_device=openvino_gpu_device,
+            )
+        except (BenchmarkInputError, FileNotFoundError, OSError) as exc:
+            code = exc.code if isinstance(exc, BenchmarkInputError) else "invalid_smoke_manifest"
+            report = _unavailable_report(config, code)
+            write_benchmark_reports(report, json_path, markdown_path, force=force)
+            return 2
+        except SourceMutationError:
+            report = _unavailable_report(config, "benchmark_runtime_error")
+            write_benchmark_reports(report, json_path, markdown_path, force=force)
+            return 3
+        write_benchmark_reports(report, json_path, markdown_path, force=force)
+        return benchmark_exit_code(report)
+    except (BenchmarkInputError, FileNotFoundError, OSError, ValueError):
+        return 2

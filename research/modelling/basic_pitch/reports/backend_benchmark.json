@@ -1,0 +1,123 @@
+{
+  "benchmark_spec_version": 1,
+  "conclusions": {
+    "reason": "a valid existing local smoke manifest was unavailable",
+    "status": "blocked"
+  },
+  "config": {
+    "batch_sizes": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "end_to_end_batch_size": 1,
+    "precision": "float32",
+    "process_repetitions": 3,
+    "routes": {
+      "inference": [
+        "pytorch_cpu",
+        "pytorch_xpu",
+        "openvino_cpu",
+        "openvino_gpu"
+      ],
+      "training": [
+        "pytorch_cpu",
+        "pytorch_xpu"
+      ]
+    },
+    "smoke_set": {
+      "coverage": {
+        "duration_classes": [
+          "short",
+          "medium",
+          "long"
+        ],
+        "envelopes": [
+          "transient",
+          "sustained"
+        ],
+        "note_density_classes": [
+          "low",
+          "high"
+        ],
+        "performance": [
+          "monophonic",
+          "polyphonic"
+        ],
+        "roles": [
+          "bass",
+          "lead",
+          "arp_sequence",
+          "pad_sustained",
+          "other"
+        ]
+      },
+      "max_cases": 12,
+      "min_cases": 8
+    },
+    "timed_iterations": 10,
+    "version": 1,
+    "warmup_iterations": 3
+  },
+  "crossovers": [],
+  "format_version": 1,
+  "inference": [
+    {
+      "failure_code": "invalid_smoke_manifest",
+      "mode": "inference",
+      "route": "pytorch_cpu",
+      "status": "unavailable"
+    },
+    {
+      "failure_code": "invalid_smoke_manifest",
+      "mode": "inference",
+      "route": "pytorch_xpu",
+      "status": "unavailable"
+    },
+    {
+      "failure_code": "invalid_smoke_manifest",
+      "mode": "inference",
+      "route": "openvino_cpu",
+      "status": "unavailable"
+    },
+    {
+      "failure_code": "invalid_smoke_manifest",
+      "mode": "inference",
+      "route": "openvino_gpu",
+      "status": "unavailable"
+    }
+  ],
+  "model_id": "spotify-basic-pitch-icassp-2022-v0.4.0",
+  "runtime": {
+    "numpy": "2.4.6",
+    "onnx": "1.22.0",
+    "onnxruntime": "1.28.0",
+    "openvino": "2026.3.0-000--",
+    "psutil": "7.2.2",
+    "python": "3.12.13",
+    "scipy": "1.18.0",
+    "torch": "2.12.1+xpu"
+  },
+  "smoke_set": {
+    "case_count": 0,
+    "coverage": {},
+    "failure_code": "invalid_smoke_manifest",
+    "status": "unavailable"
+  },
+  "source_git_blob_sha1": "c30e5f9438e798604b7177aa26be1fe64482f767",
+  "training": [
+    {
+      "failure_code": "invalid_smoke_manifest",
+      "mode": "training",
+      "route": "pytorch_cpu",
+      "status": "unavailable"
+    },
+    {
+      "failure_code": "invalid_smoke_manifest",
+      "mode": "training",
+      "route": "pytorch_xpu",
+      "status": "unavailable"
+    }
+  ]
+}

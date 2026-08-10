@@ -10,8 +10,6 @@ from typing import Any
 import numpy as np
 import onnxruntime as ort
 import torch
-from scipy import signal
-from scipy.io import wavfile
 
 from .constants import (
     AUDIO_N_SAMPLES,
@@ -25,6 +23,7 @@ from .constants import (
     ONSET_THRESHOLD,
     SPOTIFY_ONNX_GIT_BLOB_SHA1,
 )
+from .inference import prepare_wav
 from .model import BasicPitchICASSP2022
 from .postprocess import NoteEvent, posteriorgrams_to_note_events
 
@@ -84,30 +83,7 @@ def synthetic_windows() -> np.ndarray:
 
 def audio_to_windows(path: Path) -> np.ndarray:
     """Read one local WAV read-only and create the prescribed shared windows."""
-    sample_rate, audio = wavfile.read(path)
-    samples = np.asarray(audio)
-    if samples.ndim == 2:
-        samples = samples.astype(np.float32).mean(axis=1)
-    else:
-        samples = samples.astype(np.float32)
-    if np.issubdtype(audio.dtype, np.integer):
-        samples /= np.iinfo(audio.dtype).max
-    if sample_rate != AUDIO_SAMPLE_RATE:
-        gcd = np.gcd(sample_rate, AUDIO_SAMPLE_RATE)
-        samples = signal.resample_poly(samples, AUDIO_SAMPLE_RATE // gcd, sample_rate // gcd).astype(np.float32)
-    samples = np.ascontiguousarray(samples, dtype=np.float32)
-    padded = np.concatenate((np.zeros(3840, dtype=np.float32), samples))
-    hop = AUDIO_N_SAMPLES - 30 * 256
-    starts = list(range(0, max(1, padded.shape[0] - AUDIO_N_SAMPLES + 1), hop))
-    if starts[-1] + AUDIO_N_SAMPLES < padded.shape[0]:
-        starts.append(padded.shape[0] - AUDIO_N_SAMPLES)
-    windows = []
-    for start in starts:
-        window = padded[start : start + AUDIO_N_SAMPLES]
-        if window.shape[0] < AUDIO_N_SAMPLES:
-            window = np.pad(window, (0, AUDIO_N_SAMPLES - window.shape[0]))
-        windows.append(window)
-    return np.ascontiguousarray(np.stack(windows, axis=0)[:, :, None], dtype=np.float32)
+    return prepare_wav(path).windows
 
 
 def _output_parity(reference: np.ndarray, candidate: np.ndarray) -> OutputParity:
