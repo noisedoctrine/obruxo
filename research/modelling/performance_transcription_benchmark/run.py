@@ -83,7 +83,7 @@ def main() -> int:
             return 0 if result.status in {"ok", "unavailable"} else 3
         result = run_benchmark(spec, adapter, args.smoke_manifest, args.output, quantized=args.quantized, force=args.force)
         print(f"{result['model_id']}: {result['status']}")
-        return 0 if result["status"] == "unavailable" else 3
+        return 0 if result["status"] in {"ok", "unavailable"} else 3
     except (ArtifactUnavailable, ArtifactError, FileExistsError, FileNotFoundError, OSError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
         return 2

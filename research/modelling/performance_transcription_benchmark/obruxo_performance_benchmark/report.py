@@ -64,6 +64,9 @@ def _stored_results(root: Path) -> dict[str, dict[str, Any]]:
             continue
         model_id = str(run["model_id"])
         current = results.setdefault(model_id, {})
+        if run.get("variant_id") == "dynamic_int8_linear":
+            current["quantization"] = run.get("quantization")
+            continue
         current["run"] = run
         current["runtime"] = _read_json(run_path.with_name("runtime.json"))
         current["aggregates"] = _read_json(run_path.with_name("aggregates.json"))
@@ -75,6 +78,43 @@ def _landed_basic_pitch_reports() -> tuple[dict[str, Any] | None, dict[str, Any]
     return _read_json(reports / "presetshare_baseline.json"), _read_json(reports / "backend_benchmark.json")
 
 
+def _landed_basic_pitch_quality(report: Mapping[str, Any]) -> dict[str, Any]:
+    pairing = report.get("pairing", {})
+    aggregate = report.get("aggregate", {})
+    eligible = int(aggregate.get("pair_count", pairing.get("eligible_count", 0)))
+    successful = int(aggregate.get("successful_pair_count", eligible))
+    failed = int(aggregate.get("failed_pair_count", max(0, eligible - successful)))
+    view = {
+        "eligible_pairs": eligible,
+        "successful_pairs": successful,
+        "failed_pairs": failed,
+        "coverage": float(successful / eligible) if eligible else None,
+        "aggregate": dict(aggregate),
+    }
+    return {"success_only": view, "failure_penalized": dict(view)}
+
+
+def _landed_basic_pitch_runtime(report: Mapping[str, Any]) -> dict[str, Any]:
+    routes = list(report.get("inference", [])) + list(report.get("training", []))
+    successful = [route for route in routes if route.get("status") == "ok"]
+    failures = [
+        {"route": route.get("route"), "status": route.get("status")}
+        for route in routes
+        if route.get("status") != "ok"
+    ]
+    value = dict(report)
+    value.update(
+        {
+            "status": "measured" if successful else "unavailable",
+            "failure_code": None,
+            "routes": routes,
+            "timing_contract": report.get("config"),
+            "route_failures": failures,
+        }
+    )
+    return value
+
+
 def build_public_report(specs: Mapping[str, ModelSpec], input_root: Path) -> dict[str, Any]:
     stored = _stored_results(Path(input_root).resolve(strict=False))
     landed_quality, landed_runtime = _landed_basic_pitch_reports()
@@ -84,13 +124,15 @@ def build_public_report(specs: Mapping[str, ModelSpec], input_root: Path) -> dic
         run = current.get("run") or {}
         runtime = current.get("runtime") or {}
         aggregates = current.get("aggregates") or {}
-        if model_id == "basic_pitch" and not run and (landed_quality or landed_runtime):
+        stored_quantization = current.get("quantization") or run.get("quantization")
+        if model_id == "basic_pitch" and (landed_quality or landed_runtime):
             run = {
                 "model_id": model_id,
                 "status": (landed_quality or {}).get("status", spec.availability),
                 "failure_code": (landed_quality or {}).get("failure_code"),
             }
-            runtime = landed_runtime or {}
+            runtime = _landed_basic_pitch_runtime(landed_runtime) if landed_runtime else {}
+            aggregates = {"quality": _landed_basic_pitch_quality(landed_quality)} if landed_quality else {}
         status = str(run.get("status", spec.availability))
         failure_code = run.get("failure_code") or (spec.unavailability_reason if status != "ok" else None)
         routes = runtime.get("routes")
@@ -104,6 +146,7 @@ def build_public_report(specs: Mapping[str, ModelSpec], input_root: Path) -> dic
             "identity": spec.public_identity(),
             "status": status,
             "failure_code": failure_code,
+            "availability_reason": spec.unavailability_reason,
             "quality": aggregates.get("quality") if status == "ok" else None,
             "execution": {
                 "status": runtime.get("status", "unavailable"),
@@ -111,13 +154,14 @@ def build_public_report(specs: Mapping[str, ModelSpec], input_root: Path) -> dic
                 "routes": routes,
                 "timing_contract": runtime.get("timing_contract") or runtime.get("config"),
                 "phases": runtime.get("phases"),
+                "route_failures": runtime.get("route_failures", []),
                 "resources": runtime.get("resources") or run.get("resources"),
                 "native_batch_sizes": runtime.get("native_batch_sizes", list(spec.native_batch_sizes)),
                 "backward": runtime.get("backward"),
             },
             "resources": run.get("resources") or runtime.get("resources"),
             "representation": spec.representation,
-            "quantization": run.get("quantization"),
+            "quantization": stored_quantization,
         }
         if model_id == "basic_pitch" and (landed_quality or landed_runtime):
             item["landed_baseline"] = {
@@ -125,8 +169,9 @@ def build_public_report(specs: Mapping[str, ModelSpec], input_root: Path) -> dic
                 "quality_failure_code": (landed_quality or {}).get("failure_code"),
                 "eligible_pairs": ((landed_quality or {}).get("pairing") or {}).get("eligible_count"),
                 "quality_coverage": ((landed_quality or {}).get("aggregate") or {}).get("coverage"),
-                "cost_status": (landed_runtime or {}).get("conclusions", {}).get("status"),
-                "cost_failure_code": (landed_runtime or {}).get("conclusions", {}).get("reason"),
+                "cost_status": runtime.get("status"),
+                "cost_failure_code": runtime.get("failure_code"),
+                "cost_route_failures": runtime.get("route_failures", []),
             }
         models.append(item)
     return sanitize_public_report(
@@ -174,10 +219,50 @@ def _markdown(report: Mapping[str, Any]) -> str:
             "- Timbre-Trap remains frame-only; no synthetic note-event decoder is included.",
             "- Private paths, pair identifiers, source filenames, and row predictions are excluded.",
             "",
-            "## Interpretation",
-            "",
         ]
     )
+    def _metric(value: Any) -> str:
+        return "n/a" if value is None else f"{float(value):.6f}"
+
+    lines.extend(["## Quality, cost, and quantization details", ""])
+    for model in report.get("models", []):
+        model_id = model.get("model_id", "unknown")
+        lines.extend([f"### `{model_id}`", ""])
+        if model.get("status") != "ok":
+            reason = model.get("availability_reason") or model.get("failure_code") or "not recorded"
+            lines.append(f"- Availability: `{model.get('status', 'unknown')}` — {reason}.")
+        quality = model.get("quality") or {}
+        if quality:
+            lines.extend(
+                [
+                    "",
+                    "| Quality view | Eligible | Succeeded | Failed | Coverage | Onset+pitch F1 | Onset+pitch+offset F1 | Frame F1 |",
+                    "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+                ]
+            )
+            for view_name in ("success_only", "failure_penalized"):
+                view = quality.get(view_name) or {}
+                micro = (view.get("aggregate") or {}).get("micro") or {}
+                lines.append(
+                    f"| `{view_name}` | {view.get('eligible_pairs', 'n/a')} | {view.get('successful_pairs', 'n/a')} | {view.get('failed_pairs', 'n/a')} | {_metric(view.get('coverage'))} | {_metric((micro.get('onset_pitch') or {}).get('f1'))} | {_metric((micro.get('onset_pitch_offset') or {}).get('f1'))} | {_metric((micro.get('frames') or {}).get('f1'))} |"
+                )
+        else:
+            lines.append("- Quality: unavailable; no score is synthesized.")
+        execution = model.get("execution") or {}
+        routes = execution.get("routes") or []
+        if routes:
+            lines.extend(["", f"- Execution status: `{execution.get('status', 'unknown')}`.", "", "| Route | Status |", "| --- | --- |"])
+            for route in routes:
+                lines.append(f"| `{route.get('route', 'unknown')}` | `{route.get('status', 'unknown')}` |")
+        else:
+            lines.append(f"- Execution status: `{execution.get('status', 'unavailable')}`.")
+        quantization = model.get("quantization")
+        if quantization:
+            lines.append(
+                f"- Quantization: `{quantization.get('status', 'unknown')}`; ordinary Linear modules {quantization.get('original_linear_modules', 'n/a')} → {quantization.get('quantized_linear_modules', 'n/a')}; engine `{quantization.get('engine', 'n/a')}`."
+            )
+        lines.append("")
+    lines.extend(["## Interpretation", ""])
     conclusion = report.get("conclusion", {})
     for key in ("quality", "cost", "representation", "later_integration"):
         lines.append(f"- {conclusion.get(key, 'not recorded')}")

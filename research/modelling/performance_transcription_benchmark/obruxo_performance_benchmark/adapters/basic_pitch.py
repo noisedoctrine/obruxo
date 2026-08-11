@@ -46,6 +46,8 @@ def read_landed_baseline(manifest_path: Path) -> dict[str, Any]:
         "status": str(run.get("status", "unavailable")),
         "failure_code": run.get("failure_code"),
         "pair_count": int(run.get("pair_count", 0)),
+        "successful_pair_count": int(run.get("successful_pair_count", 0)),
+        "failed_pair_count": int(run.get("failed_pair_count", 0)),
         "aggregate": aggregate,
         "backend": run.get("backend"),
         "run_identity": run.get("run_identity"),
@@ -75,6 +77,21 @@ class BasicPitchAdapter:
 
     def load(self) -> None:
         self.preflight()
+
+    def quantization_result(self) -> Any:
+        self.preflight()
+        import torch
+
+        from ..quantization import quantize_dynamic_linear_int8
+
+        root = _basic_pitch_root() if self.source_root is None else self.source_root.resolve(strict=True)
+        checkpoint = self.checkpoint or root / "artifacts" / "basic_pitch_icassp_2022.pt"
+        from obruxo_basic_pitch.model import BasicPitchICASSP2022
+
+        model = BasicPitchICASSP2022()
+        state = torch.load(checkpoint, map_location="cpu", weights_only=True)
+        model.load_state_dict(state, strict=True)
+        return quantize_dynamic_linear_int8(model)
 
     def transcribe(self, _audio: Path) -> Any:
         raise ArtifactUnavailable("Basic Pitch quality is consumed from the landed #25 result")

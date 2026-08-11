@@ -279,6 +279,129 @@ def _write_unavailable(output: Path, run: EvaluationRun, *, reason: str | None =
     _atomic_json(output / "aggregates.json", {"status": run.status, "failure_code": run.failure_code, "quality": None})
 
 
+def _landed_quality_views(aggregate: Mapping[str, Any], *, eligible_pairs: int, successful_pairs: int, failed_pairs: int) -> dict[str, Any]:
+    view = {
+        "eligible_pairs": eligible_pairs,
+        "successful_pairs": successful_pairs,
+        "failed_pairs": failed_pairs,
+        "coverage": float(successful_pairs / eligible_pairs) if eligible_pairs else None,
+        "aggregate": dict(aggregate),
+    }
+    return {"success_only": view, "failure_penalized": dict(view)}
+
+
+def _consume_landed_basic_pitch(
+    spec: ModelSpec,
+    adapter: object,
+    manifest: Path,
+    pairs: Sequence[Any],
+    output: Path,
+) -> EvaluationRun:
+    from .adapters.basic_pitch import read_landed_baseline
+
+    baseline = read_landed_baseline(manifest)
+    if baseline.get("status") != "ok":
+        raise ArtifactError("landed Basic Pitch baseline is unavailable")
+    identity = baseline.get("run_identity")
+    if not isinstance(identity, Mapping) or identity.get("manifest_sha256") != _digest(manifest):
+        raise ArtifactError("landed Basic Pitch baseline does not match the supplied #25 manifest")
+    if identity.get("checkpoint_sha256") != spec.checkpoint_sha256:
+        raise ArtifactError("landed Basic Pitch baseline checkpoint does not match models.yaml")
+    pair_count = int(baseline.get("pair_count", 0))
+    successful_pairs = int(baseline.get("successful_pair_count", 0))
+    failed_pairs = int(baseline.get("failed_pair_count", 0))
+    if pair_count != len(pairs) or successful_pairs + failed_pairs != pair_count:
+        raise ArtifactError("landed Basic Pitch baseline pair population does not match the supplied #25 manifest")
+    aggregate = baseline.get("aggregate")
+    if not isinstance(aggregate, Mapping):
+        raise ArtifactError("landed Basic Pitch aggregate is unavailable")
+    variant_id = "full_precision"
+    adapter_identity = f"{type(adapter).__module__}.{type(adapter).__qualname__}"
+    _atomic_json(
+        output / "model_lock.json",
+        {
+            "format_version": 1,
+            "model_id": spec.model_id,
+            "model_identity": spec.identity_digest(),
+            "variant_id": variant_id,
+            "adapter_identity": adapter_identity,
+            "source": "landed_issue_25_result",
+            "source_run_identity": dict(identity),
+        },
+    )
+    run = _model_run(spec, variant_id, manifest, "ok", successful_pairs=successful_pairs, failed_pairs=failed_pairs)
+    _atomic_json(
+        output / "run.json",
+        {
+            "format_version": 1,
+            "status": run.status,
+            "failure_code": None,
+            "model_id": run.model_id,
+            "variant_id": run.variant_id,
+            "manifest_sha256": run.manifest_identity,
+            "model_identity": run.model_identity,
+            "successful_pairs": successful_pairs,
+            "failed_pairs": failed_pairs,
+            "source": "landed_issue_25_result",
+            "source_run_identity": dict(identity),
+        },
+    )
+    _atomic_json(
+        output / "aggregates.json",
+        {"status": "ok", "quality": _landed_quality_views(aggregate, eligible_pairs=pair_count, successful_pairs=successful_pairs, failed_pairs=failed_pairs)},
+    )
+    return run
+
+
+def _record_basic_pitch_quantization(spec: ModelSpec, adapter: object, manifest: Path, output: Path) -> EvaluationRun:
+    quantization = getattr(adapter, "quantization_result", None)
+    if not callable(quantization):
+        raise ArtifactError("Basic Pitch quantization capability is unavailable")
+    result = quantization()
+    status = str(result.status)
+    run_status = "unavailable" if status != "ok" else "failed"
+    failure_code = status if status != "ok" else "quantized_runtime_failed"
+    run = _model_run(spec, "dynamic_int8_linear", manifest, run_status, failure_code=failure_code)
+    _atomic_json(
+        output / "model_lock.json",
+        {
+            "format_version": 1,
+            "model_id": spec.model_id,
+            "model_identity": spec.identity_digest(),
+            "variant_id": run.variant_id,
+            "adapter_identity": f"{type(adapter).__module__}.{type(adapter).__qualname__}",
+            "quantization": {
+                "status": status,
+                "original_linear_modules": int(result.original_linear_modules),
+                "quantized_linear_modules": int(result.quantized_linear_modules),
+                "engine": result.engine,
+            },
+        },
+    )
+    _atomic_json(
+        output / "run.json",
+        {
+            "format_version": 1,
+            "status": run.status,
+            "failure_code": run.failure_code,
+            "model_id": run.model_id,
+            "variant_id": run.variant_id,
+            "manifest_sha256": run.manifest_identity,
+            "model_identity": run.model_identity,
+            "successful_pairs": 0,
+            "failed_pairs": 0,
+            "quantization": {
+                "status": status,
+                "original_linear_modules": int(result.original_linear_modules),
+                "quantized_linear_modules": int(result.quantized_linear_modules),
+                "engine": result.engine,
+            },
+        },
+    )
+    _atomic_json(output / "aggregates.json", {"status": run.status, "failure_code": run.failure_code, "quality": None})
+    return run
+
+
 def evaluate_model(
     spec: ModelSpec,
     adapter: object,
@@ -296,6 +419,16 @@ def evaluate_model(
     manifest = Path(manifest_path).resolve(strict=True)
     _, load_manifest, performance_labels, _ = _metric_modules()
     pairs = tuple(load_manifest(manifest))
+    if spec.family == "basic_pitch" and quantized:
+        load = getattr(adapter, "load", None)
+        if callable(load):
+            load()
+        return _record_basic_pitch_quantization(spec, adapter, manifest, output)
+    if spec.family == "basic_pitch" and not quantized:
+        load = getattr(adapter, "load", None)
+        if callable(load):
+            load()
+        return _consume_landed_basic_pitch(spec, adapter, manifest, pairs, output)
     if not spec.is_available:
         run = _model_run(spec, "dynamic_int8_linear" if quantized else "full_precision", manifest, "unavailable", failure_code="dependency_unavailable")
         _write_unavailable(output, run, reason=spec.unavailability_reason)
