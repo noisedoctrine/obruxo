@@ -486,6 +486,9 @@ def test_report_markdown_surfaces_persisted_findings() -> None:
     assert "Parity diagnostics by framework and processor" in markdown
     assert "component-level parity values are tabulated above" in markdown
     assert "227040" in markdown
+    assert "OpenVINO GPU precision correction" in markdown
+    assert "INFERENCE_PRECISION_HINT" in markdown
+    assert "post-fix FP32 + PERFORMANCE diagnostic passes GPU parity" in markdown
 
 
 def test_report_markdown_tabulates_component_parity_by_route() -> None:
@@ -519,6 +522,6 @@ def test_report_markdown_tabulates_component_parity_by_route() -> None:
     }
     markdown = _benchmark_markdown(report)
     assert "| Parity check (applied threshold) | PyTorch CPU | PyTorch XPU | OpenVINO CPU | OpenVINO GPU |" in markdown
-    assert "Maximum contour absolute error (≤ 0.0205306)" in markdown
+    assert "Maximum contour absolute error (<= 0.0205306)" in markdown
     assert "Note-frame threshold disagreements (threshold 0.3; must be 0)" in markdown
     assert "(start_time_s, end_time_s, MIDI pitch) disagreements (must be 0)" in markdown

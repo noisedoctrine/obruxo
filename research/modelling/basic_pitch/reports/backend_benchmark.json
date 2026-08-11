@@ -1153,10 +1153,69 @@
       "status": "parity_failed"
     }
   ],
+  "measurement_status": {
+    "full_benchmark": "pre_fix_openvino_precision",
+    "note": "Persisted inference, training, startup, throughput, end-to-end, and resource measurements predate the explicit OpenVINO float32 inference-precision correction. A later full benchmark rerun is required for post-fix OpenVINO speed/resource claims.",
+    "post_fix_parity": "passed",
+    "post_fix_timing": "not_run"
+  },
   "model_id": "spotify-basic-pitch-icassp-2022-v0.4.0",
+  "openvino_precision_diagnostic": {
+    "batch_size": 5,
+    "configuration": {
+      "execution_mode_hint_compiled": "PERFORMANCE",
+      "execution_mode_hint_requested": "unconfigured",
+      "inference_precision_hint_compiled": "float32",
+      "inference_precision_hint_requested": "float32",
+      "performance_hint_compiled": "LATENCY"
+    },
+    "parity": {
+      "candidate_event_count": 8,
+      "contour_max_abs_error": 1.430511474609375e-06,
+      "contour_non_finite_count": 0,
+      "event_count_disagreements": 0,
+      "event_structure_disagreements": 0,
+      "event_tuple_disagreements": 0,
+      "note_max_abs_error": 7.152557373046875e-07,
+      "note_non_finite_count": 0,
+      "note_threshold_disagreements": 0,
+      "onset_max_abs_error": 1.1324882507324219e-06,
+      "onset_non_finite_count": 0,
+      "onset_threshold_disagreements": 0,
+      "parity_passed": true,
+      "pitch_bend_element_disagreements": 0,
+      "reference_event_count": 8
+    },
+    "phase": "post_fix",
+    "route": "openvino_gpu",
+    "runtime": {
+      "device_architecture": "GPU: vendor=0x8086 arch=v12.74.4",
+      "device_name": "Intel(R) Arc(TM) 140T GPU (16GB) (iGPU)",
+      "device_type": "integrated",
+      "driver_version": "not exposed by OpenVINO; host query permission denied",
+      "gpu_uarch_version": "12.74.4",
+      "openvino": "2026.3.0-000--"
+    },
+    "scope": "five public synthetic windows in one batch; no private smoke audio or rendering",
+    "status": "parity_passed",
+    "thresholds": {
+      "contour_max_abs_error": 0.0205306,
+      "note_frame_threshold": 0.3,
+      "note_max_abs_error": 0.0038445,
+      "onset_max_abs_error": 0.2089347,
+      "onset_threshold": 0.5
+    },
+    "windows": 5
+  },
   "parity_diagnostics": {
+    "configuration": {
+      "execution_mode_hint": "plugin default (observed PERFORMANCE)",
+      "inference_precision_hint": "plugin default (observed float16)",
+      "note": "This matrix was collected before the explicit OpenVINO float32 correction. The GPU compile path did not request inference precision; the runtime default was observed as float16 with PERFORMANCE execution."
+    },
     "format_version": 1,
     "model_id": "spotify-basic-pitch-icassp-2022-v0.4.0",
+    "phase": "pre_fix",
     "process_repetitions": 3,
     "routes": [
       {
