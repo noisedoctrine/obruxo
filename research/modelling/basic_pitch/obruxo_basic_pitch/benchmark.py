@@ -1261,6 +1261,7 @@ def _parity_diagnostics_markdown(report: Mapping[str, Any]) -> list[str]:
             "Per-component parity values were not retained in this benchmark artifact.",
         ]
     thresholds = diagnostics.get("thresholds", {})
+    configuration = diagnostics.get("configuration", {})
     contour_limit = thresholds.get("contour_max_abs_error", "not recorded")
     note_limit = thresholds.get("note_max_abs_error", "not recorded")
     onset_limit = thresholds.get("onset_max_abs_error", "not recorded")
@@ -1271,9 +1272,9 @@ def _parity_diagnostics_markdown(report: Mapping[str, Any]) -> list[str]:
         ("Non-finite contour values (must be 0)", "contour_non_finite_count"),
         ("Non-finite note values (must be 0)", "note_non_finite_count"),
         ("Non-finite onset values (must be 0)", "onset_non_finite_count"),
-        (f"Maximum contour absolute error (≤ {contour_limit})", "contour_max_abs_error"),
-        (f"Maximum note absolute error (≤ {note_limit})", "note_max_abs_error"),
-        (f"Maximum onset absolute error (≤ {onset_limit})", "onset_max_abs_error"),
+        (f"Maximum contour absolute error (<= {contour_limit})", "contour_max_abs_error"),
+        (f"Maximum note absolute error (<= {note_limit})", "note_max_abs_error"),
+        (f"Maximum onset absolute error (<= {onset_limit})", "onset_max_abs_error"),
         (f"Note-frame threshold disagreements (threshold {note_threshold}; must be 0)", "note_threshold_disagreements"),
         (f"Onset threshold disagreements (threshold {onset_threshold}; must be 0)", "onset_threshold_disagreements"),
         ("Generated note-event count disagreements (must be 0)", "event_count_disagreements"),
@@ -1290,14 +1291,62 @@ def _parity_diagnostics_markdown(report: Mapping[str, Any]) -> list[str]:
         "## Parity diagnostics by framework and processor",
         "",
         f"The gate was evaluated on `{diagnostics.get('process_repetitions', 'n/a')}` fresh-process repetitions of `{diagnostics.get('scope', 'the public synthetic suite')}`. Each cell reports the maximum observed value across repetitions; the JSON retains each repetition separately.",
-        "",
         "| Parity check (applied threshold) | " + " | ".join(label for _, label in route_labels) + " |",
         "| --- | " + " | ".join("---" for _ in route_labels) + " |",
     ]
+    if isinstance(configuration, Mapping) and configuration.get("note"):
+        lines[4:4] = ["", str(configuration["note"]), ""]
     for label, metric in metric_rows:
         lines.append(
             "| " + label + " | " + " | ".join(_parity_diagnostic_value(report, route, metric) for route, _ in route_labels) + " |"
         )
+    return lines
+
+
+def _openvino_precision_diagnostic_markdown(report: Mapping[str, Any]) -> list[str]:
+    diagnostic = report.get("openvino_precision_diagnostic")
+    lines = ["", "## OpenVINO GPU precision correction", ""]
+    if not isinstance(diagnostic, Mapping):
+        lines.append("No post-fix OpenVINO GPU precision diagnostic was retained in this benchmark artifact.")
+        return lines
+    runtime = diagnostic.get("runtime", {})
+    configuration = diagnostic.get("configuration", {})
+    parity = diagnostic.get("parity", {})
+
+    def result(name: str, digits: int = 9) -> str:
+        value = parity.get(name)
+        if value is None:
+            return "n/a"
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            return _report_number(value, digits)
+        return str(value)
+
+    lines.extend(
+        [
+            f"This bounded post-fix diagnostic used `{diagnostic.get('batch_size', 'n/a')}` synthetic windows in one batch; it did not use private smoke audio, render audio, or measure benchmark throughput.",
+            "",
+            f"- Runtime: OpenVINO `{runtime.get('openvino', 'n/a')}` on `{runtime.get('device_name', 'n/a')}`; device architecture `{runtime.get('device_architecture', 'n/a')}`.",
+            f"- Driver version: `{runtime.get('driver_version', 'n/a')}`.",
+            f"- Compiled inference precision: `{configuration.get('inference_precision_hint_compiled', 'n/a')}` (requested `{configuration.get('inference_precision_hint_requested', 'n/a')}`).",
+            f"- Compiled execution mode: `{configuration.get('execution_mode_hint_compiled', 'n/a')}`; execution-mode request: `{configuration.get('execution_mode_hint_requested', 'n/a')}`.",
+            f"- Diagnostic status: `{diagnostic.get('status', 'not_recorded')}`. The original full benchmark timing rows remain pre-fix and require a later rerun.",
+            "",
+            "| Check (applied threshold) | Result |",
+            "| --- | ---: |",
+            f"| Compiled inference precision (must be float32) | {configuration.get('inference_precision_hint_compiled', 'n/a')} |",
+            f"| Compiled execution mode (must remain PERFORMANCE) | {configuration.get('execution_mode_hint_compiled', 'n/a')} |",
+            f"| Non-finite contour values (must be 0) | {result('contour_non_finite_count', 0)} |",
+            f"| Non-finite note values (must be 0) | {result('note_non_finite_count', 0)} |",
+            f"| Non-finite onset values (must be 0) | {result('onset_non_finite_count', 0)} |",
+            f"| Maximum contour absolute error (<= {diagnostic.get('thresholds', {}).get('contour_max_abs_error', 'n/a')}) | {result('contour_max_abs_error')} |",
+            f"| Maximum note absolute error (<= {diagnostic.get('thresholds', {}).get('note_max_abs_error', 'n/a')}) | {result('note_max_abs_error')} |",
+            f"| Maximum onset absolute error (<= {diagnostic.get('thresholds', {}).get('onset_max_abs_error', 'n/a')}) | {result('onset_max_abs_error')} |",
+            f"| Note-frame threshold disagreements (threshold {diagnostic.get('thresholds', {}).get('note_frame_threshold', 'n/a')}; must be 0) | {result('note_threshold_disagreements', 0)} |",
+            f"| Onset threshold disagreements (threshold {diagnostic.get('thresholds', {}).get('onset_threshold', 'n/a')}; must be 0) | {result('onset_threshold_disagreements', 0)} |",
+            f"| Generated note-event count disagreements (must be 0) | {result('event_count_disagreements', 0)} |",
+            f"| (start_time_s, end_time_s, MIDI pitch) disagreements (must be 0) | {result('event_tuple_disagreements', 0)} |",
+        ]
+    )
     return lines
 
 
@@ -1326,6 +1375,13 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
     xpu = next((row for row in successful_inference if row.get("route") == "pytorch_xpu"), {})
     openvino_cpu = next((row for row in successful_inference if row.get("route") == "openvino_cpu"), {})
     gpu_failure = next((row for row in inference if row.get("route") == "openvino_gpu" and row.get("status") != "ok"), None)
+    precision_diagnostic = report.get("openvino_precision_diagnostic")
+    has_precision_diagnostic = isinstance(precision_diagnostic, Mapping)
+    timing_provenance = (
+        "These persisted timing values were collected before the OpenVINO float32 precision correction; `n/a` means the route failed before that phase or the phase does not apply."
+        if has_precision_diagnostic
+        else "Values below are median seconds across the three fresh processes; `n/a` means the route failed before that phase or the phase does not apply."
+    )
     crossover = next(
         (
             row
@@ -1345,7 +1401,7 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
         f"- On the warmed end-to-end smoke boundary, PyTorch XPU processes `{_report_number(xpu.get('end_to_end', {}).get('audio_seconds_per_wall_second', {}).get('median'))}` audio-seconds per wall-second, versus `{_report_number(cpu.get('end_to_end', {}).get('audio_seconds_per_wall_second', {}).get('median'))}` for CPU and `{_report_number(openvino_cpu.get('end_to_end', {}).get('audio_seconds_per_wall_second', {}).get('median'))}` for OpenVINO CPU.",
         f"- The model-call startup/throughput calculation records one positive CPU/XPU crossover at `{_report_number((crossover or {}).get('audio_seconds'))}` audio seconds. This is a descriptive model-only crossover, not a claim about all application workloads.",
         "- XPU pays a much larger first model call in the stored run than CPU, so short interactive calls should account for initialization and first-call latency; reused or longer workloads benefit from XPU steady-state throughput.",
-        "- OpenVINO GPU failed the parity gate in all three repetitions before timing. It has no published throughput or memory result, and no conclusion about its speed is supported.",
+        "- The persisted OpenVINO GPU row failed the parity gate in all three repetitions before timing under the original default GPU precision configuration. It has no pre-fix throughput or memory result.",
         "",
         "## Runtime and benchmark setup",
         "",
@@ -1357,11 +1413,22 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
         "",
         "## Inference startup and initialization",
         "",
-        "Startup is separated from first-call, warmup, and steady-state timing. Values below are median seconds across the three fresh processes; `n/a` means the route failed before that phase or the phase does not apply.",
+        "Startup is separated from first-call, warmup, and steady-state timing. " + timing_provenance,
         "",
         "| Route | Status | Import | Construct | Checkpoint | Device move | OV convert | OV compile | Total startup |",
         "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
+    if has_precision_diagnostic:
+        runtime_index = lines.index("## Runtime and benchmark setup")
+        lines.insert(
+            runtime_index - 1,
+            "- A separate post-fix FP32 + PERFORMANCE diagnostic passes GPU parity, but it did not measure startup, throughput, end-to-end rate, or memory; those measurements remain pending a later full benchmark rerun.",
+        )
+        inference_index = lines.index("## Inference startup and initialization")
+        lines.insert(
+            inference_index - 1,
+            "- Current OpenVINO compilation explicitly sets `INFERENCE_PRECISION_HINT=float32` and leaves `EXECUTION_MODE_HINT` unconfigured; the bounded GPU diagnostic observed compiled `float32` with `PERFORMANCE` execution.",
+        )
     for row in inference:
         lines.append(
             f"| `{row.get('route', 'unknown')}` | `{row.get('status', 'unknown')}` | {_report_number(_report_startup(row, 'backend_import_seconds'))} | {_report_number(_report_startup(row, 'model_construct_seconds'))} | {_report_number(_report_startup(row, 'checkpoint_load_seconds'))} | {_report_number(_report_startup(row, 'model_device_move_seconds'))} | {_report_number(_report_startup(row, 'openvino_conversion_seconds'))} | {_report_number(_report_startup(row, 'openvino_compile_seconds'))} | {_report_number(_report_startup(row, 'total_seconds'))} |"
@@ -1385,7 +1452,12 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
             "",
             "## Steady-state inference scaling",
             "",
-            "The two tables expose both throughput and call latency for every tested batch. Throughput is the model-call audio-equivalent rate; it excludes audio decode and stock postprocessing.",
+            (
+                "The persisted pre-fix timing tables expose both throughput and call latency for every tested batch. "
+                "Throughput is the model-call audio-equivalent rate; it excludes audio decode and stock postprocessing."
+                if has_precision_diagnostic
+                else "The two tables expose both throughput and call latency for every tested batch. Throughput is the model-call audio-equivalent rate; it excludes audio decode and stock postprocessing."
+            ),
             "",
         ]
     )
@@ -1421,7 +1493,11 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
     lines.extend(
         [
             "",
-            "The end-to-end result preserves the same ordering as model-only batch 1: XPU is fastest, OpenVINO CPU is slightly ahead of CPU, and neither timing includes the failed OpenVINO GPU route.",
+            (
+                "The persisted pre-fix end-to-end result preserves the same ordering as model-only batch 1: XPU is fastest, OpenVINO CPU is slightly ahead of CPU, and neither timing includes the failed OpenVINO GPU route."
+                if has_precision_diagnostic
+                else "The end-to-end result preserves the same ordering as model-only batch 1: XPU is fastest, OpenVINO CPU is slightly ahead of CPU, and neither timing includes the failed OpenVINO GPU route."
+            ),
             "",
             "## CPU versus XPU full forward+backward cost",
             "",
@@ -1466,7 +1542,11 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
     lines.extend(
         [
             "",
-            "The observed XPU routes use substantially more host RSS than CPU in these fresh processes, while their recorded device allocations are much smaller than host RSS. OpenVINO GPU has no memory observation because it failed parity before timing.",
+            (
+                "The observed XPU routes use substantially more host RSS than CPU in these fresh processes, while their recorded device allocations are much smaller than host RSS. OpenVINO GPU has no pre-fix memory observation because it failed parity before timing; the post-fix diagnostic did not measure memory."
+                if has_precision_diagnostic
+                else "The observed XPU routes use substantially more host RSS than CPU in these fresh processes, while their recorded device allocations are much smaller than host RSS. OpenVINO GPU has no memory observation because it failed parity before timing."
+            ),
             "",
             "## Startup versus throughput crossover",
             "",
@@ -1483,7 +1563,8 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
     else:
         lines.append("- No positive finite crossover was retained by the fixed formula for the successful routes.")
     lines.extend(_parity_diagnostics_markdown(report))
-    lines.extend(["", "## OpenVINO GPU parity failure", ""])
+    failure_heading = "## OpenVINO GPU parity failure (pre-fix configuration)" if has_precision_diagnostic else "## OpenVINO GPU parity failure"
+    lines.extend(["", failure_heading, ""])
     if gpu_failure:
         lines.extend(
             [
@@ -1499,6 +1580,7 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
         )
     else:
         lines.append("- No OpenVINO GPU failure was present in the supplied report.")
+    lines.extend(_openvino_precision_diagnostic_markdown(report))
     lines.extend(
         [
             "",
@@ -1508,7 +1590,11 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
             "- For short interactive workloads, initialization and first-call behavior should be treated as part of the product latency budget. XPU's first batch-1 call is materially slower than CPU in the stored measurements even though its warmed rate is higher; the benchmark does not establish a product policy for hiding or amortizing that cost.",
             "- OpenVINO CPU has a larger one-time conversion/compile cost and lower model-call throughput than XPU, but its warmed end-to-end smoke rate is close to CPU. It remains a measured explicit route, not an automatically preferred backend.",
             "- XPU is also faster for the measured full forward+backward cost at all tested batches, with the resource caveat above.",
-            "- These conclusions describe the fixed 8-case smoke workload, current runtime versions, float32 precision, and exact benchmark contract. They do not claim a universal optimum or validate the failed OpenVINO GPU route.",
+            (
+                "- These timing conclusions describe the fixed 8-case smoke workload and the persisted pre-fix OpenVINO configuration. The bounded post-fix FP32 + PERFORMANCE diagnostic validates GPU parity but provides no speed, startup, end-to-end, or memory result; a post-fix full benchmark is still required."
+                if has_precision_diagnostic
+                else "- These conclusions describe the fixed 8-case smoke workload, current runtime versions, float32 precision, and exact benchmark contract. They do not claim a universal optimum or validate the failed OpenVINO GPU route."
+            ),
             "",
             "## Scope and caveats",
             "",

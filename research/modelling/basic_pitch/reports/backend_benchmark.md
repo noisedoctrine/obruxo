@@ -8,7 +8,8 @@ This is a fixed measurement of the canonical #23 float32 model, not an optimizat
 - On the warmed end-to-end smoke boundary, PyTorch XPU processes `130.873` audio-seconds per wall-second, versus `56.559` for CPU and `60.948` for OpenVINO CPU.
 - The model-call startup/throughput calculation records one positive CPU/XPU crossover at `3.317` audio seconds. This is a descriptive model-only crossover, not a claim about all application workloads.
 - XPU pays a much larger first model call in the stored run than CPU, so short interactive calls should account for initialization and first-call latency; reused or longer workloads benefit from XPU steady-state throughput.
-- OpenVINO GPU failed the parity gate in all three repetitions before timing. It has no published throughput or memory result, and no conclusion about its speed is supported.
+- The persisted OpenVINO GPU row failed the parity gate in all three repetitions before timing under the original default GPU precision configuration. It has no pre-fix throughput or memory result.
+- A separate post-fix FP32 + PERFORMANCE diagnostic passes GPU parity, but it did not measure startup, throughput, end-to-end rate, or memory; those measurements remain pending a later full benchmark rerun.
 
 ## Runtime and benchmark setup
 
@@ -17,10 +18,11 @@ This is a fixed measurement of the canonical #23 float32 model, not an optimizat
 - Each route used a fresh process for each of 3 repetitions; each fixed batch used 3 warmups and 10 timed calls.
 - Model-only inference and full forward+backward training used batches `[1, 2, 4, 8]`. End-to-end inference used batch 1 and covered read-only audio preparation through stock note-event materialization.
 - Missing-WAV derived rendering was opt-in only; source patches, MIDI, audio, and metadata remained read-only.
+- Current OpenVINO compilation explicitly sets `INFERENCE_PRECISION_HINT=float32` and leaves `EXECUTION_MODE_HINT` unconfigured; the bounded GPU diagnostic observed compiled `float32` with `PERFORMANCE` execution.
 
 ## Inference startup and initialization
 
-Startup is separated from first-call, warmup, and steady-state timing. Values below are median seconds across the three fresh processes; `n/a` means the route failed before that phase or the phase does not apply.
+Startup is separated from first-call, warmup, and steady-state timing. These persisted timing values were collected before the OpenVINO float32 precision correction; `n/a` means the route failed before that phase or the phase does not apply.
 
 | Route | Status | Import | Construct | Checkpoint | Device move | OV convert | OV compile | Total startup |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -42,7 +44,7 @@ Startup is separated from first-call, warmup, and steady-state timing. Values be
 
 ## Steady-state inference scaling
 
-The two tables expose both throughput and call latency for every tested batch. Throughput is the model-call audio-equivalent rate; it excludes audio decode and stock postprocessing.
+The persisted pre-fix timing tables expose both throughput and call latency for every tested batch. Throughput is the model-call audio-equivalent rate; it excludes audio decode and stock postprocessing.
 
 ### Audio-equivalent throughput (audio-seconds/second)
 
@@ -72,7 +74,7 @@ This is the realistic batch-1 boundary: read-only audio open/decode, in-memory p
 | `pytorch_xpu` | 0.879 | 0.790-1.229 | 130.873 | 0.00764 |
 | `openvino_cpu` | 1.887 | 1.592-1.922 | 60.948 | 0.01641 |
 
-The end-to-end result preserves the same ordering as model-only batch 1: XPU is fastest, OpenVINO CPU is slightly ahead of CPU, and neither timing includes the failed OpenVINO GPU route.
+The persisted pre-fix end-to-end result preserves the same ordering as model-only batch 1: XPU is fastest, OpenVINO CPU is slightly ahead of CPU, and neither timing includes the failed OpenVINO GPU route.
 
 ## CPU versus XPU full forward+backward cost
 
@@ -107,7 +109,7 @@ Host RSS is a peak process measurement and is not directly interchangeable with 
 | training | `pytorch_cpu` | 902.8 | n/a | n/a | available |
 | training | `pytorch_xpu` | 2915.3 | 182.1 | 316.0 | available |
 
-The observed XPU routes use substantially more host RSS than CPU in these fresh processes, while their recorded device allocations are much smaller than host RSS. OpenVINO GPU has no memory observation because it failed parity before timing.
+The observed XPU routes use substantially more host RSS than CPU in these fresh processes, while their recorded device allocations are much smaller than host RSS. OpenVINO GPU has no pre-fix memory observation because it failed parity before timing; the post-fix diagnostic did not measure memory.
 
 ## Startup versus throughput crossover
 
@@ -119,26 +121,53 @@ The observed XPU routes use substantially more host RSS than CPU in these fresh 
 
 The gate was evaluated on `3` fresh-process repetitions of `canonical float32 model on five public synthetic windows; no private smoke audio or rendering`. Each cell reports the maximum observed value across repetitions; the JSON retains each repetition separately.
 
+This matrix was collected before the explicit OpenVINO float32 correction. The GPU compile path did not request inference precision; the runtime default was observed as float16 with PERFORMANCE execution.
+
 | Parity check (applied threshold) | PyTorch CPU | PyTorch XPU | OpenVINO CPU | OpenVINO GPU |
 | --- | --- | --- | --- | --- |
 | Route status (must be `ok`) | ok | ok | ok | parity_failed |
 | Non-finite contour values (must be 0) | 0 | 0 | 0 | 227040 |
 | Non-finite note values (must be 0) | 0 | 0 | 0 | 75680 |
 | Non-finite onset values (must be 0) | 0 | 0 | 0 | 75680 |
-| Maximum contour absolute error (≤ 0.0205306) | 0 | 8.94069672e-07 | 0.00046145916 | non_finite |
-| Maximum note absolute error (≤ 0.0038445) | 0 | 7.4505806e-07 | 0.000364899635 | non_finite |
-| Maximum onset absolute error (≤ 0.2089347) | 0 | 1.10268593e-06 | 0.000262662768 | non_finite |
+| Maximum contour absolute error (<= 0.0205306) | 0 | 8.94069672e-07 | 0.00046145916 | non_finite |
+| Maximum note absolute error (<= 0.0038445) | 0 | 7.4505806e-07 | 0.000364899635 | non_finite |
+| Maximum onset absolute error (<= 0.2089347) | 0 | 1.10268593e-06 | 0.000262662768 | non_finite |
 | Note-frame threshold disagreements (threshold 0.3; must be 0) | 0 | 0 | 0 | 733 |
 | Onset threshold disagreements (threshold 0.5; must be 0) | 0 | 0 | 0 | 190 |
 | Generated note-event count disagreements (must be 0) | 0 | 0 | 0 | 1 |
 | (start_time_s, end_time_s, MIDI pitch) disagreements (must be 0) | 0 | 0 | 0 | 0 |
 
-## OpenVINO GPU parity failure
+## OpenVINO GPU parity failure (pre-fix configuration)
 
 - Status: `parity_failed` for `3` repetitions; failure code: `parity_failed`.
 - The worker performs the parity gate before model-only or end-to-end timing. The gate compares contour, note, and onset numeric outputs plus note/onset threshold decisions and stock note-event structure against the canonical PyTorch CPU route.
 - The component-level parity values are tabulated above. They describe the fixed synthetic gate only; they do not authorize timing a route that failed parity.
 - No OpenVINO GPU throughput, latency, end-to-end rate, or memory claim is supported; no CPU fallback or substitute-device measurement was used.
+
+## OpenVINO GPU precision correction
+
+This bounded post-fix diagnostic used `5` synthetic windows in one batch; it did not use private smoke audio, render audio, or measure benchmark throughput.
+
+- Runtime: OpenVINO `2026.3.0-000--` on `Intel(R) Arc(TM) 140T GPU (16GB) (iGPU)`; device architecture `GPU: vendor=0x8086 arch=v12.74.4`.
+- Driver version: `not exposed by OpenVINO; host query permission denied`.
+- Compiled inference precision: `float32` (requested `float32`).
+- Compiled execution mode: `PERFORMANCE`; execution-mode request: `unconfigured`.
+- Diagnostic status: `parity_passed`. The original full benchmark timing rows remain pre-fix and require a later rerun.
+
+| Check (applied threshold) | Result |
+| --- | ---: |
+| Compiled inference precision (must be float32) | float32 |
+| Compiled execution mode (must remain PERFORMANCE) | PERFORMANCE |
+| Non-finite contour values (must be 0) | 0 |
+| Non-finite note values (must be 0) | 0 |
+| Non-finite onset values (must be 0) | 0 |
+| Maximum contour absolute error (<= 0.0205306) | 0.000001431 |
+| Maximum note absolute error (<= 0.0038445) | 0.000000715 |
+| Maximum onset absolute error (<= 0.2089347) | 0.000001132 |
+| Note-frame threshold disagreements (threshold 0.3; must be 0) | 0 |
+| Onset threshold disagreements (threshold 0.5; must be 0) | 0 |
+| Generated note-event count disagreements (must be 0) | 0 |
+| (start_time_s, end_time_s, MIDI pitch) disagreements (must be 0) | 0 |
 
 ## Practical conclusions supported by this run
 
@@ -146,7 +175,7 @@ The gate was evaluated on `3` fresh-process repetitions of `canonical float32 mo
 - For short interactive workloads, initialization and first-call behavior should be treated as part of the product latency budget. XPU's first batch-1 call is materially slower than CPU in the stored measurements even though its warmed rate is higher; the benchmark does not establish a product policy for hiding or amortizing that cost.
 - OpenVINO CPU has a larger one-time conversion/compile cost and lower model-call throughput than XPU, but its warmed end-to-end smoke rate is close to CPU. It remains a measured explicit route, not an automatically preferred backend.
 - XPU is also faster for the measured full forward+backward cost at all tested batches, with the resource caveat above.
-- These conclusions describe the fixed 8-case smoke workload, current runtime versions, float32 precision, and exact benchmark contract. They do not claim a universal optimum or validate the failed OpenVINO GPU route.
+- These timing conclusions describe the fixed 8-case smoke workload and the persisted pre-fix OpenVINO configuration. The bounded post-fix FP32 + PERFORMANCE diagnostic validates GPU parity but provides no speed, startup, end-to-end, or memory result; a post-fix full benchmark is still required.
 
 ## Scope and caveats
 
