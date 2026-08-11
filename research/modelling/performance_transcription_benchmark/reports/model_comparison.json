@@ -3,13 +3,34 @@
     "cost_contract": "landed_issue_24_end_to_end_boundary",
     "no_composite_winner": true,
     "quality_contract": "landed_issue_25_metrics_and_10000_replicate_seed_0_bootstrap",
-    "quantization_contract": "cpu_dynamic_qint8_ordinary_linear_only"
+    "quantization_contract": "cpu_dynamic_qint8_ordinary_linear_only",
+    "status": "incomplete_alternatives_unavailable"
   },
   "conclusion": {
     "cost": "Cost rows remain separate by route and are unavailable when the fixed smoke input or candidate runtime is unavailable.",
     "later_integration": "No candidate is promoted without executable common-corpus evidence.",
+    "measured": "Directly measured evidence exists only for Basic Pitch: #25 quality on 1,769 eligible pairs and #24 route/cost evidence, including the OpenVINO GPU parity failure.",
     "quality": "No quality score is published for unavailable models or an empty eligible population.",
-    "representation": "Representation and licensing are inventories, not an integration decision."
+    "representation": "Representation and licensing are inventories, not an integration decision.",
+    "sourced": "The candidate inventory establishes model identity, representation, architecture boundary, native rate/batch semantics, and licensing where verified, but none of these facts ranks execution quality or cost.",
+    "unresolved": "Alternative-model quality, latency, throughput, memory, backward cost, quantization response, and quality-versus-cost trade-offs remain unanswered because those candidates were not executable in the permitted local state."
+  },
+  "evidence": {
+    "measured_models": [
+      "basic_pitch"
+    ],
+    "measured_scope": "Only Basic Pitch produced executable #24/#25 evidence in the permitted existing runtime and storage. Its quality and cost evidence are inherited, not rerun by #26.",
+    "metadata_only_models": [
+      "timbre_trap_base",
+      "ymt3_plus",
+      "yptf_multi",
+      "yptf_moe_multi",
+      "muscriptor_small",
+      "muscriptor_medium",
+      "muscriptor_large"
+    ],
+    "sourced_scope": "Candidate source, checkpoint, representation, architecture boundary, native sample rate, batch semantics, and license fields are verified inventory facts; they are not performance measurements.",
+    "unresolved_scope": "No comparative quality, execution cost, resource, backward-cost, or quantization result exists for the unavailable alternatives. The intended comparative benchmark remains incomplete."
   },
   "format_version": 1,
   "models": [
@@ -25,6 +46,7 @@
           8
         ],
         "phases": null,
+        "reporting_note": "Routes and findings are consumed from the landed #24 report; #26 does not rerun Basic Pitch cost measurements.",
         "resources": null,
         "route_failures": [
           {
@@ -1672,6 +1694,7 @@
             "status": "ok"
           }
         ],
+        "source": "landed_issue_24_report",
         "status": "measured",
         "timing_contract": {
           "batch_sizes": [
@@ -9172,6 +9195,169 @@
           "successful_pairs": 1769
         }
       },
+      "quality_provenance": {
+        "backend": {
+          "backend_id": "pytorch_cpu",
+          "boundary": "#24_end_to_end_audio_to_note_events_batch_1",
+          "contract_version": 1,
+          "precision": "float32"
+        },
+        "category_findings": {
+          "duration_class": {
+            "highest": {
+              "category": "medium",
+              "onset_pitch_f1": 0.33326405918782986,
+              "pair_count": 388,
+              "support": "well_supported"
+            },
+            "highest_well_supported": {
+              "category": "medium",
+              "onset_pitch_f1": 0.33326405918782986,
+              "pair_count": 388,
+              "support": "well_supported"
+            },
+            "lowest": {
+              "category": "short",
+              "onset_pitch_f1": 0.17061611374407584,
+              "pair_count": 13,
+              "support": "small_subset"
+            },
+            "lowest_well_supported": {
+              "category": "long",
+              "onset_pitch_f1": 0.27390631998456866,
+              "pair_count": 1368,
+              "support": "well_supported"
+            },
+            "metric": "onset_pitch_f1",
+            "support_rule": "well_supported >=100 pairs; moderately_supported 30-99; small_subset <30"
+          },
+          "note_density_class": {
+            "highest": {
+              "category": "high",
+              "onset_pitch_f1": 0.3287220234891893,
+              "pair_count": 222,
+              "support": "well_supported"
+            },
+            "highest_well_supported": {
+              "category": "high",
+              "onset_pitch_f1": 0.3287220234891893,
+              "pair_count": 222,
+              "support": "well_supported"
+            },
+            "lowest": {
+              "category": "low",
+              "onset_pitch_f1": 0.10223868692060904,
+              "pair_count": 512,
+              "support": "well_supported"
+            },
+            "lowest_well_supported": {
+              "category": "low",
+              "onset_pitch_f1": 0.10223868692060904,
+              "pair_count": 512,
+              "support": "well_supported"
+            },
+            "metric": "onset_pitch_f1",
+            "support_rule": "well_supported >=100 pairs; moderately_supported 30-99; small_subset <30"
+          },
+          "pitch_register_class": {
+            "highest": {
+              "category": "mid",
+              "onset_pitch_f1": 0.29071027704367963,
+              "pair_count": 1292,
+              "support": "well_supported"
+            },
+            "highest_well_supported": {
+              "category": "mid",
+              "onset_pitch_f1": 0.29071027704367963,
+              "pair_count": 1292,
+              "support": "well_supported"
+            },
+            "lowest": {
+              "category": "low",
+              "onset_pitch_f1": 0.17334264629961432,
+              "pair_count": 322,
+              "support": "well_supported"
+            },
+            "lowest_well_supported": {
+              "category": "low",
+              "onset_pitch_f1": 0.17334264629961432,
+              "pair_count": 322,
+              "support": "well_supported"
+            },
+            "metric": "onset_pitch_f1",
+            "support_rule": "well_supported >=100 pairs; moderately_supported 30-99; small_subset <30"
+          },
+          "polyphony_class": {
+            "highest": {
+              "category": "polyphonic",
+              "onset_pitch_f1": 0.27842908699648067,
+              "pair_count": 1150,
+              "support": "well_supported"
+            },
+            "highest_well_supported": {
+              "category": "polyphonic",
+              "onset_pitch_f1": 0.27842908699648067,
+              "pair_count": 1150,
+              "support": "well_supported"
+            },
+            "lowest": {
+              "category": "monophonic",
+              "onset_pitch_f1": 0.27703881552621046,
+              "pair_count": 619,
+              "support": "well_supported"
+            },
+            "lowest_well_supported": {
+              "category": "monophonic",
+              "onset_pitch_f1": 0.27703881552621046,
+              "pair_count": 619,
+              "support": "well_supported"
+            },
+            "metric": "onset_pitch_f1",
+            "support_rule": "well_supported >=100 pairs; moderately_supported 30-99; small_subset <30"
+          },
+          "type": {
+            "highest": {
+              "category": "Sub",
+              "onset_pitch_f1": 0.7384615384615385,
+              "pair_count": 2,
+              "support": "small_subset"
+            },
+            "highest_well_supported": {
+              "category": "Pluck",
+              "onset_pitch_f1": 0.5094183284538475,
+              "pair_count": 107,
+              "support": "well_supported"
+            },
+            "lowest": {
+              "category": "Drums",
+              "onset_pitch_f1": 0.001229256299938537,
+              "pair_count": 45,
+              "support": "moderately_supported"
+            },
+            "lowest_well_supported": {
+              "category": "Pad",
+              "onset_pitch_f1": 0.0736995458051247,
+              "pair_count": 161,
+              "support": "well_supported"
+            },
+            "metric": "onset_pitch_f1",
+            "support_rule": "well_supported >=100 pairs; moderately_supported 30-99; small_subset <30"
+          }
+        },
+        "runtime_provenance": {
+          "consistency": "recorded_backend_does_not_match_issue_24_observed_leader",
+          "interpretation": "The existing #25 quality run records a different backend from the fastest observed #24 route. Its quality result remains a CPU-provenance measurement; no XPU full-corpus quality or equivalence claim is made.",
+          "issue_24_observed_highest_batch_1_audio_seconds_per_second": 280.00812052550737,
+          "issue_24_observed_highest_batch_1_route": "pytorch_xpu",
+          "issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second": 130.87338461813948,
+          "issue_24_observed_highest_end_to_end_route": "pytorch_xpu",
+          "selected_backend": "pytorch_cpu",
+          "selected_contract": "#24_end_to_end_audio_to_note_events_batch_1",
+          "selection_rationale": "The existing #25 run fixed pytorch_cpu in its backend contract; no independent rationale for overriding the faster observed #24 pytorch_xpu route is recorded in the result artifacts.",
+          "selection_source": "the backend contract recorded by the existing #25 run"
+        },
+        "source": "landed_issue_25_report"
+      },
       "quantization": {
         "engine": "onednn",
         "original_linear_modules": 0,
@@ -9194,9 +9380,11 @@
           1
         ],
         "phases": null,
+        "reporting_note": null,
         "resources": null,
         "route_failures": [],
         "routes": [],
+        "source": null,
         "status": "unavailable",
         "timing_contract": null
       },
@@ -9241,6 +9429,7 @@
       "output_contract": "frame_pitch",
       "publication_year": 2024,
       "quality": null,
+      "quality_provenance": null,
       "quantization": null,
       "representation": {},
       "resources": null,
@@ -9255,9 +9444,11 @@
           1
         ],
         "phases": null,
+        "reporting_note": null,
         "resources": null,
         "route_failures": [],
         "routes": [],
+        "source": null,
         "status": "unavailable",
         "timing_contract": null
       },
@@ -9301,6 +9492,7 @@
       "output_contract": "note_events",
       "publication_year": 2024,
       "quality": null,
+      "quality_provenance": null,
       "quantization": null,
       "representation": {},
       "resources": null,
@@ -9315,9 +9507,11 @@
           1
         ],
         "phases": null,
+        "reporting_note": null,
         "resources": null,
         "route_failures": [],
         "routes": [],
+        "source": null,
         "status": "unavailable",
         "timing_contract": null
       },
@@ -9361,6 +9555,7 @@
       "output_contract": "note_events",
       "publication_year": 2024,
       "quality": null,
+      "quality_provenance": null,
       "quantization": null,
       "representation": {},
       "resources": null,
@@ -9375,9 +9570,11 @@
           1
         ],
         "phases": null,
+        "reporting_note": null,
         "resources": null,
         "route_failures": [],
         "routes": [],
+        "source": null,
         "status": "unavailable",
         "timing_contract": null
       },
@@ -9421,6 +9618,7 @@
       "output_contract": "note_events",
       "publication_year": 2024,
       "quality": null,
+      "quality_provenance": null,
       "quantization": null,
       "representation": {},
       "resources": null,
@@ -9435,9 +9633,11 @@
           1
         ],
         "phases": null,
+        "reporting_note": null,
         "resources": null,
         "route_failures": [],
         "routes": [],
+        "source": null,
         "status": "unavailable",
         "timing_contract": null
       },
@@ -9484,6 +9684,7 @@
       "output_contract": "note_events",
       "publication_year": 2026,
       "quality": null,
+      "quality_provenance": null,
       "quantization": null,
       "representation": {},
       "resources": null,
@@ -9498,9 +9699,11 @@
           1
         ],
         "phases": null,
+        "reporting_note": null,
         "resources": null,
         "route_failures": [],
         "routes": [],
+        "source": null,
         "status": "unavailable",
         "timing_contract": null
       },
@@ -9547,6 +9750,7 @@
       "output_contract": "note_events",
       "publication_year": 2026,
       "quality": null,
+      "quality_provenance": null,
       "quantization": null,
       "representation": {},
       "resources": null,
@@ -9561,9 +9765,11 @@
           1
         ],
         "phases": null,
+        "reporting_note": null,
         "resources": null,
         "route_failures": [],
         "routes": [],
+        "source": null,
         "status": "unavailable",
         "timing_contract": null
       },
@@ -9610,6 +9816,7 @@
       "output_contract": "note_events",
       "publication_year": 2026,
       "quality": null,
+      "quality_provenance": null,
       "quantization": null,
       "representation": {},
       "resources": null,

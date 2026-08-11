@@ -1,9 +1,15 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 from obruxo_performance_benchmark.report import (
     _landed_basic_pitch_quality,
     _landed_basic_pitch_runtime,
+    _markdown,
 )
+
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_landed_quality_is_exposed_as_both_required_views() -> None:
@@ -34,3 +40,13 @@ def test_landed_runtime_preserves_route_failure_without_global_fallback() -> Non
     assert runtime["status"] == "measured"
     assert runtime["routes"][1]["status"] == "parity_failed"
     assert runtime["route_failures"] == [{"route": "pytorch_xpu", "status": "parity_failed"}]
+
+
+def test_comparison_report_distinguishes_baseline_from_blocked_comparison() -> None:
+    report = json.loads((ROOT / "reports" / "model_comparison.json").read_text(encoding="utf-8"))
+    markdown = _markdown(report)
+    assert "incomplete_alternatives_unavailable" in markdown
+    assert "What was actually executed" in markdown
+    assert "What could not be executed" in markdown
+    assert "The intended comparative benchmark remains incomplete" in markdown
+    assert "No ranking, quality estimate, cost estimate" in markdown
