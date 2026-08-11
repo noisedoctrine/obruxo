@@ -101,6 +101,7 @@ def test_actual_direct_directory_pairing_is_deterministic_and_read_only() -> Non
         pairs = load_evaluation_manifest(output)
         assert len(pairs) == 2
         modern = next(pair for pair in pairs if pair.midi_path == modern_midi.resolve())
+        assert modern.audio_source == "existing_audio"
         assert modern.provenance_status == "available"
         assert modern.qa_warning_codes == ("qa.silence_warning",)
         audit_value = json.loads(audit.read_text(encoding="utf-8"))

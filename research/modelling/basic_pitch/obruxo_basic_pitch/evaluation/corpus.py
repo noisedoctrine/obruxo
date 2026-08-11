@@ -6,7 +6,6 @@ import csv
 import hashlib
 import json
 import os
-import sys
 import tempfile
 from collections import Counter
 from collections.abc import Mapping
@@ -14,6 +13,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from ..benchmark import DerivedRenderUnavailable as BenchmarkDerivedRenderUnavailable
+from ..benchmark import PedalboardVitalRenderer, render_derived_vital_audio
 from .labels import add_source_metadata, performance_labels
 
 EXCLUSION_CODES = (
@@ -46,6 +47,7 @@ class DerivedRenderUnavailable(RuntimeError):
 class EvaluationPair:
     pair_id: str
     audio_path: Path
+    audio_source: str
     midi_path: Path
     preset_path: Path | None
     preset_id: str | None
@@ -59,6 +61,7 @@ class EvaluationPair:
         return {
             "pair_id": self.pair_id,
             "audio_path": str(self.audio_path),
+            "audio_source": self.audio_source,
             "midi_path": str(self.midi_path),
             "preset_path": None if self.preset_path is None else str(self.preset_path),
             "preset_id": self.preset_id,
@@ -232,74 +235,21 @@ def _sidecar_details(audio_path: Path) -> tuple[Path | None, str, tuple[str, ...
 
 
 def _renderer() -> Any:
-    data_generation_root = Path(__file__).resolve().parents[5] / "research" / "data_generation"
-    if not data_generation_root.is_dir():
-        raise DerivedRenderUnavailable("data-generation renderer path unavailable")
-    root_text = str(data_generation_root)
-    inserted = root_text not in sys.path
-    if inserted:
-        sys.path.insert(0, root_text)
+    config_path = Path(__file__).resolve().parents[5] / "research" / "data_generation" / "configs" / "renderer.yaml"
     try:
-        from importlib.util import find_spec
-
-        if find_spec("dawdreamer") is None:
-            raise DerivedRenderUnavailable("DawDreamer unavailable")
-        from obruxo_data.render import VitalRenderer
-
-        return VitalRenderer.from_config(data_generation_root / "configs" / "renderer.yaml")
-    finally:
-        if inserted:
-            sys.path.remove(root_text)
+        return PedalboardVitalRenderer.from_config(config_path)
+    except BenchmarkDerivedRenderUnavailable as exc:
+        raise DerivedRenderUnavailable("Pedalboard/Vital renderer unavailable") from exc
 
 
 def _derive_audio(renderer: Any, preset_path: Path, midi_path: Path, destination: Path, output_root: Path) -> Path:
-    data_generation_root = Path(__file__).resolve().parents[5] / "research" / "data_generation"
-    root_text = str(data_generation_root)
-    inserted = root_text not in sys.path
-    if inserted:
-        sys.path.insert(0, root_text)
     try:
-        from obruxo_data.midi import Performance
-        from obruxo_data.render import RenderRequest
-        from obruxo_data.vital import VitalPreset
-
-        preset = VitalPreset.load(preset_path)
-        performance = Performance.from_midi(midi_path)
-        request = RenderRequest(
-            preset=preset,
-            performance=performance,
-            sample_rate=44_100,
-            end_tick=performance.end_tick,
-            tail_seconds=2.0,
-            renderer_id=renderer.renderer_id,
-        )
-        previous_tempdir = tempfile.tempdir
-        tempfile.tempdir = str(output_root)
-        try:
-            result = renderer.render(request)
-        finally:
-            tempfile.tempdir = previous_tempdir
-        if any(getattr(item.severity, "value", None) == "error" for item in result.diagnostics):
-            raise RuntimeError("derived render diagnostics contain errors")
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        result.write_wav(destination)
-        sidecar = destination.with_suffix(".json")
-        result.write_json(sidecar)
-        metadata = json.loads(sidecar.read_text(encoding="utf-8"))
-        metadata["audio_source"] = "derived_render"
-        metadata["derived_render_provenance"] = {
-            "renderer": "obruxo_data.render.VitalRenderer",
-            "renderer_id": str(getattr(renderer, "renderer_id", "unknown")),
-            "config_path": str(data_generation_root / "configs" / "renderer.yaml"),
-            "python": sys.version.split()[0],
-            "source_preset_path": str(preset_path),
-            "source_midi_path": str(midi_path),
-        }
-        _atomic_write(sidecar, json.dumps(metadata, indent=2, sort_keys=True) + "\n")
-        return destination
-    finally:
-        if inserted:
-            sys.path.remove(root_text)
+        render_derived_vital_audio(renderer, preset_path, midi_path, destination, output_root)
+    except BenchmarkDerivedRenderUnavailable as exc:
+        if getattr(exc, "code", None) == "derived_render_unavailable":
+            raise DerivedRenderUnavailable("Pedalboard/Vital renderer unavailable") from exc
+        raise RuntimeError("Pedalboard/Vital renderer failed") from exc
+    return destination
 
 
 def _derived_destination(output: Path, pair_id: str, preset_path: Path, midi_path: Path) -> Path:
@@ -311,9 +261,18 @@ def _derived_destination(output: Path, pair_id: str, preset_path: Path, midi_pat
         source_root = source.parent.resolve()
         if destination == source_root or destination.is_relative_to(source_root):
             raise CorpusInputError("derived render destination overlaps a source directory")
-    if destination.exists():
-        raise CorpusInputError("refusing to overwrite an existing derived render")
     return destination
+
+
+def _derived_sidecar_details(audio_path: Path) -> tuple[Path | None, str, tuple[str, ...]]:
+    sidecar = audio_path.with_suffix(".json")
+    try:
+        metadata = json.loads(sidecar.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise CorpusInputError("derived render provenance is missing or invalid") from exc
+    if not isinstance(metadata, Mapping) or metadata.get("audio_source") != "derived_render":
+        raise CorpusInputError("existing audio is not a derived render")
+    return _sidecar_details(audio_path)
 
 
 def _candidate_record(directory: Path, status: str, reason: str | None = None) -> dict[str, Any]:
@@ -342,6 +301,9 @@ def _spot_check(audit_rows: list[Mapping[str, Any]]) -> dict[str, Any]:
         if row.get("reason", "").startswith("pair.derived_render"):
             methods.add(DERIVED_PAIRING_METHOD)
             valid = midi_count == 1 and vital_count == 1 and audio_count == 0
+        elif audio_count == 0 and vital_count == 1:
+            methods.add(DERIVED_PAIRING_METHOD)
+            valid = midi_count == 1
         else:
             methods.add(PAIRING_METHOD)
             valid = midi_count == 1 and audio_count == 1
@@ -377,12 +339,14 @@ def _evaluate_candidate(
     metadata_row = metadata.get(preset_path, {}) if preset_path is not None else {}
     labels = add_source_metadata(midi_labels, metadata_row)
     audio_path: Path
+    audio_source: str
     render_result_path: Path | None
     provenance_status: str
     qa_codes: tuple[str, ...]
     pairing_method = PAIRING_METHOD
     if audio_paths:
         audio_path = audio_paths[0].resolve()
+        audio_source = "existing_audio"
         try:
             _read_audio(audio_path)
             render_result_path, provenance_status, qa_codes = _sidecar_details(audio_path)
@@ -394,15 +358,23 @@ def _evaluate_candidate(
             return None, _candidate_record(directory, "excluded", "pair.missing_audio"), renderer
         if preset_path is None:
             return None, _candidate_record(directory, "excluded", "pair.missing_audio"), renderer
+        audio_source = "derived_render"
         pair_id = _pair_id(midi_path, None, preset_path)
         try:
             audio_path = _derived_destination(output, pair_id, preset_path, midi_path)
-            if renderer is _RENDERER_UNAVAILABLE:
-                return None, _candidate_record(directory, "excluded", "pair.derived_render_unavailable"), renderer
-            if renderer is None:
-                renderer = _renderer()
-            _derive_audio(renderer, preset_path, midi_path, audio_path, _approved_output_root())
-            _read_audio(audio_path)
+            if audio_path.exists():
+                _read_audio(audio_path)
+                render_result_path, provenance_status, qa_codes = _derived_sidecar_details(audio_path)
+            else:
+                if audio_path.with_suffix(".json").exists():
+                    raise CorpusInputError("derived render provenance exists without audio")
+                if renderer is _RENDERER_UNAVAILABLE:
+                    return None, _candidate_record(directory, "excluded", "pair.derived_render_unavailable"), renderer
+                if renderer is None:
+                    renderer = _renderer()
+                _derive_audio(renderer, preset_path, midi_path, audio_path, _approved_output_root())
+                _read_audio(audio_path)
+                render_result_path, provenance_status, qa_codes = _derived_sidecar_details(audio_path)
         except CorpusInputError:
             return None, _candidate_record(directory, "excluded", "pair.derived_render_failed"), renderer
         except DerivedRenderUnavailable:
@@ -415,6 +387,7 @@ def _evaluate_candidate(
     pair = EvaluationPair(
         pair_id=pair_id,
         audio_path=audio_path,
+        audio_source=audio_source,
         midi_path=midi_path,
         preset_path=preset_path,
         preset_id=metadata_row.get("preset_id") or None,
@@ -536,6 +509,9 @@ def load_evaluation_manifest(path: Path | str) -> tuple[EvaluationPair, ...]:
         midi = Path(str(row["midi_path"])).resolve(strict=True)
         preset_value = row.get("preset_path")
         preset = None if preset_value in (None, "") else Path(str(preset_value)).resolve(strict=True)
+        audio_source = str(row.get("audio_source", ""))
+        if audio_source not in {"existing_audio", "derived_render"}:
+            raise CorpusInputError("evaluation manifest has invalid audio source")
         if not audio.is_file() or not midi.is_file() or (preset is not None and not preset.is_file()):
             raise CorpusInputError("evaluation manifest references missing source")
         ids.add(pair_id)
@@ -543,6 +519,7 @@ def load_evaluation_manifest(path: Path | str) -> tuple[EvaluationPair, ...]:
             EvaluationPair(
                 pair_id=pair_id,
                 audio_path=audio,
+                audio_source=audio_source,
                 midi_path=midi,
                 preset_path=preset,
                 preset_id=None if row.get("preset_id") in (None, "") else str(row["preset_id"]),

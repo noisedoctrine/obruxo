@@ -182,6 +182,7 @@ def _pair_result(pair: EvaluationPair, identity: Mapping[str, Any], result: Mapp
         "preset_id": pair.preset_id,
         "labels": pair.labels,
         "pairing_method": pair.pairing_method,
+        "audio_source": pair.audio_source,
         "provenance_status": pair.provenance_status,
         "qa_warning_codes": list(pair.qa_warning_codes),
         "run_identity": dict(identity),

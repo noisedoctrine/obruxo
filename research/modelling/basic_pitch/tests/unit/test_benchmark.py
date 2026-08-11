@@ -312,7 +312,8 @@ def test_pedalboard_render_uses_timestamped_midi_and_local_provenance(
             self.messages = messages
             self.process_kwargs = kwargs
             assert self.raw_state == b"applied-state"
-            return np.zeros((2, 88_200), dtype=np.float32)
+            frame_count = 88_199 if float(kwargs["duration"]) <= 2.0 else 88_200
+            return np.zeros((2, frame_count), dtype=np.float32)
 
     plugin = FakePlugin()
     monkeypatch.setattr(
@@ -333,7 +334,7 @@ def test_pedalboard_render_uses_timestamped_midi_and_local_provenance(
     )
     destination = output_root / "derived.wav"
     renderer.render(preset_path, midi_path, destination, output_root)
-    assert plugin.reset_calls == 2
+    assert plugin.reset_calls == 4
     assert plugin.messages == [(b"\x90<d", 0.01), (b"\x80<\x00", 0.04)]
     assert plugin.process_kwargs["duration"] == pytest.approx(88_200.5 / 44_100)
     assert plugin.process_kwargs["sample_rate"] == 44_100
@@ -345,6 +346,8 @@ def test_pedalboard_render_uses_timestamped_midi_and_local_provenance(
     assert metadata["provenance"]["backend_version"] == "0.9.test"
     assert metadata["provenance"]["settings"]["host"] == "pedalboard"
     assert metadata["provenance"]["settings"]["buffer_size"] == 128
+    assert metadata["provenance"]["settings"]["midi_timestamp_epsilon_seconds"] == pytest.approx(1e-9)
+    assert metadata["provenance"]["settings"]["duration_rounding"] == "half-frame correction (88199->88200)"
     assert metadata["derived_render_provenance"]["audio_label"] == "derived_render"
 
 
