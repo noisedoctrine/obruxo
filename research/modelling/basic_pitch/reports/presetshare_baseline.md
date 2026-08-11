@@ -13,6 +13,17 @@
 - Existing audio remains read-only; derived audio uses the parent-approved Vital/Pedalboard path and is never described as historical source audio.
 - Private source-stat records: `11518`; mismatches: `0`.
 
+## Runtime provenance and #24 route decision
+
+- Recorded #25 corpus backend: `pytorch_cpu`; boundary: `#24_end_to_end_audio_to_note_events_batch_1`; precision: `float32`.
+- Runtime-selection source: the backend contract recorded by the existing #25 run.
+- Selection rationale recorded by the artifacts: The existing #25 run fixed pytorch_cpu in its backend contract; no independent rationale for overriding the faster observed #24 pytorch_xpu route is recorded in the result artifacts..
+- Existing #24 report's highest batch-1 inference route: `pytorch_xpu` at `280.00812052550737` audio-seconds/second.
+- Existing #24 report's highest warmed end-to-end route: `pytorch_xpu` at `130.87338461813948` audio-seconds/wall-second.
+- Consistency assessment: `recorded_backend_does_not_match_issue_24_observed_leader`.
+- Interpretation: The existing #25 quality run records a different backend from the fastest observed #24 route. Its quality result remains a CPU-provenance measurement; no XPU full-corpus quality or equivalence claim is made.
+- This report revision does not rerun the corpus evaluation. The backend mismatch is surfaced for review rather than silently reassigning the existing F1 result to XPU.
+
 ## Evaluation status
 
 - Status: `ok`.
@@ -30,9 +41,31 @@
 - Pair coverage: `1769/1769`.
 - Micro metrics are derived from total counts. Pair-macro values and preset-cluster bootstrap intervals remain separate.
 
+## Uncertainty and support
+
+- Preset-cluster bootstrap: `10000` replicates, seed `0`, `1769` clusters.
+
+| Metric | F1 | Bootstrap 95% interval |
+| --- | ---: | ---: |
+| `onset_pitch` | 0.278166 | 0.255365 - 0.300425 |
+| `onset_pitch_offset` | 0.098394 | 0.087394 - 0.110627 |
+| `frames` | 0.398800 | 0.376780 - 0.419742 |
+
 ## Category summaries
 
 The committed report retains counts and support for objective MIDI categories and explicit source metadata categories. Unknown metadata remains unknown; no style labels are inferred from filenames.
+
+## Category interpretation
+
+The following statements use onset+pitch F1 and retain category support. `well_supported` means at least 100 pairs, `moderately_supported` 30-99, and `small_subset` fewer than 30; small-subset extremes are descriptive, not robust corpus-wide findings.
+
+- `duration_class`: highest `medium` `0.333264` (388 pairs, `well_supported`); lowest `short` `0.170616` (13 pairs, `small_subset`). The well-supported range is `0.273906`-`0.333264` across `long` to `medium`.
+- `note_density_class`: highest `high` `0.328722` (222 pairs, `well_supported`); lowest `low` `0.102239` (512 pairs, `well_supported`). The well-supported range is `0.102239`-`0.328722` across `low` to `high`.
+- `pitch_register_class`: highest `mid` `0.290710` (1292 pairs, `well_supported`); lowest `low` `0.173343` (322 pairs, `well_supported`). The well-supported range is `0.173343`-`0.290710` across `low` to `mid`.
+- `polyphony_class`: `polyphonic` `0.278429` vs `monophonic` `0.277039`; near tie across `1150` and `619` pairs. Frame behavior should be read separately from event F1.
+- `type`: the overall high is `Sub` `0.738462` on `2` pairs (`small_subset`); among well-supported types, `Pluck` is highest at `0.509418` on `107` pairs, while `Pad` is lowest at `0.073700` on `161` pairs. This separates robust patterns from tiny type strata.
+
+The category tables below retain every observed stratum so these summaries can be checked against the underlying aggregate counts.
 
 ### duration_class
 

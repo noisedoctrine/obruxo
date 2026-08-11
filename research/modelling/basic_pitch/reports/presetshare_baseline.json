@@ -3690,6 +3690,148 @@
     "contract_version": 1,
     "precision": "float32"
   },
+  "category_findings": {
+    "duration_class": {
+      "highest": {
+        "category": "medium",
+        "onset_pitch_f1": 0.33326405918782986,
+        "pair_count": 388,
+        "support": "well_supported"
+      },
+      "highest_well_supported": {
+        "category": "medium",
+        "onset_pitch_f1": 0.33326405918782986,
+        "pair_count": 388,
+        "support": "well_supported"
+      },
+      "lowest": {
+        "category": "short",
+        "onset_pitch_f1": 0.17061611374407584,
+        "pair_count": 13,
+        "support": "small_subset"
+      },
+      "lowest_well_supported": {
+        "category": "long",
+        "onset_pitch_f1": 0.27390631998456866,
+        "pair_count": 1368,
+        "support": "well_supported"
+      },
+      "metric": "onset_pitch_f1",
+      "support_rule": "well_supported >=100 pairs; moderately_supported 30-99; small_subset <30"
+    },
+    "note_density_class": {
+      "highest": {
+        "category": "high",
+        "onset_pitch_f1": 0.3287220234891893,
+        "pair_count": 222,
+        "support": "well_supported"
+      },
+      "highest_well_supported": {
+        "category": "high",
+        "onset_pitch_f1": 0.3287220234891893,
+        "pair_count": 222,
+        "support": "well_supported"
+      },
+      "lowest": {
+        "category": "low",
+        "onset_pitch_f1": 0.10223868692060904,
+        "pair_count": 512,
+        "support": "well_supported"
+      },
+      "lowest_well_supported": {
+        "category": "low",
+        "onset_pitch_f1": 0.10223868692060904,
+        "pair_count": 512,
+        "support": "well_supported"
+      },
+      "metric": "onset_pitch_f1",
+      "support_rule": "well_supported >=100 pairs; moderately_supported 30-99; small_subset <30"
+    },
+    "pitch_register_class": {
+      "highest": {
+        "category": "mid",
+        "onset_pitch_f1": 0.29071027704367963,
+        "pair_count": 1292,
+        "support": "well_supported"
+      },
+      "highest_well_supported": {
+        "category": "mid",
+        "onset_pitch_f1": 0.29071027704367963,
+        "pair_count": 1292,
+        "support": "well_supported"
+      },
+      "lowest": {
+        "category": "low",
+        "onset_pitch_f1": 0.17334264629961432,
+        "pair_count": 322,
+        "support": "well_supported"
+      },
+      "lowest_well_supported": {
+        "category": "low",
+        "onset_pitch_f1": 0.17334264629961432,
+        "pair_count": 322,
+        "support": "well_supported"
+      },
+      "metric": "onset_pitch_f1",
+      "support_rule": "well_supported >=100 pairs; moderately_supported 30-99; small_subset <30"
+    },
+    "polyphony_class": {
+      "highest": {
+        "category": "polyphonic",
+        "onset_pitch_f1": 0.27842908699648067,
+        "pair_count": 1150,
+        "support": "well_supported"
+      },
+      "highest_well_supported": {
+        "category": "polyphonic",
+        "onset_pitch_f1": 0.27842908699648067,
+        "pair_count": 1150,
+        "support": "well_supported"
+      },
+      "lowest": {
+        "category": "monophonic",
+        "onset_pitch_f1": 0.27703881552621046,
+        "pair_count": 619,
+        "support": "well_supported"
+      },
+      "lowest_well_supported": {
+        "category": "monophonic",
+        "onset_pitch_f1": 0.27703881552621046,
+        "pair_count": 619,
+        "support": "well_supported"
+      },
+      "metric": "onset_pitch_f1",
+      "support_rule": "well_supported >=100 pairs; moderately_supported 30-99; small_subset <30"
+    },
+    "type": {
+      "highest": {
+        "category": "Sub",
+        "onset_pitch_f1": 0.7384615384615385,
+        "pair_count": 2,
+        "support": "small_subset"
+      },
+      "highest_well_supported": {
+        "category": "Pluck",
+        "onset_pitch_f1": 0.5094183284538475,
+        "pair_count": 107,
+        "support": "well_supported"
+      },
+      "lowest": {
+        "category": "Drums",
+        "onset_pitch_f1": 0.001229256299938537,
+        "pair_count": 45,
+        "support": "moderately_supported"
+      },
+      "lowest_well_supported": {
+        "category": "Pad",
+        "onset_pitch_f1": 0.0736995458051247,
+        "pair_count": 161,
+        "support": "well_supported"
+      },
+      "metric": "onset_pitch_f1",
+      "support_rule": "well_supported >=100 pairs; moderately_supported 30-99; small_subset <30"
+    }
+  },
   "decoder": {
     "frame_threshold": 0.3,
     "infer_onsets": true,
@@ -3733,6 +3875,18 @@
       "discrepancies": 0,
       "status": "passed"
     }
+  },
+  "runtime_provenance": {
+    "consistency": "recorded_backend_does_not_match_issue_24_observed_leader",
+    "interpretation": "The existing #25 quality run records a different backend from the fastest observed #24 route. Its quality result remains a CPU-provenance measurement; no XPU full-corpus quality or equivalence claim is made.",
+    "issue_24_observed_highest_batch_1_audio_seconds_per_second": 280.00812052550737,
+    "issue_24_observed_highest_batch_1_route": "pytorch_xpu",
+    "issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second": 130.87338461813948,
+    "issue_24_observed_highest_end_to_end_route": "pytorch_xpu",
+    "selected_backend": "pytorch_cpu",
+    "selected_contract": "#24_end_to_end_audio_to_note_events_batch_1",
+    "selection_rationale": "The existing #25 run fixed pytorch_cpu in its backend contract; no independent rationale for overriding the faster observed #24 pytorch_xpu route is recorded in the result artifacts.",
+    "selection_source": "the backend contract recorded by the existing #25 run"
   },
   "status": "ok"
 }

@@ -106,6 +106,9 @@ def test_resume_identity_backend_guard_and_sanitized_report() -> None:
         )
         text = public_json.read_text(encoding="utf-8") + public_markdown.read_text(encoding="utf-8")
         assert report["aggregate"]["pair_count"] == 1
+        assert report["runtime_provenance"]["selected_backend"] == "pytorch_cpu"
+        assert report["runtime_provenance"]["selection_rationale"]
+        assert "Runtime provenance and #24 route decision" in public_markdown.read_text(encoding="utf-8")
         assert str(corpus) not in text
         assert "performance.mid" not in text
         assert "render.wav" not in text

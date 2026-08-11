@@ -119,8 +119,108 @@ def _pairing_summary(audit: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _category_f1(summary: Mapping[str, Any]) -> float | None:
+    value = summary.get("micro", {}).get("onset_pitch", {}).get("f1")
+    return None if value is None else float(value)
+
+
+def _support_class(pair_count: int) -> str:
+    if pair_count >= 100:
+        return "well_supported"
+    if pair_count >= 30:
+        return "moderately_supported"
+    return "small_subset"
+
+
+def _category_findings(aggregate: Mapping[str, Any]) -> dict[str, Any]:
+    """Summarize observed category ranges without hiding their support sizes."""
+    groups = aggregate.get("groups", {})
+    findings: dict[str, Any] = {}
+    for field in ("duration_class", "note_density_class", "pitch_register_class", "polyphony_class", "type"):
+        entries = groups.get(field, {})
+        rows = []
+        if not isinstance(entries, Mapping):
+            continue
+        for category, summary in entries.items():
+            if not isinstance(summary, Mapping) or _category_f1(summary) is None:
+                continue
+            pair_count = int(summary.get("pair_count", 0))
+            rows.append(
+                {
+                    "category": str(category),
+                    "pair_count": pair_count,
+                    "support": _support_class(pair_count),
+                    "onset_pitch_f1": _category_f1(summary),
+                }
+            )
+        if not rows:
+            continue
+        rows.sort(key=lambda row: (row["onset_pitch_f1"], row["category"]))
+        supported = [row for row in rows if row["pair_count"] >= 100]
+        findings[field] = {
+            "metric": "onset_pitch_f1",
+            "support_rule": "well_supported >=100 pairs; moderately_supported 30-99; small_subset <30",
+            "lowest": rows[0],
+            "highest": rows[-1],
+            "lowest_well_supported": supported[0] if supported else None,
+            "highest_well_supported": supported[-1] if supported else None,
+        }
+    return findings
+
+
+def _runtime_selection(run: Mapping[str, Any]) -> dict[str, Any]:
+    """Compare the recorded #25 backend with the already-landed #24 report."""
+    backend = run.get("backend", {})
+    selected = backend.get("backend_id")
+    result: dict[str, Any] = {
+        "selected_backend": selected,
+        "selected_contract": backend.get("boundary"),
+        "selection_source": "the backend contract recorded by the existing #25 run",
+        "selection_rationale": "The existing #25 run fixed pytorch_cpu in its backend contract; no independent rationale for overriding the faster observed #24 pytorch_xpu route is recorded in the result artifacts.",
+        "issue_24_observed_highest_batch_1_route": None,
+        "issue_24_observed_highest_batch_1_audio_seconds_per_second": None,
+        "issue_24_observed_highest_end_to_end_route": None,
+        "issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second": None,
+        "consistency": "issue_24_report_unavailable",
+        "interpretation": "The quality result is attributed to the recorded backend only; no alternate-backend quality result is inferred.",
+    }
+    benchmark_path = _reports_root() / "backend_benchmark.json"
+    try:
+        benchmark = _read_json(benchmark_path)
+    except ReportInputError:
+        return result
+    inference = [row for row in benchmark.get("inference", []) if row.get("status") == "ok"]
+    if not inference:
+        return result
+    highest_batch = max(
+        inference,
+        key=lambda row: row.get("batch_results", {}).get("1", {}).get("audio_seconds_per_second", {}).get("median", float("-inf")),
+    )
+    highest_end_to_end = max(
+        (row for row in inference if row.get("end_to_end")),
+        key=lambda row: row.get("end_to_end", {}).get("audio_seconds_per_wall_second", {}).get("median", float("-inf")),
+        default=None,
+    )
+    result.update(
+        {
+            "issue_24_observed_highest_batch_1_route": highest_batch.get("route"),
+            "issue_24_observed_highest_batch_1_audio_seconds_per_second": highest_batch.get("batch_results", {}).get("1", {}).get("audio_seconds_per_second", {}).get("median"),
+            "issue_24_observed_highest_end_to_end_route": highest_end_to_end.get("route") if highest_end_to_end else None,
+            "issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second": highest_end_to_end.get("end_to_end", {}).get("audio_seconds_per_wall_second", {}).get("median") if highest_end_to_end else None,
+        }
+    )
+    if selected == highest_batch.get("route") == (highest_end_to_end or {}).get("route"):
+        result["consistency"] = "matches_issue_24_observed_leader"
+        result["interpretation"] = "The recorded #25 backend matches the fastest observed #24 inference and end-to-end routes."
+    else:
+        result["consistency"] = "recorded_backend_does_not_match_issue_24_observed_leader"
+        result["interpretation"] = "The existing #25 quality run records a different backend from the fastest observed #24 route. Its quality result remains a CPU-provenance measurement; no XPU full-corpus quality or equivalence claim is made."
+    return result
+
+
 def build_sanitized_report(audit: Mapping[str, Any], run: Mapping[str, Any], aggregate: Mapping[str, Any]) -> dict[str, Any]:
     """Construct the committed report from private inputs without copying row data."""
+    sanitized_aggregate = sanitize_aggregate(aggregate)
     return {
         "format_version": 1,
         "status": run.get("status", "unknown"),
@@ -134,7 +234,9 @@ def build_sanitized_report(audit: Mapping[str, Any], run: Mapping[str, Any], agg
             "precision": run.get("backend", {}).get("precision"),
         },
         "decoder": run.get("decoder", {}),
-        "aggregate": sanitize_aggregate(aggregate),
+        "aggregate": sanitized_aggregate,
+        "runtime_provenance": _runtime_selection(run),
+        "category_findings": _category_findings(sanitized_aggregate),
         "interpretation": {
             "measured": "Aggregate values are computed from successful pair results using fixed stock Basic Pitch decoding and no threshold tuning.",
             "meaning": "Quality describes the frozen Basic Pitch performance prior; it is not a claim about source audio reconstruction or an OBRUXO training objective.",
@@ -167,6 +269,17 @@ def _markdown(report: Mapping[str, Any]) -> str:
         "- Existing audio remains read-only; derived audio uses the parent-approved Vital/Pedalboard path and is never described as historical source audio.",
         f"- Private source-stat records: `{pairing.get('source_stat_records')}`; mismatches: `{pairing.get('source_stat_mismatches')}`.",
         "",
+        "## Runtime provenance and #24 route decision",
+        "",
+        f"- Recorded #25 corpus backend: `{report.get('backend', {}).get('backend_id')}`; boundary: `{report.get('backend', {}).get('boundary')}`; precision: `{report.get('backend', {}).get('precision')}`.",
+        f"- Runtime-selection source: {report.get('runtime_provenance', {}).get('selection_source', 'not recorded')}.",
+        f"- Selection rationale recorded by the artifacts: {report.get('runtime_provenance', {}).get('selection_rationale', 'not recorded')}.",
+        f"- Existing #24 report's highest batch-1 inference route: `{report.get('runtime_provenance', {}).get('issue_24_observed_highest_batch_1_route')}` at `{report.get('runtime_provenance', {}).get('issue_24_observed_highest_batch_1_audio_seconds_per_second')}` audio-seconds/second.",
+        f"- Existing #24 report's highest warmed end-to-end route: `{report.get('runtime_provenance', {}).get('issue_24_observed_highest_end_to_end_route')}` at `{report.get('runtime_provenance', {}).get('issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second')}` audio-seconds/wall-second.",
+        f"- Consistency assessment: `{report.get('runtime_provenance', {}).get('consistency')}`.",
+        f"- Interpretation: {report.get('runtime_provenance', {}).get('interpretation', 'not recorded')}",
+        "- This report revision does not rerun the corpus evaluation. The backend mismatch is surfaced for review rather than silently reassigning the existing F1 result to XPU.",
+        "",
         "## Evaluation status",
         "",
         f"- Status: `{report.get('status')}`.",
@@ -187,11 +300,53 @@ def _markdown(report: Mapping[str, Any]) -> str:
         f"- Pair coverage: `{aggregate.get('successful_pair_count', 0)}/{aggregate.get('pair_count', 0)}`.",
         "- Micro metrics are derived from total counts. Pair-macro values and preset-cluster bootstrap intervals remain separate.",
         "",
+        "## Uncertainty and support",
+        "",
+    ])
+    bootstrap = aggregate.get("bootstrap", {})
+    lines.extend(
+        [
+            f"- Preset-cluster bootstrap: `{bootstrap.get('replicates', 'n/a')}` replicates, seed `{bootstrap.get('seed', 'n/a')}`, `{bootstrap.get('cluster_count', 'n/a')}` clusters.",
+            "",
+            "| Metric | F1 | Bootstrap 95% interval |",
+            "| --- | ---: | ---: |",
+        ]
+    )
+    micro = aggregate.get("micro", {})
+    for name in HEADLINE_METRICS:
+        metric = micro.get(name, {})
+        interval = bootstrap.get("metrics", {}).get(name, {})
+        if isinstance(metric, Mapping):
+            f1 = metric.get("f1")
+            low = interval.get("lower_95")
+            high = interval.get("upper_95")
+            lines.append(f"| `{name}` | {'n/a' if f1 is None else f'{f1:.6f}'} | {'n/a' if low is None or high is None else f'{low:.6f} - {high:.6f}'} |")
+    lines.extend([
+        "",
         "## Category summaries",
         "",
         "The committed report retains counts and support for objective MIDI categories and explicit source metadata categories. Unknown metadata remains unknown; no style labels are inferred from filenames.",
         "",
     ])
+    findings = report.get("category_findings", {})
+    lines.extend(["## Category interpretation", "", "The following statements use onset+pitch F1 and retain category support. `well_supported` means at least 100 pairs, `moderately_supported` 30-99, and `small_subset` fewer than 30; small-subset extremes are descriptive, not robust corpus-wide findings.", ""])
+    for field in ("duration_class", "note_density_class", "pitch_register_class", "polyphony_class", "type"):
+        finding = findings.get(field)
+        if not finding:
+            continue
+        highest = finding.get("highest", {})
+        lowest = finding.get("lowest", {})
+        high_supported = finding.get("highest_well_supported") or highest
+        low_supported = finding.get("lowest_well_supported") or lowest
+        if field == "polyphony_class":
+            delta = abs(float(highest.get("onset_pitch_f1", 0.0)) - float(lowest.get("onset_pitch_f1", 0.0)))
+            interpretation = "near tie" if delta < 0.02 else "separation observed"
+            lines.append(f"- `{field}`: `{highest.get('category')}` `{highest.get('onset_pitch_f1'):.6f}` vs `{lowest.get('category')}` `{lowest.get('onset_pitch_f1'):.6f}`; {interpretation} across `{highest.get('pair_count')}` and `{lowest.get('pair_count')}` pairs. Frame behavior should be read separately from event F1.")
+        elif field == "type":
+            lines.append(f"- `{field}`: the overall high is `{highest.get('category')}` `{highest.get('onset_pitch_f1'):.6f}` on `{highest.get('pair_count')}` pairs (`{highest.get('support')}`); among well-supported types, `{high_supported.get('category')}` is highest at `{high_supported.get('onset_pitch_f1'):.6f}` on `{high_supported.get('pair_count')}` pairs, while `{low_supported.get('category')}` is lowest at `{low_supported.get('onset_pitch_f1'):.6f}` on `{low_supported.get('pair_count')}` pairs. This separates robust patterns from tiny type strata.")
+        else:
+            lines.append(f"- `{field}`: highest `{highest.get('category')}` `{highest.get('onset_pitch_f1'):.6f}` ({highest.get('pair_count')} pairs, `{highest.get('support')}`); lowest `{lowest.get('category')}` `{lowest.get('onset_pitch_f1'):.6f}` ({lowest.get('pair_count')} pairs, `{lowest.get('support')}`). The well-supported range is `{low_supported.get('onset_pitch_f1'):.6f}`-`{high_supported.get('onset_pitch_f1'):.6f}` across `{low_supported.get('category')}` to `{high_supported.get('category')}`.")
+    lines.extend(["", "The category tables below retain every observed stratum so these summaries can be checked against the underlying aggregate counts.", ""])
     for field, entries in aggregate.get("groups", {}).items():
         if not entries:
             continue
