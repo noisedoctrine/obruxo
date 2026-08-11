@@ -17,8 +17,6 @@ def _preload_conda_openmp_runtime() -> None:
     runtime = Path(sys.prefix) / "Library" / "bin" / "libiomp5md.dll"
     if runtime.is_file():
         ctypes.CDLL(str(runtime))
-
-
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="OBRUXO Basic Pitch conversion and parity tools")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -67,6 +65,18 @@ def _parser() -> argparse.ArgumentParser:
     evaluation.add_argument("--manifest", type=Path, required=True)
     evaluation.add_argument("--output", type=Path, required=True)
     evaluation.add_argument("--force", action="store_true")
+
+    parity_diagnostic = subparsers.add_parser(
+        "parity-diagnostic",
+        help="run the fixed synthetic parity gate for every inference route",
+    )
+    parity_diagnostic.add_argument("--checkpoint", type=Path, required=True)
+    parity_diagnostic.add_argument("--json", type=Path, required=True, help="existing backend benchmark JSON to augment")
+    parity_diagnostic.add_argument("--markdown", type=Path, required=True, help="existing backend benchmark Markdown to augment")
+    parity_diagnostic.add_argument("--xpu-index", type=int, default=0)
+    parity_diagnostic.add_argument("--openvino-gpu-device", default="GPU")
+    parity_diagnostic.add_argument("--repetitions", type=int, default=3)
+    parity_diagnostic.add_argument("--force", action="store_true")
     return parser
 
 
@@ -91,6 +101,19 @@ def main() -> int:
             xpu_index=args.xpu_index,
             openvino_gpu_device=args.openvino_gpu_device,
             allow_derived_render=args.allow_derived_render,
+            force=args.force,
+        )
+
+    if args.command == "parity-diagnostic":
+        from obruxo_basic_pitch.benchmark import run_parity_diagnostic_cli
+
+        return run_parity_diagnostic_cli(
+            args.checkpoint,
+            args.json,
+            args.markdown,
+            xpu_index=args.xpu_index,
+            openvino_gpu_device=args.openvino_gpu_device,
+            process_repetitions=args.repetitions,
             force=args.force,
         )
 

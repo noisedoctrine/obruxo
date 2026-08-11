@@ -58,6 +58,19 @@ python research/modelling/basic_pitch/run.py benchmark \
 
 The manifest and all source-derived scratch state remain local and ignored. Reports contain only anonymous labels, sanitized aggregate timings, memory availability, parity summaries, and route statuses. Existing WAVs are always read-only. When an otherwise unambiguous source relationship has an existing Vital patch and MIDI performance but no WAV, the parent contract permits an explicitly opted-in derived render under `research/modelling/basic_pitch/outputs/`:
 
+To inspect the component-level parity gate without rerunning the smoke benchmark, run the synthetic-only diagnostic. It launches the same fresh worker processes for all four inference routes, uses five public synthetic windows, and augments the existing sanitized backend report with per-repetition parity values. It does not read the private smoke manifest, render audio, or publish private data:
+
+```text
+python research/modelling/basic_pitch/run.py parity-diagnostic \
+  --checkpoint research/modelling/basic_pitch/artifacts/basic_pitch_icassp_2022.pt \
+  --json research/modelling/basic_pitch/reports/backend_benchmark.json \
+  --markdown research/modelling/basic_pitch/reports/backend_benchmark.md \
+  --xpu-index 0 \
+  --openvino-gpu-device GPU \
+  --repetitions 3 \
+  --force
+```
+
 ```text
 python research/modelling/basic_pitch/run.py benchmark \
   --config research/modelling/basic_pitch/configs/backend_benchmark.yaml \

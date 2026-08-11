@@ -794,27 +794,34 @@ def _worker_request(
     route: str,
     mode: str,
     repetition: int,
-    config: BenchmarkConfig,
-    manifest_path: Path,
+    config: BenchmarkConfig | None,
+    manifest_path: Path | None,
     checkpoint_path: Path,
     xpu_index: int,
     openvino_gpu_device: str,
+    *,
+    parity_only: bool = False,
 ) -> dict[str, Any]:
-    return {
+    request = {
         "route": route,
         "mode": mode,
         "repetition": repetition,
-        "config": {
-            "warmup_iterations": config.warmup_iterations,
-            "timed_iterations": config.timed_iterations,
-            "batch_sizes": list(config.batch_sizes),
-            "end_to_end_batch_size": config.end_to_end_batch_size,
-        },
-        "manifest_path": str(manifest_path),
         "checkpoint_path": str(checkpoint_path),
         "xpu_index": xpu_index,
         "openvino_gpu_device": openvino_gpu_device,
     }
+    if config is not None:
+        request["config"] = {
+            "warmup_iterations": config.warmup_iterations,
+            "timed_iterations": config.timed_iterations,
+            "batch_sizes": list(config.batch_sizes),
+            "end_to_end_batch_size": config.end_to_end_batch_size,
+        }
+    if manifest_path is not None:
+        request["manifest_path"] = str(manifest_path)
+    if parity_only:
+        request["parity_only"] = True
+    return request
 
 
 def _run_worker(request: Mapping[str, Any]) -> dict[str, Any]:
@@ -862,6 +869,17 @@ def _aggregate_route(rows: Sequence[Mapping[str, Any]], route: str, mode: str, c
     failure_codes = sorted({str(row["failure_code"]) for row in rows if row.get("failure_code")})
     if failure_codes:
         result["failure_codes"] = failure_codes
+    parity_rows = [
+        {
+            "repetition": int(row.get("repetition", index)),
+            "status": row.get("status"),
+            "parity": row["parity"],
+        }
+        for index, row in enumerate(rows)
+        if isinstance(row.get("parity"), Mapping)
+    ]
+    if parity_rows:
+        result["parity_repetitions"] = parity_rows
     if status != "ok":
         return result
 
@@ -889,6 +907,11 @@ def _aggregate_route(rows: Sequence[Mapping[str, Any]], route: str, mode: str, c
             "contour_max_abs_error",
             "note_max_abs_error",
             "onset_max_abs_error",
+            "contour_non_finite_count",
+            "note_non_finite_count",
+            "onset_non_finite_count",
+            "event_count_disagreements",
+            "event_tuple_disagreements",
             "note_threshold_disagreements",
             "onset_threshold_disagreements",
             "event_structure_disagreements",
@@ -940,6 +963,112 @@ def _aggregate_route(rows: Sequence[Mapping[str, Any]], route: str, mode: str, c
         }
     result["memory"] = rows[0].get("memory", {"status": "unavailable"})
     return result
+
+
+def _parity_contract() -> dict[str, Any]:
+    from .constants import FRAME_THRESHOLD, ONSET_THRESHOLD
+    from .parity import ADOPTED_MAX_ABS_TOLERANCES
+
+    return {
+        "non_finite_values": "0 values",
+        "contour_max_abs_error": ADOPTED_MAX_ABS_TOLERANCES["contour"],
+        "note_max_abs_error": ADOPTED_MAX_ABS_TOLERANCES["note"],
+        "onset_max_abs_error": ADOPTED_MAX_ABS_TOLERANCES["onset"],
+        "note_frame_threshold": FRAME_THRESHOLD,
+        "onset_threshold": ONSET_THRESHOLD,
+        "note_threshold_disagreements": "0",
+        "onset_threshold_disagreements": "0",
+        "event_count_disagreements": "0",
+        "event_tuple_disagreements": "0",
+    }
+
+
+_PARITY_DIAGNOSTIC_METRICS = (
+    "contour_non_finite_count",
+    "note_non_finite_count",
+    "onset_non_finite_count",
+    "contour_max_abs_error",
+    "note_max_abs_error",
+    "onset_max_abs_error",
+    "note_threshold_disagreements",
+    "onset_threshold_disagreements",
+    "event_count_disagreements",
+    "event_tuple_disagreements",
+)
+
+
+def _parity_route_status(rows: Sequence[Mapping[str, Any]]) -> str:
+    statuses = [row.get("status") for row in rows]
+    if any(status == "parity_failed" for status in statuses):
+        return "parity_failed"
+    if any(status == "out_of_memory" for status in statuses):
+        return "out_of_memory"
+    if any(status == "runtime_failed" for status in statuses):
+        return "runtime_failed"
+    if any(status == "unavailable" for status in statuses):
+        return "unavailable"
+    return "ok"
+
+
+def _parity_route_report(route: str, rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    values = [row["parity"] for row in rows if isinstance(row.get("parity"), Mapping)]
+    aggregate: dict[str, Any] = {}
+    for name in _PARITY_DIAGNOSTIC_METRICS:
+        observed = [value.get(name) for value in values if value.get(name) is not None]
+        aggregate[name] = max(observed) if observed else None
+    return {
+        "route": route,
+        "status": _parity_route_status(rows),
+        "repetitions": [
+            {
+                "repetition": int(row.get("repetition", index)),
+                "status": row.get("status"),
+                "parity": row.get("parity"),
+            }
+            for index, row in enumerate(rows)
+        ],
+        "max_across_repetitions": aggregate,
+    }
+
+
+def run_parity_diagnostics(
+    checkpoint_path: str | Path,
+    *,
+    process_repetitions: int = 3,
+    xpu_index: int = 0,
+    openvino_gpu_device: str = "GPU",
+) -> dict[str, Any]:
+    """Run only the fixed synthetic parity gate in fresh worker processes."""
+    if process_repetitions < 1:
+        raise ValueError("process_repetitions must be positive")
+    checkpoint = Path(checkpoint_path).resolve(strict=True)
+    routes = []
+    for route in INFERENCE_ROUTES:
+        rows = [
+            _run_worker(
+                _worker_request(
+                    route,
+                    "inference",
+                    repetition,
+                    None,
+                    None,
+                    checkpoint,
+                    xpu_index,
+                    openvino_gpu_device,
+                    parity_only=True,
+                )
+            )
+            for repetition in range(process_repetitions)
+        ]
+        routes.append(_parity_route_report(route, rows))
+    return {
+        "format_version": 1,
+        "model_id": MODEL_ID,
+        "scope": "canonical float32 model on five public synthetic windows; no private smoke audio or rendering",
+        "process_repetitions": process_repetitions,
+        "thresholds": _parity_contract(),
+        "routes": routes,
+    }
 
 
 def _unavailable_report(
@@ -1099,6 +1228,77 @@ def _report_number(value: Any, digits: int = 3) -> str:
 
 def _report_mib(value: Any) -> str:
     return "n/a" if value is None else f"{float(value) / (1024 * 1024):.1f}"
+
+
+def _parity_diagnostic_value(report: Mapping[str, Any], route: str, metric: str) -> str:
+    diagnostics = report.get("parity_diagnostics", {})
+    route_report = next(
+        (row for row in diagnostics.get("routes", []) if row.get("route") == route),
+        {},
+    )
+    if metric == "status":
+        return str(route_report.get("status", "not_recorded"))
+    aggregate = route_report.get("max_across_repetitions", {})
+    value = aggregate.get(metric)
+    if value is None:
+        if metric.endswith("_max_abs_error"):
+            output_name = metric.removesuffix("_max_abs_error")
+            if aggregate.get(f"{output_name}_non_finite_count", 0):
+                return "non_finite"
+        return "n/a"
+    if metric.endswith(("_count", "_disagreements")):
+        return str(int(value))
+    return f"{float(value):.9g}"
+
+
+def _parity_diagnostics_markdown(report: Mapping[str, Any]) -> list[str]:
+    diagnostics = report.get("parity_diagnostics")
+    if not isinstance(diagnostics, Mapping):
+        return [
+            "",
+            "## Parity diagnostics by framework and processor",
+            "",
+            "Per-component parity values were not retained in this benchmark artifact.",
+        ]
+    thresholds = diagnostics.get("thresholds", {})
+    contour_limit = thresholds.get("contour_max_abs_error", "not recorded")
+    note_limit = thresholds.get("note_max_abs_error", "not recorded")
+    onset_limit = thresholds.get("onset_max_abs_error", "not recorded")
+    note_threshold = thresholds.get("note_frame_threshold", "not recorded")
+    onset_threshold = thresholds.get("onset_threshold", "not recorded")
+    metric_rows = (
+        ("Route status (must be `ok`)", "status"),
+        ("Non-finite contour values (must be 0)", "contour_non_finite_count"),
+        ("Non-finite note values (must be 0)", "note_non_finite_count"),
+        ("Non-finite onset values (must be 0)", "onset_non_finite_count"),
+        (f"Maximum contour absolute error (≤ {contour_limit})", "contour_max_abs_error"),
+        (f"Maximum note absolute error (≤ {note_limit})", "note_max_abs_error"),
+        (f"Maximum onset absolute error (≤ {onset_limit})", "onset_max_abs_error"),
+        (f"Note-frame threshold disagreements (threshold {note_threshold}; must be 0)", "note_threshold_disagreements"),
+        (f"Onset threshold disagreements (threshold {onset_threshold}; must be 0)", "onset_threshold_disagreements"),
+        ("Generated note-event count disagreements (must be 0)", "event_count_disagreements"),
+        ("(start_time_s, end_time_s, MIDI pitch) disagreements (must be 0)", "event_tuple_disagreements"),
+    )
+    route_labels = (
+        ("pytorch_cpu", "PyTorch CPU"),
+        ("pytorch_xpu", "PyTorch XPU"),
+        ("openvino_cpu", "OpenVINO CPU"),
+        ("openvino_gpu", "OpenVINO GPU"),
+    )
+    lines = [
+        "",
+        "## Parity diagnostics by framework and processor",
+        "",
+        f"The gate was evaluated on `{diagnostics.get('process_repetitions', 'n/a')}` fresh-process repetitions of `{diagnostics.get('scope', 'the public synthetic suite')}`. Each cell reports the maximum observed value across repetitions; the JSON retains each repetition separately.",
+        "",
+        "| Parity check (applied threshold) | " + " | ".join(label for _, label in route_labels) + " |",
+        "| --- | " + " | ".join("---" for _ in route_labels) + " |",
+    ]
+    for label, metric in metric_rows:
+        lines.append(
+            "| " + label + " | " + " | ".join(_parity_diagnostic_value(report, route, metric) for route, _ in route_labels) + " |"
+        )
+    return lines
 
 
 def _report_throughput_table(rows: Sequence[Mapping[str, Any]], field: str, heading: str) -> list[str]:
@@ -1282,13 +1482,18 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
         )
     else:
         lines.append("- No positive finite crossover was retained by the fixed formula for the successful routes.")
+    lines.extend(_parity_diagnostics_markdown(report))
     lines.extend(["", "## OpenVINO GPU parity failure", ""])
     if gpu_failure:
         lines.extend(
             [
                 f"- Status: `{gpu_failure.get('status')}` for `{gpu_failure.get('repetitions', 0)}` repetitions; failure code: `{', '.join(gpu_failure.get('failure_codes', [])) or 'not retained'}`.",
                 "- The worker performs the parity gate before model-only or end-to-end timing. The gate compares contour, note, and onset numeric outputs plus note/onset threshold decisions and stock note-event structure against the canonical PyTorch CPU route.",
-                "- The committed aggregate retains only the generic `parity_failed` code, not the component-level error payload. Therefore the existing evidence identifies a parity-gate failure but does not identify which subcheck triggered it. That missing diagnostic is a reporting limitation, not permission to infer a GPU performance result.",
+                (
+                    "- The component-level parity values are tabulated above. They describe the fixed synthetic gate only; they do not authorize timing a route that failed parity."
+                    if isinstance(report.get("parity_diagnostics"), Mapping)
+                    else "- The committed aggregate retains only the generic `parity_failed` code, not the component-level error payload. Therefore the existing evidence identifies a parity-gate failure but does not identify which subcheck triggered it. That missing diagnostic is a reporting limitation, not permission to infer a GPU performance result."
+                ),
                 "- No OpenVINO GPU throughput, latency, end-to-end rate, or memory claim is supported; no CPU fallback or substitute-device measurement was used.",
             ]
         )
@@ -1386,6 +1591,34 @@ def benchmark_exit_code(report: Mapping[str, Any]) -> int:
     """Return 0 for successful/unavailable route rows and 3 for route failures."""
     rows = list(report.get("inference", [])) + list(report.get("training", []))
     return 0 if all(row.get("status") in {"ok", "unavailable"} for row in rows) else 3
+
+
+def run_parity_diagnostic_cli(
+    checkpoint_path: str | Path,
+    json_path: str | Path,
+    markdown_path: str | Path,
+    *,
+    xpu_index: int = 0,
+    openvino_gpu_device: str = "GPU",
+    process_repetitions: int = 3,
+    force: bool = False,
+) -> int:
+    try:
+        json_file, markdown_file = _approved_report_paths(json_path, markdown_path)
+        report = json.loads(json_file.read_text(encoding="utf-8"))
+        if not isinstance(report, dict):
+            return 2
+        report["parity_diagnostics"] = run_parity_diagnostics(
+            checkpoint_path,
+            process_repetitions=process_repetitions,
+            xpu_index=xpu_index,
+            openvino_gpu_device=openvino_gpu_device,
+        )
+        write_benchmark_reports(report, json_file, markdown_file, force=force)
+        routes = report["parity_diagnostics"].get("routes", [])
+        return 0 if all(route.get("status") == "ok" for route in routes) else 3
+    except (BenchmarkInputError, FileNotFoundError, OSError, TypeError, ValueError, json.JSONDecodeError):
+        return 2
 
 
 def run_benchmark_cli(
