@@ -24,7 +24,11 @@ from obruxo_basic_pitch.benchmark import (
     load_manifest,
     write_benchmark_reports,
 )
-from obruxo_basic_pitch.benchmark_worker import _openvino_target, _RouteError
+from obruxo_basic_pitch.benchmark_worker import (
+    _build_openvino,
+    _openvino_target,
+    _RouteError,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG_PATH = ROOT / "configs" / "backend_benchmark.yaml"
@@ -366,6 +370,54 @@ def test_openvino_gpu_never_falls_back_to_another_device() -> None:
     with pytest.raises(_RouteError) as error:
         _openvino_target(Core(), "openvino_gpu", "GPU")
     assert error.value.code == "openvino_gpu_unavailable"
+
+
+def test_openvino_compile_pins_float32_without_changing_execution_mode() -> None:
+    class FakeTorch:
+        float32 = "torch.float32"
+
+        @staticmethod
+        def zeros(shape: tuple[int, ...], *, dtype: str) -> tuple[tuple[int, ...], str]:
+            return shape, dtype
+
+    class FakeConverted:
+        def __init__(self) -> None:
+            self.inputs = [object()]
+
+        def reshape(self, shape: object) -> None:
+            self.reshape_shape = shape
+
+    class FakeCore:
+        def __init__(self) -> None:
+            self.available_devices = ["GPU"]
+            self.compile_arguments: tuple[object, str, dict[str, object]] | None = None
+
+        def compile_model(self, model: object, target: str, config: dict[str, object]) -> object:
+            self.compile_arguments = (model, target, config)
+            return object()
+
+    class FakeOpenVINO:
+        class Type:
+            f32 = "float32"
+
+        properties = SimpleNamespace(hint=SimpleNamespace(inference_precision="INFERENCE_PRECISION_HINT"))
+        PartialShape = staticmethod(lambda shape: shape)
+
+        def __init__(self) -> None:
+            self.core = FakeCore()
+
+        def Core(self) -> FakeCore:
+            return self.core
+
+        @staticmethod
+        def convert_model(model: object, *, example_input: object) -> FakeConverted:
+            return FakeConverted()
+
+    ov = FakeOpenVINO()
+    _build_openvino(FakeTorch(), ov, object(), "openvino_gpu", "GPU")
+
+    assert ov.core.compile_arguments is not None
+    assert ov.core.compile_arguments[1:] == ("GPU", {"INFERENCE_PRECISION_HINT": "float32"})
 
 
 def test_parity_failure_suppresses_timing_aggregation() -> None:
