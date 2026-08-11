@@ -431,4 +431,42 @@ def test_report_markdown_surfaces_persisted_findings() -> None:
     ):
         assert section in markdown
     assert "Batch 8" in markdown
-    assert "parity-gate failure" in markdown
+    assert "Parity diagnostics by framework and processor" in markdown
+    assert "component-level parity values are tabulated above" in markdown
+    assert "227040" in markdown
+
+
+def test_report_markdown_tabulates_component_parity_by_route() -> None:
+    report = json.loads((ROOT / "reports" / "backend_benchmark.json").read_text(encoding="utf-8"))
+    metrics = {
+        "contour_non_finite_count": 0,
+        "note_non_finite_count": 0,
+        "onset_non_finite_count": 0,
+        "contour_max_abs_error": 0.001,
+        "note_max_abs_error": 0.002,
+        "onset_max_abs_error": 0.003,
+        "note_threshold_disagreements": 0,
+        "onset_threshold_disagreements": 0,
+        "event_count_disagreements": 0,
+        "event_tuple_disagreements": 0,
+    }
+    report["parity_diagnostics"] = {
+        "process_repetitions": 3,
+        "scope": "five public synthetic windows",
+        "thresholds": {
+            "contour_max_abs_error": 0.0205306,
+            "note_max_abs_error": 0.0038445,
+            "onset_max_abs_error": 0.2089347,
+            "note_frame_threshold": 0.3,
+            "onset_threshold": 0.5,
+        },
+        "routes": [
+            {"route": route, "status": "ok", "max_across_repetitions": metrics}
+            for route in ("pytorch_cpu", "pytorch_xpu", "openvino_cpu", "openvino_gpu")
+        ],
+    }
+    markdown = _benchmark_markdown(report)
+    assert "| Parity check (applied threshold) | PyTorch CPU | PyTorch XPU | OpenVINO CPU | OpenVINO GPU |" in markdown
+    assert "Maximum contour absolute error (≤ 0.0205306)" in markdown
+    assert "Note-frame threshold disagreements (threshold 0.3; must be 0)" in markdown
+    assert "(start_time_s, end_time_s, MIDI pitch) disagreements (must be 0)" in markdown

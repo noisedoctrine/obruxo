@@ -115,11 +115,29 @@ The observed XPU routes use substantially more host RSS than CPU in these fresh 
 - The formula uses median one-time startup and median batch-1 model-call throughput. In this run, CPU startup is `0.823` s and XPU startup is `0.836` s, while their batch-1 rates are `129.654` and `280.008` audio-seconds/second.
 - This crossover means the XPU steady-state advantage repays its measured startup difference after roughly 3.3 audio seconds under the model-only abstraction. It does not erase XPU's larger first-call observation, and it is not a universal short-clip latency guarantee.
 
+## Parity diagnostics by framework and processor
+
+The gate was evaluated on `3` fresh-process repetitions of `canonical float32 model on five public synthetic windows; no private smoke audio or rendering`. Each cell reports the maximum observed value across repetitions; the JSON retains each repetition separately.
+
+| Parity check (applied threshold) | PyTorch CPU | PyTorch XPU | OpenVINO CPU | OpenVINO GPU |
+| --- | --- | --- | --- | --- |
+| Route status (must be `ok`) | ok | ok | ok | parity_failed |
+| Non-finite contour values (must be 0) | 0 | 0 | 0 | 227040 |
+| Non-finite note values (must be 0) | 0 | 0 | 0 | 75680 |
+| Non-finite onset values (must be 0) | 0 | 0 | 0 | 75680 |
+| Maximum contour absolute error (≤ 0.0205306) | 0 | 8.94069672e-07 | 0.00046145916 | non_finite |
+| Maximum note absolute error (≤ 0.0038445) | 0 | 7.4505806e-07 | 0.000364899635 | non_finite |
+| Maximum onset absolute error (≤ 0.2089347) | 0 | 1.10268593e-06 | 0.000262662768 | non_finite |
+| Note-frame threshold disagreements (threshold 0.3; must be 0) | 0 | 0 | 0 | 733 |
+| Onset threshold disagreements (threshold 0.5; must be 0) | 0 | 0 | 0 | 190 |
+| Generated note-event count disagreements (must be 0) | 0 | 0 | 0 | 1 |
+| (start_time_s, end_time_s, MIDI pitch) disagreements (must be 0) | 0 | 0 | 0 | 0 |
+
 ## OpenVINO GPU parity failure
 
 - Status: `parity_failed` for `3` repetitions; failure code: `parity_failed`.
 - The worker performs the parity gate before model-only or end-to-end timing. The gate compares contour, note, and onset numeric outputs plus note/onset threshold decisions and stock note-event structure against the canonical PyTorch CPU route.
-- The committed aggregate retains only the generic `parity_failed` code, not the component-level error payload. Therefore the existing evidence identifies a parity-gate failure but does not identify which subcheck triggered it. That missing diagnostic is a reporting limitation, not permission to infer a GPU performance result.
+- The component-level parity values are tabulated above. They describe the fixed synthetic gate only; they do not authorize timing a route that failed parity.
 - No OpenVINO GPU throughput, latency, end-to-end rate, or memory claim is supported; no CPU fallback or substitute-device measurement was used.
 
 ## Practical conclusions supported by this run

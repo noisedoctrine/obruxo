@@ -7,7 +7,7 @@ from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
-from obruxo_basic_pitch.benchmark import run_benchmark_cli
+from obruxo_basic_pitch.benchmark import run_benchmark_cli, run_parity_diagnostic_cli
 from obruxo_basic_pitch.parity import (
     assert_parity,
     audio_to_windows,
@@ -50,6 +50,18 @@ def _parser() -> argparse.ArgumentParser:
         help="opt in to missing-WAV renders from an unambiguous Vital patch and MIDI pair",
     )
     benchmark.add_argument("--force", action="store_true")
+
+    parity_diagnostic = subparsers.add_parser(
+        "parity-diagnostic",
+        help="run the fixed synthetic parity gate for every inference route",
+    )
+    parity_diagnostic.add_argument("--checkpoint", type=Path, required=True)
+    parity_diagnostic.add_argument("--json", type=Path, required=True, help="existing backend benchmark JSON to augment")
+    parity_diagnostic.add_argument("--markdown", type=Path, required=True, help="existing backend benchmark Markdown to augment")
+    parity_diagnostic.add_argument("--xpu-index", type=int, default=0)
+    parity_diagnostic.add_argument("--openvino-gpu-device", default="GPU")
+    parity_diagnostic.add_argument("--repetitions", type=int, default=3)
+    parity_diagnostic.add_argument("--force", action="store_true")
     return parser
 
 
@@ -70,6 +82,17 @@ def main() -> int:
             xpu_index=args.xpu_index,
             openvino_gpu_device=args.openvino_gpu_device,
             allow_derived_render=args.allow_derived_render,
+            force=args.force,
+        )
+
+    if args.command == "parity-diagnostic":
+        return run_parity_diagnostic_cli(
+            args.checkpoint,
+            args.json,
+            args.markdown,
+            xpu_index=args.xpu_index,
+            openvino_gpu_device=args.openvino_gpu_device,
+            process_repetitions=args.repetitions,
             force=args.force,
         )
 

@@ -147,13 +147,15 @@ def _candidate_parity(np: Any, reference: Mapping[str, Any], candidate: Mapping[
     from obruxo_basic_pitch.parity import ADOPTED_MAX_ABS_TOLERANCES
     from obruxo_basic_pitch.postprocess import posteriorgrams_to_note_events
 
-    errors: dict[str, float] = {}
+    errors: dict[str, Any] = {}
     failed = False
     for name in ("contour", "note", "onset"):
-        difference = np.asarray(candidate[name], dtype=np.float64) - np.asarray(reference[name], dtype=np.float64)
+        candidate_values = np.asarray(candidate[name], dtype=np.float64)
+        difference = candidate_values - np.asarray(reference[name], dtype=np.float64)
+        errors[f"{name}_non_finite_count"] = int(np.count_nonzero(~np.isfinite(candidate_values)))
         if not np.isfinite(difference).all():
             failed = True
-            errors[f"{name}_max_abs_error"] = float("inf")
+            errors[f"{name}_max_abs_error"] = None
             continue
         errors[f"{name}_max_abs_error"] = float(np.max(np.abs(difference)))
         if errors[f"{name}_max_abs_error"] > ADOPTED_MAX_ABS_TOLERANCES[name]:
@@ -170,16 +172,17 @@ def _candidate_parity(np: Any, reference: Mapping[str, Any], candidate: Mapping[
         candidate_events.extend(
             posteriorgrams_to_note_events({name: value[index] for name, value in candidate.items()})
         )
-    structure_disagreements = 0
-    if len(reference_events) != len(candidate_events):
-        structure_disagreements = 1
+    event_count_disagreements = int(len(reference_events) != len(candidate_events))
+    if event_count_disagreements:
+        event_tuple_disagreements = 0
     else:
-        structure_disagreements = sum(
+        event_tuple_disagreements = sum(
             left != right
             for left, right in zip(
                 map(_event_signature, reference_events), map(_event_signature, candidate_events), strict=True
             )
         )
+    structure_disagreements = event_count_disagreements or event_tuple_disagreements
     pitch_bend_disagreements = sum(
         (left.pitch_bend or ()) != (right.pitch_bend or ())
         for left, right in zip(reference_events, candidate_events, strict=True)
@@ -188,6 +191,8 @@ def _candidate_parity(np: Any, reference: Mapping[str, Any], candidate: Mapping[
     return {
         **errors,
         "parity_passed": not failed,
+        "event_count_disagreements": event_count_disagreements,
+        "event_tuple_disagreements": int(event_tuple_disagreements),
         "note_threshold_disagreements": note_disagreements,
         "onset_threshold_disagreements": onset_disagreements,
         "event_structure_disagreements": structure_disagreements,
@@ -331,23 +336,26 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
     runtime_import_seconds = float(time.perf_counter() - runtime_import_started)
     route = str(request.get("route", ""))
     mode = str(request.get("mode", ""))
+    parity: dict[str, Any] | None = None
     try:
-        from obruxo_basic_pitch.benchmark import BenchmarkConfig, load_manifest
+        parity_only = bool(request.get("parity_only", False))
+        if not parity_only:
+            from obruxo_basic_pitch.benchmark import BenchmarkConfig, load_manifest
 
-        config_data = request["config"]
-        config = BenchmarkConfig(
-            version=1,
-            precision="float32",
-            process_repetitions=3,
-            warmup_iterations=int(config_data["warmup_iterations"]),
-            timed_iterations=int(config_data["timed_iterations"]),
-            batch_sizes=tuple(int(value) for value in config_data["batch_sizes"]),
-            end_to_end_batch_size=int(config_data["end_to_end_batch_size"]),
-            smoke_min_cases=8,
-            smoke_max_cases=12,
-            coverage={},
-        )
-        cases = load_manifest(request["manifest_path"], config, allow_derived_render=True)
+            config_data = request["config"]
+            config = BenchmarkConfig(
+                version=1,
+                precision="float32",
+                process_repetitions=3,
+                warmup_iterations=int(config_data["warmup_iterations"]),
+                timed_iterations=int(config_data["timed_iterations"]),
+                batch_sizes=tuple(int(value) for value in config_data["batch_sizes"]),
+                end_to_end_batch_size=int(config_data["end_to_end_batch_size"]),
+                smoke_min_cases=8,
+                smoke_max_cases=12,
+                coverage={},
+            )
+            cases = load_manifest(request["manifest_path"], config, allow_derived_render=True)
         checkpoint_path = Path(str(request["checkpoint_path"])).resolve(strict=True)
         model, model_construct_seconds, checkpoint_load_seconds = _load_state(torch, BasicPitchICASSP2022, checkpoint_path)
         model.eval()
@@ -388,6 +396,17 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
         canonical = _torch_outputs(torch, canonical_model, torch.device("cpu"), public_windows, inference=True)
         candidate = predict(public_windows)
         parity = _candidate_parity(np, canonical, candidate)
+        if parity_only:
+            return {
+                "route": route,
+                "mode": mode,
+                "repetition": int(request.get("repetition", 0)),
+                "status": "ok" if parity["parity_passed"] else "parity_failed",
+                "failure_code": None if parity["parity_passed"] else "parity_failed",
+                "runtime": _runtime_identity(np, torch, psutil, ov),
+                "parity_windows": int(public_windows.shape[0]),
+                "parity": parity,
+            }
         if not parity["parity_passed"]:
             raise _ParityError("candidate parity changed threshold or stock note-event behavior")
 
@@ -460,7 +479,10 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
     except _RouteError as exc:
         return {"route": route, "mode": mode, "status": exc.status, "failure_code": exc.code}
     except _ParityError:
-        return {"route": route, "mode": mode, "status": "parity_failed", "failure_code": "parity_failed"}
+        result = {"route": route, "mode": mode, "status": "parity_failed", "failure_code": "parity_failed"}
+        if parity is not None:
+            result["parity"] = parity
+        return result
     except _TrainingError:
         return {"route": route, "mode": mode, "status": "runtime_failed", "failure_code": "non_finite_training_step"}
     except RuntimeError as exc:
