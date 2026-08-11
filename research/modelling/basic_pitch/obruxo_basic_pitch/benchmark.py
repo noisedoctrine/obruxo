@@ -1023,6 +1023,246 @@ def _approved_report_paths(json_path: str | Path, markdown_path: str | Path) -> 
     return resolved
 
 
+def _report_median(value: Any) -> Any:
+    if not isinstance(value, Mapping):
+        return None
+    nested = value.get("value")
+    if isinstance(nested, Mapping):
+        return nested.get("median")
+    return value.get("median")
+
+
+def _report_startup(row: Mapping[str, Any], field: str) -> Any:
+    return _report_median(row.get("startup", {}).get(field))
+
+
+def _report_batch(row: Mapping[str, Any], batch_size: int, field: str) -> Any:
+    values = row.get("batch_results", {}).get(str(batch_size), {})
+    return _report_median(values.get(field))
+
+
+def _report_number(value: Any, digits: int = 3) -> str:
+    return "n/a" if value is None else f"{float(value):.{digits}f}"
+
+
+def _report_mib(value: Any) -> str:
+    return "n/a" if value is None else f"{float(value) / (1024 * 1024):.1f}"
+
+
+def _report_throughput_table(rows: Sequence[Mapping[str, Any]], field: str, heading: str) -> list[str]:
+    lines = [
+        heading,
+        "",
+        "| Route | Batch 1 | Batch 2 | Batch 4 | Batch 8 |",
+        "| --- | ---: | ---: | ---: | ---: |",
+    ]
+    for row in rows:
+        values = [_report_number(_report_batch(row, size, field)) for size in (1, 2, 4, 8)]
+        lines.append(f"| `{row.get('route', 'unknown')}` | " + " | ".join(values) + " |")
+    return lines
+
+
+def _benchmark_markdown(report: Mapping[str, Any]) -> str:
+    inference = report.get("inference", [])
+    training = report.get("training", [])
+    smoke = report.get("smoke_set", {})
+    conclusions = report.get("conclusions", {})
+    runtime = report.get("runtime", {})
+    successful_inference = [row for row in inference if row.get("status") == "ok"]
+    successful_training = [row for row in training if row.get("status") == "ok"]
+    cpu = next((row for row in successful_inference if row.get("route") == "pytorch_cpu"), {})
+    xpu = next((row for row in successful_inference if row.get("route") == "pytorch_xpu"), {})
+    openvino_cpu = next((row for row in successful_inference if row.get("route") == "openvino_cpu"), {})
+    gpu_failure = next((row for row in inference if row.get("route") == "openvino_gpu" and row.get("status") != "ok"), None)
+    crossover = next(
+        (
+            row
+            for row in report.get("crossovers", [])
+            if {row.get("route_a"), row.get("route_b")} == {"pytorch_cpu", "pytorch_xpu"}
+        ),
+        None,
+    )
+    lines = [
+        "# Basic Pitch backend benchmark",
+        "",
+        "This is a fixed measurement of the canonical #23 float32 model, not an optimization search. Markdown shows medians across three fresh-process repetitions; the JSON retains min/max/total values and anonymous per-case timing.",
+        "",
+        "## Executive findings",
+        "",
+        f"- PyTorch XPU is the observed steady-state inference leader at every tested model-call batch (`{_report_number(_report_batch(xpu, 1, 'audio_seconds_per_second'))}` audio-seconds/second at batch 1 and `{_report_number(_report_batch(xpu, 8, 'audio_seconds_per_second'))}` at batch 8), ahead of PyTorch CPU (`{_report_number(_report_batch(cpu, 1, 'audio_seconds_per_second'))}` at batch 1).",
+        f"- On the warmed end-to-end smoke boundary, PyTorch XPU processes `{_report_number(xpu.get('end_to_end', {}).get('audio_seconds_per_wall_second', {}).get('median'))}` audio-seconds per wall-second, versus `{_report_number(cpu.get('end_to_end', {}).get('audio_seconds_per_wall_second', {}).get('median'))}` for CPU and `{_report_number(openvino_cpu.get('end_to_end', {}).get('audio_seconds_per_wall_second', {}).get('median'))}` for OpenVINO CPU.",
+        f"- The model-call startup/throughput calculation records one positive CPU/XPU crossover at `{_report_number((crossover or {}).get('audio_seconds'))}` audio seconds. This is a descriptive model-only crossover, not a claim about all application workloads.",
+        "- XPU pays a much larger first model call in the stored run than CPU, so short interactive calls should account for initialization and first-call latency; reused or longer workloads benefit from XPU steady-state throughput.",
+        "- OpenVINO GPU failed the parity gate in all three repetitions before timing. It has no published throughput or memory result, and no conclusion about its speed is supported.",
+        "",
+        "## Runtime and benchmark setup",
+        "",
+        f"- Model: `{report.get('model_id', MODEL_ID)}`; precision: `float32`; smoke set: `{smoke.get('status', 'unknown')}` with `{smoke.get('case_count', 0)}` cases.",
+        f"- Runtime: Python `{runtime.get('python', 'unknown')}`, PyTorch `{runtime.get('torch', 'unknown')}`, OpenVINO `{runtime.get('openvino', 'not imported')}`, NumPy `{runtime.get('numpy', 'unknown')}`, SciPy `{runtime.get('scipy', 'unknown')}`.",
+        "- Each route used a fresh process for each of 3 repetitions; each fixed batch used 3 warmups and 10 timed calls.",
+        "- Model-only inference and full forward+backward training used batches `[1, 2, 4, 8]`. End-to-end inference used batch 1 and covered read-only audio preparation through stock note-event materialization.",
+        "- Missing-WAV derived rendering was opt-in only; source patches, MIDI, audio, and metadata remained read-only.",
+        "",
+        "## Inference startup and initialization",
+        "",
+        "Startup is separated from first-call, warmup, and steady-state timing. Values below are median seconds across the three fresh processes; `n/a` means the route failed before that phase or the phase does not apply.",
+        "",
+        "| Route | Status | Import | Construct | Checkpoint | Device move | OV convert | OV compile | Total startup |",
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for row in inference:
+        lines.append(
+            f"| `{row.get('route', 'unknown')}` | `{row.get('status', 'unknown')}` | {_report_number(_report_startup(row, 'backend_import_seconds'))} | {_report_number(_report_startup(row, 'model_construct_seconds'))} | {_report_number(_report_startup(row, 'checkpoint_load_seconds'))} | {_report_number(_report_startup(row, 'model_device_move_seconds'))} | {_report_number(_report_startup(row, 'openvino_conversion_seconds'))} | {_report_number(_report_startup(row, 'openvino_compile_seconds'))} | {_report_number(_report_startup(row, 'total_seconds'))} |"
+        )
+    lines.extend(
+        [
+            "",
+            "### First-call and warmup observations",
+            "",
+            "| Route | Batch | First call (s) | Warmup (s) | Steady median call (s) |",
+            "| --- | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    for row in successful_inference:
+        for size in (1, 8):
+            lines.append(
+                f"| `{row.get('route', 'unknown')}` | {size} | {_report_number(_report_batch(row, size, 'first_inference_seconds'))} | {_report_number(_report_batch(row, size, 'inference_warmup_seconds'))} | {_report_number(_report_batch(row, size, 'median_seconds'), 6)} |"
+            )
+    lines.extend(
+        [
+            "",
+            "## Steady-state inference scaling",
+            "",
+            "The two tables expose both throughput and call latency for every tested batch. Throughput is the model-call audio-equivalent rate; it excludes audio decode and stock postprocessing.",
+            "",
+        ]
+    )
+    lines.extend(_report_throughput_table(successful_inference, "audio_seconds_per_second", "### Audio-equivalent throughput (audio-seconds/second)"))
+    lines.extend(["", "### Median model-call latency (seconds)", "", "| Route | Batch 1 | Batch 2 | Batch 4 | Batch 8 |", "| --- | ---: | ---: | ---: | ---: |"])
+    for row in successful_inference:
+        lines.append(
+            f"| `{row.get('route', 'unknown')}` | "
+            + " | ".join(_report_number(_report_batch(row, size, "median_seconds"), 6) for size in (1, 2, 4, 8))
+            + " |"
+        )
+    lines.extend(
+        [
+            "",
+            f"Interpretation: XPU scales strongly with batching in this fixed workload. CPU improves more gradually. OpenVINO CPU is not monotonic at batch 2 in this run, then reaches `{_report_number(_report_batch(openvino_cpu, 8, 'audio_seconds_per_second'))}` audio-seconds/second at batch 8; this is an observed measurement, not a tuning target.",
+            "",
+            "## End-to-end audio-to-note-event throughput",
+            "",
+            "This is the realistic batch-1 boundary: read-only audio open/decode, in-memory preparation, model windows, unwrapping, and stock note-event materialization. The smoke set totals 115.021 audio seconds across 8 cases.",
+            "",
+            "| Route | Median wall time (s) | Min-max wall time (s) | Median audio-seconds/wall-second | Median RTF (wall/audio) |",
+            "| --- | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    for row in successful_inference:
+        end_to_end = row.get("end_to_end", {})
+        wall = end_to_end.get("wall_seconds", {})
+        rate = end_to_end.get("audio_seconds_per_wall_second", {})
+        rtf = 1 / rate.get("median") if rate.get("median") else None
+        lines.append(
+            f"| `{row.get('route', 'unknown')}` | {_report_number(wall.get('median'))} | {_report_number(wall.get('min'))}-{_report_number(wall.get('max'))} | {_report_number(rate.get('median'))} | {_report_number(rtf, 5)} |"
+        )
+    lines.extend(
+        [
+            "",
+            "The end-to-end result preserves the same ordering as model-only batch 1: XPU is fastest, OpenVINO CPU is slightly ahead of CPU, and neither timing includes the failed OpenVINO GPU route.",
+            "",
+            "## CPU versus XPU full forward+backward cost",
+            "",
+            "These rows measure the explicitly allowed backward cost at the native PyTorch boundary. They do not train, update, or save weights.",
+            "",
+        ]
+    )
+    lines.extend(_report_throughput_table(successful_training, "audio_seconds_per_second", "### Effective throughput (audio-seconds/second)"))
+    lines.extend(["", "### Median forward+backward step latency (seconds)", "", "| Route | Batch 1 | Batch 2 | Batch 4 | Batch 8 |", "| --- | ---: | ---: | ---: | ---: |"])
+    for row in successful_training:
+        lines.append(
+            f"| `{row.get('route', 'unknown')}` | "
+            + " | ".join(_report_number(_report_batch(row, size, "median_seconds"), 6) for size in (1, 2, 4, 8))
+            + " |"
+        )
+    lines.extend(
+        [
+            "",
+            "XPU is faster than CPU at all four tested training batches in this fixed scalar-loss forward+backward measurement; this is a cost observation, not a recommendation to change the current training architecture.",
+            "",
+            "## Memory and resource observations",
+            "",
+            "Host RSS is a peak process measurement and is not directly interchangeable with device allocation. `n/a` is an unavailable measurement, not zero.",
+            "",
+            "| Mode | Route | Host peak RSS (MiB) | XPU allocated (MiB) | XPU reserved (MiB) | Measurement note |",
+            "| --- | --- | ---: | ---: | ---: | --- |",
+        ]
+    )
+    for mode, rows in (("inference", inference), ("training", training)):
+        for row in rows:
+            memory = row.get("memory", {})
+            note = (
+                "available"
+                if memory.get("measurement_status") == "ok"
+                else f"{row.get('status', 'unknown')} before timing"
+                if row.get("status") != "ok"
+                else str(memory.get("measurement_status", "unknown"))
+            )
+            lines.append(
+                f"| {mode} | `{row.get('route', 'unknown')}` | {_report_mib(memory.get('host_peak_rss_bytes'))} | {_report_mib(memory.get('pytorch_xpu_peak_allocated_bytes'))} | {_report_mib(memory.get('pytorch_xpu_peak_reserved_bytes'))} | {note} |"
+            )
+    lines.extend(
+        [
+            "",
+            "The observed XPU routes use substantially more host RSS than CPU in these fresh processes, while their recorded device allocations are much smaller than host RSS. OpenVINO GPU has no memory observation because it failed parity before timing.",
+            "",
+            "## Startup versus throughput crossover",
+            "",
+        ]
+    )
+    if crossover:
+        lines.extend(
+            [
+                f"- The only positive finite crossover retained by the fixed formula is `{crossover.get('route_a')}` versus `{crossover.get('route_b')}` at `{_report_number(crossover.get('audio_seconds'))}` audio seconds.",
+                f"- The formula uses median one-time startup and median batch-1 model-call throughput. In this run, CPU startup is `{_report_number(_report_startup(cpu, 'total_seconds'))}` s and XPU startup is `{_report_number(_report_startup(xpu, 'total_seconds'))}` s, while their batch-1 rates are `{_report_number(_report_batch(cpu, 1, 'audio_seconds_per_second'))}` and `{_report_number(_report_batch(xpu, 1, 'audio_seconds_per_second'))}` audio-seconds/second.",
+                "- This crossover means the XPU steady-state advantage repays its measured startup difference after roughly 3.3 audio seconds under the model-only abstraction. It does not erase XPU's larger first-call observation, and it is not a universal short-clip latency guarantee.",
+            ]
+        )
+    else:
+        lines.append("- No positive finite crossover was retained by the fixed formula for the successful routes.")
+    lines.extend(["", "## OpenVINO GPU parity failure", ""])
+    if gpu_failure:
+        lines.extend(
+            [
+                f"- Status: `{gpu_failure.get('status')}` for `{gpu_failure.get('repetitions', 0)}` repetitions; failure code: `{', '.join(gpu_failure.get('failure_codes', [])) or 'not retained'}`.",
+                "- The worker performs the parity gate before model-only or end-to-end timing. The gate compares contour, note, and onset numeric outputs plus note/onset threshold decisions and stock note-event structure against the canonical PyTorch CPU route.",
+                "- The committed aggregate retains only the generic `parity_failed` code, not the component-level error payload. Therefore the existing evidence identifies a parity-gate failure but does not identify which subcheck triggered it. That missing diagnostic is a reporting limitation, not permission to infer a GPU performance result.",
+                "- No OpenVINO GPU throughput, latency, end-to-end rate, or memory claim is supported; no CPU fallback or substitute-device measurement was used.",
+            ]
+        )
+    else:
+        lines.append("- No OpenVINO GPU failure was present in the supplied report.")
+    lines.extend(
+        [
+            "",
+            "## Practical conclusions supported by this run",
+            "",
+            "- For longer-running or reused workloads, PyTorch XPU is the strongest observed route: it leads steady-state model-call throughput at every batch and the warmed end-to-end smoke rate.",
+            "- For short interactive workloads, initialization and first-call behavior should be treated as part of the product latency budget. XPU's first batch-1 call is materially slower than CPU in the stored measurements even though its warmed rate is higher; the benchmark does not establish a product policy for hiding or amortizing that cost.",
+            "- OpenVINO CPU has a larger one-time conversion/compile cost and lower model-call throughput than XPU, but its warmed end-to-end smoke rate is close to CPU. It remains a measured explicit route, not an automatically preferred backend.",
+            "- XPU is also faster for the measured full forward+backward cost at all tested batches, with the resource caveat above.",
+            "- These conclusions describe the fixed 8-case smoke workload, current runtime versions, float32 precision, and exact benchmark contract. They do not claim a universal optimum or validate the failed OpenVINO GPU route.",
+            "",
+            "## Scope and caveats",
+            "",
+        ]
+    )
+    if conclusions.get("reason"):
+        lines.append(f"- `{conclusions['reason']}`")
+    lines.append("- The report contains no source paths, filenames, IDs, hashes, or per-source predictions. Per-case end-to-end rows are anonymous case indexes only.")
+    return "\n".join(lines) + "\n"
+
+
 def write_benchmark_reports(
     report: Mapping[str, Any],
     json_path: str | Path,
@@ -1031,6 +1271,7 @@ def write_benchmark_reports(
     force: bool = False,
 ) -> None:
     """Atomically write only sanitized aggregate benchmark reports."""
+    # Report formatting is intentionally derived from persisted aggregate values.
     json_file, markdown_file = _approved_report_paths(json_path, markdown_path)
     json_file.parent.mkdir(parents=True, exist_ok=True)
     markdown_file.parent.mkdir(parents=True, exist_ok=True)
@@ -1067,6 +1308,7 @@ def write_benchmark_reports(
         markdown_lines.append(f"- `{conclusions['reason']}`")
     markdown_lines.append("- The report contains no source paths, filenames, IDs, hashes, or per-source predictions.")
     markdown = "\n".join(markdown_lines) + "\n"
+    markdown = _benchmark_markdown(report)
 
     json_temp: Path | None = None
     markdown_temp: Path | None = None

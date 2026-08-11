@@ -14,6 +14,7 @@ from obruxo_basic_pitch.benchmark import (
     PedalboardVitalRenderer,
     _aggregate_route,
     _approved_derived_output_root,
+    _benchmark_markdown,
     _run_worker,
     _validate_derived_destination,
     aggregate_measurements,
@@ -414,3 +415,20 @@ def test_report_write_is_atomic_and_requires_force_for_overwrite() -> None:
         for path in (json_path, markdown_path):
             if path.exists():
                 path.unlink()
+
+
+def test_report_markdown_surfaces_persisted_findings() -> None:
+    report = json.loads((ROOT / "reports" / "backend_benchmark.json").read_text(encoding="utf-8"))
+    markdown = _benchmark_markdown(report)
+    for section in (
+        "Inference startup and initialization",
+        "Steady-state inference scaling",
+        "End-to-end audio-to-note-event throughput",
+        "CPU versus XPU full forward+backward cost",
+        "Memory and resource observations",
+        "Startup versus throughput crossover",
+        "OpenVINO GPU parity failure",
+    ):
+        assert section in markdown
+    assert "Batch 8" in markdown
+    assert "parity-gate failure" in markdown
