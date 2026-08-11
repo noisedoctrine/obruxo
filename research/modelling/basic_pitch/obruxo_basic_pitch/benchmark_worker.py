@@ -233,7 +233,13 @@ def _build_openvino(torch: Any, ov: Any, model: Any, route: str, requested: str)
     conversion_seconds = time.perf_counter() - conversion_started
     compile_started = time.perf_counter()
     try:
-        compiled = core.compile_model(converted, target)
+        # The fixed benchmark contract is float32; do not accept the GPU
+        # plugin's default reduced-precision inference hint.
+        compiled = core.compile_model(
+            converted,
+            target,
+            {ov.properties.hint.inference_precision: ov.Type.f32},
+        )
     except Exception as exc:
         raise _RouteError("runtime_failed", "openvino_compile_failed") from exc
     return compiled, float(conversion_seconds), float(time.perf_counter() - compile_started)
