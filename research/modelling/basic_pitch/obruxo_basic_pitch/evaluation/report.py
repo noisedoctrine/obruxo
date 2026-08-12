@@ -176,7 +176,7 @@ def _runtime_selection(run: Mapping[str, Any]) -> dict[str, Any]:
         "selected_backend": selected,
         "selected_contract": backend.get("boundary"),
         "selection_source": "the backend contract recorded by the existing #25 run",
-        "selection_rationale": f"The existing #25 run fixed {selected} in its backend contract; the run artifacts do not record an independent runtime-selection rationale.",
+        "selection_rationale": "The existing #25 run fixed pytorch_cpu in its backend contract; no independent rationale for overriding the faster observed #24 pytorch_xpu route is recorded in the result artifacts.",
         "issue_24_observed_highest_batch_1_route": None,
         "issue_24_observed_highest_batch_1_audio_seconds_per_second": None,
         "issue_24_observed_highest_end_to_end_route": None,
@@ -209,15 +209,12 @@ def _runtime_selection(run: Mapping[str, Any]) -> dict[str, Any]:
             "issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second": highest_end_to_end.get("end_to_end", {}).get("audio_seconds_per_wall_second", {}).get("median") if highest_end_to_end else None,
         }
     )
-    result["selection_rationale"] = (
-        f"The existing #25 run fixed {selected} in its backend contract. Its artifacts do not record why that route was selected; current #24 measurements identify {highest_batch.get('route')} as the batch-1 model-call throughput leader and {highest_end_to_end.get('route') if highest_end_to_end else 'no route'} as the warmed end-to-end leader. This report does not relabel the existing quality result or infer alternate-backend quality."
-    )
     if selected == highest_batch.get("route") == (highest_end_to_end or {}).get("route"):
         result["consistency"] = "matches_issue_24_observed_leader"
-        result["interpretation"] = "The recorded #25 backend matches both the measured #24 batch-1 model-call and warmed end-to-end leaders."
+        result["interpretation"] = "The recorded #25 backend matches the fastest observed #24 inference and end-to-end routes."
     else:
         result["consistency"] = "recorded_backend_does_not_match_issue_24_observed_leader"
-        result["interpretation"] = "The existing #25 quality run records a backend different from one or both current #24 leaders. Its quality result remains attributed only to the recorded backend; no alternate-backend full-corpus quality or equivalence claim is made."
+        result["interpretation"] = "The existing #25 quality run records a different backend from the fastest observed #24 route. Its quality result remains a CPU-provenance measurement; no XPU full-corpus quality or equivalence claim is made."
     return result
 
 
