@@ -12,11 +12,19 @@ from obruxo_basic_pitch.evaluation.metrics import (
 from obruxo_basic_pitch.postprocess import NoteEvent, model_frames_to_time
 
 
-def _reference(*, pitch: int = 60, onset: float = 0.1, offset: float = 0.5, velocity: int = 80) -> list[ReferenceNote]:
+def _reference(
+    *, pitch: int = 60, onset: float = 0.1, offset: float = 0.5, velocity: int = 80
+) -> list[ReferenceNote]:
     return [ReferenceNote(onset, offset, pitch, velocity)]
 
 
-def _prediction(*, pitch: int = 60, onset: float = 0.1, offset: float = 0.5, amplitude: float = 80 / 127) -> list[NoteEvent]:
+def _prediction(
+    *,
+    pitch: int = 60,
+    onset: float = 0.1,
+    offset: float = 0.5,
+    amplitude: float = 80 / 127,
+) -> list[NoteEvent]:
     return [NoteEvent(onset, offset, pitch, amplitude)]
 
 
@@ -40,7 +48,9 @@ def test_onset_and_offset_tolerances_are_not_loosened() -> None:
     assert match_note_indices(reference, outside, include_offsets=False) == []
     assert match_note_indices(reference, inside, include_offsets=True) == [(0, 0)]
     beyond_short_offset = _prediction(onset=0.1, offset=0.251)
-    assert match_note_indices(reference, beyond_short_offset, include_offsets=True) == []
+    assert (
+        match_note_indices(reference, beyond_short_offset, include_offsets=True) == []
+    )
     wrong_offset = note_metrics(reference, _prediction(offset=0.28))
     assert wrong_offset["onset_pitch"]["f1"] == 1.0
     assert wrong_offset["onset_pitch_offset"]["f1"] == 0.0
@@ -87,9 +97,24 @@ def test_micro_aggregation_is_count_based_and_bootstrap_is_deterministic() -> No
             "labels": {"polyphony_class": "monophonic"},
             "status": "ok",
             "metrics": {
-                "onset_pitch": {"reference_count": 1, "prediction_count": 1, "tp": 1, "f1": 1.0},
-                "onset_pitch_offset": {"reference_count": 1, "prediction_count": 1, "tp": 1, "f1": 1.0},
-                "frames": {"reference_count": 1, "prediction_count": 1, "tp": 1, "f1": 1.0},
+                "onset_pitch": {
+                    "reference_count": 1,
+                    "prediction_count": 1,
+                    "tp": 1,
+                    "f1": 1.0,
+                },
+                "onset_pitch_offset": {
+                    "reference_count": 1,
+                    "prediction_count": 1,
+                    "tp": 1,
+                    "f1": 1.0,
+                },
+                "frames": {
+                    "reference_count": 1,
+                    "prediction_count": 1,
+                    "tp": 1,
+                    "f1": 1.0,
+                },
             },
         },
         {
@@ -98,9 +123,24 @@ def test_micro_aggregation_is_count_based_and_bootstrap_is_deterministic() -> No
             "labels": {"polyphony_class": "polyphonic"},
             "status": "ok",
             "metrics": {
-                "onset_pitch": {"reference_count": 9, "prediction_count": 0, "tp": 0, "f1": None},
-                "onset_pitch_offset": {"reference_count": 9, "prediction_count": 0, "tp": 0, "f1": None},
-                "frames": {"reference_count": 9, "prediction_count": 0, "tp": 0, "f1": None},
+                "onset_pitch": {
+                    "reference_count": 9,
+                    "prediction_count": 0,
+                    "tp": 0,
+                    "f1": None,
+                },
+                "onset_pitch_offset": {
+                    "reference_count": 9,
+                    "prediction_count": 0,
+                    "tp": 0,
+                    "f1": None,
+                },
+                "frames": {
+                    "reference_count": 9,
+                    "prediction_count": 0,
+                    "tp": 0,
+                    "f1": None,
+                },
             },
         },
     ]

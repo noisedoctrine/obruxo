@@ -20,7 +20,9 @@ ROOT = Path(__file__).resolve().parents[2]
 def _remove_tree(path: Path) -> None:
     if not path.exists():
         return
-    for child in sorted(path.rglob("*"), key=lambda item: len(item.parts), reverse=True):
+    for child in sorted(
+        path.rglob("*"), key=lambda item: len(item.parts), reverse=True
+    ):
         if child.is_file() or child.is_symlink():
             child.unlink()
         elif child.is_dir():
@@ -41,7 +43,9 @@ def _write_audio(path: Path) -> None:
     wavfile.write(path, 22_050, np.zeros(22_050, dtype=np.int16))
 
 
-def _make_pair(root: Path, name: str, *, modern: bool = False, pitch: int = 60) -> tuple[Path, Path]:
+def _make_pair(
+    root: Path, name: str, *, modern: bool = False, pitch: int = 60
+) -> tuple[Path, Path]:
     directory = root / name
     directory.mkdir()
     midi = directory / "performance.mid"
@@ -50,13 +54,19 @@ def _make_pair(root: Path, name: str, *, modern: bool = False, pitch: int = 60) 
     _write_audio(audio)
     if modern:
         audio.with_suffix(".json").write_text(
-            json.dumps({"request_id": "local-only", "qa": {"silence_warning": True}}), encoding="utf-8"
+            json.dumps({"request_id": "local-only", "qa": {"silence_warning": True}}),
+            encoding="utf-8",
         )
     return midi, audio
 
 
 def test_actual_direct_directory_pairing_is_deterministic_and_read_only() -> None:
-    assert inspect.signature(build_evaluation_manifest).parameters["allow_derived_render"].default is False
+    assert (
+        inspect.signature(build_evaluation_manifest)
+        .parameters["allow_derived_render"]
+        .default
+        is False
+    )
     output_root = ROOT / "outputs" / f".test-evaluation-corpus-{os.getpid()}"
     assert not output_root.exists()
     corpus = output_root / "sources" / "presetshare_files" / "data"

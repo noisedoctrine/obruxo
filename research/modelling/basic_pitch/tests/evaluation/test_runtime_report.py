@@ -22,7 +22,9 @@ ROOT = Path(__file__).resolve().parents[2]
 def _remove_tree(path: Path) -> None:
     if not path.exists():
         return
-    for child in sorted(path.rglob("*"), key=lambda item: len(item.parts), reverse=True):
+    for child in sorted(
+        path.rglob("*"), key=lambda item: len(item.parts), reverse=True
+    ):
         if child.is_file() or child.is_symlink():
             child.unlink()
         elif child.is_dir():
@@ -63,7 +65,9 @@ def _fake_result(_: object) -> dict[str, object]:
     }
 
 
-def test_resume_identity_backend_guard_and_sanitized_report(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_resume_identity_backend_guard_and_sanitized_report(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     output_root = ROOT / "outputs" / f".test-evaluation-runtime-{os.getpid()}"
     assert not output_root.exists()
     corpus = output_root / "sources" / "data"
@@ -92,14 +96,21 @@ def test_resume_identity_backend_guard_and_sanitized_report(monkeypatch: pytest.
         assert calls == []
 
         changed_manifest = output_root / "manifest-copy.jsonl"
-        changed_manifest.write_text(output.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+        changed_manifest.write_text(
+            output.read_text(encoding="utf-8") + "\n", encoding="utf-8"
+        )
         evaluate_corpus(changed_manifest, output_root, predictor=predictor)
         assert len(calls) == 1
 
         monkeypatch.setattr(
             runner_module,
             "_runtime_identity",
-            lambda _: {"python": "3.12.13-changed", "numpy": "2.4.6", "scipy": "1.18.0", "torch": "2.12.1+xpu"},
+            lambda _: {
+                "python": "3.12.13-changed",
+                "numpy": "2.4.6",
+                "scipy": "1.18.0",
+                "torch": "2.12.1+xpu",
+            },
         )
         evaluate_corpus(changed_manifest, output_root, predictor=predictor)
         assert len(calls) == 2
@@ -113,15 +124,25 @@ def test_resume_identity_backend_guard_and_sanitized_report(monkeypatch: pytest.
             public_json,
             public_markdown,
         )
-        text = public_json.read_text(encoding="utf-8") + public_markdown.read_text(encoding="utf-8")
+        text = public_json.read_text(encoding="utf-8") + public_markdown.read_text(
+            encoding="utf-8"
+        )
         assert report["aggregate"]["pair_count"] == 1
         assert report["runtime_provenance"]["selected_backend"] == "pytorch_xpu"
         assert report["runtime_provenance"]["selected_device"] == "xpu:0"
-        assert report["runtime_provenance"]["selection_source"] == "#24 corpus_inference_decision"
+        assert (
+            report["runtime_provenance"]["selection_source"]
+            == "#24 corpus_inference_decision"
+        )
         assert report["runtime_provenance"]["decision_identity_match"] is True
-        assert report["runtime_provenance"]["consistency"] == "exact_issue_24_decision_consumed"
+        assert (
+            report["runtime_provenance"]["consistency"]
+            == "exact_issue_24_decision_consumed"
+        )
         assert report["runtime_provenance"]["selection_rationale"]
-        assert "Runtime provenance and #24 route decision" in public_markdown.read_text(encoding="utf-8")
+        assert "Runtime provenance and #24 route decision" in public_markdown.read_text(
+            encoding="utf-8"
+        )
         assert str(corpus) not in text
         assert "performance.mid" not in text
         assert "render.wav" not in text

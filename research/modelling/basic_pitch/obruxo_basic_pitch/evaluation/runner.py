@@ -53,7 +53,9 @@ def _output_dir(path: Path | str) -> Path:
     root = _approved_output_root()
     resolved = Path(path).resolve(strict=False)
     if resolved == root or not resolved.is_relative_to(root):
-        raise EvaluationInputError("evaluation output must be inside Basic Pitch outputs")
+        raise EvaluationInputError(
+            "evaluation output must be inside Basic Pitch outputs"
+        )
     return resolved
 
 
@@ -61,7 +63,14 @@ def _atomic_json(path: Path, value: Mapping[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary: Path | None = None
     try:
-        with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=path.parent, prefix=f".{path.name}.", suffix=".tmp", delete=False) as handle:
+        with tempfile.NamedTemporaryFile(
+            "w",
+            encoding="utf-8",
+            dir=path.parent,
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as handle:
             temporary = Path(handle.name)
             json.dump(value, handle, indent=2, sort_keys=True, allow_nan=False)
             handle.write("\n")
@@ -113,14 +122,20 @@ def _runtime_identity(torch: Any) -> dict[str, Any]:
 
 def backend_contract() -> dict[str, Any]:
     """Return the exact machine-readable corpus route selected by #24."""
-    config_path = Path(__file__).resolve().parents[2] / "configs" / "backend_benchmark.yaml"
+    config_path = (
+        Path(__file__).resolve().parents[2] / "configs" / "backend_benchmark.yaml"
+    )
     try:
         config = load_config(config_path)
     except (FileNotFoundError, OSError, ValueError) as exc:
         raise BackendUnavailable("#24 backend configuration is unavailable") from exc
     if config.precision != "float32" or config.end_to_end_batch_size != 1:
-        raise BackendUnavailable("#24 corpus boundary is not the fixed float32 batch-1 contract")
-    report_path = Path(__file__).resolve().parents[2] / "reports" / "backend_benchmark.json"
+        raise BackendUnavailable(
+            "#24 corpus boundary is not the fixed float32 batch-1 contract"
+        )
+    report_path = (
+        Path(__file__).resolve().parents[2] / "reports" / "backend_benchmark.json"
+    )
     try:
         benchmark = json.loads(report_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
@@ -132,13 +147,25 @@ def backend_contract() -> dict[str, Any]:
     if not isinstance(decision, Mapping) or decision.get("status") != "selected":
         raise BackendUnavailable("#24 corpus inference decision is unavailable")
     supporting_identity = decision.get("supporting_run_identity")
-    if not isinstance(report_identity, Mapping) or supporting_identity != report_identity:
-        raise BackendUnavailable("#24 corpus inference decision identity does not match its report")
+    if (
+        not isinstance(report_identity, Mapping)
+        or supporting_identity != report_identity
+    ):
+        raise BackendUnavailable(
+            "#24 corpus inference decision identity does not match its report"
+        )
     backend_id = str(decision.get("backend_id", ""))
     if backend_id not in SUPPORTED_TORCH_BACKENDS:
-        raise BackendUnavailable(f"selected #24 backend {backend_id!r} is not executable by this evaluator")
-    if decision.get("precision") != config.precision or decision.get("boundary") != "end_to_end_audio_to_note_event":
-        raise BackendUnavailable("#24 corpus inference decision does not match the fixed evaluation contract")
+        raise BackendUnavailable(
+            f"selected #24 backend {backend_id!r} is not executable by this evaluator"
+        )
+    if (
+        decision.get("precision") != config.precision
+        or decision.get("boundary") != "end_to_end_audio_to_note_event"
+    ):
+        raise BackendUnavailable(
+            "#24 corpus inference decision does not match the fixed evaluation contract"
+        )
     device = str(decision.get("device", ""))
     if backend_id == "pytorch_cpu" and device != "cpu":
         raise BackendUnavailable("#24 CPU route has an invalid selected device")
@@ -162,7 +189,9 @@ def backend_contract() -> dict[str, Any]:
 def validate_backend_id(backend_id: str) -> None:
     """Reject routes this evaluator cannot execute; there is no fallback."""
     if backend_id not in SUPPORTED_TORCH_BACKENDS:
-        raise BackendUnavailable(f"selected backend {backend_id!r} is unavailable; no fallback is permitted")
+        raise BackendUnavailable(
+            f"selected backend {backend_id!r} is unavailable; no fallback is permitted"
+        )
 
 
 def _select_device(torch: Any, backend: Mapping[str, Any]) -> Any:
@@ -171,16 +200,22 @@ def _select_device(torch: Any, backend: Mapping[str, Any]) -> Any:
     if backend_id == "pytorch_cpu":
         return torch.device("cpu")
     if backend_id != "pytorch_xpu":
-        raise BackendUnavailable(f"selected backend {backend_id!r} is unavailable; no fallback is permitted")
+        raise BackendUnavailable(
+            f"selected backend {backend_id!r} is unavailable; no fallback is permitted"
+        )
     try:
         if not torch.xpu.is_available():
-            raise BackendUnavailable("selected PyTorch XPU route is unavailable; no CPU fallback is permitted")
+            raise BackendUnavailable(
+                "selected PyTorch XPU route is unavailable; no CPU fallback is permitted"
+            )
         device = torch.device(device_name)
         if device.type != "xpu":
             raise BackendUnavailable("selected PyTorch XPU route has an invalid device")
         return device
     except (AttributeError, RuntimeError, TypeError, ValueError) as exc:
-        raise BackendUnavailable("selected PyTorch XPU route is unavailable; no CPU fallback is permitted") from exc
+        raise BackendUnavailable(
+            "selected PyTorch XPU route is unavailable; no CPU fallback is permitted"
+        ) from exc
 
 
 def _synchronize(torch: Any, device: Any) -> None:
@@ -188,7 +223,9 @@ def _synchronize(torch: Any, device: Any) -> None:
         torch.xpu.synchronize(device)
 
 
-def _load_model(checkpoint: Path, backend: Mapping[str, Any], torch: Any) -> tuple[Any, Any]:
+def _load_model(
+    checkpoint: Path, backend: Mapping[str, Any], torch: Any
+) -> tuple[Any, Any]:
     try:
         state = torch.load(checkpoint, map_location="cpu", weights_only=True)
         model = BasicPitchICASSP2022()
@@ -200,32 +237,59 @@ def _load_model(checkpoint: Path, backend: Mapping[str, Any], torch: Any) -> tup
         _synchronize(torch, device)
     except BackendUnavailable:
         raise
-    except (AttributeError, ImportError, OSError, RuntimeError, TypeError, ValueError) as exc:
-        raise BackendUnavailable("the canonical Basic Pitch selected-route model could not be loaded") from exc
+    except (
+        AttributeError,
+        ImportError,
+        OSError,
+        RuntimeError,
+        TypeError,
+        ValueError,
+    ) as exc:
+        raise BackendUnavailable(
+            "the canonical Basic Pitch selected-route model could not be loaded"
+        ) from exc
     return model, device
 
 
-def _predict_pair(model: Any, pair: EvaluationPair, torch: Any, device: Any) -> dict[str, Any]:
+def _predict_pair(
+    model: Any, pair: EvaluationPair, torch: Any, device: Any
+) -> dict[str, Any]:
     try:
         import numpy as np
 
         prepared = prepare_wav(pair.audio_path)
     except (ImportError, OSError, RuntimeError, TypeError, ValueError) as exc:
-        return {"status": "failed", "failure_code": "audio_decode_failed", "error_type": type(exc).__name__}
+        return {
+            "status": "failed",
+            "failure_code": "audio_decode_failed",
+            "error_type": type(exc).__name__,
+        }
     try:
-        outputs: dict[str, list[Any]] = {name: [] for name in ("note", "onset", "contour")}
+        outputs: dict[str, list[Any]] = {
+            name: [] for name in ("note", "onset", "contour")
+        }
         with torch.inference_mode():
             for start in range(0, prepared.windows.shape[0], 1):
-                host_batch = torch.from_numpy(prepared.windows[start : start + 1]).to(device)
+                host_batch = torch.from_numpy(prepared.windows[start : start + 1]).to(
+                    device
+                )
                 _synchronize(torch, device)
                 prediction = model(host_batch)
                 _synchronize(torch, device)
                 for name, values in outputs.items():
                     values.append(prediction[name].detach().cpu().numpy())
-        windowed = {name: np.concatenate(values, axis=0) for name, values in outputs.items()}
-        unwrapped = unwrap_window_outputs(windowed, original_sample_count=prepared.original_sample_count)
+        windowed = {
+            name: np.concatenate(values, axis=0) for name, values in outputs.items()
+        }
+        unwrapped = unwrap_window_outputs(
+            windowed, original_sample_count=prepared.original_sample_count
+        )
     except (AttributeError, RuntimeError, TypeError, ValueError) as exc:
-        return {"status": "failed", "failure_code": "inference_failed", "error_type": type(exc).__name__}
+        return {
+            "status": "failed",
+            "failure_code": "inference_failed",
+            "error_type": type(exc).__name__,
+        }
     try:
         reference, _ = performance_labels(pair.midi_path)
         if unwrapped["note"].shape[0] == 0:
@@ -234,7 +298,11 @@ def _predict_pair(model: Any, pair: EvaluationPair, torch: Any, device: Any) -> 
             predicted = posteriorgrams_to_note_events(unwrapped)
         metrics = evaluate_notes_and_frames(reference, predicted, unwrapped["note"])
     except (ImportError, OSError, RuntimeError, TypeError, ValueError) as exc:
-        return {"status": "failed", "failure_code": "decoder_failed", "error_type": type(exc).__name__}
+        return {
+            "status": "failed",
+            "failure_code": "decoder_failed",
+            "error_type": type(exc).__name__,
+        }
     return {
         "status": "ok",
         "failure_code": None,
@@ -244,7 +312,9 @@ def _predict_pair(model: Any, pair: EvaluationPair, torch: Any, device: Any) -> 
     }
 
 
-def _pair_result(pair: EvaluationPair, identity: Mapping[str, Any], result: Mapping[str, Any]) -> dict[str, Any]:
+def _pair_result(
+    pair: EvaluationPair, identity: Mapping[str, Any], result: Mapping[str, Any]
+) -> dict[str, Any]:
     return {
         "pair_id": pair.pair_id,
         "preset_id": pair.preset_id,
@@ -258,7 +328,9 @@ def _pair_result(pair: EvaluationPair, identity: Mapping[str, Any], result: Mapp
     }
 
 
-def _same_identity(path: Path, pair_id: str, identity: Mapping[str, Any]) -> dict[str, Any] | None:
+def _same_identity(
+    path: Path, pair_id: str, identity: Mapping[str, Any]
+) -> dict[str, Any] | None:
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
@@ -281,20 +353,35 @@ def evaluate_corpus(
     pairs = load_evaluation_manifest(manifest)
     for pair in pairs:
         for source in (pair.audio_path, pair.midi_path, pair.preset_path):
-            if source is not None and (output_dir == source.parent or output_dir.is_relative_to(source.parent)):
-                raise EvaluationInputError("evaluation output overlaps a source directory")
+            if source is not None and (
+                output_dir == source.parent or output_dir.is_relative_to(source.parent)
+            ):
+                raise EvaluationInputError(
+                    "evaluation output overlaps a source directory"
+                )
     backend = backend_contract()
     validate_backend_id(str(backend["backend_id"]))
     try:
         import torch
 
         runtime = _runtime_identity(torch)
-    except (AttributeError, ImportError, OSError, RuntimeError, TypeError, ValueError) as exc:
-        raise BackendUnavailable("the required PyTorch runtime could not be initialized") from exc
+    except (
+        AttributeError,
+        ImportError,
+        OSError,
+        RuntimeError,
+        TypeError,
+        ValueError,
+    ) as exc:
+        raise BackendUnavailable(
+            "the required PyTorch runtime could not be initialized"
+        ) from exc
     checkpoint_path = (
         Path(checkpoint).resolve(strict=True)
         if checkpoint is not None
-        else Path(__file__).resolve().parents[2] / "artifacts" / "basic_pitch_icassp_2022.pt"
+        else Path(__file__).resolve().parents[2]
+        / "artifacts"
+        / "basic_pitch_icassp_2022.pt"
     )
     if not checkpoint_path.is_file():
         raise BackendUnavailable("canonical Basic Pitch checkpoint is unavailable")
@@ -336,14 +423,22 @@ def evaluate_corpus(
         model, device = _load_model(checkpoint_path, backend, torch)
     results = list(existing)
     for pair in pending:
-        result = predictor(pair) if predictor is not None else _predict_pair(model, pair, torch, device)
+        result = (
+            predictor(pair)
+            if predictor is not None
+            else _predict_pair(model, pair, torch, device)
+        )
         row = _pair_result(pair, identity, result)
         _atomic_json(pairs_dir / f"{pair.pair_id}.json", row)
         results.append(row)
     results.sort(key=lambda row: str(row["pair_id"]))
     aggregate = aggregate_results(results)
     failures = [
-        {"pair_id": row["pair_id"], "failure_code": row.get("failure_code"), "error_type": row.get("error_type")}
+        {
+            "pair_id": row["pair_id"],
+            "failure_code": row.get("failure_code"),
+            "error_type": row.get("error_type"),
+        }
         for row in results
         if row.get("status") != "ok"
     ]
@@ -362,19 +457,34 @@ def evaluate_corpus(
         "format_version": 1,
         "status": status,
         "failure_code": None if pairs else "no_eligible_pairs",
-        "model": {"model_id": MODEL_ID, "source_git_blob_sha1": SPOTIFY_ONNX_GIT_BLOB_SHA1},
+        "model": {
+            "model_id": MODEL_ID,
+            "source_git_blob_sha1": SPOTIFY_ONNX_GIT_BLOB_SHA1,
+        },
         "runtime": runtime,
         "backend": backend,
         "decoder": identity["decoder"],
         "pair_count": len(pairs),
         "successful_pair_count": sum(row.get("status") == "ok" for row in results),
         "failed_pair_count": len(failures),
-        "source_check": None if source_check is None else {
+        "source_check": None
+        if source_check is None
+        else {
             "source_stat_records": source_check["source_stat_records"],
             "source_stat_mismatches": len(source_check["source_stat_mismatches"]),
         },
         "run_identity": identity,
     }
-    for name, value in (("run.json", run_value), ("aggregates.json", aggregate), ("failure_cases.json", {"failures": failures})):
+    for name, value in (
+        ("run.json", run_value),
+        ("aggregates.json", aggregate),
+        ("failure_cases.json", {"failures": failures}),
+    ):
         _atomic_json(output_dir / name, value)
-    return {"status": status, "pair_count": len(pairs), "successful_pair_count": run_value["successful_pair_count"], "failed_pair_count": len(failures), "aggregate": aggregate}
+    return {
+        "status": status,
+        "pair_count": len(pairs),
+        "successful_pair_count": run_value["successful_pair_count"],
+        "failed_pair_count": len(failures),
+        "aggregate": aggregate,
+    }

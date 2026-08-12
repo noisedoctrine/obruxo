@@ -33,7 +33,9 @@ def _ensure_data_generation_importable() -> None:
 
 
 def _max_polyphony(spans: list[Any]) -> int:
-    boundaries = [(span.start_tick, 1) for span in spans] + [(span.end_tick, -1) for span in spans]
+    boundaries = [(span.start_tick, 1) for span in spans] + [
+        (span.end_tick, -1) for span in spans
+    ]
     active = 0
     maximum = 0
     for _, delta in sorted(boundaries, key=lambda item: (item[0], item[1])):
@@ -42,7 +44,9 @@ def _max_polyphony(spans: list[Any]) -> int:
     return maximum
 
 
-def _fixed_class(value: float | None, boundaries: tuple[float, float], names: tuple[str, str, str]) -> str:
+def _fixed_class(
+    value: float | None, boundaries: tuple[float, float], names: tuple[str, str, str]
+) -> str:
     if value is None:
         return "unknown"
     if value < boundaries[0]:
@@ -94,14 +98,20 @@ def performance_labels(path: Path | str) -> tuple[list[ReferenceNote], dict[str,
         "notes_per_second": float(len(notes) / duration_s) if duration_s > 0 else None,
         "median_note_duration_s": float(median(durations)),
         "simultaneous_note_onsets": len(onset_ticks) != len(set(onset_ticks)),
-        "out_of_range_reference_notes": sum(not 21 <= pitch <= 108 for pitch in pitches),
-        "duration_class": _fixed_class(duration_s, (2.0, 8.0), ("short", "medium", "long")),
+        "out_of_range_reference_notes": sum(
+            not 21 <= pitch <= 108 for pitch in pitches
+        ),
+        "duration_class": _fixed_class(
+            duration_s, (2.0, 8.0), ("short", "medium", "long")
+        ),
         "note_density_class": _fixed_class(
             float(len(notes) / duration_s) if duration_s > 0 else None,
             (2.0, 8.0),
             ("low", "medium", "high"),
         ),
-        "pitch_register_class": _fixed_class(pitch_mean, (48.0, 72.0), ("low", "mid", "high")),
+        "pitch_register_class": _fixed_class(
+            pitch_mean, (48.0, 72.0), ("low", "mid", "high")
+        ),
         "label_sources": {
             "note_count": "derived_midi",
             "duration_s": "derived_midi",
@@ -123,7 +133,9 @@ def performance_labels(path: Path | str) -> tuple[list[ReferenceNote], dict[str,
     return notes, labels
 
 
-def add_source_metadata(labels: Mapping[str, Any], metadata: Mapping[str, Any] | None) -> dict[str, Any]:
+def add_source_metadata(
+    labels: Mapping[str, Any], metadata: Mapping[str, Any] | None
+) -> dict[str, Any]:
     """Add only explicit PresetShare fields; absent metadata remains unknown."""
     result = dict(labels)
     sources = dict(result.get("label_sources", {}))

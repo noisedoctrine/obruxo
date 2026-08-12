@@ -67,7 +67,9 @@ class EvaluationPair:
             "preset_id": self.preset_id,
             "pairing_method": self.pairing_method,
             "provenance_status": self.provenance_status,
-            "render_result_path": None if self.render_result_path is None else str(self.render_result_path),
+            "render_result_path": None
+            if self.render_result_path is None
+            else str(self.render_result_path),
             "qa_warning_codes": list(self.qa_warning_codes),
             "labels": self.labels,
         }
@@ -81,10 +83,14 @@ def _safe_output(path: Path | str, *, output_root: Path | None = None) -> Path:
     root = output_root or _approved_output_root()
     resolved = Path(path).resolve(strict=False)
     if resolved == root or not resolved.is_relative_to(root):
-        raise CorpusInputError("output must be inside the approved ignored Basic Pitch output area")
+        raise CorpusInputError(
+            "output must be inside the approved ignored Basic Pitch output area"
+        )
     parent = resolved.parent.resolve(strict=False)
     if not parent.is_relative_to(root):
-        raise CorpusInputError("output parent is outside the approved ignored Basic Pitch output area")
+        raise CorpusInputError(
+            "output parent is outside the approved ignored Basic Pitch output area"
+        )
     return resolved
 
 
@@ -92,7 +98,15 @@ def _atomic_write(path: Path, text: str) -> None:
     temporary: Path | None = None
     path.parent.mkdir(parents=True, exist_ok=True)
     try:
-        with tempfile.NamedTemporaryFile("w", encoding="utf-8", newline="\n", dir=path.parent, prefix=f".{path.name}.", suffix=".tmp", delete=False) as handle:
+        with tempfile.NamedTemporaryFile(
+            "w",
+            encoding="utf-8",
+            newline="\n",
+            dir=path.parent,
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as handle:
             temporary = Path(handle.name)
             handle.write(text)
             handle.flush()
@@ -134,17 +148,28 @@ def _load_metadata(corpus_root: Path) -> dict[Path, dict[str, str]]:
                     continue
                 path = _resolve_metadata_path(analytics_path.parent, value)
                 if path in result:
-                    result[path].update({key: value for key, value in row.items() if value not in (None, "")})
+                    result[path].update(
+                        {
+                            key: value
+                            for key, value in row.items()
+                            if value not in (None, "")
+                        }
+                    )
     return result
 
 
 def _metadata_paths(corpus_root: Path) -> tuple[Path, ...]:
     raw_root = corpus_root.parent.parent
-    paths = [raw_root / "presetshare_vital_metadata.csv", raw_root.parent / "analyze" / "preset_analytics.csv"]
+    paths = [
+        raw_root / "presetshare_vital_metadata.csv",
+        raw_root.parent / "analyze" / "preset_analytics.csv",
+    ]
     return tuple(path.resolve() for path in paths if path.is_file())
 
 
-def source_snapshot(root: Path | str, *, extra_paths: tuple[Path, ...] = ()) -> list[dict[str, Any]]:
+def source_snapshot(
+    root: Path | str, *, extra_paths: tuple[Path, ...] = ()
+) -> list[dict[str, Any]]:
     """Capture private source stat records without reading or changing source bytes."""
     source_root = Path(root).resolve(strict=True)
     paths = {path.resolve() for path in source_root.rglob("*") if path.is_file()}
@@ -152,11 +177,15 @@ def source_snapshot(root: Path | str, *, extra_paths: tuple[Path, ...] = ()) -> 
     records = []
     for path in sorted(paths, key=lambda item: str(item).casefold()):
         stat = path.stat()
-        records.append({"path": str(path), "size": stat.st_size, "mtime_ns": stat.st_mtime_ns})
+        records.append(
+            {"path": str(path), "size": stat.st_size, "mtime_ns": stat.st_mtime_ns}
+        )
     return records
 
 
-def compare_source_records(before: list[Mapping[str, Any]], after: list[Mapping[str, Any]]) -> dict[str, Any]:
+def compare_source_records(
+    before: list[Mapping[str, Any]], after: list[Mapping[str, Any]]
+) -> dict[str, Any]:
     """Compare two private source-stat captures without exposing them in public reports."""
     before_by_path = {str(record["path"]): dict(record) for record in before}
     after_by_path = {str(record["path"]): dict(record) for record in after}
@@ -176,7 +205,9 @@ def compare_source_snapshot(records: list[Mapping[str, Any]]) -> dict[str, Any]:
         path = Path(str(record["path"]))
         try:
             stat = path.stat()
-            current_records.append({"path": str(path), "size": stat.st_size, "mtime_ns": stat.st_mtime_ns})
+            current_records.append(
+                {"path": str(path), "size": stat.st_size, "mtime_ns": stat.st_mtime_ns}
+            )
         except OSError:
             current_records.append({"path": str(path), "missing": True})
     return compare_source_records(records, current_records)
@@ -193,9 +224,15 @@ def _file_digest(path: Path) -> str:
 def _pair_id(midi_path: Path, audio_path: Path | None, preset_path: Path | None) -> str:
     digest = hashlib.sha256()
     digest.update(b"obruxo-presetshare-pair-v1\0")
-    for label, path in ((b"midi", midi_path), (b"audio", audio_path), (b"preset", preset_path)):
+    for label, path in (
+        (b"midi", midi_path),
+        (b"audio", audio_path),
+        (b"preset", preset_path),
+    ):
         digest.update(label + b"\0")
-        digest.update(b"missing\0" if path is None else _file_digest(path).encode() + b"\0")
+        digest.update(
+            b"missing\0" if path is None else _file_digest(path).encode() + b"\0"
+        )
     return f"pair-{digest.hexdigest()}"
 
 
@@ -206,7 +243,10 @@ def _read_audio(path: Path) -> None:
 
         _, samples = wavfile.read(path)
         values = np.asarray(samples)
-        if values.size == 0 or not np.isfinite(values.astype(np.float64, copy=False)).all():
+        if (
+            values.size == 0
+            or not np.isfinite(values.astype(np.float64, copy=False)).all()
+        ):
             raise ValueError("audio is empty or non-finite")
     except (ImportError, OSError, OverflowError, TypeError, ValueError) as exc:
         raise CorpusInputError("audio could not be decoded") from exc
@@ -228,54 +268,90 @@ def _sidecar_details(audio_path: Path) -> tuple[Path | None, str, tuple[str, ...
                 codes.add(code)
     qa = value.get("qa", {}) if isinstance(value, Mapping) else {}
     if isinstance(qa, Mapping):
-        for key in ("silence_warning", "clipping_count", "tail_warning", "dc_offset_warning"):
+        for key in (
+            "silence_warning",
+            "clipping_count",
+            "tail_warning",
+            "dc_offset_warning",
+        ):
             if qa.get(key):
                 codes.add(f"qa.{key}")
     return sidecar.resolve(), "available", tuple(sorted(codes))
 
 
 def _renderer() -> Any:
-    config_path = Path(__file__).resolve().parents[5] / "research" / "data_generation" / "configs" / "renderer.yaml"
+    config_path = (
+        Path(__file__).resolve().parents[5]
+        / "research"
+        / "data_generation"
+        / "configs"
+        / "renderer.yaml"
+    )
     try:
         return PedalboardVitalRenderer.from_config(config_path)
     except BenchmarkDerivedRenderUnavailable as exc:
         raise DerivedRenderUnavailable("Pedalboard/Vital renderer unavailable") from exc
 
 
-def _derive_audio(renderer: Any, preset_path: Path, midi_path: Path, destination: Path, output_root: Path) -> Path:
+def _derive_audio(
+    renderer: Any,
+    preset_path: Path,
+    midi_path: Path,
+    destination: Path,
+    output_root: Path,
+) -> Path:
     try:
-        render_derived_vital_audio(renderer, preset_path, midi_path, destination, output_root)
+        render_derived_vital_audio(
+            renderer, preset_path, midi_path, destination, output_root
+        )
     except BenchmarkDerivedRenderUnavailable as exc:
         if getattr(exc, "code", None) == "derived_render_unavailable":
-            raise DerivedRenderUnavailable("Pedalboard/Vital renderer unavailable") from exc
+            raise DerivedRenderUnavailable(
+                "Pedalboard/Vital renderer unavailable"
+            ) from exc
         raise RuntimeError("Pedalboard/Vital renderer failed") from exc
     return destination
 
 
-def _derived_destination(output: Path, pair_id: str, preset_path: Path, midi_path: Path) -> Path:
+def _derived_destination(
+    output: Path, pair_id: str, preset_path: Path, midi_path: Path
+) -> Path:
     root = _approved_output_root()
-    destination = (output.parent / "derived_renders" / f"{pair_id}.wav").resolve(strict=False)
+    destination = (output.parent / "derived_renders" / f"{pair_id}.wav").resolve(
+        strict=False
+    )
     if destination == root or not destination.is_relative_to(root):
         raise CorpusInputError("derived render destination is outside approved outputs")
     for source in (preset_path, midi_path):
         source_root = source.parent.resolve()
         if destination == source_root or destination.is_relative_to(source_root):
-            raise CorpusInputError("derived render destination overlaps a source directory")
+            raise CorpusInputError(
+                "derived render destination overlaps a source directory"
+            )
     return destination
 
 
-def _derived_sidecar_details(audio_path: Path) -> tuple[Path | None, str, tuple[str, ...]]:
+def _derived_sidecar_details(
+    audio_path: Path,
+) -> tuple[Path | None, str, tuple[str, ...]]:
     sidecar = audio_path.with_suffix(".json")
     try:
         metadata = json.loads(sidecar.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        raise CorpusInputError("derived render provenance is missing or invalid") from exc
-    if not isinstance(metadata, Mapping) or metadata.get("audio_source") != "derived_render":
+        raise CorpusInputError(
+            "derived render provenance is missing or invalid"
+        ) from exc
+    if (
+        not isinstance(metadata, Mapping)
+        or metadata.get("audio_source") != "derived_render"
+    ):
         raise CorpusInputError("existing audio is not a derived render")
     return _sidecar_details(audio_path)
 
 
-def _candidate_record(directory: Path, status: str, reason: str | None = None) -> dict[str, Any]:
+def _candidate_record(
+    directory: Path, status: str, reason: str | None = None
+) -> dict[str, Any]:
     value = {"directory": str(directory), "status": status}
     if reason:
         value["reason"] = reason
@@ -288,7 +364,8 @@ def _spot_check(audit_rows: list[Mapping[str, Any]]) -> dict[str, Any]:
     candidates += [
         row
         for row in audit_rows
-        if row.get("reason") in {"pair.derived_render_unavailable", "pair.derived_render_failed"}
+        if row.get("reason")
+        in {"pair.derived_render_unavailable", "pair.derived_render_failed"}
     ]
     checked = 0
     discrepancies = 0
@@ -309,7 +386,12 @@ def _spot_check(audit_rows: list[Mapping[str, Any]]) -> dict[str, Any]:
             valid = midi_count == 1 and audio_count == 1
         checked += 1
         discrepancies += not valid
-    return {"count": checked, "discrepancies": discrepancies, "status": "passed" if discrepancies == 0 else "failed", "methods": sorted(methods)}
+    return {
+        "count": checked,
+        "discrepancies": discrepancies,
+        "status": "passed" if discrepancies == 0 else "failed",
+        "methods": sorted(methods),
+    }
 
 
 def _evaluate_candidate(
@@ -324,17 +406,33 @@ def _evaluate_candidate(
     midi_paths = sorted(directory.glob("*.mid"), key=lambda path: path.name)
     audio_paths = sorted(directory.glob("*.wav"), key=lambda path: path.name)
     if len(midi_paths) == 0:
-        return None, _candidate_record(directory, "excluded", "pair.missing_midi"), renderer
+        return (
+            None,
+            _candidate_record(directory, "excluded", "pair.missing_midi"),
+            renderer,
+        )
     if len(midi_paths) != 1 or len(audio_paths) > 1:
-        return None, _candidate_record(directory, "pairing_ambiguous", "pair.ambiguous"), renderer
+        return (
+            None,
+            _candidate_record(directory, "pairing_ambiguous", "pair.ambiguous"),
+            renderer,
+        )
     if not audio_paths and len(vital_paths) > 1:
-        return None, _candidate_record(directory, "pairing_ambiguous", "pair.ambiguous"), renderer
+        return (
+            None,
+            _candidate_record(directory, "pairing_ambiguous", "pair.ambiguous"),
+            renderer,
+        )
     midi_path = midi_paths[0].resolve()
     preset_path = vital_paths[0].resolve() if len(vital_paths) == 1 else None
     try:
         _, midi_labels = performance_labels(midi_path)
     except ValueError as exc:
-        reason = "pair.empty_reference" if "no note spans" in str(exc) else "pair.invalid_midi"
+        reason = (
+            "pair.empty_reference"
+            if "no note spans" in str(exc)
+            else "pair.invalid_midi"
+        )
         return None, _candidate_record(directory, "excluded", reason), renderer
     metadata_row = metadata.get(preset_path, {}) if preset_path is not None else {}
     labels = add_source_metadata(midi_labels, metadata_row)
@@ -349,41 +447,89 @@ def _evaluate_candidate(
         audio_source = "existing_audio"
         try:
             _read_audio(audio_path)
-            render_result_path, provenance_status, qa_codes = _sidecar_details(audio_path)
+            render_result_path, provenance_status, qa_codes = _sidecar_details(
+                audio_path
+            )
         except CorpusInputError as exc:
-            reason = "pair.invalid_render_sidecar" if "sidecar" in str(exc) else "pair.unreadable_audio"
+            reason = (
+                "pair.invalid_render_sidecar"
+                if "sidecar" in str(exc)
+                else "pair.unreadable_audio"
+            )
             return None, _candidate_record(directory, "excluded", reason), renderer
     else:
         if not allow_derived_render:
-            return None, _candidate_record(directory, "excluded", "pair.missing_audio"), renderer
+            return (
+                None,
+                _candidate_record(directory, "excluded", "pair.missing_audio"),
+                renderer,
+            )
         if preset_path is None:
-            return None, _candidate_record(directory, "excluded", "pair.missing_audio"), renderer
+            return (
+                None,
+                _candidate_record(directory, "excluded", "pair.missing_audio"),
+                renderer,
+            )
         audio_source = "derived_render"
         pair_id = _pair_id(midi_path, None, preset_path)
         try:
             audio_path = _derived_destination(output, pair_id, preset_path, midi_path)
             if audio_path.exists():
                 _read_audio(audio_path)
-                render_result_path, provenance_status, qa_codes = _derived_sidecar_details(audio_path)
+                render_result_path, provenance_status, qa_codes = (
+                    _derived_sidecar_details(audio_path)
+                )
             else:
                 if audio_path.with_suffix(".json").exists():
-                    raise CorpusInputError("derived render provenance exists without audio")
+                    raise CorpusInputError(
+                        "derived render provenance exists without audio"
+                    )
                 if renderer is _RENDERER_UNAVAILABLE:
-                    return None, _candidate_record(directory, "excluded", "pair.derived_render_unavailable"), renderer
+                    return (
+                        None,
+                        _candidate_record(
+                            directory, "excluded", "pair.derived_render_unavailable"
+                        ),
+                        renderer,
+                    )
                 if renderer is None:
                     renderer = _renderer()
-                _derive_audio(renderer, preset_path, midi_path, audio_path, _approved_output_root())
+                _derive_audio(
+                    renderer,
+                    preset_path,
+                    midi_path,
+                    audio_path,
+                    _approved_output_root(),
+                )
                 _read_audio(audio_path)
-                render_result_path, provenance_status, qa_codes = _derived_sidecar_details(audio_path)
+                render_result_path, provenance_status, qa_codes = (
+                    _derived_sidecar_details(audio_path)
+                )
         except CorpusInputError:
-            return None, _candidate_record(directory, "excluded", "pair.derived_render_failed"), renderer
+            return (
+                None,
+                _candidate_record(directory, "excluded", "pair.derived_render_failed"),
+                renderer,
+            )
         except DerivedRenderUnavailable:
-            return None, _candidate_record(directory, "excluded", "pair.derived_render_unavailable"), _RENDERER_UNAVAILABLE
+            return (
+                None,
+                _candidate_record(
+                    directory, "excluded", "pair.derived_render_unavailable"
+                ),
+                _RENDERER_UNAVAILABLE,
+            )
         except (ImportError, OSError, RuntimeError, TypeError, ValueError):
-            return None, _candidate_record(directory, "excluded", "pair.derived_render_failed"), renderer
+            return (
+                None,
+                _candidate_record(directory, "excluded", "pair.derived_render_failed"),
+                renderer,
+            )
         render_result_path, provenance_status, qa_codes = _sidecar_details(audio_path)
         pairing_method = DERIVED_PAIRING_METHOD
-    pair_id = _pair_id(midi_path, audio_path if pairing_method == PAIRING_METHOD else None, preset_path)
+    pair_id = _pair_id(
+        midi_path, audio_path if pairing_method == PAIRING_METHOD else None, preset_path
+    )
     pair = EvaluationPair(
         pair_id=pair_id,
         audio_path=audio_path,
@@ -412,13 +558,24 @@ def build_evaluation_manifest(
     root = Path(corpus_root).resolve(strict=True)
     output_path = _safe_output(output)
     audit_path = _safe_output(audit)
-    if not root.is_dir() or output_path == audit_path or output_path == root or output_path.is_relative_to(root) or audit_path.is_relative_to(root):
+    if (
+        not root.is_dir()
+        or output_path == audit_path
+        or output_path == root
+        or output_path.is_relative_to(root)
+        or audit_path.is_relative_to(root)
+    ):
         raise CorpusInputError("invalid corpus or output path")
     if not force and (output_path.exists() or audit_path.exists()):
-        raise FileExistsError("refusing to overwrite evaluation artifacts without force=True")
+        raise FileExistsError(
+            "refusing to overwrite evaluation artifacts without force=True"
+        )
     metadata = _load_metadata(root)
     source_records = source_snapshot(root, extra_paths=_metadata_paths(root))
-    candidates = sorted((item for item in root.iterdir() if item.is_dir()), key=lambda path: path.relative_to(root).as_posix())
+    candidates = sorted(
+        (item for item in root.iterdir() if item.is_dir()),
+        key=lambda path: path.relative_to(root).as_posix(),
+    )
     pairs: list[EvaluationPair] = []
     audit_rows: list[dict[str, Any]] = []
     renderer = None
@@ -445,18 +602,27 @@ def build_evaluation_manifest(
     if not pairs:
         manifest_text = ""
     else:
-        manifest_text = "\n".join(json.dumps(pair.manifest_record(), sort_keys=True) for pair in pairs) + "\n"
+        manifest_text = (
+            "\n".join(
+                json.dumps(pair.manifest_record(), sort_keys=True) for pair in pairs
+            )
+            + "\n"
+        )
     counts = Counter(str(row["status"]) for row in audit_rows)
     reasons = Counter(str(row["reason"]) for row in audit_rows if row.get("reason"))
     spot_check = _spot_check(audit_rows)
-    methods = sorted({pair.pairing_method for pair in pairs} | set(spot_check["methods"]))
+    methods = sorted(
+        {pair.pairing_method for pair in pairs} | set(spot_check["methods"])
+    )
     audit_value = {
         "format_version": 1,
         "pairing_contract_version": 1,
         "corpus_layout": "direct child directory with exact one-to-one extensions",
         "candidate_count": len(candidates),
         "eligible_count": len(pairs),
-        "excluded_count": sum(count for key, count in reasons.items() if key != "pair.ambiguous"),
+        "excluded_count": sum(
+            count for key, count in reasons.items() if key != "pair.ambiguous"
+        ),
         "ambiguous_count": reasons.get("pair.ambiguous", 0),
         "status_counts": dict(sorted(counts.items())),
         "excluded_by_reason": dict(sorted(reasons.items())),
@@ -477,7 +643,16 @@ def build_evaluation_manifest(
     _atomic_write(audit_path, json.dumps(audit_value, indent=2, sort_keys=True) + "\n")
     _atomic_write(
         output_path.with_name("source_snapshot.json"),
-        json.dumps({"before": source_records, "after": source_after, "comparison": source_check}, indent=2, sort_keys=True) + "\n",
+        json.dumps(
+            {
+                "before": source_records,
+                "after": source_after,
+                "comparison": source_check,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
     )
     return {
         "candidate_count": len(candidates),
@@ -508,11 +683,19 @@ def load_evaluation_manifest(path: Path | str) -> tuple[EvaluationPair, ...]:
         audio = Path(str(row["audio_path"])).resolve(strict=True)
         midi = Path(str(row["midi_path"])).resolve(strict=True)
         preset_value = row.get("preset_path")
-        preset = None if preset_value in (None, "") else Path(str(preset_value)).resolve(strict=True)
+        preset = (
+            None
+            if preset_value in (None, "")
+            else Path(str(preset_value)).resolve(strict=True)
+        )
         audio_source = str(row.get("audio_source", ""))
         if audio_source not in {"existing_audio", "derived_render"}:
             raise CorpusInputError("evaluation manifest has invalid audio source")
-        if not audio.is_file() or not midi.is_file() or (preset is not None and not preset.is_file()):
+        if (
+            not audio.is_file()
+            or not midi.is_file()
+            or (preset is not None and not preset.is_file())
+        ):
             raise CorpusInputError("evaluation manifest references missing source")
         ids.add(pair_id)
         pairs.append(
@@ -522,11 +705,17 @@ def load_evaluation_manifest(path: Path | str) -> tuple[EvaluationPair, ...]:
                 audio_source=audio_source,
                 midi_path=midi,
                 preset_path=preset,
-                preset_id=None if row.get("preset_id") in (None, "") else str(row["preset_id"]),
+                preset_id=None
+                if row.get("preset_id") in (None, "")
+                else str(row["preset_id"]),
                 pairing_method=str(row["pairing_method"]),
                 provenance_status=str(row["provenance_status"]),
-                render_result_path=None if row.get("render_result_path") in (None, "") else Path(str(row["render_result_path"])).resolve(strict=True),
-                qa_warning_codes=tuple(str(value) for value in row.get("qa_warning_codes", [])),
+                render_result_path=None
+                if row.get("render_result_path") in (None, "")
+                else Path(str(row["render_result_path"])).resolve(strict=True),
+                qa_warning_codes=tuple(
+                    str(value) for value in row.get("qa_warning_codes", [])
+                ),
                 labels=dict(row.get("labels", {})),
             )
         )

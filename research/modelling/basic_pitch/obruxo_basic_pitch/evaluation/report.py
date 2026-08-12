@@ -20,7 +20,15 @@ def _atomic_write(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary: Path | None = None
     try:
-        with tempfile.NamedTemporaryFile("w", encoding="utf-8", newline="\n", dir=path.parent, prefix=f".{path.name}.", suffix=".tmp", delete=False) as handle:
+        with tempfile.NamedTemporaryFile(
+            "w",
+            encoding="utf-8",
+            newline="\n",
+            dir=path.parent,
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as handle:
             temporary = Path(handle.name)
             handle.write(text)
             handle.flush()
@@ -40,7 +48,9 @@ def _report_path(path: Path | str) -> Path:
     root = _reports_root()
     resolved = Path(path).resolve(strict=False)
     if resolved == root or not resolved.is_relative_to(root):
-        raise ReportInputError("public report must be inside the Basic Pitch reports directory")
+        raise ReportInputError(
+            "public report must be inside the Basic Pitch reports directory"
+        )
     return resolved
 
 
@@ -57,7 +67,19 @@ def _read_json(path: Path | str) -> dict[str, Any]:
 def _public_metric(value: Mapping[str, Any]) -> dict[str, Any]:
     return {
         key: value.get(key)
-        for key in ("reference_count", "prediction_count", "count_bias", "tp", "fp", "fn", "precision", "recall", "f1", "false_negative_rate", "false_positive_fraction")
+        for key in (
+            "reference_count",
+            "prediction_count",
+            "count_bias",
+            "tp",
+            "fp",
+            "fn",
+            "precision",
+            "recall",
+            "f1",
+            "false_negative_rate",
+            "false_positive_fraction",
+        )
     }
 
 
@@ -65,7 +87,9 @@ def sanitize_aggregate(value: Mapping[str, Any]) -> dict[str, Any]:
     """Keep aggregate evidence while dropping private per-pair/preset material."""
     bootstrap = dict(value.get("bootstrap", {}))
     if "cluster_rule" in bootstrap:
-        bootstrap["cluster_rule"] = "known preset grouping; unknown presets are singleton clusters"
+        bootstrap["cluster_rule"] = (
+            "known preset grouping; unknown presets are singleton clusters"
+        )
     result: dict[str, Any] = {
         "pair_count": value.get("pair_count", 0),
         "successful_pair_count": value.get("successful_pair_count", 0),
@@ -90,7 +114,14 @@ def sanitize_aggregate(value: Mapping[str, Any]) -> dict[str, Any]:
             result["groups"][str(field)] = {
                 str(category): {
                     key: summary.get(key)
-                    for key in ("pair_count", "successful_pair_count", "failed_pair_count", "coverage", "micro", "pair_macro")
+                    for key in (
+                        "pair_count",
+                        "successful_pair_count",
+                        "failed_pair_count",
+                        "coverage",
+                        "micro",
+                        "pair_macro",
+                    )
                 }
                 for category, summary in entries.items()
                 if isinstance(summary, Mapping)
@@ -136,7 +167,13 @@ def _category_findings(aggregate: Mapping[str, Any]) -> dict[str, Any]:
     """Summarize observed category ranges without hiding their support sizes."""
     groups = aggregate.get("groups", {})
     findings: dict[str, Any] = {}
-    for field in ("duration_class", "note_density_class", "pitch_register_class", "polyphony_class", "type"):
+    for field in (
+        "duration_class",
+        "note_density_class",
+        "pitch_register_class",
+        "polyphony_class",
+        "type",
+    ):
         entries = groups.get(field, {})
         rows = []
         if not isinstance(entries, Mapping):
@@ -195,8 +232,16 @@ def _runtime_selection(run: Mapping[str, Any]) -> dict[str, Any]:
         return result
     decision = benchmark.get("corpus_inference_decision")
     report_identity = benchmark.get("run_identity")
-    supporting_identity = decision.get("supporting_run_identity") if isinstance(decision, Mapping) else None
-    if not isinstance(decision, Mapping) or decision.get("status") != "selected" or not isinstance(supporting_identity, Mapping):
+    supporting_identity = (
+        decision.get("supporting_run_identity")
+        if isinstance(decision, Mapping)
+        else None
+    )
+    if (
+        not isinstance(decision, Mapping)
+        or decision.get("status") != "selected"
+        or not isinstance(supporting_identity, Mapping)
+    ):
         return result
     decision_backend = decision.get("backend_id")
     result.update(
@@ -207,23 +252,37 @@ def _runtime_selection(run: Mapping[str, Any]) -> dict[str, Any]:
             "selection_rule": decision.get("selection_rule"),
             "supporting_measurement": decision.get("supporting_measurement", {}),
             "issue_24_observed_highest_batch_1_route": decision_backend,
-            "issue_24_observed_highest_batch_1_audio_seconds_per_second": decision.get("supporting_measurement", {}).get("model_call_batch_1_audio_seconds_per_second_median"),
+            "issue_24_observed_highest_batch_1_audio_seconds_per_second": decision.get(
+                "supporting_measurement", {}
+            ).get("model_call_batch_1_audio_seconds_per_second_median"),
             "issue_24_observed_highest_end_to_end_route": decision_backend,
-            "issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second": decision.get("supporting_measurement", {}).get("audio_seconds_per_wall_second_median"),
-            "decision_identity_match": dict(supporting_identity) == dict(report_identity or {}) == dict(backend.get("supporting_run_identity", {})),
+            "issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second": decision.get(
+                "supporting_measurement", {}
+            ).get("audio_seconds_per_wall_second_median"),
+            "decision_identity_match": dict(supporting_identity)
+            == dict(report_identity or {})
+            == dict(backend.get("supporting_run_identity", {})),
         }
     )
     if result["selected_backend"] == selected and result["decision_identity_match"]:
         result["consistency"] = "exact_issue_24_decision_consumed"
-        result["selection_rationale"] = f"#24 selected `{decision_backend}` by the recorded rule: {decision.get('selection_rule')}. #25 consumed that backend, device, precision, boundary, and supporting run identity exactly; no fallback was used."
-        result["interpretation"] = "The full-corpus quality result is attributed to the exact #24-selected runtime. It does not establish quality equivalence for any other backend."
+        result["selection_rationale"] = (
+            f"#24 selected `{decision_backend}` by the recorded rule: {decision.get('selection_rule')}. #25 consumed that backend, device, precision, boundary, and supporting run identity exactly; no fallback was used."
+        )
+        result["interpretation"] = (
+            "The full-corpus quality result is attributed to the exact #24-selected runtime. It does not establish quality equivalence for any other backend."
+        )
     else:
         result["consistency"] = "issue_24_decision_mismatch"
-        result["interpretation"] = "The evaluator did not consume the exact #24 decision identity; the run must not be treated as a canonical corpus baseline."
+        result["interpretation"] = (
+            "The evaluator did not consume the exact #24 decision identity; the run must not be treated as a canonical corpus baseline."
+        )
     return result
 
 
-def build_sanitized_report(audit: Mapping[str, Any], run: Mapping[str, Any], aggregate: Mapping[str, Any]) -> dict[str, Any]:
+def build_sanitized_report(
+    audit: Mapping[str, Any], run: Mapping[str, Any], aggregate: Mapping[str, Any]
+) -> dict[str, Any]:
     """Construct the committed report from private inputs without copying row data."""
     sanitized_aggregate = sanitize_aggregate(aggregate)
     return {
@@ -251,7 +310,11 @@ def build_sanitized_report(audit: Mapping[str, Any], run: Mapping[str, Any], agg
 
 
 def _metric_row(name: str, value: Mapping[str, Any]) -> str:
-    label = {"onset_pitch": "Onset + pitch", "onset_pitch_offset": "Onset + pitch + offset", "frames": "Frame"}.get(name, name)
+    label = {
+        "onset_pitch": "Onset + pitch",
+        "onset_pitch_offset": "Onset + pitch + offset",
+        "frames": "Frame",
+    }.get(name, name)
     f1 = value.get("f1")
     return f"| {label} | {value.get('reference_count', 0)} | {value.get('prediction_count', 0)} | {value.get('tp', 0)} | {value.get('fp', 0)} | {value.get('fn', 0)} | {'n/a' if f1 is None else f'{f1:.6f}'} |"
 
@@ -301,14 +364,16 @@ def _markdown(report: Mapping[str, Any]) -> str:
     for name in HEADLINE_METRICS:
         if isinstance(micro.get(name), Mapping):
             lines.append(_metric_row(name, micro[name]))
-    lines.extend([
-        "",
-        f"- Pair coverage: `{aggregate.get('successful_pair_count', 0)}/{aggregate.get('pair_count', 0)}`.",
-        "- Micro metrics are derived from total counts. Pair-macro values and preset-cluster bootstrap intervals remain separate.",
-        "",
-        "## Uncertainty and support",
-        "",
-    ])
+    lines.extend(
+        [
+            "",
+            f"- Pair coverage: `{aggregate.get('successful_pair_count', 0)}/{aggregate.get('pair_count', 0)}`.",
+            "- Micro metrics are derived from total counts. Pair-macro values and preset-cluster bootstrap intervals remain separate.",
+            "",
+            "## Uncertainty and support",
+            "",
+        ]
+    )
     bootstrap = aggregate.get("bootstrap", {})
     lines.extend(
         [
@@ -326,17 +391,34 @@ def _markdown(report: Mapping[str, Any]) -> str:
             f1 = metric.get("f1")
             low = interval.get("lower_95")
             high = interval.get("upper_95")
-            lines.append(f"| `{name}` | {'n/a' if f1 is None else f'{f1:.6f}'} | {'n/a' if low is None or high is None else f'{low:.6f} - {high:.6f}'} |")
-    lines.extend([
-        "",
-        "## Category summaries",
-        "",
-        "The committed report retains counts and support for objective MIDI categories and explicit source metadata categories. Unknown metadata remains unknown; no style labels are inferred from filenames.",
-        "",
-    ])
+            lines.append(
+                f"| `{name}` | {'n/a' if f1 is None else f'{f1:.6f}'} | {'n/a' if low is None or high is None else f'{low:.6f} - {high:.6f}'} |"
+            )
+    lines.extend(
+        [
+            "",
+            "## Category summaries",
+            "",
+            "The committed report retains counts and support for objective MIDI categories and explicit source metadata categories. Unknown metadata remains unknown; no style labels are inferred from filenames.",
+            "",
+        ]
+    )
     findings = report.get("category_findings", {})
-    lines.extend(["## Category interpretation", "", "The following statements use onset+pitch F1 and retain category support. `well_supported` means at least 100 pairs, `moderately_supported` 30-99, and `small_subset` fewer than 30; small-subset extremes are descriptive, not robust corpus-wide findings.", ""])
-    for field in ("duration_class", "note_density_class", "pitch_register_class", "polyphony_class", "type"):
+    lines.extend(
+        [
+            "## Category interpretation",
+            "",
+            "The following statements use onset+pitch F1 and retain category support. `well_supported` means at least 100 pairs, `moderately_supported` 30-99, and `small_subset` fewer than 30; small-subset extremes are descriptive, not robust corpus-wide findings.",
+            "",
+        ]
+    )
+    for field in (
+        "duration_class",
+        "note_density_class",
+        "pitch_register_class",
+        "polyphony_class",
+        "type",
+    ):
         finding = findings.get(field)
         if not finding:
             continue
@@ -345,52 +427,90 @@ def _markdown(report: Mapping[str, Any]) -> str:
         high_supported = finding.get("highest_well_supported") or highest
         low_supported = finding.get("lowest_well_supported") or lowest
         if field == "polyphony_class":
-            delta = abs(float(highest.get("onset_pitch_f1", 0.0)) - float(lowest.get("onset_pitch_f1", 0.0)))
+            delta = abs(
+                float(highest.get("onset_pitch_f1", 0.0))
+                - float(lowest.get("onset_pitch_f1", 0.0))
+            )
             interpretation = "near tie" if delta < 0.02 else "separation observed"
-            lines.append(f"- `{field}`: `{highest.get('category')}` `{highest.get('onset_pitch_f1'):.6f}` vs `{lowest.get('category')}` `{lowest.get('onset_pitch_f1'):.6f}`; {interpretation} across `{highest.get('pair_count')}` and `{lowest.get('pair_count')}` pairs. Frame behavior should be read separately from event F1.")
+            lines.append(
+                f"- `{field}`: `{highest.get('category')}` `{highest.get('onset_pitch_f1'):.6f}` vs `{lowest.get('category')}` `{lowest.get('onset_pitch_f1'):.6f}`; {interpretation} across `{highest.get('pair_count')}` and `{lowest.get('pair_count')}` pairs. Frame behavior should be read separately from event F1."
+            )
         elif field == "type":
-            lines.append(f"- `{field}`: the overall high is `{highest.get('category')}` `{highest.get('onset_pitch_f1'):.6f}` on `{highest.get('pair_count')}` pairs (`{highest.get('support')}`); among well-supported types, `{high_supported.get('category')}` is highest at `{high_supported.get('onset_pitch_f1'):.6f}` on `{high_supported.get('pair_count')}` pairs, while `{low_supported.get('category')}` is lowest at `{low_supported.get('onset_pitch_f1'):.6f}` on `{low_supported.get('pair_count')}` pairs. This separates robust patterns from tiny type strata.")
+            lines.append(
+                f"- `{field}`: the overall high is `{highest.get('category')}` `{highest.get('onset_pitch_f1'):.6f}` on `{highest.get('pair_count')}` pairs (`{highest.get('support')}`); among well-supported types, `{high_supported.get('category')}` is highest at `{high_supported.get('onset_pitch_f1'):.6f}` on `{high_supported.get('pair_count')}` pairs, while `{low_supported.get('category')}` is lowest at `{low_supported.get('onset_pitch_f1'):.6f}` on `{low_supported.get('pair_count')}` pairs. This separates robust patterns from tiny type strata."
+            )
         else:
-            lines.append(f"- `{field}`: highest `{highest.get('category')}` `{highest.get('onset_pitch_f1'):.6f}` ({highest.get('pair_count')} pairs, `{highest.get('support')}`); lowest `{lowest.get('category')}` `{lowest.get('onset_pitch_f1'):.6f}` ({lowest.get('pair_count')} pairs, `{lowest.get('support')}`). The well-supported range is `{low_supported.get('onset_pitch_f1'):.6f}`-`{high_supported.get('onset_pitch_f1'):.6f}` across `{low_supported.get('category')}` to `{high_supported.get('category')}`.")
-    lines.extend(["", "The category tables below retain every observed stratum so these summaries can be checked against the underlying aggregate counts.", ""])
+            lines.append(
+                f"- `{field}`: highest `{highest.get('category')}` `{highest.get('onset_pitch_f1'):.6f}` ({highest.get('pair_count')} pairs, `{highest.get('support')}`); lowest `{lowest.get('category')}` `{lowest.get('onset_pitch_f1'):.6f}` ({lowest.get('pair_count')} pairs, `{lowest.get('support')}`). The well-supported range is `{low_supported.get('onset_pitch_f1'):.6f}`-`{high_supported.get('onset_pitch_f1'):.6f}` across `{low_supported.get('category')}` to `{high_supported.get('category')}`."
+            )
+    lines.extend(
+        [
+            "",
+            "The category tables below retain every observed stratum so these summaries can be checked against the underlying aggregate counts.",
+            "",
+        ]
+    )
     for field, entries in aggregate.get("groups", {}).items():
         if not entries:
             continue
-        lines.extend([f"### {field}", "", "| Category | Pairs | Successful | Coverage | Onset + pitch F1 |", "| --- | ---: | ---: | ---: | ---: |"])
+        lines.extend(
+            [
+                f"### {field}",
+                "",
+                "| Category | Pairs | Successful | Coverage | Onset + pitch F1 |",
+                "| --- | ---: | ---: | ---: | ---: |",
+            ]
+        )
         for category, summary in entries.items():
             f1 = summary.get("micro", {}).get("onset_pitch", {}).get("f1")
-            lines.append(f"| `{category}` | {summary.get('pair_count', 0)} | {summary.get('successful_pair_count', 0)} | {'n/a' if summary.get('coverage') is None else f'{summary.get('coverage'):.3f}'} | {'n/a' if f1 is None else f'{f1:.6f}'} |")
+            lines.append(
+                f"| `{category}` | {summary.get('pair_count', 0)} | {summary.get('successful_pair_count', 0)} | {'n/a' if summary.get('coverage') is None else f'{summary.get('coverage'):.3f}'} | {'n/a' if f1 is None else f'{f1:.6f}'} |"
+            )
         lines.append("")
-    lines.extend([
-        "## Failure analysis",
-        "",
-        f"- Onset + pitch false negatives: `{aggregate.get('failure_analysis', {}).get('note', {}).get('onset_pitch_false_negatives', 0)}`; false positives: `{aggregate.get('failure_analysis', {}).get('note', {}).get('onset_pitch_false_positives', 0)}`.",
-        f"- Additional offset false negatives: `{aggregate.get('failure_analysis', {}).get('note', {}).get('additional_offset_false_negatives', 0)}`.",
-        f"- Assigned near-onset pitch errors: `{aggregate.get('failure_analysis', {}).get('pitch', {}).get('assigned_near_onset_errors', 0)}`; octave errors: `{aggregate.get('failure_analysis', {}).get('pitch', {}).get('octave_error_count', 0)}`; diagnostically unassigned residual references/predictions: `{aggregate.get('failure_analysis', {}).get('pitch', {}).get('unassigned_near_onset_errors', 0)}`.",
-        "- Pair-level failures and private best/worst rows remain under ignored local outputs. This committed view contains only aggregate coverage and stable exclusion counts.",
-        "",
-        "## Interpretation",
-        "",
-        report["interpretation"]["measured"],
-        "",
-        report["interpretation"]["meaning"],
-        "",
-        "## Provenance and limits",
-        "",
-        f"- Model: `{report.get('model', {}).get('model_id', 'unknown')}`.",
-        f"- Backend: `{report.get('backend', {}).get('backend_id', 'unknown')}` on `{report.get('backend', {}).get('device', 'unknown')}`; precision: `{report.get('backend', {}).get('precision', 'unknown')}`.",
-        "- Stock settings are onset threshold 0.5, frame threshold 0.3, minimum note length 11 frames, inferred onsets enabled, Melodia fallback enabled, and no frequency limits.",
-        "- No composite score is used and no upstream model/runtime setting is tuned from corpus results.",
-        "",
-    ])
+    lines.extend(
+        [
+            "## Failure analysis",
+            "",
+            f"- Onset + pitch false negatives: `{aggregate.get('failure_analysis', {}).get('note', {}).get('onset_pitch_false_negatives', 0)}`; false positives: `{aggregate.get('failure_analysis', {}).get('note', {}).get('onset_pitch_false_positives', 0)}`.",
+            f"- Additional offset false negatives: `{aggregate.get('failure_analysis', {}).get('note', {}).get('additional_offset_false_negatives', 0)}`.",
+            f"- Assigned near-onset pitch errors: `{aggregate.get('failure_analysis', {}).get('pitch', {}).get('assigned_near_onset_errors', 0)}`; octave errors: `{aggregate.get('failure_analysis', {}).get('pitch', {}).get('octave_error_count', 0)}`; diagnostically unassigned residual references/predictions: `{aggregate.get('failure_analysis', {}).get('pitch', {}).get('unassigned_near_onset_errors', 0)}`.",
+            "- Pair-level failures and private best/worst rows remain under ignored local outputs. This committed view contains only aggregate coverage and stable exclusion counts.",
+            "",
+            "## Interpretation",
+            "",
+            report["interpretation"]["measured"],
+            "",
+            report["interpretation"]["meaning"],
+            "",
+            "## Provenance and limits",
+            "",
+            f"- Model: `{report.get('model', {}).get('model_id', 'unknown')}`.",
+            f"- Backend: `{report.get('backend', {}).get('backend_id', 'unknown')}` on `{report.get('backend', {}).get('device', 'unknown')}`; precision: `{report.get('backend', {}).get('precision', 'unknown')}`.",
+            "- Stock settings are onset threshold 0.5, frame threshold 0.3, minimum note length 11 frames, inferred onsets enabled, Melodia fallback enabled, and no frequency limits.",
+            "- No composite score is used and no upstream model/runtime setting is tuned from corpus results.",
+            "",
+        ]
+    )
     return "\n".join(lines)
 
 
 def _assert_public(value: Any) -> None:
     serialized = json.dumps(value, sort_keys=True)
-    forbidden = ("pair-", ".mid", ".wav", "preset_id", "preset_path", "audio_path", "midi_path", "author", "request_id")
+    forbidden = (
+        "pair-",
+        ".mid",
+        ".wav",
+        "preset_id",
+        "preset_path",
+        "audio_path",
+        "midi_path",
+        "author",
+        "request_id",
+    )
     if any(token in serialized.lower() for token in forbidden):
-        raise ReportInputError("sanitized report contains a private identifier or source reference")
+        raise ReportInputError(
+            "sanitized report contains a private identifier or source reference"
+        )
 
 
 def write_sanitized_reports(
@@ -403,7 +523,9 @@ def write_sanitized_reports(
     force: bool = False,
 ) -> dict[str, Any]:
     """Write only sanitized aggregate JSON/Markdown reports under tracked reports."""
-    report = build_sanitized_report(_read_json(audit_path), _read_json(run_path), _read_json(aggregate_path))
+    report = build_sanitized_report(
+        _read_json(audit_path), _read_json(run_path), _read_json(aggregate_path)
+    )
     _assert_public(report)
     json_file = _report_path(json_path)
     markdown_file = _report_path(markdown_path)

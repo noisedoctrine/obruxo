@@ -8,7 +8,9 @@ from obruxo_basic_pitch.evaluation.labels import add_source_metadata, performanc
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def _write_performance(path: Path, *, tempo_change: bool = False, adjacent: bool = False) -> None:
+def _write_performance(
+    path: Path, *, tempo_change: bool = False, adjacent: bool = False
+) -> None:
     from obruxo_basic_pitch.evaluation.labels import _ensure_data_generation_importable
 
     _ensure_data_generation_importable()
@@ -49,7 +51,9 @@ def test_tempo_map_and_half_open_polyphony() -> None:
         assert round(changed_notes[1].offset_s, 6) == 1.5
         assert changed_labels["duration_s"] == 1.5
     finally:
-        for path in sorted(root.rglob("*"), key=lambda item: len(item.parts), reverse=True):
+        for path in sorted(
+            root.rglob("*"), key=lambda item: len(item.parts), reverse=True
+        ):
             if path.is_file():
                 path.unlink()
             elif path.is_dir():
@@ -78,7 +82,9 @@ def test_objective_descriptors_and_unknown_source_metadata() -> None:
         assert enriched["genre"] == "unknown"
         assert enriched["label_sources"]["instrument"] == "unknown"
     finally:
-        for path in sorted(root.rglob("*"), key=lambda item: len(item.parts), reverse=True):
+        for path in sorted(
+            root.rglob("*"), key=lambda item: len(item.parts), reverse=True
+        ):
             if path.is_file():
                 path.unlink()
             elif path.is_dir():

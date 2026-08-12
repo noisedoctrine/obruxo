@@ -60,7 +60,9 @@ def _parser() -> argparse.ArgumentParser:
     )
     benchmark.add_argument("--force", action="store_true")
 
-    manifest = subparsers.add_parser("build-eval-manifest", help="resolve the local PresetShare evaluation pairs")
+    manifest = subparsers.add_parser(
+        "build-eval-manifest", help="resolve the local PresetShare evaluation pairs"
+    )
     manifest.add_argument("--corpus-root", type=Path, required=True)
     manifest.add_argument("--output", type=Path, required=True)
     manifest.add_argument("--audit", type=Path, required=True)
@@ -71,7 +73,9 @@ def _parser() -> argparse.ArgumentParser:
     )
     manifest.add_argument("--force", action="store_true")
 
-    evaluation = subparsers.add_parser("evaluate-corpus", help="evaluate the fixed stock Basic Pitch corpus manifest")
+    evaluation = subparsers.add_parser(
+        "evaluate-corpus", help="evaluate the fixed stock Basic Pitch corpus manifest"
+    )
     evaluation.add_argument("--manifest", type=Path, required=True)
     evaluation.add_argument("--output", type=Path, required=True)
     evaluation.add_argument("--force", action="store_true")
@@ -156,7 +160,9 @@ def main() -> int:
         except (CorpusInputError, FileExistsError, OSError, ValueError) as exc:
             print(str(exc), file=sys.stderr)
             return 2
-        print(f"paired {summary['eligible_count']} of {summary['candidate_count']} candidates")
+        print(
+            f"paired {summary['eligible_count']} of {summary['candidate_count']} candidates"
+        )
         return 0
 
     if args.command == "evaluate-corpus":
@@ -176,14 +182,24 @@ def main() -> int:
                 manifest_path.with_name("pairing_audit.json"),
                 output_dir / "run.json",
                 output_dir / "aggregates.json",
-                Path(__file__).resolve().parent / "reports" / "presetshare_baseline.json",
+                Path(__file__).resolve().parent
+                / "reports"
+                / "presetshare_baseline.json",
                 Path(__file__).resolve().parent / "reports" / "presetshare_baseline.md",
                 force=args.force,
             )
-        except (BackendUnavailable, EvaluationInputError, FileExistsError, OSError, ValueError) as exc:
+        except (
+            BackendUnavailable,
+            EvaluationInputError,
+            FileExistsError,
+            OSError,
+            ValueError,
+        ) as exc:
             print(str(exc), file=sys.stderr)
             return 3 if isinstance(exc, BackendUnavailable) else 2
-        print(f"evaluated {result['successful_pair_count']} of {result['pair_count']} pairs")
+        print(
+            f"evaluated {result['successful_pair_count']} of {result['pair_count']} pairs"
+        )
         return 0 if result["status"] == "ok" else 3
 
     from obruxo_basic_pitch.inference import prepare_wav

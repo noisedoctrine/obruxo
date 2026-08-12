@@ -109,7 +109,7 @@ python research/modelling/basic_pitch/run.py build-eval-manifest \
 
 This opt-in exists because the patch and MIDI provide an exact, reproducible local rendering input under the current parent contract. It writes only a labeled `derived_render` WAV and provenance sidecar below the ignored Basic Pitch output root, refuses source overlap/overwrite, and never calls the result an original or historical WAV. Existing WAVs are read-only. The current run used the imported `pedalboard` 0.9.24 package with the exact Vital VST3 identity from the renderer configuration; no environment change or fallback renderer was used. If the validated renderer is unavailable or a source patch cannot be parsed/applied, the audit records `pair.derived_render_unavailable` or `pair.derived_render_failed`.
 
-Run the fixed stock evaluation with the #24 CPU route and no threshold controls:
+Run the fixed stock evaluation with the persisted #24-selected route and no threshold controls:
 
 ```text
 python research/modelling/basic_pitch/run.py evaluate-corpus \

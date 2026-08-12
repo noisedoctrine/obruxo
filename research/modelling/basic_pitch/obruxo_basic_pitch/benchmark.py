@@ -680,10 +680,14 @@ class PedalboardVitalRenderer:
             channel = 0 if event.channel is None else int(event.channel)
             source_timestamp = float(tempo_map.tick_to_seconds(event.tick))
             if source_timestamp < previous_source_timestamp:
-                raise ValueError("Performance events are not ordered by absolute timestamp")
+                raise ValueError(
+                    "Performance events are not ordered by absolute timestamp"
+                )
             timestamp = source_timestamp
             if timestamp <= previous_emitted_timestamp:
-                timestamp = previous_emitted_timestamp + self.midi_timestamp_epsilon_seconds
+                timestamp = (
+                    previous_emitted_timestamp + self.midi_timestamp_epsilon_seconds
+                )
             previous_source_timestamp = source_timestamp
             previous_emitted_timestamp = timestamp
             if event.kind.value == "note_on":
@@ -710,7 +714,13 @@ class PedalboardVitalRenderer:
             messages.append((message, timestamp))
         return messages
 
-    def _process_exact_frames(self, state: bytes, messages: list[tuple[bytes, float]], frame_count: int, np: Any) -> tuple[Any, float, str]:
+    def _process_exact_frames(
+        self,
+        state: bytes,
+        messages: list[tuple[bytes, float]],
+        frame_count: int,
+        np: Any,
+    ) -> tuple[Any, float, str]:
         semantic_duration = frame_count / self.sample_rate
 
         def process(duration: float) -> Any:
@@ -736,20 +746,38 @@ class PedalboardVitalRenderer:
         if observed_frames == frame_count:
             return audio, semantic_duration, "none"
         if abs(observed_frames - frame_count) != 1:
-            raise ValueError(f"Pedalboard returned an unexpected frame count ({observed_frames} != {frame_count})")
+            raise ValueError(
+                f"Pedalboard returned an unexpected frame count ({observed_frames} != {frame_count})"
+            )
         if observed_frames > frame_count:
-            return audio[:, :frame_count], semantic_duration, f"host-boundary trim ({observed_frames}->{frame_count})"
+            return (
+                audio[:, :frame_count],
+                semantic_duration,
+                f"host-boundary trim ({observed_frames}->{frame_count})",
+            )
         correction = 0.5 if observed_frames < frame_count else -0.5
         corrected_duration = (frame_count + correction) / self.sample_rate
         audio = process(corrected_duration)
         if audio.ndim != 2 or audio.shape[0] != self.channels:
-            raise ValueError("Pedalboard returned an unexpected corrected channel layout")
+            raise ValueError(
+                "Pedalboard returned an unexpected corrected channel layout"
+            )
         corrected_frames = int(audio.shape[1])
         if corrected_frames == frame_count:
-            return audio, corrected_duration, f"half-frame correction ({observed_frames}->{frame_count})"
+            return (
+                audio,
+                corrected_duration,
+                f"half-frame correction ({observed_frames}->{frame_count})",
+            )
         if observed_frames < frame_count and corrected_frames == frame_count + 1:
-            return audio[:, :frame_count], corrected_duration, f"host-boundary trim ({corrected_frames}->{frame_count})"
-        raise ValueError(f"Pedalboard returned an unexpected corrected frame count ({corrected_frames} != {frame_count})")
+            return (
+                audio[:, :frame_count],
+                corrected_duration,
+                f"host-boundary trim ({corrected_frames}->{frame_count})",
+            )
+        raise ValueError(
+            f"Pedalboard returned an unexpected corrected frame count ({corrected_frames} != {frame_count})"
+        )
 
     def render(
         self, preset_path: Path, midi_path: Path, destination: Path, output_root: Path
@@ -786,7 +814,11 @@ class PedalboardVitalRenderer:
             self._plugin.reset()
             self._plugin.raw_state = state
             self._plugin.reset()
-            tempo_events = [event for event in performance.canonical_events() if event.kind.value == "tempo"]
+            tempo_events = [
+                event
+                for event in performance.canonical_events()
+                if event.kind.value == "tempo"
+            ]
             tempo_setting_status = "not_applicable"
             tempo_bpm = None
             if tempo_events and hasattr(self._plugin, "beats_per_minute"):
@@ -800,8 +832,10 @@ class PedalboardVitalRenderer:
                 performance.end_tick, self.tail_seconds, self.sample_rate
             )
             duration = frame_count / self.sample_rate
-            channel_first, host_duration, duration_rounding = self._process_exact_frames(
-                state, self._timestamped_midi(performance, timing), frame_count, np
+            channel_first, host_duration, duration_rounding = (
+                self._process_exact_frames(
+                    state, self._timestamped_midi(performance, timing), frame_count, np
+                )
             )
             rendered = np.ascontiguousarray(channel_first.T)
             if rendered.shape != (frame_count, self.channels) or not bool(
