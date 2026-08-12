@@ -4,9 +4,9 @@ This is a fixed measurement of the canonical #23 float32 model, not an optimizat
 
 ## Executive findings
 
-- Measured steady-state inference winners by model-call batch: batch 1 `pytorch_xpu` (225.829 audio-seconds/second), batch 2 `pytorch_xpu` (379.212 audio-seconds/second), batch 4 `pytorch_xpu` (578.354 audio-seconds/second), batch 8 `pytorch_xpu` (779.279 audio-seconds/second).
-- On the warmed end-to-end smoke boundary, `pytorch_xpu` is fastest at `95.727` audio-seconds per wall-second.
-- The fixed startup/throughput calculation retains `1` positive finite crossover point(s); these are descriptive model-only results, not claims about all application workloads.
+- Measured steady-state inference winners by model-call batch: batch 1 `pytorch_xpu` (238.368 audio-seconds/second), batch 2 `pytorch_xpu` (417.493 audio-seconds/second), batch 4 `pytorch_xpu` (616.100 audio-seconds/second), batch 8 `pytorch_xpu` (727.274 audio-seconds/second).
+- On the warmed end-to-end smoke boundary, `pytorch_xpu` is fastest at `96.027` audio-seconds per wall-second.
+- The fixed startup/throughput calculation retains `2` positive finite crossover point(s); these are descriptive model-only results, not claims about all application workloads.
 - First-call and startup trade-offs remain visible in the dedicated tables, so short interactive calls must be interpreted separately from reused or longer workloads.
 - The corrected OpenVINO GPU route now has measured FP32 + PERFORMANCE startup, batch scaling, end-to-end, parity, and resource results.
 - The original/default FP16 + PERFORMANCE OpenVINO GPU parity failure remains preserved as historical evidence; it is not conflated with the corrected timed route.
@@ -16,6 +16,7 @@ This is a fixed measurement of the canonical #23 float32 model, not an optimizat
 
 - Model: `spotify-basic-pitch-icassp-2022-v0.4.0`; precision: `float32`; smoke set: `ok` with `8` cases.
 - Runtime: Python `3.12.13`, PyTorch `2.12.1+xpu`, OpenVINO `2026.3.0-000--`, NumPy `2.4.6`, SciPy `1.18.0`.
+- Smoke-set coverage gate: `complete`; required representative categories are recorded in the JSON contract and missing categories are `{}`.
 - Each route used a fresh process for each of 3 repetitions; each fixed batch used 3 warmups and 10 timed calls.
 - Model-only inference and full forward+backward training used batches `[1, 2, 4, 8]`. End-to-end inference used batch 1 and covered read-only audio preparation through stock note-event materialization.
 - Missing-WAV derived rendering was opt-in only; source patches, MIDI, audio, and metadata remained read-only.
@@ -25,7 +26,7 @@ This is a fixed measurement of the canonical #23 float32 model, not an optimizat
 - Status: `selected`; selected backend: `pytorch_xpu`; device: `xpu:0`; precision: `float32`.
 - Boundary: `end_to_end_audio_to_note_event`.
 - Selection rule: highest median end-to-end audio-seconds/wall-second among successful parity-safe inference routes.
-- Supporting run identity code revision: `35741ef481c1baa3726d4aaab4054b242d8b5ac6`.
+- Supporting run identity code revision: `c61ffc23b89abc09ce645760849e9be3a004d6ab`.
 
 ## Timed inference route identity
 
@@ -43,21 +44,21 @@ Startup is separated from first-call, warmup, and steady-state timing. The corre
 
 | Route | Status | Import | Construct | Checkpoint | Device move | OV convert | OV compile | Total startup |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `pytorch_cpu` | `ok` | 1.015 | 0.004 | 0.010 | n/a | n/a | n/a | 1.028 |
-| `pytorch_xpu` | `ok` | 0.948 | 0.003 | 0.009 | 0.024 | n/a | n/a | 0.983 |
+| `pytorch_cpu` | `ok` | 0.778 | 0.002 | 0.004 | n/a | n/a | n/a | 0.783 |
+| `pytorch_xpu` | `ok` | 0.782 | 0.002 | 0.005 | 0.016 | n/a | n/a | 0.804 |
 | `openvino_cpu` | `parity_failed` | n/a | n/a | n/a | n/a | n/a | n/a | n/a |
-| `openvino_gpu` | `ok` | 0.968 | 0.002 | 0.006 | n/a | 2.539 | 0.516 | 3.977 |
+| `openvino_gpu` | `ok` | 0.777 | 0.002 | 0.004 | n/a | 1.592 | 0.346 | 2.700 |
 
 ### First-call and warmup observations
 
 | Route | Batch | First call (s) | Warmup (s) | Steady median call (s) |
 | --- | ---: | ---: | ---: | ---: |
-| `pytorch_cpu` | 1 | 0.030 | 0.077 | 0.025544 |
-| `pytorch_cpu` | 8 | 0.120 | 0.300 | 0.096693 |
-| `pytorch_xpu` | 1 | 0.773 | 0.028 | 0.008856 |
-| `pytorch_xpu` | 8 | 0.948 | 0.062 | 0.020532 |
-| `openvino_gpu` | 1 | 0.047 | 0.061 | 0.016407 |
-| `openvino_gpu` | 8 | 0.094 | 0.163 | 0.050029 |
+| `pytorch_cpu` | 1 | 0.026 | 0.072 | 0.025442 |
+| `pytorch_cpu` | 8 | 0.090 | 0.245 | 0.089291 |
+| `pytorch_xpu` | 1 | 0.624 | 0.023 | 0.008390 |
+| `pytorch_xpu` | 8 | 0.657 | 0.069 | 0.022000 |
+| `openvino_gpu` | 1 | 0.038 | 0.062 | 0.017905 |
+| `openvino_gpu` | 8 | 0.095 | 0.162 | 0.052546 |
 
 ## Steady-state inference scaling
 
@@ -67,29 +68,29 @@ The corrected timing tables expose both throughput and call latency for every te
 
 | Route | Batch 1 | Batch 2 | Batch 4 | Batch 8 |
 | --- | ---: | ---: | ---: | ---: |
-| `pytorch_cpu` | 78.297 | 110.257 | 140.898 | 165.472 |
-| `pytorch_xpu` | 225.829 | 379.212 | 578.354 | 779.279 |
-| `openvino_gpu` | 121.901 | 262.879 | 310.162 | 319.814 |
+| `pytorch_cpu` | 78.610 | 141.531 | 225.268 | 179.190 |
+| `pytorch_xpu` | 238.368 | 417.493 | 616.100 | 727.274 |
+| `openvino_gpu` | 111.703 | 242.847 | 287.862 | 304.494 |
 
 ### Median model-call latency (seconds)
 
 | Route | Batch 1 | Batch 2 | Batch 4 | Batch 8 |
 | --- | ---: | ---: | ---: | ---: |
-| `pytorch_cpu` | 0.025544 | 0.036279 | 0.056778 | 0.096693 |
-| `pytorch_xpu` | 0.008856 | 0.010548 | 0.013832 | 0.020532 |
-| `openvino_gpu` | 0.016407 | 0.015216 | 0.025793 | 0.050029 |
+| `pytorch_cpu` | 0.025442 | 0.028262 | 0.035513 | 0.089291 |
+| `pytorch_xpu` | 0.008390 | 0.009581 | 0.012985 | 0.022000 |
+| `openvino_gpu` | 0.017905 | 0.016471 | 0.027791 | 0.052546 |
 
-Interpretation: batch 1 winner is `pytorch_xpu` at 225.829 audio-seconds/second; batch 2 winner is `pytorch_xpu` at 379.212 audio-seconds/second; batch 4 winner is `pytorch_xpu` at 578.354 audio-seconds/second; batch 8 winner is `pytorch_xpu` at 779.279 audio-seconds/second. These are fixed-workload observations, not tuning targets.
+Interpretation: batch 1 winner is `pytorch_xpu` at 238.368 audio-seconds/second; batch 2 winner is `pytorch_xpu` at 417.493 audio-seconds/second; batch 4 winner is `pytorch_xpu` at 616.100 audio-seconds/second; batch 8 winner is `pytorch_xpu` at 727.274 audio-seconds/second. These are fixed-workload observations, not tuning targets.
 
 ## End-to-end audio-to-note-event throughput
 
-This is the realistic batch-1 boundary: read-only audio open/decode, in-memory preparation, model windows, unwrapping, and stock note-event materialization. The smoke set totals 115.021 audio seconds across 8 cases.
+This is the realistic batch-1 boundary: read-only audio open/decode, in-memory preparation, model windows, unwrapping, and stock note-event materialization. The smoke set totals 162.073 audio seconds across 8 cases.
 
 | Route | Median wall time (s) | Min-max wall time (s) | Median audio-seconds/wall-second | Median RTF (wall/audio) |
 | --- | ---: | ---: | ---: | ---: |
-| `pytorch_cpu` | 2.379 | 2.357-2.383 | 48.355 | 0.02068 |
-| `pytorch_xpu` | 1.202 | 1.196-1.203 | 95.727 | 0.01045 |
-| `openvino_gpu` | 1.629 | 1.566-1.686 | 70.608 | 0.01416 |
+| `pytorch_cpu` | 3.123 | 3.092-3.272 | 51.896 | 0.01927 |
+| `pytorch_xpu` | 1.688 | 1.610-1.728 | 96.027 | 0.01041 |
+| `openvino_gpu` | 3.612 | 3.542-3.616 | 44.868 | 0.02229 |
 
 The measured end-to-end winner is `pytorch_xpu`; this ordering is specific to the fixed smoke boundary and includes no failed route.
 
@@ -101,17 +102,17 @@ These rows measure the explicitly allowed backward cost at the native PyTorch bo
 
 | Route | Batch 1 | Batch 2 | Batch 4 | Batch 8 |
 | --- | ---: | ---: | ---: | ---: |
-| `pytorch_cpu` | 33.053 | 33.343 | 32.575 | 35.637 |
-| `pytorch_xpu` | 98.683 | 151.480 | 205.752 | 252.572 |
+| `pytorch_cpu` | 28.533 | 32.766 | 31.880 | 28.735 |
+| `pytorch_xpu` | 87.951 | 142.903 | 209.984 | 227.634 |
 
 ### Median forward+backward step latency (seconds)
 
 | Route | Batch 1 | Batch 2 | Batch 4 | Batch 8 |
 | --- | ---: | ---: | ---: | ---: |
-| `pytorch_cpu` | 0.060509 | 0.119964 | 0.245590 | 0.448974 |
-| `pytorch_xpu` | 0.020267 | 0.026406 | 0.038882 | 0.063348 |
+| `pytorch_cpu` | 0.070094 | 0.122076 | 0.250945 | 0.556816 |
+| `pytorch_xpu` | 0.022740 | 0.027991 | 0.038098 | 0.070288 |
 
-Training winners by batch are: batch 1 `pytorch_xpu` (98.683 audio-seconds/second); batch 2 `pytorch_xpu` (151.480 audio-seconds/second); batch 4 `pytorch_xpu` (205.752 audio-seconds/second); batch 8 `pytorch_xpu` (252.572 audio-seconds/second). This is a cost observation, not a recommendation to change the current training architecture.
+Training winners by batch are: batch 1 `pytorch_xpu` (87.951 audio-seconds/second); batch 2 `pytorch_xpu` (142.903 audio-seconds/second); batch 4 `pytorch_xpu` (209.984 audio-seconds/second); batch 8 `pytorch_xpu` (227.634 audio-seconds/second). This is a cost observation, not a recommendation to change the current training architecture.
 
 ## Memory and resource observations
 
@@ -119,19 +120,20 @@ Host RSS is a peak process measurement and is not directly interchangeable with 
 
 | Mode | Route | Host peak RSS (MiB) | XPU allocated (MiB) | XPU reserved (MiB) | OV GPU current allocation (MiB) | OV GPU device memory (MiB) | Measurement note |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| inference | `pytorch_cpu` | 598.9 | n/a | n/a | n/a | n/a | available |
-| inference | `pytorch_xpu` | 2310.6 | 70.3 | 124.0 | n/a | n/a | available |
+| inference | `pytorch_cpu` | 609.1 | n/a | n/a | n/a | n/a | available |
+| inference | `pytorch_xpu` | 2331.6 | 70.3 | 124.0 | n/a | n/a | available |
 | inference | `openvino_cpu` | n/a | n/a | n/a | n/a | n/a | parity_failed before timing |
-| inference | `openvino_gpu` | 1188.8 | n/a | n/a | 236.6 | 16762.6 | available |
-| training | `pytorch_cpu` | 907.5 | n/a | n/a | n/a | n/a | available |
-| training | `pytorch_xpu` | 2926.7 | 182.1 | 316.0 | n/a | n/a | available |
+| inference | `openvino_gpu` | 1209.5 | n/a | n/a | 241.5 | 16762.6 | available |
+| training | `pytorch_cpu` | 910.0 | n/a | n/a | n/a | n/a | available |
+| training | `pytorch_xpu` | 2925.7 | 182.1 | 316.0 | n/a | n/a | available |
 
 OpenVINO GPU memory is reported as the post-measurement GPU_MEMORY_STATISTICS allocation total, not a peak; host RSS remains a separate process-level measurement.
 
 ## Startup versus throughput crossover
 
 - Each point uses median one-time startup and median batch-1 model-call throughput; only positive finite distances are retained.
-- `pytorch_cpu` versus `openvino_gpu`: `645.619` audio seconds.
+- `pytorch_cpu` versus `pytorch_xpu`: `2.471` audio seconds.
+- `pytorch_cpu` versus `openvino_gpu`: `508.519` audio seconds.
 - These model-only crossover points describe when the measured steady-state rate repays the measured startup difference; they are not universal short-clip latency guarantees.
 
 ## Parity diagnostics by framework and processor
