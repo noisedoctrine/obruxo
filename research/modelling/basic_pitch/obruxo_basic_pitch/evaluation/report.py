@@ -366,7 +366,7 @@ def _markdown(report: Mapping[str, Any]) -> str:
         "",
         f"- Onset + pitch false negatives: `{aggregate.get('failure_analysis', {}).get('note', {}).get('onset_pitch_false_negatives', 0)}`; false positives: `{aggregate.get('failure_analysis', {}).get('note', {}).get('onset_pitch_false_positives', 0)}`.",
         f"- Additional offset false negatives: `{aggregate.get('failure_analysis', {}).get('note', {}).get('additional_offset_false_negatives', 0)}`.",
-        f"- Assigned near-onset pitch errors: `{aggregate.get('failure_analysis', {}).get('pitch', {}).get('assigned_near_onset_errors', 0)}`; octave errors: `{aggregate.get('failure_analysis', {}).get('pitch', {}).get('octave_error_count', 0)}`; ambiguous/unassigned: `{aggregate.get('failure_analysis', {}).get('pitch', {}).get('unassigned_near_onset_errors', 0)}`.",
+        f"- Assigned near-onset pitch errors: `{aggregate.get('failure_analysis', {}).get('pitch', {}).get('assigned_near_onset_errors', 0)}`; octave errors: `{aggregate.get('failure_analysis', {}).get('pitch', {}).get('octave_error_count', 0)}`; diagnostically unassigned residual references/predictions: `{aggregate.get('failure_analysis', {}).get('pitch', {}).get('unassigned_near_onset_errors', 0)}`.",
         "- Pair-level failures and private best/worst rows remain under ignored local outputs. This committed view contains only aggregate coverage and stable exclusion counts.",
         "",
         "## Interpretation",

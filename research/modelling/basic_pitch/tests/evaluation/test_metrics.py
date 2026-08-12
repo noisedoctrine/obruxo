@@ -68,7 +68,15 @@ def test_count_bias_out_of_range_velocity_and_pitch_confusion() -> None:
         [NoteEvent(0.1, 0.5, 72, 80 / 127), NoteEvent(0.1, 0.5, 76, 80 / 127)],
     )
     assert ambiguous["pitch_confusion"]["assigned_count"] == 0
-    assert ambiguous["pitch_confusion"]["unassigned_error_count"] == 2
+    assert ambiguous["pitch_confusion"]["ambiguous_reference_count"] == 2
+    assert ambiguous["pitch_confusion"]["unassigned_reference_count"] == 2
+    assert ambiguous["pitch_confusion"]["unassigned_prediction_count"] == 2
+    assert ambiguous["pitch_confusion"]["unassigned_error_count"] == 4
+
+    missing_prediction = note_metrics(_reference(), [])
+    assert missing_prediction["pitch_confusion"]["unassigned_error_count"] == 1
+    extra_prediction = note_metrics([], _prediction())
+    assert extra_prediction["pitch_confusion"]["unassigned_error_count"] == 1
 
 
 def test_micro_aggregation_is_count_based_and_bootstrap_is_deterministic() -> None:

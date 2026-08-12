@@ -159,11 +159,18 @@ def _pitch_confusion(
     ambiguous_reference_count = sum(
         1 for ref_index, candidates in candidate_by_reference.items() if len(candidates) != 1 or len(candidate_by_prediction[candidates[0]]) != 1
     )
+    assigned_reference = {ref for ref, _ in assigned}
+    assigned_prediction = {est for _, est in assigned}
+    unassigned_reference_count = len(reference) - len(matched_reference) - len(assigned_reference)
+    unassigned_prediction_count = len(predicted) - len(matched_prediction) - len(assigned_prediction)
     return {
         "assigned_count": len(assigned),
         "signed_semitone_deltas": deltas,
         "octave_error_count": octave_errors,
-        "unassigned_error_count": ambiguous_reference_count,
+        "ambiguous_reference_count": ambiguous_reference_count,
+        "unassigned_reference_count": unassigned_reference_count,
+        "unassigned_prediction_count": unassigned_prediction_count,
+        "unassigned_error_count": unassigned_reference_count + unassigned_prediction_count,
         "candidate_reference_count": len(candidate_by_reference),
     }
 
