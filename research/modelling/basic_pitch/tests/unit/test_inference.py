@@ -83,8 +83,12 @@ def test_unwrap_crops_each_window_then_trims_once_to_original_duration() -> None
     }
 
     original_sample_count = AUDIO_SAMPLE_RATE * 2 + 100
-    unwrapped = unwrap_window_outputs(output, original_sample_count=original_sample_count)
-    expected_frames = original_sample_count * (AUDIO_SAMPLE_RATE // FFT_HOP) // AUDIO_SAMPLE_RATE
+    unwrapped = unwrap_window_outputs(
+        output, original_sample_count=original_sample_count
+    )
+    expected_frames = (
+        original_sample_count * (AUDIO_SAMPLE_RATE // FFT_HOP) // AUDIO_SAMPLE_RATE
+    )
 
     assert {name: value.shape for name, value in unwrapped.items()} == {
         "note": (expected_frames, 88),

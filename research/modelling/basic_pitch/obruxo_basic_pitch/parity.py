@@ -78,8 +78,15 @@ def synthetic_windows() -> np.ndarray:
         0.2 * np.sin(2.0 * np.pi * frequency * seconds)
         for frequency in (220.0, 330.0, 440.0)
     ).astype(np.float32)
-    noise = np.random.default_rng(20260810).standard_normal(AUDIO_N_SAMPLES).astype(np.float32) * 0.05
-    return np.ascontiguousarray(np.stack((zeros, impulses, sinusoid, chord, noise), axis=0)[:, :, None])
+    noise = (
+        np.random.default_rng(20260810)
+        .standard_normal(AUDIO_N_SAMPLES)
+        .astype(np.float32)
+        * 0.05
+    )
+    return np.ascontiguousarray(
+        np.stack((zeros, impulses, sinusoid, chord, noise), axis=0)[:, :, None]
+    )
 
 
 def audio_to_windows(path: Path) -> np.ndarray:
@@ -91,9 +98,13 @@ def _output_parity(reference: np.ndarray, candidate: np.ndarray) -> OutputParity
     reference = np.asarray(reference, dtype=np.float64)
     candidate = np.asarray(candidate, dtype=np.float64)
     if reference.shape != candidate.shape:
-        raise ValueError(f"parity output shapes differ: {reference.shape} versus {candidate.shape}")
+        raise ValueError(
+            f"parity output shapes differ: {reference.shape} versus {candidate.shape}"
+        )
     if not np.all(np.isfinite(reference)) or not np.all(np.isfinite(candidate)):
-        return OutputParity(max_abs_error=float("inf"), mean_abs_error=float("inf"), rmse=float("inf"))
+        return OutputParity(
+            max_abs_error=float("inf"), mean_abs_error=float("inf"), rmse=float("inf")
+        )
     difference = candidate - reference
     absolute = np.abs(difference)
     return OutputParity(
@@ -103,20 +114,34 @@ def _output_parity(reference: np.ndarray, candidate: np.ndarray) -> OutputParity
     )
 
 
-def _event_structure(event: NoteEvent) -> tuple[float, float, int, tuple[int, ...] | None]:
+def _event_structure(
+    event: NoteEvent,
+) -> tuple[float, float, int, tuple[int, ...] | None]:
     return event.start_time_s, event.end_time_s, event.pitch_midi, event.pitch_bend
 
 
-def _event_metrics(onnx_events: list[NoteEvent], torch_events: list[NoteEvent]) -> tuple[int, float | None, float | None, int]:
+def _event_metrics(
+    onnx_events: list[NoteEvent], torch_events: list[NoteEvent]
+) -> tuple[int, float | None, float | None, int]:
     if len(onnx_events) != len(torch_events):
         return 1, None, None, max(len(onnx_events), len(torch_events))
     structure_disagreements = sum(
-        left != right for left, right in zip(map(_event_structure, onnx_events), map(_event_structure, torch_events))
+        left != right
+        for left, right in zip(
+            map(_event_structure, onnx_events), map(_event_structure, torch_events)
+        )
     )
-    amplitude_diffs = np.asarray([right.amplitude - left.amplitude for left, right in zip(onnx_events, torch_events)], dtype=np.float64)
+    amplitude_diffs = np.asarray(
+        [
+            right.amplitude - left.amplitude
+            for left, right in zip(onnx_events, torch_events)
+        ],
+        dtype=np.float64,
+    )
     amplitude_abs = np.abs(amplitude_diffs)
     pitch_bend_disagreements = sum(
-        (left.pitch_bend or ()) != (right.pitch_bend or ()) for left, right in zip(onnx_events, torch_events)
+        (left.pitch_bend or ()) != (right.pitch_bend or ())
+        for left, right in zip(onnx_events, torch_events)
     )
     if amplitude_abs.size == 0:
         return structure_disagreements, 0.0, 0.0, int(pitch_bend_disagreements)
@@ -130,8 +155,14 @@ def _event_metrics(onnx_events: list[NoteEvent], torch_events: list[NoteEvent]) 
 
 def _validate_windows(windows: np.ndarray) -> np.ndarray:
     windows = np.asarray(windows)
-    if windows.dtype != np.float32 or windows.ndim != 3 or windows.shape[1:] != (AUDIO_N_SAMPLES, 1):
-        raise ValueError(f"expected CQT windows [N,{AUDIO_N_SAMPLES},1] float32, got {windows.shape} {windows.dtype}")
+    if (
+        windows.dtype != np.float32
+        or windows.ndim != 3
+        or windows.shape[1:] != (AUDIO_N_SAMPLES, 1)
+    ):
+        raise ValueError(
+            f"expected CQT windows [N,{AUDIO_N_SAMPLES},1] float32, got {windows.shape} {windows.dtype}"
+        )
     if not windows.flags.c_contiguous:
         raise ValueError("parity windows must be C-contiguous")
     if windows.shape[0] == 0:
@@ -141,11 +172,15 @@ def _validate_windows(windows: np.ndarray) -> np.ndarray:
     return windows
 
 
-def _run_model_outputs(onnx_path: Path, checkpoint_path: Path, windows: np.ndarray) -> tuple[dict[str, np.ndarray], dict[str, np.ndarray]]:
+def _run_model_outputs(
+    onnx_path: Path, checkpoint_path: Path, windows: np.ndarray
+) -> tuple[dict[str, np.ndarray], dict[str, np.ndarray]]:
     windows = _validate_windows(windows)
     session = ort.InferenceSession(str(onnx_path), providers=["CPUExecutionProvider"])
     if session.get_providers() != ["CPUExecutionProvider"]:
-        raise RuntimeError(f"unexpected ONNX Runtime providers: {session.get_providers()}")
+        raise RuntimeError(
+            f"unexpected ONNX Runtime providers: {session.get_providers()}"
+        )
     if session.get_inputs()[0].name != ONNX_INPUT_NAME:
         raise RuntimeError("unexpected ONNX Runtime input name")
     onnx_values = session.run(None, {ONNX_INPUT_NAME: windows})
@@ -163,18 +198,26 @@ def _run_model_outputs(onnx_path: Path, checkpoint_path: Path, windows: np.ndarr
     model.eval()
     with torch.inference_mode():
         torch_values = model(torch.from_numpy(windows))
-    torch_outputs = {name: value.detach().cpu().numpy() for name, value in torch_values.items()}
+    torch_outputs = {
+        name: value.detach().cpu().numpy() for name, value in torch_values.items()
+    }
     return onnx_outputs, torch_outputs
 
 
-def _events_for_clip(output: dict[str, np.ndarray], *, original_sample_count: int | None) -> list[NoteEvent]:
+def _events_for_clip(
+    output: dict[str, np.ndarray], *, original_sample_count: int | None
+) -> list[NoteEvent]:
     if original_sample_count is None:
         return [
             event
             for index in range(output["note"].shape[0])
-            for event in posteriorgrams_to_note_events({name: value[index] for name, value in output.items()})
+            for event in posteriorgrams_to_note_events(
+                {name: value[index] for name, value in output.items()}
+            )
         ]
-    return posteriorgrams_to_note_events(unwrap_window_outputs(output, original_sample_count=original_sample_count))
+    return posteriorgrams_to_note_events(
+        unwrap_window_outputs(output, original_sample_count=original_sample_count)
+    )
 
 
 def _compare_batches(
@@ -184,12 +227,29 @@ def _compare_batches(
 ) -> ParitySummary:
     if not batches:
         raise ValueError("parity requires at least one batch")
-    windows = np.ascontiguousarray(np.concatenate([_validate_windows(value) for value, _ in batches], axis=0))
-    onnx_outputs, torch_outputs = _run_model_outputs(onnx_path, checkpoint_path, windows)
+    windows = np.ascontiguousarray(
+        np.concatenate([_validate_windows(value) for value, _ in batches], axis=0)
+    )
+    onnx_outputs, torch_outputs = _run_model_outputs(
+        onnx_path, checkpoint_path, windows
+    )
 
-    output_metrics = {name: _output_parity(onnx_outputs[name], torch_outputs[name]) for name in ("contour", "note", "onset")}
-    note_disagreements = int(np.count_nonzero((onnx_outputs["note"] >= FRAME_THRESHOLD) != (torch_outputs["note"] >= FRAME_THRESHOLD)))
-    onset_disagreements = int(np.count_nonzero((onnx_outputs["onset"] >= ONSET_THRESHOLD) != (torch_outputs["onset"] >= ONSET_THRESHOLD)))
+    output_metrics = {
+        name: _output_parity(onnx_outputs[name], torch_outputs[name])
+        for name in ("contour", "note", "onset")
+    }
+    note_disagreements = int(
+        np.count_nonzero(
+            (onnx_outputs["note"] >= FRAME_THRESHOLD)
+            != (torch_outputs["note"] >= FRAME_THRESHOLD)
+        )
+    )
+    onset_disagreements = int(
+        np.count_nonzero(
+            (onnx_outputs["onset"] >= ONSET_THRESHOLD)
+            != (torch_outputs["onset"] >= ONSET_THRESHOLD)
+        )
+    )
 
     onnx_events: list[NoteEvent] = []
     torch_events: list[NoteEvent] = []
@@ -200,13 +260,24 @@ def _compare_batches(
     amplitude_mismatch = False
     for batch, original_sample_count in batches:
         count = batch.shape[0]
-        onnx_clip = {name: value[offset : offset + count] for name, value in onnx_outputs.items()}
-        torch_clip = {name: value[offset : offset + count] for name, value in torch_outputs.items()}
-        onnx_clip_events = _events_for_clip(onnx_clip, original_sample_count=original_sample_count)
-        torch_clip_events = _events_for_clip(torch_clip, original_sample_count=original_sample_count)
+        onnx_clip = {
+            name: value[offset : offset + count] for name, value in onnx_outputs.items()
+        }
+        torch_clip = {
+            name: value[offset : offset + count]
+            for name, value in torch_outputs.items()
+        }
+        onnx_clip_events = _events_for_clip(
+            onnx_clip, original_sample_count=original_sample_count
+        )
+        torch_clip_events = _events_for_clip(
+            torch_clip, original_sample_count=original_sample_count
+        )
         onnx_events.extend(onnx_clip_events)
         torch_events.extend(torch_clip_events)
-        clip_structure, clip_amplitude_max, clip_amplitude_mean, clip_pitch_bends = _event_metrics(onnx_clip_events, torch_clip_events)
+        clip_structure, clip_amplitude_max, clip_amplitude_mean, clip_pitch_bends = (
+            _event_metrics(onnx_clip_events, torch_clip_events)
+        )
         structure_disagreements += clip_structure
         pitch_bend_disagreements += clip_pitch_bends
         if clip_amplitude_max is None or clip_amplitude_mean is None:
@@ -217,8 +288,14 @@ def _compare_batches(
                 for left, right in zip(onnx_clip_events, torch_clip_events, strict=True)
             )
         offset += count
-    amplitude_max = None if amplitude_mismatch else (max(amplitude_differences, default=0.0))
-    amplitude_mean = None if amplitude_mismatch else (float(np.mean(amplitude_differences)) if amplitude_differences else 0.0)
+    amplitude_max = (
+        None if amplitude_mismatch else (max(amplitude_differences, default=0.0))
+    )
+    amplitude_mean = (
+        None
+        if amplitude_mismatch
+        else (float(np.mean(amplitude_differences)) if amplitude_differences else 0.0)
+    )
     return ParitySummary(
         contour=output_metrics["contour"],
         note=output_metrics["note"],
@@ -237,14 +314,22 @@ def _compare_batches(
     )
 
 
-def compare_windows(onnx_path: Path, checkpoint_path: Path, windows: np.ndarray) -> ParitySummary:
+def compare_windows(
+    onnx_path: Path, checkpoint_path: Path, windows: np.ndarray
+) -> ParitySummary:
     """Compare independent model windows through both model paths."""
     return _compare_batches(onnx_path, checkpoint_path, ((windows, None),))
 
 
-def compare_audio(onnx_path: Path, checkpoint_path: Path, prepared: PreparedAudio) -> ParitySummary:
+def compare_audio(
+    onnx_path: Path, checkpoint_path: Path, prepared: PreparedAudio
+) -> ParitySummary:
     """Compare one prepared audio clip after unwrapping its complete posterior timeline."""
-    return _compare_batches(onnx_path, checkpoint_path, ((prepared.windows, prepared.original_sample_count),))
+    return _compare_batches(
+        onnx_path,
+        checkpoint_path,
+        ((prepared.windows, prepared.original_sample_count),),
+    )
 
 
 def compare_audio_clips(
@@ -270,7 +355,10 @@ def compare_windows_and_audio(
     return _compare_batches(
         onnx_path,
         checkpoint_path,
-        ((windows, None), *((clip.windows, clip.original_sample_count) for clip in clips)),
+        (
+            (windows, None),
+            *((clip.windows, clip.original_sample_count) for clip in clips),
+        ),
     )
 
 
@@ -282,10 +370,15 @@ def assert_parity(summary: ParitySummary) -> None:
     for name, tolerance in ADOPTED_MAX_ABS_TOLERANCES.items():
         observed = getattr(summary, name).max_abs_error
         if observed > tolerance:
-            raise AssertionError(f"{name} max absolute error {observed} exceeds {tolerance}")
+            raise AssertionError(
+                f"{name} max absolute error {observed} exceeds {tolerance}"
+            )
     if summary.note_threshold_disagreements or summary.onset_threshold_disagreements:
         raise AssertionError("threshold crossing disagreement detected")
-    if summary.event_structure_disagreements or summary.pitch_bend_element_disagreements:
+    if (
+        summary.event_structure_disagreements
+        or summary.pitch_bend_element_disagreements
+    ):
         raise AssertionError("stock note-event disagreement detected")
 
 
@@ -301,8 +394,12 @@ def write_reports(
     markdown_path = markdown_path.resolve(strict=False)
     workspace = Path(__file__).resolve().parents[1]
     reports = workspace / "reports"
-    if not json_path.is_relative_to(reports) or not markdown_path.is_relative_to(reports):
-        raise ValueError("parity reports must be written inside the approved reports directory")
+    if not json_path.is_relative_to(reports) or not markdown_path.is_relative_to(
+        reports
+    ):
+        raise ValueError(
+            "parity reports must be written inside the approved reports directory"
+        )
     json_path.parent.mkdir(parents=True, exist_ok=True)
     markdown_path.parent.mkdir(parents=True, exist_ok=True)
     if not force and (json_path.exists() or markdown_path.exists()):
@@ -359,7 +456,9 @@ def write_reports(
     }
     json_path.parent.mkdir(parents=True, exist_ok=True)
     markdown_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    json_path.write_text(
+        json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
     markdown = "\n".join(
         [
             "# Basic Pitch ONNX parity",
