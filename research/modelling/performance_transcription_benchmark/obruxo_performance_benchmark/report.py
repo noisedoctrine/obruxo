@@ -475,6 +475,8 @@ def _markdown(report: Mapping[str, Any]) -> str:
     model_call_winner_rates: dict[int, Any] = {}
     e2e_winner: str | None = None
     e2e_winner_rate: Any = None
+    quality_backend: Mapping[str, Any] = {}
+    runtime_provenance: Mapping[str, Any] = {}
     if basic_pitch:
         quality = basic_pitch.get("quality") or {}
         quality_provenance = basic_pitch.get("quality_provenance") or {}
@@ -641,6 +643,10 @@ def _markdown(report: Mapping[str, Any]) -> str:
     else:
         measured_route_note = "- The observed Basic Pitch route trade-offs and the historical pre-fix OpenVINO GPU failure are findings of #24; corrected GPU performance is not present in the consumed route rows."
         bounded_route_note = "- This bounded result validates numerical parity only; it does not add a corrected OpenVINO GPU speed, startup, end-to-end, memory, or resource result."
+    if runtime_provenance.get("consistency") == "exact_issue_24_decision_consumed":
+        quality_route_note = f"- The #25 quality result is explicitly provenanced to the exact #24-selected `{quality_backend.get('backend_id', 'unknown')}` route on `{quality_backend.get('device', 'unknown')}`; it does not establish quality equivalence for any other backend."
+    else:
+        quality_route_note = "- The #25 quality route provenance is not an exact #24 decision match, so it is not treated as the canonical corpus baseline."
     lines.extend(["", "## What could not be executed", "", "No alternative candidate produced a quality, execution-cost, resource, backward-cost, or quantization measurement. The unavailability reasons are concrete local prerequisites, not claims that the models are intrinsically impossible to run.", "", "| Candidate | Status | Concrete blocker | What this prevents |", "| --- | --- | --- | --- |"])
     for model in unavailable:
         reason = model.get("availability_reason") or model.get("failure_code") or "not recorded"
@@ -659,7 +665,7 @@ def _markdown(report: Mapping[str, Any]) -> str:
             f"- {conclusion.get('measured', 'not recorded')}",
             "- The Basic Pitch evidence is a complete baseline for the landed #24/#25 contracts, not a comparison against the unavailable alternatives.",
             measured_route_note,
-            "- The #25 quality result remains CPU-provenanced until route provenance is resolved.",
+            quality_route_note,
             "",
             "### Bounded diagnostic results",
             "",

@@ -15,7 +15,12 @@ from ..artifacts import (
     ModelSpec,
     verify_checkpoint,
 )
-from ..types import NormalizedNote, TranscriptionOutput, rasterize_notes
+from ..types import (
+    NormalizedNote,
+    TranscriptionOutput,
+    common_frame_count,
+    rasterize_notes,
+)
 
 
 def _basic_pitch_root() -> Path:
@@ -147,7 +152,5 @@ class BasicPitchAdapter:
             for event in events
             if event.end_time_s > event.start_time_s
         )
-        from obruxo_basic_pitch.constants import ANNOTATIONS_FPS, AUDIO_SAMPLE_RATE
-
-        frame_count = int(prepared.original_sample_count * ANNOTATIONS_FPS // AUDIO_SAMPLE_RATE)
+        frame_count = common_frame_count(prepared.original_sample_count)
         return TranscriptionOutput(notes, rasterize_notes(notes, frame_count))

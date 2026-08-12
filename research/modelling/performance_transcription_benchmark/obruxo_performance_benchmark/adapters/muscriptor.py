@@ -13,7 +13,12 @@ from ..artifacts import (
     verify_checkout,
     verify_checkpoint,
 )
-from ..types import NormalizedNote, TranscriptionOutput, rasterize_notes
+from ..types import (
+    NormalizedNote,
+    TranscriptionOutput,
+    common_frame_count,
+    rasterize_notes,
+)
 from .yourmt3 import normalize_note_events
 
 MUSCRIPTOR_IDS = ("muscriptor_small", "muscriptor_medium", "muscriptor_large")
@@ -102,7 +107,7 @@ class MuScriptorAdapter:
             sys.path.insert(0, str(root))
         from obruxo_basic_pitch.inference import prepare_wav
 
-        return int(prepare_wav(Path(audio)).original_sample_count * 100 // 22050)
+        return common_frame_count(prepare_wav(Path(audio)).original_sample_count)
 
     @staticmethod
     def _decode_midi(data: bytes) -> tuple[NormalizedNote, ...]:

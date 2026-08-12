@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -111,15 +113,27 @@ def common_frame_times(n_frames: int) -> np.ndarray:
     """Return #25's exact model-frame timestamps, without a second grid."""
     if n_frames < 0:
         raise ValueError("frame count must be non-negative")
-    import sys
-    from pathlib import Path
-
-    basic_pitch_root = Path(__file__).resolve().parents[2] / "basic_pitch"
-    if str(basic_pitch_root) not in sys.path:
-        sys.path.insert(0, str(basic_pitch_root))
+    _basic_pitch_root()
     from obruxo_basic_pitch.postprocess import model_frames_to_time
 
     return np.asarray(model_frames_to_time(n_frames), dtype=np.float64)
+
+
+def common_frame_count(original_sample_count: int) -> int:
+    """Return #25's canonical frame population for resampled audio."""
+    if original_sample_count < 0:
+        raise ValueError("sample count must be non-negative")
+    _basic_pitch_root()
+    from obruxo_basic_pitch.constants import ANNOTATIONS_FPS, AUDIO_SAMPLE_RATE
+
+    return int(original_sample_count * ANNOTATIONS_FPS // AUDIO_SAMPLE_RATE)
+
+
+def _basic_pitch_root() -> Path:
+    root = Path(__file__).resolve().parents[2] / "basic_pitch"
+    if str(root) not in sys.path:
+        sys.path.insert(0, str(root))
+    return root
 
 
 def rasterize_notes(notes: tuple[NormalizedNote, ...] | list[NormalizedNote], n_frames: int) -> FramePitchPrediction:

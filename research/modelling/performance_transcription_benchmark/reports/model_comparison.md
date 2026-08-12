@@ -72,12 +72,12 @@ Only Basic Pitch produced executable evidence. The following sections consume th
 
 | Mode | Route | Evidence state | Batch-1 throughput | Batch-8 throughput | E2E rate | Startup (s) | Host RSS (MiB) | XPU allocated/reserved (MiB) | OpenVINO GPU memory (MiB) |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- | ---: |
-| `inference` | `pytorch_cpu` | `ok` | 78.297 | 165.472 | 48.355 | 1.028 | 598.9 | n/a / n/a | n/a |
-| `inference` | `pytorch_xpu` | `ok` | 225.829 | 779.279 | 95.727 | 0.983 | 2310.6 | 70.3 / 124.0 | n/a |
+| `inference` | `pytorch_cpu` | `ok` | 78.610 | 179.190 | 51.896 | 0.783 | 609.1 | n/a / n/a | n/a |
+| `inference` | `pytorch_xpu` | `ok` | 238.368 | 727.274 | 96.027 | 0.804 | 2331.6 | 70.3 / 124.0 | n/a |
 | `inference` | `openvino_cpu` | `parity_failed` | n/a | n/a | n/a | n/a | n/a | n/a / n/a | n/a |
-| `inference` | `openvino_gpu` | `measured_corrected_fp32_performance` | 121.901 | 319.814 | 70.608 | 3.977 | 1188.8 | n/a / n/a | 236.6 / 16762.6 |
-| `training` | `pytorch_cpu` | `ok` | 33.053 | 35.637 | n/a | 0.800 | 907.5 | n/a / n/a | n/a |
-| `training` | `pytorch_xpu` | `ok` | 98.683 | 252.572 | n/a | 0.784 | 2926.7 | 182.1 / 316.0 | n/a |
+| `inference` | `openvino_gpu` | `measured_corrected_fp32_performance` | 111.703 | 304.494 | 44.868 | 2.700 | 1209.5 | n/a / n/a | 241.5 / 16762.6 |
+| `training` | `pytorch_cpu` | `ok` | 28.533 | 28.735 | n/a | 0.804 | 910.0 | n/a / n/a | n/a |
+| `training` | `pytorch_xpu` | `ok` | 87.951 | 227.634 | n/a | 0.776 | 2925.7 | 182.1 / 316.0 | n/a |
 
 Historical route records:
 - `openvino_cpu`: `parity_failed`. The landed #24 report suppresses timing for this route.
@@ -88,9 +88,9 @@ Historical route records:
 - Bounded diagnostic result (corrected): requested `INFERENCE_PRECISION_HINT=float32`, compiled `float32` + `PERFORMANCE`; status `parity_passed` on `5` public synthetic windows.
 - Bounded parity metrics: non-finite values and threshold/event disagreements were `0`; maximum contour/note/onset errors were `0.000001431`, `0.000000715`, and `0.000001132`.
 - Corrected measured result: the actual #24 smoke route compiled `float32` on `Intel(R) Arc(TM) 140T GPU (16GB) (iGPU)` with `PERFORMANCE` execution; timed-route parity is `passed`.
-- Corrected startup medians: backend import `0.968` s, model conversion `2.539` s, GPU compilation `0.516` s, total startup `3.977` s; first-call / warmup at batch 1 `0.047` / `0.061` s.
-- Corrected steady-state audio-equivalent throughput (audio-s/s): batch 1 `121.901`, batch 2 `262.879`, batch 4 `310.162`, batch 8 `319.814`.
-- Corrected end-to-end throughput: `70.608` audio-s/s; host peak RSS `1188.8` MiB; OpenVINO GPU memory `236.6` / `16762.6` MiB where reported.
+- Corrected startup medians: backend import `0.777` s, model conversion `1.592` s, GPU compilation `0.346` s, total startup `2.700` s; first-call / warmup at batch 1 `0.038` / `0.062` s.
+- Corrected steady-state audio-equivalent throughput (audio-s/s): batch 1 `111.703`, batch 2 `242.847`, batch 4 `287.862`, batch 8 `304.494`.
+- Corrected end-to-end throughput: `44.868` audio-s/s; host peak RSS `1209.5` MiB; OpenVINO GPU memory `241.5` / `16762.6` MiB where reported.
 - Timed-route parity errors: non-finite values and threshold/event disagreements were `0`; maximum contour/note/onset errors were `0.000001431`, `0.000000715`, and `0.000001132`.
 
 ### Basic Pitch quantization evidence
@@ -122,8 +122,8 @@ No alternative candidate produced a quality, execution-cost, resource, backward-
 
 - Directly measured evidence exists only for Basic Pitch: #25 quality on 1,769 eligible pairs and #24 route/cost evidence. The current #24 inference comparison includes corrected OpenVINO GPU FP32 + PERFORMANCE startup, throughput, end-to-end, parity, and resource measurements when that route is present.
 - The Basic Pitch evidence is a complete baseline for the landed #24/#25 contracts, not a comparison against the unavailable alternatives.
-- The measured #24 model-call throughput winners were batch 1: `pytorch_xpu` (225.829 audio-s/s), batch 2: `pytorch_xpu` (379.212 audio-s/s), batch 4: `pytorch_xpu` (578.354 audio-s/s), batch 8: `pytorch_xpu` (779.279 audio-s/s); the end-to-end winner was `pytorch_xpu` (95.727 audio-s/s). These are Basic Pitch route findings, not alternative-model results.
-- The #25 quality result remains CPU-provenanced until route provenance is resolved.
+- The measured #24 model-call throughput winners were batch 1: `pytorch_xpu` (238.368 audio-s/s), batch 2: `pytorch_xpu` (417.493 audio-s/s), batch 4: `pytorch_xpu` (616.100 audio-s/s), batch 8: `pytorch_xpu` (727.274 audio-s/s); the end-to-end winner was `pytorch_xpu` (96.027 audio-s/s). These are Basic Pitch route findings, not alternative-model results.
+- The #25 quality result is explicitly provenanced to the exact #24-selected `pytorch_xpu` route on `xpu:0`; it does not establish quality equivalence for any other backend.
 
 ### Bounded diagnostic results
 

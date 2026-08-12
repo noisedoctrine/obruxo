@@ -16,7 +16,12 @@ from ..artifacts import (
     verify_checkout,
     verify_checkpoint,
 )
-from ..types import NormalizedNote, TranscriptionOutput, rasterize_notes
+from ..types import (
+    NormalizedNote,
+    TranscriptionOutput,
+    common_frame_count,
+    rasterize_notes,
+)
 
 YOURMT3_IDS = ("ymt3_plus", "yptf_multi", "yptf_moe_multi")
 
@@ -197,7 +202,7 @@ class YourMT3Adapter:
             sys.path.insert(0, str(root))
         from obruxo_basic_pitch.inference import prepare_wav
 
-        return int(prepare_wav(Path(audio)).original_sample_count * 100 // 22050)
+        return common_frame_count(prepare_wav(Path(audio)).original_sample_count)
 
     def transcribe(self, audio: Path) -> TranscriptionOutput:
         if self.active_model is None or self._helper is None:

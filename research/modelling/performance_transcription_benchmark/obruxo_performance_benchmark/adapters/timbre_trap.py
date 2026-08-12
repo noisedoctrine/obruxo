@@ -13,7 +13,12 @@ from ..artifacts import (
     verify_checkout,
     verify_checkpoint,
 )
-from ..types import FramePitchPrediction, TranscriptionOutput, common_frame_times
+from ..types import (
+    FramePitchPrediction,
+    TranscriptionOutput,
+    common_frame_count,
+    common_frame_times,
+)
 
 PAPER_ACTIVATION_THRESHOLD = 0.5
 PITCH_TOLERANCE_CENTS = 50.0
@@ -188,13 +193,14 @@ class TimbreTrapAdapter:
         native_times = np.asarray(sli_cq.get_times(values.shape[0]), dtype=np.float64)
         native_midi = np.asarray(sli_cq.get_midi_freqs(), dtype=np.float64)
         native_hz = 440.0 * np.power(2.0, (native_midi - 69.0) / 12.0)
-        frame_count = int(self._audio_sample_count(Path(audio)) * 100 // 22050)
+        frame_count = self._frame_count(Path(audio))
         return normalize_frame_output(native_times, native_hz, values, common_frame_times(frame_count))
 
     @staticmethod
-    def _audio_sample_count(path: Path) -> int:
+    def _frame_count(path: Path) -> int:
         from scipy.io import wavfile
 
         source_rate, values = wavfile.read(Path(path).resolve(strict=True))
         count = int(np.asarray(values).shape[0])
-        return round(count * 22050 / source_rate) if source_rate != 22050 else count
+        sample_count = round(count * 22050 / source_rate) if source_rate != 22050 else count
+        return common_frame_count(sample_count)
