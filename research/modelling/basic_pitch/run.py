@@ -6,12 +6,11 @@ import argparse
 from dataclasses import replace
 from pathlib import Path
 
-import numpy as np
 from obruxo_basic_pitch.benchmark import run_benchmark_cli, run_parity_diagnostic_cli
+from obruxo_basic_pitch.inference import prepare_wav
 from obruxo_basic_pitch.parity import (
     assert_parity,
-    audio_to_windows,
-    compare_windows,
+    compare_windows_and_audio,
     synthetic_windows,
     write_reports,
 )
@@ -97,13 +96,21 @@ def main() -> int:
         )
 
     public = synthetic_windows()
-    local = [audio_to_windows(path) for path in args.audio]
-    windows = np.concatenate((public, *local), axis=0) if local else public
-    summary = compare_windows(args.onnx, args.checkpoint, windows)
-    summary = replace(summary, synthetic_windows=public.shape[0], private_local_windows=windows.shape[0] - public.shape[0])
+    local = [prepare_wav(path) for path in args.audio]
+    summary = compare_windows_and_audio(
+        args.onnx,
+        args.checkpoint,
+        public,
+        local,
+    )
+    summary = replace(
+        summary,
+        synthetic_windows=public.shape[0],
+        private_local_windows=sum(clip.windows.shape[0] for clip in local),
+    )
     assert_parity(summary)
     write_reports(summary, args.json, args.markdown, private_local_clips=len(args.audio), force=args.force)
-    print(f"parity passed for {windows.shape[0]} windows")
+    print(f"parity passed for {summary.synthetic_windows + summary.private_local_windows} windows")
     return 0
 
 
