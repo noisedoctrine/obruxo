@@ -41,7 +41,9 @@ def _parser() -> argparse.ArgumentParser:
     parity.add_argument("--audio", type=Path, action="append", default=[])
     parity.add_argument("--force", action="store_true")
 
-    benchmark = subparsers.add_parser("benchmark", help="run the fixed CPU/XPU/OpenVINO benchmark")
+    benchmark = subparsers.add_parser(
+        "benchmark", help="run the fixed CPU/XPU/OpenVINO benchmark"
+    )
     benchmark.add_argument("--config", type=Path, required=True)
     benchmark.add_argument("--manifest", type=Path, required=True)
     benchmark.add_argument("--checkpoint", type=Path, required=True)
@@ -61,8 +63,18 @@ def _parser() -> argparse.ArgumentParser:
         help="run the fixed synthetic parity gate for every inference route",
     )
     parity_diagnostic.add_argument("--checkpoint", type=Path, required=True)
-    parity_diagnostic.add_argument("--json", type=Path, required=True, help="existing backend benchmark JSON to augment")
-    parity_diagnostic.add_argument("--markdown", type=Path, required=True, help="existing backend benchmark Markdown to augment")
+    parity_diagnostic.add_argument(
+        "--json",
+        type=Path,
+        required=True,
+        help="existing backend benchmark JSON to augment",
+    )
+    parity_diagnostic.add_argument(
+        "--markdown",
+        type=Path,
+        required=True,
+        help="existing backend benchmark Markdown to augment",
+    )
     parity_diagnostic.add_argument("--xpu-index", type=int, default=0)
     parity_diagnostic.add_argument("--openvino-gpu-device", default="GPU")
     parity_diagnostic.add_argument("--repetitions", type=int, default=3)

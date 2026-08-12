@@ -23,6 +23,7 @@ from .constants import (
 @dataclass(frozen=True)
 class PreparedAudio:
     """A read-only source reduced to the canonical Basic Pitch model windows."""
+
     sample_rate: int
     original_sample_count: int
     audio_seconds: float

@@ -11,6 +11,7 @@ from types import ModuleType, SimpleNamespace
 import pytest
 from obruxo_basic_pitch.benchmark import (
     BenchmarkConfig,
+    BenchmarkInputError,
     PedalboardVitalRenderer,
     SmokeCase,
     SourceMutationError,
@@ -24,6 +25,7 @@ from obruxo_basic_pitch.benchmark import (
     _validate_derived_destination,
     aggregate_measurements,
     benchmark_exit_code,
+    coverage_contract,
     crossover_audio_seconds,
     load_config,
     load_manifest,
@@ -45,7 +47,64 @@ ROOT = Path(__file__).resolve().parents[2]
 CONFIG_PATH = ROOT / "configs" / "backend_benchmark.yaml"
 
 
-def test_worker_launches_as_package_from_workspace(monkeypatch: pytest.MonkeyPatch) -> None:
+def _coverage_labels(index: int) -> dict[str, str]:
+    return {
+        "performance": (
+            "monophonic",
+            "monophonic",
+            "monophonic",
+            "monophonic",
+            "polyphonic",
+            "polyphonic",
+            "polyphonic",
+            "polyphonic",
+        )[index - 1],
+        "role": (
+            "bass",
+            "lead",
+            "arp_sequence",
+            "pad_sustained",
+            "other",
+            "bass",
+            "lead",
+            "other",
+        )[index - 1],
+        "envelope": (
+            "transient",
+            "transient",
+            "sustained",
+            "sustained",
+            "transient",
+            "sustained",
+            "transient",
+            "sustained",
+        )[index - 1],
+        "duration_class": (
+            "short",
+            "medium",
+            "long",
+            "short",
+            "medium",
+            "long",
+            "short",
+            "medium",
+        )[index - 1],
+        "note_density_class": (
+            "low",
+            "high",
+            "low",
+            "high",
+            "low",
+            "high",
+            "low",
+            "high",
+        )[index - 1],
+    }
+
+
+def test_worker_launches_as_package_from_workspace(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     captured: dict[str, object] = {}
 
     def fake_run(args: list[str], **kwargs: object) -> SimpleNamespace:
@@ -95,21 +154,34 @@ def test_manifest_validation_and_sanitization() -> None:
                     "case_index": index,
                     "audio_path": str(audio),
                     "midi_path": str(midi),
-                    "performance": "monophonic" if index < 5 else "polyphonic",
-                    "role": "bass" if index == 1 else "other",
-                    "envelope": "transient" if index < 5 else "sustained",
-                    "duration_class": ("short", "medium", "long")[index % 3],
-                    "note_density_class": "low" if index < 5 else "high",
+                    **_coverage_labels(index),
                 }
             )
         manifest_path = tmp_path / "manifest.json"
         manifest_path.write_text(
-            json.dumps({"format_version": 1, "benchmark_spec_version": 1, "cases": cases}), encoding="utf-8"
+            json.dumps(
+                {"format_version": 1, "benchmark_spec_version": 1, "cases": cases}
+            ),
+            encoding="utf-8",
         )
         manifest = load_manifest(manifest_path, load_config(CONFIG_PATH))
         assert len(manifest) == 8
+        assert (
+            coverage_contract(manifest, load_config(CONFIG_PATH))["status"]
+            == "complete"
+        )
         sanitized = manifest[0].sanitized()
         assert "audio_path" not in sanitized and "midi_path" not in sanitized
+        cases[2]["role"] = "other"
+        manifest_path.write_text(
+            json.dumps(
+                {"format_version": 1, "benchmark_spec_version": 1, "cases": cases}
+            ),
+            encoding="utf-8",
+        )
+        with pytest.raises(BenchmarkInputError) as error:
+            load_manifest(manifest_path, load_config(CONFIG_PATH))
+        assert error.value.code == "incomplete_smoke_coverage"
     finally:
         for path in tmp_path.glob("*"):
             path.unlink()
@@ -118,7 +190,10 @@ def test_manifest_validation_and_sanitization() -> None:
 
 def test_derived_render_manifest_is_opt_in_and_destination_checked() -> None:
     tmp_path = ROOT / "outputs" / f".test-derived-manifest-{os.getpid()}"
-    target_paths = [ROOT / "outputs" / f".test-derived-target-{os.getpid()}-{index}.wav" for index in range(1, 9)]
+    target_paths = [
+        ROOT / "outputs" / f".test-derived-target-{os.getpid()}-{index}.wav"
+        for index in range(1, 9)
+    ]
     assert not tmp_path.exists() and all(not path.exists() for path in target_paths)
     source_dir = tmp_path / "sources"
     source_dir.mkdir(parents=True)
@@ -136,16 +211,15 @@ def test_derived_render_manifest_is_opt_in_and_destination_checked() -> None:
                     "midi_path": str(midi),
                     "audio_source": "derived_render",
                     "preset_path": str(preset),
-                    "performance": "monophonic",
-                    "role": "other",
-                    "envelope": "sustained",
-                    "duration_class": "medium",
-                    "note_density_class": "low",
+                    **_coverage_labels(index),
                 }
             )
         manifest_path = tmp_path / "manifest.json"
         manifest_path.write_text(
-            json.dumps({"format_version": 1, "benchmark_spec_version": 1, "cases": cases}), encoding="utf-8"
+            json.dumps(
+                {"format_version": 1, "benchmark_spec_version": 1, "cases": cases}
+            ),
+            encoding="utf-8",
         )
         config = load_config(CONFIG_PATH)
         with pytest.raises(ValueError):
@@ -161,7 +235,10 @@ def test_derived_render_manifest_is_opt_in_and_destination_checked() -> None:
         assert manifest[0].sanitized()["audio_source"] == "derived_render"
         assert "preset_path" not in manifest[0].sanitized()
         output_root = _approved_derived_output_root()
-        assert _validate_derived_destination(manifest[0], output_root) == target_paths[0].resolve()
+        assert (
+            _validate_derived_destination(manifest[0], output_root)
+            == target_paths[0].resolve()
+        )
         unsafe = replace(manifest[0], audio_path=source_dir / "nested.wav")
         with pytest.raises(ValueError):
             _validate_derived_destination(unsafe, output_root)
@@ -178,7 +255,9 @@ def test_derived_render_manifest_is_opt_in_and_destination_checked() -> None:
                 path.unlink()
 
 
-def test_pedalboard_preflight_uses_accepted_vital_binary_and_raw_state(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_pedalboard_preflight_uses_accepted_vital_binary_and_raw_state(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     plugin_path = tmp_path / "Vital.vst3"
     plugin_path.write_bytes(b"accepted-vital")
     digest = hashlib.sha256(plugin_path.read_bytes()).hexdigest()
@@ -210,7 +289,9 @@ def test_pedalboard_preflight_uses_accepted_vital_binary_and_raw_state(monkeypat
     pedalboard = ModuleType("pedalboard")
     pedalboard.load_plugin = lambda path: plugin  # type: ignore[attr-defined]
     monkeypatch.setitem(sys.modules, "pedalboard", pedalboard)
-    monkeypatch.setattr("obruxo_basic_pitch.benchmark.importlib.metadata.version", lambda _: "0.9.test")
+    monkeypatch.setattr(
+        "obruxo_basic_pitch.benchmark.importlib.metadata.version", lambda _: "0.9.test"
+    )
 
     class FakeStateTemplate:
         def __init__(self, state: bytes) -> None:
@@ -227,7 +308,16 @@ def test_pedalboard_preflight_uses_accepted_vital_binary_and_raw_state(monkeypat
 
     monkeypatch.setattr(
         "obruxo_basic_pitch.benchmark._import_data_generation_modules",
-        lambda: (object, object, FakeCapabilities, FakeAudioQualityConfig, object, FakeStateTemplate, object, object),
+        lambda: (
+            object,
+            object,
+            FakeCapabilities,
+            FakeAudioQualityConfig,
+            object,
+            FakeStateTemplate,
+            object,
+            object,
+        ),
     )
     renderer = PedalboardVitalRenderer.from_config(config_path)
     assert renderer.plugin_path == plugin_path.resolve()
@@ -281,13 +371,18 @@ def test_pedalboard_render_uses_timestamped_midi_and_local_provenance(
             return [FakeSpan()]
 
         def canonical_events(self) -> list[FakeEvent]:
-            return [FakeEvent("note_on", 10, (60, 100)), FakeEvent("note_off", 40, (60, 0))]
+            return [
+                FakeEvent("note_on", 10, (60, 100)),
+                FakeEvent("note_off", 40, (60, 0)),
+            ]
 
     class FakeTiming:
         def tick_to_seconds(self, tick: int) -> float:
             return tick / 1000
 
-        def render_frame_count(self, end_tick: int, tail_seconds: float, sample_rate: int) -> int:
+        def render_frame_count(
+            self, end_tick: int, tail_seconds: float, sample_rate: int
+        ) -> int:
             assert (end_tick, tail_seconds, sample_rate) == (100, 2.0, 44_100)
             return 88_200
 
@@ -333,7 +428,16 @@ def test_pedalboard_render_uses_timestamped_midi_and_local_provenance(
     plugin = FakePlugin()
     monkeypatch.setattr(
         "obruxo_basic_pitch.benchmark._import_data_generation_modules",
-        lambda: (FakePerformance, FakeTempoMap, object, object, lambda *args, **kwargs: ({"finite": True}, ()), object, FakePreset, object),
+        lambda: (
+            FakePerformance,
+            FakeTempoMap,
+            object,
+            object,
+            lambda *args, **kwargs: ({"finite": True}, ()),
+            object,
+            FakePreset,
+            object,
+        ),
     )
     renderer = PedalboardVitalRenderer(
         config_path=tmp_path / "renderer.yaml",
@@ -365,7 +469,12 @@ def test_pedalboard_render_uses_timestamped_midi_and_local_provenance(
 
 
 def test_aggregate_measurements_and_crossover_formula() -> None:
-    assert aggregate_measurements([1.0, 3.0, 2.0]) == {"median": 2.0, "min": 1.0, "max": 3.0, "total": 6.0}
+    assert aggregate_measurements([1.0, 3.0, 2.0]) == {
+        "median": 2.0,
+        "min": 1.0,
+        "max": 3.0,
+        "total": 6.0,
+    }
     assert crossover_audio_seconds(1.0, 1.0, 3.0, 2.0) == 4.0
     assert crossover_audio_seconds(3.0, 1.0, 1.0, 2.0) is None
 
@@ -409,7 +518,13 @@ def test_per_case_end_to_end_and_memory_aggregate_all_repetitions() -> None:
         {
             "end_to_end": {
                 "cases": [
-                    {"case_index": 1, "status": "ok", "audio_seconds": 1.0, "wall_seconds": wall, "note_event_count": 4}
+                    {
+                        "case_index": 1,
+                        "status": "ok",
+                        "audio_seconds": 1.0,
+                        "wall_seconds": wall,
+                        "note_event_count": 4,
+                    }
                 ]
             },
             "memory": {
@@ -422,7 +537,12 @@ def test_per_case_end_to_end_and_memory_aggregate_all_repetitions() -> None:
     ]
     cases = _aggregate_end_to_end_cases(rows)
     memory = _aggregate_memory(rows)
-    assert cases[0]["wall_seconds"] == {"median": 2.0, "min": 1.0, "max": 3.0, "total": 6.0}
+    assert cases[0]["wall_seconds"] == {
+        "median": 2.0,
+        "min": 1.0,
+        "max": 3.0,
+        "total": 6.0,
+    }
     assert memory["host_peak_rss_bytes"]["value"]["median"] == 200.0
     assert memory["openvino_gpu_memory_bytes"]["value"]["median"] == 400.0
 
@@ -451,7 +571,9 @@ def test_xpu_timing_regions_synchronize_before_and_after_invocation() -> None:
     ]
 
 
-def test_pitch_bend_difference_fails_benchmark_parity(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_pitch_bend_difference_fails_benchmark_parity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import numpy as np
 
     reference_event = NoteEvent(0.0, 0.1, 60, 0.5, (0,))
@@ -474,7 +596,9 @@ def test_pitch_bend_difference_fails_benchmark_parity(monkeypatch: pytest.Monkey
     assert result["parity_passed"] is False
 
 
-def test_source_snapshot_precedes_derived_render(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_source_snapshot_precedes_derived_render(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     manifest_path = tmp_path / "manifest.json"
     checkpoint_path = tmp_path / "checkpoint.pt"
     midi_path = tmp_path / "source.mid"
@@ -496,15 +620,21 @@ def test_source_snapshot_precedes_derived_render(monkeypatch: pytest.MonkeyPatch
         note_density_class="low",
     )
     config = load_config(CONFIG_PATH)
-    monkeypatch.setattr("obruxo_basic_pitch.benchmark.load_manifest", lambda *args, **kwargs: (case,))
+    monkeypatch.setattr(
+        "obruxo_basic_pitch.benchmark.load_manifest", lambda *args, **kwargs: (case,)
+    )
 
     def mutate_source(*args: object, **kwargs: object) -> None:
         midi_path.write_bytes(b"mutated-midi")
 
-    monkeypatch.setattr("obruxo_basic_pitch.benchmark.prepare_derived_renders", mutate_source)
+    monkeypatch.setattr(
+        "obruxo_basic_pitch.benchmark.prepare_derived_renders", mutate_source
+    )
     monkeypatch.setattr(
         "obruxo_basic_pitch.benchmark._run_worker",
-        lambda request: pytest.fail(f"worker should not run after source mutation: {request}"),
+        lambda request: pytest.fail(
+            f"worker should not run after source mutation: {request}"
+        ),
     )
 
     with pytest.raises(SourceMutationError):
@@ -541,7 +671,9 @@ def test_openvino_compile_pins_float32_without_changing_execution_mode() -> None
             self.available_devices = ["GPU"]
             self.compile_arguments: tuple[object, str, dict[str, object]] | None = None
 
-        def compile_model(self, model: object, target: str, config: dict[str, object]) -> object:
+        def compile_model(
+            self, model: object, target: str, config: dict[str, object]
+        ) -> object:
             self.compile_arguments = (model, target, config)
             return object()
 
@@ -549,7 +681,9 @@ def test_openvino_compile_pins_float32_without_changing_execution_mode() -> None
         class Type:
             f32 = "float32"
 
-        properties = SimpleNamespace(hint=SimpleNamespace(inference_precision="INFERENCE_PRECISION_HINT"))
+        properties = SimpleNamespace(
+            hint=SimpleNamespace(inference_precision="INFERENCE_PRECISION_HINT")
+        )
         PartialShape = staticmethod(lambda shape: shape)
 
         def __init__(self) -> None:
@@ -566,7 +700,10 @@ def test_openvino_compile_pins_float32_without_changing_execution_mode() -> None
     _build_openvino(FakeTorch(), ov, object(), "openvino_gpu", "GPU")
 
     assert ov.core.compile_arguments is not None
-    assert ov.core.compile_arguments[1:] == ("GPU", {"INFERENCE_PRECISION_HINT": "float32"})
+    assert ov.core.compile_arguments[1:] == (
+        "GPU",
+        {"INFERENCE_PRECISION_HINT": "float32"},
+    )
 
 
 def test_openvino_route_records_compiled_device_and_memory_properties() -> None:
@@ -601,7 +738,10 @@ def test_openvino_route_records_compiled_device_and_memory_properties() -> None:
     assert info["execution_mode_hint_compiled"] == "PERFORMANCE"
     memory = _openvino_memory_snapshot(Core(), "GPU")
     assert memory["openvino_gpu_memory_measurement_status"] == "ok"
-    assert memory["openvino_gpu_memory_statistics_bytes"] == {"usm_device": 100, "usm_host": 20}
+    assert memory["openvino_gpu_memory_statistics_bytes"] == {
+        "usm_device": 100,
+        "usm_host": 20,
+    }
     assert memory["openvino_gpu_memory_bytes"] == 120
     assert memory["openvino_gpu_total_memory_bytes"] == 1000
 
@@ -624,12 +764,15 @@ def test_parity_failure_suppresses_timing_aggregation() -> None:
 
 
 def test_unavailable_routes_are_not_failure_exit_code() -> None:
-    assert benchmark_exit_code(
-        {
-            "inference": [{"status": "ok"}, {"status": "unavailable"}],
-            "training": [{"status": "unavailable"}],
-        }
-    ) == 0
+    assert (
+        benchmark_exit_code(
+            {
+                "inference": [{"status": "ok"}, {"status": "unavailable"}],
+                "training": [{"status": "unavailable"}],
+            }
+        )
+        == 0
+    )
 
 
 def test_report_write_is_atomic_and_requires_force_for_overwrite() -> None:
@@ -659,7 +802,9 @@ def test_report_write_is_atomic_and_requires_force_for_overwrite() -> None:
 
 
 def test_report_markdown_surfaces_persisted_findings() -> None:
-    report = json.loads((ROOT / "reports" / "backend_benchmark.json").read_text(encoding="utf-8"))
+    report = json.loads(
+        (ROOT / "reports" / "backend_benchmark.json").read_text(encoding="utf-8")
+    )
     markdown = _benchmark_markdown(report)
     for section in (
         "Inference startup and initialization",
@@ -678,10 +823,13 @@ def test_report_markdown_surfaces_persisted_findings() -> None:
     assert "OpenVINO GPU precision correction" in markdown
     assert "INFERENCE_PRECISION_HINT" in markdown
     assert "post-fix FP32 + PERFORMANCE diagnostic passes GPU parity" in markdown
+    assert "Smoke-set coverage gate" in markdown
 
 
 def test_report_markdown_tabulates_component_parity_by_route() -> None:
-    report = json.loads((ROOT / "reports" / "backend_benchmark.json").read_text(encoding="utf-8"))
+    report = json.loads(
+        (ROOT / "reports" / "backend_benchmark.json").read_text(encoding="utf-8")
+    )
     metrics = {
         "contour_non_finite_count": 0,
         "note_non_finite_count": 0,
@@ -710,7 +858,12 @@ def test_report_markdown_tabulates_component_parity_by_route() -> None:
         ],
     }
     markdown = _benchmark_markdown(report)
-    assert "| Parity check (applied threshold) | PyTorch CPU | PyTorch XPU | OpenVINO CPU | OpenVINO GPU |" in markdown
+    assert (
+        "| Parity check (applied threshold) | PyTorch CPU | PyTorch XPU | OpenVINO CPU | OpenVINO GPU |"
+        in markdown
+    )
     assert "Maximum contour absolute error (<= 0.0205306)" in markdown
     assert "Note-frame threshold disagreements (threshold 0.3; must be 0)" in markdown
-    assert "(start_time_s, end_time_s, MIDI pitch) disagreements (must be 0)" in markdown
+    assert (
+        "(start_time_s, end_time_s, MIDI pitch) disagreements (must be 0)" in markdown
+    )
