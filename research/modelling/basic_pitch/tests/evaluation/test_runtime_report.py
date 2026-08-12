@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 
 import numpy as np
+import obruxo_basic_pitch.evaluation.runner as runner_module
 import pytest
 from obruxo_basic_pitch.evaluation.corpus import build_evaluation_manifest
 from obruxo_basic_pitch.evaluation.labels import _ensure_data_generation_importable
@@ -62,7 +63,7 @@ def _fake_result(_: object) -> dict[str, object]:
     }
 
 
-def test_resume_identity_backend_guard_and_sanitized_report() -> None:
+def test_resume_identity_backend_guard_and_sanitized_report(monkeypatch: pytest.MonkeyPatch) -> None:
     output_root = ROOT / "outputs" / f".test-evaluation-runtime-{os.getpid()}"
     assert not output_root.exists()
     corpus = output_root / "sources" / "data"
@@ -95,6 +96,14 @@ def test_resume_identity_backend_guard_and_sanitized_report() -> None:
         evaluate_corpus(changed_manifest, output_root, predictor=predictor)
         assert len(calls) == 1
 
+        monkeypatch.setattr(
+            runner_module,
+            "_runtime_identity",
+            lambda _: {"python": "3.12.13-changed", "numpy": "2.4.6", "scipy": "1.18.0", "torch": "2.12.1+xpu"},
+        )
+        evaluate_corpus(changed_manifest, output_root, predictor=predictor)
+        assert len(calls) == 2
+
         with pytest.raises(BackendUnavailable):
             validate_backend_id("openvino_gpu")
         report = write_sanitized_reports(
@@ -106,7 +115,11 @@ def test_resume_identity_backend_guard_and_sanitized_report() -> None:
         )
         text = public_json.read_text(encoding="utf-8") + public_markdown.read_text(encoding="utf-8")
         assert report["aggregate"]["pair_count"] == 1
-        assert report["runtime_provenance"]["selected_backend"] == "pytorch_cpu"
+        assert report["runtime_provenance"]["selected_backend"] == "pytorch_xpu"
+        assert report["runtime_provenance"]["selected_device"] == "xpu:0"
+        assert report["runtime_provenance"]["selection_source"] == "#24 corpus_inference_decision"
+        assert report["runtime_provenance"]["decision_identity_match"] is True
+        assert report["runtime_provenance"]["consistency"] == "exact_issue_24_decision_consumed"
         assert report["runtime_provenance"]["selection_rationale"]
         assert "Runtime provenance and #24 route decision" in public_markdown.read_text(encoding="utf-8")
         assert str(corpus) not in text

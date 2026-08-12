@@ -169,19 +169,23 @@ def _category_findings(aggregate: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _runtime_selection(run: Mapping[str, Any]) -> dict[str, Any]:
-    """Compare the recorded #25 backend with the already-landed #24 report."""
+    """Explain the exact #24 machine-readable corpus decision consumed by #25."""
     backend = run.get("backend", {})
     selected = backend.get("backend_id")
     result: dict[str, Any] = {
         "selected_backend": selected,
+        "selected_device": backend.get("device"),
         "selected_contract": backend.get("boundary"),
-        "selection_source": "the backend contract recorded by the existing #25 run",
-        "selection_rationale": f"The existing #25 run fixed {selected} in its backend contract; the run artifacts do not record an independent runtime-selection rationale.",
+        "selection_source": "#24 corpus_inference_decision",
+        "selection_rule": backend.get("selection_rule"),
+        "selection_rationale": "The exact #24 corpus inference decision was consumed without relabeling or fallback.",
+        "supporting_measurement": backend.get("supporting_measurement", {}),
+        "decision_identity_match": False,
         "issue_24_observed_highest_batch_1_route": None,
         "issue_24_observed_highest_batch_1_audio_seconds_per_second": None,
         "issue_24_observed_highest_end_to_end_route": None,
         "issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second": None,
-        "consistency": "issue_24_report_unavailable",
+        "consistency": "issue_24_decision_unavailable",
         "interpretation": "The quality result is attributed to the recorded backend only; no alternate-backend quality result is inferred.",
     }
     benchmark_path = _reports_root() / "backend_benchmark.json"
@@ -189,35 +193,33 @@ def _runtime_selection(run: Mapping[str, Any]) -> dict[str, Any]:
         benchmark = _read_json(benchmark_path)
     except ReportInputError:
         return result
-    inference = [row for row in benchmark.get("inference", []) if row.get("status") == "ok"]
-    if not inference:
+    decision = benchmark.get("corpus_inference_decision")
+    report_identity = benchmark.get("run_identity")
+    supporting_identity = decision.get("supporting_run_identity") if isinstance(decision, Mapping) else None
+    if not isinstance(decision, Mapping) or decision.get("status") != "selected" or not isinstance(supporting_identity, Mapping):
         return result
-    highest_batch = max(
-        inference,
-        key=lambda row: row.get("batch_results", {}).get("1", {}).get("audio_seconds_per_second", {}).get("median", float("-inf")),
-    )
-    highest_end_to_end = max(
-        (row for row in inference if row.get("end_to_end")),
-        key=lambda row: row.get("end_to_end", {}).get("audio_seconds_per_wall_second", {}).get("median", float("-inf")),
-        default=None,
-    )
+    decision_backend = decision.get("backend_id")
     result.update(
         {
-            "issue_24_observed_highest_batch_1_route": highest_batch.get("route"),
-            "issue_24_observed_highest_batch_1_audio_seconds_per_second": highest_batch.get("batch_results", {}).get("1", {}).get("audio_seconds_per_second", {}).get("median"),
-            "issue_24_observed_highest_end_to_end_route": highest_end_to_end.get("route") if highest_end_to_end else None,
-            "issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second": highest_end_to_end.get("end_to_end", {}).get("audio_seconds_per_wall_second", {}).get("median") if highest_end_to_end else None,
+            "selected_backend": decision_backend,
+            "selected_device": decision.get("device"),
+            "selected_contract": decision.get("boundary"),
+            "selection_rule": decision.get("selection_rule"),
+            "supporting_measurement": decision.get("supporting_measurement", {}),
+            "issue_24_observed_highest_batch_1_route": decision_backend,
+            "issue_24_observed_highest_batch_1_audio_seconds_per_second": decision.get("supporting_measurement", {}).get("model_call_batch_1_audio_seconds_per_second_median"),
+            "issue_24_observed_highest_end_to_end_route": decision_backend,
+            "issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second": decision.get("supporting_measurement", {}).get("audio_seconds_per_wall_second_median"),
+            "decision_identity_match": dict(supporting_identity) == dict(report_identity or {}) == dict(backend.get("supporting_run_identity", {})),
         }
     )
-    result["selection_rationale"] = (
-        f"The existing #25 run fixed {selected} in its backend contract. Its artifacts do not record why that route was selected; current #24 measurements identify {highest_batch.get('route')} as the batch-1 model-call throughput leader and {highest_end_to_end.get('route') if highest_end_to_end else 'no route'} as the warmed end-to-end leader. This report does not relabel the existing quality result or infer alternate-backend quality."
-    )
-    if selected == highest_batch.get("route") == (highest_end_to_end or {}).get("route"):
-        result["consistency"] = "matches_issue_24_observed_leader"
-        result["interpretation"] = "The recorded #25 backend matches both the measured #24 batch-1 model-call and warmed end-to-end leaders."
+    if result["selected_backend"] == selected and result["decision_identity_match"]:
+        result["consistency"] = "exact_issue_24_decision_consumed"
+        result["selection_rationale"] = f"#24 selected `{decision_backend}` by the recorded rule: {decision.get('selection_rule')}. #25 consumed that backend, device, precision, boundary, and supporting run identity exactly; no fallback was used."
+        result["interpretation"] = "The full-corpus quality result is attributed to the exact #24-selected runtime. It does not establish quality equivalence for any other backend."
     else:
-        result["consistency"] = "recorded_backend_does_not_match_issue_24_observed_leader"
-        result["interpretation"] = "The existing #25 quality run records a backend different from one or both current #24 leaders. Its quality result remains attributed only to the recorded backend; no alternate-backend full-corpus quality or equivalence claim is made."
+        result["consistency"] = "issue_24_decision_mismatch"
+        result["interpretation"] = "The evaluator did not consume the exact #24 decision identity; the run must not be treated as a canonical corpus baseline."
     return result
 
 
@@ -232,6 +234,7 @@ def build_sanitized_report(audit: Mapping[str, Any], run: Mapping[str, Any], agg
         "model": run.get("model", {}),
         "backend": {
             "backend_id": run.get("backend", {}).get("backend_id"),
+            "device": run.get("backend", {}).get("device"),
             "contract_version": run.get("backend", {}).get("contract_version"),
             "boundary": run.get("backend", {}).get("boundary"),
             "precision": run.get("backend", {}).get("precision"),
@@ -274,14 +277,14 @@ def _markdown(report: Mapping[str, Any]) -> str:
         "",
         "## Runtime provenance and #24 route decision",
         "",
-        f"- Recorded #25 corpus backend: `{report.get('backend', {}).get('backend_id')}`; boundary: `{report.get('backend', {}).get('boundary')}`; precision: `{report.get('backend', {}).get('precision')}`.",
-        f"- Runtime-selection source: {report.get('runtime_provenance', {}).get('selection_source', 'not recorded')}.",
-        f"- Selection rationale recorded by the artifacts: {report.get('runtime_provenance', {}).get('selection_rationale', 'not recorded')}.",
-        f"- Existing #24 report's highest batch-1 inference route: `{report.get('runtime_provenance', {}).get('issue_24_observed_highest_batch_1_route')}` at `{report.get('runtime_provenance', {}).get('issue_24_observed_highest_batch_1_audio_seconds_per_second')}` audio-seconds/second.",
-        f"- Existing #24 report's highest warmed end-to-end route: `{report.get('runtime_provenance', {}).get('issue_24_observed_highest_end_to_end_route')}` at `{report.get('runtime_provenance', {}).get('issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second')}` audio-seconds/wall-second.",
+        f"- Exact #24 decision consumed: backend `{report.get('runtime_provenance', {}).get('selected_backend')}`; device `{report.get('runtime_provenance', {}).get('selected_device')}`; boundary `{report.get('runtime_provenance', {}).get('selected_contract')}`; precision `{report.get('backend', {}).get('precision')}`.",
+        f"- Runtime-selection source: `{report.get('runtime_provenance', {}).get('selection_source', 'not recorded')}`.",
+        f"- Selection rule: {report.get('runtime_provenance', {}).get('selection_rule', 'not recorded')}.",
+        f"- Supporting #24 measurements: batch-1 model-call `{report.get('runtime_provenance', {}).get('issue_24_observed_highest_batch_1_audio_seconds_per_second')}` audio-seconds/second; end-to-end `{report.get('runtime_provenance', {}).get('issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second')}` audio-seconds/wall-second.",
+        f"- Supporting decision identity matched the #24 report and recorded evaluator contract: `{report.get('runtime_provenance', {}).get('decision_identity_match')}`.",
         f"- Consistency assessment: `{report.get('runtime_provenance', {}).get('consistency')}`.",
         f"- Interpretation: {report.get('runtime_provenance', {}).get('interpretation', 'not recorded')}",
-        "- This report revision does not rerun the corpus evaluation. The backend mismatch is surfaced for review rather than silently reassigning the existing F1 result to XPU.",
+        "- The full-corpus result is not relabeled as another backend and no quality equivalence is inferred for routes not executed here.",
         "",
         "## Evaluation status",
         "",
@@ -375,7 +378,7 @@ def _markdown(report: Mapping[str, Any]) -> str:
         "## Provenance and limits",
         "",
         f"- Model: `{report.get('model', {}).get('model_id', 'unknown')}`.",
-        f"- Backend: `{report.get('backend', {}).get('backend_id', 'unknown')}`; precision: `{report.get('backend', {}).get('precision', 'unknown')}`.",
+        f"- Backend: `{report.get('backend', {}).get('backend_id', 'unknown')}` on `{report.get('backend', {}).get('device', 'unknown')}`; precision: `{report.get('backend', {}).get('precision', 'unknown')}`.",
         "- Stock settings are onset threshold 0.5, frame threshold 0.3, minimum note length 11 frames, inferred onsets enabled, Melodia fallback enabled, and no frequency limits.",
         "- No composite score is used and no upstream model/runtime setting is tuned from corpus results.",
         "",
