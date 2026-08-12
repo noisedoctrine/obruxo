@@ -12,6 +12,10 @@ import pytest
 from obruxo_basic_pitch.benchmark import (
     BenchmarkConfig,
     PedalboardVitalRenderer,
+    SmokeCase,
+    SourceMutationError,
+    _aggregate_end_to_end_cases,
+    _aggregate_memory,
     _aggregate_route,
     _approved_derived_output_root,
     _benchmark_markdown,
@@ -22,15 +26,19 @@ from obruxo_basic_pitch.benchmark import (
     crossover_audio_seconds,
     load_config,
     load_manifest,
+    run_benchmark,
     write_benchmark_reports,
 )
 from obruxo_basic_pitch.benchmark_worker import (
     _build_openvino,
+    _candidate_parity,
+    _measure_calls,
     _openvino_device_info,
     _openvino_memory_snapshot,
     _openvino_target,
     _RouteError,
 )
+from obruxo_basic_pitch.postprocess import NoteEvent
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG_PATH = ROOT / "configs" / "backend_benchmark.yaml"
@@ -364,6 +372,113 @@ def test_aggregate_measurements_and_crossover_formula() -> None:
     assert crossover_audio_seconds(3.0, 1.0, 1.0, 2.0) is None
 
 
+def test_per_case_end_to_end_and_memory_aggregate_all_repetitions() -> None:
+    rows = [
+        {
+            "end_to_end": {
+                "cases": [
+                    {"case_index": 1, "status": "ok", "audio_seconds": 1.0, "wall_seconds": wall, "note_event_count": 4}
+                ]
+            },
+            "memory": {
+                "measurement_status": "ok",
+                "host_peak_rss_bytes": memory,
+                "openvino_gpu_memory_bytes": memory * 2,
+            },
+        }
+        for wall, memory in ((1.0, 100), (3.0, 300), (2.0, 200))
+    ]
+    cases = _aggregate_end_to_end_cases(rows)
+    memory = _aggregate_memory(rows)
+    assert cases[0]["wall_seconds"] == {"median": 2.0, "min": 1.0, "max": 3.0, "total": 6.0}
+    assert memory["host_peak_rss_bytes"]["value"]["median"] == 200.0
+    assert memory["openvino_gpu_memory_bytes"]["value"]["median"] == 400.0
+
+
+def test_xpu_timing_regions_synchronize_before_and_after_invocation() -> None:
+    events: list[str] = []
+
+    _measure_calls(
+        lambda: events.append("invoke"),
+        batch_size=1,
+        warmup_iterations=1,
+        timed_iterations=1,
+        synchronize=lambda: events.append("sync"),
+    )
+
+    assert events == [
+        "sync",
+        "invoke",
+        "sync",
+        "sync",
+        "invoke",
+        "sync",
+        "sync",
+        "invoke",
+        "sync",
+    ]
+
+
+def test_pitch_bend_difference_fails_benchmark_parity(monkeypatch: pytest.MonkeyPatch) -> None:
+    import numpy as np
+
+    reference_event = NoteEvent(0.0, 0.1, 60, 0.5, (0,))
+    candidate_event = NoteEvent(0.0, 0.1, 60, 0.5, (1,))
+    events = iter((reference_event, candidate_event))
+    monkeypatch.setattr(
+        "obruxo_basic_pitch.postprocess.posteriorgrams_to_note_events",
+        lambda _: [next(events)],
+    )
+    arrays = {
+        "contour": np.zeros((1, 172, 264), dtype=np.float32),
+        "note": np.zeros((1, 172, 88), dtype=np.float32),
+        "onset": np.zeros((1, 172, 88), dtype=np.float32),
+    }
+
+    result = _candidate_parity(np, arrays, arrays)
+
+    assert result["pitch_bend_element_disagreements"] == 1
+    assert result["event_tuple_disagreements"] == 0
+    assert result["parity_passed"] is False
+
+
+def test_source_snapshot_precedes_derived_render(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    manifest_path = tmp_path / "manifest.json"
+    checkpoint_path = tmp_path / "checkpoint.pt"
+    midi_path = tmp_path / "source.mid"
+    preset_path = tmp_path / "source.vital"
+    manifest_path.write_text("{}", encoding="utf-8")
+    checkpoint_path.write_bytes(b"checkpoint")
+    midi_path.write_bytes(b"original-midi")
+    preset_path.write_bytes(b"original-preset")
+    case = SmokeCase(
+        case_index=1,
+        audio_path=tmp_path / "derived.wav",
+        midi_path=midi_path,
+        audio_source="derived_render",
+        preset_path=preset_path,
+        performance="monophonic",
+        role="other",
+        envelope="sustained",
+        duration_class="medium",
+        note_density_class="low",
+    )
+    config = load_config(CONFIG_PATH)
+    monkeypatch.setattr("obruxo_basic_pitch.benchmark.load_manifest", lambda *args, **kwargs: (case,))
+
+    def mutate_source(*args: object, **kwargs: object) -> None:
+        midi_path.write_bytes(b"mutated-midi")
+
+    monkeypatch.setattr("obruxo_basic_pitch.benchmark.prepare_derived_renders", mutate_source)
+    monkeypatch.setattr(
+        "obruxo_basic_pitch.benchmark._run_worker",
+        lambda request: pytest.fail(f"worker should not run after source mutation: {request}"),
+    )
+
+    with pytest.raises(SourceMutationError):
+        run_benchmark(config, manifest_path, checkpoint_path, allow_derived_render=True)
+
+
 def test_openvino_gpu_never_falls_back_to_another_device() -> None:
     class Core:
         def __init__(self) -> None:
@@ -526,7 +641,7 @@ def test_report_markdown_surfaces_persisted_findings() -> None:
         assert section in markdown
     assert "Batch 8" in markdown
     assert "Parity diagnostics by framework and processor" in markdown
-    assert "component-level parity values are tabulated above" in markdown
+    assert "Preserved pre-fix maximums were" in markdown
     assert "227040" in markdown
     assert "OpenVINO GPU precision correction" in markdown
     assert "INFERENCE_PRECISION_HINT" in markdown

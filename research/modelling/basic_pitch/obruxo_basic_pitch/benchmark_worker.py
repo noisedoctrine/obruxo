@@ -36,20 +36,28 @@ def _measure_calls(
     batch_size: int,
     warmup_iterations: int,
     timed_iterations: int,
+    synchronize: Callable[[], None] | None = None,
 ) -> dict[str, float]:
+    synchronize = synchronize or (lambda: None)
+    synchronize()
     first_started = time.perf_counter()
     invoke()
+    synchronize()
     first_seconds = time.perf_counter() - first_started
 
+    synchronize()
     warmup_started = time.perf_counter()
     for _ in range(warmup_iterations):
         invoke()
+    synchronize()
     warmup_seconds = time.perf_counter() - warmup_started
 
     samples = []
     for _ in range(timed_iterations):
+        synchronize()
         started = time.perf_counter()
         invoke()
+        synchronize()
         samples.append(time.perf_counter() - started)
     median_seconds = float(__import__("statistics").median(samples))
     total_seconds = float(sum(samples))
@@ -218,22 +226,27 @@ def _event_signature(event: Any) -> tuple[float, float, int]:
 
 def _candidate_parity(np: Any, reference: Mapping[str, Any], candidate: Mapping[str, Any]) -> dict[str, Any]:
     from obruxo_basic_pitch.constants import FRAME_THRESHOLD, ONSET_THRESHOLD
-    from obruxo_basic_pitch.parity import ADOPTED_MAX_ABS_TOLERANCES
+    from obruxo_basic_pitch.parity import OutputParity, ParitySummary, assert_parity
     from obruxo_basic_pitch.postprocess import posteriorgrams_to_note_events
 
     errors: dict[str, Any] = {}
-    failed = False
+    output_parity: dict[str, OutputParity] = {}
     for name in ("contour", "note", "onset"):
         candidate_values = np.asarray(candidate[name], dtype=np.float64)
         difference = candidate_values - np.asarray(reference[name], dtype=np.float64)
         errors[f"{name}_non_finite_count"] = int(np.count_nonzero(~np.isfinite(candidate_values)))
         if not np.isfinite(difference).all():
-            failed = True
             errors[f"{name}_max_abs_error"] = None
+            output_parity[name] = OutputParity(float("inf"), float("inf"), float("inf"))
             continue
-        errors[f"{name}_max_abs_error"] = float(np.max(np.abs(difference)))
-        if errors[f"{name}_max_abs_error"] > ADOPTED_MAX_ABS_TOLERANCES[name]:
-            failed = True
+        absolute = np.abs(difference)
+        maximum = float(np.max(absolute))
+        errors[f"{name}_max_abs_error"] = maximum
+        output_parity[name] = OutputParity(
+            maximum,
+            float(np.mean(absolute)),
+            float(np.sqrt(np.mean(difference * difference))),
+        )
 
     note_disagreements = int(np.count_nonzero((candidate["note"] >= FRAME_THRESHOLD) != (reference["note"] >= FRAME_THRESHOLD)))
     onset_disagreements = int(np.count_nonzero((candidate["onset"] >= ONSET_THRESHOLD) != (reference["onset"] >= ONSET_THRESHOLD)))
@@ -261,10 +274,31 @@ def _candidate_parity(np: Any, reference: Mapping[str, Any], candidate: Mapping[
         (left.pitch_bend or ()) != (right.pitch_bend or ())
         for left, right in zip(reference_events, candidate_events, strict=True)
     ) if len(reference_events) == len(candidate_events) else max(len(reference_events), len(candidate_events))
-    failed = failed or bool(note_disagreements or onset_disagreements or structure_disagreements)
+    summary = ParitySummary(
+        contour=output_parity["contour"],
+        note=output_parity["note"],
+        onset=output_parity["onset"],
+        note_threshold_disagreements=note_disagreements,
+        onset_threshold_disagreements=onset_disagreements,
+        note_threshold_elements=int(reference["note"].size),
+        onset_threshold_elements=int(reference["onset"].size),
+        onnx_event_count=len(reference_events),
+        torch_event_count=len(candidate_events),
+        event_structure_disagreements=int(structure_disagreements),
+        amplitude_max_abs_error=None,
+        amplitude_mean_abs_error=None,
+        pitch_bend_element_disagreements=int(pitch_bend_disagreements),
+        synthetic_windows=int(reference["note"].shape[0]),
+    )
+    try:
+        assert_parity(summary)
+    except AssertionError:
+        parity_passed = False
+    else:
+        parity_passed = True
     return {
         **errors,
-        "parity_passed": not failed,
+        "parity_passed": parity_passed,
         "event_count_disagreements": event_count_disagreements,
         "event_tuple_disagreements": int(event_tuple_disagreements),
         "note_threshold_disagreements": note_disagreements,
@@ -385,11 +419,14 @@ def _end_to_end(
     predict: Callable[[Any], Mapping[str, Any]],
     np: Any,
     postprocess: Any,
+    synchronize: Callable[[], None] | None = None,
 ) -> dict[str, Any]:
+    synchronize = synchronize or (lambda: None)
     rows = []
     total_audio_seconds = 0.0
     total_wall_seconds = 0.0
     for case in cases:
+        synchronize()
         started = time.perf_counter()
         prepared = prepare_wav(case.audio_path)
         chunks = []
@@ -401,6 +438,7 @@ def _end_to_end(
         }
         unwrapped = unwrap_window_outputs(outputs, original_sample_count=prepared.original_sample_count)
         events = [] if unwrapped["note"].shape[0] == 0 else postprocess(unwrapped)
+        synchronize()
         wall_seconds = float(time.perf_counter() - started)
         total_audio_seconds += prepared.audio_seconds
         total_wall_seconds += wall_seconds
@@ -474,8 +512,10 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
         elif route == "pytorch_xpu":
             route_device = _xpu_device(torch, int(request.get("xpu_index", 0)))
             xpu_peak_reset = _reset_xpu_peak_memory(torch, route_device)
+            _sync_xpu(torch, route_device)
             move_started = time.perf_counter()
             model.to(route_device)
+            _sync_xpu(torch, route_device)
             device_move_seconds = float(time.perf_counter() - move_started)
         elif route in {"openvino_cpu", "openvino_gpu"}:
             try:
@@ -528,6 +568,7 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
         if mode not in {"inference", "training"}:
             raise _RouteError("runtime_failed", "benchmark_runtime_error")
         batch_results: dict[str, Any] = {}
+        synchronize = lambda: _sync_xpu(torch, route_device) if route_device is not None else None
         for batch_size in config.batch_sizes:
             host_batch = np.ascontiguousarray(windows[:batch_size], dtype=np.float32)
             if host_batch.shape[0] != batch_size:
@@ -544,6 +585,7 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
                 batch_size=batch_size,
                 warmup_iterations=config.warmup_iterations,
                 timed_iterations=config.timed_iterations,
+                synchronize=synchronize,
             )
             if mode == "inference":
                 measurement["first_inference_seconds"] = measurement.pop("first_call_seconds")
@@ -561,6 +603,7 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
                 predict,
                 np,
                 posteriorgrams_to_note_events,
+                synchronize=synchronize,
             )
         memory = _memory_snapshot(
             psutil,

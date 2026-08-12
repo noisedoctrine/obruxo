@@ -41,7 +41,7 @@ The committed parity report contains aggregate synthetic/public results only. Op
 
 ## Fixed backend benchmark
 
-The #24 benchmark measures the canonical checkpoint on the fixed inference matrix (`pytorch_cpu`, `pytorch_xpu`, `openvino_cpu`, `openvino_gpu`) and the fixed full forward-plus-backward training matrix (`pytorch_cpu`, `pytorch_xpu`). It uses float32, fresh subprocesses, three repetitions, three warmups, ten timed calls, and model-call batches `[1, 2, 4, 8]`. OpenVINO is converted from the native PyTorch module and compiled for the explicitly requested device; it never uses automatic device selection or fallback.
+The #24 benchmark measures the canonical checkpoint on the fixed inference matrix (`pytorch_cpu`, `pytorch_xpu`, `openvino_cpu`, `openvino_gpu`) and the fixed full forward-plus-backward training matrix (`pytorch_cpu`, `pytorch_xpu`). It uses float32, fresh subprocesses, three repetitions, three warmups, ten timed calls, and model-call batches `[1, 2, 4, 8]`. OpenVINO is converted from the native PyTorch module and compiled for the explicitly requested device with an explicit `INFERENCE_PRECISION_HINT=float32`; the GPU route leaves execution mode at the plugin default (observed as `PERFORMANCE`). It never uses automatic device selection or fallback.
 
 Create the private ignored smoke manifest from existing paired WAV/MIDI files, then run:
 

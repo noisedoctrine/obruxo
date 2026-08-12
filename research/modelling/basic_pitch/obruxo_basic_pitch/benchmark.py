@@ -741,6 +741,63 @@ def _aggregate_optional(rows: Sequence[Mapping[str, Any]], field: str) -> dict[s
     return {"value": aggregate_measurements(present), "measurement_status": "ok"}
 
 
+def _aggregate_end_to_end_cases(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Aggregate anonymous per-case E2E rows across every fresh worker."""
+    case_rows = [row.get("end_to_end", {}).get("cases", []) for row in rows]
+    indexes = [tuple(int(item["case_index"]) for item in cases) for cases in case_rows]
+    if not indexes or any(value != indexes[0] for value in indexes[1:]):
+        raise ValueError("end-to-end case indexes differ across repetitions")
+    aggregated = []
+    for case_position, case_index in enumerate(indexes[0]):
+        repetitions = [cases[case_position] for cases in case_rows]
+        for field in ("status", "audio_seconds", "note_event_count"):
+            values = [item[field] for item in repetitions]
+            if any(value != values[0] for value in values[1:]):
+                raise ValueError(f"end-to-end invariant {field} differs for case {case_index}")
+        aggregated.append(
+            {
+                "case_index": case_index,
+                "status": repetitions[0]["status"],
+                "audio_seconds": repetitions[0]["audio_seconds"],
+                "wall_seconds": aggregate_measurements([float(item["wall_seconds"]) for item in repetitions]),
+                "note_event_count": repetitions[0]["note_event_count"],
+            }
+        )
+    return aggregated
+
+
+def _aggregate_memory(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """Aggregate supported process/device memory values across repetitions."""
+    memory_rows = [row.get("memory", {}) for row in rows]
+    fields = (
+        "host_peak_rss_bytes",
+        "pytorch_xpu_peak_allocated_bytes",
+        "pytorch_xpu_peak_reserved_bytes",
+        "openvino_gpu_memory_bytes",
+        "openvino_gpu_total_memory_bytes",
+    )
+    result = {field: _aggregate_optional(memory_rows, field) for field in fields}
+    statuses = [memory.get("measurement_status") for memory in memory_rows]
+    result["measurement_status"] = "ok" if statuses and all(status == "ok" for status in statuses) else "unavailable"
+    statistics_keys = sorted(
+        {
+            str(key)
+            for memory in memory_rows
+            for key in (memory.get("openvino_gpu_memory_statistics_bytes") or {})
+        }
+    )
+    result["openvino_gpu_memory_statistics_bytes"] = {
+        key: _aggregate_optional(
+            [memory.get("openvino_gpu_memory_statistics_bytes") or {} for memory in memory_rows],
+            key,
+        )
+        for key in statistics_keys
+    }
+    reset_values = [memory.get("xpu_peak_reset_before_move") for memory in memory_rows]
+    result["xpu_peak_reset_before_move"] = all(reset_values) if reset_values else None
+    return result
+
+
 def crossover_audio_seconds(startup_a: float, throughput_a: float, startup_b: float, throughput_b: float) -> float | None:
     """Apply the fixed crossover formula, returning only positive finite results."""
     if not all(math.isfinite(value) and value > 0 for value in (startup_a, throughput_a, startup_b, throughput_b)):
@@ -770,22 +827,171 @@ def _runtime_identity() -> dict[str, str | None]:
     return versions
 
 
+def _git_revision() -> str | None:
+    workspace = Path(__file__).resolve().parents[4]
+    try:
+        completed = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=workspace,
+            capture_output=True,
+            check=False,
+            text=True,
+        )
+    except OSError:
+        return None
+    revision = completed.stdout.strip()
+    return revision if completed.returncode == 0 and revision else None
+
+
+def _checkpoint_identity(path: Path) -> dict[str, Any]:
+    stat = path.stat()
+    return {"sha256": _sha256_file(path), "size_bytes": int(stat.st_size)}
+
+
+def _benchmark_run_identity(
+    checkpoint: Path,
+    config: BenchmarkConfig,
+    cases: Sequence[SmokeCase],
+    runtime: Mapping[str, Any],
+) -> dict[str, Any]:
+    return {
+        "model_id": MODEL_ID,
+        "source_git_blob_sha1": SPOTIFY_ONNX_GIT_BLOB_SHA1,
+        "checkpoint": _checkpoint_identity(checkpoint),
+        "code_revision": _git_revision(),
+        "runtime": dict(runtime),
+        "benchmark_spec_version": config.version,
+        "precision": config.precision,
+        "smoke_contract": {
+            "case_count": len(cases),
+            "coverage": coverage_summary(cases),
+            "batch_sizes": list(config.batch_sizes),
+            "end_to_end_batch_size": config.end_to_end_batch_size,
+            "process_repetitions": config.process_repetitions,
+            "warmup_iterations": config.warmup_iterations,
+            "timed_iterations": config.timed_iterations,
+        },
+        "parity_contract": _parity_contract(),
+    }
+
+
+def _current_parity_diagnostics(
+    inference: Sequence[Mapping[str, Any]],
+    config: BenchmarkConfig,
+    run_identity: Mapping[str, Any],
+) -> dict[str, Any]:
+    metrics = (
+        "contour_non_finite_count",
+        "note_non_finite_count",
+        "onset_non_finite_count",
+        "contour_max_abs_error",
+        "note_max_abs_error",
+        "onset_max_abs_error",
+        "note_threshold_disagreements",
+        "onset_threshold_disagreements",
+        "event_count_disagreements",
+        "event_tuple_disagreements",
+        "event_structure_disagreements",
+        "pitch_bend_element_disagreements",
+    )
+    routes = []
+    for row in inference:
+        repetitions = row.get("parity_repetitions", [])
+        aggregate = {
+            name: max(
+                (float(item["parity"][name]) for item in repetitions if isinstance(item.get("parity"), Mapping) and item["parity"].get(name) is not None),
+                default=None,
+            )
+            for name in metrics
+        }
+        routes.append(
+            {
+                "route": row.get("route"),
+                "status": row.get("parity_status", row.get("status")),
+                "repetitions": repetitions,
+                "max_across_repetitions": aggregate,
+            }
+        )
+    return {
+        "format_version": 1,
+        "model_id": MODEL_ID,
+        "phase": "current_benchmark_parity_gate",
+        "scope": "canonical float32 model on five public synthetic windows; no private smoke audio or rendering",
+        "process_repetitions": config.process_repetitions,
+        "thresholds": _parity_contract(),
+        "run_identity": dict(run_identity),
+        "routes": routes,
+    }
+
+
+def _committed_report_revision() -> str | None:
+    report_path = Path(__file__).resolve().parents[1] / "reports" / "backend_benchmark.json"
+    workspace = Path(__file__).resolve().parents[4]
+    try:
+        completed = subprocess.run(
+            ["git", "log", "-n", "1", "--format=%H", "--", str(report_path.relative_to(workspace))],
+            cwd=workspace,
+            capture_output=True,
+            check=False,
+            text=True,
+        )
+    except (OSError, ValueError):
+        return None
+    revision = completed.stdout.strip()
+    return revision if completed.returncode == 0 and revision else None
+
+
+def _historical_evidence(previous: Mapping[str, Any], checkpoint: Path) -> dict[str, Any]:
+    history = dict(previous.get("historical_evidence", {})) if isinstance(previous.get("historical_evidence"), Mapping) else {}
+    identity = previous.get("run_identity")
+    if not isinstance(identity, Mapping):
+        identity = {
+            "model_id": previous.get("model_id", MODEL_ID),
+            "source_git_blob_sha1": previous.get("source_git_blob_sha1", SPOTIFY_ONNX_GIT_BLOB_SHA1),
+            "checkpoint": _checkpoint_identity(checkpoint),
+            "code_revision": _committed_report_revision(),
+            "runtime": previous.get("runtime", {}),
+            "diagnostic_suite": "five public synthetic windows; pre-existing committed report artifact",
+            "identity_recovered_from_committed_report": True,
+        }
+    parity = previous.get("parity_diagnostics")
+    if isinstance(parity, Mapping) and parity.get("phase") == "pre_fix":
+        history.setdefault(
+            "pre_fix_default_openvino_gpu",
+            {"run_identity": dict(identity), "data": dict(parity)},
+        )
+    precision = previous.get("openvino_precision_diagnostic")
+    if isinstance(precision, Mapping) and precision.get("phase") == "post_fix":
+        history.setdefault(
+            "bounded_corrected_openvino_gpu",
+            {"run_identity": dict(identity), "data": dict(precision)},
+        )
+    return history
+
+
 def _unavailable_route(route: str, mode: str, code: str) -> dict[str, Any]:
     return {"route": route, "mode": mode, "status": "unavailable", "failure_code": code}
 
 
 def _source_snapshot(cases: Sequence[SmokeCase]) -> dict[Path, tuple[int, int]]:
+    paths = []
+    for case in cases:
+        paths.extend((case.midi_path, case.preset_path))
+        if case.audio_source == "existing_audio":
+            paths.append(case.audio_path)
     return {
         path: (path.stat().st_size, path.stat().st_mtime_ns)
-        for case in cases
-        for path in (case.audio_path, case.midi_path, case.preset_path)
+        for path in paths
         if path is not None
     }
 
 
 def _verify_source_snapshot(snapshot: Mapping[Path, tuple[int, int]]) -> None:
     for path, before in snapshot.items():
-        current = path.stat()
+        try:
+            current = path.stat()
+        except OSError as exc:
+            raise SourceMutationError("an immutable benchmark source disappeared during execution") from exc
         if (current.st_size, current.st_mtime_ns) != before:
             raise SourceMutationError("an immutable benchmark source changed during execution")
 
@@ -957,16 +1163,9 @@ def _aggregate_route(rows: Sequence[Mapping[str, Any]], route: str, mode: str, c
             "audio_seconds_per_wall_second": aggregate_measurements(
                 [float(row["end_to_end"]["audio_seconds_per_wall_second"]) for row in rows]
             ),
-            "cases": [
-                {
-                    key: row["end_to_end"]["cases"][case_index][key]
-                    for key in ("case_index", "status", "audio_seconds", "wall_seconds", "note_event_count")
-                }
-                for case_index in range(len(rows[0]["end_to_end"]["cases"]))
-                for row in rows[:1]
-            ],
+            "cases": _aggregate_end_to_end_cases(rows),
         }
-    result["memory"] = rows[0].get("memory", {"status": "unavailable"})
+    result["memory"] = _aggregate_memory(rows)
     return result
 
 
@@ -985,6 +1184,8 @@ def _parity_contract() -> dict[str, Any]:
         "onset_threshold_disagreements": "0",
         "event_count_disagreements": "0",
         "event_tuple_disagreements": "0",
+        "event_structure_disagreements": "0",
+        "pitch_bend_element_disagreements": "0",
     }
 
 
@@ -999,6 +1200,8 @@ _PARITY_DIAGNOSTIC_METRICS = (
     "onset_threshold_disagreements",
     "event_count_disagreements",
     "event_tuple_disagreements",
+    "event_structure_disagreements",
+    "pitch_bend_element_disagreements",
 )
 
 
@@ -1072,6 +1275,14 @@ def run_parity_diagnostics(
         "scope": "canonical float32 model on five public synthetic windows; no private smoke audio or rendering",
         "process_repetitions": process_repetitions,
         "thresholds": _parity_contract(),
+        "run_identity": {
+            "model_id": MODEL_ID,
+            "source_git_blob_sha1": SPOTIFY_ONNX_GIT_BLOB_SHA1,
+            "checkpoint": _checkpoint_identity(checkpoint),
+            "code_revision": _git_revision(),
+            "runtime": _runtime_identity(),
+            "diagnostic_suite": "five public synthetic windows; route parity gate",
+        },
         "routes": routes,
     }
 
@@ -1138,10 +1349,17 @@ def run_benchmark(
 ) -> dict[str, Any]:
     """Run the fixed matrix in foreground fresh subprocesses and sanitize it."""
     manifest = Path(manifest_path).resolve(strict=True)
+    cases = load_manifest(
+        manifest,
+        config,
+        allow_derived_render=allow_derived_render,
+        allow_missing_derived_audio=allow_derived_render,
+    )
+    source_snapshot = _source_snapshot(cases)
     if allow_derived_render:
         prepare_derived_renders(manifest, config)
+    _verify_source_snapshot(source_snapshot)
     cases = load_manifest(manifest, config, allow_derived_render=allow_derived_render)
-    snapshot = _source_snapshot(cases)
     checkpoint = Path(checkpoint_path).resolve(strict=True)
     inference: list[dict[str, Any]] = []
     training: list[dict[str, Any]] = []
@@ -1168,17 +1386,35 @@ def run_benchmark(
                 ]
                 destination.append(_aggregate_route(rows, route, mode, config))
     finally:
-        _verify_source_snapshot(snapshot)
+        _verify_source_snapshot(source_snapshot)
+    runtime = _runtime_identity()
+    run_identity = _benchmark_run_identity(checkpoint, config, cases, runtime)
+    total_audio_seconds = next(
+        (
+            row.get("end_to_end", {}).get("audio_seconds", {}).get("median")
+            for row in inference
+            if row.get("status") == "ok"
+        ),
+        None,
+    )
     report = {
         "format_version": 1,
         "benchmark_spec_version": config.version,
         "model_id": MODEL_ID,
         "source_git_blob_sha1": SPOTIFY_ONNX_GIT_BLOB_SHA1,
-        "runtime": _runtime_identity(),
+        "runtime": runtime,
+        "run_identity": run_identity,
         "config": config.as_dict(),
-        "smoke_set": {"status": "ok", "case_count": len(cases), "coverage": coverage_summary(cases), "cases": [case.sanitized() for case in cases]},
+        "smoke_set": {
+            "status": "ok",
+            "case_count": len(cases),
+            "total_audio_seconds": total_audio_seconds,
+            "coverage": coverage_summary(cases),
+            "cases": [case.sanitized() for case in cases],
+        },
         "inference": inference,
         "training": training,
+        "parity_diagnostics": _current_parity_diagnostics(inference, config, run_identity),
         "crossovers": _crossover_rows(inference),
         "conclusions": {
             "inference_highest_batch_1_audio_throughput": max(
@@ -1196,7 +1432,7 @@ def run_benchmark(
             "full_benchmark": "post_fix_openvino_precision",
             "post_fix_parity": "passed",
             "post_fix_timing": "measured",
-            "note": "The corrected OpenVINO GPU route requested float32 inference and retained the plugin's PERFORMANCE execution mode; its performance/resource rows are measured under the fixed #24 contract.",
+            "note": "The corrected OpenVINO GPU route requested float32 inference and retained the plugin's PERFORMANCE execution mode; its performance/resource rows are measured under the fixed #24 contract. Historical diagnostics are kept under historical_evidence with their original run identity.",
         },
     }
     for section in ("inference", "training"):
@@ -1238,7 +1474,8 @@ def _report_number(value: Any, digits: int = 3) -> str:
 
 
 def _report_mib(value: Any) -> str:
-    return "n/a" if value is None else f"{float(value) / (1024 * 1024):.1f}"
+    numeric = _report_median(value) if isinstance(value, Mapping) else value
+    return "n/a" if numeric is None else f"{float(numeric) / (1024 * 1024):.1f}"
 
 
 def _parity_diagnostic_value(report: Mapping[str, Any], route: str, metric: str) -> str:
@@ -1289,7 +1526,9 @@ def _parity_diagnostics_markdown(report: Mapping[str, Any]) -> list[str]:
         (f"Note-frame threshold disagreements (threshold {note_threshold}; must be 0)", "note_threshold_disagreements"),
         (f"Onset threshold disagreements (threshold {onset_threshold}; must be 0)", "onset_threshold_disagreements"),
         ("Generated note-event count disagreements (must be 0)", "event_count_disagreements"),
+        ("Generated note-event structural disagreements (must be 0)", "event_structure_disagreements"),
         ("(start_time_s, end_time_s, MIDI pitch) disagreements (must be 0)", "event_tuple_disagreements"),
+        ("Pitch-bend element disagreements (must be 0)", "pitch_bend_element_disagreements"),
     )
     route_labels = (
         ("pytorch_cpu", "PyTorch CPU"),
@@ -1316,6 +1555,14 @@ def _parity_diagnostics_markdown(report: Mapping[str, Any]) -> list[str]:
 
 def _openvino_precision_diagnostic_markdown(report: Mapping[str, Any]) -> list[str]:
     diagnostic = report.get("openvino_precision_diagnostic")
+    evidence_source = ""
+    if not isinstance(diagnostic, Mapping):
+        history = report.get("historical_evidence", {})
+        bounded = history.get("bounded_corrected_openvino_gpu", {}) if isinstance(history, Mapping) else {}
+        if isinstance(bounded, Mapping):
+            diagnostic = bounded.get("data")
+            if isinstance(diagnostic, Mapping):
+                evidence_source = "historical bounded diagnostic"
     lines = ["", "## OpenVINO GPU precision correction", ""]
     if not isinstance(diagnostic, Mapping):
         lines.append("No post-fix OpenVINO GPU precision diagnostic was retained in this benchmark artifact.")
@@ -1338,7 +1585,8 @@ def _openvino_precision_diagnostic_markdown(report: Mapping[str, Any]) -> list[s
 
     lines.extend(
         [
-            f"This bounded post-fix diagnostic used `{diagnostic.get('batch_size', 'n/a')}` synthetic windows in one batch; it did not use private smoke audio, render audio, or measure benchmark throughput.",
+            f"This bounded post-fix diagnostic used `{diagnostic.get('batch_size', 'n/a')}` synthetic windows in one batch; it did not use private smoke audio, render audio, or measure benchmark throughput."
+            + (f" It is retained as {evidence_source}." if evidence_source else ""),
             "",
             f"- Runtime: OpenVINO `{runtime.get('openvino', 'n/a')}` on `{runtime.get('device_name', 'n/a')}`; device architecture `{runtime.get('device_architecture', 'n/a')}`.",
             f"- Driver version: `{runtime.get('driver_version', 'n/a')}`.",
@@ -1365,7 +1613,9 @@ def _openvino_precision_diagnostic_markdown(report: Mapping[str, Any]) -> list[s
             f"| Note-frame threshold disagreements (threshold {diagnostic.get('thresholds', {}).get('note_frame_threshold', 'n/a')}; must be 0) | {result('note_threshold_disagreements', 0)} |",
             f"| Onset threshold disagreements (threshold {diagnostic.get('thresholds', {}).get('onset_threshold', 'n/a')}; must be 0) | {result('onset_threshold_disagreements', 0)} |",
             f"| Generated note-event count disagreements (must be 0) | {result('event_count_disagreements', 0)} |",
+            f"| Generated note-event structural disagreements (must be 0) | {result('event_structure_disagreements', 0)} |",
             f"| (start_time_s, end_time_s, MIDI pitch) disagreements (must be 0) | {result('event_tuple_disagreements', 0)} |",
+            f"| Pitch-bend element disagreements (must be 0) | {result('pitch_bend_element_disagreements', 0)} |",
         ]
     )
     return lines
@@ -1409,17 +1659,48 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
     successful_inference = [row for row in inference if row.get("status") == "ok"]
     successful_training = [row for row in training if row.get("status") == "ok"]
     openvino_gpu = next((row for row in successful_inference if row.get("route") == "openvino_gpu"), {})
+    historical_evidence = report.get("historical_evidence", {})
+    pre_fix_evidence = (
+        historical_evidence.get("pre_fix_default_openvino_gpu", {})
+        if isinstance(historical_evidence, Mapping)
+        else {}
+    )
+    pre_fix_diagnostic = pre_fix_evidence.get("data", {}) if isinstance(pre_fix_evidence, Mapping) else {}
+    pre_fix_routes = pre_fix_diagnostic.get("routes", []) if isinstance(pre_fix_diagnostic, Mapping) else []
+    if not pre_fix_routes:
+        pre_fix_diagnostic = report.get("parity_diagnostics", {})
+        pre_fix_routes = pre_fix_diagnostic.get("routes", []) if isinstance(pre_fix_diagnostic, Mapping) else []
     historical_gpu_failure = next(
         (
             row
-            for row in report.get("parity_diagnostics", {}).get("routes", [])
+            for row in pre_fix_routes
             if row.get("route") == "openvino_gpu" and row.get("status") == "parity_failed"
         ),
         None,
     )
+    historical_gpu_max = dict(historical_gpu_failure.get("max_across_repetitions", {})) if historical_gpu_failure else {}
+    if historical_gpu_failure:
+        for metric in _PARITY_DIAGNOSTIC_METRICS:
+            values = [
+                repetition.get("parity", {}).get(metric)
+                for repetition in historical_gpu_failure.get("repetitions", [])
+                if isinstance(repetition.get("parity"), Mapping)
+                and repetition.get("parity", {}).get(metric) is not None
+            ]
+            if metric not in historical_gpu_max or historical_gpu_max[metric] is None:
+                historical_gpu_max[metric] = max(values) if values else None
     current_gpu_failure = next((row for row in inference if row.get("route") == "openvino_gpu" and row.get("status") != "ok"), None)
+    bounded_evidence = (
+        historical_evidence.get("bounded_corrected_openvino_gpu", {})
+        if isinstance(historical_evidence, Mapping)
+        else {}
+    )
     precision_diagnostic = report.get("openvino_precision_diagnostic")
+    if not isinstance(precision_diagnostic, Mapping) and isinstance(bounded_evidence, Mapping):
+        precision_diagnostic = bounded_evidence.get("data")
     has_precision_diagnostic = isinstance(precision_diagnostic, Mapping)
+    smoke_case_count = smoke.get("case_count", 0)
+    smoke_audio_seconds = smoke.get("total_audio_seconds")
     corrected_gpu_measured = bool(openvino_gpu.get("batch_results"))
     batch_winners = {
         size: _route_metric_winner(successful_inference, size, "audio_seconds_per_second") for size in (1, 2, 4, 8)
@@ -1575,7 +1856,7 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
             "",
             "## End-to-end audio-to-note-event throughput",
             "",
-            "This is the realistic batch-1 boundary: read-only audio open/decode, in-memory preparation, model windows, unwrapping, and stock note-event materialization. The smoke set totals 115.021 audio seconds across 8 cases.",
+            f"This is the realistic batch-1 boundary: read-only audio open/decode, in-memory preparation, model windows, unwrapping, and stock note-event materialization. The smoke set totals {_report_number(smoke_audio_seconds)} audio seconds across {smoke_case_count} cases.",
             "",
             "| Route | Median wall time (s) | Min-max wall time (s) | Median audio-seconds/wall-second | Median RTF (wall/audio) |",
             "| --- | ---: | ---: | ---: | ---: |",
@@ -1676,8 +1957,8 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
                 f"- Status: `{historical_gpu_failure.get('status')}` across the preserved pre-fix diagnostic repetitions.",
                 "- The worker performs the parity gate before model-only or end-to-end timing. The gate compares contour, note, and onset numeric outputs plus note/onset threshold decisions and stock note-event structure against the canonical PyTorch CPU route.",
                 (
-                    "- The component-level parity values are tabulated above. They describe the fixed synthetic gate only; they do not authorize timing a route that failed parity."
-                    if isinstance(report.get("parity_diagnostics"), Mapping)
+                    f"- Preserved pre-fix maximums were contour/non-finite `{historical_gpu_max.get('contour_non_finite_count', 'n/a')}`, note/non-finite `{historical_gpu_max.get('note_non_finite_count', 'n/a')}`, onset/non-finite `{historical_gpu_max.get('onset_non_finite_count', 'n/a')}`, note-threshold `{historical_gpu_max.get('note_threshold_disagreements', 'n/a')}`, onset-threshold `{historical_gpu_max.get('onset_threshold_disagreements', 'n/a')}`, event-count `{historical_gpu_max.get('event_count_disagreements', 'n/a')}`, event-tuple `{historical_gpu_max.get('event_tuple_disagreements', 'n/a')}`, and pitch-bend `{historical_gpu_max.get('pitch_bend_element_disagreements', 'n/a')}`. These are the fixed synthetic gate only; they do not authorize timing a route that failed parity."
+                    if historical_gpu_max
                     else "- The committed aggregate retains only the generic `parity_failed` code, not the component-level error payload. Therefore the existing evidence identifies a parity-gate failure but does not identify which subcheck triggered it. That missing diagnostic is a reporting limitation, not permission to infer a GPU performance result."
                 ),
                 (
@@ -1700,7 +1981,7 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
             "## Practical conclusions supported by this run",
             "",
             "- The batch-scaling table is the direct comparison of the four inference routes; it should be read together with startup/first-call and resource rows rather than reduced to one universal winner.",
-            f"- The measured end-to-end ordering is led by `{_route_name(end_to_end_winner)}` on this fixed 8-case smoke set; it is not a claim about other audio distributions or application integration overhead.",
+            f"- The measured end-to-end ordering is led by `{_route_name(end_to_end_winner)}` on this fixed {smoke_case_count}-case smoke set; it is not a claim about other audio distributions or application integration overhead.",
             "- Startup, first-call, and crossover sections quantify the trade-off between short interactive use and longer/reused workloads without changing backend settings.",
             (
                 "- The corrected OpenVINO GPU route is measured under requested float32 + plugin-reported PERFORMANCE; its practical position relative to PyTorch XPU, PyTorch CPU, and OpenVINO CPU is visible in all four inference tables."
@@ -1816,6 +2097,10 @@ def run_parity_diagnostic_cli(
         report = json.loads(json_file.read_text(encoding="utf-8"))
         if not isinstance(report, dict):
             return 2
+        history = _historical_evidence(report, Path(checkpoint_path).resolve(strict=True))
+        if history:
+            report["historical_evidence"] = history
+        report.pop("openvino_precision_diagnostic", None)
         report["parity_diagnostics"] = run_parity_diagnostics(
             checkpoint_path,
             process_repetitions=process_repetitions,
@@ -1861,9 +2146,9 @@ def run_benchmark_cli(
                 allow_derived_render=allow_derived_render,
             )
             if previous_report is not None:
-                for key in ("parity_diagnostics", "openvino_precision_diagnostic"):
-                    if key in previous_report:
-                        report[key] = previous_report[key]
+                historical = _historical_evidence(previous_report, Path(checkpoint_path).resolve(strict=True))
+                if historical:
+                    report["historical_evidence"] = historical
         except DerivedRenderUnavailable as exc:
             try:
                 cases = load_manifest(

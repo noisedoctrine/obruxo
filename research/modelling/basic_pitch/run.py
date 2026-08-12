@@ -17,6 +17,8 @@ def _preload_conda_openmp_runtime() -> None:
     runtime = Path(sys.prefix) / "Library" / "bin" / "libiomp5md.dll"
     if runtime.is_file():
         ctypes.CDLL(str(runtime))
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="OBRUXO Basic Pitch conversion and parity tools")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -164,23 +166,30 @@ def main() -> int:
         print(f"evaluated {result['successful_pair_count']} of {result['pair_count']} pairs")
         return 0 if result["status"] == "ok" else 3
 
-    import numpy as np
+    from obruxo_basic_pitch.inference import prepare_wav
     from obruxo_basic_pitch.parity import (
         assert_parity,
-        audio_to_windows,
-        compare_windows,
+        compare_windows_and_audio,
         synthetic_windows,
         write_reports,
     )
 
     public = synthetic_windows()
-    local = [audio_to_windows(path) for path in args.audio]
-    windows = np.concatenate((public, *local), axis=0) if local else public
-    summary = compare_windows(args.onnx, args.checkpoint, windows)
-    summary = replace(summary, synthetic_windows=public.shape[0], private_local_windows=windows.shape[0] - public.shape[0])
+    local = [prepare_wav(path) for path in args.audio]
+    summary = compare_windows_and_audio(
+        args.onnx,
+        args.checkpoint,
+        public,
+        local,
+    )
+    summary = replace(
+        summary,
+        synthetic_windows=public.shape[0],
+        private_local_windows=sum(clip.windows.shape[0] for clip in local),
+    )
     assert_parity(summary)
     write_reports(summary, args.json, args.markdown, private_local_clips=len(args.audio), force=args.force)
-    print(f"parity passed for {windows.shape[0]} windows")
+    print(f"parity passed for {summary.synthetic_windows + summary.private_local_windows} windows")
     return 0
 
 

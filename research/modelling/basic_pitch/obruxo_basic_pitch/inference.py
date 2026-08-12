@@ -10,11 +10,19 @@ import numpy as np
 from scipy import signal
 from scipy.io import wavfile
 
-from .constants import ANNOTATIONS_FPS, AUDIO_N_SAMPLES, AUDIO_SAMPLE_RATE
+from .constants import (
+    ANNOT_N_FRAMES,
+    ANNOTATIONS_FPS,
+    AUDIO_N_SAMPLES,
+    AUDIO_SAMPLE_RATE,
+    FFT_HOP,
+    OVERLAP,
+)
 
 
 @dataclass(frozen=True)
 class PreparedAudio:
+    """A read-only source reduced to the canonical Basic Pitch model windows."""
     sample_rate: int
     original_sample_count: int
     audio_seconds: float
@@ -22,13 +30,16 @@ class PreparedAudio:
 
 
 def _window_audio(samples: np.ndarray) -> np.ndarray:
-    padded = np.concatenate((np.zeros(3840, dtype=np.float32), samples))
-    hop = AUDIO_N_SAMPLES - 30 * 256
-    starts = list(range(0, max(1, padded.shape[0] - AUDIO_N_SAMPLES + 1), hop))
-    if starts[-1] + AUDIO_N_SAMPLES < padded.shape[0]:
-        starts.append(padded.shape[0] - AUDIO_N_SAMPLES)
+    """Create fixed-hop windows, zero-padding only the final tail window."""
+    samples = np.asarray(samples, dtype=np.float32)
+    if samples.ndim != 1:
+        raise ValueError(f"expected mono samples [N], got {samples.shape}")
+    if not np.all(np.isfinite(samples)):
+        raise ValueError("audio samples must be finite")
+    padded = np.concatenate((np.zeros((OVERLAP * FFT_HOP) // 2, dtype=np.float32), samples))
+    hop = AUDIO_N_SAMPLES - OVERLAP * FFT_HOP
     windows = []
-    for start in starts:
+    for start in range(0, padded.shape[0], hop):
         window = padded[start : start + AUDIO_N_SAMPLES]
         if window.shape[0] < AUDIO_N_SAMPLES:
             window = np.pad(window, (0, AUDIO_N_SAMPLES - window.shape[0]))
@@ -64,12 +75,16 @@ def unwrap_window_outputs(
     *,
     original_sample_count: int,
 ) -> dict[str, np.ndarray]:
-    """Drop the 15-frame window margins and trim to the source duration."""
-    target_frames = int(original_sample_count * ANNOTATIONS_FPS // AUDIO_SAMPLE_RATE)
+    """Crop each model window, concatenate in order, and trim to source duration."""
+    n_overlapping_frames = OVERLAP
     unwrapped = {}
     for name, value in output.items():
         array = np.asarray(value)
-        if array.ndim != 3 or array.shape[1] != 172:
-            raise ValueError(f"expected windowed posterior {name} [N,172,F], got {array.shape}")
-        unwrapped[name] = np.ascontiguousarray(array[:, 15:-15, :].reshape(-1, array.shape[2])[:target_frames])
+        if array.ndim != 3 or array.shape[1] != ANNOT_N_FRAMES:
+            raise ValueError(f"expected windowed posterior {name} [N,{ANNOT_N_FRAMES},F], got {array.shape}")
+        if array.shape[1] <= 2 * n_overlapping_frames // 2:
+            raise ValueError(f"posterior {name} has no non-overlapping frames")
+        cropped = array[:, n_overlapping_frames // 2 : -n_overlapping_frames // 2, :]
+        target_frames = int(original_sample_count * ANNOTATIONS_FPS // AUDIO_SAMPLE_RATE)
+        unwrapped[name] = np.ascontiguousarray(cropped.reshape(-1, array.shape[2])[:target_frames])
     return unwrapped
