@@ -10,7 +10,7 @@ The JSON is authoritative, but this Markdown is intended to stand alone as the r
 
 - Measured candidates: `basic_pitch`.
 - Metadata-only or unavailable candidates: `timbre_trap_base, ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_small, muscriptor_medium, muscriptor_large`.
-- Directly measured scope: Only Basic Pitch produced executable #24/#25 evidence in the permitted existing runtime and storage. Its quality and cost evidence are inherited, not rerun by #26.
+- Directly measured scope: Only Basic Pitch produced executable #24/#25 evidence in the permitted existing runtime and storage. Its quality and cost evidence are inherited, not rerun by #26; the persisted OpenVINO GPU cost row is pre-fix evidence.
 - Sourced/model-level scope: Candidate source, checkpoint, representation, architecture boundary, native sample rate, batch semantics, and license fields are verified inventory facts; they are not performance measurements.
 - Unresolved comparative scope: No comparative quality, execution cost, resource, backward-cost, or quantization result exists for the unavailable alternatives. The intended comparative benchmark remains incomplete.
 
@@ -65,20 +65,26 @@ Only Basic Pitch produced executable evidence. The following sections consume th
 
 - Source: `landed_issue_24_report`; Routes and findings are consumed from the landed #24 report; #26 does not rerun Basic Pitch cost measurements.
 - Cost evidence is route-specific; a route failure is not converted into a score or a fallback result.
+- The persisted #24 cost rows below are pre-fix OpenVINO evidence where indicated; a bounded post-fix parity pass is not a corrected performance measurement.
 
-| Mode | Route | Status | Batch-1 throughput | Batch-8 throughput | E2E rate | Startup (s) | Host RSS (MiB) | XPU allocated/reserved (MiB) |
+| Mode | Route | Evidence state | Batch-1 throughput | Batch-8 throughput | E2E rate | Startup (s) | Host RSS (MiB) | XPU allocated/reserved (MiB) |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | `inference` | `pytorch_cpu` | `ok` | 129.654 | 188.064 | 56.559 | 0.823 | 590.6 | n/a / n/a |
 | `inference` | `pytorch_xpu` | `ok` | 280.008 | 747.332 | 130.873 | 0.836 | 2300.1 | 70.3 / 124.0 |
 | `inference` | `openvino_cpu` | `ok` | 102.785 | 222.926 | 60.948 | 2.519 | 807.0 | n/a / n/a |
-| `inference` | `openvino_gpu` | `parity_failed` | n/a | n/a | n/a | n/a | n/a | n/a / n/a |
+| `inference` | `openvino_gpu` | `pre_fix_parity_failed` | n/a | n/a | n/a | n/a | n/a | n/a / n/a |
 | `training` | `pytorch_cpu` | `ok` | 29.344 | 33.566 | n/a | 0.763 | 902.8 | n/a / n/a |
 | `training` | `pytorch_xpu` | `ok` | 92.505 | 254.338 | n/a | 0.833 | 2915.3 | 182.1 / 316.0 |
 
-Route failures:
-- `openvino_gpu`: `parity_failed`. The landed #24 report suppresses timing for this route.
+Historical route records:
+- `openvino_gpu`: pre-fix/default `float16` + `PERFORMANCE` -> `parity_failed` before timing. The corrected route has a bounded parity result only.
 
-The OpenVINO GPU row is a parity failure before timing; it supports no GPU speed, memory, or quality conclusion. The #24 report retains the detailed route findings, including startup/throughput crossover and CPU/XPU backward measurements.
+### OpenVINO GPU evidence state
+
+- Measured result (pre-fix/default): the plugin compiled the GPU route as `float16` + `PERFORMANCE`; parity failed catastrophically before timing, so the persisted cost row contains no GPU performance or resource result.
+- Bounded diagnostic result (corrected): requested `INFERENCE_PRECISION_HINT=float32`, compiled `float32` + `PERFORMANCE`; status `parity_passed` on `5` public synthetic windows.
+- Bounded parity metrics: non-finite values and threshold/event disagreements were `0`; maximum contour/note/onset errors were `0.000001431`, `0.000000715`, and `0.000001132`.
+- Not yet measured: corrected FP32 startup, throughput, end-to-end, and resource measurements remain `not_run`; no corrected OpenVINO GPU performance claim is made.
 
 ### Basic Pitch quantization evidence
 
@@ -107,9 +113,14 @@ No alternative candidate produced a quality, execution-cost, resource, backward-
 
 ### Directly supported by measured results
 
-- Directly measured evidence exists only for Basic Pitch: #25 quality on 1,769 eligible pairs and #24 route/cost evidence, including the OpenVINO GPU parity failure.
+- Directly measured evidence exists only for Basic Pitch: #25 quality on 1,769 eligible pairs and #24 route/cost evidence. The persisted OpenVINO GPU cost row is the pre-fix default FP16 + PERFORMANCE parity failure and contains no GPU timing/resource result.
 - The Basic Pitch evidence is a complete baseline for the landed #24/#25 contracts, not a comparison against the unavailable alternatives.
-- The observed Basic Pitch route trade-offs and OpenVINO GPU parity limitation are findings of #24; the #25 quality result remains CPU-provenanced until route provenance is resolved.
+- The observed Basic Pitch route trade-offs and the historical pre-fix OpenVINO GPU failure are findings of #24; the #25 quality result remains CPU-provenanced until route provenance is resolved.
+
+### Bounded diagnostic results
+
+- A separate bounded #24 diagnostic compiled OpenVINO GPU with INFERENCE_PRECISION_HINT=float32 while retaining PERFORMANCE and passed parity on five public synthetic windows. This is a parity result, not a performance/resource result.
+- This bounded result validates numerical parity only; it does not add a corrected OpenVINO GPU speed, startup, end-to-end, memory, or resource result.
 
 ### Supported only by verified model characteristics
 
@@ -119,6 +130,7 @@ No alternative candidate produced a quality, execution-cost, resource, backward-
 ### Comparative questions that remain unanswered
 
 - Alternative-model quality, latency, throughput, memory, backward cost, quantization response, and quality-versus-cost trade-offs remain unanswered because those candidates were not executable in the permitted local state.
+- Corrected OpenVINO GPU startup, throughput, end-to-end, and resource measurements have not yet been run; alternative-model comparisons remain blocked by unavailable prerequisites.
 - No ranking, quality estimate, cost estimate, quantization effect, or integration recommendation is assigned to any unavailable candidate.
 
 ## What is required before the intended comparison can be completed

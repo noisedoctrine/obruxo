@@ -111,6 +111,8 @@ def _landed_basic_pitch_runtime(report: Mapping[str, Any]) -> dict[str, Any]:
             "routes": routes,
             "timing_contract": report.get("config"),
             "route_failures": failures,
+            "measurement_status": report.get("measurement_status"),
+            "openvino_precision_diagnostic": report.get("openvino_precision_diagnostic"),
             "reporting_note": "Routes and findings are consumed from the landed #24 report; #26 does not rerun Basic Pitch cost measurements.",
         }
     )
@@ -166,6 +168,8 @@ def build_public_report(specs: Mapping[str, ModelSpec], input_root: Path) -> dic
                 "timing_contract": runtime.get("timing_contract") or runtime.get("config"),
                 "phases": runtime.get("phases"),
                 "route_failures": runtime.get("route_failures", []),
+                "measurement_status": runtime.get("measurement_status"),
+                "openvino_precision_diagnostic": runtime.get("openvino_precision_diagnostic"),
                 "reporting_note": runtime.get("reporting_note"),
                 "resources": runtime.get("resources") or run.get("resources"),
                 "native_batch_sizes": runtime.get("native_batch_sizes", list(spec.native_batch_sizes)),
@@ -184,6 +188,8 @@ def build_public_report(specs: Mapping[str, ModelSpec], input_root: Path) -> dic
                 "cost_status": runtime.get("status"),
                 "cost_failure_code": runtime.get("failure_code"),
                 "cost_route_failures": runtime.get("route_failures", []),
+                "cost_measurement_status": runtime.get("measurement_status"),
+                "openvino_gpu_diagnostic_status": ((runtime.get("openvino_precision_diagnostic") or {}).get("status")),
             }
         models.append(item)
     measured_models = [model["model_id"] for model in models if model.get("status") == "ok"]
@@ -202,12 +208,16 @@ def build_public_report(specs: Mapping[str, ModelSpec], input_root: Path) -> dic
             "evidence": {
                 "measured_models": measured_models,
                 "metadata_only_models": unavailable_models,
-                "measured_scope": "Only Basic Pitch produced executable #24/#25 evidence in the permitted existing runtime and storage. Its quality and cost evidence are inherited, not rerun by #26.",
+                "measured_scope": "Only Basic Pitch produced executable #24/#25 evidence in the permitted existing runtime and storage. Its quality and cost evidence are inherited, not rerun by #26; the persisted OpenVINO GPU cost row is pre-fix evidence.",
+                "bounded_diagnostic_scope": "The corrected OpenVINO GPU route has only a bounded five-window FP32 + PERFORMANCE parity diagnostic; it has no corrected timing or resource measurement.",
+                "not_measured_scope": "Corrected OpenVINO GPU performance/resource behavior and all alternative-model quality/cost comparisons remain not measured or blocked.",
                 "sourced_scope": "Candidate source, checkpoint, representation, architecture boundary, native sample rate, batch semantics, and license fields are verified inventory facts; they are not performance measurements.",
                 "unresolved_scope": "No comparative quality, execution cost, resource, backward-cost, or quantization result exists for the unavailable alternatives. The intended comparative benchmark remains incomplete.",
             },
             "conclusion": {
-                "measured": "Directly measured evidence exists only for Basic Pitch: #25 quality on 1,769 eligible pairs and #24 route/cost evidence, including the OpenVINO GPU parity failure.",
+                "measured": "Directly measured evidence exists only for Basic Pitch: #25 quality on 1,769 eligible pairs and #24 route/cost evidence. The persisted OpenVINO GPU cost row is the pre-fix default FP16 + PERFORMANCE parity failure and contains no GPU timing/resource result.",
+                "bounded_diagnostic": "A separate bounded #24 diagnostic compiled OpenVINO GPU with INFERENCE_PRECISION_HINT=float32 while retaining PERFORMANCE and passed parity on five public synthetic windows. This is a parity result, not a performance/resource result.",
+                "not_measured": "Corrected OpenVINO GPU startup, throughput, end-to-end, and resource measurements have not yet been run; alternative-model comparisons remain blocked by unavailable prerequisites.",
                 "sourced": "The candidate inventory establishes model identity, representation, architecture boundary, native rate/batch semantics, and licensing where verified, but none of these facts ranks execution quality or cost.",
                 "unresolved": "Alternative-model quality, latency, throughput, memory, backward cost, quantization response, and quality-versus-cost trade-offs remain unanswered because those candidates were not executable in the permitted local state.",
                 "quality": "No quality score is published for unavailable models or an empty eligible population.",
@@ -395,6 +405,10 @@ def _markdown(report: Mapping[str, Any]) -> str:
         quality = basic_pitch.get("quality") or {}
         quality_provenance = basic_pitch.get("quality_provenance") or {}
         execution = basic_pitch.get("execution") or {}
+        measurement_status = execution.get("measurement_status") or {}
+        openvino_diagnostic = execution.get("openvino_precision_diagnostic") or {}
+        if not isinstance(openvino_diagnostic, Mapping):
+            openvino_diagnostic = {}
         quality_backend = quality_provenance.get("backend") or {}
         runtime_provenance = quality_provenance.get("runtime_provenance") or {}
         lines.extend(
@@ -424,8 +438,9 @@ def _markdown(report: Mapping[str, Any]) -> str:
                 "",
                 f"- Source: `{execution.get('source', 'not recorded')}`; {execution.get('reporting_note', '')}",
                 "- Cost evidence is route-specific; a route failure is not converted into a score or a fallback result.",
+                "- The persisted #24 cost rows below are pre-fix OpenVINO evidence where indicated; a bounded post-fix parity pass is not a corrected performance measurement.",
                 "",
-                "| Mode | Route | Status | Batch-1 throughput | Batch-8 throughput | E2E rate | Startup (s) | Host RSS (MiB) | XPU allocated/reserved (MiB) |",
+                "| Mode | Route | Evidence state | Batch-1 throughput | Batch-8 throughput | E2E rate | Startup (s) | Host RSS (MiB) | XPU allocated/reserved (MiB) |",
                 "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |",
             ]
         )
@@ -435,20 +450,41 @@ def _markdown(report: Mapping[str, Any]) -> str:
             e2e_rate = end_to_end.get("audio_seconds_per_wall_second", {}).get("median")
             allocated = _report_mib(memory.get("pytorch_xpu_peak_allocated_bytes"))
             reserved = _report_mib(memory.get("pytorch_xpu_peak_reserved_bytes"))
+            evidence_state = route.get("status", "unknown")
+            if route.get("route") == "openvino_gpu" and openvino_diagnostic:
+                evidence_state = "pre_fix_parity_failed"
             lines.append(
-                f"| `{route.get('mode', 'unknown')}` | `{route.get('route', 'unknown')}` | `{route.get('status', 'unknown')}` | {_report_number(_route_median(route, 1, 'audio_seconds_per_second'))} | {_report_number(_route_median(route, 8, 'audio_seconds_per_second'))} | {_report_number(e2e_rate)} | {_report_number(_startup_median(route))} | {_report_mib(memory.get('host_peak_rss_bytes'))} | {allocated} / {reserved} |"
+                f"| `{route.get('mode', 'unknown')}` | `{route.get('route', 'unknown')}` | `{evidence_state}` | {_report_number(_route_median(route, 1, 'audio_seconds_per_second'))} | {_report_number(_route_median(route, 8, 'audio_seconds_per_second'))} | {_report_number(e2e_rate)} | {_report_number(_startup_median(route))} | {_report_mib(memory.get('host_peak_rss_bytes'))} | {allocated} / {reserved} |"
             )
         failures = execution.get("route_failures") or []
         if failures:
-            lines.extend(["", "Route failures:"])
+            lines.extend(["", "Historical route records:"])
             for failure in failures:
-                lines.append(f"- `{failure.get('route', 'unknown')}`: `{failure.get('status', 'unknown')}`. The landed #24 report suppresses timing for this route.")
-        lines.extend(
-            [
-                "",
-                "The OpenVINO GPU row is a parity failure before timing; it supports no GPU speed, memory, or quality conclusion. The #24 report retains the detailed route findings, including startup/throughput crossover and CPU/XPU backward measurements.",
-            ]
-        )
+                if failure.get("route") == "openvino_gpu" and openvino_diagnostic:
+                    lines.append(f"- `{failure.get('route')}`: pre-fix/default `float16` + `PERFORMANCE` -> `{failure.get('status', 'unknown')}` before timing. The corrected route has a bounded parity result only.")
+                else:
+                    lines.append(f"- `{failure.get('route', 'unknown')}`: `{failure.get('status', 'unknown')}`. The landed #24 report suppresses timing for this route.")
+        if openvino_diagnostic:
+            configuration = openvino_diagnostic.get("configuration") or {}
+            parity = openvino_diagnostic.get("parity") or {}
+            lines.extend(
+                [
+                    "",
+                    "### OpenVINO GPU evidence state",
+                    "",
+                    "- Measured result (pre-fix/default): the plugin compiled the GPU route as `float16` + `PERFORMANCE`; parity failed catastrophically before timing, so the persisted cost row contains no GPU performance or resource result.",
+                    f"- Bounded diagnostic result (corrected): requested `INFERENCE_PRECISION_HINT={configuration.get('inference_precision_hint_requested', 'not_recorded')}`, compiled `{configuration.get('inference_precision_hint_compiled', 'not_recorded')}` + `{configuration.get('execution_mode_hint_compiled', 'not_recorded')}`; status `{openvino_diagnostic.get('status', 'not_recorded')}` on `{openvino_diagnostic.get('windows', 'not_recorded')}` public synthetic windows.",
+                    f"- Bounded parity metrics: non-finite values and threshold/event disagreements were `0`; maximum contour/note/onset errors were `{_report_number(parity.get('contour_max_abs_error'), 9)}`, `{_report_number(parity.get('note_max_abs_error'), 9)}`, and `{_report_number(parity.get('onset_max_abs_error'), 9)}`.",
+                    f"- Not yet measured: corrected FP32 startup, throughput, end-to-end, and resource measurements remain `{measurement_status.get('post_fix_timing', 'not_recorded')}`; no corrected OpenVINO GPU performance claim is made.",
+                ]
+            )
+        else:
+            lines.extend(
+                [
+                    "",
+                    "The OpenVINO GPU row is a parity failure before timing; it supports no GPU speed, memory, or quality conclusion. The #24 report retains the detailed route findings, including startup/throughput crossover and CPU/XPU backward measurements.",
+                ]
+            )
         quantization = basic_pitch.get("quantization") or {}
         lines.extend(
             [
@@ -476,7 +512,12 @@ def _markdown(report: Mapping[str, Any]) -> str:
             "",
             f"- {conclusion.get('measured', 'not recorded')}",
             "- The Basic Pitch evidence is a complete baseline for the landed #24/#25 contracts, not a comparison against the unavailable alternatives.",
-            "- The observed Basic Pitch route trade-offs and OpenVINO GPU parity limitation are findings of #24; the #25 quality result remains CPU-provenanced until route provenance is resolved.",
+            "- The observed Basic Pitch route trade-offs and the historical pre-fix OpenVINO GPU failure are findings of #24; the #25 quality result remains CPU-provenanced until route provenance is resolved.",
+            "",
+            "### Bounded diagnostic results",
+            "",
+            f"- {conclusion.get('bounded_diagnostic', 'not recorded')}",
+            "- This bounded result validates numerical parity only; it does not add a corrected OpenVINO GPU speed, startup, end-to-end, memory, or resource result.",
             "",
             "### Supported only by verified model characteristics",
             "",
@@ -486,6 +527,7 @@ def _markdown(report: Mapping[str, Any]) -> str:
             "### Comparative questions that remain unanswered",
             "",
             f"- {conclusion.get('unresolved', 'not recorded')}",
+            f"- {conclusion.get('not_measured', 'not recorded')}",
             "- No ranking, quality estimate, cost estimate, quantization effect, or integration recommendation is assigned to any unavailable candidate.",
             "",
             "## What is required before the intended comparison can be completed",

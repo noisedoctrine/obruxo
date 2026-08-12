@@ -7,19 +7,22 @@
     "status": "incomplete_alternatives_unavailable"
   },
   "conclusion": {
+    "bounded_diagnostic": "A separate bounded #24 diagnostic compiled OpenVINO GPU with INFERENCE_PRECISION_HINT=float32 while retaining PERFORMANCE and passed parity on five public synthetic windows. This is a parity result, not a performance/resource result.",
     "cost": "Cost rows remain separate by route and are unavailable when the fixed smoke input or candidate runtime is unavailable.",
     "later_integration": "No candidate is promoted without executable common-corpus evidence.",
-    "measured": "Directly measured evidence exists only for Basic Pitch: #25 quality on 1,769 eligible pairs and #24 route/cost evidence, including the OpenVINO GPU parity failure.",
+    "measured": "Directly measured evidence exists only for Basic Pitch: #25 quality on 1,769 eligible pairs and #24 route/cost evidence. The persisted OpenVINO GPU cost row is the pre-fix default FP16 + PERFORMANCE parity failure and contains no GPU timing/resource result.",
+    "not_measured": "Corrected OpenVINO GPU startup, throughput, end-to-end, and resource measurements have not yet been run; alternative-model comparisons remain blocked by unavailable prerequisites.",
     "quality": "No quality score is published for unavailable models or an empty eligible population.",
     "representation": "Representation and licensing are inventories, not an integration decision.",
     "sourced": "The candidate inventory establishes model identity, representation, architecture boundary, native rate/batch semantics, and licensing where verified, but none of these facts ranks execution quality or cost.",
     "unresolved": "Alternative-model quality, latency, throughput, memory, backward cost, quantization response, and quality-versus-cost trade-offs remain unanswered because those candidates were not executable in the permitted local state."
   },
   "evidence": {
+    "bounded_diagnostic_scope": "The corrected OpenVINO GPU route has only a bounded five-window FP32 + PERFORMANCE parity diagnostic; it has no corrected timing or resource measurement.",
     "measured_models": [
       "basic_pitch"
     ],
-    "measured_scope": "Only Basic Pitch produced executable #24/#25 evidence in the permitted existing runtime and storage. Its quality and cost evidence are inherited, not rerun by #26.",
+    "measured_scope": "Only Basic Pitch produced executable #24/#25 evidence in the permitted existing runtime and storage. Its quality and cost evidence are inherited, not rerun by #26; the persisted OpenVINO GPU cost row is pre-fix evidence.",
     "metadata_only_models": [
       "timbre_trap_base",
       "ymt3_plus",
@@ -29,6 +32,7 @@
       "muscriptor_medium",
       "muscriptor_large"
     ],
+    "not_measured_scope": "Corrected OpenVINO GPU performance/resource behavior and all alternative-model quality/cost comparisons remain not measured or blocked.",
     "sourced_scope": "Candidate source, checkpoint, representation, architecture boundary, native sample rate, batch semantics, and license fields are verified inventory facts; they are not performance measurements.",
     "unresolved_scope": "No comparative quality, execution cost, resource, backward-cost, or quantization result exists for the unavailable alternatives. The intended comparative benchmark remains incomplete."
   },
@@ -39,12 +43,65 @@
       "execution": {
         "backward": null,
         "failure_code": null,
+        "measurement_status": {
+          "full_benchmark": "pre_fix_openvino_precision",
+          "note": "Persisted inference, training, startup, throughput, end-to-end, and resource measurements predate the explicit OpenVINO float32 inference-precision correction. A later full benchmark rerun is required for post-fix OpenVINO speed/resource claims.",
+          "post_fix_parity": "passed",
+          "post_fix_timing": "not_run"
+        },
         "native_batch_sizes": [
           1,
           2,
           4,
           8
         ],
+        "openvino_precision_diagnostic": {
+          "batch_size": 5,
+          "configuration": {
+            "execution_mode_hint_compiled": "PERFORMANCE",
+            "execution_mode_hint_requested": "unconfigured",
+            "inference_precision_hint_compiled": "float32",
+            "inference_precision_hint_requested": "float32",
+            "performance_hint_compiled": "LATENCY"
+          },
+          "parity": {
+            "candidate_event_count": 8,
+            "contour_max_abs_error": 1.430511474609375e-06,
+            "contour_non_finite_count": 0,
+            "event_count_disagreements": 0,
+            "event_structure_disagreements": 0,
+            "event_tuple_disagreements": 0,
+            "note_max_abs_error": 7.152557373046875e-07,
+            "note_non_finite_count": 0,
+            "note_threshold_disagreements": 0,
+            "onset_max_abs_error": 1.1324882507324219e-06,
+            "onset_non_finite_count": 0,
+            "onset_threshold_disagreements": 0,
+            "parity_passed": true,
+            "pitch_bend_element_disagreements": 0,
+            "reference_event_count": 8
+          },
+          "phase": "post_fix",
+          "route": "openvino_gpu",
+          "runtime": {
+            "device_architecture": "GPU: vendor=0x8086 arch=v12.74.4",
+            "device_name": "Intel(R) Arc(TM) 140T GPU (16GB) (iGPU)",
+            "device_type": "integrated",
+            "driver_version": "not exposed by OpenVINO; host query permission denied",
+            "gpu_uarch_version": "12.74.4",
+            "openvino": "2026.3.0-000--"
+          },
+          "scope": "five public synthetic windows in one batch; no private smoke audio or rendering",
+          "status": "parity_passed",
+          "thresholds": {
+            "contour_max_abs_error": 0.0205306,
+            "note_frame_threshold": 0.3,
+            "note_max_abs_error": 0.0038445,
+            "onset_max_abs_error": 0.2089347,
+            "onset_threshold": 0.5
+          },
+          "windows": 5
+        },
         "phases": null,
         "reporting_note": "Routes and findings are consumed from the landed #24 report; #26 does not rerun Basic Pitch cost measurements.",
         "resources": null,
@@ -1796,6 +1853,12 @@
       },
       "landed_baseline": {
         "cost_failure_code": null,
+        "cost_measurement_status": {
+          "full_benchmark": "pre_fix_openvino_precision",
+          "note": "Persisted inference, training, startup, throughput, end-to-end, and resource measurements predate the explicit OpenVINO float32 inference-precision correction. A later full benchmark rerun is required for post-fix OpenVINO speed/resource claims.",
+          "post_fix_parity": "passed",
+          "post_fix_timing": "not_run"
+        },
         "cost_route_failures": [
           {
             "route": "openvino_gpu",
@@ -1804,6 +1867,7 @@
         ],
         "cost_status": "measured",
         "eligible_pairs": 1769,
+        "openvino_gpu_diagnostic_status": "parity_passed",
         "quality_coverage": 1.0,
         "quality_failure_code": null,
         "quality_status": "ok"
@@ -9376,9 +9440,11 @@
       "execution": {
         "backward": null,
         "failure_code": null,
+        "measurement_status": null,
         "native_batch_sizes": [
           1
         ],
+        "openvino_precision_diagnostic": null,
         "phases": null,
         "reporting_note": null,
         "resources": null,
@@ -9440,9 +9506,11 @@
       "execution": {
         "backward": null,
         "failure_code": null,
+        "measurement_status": null,
         "native_batch_sizes": [
           1
         ],
+        "openvino_precision_diagnostic": null,
         "phases": null,
         "reporting_note": null,
         "resources": null,
@@ -9503,9 +9571,11 @@
       "execution": {
         "backward": null,
         "failure_code": null,
+        "measurement_status": null,
         "native_batch_sizes": [
           1
         ],
+        "openvino_precision_diagnostic": null,
         "phases": null,
         "reporting_note": null,
         "resources": null,
@@ -9566,9 +9636,11 @@
       "execution": {
         "backward": null,
         "failure_code": null,
+        "measurement_status": null,
         "native_batch_sizes": [
           1
         ],
+        "openvino_precision_diagnostic": null,
         "phases": null,
         "reporting_note": null,
         "resources": null,
@@ -9629,9 +9701,11 @@
       "execution": {
         "backward": null,
         "failure_code": null,
+        "measurement_status": null,
         "native_batch_sizes": [
           1
         ],
+        "openvino_precision_diagnostic": null,
         "phases": null,
         "reporting_note": null,
         "resources": null,
@@ -9695,9 +9769,11 @@
       "execution": {
         "backward": null,
         "failure_code": null,
+        "measurement_status": null,
         "native_batch_sizes": [
           1
         ],
+        "openvino_precision_diagnostic": null,
         "phases": null,
         "reporting_note": null,
         "resources": null,
@@ -9761,9 +9837,11 @@
       "execution": {
         "backward": null,
         "failure_code": null,
+        "measurement_status": null,
         "native_batch_sizes": [
           1
         ],
+        "openvino_precision_diagnostic": null,
         "phases": null,
         "reporting_note": null,
         "resources": null,
