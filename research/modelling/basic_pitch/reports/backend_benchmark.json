@@ -60,6 +60,92 @@
     "version": 1,
     "warmup_iterations": 3
   },
+  "corpus_inference_decision": {
+    "backend_id": "pytorch_xpu",
+    "boundary": "end_to_end_audio_to_note_event",
+    "device": "xpu:0",
+    "format_version": 1,
+    "precision": "float32",
+    "selection_rule": "highest median end-to-end audio-seconds/wall-second among successful parity-safe inference routes",
+    "status": "selected",
+    "supporting_measurement": {
+      "audio_seconds_per_wall_second_median": 95.72711839188128,
+      "model_call_batch_1_audio_seconds_per_second_median": 225.8292173388524
+    },
+    "supporting_run_identity": {
+      "benchmark_spec_version": 1,
+      "checkpoint": {
+        "sha256": "6c8869af67af45472827bb68b4d1a99e78fe3d5e7b6dd41132ac5df609f0cb55",
+        "size_bytes": 153383
+      },
+      "code_revision": "35741ef481c1baa3726d4aaab4054b242d8b5ac6",
+      "model_id": "spotify-basic-pitch-icassp-2022-v0.4.0",
+      "parity_contract": {
+        "contour_max_abs_error": 0.0205306,
+        "event_count_disagreements": "0",
+        "event_structure_disagreements": "0",
+        "event_tuple_disagreements": "0",
+        "non_finite_values": "0 values",
+        "note_frame_threshold": 0.3,
+        "note_max_abs_error": 0.0038445,
+        "note_threshold_disagreements": "0",
+        "onset_max_abs_error": 0.2089347,
+        "onset_threshold": 0.5,
+        "onset_threshold_disagreements": "0",
+        "pitch_bend_element_disagreements": "0"
+      },
+      "precision": "float32",
+      "runtime": {
+        "numpy": "2.4.6",
+        "onnx": "1.22.0",
+        "onnxruntime": "1.28.0",
+        "openvino": "2026.3.0-000--",
+        "psutil": "7.2.2",
+        "python": "3.12.13",
+        "scipy": "1.18.0",
+        "torch": "2.12.1+xpu"
+      },
+      "smoke_contract": {
+        "batch_sizes": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "case_count": 8,
+        "coverage": {
+          "audio_source": {
+            "derived_render": 8
+          },
+          "duration_class": {
+            "long": 6,
+            "medium": 1,
+            "short": 1
+          },
+          "envelope": {
+            "unknown": 8
+          },
+          "note_density_class": {
+            "high": 4,
+            "low": 1,
+            "medium": 3
+          },
+          "performance": {
+            "monophonic": 4,
+            "polyphonic": 4
+          },
+          "role": {
+            "other": 8
+          }
+        },
+        "end_to_end_batch_size": 1,
+        "process_repetitions": 3,
+        "timed_iterations": 10,
+        "warmup_iterations": 3
+      },
+      "source_git_blob_sha1": "c30e5f9438e798604b7177aa26be1fe64482f767"
+    }
+  },
   "crossovers": [
     {
       "audio_seconds": 645.6190860989537,

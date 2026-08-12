@@ -19,6 +19,7 @@ from obruxo_basic_pitch.benchmark import (
     _aggregate_route,
     _approved_derived_output_root,
     _benchmark_markdown,
+    _corpus_inference_decision,
     _run_worker,
     _validate_derived_destination,
     aggregate_measurements,
@@ -367,6 +368,40 @@ def test_aggregate_measurements_and_crossover_formula() -> None:
     assert aggregate_measurements([1.0, 3.0, 2.0]) == {"median": 2.0, "min": 1.0, "max": 3.0, "total": 6.0}
     assert crossover_audio_seconds(1.0, 1.0, 3.0, 2.0) == 4.0
     assert crossover_audio_seconds(3.0, 1.0, 1.0, 2.0) is None
+
+
+def test_corpus_inference_decision_selects_parity_safe_end_to_end_winner() -> None:
+    rows = [
+        {
+            "route": "pytorch_cpu",
+            "status": "ok",
+            "parity_status": "passed",
+            "batch_results": {"1": {"audio_seconds_per_second": {"median": 100.0}}},
+            "end_to_end": {"audio_seconds_per_wall_second": {"median": 40.0}},
+        },
+        {
+            "route": "pytorch_xpu",
+            "status": "ok",
+            "parity_status": "passed",
+            "batch_results": {"1": {"audio_seconds_per_second": {"median": 150.0}}},
+            "end_to_end": {"audio_seconds_per_wall_second": {"median": 80.0}},
+        },
+        {
+            "route": "openvino_cpu",
+            "status": "parity_failed",
+            "parity_status": "parity_failed",
+            "batch_results": {},
+            "end_to_end": {},
+        },
+    ]
+
+    decision = _corpus_inference_decision(rows, {"code_revision": "test"}, xpu_index=0)
+
+    assert decision["status"] == "selected"
+    assert decision["backend_id"] == "pytorch_xpu"
+    assert decision["device"] == "xpu:0"
+    assert decision["boundary"] == "end_to_end_audio_to_note_event"
+    assert decision["supporting_run_identity"] == {"code_revision": "test"}
 
 
 def test_per_case_end_to_end_and_memory_aggregate_all_repetitions() -> None:
