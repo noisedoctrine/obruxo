@@ -226,22 +226,27 @@ def _event_signature(event: Any) -> tuple[float, float, int]:
 
 def _candidate_parity(np: Any, reference: Mapping[str, Any], candidate: Mapping[str, Any]) -> dict[str, Any]:
     from obruxo_basic_pitch.constants import FRAME_THRESHOLD, ONSET_THRESHOLD
-    from obruxo_basic_pitch.parity import ADOPTED_MAX_ABS_TOLERANCES
+    from obruxo_basic_pitch.parity import OutputParity, ParitySummary, assert_parity
     from obruxo_basic_pitch.postprocess import posteriorgrams_to_note_events
 
     errors: dict[str, Any] = {}
-    failed = False
+    output_parity: dict[str, OutputParity] = {}
     for name in ("contour", "note", "onset"):
         candidate_values = np.asarray(candidate[name], dtype=np.float64)
         difference = candidate_values - np.asarray(reference[name], dtype=np.float64)
         errors[f"{name}_non_finite_count"] = int(np.count_nonzero(~np.isfinite(candidate_values)))
         if not np.isfinite(difference).all():
-            failed = True
             errors[f"{name}_max_abs_error"] = None
+            output_parity[name] = OutputParity(float("inf"), float("inf"), float("inf"))
             continue
-        errors[f"{name}_max_abs_error"] = float(np.max(np.abs(difference)))
-        if errors[f"{name}_max_abs_error"] > ADOPTED_MAX_ABS_TOLERANCES[name]:
-            failed = True
+        absolute = np.abs(difference)
+        maximum = float(np.max(absolute))
+        errors[f"{name}_max_abs_error"] = maximum
+        output_parity[name] = OutputParity(
+            maximum,
+            float(np.mean(absolute)),
+            float(np.sqrt(np.mean(difference * difference))),
+        )
 
     note_disagreements = int(np.count_nonzero((candidate["note"] >= FRAME_THRESHOLD) != (reference["note"] >= FRAME_THRESHOLD)))
     onset_disagreements = int(np.count_nonzero((candidate["onset"] >= ONSET_THRESHOLD) != (reference["onset"] >= ONSET_THRESHOLD)))
@@ -269,15 +274,31 @@ def _candidate_parity(np: Any, reference: Mapping[str, Any], candidate: Mapping[
         (left.pitch_bend or ()) != (right.pitch_bend or ())
         for left, right in zip(reference_events, candidate_events, strict=True)
     ) if len(reference_events) == len(candidate_events) else max(len(reference_events), len(candidate_events))
-    failed = failed or bool(
-        note_disagreements
-        or onset_disagreements
-        or structure_disagreements
-        or pitch_bend_disagreements
+    summary = ParitySummary(
+        contour=output_parity["contour"],
+        note=output_parity["note"],
+        onset=output_parity["onset"],
+        note_threshold_disagreements=note_disagreements,
+        onset_threshold_disagreements=onset_disagreements,
+        note_threshold_elements=int(reference["note"].size),
+        onset_threshold_elements=int(reference["onset"].size),
+        onnx_event_count=len(reference_events),
+        torch_event_count=len(candidate_events),
+        event_structure_disagreements=int(structure_disagreements),
+        amplitude_max_abs_error=None,
+        amplitude_mean_abs_error=None,
+        pitch_bend_element_disagreements=int(pitch_bend_disagreements),
+        synthetic_windows=int(reference["note"].shape[0]),
     )
+    try:
+        assert_parity(summary)
+    except AssertionError:
+        parity_passed = False
+    else:
+        parity_passed = True
     return {
         **errors,
-        "parity_passed": not failed,
+        "parity_passed": parity_passed,
         "event_count_disagreements": event_count_disagreements,
         "event_tuple_disagreements": int(event_tuple_disagreements),
         "note_threshold_disagreements": note_disagreements,

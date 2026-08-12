@@ -1503,6 +1503,14 @@ def _parity_diagnostics_markdown(report: Mapping[str, Any]) -> list[str]:
 
 def _openvino_precision_diagnostic_markdown(report: Mapping[str, Any]) -> list[str]:
     diagnostic = report.get("openvino_precision_diagnostic")
+    evidence_source = ""
+    if not isinstance(diagnostic, Mapping):
+        history = report.get("historical_evidence", {})
+        bounded = history.get("bounded_corrected_openvino_gpu", {}) if isinstance(history, Mapping) else {}
+        if isinstance(bounded, Mapping):
+            diagnostic = bounded.get("data")
+            if isinstance(diagnostic, Mapping):
+                evidence_source = "historical bounded diagnostic"
     lines = ["", "## OpenVINO GPU precision correction", ""]
     if not isinstance(diagnostic, Mapping):
         lines.append("No post-fix OpenVINO GPU precision diagnostic was retained in this benchmark artifact.")
@@ -1525,7 +1533,8 @@ def _openvino_precision_diagnostic_markdown(report: Mapping[str, Any]) -> list[s
 
     lines.extend(
         [
-            f"This bounded post-fix diagnostic used `{diagnostic.get('batch_size', 'n/a')}` synthetic windows in one batch; it did not use private smoke audio, render audio, or measure benchmark throughput.",
+            f"This bounded post-fix diagnostic used `{diagnostic.get('batch_size', 'n/a')}` synthetic windows in one batch; it did not use private smoke audio, render audio, or measure benchmark throughput."
+            + (f" It is retained as {evidence_source}." if evidence_source else ""),
             "",
             f"- Runtime: OpenVINO `{runtime.get('openvino', 'n/a')}` on `{runtime.get('device_name', 'n/a')}`; device architecture `{runtime.get('device_architecture', 'n/a')}`.",
             f"- Driver version: `{runtime.get('driver_version', 'n/a')}`.",
