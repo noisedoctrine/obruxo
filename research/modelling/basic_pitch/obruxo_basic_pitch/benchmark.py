@@ -1402,6 +1402,7 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
         f"- The model-call startup/throughput calculation records one positive CPU/XPU crossover at `{_report_number((crossover or {}).get('audio_seconds'))}` audio seconds. This is a descriptive model-only crossover, not a claim about all application workloads.",
         "- XPU pays a much larger first model call in the stored run than CPU, so short interactive calls should account for initialization and first-call latency; reused or longer workloads benefit from XPU steady-state throughput.",
         "- The persisted OpenVINO GPU row failed the parity gate in all three repetitions before timing under the original default GPU precision configuration. It has no pre-fix throughput or memory result.",
+        "- Current OpenVINO GPU state: FP32 parity is validated by the bounded post-fix diagnostic; corrected FP32 startup, throughput, end-to-end, and resource measurements have not yet been collected.",
         "",
         "## Runtime and benchmark setup",
         "",
@@ -1494,7 +1495,7 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
         [
             "",
             (
-                "The persisted pre-fix end-to-end result preserves the same ordering as model-only batch 1: XPU is fastest, OpenVINO CPU is slightly ahead of CPU, and neither timing includes the failed OpenVINO GPU route."
+                "The persisted pre-fix end-to-end result preserves the same ordering as model-only batch 1: XPU is fastest, OpenVINO CPU is slightly ahead of CPU, and neither timing includes the pre-fix failed OpenVINO GPU route."
                 if has_precision_diagnostic
                 else "The end-to-end result preserves the same ordering as model-only batch 1: XPU is fastest, OpenVINO CPU is slightly ahead of CPU, and neither timing includes the failed OpenVINO GPU route."
             ),

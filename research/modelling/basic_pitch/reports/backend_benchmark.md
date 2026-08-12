@@ -9,6 +9,7 @@ This is a fixed measurement of the canonical #23 float32 model, not an optimizat
 - The model-call startup/throughput calculation records one positive CPU/XPU crossover at `3.317` audio seconds. This is a descriptive model-only crossover, not a claim about all application workloads.
 - XPU pays a much larger first model call in the stored run than CPU, so short interactive calls should account for initialization and first-call latency; reused or longer workloads benefit from XPU steady-state throughput.
 - The persisted OpenVINO GPU row failed the parity gate in all three repetitions before timing under the original default GPU precision configuration. It has no pre-fix throughput or memory result.
+- Current OpenVINO GPU state: FP32 parity is validated by the bounded post-fix diagnostic; corrected FP32 startup, throughput, end-to-end, and resource measurements have not yet been collected.
 - A separate post-fix FP32 + PERFORMANCE diagnostic passes GPU parity, but it did not measure startup, throughput, end-to-end rate, or memory; those measurements remain pending a later full benchmark rerun.
 
 ## Runtime and benchmark setup
@@ -74,7 +75,7 @@ This is the realistic batch-1 boundary: read-only audio open/decode, in-memory p
 | `pytorch_xpu` | 0.879 | 0.790-1.229 | 130.873 | 0.00764 |
 | `openvino_cpu` | 1.887 | 1.592-1.922 | 60.948 | 0.01641 |
 
-The persisted pre-fix end-to-end result preserves the same ordering as model-only batch 1: XPU is fastest, OpenVINO CPU is slightly ahead of CPU, and neither timing includes the failed OpenVINO GPU route.
+The persisted pre-fix end-to-end result preserves the same ordering as model-only batch 1: XPU is fastest, OpenVINO CPU is slightly ahead of CPU, and neither timing includes the pre-fix failed OpenVINO GPU route.
 
 ## CPU versus XPU full forward+backward cost
 
