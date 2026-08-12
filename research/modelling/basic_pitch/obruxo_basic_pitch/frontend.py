@@ -55,20 +55,32 @@ class BasicPitchFrontend(nn.Module):
 
     def __init__(self) -> None:
         super().__init__()
-        self.register_buffer("cqt_kernels_real", torch.zeros(CQT_N_FILTERS, 1, CQT_KERNEL_LENGTH))
-        self.register_buffer("cqt_kernels_imag", torch.zeros(CQT_N_FILTERS, 1, CQT_KERNEL_LENGTH))
-        self.register_buffer("lowpass_filter", torch.zeros(1, 1, DOWNSAMPLE_FILTER_LENGTH))
+        self.register_buffer(
+            "cqt_kernels_real", torch.zeros(CQT_N_FILTERS, 1, CQT_KERNEL_LENGTH)
+        )
+        self.register_buffer(
+            "cqt_kernels_imag", torch.zeros(CQT_N_FILTERS, 1, CQT_KERNEL_LENGTH)
+        )
+        self.register_buffer(
+            "lowpass_filter", torch.zeros(1, 1, DOWNSAMPLE_FILTER_LENGTH)
+        )
         self.register_buffer("cqt_lengths", torch.zeros(CQT_N_BINS))
-        self.normalization = nn.BatchNorm2d(1, eps=FRONTEND_BATCHNORM_EPS, momentum=0.01)
+        self.normalization = nn.BatchNorm2d(
+            1, eps=FRONTEND_BATCHNORM_EPS, momentum=0.01
+        )
 
     def _complex_cqt(self, audio: Tensor, hop: int) -> Tensor:
-        padded = F.pad(audio, (CQT_INPUT_REFLECTION, CQT_INPUT_REFLECTION), mode="reflect")
+        padded = F.pad(
+            audio, (CQT_INPUT_REFLECTION, CQT_INPUT_REFLECTION), mode="reflect"
+        )
         real = F.conv1d(padded, self.cqt_kernels_real, stride=hop)
         imag = -F.conv1d(padded, self.cqt_kernels_imag, stride=hop)
         return torch.stack((real, imag), dim=-1).permute(0, 2, 1, 3)
 
     def _downsample_by_two(self, audio: Tensor) -> Tensor:
-        padded = F.pad(audio, (DOWNSAMPLE_REFLECTION, DOWNSAMPLE_REFLECTION), mode="constant")
+        padded = F.pad(
+            audio, (DOWNSAMPLE_REFLECTION, DOWNSAMPLE_REFLECTION), mode="constant"
+        )
         return F.conv1d(padded, self.lowpass_filter, stride=2)
 
     def _cqt_magnitude(self, audio: Tensor) -> Tensor:
@@ -82,7 +94,9 @@ class BasicPitchFrontend(nn.Module):
 
     def forward(self, audio: Tensor) -> Tensor:
         if audio.ndim != 3 or audio.shape[1:] != (AUDIO_N_SAMPLES, 1):
-            raise ValueError(f"expected input shape [B,{AUDIO_N_SAMPLES},1], got {tuple(audio.shape)}")
+            raise ValueError(
+                f"expected input shape [B,{AUDIO_N_SAMPLES},1], got {tuple(audio.shape)}"
+            )
         if audio.dtype is not torch.float32:
             raise TypeError(f"expected torch.float32 input, got {audio.dtype}")
         audio_nchw = audio.transpose(1, 2)

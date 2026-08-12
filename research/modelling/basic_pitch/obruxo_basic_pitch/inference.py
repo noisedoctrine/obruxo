@@ -37,7 +37,9 @@ def _window_audio(samples: np.ndarray) -> np.ndarray:
         raise ValueError(f"expected mono samples [N], got {samples.shape}")
     if not np.all(np.isfinite(samples)):
         raise ValueError("audio samples must be finite")
-    padded = np.concatenate((np.zeros((OVERLAP * FFT_HOP) // 2, dtype=np.float32), samples))
+    padded = np.concatenate(
+        (np.zeros((OVERLAP * FFT_HOP) // 2, dtype=np.float32), samples)
+    )
     hop = AUDIO_N_SAMPLES - OVERLAP * FFT_HOP
     windows = []
     for start in range(0, padded.shape[0], hop):
@@ -61,7 +63,9 @@ def prepare_wav(path: Path) -> PreparedAudio:
         samples /= np.iinfo(decoded.dtype).max
     if sample_rate != AUDIO_SAMPLE_RATE:
         gcd = np.gcd(sample_rate, AUDIO_SAMPLE_RATE)
-        samples = signal.resample_poly(samples, AUDIO_SAMPLE_RATE // gcd, sample_rate // gcd).astype(np.float32)
+        samples = signal.resample_poly(
+            samples, AUDIO_SAMPLE_RATE // gcd, sample_rate // gcd
+        ).astype(np.float32)
     samples = np.ascontiguousarray(samples, dtype=np.float32)
     return PreparedAudio(
         sample_rate=AUDIO_SAMPLE_RATE,
@@ -82,10 +86,16 @@ def unwrap_window_outputs(
     for name, value in output.items():
         array = np.asarray(value)
         if array.ndim != 3 or array.shape[1] != ANNOT_N_FRAMES:
-            raise ValueError(f"expected windowed posterior {name} [N,{ANNOT_N_FRAMES},F], got {array.shape}")
+            raise ValueError(
+                f"expected windowed posterior {name} [N,{ANNOT_N_FRAMES},F], got {array.shape}"
+            )
         if array.shape[1] <= 2 * n_overlapping_frames // 2:
             raise ValueError(f"posterior {name} has no non-overlapping frames")
         cropped = array[:, n_overlapping_frames // 2 : -n_overlapping_frames // 2, :]
-        target_frames = int(original_sample_count * ANNOTATIONS_FPS // AUDIO_SAMPLE_RATE)
-        unwrapped[name] = np.ascontiguousarray(cropped.reshape(-1, array.shape[2])[:target_frames])
+        target_frames = int(
+            original_sample_count * ANNOTATIONS_FPS // AUDIO_SAMPLE_RATE
+        )
+        unwrapped[name] = np.ascontiguousarray(
+            cropped.reshape(-1, array.shape[2])[:target_frames]
+        )
     return unwrapped
