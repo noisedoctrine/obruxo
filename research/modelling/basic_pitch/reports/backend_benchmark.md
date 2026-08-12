@@ -20,6 +20,13 @@ This is a fixed measurement of the canonical #23 float32 model, not an optimizat
 - Model-only inference and full forward+backward training used batches `[1, 2, 4, 8]`. End-to-end inference used batch 1 and covered read-only audio preparation through stock note-event materialization.
 - Missing-WAV derived rendering was opt-in only; source patches, MIDI, audio, and metadata remained read-only.
 
+## Corpus inference decision for #25
+
+- Status: `selected`; selected backend: `pytorch_xpu`; device: `xpu:0`; precision: `float32`.
+- Boundary: `end_to_end_audio_to_note_event`.
+- Selection rule: highest median end-to-end audio-seconds/wall-second among successful parity-safe inference routes.
+- Supporting run identity code revision: `35741ef481c1baa3726d4aaab4054b242d8b5ac6`.
+
 ## Timed inference route identity
 
 The route-specific properties below are recorded from the actual compiled/runtime objects. `n/a` means the property was not exposed by that route; no device fallback is inferred.

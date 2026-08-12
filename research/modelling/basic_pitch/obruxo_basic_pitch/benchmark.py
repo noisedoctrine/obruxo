@@ -924,6 +924,59 @@ def _current_parity_diagnostics(
     }
 
 
+def _corpus_inference_decision(
+    inference: Sequence[Mapping[str, Any]],
+    run_identity: Mapping[str, Any],
+    *,
+    xpu_index: int,
+) -> dict[str, Any]:
+    candidates = [
+        row
+        for row in inference
+        if row.get("status") == "ok"
+        and row.get("parity_status") == "passed"
+        and row.get("end_to_end", {}).get("audio_seconds_per_wall_second", {}).get("median") is not None
+    ]
+    selected = max(
+        candidates,
+        key=lambda row: row["end_to_end"]["audio_seconds_per_wall_second"]["median"],
+        default=None,
+    )
+    if selected is None:
+        return {
+            "format_version": 1,
+            "status": "unavailable",
+            "backend_id": None,
+            "device": None,
+            "precision": "float32",
+            "boundary": "end_to_end_audio_to_note_event",
+            "selection_rule": "highest median end-to-end audio-seconds/wall-second among successful parity-safe inference routes",
+            "reason": "no successful parity-safe inference route has an end-to-end measurement",
+            "supporting_run_identity": dict(run_identity),
+        }
+    route = str(selected["route"])
+    if route == "pytorch_cpu":
+        device = "cpu"
+    elif route == "pytorch_xpu":
+        device = f"xpu:{xpu_index}"
+    else:
+        device = selected.get("backend", {}).get("selected_device")
+    return {
+        "format_version": 1,
+        "status": "selected",
+        "backend_id": route,
+        "device": device,
+        "precision": "float32",
+        "boundary": "end_to_end_audio_to_note_event",
+        "selection_rule": "highest median end-to-end audio-seconds/wall-second among successful parity-safe inference routes",
+        "supporting_run_identity": dict(run_identity),
+        "supporting_measurement": {
+            "audio_seconds_per_wall_second_median": selected["end_to_end"]["audio_seconds_per_wall_second"]["median"],
+            "model_call_batch_1_audio_seconds_per_second_median": selected["batch_results"]["1"]["audio_seconds_per_second"]["median"],
+        },
+    }
+
+
 def _committed_report_revision() -> str | None:
     report_path = Path(__file__).resolve().parents[1] / "reports" / "backend_benchmark.json"
     workspace = Path(__file__).resolve().parents[4]
@@ -1415,6 +1468,7 @@ def run_benchmark(
         "inference": inference,
         "training": training,
         "parity_diagnostics": _current_parity_diagnostics(inference, config, run_identity),
+        "corpus_inference_decision": _corpus_inference_decision(inference, run_identity, xpu_index=xpu_index),
         "crossovers": _crossover_rows(inference),
         "conclusions": {
             "inference_highest_batch_1_audio_throughput": max(
@@ -1655,6 +1709,7 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
     training = report.get("training", [])
     smoke = report.get("smoke_set", {})
     conclusions = report.get("conclusions", {})
+    corpus_decision = report.get("corpus_inference_decision", {})
     runtime = report.get("runtime", {})
     successful_inference = [row for row in inference if row.get("status") == "ok"]
     successful_training = [row for row in training if row.get("status") == "ok"]
@@ -1754,6 +1809,13 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
         "- Each route used a fresh process for each of 3 repetitions; each fixed batch used 3 warmups and 10 timed calls.",
         "- Model-only inference and full forward+backward training used batches `[1, 2, 4, 8]`. End-to-end inference used batch 1 and covered read-only audio preparation through stock note-event materialization.",
         "- Missing-WAV derived rendering was opt-in only; source patches, MIDI, audio, and metadata remained read-only.",
+        "",
+        "## Corpus inference decision for #25",
+        "",
+        f"- Status: `{corpus_decision.get('status', 'not_recorded')}`; selected backend: `{corpus_decision.get('backend_id', 'n/a')}`; device: `{corpus_decision.get('device', 'n/a')}`; precision: `{corpus_decision.get('precision', 'n/a')}`.",
+        f"- Boundary: `{corpus_decision.get('boundary', 'n/a')}`.",
+        f"- Selection rule: {corpus_decision.get('selection_rule', 'not recorded')}.",
+        f"- Supporting run identity code revision: `{corpus_decision.get('supporting_run_identity', {}).get('code_revision', 'n/a')}`.",
         "",
         "## Timed inference route identity",
         "",
