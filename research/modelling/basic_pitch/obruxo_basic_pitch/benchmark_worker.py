@@ -36,20 +36,28 @@ def _measure_calls(
     batch_size: int,
     warmup_iterations: int,
     timed_iterations: int,
+    synchronize: Callable[[], None] | None = None,
 ) -> dict[str, float]:
+    synchronize = synchronize or (lambda: None)
+    synchronize()
     first_started = time.perf_counter()
     invoke()
+    synchronize()
     first_seconds = time.perf_counter() - first_started
 
+    synchronize()
     warmup_started = time.perf_counter()
     for _ in range(warmup_iterations):
         invoke()
+    synchronize()
     warmup_seconds = time.perf_counter() - warmup_started
 
     samples = []
     for _ in range(timed_iterations):
+        synchronize()
         started = time.perf_counter()
         invoke()
+        synchronize()
         samples.append(time.perf_counter() - started)
     median_seconds = float(__import__("statistics").median(samples))
     total_seconds = float(sum(samples))
@@ -261,7 +269,12 @@ def _candidate_parity(np: Any, reference: Mapping[str, Any], candidate: Mapping[
         (left.pitch_bend or ()) != (right.pitch_bend or ())
         for left, right in zip(reference_events, candidate_events, strict=True)
     ) if len(reference_events) == len(candidate_events) else max(len(reference_events), len(candidate_events))
-    failed = failed or bool(note_disagreements or onset_disagreements or structure_disagreements)
+    failed = failed or bool(
+        note_disagreements
+        or onset_disagreements
+        or structure_disagreements
+        or pitch_bend_disagreements
+    )
     return {
         **errors,
         "parity_passed": not failed,
@@ -385,11 +398,14 @@ def _end_to_end(
     predict: Callable[[Any], Mapping[str, Any]],
     np: Any,
     postprocess: Any,
+    synchronize: Callable[[], None] | None = None,
 ) -> dict[str, Any]:
+    synchronize = synchronize or (lambda: None)
     rows = []
     total_audio_seconds = 0.0
     total_wall_seconds = 0.0
     for case in cases:
+        synchronize()
         started = time.perf_counter()
         prepared = prepare_wav(case.audio_path)
         chunks = []
@@ -401,6 +417,7 @@ def _end_to_end(
         }
         unwrapped = unwrap_window_outputs(outputs, original_sample_count=prepared.original_sample_count)
         events = [] if unwrapped["note"].shape[0] == 0 else postprocess(unwrapped)
+        synchronize()
         wall_seconds = float(time.perf_counter() - started)
         total_audio_seconds += prepared.audio_seconds
         total_wall_seconds += wall_seconds
@@ -474,8 +491,10 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
         elif route == "pytorch_xpu":
             route_device = _xpu_device(torch, int(request.get("xpu_index", 0)))
             xpu_peak_reset = _reset_xpu_peak_memory(torch, route_device)
+            _sync_xpu(torch, route_device)
             move_started = time.perf_counter()
             model.to(route_device)
+            _sync_xpu(torch, route_device)
             device_move_seconds = float(time.perf_counter() - move_started)
         elif route in {"openvino_cpu", "openvino_gpu"}:
             try:
@@ -528,6 +547,7 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
         if mode not in {"inference", "training"}:
             raise _RouteError("runtime_failed", "benchmark_runtime_error")
         batch_results: dict[str, Any] = {}
+        synchronize = lambda: _sync_xpu(torch, route_device) if route_device is not None else None
         for batch_size in config.batch_sizes:
             host_batch = np.ascontiguousarray(windows[:batch_size], dtype=np.float32)
             if host_batch.shape[0] != batch_size:
@@ -544,6 +564,7 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
                 batch_size=batch_size,
                 warmup_iterations=config.warmup_iterations,
                 timed_iterations=config.timed_iterations,
+                synchronize=synchronize,
             )
             if mode == "inference":
                 measurement["first_inference_seconds"] = measurement.pop("first_call_seconds")
@@ -561,6 +582,7 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
                 predict,
                 np,
                 posteriorgrams_to_note_events,
+                synchronize=synchronize,
             )
         memory = _memory_snapshot(
             psutil,
