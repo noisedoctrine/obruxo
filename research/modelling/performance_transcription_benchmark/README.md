@@ -1,10 +1,10 @@
 # Comparative performance-transcription benchmark
 
-This workspace compares exactly the frozen Basic Pitch baseline, Timbre-Trap base, the three required YourMT3+ variants, and MuScriptor small/medium/large. It owns no model integration or training. It consumes the landed #24 cost contract and #25 manifest, ground truth, metrics, aggregation, and sanitized-report seams.
+This workspace compares exactly the frozen Basic Pitch baseline, Timbre-Trap base, the three required YourMT3+ variants, and MuScriptor small/medium/large. It owns the pinned official adapter, evaluation, cost, quantization, and sanitized-report paths for those candidates; it does not train or alter model weights. It consumes the landed #24 cost contract and #25 manifest, ground truth, metrics, aggregation, and sanitized-report seams.
 
 ## Reproducibility and availability
 
-`config/models.yaml` records public source/checkpoint identity, hashes where the public artifact identity is available, licenses, native sample rates, output representation, and stock inference settings before any PresetShare result is inspected. Candidate source trees and weights are acquired manually from their official public locations into task-owned storage; they are never vendored, auto-downloaded, uploaded, or written into this repository. MuScriptor weights are gated, so a new login or terms acceptance is a blocker and is recorded as unavailable.
+`config/models.yaml` records immutable source/checkpoint revisions, exact public hashes and byte sizes where exposed, explicit gated identity status where a digest is not exposed without access, separate code/weight license fields, native sample rates, output representation, and stock inference settings before any PresetShare result is inspected. Candidate source trees and weights are acquired manually from their official public locations into task-owned storage; they are never vendored, auto-downloaded, uploaded, or written into this repository. MuScriptor weights are gated, so a new login or terms acceptance is a blocker and is recorded as unavailable.
 
 Only the existing user-managed `py312` environment may be used for local execution. The YAML files are reproducibility metadata only; they are not applied by the implementation. Missing dependencies, source checkouts, gated credentials, checkpoints, or runtimes produce explicit unavailable/dependency-unavailable results. There is no CPU/XPU, precision, decoder, model, or checkpoint fallback.
 
@@ -16,6 +16,7 @@ Only the existing user-managed `py312` environment may be used for local executi
 - MuScriptor uses `transcribe_to_midi`, `prelude_forcing=True`, greedy deterministic decoding, batch size 1, and no serialization velocity.
 - Accuracy calls #25's note/frame metrics and 10,000-replicate seed-0 preset-cluster bootstrap. Executable candidates expose both success-only and failure-penalized views; unavailable candidates receive no fabricated F1.
 - Full-precision cost follows #24's end-to-end clip boundary. Alternative models use only `pytorch_cpu` and `pytorch_xpu`; OpenVINO is not added. Quantization is only CPU dynamic qint8 ordinary `torch.nn.Linear`, with no calibration, search, XPU, backward, or batch sweep.
+- Executable candidate routes run in one foreground worker process per route/repetition and aggregate all fixed repetitions. Pair evaluation resumes only exact manifest/model/variant/adapter/code/runtime/decoder/metric identities; stale or partial rows are recomputed individually.
 
 ## Commands
 

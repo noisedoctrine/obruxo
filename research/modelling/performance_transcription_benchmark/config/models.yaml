@@ -13,6 +13,7 @@ models:
       path: research/modelling/basic_pitch/artifacts/basic_pitch_icassp_2022.pt
       sha256: 6c8869af67af45472827bb68b4d1a99e78fe3d5e7b6dd41132ac5df609f0cb55
       size_bytes: 153383
+      identity_status: locked
     code_license: Apache-2.0
     weight_license: Apache-2.0
     environment: environment.yml
@@ -40,10 +41,11 @@ models:
       revision: 7afe7e9b327929c099baeccd4b21973aedb94d9b
     checkpoint:
       repository: cwitkowitz/timbre-trap
-      revision: c1112a0
+      revision: 84fbd38582435c863a2d65197a75edd794888f19
       path: models/tt-orig.pt
       sha256: 1c3bafd33a831d61e8ee9051d6c5b4c5d483e6a7669ca9df85ac6ab304cb9fe3
-      size_bytes: 0
+      size_bytes: 11353410
+      identity_status: locked
     code_license: MIT
     weight_license: upstream_space_license_not_separately_declared
     environment: environments/timbre_trap.yml
@@ -55,11 +57,15 @@ models:
     source_url: https://github.com/sony/timbre-trap
     checkpoint_url: https://huggingface.co/spaces/cwitkowitz/timbre-trap/blob/main/models/tt-orig.pt
     availability: unavailable
-    unavailability_reason: pinned checkpoint size is not locally verifiable and the approved py312 runtime has no Timbre-Trap checkout
+    unavailability_reason: approved py312 storage has no pinned Timbre-Trap checkout or checkpoint
     stock_inference:
       sample_rate: 22050
       cqt_bins_per_octave: 60
       cqt_octaves: 9
+      secs_per_block: 3
+      latent_size: 128
+      model_complexity: 2
+      skip_connections: false
       peak_picking: native_frequency
       activation_threshold: 0.5
       output_notes: null
@@ -68,14 +74,15 @@ models:
     publication_year: 2024
     output_contract: note_events
     source:
-      repository: mimbres/YourMT3-HuggingFace-Space
-      revision: a03c9b4d8c3b97c6a7a556768726794042127628
+      repository: mimbres/YourMT3
+      revision: 5e66c1ea173a8186e0d20432b841d3180cc015b5
     checkpoint:
       repository: mimbres/YourMT3
-      revision: e45ebd70398682d54b7bb1901a5216e18f3b1824
+      revision: 5e66c1ea173a8186e0d20432b841d3180cc015b5
       path: logs/2024/notask_all_cross_v6_xk2_amp0811_gm_ext_plus_nops_b72/checkpoints/model.ckpt
       sha256: 76673d4289aae1a66984b3fee59157d484cda8fdf9b56279251b137321d448e6
       size_bytes: 542707465
+      identity_status: locked
     code_license: GPL-3.0-only
     weight_license: Apache-2.0
     environment: environments/yourmt3.yml
@@ -99,14 +106,15 @@ models:
     publication_year: 2024
     output_contract: note_events
     source:
-      repository: mimbres/YourMT3-HuggingFace-Space
-      revision: a03c9b4d8c3b97c6a7a556768726794042127628
+      repository: mimbres/YourMT3
+      revision: 5e66c1ea173a8186e0d20432b841d3180cc015b5
     checkpoint:
       repository: mimbres/YourMT3
-      revision: e45ebd70398682d54b7bb1901a5216e18f3b1824
+      revision: 5e66c1ea173a8186e0d20432b841d3180cc015b5
       path: logs/2024/mc13_256_all_cross_v6_xk5_amp0811_edr005_attend_c_full_plus_2psn_nl26_sb_b26r_800k/checkpoints/model.ckpt
       sha256: f7ed46a7c61244bd35485143a791b3cf46515ef96239793845ae8e4084865130
       size_bytes: 541553263
+      identity_status: locked
     code_license: GPL-3.0-only
     weight_license: Apache-2.0
     environment: environments/yourmt3.yml
@@ -130,14 +138,15 @@ models:
     publication_year: 2024
     output_contract: note_events
     source:
-      repository: mimbres/YourMT3-HuggingFace-Space
-      revision: a03c9b4d8c3b97c6a7a556768726794042127628
+      repository: mimbres/YourMT3
+      revision: 5e66c1ea173a8186e0d20432b841d3180cc015b5
     checkpoint:
       repository: mimbres/YourMT3
-      revision: e45ebd70398682d54b7bb1901a5216e18f3b1824
+      revision: 5e66c1ea173a8186e0d20432b841d3180cc015b5
       path: logs/2024/mc13_256_g4_all_v7_mt3f_sqr_rms_moe_wf4_n8k2_silu_rope_rp_b36_nops/checkpoints/last.ckpt
       sha256: ae38e415c79efd5592dcb9b658cdb99ddb11d4c4e1eaa364cab04a052473fc25
       size_bytes: 561544628
+      identity_status: locked
     code_license: GPL-3.0-only
     weight_license: Apache-2.0
     environment: environments/yourmt3.yml
@@ -162,13 +171,14 @@ models:
     output_contract: note_events
     source:
       repository: muscriptor/muscriptor
-      revision: c3b82e7
+      revision: c3a50ec3f7a54361495b79ed8875ba330240324c
     checkpoint:
       repository: MuScriptor/muscriptor-small
-      revision: gated_revision_not_available_locally
+      revision: 8c127f603b807520fa465c838e9bfee8a91ada4e
       path: model.safetensors
-      sha256: gated_checkpoint_not_available_locally
-      size_bytes: 0
+      sha256: null
+      size_bytes: 411888600
+      identity_status: gated_digest_not_exposed_without_access
     code_license: MIT
     weight_license: CC-BY-NC-4.0
     environment: environments/muscriptor.yml
@@ -196,13 +206,14 @@ models:
     output_contract: note_events
     source:
       repository: muscriptor/muscriptor
-      revision: c3b82e7
+      revision: c3a50ec3f7a54361495b79ed8875ba330240324c
     checkpoint:
       repository: MuScriptor/muscriptor-medium
-      revision: gated_revision_not_available_locally
+      revision: f32236969308476e01fd3aae67357de5feb05a2d
       path: model.safetensors
-      sha256: gated_checkpoint_not_available_locally
-      size_bytes: 0
+      sha256: null
+      size_bytes: 1228144472
+      identity_status: gated_digest_not_exposed_without_access
     code_license: MIT
     weight_license: CC-BY-NC-4.0
     environment: environments/muscriptor.yml
@@ -230,13 +241,14 @@ models:
     output_contract: note_events
     source:
       repository: muscriptor/muscriptor
-      revision: c3b82e7
+      revision: c3a50ec3f7a54361495b79ed8875ba330240324c
     checkpoint:
       repository: MuScriptor/muscriptor-large
-      revision: gated_revision_not_available_locally
+      revision: 8809fdfbed2affa7ade94a7059e746e3880720e7
       path: model.safetensors
-      sha256: gated_checkpoint_not_available_locally
-      size_bytes: 0
+      sha256: null
+      size_bytes: 5465642136
+      identity_status: gated_digest_not_exposed_without_access
     code_license: MIT
     weight_license: CC-BY-NC-4.0
     environment: environments/muscriptor.yml

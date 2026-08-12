@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import inspect
 import os
+import sys
 import tempfile
 from collections.abc import Mapping
 from pathlib import Path
@@ -14,7 +16,7 @@ from ..artifacts import (
     verify_checkout,
     verify_checkpoint,
 )
-from ..types import NormalizedNote
+from ..types import NormalizedNote, TranscriptionOutput, rasterize_notes
 
 YOURMT3_IDS = ("ymt3_plus", "yptf_multi", "yptf_moe_multi")
 
@@ -53,12 +55,13 @@ def normalize_note_events(events: Any) -> tuple[NormalizedNote, ...]:
         kind = str(_field(event, "event_type", _field(event, "type", event.__class__.__name__))).casefold()
         if "progress" in kind or "tempo" in kind:
             continue
-        if _field(event, "onset_seconds") is not None or _field(event, "onset") is not None:
-            onset = _field(event, "onset_seconds", _field(event, "onset"))
-            offset = _field(event, "offset_seconds", _field(event, "offset"))
+        onset_value = _field(event, "onset_seconds", _field(event, "onset", _field(event, "start")))
+        offset_value = _field(event, "offset_seconds", _field(event, "offset", _field(event, "end")))
+        pitch_value = _field(event, "midi_pitch", _field(event, "pitch"))
+        if onset_value is not None and offset_value is not None and pitch_value is not None:
+            onset = onset_value
+            offset = offset_value
             pitch = _field(event, "midi_pitch", _field(event, "pitch"))
-            if offset is None:
-                offset = _field(event, "end_time", _field(event, "end_seconds"))
             result.append(
                 NormalizedNote(
                     float(onset),
@@ -123,6 +126,9 @@ class YourMT3Adapter:
         self.source_root = None if source_root is None else Path(source_root)
         self.checkpoint = None if checkpoint is None else Path(checkpoint)
         self.inference = stock_inference_config(spec.model_id)
+        self.model: Any | None = None
+        self.bound_model: Any | None = None
+        self._helper: Any | None = None
 
     def preflight(self) -> None:
         if self.source_root is None or self.checkpoint is None:
@@ -130,13 +136,93 @@ class YourMT3Adapter:
         verify_checkout(self.spec, self.source_root)
         verify_checkpoint(self.spec, self.checkpoint)
 
-    def load(self) -> None:
+    @property
+    def active_model(self) -> Any | None:
+        return self.bound_model if self.bound_model is not None else self.model
+
+    def _official_args(self) -> list[str]:
+        checkpoint_path = Path(self.spec.checkpoint_path)
+        checkpoint_name = checkpoint_path.name
+        experiment = checkpoint_path.parent.parent.name
+        args = [f"{experiment}@{checkpoint_name}", "-p", "2024", "-pr", "32", "-w", "false"]
+        if self.spec.model_id == "yptf_multi":
+            args += ["-tk", "mc13_full_plus_256", "-dec", "multi-t5", "-nl", "26", "-enc", "perceiver-tf", "-ac", "spec", "-hop", "300", "-atc", "1"]
+        elif self.spec.model_id == "yptf_moe_multi":
+            args += ["-tk", "mc13_full_plus_256", "-dec", "multi-t5", "-nl", "26", "-enc", "perceiver-tf", "-sqr", "1", "-ff", "moe", "-wf", "4", "-nmoe", "8", "-kmoe", "2", "-act", "silu", "-epe", "rope", "-rp", "1", "-ac", "spec", "-hop", "300", "-atc", "1"]
+        return args
+
+    def load(self, device: str = "cpu") -> None:
         self.preflight()
+        if device != "cpu":
+            raise ArtifactUnavailable("official YourMT3+ loader does not expose an approved XPU path")
         try:
-            __import__("torch")
-            __import__("torchaudio")
+            import torch
+
+            root = self.source_root.resolve(strict=True)
+            amt_src = root / "amt" / "src"
+            if not amt_src.is_dir():
+                raise ArtifactUnavailable("official YourMT3+ amt/src checkout is missing")
+            for path in (root, amt_src):
+                if str(path) not in sys.path:
+                    sys.path.insert(0, str(path))
+            import model_helper
         except (ImportError, OSError) as exc:
             raise ArtifactUnavailable("dependency_unavailable") from exc
+        if not Path(self.checkpoint).resolve().is_relative_to(root):
+            raise ArtifactUnavailable("checkpoint must be inside the pinned official checkout for stock loading")
+        args = self._official_args()
+        loader = model_helper.load_model_checkpoint
+        try:
+            if "device" in inspect.signature(loader).parameters:
+                model = loader(args=args, device=torch.device("cpu"))
+            else:
+                model = loader(args=args)
+        except (ImportError, ModuleNotFoundError) as exc:
+            raise ArtifactUnavailable("dependency_unavailable") from exc
+        self.model = model
+        self.bound_model = model
+        self._helper = model_helper
 
-    def transcribe(self, _audio: Path) -> Any:
-        raise ArtifactUnavailable("official YourMT3+ runtime is not present")
+    def bind_model(self, model: Any) -> None:
+        self.bound_model = model
+        if hasattr(model, "eval"):
+            model.eval()
+
+    @staticmethod
+    def _frame_count(audio: Path) -> int:
+        import sys
+
+        root = Path(__file__).resolve().parents[2] / "basic_pitch"
+        if str(root) not in sys.path:
+            sys.path.insert(0, str(root))
+        from obruxo_basic_pitch.inference import prepare_wav
+
+        return int(prepare_wav(Path(audio)).original_sample_count * 100 // 22050)
+
+    def transcribe(self, audio: Path) -> TranscriptionOutput:
+        if self.active_model is None or self._helper is None:
+            self.load()
+        import torch
+        import torchaudio
+
+        model = self.active_model
+        helper = self._helper
+        waveform, sample_rate = torchaudio.load(uri=str(Path(audio).resolve(strict=True)))
+        waveform = torch.mean(waveform, dim=0).unsqueeze(0)
+        target_rate = int(model.audio_cfg["sample_rate"])
+        waveform = torchaudio.functional.resample(waveform, sample_rate, target_rate)
+        segments = helper.slice_padded_array(waveform, model.audio_cfg["input_frames"], model.audio_cfg["input_frames"])
+        device = next(model.parameters()).device
+        segments = torch.from_numpy(segments.astype("float32")).to(device).unsqueeze(1)
+        with torch.inference_mode():
+            predicted, _ = model.inference_file(bsz=8, audio_segments=segments)
+        channels = int(model.task_manager.num_decoding_channels)
+        starts = [model.audio_cfg["input_frames"] * i / target_rate for i in range(segments.shape[0])]
+        notes_by_channel = []
+        for channel in range(channels):
+            channel_tokens = [array[:, channel, :] for array in predicted]
+            zipped, _, _ = model.task_manager.detokenize_list_batches(channel_tokens, starts, return_events=True)
+            notes, _ = helper.merge_zipped_note_events_and_ties_to_notes(zipped)
+            notes_by_channel.append(notes)
+        notes = normalize_note_events(helper.mix_notes(notes_by_channel))
+        return TranscriptionOutput(notes, rasterize_notes(notes, self._frame_count(Path(audio))))

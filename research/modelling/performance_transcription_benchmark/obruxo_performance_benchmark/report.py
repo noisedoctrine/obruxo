@@ -54,7 +54,7 @@ def _read_json(path: Path) -> dict[str, Any] | None:
     return value if isinstance(value, dict) else None
 
 
-def _stored_results(root: Path) -> dict[str, dict[str, Any]]:
+def _stored_results(root: Path, specs: Mapping[str, ModelSpec]) -> dict[str, dict[str, Any]]:
     results: dict[str, dict[str, Any]] = {}
     if not root.is_dir():
         return results
@@ -63,6 +63,9 @@ def _stored_results(root: Path) -> dict[str, dict[str, Any]]:
         if not run or not isinstance(run.get("model_id"), str):
             continue
         model_id = str(run["model_id"])
+        spec = specs.get(model_id)
+        if spec is not None and run.get("model_identity") != spec.identity_digest():
+            continue
         current = results.setdefault(model_id, {})
         if run.get("variant_id") == "dynamic_int8_linear":
             current["quantization"] = run.get("quantization")
@@ -102,6 +105,9 @@ def _landed_basic_pitch_runtime(report: Mapping[str, Any]) -> dict[str, Any]:
         for route in routes
         if route.get("status") != "ok"
     ]
+    historical_evidence = report.get("historical_evidence") or {}
+    pre_fix = historical_evidence.get("pre_fix_default_openvino_gpu", {}) if isinstance(historical_evidence, Mapping) else {}
+    bounded = historical_evidence.get("bounded_corrected_openvino_gpu", {}) if isinstance(historical_evidence, Mapping) else {}
     value = dict(report)
     value.update(
         {
@@ -112,8 +118,8 @@ def _landed_basic_pitch_runtime(report: Mapping[str, Any]) -> dict[str, Any]:
             "timing_contract": report.get("config"),
             "route_failures": failures,
             "measurement_status": report.get("measurement_status"),
-            "openvino_parity_history": report.get("parity_diagnostics"),
-            "openvino_precision_diagnostic": report.get("openvino_precision_diagnostic"),
+            "openvino_parity_history": pre_fix.get("data") if isinstance(pre_fix, Mapping) else None,
+            "openvino_precision_diagnostic": bounded.get("data") if isinstance(bounded, Mapping) else None,
             "reporting_note": "Routes and findings are consumed from the landed #24 report; #26 does not rerun Basic Pitch cost measurements.",
         }
     )
@@ -121,7 +127,7 @@ def _landed_basic_pitch_runtime(report: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def build_public_report(specs: Mapping[str, ModelSpec], input_root: Path) -> dict[str, Any]:
-    stored = _stored_results(Path(input_root).resolve(strict=False))
+    stored = _stored_results(Path(input_root).resolve(strict=False), specs)
     landed_quality, landed_runtime = _landed_basic_pitch_reports()
     models: list[dict[str, Any]] = []
     for model_id, spec in specs.items():
@@ -170,6 +176,7 @@ def build_public_report(specs: Mapping[str, ModelSpec], input_root: Path) -> dic
                 "phases": runtime.get("phases"),
                 "route_failures": runtime.get("route_failures", []),
                 "measurement_status": runtime.get("measurement_status"),
+                "adapter_status": "landed_baseline" if model_id == "basic_pitch" else "implemented_official_path",
                 "openvino_parity_history": runtime.get("openvino_parity_history"),
                 "openvino_precision_diagnostic": runtime.get("openvino_precision_diagnostic"),
                 "reporting_note": runtime.get("reporting_note"),
@@ -214,6 +221,7 @@ def build_public_report(specs: Mapping[str, ModelSpec], input_root: Path) -> dic
                 "bounded_diagnostic_scope": "The corrected OpenVINO GPU route also retains a bounded five-window FP32 + PERFORMANCE parity diagnostic; that diagnostic is separate from the corrected route's smoke-benchmark timing and resource measurements.",
                 "not_measured_scope": "All alternative-model quality/cost comparisons remain not measured or blocked; no #26 candidate comparison was rerun for this reporting update.",
                 "sourced_scope": "Candidate source, checkpoint, representation, architecture boundary, native sample rate, batch semantics, and license fields are verified inventory facts; they are not performance measurements.",
+                "adapter_scope": "The repository contains an implemented pinned-official adapter path for every required candidate family. An implemented adapter is not treated as executed when its source, checkpoint, dependency, or credential prerequisite is unavailable.",
                 "unresolved_scope": "No comparative quality, execution cost, resource, backward-cost, or quantization result exists for the unavailable alternatives. The intended comparative benchmark remains incomplete.",
             },
             "conclusion": {
@@ -291,6 +299,28 @@ def _legacy_markdown(report: Mapping[str, Any]) -> str:
             lines.extend(["", f"- Execution status: `{execution.get('status', 'unknown')}`.", "", "| Route | Status |", "| --- | --- |"])
             for route in routes:
                 lines.append(f"| `{route.get('route', 'unknown')}` | `{route.get('status', 'unknown')}` |")
+            detailed_routes = [route for route in routes if isinstance(route.get("startup"), Mapping) or isinstance(route.get("steady_state"), Mapping) or isinstance(route.get("end_to_end"), Mapping)]
+            if detailed_routes:
+                lines.extend(
+                    [
+                        "",
+                        "| Route | Startup/load (s) | First call (s) | Steady calls/s | E2E audio-s/s | Host RSS (MiB) |",
+                        "| --- | ---: | ---: | ---: | ---: | ---: |",
+                    ]
+                )
+                for route in detailed_routes:
+                    startup = route.get("startup") or {}
+                    steady = route.get("steady_state") or {}
+                    e2e = route.get("end_to_end") or {}
+                    first = _median_value(startup.get("first_call_seconds"))
+                    if first is None:
+                        first = _route_median(route, 1, "first_inference_seconds")
+                    startup_value = _median_value(startup.get("model_load_seconds"))
+                    if startup_value is None:
+                        startup_value = _startup_median(route)
+                    lines.append(
+                        f"| `{route.get('route', 'unknown')}` | {_report_number(startup_value)} | {_report_number(first)} | {_report_number(_median_value(steady.get('calls_per_second')))} | {_report_number(_median_value(e2e.get('audio_seconds_per_wall_second')))} | {_report_mib((route.get('resources') or {}).get('host_peak_rss_bytes'))} |"
+                    )
         else:
             lines.append(f"- Execution status: `{execution.get('status', 'unavailable')}`.")
         quantization = model.get("quantization")
@@ -311,6 +341,10 @@ def _report_number(value: Any, digits: int = 3) -> str:
 
 
 def _report_mib(value: Any) -> str:
+    if isinstance(value, Mapping):
+        value = value.get("value", value)
+        if isinstance(value, Mapping):
+            value = value.get("median")
     return "n/a" if value is None else f"{float(value) / (1024 * 1024):.1f}"
 
 
@@ -333,6 +367,13 @@ def _startup_component_median(route: Mapping[str, Any], component: str) -> Any:
         return None
     nested = value.get("value")
     return nested.get("median") if isinstance(nested, Mapping) else value.get("median")
+
+
+def _median_value(value: Any) -> Any:
+    if not isinstance(value, Mapping):
+        return value
+    nested = value.get("value", value)
+    return nested.get("median") if isinstance(nested, Mapping) else nested
 
 
 def _report_count(value: Any) -> str:
@@ -379,6 +420,7 @@ def _markdown(report: Mapping[str, Any]) -> str:
         f"- Metadata-only or unavailable candidates: `{', '.join(evidence.get('metadata_only_models', [])) or 'none'}`.",
         f"- Directly measured scope: {evidence.get('measured_scope', 'not recorded')}",
         f"- Sourced/model-level scope: {evidence.get('sourced_scope', 'not recorded')}",
+        f"- Adapter implementation scope: {evidence.get('adapter_scope', 'not recorded')}",
         f"- Unresolved comparative scope: {evidence.get('unresolved_scope', 'not recorded')}",
         "",
         "## Candidate identity and known properties",
@@ -410,6 +452,12 @@ def _markdown(report: Mapping[str, Any]) -> str:
         checkpoint = f"{identity.get('checkpoint_repository', 'n/a')} @ {identity.get('checkpoint_revision', 'n/a')}"
         reason = model.get("availability_reason") or "available and verified"
         lines.append(f"| `{model.get('model_id', 'unknown')}` | `{source}` | `{checkpoint}` | {reason} |")
+    lines.extend(
+        [
+            "",
+            "Checkpoint lock status is explicit in the JSON source of truth: `locked` means the public digest and byte size are fixed; `gated_digest_not_exposed_without_access` means the immutable model revision and public size are recorded but the upstream gated service did not expose a digest without access. Neither state implies local executability.",
+        ]
+    )
     lines.extend(
         [
             "",

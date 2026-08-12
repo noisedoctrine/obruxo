@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import json
-import math
 import os
+import platform
+import sys
 import tempfile
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
@@ -229,13 +230,124 @@ def build_quality_views(
 
 def _frame_count(audio_path: Path) -> int:
     try:
-        from obruxo_basic_pitch.constants import FFT_HOP
-        from scipy.io import wavfile
+        root = _basic_pitch_root()
+        if str(root) not in sys.path:
+            sys.path.insert(0, str(root))
+        from obruxo_basic_pitch.constants import ANNOTATIONS_FPS, AUDIO_SAMPLE_RATE
+        from obruxo_basic_pitch.inference import prepare_wav
 
-        _, audio = wavfile.read(audio_path)
-        return max(0, math.ceil(np.asarray(audio).shape[0] / FFT_HOP))
+        prepared = prepare_wav(audio_path)
+        return max(0, int(prepared.original_sample_count * ANNOTATIONS_FPS // AUDIO_SAMPLE_RATE))
     except (ImportError, OSError, ValueError, TypeError):
         return 0
+
+
+def _runtime_identity() -> dict[str, Any]:
+    """Resolve the imported runtime before any pair cache can be reused."""
+    import numpy
+    import scipy
+    import torch
+
+    return {
+        "python": platform.python_version(),
+        "numpy": numpy.__version__,
+        "scipy": scipy.__version__,
+        "torch": torch.__version__,
+        "platform": platform.platform(),
+    }
+
+
+def _code_identity() -> dict[str, str]:
+    benchmark_root = Path(__file__).resolve().parent
+    basic_pitch_root = _basic_pitch_root()
+    files = {
+        "artifacts.py": benchmark_root / "artifacts.py",
+        "types.py": benchmark_root / "types.py",
+        "evaluate.py": benchmark_root / "evaluate.py",
+        "quantization.py": benchmark_root / "quantization.py",
+        "adapters/__init__.py": benchmark_root / "adapters" / "__init__.py",
+        "adapters/basic_pitch.py": benchmark_root / "adapters" / "basic_pitch.py",
+        "adapters/muscriptor.py": benchmark_root / "adapters" / "muscriptor.py",
+        "adapters/timbre_trap.py": benchmark_root / "adapters" / "timbre_trap.py",
+        "adapters/yourmt3.py": benchmark_root / "adapters" / "yourmt3.py",
+        "basic_pitch/constants.py": basic_pitch_root / "obruxo_basic_pitch" / "constants.py",
+        "basic_pitch/inference.py": basic_pitch_root / "obruxo_basic_pitch" / "inference.py",
+        "basic_pitch/model.py": basic_pitch_root / "obruxo_basic_pitch" / "model.py",
+        "basic_pitch/postprocess.py": basic_pitch_root / "obruxo_basic_pitch" / "postprocess.py",
+        "basic_pitch/evaluation/aggregate.py": basic_pitch_root / "obruxo_basic_pitch" / "evaluation" / "aggregate.py",
+        "basic_pitch/evaluation/corpus.py": basic_pitch_root / "obruxo_basic_pitch" / "evaluation" / "corpus.py",
+        "basic_pitch/evaluation/labels.py": basic_pitch_root / "obruxo_basic_pitch" / "evaluation" / "labels.py",
+        "basic_pitch/evaluation/metrics.py": basic_pitch_root / "obruxo_basic_pitch" / "evaluation" / "metrics.py",
+    }
+    return {name: _digest(path) for name, path in files.items()}
+
+
+def _adapter_identity(adapter: object) -> str:
+    return f"{type(adapter).__module__}.{type(adapter).__qualname__}"
+
+
+def _pair_resume_identity(
+    spec: ModelSpec,
+    variant_id: str,
+    adapter: object,
+    manifest_identity: str,
+    runtime_identity: Mapping[str, Any],
+    pair_id: str,
+    code_identity: Mapping[str, str] | None = None,
+) -> tuple[str, dict[str, Any]]:
+    identity = {
+        "pair_id": pair_id,
+        "manifest_sha256": manifest_identity,
+        "model_identity": spec.identity_digest(),
+        "variant_id": variant_id,
+        "adapter_identity": _adapter_identity(adapter),
+        "runtime_identity": dict(runtime_identity),
+        "code_identity": dict(code_identity or _code_identity()),
+        "backend_contract": {
+            "route": "pytorch_cpu",
+            "device": "cpu",
+            "precision": spec.benchmark_dtype,
+            "boundary": "full_clip_native_transcription",
+        },
+        "stock_inference": dict(spec.stock_inference),
+        "metric_contract": "issue_25_note_frame_metrics_v1",
+    }
+    encoded = json.dumps(identity, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest(), identity
+
+
+def _load_cached_pair(
+    path: Path,
+    expected_identity: str,
+    pair_id: str,
+    expected_details: Mapping[str, Any] | None = None,
+) -> dict[str, Any] | None:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(value, dict) or value.get("pair_id") != pair_id:
+        return None
+    stored_identity = value.get("resume_identity_digest", value.get("resume_identity"))
+    if stored_identity != expected_identity:
+        return None
+    if expected_details is not None and value.get("resume_identity") != dict(expected_details):
+        return None
+    if value.get("status") not in {"ok", "runtime_failed", "out_of_memory", "invalid_native_output"}:
+        return None
+    return value
+
+
+def _source_stat_snapshot(pairs: Sequence[Any]) -> dict[str, tuple[int, int]]:
+    records: dict[str, tuple[int, int]] = {}
+    for pair in pairs:
+        for path in (pair.audio_path, pair.midi_path, pair.preset_path):
+            if path is None:
+                continue
+            candidate = Path(path).resolve(strict=True)
+            stat = candidate.stat()
+            records[str(candidate)] = (int(stat.st_size), int(stat.st_mtime_ns))
+    return records
 
 
 def _model_run(
@@ -296,6 +408,8 @@ def _consume_landed_basic_pitch(
     manifest: Path,
     pairs: Sequence[Any],
     output: Path,
+    runtime_identity: Mapping[str, Any],
+    code_identity: Mapping[str, str],
 ) -> EvaluationRun:
     from .adapters.basic_pitch import read_landed_baseline
 
@@ -327,6 +441,8 @@ def _consume_landed_basic_pitch(
             "adapter_identity": adapter_identity,
             "source": "landed_issue_25_result",
             "source_run_identity": dict(identity),
+            "runtime_identity": runtime_identity,
+            "code_identity": code_identity,
         },
     )
     run = _model_run(spec, variant_id, manifest, "ok", successful_pairs=successful_pairs, failed_pairs=failed_pairs)
@@ -344,61 +460,14 @@ def _consume_landed_basic_pitch(
             "failed_pairs": failed_pairs,
             "source": "landed_issue_25_result",
             "source_run_identity": dict(identity),
+            "runtime_identity": runtime_identity,
+            "code_identity": code_identity,
         },
     )
     _atomic_json(
         output / "aggregates.json",
         {"status": "ok", "quality": _landed_quality_views(aggregate, eligible_pairs=pair_count, successful_pairs=successful_pairs, failed_pairs=failed_pairs)},
     )
-    return run
-
-
-def _record_basic_pitch_quantization(spec: ModelSpec, adapter: object, manifest: Path, output: Path) -> EvaluationRun:
-    quantization = getattr(adapter, "quantization_result", None)
-    if not callable(quantization):
-        raise ArtifactError("Basic Pitch quantization capability is unavailable")
-    result = quantization()
-    status = str(result.status)
-    run_status = "unavailable" if status != "ok" else "failed"
-    failure_code = status if status != "ok" else "quantized_runtime_failed"
-    run = _model_run(spec, "dynamic_int8_linear", manifest, run_status, failure_code=failure_code)
-    _atomic_json(
-        output / "model_lock.json",
-        {
-            "format_version": 1,
-            "model_id": spec.model_id,
-            "model_identity": spec.identity_digest(),
-            "variant_id": run.variant_id,
-            "adapter_identity": f"{type(adapter).__module__}.{type(adapter).__qualname__}",
-            "quantization": {
-                "status": status,
-                "original_linear_modules": int(result.original_linear_modules),
-                "quantized_linear_modules": int(result.quantized_linear_modules),
-                "engine": result.engine,
-            },
-        },
-    )
-    _atomic_json(
-        output / "run.json",
-        {
-            "format_version": 1,
-            "status": run.status,
-            "failure_code": run.failure_code,
-            "model_id": run.model_id,
-            "variant_id": run.variant_id,
-            "manifest_sha256": run.manifest_identity,
-            "model_identity": run.model_identity,
-            "successful_pairs": 0,
-            "failed_pairs": 0,
-            "quantization": {
-                "status": status,
-                "original_linear_modules": int(result.original_linear_modules),
-                "quantized_linear_modules": int(result.quantized_linear_modules),
-                "engine": result.engine,
-            },
-        },
-    )
-    _atomic_json(output / "aggregates.json", {"status": run.status, "failure_code": run.failure_code, "quality": None})
     return run
 
 
@@ -411,42 +480,76 @@ def evaluate_model(
     quantized: bool = False,
     force: bool = False,
 ) -> EvaluationRun:
-    """Run fixed per-pair evaluation, or persist a truthful unavailable state."""
+    """Run fixed per-pair evaluation with exact identity-based resume."""
     output = _approved_output(output_dir)
-    if output.exists() and not force and any(output.iterdir()):
-        raise FileExistsError("refusing to overwrite evaluation output without force=True")
     output.mkdir(parents=True, exist_ok=True)
     manifest = Path(manifest_path).resolve(strict=True)
     _, load_manifest, performance_labels, _ = _metric_modules()
     pairs = tuple(load_manifest(manifest))
+    source_before = _source_stat_snapshot(pairs)
+    variant_id = "dynamic_int8_linear" if quantized else "full_precision"
+    runtime_identity = _runtime_identity()
+    code_identity = _code_identity()
     if spec.family == "basic_pitch" and quantized:
         load = getattr(adapter, "load", None)
         if callable(load):
             load()
-        return _record_basic_pitch_quantization(spec, adapter, manifest, output)
-    if spec.family == "basic_pitch" and not quantized:
+    elif spec.family == "basic_pitch" and not quantized:
         load = getattr(adapter, "load", None)
         if callable(load):
             load()
-        return _consume_landed_basic_pitch(spec, adapter, manifest, pairs, output)
+        return _consume_landed_basic_pitch(spec, adapter, manifest, pairs, output, runtime_identity, code_identity)
     if not spec.is_available:
-        run = _model_run(spec, "dynamic_int8_linear" if quantized else "full_precision", manifest, "unavailable", failure_code="dependency_unavailable")
+        run = _model_run(spec, variant_id, manifest, "unavailable", failure_code="dependency_unavailable")
         _write_unavailable(output, run, reason=spec.unavailability_reason)
         return run
-    variant_id = "dynamic_int8_linear" if quantized else "full_precision"
-    load = getattr(adapter, "load", None)
-    try:
-        if callable(load):
-            load()
-    except ArtifactUnavailable as exc:
-        run = _model_run(spec, variant_id, manifest, "failed", failure_code="dependency_unavailable")
-        _write_unavailable(output, run, reason=str(exc))
-        return run
-    except (ArtifactError, OSError, RuntimeError, TypeError, ValueError) as exc:
-        run = _model_run(spec, variant_id, manifest, "failed", failure_code="model_load_failed")
-        _write_unavailable(output, run, reason=str(exc))
-        return run
-    adapter_identity = f"{type(adapter).__module__}.{type(adapter).__qualname__}"
+    if spec.family != "basic_pitch":
+        load = getattr(adapter, "load", None)
+        try:
+            if callable(load):
+                load()
+        except ArtifactUnavailable as exc:
+            run = _model_run(spec, variant_id, manifest, "failed", failure_code="dependency_unavailable")
+            _write_unavailable(output, run, reason=str(exc))
+            return run
+        except (ArtifactError, OSError, RuntimeError, TypeError, ValueError) as exc:
+            run = _model_run(spec, variant_id, manifest, "failed", failure_code="model_load_failed")
+            _write_unavailable(output, run, reason=str(exc))
+            return run
+    quantization_info: dict[str, Any] | None = None
+    if quantized:
+        from .quantization import quantize_dynamic_linear_int8
+
+        try:
+            quantization = getattr(adapter, "quantization_result", None)
+            if callable(quantization):
+                result = quantization()
+            else:
+                model = getattr(adapter, "model", None)
+                if model is None:
+                    raise RuntimeError("quantization source model is unavailable")
+                result = quantize_dynamic_linear_int8(model)
+            quantization_info = {
+                "status": str(result.status),
+                "original_linear_modules": int(result.original_linear_modules),
+                "quantized_linear_modules": int(result.quantized_linear_modules),
+                "engine": result.engine,
+            }
+            if result.status != "ok" or result.model is None or result.quantized_linear_modules < 1:
+                raise RuntimeError(str(result.status))
+            bind = getattr(adapter, "bind_model", None)
+            if not callable(bind):
+                raise TypeError("adapter cannot bind the quantized model")
+            bind(result.model)
+            active_model = getattr(adapter, "active_model", None)
+            if active_model is not result.model:
+                raise RuntimeError("adapter did not bind the quantized model")
+        except (ArtifactUnavailable, RuntimeError, TypeError, ValueError) as exc:
+            failure_code = "quantization_unsupported" if quantization_info is None or quantization_info.get("status") != "ok" else "quantized_runtime_failed"
+            run = _model_run(spec, variant_id, manifest, "failed", failure_code=failure_code)
+            _write_unavailable(output, run, reason=str(exc))
+            return run
+    adapter_identity = _adapter_identity(adapter)
     _atomic_json(
         output / "model_lock.json",
         {
@@ -456,69 +559,62 @@ def evaluate_model(
             "variant_id": variant_id,
             "adapter_identity": adapter_identity,
             "stock_inference": dict(spec.stock_inference),
+            "runtime_identity": runtime_identity,
+            "code_identity": code_identity,
+            "checkpoint_identity_status": spec.checkpoint_identity_status,
+            "quantization": quantization_info,
         },
     )
     if not pairs:
         run = _model_run(spec, variant_id, manifest, "unavailable", failure_code="no_eligible_pairs")
         _write_unavailable(output, run, reason="the exact landed #25 manifest contains no eligible pairs")
         return run
-    try:
-        if quantized:
-            from .quantization import quantize_dynamic_linear_int8
-
-            model = getattr(adapter, "model", None)
-            if model is None:
-                raise ArtifactUnavailable("quantization source model is unavailable")
-            quantized_result = quantize_dynamic_linear_int8(model)
-            if quantized_result.status != "ok":
-                raise ArtifactUnavailable(quantized_result.status)
-    except ArtifactUnavailable as exc:
-        run = _model_run(spec, variant_id, manifest, "failed", failure_code="dependency_unavailable")
-        _write_unavailable(output, run, reason=str(exc))
-        return run
     rows: list[dict[str, Any]] = []
     references: dict[str, Sequence[Any]] = {}
     frame_model = spec.output_contract == "frame_pitch"
     pairs_dir = output / "pairs"
     for pair in pairs:
+        reference, _ = performance_labels(pair.midi_path)
+        references[pair.pair_id] = reference
+        resume_identity, resume_details = _pair_resume_identity(
+            spec,
+            variant_id,
+            adapter,
+            _digest(manifest),
+            runtime_identity,
+            pair.pair_id,
+            code_identity,
+        )
+        cached = None if force else _load_cached_pair(pairs_dir / f"{pair.pair_id}.json", resume_identity, pair.pair_id, resume_details)
+        if cached is not None:
+            row = cached
+            rows.append(row)
+            continue
         try:
-            reference, _ = performance_labels(pair.midi_path)
-            references[pair.pair_id] = reference
             value = adapter.transcribe(pair.audio_path)
             output_value = validate_output(value)
             metrics = score_output(reference, output_value)
-            rows.append(
-                {
-                    "pair_id": pair.pair_id,
-                    "preset_id": pair.preset_id,
-                    "labels": pair.labels,
-                    "status": "ok",
-                    "failure_code": None,
-                    "metrics": metrics,
-                    "frame_count": output_value.frame_pitch.active_midi.shape[0] if output_value.frame_pitch is not None else 0,
-                }
-            )
+            row = {
+                "pair_id": pair.pair_id,
+                "preset_id": pair.preset_id,
+                "labels": pair.labels,
+                "status": "ok",
+                "failure_code": None,
+                "metrics": metrics,
+                "frame_count": output_value.frame_pitch.active_midi.shape[0] if output_value.frame_pitch is not None else 0,
+            }
         except MemoryError:
-            rows.append({"pair_id": pair.pair_id, "preset_id": pair.preset_id, "labels": pair.labels, "status": "out_of_memory", "failure_code": "out_of_memory", "frame_count": _frame_count(pair.audio_path) if frame_model else 0})
+            row = {"pair_id": pair.pair_id, "preset_id": pair.preset_id, "labels": pair.labels, "status": "out_of_memory", "failure_code": "out_of_memory", "frame_count": _frame_count(pair.audio_path) if frame_model else 0}
         except ValueError as exc:
-            rows.append({"pair_id": pair.pair_id, "preset_id": pair.preset_id, "labels": pair.labels, "status": "invalid_native_output", "failure_code": "invalid_native_output", "error_type": type(exc).__name__, "frame_count": _frame_count(pair.audio_path) if frame_model else 0})
+            row = {"pair_id": pair.pair_id, "preset_id": pair.preset_id, "labels": pair.labels, "status": "invalid_native_output", "failure_code": "invalid_native_output", "error_type": type(exc).__name__, "frame_count": _frame_count(pair.audio_path) if frame_model else 0}
         except Exception as exc:  # noqa: BLE001 - pair failure must not discard later pairs
-            rows.append({"pair_id": pair.pair_id, "preset_id": pair.preset_id, "labels": pair.labels, "status": "runtime_failed", "failure_code": "transcription_runtime_error", "error_type": type(exc).__name__, "frame_count": _frame_count(pair.audio_path) if frame_model else 0})
-        row = rows[-1]
-        row["resume_identity"] = hashlib.sha256(
-            json.dumps(
-                {
-                    "pair_id": pair.pair_id,
-                    "model_identity": spec.identity_digest(),
-                    "variant_id": variant_id,
-                    "adapter_identity": adapter_identity,
-                    "stock_inference": dict(spec.stock_inference),
-                },
-                sort_keys=True,
-                separators=(",", ":"),
-            ).encode("utf-8")
-        ).hexdigest()
+            row = {"pair_id": pair.pair_id, "preset_id": pair.preset_id, "labels": pair.labels, "status": "runtime_failed", "failure_code": "transcription_runtime_error", "error_type": type(exc).__name__, "frame_count": _frame_count(pair.audio_path) if frame_model else 0}
+        row["resume_identity"] = resume_details
+        row["resume_identity_digest"] = resume_identity
+        rows.append(row)
         _atomic_json(pairs_dir / f"{row['pair_id']}.json", row)
+    if _source_stat_snapshot(pairs) != source_before:
+        raise ArtifactError("a #25 source artifact changed during #26 evaluation")
     views = build_quality_views(rows, references, frame_model=frame_model)
     successful = sum(row["status"] == "ok" for row in rows)
     run = _model_run(spec, variant_id, manifest, "ok", successful_pairs=successful, failed_pairs=len(rows) - successful)
@@ -535,6 +631,11 @@ def evaluate_model(
             "successful_pairs": successful,
             "failed_pairs": len(rows) - successful,
             "frame_model": frame_model,
+            "adapter_identity": adapter_identity,
+            "runtime_identity": runtime_identity,
+            "code_identity": code_identity,
+            "metric_contract": "issue_25_note_frame_metrics_v1",
+            "quantization": quantization_info,
         },
     )
     _atomic_json(output / "aggregates.json", {"status": "ok", "quality": views})

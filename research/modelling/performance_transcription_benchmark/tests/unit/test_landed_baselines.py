@@ -48,6 +48,8 @@ def test_comparison_report_distinguishes_baseline_from_blocked_comparison() -> N
     assert "incomplete_alternatives_unavailable" in markdown
     assert "What was actually executed" in markdown
     assert "What could not be executed" in markdown
+    assert "Adapter implementation scope" in markdown
+    assert "implemented pinned-official adapter path" in markdown
     assert "The intended comparative benchmark remains incomplete" in markdown
     assert "No ranking, quality estimate, cost estimate" in markdown
     assert "measured_corrected_fp32_performance" in markdown

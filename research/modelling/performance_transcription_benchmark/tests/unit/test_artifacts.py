@@ -47,6 +47,13 @@ def test_release_config_has_exact_candidate_set() -> None:
         "muscriptor_medium",
         "muscriptor_large",
     ]
+    assert all(spec.is_fully_locked for spec in specs.values() if not spec.model_id.startswith("muscriptor_"))
+    for model_id in ("muscriptor_small", "muscriptor_medium", "muscriptor_large"):
+        spec = specs[model_id]
+        assert spec.checkpoint_sha256 is None
+        assert spec.checkpoint_size_bytes > 0
+        assert spec.checkpoint_identity_status == "gated_digest_not_exposed_without_access"
+        assert not spec.is_fully_locked
 
 
 def test_checkpoint_verification_is_read_only(tmp_path: Path) -> None:

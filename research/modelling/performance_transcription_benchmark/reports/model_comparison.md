@@ -12,6 +12,7 @@ The JSON is authoritative, but this Markdown is intended to stand alone as the r
 - Metadata-only or unavailable candidates: `timbre_trap_base, ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_small, muscriptor_medium, muscriptor_large`.
 - Directly measured scope: Only Basic Pitch produced executable #24/#25 evidence in the permitted existing runtime and storage. Its quality and cost evidence are inherited, not rerun by #26; the current #24 cost rows include the corrected OpenVINO GPU FP32 + PERFORMANCE route when present.
 - Sourced/model-level scope: Candidate source, checkpoint, representation, architecture boundary, native sample rate, batch semantics, and license fields are verified inventory facts; they are not performance measurements.
+- Adapter implementation scope: The repository contains an implemented pinned-official adapter path for every required candidate family. An implemented adapter is not treated as executed when its source, checkpoint, dependency, or credential prerequisite is unavailable.
 - Unresolved comparative scope: No comparative quality, execution cost, resource, backward-cost, or quantization result exists for the unavailable alternatives. The intended comparative benchmark remains incomplete.
 
 ## Candidate identity and known properties
@@ -34,13 +35,15 @@ These are verified inventory facts, separated from observations produced by exec
 | Candidate | Source identity | Checkpoint identity | Availability reason |
 | --- | --- | --- | --- |
 | `basic_pitch` | `spotify/basic-pitch @ 9991303bba609a3b93089d13ec80d1d495083596` | `noisedoctrine/obruxo @ 918a1678465815c6f0a70009910737c164ed5a02` | available and verified |
-| `timbre_trap_base` | `sony/timbre-trap @ 7afe7e9b327929c099baeccd4b21973aedb94d9b` | `cwitkowitz/timbre-trap @ c1112a0` | pinned checkpoint size is not locally verifiable and the approved py312 runtime has no Timbre-Trap checkout |
-| `ymt3_plus` | `mimbres/YourMT3-HuggingFace-Space @ a03c9b4d8c3b97c6a7a556768726794042127628` | `mimbres/YourMT3 @ e45ebd70398682d54b7bb1901a5216e18f3b1824` | official source and checkpoint are not present in permitted local storage |
-| `yptf_multi` | `mimbres/YourMT3-HuggingFace-Space @ a03c9b4d8c3b97c6a7a556768726794042127628` | `mimbres/YourMT3 @ e45ebd70398682d54b7bb1901a5216e18f3b1824` | official source and checkpoint are not present in permitted local storage |
-| `yptf_moe_multi` | `mimbres/YourMT3-HuggingFace-Space @ a03c9b4d8c3b97c6a7a556768726794042127628` | `mimbres/YourMT3 @ e45ebd70398682d54b7bb1901a5216e18f3b1824` | official source and checkpoint are not present in permitted local storage |
-| `muscriptor_small` | `muscriptor/muscriptor @ c3b82e7` | `MuScriptor/muscriptor-small @ gated_revision_not_available_locally` | checkpoint is gated and no approved credential or local copy is available |
-| `muscriptor_medium` | `muscriptor/muscriptor @ c3b82e7` | `MuScriptor/muscriptor-medium @ gated_revision_not_available_locally` | checkpoint is gated and no approved credential or local copy is available |
-| `muscriptor_large` | `muscriptor/muscriptor @ c3b82e7` | `MuScriptor/muscriptor-large @ gated_revision_not_available_locally` | checkpoint is gated and no approved credential or local copy is available |
+| `timbre_trap_base` | `sony/timbre-trap @ 7afe7e9b327929c099baeccd4b21973aedb94d9b` | `cwitkowitz/timbre-trap @ 84fbd38582435c863a2d65197a75edd794888f19` | approved py312 storage has no pinned Timbre-Trap checkout or checkpoint |
+| `ymt3_plus` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | official source and checkpoint are not present in permitted local storage |
+| `yptf_multi` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | official source and checkpoint are not present in permitted local storage |
+| `yptf_moe_multi` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | official source and checkpoint are not present in permitted local storage |
+| `muscriptor_small` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-small @ 8c127f603b807520fa465c838e9bfee8a91ada4e` | checkpoint is gated and no approved credential or local copy is available |
+| `muscriptor_medium` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-medium @ f32236969308476e01fd3aae67357de5feb05a2d` | checkpoint is gated and no approved credential or local copy is available |
+| `muscriptor_large` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-large @ 8809fdfbed2affa7ade94a7059e746e3880720e7` | checkpoint is gated and no approved credential or local copy is available |
+
+Checkpoint lock status is explicit in the JSON source of truth: `locked` means the public digest and byte size are fixed; `gated_digest_not_exposed_without_access` means the immutable model revision and public size are recorded but the upstream gated service did not expose a digest without access. Neither state implies local executability.
 
 Sourced representation notes: Timbre-Trap is retained as a native frame/pitch output and is not given a fabricated note-event decoder; YourMT3 variants expose stock note-event output; MuScriptor exposes timing-corrected MIDI note events with stock prelude forcing. These facts describe upstream interfaces, not measured OBRUXO performance.
 
@@ -51,8 +54,8 @@ Only Basic Pitch produced executable evidence. The following sections consume th
 ### Basic Pitch quality evidence inherited from #25
 
 - Source: `landed_issue_25_report`; eligible population: `1769`; coverage: `1.000`.
-- Recorded #25 backend: `pytorch_cpu`; boundary: `#24_end_to_end_audio_to_note_events_batch_1`; precision: `float32`.
-- #25 route provenance assessment: `recorded_backend_does_not_match_issue_24_observed_leader`. The existing #25 quality run records a backend different from one or both current #24 leaders. Its quality result remains attributed only to the recorded backend; no alternate-backend full-corpus quality or equivalence claim is made.
+- Recorded #25 backend: `pytorch_xpu`; boundary: `end_to_end_audio_to_note_event`; precision: `float32`.
+- #25 route provenance assessment: `exact_issue_24_decision_consumed`. The full-corpus quality result is attributed to the exact #24-selected runtime. It does not establish quality equivalence for any other backend.
 
 | Quality view | Eligible | Succeeded | Failed | Coverage | Onset+pitch F1 | Onset+pitch+offset F1 | Frame F1 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -69,12 +72,15 @@ Only Basic Pitch produced executable evidence. The following sections consume th
 
 | Mode | Route | Evidence state | Batch-1 throughput | Batch-8 throughput | E2E rate | Startup (s) | Host RSS (MiB) | XPU allocated/reserved (MiB) | OpenVINO GPU memory (MiB) |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- | ---: |
-| `inference` | `pytorch_cpu` | `ok` | 79.775 | 174.782 | 50.547 | 1.002 | 589.7 | n/a / n/a | n/a |
-| `inference` | `pytorch_xpu` | `ok` | 217.878 | 727.400 | 91.984 | 1.040 | 2300.1 | 70.3 / 124.0 | n/a |
-| `inference` | `openvino_cpu` | `ok` | 91.475 | 215.639 | 53.338 | 3.583 | 814.0 | n/a / n/a | n/a |
-| `inference` | `openvino_gpu` | `measured_corrected_fp32_performance` | 197.036 | 320.379 | 98.262 | 19.287 | 1191.9 | n/a / n/a | 225.9 / 16762.6 |
-| `training` | `pytorch_cpu` | `ok` | 23.911 | 31.338 | n/a | 0.968 | 904.0 | n/a / n/a | n/a |
-| `training` | `pytorch_xpu` | `ok` | 81.987 | 241.946 | n/a | 0.906 | 2926.4 | 182.1 / 316.0 | n/a |
+| `inference` | `pytorch_cpu` | `ok` | 78.297 | 165.472 | 48.355 | 1.028 | 598.9 | n/a / n/a | n/a |
+| `inference` | `pytorch_xpu` | `ok` | 225.829 | 779.279 | 95.727 | 0.983 | 2310.6 | 70.3 / 124.0 | n/a |
+| `inference` | `openvino_cpu` | `parity_failed` | n/a | n/a | n/a | n/a | n/a | n/a / n/a | n/a |
+| `inference` | `openvino_gpu` | `measured_corrected_fp32_performance` | 121.901 | 319.814 | 70.608 | 3.977 | 1188.8 | n/a / n/a | 236.6 / 16762.6 |
+| `training` | `pytorch_cpu` | `ok` | 33.053 | 35.637 | n/a | 0.800 | 907.5 | n/a / n/a | n/a |
+| `training` | `pytorch_xpu` | `ok` | 98.683 | 252.572 | n/a | 0.784 | 2926.7 | 182.1 / 316.0 | n/a |
+
+Historical route records:
+- `openvino_cpu`: `parity_failed`. The landed #24 report suppresses timing for this route.
 
 ### OpenVINO GPU evidence state
 
@@ -82,14 +88,14 @@ Only Basic Pitch produced executable evidence. The following sections consume th
 - Bounded diagnostic result (corrected): requested `INFERENCE_PRECISION_HINT=float32`, compiled `float32` + `PERFORMANCE`; status `parity_passed` on `5` public synthetic windows.
 - Bounded parity metrics: non-finite values and threshold/event disagreements were `0`; maximum contour/note/onset errors were `0.000001431`, `0.000000715`, and `0.000001132`.
 - Corrected measured result: the actual #24 smoke route compiled `float32` on `Intel(R) Arc(TM) 140T GPU (16GB) (iGPU)` with `PERFORMANCE` execution; timed-route parity is `passed`.
-- Corrected startup medians: backend import `1.040` s, model conversion `2.439` s, GPU compilation `15.643` s, total startup `19.287` s; first-call / warmup at batch 1 `5.345` / `0.030` s.
-- Corrected steady-state audio-equivalent throughput (audio-s/s): batch 1 `197.036`, batch 2 `272.918`, batch 4 `321.501`, batch 8 `320.379`.
-- Corrected end-to-end throughput: `98.262` audio-s/s; host peak RSS `1191.9` MiB; OpenVINO GPU memory `225.9` / `16762.6` MiB where reported.
+- Corrected startup medians: backend import `0.968` s, model conversion `2.539` s, GPU compilation `0.516` s, total startup `3.977` s; first-call / warmup at batch 1 `0.047` / `0.061` s.
+- Corrected steady-state audio-equivalent throughput (audio-s/s): batch 1 `121.901`, batch 2 `262.879`, batch 4 `310.162`, batch 8 `319.814`.
+- Corrected end-to-end throughput: `70.608` audio-s/s; host peak RSS `1188.8` MiB; OpenVINO GPU memory `236.6` / `16762.6` MiB where reported.
 - Timed-route parity errors: non-finite values and threshold/event disagreements were `0`; maximum contour/note/onset errors were `0.000001431`, `0.000000715`, and `0.000001132`.
 
 ### Basic Pitch quantization evidence
 
-- Status: `not_applicable_no_linear`; ordinary Linear modules `0` -> `0`; engine `onednn`.
+- Status: `not recorded`; ordinary Linear modules `n/a` -> `n/a`; engine `n/a`.
 - No quantized artifact was produced, and no quantized XPU/OpenVINO/backward/batch-sweep result exists.
 
 ## What could not be executed
@@ -98,7 +104,7 @@ No alternative candidate produced a quality, execution-cost, resource, backward-
 
 | Candidate | Status | Concrete blocker | What this prevents |
 | --- | --- | --- | --- |
-| `timbre_trap_base` | `unavailable` | pinned checkpoint size is not locally verifiable and the approved py312 runtime has no Timbre-Trap checkout | no comparative quality/cost result |
+| `timbre_trap_base` | `unavailable` | approved py312 storage has no pinned Timbre-Trap checkout or checkpoint | no comparative quality/cost result |
 | `ymt3_plus` | `unavailable` | official source and checkpoint are not present in permitted local storage | no comparative quality/cost result |
 | `yptf_multi` | `unavailable` | official source and checkpoint are not present in permitted local storage | no comparative quality/cost result |
 | `yptf_moe_multi` | `unavailable` | official source and checkpoint are not present in permitted local storage | no comparative quality/cost result |
@@ -116,7 +122,7 @@ No alternative candidate produced a quality, execution-cost, resource, backward-
 
 - Directly measured evidence exists only for Basic Pitch: #25 quality on 1,769 eligible pairs and #24 route/cost evidence. The current #24 inference comparison includes corrected OpenVINO GPU FP32 + PERFORMANCE startup, throughput, end-to-end, parity, and resource measurements when that route is present.
 - The Basic Pitch evidence is a complete baseline for the landed #24/#25 contracts, not a comparison against the unavailable alternatives.
-- The measured #24 model-call throughput winners were batch 1: `pytorch_xpu` (217.878 audio-s/s), batch 2: `pytorch_xpu` (341.191 audio-s/s), batch 4: `pytorch_xpu` (521.529 audio-s/s), batch 8: `pytorch_xpu` (727.400 audio-s/s); the end-to-end winner was `openvino_gpu` (98.262 audio-s/s). These are Basic Pitch route findings, not alternative-model results.
+- The measured #24 model-call throughput winners were batch 1: `pytorch_xpu` (225.829 audio-s/s), batch 2: `pytorch_xpu` (379.212 audio-s/s), batch 4: `pytorch_xpu` (578.354 audio-s/s), batch 8: `pytorch_xpu` (779.279 audio-s/s); the end-to-end winner was `pytorch_xpu` (95.727 audio-s/s). These are Basic Pitch route findings, not alternative-model results.
 - The #25 quality result remains CPU-provenanced until route provenance is resolved.
 
 ### Bounded diagnostic results

@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
+import sys
 import tempfile
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -120,6 +122,115 @@ def _unavailable_phases(code: str) -> dict[str, dict[str, Any]]:
     }
 
 
+def _run_candidate_worker(request: Mapping[str, Any]) -> dict[str, Any]:
+    worker = Path(__file__).with_name("candidate_benchmark_worker.py")
+    completed = subprocess.run(
+        [sys.executable, str(worker)],
+        input=json.dumps(dict(request), sort_keys=True),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    for line in reversed(completed.stdout.splitlines()):
+        try:
+            value = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(value, dict):
+            return value
+    return {"status": "runtime_failed", "failure_code": "candidate_worker_failed"}
+
+
+def _aggregate_candidate_route(rows: Sequence[Mapping[str, Any]], *, route: str, native_batch_sizes: Sequence[int]) -> dict[str, Any]:
+    successful = [row for row in rows if row.get("status") == "ok"]
+    if len(successful) != len(rows):
+        failure = next((row for row in rows if row.get("status") != "ok"), {})
+        return {
+            "route": route,
+            "status": str(failure.get("status", "runtime_failed")),
+            "failure_code": failure.get("failure_code", "candidate_worker_failed"),
+            "repetitions": list(rows),
+            "native_batch_sizes": list(native_batch_sizes),
+        }
+    e2e_rows: list[dict[str, Any]] = []
+    for case_index in sorted({int(case["case_index"]) for row in successful for case in row["end_to_end"]["cases"]}):
+        cases = [case for row in successful for case in row["end_to_end"]["cases"] if int(case["case_index"]) == case_index]
+        audio_values = {float(case["audio_seconds"]) for case in cases}
+        if len(audio_values) != 1:
+            raise ValueError("candidate smoke audio duration changed across repetitions")
+        wall_summary = aggregate_measurements([float(case["wall_seconds"]) for case in cases])
+        e2e_rows.append(
+            {
+                "case_index": case_index,
+                "audio_seconds": float(next(iter(audio_values))),
+                "wall_seconds": wall_summary,
+                "status": "ok",
+            }
+        )
+    total_audio = float(sum(float(case["audio_seconds"]) for case in e2e_rows))
+    total_wall = aggregate_measurements([float(row["end_to_end"]["wall_seconds"]) for row in successful])
+    memories = [row.get("resources", {}) for row in successful]
+    memory = dict(memories[0])
+    for field in ("checkpoint_bytes", "parameters", "trainable_parameters", "state_tensor_bytes_by_dtype"):
+        values = [item.get(field) for item in memories if item.get(field) is not None]
+        if values and any(value != values[0] for value in values[1:]):
+            raise ValueError(f"candidate resource invariant changed across repetitions: {field}")
+        if values:
+            memory[field] = values[0]
+    for field in ("host_peak_rss_bytes",):
+        values = [float(item[field]) for item in memories if item.get(field) is not None]
+        if values:
+            memory[field] = aggregate_measurements(values)
+    xpu_values = [item.get("xpu_memory") for item in memories if item.get("xpu_memory") is not None]
+    if xpu_values:
+        if not all(isinstance(value, Mapping) for value in xpu_values):
+            raise ValueError("candidate XPU memory measurements have inconsistent shapes")
+        memory["xpu_memory"] = {
+            key: aggregate_measurements([float(value[key]) for value in xpu_values if key in value])
+            for key in sorted({key for value in xpu_values for key in value})
+        }
+    return {
+        "route": route,
+        "status": "ok",
+        "failure_code": None,
+        "repetitions": list(rows),
+        "runtime": successful[0].get("runtime"),
+        "startup": {
+            "model_load_seconds": aggregate_measurements([float(row["startup"]["model_load_seconds"]) for row in successful]),
+            "first_call_seconds": aggregate_measurements([float(row["startup"]["first_call_seconds"]) for row in successful]),
+            "warmup_seconds": aggregate_measurements([float(row["startup"]["warmup_seconds"]) for row in successful]),
+        },
+        "steady_state": {
+            "seconds": aggregate_measurements([float(row["steady_state"]["seconds"]["median"]) for row in successful]),
+            "calls_per_second": aggregate_measurements([float(row["steady_state"]["calls_per_second"]) for row in successful]),
+        },
+        "batch_scaling": successful[0].get("batch_scaling", {}),
+        "end_to_end": {
+            "status": "measured",
+            "audio_seconds": total_audio,
+            "wall_seconds": total_wall,
+            "audio_seconds_per_wall_second": total_audio / total_wall["median"] if total_wall["median"] else 0.0,
+            "cases": e2e_rows,
+        },
+        "resources": memory,
+        "backward": successful[0].get("backward", {}),
+        "native_batch_sizes": list(native_batch_sizes),
+        "quantization": successful[0].get("quantization"),
+    }
+
+
+def _source_stat_snapshot(cases: Sequence[Any]) -> dict[str, tuple[int, int]]:
+    records: dict[str, tuple[int, int]] = {}
+    for case in cases:
+        for path in (case.audio_path, case.midi_path, case.preset_path):
+            if path is None:
+                continue
+            candidate = Path(path).resolve(strict=True)
+            stat = candidate.stat()
+            records[str(candidate)] = (int(stat.st_size), int(stat.st_mtime_ns))
+    return records
+
+
 def _landed_basic_pitch_runtime(smoke_manifest: Path, spec: ModelSpec) -> tuple[dict[str, Any], int]:
     root = _basic_pitch_root()
     report_path = root / "reports" / "backend_benchmark.json"
@@ -167,49 +278,6 @@ def run_benchmark(
             "stock_inference": dict(spec.stock_inference),
         },
     )
-    if spec.model_id == "basic_pitch" and quantized:
-        try:
-            load = getattr(adapter, "load", None)
-            if callable(load):
-                load()
-            quantization = adapter.quantization_result()
-            quantization_status = str(quantization.status)
-            status = "unavailable" if quantization_status != "ok" else "failed"
-            failure_code = quantization_status if quantization_status != "ok" else "quantized_runtime_failed"
-        except (AttributeError, ImportError, OSError, RuntimeError, TypeError, ValueError) as exc:
-            status = "unavailable"
-            failure_code = "quantization_unsupported"
-            quantization = None
-            reason = type(exc).__name__
-        else:
-            reason = None
-        result = {
-            "format_version": 1,
-            "status": status if status != "ok" else "failed",
-            "failure_code": failure_code,
-            "model_id": spec.model_id,
-            "variant_id": "dynamic_int8_linear",
-            "model_identity": spec.identity_digest(),
-            "smoke_manifest_present": manifest.is_file(),
-            "smoke_case_count": 0,
-            "source": "fixed_cpu_dynamic_int8_linear",
-            "reason": reason,
-            "timing_contract": contract,
-            "routes": _unavailable_routes(failure_code, quantized=True),
-            "phases": _unavailable_phases(failure_code),
-            "resources": {},
-            "native_batch_sizes": [1],
-            "backward": {"status": "not_applicable", "reason": "quantized benchmark excludes backward"},
-            "batch_scaling": {"1": {"status": "not_applicable", "reason": "quantized benchmark is fixed batch 1"}},
-            "quantization": None if quantization is None else {
-                "status": str(quantization.status),
-                "original_linear_modules": int(quantization.original_linear_modules),
-                "quantized_linear_modules": int(quantization.quantized_linear_modules),
-                "engine": quantization.engine,
-            },
-        }
-        _atomic_json(output / "runtime.json", result)
-        return result
     if spec.model_id == "basic_pitch" and not quantized:
         try:
             report, case_count = _landed_basic_pitch_runtime(manifest, spec)
@@ -260,6 +328,9 @@ def run_benchmark(
         return result
     code = "dependency_unavailable"
     case_count = 0
+    routes: list[dict[str, Any]] = []
+    route_failures: list[dict[str, Any]] = []
+    quantization_info = None
     if not manifest.is_file():
         code = "smoke_manifest_missing"
     elif not spec.is_available:
@@ -272,35 +343,83 @@ def run_benchmark(
             sys.path.insert(0, str(root))
         from obruxo_basic_pitch.benchmark import load_config, load_manifest
 
+        cases: Sequence[Any] = ()
+        source_before: dict[str, tuple[int, int]] | None = None
         try:
             config = load_config(root / "configs" / "backend_benchmark.yaml")
-            cases = load_manifest(manifest, config, allow_derived_render=True, allow_missing_derived_audio=True)
+            cases = load_manifest(manifest, config, allow_derived_render=True, allow_missing_derived_audio=False)
             case_count = len(cases)
+            source_before = _source_stat_snapshot(cases)
             if any(not case.audio_path.is_file() for case in cases):
                 code = "derived_audio_unavailable"
             else:
-                load = getattr(adapter, "load", None)
-                if callable(load):
-                    load()
-                code = "candidate_runtime_unimplemented"
+                source_root = getattr(adapter, "source_root", None) or root
+                checkpoint = getattr(adapter, "checkpoint", None) or root / "artifacts" / "basic_pitch_icassp_2022.pt"
+                for route in ("pytorch_cpu", "pytorch_xpu"):
+                    if quantized and route != "pytorch_cpu":
+                        routes.append({"route": route, "status": "not_applicable", "failure_code": "quantized_cpu_only", "quantized": True})
+                        continue
+                    repetitions = []
+                    for repetition in range(config.process_repetitions):
+                        repetitions.append(
+                            _run_candidate_worker(
+                                {
+                                    "config_path": str(Path(__file__).resolve().parents[1] / "config" / "models.yaml"),
+                                    "model_id": spec.model_id,
+                                    "source_root": str(Path(source_root).resolve()),
+                                    "checkpoint": str(Path(checkpoint).resolve()),
+                                    "smoke_manifest": str(manifest),
+                                    "route": route,
+                                    "repetition": repetition,
+                                    "quantized": quantized,
+                                }
+                            )
+                        )
+                    route_result = _aggregate_candidate_route(repetitions, route=route, native_batch_sizes=spec.native_batch_sizes)
+                    routes.append(route_result)
+                    if route_result.get("status") != "ok":
+                        route_failures.append({"route": route, "status": route_result.get("status"), "failure_code": route_result.get("failure_code")})
+                successful_routes = [route for route in routes if route.get("status") == "ok"]
+                if successful_routes:
+                    code = None
+                    quantization_info = next((route.get("quantization") for route in successful_routes if route.get("quantization")), None)
+                else:
+                    code = route_failures[0].get("failure_code", "candidate_runtime_failed") if route_failures else "candidate_runtime_failed"
         except (ImportError, OSError, RuntimeError, TypeError, ValueError) as exc:
             code = type(exc).__name__.casefold()
+        finally:
+            if source_before is not None:
+                try:
+                    source_after = _source_stat_snapshot(cases)
+                except (OSError, RuntimeError, ValueError):
+                    code = "source_audit_failed"
+                    routes = []
+                    route_failures = [{"route": "all", "status": "failed", "failure_code": code}]
+                else:
+                    if source_after != source_before:
+                        code = "source_mutated"
+                        routes = []
+                        route_failures = [{"route": "all", "status": "failed", "failure_code": code}]
+    status = "ok" if any(route.get("status") == "ok" for route in routes) else ("unavailable" if code in {"dependency_unavailable", "smoke_manifest_missing", "derived_audio_unavailable"} else "failed")
     result = {
         "format_version": 1,
-        "status": "unavailable" if not spec.is_available or not manifest.is_file() or code == "derived_audio_unavailable" else "failed",
+        "status": status,
         "failure_code": code,
         "model_id": spec.model_id,
         "variant_id": "dynamic_int8_linear" if quantized else "full_precision",
         "model_identity": spec.identity_digest(),
         "smoke_manifest_present": manifest.is_file(),
         "smoke_case_count": case_count,
+        "source": "fixed_issue_24_candidate_worker",
         "timing_contract": contract,
-        "routes": _unavailable_routes(code, quantized=quantized),
-        "phases": _unavailable_phases(code),
-        "resources": {"parameters": None, "trainable_parameters": None, "state_tensor_bytes_by_dtype": None, "checkpoint_bytes": None, "peak_rss_bytes": None, "xpu_memory_bytes": None},
+        "routes": routes or _unavailable_routes(code, quantized=quantized),
+        "route_failures": route_failures,
+        "phases": {},
+        "resources": {},
         "native_batch_sizes": list(spec.native_batch_sizes),
-        "backward": {"status": "not_applicable", "reason": "no executable native differentiable boundary"},
-        "batch_scaling": {str(size): {"status": "not_applicable", "reason": "candidate unavailable"} for size in (1, 2, 4, 8)},
+        "backward": {"status": "not_applicable", "reason": "no executable natural differentiable boundary"},
+        "batch_scaling": {},
+        "quantization": quantization_info,
     }
     _atomic_json(output / "runtime.json", result)
     return result

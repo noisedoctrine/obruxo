@@ -24,7 +24,12 @@ REQUIRED_MODEL_IDS = (
     "muscriptor_large",
 )
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
+_REVISION = re.compile(r"^[0-9a-f]{40}$")
 _PLACEHOLDER = re.compile(r"<[^>]+>|\b(?:TODO|TBD|PLACEHOLDER|LATEST)\b", re.IGNORECASE)
+CHECKPOINT_IDENTITY_STATUSES = {
+    "locked",
+    "gated_digest_not_exposed_without_access",
+}
 
 
 class ArtifactError(ValueError):
@@ -46,8 +51,8 @@ class ModelSpec:
     checkpoint_repository: str
     checkpoint_revision: str
     checkpoint_path: str
-    checkpoint_sha256: str
-    checkpoint_size_bytes: int
+    checkpoint_sha256: str | None
+    checkpoint_size_bytes: int | None
     code_license: str
     weight_license: str
     benchmark_dtype: str
@@ -62,10 +67,15 @@ class ModelSpec:
     source_url: str | None = None
     checkpoint_url: str | None = None
     representation: Mapping[str, object] = field(default_factory=dict)
+    checkpoint_identity_status: str = "locked"
 
     @property
     def is_available(self) -> bool:
         return self.availability == "available"
+
+    @property
+    def is_fully_locked(self) -> bool:
+        return self.checkpoint_identity_status == "locked" and bool(self.checkpoint_sha256) and self.checkpoint_size_bytes is not None
 
     def public_identity(self) -> dict[str, Any]:
         return {
@@ -79,6 +89,7 @@ class ModelSpec:
             "checkpoint_revision": self.checkpoint_revision,
             "checkpoint_sha256": self.checkpoint_sha256,
             "checkpoint_size_bytes": self.checkpoint_size_bytes,
+            "checkpoint_identity_status": self.checkpoint_identity_status,
             "code_license": self.code_license,
             "weight_license": self.weight_license,
             "benchmark_dtype": self.benchmark_dtype,
@@ -125,13 +136,31 @@ def _spec(model_id: str, raw: Mapping[str, Any]) -> ModelSpec:
     availability = str(raw.get("availability", "available"))
     if availability not in {"available", "unavailable"}:
         raise ArtifactError(f"{model_id}.availability must be available or unavailable")
-    allow_unverified = availability != "available"
     sizes = raw.get("native_batch_sizes", [1])
     if not isinstance(sizes, list) or any(type(item) is not int or item < 1 for item in sizes):
         raise ArtifactError(f"{model_id} native_batch_sizes is invalid")
     stock = raw.get("stock_inference")
     if not isinstance(stock, Mapping):
         raise ArtifactError(f"{model_id} stock_inference must be a mapping")
+    identity_status = _text(
+        _required(checkpoint, "identity_status", model_id),
+        f"{model_id}.checkpoint.identity_status",
+        allow_unverified=True,
+    )
+    if identity_status not in CHECKPOINT_IDENTITY_STATUSES:
+        raise ArtifactError(f"{model_id}.checkpoint.identity_status is invalid")
+    sha_value = checkpoint.get("sha256")
+    size_value = checkpoint.get("size_bytes")
+    if identity_status == "locked":
+        if not isinstance(sha_value, str) or not _SHA256.fullmatch(sha_value):
+            raise ArtifactError(f"{model_id}.checkpoint.sha256 is not a SHA-256 digest")
+        if type(size_value) is not int or size_value <= 0:
+            raise ArtifactError(f"{model_id}.checkpoint.size_bytes is not a positive integer")
+    else:
+        if sha_value is not None:
+            raise ArtifactError(f"{model_id}.checkpoint.sha256 must be null when its digest is not exposed")
+        if type(size_value) is not int or size_value <= 0:
+            raise ArtifactError(f"{model_id}.checkpoint.size_bytes must be a positive public size")
     values = {
         "model_id": model_id,
         "family": _text(_required(raw, "family", model_id), f"{model_id}.family"),
@@ -142,10 +171,11 @@ def _spec(model_id: str, raw: Mapping[str, Any]) -> ModelSpec:
         "checkpoint_repository": _text(_required(checkpoint, "repository", model_id), f"{model_id}.checkpoint.repository"),
         "checkpoint_revision": _text(_required(checkpoint, "revision", model_id), f"{model_id}.checkpoint.revision"),
         "checkpoint_path": _text(_required(checkpoint, "path", model_id), f"{model_id}.checkpoint.path"),
-        "checkpoint_sha256": _text(_required(checkpoint, "sha256", model_id), f"{model_id}.checkpoint.sha256", allow_unverified=allow_unverified),
-        "checkpoint_size_bytes": int(_required(checkpoint, "size_bytes", model_id)),
-        "code_license": _text(_required(raw, "code_license", model_id), f"{model_id}.code_license", allow_unverified=allow_unverified),
-        "weight_license": _text(_required(raw, "weight_license", model_id), f"{model_id}.weight_license", allow_unverified=allow_unverified),
+        "checkpoint_sha256": sha_value,
+        "checkpoint_size_bytes": size_value,
+        "checkpoint_identity_status": identity_status,
+        "code_license": _text(_required(raw, "code_license", model_id), f"{model_id}.code_license"),
+        "weight_license": _text(_required(raw, "weight_license", model_id), f"{model_id}.weight_license"),
         "benchmark_dtype": _text(_required(raw, "benchmark_dtype", model_id), f"{model_id}.benchmark_dtype"),
         "native_sample_rate": int(_required(raw, "native_sample_rate", model_id)),
         "environment": _text(_required(raw, "environment", model_id), f"{model_id}.environment"),
@@ -159,12 +189,14 @@ def _spec(model_id: str, raw: Mapping[str, Any]) -> ModelSpec:
         "checkpoint_url": raw.get("checkpoint_url"),
         "representation": dict(raw.get("representation", {})),
     }
-    if values["checkpoint_size_bytes"] < 0 or values["native_sample_rate"] <= 0:
+    if not _REVISION.fullmatch(values["source_revision"]) or not _REVISION.fullmatch(values["checkpoint_revision"]):
+        raise ArtifactError(f"{model_id} source/checkpoint revisions must be immutable commit IDs")
+    if values["native_sample_rate"] <= 0:
         raise ArtifactError(f"{model_id} contains an invalid size or sample rate")
     if availability != "available" and not isinstance(values["unavailability_reason"], str):
         raise ArtifactError(f"{model_id}.unavailability_reason is required when unavailable")
-    if availability == "available" and not _SHA256.fullmatch(values["checkpoint_sha256"]):
-        raise ArtifactError(f"{model_id}.checkpoint.sha256 is not a SHA-256 digest")
+    if availability == "available" and not values["checkpoint_identity_status"] == "locked":
+        raise ArtifactError(f"{model_id}.available checkpoint identity must be locked")
     return ModelSpec(**values)
 
 

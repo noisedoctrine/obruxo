@@ -7,12 +7,15 @@ import sys
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 from ..artifacts import (
     ArtifactError,
     ArtifactUnavailable,
     ModelSpec,
     verify_checkpoint,
 )
+from ..types import NormalizedNote, TranscriptionOutput, rasterize_notes
 
 
 def _basic_pitch_root() -> Path:
@@ -55,12 +58,14 @@ def read_landed_baseline(manifest_path: Path) -> dict[str, Any]:
 
 
 class BasicPitchAdapter:
-    """A deliberate no-op adapter: quality consumes #25's canonical result."""
+    """Consume #25 for the full-precision baseline and run its graph for quantization."""
 
     def __init__(self, spec: ModelSpec, source_root: Path | None, checkpoint: Path | None) -> None:
         self.spec = spec
         self.source_root = None if source_root is None else Path(source_root)
         self.checkpoint = None if checkpoint is None else Path(checkpoint)
+        self.model: Any | None = None
+        self.bound_model: Any | None = None
 
     def preflight(self) -> None:
         root = _basic_pitch_root() if self.source_root is None else self.source_root.resolve(strict=True)
@@ -75,15 +80,16 @@ class BasicPitchAdapter:
         if self.checkpoint is not None:
             verify_checkpoint(self.spec, self.checkpoint)
 
-    def load(self) -> None:
-        self.preflight()
+    @property
+    def active_model(self) -> Any | None:
+        return self.bound_model if self.bound_model is not None else self.model
 
-    def quantization_result(self) -> Any:
+    def load(self, device: str = "cpu") -> None:
         self.preflight()
         import torch
 
-        from ..quantization import quantize_dynamic_linear_int8
-
+        if device != "cpu":
+            raise ArtifactUnavailable("Basic Pitch adapter quality/cost loading is CPU-only in #26")
         root = _basic_pitch_root() if self.source_root is None else self.source_root.resolve(strict=True)
         checkpoint = self.checkpoint or root / "artifacts" / "basic_pitch_icassp_2022.pt"
         from obruxo_basic_pitch.model import BasicPitchICASSP2022
@@ -91,7 +97,57 @@ class BasicPitchAdapter:
         model = BasicPitchICASSP2022()
         state = torch.load(checkpoint, map_location="cpu", weights_only=True)
         model.load_state_dict(state, strict=True)
-        return quantize_dynamic_linear_int8(model)
+        model.eval()
+        self.model = model
+        self.bound_model = model
 
-    def transcribe(self, _audio: Path) -> Any:
-        raise ArtifactUnavailable("Basic Pitch quality is consumed from the landed #25 result")
+    def bind_model(self, model: Any) -> None:
+        import torch
+
+        if not isinstance(model, torch.nn.Module):
+            raise TypeError("Basic Pitch bound model must be a torch module")
+        devices = {tensor.device.type for tensor in (*model.parameters(), *model.buffers())}
+        if devices and devices != {"cpu"}:
+            raise ValueError("Basic Pitch quantized model must remain on CPU")
+        model.eval()
+        self.bound_model = model
+
+    def quantization_result(self) -> Any:
+        if self.model is None:
+            self.load()
+
+        from ..quantization import quantize_dynamic_linear_int8
+
+        return quantize_dynamic_linear_int8(self.model)
+
+    def transcribe(self, audio: Path) -> TranscriptionOutput:
+        if self.active_model is None:
+            self.load()
+        import torch
+        from obruxo_basic_pitch.inference import prepare_wav, unwrap_window_outputs
+        from obruxo_basic_pitch.postprocess import posteriorgrams_to_note_events
+
+        prepared = prepare_wav(Path(audio))
+        tensors = torch.from_numpy(prepared.windows)
+        with torch.inference_mode():
+            raw = self.active_model(tensors)
+        posterior = unwrap_window_outputs(
+            {name: value.detach().cpu().numpy() for name, value in raw.items()},
+            original_sample_count=prepared.original_sample_count,
+        )
+        events = posteriorgrams_to_note_events(posterior)
+        notes = tuple(
+            NormalizedNote(
+                event.start_time_s,
+                event.end_time_s,
+                event.pitch_midi,
+                int(np.clip(np.rint(event.amplitude * 127.0), 0, 127)),
+                None,
+            )
+            for event in events
+            if event.end_time_s > event.start_time_s
+        )
+        from obruxo_basic_pitch.constants import ANNOTATIONS_FPS, AUDIO_SAMPLE_RATE
+
+        frame_count = int(prepared.original_sample_count * ANNOTATIONS_FPS // AUDIO_SAMPLE_RATE)
+        return TranscriptionOutput(notes, rasterize_notes(notes, frame_count))
