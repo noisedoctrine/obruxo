@@ -138,6 +138,80 @@ def _openvino_outputs(compiled: Any, host_batch: Any, np: Any) -> dict[str, Any]
     return dict(zip(("note", "onset", "contour"), values, strict=True))
 
 
+def _openvino_property(target: Any, name: str, *, device: str | None = None) -> Any | None:
+    getter = getattr(target, "get_property", None)
+    if not callable(getter):
+        return None
+    try:
+        return getter(device, name) if device is not None else getter(name)
+    except (AttributeError, RuntimeError, TypeError, ValueError):
+        return None
+
+
+def _openvino_property_value(value: Any) -> Any:
+    if value is None or isinstance(value, (bool, int, float, str)):
+        return value
+    if isinstance(value, Mapping):
+        return {str(key): _openvino_property_value(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple, set)):
+        return [_openvino_property_value(item) for item in value]
+    text = str(value)
+    lowered = text.lower()
+    if "float32" in lowered:
+        return "float32"
+    if "float16" in lowered:
+        return "float16"
+    upper = text.upper()
+    for name in ("PERFORMANCE", "LATENCY", "THROUGHPUT"):
+        if name in upper:
+            return name
+    return text
+
+
+def _openvino_device_info(core: Any, compiled: Any, target: str) -> dict[str, Any]:
+    return {
+        "selected_device": target,
+        "available_devices": sorted(str(device) for device in getattr(core, "available_devices", ())),
+        "full_device_name": _openvino_property_value(_openvino_property(core, "FULL_DEVICE_NAME", device=target)),
+        "device_architecture": _openvino_property_value(_openvino_property(core, "DEVICE_ARCHITECTURE", device=target)),
+        "execution_devices": _openvino_property_value(_openvino_property(compiled, "EXECUTION_DEVICES")),
+        "inference_precision_hint_requested": "float32",
+        "inference_precision_hint_compiled": _openvino_property_value(
+            _openvino_property(compiled, "INFERENCE_PRECISION_HINT")
+        ),
+        "execution_mode_hint_requested": "unconfigured (plugin default)",
+        "execution_mode_hint_compiled": _openvino_property_value(_openvino_property(compiled, "EXECUTION_MODE_HINT")),
+        "performance_hint_compiled": _openvino_property_value(_openvino_property(compiled, "PERFORMANCE_HINT")),
+    }
+
+
+def _openvino_memory_snapshot(core: Any, target: str) -> dict[str, Any]:
+    statistics = _openvino_property(core, "GPU_MEMORY_STATISTICS", device=target)
+    total_memory = _openvino_property(core, "GPU_DEVICE_TOTAL_MEM_SIZE", device=target)
+    if not isinstance(statistics, Mapping):
+        return {
+            "openvino_gpu_memory_measurement_status": "unavailable",
+            "openvino_gpu_memory_statistics_bytes": None,
+            "openvino_gpu_memory_bytes": None,
+            "openvino_gpu_total_memory_bytes": int(total_memory) if isinstance(total_memory, int) else None,
+        }
+    try:
+        sanitized = {str(key): int(value) for key, value in statistics.items()}
+    except (TypeError, ValueError):
+        return {
+            "openvino_gpu_memory_measurement_status": "unavailable",
+            "openvino_gpu_memory_statistics_bytes": None,
+            "openvino_gpu_memory_bytes": None,
+            "openvino_gpu_total_memory_bytes": int(total_memory) if isinstance(total_memory, int) else None,
+        }
+    return {
+        "openvino_gpu_memory_measurement_status": "ok",
+        "openvino_gpu_memory_statistics_bytes": sanitized,
+        "openvino_gpu_memory_bytes": sum(sanitized.values()),
+        "openvino_gpu_total_memory_bytes": int(total_memory) if isinstance(total_memory, int) else None,
+    }
+
+
 def _event_signature(event: Any) -> tuple[float, float, int]:
     return event.start_time_s, event.end_time_s, event.pitch_midi
 
@@ -220,7 +294,9 @@ def _openvino_target(core: Any, route: str, requested: str) -> str:
     return requested
 
 
-def _build_openvino(torch: Any, ov: Any, model: Any, route: str, requested: str) -> tuple[Any, float, float]:
+def _build_openvino(
+    torch: Any, ov: Any, model: Any, route: str, requested: str
+) -> tuple[Any, float, float, dict[str, Any], Any, str]:
     core = ov.Core()
     target = _openvino_target(core, route, requested)
     example = torch.zeros((1, 43_844, 1), dtype=torch.float32)
@@ -242,10 +318,24 @@ def _build_openvino(torch: Any, ov: Any, model: Any, route: str, requested: str)
         )
     except Exception as exc:
         raise _RouteError("runtime_failed", "openvino_compile_failed") from exc
-    return compiled, float(conversion_seconds), float(time.perf_counter() - compile_started)
+    return (
+        compiled,
+        float(conversion_seconds),
+        float(time.perf_counter() - compile_started),
+        _openvino_device_info(core, compiled, target),
+        core,
+        target,
+    )
 
 
-def _memory_snapshot(psutil: Any, torch: Any, device: Any | None) -> dict[str, Any]:
+def _memory_snapshot(
+    psutil: Any,
+    torch: Any,
+    device: Any | None,
+    *,
+    openvino_core: Any | None = None,
+    openvino_target: str | None = None,
+) -> dict[str, Any]:
     process_info = psutil.Process().memory_info()
     host_peak = getattr(process_info, "peak_wset", None)
     result: dict[str, Any] = {
@@ -254,6 +344,9 @@ def _memory_snapshot(psutil: Any, torch: Any, device: Any | None) -> dict[str, A
         "pytorch_xpu_peak_allocated_bytes": None,
         "pytorch_xpu_peak_reserved_bytes": None,
         "openvino_gpu_memory_bytes": None,
+        "openvino_gpu_memory_measurement_status": "not_applicable",
+        "openvino_gpu_memory_statistics_bytes": None,
+        "openvino_gpu_total_memory_bytes": None,
     }
     if device is not None and device.type == "xpu":
         try:
@@ -261,6 +354,8 @@ def _memory_snapshot(psutil: Any, torch: Any, device: Any | None) -> dict[str, A
             result["pytorch_xpu_peak_reserved_bytes"] = int(torch.xpu.max_memory_reserved(device))
         except (AttributeError, RuntimeError, TypeError):
             result["measurement_status"] = "unavailable"
+    if openvino_core is not None and openvino_target is not None:
+        result.update(_openvino_memory_snapshot(openvino_core, openvino_target))
     return result
 
 
@@ -370,6 +465,9 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
         device_move_seconds = 0.0
         openvino_conversion_seconds = 0.0
         openvino_compile_seconds = 0.0
+        openvino_device_info = None
+        openvino_core = None
+        openvino_target = None
         ov = None
         if route == "pytorch_cpu":
             route_device = torch.device("cpu")
@@ -385,7 +483,14 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
             except Exception as exc:
                 code = "openvino_cpu_unavailable" if route == "openvino_cpu" else "openvino_gpu_unavailable"
                 raise _RouteError("unavailable", code) from exc
-            compiled, openvino_conversion_seconds, openvino_compile_seconds = _build_openvino(
+            (
+                compiled,
+                openvino_conversion_seconds,
+                openvino_compile_seconds,
+                openvino_device_info,
+                openvino_core,
+                openvino_target,
+            ) = _build_openvino(
                 torch, ov, model, route, str(request.get("openvino_gpu_device", "GPU"))
             )
         else:
@@ -412,6 +517,7 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
                 "runtime": _runtime_identity(np, torch, psutil, ov),
                 "parity_windows": int(public_windows.shape[0]),
                 "parity": parity,
+                "backend": openvino_device_info,
             }
         if not parity["parity_passed"]:
             raise _ParityError("candidate parity changed threshold or stock note-event behavior")
@@ -456,7 +562,13 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
                 np,
                 posteriorgrams_to_note_events,
             )
-        memory = _memory_snapshot(psutil, torch, memory_device)
+        memory = _memory_snapshot(
+            psutil,
+            torch,
+            memory_device,
+            openvino_core=openvino_core,
+            openvino_target=openvino_target,
+        )
         memory["xpu_peak_reset_before_move"] = xpu_peak_reset
         return {
             "route": route,
@@ -464,6 +576,7 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
             "status": "ok",
             "failure_code": None,
             "runtime": _runtime_identity(np, torch, psutil, ov),
+            "backend": openvino_device_info,
             "startup": {
                 "backend_import_seconds": runtime_import_seconds,
                 "model_construct_seconds": model_construct_seconds,
