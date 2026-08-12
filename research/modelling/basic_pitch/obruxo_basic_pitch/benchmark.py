@@ -42,14 +42,38 @@ FAILURE_CODES = (
     "derived_render_unavailable",
     "derived_render_failed",
     "derived_render_destination_invalid",
+    "incomplete_smoke_coverage",
 )
 
 _PERFORMANCE = ("monophonic", "polyphonic")
-_ROLES = ("bass", "lead", "arp_sequence", "pad_sustained", "keys_pluck", "fx_texture", "other", "unknown")
+_ROLES = (
+    "bass",
+    "lead",
+    "arp_sequence",
+    "pad_sustained",
+    "keys_pluck",
+    "fx_texture",
+    "other",
+    "unknown",
+)
 _ENVELOPES = ("transient", "sustained", "mixed", "unknown")
 _DURATIONS = ("short", "medium", "long")
 _DENSITIES = ("low", "medium", "high", "unknown")
 _AUDIO_SOURCES = ("existing_audio", "derived_render")
+_COVERAGE_CASE_FIELDS = {
+    "performance": "performance",
+    "roles": "role",
+    "envelopes": "envelope",
+    "duration_classes": "duration_class",
+    "note_density_classes": "note_density_class",
+}
+_REQUIRED_COVERAGE = {
+    "performance": ("monophonic", "polyphonic"),
+    "roles": ("bass", "lead", "arp_sequence", "pad_sustained", "other"),
+    "envelopes": ("transient", "sustained"),
+    "duration_classes": ("short", "medium", "long"),
+    "note_density_classes": ("low", "high"),
+}
 
 
 class BenchmarkInputError(ValueError):
@@ -101,7 +125,9 @@ class BenchmarkConfig:
             "smoke_set": {
                 "min_cases": self.smoke_min_cases,
                 "max_cases": self.smoke_max_cases,
-                "coverage": {name: list(values) for name, values in self.coverage.items()},
+                "coverage": {
+                    name: list(values) for name, values in self.coverage.items()
+                },
             },
             "routes": {
                 "inference": list(INFERENCE_ROUTES),
@@ -137,7 +163,9 @@ class SmokeCase:
 
 def _required_mapping(value: Any, label: str) -> Mapping[str, Any]:
     if not isinstance(value, Mapping):
-        raise BenchmarkInputError("invalid_smoke_manifest", f"{label} must be a mapping")
+        raise BenchmarkInputError(
+            "invalid_smoke_manifest", f"{label} must be a mapping"
+        )
     return value
 
 
@@ -152,7 +180,9 @@ def load_config(path: str | Path) -> BenchmarkConfig:
     try:
         raw = yaml.safe_load(config_path.read_text(encoding="utf-8"))
     except (OSError, yaml.YAMLError) as exc:
-        raise BenchmarkInputError("invalid_smoke_manifest", "benchmark config could not be read") from exc
+        raise BenchmarkInputError(
+            "invalid_smoke_manifest", "benchmark config could not be read"
+        ) from exc
     data = _required_mapping(raw, "benchmark config")
     _validate_exact(data.get("version"), 1, "config version")
     _validate_exact(data.get("precision"), "float32", "precision")
@@ -169,7 +199,15 @@ def load_config(path: str | Path) -> BenchmarkConfig:
     _validate_exact(routes.get("training"), list(TRAINING_ROUTES), "training routes")
     coverage = smoke.get("coverage", {})
     if not isinstance(coverage, Mapping):
-        raise BenchmarkInputError("invalid_smoke_manifest", "smoke coverage must be a mapping")
+        raise BenchmarkInputError(
+            "invalid_smoke_manifest", "smoke coverage must be a mapping"
+        )
+    if set(coverage) != set(_REQUIRED_COVERAGE):
+        raise BenchmarkInputError(
+            "invalid_smoke_manifest", "smoke coverage fields are incomplete"
+        )
+    for field, expected in _REQUIRED_COVERAGE.items():
+        _validate_exact(coverage.get(field), list(expected), f"{field} coverage")
     return BenchmarkConfig(
         version=1,
         precision="float32",
@@ -180,29 +218,42 @@ def load_config(path: str | Path) -> BenchmarkConfig:
         end_to_end_batch_size=1,
         smoke_min_cases=8,
         smoke_max_cases=12,
-        coverage={name: tuple(str(item) for item in values) for name, values in coverage.items()},
+        coverage={
+            name: tuple(str(item) for item in values)
+            for name, values in coverage.items()
+        },
     )
 
 
-def _source_path(manifest_path: Path, value: Any, label: str, *, allow_missing: bool = False) -> Path:
+def _source_path(
+    manifest_path: Path, value: Any, label: str, *, allow_missing: bool = False
+) -> Path:
     if not isinstance(value, str) or not value:
-        raise BenchmarkInputError("invalid_smoke_manifest", f"{label} must be a non-empty path")
+        raise BenchmarkInputError(
+            "invalid_smoke_manifest", f"{label} must be a non-empty path"
+        )
     candidate = Path(value)
     if not candidate.is_absolute():
         candidate = manifest_path.parent / candidate
     try:
         resolved = candidate.resolve(strict=not allow_missing)
     except OSError as exc:
-        raise BenchmarkInputError("invalid_smoke_manifest", f"{label} is missing or unreadable") from exc
+        raise BenchmarkInputError(
+            "invalid_smoke_manifest", f"{label} is missing or unreadable"
+        ) from exc
     if allow_missing and not resolved.exists():
         return resolved
     if not resolved.is_file() or not os.access(resolved, os.R_OK):
-        raise BenchmarkInputError("invalid_smoke_manifest", f"{label} is missing or unreadable")
+        raise BenchmarkInputError(
+            "invalid_smoke_manifest", f"{label} is missing or unreadable"
+        )
     try:
         with resolved.open("rb"):
             pass
     except OSError as exc:
-        raise BenchmarkInputError("invalid_smoke_manifest", f"{label} is unreadable") from exc
+        raise BenchmarkInputError(
+            "invalid_smoke_manifest", f"{label} is unreadable"
+        ) from exc
     return resolved
 
 
@@ -218,15 +269,25 @@ def load_manifest(
     try:
         raw = json.loads(manifest_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        raise BenchmarkInputError("invalid_smoke_manifest", "smoke manifest could not be read") from exc
+        raise BenchmarkInputError(
+            "invalid_smoke_manifest", "smoke manifest could not be read"
+        ) from exc
     data = _required_mapping(raw, "smoke manifest")
     if set(data) != {"format_version", "benchmark_spec_version", "cases"}:
-        raise BenchmarkInputError("invalid_smoke_manifest", "smoke manifest shape is not version 1")
+        raise BenchmarkInputError(
+            "invalid_smoke_manifest", "smoke manifest shape is not version 1"
+        )
     _validate_exact(data.get("format_version"), 1, "manifest format version")
     _validate_exact(data.get("benchmark_spec_version"), 1, "benchmark spec version")
     rows = data.get("cases")
-    if not isinstance(rows, list) or not config.smoke_min_cases <= len(rows) <= config.smoke_max_cases:
-        raise BenchmarkInputError("invalid_smoke_manifest", "smoke manifest case count is outside the fixed range")
+    if (
+        not isinstance(rows, list)
+        or not config.smoke_min_cases <= len(rows) <= config.smoke_max_cases
+    ):
+        raise BenchmarkInputError(
+            "invalid_smoke_manifest",
+            "smoke manifest case count is outside the fixed range",
+        )
 
     cases: list[SmokeCase] = []
     audio_paths: set[Path] = set()
@@ -260,29 +321,51 @@ def load_manifest(
             preset_path = None
         elif allow_derived_render and set(item) == derived_fields:
             audio_source = item["audio_source"]
-            preset_path = _source_path(manifest_path, item["preset_path"], "preset path")
+            preset_path = _source_path(
+                manifest_path, item["preset_path"], "preset path"
+            )
         else:
-            raise BenchmarkInputError("invalid_smoke_manifest", "smoke case shape is invalid")
+            raise BenchmarkInputError(
+                "invalid_smoke_manifest", "smoke case shape is invalid"
+            )
         if audio_source not in _AUDIO_SOURCES:
-            raise BenchmarkInputError("invalid_smoke_manifest", "smoke case has an unsupported audio source")
+            raise BenchmarkInputError(
+                "invalid_smoke_manifest", "smoke case has an unsupported audio source"
+            )
         if audio_source == "derived_render" and preset_path is None:
-            raise BenchmarkInputError("invalid_smoke_manifest", "derived render case requires a preset path")
+            raise BenchmarkInputError(
+                "invalid_smoke_manifest", "derived render case requires a preset path"
+            )
         if audio_source == "existing_audio" and preset_path is not None:
-            raise BenchmarkInputError("invalid_smoke_manifest", "existing audio case cannot have a preset path")
+            raise BenchmarkInputError(
+                "invalid_smoke_manifest",
+                "existing audio case cannot have a preset path",
+            )
         if type(item["case_index"]) is not int or item["case_index"] != expected_index:
-            raise BenchmarkInputError("invalid_smoke_manifest", "case indexes must be sequential")
+            raise BenchmarkInputError(
+                "invalid_smoke_manifest", "case indexes must be sequential"
+            )
         labels = {name: item[name] for name in allowed}
-        if any(not isinstance(value, str) or value not in allowed[name] for name, value in labels.items()):
-            raise BenchmarkInputError("invalid_smoke_manifest", "smoke case has an unsupported label")
+        if any(
+            not isinstance(value, str) or value not in allowed[name]
+            for name, value in labels.items()
+        ):
+            raise BenchmarkInputError(
+                "invalid_smoke_manifest", "smoke case has an unsupported label"
+            )
         audio_path = _source_path(
             manifest_path,
             item["audio_path"],
             "audio path",
-            allow_missing=audio_source == "derived_render" and allow_missing_derived_audio,
+            allow_missing=audio_source == "derived_render"
+            and allow_missing_derived_audio,
         )
         midi_path = _source_path(manifest_path, item["midi_path"], "MIDI path")
         if audio_path in audio_paths or (audio_path, midi_path) in pair_paths:
-            raise BenchmarkInputError("invalid_smoke_manifest", "smoke manifest contains a duplicate source pair")
+            raise BenchmarkInputError(
+                "invalid_smoke_manifest",
+                "smoke manifest contains a duplicate source pair",
+            )
         audio_paths.add(audio_path)
         pair_paths.add((audio_path, midi_path))
         cases.append(
@@ -295,12 +378,58 @@ def load_manifest(
                 **labels,
             )
         )
-    return tuple(cases)
+    validated_cases = tuple(cases)
+    _validate_coverage(validated_cases, config)
+    return validated_cases
 
 
 def coverage_summary(cases: Sequence[SmokeCase]) -> dict[str, dict[str, int]]:
-    fields = ("audio_source", "performance", "role", "envelope", "duration_class", "note_density_class")
-    return {field: dict(sorted(Counter(getattr(case, field) for case in cases).items())) for field in fields}
+    fields = (
+        "audio_source",
+        "performance",
+        "role",
+        "envelope",
+        "duration_class",
+        "note_density_class",
+    )
+    return {
+        field: dict(sorted(Counter(getattr(case, field) for case in cases).items()))
+        for field in fields
+    }
+
+
+def coverage_contract(
+    cases: Sequence[SmokeCase], config: BenchmarkConfig
+) -> dict[str, Any]:
+    observed = coverage_summary(cases)
+    missing = {
+        requirement: [
+            value
+            for value in required_values
+            if observed.get(_COVERAGE_CASE_FIELDS[requirement], {}).get(value, 0) == 0
+        ]
+        for requirement, required_values in config.coverage.items()
+    }
+    missing = {field: values for field, values in missing.items() if values}
+    return {
+        "status": "complete" if not missing else "incomplete",
+        "required": {field: list(values) for field, values in config.coverage.items()},
+        "observed": observed,
+        "missing": missing,
+    }
+
+
+def _validate_coverage(cases: Sequence[SmokeCase], config: BenchmarkConfig) -> None:
+    contract = coverage_contract(cases, config)
+    if contract["missing"]:
+        missing = ", ".join(
+            f"{field}={','.join(values)}"
+            for field, values in contract["missing"].items()
+        )
+        raise BenchmarkInputError(
+            "incomplete_smoke_coverage",
+            f"smoke manifest is missing required representative coverage: {missing}",
+        )
 
 
 def _approved_derived_output_root() -> Path:
@@ -310,16 +439,28 @@ def _approved_derived_output_root() -> Path:
 def _validate_derived_destination(case: SmokeCase, output_root: Path) -> Path:
     destination = case.audio_path.resolve(strict=False)
     if destination == output_root or not destination.is_relative_to(output_root):
-        raise BenchmarkInputError("derived_render_destination_invalid", "derived audio destination is outside approved outputs")
+        raise BenchmarkInputError(
+            "derived_render_destination_invalid",
+            "derived audio destination is outside approved outputs",
+        )
     if destination.suffix.lower() != ".wav":
-        raise BenchmarkInputError("derived_render_destination_invalid", "derived audio destination must be a WAV")
+        raise BenchmarkInputError(
+            "derived_render_destination_invalid",
+            "derived audio destination must be a WAV",
+        )
     for source in (case.preset_path, case.midi_path):
         assert source is not None
         source_root = source.parent.resolve()
         if destination == source_root or destination.is_relative_to(source_root):
-            raise BenchmarkInputError("derived_render_destination_invalid", "derived audio destination overlaps a source directory")
+            raise BenchmarkInputError(
+                "derived_render_destination_invalid",
+                "derived audio destination overlaps a source directory",
+            )
     if destination.exists() and not destination.is_file():
-        raise BenchmarkInputError("derived_render_destination_invalid", "derived audio destination is not a file")
+        raise BenchmarkInputError(
+            "derived_render_destination_invalid",
+            "derived audio destination is not a file",
+        )
     return destination
 
 
@@ -327,7 +468,12 @@ def _atomic_json_write(path: Path, value: Mapping[str, Any]) -> None:
     temporary: Path | None = None
     try:
         with tempfile.NamedTemporaryFile(
-            "w", encoding="utf-8", dir=path.parent, prefix=f".{path.name}.", suffix=".tmp", delete=False
+            "w",
+            encoding="utf-8",
+            dir=path.parent,
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            delete=False,
         ) as handle:
             temporary = Path(handle.name)
             json.dump(value, handle, indent=2, sort_keys=True)
@@ -350,7 +496,9 @@ def _sha256_file(path: Path) -> str:
 
 
 def _data_generation_root() -> Path:
-    return (Path(__file__).resolve().parents[4] / "research" / "data_generation").resolve()
+    return (
+        Path(__file__).resolve().parents[4] / "research" / "data_generation"
+    ).resolve()
 
 
 def _default_vital_plugin_path() -> Path | None:
@@ -363,7 +511,10 @@ def _default_vital_plugin_path() -> Path | None:
     elif sys.platform == "darwin":
         candidates = [Path("/Library/Audio/Plug-Ins/VST3/Vital.vst3")]
     else:
-        candidates = [Path("/usr/lib/vst3/Vital.vst3"), Path("/usr/local/lib/vst3/Vital.vst3")]
+        candidates = [
+            Path("/usr/lib/vst3/Vital.vst3"),
+            Path("/usr/local/lib/vst3/Vital.vst3"),
+        ]
     return next((path for path in candidates if path.exists()), None)
 
 
@@ -408,9 +559,20 @@ class PedalboardVitalRenderer:
     tail_seconds = 2.0
     midi_timestamp_epsilon_seconds = 1e-9
 
-    def __init__(self, *, config_path: Path, plugin_path: Path, vital_sha256: str, buffer_size: int,
-                 capabilities: Any, qa_config: Any, pedalboard_module: Any, state_template: Any,
-                 plugin: Any, pedalboard_version: str):
+    def __init__(
+        self,
+        *,
+        config_path: Path,
+        plugin_path: Path,
+        vital_sha256: str,
+        buffer_size: int,
+        capabilities: Any,
+        qa_config: Any,
+        pedalboard_module: Any,
+        state_template: Any,
+        plugin: Any,
+        pedalboard_version: str,
+    ):
         self.config_path = config_path.resolve()
         self.plugin_path = plugin_path.resolve()
         self.vital_sha256 = vital_sha256
@@ -421,7 +583,9 @@ class PedalboardVitalRenderer:
         self._state_template = state_template
         self._plugin = plugin
         self.pedalboard_version = pedalboard_version
-        self.renderer_id = f"vital-{self.vital_sha256}-pedalboard-{self.pedalboard_version}"
+        self.renderer_id = (
+            f"vital-{self.vital_sha256}-pedalboard-{self.pedalboard_version}"
+        )
 
     @classmethod
     def from_config(cls, config_path: str | Path) -> PedalboardVitalRenderer:
@@ -430,14 +594,18 @@ class PedalboardVitalRenderer:
             document = yaml.safe_load(config.read_text(encoding="utf-8"))
             if not isinstance(document, Mapping) or document.get("version") != 1:
                 raise ValueError("unsupported renderer configuration")
-            accepted = {str(item).lower() for item in document.get("accepted_plugin_sha256", [])}
+            accepted = {
+                str(item).lower() for item in document.get("accepted_plugin_sha256", [])
+            }
             if not accepted:
                 raise ValueError("renderer configuration has no accepted Vital digest")
             buffer_size = int(document.get("buffer_size", 0))
             if buffer_size != 128:
                 raise ValueError("the approved Vital buffer size must be 128")
             configured = document.get("plugin_path")
-            plugin_path = Path(str(configured)) if configured else _default_vital_plugin_path()
+            plugin_path = (
+                Path(str(configured)) if configured else _default_vital_plugin_path()
+            )
             if plugin_path is None:
                 raise FileNotFoundError("Vital VST3 was not found")
             plugin_path = plugin_path.resolve(strict=True)
@@ -448,10 +616,19 @@ class PedalboardVitalRenderer:
                 raise ValueError("Vital VST3 SHA-256 is not accepted by renderer.yaml")
             capabilities_data = document.get("capabilities", {})
             qa_data = document.get("qa", {})
-            if not isinstance(capabilities_data, Mapping) or not isinstance(qa_data, Mapping):
+            if not isinstance(capabilities_data, Mapping) or not isinstance(
+                qa_data, Mapping
+            ):
                 raise TypeError("renderer configuration sections are invalid")
             (
-                _, _, renderer_capabilities, audio_quality_config, _, vital_state_template, _, _
+                _,
+                _,
+                renderer_capabilities,
+                audio_quality_config,
+                _,
+                vital_state_template,
+                _,
+                _,
             ) = _import_data_generation_modules()
             capabilities = renderer_capabilities.from_dict(dict(capabilities_data))
             qa_config = audio_quality_config(**dict(qa_data))
@@ -468,8 +645,12 @@ class PedalboardVitalRenderer:
             if not isinstance(raw_state, (bytes, bytearray)):
                 raise TypeError("Pedalboard Vital plugin has no byte raw_state")
             state_template = vital_state_template(bytes(raw_state))
-            if not callable(getattr(plugin, "reset", None)) or not callable(getattr(plugin, "process", None)):
-                raise TypeError("installed Pedalboard Vital plugin lacks reset/process support")
+            if not callable(getattr(plugin, "reset", None)) or not callable(
+                getattr(plugin, "process", None)
+            ):
+                raise TypeError(
+                    "installed Pedalboard Vital plugin lacks reset/process support"
+                )
             return cls(
                 config_path=config,
                 plugin_path=plugin_path,
@@ -487,7 +668,9 @@ class PedalboardVitalRenderer:
         except Exception as exc:
             raise DerivedRenderUnavailable() from exc
 
-    def _timestamped_midi(self, performance: Any, tempo_map: Any) -> list[tuple[bytes, float]]:
+    def _timestamped_midi(
+        self, performance: Any, tempo_map: Any
+    ) -> list[tuple[bytes, float]]:
         messages: list[tuple[bytes, float]] = []
         previous_source_timestamp = -float("inf")
         previous_emitted_timestamp = -float("inf")
@@ -504,14 +687,20 @@ class PedalboardVitalRenderer:
             previous_source_timestamp = source_timestamp
             previous_emitted_timestamp = timestamp
             if event.kind.value == "note_on":
-                message = bytes((0x90 | channel, int(event.data[0]), int(event.data[1])))
+                message = bytes(
+                    (0x90 | channel, int(event.data[0]), int(event.data[1]))
+                )
             elif event.kind.value == "note_off":
-                message = bytes((0x80 | channel, int(event.data[0]), int(event.data[1])))
+                message = bytes(
+                    (0x80 | channel, int(event.data[0]), int(event.data[1]))
+                )
             elif event.kind.value == "pitch_bend":
                 value = int(event.data[0]) + 8192
                 message = bytes((0xE0 | channel, value & 0x7F, (value >> 7) & 0x7F))
             elif event.kind.value == "control_change":
-                message = bytes((0xB0 | channel, int(event.data[0]), int(event.data[1])))
+                message = bytes(
+                    (0xB0 | channel, int(event.data[0]), int(event.data[1]))
+                )
             elif event.kind.value == "channel_pressure":
                 message = bytes((0xD0 | channel, int(event.data[0])))
             elif event.kind.value in {"tempo", "time_signature", "opaque"}:
@@ -562,20 +751,28 @@ class PedalboardVitalRenderer:
             return audio[:, :frame_count], corrected_duration, f"host-boundary trim ({corrected_frames}->{frame_count})"
         raise ValueError(f"Pedalboard returned an unexpected corrected frame count ({corrected_frames} != {frame_count})")
 
-    def render(self, preset_path: Path, midi_path: Path, destination: Path, output_root: Path) -> None:
+    def render(
+        self, preset_path: Path, midi_path: Path, destination: Path, output_root: Path
+    ) -> None:
         if destination.exists():
             raise DerivedRenderUnavailable("derived_render_failed")
         destination = destination.resolve(strict=False)
         output_root = output_root.resolve()
         if destination == output_root or not destination.is_relative_to(output_root):
-            raise BenchmarkInputError("derived_render_destination_invalid", "derived audio destination is outside approved outputs")
+            raise BenchmarkInputError(
+                "derived_render_destination_invalid",
+                "derived audio destination is outside approved outputs",
+            )
         for source in (preset_path, midi_path):
             source_root = source.resolve(strict=True).parent
             if destination == source_root or destination.is_relative_to(source_root):
-                raise BenchmarkInputError("derived_render_destination_invalid", "derived audio destination overlaps a source directory")
-        (
-            Performance, tempo_map_type, _, _, analyze_audio, _, _, Severity
-        ) = _import_data_generation_modules()
+                raise BenchmarkInputError(
+                    "derived_render_destination_invalid",
+                    "derived audio destination overlaps a source directory",
+                )
+        (Performance, tempo_map_type, _, _, analyze_audio, _, _, Severity) = (
+            _import_data_generation_modules()
+        )
         try:
             import numpy as np
             from scipy.io import wavfile
@@ -586,6 +783,9 @@ class PedalboardVitalRenderer:
             performance.validate().require_valid()
             timing = tempo_map_type.from_performance(performance)
             state = self._state_template.build(preset_json)
+            self._plugin.reset()
+            self._plugin.raw_state = state
+            self._plugin.reset()
             tempo_events = [event for event in performance.canonical_events() if event.kind.value == "tempo"]
             tempo_setting_status = "not_applicable"
             tempo_bpm = None
@@ -596,13 +796,17 @@ class PedalboardVitalRenderer:
                     tempo_setting_status = "applied"
                 except (TypeError, ValueError):
                     tempo_setting_status = "host_rejected_value_not_clamped"
-            frame_count = timing.render_frame_count(performance.end_tick, self.tail_seconds, self.sample_rate)
+            frame_count = timing.render_frame_count(
+                performance.end_tick, self.tail_seconds, self.sample_rate
+            )
             duration = frame_count / self.sample_rate
             channel_first, host_duration, duration_rounding = self._process_exact_frames(
                 state, self._timestamped_midi(performance, timing), frame_count, np
             )
             rendered = np.ascontiguousarray(channel_first.T)
-            if rendered.shape != (frame_count, self.channels) or not bool(np.isfinite(rendered).all()):
+            if rendered.shape != (frame_count, self.channels) or not bool(
+                np.isfinite(rendered).all()
+            ):
                 raise ValueError("Pedalboard returned invalid Vital audio")
             qa, diagnostics = analyze_audio(
                 rendered,
@@ -616,7 +820,12 @@ class PedalboardVitalRenderer:
             destination.parent.mkdir(parents=True, exist_ok=True)
             temporary: Path | None = None
             try:
-                with tempfile.NamedTemporaryFile(dir=destination.parent, prefix=f".{destination.name}.", suffix=".tmp", delete=False) as stream:
+                with tempfile.NamedTemporaryFile(
+                    dir=destination.parent,
+                    prefix=f".{destination.name}.",
+                    suffix=".tmp",
+                    delete=False,
+                ) as stream:
                     temporary = Path(stream.name)
                 wavfile.write(temporary, self.sample_rate, rendered)
                 os.replace(temporary, destination)
@@ -670,18 +879,32 @@ class PedalboardVitalRenderer:
 
 
 def _validated_vital_renderer() -> PedalboardVitalRenderer:
-    return PedalboardVitalRenderer.from_config(_data_generation_root() / "configs" / "renderer.yaml")
+    return PedalboardVitalRenderer.from_config(
+        _data_generation_root() / "configs" / "renderer.yaml"
+    )
 
 
-def render_derived_vital_audio(renderer: PedalboardVitalRenderer, preset_path: Path, midi_path: Path,
-                               destination: Path, output_root: Path) -> None:
+def render_derived_vital_audio(
+    renderer: PedalboardVitalRenderer,
+    preset_path: Path,
+    midi_path: Path,
+    destination: Path,
+    output_root: Path,
+) -> None:
     """Render one approved derived WAV through the #24 Pedalboard/Vital seam."""
     renderer.render(preset_path, midi_path, destination, output_root)
 
 
-def _render_derived_audio(renderer: PedalboardVitalRenderer, case: SmokeCase, destination: Path, output_root: Path) -> None:
+def _render_derived_audio(
+    renderer: PedalboardVitalRenderer,
+    case: SmokeCase,
+    destination: Path,
+    output_root: Path,
+) -> None:
     assert case.preset_path is not None
-    render_derived_vital_audio(renderer, case.preset_path, case.midi_path, destination, output_root)
+    render_derived_vital_audio(
+        renderer, case.preset_path, case.midi_path, destination, output_root
+    )
 
 
 def prepare_derived_renders(path: str | Path, config: BenchmarkConfig) -> None:
@@ -705,12 +928,21 @@ def prepare_derived_renders(path: str | Path, config: BenchmarkConfig) -> None:
             try:
                 metadata = json.loads(sidecar.read_text(encoding="utf-8"))
             except (OSError, json.JSONDecodeError) as exc:
-                raise BenchmarkInputError("derived_render_destination_invalid", "existing derived audio lacks provenance") from exc
+                raise BenchmarkInputError(
+                    "derived_render_destination_invalid",
+                    "existing derived audio lacks provenance",
+                ) from exc
             if metadata.get("audio_source") != "derived_render":
-                raise BenchmarkInputError("derived_render_destination_invalid", "existing audio is not labeled as derived")
+                raise BenchmarkInputError(
+                    "derived_render_destination_invalid",
+                    "existing audio is not labeled as derived",
+                )
             continue
         if sidecar.exists():
-            raise BenchmarkInputError("derived_render_destination_invalid", "derived audio provenance exists without audio")
+            raise BenchmarkInputError(
+                "derived_render_destination_invalid",
+                "derived audio provenance exists without audio",
+            )
         if renderer is None:
             renderer = _validated_vital_renderer()
         _render_derived_audio(renderer, case, destination, output_root)
@@ -731,7 +963,9 @@ def aggregate_measurements(values: Sequence[float]) -> dict[str, float]:
     }
 
 
-def _aggregate_optional(rows: Sequence[Mapping[str, Any]], field: str) -> dict[str, Any]:
+def _aggregate_optional(
+    rows: Sequence[Mapping[str, Any]], field: str
+) -> dict[str, Any]:
     values = [row.get(field) for row in rows]
     present = [float(value) for value in values if value is not None]
     if not present:
@@ -741,7 +975,9 @@ def _aggregate_optional(rows: Sequence[Mapping[str, Any]], field: str) -> dict[s
     return {"value": aggregate_measurements(present), "measurement_status": "ok"}
 
 
-def _aggregate_end_to_end_cases(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+def _aggregate_end_to_end_cases(
+    rows: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
     """Aggregate anonymous per-case E2E rows across every fresh worker."""
     case_rows = [row.get("end_to_end", {}).get("cases", []) for row in rows]
     indexes = [tuple(int(item["case_index"]) for item in cases) for cases in case_rows]
@@ -753,13 +989,17 @@ def _aggregate_end_to_end_cases(rows: Sequence[Mapping[str, Any]]) -> list[dict[
         for field in ("status", "audio_seconds", "note_event_count"):
             values = [item[field] for item in repetitions]
             if any(value != values[0] for value in values[1:]):
-                raise ValueError(f"end-to-end invariant {field} differs for case {case_index}")
+                raise ValueError(
+                    f"end-to-end invariant {field} differs for case {case_index}"
+                )
         aggregated.append(
             {
                 "case_index": case_index,
                 "status": repetitions[0]["status"],
                 "audio_seconds": repetitions[0]["audio_seconds"],
-                "wall_seconds": aggregate_measurements([float(item["wall_seconds"]) for item in repetitions]),
+                "wall_seconds": aggregate_measurements(
+                    [float(item["wall_seconds"]) for item in repetitions]
+                ),
                 "note_event_count": repetitions[0]["note_event_count"],
             }
         )
@@ -778,7 +1018,11 @@ def _aggregate_memory(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     )
     result = {field: _aggregate_optional(memory_rows, field) for field in fields}
     statuses = [memory.get("measurement_status") for memory in memory_rows]
-    result["measurement_status"] = "ok" if statuses and all(status == "ok" for status in statuses) else "unavailable"
+    result["measurement_status"] = (
+        "ok"
+        if statuses and all(status == "ok" for status in statuses)
+        else "unavailable"
+    )
     statistics_keys = sorted(
         {
             str(key)
@@ -788,7 +1032,10 @@ def _aggregate_memory(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     )
     result["openvino_gpu_memory_statistics_bytes"] = {
         key: _aggregate_optional(
-            [memory.get("openvino_gpu_memory_statistics_bytes") or {} for memory in memory_rows],
+            [
+                memory.get("openvino_gpu_memory_statistics_bytes") or {}
+                for memory in memory_rows
+            ],
             key,
         )
         for key in statistics_keys
@@ -798,9 +1045,14 @@ def _aggregate_memory(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     return result
 
 
-def crossover_audio_seconds(startup_a: float, throughput_a: float, startup_b: float, throughput_b: float) -> float | None:
+def crossover_audio_seconds(
+    startup_a: float, throughput_a: float, startup_b: float, throughput_b: float
+) -> float | None:
     """Apply the fixed crossover formula, returning only positive finite results."""
-    if not all(math.isfinite(value) and value > 0 for value in (startup_a, throughput_a, startup_b, throughput_b)):
+    if not all(
+        math.isfinite(value) and value > 0
+        for value in (startup_a, throughput_a, startup_b, throughput_b)
+    ):
         return None
     if not startup_b > startup_a or not throughput_b > throughput_a:
         return None
@@ -865,6 +1117,9 @@ def _benchmark_run_identity(
         "smoke_contract": {
             "case_count": len(cases),
             "coverage": coverage_summary(cases),
+            "coverage_requirements": {
+                name: list(values) for name, values in config.coverage.items()
+            },
             "batch_sizes": list(config.batch_sizes),
             "end_to_end_batch_size": config.end_to_end_batch_size,
             "process_repetitions": config.process_repetitions,
@@ -899,7 +1154,12 @@ def _current_parity_diagnostics(
         repetitions = row.get("parity_repetitions", [])
         aggregate = {
             name: max(
-                (float(item["parity"][name]) for item in repetitions if isinstance(item.get("parity"), Mapping) and item["parity"].get(name) is not None),
+                (
+                    float(item["parity"][name])
+                    for item in repetitions
+                    if isinstance(item.get("parity"), Mapping)
+                    and item["parity"].get(name) is not None
+                ),
                 default=None,
             )
             for name in metrics
@@ -935,7 +1195,10 @@ def _corpus_inference_decision(
         for row in inference
         if row.get("status") == "ok"
         and row.get("parity_status") == "passed"
-        and row.get("end_to_end", {}).get("audio_seconds_per_wall_second", {}).get("median") is not None
+        and row.get("end_to_end", {})
+        .get("audio_seconds_per_wall_second", {})
+        .get("median")
+        is not None
     ]
     selected = max(
         candidates,
@@ -971,18 +1234,32 @@ def _corpus_inference_decision(
         "selection_rule": "highest median end-to-end audio-seconds/wall-second among successful parity-safe inference routes",
         "supporting_run_identity": dict(run_identity),
         "supporting_measurement": {
-            "audio_seconds_per_wall_second_median": selected["end_to_end"]["audio_seconds_per_wall_second"]["median"],
-            "model_call_batch_1_audio_seconds_per_second_median": selected["batch_results"]["1"]["audio_seconds_per_second"]["median"],
+            "audio_seconds_per_wall_second_median": selected["end_to_end"][
+                "audio_seconds_per_wall_second"
+            ]["median"],
+            "model_call_batch_1_audio_seconds_per_second_median": selected[
+                "batch_results"
+            ]["1"]["audio_seconds_per_second"]["median"],
         },
     }
 
 
 def _committed_report_revision() -> str | None:
-    report_path = Path(__file__).resolve().parents[1] / "reports" / "backend_benchmark.json"
+    report_path = (
+        Path(__file__).resolve().parents[1] / "reports" / "backend_benchmark.json"
+    )
     workspace = Path(__file__).resolve().parents[4]
     try:
         completed = subprocess.run(
-            ["git", "log", "-n", "1", "--format=%H", "--", str(report_path.relative_to(workspace))],
+            [
+                "git",
+                "log",
+                "-n",
+                "1",
+                "--format=%H",
+                "--",
+                str(report_path.relative_to(workspace)),
+            ],
             cwd=workspace,
             capture_output=True,
             check=False,
@@ -994,13 +1271,21 @@ def _committed_report_revision() -> str | None:
     return revision if completed.returncode == 0 and revision else None
 
 
-def _historical_evidence(previous: Mapping[str, Any], checkpoint: Path) -> dict[str, Any]:
-    history = dict(previous.get("historical_evidence", {})) if isinstance(previous.get("historical_evidence"), Mapping) else {}
+def _historical_evidence(
+    previous: Mapping[str, Any], checkpoint: Path
+) -> dict[str, Any]:
+    history = (
+        dict(previous.get("historical_evidence", {}))
+        if isinstance(previous.get("historical_evidence"), Mapping)
+        else {}
+    )
     identity = previous.get("run_identity")
     if not isinstance(identity, Mapping):
         identity = {
             "model_id": previous.get("model_id", MODEL_ID),
-            "source_git_blob_sha1": previous.get("source_git_blob_sha1", SPOTIFY_ONNX_GIT_BLOB_SHA1),
+            "source_git_blob_sha1": previous.get(
+                "source_git_blob_sha1", SPOTIFY_ONNX_GIT_BLOB_SHA1
+            ),
             "checkpoint": _checkpoint_identity(checkpoint),
             "code_revision": _committed_report_revision(),
             "runtime": previous.get("runtime", {}),
@@ -1044,9 +1329,13 @@ def _verify_source_snapshot(snapshot: Mapping[Path, tuple[int, int]]) -> None:
         try:
             current = path.stat()
         except OSError as exc:
-            raise SourceMutationError("an immutable benchmark source disappeared during execution") from exc
+            raise SourceMutationError(
+                "an immutable benchmark source disappeared during execution"
+            ) from exc
         if (current.st_size, current.st_mtime_ns) != before:
-            raise SourceMutationError("an immutable benchmark source changed during execution")
+            raise SourceMutationError(
+                "an immutable benchmark source changed during execution"
+            )
 
 
 def _worker_request(
@@ -1107,7 +1396,9 @@ def _run_worker(request: Mapping[str, Any]) -> dict[str, Any]:
     return result
 
 
-def _aggregate_route(rows: Sequence[Mapping[str, Any]], route: str, mode: str, config: BenchmarkConfig) -> dict[str, Any]:
+def _aggregate_route(
+    rows: Sequence[Mapping[str, Any]], route: str, mode: str, config: BenchmarkConfig
+) -> dict[str, Any]:
     statuses = [row.get("status") for row in rows]
     if any(status == "parity_failed" for status in statuses):
         status = "parity_failed"
@@ -1125,7 +1416,9 @@ def _aggregate_route(rows: Sequence[Mapping[str, Any]], route: str, mode: str, c
         "status": status,
         "repetitions": len(rows),
     }
-    failure_codes = sorted({str(row["failure_code"]) for row in rows if row.get("failure_code")})
+    failure_codes = sorted(
+        {str(row["failure_code"]) for row in rows if row.get("failure_code")}
+    )
     if failure_codes:
         result["failure_codes"] = failure_codes
     parity_rows = [
@@ -1142,7 +1435,9 @@ def _aggregate_route(rows: Sequence[Mapping[str, Any]], route: str, mode: str, c
     if status != "ok":
         return result
 
-    backend_rows = [row.get("backend") for row in rows if isinstance(row.get("backend"), Mapping)]
+    backend_rows = [
+        row.get("backend") for row in rows if isinstance(row.get("backend"), Mapping)
+    ]
     if backend_rows:
         result["backend"] = backend_rows[0]
 
@@ -1154,7 +1449,10 @@ def _aggregate_route(rows: Sequence[Mapping[str, Any]], route: str, mode: str, c
         "openvino_conversion_seconds",
         "openvino_compile_seconds",
     )
-    result["startup"] = {field: _aggregate_optional([row["startup"] for row in rows], field) for field in startup_fields}
+    result["startup"] = {
+        field: _aggregate_optional([row["startup"] for row in rows], field)
+        for field in startup_fields
+    }
     startup_values = [
         sum(
             float(row["startup"][field])
@@ -1163,7 +1461,10 @@ def _aggregate_route(rows: Sequence[Mapping[str, Any]], route: str, mode: str, c
         )
         for row in rows
     ]
-    result["startup"]["total_seconds"] = {"value": aggregate_measurements(startup_values), "measurement_status": "ok"}
+    result["startup"]["total_seconds"] = {
+        "value": aggregate_measurements(startup_values),
+        "measurement_status": "ok",
+    }
     result["parity"] = {
         name: max(float(row["parity"][name]) for row in rows)
         for name in (
@@ -1187,11 +1488,15 @@ def _aggregate_route(rows: Sequence[Mapping[str, Any]], route: str, mode: str, c
     for batch_size in config.batch_sizes:
         values = [row[source_key]["batch_sizes"][str(batch_size)] for row in rows]
         phase_fields = (
-            "first_inference_seconds",
-            "inference_warmup_seconds",
-        ) if mode == "inference" else (
-            "first_training_step_seconds",
-            "training_warmup_seconds",
+            (
+                "first_inference_seconds",
+                "inference_warmup_seconds",
+            )
+            if mode == "inference"
+            else (
+                "first_training_step_seconds",
+                "training_warmup_seconds",
+            )
         )
         result["batch_results"][str(batch_size)] = {
             field: aggregate_measurements([float(value[field]) for value in values])
@@ -1203,18 +1508,29 @@ def _aggregate_route(rows: Sequence[Mapping[str, Any]], route: str, mode: str, c
                 "total_seconds",
             )
         }
-        result["batch_results"][str(batch_size)]["windows_per_second"] = aggregate_measurements(
-            [float(value["windows_per_second"]) for value in values]
+        result["batch_results"][str(batch_size)]["windows_per_second"] = (
+            aggregate_measurements(
+                [float(value["windows_per_second"]) for value in values]
+            )
         )
-        result["batch_results"][str(batch_size)]["audio_seconds_per_second"] = aggregate_measurements(
-            [float(value["audio_seconds_per_second"]) for value in values]
+        result["batch_results"][str(batch_size)]["audio_seconds_per_second"] = (
+            aggregate_measurements(
+                [float(value["audio_seconds_per_second"]) for value in values]
+            )
         )
     if mode == "inference":
         result["end_to_end"] = {
-            "audio_seconds": aggregate_measurements([float(row["end_to_end"]["audio_seconds"]) for row in rows]),
-            "wall_seconds": aggregate_measurements([float(row["end_to_end"]["wall_seconds"]) for row in rows]),
+            "audio_seconds": aggregate_measurements(
+                [float(row["end_to_end"]["audio_seconds"]) for row in rows]
+            ),
+            "wall_seconds": aggregate_measurements(
+                [float(row["end_to_end"]["wall_seconds"]) for row in rows]
+            ),
             "audio_seconds_per_wall_second": aggregate_measurements(
-                [float(row["end_to_end"]["audio_seconds_per_wall_second"]) for row in rows]
+                [
+                    float(row["end_to_end"]["audio_seconds_per_wall_second"])
+                    for row in rows
+                ]
             ),
             "cases": _aggregate_end_to_end_cases(rows),
         }
@@ -1271,7 +1587,9 @@ def _parity_route_status(rows: Sequence[Mapping[str, Any]]) -> str:
     return "ok"
 
 
-def _parity_route_report(route: str, rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+def _parity_route_report(
+    route: str, rows: Sequence[Mapping[str, Any]]
+) -> dict[str, Any]:
     values = [row["parity"] for row in rows if isinstance(row.get("parity"), Mapping)]
     aggregate: dict[str, Any] = {}
     for name in _PARITY_DIAGNOSTIC_METRICS:
@@ -1365,9 +1683,23 @@ def _unavailable_report(
             "failure_code": code,
             "case_count": len(cases),
             "coverage": coverage_summary(cases) if cases else {},
+            "coverage_contract": coverage_contract(cases, config)
+            if cases
+            else {
+                "status": "not_validated",
+                "required": {
+                    name: list(values) for name, values in config.coverage.items()
+                },
+                "observed": {},
+                "missing": {},
+            },
         },
-        "inference": [_unavailable_route(route, "inference", code) for route in INFERENCE_ROUTES],
-        "training": [_unavailable_route(route, "training", code) for route in TRAINING_ROUTES],
+        "inference": [
+            _unavailable_route(route, "inference", code) for route in INFERENCE_ROUTES
+        ],
+        "training": [
+            _unavailable_route(route, "training", code) for route in TRAINING_ROUTES
+        ],
         "crossovers": [],
         "conclusions": {"status": "blocked", "reason": reason},
     }
@@ -1383,11 +1715,23 @@ def _crossover_rows(inference: Sequence[Mapping[str, Any]]) -> list[dict[str, An
                 continue
             left_start = float(left["startup"]["total_seconds"]["value"]["median"])
             right_start = float(right["startup"]["total_seconds"]["value"]["median"])
-            left_rate = float(left["batch_results"]["1"]["audio_seconds_per_second"]["median"])
-            right_rate = float(right["batch_results"]["1"]["audio_seconds_per_second"]["median"])
-            distance = crossover_audio_seconds(left_start, left_rate, right_start, right_rate)
+            left_rate = float(
+                left["batch_results"]["1"]["audio_seconds_per_second"]["median"]
+            )
+            right_rate = float(
+                right["batch_results"]["1"]["audio_seconds_per_second"]["median"]
+            )
+            distance = crossover_audio_seconds(
+                left_start, left_rate, right_start, right_rate
+            )
             if distance is not None:
-                rows.append({"route_a": left["route"], "route_b": right["route"], "audio_seconds": distance})
+                rows.append(
+                    {
+                        "route_a": left["route"],
+                        "route_b": right["route"],
+                        "audio_seconds": distance,
+                    }
+                )
     return rows
 
 
@@ -1463,22 +1807,31 @@ def run_benchmark(
             "case_count": len(cases),
             "total_audio_seconds": total_audio_seconds,
             "coverage": coverage_summary(cases),
+            "coverage_contract": coverage_contract(cases, config),
             "cases": [case.sanitized() for case in cases],
         },
         "inference": inference,
         "training": training,
-        "parity_diagnostics": _current_parity_diagnostics(inference, config, run_identity),
-        "corpus_inference_decision": _corpus_inference_decision(inference, run_identity, xpu_index=xpu_index),
+        "parity_diagnostics": _current_parity_diagnostics(
+            inference, config, run_identity
+        ),
+        "corpus_inference_decision": _corpus_inference_decision(
+            inference, run_identity, xpu_index=xpu_index
+        ),
         "crossovers": _crossover_rows(inference),
         "conclusions": {
             "inference_highest_batch_1_audio_throughput": max(
                 (row for row in inference if row.get("status") == "ok"),
-                key=lambda row: row["batch_results"]["1"]["audio_seconds_per_second"]["median"],
+                key=lambda row: row["batch_results"]["1"]["audio_seconds_per_second"][
+                    "median"
+                ],
                 default=None,
             ),
             "training_highest_batch_1_audio_throughput": max(
                 (row for row in training if row.get("status") == "ok"),
-                key=lambda row: row["batch_results"]["1"]["audio_seconds_per_second"]["median"],
+                key=lambda row: row["batch_results"]["1"]["audio_seconds_per_second"][
+                    "median"
+                ],
                 default=None,
             ),
         },
@@ -1497,11 +1850,20 @@ def run_benchmark(
     return report
 
 
-def _approved_report_paths(json_path: str | Path, markdown_path: str | Path) -> tuple[Path, Path]:
+def _approved_report_paths(
+    json_path: str | Path, markdown_path: str | Path
+) -> tuple[Path, Path]:
     reports_root = (Path(__file__).resolve().parents[1] / "reports").resolve()
-    resolved = tuple(Path(path).resolve(strict=False) for path in (json_path, markdown_path))
-    if any(path == reports_root or not path.is_relative_to(reports_root) for path in resolved):
-        raise ValueError("benchmark reports must be inside the approved reports directory")
+    resolved = tuple(
+        Path(path).resolve(strict=False) for path in (json_path, markdown_path)
+    )
+    if any(
+        path == reports_root or not path.is_relative_to(reports_root)
+        for path in resolved
+    ):
+        raise ValueError(
+            "benchmark reports must be inside the approved reports directory"
+        )
     return resolved
 
 
@@ -1574,15 +1936,36 @@ def _parity_diagnostics_markdown(report: Mapping[str, Any]) -> list[str]:
         ("Non-finite contour values (must be 0)", "contour_non_finite_count"),
         ("Non-finite note values (must be 0)", "note_non_finite_count"),
         ("Non-finite onset values (must be 0)", "onset_non_finite_count"),
-        (f"Maximum contour absolute error (<= {contour_limit})", "contour_max_abs_error"),
+        (
+            f"Maximum contour absolute error (<= {contour_limit})",
+            "contour_max_abs_error",
+        ),
         (f"Maximum note absolute error (<= {note_limit})", "note_max_abs_error"),
         (f"Maximum onset absolute error (<= {onset_limit})", "onset_max_abs_error"),
-        (f"Note-frame threshold disagreements (threshold {note_threshold}; must be 0)", "note_threshold_disagreements"),
-        (f"Onset threshold disagreements (threshold {onset_threshold}; must be 0)", "onset_threshold_disagreements"),
-        ("Generated note-event count disagreements (must be 0)", "event_count_disagreements"),
-        ("Generated note-event structural disagreements (must be 0)", "event_structure_disagreements"),
-        ("(start_time_s, end_time_s, MIDI pitch) disagreements (must be 0)", "event_tuple_disagreements"),
-        ("Pitch-bend element disagreements (must be 0)", "pitch_bend_element_disagreements"),
+        (
+            f"Note-frame threshold disagreements (threshold {note_threshold}; must be 0)",
+            "note_threshold_disagreements",
+        ),
+        (
+            f"Onset threshold disagreements (threshold {onset_threshold}; must be 0)",
+            "onset_threshold_disagreements",
+        ),
+        (
+            "Generated note-event count disagreements (must be 0)",
+            "event_count_disagreements",
+        ),
+        (
+            "Generated note-event structural disagreements (must be 0)",
+            "event_structure_disagreements",
+        ),
+        (
+            "(start_time_s, end_time_s, MIDI pitch) disagreements (must be 0)",
+            "event_tuple_disagreements",
+        ),
+        (
+            "Pitch-bend element disagreements (must be 0)",
+            "pitch_bend_element_disagreements",
+        ),
     )
     route_labels = (
         ("pytorch_cpu", "PyTorch CPU"),
@@ -1595,14 +1978,23 @@ def _parity_diagnostics_markdown(report: Mapping[str, Any]) -> list[str]:
         "## Parity diagnostics by framework and processor",
         "",
         f"The gate was evaluated on `{diagnostics.get('process_repetitions', 'n/a')}` fresh-process repetitions of `{diagnostics.get('scope', 'the public synthetic suite')}`. Each cell reports the maximum observed value across repetitions; the JSON retains each repetition separately.",
-        "| Parity check (applied threshold) | " + " | ".join(label for _, label in route_labels) + " |",
+        "| Parity check (applied threshold) | "
+        + " | ".join(label for _, label in route_labels)
+        + " |",
         "| --- | " + " | ".join("---" for _ in route_labels) + " |",
     ]
     if isinstance(configuration, Mapping) and configuration.get("note"):
         lines[4:4] = ["", str(configuration["note"]), ""]
     for label, metric in metric_rows:
         lines.append(
-            "| " + label + " | " + " | ".join(_parity_diagnostic_value(report, route, metric) for route, _ in route_labels) + " |"
+            "| "
+            + label
+            + " | "
+            + " | ".join(
+                _parity_diagnostic_value(report, route, metric)
+                for route, _ in route_labels
+            )
+            + " |"
         )
     return lines
 
@@ -1612,20 +2004,28 @@ def _openvino_precision_diagnostic_markdown(report: Mapping[str, Any]) -> list[s
     evidence_source = ""
     if not isinstance(diagnostic, Mapping):
         history = report.get("historical_evidence", {})
-        bounded = history.get("bounded_corrected_openvino_gpu", {}) if isinstance(history, Mapping) else {}
+        bounded = (
+            history.get("bounded_corrected_openvino_gpu", {})
+            if isinstance(history, Mapping)
+            else {}
+        )
         if isinstance(bounded, Mapping):
             diagnostic = bounded.get("data")
             if isinstance(diagnostic, Mapping):
                 evidence_source = "historical bounded diagnostic"
     lines = ["", "## OpenVINO GPU precision correction", ""]
     if not isinstance(diagnostic, Mapping):
-        lines.append("No post-fix OpenVINO GPU precision diagnostic was retained in this benchmark artifact.")
+        lines.append(
+            "No post-fix OpenVINO GPU precision diagnostic was retained in this benchmark artifact."
+        )
         return lines
     runtime = diagnostic.get("runtime", {})
     configuration = diagnostic.get("configuration", {})
     parity = diagnostic.get("parity", {})
     corrected_gpu_measured = any(
-        row.get("route") == "openvino_gpu" and row.get("status") == "ok" and row.get("batch_results")
+        row.get("route") == "openvino_gpu"
+        and row.get("status") == "ok"
+        and row.get("batch_results")
         for row in report.get("inference", [])
     )
 
@@ -1675,7 +2075,9 @@ def _openvino_precision_diagnostic_markdown(report: Mapping[str, Any]) -> list[s
     return lines
 
 
-def _report_throughput_table(rows: Sequence[Mapping[str, Any]], field: str, heading: str) -> list[str]:
+def _report_throughput_table(
+    rows: Sequence[Mapping[str, Any]], field: str, heading: str
+) -> list[str]:
     lines = [
         heading,
         "",
@@ -1683,12 +2085,18 @@ def _report_throughput_table(rows: Sequence[Mapping[str, Any]], field: str, head
         "| --- | ---: | ---: | ---: | ---: |",
     ]
     for row in rows:
-        values = [_report_number(_report_batch(row, size, field)) for size in (1, 2, 4, 8)]
-        lines.append(f"| `{row.get('route', 'unknown')}` | " + " | ".join(values) + " |")
+        values = [
+            _report_number(_report_batch(row, size, field)) for size in (1, 2, 4, 8)
+        ]
+        lines.append(
+            f"| `{row.get('route', 'unknown')}` | " + " | ".join(values) + " |"
+        )
     return lines
 
 
-def _route_metric_winner(rows: Sequence[Mapping[str, Any]], batch_size: int, field: str) -> Mapping[str, Any] | None:
+def _route_metric_winner(
+    rows: Sequence[Mapping[str, Any]], batch_size: int, field: str
+) -> Mapping[str, Any] | None:
     return max(
         rows,
         key=lambda row: _report_batch(row, batch_size, field) or float("-inf"),
@@ -1696,7 +2104,9 @@ def _route_metric_winner(rows: Sequence[Mapping[str, Any]], batch_size: int, fie
     )
 
 
-def _route_metric_value(row: Mapping[str, Any] | None, batch_size: int, field: str) -> Any:
+def _route_metric_value(
+    row: Mapping[str, Any] | None, batch_size: int, field: str
+) -> Any:
     return None if row is None else _report_batch(row, batch_size, field)
 
 
@@ -1711,29 +2121,49 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
     conclusions = report.get("conclusions", {})
     corpus_decision = report.get("corpus_inference_decision", {})
     runtime = report.get("runtime", {})
+    coverage = smoke.get("coverage_contract", {})
     successful_inference = [row for row in inference if row.get("status") == "ok"]
     successful_training = [row for row in training if row.get("status") == "ok"]
-    openvino_gpu = next((row for row in successful_inference if row.get("route") == "openvino_gpu"), {})
+    openvino_gpu = next(
+        (row for row in successful_inference if row.get("route") == "openvino_gpu"), {}
+    )
     historical_evidence = report.get("historical_evidence", {})
     pre_fix_evidence = (
         historical_evidence.get("pre_fix_default_openvino_gpu", {})
         if isinstance(historical_evidence, Mapping)
         else {}
     )
-    pre_fix_diagnostic = pre_fix_evidence.get("data", {}) if isinstance(pre_fix_evidence, Mapping) else {}
-    pre_fix_routes = pre_fix_diagnostic.get("routes", []) if isinstance(pre_fix_diagnostic, Mapping) else []
+    pre_fix_diagnostic = (
+        pre_fix_evidence.get("data", {})
+        if isinstance(pre_fix_evidence, Mapping)
+        else {}
+    )
+    pre_fix_routes = (
+        pre_fix_diagnostic.get("routes", [])
+        if isinstance(pre_fix_diagnostic, Mapping)
+        else []
+    )
     if not pre_fix_routes:
         pre_fix_diagnostic = report.get("parity_diagnostics", {})
-        pre_fix_routes = pre_fix_diagnostic.get("routes", []) if isinstance(pre_fix_diagnostic, Mapping) else []
+        pre_fix_routes = (
+            pre_fix_diagnostic.get("routes", [])
+            if isinstance(pre_fix_diagnostic, Mapping)
+            else []
+        )
     historical_gpu_failure = next(
         (
             row
             for row in pre_fix_routes
-            if row.get("route") == "openvino_gpu" and row.get("status") == "parity_failed"
+            if row.get("route") == "openvino_gpu"
+            and row.get("status") == "parity_failed"
         ),
         None,
     )
-    historical_gpu_max = dict(historical_gpu_failure.get("max_across_repetitions", {})) if historical_gpu_failure else {}
+    historical_gpu_max = (
+        dict(historical_gpu_failure.get("max_across_repetitions", {}))
+        if historical_gpu_failure
+        else {}
+    )
     if historical_gpu_failure:
         for metric in _PARITY_DIAGNOSTIC_METRICS:
             values = [
@@ -1744,29 +2174,48 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
             ]
             if metric not in historical_gpu_max or historical_gpu_max[metric] is None:
                 historical_gpu_max[metric] = max(values) if values else None
-    current_gpu_failure = next((row for row in inference if row.get("route") == "openvino_gpu" and row.get("status") != "ok"), None)
+    current_gpu_failure = next(
+        (
+            row
+            for row in inference
+            if row.get("route") == "openvino_gpu" and row.get("status") != "ok"
+        ),
+        None,
+    )
     bounded_evidence = (
         historical_evidence.get("bounded_corrected_openvino_gpu", {})
         if isinstance(historical_evidence, Mapping)
         else {}
     )
     precision_diagnostic = report.get("openvino_precision_diagnostic")
-    if not isinstance(precision_diagnostic, Mapping) and isinstance(bounded_evidence, Mapping):
+    if not isinstance(precision_diagnostic, Mapping) and isinstance(
+        bounded_evidence, Mapping
+    ):
         precision_diagnostic = bounded_evidence.get("data")
     has_precision_diagnostic = isinstance(precision_diagnostic, Mapping)
     smoke_case_count = smoke.get("case_count", 0)
     smoke_audio_seconds = smoke.get("total_audio_seconds")
     corrected_gpu_measured = bool(openvino_gpu.get("batch_results"))
     batch_winners = {
-        size: _route_metric_winner(successful_inference, size, "audio_seconds_per_second") for size in (1, 2, 4, 8)
+        size: _route_metric_winner(
+            successful_inference, size, "audio_seconds_per_second"
+        )
+        for size in (1, 2, 4, 8)
     }
     end_to_end_winner = max(
         successful_inference,
-        key=lambda row: row.get("end_to_end", {}).get("audio_seconds_per_wall_second", {}).get("median", float("-inf")),
+        key=lambda row: (
+            row.get("end_to_end", {})
+            .get("audio_seconds_per_wall_second", {})
+            .get("median", float("-inf"))
+        ),
         default=None,
     )
     training_winner_by_batch = {
-        size: _route_metric_winner(successful_training, size, "audio_seconds_per_second") for size in (1, 2, 4, 8)
+        size: _route_metric_winner(
+            successful_training, size, "audio_seconds_per_second"
+        )
+        for size in (1, 2, 4, 8)
     }
     timing_provenance = (
         "The corrected OpenVINO GPU timing rows below use the explicit float32 inference hint and the plugin-reported PERFORMANCE execution mode. The historical pre-fix failure remains preserved in the diagnostic sections; `n/a` means the route failed before that phase or the phase does not apply."
@@ -1806,6 +2255,7 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
         "",
         f"- Model: `{report.get('model_id', MODEL_ID)}`; precision: `float32`; smoke set: `{smoke.get('status', 'unknown')}` with `{smoke.get('case_count', 0)}` cases.",
         f"- Runtime: Python `{runtime.get('python', 'unknown')}`, PyTorch `{runtime.get('torch', 'unknown')}`, OpenVINO `{runtime.get('openvino', 'not imported')}`, NumPy `{runtime.get('numpy', 'unknown')}`, SciPy `{runtime.get('scipy', 'unknown')}`.",
+        f"- Smoke-set coverage gate: `{coverage.get('status', 'not recorded')}`; required representative categories are recorded in the JSON contract and missing categories are `{coverage.get('missing', {})}`.",
         "- Each route used a fresh process for each of 3 repetitions; each fixed batch used 3 warmups and 10 timed calls.",
         "- Model-only inference and full forward+backward training used batches `[1, 2, 4, 8]`. End-to-end inference used batch 1 and covered read-only audio preparation through stock note-event materialization.",
         "- Missing-WAV derived rendering was opt-in only; source patches, MIDI, audio, and metadata remained read-only.",
@@ -1838,12 +2288,13 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
     lines.extend(
         [
             "",
-        "## Inference startup and initialization",
-        "",
-        "Startup is separated from first-call, warmup, and steady-state timing. " + timing_provenance,
-        "",
-        "| Route | Status | Import | Construct | Checkpoint | Device move | OV convert | OV compile | Total startup |",
-        "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+            "## Inference startup and initialization",
+            "",
+            "Startup is separated from first-call, warmup, and steady-state timing. "
+            + timing_provenance,
+            "",
+            "| Route | Status | Import | Construct | Checkpoint | Device move | OV convert | OV compile | Total startup |",
+            "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
         ]
     )
     if has_precision_diagnostic and not corrected_gpu_measured:
@@ -1898,12 +2349,29 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
             "",
         ]
     )
-    lines.extend(_report_throughput_table(successful_inference, "audio_seconds_per_second", "### Audio-equivalent throughput (audio-seconds/second)"))
-    lines.extend(["", "### Median model-call latency (seconds)", "", "| Route | Batch 1 | Batch 2 | Batch 4 | Batch 8 |", "| --- | ---: | ---: | ---: | ---: |"])
+    lines.extend(
+        _report_throughput_table(
+            successful_inference,
+            "audio_seconds_per_second",
+            "### Audio-equivalent throughput (audio-seconds/second)",
+        )
+    )
+    lines.extend(
+        [
+            "",
+            "### Median model-call latency (seconds)",
+            "",
+            "| Route | Batch 1 | Batch 2 | Batch 4 | Batch 8 |",
+            "| --- | ---: | ---: | ---: | ---: |",
+        ]
+    )
     for row in successful_inference:
         lines.append(
             f"| `{row.get('route', 'unknown')}` | "
-            + " | ".join(_report_number(_report_batch(row, size, "median_seconds"), 6) for size in (1, 2, 4, 8))
+            + " | ".join(
+                _report_number(_report_batch(row, size, "median_seconds"), 6)
+                for size in (1, 2, 4, 8)
+            )
             + " |"
         )
     lines.extend(
@@ -1949,12 +2417,29 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
             "",
         ]
     )
-    lines.extend(_report_throughput_table(successful_training, "audio_seconds_per_second", "### Effective throughput (audio-seconds/second)"))
-    lines.extend(["", "### Median forward+backward step latency (seconds)", "", "| Route | Batch 1 | Batch 2 | Batch 4 | Batch 8 |", "| --- | ---: | ---: | ---: | ---: |"])
+    lines.extend(
+        _report_throughput_table(
+            successful_training,
+            "audio_seconds_per_second",
+            "### Effective throughput (audio-seconds/second)",
+        )
+    )
+    lines.extend(
+        [
+            "",
+            "### Median forward+backward step latency (seconds)",
+            "",
+            "| Route | Batch 1 | Batch 2 | Batch 4 | Batch 8 |",
+            "| --- | ---: | ---: | ---: | ---: |",
+        ]
+    )
     for row in successful_training:
         lines.append(
             f"| `{row.get('route', 'unknown')}` | "
-            + " | ".join(_report_number(_report_batch(row, size, "median_seconds"), 6) for size in (1, 2, 4, 8))
+            + " | ".join(
+                _report_number(_report_batch(row, size, "median_seconds"), 6)
+                for size in (1, 2, 4, 8)
+            )
             + " |"
         )
     lines.extend(
@@ -2002,16 +2487,24 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
         ]
     )
     if report.get("crossovers"):
-        lines.append("- Each point uses median one-time startup and median batch-1 model-call throughput; only positive finite distances are retained.")
+        lines.append(
+            "- Each point uses median one-time startup and median batch-1 model-call throughput; only positive finite distances are retained."
+        )
         for crossover_row in report["crossovers"]:
             lines.append(
                 f"- `{crossover_row.get('route_a')}` versus `{crossover_row.get('route_b')}`: `{_report_number(crossover_row.get('audio_seconds'))}` audio seconds."
             )
-        lines.append("- These model-only crossover points describe when the measured steady-state rate repays the measured startup difference; they are not universal short-clip latency guarantees.")
+        lines.append(
+            "- These model-only crossover points describe when the measured steady-state rate repays the measured startup difference; they are not universal short-clip latency guarantees."
+        )
     else:
-        lines.append("- No positive finite crossover was retained by the fixed formula for the successful routes.")
+        lines.append(
+            "- No positive finite crossover was retained by the fixed formula for the successful routes."
+        )
     lines.extend(_parity_diagnostics_markdown(report))
-    failure_heading = "## OpenVINO GPU historical parity failure (pre-fix configuration)"
+    failure_heading = (
+        "## OpenVINO GPU historical parity failure (pre-fix configuration)"
+    )
     lines.extend(["", failure_heading, ""])
     if historical_gpu_failure:
         lines.extend(
@@ -2035,7 +2528,9 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
             f"- The current corrected route is `{current_gpu_failure.get('status')}`; no corrected OpenVINO GPU performance result is published."
         )
     else:
-        lines.append("- No preserved pre-fix OpenVINO GPU failure was present in the supplied report.")
+        lines.append(
+            "- No preserved pre-fix OpenVINO GPU failure was present in the supplied report."
+        )
     lines.extend(_openvino_precision_diagnostic_markdown(report))
     lines.extend(
         [
@@ -2067,7 +2562,9 @@ def _benchmark_markdown(report: Mapping[str, Any]) -> str:
     )
     if conclusions.get("reason"):
         lines.append(f"- `{conclusions['reason']}`")
-    lines.append("- The report contains no source paths, filenames, IDs, hashes, or per-source predictions. Per-case end-to-end rows are anonymous case indexes only.")
+    lines.append(
+        "- The report contains no source paths, filenames, IDs, hashes, or per-source predictions. Per-case end-to-end rows are anonymous case indexes only."
+    )
     return "\n".join(lines) + "\n"
 
 
@@ -2084,7 +2581,9 @@ def write_benchmark_reports(
     json_file.parent.mkdir(parents=True, exist_ok=True)
     markdown_file.parent.mkdir(parents=True, exist_ok=True)
     if not force and (json_file.exists() or markdown_file.exists()):
-        raise FileExistsError("refusing to overwrite benchmark reports without force=True")
+        raise FileExistsError(
+            "refusing to overwrite benchmark reports without force=True"
+        )
     inference = report.get("inference", [])
     training = report.get("training", [])
     smoke = report.get("smoke_set", {})
@@ -2103,29 +2602,67 @@ def write_benchmark_reports(
         "| --- | --- | ---: |",
     ]
     for row in inference:
-        rate = row.get("batch_results", {}).get("1", {}).get("audio_seconds_per_second", {}).get("median", "—")
+        rate = (
+            row.get("batch_results", {})
+            .get("1", {})
+            .get("audio_seconds_per_second", {})
+            .get("median", "—")
+        )
         rate_text = f"{rate:.6g}" if isinstance(rate, (int, float)) else str(rate)
-        markdown_lines.append(f"| `{row.get('route', 'unknown')}` | `{row.get('status', 'unknown')}` | {rate_text} |")
-    markdown_lines.extend(["", "## Training routes", "", "| Route | Status | Batch-1 audio seconds/second |", "| --- | --- | ---: |"])
+        markdown_lines.append(
+            f"| `{row.get('route', 'unknown')}` | `{row.get('status', 'unknown')}` | {rate_text} |"
+        )
+    markdown_lines.extend(
+        [
+            "",
+            "## Training routes",
+            "",
+            "| Route | Status | Batch-1 audio seconds/second |",
+            "| --- | --- | ---: |",
+        ]
+    )
     for row in training:
-        rate = row.get("batch_results", {}).get("1", {}).get("audio_seconds_per_second", {}).get("median", "—")
+        rate = (
+            row.get("batch_results", {})
+            .get("1", {})
+            .get("audio_seconds_per_second", {})
+            .get("median", "—")
+        )
         rate_text = f"{rate:.6g}" if isinstance(rate, (int, float)) else str(rate)
-        markdown_lines.append(f"| `{row.get('route', 'unknown')}` | `{row.get('status', 'unknown')}` | {rate_text} |")
+        markdown_lines.append(
+            f"| `{row.get('route', 'unknown')}` | `{row.get('status', 'unknown')}` | {rate_text} |"
+        )
     markdown_lines.extend(["", "## Scope and caveats", ""])
     if conclusions.get("reason"):
         markdown_lines.append(f"- `{conclusions['reason']}`")
-    markdown_lines.append("- The report contains no source paths, filenames, IDs, hashes, or per-source predictions.")
+    markdown_lines.append(
+        "- The report contains no source paths, filenames, IDs, hashes, or per-source predictions."
+    )
     markdown = "\n".join(markdown_lines) + "\n"
     markdown = _benchmark_markdown(report)
 
     json_temp: Path | None = None
     markdown_temp: Path | None = None
     try:
-        with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=json_file.parent, prefix=".backend-", suffix=".json.tmp", delete=False) as handle:
+        with tempfile.NamedTemporaryFile(
+            "w",
+            encoding="utf-8",
+            dir=json_file.parent,
+            prefix=".backend-",
+            suffix=".json.tmp",
+            delete=False,
+        ) as handle:
             json_temp = Path(handle.name)
             json.dump(report, handle, indent=2, sort_keys=True)
             handle.write("\n")
-        with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=markdown_file.parent, prefix=".backend-", suffix=".md.tmp", delete=False) as handle:
+        with tempfile.NamedTemporaryFile(
+            "w",
+            encoding="utf-8",
+            dir=markdown_file.parent,
+            prefix=".backend-",
+            suffix=".md.tmp",
+            delete=False,
+        ) as handle:
             markdown_temp = Path(handle.name)
             handle.write(markdown)
         os.replace(json_temp, json_file)
@@ -2159,7 +2696,9 @@ def run_parity_diagnostic_cli(
         report = json.loads(json_file.read_text(encoding="utf-8"))
         if not isinstance(report, dict):
             return 2
-        history = _historical_evidence(report, Path(checkpoint_path).resolve(strict=True))
+        history = _historical_evidence(
+            report, Path(checkpoint_path).resolve(strict=True)
+        )
         if history:
             report["historical_evidence"] = history
         report.pop("openvino_precision_diagnostic", None)
@@ -2172,7 +2711,14 @@ def run_parity_diagnostic_cli(
         write_benchmark_reports(report, json_file, markdown_file, force=force)
         routes = report["parity_diagnostics"].get("routes", [])
         return 0 if all(route.get("status") == "ok" for route in routes) else 3
-    except (BenchmarkInputError, FileNotFoundError, OSError, TypeError, ValueError, json.JSONDecodeError):
+    except (
+        BenchmarkInputError,
+        FileNotFoundError,
+        OSError,
+        TypeError,
+        ValueError,
+        json.JSONDecodeError,
+    ):
         return 2
 
 
@@ -2196,7 +2742,13 @@ def run_benchmark_cli(
             loaded = json.loads(existing_json.read_text(encoding="utf-8"))
             if isinstance(loaded, dict):
                 previous_report = loaded
-        except (FileNotFoundError, OSError, TypeError, ValueError, json.JSONDecodeError):
+        except (
+            FileNotFoundError,
+            OSError,
+            TypeError,
+            ValueError,
+            json.JSONDecodeError,
+        ):
             previous_report = None
         try:
             report = run_benchmark(
@@ -2208,7 +2760,9 @@ def run_benchmark_cli(
                 allow_derived_render=allow_derived_render,
             )
             if previous_report is not None:
-                historical = _historical_evidence(previous_report, Path(checkpoint_path).resolve(strict=True))
+                historical = _historical_evidence(
+                    previous_report, Path(checkpoint_path).resolve(strict=True)
+                )
                 if historical:
                     report["historical_evidence"] = historical
         except DerivedRenderUnavailable as exc:
@@ -2225,7 +2779,11 @@ def run_benchmark_cli(
             write_benchmark_reports(report, json_path, markdown_path, force=force)
             return 3
         except (BenchmarkInputError, FileNotFoundError, OSError) as exc:
-            code = exc.code if isinstance(exc, BenchmarkInputError) else "invalid_smoke_manifest"
+            code = (
+                exc.code
+                if isinstance(exc, BenchmarkInputError)
+                else "invalid_smoke_manifest"
+            )
             report = _unavailable_report(config, code)
             write_benchmark_reports(report, json_path, markdown_path, force=force)
             return 2

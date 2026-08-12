@@ -20,16 +20,22 @@ def _preload_conda_openmp_runtime() -> None:
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="OBRUXO Basic Pitch conversion and parity tools")
+    parser = argparse.ArgumentParser(
+        description="OBRUXO Basic Pitch conversion and parity tools"
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    importer = subparsers.add_parser("import-onnx", help="verify and import the pinned public ONNX checkpoint")
+    importer = subparsers.add_parser(
+        "import-onnx", help="verify and import the pinned public ONNX checkpoint"
+    )
     importer.add_argument("--onnx", type=Path, required=True)
     importer.add_argument("--checkpoint", type=Path, required=True)
     importer.add_argument("--metadata", type=Path, required=True)
     importer.add_argument("--force", action="store_true")
 
-    parity = subparsers.add_parser("parity", help="compare the native module with ONNX Runtime CPU")
+    parity = subparsers.add_parser(
+        "parity", help="compare the native module with ONNX Runtime CPU"
+    )
     parity.add_argument("--onnx", type=Path, required=True)
     parity.add_argument("--checkpoint", type=Path, required=True)
     parity.add_argument("--json", type=Path, required=True)
@@ -37,7 +43,9 @@ def _parser() -> argparse.ArgumentParser:
     parity.add_argument("--audio", type=Path, action="append", default=[])
     parity.add_argument("--force", action="store_true")
 
-    benchmark = subparsers.add_parser("benchmark", help="run the fixed CPU/XPU/OpenVINO benchmark")
+    benchmark = subparsers.add_parser(
+        "benchmark", help="run the fixed CPU/XPU/OpenVINO benchmark"
+    )
     benchmark.add_argument("--config", type=Path, required=True)
     benchmark.add_argument("--manifest", type=Path, required=True)
     benchmark.add_argument("--checkpoint", type=Path, required=True)
@@ -73,8 +81,18 @@ def _parser() -> argparse.ArgumentParser:
         help="run the fixed synthetic parity gate for every inference route",
     )
     parity_diagnostic.add_argument("--checkpoint", type=Path, required=True)
-    parity_diagnostic.add_argument("--json", type=Path, required=True, help="existing backend benchmark JSON to augment")
-    parity_diagnostic.add_argument("--markdown", type=Path, required=True, help="existing backend benchmark Markdown to augment")
+    parity_diagnostic.add_argument(
+        "--json",
+        type=Path,
+        required=True,
+        help="existing backend benchmark JSON to augment",
+    )
+    parity_diagnostic.add_argument(
+        "--markdown",
+        type=Path,
+        required=True,
+        help="existing backend benchmark Markdown to augment",
+    )
     parity_diagnostic.add_argument("--xpu-index", type=int, default=0)
     parity_diagnostic.add_argument("--openvino-gpu-device", default="GPU")
     parity_diagnostic.add_argument("--repetitions", type=int, default=3)
@@ -87,7 +105,9 @@ def main() -> int:
     if args.command == "import-onnx":
         from obruxo_basic_pitch.weights import write_imported_checkpoint
 
-        metadata = write_imported_checkpoint(args.onnx, args.checkpoint, args.metadata, force=args.force)
+        metadata = write_imported_checkpoint(
+            args.onnx, args.checkpoint, args.metadata, force=args.force
+        )
         print(f"imported {metadata.model_id} from the pinned public artifact")
         return 0
 
@@ -188,8 +208,16 @@ def main() -> int:
         private_local_windows=sum(clip.windows.shape[0] for clip in local),
     )
     assert_parity(summary)
-    write_reports(summary, args.json, args.markdown, private_local_clips=len(args.audio), force=args.force)
-    print(f"parity passed for {summary.synthetic_windows + summary.private_local_windows} windows")
+    write_reports(
+        summary,
+        args.json,
+        args.markdown,
+        private_local_clips=len(args.audio),
+        force=args.force,
+    )
+    print(
+        f"parity passed for {summary.synthetic_windows + summary.private_local_windows} windows"
+    )
     return 0
 
 

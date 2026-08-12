@@ -23,7 +23,9 @@ ROOT = Path(__file__).resolve().parents[2]
 def test_prepare_wav_reads_and_resamples_without_source_side_effects() -> None:
     path = ROOT / "outputs" / f".test-source-{os.getpid()}.wav"
     assert not path.exists()
-    samples = np.stack((np.arange(2_205, dtype=np.int16), np.zeros(2_205, dtype=np.int16)), axis=1)
+    samples = np.stack(
+        (np.arange(2_205, dtype=np.int16), np.zeros(2_205, dtype=np.int16)), axis=1
+    )
     try:
         wavfile.write(path, 11_025, samples)
         before = path.stat()
@@ -48,7 +50,9 @@ def test_unwrap_window_outputs_drops_overlap_and_trims_duration() -> None:
         "contour": np.zeros((2, 172, 264), dtype=np.float32),
     }
 
-    unwrapped = unwrap_window_outputs(output, original_sample_count=AUDIO_SAMPLE_RATE * 2)
+    unwrapped = unwrap_window_outputs(
+        output, original_sample_count=AUDIO_SAMPLE_RATE * 2
+    )
 
     assert {name: value.shape for name, value in unwrapped.items()} == {
         "note": (172, 88),
@@ -83,8 +87,12 @@ def test_unwrap_crops_each_window_then_trims_once_to_original_duration() -> None
     }
 
     original_sample_count = AUDIO_SAMPLE_RATE * 2 + 100
-    unwrapped = unwrap_window_outputs(output, original_sample_count=original_sample_count)
-    expected_frames = original_sample_count * (AUDIO_SAMPLE_RATE // FFT_HOP) // AUDIO_SAMPLE_RATE
+    unwrapped = unwrap_window_outputs(
+        output, original_sample_count=original_sample_count
+    )
+    expected_frames = (
+        original_sample_count * (AUDIO_SAMPLE_RATE // FFT_HOP) // AUDIO_SAMPLE_RATE
+    )
 
     assert {name: value.shape for name, value in unwrapped.items()} == {
         "note": (expected_frames, 88),

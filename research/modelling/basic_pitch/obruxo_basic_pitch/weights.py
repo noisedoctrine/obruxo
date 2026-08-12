@@ -121,11 +121,16 @@ def _check_shape(value: onnx.ValueInfoProto, expected: tuple[int, ...]) -> None:
         raise ValueError(f"unexpected rank for {value.name}: {len(dims)}")
     for actual, required in zip(dims[1:], expected[1:]):
         if actual.dim_value != required:
-            raise ValueError(f"unexpected shape for {value.name}: {tuple(d.dim_value for d in dims)}")
+            raise ValueError(
+                f"unexpected shape for {value.name}: {tuple(d.dim_value for d in dims)}"
+            )
 
 
 def _verify_graph(model: onnx.ModelProto) -> set[str]:
-    if len(model.graph.input) != 1 or model.graph.input[0].name != "serving_default_input_2:0":
+    if (
+        len(model.graph.input) != 1
+        or model.graph.input[0].name != "serving_default_input_2:0"
+    ):
         raise ValueError("unexpected Basic Pitch ONNX input signature")
     input_value = model.graph.input[0]
     _check_shape(input_value, (0, 43_844, 1))
@@ -146,15 +151,20 @@ def _verify_graph(model: onnx.ModelProto) -> set[str]:
     required = set(_SOURCE_NAMES.values())
     missing = required - reachable
     if missing:
-        raise ValueError(f"required source tensors are not reachable: {sorted(missing)}")
+        raise ValueError(
+            f"required source tensors are not reachable: {sorted(missing)}"
+        )
     float_names = {
         initializer.name
         for initializer in model.graph.initializer
-        if numpy_helper.to_array(initializer).dtype.kind == "f" and initializer.name in reachable
+        if numpy_helper.to_array(initializer).dtype.kind == "f"
+        and initializer.name in reachable
     }
     unmapped = float_names - required - _ALLOWED_UNMAPPED_FLOATS
     if unmapped:
-        raise ValueError(f"unexpected reachable floating-point tensors: {sorted(unmapped)}")
+        raise ValueError(
+            f"unexpected reachable floating-point tensors: {sorted(unmapped)}"
+        )
     return reachable
 
 
@@ -164,7 +174,9 @@ def _load_verified(path: Path) -> tuple[onnx.ModelProto, ConversionMetadata]:
     if len(content) != SOURCE_SIZE_BYTES:
         raise ValueError(f"unexpected ONNX size: {len(content)}")
     if _git_blob_sha1(content) != SOURCE_GIT_BLOB_SHA1:
-        raise ValueError("ONNX Git blob SHA-1 does not match the pinned Spotify artifact")
+        raise ValueError(
+            "ONNX Git blob SHA-1 does not match the pinned Spotify artifact"
+        )
     model = onnx.load_model(source_path, load_external_data=False)
     onnx.checker.check_model(model)
     _verify_graph(model)
@@ -172,48 +184,79 @@ def _load_verified(path: Path) -> tuple[onnx.ModelProto, ConversionMetadata]:
 
 
 def _source_arrays(model: onnx.ModelProto) -> dict[str, np.ndarray]:
-    return {initializer.name: np.array(numpy_helper.to_array(initializer), copy=True) for initializer in model.graph.initializer}
+    return {
+        initializer.name: np.array(numpy_helper.to_array(initializer), copy=True)
+        for initializer in model.graph.initializer
+    }
 
 
-def _identity_batchnorm(state: dict[str, torch.Tensor], prefix: str, channels: int, eps: float) -> None:
+def _identity_batchnorm(
+    state: dict[str, torch.Tensor], prefix: str, channels: int, eps: float
+) -> None:
     state[f"{prefix}.weight"] = torch.ones(channels, dtype=torch.float32)
     state[f"{prefix}.bias"] = torch.zeros(channels, dtype=torch.float32)
     state[f"{prefix}.running_mean"] = torch.zeros(channels, dtype=torch.float32)
-    state[f"{prefix}.running_var"] = torch.full((channels,), 1.0 - eps, dtype=torch.float32)
+    state[f"{prefix}.running_var"] = torch.full(
+        (channels,), 1.0 - eps, dtype=torch.float32
+    )
     state[f"{prefix}.num_batches_tracked"] = torch.zeros((), dtype=torch.int64)
 
 
-def _tensor(arrays: dict[str, np.ndarray], name: str, target_shape: tuple[int, ...], *, squeeze: tuple[int, ...] = ()) -> torch.Tensor:
+def _tensor(
+    arrays: dict[str, np.ndarray],
+    name: str,
+    target_shape: tuple[int, ...],
+    *,
+    squeeze: tuple[int, ...] = (),
+) -> torch.Tensor:
     value = arrays[_SOURCE_NAMES[name]]
     for axis in sorted(squeeze, reverse=True):
         if value.shape[axis] != 1:
-            raise ValueError(f"cannot squeeze source tensor {name} at axis {axis}: {value.shape}")
+            raise ValueError(
+                f"cannot squeeze source tensor {name} at axis {axis}: {value.shape}"
+            )
         value = np.squeeze(value, axis=axis)
     if tuple(value.shape) != target_shape:
-        raise ValueError(f"unexpected shape for {name}: {value.shape}, expected {target_shape}")
+        raise ValueError(
+            f"unexpected shape for {name}: {value.shape}, expected {target_shape}"
+        )
     if value.dtype != np.float32:
         raise TypeError(f"unexpected dtype for {name}: {value.dtype}")
     return torch.from_numpy(value.copy())
 
 
-def import_onnx_state_dict(onnx_path: str | Path) -> tuple[dict[str, torch.Tensor], ConversionMetadata]:
+def import_onnx_state_dict(
+    onnx_path: str | Path,
+) -> tuple[dict[str, torch.Tensor], ConversionMetadata]:
     """Verify and import the pinned ONNX graph into the native module state."""
     model_proto, metadata = _load_verified(Path(onnx_path))
     arrays = _source_arrays(model_proto)
     model = BasicPitchICASSP2022()
     state = {key: value.detach().clone() for key, value in model.state_dict().items()}
 
-    state["frontend.cqt_kernels_real"] = _tensor(arrays, "cqt_real", (36, 1, 256), squeeze=(2,))
-    state["frontend.cqt_kernels_imag"] = _tensor(arrays, "cqt_imag", (36, 1, 256), squeeze=(2,))
-    state["frontend.lowpass_filter"] = _tensor(arrays, "lowpass", (1, 1, 256), squeeze=(2,))
-    state["frontend.cqt_lengths"] = _tensor(arrays, "cqt_lengths", (309,), squeeze=(1, 2))
+    state["frontend.cqt_kernels_real"] = _tensor(
+        arrays, "cqt_real", (36, 1, 256), squeeze=(2,)
+    )
+    state["frontend.cqt_kernels_imag"] = _tensor(
+        arrays, "cqt_imag", (36, 1, 256), squeeze=(2,)
+    )
+    state["frontend.lowpass_filter"] = _tensor(
+        arrays, "lowpass", (1, 1, 256), squeeze=(2,)
+    )
+    state["frontend.cqt_lengths"] = _tensor(
+        arrays, "cqt_lengths", (309,), squeeze=(1, 2)
+    )
     state["frontend.normalization.weight"] = _tensor(arrays, "frontend_bn_weight", (1,))
     state["frontend.normalization.bias"] = _tensor(arrays, "frontend_bn_bias", (1,))
     _identity_batchnorm(state, "contour_bn", 8, 1e-3)
     _identity_batchnorm(state, "onset_bn", 32, 1e-3)
     state["frontend.normalization.running_mean"] = torch.zeros(1, dtype=torch.float32)
-    state["frontend.normalization.running_var"] = torch.full((1,), 1.0 - FRONTEND_BATCHNORM_EPS, dtype=torch.float32)
-    state["frontend.normalization.num_batches_tracked"] = torch.zeros((), dtype=torch.int64)
+    state["frontend.normalization.running_var"] = torch.full(
+        (1,), 1.0 - FRONTEND_BATCHNORM_EPS, dtype=torch.float32
+    )
+    state["frontend.normalization.num_batches_tracked"] = torch.zeros(
+        (), dtype=torch.int64
+    )
 
     direct = {
         "contour_conv1": ("contour_conv1.weight", (8, 8, 3, 39)),
@@ -233,7 +276,9 @@ def import_onnx_state_dict(onnx_path: str | Path) -> tuple[dict[str, torch.Tenso
         state[target_name] = _tensor(arrays, source_name, shape)
 
     if set(state) != set(model.state_dict()):
-        raise ValueError("importer produced an incomplete or unexpected native state dict")
+        raise ValueError(
+            "importer produced an incomplete or unexpected native state dict"
+        )
     model.load_state_dict(state, strict=True)
     model.eval()
     with torch.inference_mode():
@@ -247,17 +292,28 @@ def _approved_destination(path: Path, source_path: Path) -> Path:
     approved = [workspace / "artifacts", workspace / "reports", workspace / "outputs"]
     destination = path.resolve(strict=False)
     source_directory = source_path.resolve(strict=True).parent
-    if destination == source_path.resolve(strict=True) or destination.is_relative_to(source_directory):
+    if destination == source_path.resolve(strict=True) or destination.is_relative_to(
+        source_directory
+    ):
         raise ValueError("refusing to write inside the ONNX input directory")
     if not any(destination.is_relative_to(directory) for directory in approved):
-        raise ValueError("destination is outside the approved Basic Pitch artifact/report/output areas")
+        raise ValueError(
+            "destination is outside the approved Basic Pitch artifact/report/output areas"
+        )
     return destination
 
 
 def _atomic_json(path: Path, value: dict[str, Any]) -> None:
     temporary: Path | None = None
     try:
-        with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=path.parent, prefix=".metadata-", suffix=".tmp", delete=False) as handle:
+        with tempfile.NamedTemporaryFile(
+            "w",
+            encoding="utf-8",
+            dir=path.parent,
+            prefix=".metadata-",
+            suffix=".tmp",
+            delete=False,
+        ) as handle:
             temporary = Path(handle.name)
             json.dump(value, handle, indent=2, sort_keys=True)
             handle.write("\n")
@@ -270,7 +326,9 @@ def _atomic_json(path: Path, value: dict[str, Any]) -> None:
 def _atomic_checkpoint(path: Path, state: dict[str, torch.Tensor]) -> None:
     temporary: Path | None = None
     try:
-        with tempfile.NamedTemporaryFile(dir=path.parent, prefix=".checkpoint-", suffix=".tmp", delete=False) as handle:
+        with tempfile.NamedTemporaryFile(
+            dir=path.parent, prefix=".checkpoint-", suffix=".tmp", delete=False
+        ) as handle:
             temporary = Path(handle.name)
         torch.save(state, temporary)
         os.replace(temporary, path)
@@ -291,9 +349,13 @@ def write_imported_checkpoint(
     checkpoint = _approved_destination(Path(checkpoint_path), source)
     metadata_file = _approved_destination(Path(metadata_path), source)
     if checkpoint.parent != metadata_file.parent:
-        raise ValueError("checkpoint and metadata must share an approved destination directory")
+        raise ValueError(
+            "checkpoint and metadata must share an approved destination directory"
+        )
     if not force and (checkpoint.exists() or metadata_file.exists()):
-        raise FileExistsError("refusing to overwrite an existing checkpoint or metadata file without force=True")
+        raise FileExistsError(
+            "refusing to overwrite an existing checkpoint or metadata file without force=True"
+        )
     checkpoint.parent.mkdir(parents=True, exist_ok=True)
     state, metadata = import_onnx_state_dict(source)
     _atomic_checkpoint(checkpoint, state)

@@ -74,7 +74,9 @@ def _measure_calls(
     }
 
 
-def _runtime_identity(np: Any, torch: Any, psutil: Any, ov: Any | None) -> dict[str, str]:
+def _runtime_identity(
+    np: Any, torch: Any, psutil: Any, ov: Any | None
+) -> dict[str, str]:
     result = {
         "python": platform.python_version(),
         "numpy": str(np.__version__),
@@ -86,7 +88,9 @@ def _runtime_identity(np: Any, torch: Any, psutil: Any, ov: Any | None) -> dict[
     return result
 
 
-def _load_state(torch: Any, model_type: Any, checkpoint_path: Path) -> tuple[Any, float, float]:
+def _load_state(
+    torch: Any, model_type: Any, checkpoint_path: Path
+) -> tuple[Any, float, float]:
     try:
         construct_started = time.perf_counter()
         model = model_type()
@@ -125,7 +129,9 @@ def _sync_xpu(torch: Any, device: Any) -> None:
         torch.xpu.synchronize(device)
 
 
-def _torch_outputs(torch: Any, model: Any, device: Any, host_batch: Any, *, inference: bool) -> dict[str, Any]:
+def _torch_outputs(
+    torch: Any, model: Any, device: Any, host_batch: Any, *, inference: bool
+) -> dict[str, Any]:
     batch = torch.from_numpy(host_batch)
     if device.type == "xpu":
         batch = batch.to(device)
@@ -135,18 +141,25 @@ def _torch_outputs(torch: Any, model: Any, device: Any, host_batch: Any, *, infe
     if not inference:
         return values
     _sync_xpu(torch, device)
-    return {name: value.detach().to("cpu", dtype=torch.float32).numpy() for name, value in values.items()}
+    return {
+        name: value.detach().to("cpu", dtype=torch.float32).numpy()
+        for name, value in values.items()
+    }
 
 
 def _openvino_outputs(compiled: Any, host_batch: Any, np: Any) -> dict[str, Any]:
     result = compiled(host_batch)
-    values = [np.asarray(result[output], dtype=np.float32) for output in compiled.outputs]
+    values = [
+        np.asarray(result[output], dtype=np.float32) for output in compiled.outputs
+    ]
     if len(values) != 3:
         raise _RouteError("runtime_failed", "benchmark_runtime_error")
     return dict(zip(("note", "onset", "contour"), values, strict=True))
 
 
-def _openvino_property(target: Any, name: str, *, device: str | None = None) -> Any | None:
+def _openvino_property(
+    target: Any, name: str, *, device: str | None = None
+) -> Any | None:
     getter = getattr(target, "get_property", None)
     if not callable(getter):
         return None
@@ -179,17 +192,29 @@ def _openvino_property_value(value: Any) -> Any:
 def _openvino_device_info(core: Any, compiled: Any, target: str) -> dict[str, Any]:
     return {
         "selected_device": target,
-        "available_devices": sorted(str(device) for device in getattr(core, "available_devices", ())),
-        "full_device_name": _openvino_property_value(_openvino_property(core, "FULL_DEVICE_NAME", device=target)),
-        "device_architecture": _openvino_property_value(_openvino_property(core, "DEVICE_ARCHITECTURE", device=target)),
-        "execution_devices": _openvino_property_value(_openvino_property(compiled, "EXECUTION_DEVICES")),
+        "available_devices": sorted(
+            str(device) for device in getattr(core, "available_devices", ())
+        ),
+        "full_device_name": _openvino_property_value(
+            _openvino_property(core, "FULL_DEVICE_NAME", device=target)
+        ),
+        "device_architecture": _openvino_property_value(
+            _openvino_property(core, "DEVICE_ARCHITECTURE", device=target)
+        ),
+        "execution_devices": _openvino_property_value(
+            _openvino_property(compiled, "EXECUTION_DEVICES")
+        ),
         "inference_precision_hint_requested": "float32",
         "inference_precision_hint_compiled": _openvino_property_value(
             _openvino_property(compiled, "INFERENCE_PRECISION_HINT")
         ),
         "execution_mode_hint_requested": "unconfigured (plugin default)",
-        "execution_mode_hint_compiled": _openvino_property_value(_openvino_property(compiled, "EXECUTION_MODE_HINT")),
-        "performance_hint_compiled": _openvino_property_value(_openvino_property(compiled, "PERFORMANCE_HINT")),
+        "execution_mode_hint_compiled": _openvino_property_value(
+            _openvino_property(compiled, "EXECUTION_MODE_HINT")
+        ),
+        "performance_hint_compiled": _openvino_property_value(
+            _openvino_property(compiled, "PERFORMANCE_HINT")
+        ),
     }
 
 
@@ -201,7 +226,9 @@ def _openvino_memory_snapshot(core: Any, target: str) -> dict[str, Any]:
             "openvino_gpu_memory_measurement_status": "unavailable",
             "openvino_gpu_memory_statistics_bytes": None,
             "openvino_gpu_memory_bytes": None,
-            "openvino_gpu_total_memory_bytes": int(total_memory) if isinstance(total_memory, int) else None,
+            "openvino_gpu_total_memory_bytes": int(total_memory)
+            if isinstance(total_memory, int)
+            else None,
         }
     try:
         sanitized = {str(key): int(value) for key, value in statistics.items()}
@@ -210,13 +237,17 @@ def _openvino_memory_snapshot(core: Any, target: str) -> dict[str, Any]:
             "openvino_gpu_memory_measurement_status": "unavailable",
             "openvino_gpu_memory_statistics_bytes": None,
             "openvino_gpu_memory_bytes": None,
-            "openvino_gpu_total_memory_bytes": int(total_memory) if isinstance(total_memory, int) else None,
+            "openvino_gpu_total_memory_bytes": int(total_memory)
+            if isinstance(total_memory, int)
+            else None,
         }
     return {
         "openvino_gpu_memory_measurement_status": "ok",
         "openvino_gpu_memory_statistics_bytes": sanitized,
         "openvino_gpu_memory_bytes": sum(sanitized.values()),
-        "openvino_gpu_total_memory_bytes": int(total_memory) if isinstance(total_memory, int) else None,
+        "openvino_gpu_total_memory_bytes": int(total_memory)
+        if isinstance(total_memory, int)
+        else None,
     }
 
 
@@ -224,7 +255,9 @@ def _event_signature(event: Any) -> tuple[float, float, int]:
     return event.start_time_s, event.end_time_s, event.pitch_midi
 
 
-def _candidate_parity(np: Any, reference: Mapping[str, Any], candidate: Mapping[str, Any]) -> dict[str, Any]:
+def _candidate_parity(
+    np: Any, reference: Mapping[str, Any], candidate: Mapping[str, Any]
+) -> dict[str, Any]:
     from obruxo_basic_pitch.constants import FRAME_THRESHOLD, ONSET_THRESHOLD
     from obruxo_basic_pitch.parity import OutputParity, ParitySummary, assert_parity
     from obruxo_basic_pitch.postprocess import posteriorgrams_to_note_events
@@ -234,7 +267,9 @@ def _candidate_parity(np: Any, reference: Mapping[str, Any], candidate: Mapping[
     for name in ("contour", "note", "onset"):
         candidate_values = np.asarray(candidate[name], dtype=np.float64)
         difference = candidate_values - np.asarray(reference[name], dtype=np.float64)
-        errors[f"{name}_non_finite_count"] = int(np.count_nonzero(~np.isfinite(candidate_values)))
+        errors[f"{name}_non_finite_count"] = int(
+            np.count_nonzero(~np.isfinite(candidate_values))
+        )
         if not np.isfinite(difference).all():
             errors[f"{name}_max_abs_error"] = None
             output_parity[name] = OutputParity(float("inf"), float("inf"), float("inf"))
@@ -248,16 +283,30 @@ def _candidate_parity(np: Any, reference: Mapping[str, Any], candidate: Mapping[
             float(np.sqrt(np.mean(difference * difference))),
         )
 
-    note_disagreements = int(np.count_nonzero((candidate["note"] >= FRAME_THRESHOLD) != (reference["note"] >= FRAME_THRESHOLD)))
-    onset_disagreements = int(np.count_nonzero((candidate["onset"] >= ONSET_THRESHOLD) != (reference["onset"] >= ONSET_THRESHOLD)))
+    note_disagreements = int(
+        np.count_nonzero(
+            (candidate["note"] >= FRAME_THRESHOLD)
+            != (reference["note"] >= FRAME_THRESHOLD)
+        )
+    )
+    onset_disagreements = int(
+        np.count_nonzero(
+            (candidate["onset"] >= ONSET_THRESHOLD)
+            != (reference["onset"] >= ONSET_THRESHOLD)
+        )
+    )
     reference_events = []
     candidate_events = []
     for index in range(reference["note"].shape[0]):
         reference_events.extend(
-            posteriorgrams_to_note_events({name: value[index] for name, value in reference.items()})
+            posteriorgrams_to_note_events(
+                {name: value[index] for name, value in reference.items()}
+            )
         )
         candidate_events.extend(
-            posteriorgrams_to_note_events({name: value[index] for name, value in candidate.items()})
+            posteriorgrams_to_note_events(
+                {name: value[index] for name, value in candidate.items()}
+            )
         )
     event_count_disagreements = int(len(reference_events) != len(candidate_events))
     if event_count_disagreements:
@@ -266,14 +315,20 @@ def _candidate_parity(np: Any, reference: Mapping[str, Any], candidate: Mapping[
         event_tuple_disagreements = sum(
             left != right
             for left, right in zip(
-                map(_event_signature, reference_events), map(_event_signature, candidate_events), strict=True
+                map(_event_signature, reference_events),
+                map(_event_signature, candidate_events),
+                strict=True,
             )
         )
     structure_disagreements = event_count_disagreements or event_tuple_disagreements
-    pitch_bend_disagreements = sum(
-        (left.pitch_bend or ()) != (right.pitch_bend or ())
-        for left, right in zip(reference_events, candidate_events, strict=True)
-    ) if len(reference_events) == len(candidate_events) else max(len(reference_events), len(candidate_events))
+    pitch_bend_disagreements = (
+        sum(
+            (left.pitch_bend or ()) != (right.pitch_bend or ())
+            for left, right in zip(reference_events, candidate_events, strict=True)
+        )
+        if len(reference_events) == len(candidate_events)
+        else max(len(reference_events), len(candidate_events))
+    )
     summary = ParitySummary(
         contour=output_parity["contour"],
         note=output_parity["note"],
@@ -384,8 +439,12 @@ def _memory_snapshot(
     }
     if device is not None and device.type == "xpu":
         try:
-            result["pytorch_xpu_peak_allocated_bytes"] = int(torch.xpu.max_memory_allocated(device))
-            result["pytorch_xpu_peak_reserved_bytes"] = int(torch.xpu.max_memory_reserved(device))
+            result["pytorch_xpu_peak_allocated_bytes"] = int(
+                torch.xpu.max_memory_allocated(device)
+            )
+            result["pytorch_xpu_peak_reserved_bytes"] = int(
+                torch.xpu.max_memory_reserved(device)
+            )
         except (AttributeError, RuntimeError, TypeError):
             result["measurement_status"] = "unavailable"
     if openvino_core is not None and openvino_target is not None:
@@ -402,13 +461,17 @@ def _training_call(torch: Any, model: Any, device: Any, host_batch: Any) -> None
     loss.backward()
     _sync_xpu(torch, device)
     for parameter in model.parameters():
-        if parameter.grad is None or not bool(torch.isfinite(parameter.grad).all().item()):
+        if parameter.grad is None or not bool(
+            torch.isfinite(parameter.grad).all().item()
+        ):
             raise _TrainingError("training gradient was non-finite or missing")
 
 
 def _prepared_windows(cases: Any, prepare_wav: Any, np: Any) -> tuple[list[Any], Any]:
     prepared = [prepare_wav(case.audio_path) for case in cases]
-    windows = np.ascontiguousarray(np.concatenate([item.windows for item in prepared], axis=0), dtype=np.float32)
+    windows = np.ascontiguousarray(
+        np.concatenate([item.windows for item in prepared], axis=0), dtype=np.float32
+    )
     return prepared, windows
 
 
@@ -436,7 +499,9 @@ def _end_to_end(
             name: np.concatenate([chunk[name] for chunk in chunks], axis=0)
             for name in ("note", "onset", "contour")
         }
-        unwrapped = unwrap_window_outputs(outputs, original_sample_count=prepared.original_sample_count)
+        unwrapped = unwrap_window_outputs(
+            outputs, original_sample_count=prepared.original_sample_count
+        )
         events = [] if unwrapped["note"].shape[0] == 0 else postprocess(unwrapped)
         synchronize()
         wall_seconds = float(time.perf_counter() - started)
@@ -454,7 +519,9 @@ def _end_to_end(
     return {
         "audio_seconds": float(total_audio_seconds),
         "wall_seconds": float(total_wall_seconds),
-        "audio_seconds_per_wall_second": float(total_audio_seconds / total_wall_seconds) if total_wall_seconds else 0.0,
+        "audio_seconds_per_wall_second": float(total_audio_seconds / total_wall_seconds)
+        if total_wall_seconds
+        else 0.0,
         "cases": rows,
     }
 
@@ -494,9 +561,13 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
                 smoke_max_cases=12,
                 coverage={},
             )
-            cases = load_manifest(request["manifest_path"], config, allow_derived_render=True)
+            cases = load_manifest(
+                request["manifest_path"], config, allow_derived_render=True
+            )
         checkpoint_path = Path(str(request["checkpoint_path"])).resolve(strict=True)
-        model, model_construct_seconds, checkpoint_load_seconds = _load_state(torch, BasicPitchICASSP2022, checkpoint_path)
+        model, model_construct_seconds, checkpoint_load_seconds = _load_state(
+            torch, BasicPitchICASSP2022, checkpoint_path
+        )
         model.eval()
         route_device = None
         xpu_peak_reset = None
@@ -521,7 +592,11 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
             try:
                 import openvino as ov
             except Exception as exc:
-                code = "openvino_cpu_unavailable" if route == "openvino_cpu" else "openvino_gpu_unavailable"
+                code = (
+                    "openvino_cpu_unavailable"
+                    if route == "openvino_cpu"
+                    else "openvino_gpu_unavailable"
+                )
                 raise _RouteError("unavailable", code) from exc
             (
                 compiled,
@@ -538,13 +613,19 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
 
         def predict(host_batch: Any) -> Mapping[str, Any]:
             if route in {"pytorch_cpu", "pytorch_xpu"}:
-                return _torch_outputs(torch, model, route_device, host_batch, inference=True)
+                return _torch_outputs(
+                    torch, model, route_device, host_batch, inference=True
+                )
             return _openvino_outputs(compiled, host_batch, np)
 
         public_windows = np.ascontiguousarray(synthetic_windows(), dtype=np.float32)
-        canonical_model, _, _ = _load_state(torch, BasicPitchICASSP2022, checkpoint_path)
+        canonical_model, _, _ = _load_state(
+            torch, BasicPitchICASSP2022, checkpoint_path
+        )
         canonical_model.eval()
-        canonical = _torch_outputs(torch, canonical_model, torch.device("cpu"), public_windows, inference=True)
+        canonical = _torch_outputs(
+            torch, canonical_model, torch.device("cpu"), public_windows, inference=True
+        )
         candidate = predict(public_windows)
         parity = _candidate_parity(np, canonical, candidate)
         if parity_only:
@@ -560,15 +641,21 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
                 "backend": openvino_device_info,
             }
         if not parity["parity_passed"]:
-            raise _ParityError("candidate parity changed threshold or stock note-event behavior")
+            raise _ParityError(
+                "candidate parity changed threshold or stock note-event behavior"
+            )
 
-        memory_device = route_device if route in {"pytorch_cpu", "pytorch_xpu"} else None
+        memory_device = (
+            route_device if route in {"pytorch_cpu", "pytorch_xpu"} else None
+        )
         _prepared, windows = _prepared_windows(cases, prepare_wav, np)
         source_key = "model_only" if mode == "inference" else "training"
         if mode not in {"inference", "training"}:
             raise _RouteError("runtime_failed", "benchmark_runtime_error")
         batch_results: dict[str, Any] = {}
-        synchronize = lambda: _sync_xpu(torch, route_device) if route_device is not None else None
+        synchronize = lambda: (
+            _sync_xpu(torch, route_device) if route_device is not None else None
+        )
         for batch_size in config.batch_sizes:
             host_batch = np.ascontiguousarray(windows[:batch_size], dtype=np.float32)
             if host_batch.shape[0] != batch_size:
@@ -579,7 +666,9 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
                 if route == "openvino_cpu" or route == "openvino_gpu":
                     raise _RouteError("runtime_failed", "benchmark_runtime_error")
                 model.train()
-                invoke = lambda host_batch=host_batch: _training_call(torch, model, route_device, host_batch)
+                invoke = lambda host_batch=host_batch: _training_call(
+                    torch, model, route_device, host_batch
+                )
             measurement = _measure_calls(
                 invoke,
                 batch_size=batch_size,
@@ -588,11 +677,19 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
                 synchronize=synchronize,
             )
             if mode == "inference":
-                measurement["first_inference_seconds"] = measurement.pop("first_call_seconds")
-                measurement["inference_warmup_seconds"] = measurement.pop("warmup_seconds")
+                measurement["first_inference_seconds"] = measurement.pop(
+                    "first_call_seconds"
+                )
+                measurement["inference_warmup_seconds"] = measurement.pop(
+                    "warmup_seconds"
+                )
             else:
-                measurement["first_training_step_seconds"] = measurement.pop("first_call_seconds")
-                measurement["training_warmup_seconds"] = measurement.pop("warmup_seconds")
+                measurement["first_training_step_seconds"] = measurement.pop(
+                    "first_call_seconds"
+                )
+                measurement["training_warmup_seconds"] = measurement.pop(
+                    "warmup_seconds"
+                )
             batch_results[str(batch_size)] = measurement
         end_to_end = None
         if mode == "inference":
@@ -624,13 +721,25 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
                 "backend_import_seconds": runtime_import_seconds,
                 "model_construct_seconds": model_construct_seconds,
                 "checkpoint_load_seconds": checkpoint_load_seconds,
-                "model_device_move_seconds": device_move_seconds if route == "pytorch_xpu" else None,
-                "openvino_conversion_seconds": openvino_conversion_seconds if route.startswith("openvino_") else None,
-                "openvino_compile_seconds": openvino_compile_seconds if route.startswith("openvino_") else None,
+                "model_device_move_seconds": device_move_seconds
+                if route == "pytorch_xpu"
+                else None,
+                "openvino_conversion_seconds": openvino_conversion_seconds
+                if route.startswith("openvino_")
+                else None,
+                "openvino_compile_seconds": openvino_compile_seconds
+                if route.startswith("openvino_")
+                else None,
                 "measurement_status": {
-                    "model_device_move_seconds": "ok" if route == "pytorch_xpu" else "not_applicable",
-                    "openvino_conversion_seconds": "ok" if route.startswith("openvino_") else "not_applicable",
-                    "openvino_compile_seconds": "ok" if route.startswith("openvino_") else "not_applicable",
+                    "model_device_move_seconds": "ok"
+                    if route == "pytorch_xpu"
+                    else "not_applicable",
+                    "openvino_conversion_seconds": "ok"
+                    if route.startswith("openvino_")
+                    else "not_applicable",
+                    "openvino_compile_seconds": "ok"
+                    if route.startswith("openvino_")
+                    else "not_applicable",
                 },
             },
             "parity": parity,
@@ -639,20 +748,44 @@ def _run(request: Mapping[str, Any]) -> dict[str, Any]:
             "memory": memory,
         }
     except _RouteError as exc:
-        return {"route": route, "mode": mode, "status": exc.status, "failure_code": exc.code}
+        return {
+            "route": route,
+            "mode": mode,
+            "status": exc.status,
+            "failure_code": exc.code,
+        }
     except _ParityError:
-        result = {"route": route, "mode": mode, "status": "parity_failed", "failure_code": "parity_failed"}
+        result = {
+            "route": route,
+            "mode": mode,
+            "status": "parity_failed",
+            "failure_code": "parity_failed",
+        }
         if parity is not None:
             result["parity"] = parity
         return result
     except _TrainingError:
-        return {"route": route, "mode": mode, "status": "runtime_failed", "failure_code": "non_finite_training_step"}
+        return {
+            "route": route,
+            "mode": mode,
+            "status": "runtime_failed",
+            "failure_code": "non_finite_training_step",
+        }
     except RuntimeError as exc:
-        status = "out_of_memory" if "out of memory" in str(exc).lower() else "runtime_failed"
-        code = "out_of_memory" if status == "out_of_memory" else "benchmark_runtime_error"
+        status = (
+            "out_of_memory" if "out of memory" in str(exc).lower() else "runtime_failed"
+        )
+        code = (
+            "out_of_memory" if status == "out_of_memory" else "benchmark_runtime_error"
+        )
         return {"route": route, "mode": mode, "status": status, "failure_code": code}
     except (AttributeError, ImportError, KeyError, OSError, TypeError, ValueError):
-        return {"route": route, "mode": mode, "status": "runtime_failed", "failure_code": "benchmark_runtime_error"}
+        return {
+            "route": route,
+            "mode": mode,
+            "status": "runtime_failed",
+            "failure_code": "benchmark_runtime_error",
+        }
 
 
 def main() -> int:

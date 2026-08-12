@@ -11,6 +11,8 @@ CHECKPOINT_PATH = ROOT / "artifacts" / "basic_pitch_icassp_2022.pt"
 
 def test_reference_onnx() -> None:
     if not ONNX_PATH.exists():
-        raise FileNotFoundError(f"pinned public ONNX artifact is required at {ONNX_PATH}")
+        raise FileNotFoundError(
+            f"pinned public ONNX artifact is required at {ONNX_PATH}"
+        )
     summary = compare_windows(ONNX_PATH, CHECKPOINT_PATH, synthetic_windows())
     assert_parity(summary)
