@@ -3878,14 +3878,14 @@
   },
   "runtime_provenance": {
     "consistency": "recorded_backend_does_not_match_issue_24_observed_leader",
-    "interpretation": "The existing #25 quality run records a different backend from the fastest observed #24 route. Its quality result remains a CPU-provenance measurement; no XPU full-corpus quality or equivalence claim is made.",
-    "issue_24_observed_highest_batch_1_audio_seconds_per_second": 280.00812052550737,
+    "interpretation": "The existing #25 quality run records a backend different from one or both current #24 leaders. Its quality result remains attributed only to the recorded backend; no alternate-backend full-corpus quality or equivalence claim is made.",
+    "issue_24_observed_highest_batch_1_audio_seconds_per_second": 217.87797768889692,
     "issue_24_observed_highest_batch_1_route": "pytorch_xpu",
-    "issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second": 130.87338461813948,
-    "issue_24_observed_highest_end_to_end_route": "pytorch_xpu",
+    "issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second": 98.26220356768816,
+    "issue_24_observed_highest_end_to_end_route": "openvino_gpu",
     "selected_backend": "pytorch_cpu",
     "selected_contract": "#24_end_to_end_audio_to_note_events_batch_1",
-    "selection_rationale": "The existing #25 run fixed pytorch_cpu in its backend contract; no independent rationale for overriding the faster observed #24 pytorch_xpu route is recorded in the result artifacts.",
+    "selection_rationale": "The existing #25 run fixed pytorch_cpu in its backend contract. Its artifacts do not record why that route was selected; current #24 measurements identify pytorch_xpu as the batch-1 model-call throughput leader and openvino_gpu as the warmed end-to-end leader. This report does not relabel the existing quality result or infer alternate-backend quality.",
     "selection_source": "the backend contract recorded by the existing #25 run"
   },
   "status": "ok"

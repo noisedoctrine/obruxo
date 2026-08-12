@@ -17,11 +17,11 @@
 
 - Recorded #25 corpus backend: `pytorch_cpu`; boundary: `#24_end_to_end_audio_to_note_events_batch_1`; precision: `float32`.
 - Runtime-selection source: the backend contract recorded by the existing #25 run.
-- Selection rationale recorded by the artifacts: The existing #25 run fixed pytorch_cpu in its backend contract; no independent rationale for overriding the faster observed #24 pytorch_xpu route is recorded in the result artifacts..
-- Existing #24 report's highest batch-1 inference route: `pytorch_xpu` at `280.00812052550737` audio-seconds/second.
-- Existing #24 report's highest warmed end-to-end route: `pytorch_xpu` at `130.87338461813948` audio-seconds/wall-second.
+- Selection rationale recorded by the artifacts: The existing #25 run fixed pytorch_cpu in its backend contract. Its artifacts do not record why that route was selected; current #24 measurements identify pytorch_xpu as the batch-1 model-call throughput leader and openvino_gpu as the warmed end-to-end leader. This report does not relabel the existing quality result or infer alternate-backend quality.
+- Existing #24 report's highest batch-1 inference route: `pytorch_xpu` at `217.87797768889692` audio-seconds/second.
+- Existing #24 report's highest warmed end-to-end route: `openvino_gpu` at `98.26220356768816` audio-seconds/wall-second.
 - Consistency assessment: `recorded_backend_does_not_match_issue_24_observed_leader`.
-- Interpretation: The existing #25 quality run records a different backend from the fastest observed #24 route. Its quality result remains a CPU-provenance measurement; no XPU full-corpus quality or equivalence claim is made.
+- Interpretation: The existing #25 quality run records a backend different from one or both current #24 leaders. Its quality result remains attributed only to the recorded backend; no alternate-backend full-corpus quality or equivalence claim is made.
 - This report revision does not rerun the corpus evaluation. The backend mismatch is surfaced for review rather than silently reassigning the existing F1 result to XPU.
 
 ## Evaluation status
