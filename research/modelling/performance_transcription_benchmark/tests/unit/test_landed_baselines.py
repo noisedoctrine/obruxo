@@ -50,12 +50,15 @@ def test_comparison_report_distinguishes_baseline_from_blocked_comparison() -> N
     assert "What could not be executed" in markdown
     assert "The intended comparative benchmark remains incomplete" in markdown
     assert "No ranking, quality estimate, cost estimate" in markdown
-    assert "pre_fix_parity_failed" in markdown
+    assert "measured_corrected_fp32_performance" in markdown
+    assert "Historical pre-fix/default result" in markdown
     assert "Bounded diagnostic result (corrected)" in markdown
-    assert "corrected FP32 startup, throughput, end-to-end, and resource measurements remain `not_run`" in markdown
+    assert "Corrected measured result" in markdown
+    assert "corrected FP32 startup, throughput, end-to-end, and resource measurements remain `not_run`" not in markdown
     assert "including the OpenVINO GPU parity failure" not in markdown
 
     execution = next(model for model in report["models"] if model["model_id"] == "basic_pitch")["execution"]
     assert execution["measurement_status"]["post_fix_parity"] == "passed"
-    assert execution["measurement_status"]["post_fix_timing"] == "not_run"
+    assert execution["measurement_status"]["post_fix_timing"] == "measured"
+    assert execution["openvino_parity_history"]["routes"][-1]["status"] == "parity_failed"
     assert execution["openvino_precision_diagnostic"]["status"] == "parity_passed"

@@ -10,7 +10,7 @@ The JSON is authoritative, but this Markdown is intended to stand alone as the r
 
 - Measured candidates: `basic_pitch`.
 - Metadata-only or unavailable candidates: `timbre_trap_base, ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_small, muscriptor_medium, muscriptor_large`.
-- Directly measured scope: Only Basic Pitch produced executable #24/#25 evidence in the permitted existing runtime and storage. Its quality and cost evidence are inherited, not rerun by #26; the persisted OpenVINO GPU cost row is pre-fix evidence.
+- Directly measured scope: Only Basic Pitch produced executable #24/#25 evidence in the permitted existing runtime and storage. Its quality and cost evidence are inherited, not rerun by #26; the current #24 cost rows include the corrected OpenVINO GPU FP32 + PERFORMANCE route when present.
 - Sourced/model-level scope: Candidate source, checkpoint, representation, architecture boundary, native sample rate, batch semantics, and license fields are verified inventory facts; they are not performance measurements.
 - Unresolved comparative scope: No comparative quality, execution cost, resource, backward-cost, or quantization result exists for the unavailable alternatives. The intended comparative benchmark remains incomplete.
 
@@ -52,7 +52,7 @@ Only Basic Pitch produced executable evidence. The following sections consume th
 
 - Source: `landed_issue_25_report`; eligible population: `1769`; coverage: `1.000`.
 - Recorded #25 backend: `pytorch_cpu`; boundary: `#24_end_to_end_audio_to_note_events_batch_1`; precision: `float32`.
-- #25 route provenance assessment: `recorded_backend_does_not_match_issue_24_observed_leader`. The existing #25 quality run records a different backend from the fastest observed #24 route. Its quality result remains a CPU-provenance measurement; no XPU full-corpus quality or equivalence claim is made.
+- #25 route provenance assessment: `recorded_backend_does_not_match_issue_24_observed_leader`. The existing #25 quality run records a backend different from one or both current #24 leaders. Its quality result remains attributed only to the recorded backend; no alternate-backend full-corpus quality or equivalence claim is made.
 
 | Quality view | Eligible | Succeeded | Failed | Coverage | Onset+pitch F1 | Onset+pitch+offset F1 | Frame F1 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -65,26 +65,27 @@ Only Basic Pitch produced executable evidence. The following sections consume th
 
 - Source: `landed_issue_24_report`; Routes and findings are consumed from the landed #24 report; #26 does not rerun Basic Pitch cost measurements.
 - Cost evidence is route-specific; a route failure is not converted into a score or a fallback result.
-- The persisted #24 cost rows below are pre-fix OpenVINO evidence where indicated; a bounded post-fix parity pass is not a corrected performance measurement.
+- The table below consumes the current #24 route rows. The historical default OpenVINO GPU failure and the bounded corrected parity diagnostic remain separate from the corrected timed route row.
 
-| Mode | Route | Evidence state | Batch-1 throughput | Batch-8 throughput | E2E rate | Startup (s) | Host RSS (MiB) | XPU allocated/reserved (MiB) |
-| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| `inference` | `pytorch_cpu` | `ok` | 129.654 | 188.064 | 56.559 | 0.823 | 590.6 | n/a / n/a |
-| `inference` | `pytorch_xpu` | `ok` | 280.008 | 747.332 | 130.873 | 0.836 | 2300.1 | 70.3 / 124.0 |
-| `inference` | `openvino_cpu` | `ok` | 102.785 | 222.926 | 60.948 | 2.519 | 807.0 | n/a / n/a |
-| `inference` | `openvino_gpu` | `pre_fix_parity_failed` | n/a | n/a | n/a | n/a | n/a | n/a / n/a |
-| `training` | `pytorch_cpu` | `ok` | 29.344 | 33.566 | n/a | 0.763 | 902.8 | n/a / n/a |
-| `training` | `pytorch_xpu` | `ok` | 92.505 | 254.338 | n/a | 0.833 | 2915.3 | 182.1 / 316.0 |
-
-Historical route records:
-- `openvino_gpu`: pre-fix/default `float16` + `PERFORMANCE` -> `parity_failed` before timing. The corrected route has a bounded parity result only.
+| Mode | Route | Evidence state | Batch-1 throughput | Batch-8 throughput | E2E rate | Startup (s) | Host RSS (MiB) | XPU allocated/reserved (MiB) | OpenVINO GPU memory (MiB) |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- | ---: |
+| `inference` | `pytorch_cpu` | `ok` | 79.775 | 174.782 | 50.547 | 1.002 | 589.7 | n/a / n/a | n/a |
+| `inference` | `pytorch_xpu` | `ok` | 217.878 | 727.400 | 91.984 | 1.040 | 2300.1 | 70.3 / 124.0 | n/a |
+| `inference` | `openvino_cpu` | `ok` | 91.475 | 215.639 | 53.338 | 3.583 | 814.0 | n/a / n/a | n/a |
+| `inference` | `openvino_gpu` | `measured_corrected_fp32_performance` | 197.036 | 320.379 | 98.262 | 19.287 | 1191.9 | n/a / n/a | 225.9 / 16762.6 |
+| `training` | `pytorch_cpu` | `ok` | 23.911 | 31.338 | n/a | 0.968 | 904.0 | n/a / n/a | n/a |
+| `training` | `pytorch_xpu` | `ok` | 81.987 | 241.946 | n/a | 0.906 | 2926.4 | 182.1 / 316.0 | n/a |
 
 ### OpenVINO GPU evidence state
 
-- Measured result (pre-fix/default): the plugin compiled the GPU route as `float16` + `PERFORMANCE`; parity failed catastrophically before timing, so the persisted cost row contains no GPU performance or resource result.
+- Historical pre-fix/default result: requested `plugin default (observed float16)`, observed `plugin default (observed PERFORMANCE)`; status `parity_failed` before timing. Non-finite contour/note/onset values were `227040` / `75680` / `75680`; candidate/reference event counts were `0` / `8`. No performance or resource result is inferred from this failed route.
 - Bounded diagnostic result (corrected): requested `INFERENCE_PRECISION_HINT=float32`, compiled `float32` + `PERFORMANCE`; status `parity_passed` on `5` public synthetic windows.
 - Bounded parity metrics: non-finite values and threshold/event disagreements were `0`; maximum contour/note/onset errors were `0.000001431`, `0.000000715`, and `0.000001132`.
-- Not yet measured: corrected FP32 startup, throughput, end-to-end, and resource measurements remain `not_run`; no corrected OpenVINO GPU performance claim is made.
+- Corrected measured result: the actual #24 smoke route compiled `float32` on `Intel(R) Arc(TM) 140T GPU (16GB) (iGPU)` with `PERFORMANCE` execution; timed-route parity is `passed`.
+- Corrected startup medians: backend import `1.040` s, model conversion `2.439` s, GPU compilation `15.643` s, total startup `19.287` s; first-call / warmup at batch 1 `5.345` / `0.030` s.
+- Corrected steady-state audio-equivalent throughput (audio-s/s): batch 1 `197.036`, batch 2 `272.918`, batch 4 `321.501`, batch 8 `320.379`.
+- Corrected end-to-end throughput: `98.262` audio-s/s; host peak RSS `1191.9` MiB; OpenVINO GPU memory `225.9` / `16762.6` MiB where reported.
+- Timed-route parity errors: non-finite values and threshold/event disagreements were `0`; maximum contour/note/onset errors were `0.000001431`, `0.000000715`, and `0.000001132`.
 
 ### Basic Pitch quantization evidence
 
@@ -113,14 +114,15 @@ No alternative candidate produced a quality, execution-cost, resource, backward-
 
 ### Directly supported by measured results
 
-- Directly measured evidence exists only for Basic Pitch: #25 quality on 1,769 eligible pairs and #24 route/cost evidence. The persisted OpenVINO GPU cost row is the pre-fix default FP16 + PERFORMANCE parity failure and contains no GPU timing/resource result.
+- Directly measured evidence exists only for Basic Pitch: #25 quality on 1,769 eligible pairs and #24 route/cost evidence. The current #24 inference comparison includes corrected OpenVINO GPU FP32 + PERFORMANCE startup, throughput, end-to-end, parity, and resource measurements when that route is present.
 - The Basic Pitch evidence is a complete baseline for the landed #24/#25 contracts, not a comparison against the unavailable alternatives.
-- The observed Basic Pitch route trade-offs and the historical pre-fix OpenVINO GPU failure are findings of #24; the #25 quality result remains CPU-provenanced until route provenance is resolved.
+- The measured #24 model-call throughput winners were batch 1: `pytorch_xpu` (217.878 audio-s/s), batch 2: `pytorch_xpu` (341.191 audio-s/s), batch 4: `pytorch_xpu` (521.529 audio-s/s), batch 8: `pytorch_xpu` (727.400 audio-s/s); the end-to-end winner was `openvino_gpu` (98.262 audio-s/s). These are Basic Pitch route findings, not alternative-model results.
+- The #25 quality result remains CPU-provenanced until route provenance is resolved.
 
 ### Bounded diagnostic results
 
 - A separate bounded #24 diagnostic compiled OpenVINO GPU with INFERENCE_PRECISION_HINT=float32 while retaining PERFORMANCE and passed parity on five public synthetic windows. This is a parity result, not a performance/resource result.
-- This bounded result validates numerical parity only; it does not add a corrected OpenVINO GPU speed, startup, end-to-end, memory, or resource result.
+- The bounded corrected parity diagnostic remains a correctness result; the corrected GPU timing/resource rows above are the separate measured result.
 
 ### Supported only by verified model characteristics
 
@@ -130,7 +132,7 @@ No alternative candidate produced a quality, execution-cost, resource, backward-
 ### Comparative questions that remain unanswered
 
 - Alternative-model quality, latency, throughput, memory, backward cost, quantization response, and quality-versus-cost trade-offs remain unanswered because those candidates were not executable in the permitted local state.
-- Corrected OpenVINO GPU startup, throughput, end-to-end, and resource measurements have not yet been run; alternative-model comparisons remain blocked by unavailable prerequisites.
+- The alternative-model comparison remains incomplete because the required candidate executions were unavailable; this reporting update did not rerun #25 evaluation or #26 candidate inference.
 - No ranking, quality estimate, cost estimate, quantization effect, or integration recommendation is assigned to any unavailable candidate.
 
 ## What is required before the intended comparison can be completed
