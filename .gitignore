@@ -37,6 +37,7 @@ Thumbs.db
 # Local secrets and machine-specific environment
 .env
 .env.*
+secrets/
 
 # Notebook/editor checkpoints
 .ipynb_checkpoints/
