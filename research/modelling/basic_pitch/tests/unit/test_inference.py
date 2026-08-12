@@ -17,7 +17,10 @@ def test_final_window_stays_on_fixed_hop_grid_and_zero_pads_tail() -> None:
     leading = (OVERLAP * FFT_HOP) // 2
 
     assert windows.shape == (2, AUDIO_N_SAMPLES, 1)
-    expected_tail = np.pad(samples[hop - leading :], (0, AUDIO_N_SAMPLES - (samples.shape[0] - hop + leading)))
+    expected_tail = np.pad(
+        samples[hop - leading :],
+        (0, AUDIO_N_SAMPLES - (samples.shape[0] - hop + leading)),
+    )
     np.testing.assert_array_equal(windows[1, :, 0], expected_tail)
     assert windows[1, 0, 0] == samples[hop - leading]
     assert windows[1, -1, 0] == 0.0
@@ -31,8 +34,12 @@ def test_unwrap_crops_each_window_then_trims_once_to_original_duration() -> None
     }
 
     original_sample_count = AUDIO_SAMPLE_RATE * 2 + 100
-    unwrapped = unwrap_window_outputs(output, original_sample_count=original_sample_count)
-    expected_frames = original_sample_count * (AUDIO_SAMPLE_RATE // FFT_HOP) // AUDIO_SAMPLE_RATE
+    unwrapped = unwrap_window_outputs(
+        output, original_sample_count=original_sample_count
+    )
+    expected_frames = (
+        original_sample_count * (AUDIO_SAMPLE_RATE // FFT_HOP) // AUDIO_SAMPLE_RATE
+    )
 
     assert {name: value.shape for name, value in unwrapped.items()} == {
         "note": (expected_frames, 88),

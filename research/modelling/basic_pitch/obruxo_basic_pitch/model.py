@@ -39,7 +39,9 @@ class BasicPitchICASSP2022(nn.Module):
 
     def forward(self, audio: Tensor) -> dict[str, Tensor]:
         if audio.ndim != 3 or audio.shape[1:] != (AUDIO_N_SAMPLES, 1):
-            raise ValueError(f"expected input shape [B,{AUDIO_N_SAMPLES},1], got {tuple(audio.shape)}")
+            raise ValueError(
+                f"expected input shape [B,{AUDIO_N_SAMPLES},1], got {tuple(audio.shape)}"
+            )
         if audio.dtype is not torch.float32:
             raise TypeError(f"expected torch.float32 input, got {audio.dtype}")
 
@@ -55,7 +57,9 @@ class BasicPitchICASSP2022(nn.Module):
 
         onset = _pad(features, 2, 2, 1, 1)
         onset = F.relu(self.onset_bn(self.onset_conv1(onset)))
-        onset = torch.sigmoid(self.onset_conv2(_pad(torch.cat((note, onset), dim=1), 1, 1, 1, 1)))
+        onset = torch.sigmoid(
+            self.onset_conv2(_pad(torch.cat((note, onset), dim=1), 1, 1, 1, 1))
+        )
 
         return {
             "note": note.squeeze(1),

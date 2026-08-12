@@ -17,16 +17,22 @@ from obruxo_basic_pitch.weights import write_imported_checkpoint
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="OBRUXO Basic Pitch conversion and parity tools")
+    parser = argparse.ArgumentParser(
+        description="OBRUXO Basic Pitch conversion and parity tools"
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    importer = subparsers.add_parser("import-onnx", help="verify and import the pinned public ONNX checkpoint")
+    importer = subparsers.add_parser(
+        "import-onnx", help="verify and import the pinned public ONNX checkpoint"
+    )
     importer.add_argument("--onnx", type=Path, required=True)
     importer.add_argument("--checkpoint", type=Path, required=True)
     importer.add_argument("--metadata", type=Path, required=True)
     importer.add_argument("--force", action="store_true")
 
-    parity = subparsers.add_parser("parity", help="compare the native module with ONNX Runtime CPU")
+    parity = subparsers.add_parser(
+        "parity", help="compare the native module with ONNX Runtime CPU"
+    )
     parity.add_argument("--onnx", type=Path, required=True)
     parity.add_argument("--checkpoint", type=Path, required=True)
     parity.add_argument("--json", type=Path, required=True)
@@ -39,7 +45,9 @@ def _parser() -> argparse.ArgumentParser:
 def main() -> int:
     args = _parser().parse_args()
     if args.command == "import-onnx":
-        metadata = write_imported_checkpoint(args.onnx, args.checkpoint, args.metadata, force=args.force)
+        metadata = write_imported_checkpoint(
+            args.onnx, args.checkpoint, args.metadata, force=args.force
+        )
         print(f"imported {metadata.model_id} from the pinned public artifact")
         return 0
 
@@ -57,8 +65,16 @@ def main() -> int:
         private_local_windows=sum(clip.windows.shape[0] for clip in local),
     )
     assert_parity(summary)
-    write_reports(summary, args.json, args.markdown, private_local_clips=len(args.audio), force=args.force)
-    print(f"parity passed for {summary.synthetic_windows + summary.private_local_windows} windows")
+    write_reports(
+        summary,
+        args.json,
+        args.markdown,
+        private_local_clips=len(args.audio),
+        force=args.force,
+    )
+    print(
+        f"parity passed for {summary.synthetic_windows + summary.private_local_windows} windows"
+    )
     return 0
 
 

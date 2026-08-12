@@ -53,22 +53,30 @@ def _hz_to_midi(frequency: float) -> float:
 
 
 def midi_pitch_to_contour_bin(pitch_midi: int) -> float:
-    return 12.0 * CONTOURS_BINS_PER_SEMITONE * np.log2(
-        _midi_to_hz(pitch_midi) / ANNOTATIONS_BASE_FREQUENCY
+    return (
+        12.0
+        * CONTOURS_BINS_PER_SEMITONE
+        * np.log2(_midi_to_hz(pitch_midi) / ANNOTATIONS_BASE_FREQUENCY)
     )
 
 
 def model_frames_to_time(n_frames: int) -> np.ndarray:
     original_times = np.arange(n_frames, dtype=np.float64) * FFT_HOP / AUDIO_SAMPLE_RATE
     window_numbers = np.floor(np.arange(n_frames, dtype=np.float64) / ANNOT_N_FRAMES)
-    window_offset = (FFT_HOP / AUDIO_SAMPLE_RATE) * (ANNOT_N_FRAMES - AUDIO_N_SAMPLES / FFT_HOP) + 0.0018
+    window_offset = (FFT_HOP / AUDIO_SAMPLE_RATE) * (
+        ANNOT_N_FRAMES - AUDIO_N_SAMPLES / FFT_HOP
+    ) + 0.0018
     return original_times - (window_offset * window_numbers)
 
 
-def get_inferred_onsets(onsets: np.ndarray, frames: np.ndarray, n_diff: int = 2) -> np.ndarray:
+def get_inferred_onsets(
+    onsets: np.ndarray, frames: np.ndarray, n_diff: int = 2
+) -> np.ndarray:
     diffs = []
     for n in range(1, n_diff + 1):
-        frames_appended = np.concatenate([np.zeros((n, frames.shape[1]), dtype=frames.dtype), frames])
+        frames_appended = np.concatenate(
+            [np.zeros((n, frames.shape[1]), dtype=frames.dtype), frames]
+        )
         diffs.append(frames_appended[n:, :] - frames_appended[:-n, :])
     frame_diff = np.min(diffs, axis=0)
     frame_diff[frame_diff < 0] = 0
@@ -98,7 +106,9 @@ def constrain_frequency(
     return onsets, frames
 
 
-def _clear_frequency_neighborhood(energy: np.ndarray, start: int, end: int, frequency: int) -> None:
+def _clear_frequency_neighborhood(
+    energy: np.ndarray, start: int, end: int, frequency: int
+) -> None:
     energy[start:end, frequency] = 0
     if frequency < MAX_FREQ_IDX:
         energy[start:end, frequency + 1] = 0
@@ -132,7 +142,9 @@ def output_to_notes_polyphonic(
 
     remaining_energy = np.array(frames, copy=True)
     note_events: list[tuple[int, int, int, float]] = []
-    for note_start_idx, frequency_idx in zip(onset_time_indices, onset_frequency_indices):
+    for note_start_idx, frequency_idx in zip(
+        onset_time_indices, onset_frequency_indices
+    ):
         if note_start_idx >= n_frames - 1:
             continue
         i = note_start_idx + 1
@@ -146,14 +158,23 @@ def output_to_notes_polyphonic(
         i -= below_threshold
         if i - note_start_idx <= min_note_len:
             continue
-        _clear_frequency_neighborhood(remaining_energy, note_start_idx, i, frequency_idx)
+        _clear_frequency_neighborhood(
+            remaining_energy, note_start_idx, i, frequency_idx
+        )
         note_events.append(
-            (note_start_idx, i, int(frequency_idx) + MIDI_OFFSET, float(np.mean(frames[note_start_idx:i, frequency_idx])))
+            (
+                note_start_idx,
+                i,
+                int(frequency_idx) + MIDI_OFFSET,
+                float(np.mean(frames[note_start_idx:i, frequency_idx])),
+            )
         )
 
     if melodia_trick:
         while np.max(remaining_energy) > frame_thresh:
-            i_mid, frequency_idx = np.unravel_index(np.argmax(remaining_energy), remaining_energy.shape)
+            i_mid, frequency_idx = np.unravel_index(
+                np.argmax(remaining_energy), remaining_energy.shape
+            )
             remaining_energy[i_mid, frequency_idx] = 0
 
             i = i_mid + 1
@@ -180,7 +201,12 @@ def output_to_notes_polyphonic(
             if i_end - i_start <= min_note_len:
                 continue
             note_events.append(
-                (i_start, i_end, int(frequency_idx) + MIDI_OFFSET, float(np.mean(frames[i_start:i_end, frequency_idx])))
+                (
+                    i_start,
+                    i_end,
+                    int(frequency_idx) + MIDI_OFFSET,
+                    float(np.mean(frames[i_start:i_end, frequency_idx])),
+                )
             )
 
     return note_events
@@ -199,8 +225,13 @@ def get_pitch_bends(
         frequency_start = max(frequency_idx - n_bins_tolerance, 0)
         frequency_end = min(N_FREQ_BINS_CONTOURS, frequency_idx + n_bins_tolerance + 1)
         left_crop = max(0, n_bins_tolerance - frequency_idx)
-        right_crop = max(0, frequency_idx - (N_FREQ_BINS_CONTOURS - n_bins_tolerance - 1))
-        submatrix = contours[start_idx:end_idx, frequency_start:frequency_end] * frequency_gaussian[left_crop:window_length - right_crop]
+        right_crop = max(
+            0, frequency_idx - (N_FREQ_BINS_CONTOURS - n_bins_tolerance - 1)
+        )
+        submatrix = (
+            contours[start_idx:end_idx, frequency_start:frequency_end]
+            * frequency_gaussian[left_crop : window_length - right_crop]
+        )
         pitch_shift = n_bins_tolerance - left_crop
         bends = tuple((np.argmax(submatrix, axis=1) - pitch_shift).astype(int).tolist())
         result.append((start_idx, end_idx, pitch_midi, amplitude, bends))
@@ -247,7 +278,9 @@ def decode_notes(
     if settings is None:
         settings = StockDecoderSettings()
     if not settings.include_pitch_bends or settings.multiple_pitch_bends:
-        raise ValueError("the parity decoder exposes only the stock single-path settings")
+        raise ValueError(
+            "the parity decoder exposes only the stock single-path settings"
+        )
     return posteriorgrams_to_note_events(
         output,
         onset_threshold=settings.onset_threshold,

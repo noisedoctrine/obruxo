@@ -21,7 +21,9 @@ def test_stock_defaults_and_known_note_event() -> None:
     contour = np.zeros((172, 264), dtype=np.float32)
     onset[10, 20] = 1.0
     note[10:80, 20] = 0.8
-    events = posteriorgrams_to_note_events({"note": note, "onset": onset, "contour": contour})
+    events = posteriorgrams_to_note_events(
+        {"note": note, "onset": onset, "contour": contour}
+    )
     assert len(events) == 1
     assert events[0].pitch_midi == 41
     assert events[0].start_time_s == model_frames_to_time(172)[10]
