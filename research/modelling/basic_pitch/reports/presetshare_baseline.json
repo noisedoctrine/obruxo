@@ -3881,9 +3881,9 @@
     "consistency": "exact_issue_24_decision_consumed",
     "decision_identity_match": true,
     "interpretation": "The full-corpus quality result is attributed to the exact #24-selected runtime. It does not establish quality equivalence for any other backend.",
-    "issue_24_observed_highest_batch_1_audio_seconds_per_second": 225.8292173388524,
+    "issue_24_observed_highest_batch_1_audio_seconds_per_second": 238.367657286303,
     "issue_24_observed_highest_batch_1_route": "pytorch_xpu",
-    "issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second": 95.72711839188128,
+    "issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second": 96.02734978647123,
     "issue_24_observed_highest_end_to_end_route": "pytorch_xpu",
     "selected_backend": "pytorch_xpu",
     "selected_contract": "end_to_end_audio_to_note_event",
@@ -3892,8 +3892,8 @@
     "selection_rule": "highest median end-to-end audio-seconds/wall-second among successful parity-safe inference routes",
     "selection_source": "#24 corpus_inference_decision",
     "supporting_measurement": {
-      "audio_seconds_per_wall_second_median": 95.72711839188128,
-      "model_call_batch_1_audio_seconds_per_second_median": 225.8292173388524
+      "audio_seconds_per_wall_second_median": 96.02734978647123,
+      "model_call_batch_1_audio_seconds_per_second_median": 238.367657286303
     }
   },
   "status": "ok"

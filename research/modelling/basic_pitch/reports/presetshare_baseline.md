@@ -18,7 +18,7 @@
 - Exact #24 decision consumed: backend `pytorch_xpu`; device `xpu:0`; boundary `end_to_end_audio_to_note_event`; precision `float32`.
 - Runtime-selection source: `#24 corpus_inference_decision`.
 - Selection rule: highest median end-to-end audio-seconds/wall-second among successful parity-safe inference routes.
-- Supporting #24 measurements: batch-1 model-call `225.8292173388524` audio-seconds/second; end-to-end `95.72711839188128` audio-seconds/wall-second.
+- Supporting #24 measurements: batch-1 model-call `238.367657286303` audio-seconds/second; end-to-end `96.02734978647123` audio-seconds/wall-second.
 - Supporting decision identity matched the #24 report and recorded evaluator contract: `True`.
 - Consistency assessment: `exact_issue_24_decision_consumed`.
 - Interpretation: The full-corpus quality result is attributed to the exact #24-selected runtime. It does not establish quality equivalence for any other backend.
