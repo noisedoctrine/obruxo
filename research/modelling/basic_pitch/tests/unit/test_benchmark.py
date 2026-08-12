@@ -26,6 +26,8 @@ from obruxo_basic_pitch.benchmark import (
 )
 from obruxo_basic_pitch.benchmark_worker import (
     _build_openvino,
+    _openvino_device_info,
+    _openvino_memory_snapshot,
     _openvino_target,
     _RouteError,
 )
@@ -415,6 +417,43 @@ def test_openvino_compile_pins_float32_without_changing_execution_mode() -> None
 
     assert ov.core.compile_arguments is not None
     assert ov.core.compile_arguments[1:] == ("GPU", {"INFERENCE_PRECISION_HINT": "float32"})
+
+
+def test_openvino_route_records_compiled_device_and_memory_properties() -> None:
+    class Core:
+        def __init__(self) -> None:
+            self.available_devices = ["CPU", "GPU"]
+
+        @staticmethod
+        def get_property(device: str, name: str) -> object:
+            assert device == "GPU"
+            return {
+                "FULL_DEVICE_NAME": "Intel Arc test GPU",
+                "DEVICE_ARCHITECTURE": "GPU: test",
+                "GPU_MEMORY_STATISTICS": {"usm_device": 100, "usm_host": 20},
+                "GPU_DEVICE_TOTAL_MEM_SIZE": 1000,
+            }[name]
+
+    class Compiled:
+        @staticmethod
+        def get_property(name: str) -> object:
+            return {
+                "EXECUTION_DEVICES": ["GPU.0"],
+                "INFERENCE_PRECISION_HINT": "float32",
+                "EXECUTION_MODE_HINT": "PERFORMANCE",
+                "PERFORMANCE_HINT": "PERFORMANCE",
+            }[name]
+
+    info = _openvino_device_info(Core(), Compiled(), "GPU")
+    assert info["full_device_name"] == "Intel Arc test GPU"
+    assert info["execution_devices"] == ["GPU.0"]
+    assert info["inference_precision_hint_compiled"] == "float32"
+    assert info["execution_mode_hint_compiled"] == "PERFORMANCE"
+    memory = _openvino_memory_snapshot(Core(), "GPU")
+    assert memory["openvino_gpu_memory_measurement_status"] == "ok"
+    assert memory["openvino_gpu_memory_statistics_bytes"] == {"usm_device": 100, "usm_host": 20}
+    assert memory["openvino_gpu_memory_bytes"] == 120
+    assert memory["openvino_gpu_total_memory_bytes"] == 1000
 
 
 def test_parity_failure_suppresses_timing_aggregation() -> None:
