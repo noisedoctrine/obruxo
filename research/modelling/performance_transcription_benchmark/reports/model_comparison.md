@@ -52,6 +52,33 @@ Sourced representation notes: Timbre-Trap is retained as a native frame/pitch ou
 
 Basic Pitch quality/cost evidence is consumed from the landed #25/#24 reports. Executed #26 alternatives are `timbre_trap_base, ymt3_plus, yptf_multi, yptf_moe_multi`; partial-coverage alternatives are identified separately and are not treated as completed correctness evaluations. Blocked candidates are reported separately. No new rendering or Basic Pitch rerun is implied.
 
+## Same-population correctness comparison
+
+This is the apples-to-apples comparison requested for the already completed candidate rows. Each table uses only the exact pair intersection on which every listed candidate returned `ok`; it is a diagnostic success-only view, not a replacement for the full #25 population, coverage, or failure-penalized results.
+
+### Note-event candidates (`709` common successful pairs)
+
+| Candidate | Common successful pairs | Onset+pitch F1 | Onset+pitch+offset F1 | Frame F1 |
+| --- | ---: | ---: | ---: | ---: |
+| `ymt3_plus` | 709 | 0.216 | 0.119 | 0.266 |
+| `yptf_multi` | 709 | 0.201 | 0.121 | 0.241 |
+| `yptf_moe_multi` | 709 | 0.200 | 0.108 | 0.225 |
+
+- Interpretation: Diagnostic success-only comparison on the exact pair intersection completed by every listed candidate; it does not replace full-population coverage or failure-penalized views.
+### Frame-comparable alternatives (`709` common successful pairs)
+
+| Candidate | Common successful pairs | Onset+pitch F1 | Onset+pitch+offset F1 | Frame F1 |
+| --- | ---: | ---: | ---: | ---: |
+| `timbre_trap_base` | 709 | n/a | n/a | 0.249 |
+| `ymt3_plus` | 709 | 0.216 | 0.119 | 0.266 |
+| `yptf_multi` | 709 | 0.201 | 0.121 | 0.241 |
+| `yptf_moe_multi` | 709 | 0.200 | 0.108 | 0.225 |
+
+- Interpretation: Diagnostic success-only comparison on the exact pair intersection completed by every listed candidate; it does not replace full-population coverage or failure-penalized views.
+
+- Basic Pitch is excluded because its inherited #25 public aggregate does not expose row-level results for constructing this intersection; its full-population baseline is reported separately.
+- The shared-successful subset can show relative behavior when all candidates ran, but it must not be read as a general model ranking because candidate-specific failures are excluded by construction.
+
 ### Basic Pitch quality evidence inherited from #25
 
 - Source: `landed_issue_25_report`; eligible population: `1769`; coverage: `1.000`.

@@ -4,6 +4,888 @@
     "no_composite_winner": true,
     "quality_contract": "landed_issue_25_metrics_and_10000_replicate_seed_0_bootstrap",
     "quantization_contract": "cpu_dynamic_qint8_ordinary_linear_only",
+    "same_successful_population": {
+      "basic_pitch_note": "Basic Pitch is excluded because its inherited #25 public aggregate does not expose row-level results for constructing this intersection; its full-population baseline is reported separately.",
+      "frame_comparable": {
+        "eligible_pairs": 709,
+        "interpretation": "Diagnostic success-only comparison on the exact pair intersection completed by every listed candidate; it does not replace full-population coverage or failure-penalized views.",
+        "model_ids": [
+          "timbre_trap_base",
+          "ymt3_plus",
+          "yptf_multi",
+          "yptf_moe_multi"
+        ],
+        "models": [
+          {
+            "aggregate": {
+              "bootstrap": {
+                "cluster_count": 709,
+                "cluster_rule": "known_preset_id; unknown-preset rows are singleton clusters",
+                "metrics": {
+                  "frames": {
+                    "lower_95": 0.22369752043011149,
+                    "support": 10000,
+                    "upper_95": 0.2758998078195892
+                  },
+                  "onset_pitch": {
+                    "lower_95": 0.0,
+                    "support": 10000,
+                    "upper_95": 0.0
+                  },
+                  "onset_pitch_offset": {
+                    "lower_95": 0.0,
+                    "support": 10000,
+                    "upper_95": 0.0
+                  }
+                },
+                "replicates": 10000,
+                "seed": 0
+              },
+              "coverage": 1.0,
+              "failed_pair_count": 0,
+              "failure_analysis": {
+                "note": {
+                  "additional_offset_false_negatives": 0,
+                  "onset_pitch_false_negatives": 0,
+                  "onset_pitch_false_positives": 0
+                },
+                "pitch": {
+                  "assigned_near_onset_errors": 0,
+                  "octave_error_count": 0,
+                  "unassigned_near_onset_errors": 0
+                },
+                "timing": {
+                  "duration": {
+                    "mae": null,
+                    "signed_mean": null,
+                    "support": 0
+                  },
+                  "offset": {
+                    "mae": null,
+                    "signed_mean": null,
+                    "support": 0
+                  },
+                  "onset": {
+                    "mae": null,
+                    "signed_mean": null,
+                    "support": 0
+                  }
+                },
+                "velocity": {
+                  "mae": null,
+                  "signed_mean": null,
+                  "support": 0
+                }
+              },
+              "micro": {
+                "frames": {
+                  "count_bias": 1653982,
+                  "f1": 0.24914838689823687,
+                  "false_negative_rate": 0.638728751486947,
+                  "false_positive_fraction": 0.8098621278253199,
+                  "fn": 1173765,
+                  "fp": 2827747,
+                  "precision": 0.1901378721746801,
+                  "prediction_count": 3491640,
+                  "recall": 0.36127124851305303,
+                  "reference_count": 1837658,
+                  "tp": 663893
+                },
+                "onset_pitch": {
+                  "count_bias": 0,
+                  "f1": null,
+                  "false_negative_rate": null,
+                  "false_positive_fraction": null,
+                  "fn": 0,
+                  "fp": 0,
+                  "precision": null,
+                  "prediction_count": 0,
+                  "recall": null,
+                  "reference_count": 0,
+                  "tp": 0
+                },
+                "onset_pitch_offset": {
+                  "count_bias": 0,
+                  "f1": null,
+                  "false_negative_rate": null,
+                  "false_positive_fraction": null,
+                  "fn": 0,
+                  "fp": 0,
+                  "precision": null,
+                  "prediction_count": 0,
+                  "recall": null,
+                  "reference_count": 0,
+                  "tp": 0
+                }
+              },
+              "pair_count": 709,
+              "pair_macro": {
+                "frames": {
+                  "f1": 0.20866130064056226,
+                  "support": 709
+                },
+                "onset_pitch": {
+                  "f1": null,
+                  "support": 0
+                },
+                "onset_pitch_offset": {
+                  "f1": null,
+                  "support": 0
+                }
+              },
+              "successful_pair_count": 709
+            },
+            "model_id": "timbre_trap_base",
+            "successful_pairs": 709
+          },
+          {
+            "aggregate": {
+              "bootstrap": {
+                "cluster_count": 709,
+                "cluster_rule": "known_preset_id; unknown-preset rows are singleton clusters",
+                "metrics": {
+                  "frames": {
+                    "lower_95": 0.234098223688858,
+                    "support": 10000,
+                    "upper_95": 0.2983767567347958
+                  },
+                  "onset_pitch": {
+                    "lower_95": 0.18829632488681075,
+                    "support": 10000,
+                    "upper_95": 0.2453985766331977
+                  },
+                  "onset_pitch_offset": {
+                    "lower_95": 0.09817297717288928,
+                    "support": 10000,
+                    "upper_95": 0.14209695292277016
+                  }
+                },
+                "replicates": 10000,
+                "seed": 0
+              },
+              "coverage": 1.0,
+              "failed_pair_count": 0,
+              "failure_analysis": {
+                "note": {
+                  "additional_offset_false_negatives": 7363,
+                  "onset_pitch_false_negatives": 40971,
+                  "onset_pitch_false_positives": 77519
+                },
+                "pitch": {
+                  "assigned_near_onset_errors": 10890,
+                  "octave_error_count": 6475,
+                  "unassigned_near_onset_errors": 96710
+                },
+                "timing": {
+                  "duration": {
+                    "mae": 0.2184745532720061,
+                    "signed_mean": -0.07341665761252825,
+                    "support": 16357
+                  },
+                  "offset": {
+                    "mae": 0.21983450117310888,
+                    "signed_mean": -0.07608132941089182,
+                    "support": 16357
+                  },
+                  "onset": {
+                    "mae": 0.009305087676631789,
+                    "signed_mean": -0.002664671798363575,
+                    "support": 16357
+                  }
+                },
+                "velocity": {
+                  "mae": 87.44262395304763,
+                  "signed_mean": -87.44262395304763,
+                  "support": 16357
+                }
+              },
+              "micro": {
+                "frames": {
+                  "count_bias": -381127,
+                  "f1": 0.2661371281368495,
+                  "false_negative_rate": 0.7614610553215017,
+                  "false_positive_fraction": 0.6990431374272158,
+                  "fn": 1399305,
+                  "fp": 1018178,
+                  "precision": 0.30095686257278426,
+                  "prediction_count": 1456531,
+                  "recall": 0.2385389446784984,
+                  "reference_count": 1837658,
+                  "tp": 438353
+                },
+                "onset_pitch": {
+                  "count_bias": 36548,
+                  "f1": 0.2163567101399434,
+                  "false_negative_rate": 0.7146769466927156,
+                  "false_positive_fraction": 0.8257595125484682,
+                  "fn": 40971,
+                  "fp": 77519,
+                  "precision": 0.1742404874515318,
+                  "prediction_count": 93876,
+                  "recall": 0.2853230533072844,
+                  "reference_count": 57328,
+                  "tp": 16357
+                },
+                "onset_pitch_offset": {
+                  "count_bias": 36548,
+                  "f1": 0.11896510674320786,
+                  "false_negative_rate": 0.8431133128663132,
+                  "false_positive_fraction": 0.9041927649239422,
+                  "fn": 48334,
+                  "fp": 84882,
+                  "precision": 0.09580723507605778,
+                  "prediction_count": 93876,
+                  "recall": 0.15688668713368686,
+                  "reference_count": 57328,
+                  "tp": 8994
+                }
+              },
+              "pair_count": 709,
+              "pair_macro": {
+                "frames": {
+                  "f1": 0.19625481621237947,
+                  "support": 709
+                },
+                "onset_pitch": {
+                  "f1": 0.18810157690380108,
+                  "support": 709
+                },
+                "onset_pitch_offset": {
+                  "f1": 0.10430684940840684,
+                  "support": 709
+                }
+              },
+              "successful_pair_count": 709
+            },
+            "model_id": "ymt3_plus",
+            "successful_pairs": 709
+          },
+          {
+            "aggregate": {
+              "bootstrap": {
+                "cluster_count": 709,
+                "cluster_rule": "known_preset_id; unknown-preset rows are singleton clusters",
+                "metrics": {
+                  "frames": {
+                    "lower_95": 0.20366379091310996,
+                    "support": 10000,
+                    "upper_95": 0.2777098521686964
+                  },
+                  "onset_pitch": {
+                    "lower_95": 0.17256370769836313,
+                    "support": 10000,
+                    "upper_95": 0.2290856625543941
+                  },
+                  "onset_pitch_offset": {
+                    "lower_95": 0.09980011296518622,
+                    "support": 10000,
+                    "upper_95": 0.14367840936362974
+                  }
+                },
+                "replicates": 10000,
+                "seed": 0
+              },
+              "coverage": 1.0,
+              "failed_pair_count": 0,
+              "failure_analysis": {
+                "note": {
+                  "additional_offset_false_negatives": 4945,
+                  "onset_pitch_false_negatives": 44883,
+                  "onset_pitch_false_positives": 54306
+                },
+                "pitch": {
+                  "assigned_near_onset_errors": 8041,
+                  "octave_error_count": 4358,
+                  "unassigned_near_onset_errors": 83107
+                },
+                "timing": {
+                  "duration": {
+                    "mae": 0.18850955239021697,
+                    "signed_mean": -0.04347407245701086,
+                    "support": 12445
+                  },
+                  "offset": {
+                    "mae": 0.18918048039755747,
+                    "signed_mean": -0.04662292977079981,
+                    "support": 12445
+                  },
+                  "onset": {
+                    "mae": 0.008017157856008095,
+                    "signed_mean": -0.0031488573137889915,
+                    "support": 12445
+                  }
+                },
+                "velocity": {
+                  "mae": 88.22627561269586,
+                  "signed_mean": -88.22627561269586,
+                  "support": 12445
+                }
+              },
+              "micro": {
+                "frames": {
+                  "count_bias": -781928,
+                  "f1": 0.24126871335610708,
+                  "false_negative_rate": 0.8100615021946412,
+                  "false_positive_fraction": 0.6693832703437432,
+                  "fn": 1488616,
+                  "fp": 706688,
+                  "precision": 0.3306167296562568,
+                  "prediction_count": 1055730,
+                  "recall": 0.18993849780535876,
+                  "reference_count": 1837658,
+                  "tp": 349042
+                },
+                "onset_pitch": {
+                  "count_bias": 9423,
+                  "f1": 0.20059800610901118,
+                  "false_negative_rate": 0.7829158526374547,
+                  "false_positive_fraction": 0.8135608455304041,
+                  "fn": 44883,
+                  "fp": 54306,
+                  "precision": 0.18643915446959597,
+                  "prediction_count": 66751,
+                  "recall": 0.21708414736254536,
+                  "reference_count": 57328,
+                  "tp": 12445
+                },
+                "onset_pitch_offset": {
+                  "count_bias": 9423,
+                  "f1": 0.1208907228459288,
+                  "false_negative_rate": 0.8691738766396874,
+                  "false_positive_fraction": 0.8876421327021318,
+                  "fn": 49828,
+                  "fp": 59251,
+                  "precision": 0.1123578672978682,
+                  "prediction_count": 66751,
+                  "recall": 0.13082612336031257,
+                  "reference_count": 57328,
+                  "tp": 7500
+                }
+              },
+              "pair_count": 709,
+              "pair_macro": {
+                "frames": {
+                  "f1": 0.15627359061224544,
+                  "support": 709
+                },
+                "onset_pitch": {
+                  "f1": 0.14650442302794162,
+                  "support": 709
+                },
+                "onset_pitch_offset": {
+                  "f1": 0.0898428006827648,
+                  "support": 709
+                }
+              },
+              "successful_pair_count": 709
+            },
+            "model_id": "yptf_multi",
+            "successful_pairs": 709
+          },
+          {
+            "aggregate": {
+              "bootstrap": {
+                "cluster_count": 709,
+                "cluster_rule": "known_preset_id; unknown-preset rows are singleton clusters",
+                "metrics": {
+                  "frames": {
+                    "lower_95": 0.19694672753327627,
+                    "support": 10000,
+                    "upper_95": 0.253842456134843
+                  },
+                  "onset_pitch": {
+                    "lower_95": 0.1690869444494235,
+                    "support": 10000,
+                    "upper_95": 0.2329570769367305
+                  },
+                  "onset_pitch_offset": {
+                    "lower_95": 0.08696409033570636,
+                    "support": 10000,
+                    "upper_95": 0.12900122315974805
+                  }
+                },
+                "replicates": 10000,
+                "seed": 0
+              },
+              "coverage": 1.0,
+              "failed_pair_count": 0,
+              "failure_analysis": {
+                "note": {
+                  "additional_offset_false_negatives": 5787,
+                  "onset_pitch_false_negatives": 44847,
+                  "onset_pitch_false_positives": 54700
+                },
+                "pitch": {
+                  "assigned_near_onset_errors": 7069,
+                  "octave_error_count": 4086,
+                  "unassigned_near_onset_errors": 85409
+                },
+                "timing": {
+                  "duration": {
+                    "mae": 0.1977428470305364,
+                    "signed_mean": -0.0844616767068777,
+                    "support": 12481
+                  },
+                  "offset": {
+                    "mae": 0.19936089474651472,
+                    "signed_mean": -0.08669847535704271,
+                    "support": 12481
+                  },
+                  "onset": {
+                    "mae": 0.010648741365759285,
+                    "signed_mean": -0.002236798650164919,
+                    "support": 12481
+                  }
+                },
+                "velocity": {
+                  "mae": 87.28499318964826,
+                  "signed_mean": -87.28499318964826,
+                  "support": 12481
+                }
+              },
+              "micro": {
+                "frames": {
+                  "count_bias": -703882,
+                  "f1": 0.22480930082916195,
+                  "false_negative_rate": 0.8182452882962988,
+                  "false_positive_fraction": 0.7054065353297301,
+                  "fn": 1503655,
+                  "fp": 799773,
+                  "precision": 0.29459346467027,
+                  "prediction_count": 1133776,
+                  "recall": 0.1817547117037011,
+                  "reference_count": 1837658,
+                  "tp": 334003
+                },
+                "onset_pitch": {
+                  "count_bias": 9853,
+                  "f1": 0.20048349918479785,
+                  "false_negative_rate": 0.7822878872453252,
+                  "false_positive_fraction": 0.8142183057709769,
+                  "fn": 44847,
+                  "fp": 54700,
+                  "precision": 0.18578169422902308,
+                  "prediction_count": 67181,
+                  "recall": 0.21771211275467486,
+                  "reference_count": 57328,
+                  "tp": 12481
+                },
+                "onset_pitch_offset": {
+                  "count_bias": 9853,
+                  "f1": 0.10752636355604817,
+                  "false_negative_rate": 0.8832333240301423,
+                  "false_positive_fraction": 0.9003587323796907,
+                  "fn": 50634,
+                  "fp": 60487,
+                  "precision": 0.09964126762030931,
+                  "prediction_count": 67181,
+                  "recall": 0.11676667596985767,
+                  "reference_count": 57328,
+                  "tp": 6694
+                }
+              },
+              "pair_count": 709,
+              "pair_macro": {
+                "frames": {
+                  "f1": 0.15148806133938736,
+                  "support": 709
+                },
+                "onset_pitch": {
+                  "f1": 0.14695419037258858,
+                  "support": 709
+                },
+                "onset_pitch_offset": {
+                  "f1": 0.08264205694125147,
+                  "support": 709
+                }
+              },
+              "successful_pair_count": 709
+            },
+            "model_id": "yptf_moe_multi",
+            "successful_pairs": 709
+          }
+        ],
+        "scope": "alternative_candidates_with_frame_or_note_event_outputs"
+      },
+      "note_event": {
+        "eligible_pairs": 709,
+        "interpretation": "Diagnostic success-only comparison on the exact pair intersection completed by every listed candidate; it does not replace full-population coverage or failure-penalized views.",
+        "model_ids": [
+          "ymt3_plus",
+          "yptf_multi",
+          "yptf_moe_multi"
+        ],
+        "models": [
+          {
+            "aggregate": {
+              "bootstrap": {
+                "cluster_count": 709,
+                "cluster_rule": "known_preset_id; unknown-preset rows are singleton clusters",
+                "metrics": {
+                  "frames": {
+                    "lower_95": 0.234098223688858,
+                    "support": 10000,
+                    "upper_95": 0.2983767567347958
+                  },
+                  "onset_pitch": {
+                    "lower_95": 0.18829632488681075,
+                    "support": 10000,
+                    "upper_95": 0.2453985766331977
+                  },
+                  "onset_pitch_offset": {
+                    "lower_95": 0.09817297717288928,
+                    "support": 10000,
+                    "upper_95": 0.14209695292277016
+                  }
+                },
+                "replicates": 10000,
+                "seed": 0
+              },
+              "coverage": 1.0,
+              "failed_pair_count": 0,
+              "failure_analysis": {
+                "note": {
+                  "additional_offset_false_negatives": 7363,
+                  "onset_pitch_false_negatives": 40971,
+                  "onset_pitch_false_positives": 77519
+                },
+                "pitch": {
+                  "assigned_near_onset_errors": 10890,
+                  "octave_error_count": 6475,
+                  "unassigned_near_onset_errors": 96710
+                },
+                "timing": {
+                  "duration": {
+                    "mae": 0.2184745532720061,
+                    "signed_mean": -0.07341665761252825,
+                    "support": 16357
+                  },
+                  "offset": {
+                    "mae": 0.21983450117310888,
+                    "signed_mean": -0.07608132941089182,
+                    "support": 16357
+                  },
+                  "onset": {
+                    "mae": 0.009305087676631789,
+                    "signed_mean": -0.002664671798363575,
+                    "support": 16357
+                  }
+                },
+                "velocity": {
+                  "mae": 87.44262395304763,
+                  "signed_mean": -87.44262395304763,
+                  "support": 16357
+                }
+              },
+              "micro": {
+                "frames": {
+                  "count_bias": -381127,
+                  "f1": 0.2661371281368495,
+                  "false_negative_rate": 0.7614610553215017,
+                  "false_positive_fraction": 0.6990431374272158,
+                  "fn": 1399305,
+                  "fp": 1018178,
+                  "precision": 0.30095686257278426,
+                  "prediction_count": 1456531,
+                  "recall": 0.2385389446784984,
+                  "reference_count": 1837658,
+                  "tp": 438353
+                },
+                "onset_pitch": {
+                  "count_bias": 36548,
+                  "f1": 0.2163567101399434,
+                  "false_negative_rate": 0.7146769466927156,
+                  "false_positive_fraction": 0.8257595125484682,
+                  "fn": 40971,
+                  "fp": 77519,
+                  "precision": 0.1742404874515318,
+                  "prediction_count": 93876,
+                  "recall": 0.2853230533072844,
+                  "reference_count": 57328,
+                  "tp": 16357
+                },
+                "onset_pitch_offset": {
+                  "count_bias": 36548,
+                  "f1": 0.11896510674320786,
+                  "false_negative_rate": 0.8431133128663132,
+                  "false_positive_fraction": 0.9041927649239422,
+                  "fn": 48334,
+                  "fp": 84882,
+                  "precision": 0.09580723507605778,
+                  "prediction_count": 93876,
+                  "recall": 0.15688668713368686,
+                  "reference_count": 57328,
+                  "tp": 8994
+                }
+              },
+              "pair_count": 709,
+              "pair_macro": {
+                "frames": {
+                  "f1": 0.19625481621237947,
+                  "support": 709
+                },
+                "onset_pitch": {
+                  "f1": 0.18810157690380108,
+                  "support": 709
+                },
+                "onset_pitch_offset": {
+                  "f1": 0.10430684940840684,
+                  "support": 709
+                }
+              },
+              "successful_pair_count": 709
+            },
+            "model_id": "ymt3_plus",
+            "successful_pairs": 709
+          },
+          {
+            "aggregate": {
+              "bootstrap": {
+                "cluster_count": 709,
+                "cluster_rule": "known_preset_id; unknown-preset rows are singleton clusters",
+                "metrics": {
+                  "frames": {
+                    "lower_95": 0.20366379091310996,
+                    "support": 10000,
+                    "upper_95": 0.2777098521686964
+                  },
+                  "onset_pitch": {
+                    "lower_95": 0.17256370769836313,
+                    "support": 10000,
+                    "upper_95": 0.2290856625543941
+                  },
+                  "onset_pitch_offset": {
+                    "lower_95": 0.09980011296518622,
+                    "support": 10000,
+                    "upper_95": 0.14367840936362974
+                  }
+                },
+                "replicates": 10000,
+                "seed": 0
+              },
+              "coverage": 1.0,
+              "failed_pair_count": 0,
+              "failure_analysis": {
+                "note": {
+                  "additional_offset_false_negatives": 4945,
+                  "onset_pitch_false_negatives": 44883,
+                  "onset_pitch_false_positives": 54306
+                },
+                "pitch": {
+                  "assigned_near_onset_errors": 8041,
+                  "octave_error_count": 4358,
+                  "unassigned_near_onset_errors": 83107
+                },
+                "timing": {
+                  "duration": {
+                    "mae": 0.18850955239021697,
+                    "signed_mean": -0.04347407245701086,
+                    "support": 12445
+                  },
+                  "offset": {
+                    "mae": 0.18918048039755747,
+                    "signed_mean": -0.04662292977079981,
+                    "support": 12445
+                  },
+                  "onset": {
+                    "mae": 0.008017157856008095,
+                    "signed_mean": -0.0031488573137889915,
+                    "support": 12445
+                  }
+                },
+                "velocity": {
+                  "mae": 88.22627561269586,
+                  "signed_mean": -88.22627561269586,
+                  "support": 12445
+                }
+              },
+              "micro": {
+                "frames": {
+                  "count_bias": -781928,
+                  "f1": 0.24126871335610708,
+                  "false_negative_rate": 0.8100615021946412,
+                  "false_positive_fraction": 0.6693832703437432,
+                  "fn": 1488616,
+                  "fp": 706688,
+                  "precision": 0.3306167296562568,
+                  "prediction_count": 1055730,
+                  "recall": 0.18993849780535876,
+                  "reference_count": 1837658,
+                  "tp": 349042
+                },
+                "onset_pitch": {
+                  "count_bias": 9423,
+                  "f1": 0.20059800610901118,
+                  "false_negative_rate": 0.7829158526374547,
+                  "false_positive_fraction": 0.8135608455304041,
+                  "fn": 44883,
+                  "fp": 54306,
+                  "precision": 0.18643915446959597,
+                  "prediction_count": 66751,
+                  "recall": 0.21708414736254536,
+                  "reference_count": 57328,
+                  "tp": 12445
+                },
+                "onset_pitch_offset": {
+                  "count_bias": 9423,
+                  "f1": 0.1208907228459288,
+                  "false_negative_rate": 0.8691738766396874,
+                  "false_positive_fraction": 0.8876421327021318,
+                  "fn": 49828,
+                  "fp": 59251,
+                  "precision": 0.1123578672978682,
+                  "prediction_count": 66751,
+                  "recall": 0.13082612336031257,
+                  "reference_count": 57328,
+                  "tp": 7500
+                }
+              },
+              "pair_count": 709,
+              "pair_macro": {
+                "frames": {
+                  "f1": 0.15627359061224544,
+                  "support": 709
+                },
+                "onset_pitch": {
+                  "f1": 0.14650442302794162,
+                  "support": 709
+                },
+                "onset_pitch_offset": {
+                  "f1": 0.0898428006827648,
+                  "support": 709
+                }
+              },
+              "successful_pair_count": 709
+            },
+            "model_id": "yptf_multi",
+            "successful_pairs": 709
+          },
+          {
+            "aggregate": {
+              "bootstrap": {
+                "cluster_count": 709,
+                "cluster_rule": "known_preset_id; unknown-preset rows are singleton clusters",
+                "metrics": {
+                  "frames": {
+                    "lower_95": 0.19694672753327627,
+                    "support": 10000,
+                    "upper_95": 0.253842456134843
+                  },
+                  "onset_pitch": {
+                    "lower_95": 0.1690869444494235,
+                    "support": 10000,
+                    "upper_95": 0.2329570769367305
+                  },
+                  "onset_pitch_offset": {
+                    "lower_95": 0.08696409033570636,
+                    "support": 10000,
+                    "upper_95": 0.12900122315974805
+                  }
+                },
+                "replicates": 10000,
+                "seed": 0
+              },
+              "coverage": 1.0,
+              "failed_pair_count": 0,
+              "failure_analysis": {
+                "note": {
+                  "additional_offset_false_negatives": 5787,
+                  "onset_pitch_false_negatives": 44847,
+                  "onset_pitch_false_positives": 54700
+                },
+                "pitch": {
+                  "assigned_near_onset_errors": 7069,
+                  "octave_error_count": 4086,
+                  "unassigned_near_onset_errors": 85409
+                },
+                "timing": {
+                  "duration": {
+                    "mae": 0.1977428470305364,
+                    "signed_mean": -0.0844616767068777,
+                    "support": 12481
+                  },
+                  "offset": {
+                    "mae": 0.19936089474651472,
+                    "signed_mean": -0.08669847535704271,
+                    "support": 12481
+                  },
+                  "onset": {
+                    "mae": 0.010648741365759285,
+                    "signed_mean": -0.002236798650164919,
+                    "support": 12481
+                  }
+                },
+                "velocity": {
+                  "mae": 87.28499318964826,
+                  "signed_mean": -87.28499318964826,
+                  "support": 12481
+                }
+              },
+              "micro": {
+                "frames": {
+                  "count_bias": -703882,
+                  "f1": 0.22480930082916195,
+                  "false_negative_rate": 0.8182452882962988,
+                  "false_positive_fraction": 0.7054065353297301,
+                  "fn": 1503655,
+                  "fp": 799773,
+                  "precision": 0.29459346467027,
+                  "prediction_count": 1133776,
+                  "recall": 0.1817547117037011,
+                  "reference_count": 1837658,
+                  "tp": 334003
+                },
+                "onset_pitch": {
+                  "count_bias": 9853,
+                  "f1": 0.20048349918479785,
+                  "false_negative_rate": 0.7822878872453252,
+                  "false_positive_fraction": 0.8142183057709769,
+                  "fn": 44847,
+                  "fp": 54700,
+                  "precision": 0.18578169422902308,
+                  "prediction_count": 67181,
+                  "recall": 0.21771211275467486,
+                  "reference_count": 57328,
+                  "tp": 12481
+                },
+                "onset_pitch_offset": {
+                  "count_bias": 9853,
+                  "f1": 0.10752636355604817,
+                  "false_negative_rate": 0.8832333240301423,
+                  "false_positive_fraction": 0.9003587323796907,
+                  "fn": 50634,
+                  "fp": 60487,
+                  "precision": 0.09964126762030931,
+                  "prediction_count": 67181,
+                  "recall": 0.11676667596985767,
+                  "reference_count": 57328,
+                  "tp": 6694
+                }
+              },
+              "pair_count": 709,
+              "pair_macro": {
+                "frames": {
+                  "f1": 0.15148806133938736,
+                  "support": 709
+                },
+                "onset_pitch": {
+                  "f1": 0.14695419037258858,
+                  "support": 709
+                },
+                "onset_pitch_offset": {
+                  "f1": 0.08264205694125147,
+                  "support": 709
+                }
+              },
+              "successful_pair_count": 709
+            },
+            "model_id": "yptf_moe_multi",
+            "successful_pairs": 709
+          }
+        ],
+        "scope": "alternative_candidates_with_native_note_events"
+      }
+    },
     "status": "partial_executable_candidates"
   },
   "conclusion": {

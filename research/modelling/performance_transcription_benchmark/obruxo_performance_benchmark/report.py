@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import sys
 import tempfile
 from collections.abc import Mapping
 from pathlib import Path
@@ -115,6 +116,138 @@ def _stored_results(
         current["runtime"] = _read_json(run_path.with_name("runtime.json"))
         current["aggregates"] = _read_json(run_path.with_name("aggregates.json"))
     return results
+
+
+def _stored_pair_rows(
+    root: Path, specs: Mapping[str, ModelSpec]
+) -> dict[str, list[dict[str, Any]]]:
+    """Read pair rows from the selected full-precision run for each model."""
+    selected_runs: dict[str, Path] = {}
+    if not root.is_dir():
+        return {}
+    for run_path in sorted(root.rglob("run.json"), key=lambda path: path.as_posix()):
+        run = _read_json(run_path)
+        if not run or run.get("variant_id") == "dynamic_int8_linear":
+            continue
+        model_id = run.get("model_id")
+        spec = specs.get(model_id) if isinstance(model_id, str) else None
+        if spec is None or run.get("model_identity") != spec.identity_digest():
+            continue
+        selected_runs[model_id] = run_path
+
+    rows_by_model: dict[str, list[dict[str, Any]]] = {}
+    for model_id, run_path in selected_runs.items():
+        rows: list[dict[str, Any]] = []
+        for pair_path in sorted((run_path.parent / "pairs").glob("*.json")):
+            row = _read_json(pair_path)
+            if row is not None and row.get("status") in {
+                "ok",
+                "runtime_failed",
+                "out_of_memory",
+                "invalid_native_output",
+            }:
+                rows.append(row)
+        if rows:
+            rows_by_model[model_id] = rows
+    return rows_by_model
+
+
+def _aggregate_pair_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    basic_pitch_root = Path(__file__).resolve().parents[2] / "basic_pitch"
+    basic_pitch_root_text = str(basic_pitch_root)
+    if basic_pitch_root_text not in sys.path:
+        sys.path.insert(0, basic_pitch_root_text)
+    from obruxo_basic_pitch.evaluation.aggregate import aggregate_results
+
+    return aggregate_results(rows, bootstrap_replicates=10_000, seed=0)
+
+
+def _compact_common_aggregate(aggregate: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        key: aggregate[key]
+        for key in (
+            "pair_count",
+            "successful_pair_count",
+            "failed_pair_count",
+            "coverage",
+            "micro",
+            "pair_macro",
+            "failure_analysis",
+            "bootstrap",
+        )
+        if key in aggregate
+    }
+
+
+def _same_successful_population(
+    root: Path, specs: Mapping[str, ModelSpec]
+) -> dict[str, Any]:
+    """Build a diagnostic comparison on rows all selected candidates completed."""
+    rows_by_model = _stored_pair_rows(root, specs)
+    alternative_ids = [
+        model_id
+        for model_id, spec in specs.items()
+        if model_id != "basic_pitch" and model_id in rows_by_model
+    ]
+    frame_ids = [
+        model_id
+        for model_id in alternative_ids
+        if specs[model_id].output_contract in {"frame_pitch", "note_events"}
+    ]
+    note_event_ids = [
+        model_id
+        for model_id in alternative_ids
+        if specs[model_id].output_contract == "note_events"
+    ]
+    aggregate_cache: dict[tuple[str, frozenset[str]], dict[str, Any]] = {}
+
+    def build_population(model_ids: list[str], scope: str) -> dict[str, Any]:
+        success_sets = [
+            {
+                str(row["pair_id"])
+                for row in rows_by_model[model_id]
+                if row.get("status") == "ok" and row.get("pair_id") is not None
+            }
+            for model_id in model_ids
+        ]
+        common_pair_ids = set.intersection(*success_sets) if success_sets else set()
+        models = []
+        for model_id in model_ids:
+            rows = [
+                row
+                for row in rows_by_model[model_id]
+                if row.get("status") == "ok"
+                and str(row.get("pair_id")) in common_pair_ids
+            ]
+            cache_key = (model_id, frozenset(common_pair_ids))
+            if cache_key not in aggregate_cache:
+                aggregate_cache[cache_key] = _compact_common_aggregate(
+                    _aggregate_pair_rows(rows)
+                )
+            models.append(
+                {
+                    "model_id": model_id,
+                    "successful_pairs": len(rows),
+                    "aggregate": aggregate_cache[cache_key],
+                }
+            )
+        return {
+            "scope": scope,
+            "eligible_pairs": len(common_pair_ids),
+            "model_ids": model_ids,
+            "models": models,
+            "interpretation": "Diagnostic success-only comparison on the exact pair intersection completed by every listed candidate; it does not replace full-population coverage or failure-penalized views.",
+        }
+
+    return {
+        "frame_comparable": build_population(
+            frame_ids, "alternative_candidates_with_frame_or_note_event_outputs"
+        ),
+        "note_event": build_population(
+            note_event_ids, "alternative_candidates_with_native_note_events"
+        ),
+        "basic_pitch_note": "Basic Pitch is excluded because its inherited #25 public aggregate does not expose row-level results for constructing this intersection; its full-population baseline is reported separately.",
+    }
 
 
 def _landed_basic_pitch_reports() -> tuple[
@@ -398,6 +531,9 @@ def build_public_report(
                 "quantization_contract": "cpu_dynamic_qint8_ordinary_linear_only",
                 "no_composite_winner": True,
                 "status": comparison_status,
+                "same_successful_population": _same_successful_population(
+                    Path(input_root).resolve(strict=False), specs
+                ),
             },
             "models": models,
             "evidence": {
@@ -608,6 +744,10 @@ def _quality_f1(quality: Mapping[str, Any], view_name: str, metric: str) -> Any:
     return view.get("aggregate", {}).get("micro", {}).get(metric, {}).get("f1")
 
 
+def _aggregate_f1(aggregate: Mapping[str, Any], metric: str) -> Any:
+    return aggregate.get("micro", {}).get(metric, {}).get("f1")
+
+
 def _identity_representation(identity: Mapping[str, Any]) -> str:
     representation = identity.get("representation") or {}
     if isinstance(representation, Mapping) and representation:
@@ -624,6 +764,7 @@ def _markdown(report: Mapping[str, Any]) -> str:
     measured = [model for model in models if model.get("status") == "ok"]
     unavailable = [model for model in models if model.get("status") != "ok"]
     comparison_status = report.get("comparison", {}).get("status", "unknown")
+    same_population = report.get("comparison", {}).get("same_successful_population", {})
     status_message = (
         f"All `{len(models)}` configured candidates produced executable evidence."
         if not unavailable
@@ -699,6 +840,55 @@ def _markdown(report: Mapping[str, Any]) -> str:
             "",
         ]
     )
+    population_sections = (
+        ("note_event", "Note-event candidates"),
+        ("frame_comparable", "Frame-comparable alternatives"),
+    )
+    if any(
+        isinstance(same_population.get(key), Mapping)
+        and same_population[key].get("models")
+        for key, _ in population_sections
+    ):
+        lines.extend(
+            [
+                "## Same-population correctness comparison",
+                "",
+                "This is the apples-to-apples comparison requested for the already completed candidate rows. Each table uses only the exact pair intersection on which every listed candidate returned `ok`; it is a diagnostic success-only view, not a replacement for the full #25 population, coverage, or failure-penalized results.",
+                "",
+            ]
+        )
+        for population_key, heading in population_sections:
+            population = same_population.get(population_key) or {}
+            population_models = population.get("models") or []
+            if not population_models:
+                continue
+            lines.extend(
+                [
+                    f"### {heading} (`{population.get('eligible_pairs', 'n/a')}` common successful pairs)",
+                    "",
+                    "| Candidate | Common successful pairs | Onset+pitch F1 | Onset+pitch+offset F1 | Frame F1 |",
+                    "| --- | ---: | ---: | ---: | ---: |",
+                ]
+            )
+            for population_model in population_models:
+                aggregate = population_model.get("aggregate") or {}
+                lines.append(
+                    f"| `{population_model.get('model_id', 'unknown')}` | {population_model.get('successful_pairs', 'n/a')} | {_report_number(_aggregate_f1(aggregate, 'onset_pitch'))} | {_report_number(_aggregate_f1(aggregate, 'onset_pitch_offset'))} | {_report_number(_aggregate_f1(aggregate, 'frames'))} |"
+                )
+            lines.extend(
+                [
+                    "",
+                    f"- Interpretation: {population.get('interpretation', 'This conditional comparison does not replace full-population evidence.')}",
+                ]
+            )
+        lines.extend(
+            [
+                "",
+                f"- {same_population.get('basic_pitch_note', 'Basic Pitch is not included in this row-level intersection.')}",
+                "- The shared-successful subset can show relative behavior when all candidates ran, but it must not be read as a general model ranking because candidate-specific failures are excluded by construction.",
+                "",
+            ]
+        )
     basic_pitch = next(
         (model for model in models if model.get("model_id") == "basic_pitch"), None
     )

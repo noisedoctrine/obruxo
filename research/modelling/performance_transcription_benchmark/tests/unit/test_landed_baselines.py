@@ -57,6 +57,9 @@ def test_comparison_report_distinguishes_baseline_from_blocked_comparison() -> N
     assert "The intended comparative benchmark remains incomplete" in markdown
     assert "Partial or incomplete candidate execution" in markdown
     assert "apples-to-apples correctness rerun on the full #25 population" in markdown
+    assert "Same-population correctness comparison" in markdown
+    assert "709` common successful pairs" in markdown
+    assert "shared-successful subset" in markdown
     assert "does not infer a composite winner" in markdown
     assert "measured_corrected_fp32_performance" in markdown
     assert "Historical pre-fix/default result" in markdown
@@ -77,3 +80,20 @@ def test_comparison_report_distinguishes_baseline_from_blocked_comparison() -> N
         execution["openvino_parity_history"]["routes"][-1]["status"] == "parity_failed"
     )
     assert execution["openvino_precision_diagnostic"]["status"] == "parity_passed"
+
+    same_population = report["comparison"]["same_successful_population"]
+    assert same_population["frame_comparable"]["eligible_pairs"] == 709
+    assert same_population["note_event"]["eligible_pairs"] == 709
+    assert same_population["note_event"]["model_ids"] == [
+        "ymt3_plus",
+        "yptf_multi",
+        "yptf_moe_multi",
+    ]
+    assert same_population["frame_comparable"]["model_ids"] == [
+        "timbre_trap_base",
+        "ymt3_plus",
+        "yptf_multi",
+        "yptf_moe_multi",
+    ]
+    assert "pair_id" not in json.dumps(same_population)
+    assert "per_preset" not in json.dumps(same_population)
