@@ -11,13 +11,20 @@ from .timbre_trap import TimbreTrapAdapter
 from .yourmt3 import YourMT3Adapter
 
 
-def adapter_for(spec: ModelSpec, source_root: Any = None, checkpoint: Any = None) -> object:
+def adapter_for(
+    spec: ModelSpec,
+    source_root: Any = None,
+    checkpoint: Any = None,
+    segment_batch_size: int | None = None,
+) -> object:
     if spec.family == "basic_pitch":
         return BasicPitchAdapter(spec, source_root, checkpoint)
     if spec.family == "timbre_trap":
         return TimbreTrapAdapter(spec, source_root, checkpoint)
     if spec.family == "yourmt3":
-        return YourMT3Adapter(spec, source_root, checkpoint)
+        return YourMT3Adapter(
+            spec, source_root, checkpoint, segment_batch_size=segment_batch_size
+        )
     if spec.family == "muscriptor":
         return MuScriptorAdapter(spec, source_root, checkpoint)
     raise ValueError(f"unsupported model family: {spec.family}")

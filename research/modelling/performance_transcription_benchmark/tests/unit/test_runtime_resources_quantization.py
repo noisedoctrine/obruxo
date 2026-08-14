@@ -28,14 +28,18 @@ def test_inherited_timing_arithmetic_and_toy_resources() -> None:
     assert state_tensor_bytes_by_dtype(model)["float32"] == 44
 
 
-def test_dynamic_quantization_targets_only_linear_and_preserves_source(tmp_path: Path) -> None:
+def test_dynamic_quantization_targets_only_linear_and_preserves_source(
+    tmp_path: Path,
+) -> None:
     model = torch.nn.Sequential(torch.nn.Linear(2, 3), torch.nn.Conv1d(1, 1, 1))
     before = {key: value.detach().clone() for key, value in model.state_dict().items()}
     result = quantize_dynamic_linear_int8(model)
     assert result.status == "ok"
     assert result.original_linear_modules == 1
     assert result.quantized_linear_modules >= 1
-    assert all(torch.equal(before[key], value) for key, value in model.state_dict().items())
+    assert all(
+        torch.equal(before[key], value) for key, value in model.state_dict().items()
+    )
     assert serialized_model_size(result.model, tmp_path) > 0
 
 

@@ -32,7 +32,13 @@ from scipy.io import wavfile
 def test_yourmt3_event_normalization_ignores_progress() -> None:
     events = [
         {"type": "ProgressEvent", "completed": 0, "total": 1},
-        {"type": "NoteStartEvent", "pitch": 60, "start_time": 0.25, "index": 4, "instrument": "strings"},
+        {
+            "type": "NoteStartEvent",
+            "pitch": 60,
+            "start_time": 0.25,
+            "index": 4,
+            "instrument": "strings",
+        },
         {"type": "NoteEndEvent", "end_time": 0.75, "start_event_index": 4},
     ]
     notes = normalize_note_events(events)
@@ -52,9 +58,17 @@ def test_stock_settings_cannot_be_overridden(tmp_path: Path) -> None:
 
 
 def test_muscriptor_timing_path_drops_serialization_velocity() -> None:
-    notes = normalize_timing_corrected_events([
-        {"onset_seconds": 0.0, "offset_seconds": 0.5, "midi_pitch": 60, "velocity": 127, "instrument": 1}
-    ])
+    notes = normalize_timing_corrected_events(
+        [
+            {
+                "onset_seconds": 0.0,
+                "offset_seconds": 0.5,
+                "midi_pitch": 60,
+                "velocity": 127,
+                "instrument": 1,
+            }
+        ]
+    )
     assert stock_decoding_config()["prelude_forcing"] is True
     assert notes[0].velocity_midi is None
     assert batch_status(4)["status"] == "not_applicable"
@@ -81,9 +95,13 @@ def test_all_adapters_use_the_canonical_basic_pitch_frame_grid(tmp_path: Path) -
     event = rasterize_notes((NormalizedNote(0.0, 1.0, 69),), frame_count)
     assert timbre.frame_pitch is not None
     assert event.times_seconds.shape == (frame_count,)
-    assert timbre.frame_pitch.active_midi.shape == event.active_midi.shape == (
-        frame_count,
-        88,
+    assert (
+        timbre.frame_pitch.active_midi.shape
+        == event.active_midi.shape
+        == (
+            frame_count,
+            88,
+        )
     )
     np.testing.assert_array_equal(timbre.frame_pitch.times_seconds, times)
     np.testing.assert_array_equal(event.times_seconds, times)

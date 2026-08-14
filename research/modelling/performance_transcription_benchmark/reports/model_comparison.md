@@ -2,46 +2,47 @@
 
 ## Research status
 
-**Comparative status: `incomplete_alternatives_unavailable`.** Exactly `1` of `8` configured candidates produced executable benchmark evidence in the permitted local state. The result is a Basic Pitch baseline plus explicit alternative-model blockers, not a completed comparative benchmark.
+**Comparative status: `partial_executable_candidates`.** `5` of `8` configured candidates produced executable evidence; `3` remain externally blocked or failed before measurement. The report separates measured candidates from genuine blockers and does not infer a composite winner.
 
 The JSON is authoritative, but this Markdown is intended to stand alone as the research finding. Quality, execution/resource cost, backward cost, representation, licensing, and quantization remain separate evidence classes; no composite winner is computed.
 
 ## What was successfully established
 
-- Measured candidates: `basic_pitch`.
-- Metadata-only or unavailable candidates: `timbre_trap_base, ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_small, muscriptor_medium, muscriptor_large`.
-- Directly measured scope: Only Basic Pitch produced executable #24/#25 evidence in the permitted existing runtime and storage. Its quality and cost evidence are inherited, not rerun by #26; the current #24 cost rows include the corrected OpenVINO GPU FP32 + PERFORMANCE route when present.
+- Measured candidates: `basic_pitch, timbre_trap_base, ymt3_plus, yptf_multi, yptf_moe_multi`.
+- Partial pair-coverage candidates: `ymt3_plus, yptf_moe_multi`; these are not treated as completed correctness evaluations.
+- Metadata-only or unavailable candidates: `muscriptor_small, muscriptor_medium, muscriptor_large`.
+- Directly measured scope: Executable evidence is present for basic_pitch, timbre_trap_base, ymt3_plus, yptf_multi, yptf_moe_multi. Basic Pitch quality and cost evidence are inherited from #25/#24; timbre_trap_base, ymt3_plus, yptf_multi, yptf_moe_multi produced new #26 evidence in the unchanged py312 runtime. Partial pair coverage is explicitly identified for ymt3_plus, yptf_moe_multi.
 - Sourced/model-level scope: Candidate source, checkpoint, representation, architecture boundary, native sample rate, batch semantics, and license fields are verified inventory facts; they are not performance measurements.
 - Adapter implementation scope: The repository contains an implemented pinned-official adapter path for every required candidate family. An implemented adapter is not treated as executed when its source, checkpoint, dependency, or credential prerequisite is unavailable.
-- Unresolved comparative scope: No comparative quality, execution cost, resource, backward-cost, or quantization result exists for the unavailable alternatives. The intended comparative benchmark remains incomplete.
+- Unresolved comparative scope: The intended comparative benchmark remains incomplete for unavailable candidates `muscriptor_small, muscriptor_medium, muscriptor_large` and partial-coverage candidates `ymt3_plus, yptf_moe_multi`; measured candidates are reported separately and no unavailable candidate receives a fabricated score.
 
 ## Candidate identity and known properties
 
 These are verified inventory facts, separated from observations produced by executing a model. A known source, representation, or license does not imply that the candidate was runnable here.
 
-| Candidate | Family | Status | Output / representation | Native rate | Native batch | Code / weight license | Differentiable boundary |
-| --- | --- | --- | --- | ---: | --- | --- | --- |
-| `basic_pitch` | `basic_pitch` | `ok` | `note_and_frame`; dense=note_posterior_on_model_frames; event=stock_polyphonic_decoder | 22050 | `1, 2, 4, 8` | `Apache-2.0 / Apache-2.0` | `native_pytorch_forward` |
-| `timbre_trap_base` | `timbre_trap` | `unavailable` | `frame_pitch`; native_frame_pitch | 22050 | `1` | `MIT / upstream_space_license_not_separately_declared` | `native_forward_if_upstream_runtime_is_present` |
-| `ymt3_plus` | `yourmt3` | `unavailable` | `note_events`; stock_midi_note_events | 16000 | `1` | `GPL-3.0-only / Apache-2.0` | `not_exposed_by_stock_inference_path` |
-| `yptf_multi` | `yourmt3` | `unavailable` | `note_events`; stock_midi_note_events | 16000 | `1` | `GPL-3.0-only / Apache-2.0` | `not_exposed_by_stock_inference_path` |
-| `yptf_moe_multi` | `yourmt3` | `unavailable` | `note_events`; stock_midi_note_events | 16000 | `1` | `GPL-3.0-only / Apache-2.0` | `not_exposed_by_stock_inference_path` |
-| `muscriptor_small` | `muscriptor` | `unavailable` | `note_events`; timing_corrected_midi_note_events | 16000 | `1` | `MIT / CC-BY-NC-4.0` | `not_exposed_by_stock_generation_path` |
-| `muscriptor_medium` | `muscriptor` | `unavailable` | `note_events`; timing_corrected_midi_note_events | 16000 | `1` | `MIT / CC-BY-NC-4.0` | `not_exposed_by_stock_generation_path` |
-| `muscriptor_large` | `muscriptor` | `unavailable` | `note_events`; timing_corrected_midi_note_events | 16000 | `1` | `MIT / CC-BY-NC-4.0` | `not_exposed_by_stock_generation_path` |
+| Candidate | Family | Status | Measurement | Output / representation | Native rate | Native batch | Code / weight license | Differentiable boundary |
+| --- | --- | --- | --- | --- | ---: | --- | --- | --- |
+| `basic_pitch` | `basic_pitch` | `ok` | `complete` | `note_and_frame`; dense=note_posterior_on_model_frames; event=stock_polyphonic_decoder | 22050 | `1, 2, 4, 8` | `Apache-2.0 / Apache-2.0` | `native_pytorch_forward` |
+| `timbre_trap_base` | `timbre_trap` | `ok` | `complete` | `frame_pitch`; native_frame_pitch | 22050 | `1` | `MIT / upstream_space_license_not_separately_declared` | `native_forward_if_upstream_runtime_is_present` |
+| `ymt3_plus` | `yourmt3` | `ok` | `partial_pair_coverage` | `note_events`; stock_midi_note_events | 16000 | `1` | `GPL-3.0-only / Apache-2.0` | `not_exposed_by_stock_inference_path` |
+| `yptf_multi` | `yourmt3` | `ok` | `complete` | `note_events`; stock_midi_note_events | 16000 | `1` | `GPL-3.0-only / Apache-2.0` | `not_exposed_by_stock_inference_path` |
+| `yptf_moe_multi` | `yourmt3` | `ok` | `partial_pair_coverage` | `note_events`; stock_midi_note_events | 16000 | `1` | `GPL-3.0-only / Apache-2.0` | `not_exposed_by_stock_inference_path` |
+| `muscriptor_small` | `muscriptor` | `unavailable` | `not_measured` | `note_events`; timing_corrected_midi_note_events | 16000 | `1` | `MIT / CC-BY-NC-4.0` | `not_exposed_by_stock_generation_path` |
+| `muscriptor_medium` | `muscriptor` | `unavailable` | `not_measured` | `note_events`; timing_corrected_midi_note_events | 16000 | `1` | `MIT / CC-BY-NC-4.0` | `not_exposed_by_stock_generation_path` |
+| `muscriptor_large` | `muscriptor` | `unavailable` | `not_measured` | `note_events`; timing_corrected_midi_note_events | 16000 | `1` | `MIT / CC-BY-NC-4.0` | `not_exposed_by_stock_generation_path` |
 
 ### Identity/source inventory
 
 | Candidate | Source identity | Checkpoint identity | Availability reason |
 | --- | --- | --- | --- |
 | `basic_pitch` | `spotify/basic-pitch @ 9991303bba609a3b93089d13ec80d1d495083596` | `noisedoctrine/obruxo @ 918a1678465815c6f0a70009910737c164ed5a02` | available and verified |
-| `timbre_trap_base` | `sony/timbre-trap @ 7afe7e9b327929c099baeccd4b21973aedb94d9b` | `cwitkowitz/timbre-trap @ 84fbd38582435c863a2d65197a75edd794888f19` | approved py312 storage has no pinned Timbre-Trap checkout or checkpoint |
-| `ymt3_plus` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | official source and checkpoint are not present in permitted local storage |
-| `yptf_multi` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | official source and checkpoint are not present in permitted local storage |
-| `yptf_moe_multi` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | official source and checkpoint are not present in permitted local storage |
-| `muscriptor_small` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-small @ 8c127f603b807520fa465c838e9bfee8a91ada4e` | checkpoint is gated and no approved credential or local copy is available |
-| `muscriptor_medium` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-medium @ f32236969308476e01fd3aae67357de5feb05a2d` | checkpoint is gated and no approved credential or local copy is available |
-| `muscriptor_large` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-large @ 8809fdfbed2affa7ade94a7059e746e3880720e7` | checkpoint is gated and no approved credential or local copy is available |
+| `timbre_trap_base` | `sony/timbre-trap @ 7afe7e9b327929c099baeccd4b21973aedb94d9b` | `cwitkowitz/timbre-trap @ 84fbd38582435c863a2d65197a75edd794888f19` | available and verified |
+| `ymt3_plus` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | available and verified |
+| `yptf_multi` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | available and verified |
+| `yptf_moe_multi` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | available and verified |
+| `muscriptor_small` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-small @ 8c127f603b807520fa465c838e9bfee8a91ada4e` | exact pinned checkpoint acquisition returned gated access (HTTP 403); no authorized account access is available |
+| `muscriptor_medium` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-medium @ f32236969308476e01fd3aae67357de5feb05a2d` | exact pinned checkpoint acquisition returned gated access (HTTP 403); no authorized account access is available |
+| `muscriptor_large` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-large @ 8809fdfbed2affa7ade94a7059e746e3880720e7` | exact pinned checkpoint acquisition returned gated access (HTTP 403); no authorized account access is available |
 
 Checkpoint lock status is explicit in the JSON source of truth: `locked` means the public digest and byte size are fixed; `gated_digest_not_exposed_without_access` means the immutable model revision and public size are recorded but the upstream gated service did not expose a digest without access. Neither state implies local executability.
 
@@ -49,7 +50,7 @@ Sourced representation notes: Timbre-Trap is retained as a native frame/pitch ou
 
 ## What was actually executed
 
-Only Basic Pitch produced executable evidence. The following sections consume the landed #24 and #25 reports; #26 did not rerun inference, evaluation, rendering, or quantization for this reporting revision.
+Basic Pitch quality/cost evidence is consumed from the landed #25/#24 reports. Executed #26 alternatives are `timbre_trap_base, ymt3_plus, yptf_multi, yptf_moe_multi`; partial-coverage alternatives are identified separately and are not treated as completed correctness evaluations. Blocked candidates are reported separately. No new rendering or Basic Pitch rerun is implied.
 
 ### Basic Pitch quality evidence inherited from #25
 
@@ -98,30 +99,69 @@ Historical route records:
 - Status: `not recorded`; ordinary Linear modules `n/a` -> `n/a`; engine `n/a`.
 - No quantized artifact was produced, and no quantized XPU/OpenVINO/backward/batch-sweep result exists.
 
+## Executed alternative-candidate evidence
+
+These rows are measured #26 results from the exact #25 eligible population. Timbre-Trap contributes frame quality only; native note-event metrics are shown only for event-output candidates. `n/a` means the metric is not applicable, not zero.
+
+| Candidate | Success coverage | Onset+pitch F1 | Frame F1 | CPU E2E audio-s/s | XPU E2E audio-s/s | CPU host RSS MiB | Quantization |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| `timbre_trap_base` | 1.000 | n/a | 0.312 | n/a | n/a | n/a | `failed` |
+| `ymt3_plus` | 0.936 | 0.244 | 0.305 | n/a | n/a | n/a | `not_run` |
+| `yptf_multi` | 1.000 | 0.232 | 0.272 | n/a | n/a | n/a | `not_run` |
+| `yptf_moe_multi` | 0.401 | 0.200 | 0.225 | n/a | n/a | n/a | `not_run` |
+
+### Alternative quality and route details
+
+#### `timbre_trap_base`
+
+- `success_only`: `1769` / `1769` successful, coverage `1.000`, onset+pitch F1 `n/a`, onset+pitch+offset F1 `n/a`, frame F1 `0.312`.
+- `failure_penalized`: `1769` / `1769` successful, coverage `1.000`, onset+pitch F1 `n/a`, onset+pitch+offset F1 `n/a`, frame F1 `0.312`.
+- Category range (success-only onset+pitch F1): highest `type=Arp` = `n/a` over `25` pairs; lowest `type=Arp` = `n/a` over `25` pairs. Small supports should not be treated as robust rankings.
+- Quantization: status `failed`, Linear measurement `n/a -> n/a`, quantized success-only onset+pitch F1 `n/a`, CPU E2E audio-s/s `n/a`.
+#### `ymt3_plus`
+
+- Measurement status: `partial_pair_coverage`; a later apples-to-apples correctness run is still required before this candidate can be treated as complete.
+- `success_only`: `1656` / `1769` successful, coverage `0.936`, onset+pitch F1 `0.244`, onset+pitch+offset F1 `0.131`, frame F1 `0.305`.
+- `failure_penalized`: `1656` / `1769` successful, coverage `0.936`, onset+pitch F1 `0.241`, onset+pitch+offset F1 `0.130`, frame F1 `0.305`.
+- Category range (success-only onset+pitch F1): highest `type=Sub` = `0.750` over `2` pairs; lowest `type=Drums` = `0.041` over `42` pairs. Small supports should not be treated as robust rankings.
+#### `yptf_multi`
+
+- `success_only`: `1769` / `1769` successful, coverage `1.000`, onset+pitch F1 `0.232`, onset+pitch+offset F1 `0.140`, frame F1 `0.272`.
+- `failure_penalized`: `1769` / `1769` successful, coverage `1.000`, onset+pitch F1 `0.232`, onset+pitch+offset F1 `0.140`, frame F1 `0.272`.
+- Category range (success-only onset+pitch F1): highest `type=Sub` = `0.407` over `2` pairs; lowest `type=Seq` = `0.037` over `42` pairs. Small supports should not be treated as robust rankings.
+#### `yptf_moe_multi`
+
+- Measurement status: `partial_pair_coverage`; a later apples-to-apples correctness run is still required before this candidate can be treated as complete.
+- Execution note: All 1769 pair rows were materialized in the bounded XPU attempt; 709 succeeded and 1060 ended runtime_failed after repeated XPU device-loss events. A later apples-to-apples correctness run remains required.
+- `success_only`: `709` / `1769` successful, coverage `0.401`, onset+pitch F1 `0.200`, onset+pitch+offset F1 `0.108`, frame F1 `0.225`.
+- `failure_penalized`: `709` / `1769` successful, coverage `0.401`, onset+pitch F1 `0.117`, onset+pitch+offset F1 `0.063`, frame F1 `0.225`.
+- Category range (success-only onset+pitch F1): highest `type=Miscellaneous` = `0.530` over `4` pairs; lowest `type=Stab` = `0.019` over `4` pairs. Small supports should not be treated as robust rankings.
+
 ## What could not be executed
 
-No alternative candidate produced a quality, execution-cost, resource, backward-cost, or quantization measurement. The unavailability reasons are concrete local prerequisites, not claims that the models are intrinsically impossible to run.
+The table distinguishes a genuine candidate-level blocker or load failure from a measured candidate. No unavailable candidate receives an invented quality or cost result.
 
-| Candidate | Status | Concrete blocker | What this prevents |
+| Candidate | Status | Concrete blocker/failure | What this prevents |
 | --- | --- | --- | --- |
-| `timbre_trap_base` | `unavailable` | approved py312 storage has no pinned Timbre-Trap checkout or checkpoint | no comparative quality/cost result |
-| `ymt3_plus` | `unavailable` | official source and checkpoint are not present in permitted local storage | no comparative quality/cost result |
-| `yptf_multi` | `unavailable` | official source and checkpoint are not present in permitted local storage | no comparative quality/cost result |
-| `yptf_moe_multi` | `unavailable` | official source and checkpoint are not present in permitted local storage | no comparative quality/cost result |
-| `muscriptor_small` | `unavailable` | checkpoint is gated and no approved credential or local copy is available | no comparative quality/cost result |
-| `muscriptor_medium` | `unavailable` | checkpoint is gated and no approved credential or local copy is available | no comparative quality/cost result |
-| `muscriptor_large` | `unavailable` | checkpoint is gated and no approved credential or local copy is available | no comparative quality/cost result |
+| `muscriptor_small` | `unavailable` | exact pinned checkpoint acquisition returned gated access (HTTP 403); no authorized account access is available | no comparative quality/cost result |
+| `muscriptor_medium` | `unavailable` | exact pinned checkpoint acquisition returned gated access (HTTP 403); no authorized account access is available | no comparative quality/cost result |
+| `muscriptor_large` | `unavailable` | exact pinned checkpoint acquisition returned gated access (HTTP 403); no authorized account access is available | no comparative quality/cost result |
 
-- `timbre_trap_base`: the pinned checkpoint size is not locally verifiable and no approved Timbre-Trap checkout is present in the existing runtime/storage.
-- `ymt3_plus`, `yptf_multi`, `yptf_moe_multi`: the official source/checkpoint material is not present in permitted local storage.
-- `muscriptor_small`, `muscriptor_medium`, `muscriptor_large`: checkpoints are gated and no approved credential or local copy is available; no login, terms acceptance, or acquisition was attempted.
+## Partial or incomplete candidate execution
+
+These candidates produced some pair-level evidence but did not complete the exact-population correctness gate. Their failure-penalized view is reported as observed runtime behavior, not as a substitute for a completed correctness evaluation.
+
+| Candidate | Successful pairs | Eligible pairs | Remaining requirement |
+| --- | ---: | ---: | --- |
+| `ymt3_plus` | 1656 | 1769 | apples-to-apples correctness rerun on the full #25 population |
+| `yptf_moe_multi` | 709 | 1769 | apples-to-apples correctness rerun on the full #25 population |
 
 ## Conclusions by evidence class
 
 ### Directly supported by measured results
 
-- Directly measured evidence exists only for Basic Pitch: #25 quality on 1,769 eligible pairs and #24 route/cost evidence. The current #24 inference comparison includes corrected OpenVINO GPU FP32 + PERFORMANCE startup, throughput, end-to-end, parity, and resource measurements when that route is present.
-- The Basic Pitch evidence is a complete baseline for the landed #24/#25 contracts, not a comparison against the unavailable alternatives.
+- Measured evidence exists for basic_pitch, timbre_trap_base, ymt3_plus, yptf_multi, yptf_moe_multi. Basic Pitch contributes the inherited #25 quality and #24 route/cost baseline; executable alternatives contribute their own #26 corpus quality and applicable CPU/XPU cost measurements. Partial pair-coverage candidates are not complete correctness results.
+- Basic Pitch remains the inherited baseline for the landed #24/#25 contracts; alternative rows are separate #26 measurements and do not replace that provenance.
 - The measured #24 model-call throughput winners were batch 1: `pytorch_xpu` (238.368 audio-s/s), batch 2: `pytorch_xpu` (417.493 audio-s/s), batch 4: `pytorch_xpu` (616.100 audio-s/s), batch 8: `pytorch_xpu` (727.274 audio-s/s); the end-to-end winner was `pytorch_xpu` (96.027 audio-s/s). These are Basic Pitch route findings, not alternative-model results.
 - The #25 quality result is explicitly provenanced to the exact #24-selected `pytorch_xpu` route on `xpu:0`; it does not establish quality equivalence for any other backend.
 
@@ -137,19 +177,18 @@ No alternative candidate produced a quality, execution-cost, resource, backward-
 
 ### Comparative questions that remain unanswered
 
-- Alternative-model quality, latency, throughput, memory, backward cost, quantization response, and quality-versus-cost trade-offs remain unanswered because those candidates were not executable in the permitted local state.
-- The alternative-model comparison remains incomplete because the required candidate executions were unavailable; this reporting update did not rerun #25 evaluation or #26 candidate inference.
-- No ranking, quality estimate, cost estimate, quantization effect, or integration recommendation is assigned to any unavailable candidate.
+- Comparative questions remain for unavailable candidates `muscriptor_small, muscriptor_medium, muscriptor_large` and partial-coverage candidates `ymt3_plus, yptf_moe_multi`; measured candidates must be compared by separate quality and cost evidence rather than a composite winner.
+- The remaining candidate execution states are muscriptor_small, muscriptor_medium, muscriptor_large; their quality, cost, memory, backward, and quantization results are not inferred from metadata or from other models. Partial-coverage candidates still require full-population correctness confirmation.
+- Quality is published only for candidates with an executed #25-compatible population; globally unavailable models receive no invented F1.
 
 ## What is required before the intended comparison can be completed
 
-The following prerequisites must become available before a legitimate comparative run can be attempted; none is acquired or changed by this report revision:
+The remaining blocked candidates require the following concrete external prerequisites:
 
-- An approved, immutable Timbre-Trap source checkout plus a verifiable pinned `tt-orig.pt` checkpoint and the already-permitted runtime prerequisites.
-- The approved YourMT3 source checkout and all three exact immutable checkpoints selected in `models.yaml`.
-- Approved access and local copies of the three gated MuScriptor checkpoints, without exposing credentials or taking account actions in this task.
-- A permitted existing-runtime preflight for each candidate, followed by the fixed common #25 quality population and applicable #24 cost routes. Missing dependencies must be recorded as blockers rather than installed or substituted.
-- After executable results exist, report both success-only and failure-penalized quality views, route/resource/backward applicability, and the fixed CPU dynamic-Linear quantization scope separately; do not synthesize a composite winner.
+- `muscriptor_small`: exact pinned checkpoint acquisition returned gated access (HTTP 403); no authorized account access is available.
+- `muscriptor_medium`: exact pinned checkpoint acquisition returned gated access (HTTP 403); no authorized account access is available.
+- `muscriptor_large`: exact pinned checkpoint acquisition returned gated access (HTTP 403); no authorized account access is available.
+- After those prerequisites become available, run only the fixed common #25 population and applicable #24 cost routes; do not infer their results from measured candidates.
 
 ## Contract and privacy limits
 

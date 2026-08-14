@@ -8,7 +8,11 @@ from typing import Any
 
 def count_parameters(model: Any) -> tuple[int, int]:
     total = sum(int(parameter.numel()) for parameter in model.parameters())
-    trainable = sum(int(parameter.numel()) for parameter in model.parameters() if parameter.requires_grad)
+    trainable = sum(
+        int(parameter.numel())
+        for parameter in model.parameters()
+        if parameter.requires_grad
+    )
     return total, trainable
 
 
@@ -18,7 +22,9 @@ def state_tensor_bytes_by_dtype(model: Any) -> dict[str, int]:
         if not hasattr(tensor, "numel") or not hasattr(tensor, "element_size"):
             continue
         name = str(tensor.dtype).removeprefix("torch.")
-        result[name] = result.get(name, 0) + int(tensor.numel()) * int(tensor.element_size())
+        result[name] = result.get(name, 0) + int(tensor.numel()) * int(
+            tensor.element_size()
+        )
     return dict(sorted(result.items()))
 
 

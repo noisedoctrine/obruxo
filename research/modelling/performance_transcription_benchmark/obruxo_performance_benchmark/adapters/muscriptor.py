@@ -40,7 +40,10 @@ def stock_decoding_config() -> dict[str, Any]:
 def batch_status(batch_size: int) -> dict[str, str]:
     if batch_size == 1:
         return {"status": "ok", "reason": "stock_prelude_forcing"}
-    return {"status": "not_applicable", "reason": "prelude_forcing_requires_batch_size_1"}
+    return {
+        "status": "not_applicable",
+        "reason": "prelude_forcing_requires_batch_size_1",
+    }
 
 
 def normalize_timing_corrected_events(events: Any) -> tuple[NormalizedNote, ...]:
@@ -59,7 +62,9 @@ def normalize_timing_corrected_events(events: Any) -> tuple[NormalizedNote, ...]
 
 
 class MuScriptorAdapter:
-    def __init__(self, spec: ModelSpec, source_root: Path | None, checkpoint: Path | None) -> None:
+    def __init__(
+        self, spec: ModelSpec, source_root: Path | None, checkpoint: Path | None
+    ) -> None:
         self.spec = spec
         self.source_root = None if source_root is None else Path(source_root)
         self.checkpoint = None if checkpoint is None else Path(checkpoint)
@@ -90,7 +95,15 @@ class MuScriptorAdapter:
             raise ArtifactUnavailable("dependency_unavailable") from exc
         if device not in {"cpu", "xpu"}:
             raise ValueError("MuScriptor supports only the requested CPU/XPU routes")
-        self.model = TranscriptionModel.load_model(weights_path=str(self.checkpoint), device=torch.device(device), dtype="float32")
+        if device == "xpu" and (
+            not hasattr(torch, "xpu") or not torch.xpu.is_available()
+        ):
+            raise ArtifactUnavailable("xpu_unavailable")
+        self.model = TranscriptionModel.load_model(
+            weights_path=str(self.checkpoint),
+            device=torch.device(device),
+            dtype="float32",
+        )
         self.bound_model = self.model
 
     def bind_model(self, model: Any) -> None:
@@ -102,7 +115,7 @@ class MuScriptorAdapter:
     def _frame_count(audio: Path) -> int:
         import sys
 
-        root = Path(__file__).resolve().parents[2] / "basic_pitch"
+        root = Path(__file__).resolve().parents[3] / "basic_pitch"
         if str(root) not in sys.path:
             sys.path.insert(0, str(root))
         from obruxo_basic_pitch.inference import prepare_wav
@@ -129,7 +142,9 @@ class MuScriptorAdapter:
             if message.type == "program_change":
                 continue
             if message.type == "note_on" and message.velocity > 0:
-                active.setdefault((message.channel, message.note), []).append((seconds, message.velocity))
+                active.setdefault((message.channel, message.note), []).append(
+                    (seconds, message.velocity)
+                )
                 continue
             if message.type not in {"note_off", "note_on"}:
                 continue
@@ -141,7 +156,11 @@ class MuScriptorAdapter:
             if not pending:
                 active.pop(key, None)
             if seconds > onset:
-                notes.append(NormalizedNote(onset, seconds, message.note, None, None, message.channel))
+                notes.append(
+                    NormalizedNote(
+                        onset, seconds, message.note, None, None, message.channel
+                    )
+                )
         return tuple(notes)
 
     def transcribe(self, audio: Path) -> TranscriptionOutput:
@@ -158,4 +177,6 @@ class MuScriptorAdapter:
             detect_tempo="best-effort",
         )
         notes = normalize_timing_corrected_events(self._decode_midi(data))
-        return TranscriptionOutput(notes, rasterize_notes(notes, self._frame_count(Path(audio))))
+        return TranscriptionOutput(
+            notes, rasterize_notes(notes, self._frame_count(Path(audio)))
+        )

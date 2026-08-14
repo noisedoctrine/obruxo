@@ -75,7 +75,11 @@ class ModelSpec:
 
     @property
     def is_fully_locked(self) -> bool:
-        return self.checkpoint_identity_status == "locked" and bool(self.checkpoint_sha256) and self.checkpoint_size_bytes is not None
+        return (
+            self.checkpoint_identity_status == "locked"
+            and bool(self.checkpoint_sha256)
+            and self.checkpoint_size_bytes is not None
+        )
 
     def public_identity(self) -> dict[str, Any]:
         return {
@@ -107,7 +111,9 @@ class ModelSpec:
         }
 
     def identity_digest(self) -> str:
-        payload = json.dumps(self.public_identity(), sort_keys=True, separators=(",", ":"))
+        payload = json.dumps(
+            self.public_identity(), sort_keys=True, separators=(",", ":")
+        )
         return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
@@ -123,7 +129,11 @@ def _text(value: Any, label: str, *, allow_unverified: bool = False) -> str:
     result = value.strip()
     if _PLACEHOLDER.search(result):
         raise ArtifactError(f"{label} contains an unresolved placeholder")
-    if not allow_unverified and result.casefold() in {"unverified", "not-used", "unknown"}:
+    if not allow_unverified and result.casefold() in {
+        "unverified",
+        "not-used",
+        "unknown",
+    }:
         raise ArtifactError(f"{label} is not locked")
     return result
 
@@ -137,7 +147,9 @@ def _spec(model_id: str, raw: Mapping[str, Any]) -> ModelSpec:
     if availability not in {"available", "unavailable"}:
         raise ArtifactError(f"{model_id}.availability must be available or unavailable")
     sizes = raw.get("native_batch_sizes", [1])
-    if not isinstance(sizes, list) or any(type(item) is not int or item < 1 for item in sizes):
+    if not isinstance(sizes, list) or any(
+        type(item) is not int or item < 1 for item in sizes
+    ):
         raise ArtifactError(f"{model_id} native_batch_sizes is invalid")
     stock = raw.get("stock_inference")
     if not isinstance(stock, Mapping):
@@ -155,47 +167,88 @@ def _spec(model_id: str, raw: Mapping[str, Any]) -> ModelSpec:
         if not isinstance(sha_value, str) or not _SHA256.fullmatch(sha_value):
             raise ArtifactError(f"{model_id}.checkpoint.sha256 is not a SHA-256 digest")
         if type(size_value) is not int or size_value <= 0:
-            raise ArtifactError(f"{model_id}.checkpoint.size_bytes is not a positive integer")
+            raise ArtifactError(
+                f"{model_id}.checkpoint.size_bytes is not a positive integer"
+            )
     else:
         if sha_value is not None:
-            raise ArtifactError(f"{model_id}.checkpoint.sha256 must be null when its digest is not exposed")
+            raise ArtifactError(
+                f"{model_id}.checkpoint.sha256 must be null when its digest is not exposed"
+            )
         if type(size_value) is not int or size_value <= 0:
-            raise ArtifactError(f"{model_id}.checkpoint.size_bytes must be a positive public size")
+            raise ArtifactError(
+                f"{model_id}.checkpoint.size_bytes must be a positive public size"
+            )
     values = {
         "model_id": model_id,
         "family": _text(_required(raw, "family", model_id), f"{model_id}.family"),
         "publication_year": int(_required(raw, "publication_year", model_id)),
-        "output_contract": _text(_required(raw, "output_contract", model_id), f"{model_id}.output_contract"),
-        "source_repository": _text(_required(source, "repository", model_id), f"{model_id}.source.repository"),
-        "source_revision": _text(_required(source, "revision", model_id), f"{model_id}.source.revision"),
-        "checkpoint_repository": _text(_required(checkpoint, "repository", model_id), f"{model_id}.checkpoint.repository"),
-        "checkpoint_revision": _text(_required(checkpoint, "revision", model_id), f"{model_id}.checkpoint.revision"),
-        "checkpoint_path": _text(_required(checkpoint, "path", model_id), f"{model_id}.checkpoint.path"),
+        "output_contract": _text(
+            _required(raw, "output_contract", model_id), f"{model_id}.output_contract"
+        ),
+        "source_repository": _text(
+            _required(source, "repository", model_id), f"{model_id}.source.repository"
+        ),
+        "source_revision": _text(
+            _required(source, "revision", model_id), f"{model_id}.source.revision"
+        ),
+        "checkpoint_repository": _text(
+            _required(checkpoint, "repository", model_id),
+            f"{model_id}.checkpoint.repository",
+        ),
+        "checkpoint_revision": _text(
+            _required(checkpoint, "revision", model_id),
+            f"{model_id}.checkpoint.revision",
+        ),
+        "checkpoint_path": _text(
+            _required(checkpoint, "path", model_id), f"{model_id}.checkpoint.path"
+        ),
         "checkpoint_sha256": sha_value,
         "checkpoint_size_bytes": size_value,
         "checkpoint_identity_status": identity_status,
-        "code_license": _text(_required(raw, "code_license", model_id), f"{model_id}.code_license"),
-        "weight_license": _text(_required(raw, "weight_license", model_id), f"{model_id}.weight_license"),
-        "benchmark_dtype": _text(_required(raw, "benchmark_dtype", model_id), f"{model_id}.benchmark_dtype"),
+        "code_license": _text(
+            _required(raw, "code_license", model_id), f"{model_id}.code_license"
+        ),
+        "weight_license": _text(
+            _required(raw, "weight_license", model_id), f"{model_id}.weight_license"
+        ),
+        "benchmark_dtype": _text(
+            _required(raw, "benchmark_dtype", model_id), f"{model_id}.benchmark_dtype"
+        ),
         "native_sample_rate": int(_required(raw, "native_sample_rate", model_id)),
-        "environment": _text(_required(raw, "environment", model_id), f"{model_id}.environment"),
+        "environment": _text(
+            _required(raw, "environment", model_id), f"{model_id}.environment"
+        ),
         "stock_inference": dict(stock),
         "availability": availability,
         "unavailability_reason": raw.get("unavailability_reason"),
-        "native_output_type": str(raw.get("native_output_type", raw.get("output_contract", "unknown"))),
+        "native_output_type": str(
+            raw.get("native_output_type", raw.get("output_contract", "unknown"))
+        ),
         "native_batch_sizes": tuple(sizes),
         "differentiable_boundary": raw.get("differentiable_boundary"),
         "source_url": raw.get("source_url"),
         "checkpoint_url": raw.get("checkpoint_url"),
         "representation": dict(raw.get("representation", {})),
     }
-    if not _REVISION.fullmatch(values["source_revision"]) or not _REVISION.fullmatch(values["checkpoint_revision"]):
-        raise ArtifactError(f"{model_id} source/checkpoint revisions must be immutable commit IDs")
+    if not _REVISION.fullmatch(values["source_revision"]) or not _REVISION.fullmatch(
+        values["checkpoint_revision"]
+    ):
+        raise ArtifactError(
+            f"{model_id} source/checkpoint revisions must be immutable commit IDs"
+        )
     if values["native_sample_rate"] <= 0:
         raise ArtifactError(f"{model_id} contains an invalid size or sample rate")
-    if availability != "available" and not isinstance(values["unavailability_reason"], str):
-        raise ArtifactError(f"{model_id}.unavailability_reason is required when unavailable")
-    if availability == "available" and not values["checkpoint_identity_status"] == "locked":
+    if availability != "available" and not isinstance(
+        values["unavailability_reason"], str
+    ):
+        raise ArtifactError(
+            f"{model_id}.unavailability_reason is required when unavailable"
+        )
+    if (
+        availability == "available"
+        and not values["checkpoint_identity_status"] == "locked"
+    ):
         raise ArtifactError(f"{model_id}.available checkpoint identity must be locked")
     return ModelSpec(**values)
 
@@ -206,11 +259,20 @@ def load_model_specs(path: Path) -> dict[str, ModelSpec]:
         raw = yaml.safe_load(config_path.read_text(encoding="utf-8"))
     except (OSError, yaml.YAMLError) as exc:
         raise ArtifactError("model config could not be read") from exc
-    if not isinstance(raw, Mapping) or raw.get("version") != 1 or not isinstance(raw.get("models"), Mapping):
+    if (
+        not isinstance(raw, Mapping)
+        or raw.get("version") != 1
+        or not isinstance(raw.get("models"), Mapping)
+    ):
         raise ArtifactError("model config must be format version 1")
-    specs = {str(model_id): _spec(str(model_id), value) for model_id, value in raw["models"].items()}
+    specs = {
+        str(model_id): _spec(str(model_id), value)
+        for model_id, value in raw["models"].items()
+    }
     if tuple(specs) != REQUIRED_MODEL_IDS:
-        raise ArtifactError("model config does not contain exactly the required model IDs")
+        raise ArtifactError(
+            "model config does not contain exactly the required model IDs"
+        )
     return specs
 
 
@@ -224,7 +286,9 @@ def _sha256(path: Path) -> str:
 
 def verify_checkpoint(spec: ModelSpec, checkpoint: Path) -> None:
     if not spec.is_available:
-        raise ArtifactUnavailable(spec.unavailability_reason or "checkpoint is unavailable")
+        raise ArtifactUnavailable(
+            spec.unavailability_reason or "checkpoint is unavailable"
+        )
     candidate = Path(checkpoint).resolve(strict=False)
     if not candidate.is_file():
         raise ArtifactUnavailable("checkpoint_missing")
@@ -239,23 +303,49 @@ def verify_checkpoint(spec: ModelSpec, checkpoint: Path) -> None:
 
 def verify_checkout(spec: ModelSpec, source_root: Path) -> None:
     if not spec.is_available:
-        raise ArtifactUnavailable(spec.unavailability_reason or "source checkout is unavailable")
+        raise ArtifactUnavailable(
+            spec.unavailability_reason or "source checkout is unavailable"
+        )
     root = Path(source_root).resolve(strict=True)
     if not root.is_dir():
         raise ArtifactUnavailable("source checkout is unavailable")
-    try:
-        completed = subprocess.run(
-            ["git", "-C", str(root), "rev-parse", "HEAD"],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-    except OSError as exc:
-        raise ArtifactUnavailable("source checkout metadata is unavailable") from exc
-    revision = completed.stdout.strip()
-    if completed.returncode != 0 or not revision or not revision.startswith(spec.source_revision):
+    if (root / ".git").exists():
+        try:
+            completed = subprocess.run(
+                [
+                    "git",
+                    "-c",
+                    f"safe.directory={root}",
+                    "-C",
+                    str(root),
+                    "rev-parse",
+                    "HEAD",
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+        except OSError as exc:
+            raise ArtifactUnavailable(
+                "source checkout metadata is unavailable"
+            ) from exc
+        revision = completed.stdout.strip()
+        if completed.returncode != 0 or not revision:
+            raise ArtifactUnavailable("source checkout metadata is unavailable")
+    else:
+        marker = root / ".obruxo_source_revision"
+        try:
+            revision = marker.read_text(encoding="utf-8").strip()
+        except OSError as exc:
+            raise ArtifactUnavailable(
+                "source checkout metadata is unavailable"
+            ) from exc
+    if not _REVISION.fullmatch(revision) or revision != spec.source_revision:
         raise ArtifactError("source_revision_mismatch")
 
 
 def public_specs(specs: Mapping[str, ModelSpec]) -> list[dict[str, Any]]:
-    return [spec.public_identity() for spec in (specs[model_id] for model_id in REQUIRED_MODEL_IDS)]
+    return [
+        spec.public_identity()
+        for spec in (specs[model_id] for model_id in REQUIRED_MODEL_IDS)
+    ]

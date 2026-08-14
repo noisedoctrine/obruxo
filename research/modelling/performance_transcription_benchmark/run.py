@@ -29,16 +29,29 @@ def _common(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--force", action="store_true")
 
 
+def _positive_int(value: str) -> int:
+    parsed = int(value)
+    if parsed <= 0:
+        raise argparse.ArgumentTypeError("value must be positive")
+    return parsed
+
+
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="OBRUXO comparative performance-transcription benchmark")
+    parser = argparse.ArgumentParser(
+        description="OBRUXO comparative performance-transcription benchmark"
+    )
     sub = parser.add_subparsers(dest="command", required=True)
-    verify = sub.add_parser("verify-model", help="verify pinned source and checkpoint identity")
+    verify = sub.add_parser(
+        "verify-model", help="verify pinned source and checkpoint identity"
+    )
     _common(verify)
     evaluate = sub.add_parser("evaluate", help="evaluate one fixed #25 manifest")
     _common(evaluate)
     evaluate.add_argument("--manifest", type=Path, required=True)
     evaluate.add_argument("--output", type=Path, required=True)
     evaluate.add_argument("--quantized", action="store_true")
+    evaluate.add_argument("--device", choices=("cpu", "xpu"), default="cpu")
+    evaluate.add_argument("--segment-batch-size", type=_positive_int, default=None)
     benchmark = sub.add_parser("benchmark", help="run one fixed #24 smoke workload")
     _common(benchmark)
     benchmark.add_argument("--smoke-manifest", type=Path, required=True)
@@ -76,15 +89,42 @@ def main() -> int:
             adapter.preflight()
             print(f"verified {spec.model_id}")
             return 0
-        adapter = adapter_for(spec, args.source_root, args.checkpoint)
+        adapter = adapter_for(
+            spec,
+            args.source_root,
+            args.checkpoint,
+            segment_batch_size=getattr(args, "segment_batch_size", None),
+        )
         if args.command == "evaluate":
-            result = evaluate_model(spec, adapter, args.manifest, args.output, quantized=args.quantized, force=args.force)
+            result = evaluate_model(
+                spec,
+                adapter,
+                args.manifest,
+                args.output,
+                quantized=args.quantized,
+                force=args.force,
+                device=args.device,
+            )
             print(f"{result.model_id}: {result.status}")
             return 0 if result.status in {"ok", "unavailable"} else 3
-        result = run_benchmark(spec, adapter, args.smoke_manifest, args.output, quantized=args.quantized, force=args.force)
+        result = run_benchmark(
+            spec,
+            adapter,
+            args.smoke_manifest,
+            args.output,
+            quantized=args.quantized,
+            force=args.force,
+        )
         print(f"{result['model_id']}: {result['status']}")
         return 0 if result["status"] in {"ok", "unavailable"} else 3
-    except (ArtifactUnavailable, ArtifactError, FileExistsError, FileNotFoundError, OSError, ValueError) as exc:
+    except (
+        ArtifactUnavailable,
+        ArtifactError,
+        FileExistsError,
+        FileNotFoundError,
+        OSError,
+        ValueError,
+    ) as exc:
         print(str(exc), file=sys.stderr)
         return 2
 

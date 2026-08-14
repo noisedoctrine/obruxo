@@ -65,7 +65,9 @@ def read_landed_baseline(manifest_path: Path) -> dict[str, Any]:
 class BasicPitchAdapter:
     """Consume #25 for the full-precision baseline and run its graph for quantization."""
 
-    def __init__(self, spec: ModelSpec, source_root: Path | None, checkpoint: Path | None) -> None:
+    def __init__(
+        self, spec: ModelSpec, source_root: Path | None, checkpoint: Path | None
+    ) -> None:
         self.spec = spec
         self.source_root = None if source_root is None else Path(source_root)
         self.checkpoint = None if checkpoint is None else Path(checkpoint)
@@ -73,15 +75,26 @@ class BasicPitchAdapter:
         self.bound_model: Any | None = None
 
     def preflight(self) -> None:
-        root = _basic_pitch_root() if self.source_root is None else self.source_root.resolve(strict=True)
+        root = (
+            _basic_pitch_root()
+            if self.source_root is None
+            else self.source_root.resolve(strict=True)
+        )
         metadata_path = root / "artifacts" / "basic_pitch_icassp_2022.json"
         try:
             metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
             source = metadata["source"]
         except (KeyError, OSError, TypeError, json.JSONDecodeError) as exc:
-            raise ArtifactUnavailable("landed Basic Pitch metadata is unavailable") from exc
-        if source.get("revision") != self.spec.source_revision or source.get("repository") != self.spec.source_repository:
-            raise ArtifactError("Basic Pitch landed metadata does not match models.yaml")
+            raise ArtifactUnavailable(
+                "landed Basic Pitch metadata is unavailable"
+            ) from exc
+        if (
+            source.get("revision") != self.spec.source_revision
+            or source.get("repository") != self.spec.source_repository
+        ):
+            raise ArtifactError(
+                "Basic Pitch landed metadata does not match models.yaml"
+            )
         if self.checkpoint is not None:
             verify_checkpoint(self.spec, self.checkpoint)
 
@@ -94,9 +107,17 @@ class BasicPitchAdapter:
         import torch
 
         if device != "cpu":
-            raise ArtifactUnavailable("Basic Pitch adapter quality/cost loading is CPU-only in #26")
-        root = _basic_pitch_root() if self.source_root is None else self.source_root.resolve(strict=True)
-        checkpoint = self.checkpoint or root / "artifacts" / "basic_pitch_icassp_2022.pt"
+            raise ArtifactUnavailable(
+                "Basic Pitch adapter quality/cost loading is CPU-only in #26"
+            )
+        root = (
+            _basic_pitch_root()
+            if self.source_root is None
+            else self.source_root.resolve(strict=True)
+        )
+        checkpoint = (
+            self.checkpoint or root / "artifacts" / "basic_pitch_icassp_2022.pt"
+        )
         from obruxo_basic_pitch.model import BasicPitchICASSP2022
 
         model = BasicPitchICASSP2022()
@@ -111,7 +132,9 @@ class BasicPitchAdapter:
 
         if not isinstance(model, torch.nn.Module):
             raise TypeError("Basic Pitch bound model must be a torch module")
-        devices = {tensor.device.type for tensor in (*model.parameters(), *model.buffers())}
+        devices = {
+            tensor.device.type for tensor in (*model.parameters(), *model.buffers())
+        }
         if devices and devices != {"cpu"}:
             raise ValueError("Basic Pitch quantized model must remain on CPU")
         model.eval()

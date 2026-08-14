@@ -56,8 +56,6 @@ models:
     differentiable_boundary: native_forward_if_upstream_runtime_is_present
     source_url: https://github.com/sony/timbre-trap
     checkpoint_url: https://huggingface.co/spaces/cwitkowitz/timbre-trap/blob/main/models/tt-orig.pt
-    availability: unavailable
-    unavailability_reason: approved py312 storage has no pinned Timbre-Trap checkout or checkpoint
     stock_inference:
       sample_rate: 22050
       cqt_bins_per_octave: 60
@@ -79,7 +77,7 @@ models:
     checkpoint:
       repository: mimbres/YourMT3
       revision: 5e66c1ea173a8186e0d20432b841d3180cc015b5
-      path: logs/2024/notask_all_cross_v6_xk2_amp0811_gm_ext_plus_nops_b72/checkpoints/model.ckpt
+      path: amt/logs/2024/notask_all_cross_v6_xk2_amp0811_gm_ext_plus_nops_b72/checkpoints/model.ckpt
       sha256: 76673d4289aae1a66984b3fee59157d484cda8fdf9b56279251b137321d448e6
       size_bytes: 542707465
       identity_status: locked
@@ -93,8 +91,6 @@ models:
     differentiable_boundary: not_exposed_by_stock_inference_path
     source_url: https://huggingface.co/spaces/mimbres/YourMT3
     checkpoint_url: https://huggingface.co/mimbres/YourMT3
-    availability: unavailable
-    unavailability_reason: official source and checkpoint are not present in permitted local storage
     stock_inference:
       project: 2024
       precision: float32
@@ -111,7 +107,7 @@ models:
     checkpoint:
       repository: mimbres/YourMT3
       revision: 5e66c1ea173a8186e0d20432b841d3180cc015b5
-      path: logs/2024/mc13_256_all_cross_v6_xk5_amp0811_edr005_attend_c_full_plus_2psn_nl26_sb_b26r_800k/checkpoints/model.ckpt
+      path: amt/logs/2024/ptf_mc13_256_all_cross_v6_xk5_amp0811_edr005_attend_c_full_plus_2psn_nl26_sb_b26r_800k/checkpoints/model.ckpt
       sha256: f7ed46a7c61244bd35485143a791b3cf46515ef96239793845ae8e4084865130
       size_bytes: 541553263
       identity_status: locked
@@ -125,8 +121,6 @@ models:
     differentiable_boundary: not_exposed_by_stock_inference_path
     source_url: https://huggingface.co/spaces/mimbres/YourMT3
     checkpoint_url: https://huggingface.co/mimbres/YourMT3
-    availability: unavailable
-    unavailability_reason: official source and checkpoint are not present in permitted local storage
     stock_inference:
       project: 2024
       precision: float32
@@ -143,7 +137,7 @@ models:
     checkpoint:
       repository: mimbres/YourMT3
       revision: 5e66c1ea173a8186e0d20432b841d3180cc015b5
-      path: logs/2024/mc13_256_g4_all_v7_mt3f_sqr_rms_moe_wf4_n8k2_silu_rope_rp_b36_nops/checkpoints/last.ckpt
+      path: amt/logs/2024/mc13_256_g4_all_v7_mt3f_sqr_rms_moe_wf4_n8k2_silu_rope_rp_b36_nops/checkpoints/last.ckpt
       sha256: ae38e415c79efd5592dcb9b658cdb99ddb11d4c4e1eaa364cab04a052473fc25
       size_bytes: 561544628
       identity_status: locked
@@ -157,8 +151,6 @@ models:
     differentiable_boundary: not_exposed_by_stock_inference_path
     source_url: https://huggingface.co/spaces/mimbres/YourMT3
     checkpoint_url: https://huggingface.co/mimbres/YourMT3
-    availability: unavailable
-    unavailability_reason: official source and checkpoint are not present in permitted local storage
     stock_inference:
       project: 2024
       precision: float32
@@ -190,7 +182,7 @@ models:
     source_url: https://github.com/muscriptor/muscriptor
     checkpoint_url: https://huggingface.co/MuScriptor/muscriptor-small
     availability: unavailable
-    unavailability_reason: checkpoint is gated and no approved credential or local copy is available
+    unavailability_reason: exact pinned checkpoint acquisition returned gated access (HTTP 403); no authorized account access is available
     stock_inference:
       use_sampling: false
       temperature: 1.0
@@ -225,7 +217,7 @@ models:
     source_url: https://github.com/muscriptor/muscriptor
     checkpoint_url: https://huggingface.co/MuScriptor/muscriptor-medium
     availability: unavailable
-    unavailability_reason: checkpoint is gated and no approved credential or local copy is available
+    unavailability_reason: exact pinned checkpoint acquisition returned gated access (HTTP 403); no authorized account access is available
     stock_inference:
       use_sampling: false
       temperature: 1.0
@@ -260,7 +252,7 @@ models:
     source_url: https://github.com/muscriptor/muscriptor
     checkpoint_url: https://huggingface.co/MuScriptor/muscriptor-large
     availability: unavailable
-    unavailability_reason: checkpoint is gated and no approved credential or local copy is available
+    unavailability_reason: exact pinned checkpoint acquisition returned gated access (HTTP 403); no authorized account access is available
     stock_inference:
       use_sampling: false
       temperature: 1.0

@@ -39,28 +39,41 @@ def test_landed_runtime_preserves_route_failure_without_global_fallback() -> Non
     )
     assert runtime["status"] == "measured"
     assert runtime["routes"][1]["status"] == "parity_failed"
-    assert runtime["route_failures"] == [{"route": "pytorch_xpu", "status": "parity_failed"}]
+    assert runtime["route_failures"] == [
+        {"route": "pytorch_xpu", "status": "parity_failed"}
+    ]
 
 
 def test_comparison_report_distinguishes_baseline_from_blocked_comparison() -> None:
-    report = json.loads((ROOT / "reports" / "model_comparison.json").read_text(encoding="utf-8"))
+    report = json.loads(
+        (ROOT / "reports" / "model_comparison.json").read_text(encoding="utf-8")
+    )
     markdown = _markdown(report)
-    assert "incomplete_alternatives_unavailable" in markdown
+    assert "partial_executable_candidates" in markdown
     assert "What was actually executed" in markdown
     assert "What could not be executed" in markdown
     assert "Adapter implementation scope" in markdown
     assert "implemented pinned-official adapter path" in markdown
     assert "The intended comparative benchmark remains incomplete" in markdown
-    assert "No ranking, quality estimate, cost estimate" in markdown
+    assert "Partial or incomplete candidate execution" in markdown
+    assert "apples-to-apples correctness rerun on the full #25 population" in markdown
+    assert "does not infer a composite winner" in markdown
     assert "measured_corrected_fp32_performance" in markdown
     assert "Historical pre-fix/default result" in markdown
     assert "Bounded diagnostic result (corrected)" in markdown
     assert "Corrected measured result" in markdown
-    assert "corrected FP32 startup, throughput, end-to-end, and resource measurements remain `not_run`" not in markdown
+    assert (
+        "corrected FP32 startup, throughput, end-to-end, and resource measurements remain `not_run`"
+        not in markdown
+    )
     assert "including the OpenVINO GPU parity failure" not in markdown
 
-    execution = next(model for model in report["models"] if model["model_id"] == "basic_pitch")["execution"]
+    execution = next(
+        model for model in report["models"] if model["model_id"] == "basic_pitch"
+    )["execution"]
     assert execution["measurement_status"]["post_fix_parity"] == "passed"
     assert execution["measurement_status"]["post_fix_timing"] == "measured"
-    assert execution["openvino_parity_history"]["routes"][-1]["status"] == "parity_failed"
+    assert (
+        execution["openvino_parity_history"]["routes"][-1]["status"] == "parity_failed"
+    )
     assert execution["openvino_precision_diagnostic"]["status"] == "parity_passed"

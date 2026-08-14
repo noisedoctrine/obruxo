@@ -49,8 +49,15 @@ class NormalizedNote:
         onset = float(self.onset_seconds)
         offset = float(self.offset_seconds)
         pitch = int(self.midi_pitch)
-        if not np.isfinite(onset) or not np.isfinite(offset) or onset < 0 or offset <= onset:
-            raise ValueError("note interval must be finite, non-negative, and non-empty")
+        if (
+            not np.isfinite(onset)
+            or not np.isfinite(offset)
+            or onset < 0
+            or offset <= onset
+        ):
+            raise ValueError(
+                "note interval must be finite, non-negative, and non-empty"
+            )
         if pitch != self.midi_pitch or not 0 <= pitch <= 127:
             raise ValueError("MIDI pitch must be an integer in [0, 127]")
         if self.velocity_midi is not None and not 0 <= int(self.velocity_midi) <= 127:
@@ -63,7 +70,9 @@ class NormalizedNote:
             "onset_seconds": float(self.onset_seconds),
             "offset_seconds": float(self.offset_seconds),
             "midi_pitch": int(self.midi_pitch),
-            "velocity_midi": None if self.velocity_midi is None else int(self.velocity_midi),
+            "velocity_midi": None
+            if self.velocity_midi is None
+            else int(self.velocity_midi),
             "confidence": None if self.confidence is None else float(self.confidence),
             "instrument_or_program": self.instrument_or_program,
         }
@@ -79,8 +88,14 @@ class FramePitchPrediction:
     def __post_init__(self) -> None:
         times = np.asarray(self.times_seconds, dtype=np.float64)
         active = np.asarray(self.active_midi)
-        if times.ndim != 1 or active.ndim != 2 or active.shape != (times.shape[0], PITCH_COUNT):
-            raise ValueError("frame prediction must have times [T] and activity [T, 88]")
+        if (
+            times.ndim != 1
+            or active.ndim != 2
+            or active.shape != (times.shape[0], PITCH_COUNT)
+        ):
+            raise ValueError(
+                "frame prediction must have times [T] and activity [T, 88]"
+            )
         if active.dtype != np.bool_:
             raise ValueError("common-grid activity must be boolean")
         if not np.isfinite(times).all() or (times.size and np.any(np.diff(times) < 0)):
@@ -98,7 +113,9 @@ class TranscriptionOutput:
 
     def __post_init__(self) -> None:
         if self.notes is None and self.frame_pitch is None:
-            raise ValueError("a transcription output must expose notes or frame activity")
+            raise ValueError(
+                "a transcription output must expose notes or frame activity"
+            )
         if self.notes is not None:
             object.__setattr__(self, "notes", tuple(self.notes))
             if not all(isinstance(note, NormalizedNote) for note in self.notes):
@@ -136,7 +153,9 @@ def _basic_pitch_root() -> Path:
     return root
 
 
-def rasterize_notes(notes: tuple[NormalizedNote, ...] | list[NormalizedNote], n_frames: int) -> FramePitchPrediction:
+def rasterize_notes(
+    notes: tuple[NormalizedNote, ...] | list[NormalizedNote], n_frames: int
+) -> FramePitchPrediction:
     """Rasterize native notes through #25's half-open frame-target helper."""
     import sys
     from pathlib import Path
@@ -148,14 +167,23 @@ def rasterize_notes(notes: tuple[NormalizedNote, ...] | list[NormalizedNote], n_
     from obruxo_basic_pitch.evaluation.metrics import frame_target
 
     reference_like = [
-        ReferenceNote(note.onset_seconds, note.offset_seconds, note.midi_pitch, note.velocity_midi or 0)
+        ReferenceNote(
+            note.onset_seconds,
+            note.offset_seconds,
+            note.midi_pitch,
+            note.velocity_midi or 0,
+        )
         for note in notes
     ]
-    return FramePitchPrediction(common_frame_times(n_frames), frame_target(reference_like, n_frames))
+    return FramePitchPrediction(
+        common_frame_times(n_frames), frame_target(reference_like, n_frames)
+    )
 
 
 def empty_frame_prediction(n_frames: int) -> FramePitchPrediction:
-    return FramePitchPrediction(common_frame_times(n_frames), np.zeros((n_frames, PITCH_COUNT), dtype=bool))
+    return FramePitchPrediction(
+        common_frame_times(n_frames), np.zeros((n_frames, PITCH_COUNT), dtype=bool)
+    )
 
 
 def validate_output(value: Any) -> TranscriptionOutput:

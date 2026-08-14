@@ -12,30 +12,65 @@ from typing import Any
 
 from .artifacts import ModelSpec, load_model_specs
 
-_PRIVATE_KEY_PARTS = ("pair_id", "preset_id", "request_id", "audio_path", "midi_path", "source_root", "local_path", "hostname")
-_PRIVATE_TEXT = re.compile(r"(?:^[A-Za-z]:[\\/]|/Users/|/home/|\\Users\\|datasets[\\/]|pair-[0-9a-f]{8,}|preset-[0-9a-f]{8,}|request-[0-9a-f]{8,})", re.IGNORECASE)
+_PRIVATE_KEY_PARTS = (
+    "pair_id",
+    "preset_id",
+    "request_id",
+    "audio_path",
+    "midi_path",
+    "source_root",
+    "local_path",
+    "hostname",
+)
+_PRIVATE_TEXT = re.compile(
+    r"(?:^[A-Za-z]:[\\/]|/Users/|/home/|\\Users\\|datasets[\\/]|pair-[0-9a-f]{8,}|preset-[0-9a-f]{8,}|request-[0-9a-f]{8,})",
+    re.IGNORECASE,
+)
 
 
 class ReportPrivacyError(ValueError):
     """A report attempted to cross the public/private boundary."""
 
 
+def _strip_private_aggregate_fields(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {
+            key: _strip_private_aggregate_fields(child)
+            for key, child in value.items()
+            if key != "per_preset"
+        }
+    if isinstance(value, list):
+        return [_strip_private_aggregate_fields(child) for child in value]
+    if isinstance(value, tuple):
+        return tuple(_strip_private_aggregate_fields(child) for child in value)
+    return value
+
+
 def _assert_public(value: Any, key: str = "") -> None:
     if any(part in key.casefold() for part in _PRIVATE_KEY_PARTS):
-        raise ReportPrivacyError(f"private field is not allowed in public report: {key}")
+        raise ReportPrivacyError(
+            f"private field is not allowed in public report: {key}"
+        )
     if isinstance(value, Mapping):
         for child_key, child_value in value.items():
             _assert_public(child_value, str(child_key))
     elif isinstance(value, (list, tuple)):
         for child in value:
             _assert_public(child, key)
-    elif isinstance(value, str) and (_PRIVATE_TEXT.search(value) or "private_" in value.casefold() or "\\tmp\\" in value.casefold()):
-        raise ReportPrivacyError("private identifier or machine path is not allowed in public report")
+    elif isinstance(value, str) and (
+        _PRIVATE_TEXT.search(value)
+        or "private_" in value.casefold()
+        or "\\tmp\\" in value.casefold()
+    ):
+        raise ReportPrivacyError(
+            "private identifier or machine path is not allowed in public report"
+        )
 
 
 def sanitize_public_report(value: Mapping[str, Any]) -> dict[str, Any]:
-    _assert_public(value)
-    return json.loads(json.dumps(value, sort_keys=True, allow_nan=False))
+    sanitized = _strip_private_aggregate_fields(value)
+    _assert_public(sanitized)
+    return json.loads(json.dumps(sanitized, sort_keys=True, allow_nan=False))
 
 
 def _approved_report(path: Path | str) -> Path:
@@ -54,7 +89,9 @@ def _read_json(path: Path) -> dict[str, Any] | None:
     return value if isinstance(value, dict) else None
 
 
-def _stored_results(root: Path, specs: Mapping[str, ModelSpec]) -> dict[str, dict[str, Any]]:
+def _stored_results(
+    root: Path, specs: Mapping[str, ModelSpec]
+) -> dict[str, dict[str, Any]]:
     results: dict[str, dict[str, Any]] = {}
     if not root.is_dir():
         return results
@@ -68,7 +105,11 @@ def _stored_results(root: Path, specs: Mapping[str, ModelSpec]) -> dict[str, dic
             continue
         current = results.setdefault(model_id, {})
         if run.get("variant_id") == "dynamic_int8_linear":
-            current["quantization"] = run.get("quantization")
+            current["quantization"] = {
+                "run": run,
+                "runtime": _read_json(run_path.with_name("runtime.json")),
+                "aggregates": _read_json(run_path.with_name("aggregates.json")),
+            }
             continue
         current["run"] = run
         current["runtime"] = _read_json(run_path.with_name("runtime.json"))
@@ -76,9 +117,13 @@ def _stored_results(root: Path, specs: Mapping[str, ModelSpec]) -> dict[str, dic
     return results
 
 
-def _landed_basic_pitch_reports() -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
+def _landed_basic_pitch_reports() -> tuple[
+    dict[str, Any] | None, dict[str, Any] | None
+]:
     reports = Path(__file__).resolve().parents[2] / "basic_pitch" / "reports"
-    return _read_json(reports / "presetshare_baseline.json"), _read_json(reports / "backend_benchmark.json")
+    return _read_json(reports / "presetshare_baseline.json"), _read_json(
+        reports / "backend_benchmark.json"
+    )
 
 
 def _landed_basic_pitch_quality(report: Mapping[str, Any]) -> dict[str, Any]:
@@ -106,8 +151,16 @@ def _landed_basic_pitch_runtime(report: Mapping[str, Any]) -> dict[str, Any]:
         if route.get("status") != "ok"
     ]
     historical_evidence = report.get("historical_evidence") or {}
-    pre_fix = historical_evidence.get("pre_fix_default_openvino_gpu", {}) if isinstance(historical_evidence, Mapping) else {}
-    bounded = historical_evidence.get("bounded_corrected_openvino_gpu", {}) if isinstance(historical_evidence, Mapping) else {}
+    pre_fix = (
+        historical_evidence.get("pre_fix_default_openvino_gpu", {})
+        if isinstance(historical_evidence, Mapping)
+        else {}
+    )
+    bounded = (
+        historical_evidence.get("bounded_corrected_openvino_gpu", {})
+        if isinstance(historical_evidence, Mapping)
+        else {}
+    )
     value = dict(report)
     value.update(
         {
@@ -118,15 +171,76 @@ def _landed_basic_pitch_runtime(report: Mapping[str, Any]) -> dict[str, Any]:
             "timing_contract": report.get("config"),
             "route_failures": failures,
             "measurement_status": report.get("measurement_status"),
-            "openvino_parity_history": pre_fix.get("data") if isinstance(pre_fix, Mapping) else None,
-            "openvino_precision_diagnostic": bounded.get("data") if isinstance(bounded, Mapping) else None,
+            "openvino_parity_history": pre_fix.get("data")
+            if isinstance(pre_fix, Mapping)
+            else None,
+            "openvino_precision_diagnostic": bounded.get("data")
+            if isinstance(bounded, Mapping)
+            else None,
             "reporting_note": "Routes and findings are consumed from the landed #24 report; #26 does not rerun Basic Pitch cost measurements.",
         }
     )
     return value
 
 
-def build_public_report(specs: Mapping[str, ModelSpec], input_root: Path) -> dict[str, Any]:
+def _public_candidate_routes(runtime: Mapping[str, Any]) -> list[dict[str, Any]]:
+    routes = runtime.get("routes")
+    if routes is None:
+        routes = list(runtime.get("inference", [])) + list(runtime.get("training", []))
+    result: list[dict[str, Any]] = []
+    for route in routes or []:
+        if not isinstance(route, Mapping):
+            continue
+        clean = {key: value for key, value in route.items() if key != "repetitions"}
+        end_to_end = clean.get("end_to_end")
+        if isinstance(end_to_end, Mapping):
+            clean["end_to_end"] = {
+                key: value for key, value in end_to_end.items() if key != "cases"
+            }
+        result.append(clean)
+    return result
+
+
+def _public_quantization(value: Mapping[str, Any] | None) -> dict[str, Any] | None:
+    if not isinstance(value, Mapping):
+        return None
+    run = value.get("run") if isinstance(value.get("run"), Mapping) else {}
+    runtime = value.get("runtime") if isinstance(value.get("runtime"), Mapping) else {}
+    aggregates = (
+        value.get("aggregates") if isinstance(value.get("aggregates"), Mapping) else {}
+    )
+    return {
+        "status": run.get("status", runtime.get("status", "unavailable")),
+        "failure_code": run.get("failure_code", runtime.get("failure_code")),
+        "quality": aggregates.get("quality"),
+        "execution": {
+            "status": runtime.get("status", "unavailable"),
+            "failure_code": runtime.get("failure_code"),
+            "routes": _public_candidate_routes(runtime),
+            "timing_contract": runtime.get("timing_contract"),
+            "route_failures": runtime.get("route_failures", []),
+            "quantization": runtime.get("quantization") or run.get("quantization"),
+        },
+        "measurement": run.get("quantization") or runtime.get("quantization"),
+    }
+
+
+def _quality_measurement_status(quality: Mapping[str, Any] | None) -> str:
+    if not isinstance(quality, Mapping):
+        return "not_measured"
+    view = quality.get("success_only")
+    if not isinstance(view, Mapping):
+        return "not_measured"
+    eligible = int(view.get("eligible_pairs", 0) or 0)
+    successful = int(view.get("successful_pairs", 0) or 0)
+    if eligible <= 0:
+        return "not_measured"
+    return "complete" if successful == eligible else "partial_pair_coverage"
+
+
+def build_public_report(
+    specs: Mapping[str, ModelSpec], input_root: Path
+) -> dict[str, Any]:
     stored = _stored_results(Path(input_root).resolve(strict=False), specs)
     landed_quality, landed_runtime = _landed_basic_pitch_reports()
     models: list[dict[str, Any]] = []
@@ -135,20 +249,37 @@ def build_public_report(specs: Mapping[str, ModelSpec], input_root: Path) -> dic
         run = current.get("run") or {}
         runtime = current.get("runtime") or {}
         aggregates = current.get("aggregates") or {}
-        stored_quantization = current.get("quantization") or run.get("quantization")
+        stored_quantization = _public_quantization(
+            current.get("quantization")
+        ) or run.get("quantization")
         if model_id == "basic_pitch" and (landed_quality or landed_runtime):
             run = {
                 "model_id": model_id,
                 "status": (landed_quality or {}).get("status", spec.availability),
                 "failure_code": (landed_quality or {}).get("failure_code"),
             }
-            runtime = _landed_basic_pitch_runtime(landed_runtime) if landed_runtime else {}
-            aggregates = {"quality": _landed_basic_pitch_quality(landed_quality)} if landed_quality else {}
+            runtime = (
+                _landed_basic_pitch_runtime(landed_runtime) if landed_runtime else {}
+            )
+            aggregates = (
+                {"quality": _landed_basic_pitch_quality(landed_quality)}
+                if landed_quality
+                else {}
+            )
         status = str(run.get("status", spec.availability))
-        failure_code = run.get("failure_code") or (spec.unavailability_reason if status != "ok" else None)
+        failure_code = run.get("failure_code") or (
+            spec.unavailability_reason if status != "ok" else None
+        )
+        quality_measurement_status = _quality_measurement_status(
+            aggregates.get("quality")
+        )
         routes = runtime.get("routes")
-        if routes is None:
-            routes = list(runtime.get("inference", [])) + list(runtime.get("training", []))
+        if model_id != "basic_pitch":
+            routes = _public_candidate_routes(runtime)
+        elif routes is None:
+            routes = list(runtime.get("inference", [])) + list(
+                runtime.get("training", [])
+            )
         item: dict[str, Any] = {
             "model_id": model_id,
             "family": spec.family,
@@ -156,32 +287,62 @@ def build_public_report(specs: Mapping[str, ModelSpec], input_root: Path) -> dic
             "output_contract": spec.output_contract,
             "identity": spec.public_identity(),
             "status": status,
+            "measurement_status": quality_measurement_status,
             "failure_code": failure_code,
             "availability_reason": spec.unavailability_reason,
             "quality": aggregates.get("quality") if status == "ok" else None,
-            "quality_provenance": {
-                "source": "landed_issue_25_report",
-                "backend": (landed_quality or {}).get("backend"),
-                "runtime_provenance": (landed_quality or {}).get("runtime_provenance"),
-                "category_findings": (landed_quality or {}).get("category_findings"),
-            }
-            if model_id == "basic_pitch" and landed_quality
-            else None,
+            "quality_provenance": (
+                {
+                    "source": "landed_issue_25_report",
+                    "backend": (landed_quality or {}).get("backend"),
+                    "runtime_provenance": (landed_quality or {}).get(
+                        "runtime_provenance"
+                    ),
+                    "category_findings": (landed_quality or {}).get(
+                        "category_findings"
+                    ),
+                }
+                if model_id == "basic_pitch" and landed_quality
+                else {
+                    "source": "local_issue_26_evaluation",
+                    "metric_contract": "issue_25_note_frame_metrics_v1",
+                }
+                if status == "ok"
+                else None
+            ),
             "execution": {
                 "source": runtime.get("source"),
                 "status": runtime.get("status", "unavailable"),
                 "failure_code": runtime.get("failure_code"),
                 "routes": routes,
-                "timing_contract": runtime.get("timing_contract") or runtime.get("config"),
+                "timing_contract": runtime.get("timing_contract")
+                or runtime.get("config"),
                 "phases": runtime.get("phases"),
                 "route_failures": runtime.get("route_failures", []),
-                "measurement_status": runtime.get("measurement_status"),
-                "adapter_status": "landed_baseline" if model_id == "basic_pitch" else "implemented_official_path",
+                "measurement_status": runtime.get("measurement_status")
+                or quality_measurement_status,
+                "execution_note": runtime.get("execution_note")
+                or run.get("execution_note"),
+                "adapter_status": "landed_baseline"
+                if model_id == "basic_pitch"
+                else "implemented_official_path",
                 "openvino_parity_history": runtime.get("openvino_parity_history"),
-                "openvino_precision_diagnostic": runtime.get("openvino_precision_diagnostic"),
+                "openvino_precision_diagnostic": runtime.get(
+                    "openvino_precision_diagnostic"
+                ),
                 "reporting_note": runtime.get("reporting_note"),
+                "adapter_configuration": runtime.get("adapter_configuration")
+                or run.get("adapter_configuration"),
+                "segment_batch_sizes_observed": runtime.get(
+                    "segment_batch_sizes_observed"
+                )
+                or run.get("segment_batch_sizes_observed"),
+                "cache_reuse_policy": runtime.get("cache_reuse_policy")
+                or run.get("cache_reuse_policy"),
                 "resources": runtime.get("resources") or run.get("resources"),
-                "native_batch_sizes": runtime.get("native_batch_sizes", list(spec.native_batch_sizes)),
+                "native_batch_sizes": runtime.get(
+                    "native_batch_sizes", list(spec.native_batch_sizes)
+                ),
                 "backward": runtime.get("backward"),
             },
             "resources": run.get("resources") or runtime.get("resources"),
@@ -192,17 +353,42 @@ def build_public_report(specs: Mapping[str, ModelSpec], input_root: Path) -> dic
             item["landed_baseline"] = {
                 "quality_status": (landed_quality or {}).get("status"),
                 "quality_failure_code": (landed_quality or {}).get("failure_code"),
-                "eligible_pairs": ((landed_quality or {}).get("pairing") or {}).get("eligible_count"),
-                "quality_coverage": ((landed_quality or {}).get("aggregate") or {}).get("coverage"),
+                "eligible_pairs": ((landed_quality or {}).get("pairing") or {}).get(
+                    "eligible_count"
+                ),
+                "quality_coverage": ((landed_quality or {}).get("aggregate") or {}).get(
+                    "coverage"
+                ),
                 "cost_status": runtime.get("status"),
                 "cost_failure_code": runtime.get("failure_code"),
                 "cost_route_failures": runtime.get("route_failures", []),
                 "cost_measurement_status": runtime.get("measurement_status"),
-                "openvino_gpu_diagnostic_status": ((runtime.get("openvino_precision_diagnostic") or {}).get("status")),
+                "openvino_gpu_diagnostic_status": (
+                    (runtime.get("openvino_precision_diagnostic") or {}).get("status")
+                ),
             }
         models.append(item)
-    measured_models = [model["model_id"] for model in models if model.get("status") == "ok"]
-    unavailable_models = [model["model_id"] for model in models if model.get("status") != "ok"]
+    measured_models = [
+        model["model_id"] for model in models if model.get("status") == "ok"
+    ]
+    partial_models = [
+        model["model_id"]
+        for model in models
+        if model.get("measurement_status") == "partial_pair_coverage"
+    ]
+    unavailable_models = [
+        model["model_id"] for model in models if model.get("status") != "ok"
+    ]
+    comparison_status = (
+        "complete"
+        if not unavailable_models and not partial_models
+        else "partial_executable_candidates"
+    )
+    measured_alternatives = [
+        model_id for model_id in measured_models if model_id != "basic_pitch"
+    ]
+    blocked_text = ", ".join(unavailable_models) or "none"
+    measured_text = ", ".join(measured_models) or "none"
     return sanitize_public_report(
         {
             "format_version": 1,
@@ -211,27 +397,28 @@ def build_public_report(specs: Mapping[str, ModelSpec], input_root: Path) -> dic
                 "cost_contract": "landed_issue_24_end_to_end_boundary",
                 "quantization_contract": "cpu_dynamic_qint8_ordinary_linear_only",
                 "no_composite_winner": True,
-                "status": "incomplete_alternatives_unavailable",
+                "status": comparison_status,
             },
             "models": models,
             "evidence": {
                 "measured_models": measured_models,
+                "partial_measurement_models": partial_models,
                 "metadata_only_models": unavailable_models,
-                "measured_scope": "Only Basic Pitch produced executable #24/#25 evidence in the permitted existing runtime and storage. Its quality and cost evidence are inherited, not rerun by #26; the current #24 cost rows include the corrected OpenVINO GPU FP32 + PERFORMANCE route when present.",
+                "measured_scope": f"Executable evidence is present for {measured_text}. Basic Pitch quality and cost evidence are inherited from #25/#24; {', '.join(measured_alternatives) or 'no alternative candidate'} produced new #26 evidence in the unchanged py312 runtime. Partial pair coverage is explicitly identified for {', '.join(partial_models) or 'none'}.",
                 "bounded_diagnostic_scope": "The corrected OpenVINO GPU route also retains a bounded five-window FP32 + PERFORMANCE parity diagnostic; that diagnostic is separate from the corrected route's smoke-benchmark timing and resource measurements.",
-                "not_measured_scope": "All alternative-model quality/cost comparisons remain not measured or blocked; no #26 candidate comparison was rerun for this reporting update.",
+                "not_measured_scope": f"No quality/cost conclusion is available for {blocked_text}; these candidates were either externally blocked or failed before producing executable evidence.",
                 "sourced_scope": "Candidate source, checkpoint, representation, architecture boundary, native sample rate, batch semantics, and license fields are verified inventory facts; they are not performance measurements.",
                 "adapter_scope": "The repository contains an implemented pinned-official adapter path for every required candidate family. An implemented adapter is not treated as executed when its source, checkpoint, dependency, or credential prerequisite is unavailable.",
-                "unresolved_scope": "No comparative quality, execution cost, resource, backward-cost, or quantization result exists for the unavailable alternatives. The intended comparative benchmark remains incomplete.",
+                "unresolved_scope": f"The intended comparative benchmark remains incomplete for unavailable candidates `{blocked_text}` and partial-coverage candidates `{', '.join(partial_models) or 'none'}`; measured candidates are reported separately and no unavailable candidate receives a fabricated score.",
             },
             "conclusion": {
-                "measured": "Directly measured evidence exists only for Basic Pitch: #25 quality on 1,769 eligible pairs and #24 route/cost evidence. The current #24 inference comparison includes corrected OpenVINO GPU FP32 + PERFORMANCE startup, throughput, end-to-end, parity, and resource measurements when that route is present.",
+                "measured": f"Measured evidence exists for {measured_text}. Basic Pitch contributes the inherited #25 quality and #24 route/cost baseline; executable alternatives contribute their own #26 corpus quality and applicable CPU/XPU cost measurements. Partial pair-coverage candidates are not complete correctness results.",
                 "bounded_diagnostic": "A separate bounded #24 diagnostic compiled OpenVINO GPU with INFERENCE_PRECISION_HINT=float32 while retaining PERFORMANCE and passed parity on five public synthetic windows. This is a parity result, not a performance/resource result.",
-                "not_measured": "The alternative-model comparison remains incomplete because the required candidate executions were unavailable; this reporting update did not rerun #25 evaluation or #26 candidate inference.",
+                "not_measured": f"The remaining candidate execution states are {blocked_text}; their quality, cost, memory, backward, and quantization results are not inferred from metadata or from other models. Partial-coverage candidates still require full-population correctness confirmation.",
                 "sourced": "The candidate inventory establishes model identity, representation, architecture boundary, native rate/batch semantics, and licensing where verified, but none of these facts ranks execution quality or cost.",
-                "unresolved": "Alternative-model quality, latency, throughput, memory, backward cost, quantization response, and quality-versus-cost trade-offs remain unanswered because those candidates were not executable in the permitted local state.",
-                "quality": "No quality score is published for unavailable models or an empty eligible population.",
-                "cost": "Cost rows remain separate by route and are unavailable when the fixed smoke input or candidate runtime is unavailable.",
+                "unresolved": f"Comparative questions remain for unavailable candidates `{blocked_text}` and partial-coverage candidates `{', '.join(partial_models) or 'none'}`; measured candidates must be compared by separate quality and cost evidence rather than a composite winner.",
+                "quality": "Quality is published only for candidates with an executed #25-compatible population; globally unavailable models receive no invented F1.",
+                "cost": "Cost rows remain separate by candidate route, with unsupported or failed routes explicitly reported rather than replaced by fallback measurements.",
                 "representation": "Representation and licensing are inventories, not an integration decision.",
                 "later_integration": "No candidate is promoted without executable common-corpus evidence.",
             },
@@ -247,12 +434,14 @@ def _legacy_markdown(report: Mapping[str, Any]) -> str:
         "",
         "## Candidate status",
         "",
-        "| Model | Family | Status | Quality |",
-        "| --- | --- | --- | --- |",
+        "| Model | Family | Status | Measurement | Quality |",
+        "| --- | --- | --- | --- | --- |",
     ]
     for model in report.get("models", []):
         quality = "reported" if model.get("quality") is not None else "unavailable"
-        lines.append(f"| `{model.get('model_id', 'unknown')}` | `{model.get('family', 'unknown')}` | `{model.get('status', 'unknown')}` | `{quality}` |")
+        lines.append(
+            f"| `{model.get('model_id', 'unknown')}` | `{model.get('family', 'unknown')}` | `{model.get('status', 'unknown')}` | `{model.get('measurement_status', 'unknown')}` | `{quality}` |"
+        )
     lines.extend(
         [
             "",
@@ -266,6 +455,7 @@ def _legacy_markdown(report: Mapping[str, Any]) -> str:
             "",
         ]
     )
+
     def _metric(value: Any) -> str:
         return "n/a" if value is None else f"{float(value):.6f}"
 
@@ -274,8 +464,14 @@ def _legacy_markdown(report: Mapping[str, Any]) -> str:
         model_id = model.get("model_id", "unknown")
         lines.extend([f"### `{model_id}`", ""])
         if model.get("status") != "ok":
-            reason = model.get("availability_reason") or model.get("failure_code") or "not recorded"
-            lines.append(f"- Availability: `{model.get('status', 'unknown')}` — {reason}.")
+            reason = (
+                model.get("availability_reason")
+                or model.get("failure_code")
+                or "not recorded"
+            )
+            lines.append(
+                f"- Availability: `{model.get('status', 'unknown')}` — {reason}."
+            )
         quality = model.get("quality") or {}
         if quality:
             lines.extend(
@@ -296,10 +492,26 @@ def _legacy_markdown(report: Mapping[str, Any]) -> str:
         execution = model.get("execution") or {}
         routes = execution.get("routes") or []
         if routes:
-            lines.extend(["", f"- Execution status: `{execution.get('status', 'unknown')}`.", "", "| Route | Status |", "| --- | --- |"])
+            lines.extend(
+                [
+                    "",
+                    f"- Execution status: `{execution.get('status', 'unknown')}`.",
+                    "",
+                    "| Route | Status |",
+                    "| --- | --- |",
+                ]
+            )
             for route in routes:
-                lines.append(f"| `{route.get('route', 'unknown')}` | `{route.get('status', 'unknown')}` |")
-            detailed_routes = [route for route in routes if isinstance(route.get("startup"), Mapping) or isinstance(route.get("steady_state"), Mapping) or isinstance(route.get("end_to_end"), Mapping)]
+                lines.append(
+                    f"| `{route.get('route', 'unknown')}` | `{route.get('status', 'unknown')}` |"
+                )
+            detailed_routes = [
+                route
+                for route in routes
+                if isinstance(route.get("startup"), Mapping)
+                or isinstance(route.get("steady_state"), Mapping)
+                or isinstance(route.get("end_to_end"), Mapping)
+            ]
             if detailed_routes:
                 lines.extend(
                     [
@@ -322,7 +534,9 @@ def _legacy_markdown(report: Mapping[str, Any]) -> str:
                         f"| `{route.get('route', 'unknown')}` | {_report_number(startup_value)} | {_report_number(first)} | {_report_number(_median_value(steady.get('calls_per_second')))} | {_report_number(_median_value(e2e.get('audio_seconds_per_wall_second')))} | {_report_mib((route.get('resources') or {}).get('host_peak_rss_bytes'))} |"
                     )
         else:
-            lines.append(f"- Execution status: `{execution.get('status', 'unavailable')}`.")
+            lines.append(
+                f"- Execution status: `{execution.get('status', 'unavailable')}`."
+            )
         quantization = model.get("quantization")
         if quantization:
             lines.append(
@@ -380,7 +594,9 @@ def _report_count(value: Any) -> str:
     return "n/a" if value is None else str(int(value))
 
 
-def _historical_route(history: Mapping[str, Any], route_id: str) -> Mapping[str, Any] | None:
+def _historical_route(
+    history: Mapping[str, Any], route_id: str
+) -> Mapping[str, Any] | None:
     for route in history.get("routes", []):
         if isinstance(route, Mapping) and route.get("route") == route_id:
             return route
@@ -396,7 +612,9 @@ def _identity_representation(identity: Mapping[str, Any]) -> str:
     representation = identity.get("representation") or {}
     if isinstance(representation, Mapping) and representation:
         return "; ".join(f"{key}={value}" for key, value in representation.items())
-    return str(identity.get("native_output_type", identity.get("output_contract", "unknown")))
+    return str(
+        identity.get("native_output_type", identity.get("output_contract", "unknown"))
+    )
 
 
 def _markdown(report: Mapping[str, Any]) -> str:
@@ -405,18 +623,25 @@ def _markdown(report: Mapping[str, Any]) -> str:
     conclusion = report.get("conclusion", {})
     measured = [model for model in models if model.get("status") == "ok"]
     unavailable = [model for model in models if model.get("status") != "ok"]
+    comparison_status = report.get("comparison", {}).get("status", "unknown")
+    status_message = (
+        f"All `{len(models)}` configured candidates produced executable evidence."
+        if not unavailable
+        else f"`{len(measured)}` of `{len(models)}` configured candidates produced executable evidence; `{len(unavailable)}` remain externally blocked or failed before measurement."
+    )
     lines = [
         "# Performance transcription benchmark",
         "",
         "## Research status",
         "",
-        f"**Comparative status: `{report.get('comparison', {}).get('status', 'unknown')}`.** Exactly `{len(measured)}` of `{len(models)}` configured candidates produced executable benchmark evidence in the permitted local state. The result is a Basic Pitch baseline plus explicit alternative-model blockers, not a completed comparative benchmark.",
+        f"**Comparative status: `{comparison_status}`.** {status_message} The report separates measured candidates from genuine blockers and does not infer a composite winner.",
         "",
         "The JSON is authoritative, but this Markdown is intended to stand alone as the research finding. Quality, execution/resource cost, backward cost, representation, licensing, and quantization remain separate evidence classes; no composite winner is computed.",
         "",
         "## What was successfully established",
         "",
         f"- Measured candidates: `{', '.join(evidence.get('measured_models', [])) or 'none'}`.",
+        f"- Partial pair-coverage candidates: `{', '.join(evidence.get('partial_measurement_models', [])) or 'none'}`; these are not treated as completed correctness evaluations.",
         f"- Metadata-only or unavailable candidates: `{', '.join(evidence.get('metadata_only_models', [])) or 'none'}`.",
         f"- Directly measured scope: {evidence.get('measured_scope', 'not recorded')}",
         f"- Sourced/model-level scope: {evidence.get('sourced_scope', 'not recorded')}",
@@ -427,15 +652,18 @@ def _markdown(report: Mapping[str, Any]) -> str:
         "",
         "These are verified inventory facts, separated from observations produced by executing a model. A known source, representation, or license does not imply that the candidate was runnable here.",
         "",
-        "| Candidate | Family | Status | Output / representation | Native rate | Native batch | Code / weight license | Differentiable boundary |",
-        "| --- | --- | --- | --- | ---: | --- | --- | --- |",
+        "| Candidate | Family | Status | Measurement | Output / representation | Native rate | Native batch | Code / weight license | Differentiable boundary |",
+        "| --- | --- | --- | --- | --- | ---: | --- | --- | --- |",
     ]
     for model in models:
         identity = model.get("identity", {})
-        native_batch = ", ".join(str(value) for value in identity.get("native_batch_sizes", [])) or "n/a"
+        native_batch = (
+            ", ".join(str(value) for value in identity.get("native_batch_sizes", []))
+            or "n/a"
+        )
         licenses = f"{identity.get('code_license', 'n/a')} / {identity.get('weight_license', 'n/a')}"
         lines.append(
-            f"| `{model.get('model_id', 'unknown')}` | `{model.get('family', 'unknown')}` | `{model.get('status', 'unknown')}` | `{model.get('output_contract', identity.get('output_contract', 'unknown'))}`; { _identity_representation(identity) } | {identity.get('native_sample_rate', 'n/a')} | `{native_batch}` | `{licenses}` | `{identity.get('differentiable_boundary', 'n/a')}` |"
+            f"| `{model.get('model_id', 'unknown')}` | `{model.get('family', 'unknown')}` | `{model.get('status', 'unknown')}` | `{model.get('measurement_status', 'unknown')}` | `{model.get('output_contract', identity.get('output_contract', 'unknown'))}`; {_identity_representation(identity)} | {identity.get('native_sample_rate', 'n/a')} | `{native_batch}` | `{licenses}` | `{identity.get('differentiable_boundary', 'n/a')}` |"
         )
     lines.extend(
         [
@@ -451,7 +679,9 @@ def _markdown(report: Mapping[str, Any]) -> str:
         source = f"{identity.get('source_repository', 'n/a')} @ {identity.get('source_revision', 'n/a')}"
         checkpoint = f"{identity.get('checkpoint_repository', 'n/a')} @ {identity.get('checkpoint_revision', 'n/a')}"
         reason = model.get("availability_reason") or "available and verified"
-        lines.append(f"| `{model.get('model_id', 'unknown')}` | `{source}` | `{checkpoint}` | {reason} |")
+        lines.append(
+            f"| `{model.get('model_id', 'unknown')}` | `{source}` | `{checkpoint}` | {reason} |"
+        )
     lines.extend(
         [
             "",
@@ -465,11 +695,13 @@ def _markdown(report: Mapping[str, Any]) -> str:
             "",
             "## What was actually executed",
             "",
-            "Only Basic Pitch produced executable evidence. The following sections consume the landed #24 and #25 reports; #26 did not rerun inference, evaluation, rendering, or quantization for this reporting revision.",
+            f"Basic Pitch quality/cost evidence is consumed from the landed #25/#24 reports. Executed #26 alternatives are `{', '.join(model.get('model_id', 'unknown') for model in measured if model.get('model_id') != 'basic_pitch') or 'none'}`; partial-coverage alternatives are identified separately and are not treated as completed correctness evaluations. Blocked candidates are reported separately. No new rendering or Basic Pitch rerun is implied.",
             "",
         ]
     )
-    basic_pitch = next((model for model in models if model.get("model_id") == "basic_pitch"), None)
+    basic_pitch = next(
+        (model for model in models if model.get("model_id") == "basic_pitch"), None
+    )
     corrected_openvino_gpu_measured = False
     model_call_winners: dict[int, str] = {}
     model_call_winner_rates: dict[int, Any] = {}
@@ -493,7 +725,11 @@ def _markdown(report: Mapping[str, Any]) -> str:
             if route.get("mode") == "inference" and route.get("status") == "ok"
         ]
         openvino_gpu = next(
-            (route for route in inference_routes if route.get("route") == "openvino_gpu"),
+            (
+                route
+                for route in inference_routes
+                if route.get("route") == "openvino_gpu"
+            ),
             None,
         )
         corrected_openvino_gpu_measured = bool(
@@ -506,18 +742,29 @@ def _markdown(report: Mapping[str, Any]) -> str:
                 (route, _route_median(route, batch_size, "audio_seconds_per_second"))
                 for route in inference_routes
             ]
-            candidates = [(route, value) for route, value in candidates if value is not None]
+            candidates = [
+                (route, value) for route, value in candidates if value is not None
+            ]
             if candidates:
                 winner_route, winner_rate = max(candidates, key=lambda item: item[1])
                 model_call_winners[batch_size] = winner_route.get("route", "unknown")
                 model_call_winner_rates[batch_size] = winner_rate
         e2e_candidates = [
-            (route, (route.get("end_to_end") or {}).get("audio_seconds_per_wall_second", {}).get("median"))
+            (
+                route,
+                (route.get("end_to_end") or {})
+                .get("audio_seconds_per_wall_second", {})
+                .get("median"),
+            )
             for route in inference_routes
         ]
-        e2e_candidates = [(route, value) for route, value in e2e_candidates if value is not None]
+        e2e_candidates = [
+            (route, value) for route, value in e2e_candidates if value is not None
+        ]
         if e2e_candidates:
-            winner_route, e2e_winner_rate = max(e2e_candidates, key=lambda item: item[1])
+            winner_route, e2e_winner_rate = max(
+                e2e_candidates, key=lambda item: item[1]
+            )
             e2e_winner = winner_route.get("route", "unknown")
         quality_backend = quality_provenance.get("backend") or {}
         runtime_provenance = quality_provenance.get("runtime_provenance") or {}
@@ -538,7 +785,9 @@ def _markdown(report: Mapping[str, Any]) -> str:
             lines.append(
                 f"| `{view_name}` | {view.get('eligible_pairs', 'n/a')} | {view.get('successful_pairs', 'n/a')} | {view.get('failed_pairs', 'n/a')} | {_report_number(view.get('coverage'))} | {_report_number(_quality_f1(quality, view_name, 'onset_pitch'))} | {_report_number(_quality_f1(quality, view_name, 'onset_pitch_offset'))} | {_report_number(_quality_f1(quality, view_name, 'frames'))} |"
             )
-        bootstrap = quality.get("success_only", {}).get("aggregate", {}).get("bootstrap", {})
+        bootstrap = (
+            quality.get("success_only", {}).get("aggregate", {}).get("bootstrap", {})
+        )
         lines.extend(
             [
                 "",
@@ -561,12 +810,18 @@ def _markdown(report: Mapping[str, Any]) -> str:
             allocated = _report_mib(memory.get("pytorch_xpu_peak_allocated_bytes"))
             reserved = _report_mib(memory.get("pytorch_xpu_peak_reserved_bytes"))
             gpu_memory = _report_mib(memory.get("openvino_gpu_memory_bytes"))
-            gpu_total_memory = _report_mib(memory.get("openvino_gpu_total_memory_bytes"))
+            gpu_total_memory = _report_mib(
+                memory.get("openvino_gpu_total_memory_bytes")
+            )
             if gpu_memory != "n/a" and gpu_total_memory != "n/a":
                 gpu_memory = f"{gpu_memory} / {gpu_total_memory}"
             evidence_state = route.get("status", "unknown")
             if route.get("route") == "openvino_gpu":
-                evidence_state = "measured_corrected_fp32_performance" if corrected_openvino_gpu_measured else "pre_fix_parity_failed"
+                evidence_state = (
+                    "measured_corrected_fp32_performance"
+                    if corrected_openvino_gpu_measured
+                    else "pre_fix_parity_failed"
+                )
             lines.append(
                 f"| `{route.get('mode', 'unknown')}` | `{route.get('route', 'unknown')}` | `{evidence_state}` | {_report_number(_route_median(route, 1, 'audio_seconds_per_second'))} | {_report_number(_route_median(route, 8, 'audio_seconds_per_second'))} | {_report_number(e2e_rate)} | {_report_number(_startup_median(route))} | {_report_mib(memory.get('host_peak_rss_bytes'))} | {allocated} / {reserved} | {gpu_memory} |"
             )
@@ -575,9 +830,13 @@ def _markdown(report: Mapping[str, Any]) -> str:
             lines.extend(["", "Historical route records:"])
             for failure in failures:
                 if failure.get("route") == "openvino_gpu" and openvino_diagnostic:
-                    lines.append(f"- `{failure.get('route')}`: historical pre-fix/default `float16` + `PERFORMANCE` -> `{failure.get('status', 'unknown')}` before timing; the current corrected route is reported separately.")
+                    lines.append(
+                        f"- `{failure.get('route')}`: historical pre-fix/default `float16` + `PERFORMANCE` -> `{failure.get('status', 'unknown')}` before timing; the current corrected route is reported separately."
+                    )
                 else:
-                    lines.append(f"- `{failure.get('route', 'unknown')}`: `{failure.get('status', 'unknown')}`. The landed #24 report suppresses timing for this route.")
+                    lines.append(
+                        f"- `{failure.get('route', 'unknown')}`: `{failure.get('status', 'unknown')}`. The landed #24 report suppresses timing for this route."
+                    )
 
         historical_gpu = _historical_route(openvino_history, "openvino_gpu")
         if openvino_diagnostic or historical_gpu or corrected_openvino_gpu_measured:
@@ -587,7 +846,9 @@ def _markdown(report: Mapping[str, Any]) -> str:
             if historical_gpu:
                 historical_max = historical_gpu.get("max_across_repetitions") or {}
                 historical_repetitions = historical_gpu.get("repetitions") or []
-                historical_first = historical_repetitions[0] if historical_repetitions else {}
+                historical_first = (
+                    historical_repetitions[0] if historical_repetitions else {}
+                )
                 historical_parity = historical_first.get("parity") or {}
                 historical_configuration = openvino_history.get("configuration") or {}
                 lines.append(
@@ -614,7 +875,9 @@ def _markdown(report: Mapping[str, Any]) -> str:
                     ]
                 )
             elif not corrected_openvino_gpu_measured:
-                lines.append("- Corrected FP32 performance/resource measurements are not present in the landed #24 route rows; no corrected OpenVINO GPU performance claim is made.")
+                lines.append(
+                    "- Corrected FP32 performance/resource measurements are not present in the landed #24 route rows; no corrected OpenVINO GPU performance claim is made."
+                )
         else:
             lines.extend(
                 [
@@ -632,12 +895,167 @@ def _markdown(report: Mapping[str, Any]) -> str:
                 "- No quantized artifact was produced, and no quantized XPU/OpenVINO/backward/batch-sweep result exists.",
             ]
         )
+    alternative_models = [
+        model for model in measured if model.get("model_id") != "basic_pitch"
+    ]
+    if alternative_models:
+        lines.extend(
+            [
+                "",
+                "## Executed alternative-candidate evidence",
+                "",
+                "These rows are measured #26 results from the exact #25 eligible population. Timbre-Trap contributes frame quality only; native note-event metrics are shown only for event-output candidates. `n/a` means the metric is not applicable, not zero.",
+                "",
+                "| Candidate | Success coverage | Onset+pitch F1 | Frame F1 | CPU E2E audio-s/s | XPU E2E audio-s/s | CPU host RSS MiB | Quantization |",
+                "| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
+            ]
+        )
+
+        def candidate_route(
+            model: Mapping[str, Any], route_id: str
+        ) -> Mapping[str, Any]:
+            return next(
+                (
+                    route
+                    for route in model.get("execution", {}).get("routes", [])
+                    if route.get("route") == route_id
+                ),
+                {},
+            )
+
+        def candidate_e2e(route: Mapping[str, Any]) -> Any:
+            value = (route.get("end_to_end") or {}).get("audio_seconds_per_wall_second")
+            return _median_value(value)
+
+        def candidate_rss(route: Mapping[str, Any]) -> Any:
+            return _median_value(
+                (route.get("resources") or {}).get("host_peak_rss_bytes")
+            )
+
+        for model in alternative_models:
+            quality = model.get("quality") or {}
+            cpu = candidate_route(model, "pytorch_cpu")
+            xpu = candidate_route(model, "pytorch_xpu")
+            quantization = model.get("quantization") or {}
+            lines.append(
+                f"| `{model.get('model_id', 'unknown')}` | {_report_number((quality.get('success_only') or {}).get('coverage'))} | {_report_number(_quality_f1(quality, 'success_only', 'onset_pitch'))} | {_report_number(_quality_f1(quality, 'success_only', 'frames'))} | {_report_number(candidate_e2e(cpu))} | {_report_number(candidate_e2e(xpu))} | {_report_mib(candidate_rss(cpu))} | `{quantization.get('status', 'not_run')}` |"
+            )
+        lines.extend(["", "### Alternative quality and route details", ""])
+        for model in alternative_models:
+            model_id = model.get("model_id", "unknown")
+            quality = model.get("quality") or {}
+            lines.extend([f"#### `{model_id}`", ""])
+            if model.get("measurement_status") != "complete":
+                lines.append(
+                    f"- Measurement status: `{model.get('measurement_status', 'unknown')}`; a later apples-to-apples correctness run is still required before this candidate can be treated as complete."
+                )
+                execution_note = (model.get("execution") or {}).get("execution_note")
+                if execution_note:
+                    lines.append(f"- Execution note: {execution_note}")
+            for view_name in ("success_only", "failure_penalized"):
+                view = quality.get(view_name) or {}
+                lines.append(
+                    f"- `{view_name}`: `{view.get('successful_pairs', 'n/a')}` / `{view.get('eligible_pairs', 'n/a')}` successful, coverage `{_report_number(view.get('coverage'))}`, onset+pitch F1 `{_report_number(_quality_f1(quality, view_name, 'onset_pitch'))}`, onset+pitch+offset F1 `{_report_number(_quality_f1(quality, view_name, 'onset_pitch_offset'))}`, frame F1 `{_report_number(_quality_f1(quality, view_name, 'frames'))}`."
+                )
+            aggregate = (quality.get("success_only") or {}).get("aggregate") or {}
+            groups = aggregate.get("groups") or {}
+            category_rows: list[tuple[str, str, int, Any, Any]] = []
+            for field in (
+                "type",
+                "note_density_class",
+                "pitch_register_class",
+                "duration_class",
+                "polyphony_class",
+                "role",
+                "envelope",
+                "performance",
+            ):
+                values = groups.get(field) or {}
+                if not isinstance(values, Mapping):
+                    continue
+                for category, value in values.items():
+                    if not isinstance(value, Mapping):
+                        continue
+                    support = int(
+                        value.get("pair_count", value.get("eligible_pairs", 0)) or 0
+                    )
+                    micro = value.get("micro") or {}
+                    onset = (micro.get("onset_pitch") or {}).get("f1")
+                    frame = (micro.get("frames") or {}).get("f1")
+                    if support:
+                        category_rows.append(
+                            (
+                                f"{field}={category}",
+                                str(category),
+                                support,
+                                onset,
+                                frame,
+                            )
+                        )
+            if category_rows:
+                best = max(
+                    category_rows,
+                    key=lambda row: float(row[3]) if row[3] is not None else -1.0,
+                )
+                worst = min(
+                    category_rows,
+                    key=lambda row: float(row[3]) if row[3] is not None else 2.0,
+                )
+                lines.append(
+                    f"- Category range (success-only onset+pitch F1): highest `{best[0]}` = `{_report_number(best[3])}` over `{best[2]}` pairs; lowest `{worst[0]}` = `{_report_number(worst[3])}` over `{worst[2]}` pairs. Small supports should not be treated as robust rankings."
+                )
+            route_rows = []
+            for route_id in ("pytorch_cpu", "pytorch_xpu"):
+                route = candidate_route(model, route_id)
+                if not route:
+                    continue
+                startup = _median_value(
+                    (route.get("startup") or {}).get("model_load_seconds")
+                )
+                calls = _median_value(
+                    (route.get("steady_state") or {}).get("calls_per_second")
+                )
+                route_rows.append(
+                    f"`{route_id}` status `{route.get('status', 'unknown')}`, load `{_report_number(startup)}` s, steady calls/s `{_report_number(calls)}`, E2E audio-s/s `{_report_number(candidate_e2e(route))}`"
+                )
+            if route_rows:
+                lines.append("- Execution: " + "; ".join(route_rows) + ".")
+            observed_batches = execution.get("segment_batch_sizes_observed")
+            cache_policy = execution.get("cache_reuse_policy")
+            adapter_configuration = execution.get("adapter_configuration")
+            if observed_batches is not None or cache_policy or adapter_configuration:
+                lines.append(
+                    f"- Adapter execution configuration: `{adapter_configuration or 'none'}`; observed segment batch sizes `{observed_batches or 'not recorded'}`; cache reuse policy `{cache_policy or 'not recorded'}`."
+                )
+            quantization = model.get("quantization") or {}
+            if quantization:
+                q_quality = quantization.get("quality") or {}
+                q_execution = quantization.get("execution") or {}
+                q_cpu = next(
+                    (
+                        route
+                        for route in q_execution.get("routes", [])
+                        if route.get("route") == "pytorch_cpu"
+                    ),
+                    {},
+                )
+                lines.append(
+                    f"- Quantization: status `{quantization.get('status', 'unknown')}`, Linear measurement `{(quantization.get('measurement') or {}).get('original_linear_modules', 'n/a')} -> {(quantization.get('measurement') or {}).get('quantized_linear_modules', 'n/a')}`, quantized success-only onset+pitch F1 `{_report_number(_quality_f1(q_quality, 'success_only', 'onset_pitch'))}`, CPU E2E audio-s/s `{_report_number(candidate_e2e(q_cpu))}`."
+                )
+
     if corrected_openvino_gpu_measured:
-        model_call_summary = ", ".join(
-            f"batch {batch_size}: `{route}` ({_report_number(model_call_winner_rates.get(batch_size))} audio-s/s)"
-            for batch_size, route in model_call_winners.items()
-        ) or "not recorded"
-        e2e_summary = f"`{e2e_winner}` ({_report_number(e2e_winner_rate)} audio-s/s)" if e2e_winner else "not recorded"
+        model_call_summary = (
+            ", ".join(
+                f"batch {batch_size}: `{route}` ({_report_number(model_call_winner_rates.get(batch_size))} audio-s/s)"
+                for batch_size, route in model_call_winners.items()
+            )
+            or "not recorded"
+        )
+        e2e_summary = (
+            f"`{e2e_winner}` ({_report_number(e2e_winner_rate)} audio-s/s)"
+            if e2e_winner
+            else "not recorded"
+        )
         measured_route_note = f"- The measured #24 model-call throughput winners were {model_call_summary}; the end-to-end winner was {e2e_summary}. These are Basic Pitch route findings, not alternative-model results."
         bounded_route_note = "- The bounded corrected parity diagnostic remains a correctness result; the corrected GPU timing/resource rows above are the separate measured result."
     else:
@@ -647,23 +1065,59 @@ def _markdown(report: Mapping[str, Any]) -> str:
         quality_route_note = f"- The #25 quality result is explicitly provenanced to the exact #24-selected `{quality_backend.get('backend_id', 'unknown')}` route on `{quality_backend.get('device', 'unknown')}`; it does not establish quality equivalence for any other backend."
     else:
         quality_route_note = "- The #25 quality route provenance is not an exact #24 decision match, so it is not treated as the canonical corpus baseline."
-    lines.extend(["", "## What could not be executed", "", "No alternative candidate produced a quality, execution-cost, resource, backward-cost, or quantization measurement. The unavailability reasons are concrete local prerequisites, not claims that the models are intrinsically impossible to run.", "", "| Candidate | Status | Concrete blocker | What this prevents |", "| --- | --- | --- | --- |"])
-    for model in unavailable:
-        reason = model.get("availability_reason") or model.get("failure_code") or "not recorded"
-        lines.append(f"| `{model.get('model_id', 'unknown')}` | `{model.get('status', 'unknown')}` | {reason} | no comparative quality/cost result |")
     lines.extend(
         [
             "",
-            "- `timbre_trap_base`: the pinned checkpoint size is not locally verifiable and no approved Timbre-Trap checkout is present in the existing runtime/storage.",
-            "- `ymt3_plus`, `yptf_multi`, `yptf_moe_multi`: the official source/checkpoint material is not present in permitted local storage.",
-            "- `muscriptor_small`, `muscriptor_medium`, `muscriptor_large`: checkpoints are gated and no approved credential or local copy is available; no login, terms acceptance, or acquisition was attempted.",
+            "## What could not be executed",
+            "",
+            "The table distinguishes a genuine candidate-level blocker or load failure from a measured candidate. No unavailable candidate receives an invented quality or cost result.",
+            "",
+            "| Candidate | Status | Concrete blocker/failure | What this prevents |",
+            "| --- | --- | --- | --- |",
+        ]
+    )
+    for model in unavailable:
+        reason = (
+            model.get("availability_reason")
+            or model.get("failure_code")
+            or "not recorded"
+        )
+        lines.append(
+            f"| `{model.get('model_id', 'unknown')}` | `{model.get('status', 'unknown')}` | {reason} | no comparative quality/cost result |"
+        )
+    if not unavailable:
+        lines.append("| none | — | all configured candidates executed | — |")
+    partial_models = [
+        model
+        for model in models
+        if model.get("measurement_status") == "partial_pair_coverage"
+    ]
+    if partial_models:
+        lines.extend(
+            [
+                "",
+                "## Partial or incomplete candidate execution",
+                "",
+                "These candidates produced some pair-level evidence but did not complete the exact-population correctness gate. Their failure-penalized view is reported as observed runtime behavior, not as a substitute for a completed correctness evaluation.",
+                "",
+                "| Candidate | Successful pairs | Eligible pairs | Remaining requirement |",
+                "| --- | ---: | ---: | --- |",
+            ]
+        )
+        for model in partial_models:
+            view = (model.get("quality") or {}).get("success_only") or {}
+            lines.append(
+                f"| `{model.get('model_id', 'unknown')}` | {view.get('successful_pairs', 'n/a')} | {view.get('eligible_pairs', 'n/a')} | apples-to-apples correctness rerun on the full #25 population |"
+            )
+    lines.extend(
+        [
             "",
             "## Conclusions by evidence class",
             "",
             "### Directly supported by measured results",
             "",
             f"- {conclusion.get('measured', 'not recorded')}",
-            "- The Basic Pitch evidence is a complete baseline for the landed #24/#25 contracts, not a comparison against the unavailable alternatives.",
+            "- Basic Pitch remains the inherited baseline for the landed #24/#25 contracts; alternative rows are separate #26 measurements and do not replace that provenance.",
             measured_route_note,
             quality_route_note,
             "",
@@ -681,17 +1135,33 @@ def _markdown(report: Mapping[str, Any]) -> str:
             "",
             f"- {conclusion.get('unresolved', 'not recorded')}",
             f"- {conclusion.get('not_measured', 'not recorded')}",
-            "- No ranking, quality estimate, cost estimate, quantization effect, or integration recommendation is assigned to any unavailable candidate.",
+            f"- {conclusion.get('quality', 'No unavailable model receives a fabricated quality score.')}",
             "",
             "## What is required before the intended comparison can be completed",
             "",
-            "The following prerequisites must become available before a legitimate comparative run can be attempted; none is acquired or changed by this report revision:",
-            "",
-            "- An approved, immutable Timbre-Trap source checkout plus a verifiable pinned `tt-orig.pt` checkpoint and the already-permitted runtime prerequisites.",
-            "- The approved YourMT3 source checkout and all three exact immutable checkpoints selected in `models.yaml`.",
-            "- Approved access and local copies of the three gated MuScriptor checkpoints, without exposing credentials or taking account actions in this task.",
-            "- A permitted existing-runtime preflight for each candidate, followed by the fixed common #25 quality population and applicable #24 cost routes. Missing dependencies must be recorded as blockers rather than installed or substituted.",
-            "- After executable results exist, report both success-only and failure-penalized quality views, route/resource/backward applicability, and the fixed CPU dynamic-Linear quantization scope separately; do not synthesize a composite winner.",
+        ]
+    )
+    if unavailable:
+        lines.append(
+            "The remaining blocked candidates require the following concrete external prerequisites:"
+        )
+        lines.append("")
+        for model in unavailable:
+            reason = (
+                model.get("availability_reason")
+                or model.get("failure_code")
+                or "not recorded"
+            )
+            lines.append(f"- `{model.get('model_id', 'unknown')}`: {reason}.")
+        lines.append(
+            "- After those prerequisites become available, run only the fixed common #25 population and applicable #24 cost routes; do not infer their results from measured candidates."
+        )
+    else:
+        lines.append(
+            "All configured candidates have executable evidence under the fixed contract; no additional acquisition blocker is recorded."
+        )
+    lines.extend(
+        [
             "",
             "## Contract and privacy limits",
             "",
@@ -707,7 +1177,15 @@ def _atomic_text(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary: Path | None = None
     try:
-        with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=path.parent, prefix=f".{path.name}.", suffix=".tmp", delete=False, newline="\n") as handle:
+        with tempfile.NamedTemporaryFile(
+            "w",
+            encoding="utf-8",
+            dir=path.parent,
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            delete=False,
+            newline="\n",
+        ) as handle:
             temporary = Path(handle.name)
             handle.write(content)
             handle.flush()
@@ -728,15 +1206,23 @@ def write_public_report(
     force: bool = False,
 ) -> dict[str, Any]:
     input_root = Path(input_root).resolve(strict=False)
-    if not input_root.is_relative_to((Path(__file__).resolve().parents[1] / "outputs").resolve()):
-        raise ValueError("report input must be inside the ignored benchmark output area")
+    if not input_root.is_relative_to(
+        (Path(__file__).resolve().parents[1] / "outputs").resolve()
+    ):
+        raise ValueError(
+            "report input must be inside the ignored benchmark output area"
+        )
     json_file = _approved_report(json_path)
     markdown_file = _approved_report(markdown_path)
     if not force and (json_file.exists() or markdown_file.exists()):
         raise FileExistsError("refusing to overwrite public report without force=True")
-    config = config_path or Path(__file__).resolve().parents[1] / "config" / "models.yaml"
+    config = (
+        config_path or Path(__file__).resolve().parents[1] / "config" / "models.yaml"
+    )
     specs = load_model_specs(config)
     report = build_public_report(specs, input_root)
-    _atomic_text(json_file, json.dumps(report, indent=2, sort_keys=True, allow_nan=False) + "\n")
+    _atomic_text(
+        json_file, json.dumps(report, indent=2, sort_keys=True, allow_nan=False) + "\n"
+    )
     _atomic_text(markdown_file, _markdown(report))
     return report
