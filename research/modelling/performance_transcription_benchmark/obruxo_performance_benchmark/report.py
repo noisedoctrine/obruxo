@@ -8,6 +8,8 @@ import re
 import sys
 import tempfile
 from collections.abc import Mapping
+from copy import deepcopy
+from html import escape
 from pathlib import Path
 from typing import Any
 
@@ -358,7 +360,125 @@ def _public_quantization(value: Mapping[str, Any] | None) -> dict[str, Any] | No
     }
 
 
-def _quality_measurement_status(quality: Mapping[str, Any] | None) -> str:
+def _unscored_reason(run: Mapping[str, Any], runtime: Mapping[str, Any]) -> str | None:
+    """Identify bounded cached runs whose absent rows were never attempted."""
+    missing = int(run.get("missing_pairs", 0) or 0)
+    recorded_failed = int(run.get("failed_pairs", 0) or 0)
+    runtime_status = str(runtime.get("status", ""))
+    if missing <= 0 or missing != recorded_failed:
+        return None
+    if runtime_status not in {"measured_partial_cached", "measured_cached_partial"}:
+        return None
+    return (
+        "The bounded experiment ended before these pairs were scored; missing rows "
+        "are unscored, not inference failures."
+    )
+
+
+def _view_counts(view: Mapping[str, Any]) -> tuple[int, int, int]:
+    eligible = int(view.get("eligible_pairs", view.get("pair_count", 0)) or 0)
+    scored = int(view.get("scored_pairs", view.get("successful_pairs", 0)) or 0)
+    unscored = max(0, eligible - scored)
+    return eligible, scored, unscored
+
+
+def _normalize_unscored_view(view: Mapping[str, Any], reason: str) -> dict[str, Any]:
+    """Expose cached successful rows without converting missing rows to failures."""
+    normalized = deepcopy(dict(view))
+    eligible, scored, unscored = _view_counts(normalized)
+    normalized.pop("failed_pairs", None)
+    normalized["scored_pairs"] = scored
+    normalized["unscored_pairs"] = unscored
+    normalized["coverage"] = float(scored / eligible) if eligible else None
+    normalized["view_status"] = "scored_only"
+    normalized["unscored_reason"] = reason
+    aggregate = normalized.get("aggregate")
+    if isinstance(aggregate, Mapping):
+        aggregate = deepcopy(dict(aggregate))
+        aggregate.pop("failed_pair_count", None)
+        aggregate["eligible_pair_count"] = eligible
+        aggregate["scored_pair_count"] = scored
+        aggregate["unscored_pair_count"] = unscored
+        normalized["aggregate"] = aggregate
+    return normalized
+
+
+def _unscored_marker(view: Mapping[str, Any], reason: str) -> dict[str, Any]:
+    eligible, scored, unscored = _view_counts(view)
+    return {
+        "status": "not_applicable_unscored_only",
+        "eligible_pairs": eligible,
+        "scored_pairs": scored,
+        "unscored_pairs": unscored,
+        "coverage": float(scored / eligible) if eligible else None,
+        "reason": reason,
+    }
+
+
+def _normalize_unscored_aggregate(
+    aggregate: Mapping[str, Any], reason: str
+) -> dict[str, Any]:
+    normalized = deepcopy(dict(aggregate))
+    eligible, scored, unscored = _view_counts(normalized)
+    if "failed_pairs" not in normalized and "failed_pair_count" not in normalized:
+        return normalized
+    normalized.pop("failed_pairs", None)
+    normalized.pop("failed_pair_count", None)
+    normalized["scored_pairs"] = scored
+    normalized["unscored_pairs"] = unscored
+    normalized["coverage"] = float(scored / eligible) if eligible else None
+    normalized["unscored_reason"] = reason
+    return normalized
+
+
+def _normalize_unscored_quality(
+    quality: Mapping[str, Any], reason: str
+) -> dict[str, Any]:
+    normalized = deepcopy(dict(quality))
+    scored_view = normalized.get("success_only")
+    if not isinstance(scored_view, Mapping):
+        return normalized
+    scored_view = _normalize_unscored_view(scored_view, reason)
+    normalized["success_only"] = scored_view
+    normalized["failure_penalized"] = _unscored_marker(scored_view, reason)
+    population_views = normalized.get("population_views")
+    if isinstance(population_views, Mapping):
+        normalized["population_views"] = {
+            name: _normalize_unscored_aggregate(value, reason)
+            if isinstance(value, Mapping)
+            else value
+            for name, value in population_views.items()
+        }
+    normalized["scoring_status"] = "partial_unscored_population"
+    normalized["scoring_note"] = reason
+    return normalized
+
+
+def _normalize_unscored_duration_views(
+    duration_views: Mapping[str, Any], reason: str
+) -> dict[str, Any]:
+    normalized: dict[str, Any] = {}
+    for name, population in duration_views.items():
+        if not isinstance(population, Mapping):
+            normalized[name] = population
+            continue
+        population_value = deepcopy(dict(population))
+        scored_view = population_value.get("success_only")
+        if isinstance(scored_view, Mapping):
+            scored_view = _normalize_unscored_view(scored_view, reason)
+            population_value["success_only"] = scored_view
+            population_value["failure_penalized"] = _unscored_marker(
+                scored_view, reason
+            )
+            population_value["scoring_status"] = "partial_unscored_population"
+            population_value["scoring_note"] = reason
+        normalized[name] = population_value
+    return normalized
+
+
+def _quality_measurement_status(
+    quality: Mapping[str, Any] | None, unscored_reason: str | None = None
+) -> str:
     if not isinstance(quality, Mapping):
         return "not_measured"
     view = quality.get("success_only")
@@ -368,7 +488,9 @@ def _quality_measurement_status(quality: Mapping[str, Any] | None) -> str:
     successful = int(view.get("successful_pairs", 0) or 0)
     if eligible <= 0:
         return "not_measured"
-    return "complete" if successful == eligible else "partial_pair_coverage"
+    if successful == eligible:
+        return "complete"
+    return "partial_unscored_population" if unscored_reason else "partial_pair_coverage"
 
 
 def build_public_report(
@@ -405,11 +527,21 @@ def build_public_report(
         )
         duration_views = _read_json(Path(input_root) / model_id / "duration_views.json")
         quality_value = aggregates.get("quality") if status == "ok" else None
+        unscored_reason = _unscored_reason(run, runtime)
         if quality_value is not None and duration_views is not None:
             quality_value = dict(quality_value)
+            if unscored_reason:
+                quality_value = _normalize_unscored_quality(
+                    quality_value, unscored_reason
+                )
+                duration_views = _normalize_unscored_duration_views(
+                    duration_views, unscored_reason
+                )
             quality_value["duration_views"] = duration_views
+        elif quality_value is not None and unscored_reason:
+            quality_value = _normalize_unscored_quality(quality_value, unscored_reason)
         quality_measurement_status = _quality_measurement_status(
-            aggregates.get("quality")
+            quality_value, unscored_reason
         )
         routes = runtime.get("routes")
         if model_id != "basic_pitch":
@@ -428,6 +560,16 @@ def build_public_report(
             "measurement_status": quality_measurement_status,
             "failure_code": failure_code,
             "availability_reason": spec.unavailability_reason,
+            "scoring_status": (
+                quality_value.get("scoring_status")
+                if isinstance(quality_value, Mapping)
+                else None
+            ),
+            "scoring_note": (
+                quality_value.get("scoring_note")
+                if isinstance(quality_value, Mapping)
+                else None
+            ),
             "quality": quality_value,
             "quality_provenance": (
                 {
@@ -512,7 +654,8 @@ def build_public_report(
     partial_models = [
         model["model_id"]
         for model in models
-        if model.get("measurement_status") == "partial_pair_coverage"
+        if model.get("measurement_status")
+        in {"partial_pair_coverage", "partial_unscored_population"}
     ]
     unavailable_models = [
         model["model_id"] for model in models if model.get("status") != "ok"
@@ -540,24 +683,29 @@ def build_public_report(
                     Path(input_root).resolve(strict=False), specs
                 ),
             },
+            "report_assets": {
+                "charts": [
+                    {"path": path, "title": title} for path, title in _CHART_ASSETS
+                ],
+            },
             "models": models,
             "evidence": {
                 "measured_models": measured_models,
                 "partial_measurement_models": partial_models,
                 "metadata_only_models": unavailable_models,
-                "measured_scope": f"Executable evidence is present for {measured_text}. Basic Pitch quality and cost evidence are inherited from #25/#24; {', '.join(measured_alternatives) or 'no alternative candidate'} produced new #26 evidence in the unchanged py312 runtime. Partial pair coverage is explicitly identified for {', '.join(partial_models) or 'none'}.",
+                "measured_scope": f"Executable evidence is present for {measured_text}. Basic Pitch quality and cost evidence are inherited from #25/#24; {', '.join(measured_alternatives) or 'no alternative candidate'} produced new #26 evidence in the unchanged py312 runtime. Partial scored populations are explicitly identified for {', '.join(partial_models) or 'none'}; rows not reached before the experiment ended are unscored, not failures.",
                 "bounded_diagnostic_scope": "The corrected OpenVINO GPU route also retains a bounded five-window FP32 + PERFORMANCE parity diagnostic; that diagnostic is separate from the corrected route's smoke-benchmark timing and resource measurements.",
                 "not_measured_scope": f"No quality/cost conclusion is available for {blocked_text}; these candidates were either externally blocked or failed before producing executable evidence.",
                 "sourced_scope": "Candidate source, checkpoint, representation, architecture boundary, native sample rate, batch semantics, and license fields are verified inventory facts; they are not performance measurements.",
                 "adapter_scope": "The repository contains an implemented pinned-official adapter path for every required candidate family. An implemented adapter is not treated as executed when its source, checkpoint, dependency, or credential prerequisite is unavailable.",
-                "unresolved_scope": f"The intended comparative benchmark remains incomplete for unavailable candidates `{blocked_text}` and partial-coverage candidates `{', '.join(partial_models) or 'none'}`; measured candidates are reported separately and no unavailable candidate receives a fabricated score.",
+                "unresolved_scope": f"The intended comparative benchmark remains incomplete for unavailable candidates `{blocked_text}` and partial scored populations `{', '.join(partial_models) or 'none'}`; measured candidates are reported separately and no unavailable candidate receives a fabricated score.",
             },
             "conclusion": {
-                "measured": f"Measured evidence exists for {measured_text}. Basic Pitch contributes the inherited #25 quality and #24 route/cost baseline; executable alternatives contribute their own #26 corpus quality and applicable CPU/XPU cost measurements. Partial pair-coverage candidates are not complete correctness results.",
+                "measured": f"Measured evidence exists for {measured_text}. Basic Pitch contributes the inherited #25 quality and #24 route/cost baseline; executable alternatives contribute their own #26 corpus quality and applicable CPU/XPU cost measurements. Partial scored populations are not complete correctness results, and their unscored rows are not treated as failures.",
                 "bounded_diagnostic": "A separate bounded #24 diagnostic compiled OpenVINO GPU with INFERENCE_PRECISION_HINT=float32 while retaining PERFORMANCE and passed parity on five public synthetic windows. This is a parity result, not a performance/resource result.",
-                "not_measured": f"The remaining candidate execution states are {blocked_text}; their quality, cost, memory, backward, and quantization results are not inferred from metadata or from other models. Partial-coverage candidates still require full-population correctness confirmation.",
+                "not_measured": f"The remaining candidate execution states are {blocked_text}; their quality, cost, memory, backward, and quantization results are not inferred from metadata or from other models. Partial scored-population candidates still require full-population correctness confirmation.",
                 "sourced": "The candidate inventory establishes model identity, representation, architecture boundary, native rate/batch semantics, and licensing where verified, but none of these facts ranks execution quality or cost.",
-                "unresolved": f"Comparative questions remain for unavailable candidates `{blocked_text}` and partial-coverage candidates `{', '.join(partial_models) or 'none'}`; measured candidates must be compared by separate quality and cost evidence rather than a composite winner.",
+                "unresolved": f"Comparative questions remain for unavailable candidates `{blocked_text}` and partial scored populations `{', '.join(partial_models) or 'none'}`; measured candidates must be compared by separate quality and cost evidence rather than a composite winner.",
                 "quality": "Quality is published only for candidates with an executed #25-compatible population; globally unavailable models receive no invented F1.",
                 "cost": "Cost rows remain separate by candidate route, with unsupported or failed routes explicitly reported rather than replaced by fallback measurements.",
                 "representation": "Representation and licensing are inventories, not an integration decision.",
@@ -762,6 +910,315 @@ def _identity_representation(identity: Mapping[str, Any]) -> str:
     )
 
 
+_DURATION_POPULATIONS = (
+    ("full_population", "Full"),
+    ("under_5_seconds", "<5 s"),
+    ("under_10_seconds", "<10 s"),
+    ("under_15_seconds", "<15 s"),
+)
+_POPULATION_COMPARISON = (
+    ("full_population", "Full"),
+    ("shared_population", "Shared"),
+)
+_CHART_ASSETS = (
+    ("charts/quality_by_duration.svg", "Primary scored F1 by duration"),
+    ("charts/coverage_by_duration.svg", "Scored coverage by duration"),
+    ("charts/event_f1_population.svg", "Event-model F1 by population"),
+    ("charts/frame_f1_population.svg", "Frame-model F1 by population"),
+)
+_CHART_COLORS = ("#2563eb", "#dc2626", "#059669", "#9333ea", "#d97706")
+
+
+def _chart_model_label(model: Mapping[str, Any]) -> str:
+    labels = {
+        "basic_pitch": "Basic Pitch",
+        "timbre_trap_base": "Timbre-Trap",
+        "muscriptor_small": "MuScriptor small",
+        "muscriptor_medium": "MuScriptor medium",
+    }
+    return labels.get(str(model.get("model_id")), str(model.get("model_id", "unknown")))
+
+
+def _chart_models(report: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+    return [
+        model
+        for model in report.get("models", [])
+        if model.get("status") == "ok"
+        and isinstance((model.get("quality") or {}).get("duration_views"), Mapping)
+    ]
+
+
+def _chart_f1(population: Mapping[str, Any], metric: str) -> float | None:
+    view = population.get("success_only") or population.get("scored_only") or {}
+    aggregate = view.get("aggregate") or {}
+    value = ((aggregate.get("micro") or {}).get(metric) or {}).get("f1")
+    return float(value) if isinstance(value, (int, float)) else None
+
+
+def _chart_coverage(population: Mapping[str, Any]) -> float | None:
+    view = population.get("success_only") or population.get("scored_only") or {}
+    value = view.get("coverage")
+    return float(value) if isinstance(value, (int, float)) else None
+
+
+def _chart_svg_text(
+    value: str,
+    x: float,
+    y: float,
+    *,
+    size: int = 11,
+    anchor: str = "start",
+    weight: str = "normal",
+    fill: str = "#1f2937",
+) -> str:
+    return (
+        f'<text x="{x:.1f}" y="{y:.1f}" font-family="Arial,sans-serif" '
+        f'font-size="{size}px" font-weight="{weight}" text-anchor="{anchor}" '
+        f'fill="{fill}">{escape(value)}</text>'
+    )
+
+
+def _chart_shell(title: str, subtitle: str, body: str) -> str:
+    return (
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 360" '
+        'role="img" aria-labelledby="title desc">'
+        '<title id="title">'
+        + escape(title)
+        + '</title><desc id="desc">'
+        + escape(subtitle)
+        + '</desc><rect width="620" height="360" fill="white"/>'
+        + _chart_svg_text(title, 22, 25, size=16, weight="bold")
+        + _chart_svg_text(subtitle, 22, 43, size=10, fill="#4b5563")
+        + body
+        + "</svg>\n"
+    )
+
+
+def _chart_legend(labels: list[str], x: float = 72, y: float = 58) -> str:
+    parts: list[str] = []
+    cursor = x
+    for index, label in enumerate(labels):
+        color = _CHART_COLORS[index % len(_CHART_COLORS)]
+        parts.append(
+            f'<rect x="{cursor:.1f}" y="{y - 9:.1f}" width="9" height="9" fill="{color}"/>'
+        )
+        parts.append(_chart_svg_text(label, cursor + 13, y, size=9))
+        cursor += max(80, 13 + len(label) * 5.4)
+    return "".join(parts)
+
+
+def _chart_grid(
+    left: float,
+    top: float,
+    width: float,
+    height: float,
+    maximum: float,
+    tick_step: float,
+    formatter: str = ".1f",
+) -> str:
+    parts: list[str] = []
+    tick = 0.0
+    while tick <= maximum + tick_step / 2:
+        y = top + height - (tick / maximum) * height if maximum else top + height
+        parts.append(
+            f'<line x1="{left:.1f}" y1="{y:.1f}" x2="{left + width:.1f}" '
+            f'y2="{y:.1f}" stroke="#e5e7eb" stroke-width="1"/>'
+        )
+        parts.append(
+            _chart_svg_text(
+                format(tick, formatter),
+                left - 8,
+                y + 4,
+                size=9,
+                anchor="end",
+                fill="#6b7280",
+            )
+        )
+        tick += tick_step
+    parts.append(
+        f'<line x1="{left:.1f}" y1="{top:.1f}" x2="{left:.1f}" '
+        f'y2="{top + height:.1f}" stroke="#374151" stroke-width="1"/>'
+    )
+    parts.append(
+        f'<line x1="{left:.1f}" y1="{top + height:.1f}" x2="{left + width:.1f}" '
+        f'y2="{top + height:.1f}" stroke="#374151" stroke-width="1"/>'
+    )
+    return "".join(parts)
+
+
+def _duration_quality_svg(report: Mapping[str, Any]) -> str:
+    models = _chart_models(report)
+    left, top, width, height = 62.0, 86.0, 530.0, 220.0
+    maximum = 0.5
+    parts = [_chart_legend([_chart_model_label(model) for model in models])]
+    parts.append(_chart_grid(left, top, width, height, maximum, 0.1))
+    group_width = width / len(_DURATION_POPULATIONS)
+    bar_width = min(24.0, group_width / max(1, len(models) + 1))
+    for group_index, (population_name, population_label) in enumerate(
+        _DURATION_POPULATIONS
+    ):
+        center = left + group_width * (group_index + 0.5)
+        parts.append(
+            _chart_svg_text(
+                population_label, center, top + height + 20, size=10, anchor="middle"
+            )
+        )
+        for model_index, model in enumerate(models):
+            quality = model.get("quality") or {}
+            population = (quality.get("duration_views") or {}).get(
+                population_name
+            ) or {}
+            metric = (
+                "frames"
+                if model.get("output_contract") == "frame_pitch"
+                else "onset_pitch"
+            )
+            value = _chart_f1(population, metric)
+            if value is None:
+                continue
+            x = (
+                center
+                + (model_index - (len(models) - 1) / 2) * bar_width
+                - bar_width / 2
+            )
+            bar_height = value / maximum * height
+            y = top + height - bar_height
+            color = _CHART_COLORS[model_index % len(_CHART_COLORS)]
+            parts.append(
+                f'<rect x="{x:.1f}" y="{y:.1f}" width="{bar_width - 2:.1f}" height="{bar_height:.1f}" fill="{color}" rx="2"/>'
+            )
+            parts.append(
+                _chart_svg_text(
+                    f"{value:.2f}",
+                    x + (bar_width - 2) / 2,
+                    max(top + 11, y - 4),
+                    size=8,
+                    anchor="middle",
+                )
+            )
+    return _chart_shell(
+        "Primary scored F1 by duration",
+        "Scored pairs only; event models use onset+pitch F1, Timbre-Trap uses frame F1.",
+        "".join(parts),
+    )
+
+
+def _coverage_svg(report: Mapping[str, Any]) -> str:
+    models = _chart_models(report)
+    left, top, width, height = 62.0, 86.0, 530.0, 220.0
+    parts = [_chart_legend([_chart_model_label(model) for model in models])]
+    parts.append(_chart_grid(left, top, width, height, 1.0, 0.2))
+    step = width / (len(_DURATION_POPULATIONS) - 1)
+    for model_index, model in enumerate(models):
+        points: list[tuple[float, float, float]] = []
+        for index, (population_name, population_label) in enumerate(
+            _DURATION_POPULATIONS
+        ):
+            population = ((model.get("quality") or {}).get("duration_views") or {}).get(
+                population_name
+            ) or {}
+            value = _chart_coverage(population)
+            if value is None:
+                continue
+            x = left + step * index
+            y = top + height - value * height
+            points.append((x, y, value))
+            parts.append(
+                f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4" fill="{_CHART_COLORS[model_index % len(_CHART_COLORS)]}"/>'
+            )
+            parts.append(
+                _chart_svg_text(f"{value:.2f}", x, y - 8, size=8, anchor="middle")
+            )
+            if model_index == 0:
+                parts.append(
+                    _chart_svg_text(
+                        population_label, x, top + height + 20, size=10, anchor="middle"
+                    )
+                )
+        if len(points) > 1:
+            coords = " ".join(f"{x:.1f},{y:.1f}" for x, y, _ in points)
+            parts.append(
+                f'<polyline points="{coords}" fill="none" stroke="{_CHART_COLORS[model_index % len(_CHART_COLORS)]}" stroke-width="2"/>'
+            )
+    return _chart_shell(
+        "Scored coverage by duration",
+        "Coverage is scored pairs / eligible pairs; unfinished pairs are unscored, not failures.",
+        "".join(parts),
+    )
+
+
+def _population_f1_svg(
+    report: Mapping[str, Any], metric: str, title: str, subtitle: str
+) -> str:
+    models = [
+        model
+        for model in _chart_models(report)
+        if metric != "onset_pitch" or model.get("output_contract") != "frame_pitch"
+    ]
+    left, top, width, height = 62.0, 86.0, 530.0, 220.0
+    maximum = 0.5
+    parts = [_chart_legend([_chart_model_label(model) for model in models])]
+    parts.append(_chart_grid(left, top, width, height, maximum, 0.1))
+    group_width = width / len(_POPULATION_COMPARISON)
+    bar_width = min(30.0, group_width / max(1, len(models) + 1))
+    for group_index, (population_name, population_label) in enumerate(
+        _POPULATION_COMPARISON
+    ):
+        center = left + group_width * (group_index + 0.5)
+        parts.append(
+            _chart_svg_text(
+                population_label, center, top + height + 20, size=10, anchor="middle"
+            )
+        )
+        for model_index, model in enumerate(models):
+            population = ((model.get("quality") or {}).get("duration_views") or {}).get(
+                population_name
+            ) or {}
+            value = _chart_f1(population, metric)
+            if value is None:
+                continue
+            x = (
+                center
+                + (model_index - (len(models) - 1) / 2) * bar_width
+                - bar_width / 2
+            )
+            bar_height = value / maximum * height
+            y = top + height - bar_height
+            color = _CHART_COLORS[model_index % len(_CHART_COLORS)]
+            parts.append(
+                f'<rect x="{x:.1f}" y="{y:.1f}" width="{bar_width - 2:.1f}" height="{bar_height:.1f}" fill="{color}" rx="2"/>'
+            )
+            parts.append(
+                _chart_svg_text(
+                    f"{value:.2f}",
+                    x + (bar_width - 2) / 2,
+                    max(top + 11, y - 4),
+                    size=8,
+                    anchor="middle",
+                )
+            )
+    return _chart_shell(title, subtitle, "".join(parts))
+
+
+def _chart_svgs(report: Mapping[str, Any]) -> dict[str, str]:
+    return {
+        "charts/quality_by_duration.svg": _duration_quality_svg(report),
+        "charts/coverage_by_duration.svg": _coverage_svg(report),
+        "charts/event_f1_population.svg": _population_f1_svg(
+            report,
+            "onset_pitch",
+            "Event-model F1 by population",
+            "Scored pairs only; Timbre-Trap is excluded because it has no native note-event output.",
+        ),
+        "charts/frame_f1_population.svg": _population_f1_svg(
+            report,
+            "frames",
+            "Frame-model F1 by population",
+            "Scored pairs only; all plotted candidates expose a comparable frame representation.",
+        ),
+    }
+
+
 def _markdown(report: Mapping[str, Any]) -> str:
     models = list(report.get("models", []))
     evidence = report.get("evidence", {})
@@ -773,7 +1230,7 @@ def _markdown(report: Mapping[str, Any]) -> str:
     status_message = (
         f"All `{len(models)}` configured candidates produced executable evidence."
         if not unavailable
-        else f"`{len(measured)}` of `{len(models)}` configured candidates produced executable evidence; `{len(unavailable)}` remain externally blocked or failed before measurement."
+        else f"`{len(measured)}` of `{len(models)}` configured candidates produced executable evidence; `{len(unavailable)}` remain externally blocked or unavailable before measurement."
     )
     lines = [
         "# Performance transcription benchmark",
@@ -787,7 +1244,7 @@ def _markdown(report: Mapping[str, Any]) -> str:
         "## What was successfully established",
         "",
         f"- Measured candidates: `{', '.join(evidence.get('measured_models', [])) or 'none'}`.",
-        f"- Partial pair-coverage candidates: `{', '.join(evidence.get('partial_measurement_models', [])) or 'none'}`; these are not treated as completed correctness evaluations.",
+        f"- Partial scored-population candidates: `{', '.join(evidence.get('partial_measurement_models', [])) or 'none'}`; unfinished rows are unscored, not failures, and these candidates are not treated as completed correctness evaluations.",
         f"- Metadata-only or unavailable candidates: `{', '.join(evidence.get('metadata_only_models', [])) or 'none'}`.",
         f"- Directly measured scope: {evidence.get('measured_scope', 'not recorded')}",
         f"- Sourced/model-level scope: {evidence.get('sourced_scope', 'not recorded')}",
@@ -841,7 +1298,7 @@ def _markdown(report: Mapping[str, Any]) -> str:
             "",
             "## What was actually executed",
             "",
-            f"Basic Pitch quality/cost evidence is consumed from the landed #25/#24 reports. Executed #26 alternatives are `{', '.join(model.get('model_id', 'unknown') for model in measured if model.get('model_id') != 'basic_pitch') or 'none'}`; partial-coverage alternatives are identified separately and are not treated as completed correctness evaluations. Blocked candidates are reported separately. No new rendering or Basic Pitch rerun is implied.",
+            f"Basic Pitch quality/cost evidence is consumed from the landed #25/#24 reports. Executed #26 alternatives are `{', '.join(model.get('model_id', 'unknown') for model in measured if model.get('model_id') != 'basic_pitch') or 'none'}`; partial scored-population alternatives are identified separately and are not treated as completed correctness evaluations. Blocked candidates are reported separately. No new rendering or Basic Pitch rerun is implied.",
             "",
         ]
     )
@@ -900,48 +1357,46 @@ def _markdown(report: Mapping[str, Any]) -> str:
         if (model.get("quality") or {}).get("duration_views")
     ]
     if duration_models:
-        population_order = (
-            "full_population",
-            "under_5_seconds",
-            "under_10_seconds",
-            "under_15_seconds",
-            "shared_population",
-            "shared_under_5_seconds",
-            "shared_under_10_seconds",
-            "shared_under_15_seconds",
-        )
-
-        def _duration_f1(population: Mapping[str, Any], basis: str, metric: str) -> Any:
-            return (
-                ((population.get(basis) or {}).get("aggregate") or {})
-                .get("micro", {})
-                .get(metric, {})
-                .get("f1")
-            )
-
         lines.extend(
             [
                 "### Cached quality by duration and comparison population",
                 "",
-                "These views are recomputed from already-cached per-pair observations joined to the canonical manifest; no model inference was rerun. `Full` includes the entire eligible population with missing rows failure-penalized. `Shared` is the common TT/small cached population (and the same IDs are used for the other models where available). The JSON retains the complete aggregate diagnostics, including precision, recall, counts, pair-macro summaries, category groups, and bootstrap intervals. The landed full-population #25 baseline retains its 10,000-replicate bootstrap; these additional duration-stratum summaries use 1,000 replicates to keep this reporting-only pass bounded.",
+                "These views are derived from already-cached observations; no model inference was rerun. The charts show the full eligible population, duration cutoffs, and the shared scored population without turning pairs that were never reached before wrap-up into failures. F1 is therefore computed from scored pairs only, with coverage shown separately. The JSON retains the detailed aggregate diagnostics, counts, category groups, and bootstrap intervals.",
                 "",
-                "| Model | Population | Eligible | Successful | Failed | Coverage | Success onset+pitch F1 | Penalized onset+pitch F1 | Success onset+pitch+offset F1 | Penalized onset+pitch+offset F1 | Success frame F1 | Penalized frame F1 |",
-                "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+                "<table>",
+                "<tr>",
+                '<td valign="top"><a href="charts/quality_by_duration.svg"><img src="charts/quality_by_duration.svg" alt="Primary scored F1 by duration" width="470"></a></td>',
+                '<td valign="top"><a href="charts/coverage_by_duration.svg"><img src="charts/coverage_by_duration.svg" alt="Scored coverage by duration" width="470"></a></td>',
+                "</tr>",
+                "<tr>",
+                '<td valign="top"><a href="charts/event_f1_population.svg"><img src="charts/event_f1_population.svg" alt="Event-model F1 by population" width="470"></a></td>',
+                '<td valign="top"><a href="charts/frame_f1_population.svg"><img src="charts/frame_f1_population.svg" alt="Frame-model F1 by population" width="470"></a></td>',
+                "</tr>",
+                "</table>",
+                "",
+                "Open the charts directly: [quality by duration](charts/quality_by_duration.svg) | [coverage by duration](charts/coverage_by_duration.svg) | [event F1](charts/event_f1_population.svg) | [frame F1](charts/frame_f1_population.svg).",
+                "",
+                "| Candidate | Primary plotted metric | Full scored | Full unscored | Full scored-only F1 | Shared scored-only F1 |",
+                "| --- | --- | ---: | ---: | ---: | ---: |",
             ]
         )
         for model in duration_models:
             quality = model.get("quality") or {}
             duration_views = quality.get("duration_views") or {}
-            for population_name in population_order:
-                population = duration_views.get(population_name)
-                if not isinstance(population, Mapping):
-                    continue
-                failure_penalized = population.get("failure_penalized") or {}
-                lines.append(
-                    f"| `{model.get('model_id', 'unknown')}` | `{population_name}` | {failure_penalized.get('eligible_pairs', 'n/a')} | {failure_penalized.get('successful_pairs', 'n/a')} | {failure_penalized.get('failed_pairs', 'n/a')} | {_report_number(failure_penalized.get('coverage'))} | {_report_number(_duration_f1(population, 'success_only', 'onset_pitch'))} | {_report_number(_duration_f1(population, 'failure_penalized', 'onset_pitch'))} | {_report_number(_duration_f1(population, 'success_only', 'onset_pitch_offset'))} | {_report_number(_duration_f1(population, 'failure_penalized', 'onset_pitch_offset'))} | {_report_number(_duration_f1(population, 'success_only', 'frames'))} | {_report_number(_duration_f1(population, 'failure_penalized', 'frames'))} |"
-                )
+            metric = (
+                "frames"
+                if model.get("output_contract") == "frame_pitch"
+                else "onset_pitch"
+            )
+            full = duration_views.get("full_population") or {}
+            shared = duration_views.get("shared_population") or {}
+            _, full_scored, full_unscored = _view_counts(full.get("success_only") or {})
+            shared_value = _chart_f1(shared, metric)
+            lines.append(
+                f"| `{model.get('model_id', 'unknown')}` | `{('frame F1' if metric == 'frames' else 'onset+pitch F1')}` | {full_scored} | {full_unscored} | {_report_number(_chart_f1(full, metric))} | {_report_number(shared_value)} |"
+            )
         lines.append(
-            "- Timbre-Trap is frame/pitch output only in this benchmark; its onset+pitch and onset+pitch+offset event columns are `n/a` by design because no MIDI/event decoder was used."
+            "- The `Full unscored` column is the number of eligible pairs with no cached prediction at wrap-up. It is not a failure count. Timbre-Trap is frame/pitch output only; it has no onset/offset event score because no MIDI/event decoder was used."
         )
     basic_pitch = next(
         (model for model in models if model.get("model_id") == "basic_pitch"), None
@@ -1150,7 +1605,7 @@ def _markdown(report: Mapping[str, Any]) -> str:
                 "",
                 "These rows are measured #26 results from the exact #25 eligible population. Timbre-Trap contributes frame quality only; native note-event metrics are shown only for event-output candidates. `n/a` means the metric is not applicable, not zero.",
                 "",
-                "| Candidate | Success coverage | Onset+pitch F1 | Frame F1 | CPU E2E audio-s/s | XPU E2E audio-s/s | CPU host RSS MiB | Quantization |",
+                "| Candidate | Scored coverage | Onset+pitch F1 | Frame F1 | CPU E2E audio-s/s | XPU E2E audio-s/s | CPU host RSS MiB | Quantization |",
                 "| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
             ]
         )
@@ -1196,13 +1651,31 @@ def _markdown(report: Mapping[str, Any]) -> str:
                 execution_note = (model.get("execution") or {}).get("execution_note")
                 if execution_note:
                     lines.append(f"- Execution note: {execution_note}")
-            for view_name in ("success_only", "failure_penalized"):
+            view_specs = (
+                [("scored_only", "success_only")]
+                if model.get("measurement_status") == "partial_unscored_population"
+                else [
+                    ("success_only", "success_only"),
+                    ("failure_penalized", "failure_penalized"),
+                ]
+            )
+            for display_name, view_name in view_specs:
                 view = quality.get(view_name) or {}
+                scored = view.get("scored_pairs", view.get("successful_pairs", "n/a"))
+                unscored = view.get("unscored_pairs")
+                count_text = f"{scored} scored"
+                if unscored is not None:
+                    count_text += f", {unscored} unscored"
                 lines.append(
-                    f"- `{view_name}`: `{view.get('successful_pairs', 'n/a')}` / `{view.get('eligible_pairs', 'n/a')}` successful, coverage `{_report_number(view.get('coverage'))}`, onset+pitch F1 `{_report_number(_quality_f1(quality, view_name, 'onset_pitch'))}`, onset+pitch+offset F1 `{_report_number(_quality_f1(quality, view_name, 'onset_pitch_offset'))}`, frame F1 `{_report_number(_quality_f1(quality, view_name, 'frames'))}`."
+                    f"- `{display_name}`: {count_text} of `{view.get('eligible_pairs', 'n/a')}` eligible, coverage `{_report_number(view.get('coverage'))}`, onset+pitch F1 `{_report_number(_quality_f1(quality, view_name, 'onset_pitch'))}`, onset+pitch+offset F1 `{_report_number(_quality_f1(quality, view_name, 'onset_pitch_offset'))}`, frame F1 `{_report_number(_quality_f1(quality, view_name, 'frames'))}`."
                 )
             aggregate = (quality.get("success_only") or {}).get("aggregate") or {}
             groups = aggregate.get("groups") or {}
+            category_metric = (
+                "frame F1"
+                if model.get("output_contract") == "frame_pitch"
+                else "onset+pitch F1"
+            )
             category_rows: list[tuple[str, str, int, Any, Any]] = []
             for field in (
                 "type",
@@ -1232,7 +1705,7 @@ def _markdown(report: Mapping[str, Any]) -> str:
                                 f"{field}={category}",
                                 str(category),
                                 support,
-                                onset,
+                                frame if category_metric == "frame F1" else onset,
                                 frame,
                             )
                         )
@@ -1246,7 +1719,7 @@ def _markdown(report: Mapping[str, Any]) -> str:
                     key=lambda row: float(row[3]) if row[3] is not None else 2.0,
                 )
                 lines.append(
-                    f"- Category range (success-only onset+pitch F1): highest `{best[0]}` = `{_report_number(best[3])}` over `{best[2]}` pairs; lowest `{worst[0]}` = `{_report_number(worst[3])}` over `{worst[2]}` pairs. Small supports should not be treated as robust rankings."
+                    f"- Category range (scored-only {category_metric}): highest `{best[0]}` = `{_report_number(best[3])}` over `{best[2]}` pairs; lowest `{worst[0]}` = `{_report_number(worst[3])}` over `{worst[2]}` pairs. Small supports should not be treated as robust rankings."
                 )
             route_rows = []
             for route_id in ("pytorch_cpu", "pytorch_xpu"):
@@ -1334,7 +1807,8 @@ def _markdown(report: Mapping[str, Any]) -> str:
     partial_models = [
         model
         for model in models
-        if model.get("measurement_status") == "partial_pair_coverage"
+        if model.get("measurement_status")
+        in {"partial_pair_coverage", "partial_unscored_population"}
     ]
     if partial_models:
         lines.extend(
@@ -1342,16 +1816,18 @@ def _markdown(report: Mapping[str, Any]) -> str:
                 "",
                 "## Partial or incomplete candidate execution",
                 "",
-                "These candidates produced some pair-level evidence but did not complete the exact-population correctness gate. Their failure-penalized view is reported as observed runtime behavior, not as a substitute for a completed correctness evaluation.",
+                "These candidates produced some pair-level evidence but did not complete the exact-population correctness gate. The remaining pairs were not reached before wrap-up, so they are unscored rather than failures; no failure-penalized score is published for those rows.",
                 "",
-                "| Candidate | Successful pairs | Eligible pairs | Remaining requirement |",
+                "| Candidate | Scored pairs | Unscored pairs | Remaining requirement |",
                 "| --- | ---: | ---: | --- |",
             ]
         )
         for model in partial_models:
             view = (model.get("quality") or {}).get("success_only") or {}
+            scored = view.get("scored_pairs", view.get("successful_pairs", "n/a"))
+            unscored = view.get("unscored_pairs", "n/a")
             lines.append(
-                f"| `{model.get('model_id', 'unknown')}` | {view.get('successful_pairs', 'n/a')} | {view.get('eligible_pairs', 'n/a')} | apples-to-apples correctness rerun on the full #25 population |"
+                f"| `{model.get('model_id', 'unknown')}` | {scored} | {unscored} | apples-to-apples correctness run on the full #25 population |"
             )
     lines.extend(
         [
@@ -1465,8 +1941,18 @@ def write_public_report(
     )
     specs = load_model_specs(config)
     report = build_public_report(specs, input_root)
+    chart_files = {
+        _approved_report(markdown_file.parent / relative_path): content
+        for relative_path, content in _chart_svgs(report).items()
+    }
+    if not force and any(path.exists() for path in chart_files):
+        raise FileExistsError(
+            "refusing to overwrite public report charts without force=True"
+        )
     _atomic_text(
         json_file, json.dumps(report, indent=2, sort_keys=True, allow_nan=False) + "\n"
     )
     _atomic_text(markdown_file, _markdown(report))
+    for chart_path, content in chart_files.items():
+        _atomic_text(chart_path, content)
     return report

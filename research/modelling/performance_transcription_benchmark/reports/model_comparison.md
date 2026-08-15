@@ -2,19 +2,19 @@
 
 ## Research status
 
-**Comparative status: `partial_executable_candidates`.** `4` of `8` configured candidates produced executable evidence; `4` remain externally blocked or failed before measurement. The report separates measured candidates from genuine blockers and does not infer a composite winner.
+**Comparative status: `partial_executable_candidates`.** `4` of `8` configured candidates produced executable evidence; `4` remain externally blocked or unavailable before measurement. The report separates measured candidates from genuine blockers and does not infer a composite winner.
 
 The JSON is authoritative, but this Markdown is intended to stand alone as the research finding. Quality, execution/resource cost, backward cost, representation, licensing, and quantization remain separate evidence classes; no composite winner is computed.
 
 ## What was successfully established
 
 - Measured candidates: `basic_pitch, timbre_trap_base, muscriptor_small, muscriptor_medium`.
-- Partial pair-coverage candidates: `timbre_trap_base, muscriptor_medium`; these are not treated as completed correctness evaluations.
+- Partial scored-population candidates: `timbre_trap_base, muscriptor_medium`; unfinished rows are unscored, not failures, and these candidates are not treated as completed correctness evaluations.
 - Metadata-only or unavailable candidates: `ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_large`.
-- Directly measured scope: Executable evidence is present for basic_pitch, timbre_trap_base, muscriptor_small, muscriptor_medium. Basic Pitch quality and cost evidence are inherited from #25/#24; timbre_trap_base, muscriptor_small, muscriptor_medium produced new #26 evidence in the unchanged py312 runtime. Partial pair coverage is explicitly identified for timbre_trap_base, muscriptor_medium.
+- Directly measured scope: Executable evidence is present for basic_pitch, timbre_trap_base, muscriptor_small, muscriptor_medium. Basic Pitch quality and cost evidence are inherited from #25/#24; timbre_trap_base, muscriptor_small, muscriptor_medium produced new #26 evidence in the unchanged py312 runtime. Partial scored populations are explicitly identified for timbre_trap_base, muscriptor_medium; rows not reached before the experiment ended are unscored, not failures.
 - Sourced/model-level scope: Candidate source, checkpoint, representation, architecture boundary, native sample rate, batch semantics, and license fields are verified inventory facts; they are not performance measurements.
 - Adapter implementation scope: The repository contains an implemented pinned-official adapter path for every required candidate family. An implemented adapter is not treated as executed when its source, checkpoint, dependency, or credential prerequisite is unavailable.
-- Unresolved comparative scope: The intended comparative benchmark remains incomplete for unavailable candidates `ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_large` and partial-coverage candidates `timbre_trap_base, muscriptor_medium`; measured candidates are reported separately and no unavailable candidate receives a fabricated score.
+- Unresolved comparative scope: The intended comparative benchmark remains incomplete for unavailable candidates `ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_large` and partial scored populations `timbre_trap_base, muscriptor_medium`; measured candidates are reported separately and no unavailable candidate receives a fabricated score.
 
 ## Candidate identity and known properties
 
@@ -23,12 +23,12 @@ These are verified inventory facts, separated from observations produced by exec
 | Candidate | Family | Status | Measurement | Output / representation | Native rate | Native batch | Code / weight license | Differentiable boundary |
 | --- | --- | --- | --- | --- | ---: | --- | --- | --- |
 | `basic_pitch` | `basic_pitch` | `ok` | `complete` | `note_and_frame`; dense=note_posterior_on_model_frames; event=stock_polyphonic_decoder | 22050 | `1, 2, 4, 8` | `Apache-2.0 / Apache-2.0` | `native_pytorch_forward` |
-| `timbre_trap_base` | `timbre_trap` | `ok` | `partial_pair_coverage` | `frame_pitch`; native_frame_pitch | 22050 | `1` | `MIT / upstream_space_license_not_separately_declared` | `native_forward_if_upstream_runtime_is_present` |
+| `timbre_trap_base` | `timbre_trap` | `ok` | `partial_unscored_population` | `frame_pitch`; native_frame_pitch | 22050 | `1` | `MIT / upstream_space_license_not_separately_declared` | `native_forward_if_upstream_runtime_is_present` |
 | `ymt3_plus` | `yourmt3` | `unavailable` | `not_measured` | `note_events`; stock_midi_note_events | 16000 | `1` | `GPL-3.0-only / Apache-2.0` | `not_exposed_by_stock_inference_path` |
 | `yptf_multi` | `yourmt3` | `unavailable` | `not_measured` | `note_events`; stock_midi_note_events | 16000 | `1` | `GPL-3.0-only / Apache-2.0` | `not_exposed_by_stock_inference_path` |
 | `yptf_moe_multi` | `yourmt3` | `unavailable` | `not_measured` | `note_events`; stock_midi_note_events | 16000 | `1` | `GPL-3.0-only / Apache-2.0` | `not_exposed_by_stock_inference_path` |
 | `muscriptor_small` | `muscriptor` | `ok` | `complete` | `note_events`; timing_corrected_midi_note_events | 16000 | `1` | `MIT / CC-BY-NC-4.0` | `not_exposed_by_stock_generation_path` |
-| `muscriptor_medium` | `muscriptor` | `ok` | `partial_pair_coverage` | `note_events`; timing_corrected_midi_note_events | 16000 | `1` | `MIT / CC-BY-NC-4.0` | `not_exposed_by_stock_generation_path` |
+| `muscriptor_medium` | `muscriptor` | `ok` | `partial_unscored_population` | `note_events`; timing_corrected_midi_note_events | 16000 | `1` | `MIT / CC-BY-NC-4.0` | `not_exposed_by_stock_generation_path` |
 | `muscriptor_large` | `muscriptor` | `unavailable` | `not_measured` | `note_events`; timing_corrected_midi_note_events | 16000 | `1` | `MIT / CC-BY-NC-4.0` | `not_exposed_by_stock_generation_path` |
 
 ### Identity/source inventory
@@ -50,47 +50,32 @@ Sourced representation notes: Timbre-Trap is retained as a native frame/pitch ou
 
 ## What was actually executed
 
-Basic Pitch quality/cost evidence is consumed from the landed #25/#24 reports. Executed #26 alternatives are `timbre_trap_base, muscriptor_small, muscriptor_medium`; partial-coverage alternatives are identified separately and are not treated as completed correctness evaluations. Blocked candidates are reported separately. No new rendering or Basic Pitch rerun is implied.
+Basic Pitch quality/cost evidence is consumed from the landed #25/#24 reports. Executed #26 alternatives are `timbre_trap_base, muscriptor_small, muscriptor_medium`; partial scored-population alternatives are identified separately and are not treated as completed correctness evaluations. Blocked candidates are reported separately. No new rendering or Basic Pitch rerun is implied.
 
 ### Cached quality by duration and comparison population
 
-These views are recomputed from already-cached per-pair observations joined to the canonical manifest; no model inference was rerun. `Full` includes the entire eligible population with missing rows failure-penalized. `Shared` is the common TT/small cached population (and the same IDs are used for the other models where available). The JSON retains the complete aggregate diagnostics, including precision, recall, counts, pair-macro summaries, category groups, and bootstrap intervals. The landed full-population #25 baseline retains its 10,000-replicate bootstrap; these additional duration-stratum summaries use 1,000 replicates to keep this reporting-only pass bounded.
+These views are derived from already-cached observations; no model inference was rerun. The charts show the full eligible population, duration cutoffs, and the shared scored population without turning pairs that were never reached before wrap-up into failures. F1 is therefore computed from scored pairs only, with coverage shown separately. The JSON retains the detailed aggregate diagnostics, counts, category groups, and bootstrap intervals.
 
-| Model | Population | Eligible | Successful | Failed | Coverage | Success onset+pitch F1 | Penalized onset+pitch F1 | Success onset+pitch+offset F1 | Penalized onset+pitch+offset F1 | Success frame F1 | Penalized frame F1 |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `basic_pitch` | `full_population` | 1769 | 1769 | 0 | 1.000 | 0.278 | 0.278 | 0.098 | 0.098 | 0.399 | 0.399 |
-| `basic_pitch` | `under_5_seconds` | 97 | 97 | 0 | 1.000 | 0.199 | 0.199 | 0.055 | 0.055 | 0.255 | 0.255 |
-| `basic_pitch` | `under_10_seconds` | 558 | 558 | 0 | 1.000 | 0.300 | 0.300 | 0.108 | 0.108 | 0.381 | 0.381 |
-| `basic_pitch` | `under_15_seconds` | 843 | 843 | 0 | 1.000 | 0.300 | 0.300 | 0.117 | 0.117 | 0.381 | 0.381 |
-| `basic_pitch` | `shared_population` | 1715 | 1715 | 0 | 1.000 | 0.265 | 0.265 | 0.094 | 0.094 | 0.399 | 0.399 |
-| `basic_pitch` | `shared_under_5_seconds` | 97 | 97 | 0 | 1.000 | 0.199 | 0.199 | 0.055 | 0.055 | 0.255 | 0.255 |
-| `basic_pitch` | `shared_under_10_seconds` | 558 | 558 | 0 | 1.000 | 0.300 | 0.300 | 0.108 | 0.108 | 0.381 | 0.381 |
-| `basic_pitch` | `shared_under_15_seconds` | 843 | 843 | 0 | 1.000 | 0.300 | 0.300 | 0.117 | 0.117 | 0.381 | 0.381 |
-| `timbre_trap_base` | `full_population` | 1769 | 1715 | 54 | 0.969 | n/a | n/a | n/a | n/a | 0.307 | 0.287 |
-| `timbre_trap_base` | `under_5_seconds` | 97 | 97 | 0 | 1.000 | n/a | n/a | n/a | n/a | 0.158 | 0.158 |
-| `timbre_trap_base` | `under_10_seconds` | 558 | 558 | 0 | 1.000 | n/a | n/a | n/a | n/a | 0.262 | 0.262 |
-| `timbre_trap_base` | `under_15_seconds` | 843 | 843 | 0 | 1.000 | n/a | n/a | n/a | n/a | 0.267 | 0.267 |
-| `timbre_trap_base` | `shared_population` | 1715 | 1715 | 0 | 1.000 | n/a | n/a | n/a | n/a | 0.307 | 0.307 |
-| `timbre_trap_base` | `shared_under_5_seconds` | 97 | 97 | 0 | 1.000 | n/a | n/a | n/a | n/a | 0.158 | 0.158 |
-| `timbre_trap_base` | `shared_under_10_seconds` | 558 | 558 | 0 | 1.000 | n/a | n/a | n/a | n/a | 0.262 | 0.262 |
-| `timbre_trap_base` | `shared_under_15_seconds` | 843 | 843 | 0 | 1.000 | n/a | n/a | n/a | n/a | 0.267 | 0.267 |
-| `muscriptor_small` | `full_population` | 1769 | 1769 | 0 | 1.000 | 0.289 | 0.289 | 0.163 | 0.163 | 0.361 | 0.361 |
-| `muscriptor_small` | `under_5_seconds` | 97 | 97 | 0 | 1.000 | 0.164 | 0.164 | 0.089 | 0.089 | 0.246 | 0.246 |
-| `muscriptor_small` | `under_10_seconds` | 558 | 558 | 0 | 1.000 | 0.268 | 0.268 | 0.152 | 0.152 | 0.314 | 0.314 |
-| `muscriptor_small` | `under_15_seconds` | 843 | 843 | 0 | 1.000 | 0.286 | 0.286 | 0.176 | 0.176 | 0.321 | 0.321 |
-| `muscriptor_small` | `shared_population` | 1715 | 1715 | 0 | 1.000 | 0.275 | 0.275 | 0.162 | 0.162 | 0.355 | 0.355 |
-| `muscriptor_small` | `shared_under_5_seconds` | 97 | 97 | 0 | 1.000 | 0.164 | 0.164 | 0.089 | 0.089 | 0.246 | 0.246 |
-| `muscriptor_small` | `shared_under_10_seconds` | 558 | 558 | 0 | 1.000 | 0.268 | 0.268 | 0.152 | 0.152 | 0.314 | 0.314 |
-| `muscriptor_small` | `shared_under_15_seconds` | 843 | 843 | 0 | 1.000 | 0.286 | 0.286 | 0.176 | 0.176 | 0.321 | 0.321 |
-| `muscriptor_medium` | `full_population` | 1769 | 883 | 886 | 0.499 | 0.239 | 0.125 | 0.129 | 0.067 | 0.291 | 0.291 |
-| `muscriptor_medium` | `under_5_seconds` | 97 | 97 | 0 | 1.000 | 0.178 | 0.178 | 0.107 | 0.107 | 0.214 | 0.214 |
-| `muscriptor_medium` | `under_10_seconds` | 558 | 495 | 63 | 0.887 | 0.278 | 0.263 | 0.156 | 0.148 | 0.315 | 0.315 |
-| `muscriptor_medium` | `under_15_seconds` | 843 | 590 | 253 | 0.700 | 0.288 | 0.228 | 0.166 | 0.131 | 0.324 | 0.324 |
-| `muscriptor_medium` | `shared_population` | 1715 | 883 | 832 | 0.515 | 0.239 | 0.143 | 0.129 | 0.077 | 0.291 | 0.291 |
-| `muscriptor_medium` | `shared_under_5_seconds` | 97 | 97 | 0 | 1.000 | 0.178 | 0.178 | 0.107 | 0.107 | 0.214 | 0.214 |
-| `muscriptor_medium` | `shared_under_10_seconds` | 558 | 495 | 63 | 0.887 | 0.278 | 0.263 | 0.156 | 0.148 | 0.315 | 0.315 |
-| `muscriptor_medium` | `shared_under_15_seconds` | 843 | 590 | 253 | 0.700 | 0.288 | 0.228 | 0.166 | 0.131 | 0.324 | 0.324 |
-- Timbre-Trap is frame/pitch output only in this benchmark; its onset+pitch and onset+pitch+offset event columns are `n/a` by design because no MIDI/event decoder was used.
+<table>
+<tr>
+<td valign="top"><a href="charts/quality_by_duration.svg"><img src="charts/quality_by_duration.svg" alt="Primary scored F1 by duration" width="470"></a></td>
+<td valign="top"><a href="charts/coverage_by_duration.svg"><img src="charts/coverage_by_duration.svg" alt="Scored coverage by duration" width="470"></a></td>
+</tr>
+<tr>
+<td valign="top"><a href="charts/event_f1_population.svg"><img src="charts/event_f1_population.svg" alt="Event-model F1 by population" width="470"></a></td>
+<td valign="top"><a href="charts/frame_f1_population.svg"><img src="charts/frame_f1_population.svg" alt="Frame-model F1 by population" width="470"></a></td>
+</tr>
+</table>
+
+Open the charts directly: [quality by duration](charts/quality_by_duration.svg) | [coverage by duration](charts/coverage_by_duration.svg) | [event F1](charts/event_f1_population.svg) | [frame F1](charts/frame_f1_population.svg).
+
+| Candidate | Primary plotted metric | Full scored | Full unscored | Full scored-only F1 | Shared scored-only F1 |
+| --- | --- | ---: | ---: | ---: | ---: |
+| `basic_pitch` | `onset+pitch F1` | 1769 | 0 | 0.278 | 0.265 |
+| `timbre_trap_base` | `frame F1` | 1715 | 54 | 0.307 | 0.307 |
+| `muscriptor_small` | `onset+pitch F1` | 1769 | 0 | 0.289 | 0.275 |
+| `muscriptor_medium` | `onset+pitch F1` | 883 | 886 | 0.239 | 0.239 |
+- The `Full unscored` column is the number of eligible pairs with no cached prediction at wrap-up. It is not a failure count. Timbre-Trap is frame/pitch output only; it has no onset/offset event score because no MIDI/event decoder was used.
 ### Basic Pitch quality evidence inherited from #25
 
 - Source: `landed_issue_25_report`; eligible population: `1769`; coverage: `1.000`.
@@ -142,7 +127,7 @@ Historical route records:
 
 These rows are measured #26 results from the exact #25 eligible population. Timbre-Trap contributes frame quality only; native note-event metrics are shown only for event-output candidates. `n/a` means the metric is not applicable, not zero.
 
-| Candidate | Success coverage | Onset+pitch F1 | Frame F1 | CPU E2E audio-s/s | XPU E2E audio-s/s | CPU host RSS MiB | Quantization |
+| Candidate | Scored coverage | Onset+pitch F1 | Frame F1 | CPU E2E audio-s/s | XPU E2E audio-s/s | CPU host RSS MiB | Quantization |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | `timbre_trap_base` | 0.969 | n/a | 0.307 | n/a | n/a | n/a | `not_run` |
 | `muscriptor_small` | 1.000 | 0.289 | 0.361 | n/a | n/a | n/a | `not_run` |
@@ -152,20 +137,18 @@ These rows are measured #26 results from the exact #25 eligible population. Timb
 
 #### `timbre_trap_base`
 
-- Measurement status: `partial_pair_coverage`; a later apples-to-apples correctness run is still required before this candidate can be treated as complete.
-- `success_only`: `1715` / `1769` successful, coverage `0.969`, onset+pitch F1 `n/a`, onset+pitch+offset F1 `n/a`, frame F1 `0.307`.
-- `failure_penalized`: `1715` / `1769` successful, coverage `0.969`, onset+pitch F1 `n/a`, onset+pitch+offset F1 `n/a`, frame F1 `0.287`.
-- Category range (success-only onset+pitch F1): highest `type=Arp` = `n/a` over `25` pairs; lowest `type=Arp` = `n/a` over `25` pairs. Small supports should not be treated as robust rankings.
+- Measurement status: `partial_unscored_population`; a later apples-to-apples correctness run is still required before this candidate can be treated as complete.
+- `scored_only`: 1715 scored, 54 unscored of `1769` eligible, coverage `0.969`, onset+pitch F1 `n/a`, onset+pitch+offset F1 `n/a`, frame F1 `0.307`.
+- Category range (scored-only frame F1): highest `type=Sub` = `0.465` over `2` pairs; lowest `type=Drums` = `0.027` over `43` pairs. Small supports should not be treated as robust rankings.
 #### `muscriptor_small`
 
-- `success_only`: `1769` / `1769` successful, coverage `1.000`, onset+pitch F1 `0.289`, onset+pitch+offset F1 `0.163`, frame F1 `0.361`.
-- `failure_penalized`: `1769` / `1769` successful, coverage `1.000`, onset+pitch F1 `0.289`, onset+pitch+offset F1 `0.163`, frame F1 `0.361`.
-- Category range (success-only onset+pitch F1): highest `type=Sub` = `0.830` over `2` pairs; lowest `type=Reese` = `0.041` over `16` pairs. Small supports should not be treated as robust rankings.
+- `success_only`: 1769 scored of `1769` eligible, coverage `1.000`, onset+pitch F1 `0.289`, onset+pitch+offset F1 `0.163`, frame F1 `0.361`.
+- `failure_penalized`: 1769 scored of `1769` eligible, coverage `1.000`, onset+pitch F1 `0.289`, onset+pitch+offset F1 `0.163`, frame F1 `0.361`.
+- Category range (scored-only onset+pitch F1): highest `type=Sub` = `0.830` over `2` pairs; lowest `type=Reese` = `0.041` over `16` pairs. Small supports should not be treated as robust rankings.
 #### `muscriptor_medium`
 
-- Measurement status: `partial_pair_coverage`; a later apples-to-apples correctness run is still required before this candidate can be treated as complete.
-- `success_only`: `883` / `1769` successful, coverage `0.499`, onset+pitch F1 `0.239`, onset+pitch+offset F1 `0.129`, frame F1 `0.291`.
-- `failure_penalized`: `883` / `1769` successful, coverage `0.499`, onset+pitch F1 `0.125`, onset+pitch+offset F1 `0.067`, frame F1 `0.291`.
+- Measurement status: `partial_unscored_population`; a later apples-to-apples correctness run is still required before this candidate can be treated as complete.
+- `scored_only`: 883 scored, 886 unscored of `1769` eligible, coverage `0.499`, onset+pitch F1 `0.239`, onset+pitch+offset F1 `0.129`, frame F1 `0.291`.
 
 ## What could not be executed
 
@@ -180,18 +163,18 @@ The table distinguishes a genuine candidate-level blocker or load failure from a
 
 ## Partial or incomplete candidate execution
 
-These candidates produced some pair-level evidence but did not complete the exact-population correctness gate. Their failure-penalized view is reported as observed runtime behavior, not as a substitute for a completed correctness evaluation.
+These candidates produced some pair-level evidence but did not complete the exact-population correctness gate. The remaining pairs were not reached before wrap-up, so they are unscored rather than failures; no failure-penalized score is published for those rows.
 
-| Candidate | Successful pairs | Eligible pairs | Remaining requirement |
+| Candidate | Scored pairs | Unscored pairs | Remaining requirement |
 | --- | ---: | ---: | --- |
-| `timbre_trap_base` | 1715 | 1769 | apples-to-apples correctness rerun on the full #25 population |
-| `muscriptor_medium` | 883 | 1769 | apples-to-apples correctness rerun on the full #25 population |
+| `timbre_trap_base` | 1715 | 54 | apples-to-apples correctness run on the full #25 population |
+| `muscriptor_medium` | 883 | 886 | apples-to-apples correctness run on the full #25 population |
 
 ## Conclusions by evidence class
 
 ### Directly supported by measured results
 
-- Measured evidence exists for basic_pitch, timbre_trap_base, muscriptor_small, muscriptor_medium. Basic Pitch contributes the inherited #25 quality and #24 route/cost baseline; executable alternatives contribute their own #26 corpus quality and applicable CPU/XPU cost measurements. Partial pair-coverage candidates are not complete correctness results.
+- Measured evidence exists for basic_pitch, timbre_trap_base, muscriptor_small, muscriptor_medium. Basic Pitch contributes the inherited #25 quality and #24 route/cost baseline; executable alternatives contribute their own #26 corpus quality and applicable CPU/XPU cost measurements. Partial scored populations are not complete correctness results, and their unscored rows are not treated as failures.
 - Basic Pitch remains the inherited baseline for the landed #24/#25 contracts; alternative rows are separate #26 measurements and do not replace that provenance.
 - The measured #24 model-call throughput winners were batch 1: `pytorch_xpu` (238.368 audio-s/s), batch 2: `pytorch_xpu` (417.493 audio-s/s), batch 4: `pytorch_xpu` (616.100 audio-s/s), batch 8: `pytorch_xpu` (727.274 audio-s/s); the end-to-end winner was `pytorch_xpu` (96.027 audio-s/s). These are Basic Pitch route findings, not alternative-model results.
 - The #25 quality result is explicitly provenanced to the exact #24-selected `pytorch_xpu` route on `xpu:0`; it does not establish quality equivalence for any other backend.
@@ -208,8 +191,8 @@ These candidates produced some pair-level evidence but did not complete the exac
 
 ### Comparative questions that remain unanswered
 
-- Comparative questions remain for unavailable candidates `ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_large` and partial-coverage candidates `timbre_trap_base, muscriptor_medium`; measured candidates must be compared by separate quality and cost evidence rather than a composite winner.
-- The remaining candidate execution states are ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_large; their quality, cost, memory, backward, and quantization results are not inferred from metadata or from other models. Partial-coverage candidates still require full-population correctness confirmation.
+- Comparative questions remain for unavailable candidates `ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_large` and partial scored populations `timbre_trap_base, muscriptor_medium`; measured candidates must be compared by separate quality and cost evidence rather than a composite winner.
+- The remaining candidate execution states are ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_large; their quality, cost, memory, backward, and quantization results are not inferred from metadata or from other models. Partial scored-population candidates still require full-population correctness confirmation.
 - Quality is published only for candidates with an executed #25-compatible population; globally unavailable models receive no invented F1.
 
 ## What is required before the intended comparison can be completed

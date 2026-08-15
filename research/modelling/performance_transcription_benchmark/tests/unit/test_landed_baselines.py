@@ -57,11 +57,12 @@ def test_comparison_report_distinguishes_baseline_from_blocked_comparison() -> N
     assert "The intended comparative benchmark remains incomplete" in markdown
     assert "Partial or incomplete candidate execution" in markdown
     assert "Cached quality by duration and comparison population" in markdown
-    assert "full_population" in markdown
-    assert "under_5_seconds" in markdown
-    assert "under_10_seconds" in markdown
-    assert "under_15_seconds" in markdown
-    assert "shared_population" in markdown
+    assert "charts/quality_by_duration.svg" in markdown
+    assert "charts/coverage_by_duration.svg" in markdown
+    assert "charts/event_f1_population.svg" in markdown
+    assert "charts/frame_f1_population.svg" in markdown
+    assert "Full unscored" in markdown
+    assert "unscored, not failures" in markdown
     assert "Timbre-Trap is frame/pitch output only" in markdown
     assert "does not infer a composite winner" in markdown
     assert "measured_corrected_fp32_performance" in markdown
@@ -95,5 +96,21 @@ def test_comparison_report_distinguishes_baseline_from_blocked_comparison() -> N
         "muscriptor_small",
         "muscriptor_medium",
     }
+    timbre_trap = next(
+        model for model in report["models"] if model["model_id"] == "timbre_trap_base"
+    )
+    assert timbre_trap["measurement_status"] == "partial_unscored_population"
+    assert timbre_trap["quality"]["success_only"]["scored_pairs"] == 1715
+    assert timbre_trap["quality"]["success_only"]["unscored_pairs"] == 54
+    assert (
+        timbre_trap["quality"]["failure_penalized"]["status"]
+        == "not_applicable_unscored_only"
+    )
+    medium = next(
+        model for model in report["models"] if model["model_id"] == "muscriptor_medium"
+    )
+    assert medium["quality"]["success_only"]["scored_pairs"] == 883
+    assert medium["quality"]["success_only"]["unscored_pairs"] == 886
+    assert len(report["report_assets"]["charts"]) == 4
     assert "pair_id" not in json.dumps(report)
     assert "per_preset" not in json.dumps(report)
