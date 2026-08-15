@@ -403,6 +403,11 @@ def build_public_report(
         failure_code = run.get("failure_code") or (
             spec.unavailability_reason if status != "ok" else None
         )
+        duration_views = _read_json(Path(input_root) / model_id / "duration_views.json")
+        quality_value = aggregates.get("quality") if status == "ok" else None
+        if quality_value is not None and duration_views is not None:
+            quality_value = dict(quality_value)
+            quality_value["duration_views"] = duration_views
         quality_measurement_status = _quality_measurement_status(
             aggregates.get("quality")
         )
@@ -423,7 +428,7 @@ def build_public_report(
             "measurement_status": quality_measurement_status,
             "failure_code": failure_code,
             "availability_reason": spec.unavailability_reason,
-            "quality": aggregates.get("quality") if status == "ok" else None,
+            "quality": quality_value,
             "quality_provenance": (
                 {
                     "source": "landed_issue_25_report",
@@ -888,6 +893,55 @@ def _markdown(report: Mapping[str, Any]) -> str:
                 "- The shared-successful subset can show relative behavior when all candidates ran, but it must not be read as a general model ranking because candidate-specific failures are excluded by construction.",
                 "",
             ]
+        )
+    duration_models = [
+        model
+        for model in measured
+        if (model.get("quality") or {}).get("duration_views")
+    ]
+    if duration_models:
+        population_order = (
+            "full_population",
+            "under_5_seconds",
+            "under_10_seconds",
+            "under_15_seconds",
+            "shared_population",
+            "shared_under_5_seconds",
+            "shared_under_10_seconds",
+            "shared_under_15_seconds",
+        )
+
+        def _duration_f1(population: Mapping[str, Any], basis: str, metric: str) -> Any:
+            return (
+                ((population.get(basis) or {}).get("aggregate") or {})
+                .get("micro", {})
+                .get(metric, {})
+                .get("f1")
+            )
+
+        lines.extend(
+            [
+                "### Cached quality by duration and comparison population",
+                "",
+                "These views are recomputed from already-cached per-pair observations joined to the canonical manifest; no model inference was rerun. `Full` includes the entire eligible population with missing rows failure-penalized. `Shared` is the common TT/small cached population (and the same IDs are used for the other models where available). The JSON retains the complete aggregate diagnostics, including precision, recall, counts, pair-macro summaries, category groups, and bootstrap intervals. The landed full-population #25 baseline retains its 10,000-replicate bootstrap; these additional duration-stratum summaries use 1,000 replicates to keep this reporting-only pass bounded.",
+                "",
+                "| Model | Population | Eligible | Successful | Failed | Coverage | Success onset+pitch F1 | Penalized onset+pitch F1 | Success onset+pitch+offset F1 | Penalized onset+pitch+offset F1 | Success frame F1 | Penalized frame F1 |",
+                "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+            ]
+        )
+        for model in duration_models:
+            quality = model.get("quality") or {}
+            duration_views = quality.get("duration_views") or {}
+            for population_name in population_order:
+                population = duration_views.get(population_name)
+                if not isinstance(population, Mapping):
+                    continue
+                failure_penalized = population.get("failure_penalized") or {}
+                lines.append(
+                    f"| `{model.get('model_id', 'unknown')}` | `{population_name}` | {failure_penalized.get('eligible_pairs', 'n/a')} | {failure_penalized.get('successful_pairs', 'n/a')} | {failure_penalized.get('failed_pairs', 'n/a')} | {_report_number(failure_penalized.get('coverage'))} | {_report_number(_duration_f1(population, 'success_only', 'onset_pitch'))} | {_report_number(_duration_f1(population, 'failure_penalized', 'onset_pitch'))} | {_report_number(_duration_f1(population, 'success_only', 'onset_pitch_offset'))} | {_report_number(_duration_f1(population, 'failure_penalized', 'onset_pitch_offset'))} | {_report_number(_duration_f1(population, 'success_only', 'frames'))} | {_report_number(_duration_f1(population, 'failure_penalized', 'frames'))} |"
+                )
+        lines.append(
+            "- Timbre-Trap is frame/pitch output only in this benchmark; its onset+pitch and onset+pitch+offset event columns are `n/a` by design because no MIDI/event decoder was used."
         )
     basic_pitch = next(
         (model for model in models if model.get("model_id") == "basic_pitch"), None
