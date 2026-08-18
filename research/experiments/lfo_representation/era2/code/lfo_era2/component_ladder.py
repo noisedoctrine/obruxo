@@ -1497,6 +1497,8 @@ def _report_text(rows: list[dict[str, Any]], mode: ReportMode) -> str:
         "",
         "This section is manual selection guidance, not an automatic ranking. The right Experiment 13 grid should preserve candidates that win different co-primary metrics.",
         "",
+        "Every independent-variable family plot includes its stable default/control setting. For `path_search_policy`, `GreedyPath` is included as the no-beam control while `Beam4Path` and `Beam8Path` remain the beam-search candidates.",
+        "",
         "- `path_search_policy`: keep `GreedyPath` as the no-beam control, then keep both `Beam4Path` and `Beam8Path` unless grid size must shrink. `Beam8Path` is modestly better on P95 (`" + _metric(beam8, "validation_p95_rmse") + "` vs `" + _metric(beam4, "validation_p95_rmse") + "`) but costs more encoding time.",
         "- `construction_policy`: shortlist `FinishRepairRescue`, `CommonCaseRepair`, and `FamilyBalancedRepair` or `ShapeClusterRepair`. `FinishRepairRescue` is the balanced choice; `CommonCaseRepair` is the median/perfect-rate stress test.",
         "- `utility_candidate_budget`: shortlist `CandidateBudget48`, `CandidateBudget24`, and `CandidateBudget12`. `CandidateBudget8` is cheap, but under `PhaseAndResidualGain` it is less compelling on tail quality.",
@@ -1849,8 +1851,16 @@ def _variable_family_plot(path: Path, rows: list[dict[str, Any]], variable: str,
         return
     x = np.arange(len(ordered), dtype=np.float32)
     values = [str(row.get("screening_value", "")) for row in ordered]
-    colors_by_value = _candidate_colors(_screening_value_order(variable), plt)
-    colors = [colors_by_value.get(value, "#4C78A8") for value in values]
+    color_keys = (
+        [f"{row.get('screening_value', '')}:{row.get('scalar_schema', '')}" for row in ordered]
+        if mode.include_scalar_comparison
+        else _screening_value_order(variable)
+    )
+    colors_by_key = _candidate_colors(color_keys, plt)
+    colors = [
+        colors_by_key.get(f"{row.get('screening_value', '')}:{row.get('scalar_schema', '')}" if mode.include_scalar_comparison else value, "#4C78A8")
+        for row, value in zip(ordered, values)
+    ]
     labels = [_wrapped_plot_label(row, mode) for row in ordered]
     figure_width = max(13.0, 1.05 * len(ordered))
     figure, axes = plt.subplots(4, 1, figsize=(figure_width, 8.6), squeeze=False)
@@ -1954,17 +1964,64 @@ def _clip_outlier_values(values: list[float]) -> tuple[list[float], float | None
     if len(finite) < 3:
         return values, None
     largest = finite[-1]
-    second = finite[-2]
     median = float(np.median(finite))
-    if largest <= 0.0 or second <= 0.0:
+    if largest <= 0.0:
         return values, None
-    if largest < max(second * 2.2, median * 3.0):
+
+    cap = _outlier_gap_cap(finite, median)
+    if cap is None:
+        q1, q3 = np.quantile(finite, [0.25, 0.75])
+        iqr = float(q3 - q1)
+        robust_cap = max(float(q3) + 1.5 * iqr, median * 3.0)
+        if largest >= max(robust_cap * 1.15, robust_cap + _minimum_outlier_gap(finite, median)):
+            cap = robust_cap
+    if cap is None or cap >= largest:
         return values, None
-    cap = max(second * 1.25, median * 1.5, 0.05 if largest <= 1.0 else 0.0)
-    if cap >= largest:
+
+    cap = max(float(cap), _minimum_visible_cap(finite, median))
+    if sum(1 for value in finite if value > cap) > max(1, int(np.ceil(len(finite) * 0.35))):
         return values, None
     clipped = [min(float(value), cap) if np.isfinite(value) else value for value in values]
     return clipped, cap
+
+
+def _outlier_gap_cap(finite: list[float], median: float) -> float | None:
+    if len(finite) < 3:
+        return None
+    q1, q3 = np.quantile(finite, [0.25, 0.75])
+    iqr = float(q3 - q1)
+    min_gap = _minimum_outlier_gap(finite, median)
+    best: tuple[float, float] | None = None
+    max_tail_count = max(1, int(np.ceil(len(finite) * 0.25)))
+    for index, (lower, upper) in enumerate(zip(finite, finite[1:])):
+        tail_count = len(finite) - index - 1
+        if tail_count > max_tail_count:
+            continue
+        gap = float(upper - lower)
+        if lower <= 0.0:
+            ratio = float("inf") if upper > 0.0 else 1.0
+        else:
+            ratio = float(upper / lower)
+        if gap >= max(min_gap, iqr * 0.55) and ratio >= 1.32:
+            cap_margin = min(gap * 0.04, max(abs(float(lower)) * 0.12, min_gap * 0.15))
+            candidate_cap = max(float(lower) + cap_margin, float(lower) * 1.08)
+            if best is None or gap > best[0]:
+                best = (gap, candidate_cap)
+    return None if best is None else best[1]
+
+
+def _minimum_visible_cap(finite: list[float], median: float) -> float:
+    largest = finite[-1]
+    if largest <= 1.0:
+        return max(0.01, median * 1.25)
+    return max(largest * 0.01, median * 1.25)
+
+
+def _minimum_outlier_gap(finite: list[float], median: float) -> float:
+    largest = finite[-1]
+    if largest <= 1.0:
+        return max(0.015, median * 0.30)
+    return max(largest * 0.05, median * 0.30)
 
 
 def _annotate_clipped_bars(axis: Any, positions: np.ndarray, values: list[float], plotted: list[float], cap: float, *, inverted: bool) -> None:
@@ -1993,7 +2050,40 @@ def _ordered_family_rows(rows: list[dict[str, Any]], variable: str, mode: Report
 
 
 def _candidate_colors(values: list[str], plt: Any) -> dict[str, str]:
-    palette = list(plt.get_cmap("tab20").colors)
+    palette = [
+        "#1F77B4",
+        "#D62728",
+        "#2CA02C",
+        "#9467BD",
+        "#FF7F0E",
+        "#17BECF",
+        "#8C564B",
+        "#E377C2",
+        "#BCBD22",
+        "#7F7F7F",
+        "#003F5C",
+        "#FFA600",
+        "#665191",
+        "#F95D6A",
+        "#2F4B7C",
+        "#00A676",
+        "#A05195",
+        "#FF6361",
+        "#58508D",
+        "#4E79A7",
+        "#E15759",
+        "#59A14F",
+        "#B07AA1",
+        "#F28E2B",
+        "#76B7B2",
+        "#9C755F",
+        "#EDC948",
+        "#AF7AA1",
+        "#499894",
+        "#E17C05",
+        "#79706E",
+        "#86BCB6",
+    ]
     return {value: palette[index % len(palette)] for index, value in enumerate(values)}
 
 
