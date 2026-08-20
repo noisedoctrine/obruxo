@@ -6,6 +6,46 @@
 
 The JSON is authoritative, but this Markdown is intended to stand alone as the research finding. Quality, execution/resource cost, backward cost, representation, licensing, and quantization remain separate evidence classes; no composite winner is computed.
 
+## Executive findings across #23–#26
+
+This is the decision-oriented synthesis of the [#23 parity report](../../basic_pitch/reports/onnx_parity.md), [#24 backend benchmark](../../basic_pitch/reports/backend_benchmark.md), [#25 PresetShare baseline](../../basic_pitch/reports/presetshare_baseline.md), and the #26 comparison below.
+
+### What the three quality metrics mean
+
+All three F1 scores range from 0 to 1; higher is better. They answer different questions and should not be collapsed into one rank.
+
+| Metric | A prediction counts as correct when | What it reveals |
+| --- | --- | --- |
+| Onset+pitch F1 | Note pitch and start time match; note end is ignored | Whether the model found the right note at approximately the right start |
+| Onset+pitch+offset F1 | Pitch, start, and end all match | Whether the model produced a usable, correctly segmented MIDI note |
+| Frame F1 | The correct pitches are active at each model frame | Pitch occupancy through time, independent of note-event segmentation |
+
+### Evidence chain
+
+- **#23 established implementation fidelity.** The native PyTorch port matched the pinned Spotify ONNX oracle on five public synthetic windows with zero note/onset threshold disagreements, zero event-structure disagreements, and zero pitch-bend disagreements. The remaining posterior error did not change stock decoding decisions. This validates the port and full-audio fixed-hop seam; it is not an exhaustive private-audio parity study.
+- **#24 established the practical Basic Pitch runtime on the measured Intel machine.** PyTorch XPU led warmed model calls at batch 8 (`727.274` audio-s/s) and end-to-end inference (`96.027` audio-s/s), versus CPU `51.896` and corrected OpenVINO GPU `44.868` audio-s/s. XPU's first call was `0.624` s versus CPU `0.026` s, so CPU remains more attractive for a cold one-shot while XPU is the measured reused/corpus route. The original default OpenVINO FP16+PERFORMANCE execution was numerically corrupt; explicit FP32+PERFORMANCE restored parity but did not beat XPU.
+- **#25 established that stock Basic Pitch is a noisy corpus prior, not reliable MIDI ground truth.** It completed `1769`/`1769` eligible pairs with onset+pitch F1 `0.278`, onset+pitch+offset F1 `0.098`, and frame F1 `0.399`. Event F1 was nearly unchanged between monophonic (`0.277`) and polyphonic (`0.278`) material; the stronger failure signals were low note density (`0.102`), low register (`0.173`), and timbre/envelope.
+- **The category pattern identifies two distinct failure modes.** Pluck/Lead/Keys onset+pitch F1 was `0.510` / `0.381` / `0.364`, while Bass and Pad were `0.116` and `0.074`. Pads retained frame F1 `0.419` despite poor event F1, indicating segmentation/onset/offset trouble; Bass was poor at both event (`0.116`) and frame (`0.150`) levels, indicating a deeper pitch/timbre/register limitation.
+
+### Measured model comparison
+
+Unfinished rows are unscored, not failures. Timbre-Trap has no stock note-event/MIDI decoder, so only frame F1 is comparable.
+
+| Model | Scored / eligible | Onset+pitch F1 | +offset F1 | Frame F1 | Evidence state |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Basic Pitch | 1769/1769 | 0.278 | 0.098 | 0.399 | `complete` |
+| MuScriptor small | 1769/1769 | 0.289 | 0.163 | 0.361 | `complete` |
+| Timbre-Trap | 1715/1769 | n/a | n/a | 0.307 | `partial_unscored_population` |
+| MuScriptor medium | 883/1769 | 0.239 | 0.129 | 0.291 | `partial_unscored_population` |
+
+### Decision support
+
+- **Use Basic Pitch on PyTorch XPU as the current practical OBRUXO baseline on this Intel target.** It has the fastest verified Basic Pitch route, permissive Apache-2.0 licensing, the strongest complete frame result (`0.399`), and stronger onset+pitch/frame results than MuScriptor small for clips under 15 seconds (`0.300` vs `0.286` onset+pitch F1). Treat its MIDI as noisy auxiliary performance information, not truth.
+- **MuScriptor small is a targeted offset-accuracy candidate, not a proven wholesale replacement.** Its full-population offset-aware F1 was materially higher (`0.163` vs Basic Pitch `0.098`), but its onset+pitch gain was small (`0.289` vs `0.278`), came with lower precision (`0.238` vs `0.251`) and higher recall (`0.370` vs `0.313`), and had lower frame F1. Its CC-BY-NC-4.0 weights and lack of a completed common cost benchmark are additional constraints.
+- **Timbre-Trap is not a direct MIDI solution in the evaluated stock form.** Its partial frame result (`0.307` over `1715` pairs) had similar recall to Basic Pitch but much lower precision, and there is no defensible onset/offset score without adding a separate decoder.
+- **MuScriptor medium and the YourMT3 family do not support an executive choice yet.** Medium covers only `883`/`1769` rows and is selection-biased; the three YourMT3 candidates and MuScriptor large produced no executable result. No quality, speed, or memory ranking is inferred for them.
+- **A cross-model quality-versus-cost frontier was not established.** Basic Pitch has complete backend/resource measurements, but no standardized alternative-model latency, memory, backward-cost, or quantization row was completed. A Basic-Pitch-frame/MuScriptor-event hybrid is therefore only a follow-up hypothesis, not a finding.
+
 ## What was successfully established
 
 - Measured candidates: `basic_pitch, timbre_trap_base, muscriptor_small, muscriptor_medium`.
@@ -35,13 +75,13 @@ These are verified inventory facts, separated from observations produced by exec
 
 | Candidate | Source identity | Checkpoint identity | Availability reason |
 | --- | --- | --- | --- |
-| `basic_pitch` | `spotify/basic-pitch @ 9991303bba609a3b93089d13ec80d1d495083596` | `noisedoctrine/obruxo @ 918a1678465815c6f0a70009910737c164ed5a02` | available and verified |
-| `timbre_trap_base` | `sony/timbre-trap @ 7afe7e9b327929c099baeccd4b21973aedb94d9b` | `cwitkowitz/timbre-trap @ 84fbd38582435c863a2d65197a75edd794888f19` | approved py312 storage has no pinned Timbre-Trap checkout or checkpoint |
+| `basic_pitch` | `spotify/basic-pitch @ 9991303bba609a3b93089d13ec80d1d495083596` | `noisedoctrine/obruxo @ 918a1678465815c6f0a70009910737c164ed5a02` | available and verified for this run |
+| `timbre_trap_base` | `sony/timbre-trap @ 7afe7e9b327929c099baeccd4b21973aedb94d9b` | `cwitkowitz/timbre-trap @ 84fbd38582435c863a2d65197a75edd794888f19` | available and verified for this run |
 | `ymt3_plus` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | official source and checkpoint are not present in permitted local storage |
 | `yptf_multi` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | official source and checkpoint are not present in permitted local storage |
 | `yptf_moe_multi` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | official source and checkpoint are not present in permitted local storage |
-| `muscriptor_small` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-small @ 8c127f603b807520fa465c838e9bfee8a91ada4e` | available and verified |
-| `muscriptor_medium` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-medium @ f32236969308476e01fd3aae67357de5feb05a2d` | available and verified |
+| `muscriptor_small` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-small @ 8c127f603b807520fa465c838e9bfee8a91ada4e` | available and verified for this run |
+| `muscriptor_medium` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-medium @ f32236969308476e01fd3aae67357de5feb05a2d` | available and verified for this run |
 | `muscriptor_large` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-large @ 8809fdfbed2affa7ade94a7059e746e3880720e7` | exact pinned checkpoint acquisition returned gated access (HTTP 403); no authorized account access is available |
 
 Checkpoint lock status is explicit in the JSON source of truth: `locked` means the public digest and byte size are fixed; `gated_digest_not_exposed_without_access` means the immutable model revision and public size are recorded but the upstream gated service did not expose a digest without access. Neither state implies local executability.
@@ -174,7 +214,7 @@ These candidates produced some pair-level evidence but did not complete the exac
 
 ### Directly supported by measured results
 
-- Measured evidence exists for basic_pitch, timbre_trap_base, muscriptor_small, muscriptor_medium. Basic Pitch contributes the inherited #25 quality and #24 route/cost baseline; executable alternatives contribute their own #26 corpus quality and applicable CPU/XPU cost measurements. Partial scored populations are not complete correctness results, and their unscored rows are not treated as failures.
+- Measured evidence exists for basic_pitch, timbre_trap_base, muscriptor_small, muscriptor_medium. Basic Pitch contributes the inherited #25 quality and #24 route/cost baseline; executable alternatives contribute #26 corpus-quality evidence, but no standardized alternative-model cost row was completed. Partial scored populations are not complete correctness results, and their unscored rows are not treated as failures.
 - Basic Pitch remains the inherited baseline for the landed #24/#25 contracts; alternative rows are separate #26 measurements and do not replace that provenance.
 - The measured #24 model-call throughput winners were batch 1: `pytorch_xpu` (238.368 audio-s/s), batch 2: `pytorch_xpu` (417.493 audio-s/s), batch 4: `pytorch_xpu` (616.100 audio-s/s), batch 8: `pytorch_xpu` (727.274 audio-s/s); the end-to-end winner was `pytorch_xpu` (96.027 audio-s/s). These are Basic Pitch route findings, not alternative-model results.
 - The #25 quality result is explicitly provenanced to the exact #24-selected `pytorch_xpu` route on `xpu:0`; it does not establish quality equivalence for any other backend.

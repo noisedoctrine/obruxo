@@ -27,7 +27,7 @@
     "bounded_diagnostic": "A separate bounded #24 diagnostic compiled OpenVINO GPU with INFERENCE_PRECISION_HINT=float32 while retaining PERFORMANCE and passed parity on five public synthetic windows. This is a parity result, not a performance/resource result.",
     "cost": "Cost rows remain separate by candidate route, with unsupported or failed routes explicitly reported rather than replaced by fallback measurements.",
     "later_integration": "No candidate is promoted without executable common-corpus evidence.",
-    "measured": "Measured evidence exists for basic_pitch, timbre_trap_base, muscriptor_small, muscriptor_medium. Basic Pitch contributes the inherited #25 quality and #24 route/cost baseline; executable alternatives contribute their own #26 corpus quality and applicable CPU/XPU cost measurements. Partial scored populations are not complete correctness results, and their unscored rows are not treated as failures.",
+    "measured": "Measured evidence exists for basic_pitch, timbre_trap_base, muscriptor_small, muscriptor_medium. Basic Pitch contributes the inherited #25 quality and #24 route/cost baseline; executable alternatives contribute #26 corpus-quality evidence, but no standardized alternative-model cost row was completed. Partial scored populations are not complete correctness results, and their unscored rows are not treated as failures.",
     "not_measured": "The remaining candidate execution states are ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_large; their quality, cost, memory, backward, and quantization results are not inferred from metadata or from other models. Partial scored-population candidates still require full-population correctness confirmation.",
     "quality": "Quality is published only for candidates with an executed #25-compatible population; globally unavailable models receive no invented F1.",
     "representation": "Representation and licensing are inventories, not an integration decision.",
@@ -13613,7 +13613,7 @@
       "status": "ok"
     },
     {
-      "availability_reason": "approved py312 storage has no pinned Timbre-Trap checkout or checkpoint",
+      "availability_reason": null,
       "execution": {
         "adapter_configuration": null,
         "adapter_status": "implemented_official_path",

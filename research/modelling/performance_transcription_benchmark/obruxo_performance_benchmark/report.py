@@ -559,7 +559,9 @@ def build_public_report(
             "status": status,
             "measurement_status": quality_measurement_status,
             "failure_code": failure_code,
-            "availability_reason": spec.unavailability_reason,
+            "availability_reason": None
+            if status == "ok"
+            else spec.unavailability_reason,
             "scoring_status": (
                 quality_value.get("scoring_status")
                 if isinstance(quality_value, Mapping)
@@ -701,7 +703,7 @@ def build_public_report(
                 "unresolved_scope": f"The intended comparative benchmark remains incomplete for unavailable candidates `{blocked_text}` and partial scored populations `{', '.join(partial_models) or 'none'}`; measured candidates are reported separately and no unavailable candidate receives a fabricated score.",
             },
             "conclusion": {
-                "measured": f"Measured evidence exists for {measured_text}. Basic Pitch contributes the inherited #25 quality and #24 route/cost baseline; executable alternatives contribute their own #26 corpus quality and applicable CPU/XPU cost measurements. Partial scored populations are not complete correctness results, and their unscored rows are not treated as failures.",
+                "measured": f"Measured evidence exists for {measured_text}. Basic Pitch contributes the inherited #25 quality and #24 route/cost baseline; executable alternatives contribute #26 corpus-quality evidence, but no standardized alternative-model cost row was completed. Partial scored populations are not complete correctness results, and their unscored rows are not treated as failures.",
                 "bounded_diagnostic": "A separate bounded #24 diagnostic compiled OpenVINO GPU with INFERENCE_PRECISION_HINT=float32 while retaining PERFORMANCE and passed parity on five public synthetic windows. This is a parity result, not a performance/resource result.",
                 "not_measured": f"The remaining candidate execution states are {blocked_text}; their quality, cost, memory, backward, and quantization results are not inferred from metadata or from other models. Partial scored-population candidates still require full-population correctness confirmation.",
                 "sourced": "The candidate inventory establishes model identity, representation, architecture boundary, native rate/batch semantics, and licensing where verified, but none of these facts ranks execution quality or cost.",
@@ -1219,6 +1221,121 @@ def _chart_svgs(report: Mapping[str, Any]) -> dict[str, str]:
     }
 
 
+def _executive_findings(models: list[Mapping[str, Any]]) -> list[str]:
+    by_id = {model.get("model_id"): model for model in models}
+    basic = by_id.get("basic_pitch", {})
+    timbre_trap = by_id.get("timbre_trap_base", {})
+    muscriptor_small = by_id.get("muscriptor_small", {})
+    muscriptor_medium = by_id.get("muscriptor_medium", {})
+
+    def view(model: Mapping[str, Any]) -> Mapping[str, Any]:
+        return (model.get("quality") or {}).get("success_only") or {}
+
+    def metric(model: Mapping[str, Any], name: str) -> Any:
+        return _quality_f1(model.get("quality") or {}, "success_only", name)
+
+    def micro_value(model: Mapping[str, Any], name: str, field: str) -> Any:
+        return (
+            view(model).get("aggregate", {}).get("micro", {}).get(name, {}).get(field)
+        )
+
+    def group_metric(group: str, category: str, name: str) -> Any:
+        return (
+            view(basic)
+            .get("aggregate", {})
+            .get("groups", {})
+            .get(group, {})
+            .get(category, {})
+            .get("micro", {})
+            .get(name, {})
+            .get("f1")
+        )
+
+    def duration_metric(model: Mapping[str, Any], population: str, name: str) -> Any:
+        aggregate = (
+            (model.get("quality") or {})
+            .get("duration_views", {})
+            .get(population, {})
+            .get("success_only", {})
+            .get("aggregate", {})
+        )
+        return _aggregate_f1(aggregate, name)
+
+    def inference_route(route_id: str) -> Mapping[str, Any]:
+        return next(
+            (
+                route
+                for route in (basic.get("execution") or {}).get("routes", [])
+                if route.get("mode") == "inference" and route.get("route") == route_id
+            ),
+            {},
+        )
+
+    def e2e_rate(route: Mapping[str, Any]) -> Any:
+        return _median_value(
+            (route.get("end_to_end") or {}).get("audio_seconds_per_wall_second")
+        )
+
+    cpu = inference_route("pytorch_cpu")
+    xpu = inference_route("pytorch_xpu")
+    openvino_gpu = inference_route("openvino_gpu")
+    candidate_rows = []
+    for model_id, label in (
+        ("basic_pitch", "Basic Pitch"),
+        ("muscriptor_small", "MuScriptor small"),
+        ("timbre_trap_base", "Timbre-Trap"),
+        ("muscriptor_medium", "MuScriptor medium"),
+    ):
+        model = by_id.get(model_id, {})
+        quality_view = view(model)
+        scored = quality_view.get(
+            "scored_pairs", quality_view.get("successful_pairs", "n/a")
+        )
+        eligible = quality_view.get("eligible_pairs", "n/a")
+        candidate_rows.append(
+            f"| {label} | {scored}/{eligible} | {_report_number(metric(model, 'onset_pitch'))} | {_report_number(metric(model, 'onset_pitch_offset'))} | {_report_number(metric(model, 'frames'))} | `{model.get('measurement_status', 'unknown')}` |"
+        )
+
+    return [
+        "## Executive findings across #23–#26",
+        "",
+        "This is the decision-oriented synthesis of the [#23 parity report](../../basic_pitch/reports/onnx_parity.md), [#24 backend benchmark](../../basic_pitch/reports/backend_benchmark.md), [#25 PresetShare baseline](../../basic_pitch/reports/presetshare_baseline.md), and the #26 comparison below.",
+        "",
+        "### What the three quality metrics mean",
+        "",
+        "All three F1 scores range from 0 to 1; higher is better. They answer different questions and should not be collapsed into one rank.",
+        "",
+        "| Metric | A prediction counts as correct when | What it reveals |",
+        "| --- | --- | --- |",
+        "| Onset+pitch F1 | Note pitch and start time match; note end is ignored | Whether the model found the right note at approximately the right start |",
+        "| Onset+pitch+offset F1 | Pitch, start, and end all match | Whether the model produced a usable, correctly segmented MIDI note |",
+        "| Frame F1 | The correct pitches are active at each model frame | Pitch occupancy through time, independent of note-event segmentation |",
+        "",
+        "### Evidence chain",
+        "",
+        "- **#23 established implementation fidelity.** The native PyTorch port matched the pinned Spotify ONNX oracle on five public synthetic windows with zero note/onset threshold disagreements, zero event-structure disagreements, and zero pitch-bend disagreements. The remaining posterior error did not change stock decoding decisions. This validates the port and full-audio fixed-hop seam; it is not an exhaustive private-audio parity study.",
+        f"- **#24 established the practical Basic Pitch runtime on the measured Intel machine.** PyTorch XPU led warmed model calls at batch 8 (`{_report_number(_route_median(xpu, 8, 'audio_seconds_per_second'))}` audio-s/s) and end-to-end inference (`{_report_number(e2e_rate(xpu))}` audio-s/s), versus CPU `{_report_number(e2e_rate(cpu))}` and corrected OpenVINO GPU `{_report_number(e2e_rate(openvino_gpu))}` audio-s/s. XPU's first call was `{_report_number(_route_median(xpu, 1, 'first_inference_seconds'))}` s versus CPU `{_report_number(_route_median(cpu, 1, 'first_inference_seconds'))}` s, so CPU remains more attractive for a cold one-shot while XPU is the measured reused/corpus route. The original default OpenVINO FP16+PERFORMANCE execution was numerically corrupt; explicit FP32+PERFORMANCE restored parity but did not beat XPU.",
+        f"- **#25 established that stock Basic Pitch is a noisy corpus prior, not reliable MIDI ground truth.** It completed `{view(basic).get('successful_pairs', 'n/a')}`/`{view(basic).get('eligible_pairs', 'n/a')}` eligible pairs with onset+pitch F1 `{_report_number(metric(basic, 'onset_pitch'))}`, onset+pitch+offset F1 `{_report_number(metric(basic, 'onset_pitch_offset'))}`, and frame F1 `{_report_number(metric(basic, 'frames'))}`. Event F1 was nearly unchanged between monophonic (`{_report_number(group_metric('polyphony_class', 'monophonic', 'onset_pitch'))}`) and polyphonic (`{_report_number(group_metric('polyphony_class', 'polyphonic', 'onset_pitch'))}`) material; the stronger failure signals were low note density (`{_report_number(group_metric('note_density_class', 'low', 'onset_pitch'))}`), low register (`{_report_number(group_metric('pitch_register_class', 'low', 'onset_pitch'))}`), and timbre/envelope.",
+        f"- **The category pattern identifies two distinct failure modes.** Pluck/Lead/Keys onset+pitch F1 was `{_report_number(group_metric('type', 'Pluck', 'onset_pitch'))}` / `{_report_number(group_metric('type', 'Lead', 'onset_pitch'))}` / `{_report_number(group_metric('type', 'Keys', 'onset_pitch'))}`, while Bass and Pad were `{_report_number(group_metric('type', 'Bass', 'onset_pitch'))}` and `{_report_number(group_metric('type', 'Pad', 'onset_pitch'))}`. Pads retained frame F1 `{_report_number(group_metric('type', 'Pad', 'frames'))}` despite poor event F1, indicating segmentation/onset/offset trouble; Bass was poor at both event (`{_report_number(group_metric('type', 'Bass', 'onset_pitch'))}`) and frame (`{_report_number(group_metric('type', 'Bass', 'frames'))}`) levels, indicating a deeper pitch/timbre/register limitation.",
+        "",
+        "### Measured model comparison",
+        "",
+        "Unfinished rows are unscored, not failures. Timbre-Trap has no stock note-event/MIDI decoder, so only frame F1 is comparable.",
+        "",
+        "| Model | Scored / eligible | Onset+pitch F1 | +offset F1 | Frame F1 | Evidence state |",
+        "| --- | ---: | ---: | ---: | ---: | --- |",
+        *candidate_rows,
+        "",
+        "### Decision support",
+        "",
+        f"- **Use Basic Pitch on PyTorch XPU as the current practical OBRUXO baseline on this Intel target.** It has the fastest verified Basic Pitch route, permissive Apache-2.0 licensing, the strongest complete frame result (`{_report_number(metric(basic, 'frames'))}`), and stronger onset+pitch/frame results than MuScriptor small for clips under 15 seconds (`{_report_number(duration_metric(basic, 'under_15_seconds', 'onset_pitch'))}` vs `{_report_number(duration_metric(muscriptor_small, 'under_15_seconds', 'onset_pitch'))}` onset+pitch F1). Treat its MIDI as noisy auxiliary performance information, not truth.",
+        f"- **MuScriptor small is a targeted offset-accuracy candidate, not a proven wholesale replacement.** Its full-population offset-aware F1 was materially higher (`{_report_number(metric(muscriptor_small, 'onset_pitch_offset'))}` vs Basic Pitch `{_report_number(metric(basic, 'onset_pitch_offset'))}`), but its onset+pitch gain was small (`{_report_number(metric(muscriptor_small, 'onset_pitch'))}` vs `{_report_number(metric(basic, 'onset_pitch'))}`), came with lower precision (`{_report_number(micro_value(muscriptor_small, 'onset_pitch', 'precision'))}` vs `{_report_number(micro_value(basic, 'onset_pitch', 'precision'))}`) and higher recall (`{_report_number(micro_value(muscriptor_small, 'onset_pitch', 'recall'))}` vs `{_report_number(micro_value(basic, 'onset_pitch', 'recall'))}`), and had lower frame F1. Its CC-BY-NC-4.0 weights and lack of a completed common cost benchmark are additional constraints.",
+        f"- **Timbre-Trap is not a direct MIDI solution in the evaluated stock form.** Its partial frame result (`{_report_number(metric(timbre_trap, 'frames'))}` over `{view(timbre_trap).get('scored_pairs', view(timbre_trap).get('successful_pairs', 'n/a'))}` pairs) had similar recall to Basic Pitch but much lower precision, and there is no defensible onset/offset score without adding a separate decoder.",
+        f"- **MuScriptor medium and the YourMT3 family do not support an executive choice yet.** Medium covers only `{view(muscriptor_medium).get('scored_pairs', view(muscriptor_medium).get('successful_pairs', 'n/a'))}`/`{view(muscriptor_medium).get('eligible_pairs', 'n/a')}` rows and is selection-biased; the three YourMT3 candidates and MuScriptor large produced no executable result. No quality, speed, or memory ranking is inferred for them.",
+        "- **A cross-model quality-versus-cost frontier was not established.** Basic Pitch has complete backend/resource measurements, but no standardized alternative-model latency, memory, backward-cost, or quantization row was completed. A Basic-Pitch-frame/MuScriptor-event hybrid is therefore only a follow-up hypothesis, not a finding.",
+    ]
+
+
 def _markdown(report: Mapping[str, Any]) -> str:
     models = list(report.get("models", []))
     evidence = report.get("evidence", {})
@@ -1240,6 +1357,8 @@ def _markdown(report: Mapping[str, Any]) -> str:
         f"**Comparative status: `{comparison_status}`.** {status_message} The report separates measured candidates from genuine blockers and does not infer a composite winner.",
         "",
         "The JSON is authoritative, but this Markdown is intended to stand alone as the research finding. Quality, execution/resource cost, backward cost, representation, licensing, and quantization remain separate evidence classes; no composite winner is computed.",
+        "",
+        *_executive_findings(models),
         "",
         "## What was successfully established",
         "",
@@ -1281,7 +1400,11 @@ def _markdown(report: Mapping[str, Any]) -> str:
         identity = model.get("identity", {})
         source = f"{identity.get('source_repository', 'n/a')} @ {identity.get('source_revision', 'n/a')}"
         checkpoint = f"{identity.get('checkpoint_repository', 'n/a')} @ {identity.get('checkpoint_revision', 'n/a')}"
-        reason = model.get("availability_reason") or "available and verified"
+        reason = (
+            "available and verified for this run"
+            if model.get("status") == "ok"
+            else model.get("availability_reason") or "not recorded"
+        )
         lines.append(
             f"| `{model.get('model_id', 'unknown')}` | `{source}` | `{checkpoint}` | {reason} |"
         )

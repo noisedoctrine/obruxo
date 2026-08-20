@@ -50,6 +50,11 @@ def test_comparison_report_distinguishes_baseline_from_blocked_comparison() -> N
     )
     markdown = _markdown(report)
     assert "partial_executable_candidates" in markdown
+    assert "Executive findings across #23–#26" in markdown
+    assert "What the three quality metrics mean" in markdown
+    assert "Use Basic Pitch on PyTorch XPU" in markdown
+    assert "MuScriptor small is a targeted offset-accuracy candidate" in markdown
+    assert "A cross-model quality-versus-cost frontier was not established" in markdown
     assert "What was actually executed" in markdown
     assert "What could not be executed" in markdown
     assert "Adapter implementation scope" in markdown
