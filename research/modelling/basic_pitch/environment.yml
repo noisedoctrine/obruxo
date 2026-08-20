@@ -1,0 +1,14 @@
+name: obruxo-basic-pitch
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12.13
+  - numpy=2.4.6
+  - scipy=1.18.0
+  - pytest=9.1.1
+  - ruff=0.12.2
+  - pip
+  - pip:
+      - torch==2.13.0
+      - onnx==1.21.0
+      - onnxruntime==1.26.0

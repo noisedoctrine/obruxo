@@ -1,0 +1,16 @@
+{
+  "conversion": {
+    "onnx_version": "1.22.0",
+    "torch_version": "2.12.1+xpu"
+  },
+  "format_version": 1,
+  "model_id": "spotify-basic-pitch-icassp-2022-v0.4.0",
+  "source": {
+    "git_blob_sha1": "c30e5f9438e798604b7177aa26be1fe64482f767",
+    "path": "basic_pitch/saved_models/icassp_2022/nmp.onnx",
+    "repository": "spotify/basic-pitch",
+    "revision": "9991303bba609a3b93089d13ec80d1d495083596",
+    "sha256": "2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec",
+    "size_bytes": 230444
+  }
+}

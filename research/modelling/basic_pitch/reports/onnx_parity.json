@@ -1,0 +1,62 @@
+{
+  "adopted_regression_tolerances": {
+    "contour_max_abs": 0.0205306,
+    "note_max_abs": 0.0038445,
+    "onset_max_abs": 0.2089347
+  },
+  "cases": {
+    "private_local_clips": 0,
+    "private_local_windows": 0,
+    "synthetic_windows": 5
+  },
+  "events": {
+    "amplitude_max_abs_error": 2.384185791015625e-07,
+    "amplitude_mean_abs_error": 1.043081283569336e-07,
+    "onnx_count": 8,
+    "pitch_bend_element_disagreements": 0,
+    "structure_disagreements": 0,
+    "torch_count": 8
+  },
+  "format_version": 1,
+  "known_non_equivalences": [
+    {
+      "case": "all_zero_window",
+      "description": "ONNX Runtime CPU's float32 log kernel leaves a one-ulp spread at 1e-10; the native divide-by-zero-safe normalized log returns zero.",
+      "event_disagreements": 0,
+      "threshold_disagreements": 0
+    }
+  ],
+  "model_id": "spotify-basic-pitch-icassp-2022-v0.4.0",
+  "outputs": {
+    "contour": {
+      "max_abs_error": 0.020529575645923615,
+      "mean_abs_error": 5.724046596242581e-05,
+      "rmse": 0.0005107504354153199
+    },
+    "note": {
+      "max_abs_error": 0.003843463957309723,
+      "mean_abs_error": 1.3932180699220923e-05,
+      "rmse": 8.789797177414172e-05
+    },
+    "onset": {
+      "max_abs_error": 0.20893362164497375,
+      "mean_abs_error": 0.00016844560567008522,
+      "rmse": 0.002793801528471215
+    }
+  },
+  "runtime": {
+    "device": "cpu",
+    "onnxruntime_version": "1.28.0",
+    "precision": "float32",
+    "torch_version": "2.12.1+xpu"
+  },
+  "source_git_blob_sha1": "c30e5f9438e798604b7177aa26be1fe64482f767",
+  "thresholds": {
+    "note": 0.3,
+    "note_disagreements": 0,
+    "note_elements": 75680,
+    "onset": 0.5,
+    "onset_disagreements": 0,
+    "onset_elements": 75680
+  }
+}
