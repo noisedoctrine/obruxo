@@ -6,6 +6,7 @@ import argparse
 from dataclasses import replace
 from pathlib import Path
 
+from obruxo_basic_pitch.benchmark import run_benchmark_cli, run_parity_diagnostic_cli
 from obruxo_basic_pitch.inference import prepare_wav
 from obruxo_basic_pitch.parity import (
     assert_parity,
@@ -39,6 +40,45 @@ def _parser() -> argparse.ArgumentParser:
     parity.add_argument("--markdown", type=Path, required=True)
     parity.add_argument("--audio", type=Path, action="append", default=[])
     parity.add_argument("--force", action="store_true")
+
+    benchmark = subparsers.add_parser(
+        "benchmark", help="run the fixed CPU/XPU/OpenVINO benchmark"
+    )
+    benchmark.add_argument("--config", type=Path, required=True)
+    benchmark.add_argument("--manifest", type=Path, required=True)
+    benchmark.add_argument("--checkpoint", type=Path, required=True)
+    benchmark.add_argument("--json", type=Path, required=True)
+    benchmark.add_argument("--markdown", type=Path, required=True)
+    benchmark.add_argument("--xpu-index", type=int, default=0)
+    benchmark.add_argument("--openvino-gpu-device", default="GPU")
+    benchmark.add_argument(
+        "--allow-derived-render",
+        action="store_true",
+        help="opt in to missing-WAV renders from an unambiguous Vital patch and MIDI pair",
+    )
+    benchmark.add_argument("--force", action="store_true")
+
+    parity_diagnostic = subparsers.add_parser(
+        "parity-diagnostic",
+        help="run the fixed synthetic parity gate for every inference route",
+    )
+    parity_diagnostic.add_argument("--checkpoint", type=Path, required=True)
+    parity_diagnostic.add_argument(
+        "--json",
+        type=Path,
+        required=True,
+        help="existing backend benchmark JSON to augment",
+    )
+    parity_diagnostic.add_argument(
+        "--markdown",
+        type=Path,
+        required=True,
+        help="existing backend benchmark Markdown to augment",
+    )
+    parity_diagnostic.add_argument("--xpu-index", type=int, default=0)
+    parity_diagnostic.add_argument("--openvino-gpu-device", default="GPU")
+    parity_diagnostic.add_argument("--repetitions", type=int, default=3)
+    parity_diagnostic.add_argument("--force", action="store_true")
     return parser
 
 
@@ -50,6 +90,30 @@ def main() -> int:
         )
         print(f"imported {metadata.model_id} from the pinned public artifact")
         return 0
+
+    if args.command == "benchmark":
+        return run_benchmark_cli(
+            args.config,
+            args.manifest,
+            args.checkpoint,
+            args.json,
+            args.markdown,
+            xpu_index=args.xpu_index,
+            openvino_gpu_device=args.openvino_gpu_device,
+            allow_derived_render=args.allow_derived_render,
+            force=args.force,
+        )
+
+    if args.command == "parity-diagnostic":
+        return run_parity_diagnostic_cli(
+            args.checkpoint,
+            args.json,
+            args.markdown,
+            xpu_index=args.xpu_index,
+            openvino_gpu_device=args.openvino_gpu_device,
+            process_repetitions=args.repetitions,
+            force=args.force,
+        )
 
     public = synthetic_windows()
     local = [prepare_wav(path) for path in args.audio]

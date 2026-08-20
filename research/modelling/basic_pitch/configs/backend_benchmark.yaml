@@ -1,0 +1,19 @@
+version: 1
+precision: float32
+process_repetitions: 3
+warmup_iterations: 3
+timed_iterations: 10
+batch_sizes: [1, 2, 4, 8]
+end_to_end_batch_size: 1
+smoke_set:
+  min_cases: 8
+  max_cases: 12
+  coverage:
+    performance: [monophonic, polyphonic]
+    roles: [bass, lead, arp_sequence, pad_sustained, other]
+    envelopes: [transient, sustained]
+    duration_classes: [short, medium, long]
+    note_density_classes: [low, high]
+routes:
+  inference: [pytorch_cpu, pytorch_xpu, openvino_cpu, openvino_gpu]
+  training: [pytorch_cpu, pytorch_xpu]

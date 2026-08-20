@@ -38,3 +38,48 @@ python research/modelling/basic_pitch/run.py parity \
 ```
 
 The committed parity report contains aggregate synthetic/public results only. Optional `--audio` validation reads existing local WAVs without modifying or publishing them; only sanitized aggregate counts and errors may be retained. CPU/XPU/OpenVINO cost measurement belongs to #24. PresetShare pairing and transcription evaluation belong to #25.
+
+## Fixed backend benchmark
+
+The #24 benchmark measures the canonical checkpoint on the fixed inference matrix (`pytorch_cpu`, `pytorch_xpu`, `openvino_cpu`, `openvino_gpu`) and the fixed full forward-plus-backward training matrix (`pytorch_cpu`, `pytorch_xpu`). It uses float32, fresh subprocesses, three repetitions, three warmups, ten timed calls, and model-call batches `[1, 2, 4, 8]`. OpenVINO is converted from the native PyTorch module and compiled for the explicitly requested device with an explicit `INFERENCE_PRECISION_HINT=float32`; the GPU route leaves execution mode at the plugin default (observed as `PERFORMANCE`). It never uses automatic device selection or fallback.
+
+Create the private ignored smoke manifest from existing paired WAV/MIDI files, then run:
+
+```text
+python research/modelling/basic_pitch/run.py benchmark \
+  --config research/modelling/basic_pitch/configs/backend_benchmark.yaml \
+  --manifest research/modelling/basic_pitch/outputs/smoke_manifest.json \
+  --checkpoint research/modelling/basic_pitch/artifacts/basic_pitch_icassp_2022.pt \
+  --json research/modelling/basic_pitch/reports/backend_benchmark.json \
+  --markdown research/modelling/basic_pitch/reports/backend_benchmark.md \
+  --xpu-index 0 \
+  --openvino-gpu-device GPU
+```
+
+The manifest and all source-derived scratch state remain local and ignored. Reports contain only anonymous labels, sanitized aggregate timings, memory availability, parity summaries, and route statuses. Existing WAVs are always read-only. When an otherwise unambiguous source relationship has an existing Vital patch and MIDI performance but no WAV, the parent contract permits an explicitly opted-in derived render under `research/modelling/basic_pitch/outputs/`:
+
+To inspect the component-level parity gate without rerunning the smoke benchmark, run the synthetic-only diagnostic. It launches the same fresh worker processes for all four inference routes, uses five public synthetic windows, and augments the existing sanitized backend report with per-repetition parity values. It does not read the private smoke manifest, render audio, or publish private data:
+
+```text
+python research/modelling/basic_pitch/run.py parity-diagnostic \
+  --checkpoint research/modelling/basic_pitch/artifacts/basic_pitch_icassp_2022.pt \
+  --json research/modelling/basic_pitch/reports/backend_benchmark.json \
+  --markdown research/modelling/basic_pitch/reports/backend_benchmark.md \
+  --xpu-index 0 \
+  --openvino-gpu-device GPU \
+  --repetitions 3 \
+  --force
+```
+
+```text
+python research/modelling/basic_pitch/run.py benchmark \
+  --config research/modelling/basic_pitch/configs/backend_benchmark.yaml \
+  --manifest research/modelling/basic_pitch/outputs/smoke_manifest.json \
+  --checkpoint research/modelling/basic_pitch/artifacts/basic_pitch_icassp_2022.pt \
+  --json research/modelling/basic_pitch/reports/backend_benchmark.json \
+  --markdown research/modelling/basic_pitch/reports/backend_benchmark.md \
+  --allow-derived-render \
+  --force
+```
+
+The opt-in flag defaults to false. Such a private manifest adds `audio_source: "derived_render"` and `preset_path` to a case, points `audio_path` at a new WAV below the approved ignored output root, and leaves the source patch/MIDI untouched. The runner performs a resolved destination check, refuses to overwrite an existing output or source directory, records renderer provenance in the local sidecar, and never publishes source paths or identities. The narrow parent-approved host is Pedalboard around the exact Vital VST3 binary identified by `research/data_generation/configs/renderer.yaml`; the implementation records the actually imported Pedalboard version rather than assuming a runtime version. If that Pedalboard/Vital preflight or render fails, the run reports `derived_render_unavailable`/`derived_render_failed` rather than falling back or changing the environment. #25 owns the comprehensive PresetShare pairing/evaluation manifest; #24 only consumes its fixed smoke contract.
