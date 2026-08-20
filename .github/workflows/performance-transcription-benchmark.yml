@@ -1,0 +1,33 @@
+name: Performance transcription benchmark
+
+on:
+  push:
+    paths:
+      - ".github/workflows/performance-transcription-benchmark.yml"
+      - "research/modelling/performance_transcription_benchmark/**"
+  pull_request:
+    paths:
+      - ".github/workflows/performance-transcription-benchmark.yml"
+      - "research/modelling/performance_transcription_benchmark/**"
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: performance-transcription-benchmark-py312
+          environment-file: research/modelling/performance_transcription_benchmark/environment.yml
+          miniforge-version: latest
+          use-mamba: true
+      - name: Lint
+        run: ruff check research/modelling/performance_transcription_benchmark/obruxo_performance_benchmark research/modelling/performance_transcription_benchmark/tests research/modelling/performance_transcription_benchmark/run.py
+      - name: Synthetic and public tests
+        run: python -m pytest research/modelling/performance_transcription_benchmark/tests -q
