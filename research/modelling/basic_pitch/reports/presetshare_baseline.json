@@ -1,0 +1,3900 @@
+{
+  "aggregate": {
+    "bootstrap": {
+      "cluster_count": 1769,
+      "cluster_rule": "known preset grouping; unknown presets are singleton clusters",
+      "metrics": {
+        "frames": {
+          "lower_95": 0.3770478203305064,
+          "support": 10000,
+          "upper_95": 0.42006203769815537
+        },
+        "onset_pitch": {
+          "lower_95": 0.25531882311171084,
+          "support": 10000,
+          "upper_95": 0.30041769617108405
+        },
+        "onset_pitch_offset": {
+          "lower_95": 0.08724915806654229,
+          "support": 10000,
+          "upper_95": 0.11054602274194512
+        }
+      },
+      "replicates": 10000,
+      "seed": 0
+    },
+    "coverage": 1.0,
+    "failed_pair_count": 0,
+    "failure_analysis": {
+      "note": {
+        "additional_offset_false_negatives": 29687,
+        "onset_pitch_false_negatives": 100935,
+        "onset_pitch_false_positives": 137342
+      },
+      "pitch": {
+        "assigned_near_onset_errors": 16170,
+        "octave_error_count": 11418,
+        "unassigned_near_onset_errors": 205937
+      },
+      "timing": {
+        "duration": {
+          "mae": 0.2690138830196294,
+          "signed_mean": -0.06335485626997588,
+          "support": 45907
+        },
+        "offset": {
+          "mae": 0.2692470159944138,
+          "signed_mean": -0.05959040183106443,
+          "support": 45907
+        },
+        "onset": {
+          "mae": 0.01115195282612379,
+          "signed_mean": 0.0037644544389114454,
+          "support": 45907
+        }
+      },
+      "velocity": {
+        "mae": 30.03631254492779,
+        "signed_mean": -21.924172784107,
+        "support": 45907
+      }
+    },
+    "groups": {
+      "duration_class": {
+        "long": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 368155,
+              "f1": 0.3995478218020042,
+              "false_negative_rate": 0.5871439859889699,
+              "false_positive_fraction": 0.6129291979280223,
+              "fn": 3244853,
+              "fp": 3613008,
+              "precision": 0.3870708020719777,
+              "prediction_count": 5894658,
+              "recall": 0.4128560140110301,
+              "reference_count": 5526503,
+              "tp": 2281650
+            },
+            "onset_pitch": {
+              "count_bias": 35190,
+              "f1": 0.27390309291832865,
+              "false_negative_rate": 0.690486570362434,
+              "false_positive_fraction": 0.7543585984459756,
+              "fn": 93447,
+              "fp": 128637,
+              "precision": 0.24564140155402434,
+              "prediction_count": 170525,
+              "recall": 0.30951342963756606,
+              "reference_count": 135335,
+              "tp": 41888
+            },
+            "onset_pitch_offset": {
+              "count_bias": 35190,
+              "f1": 0.09682861439874453,
+              "false_negative_rate": 0.890582628292755,
+              "false_positive_fraction": 0.9131622929189268,
+              "fn": 120527,
+              "fp": 155717,
+              "precision": 0.08683770708107316,
+              "prediction_count": 170525,
+              "recall": 0.10941737170724498,
+              "reference_count": 135335,
+              "tp": 14808
+            }
+          },
+          "pair_count": 1368,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.31974651570517565,
+              "support": 1368
+            },
+            "onset_pitch": {
+              "f1": 0.21570264847694187,
+              "support": 1368
+            },
+            "onset_pitch_offset": {
+              "f1": 0.08145659344622992,
+              "support": 1368
+            }
+          },
+          "successful_pair_count": 1368
+        },
+        "medium": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 100485,
+              "f1": 0.39295242512886885,
+              "false_negative_rate": 0.5375094658612612,
+              "false_positive_fraction": 0.6584079084287201,
+              "fn": 152607,
+              "fp": 253092,
+              "precision": 0.3415920915712799,
+              "prediction_count": 384400,
+              "recall": 0.4624905341387387,
+              "reference_count": 283915,
+              "tp": 131308
+            },
+            "onset_pitch": {
+              "count_bias": 1225,
+              "f1": 0.3332361637446383,
+              "false_negative_rate": 0.6488502720730209,
+              "false_positive_fraction": 0.6829384261827404,
+              "fn": 7393,
+              "fp": 8618,
+              "precision": 0.3170615738172597,
+              "prediction_count": 12619,
+              "recall": 0.3511497279269791,
+              "reference_count": 11394,
+              "tp": 4001
+            },
+            "onset_pitch_offset": {
+              "count_bias": 1225,
+              "f1": 0.11710323574730354,
+              "false_negative_rate": 0.8766017202036159,
+              "false_positive_fraction": 0.8885807116253269,
+              "fn": 9988,
+              "fp": 11213,
+              "precision": 0.11141928837467312,
+              "prediction_count": 12619,
+              "recall": 0.12339827979638406,
+              "reference_count": 11394,
+              "tp": 1406
+            }
+          },
+          "pair_count": 388,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.30762687000373384,
+              "support": 388
+            },
+            "onset_pitch": {
+              "f1": 0.2536758491667973,
+              "support": 388
+            },
+            "onset_pitch_offset": {
+              "f1": 0.09178988752753985,
+              "support": 388
+            }
+          },
+          "successful_pair_count": 388
+        },
+        "short": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 1432,
+              "f1": 0.12736273627362737,
+              "false_negative_rate": 0.8120849933598937,
+              "false_positive_fraction": 0.9036759700476514,
+              "fn": 1223,
+              "fp": 2655,
+              "precision": 0.09632402995234854,
+              "prediction_count": 2938,
+              "recall": 0.18791500664010624,
+              "reference_count": 1506,
+              "tp": 283
+            },
+            "onset_pitch": {
+              "count_bias": -8,
+              "f1": 0.16513761467889912,
+              "false_negative_rate": 0.8407079646017699,
+              "false_positive_fraction": 0.8285714285714286,
+              "fn": 95,
+              "fp": 87,
+              "precision": 0.17142857142857143,
+              "prediction_count": 105,
+              "recall": 0.1592920353982301,
+              "reference_count": 113,
+              "tp": 18
+            },
+            "onset_pitch_offset": {
+              "count_bias": -8,
+              "f1": 0.055045871559633024,
+              "false_negative_rate": 0.9469026548672567,
+              "false_positive_fraction": 0.9428571428571428,
+              "fn": 107,
+              "fp": 99,
+              "precision": 0.05714285714285714,
+              "prediction_count": 105,
+              "recall": 0.05309734513274336,
+              "reference_count": 113,
+              "tp": 6
+            }
+          },
+          "pair_count": 13,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.10520004700714508,
+              "support": 13
+            },
+            "onset_pitch": {
+              "f1": 0.1083916083916084,
+              "support": 13
+            },
+            "onset_pitch_offset": {
+              "f1": 0.04568764568764569,
+              "support": 13
+            }
+          },
+          "successful_pair_count": 13
+        }
+      },
+      "genre": {
+        "Ambient": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 141541,
+              "f1": 0.4242682819537456,
+              "false_negative_rate": 0.5101395263487875,
+              "false_positive_fraction": 0.6258326325203903,
+              "fn": 233523,
+              "fp": 375064,
+              "precision": 0.37416736747960966,
+              "prediction_count": 599304,
+              "recall": 0.48986047365121255,
+              "reference_count": 457763,
+              "tp": 224240
+            },
+            "onset_pitch": {
+              "count_bias": 7196,
+              "f1": 0.22106854838709677,
+              "false_negative_rate": 0.6531161024992092,
+              "false_positive_fraction": 0.8377718597425655,
+              "fn": 4129,
+              "fp": 11325,
+              "precision": 0.16222814025743454,
+              "prediction_count": 13518,
+              "recall": 0.3468838975007909,
+              "reference_count": 6322,
+              "tp": 2193
+            },
+            "onset_pitch_offset": {
+              "count_bias": 7196,
+              "f1": 0.07681451612903226,
+              "false_negative_rate": 0.8794685226194242,
+              "false_positive_fraction": 0.9436307146027519,
+              "fn": 5560,
+              "fp": 12756,
+              "precision": 0.056369285397248114,
+              "prediction_count": 13518,
+              "recall": 0.12053147738057576,
+              "reference_count": 6322,
+              "tp": 762
+            }
+          },
+          "pair_count": 99,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.3462749852436699,
+              "support": 99
+            },
+            "onset_pitch": {
+              "f1": 0.17628996623257548,
+              "support": 99
+            },
+            "onset_pitch_offset": {
+              "f1": 0.06376271773668508,
+              "support": 99
+            }
+          },
+          "successful_pair_count": 99
+        },
+        "Bass House": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 3712,
+              "f1": 0.1772795861176978,
+              "false_negative_rate": 0.807301185622569,
+              "false_positive_fraction": 0.8358548560935691,
+              "fn": 17227,
+              "fp": 20939,
+              "precision": 0.16414514390643087,
+              "prediction_count": 25051,
+              "recall": 0.192698814377431,
+              "reference_count": 21339,
+              "tp": 4112
+            },
+            "onset_pitch": {
+              "count_bias": -130,
+              "f1": 0.18688118811881185,
+              "false_negative_rate": 0.827033218785796,
+              "false_positive_fraction": 0.7967698519515478,
+              "fn": 722,
+              "fp": 592,
+              "precision": 0.2032301480484522,
+              "prediction_count": 743,
+              "recall": 0.1729667812142039,
+              "reference_count": 873,
+              "tp": 151
+            },
+            "onset_pitch_offset": {
+              "count_bias": -130,
+              "f1": 0.09900990099009901,
+              "false_negative_rate": 0.9083619702176403,
+              "false_positive_fraction": 0.892328398384926,
+              "fn": 793,
+              "fp": 663,
+              "precision": 0.10767160161507403,
+              "prediction_count": 743,
+              "recall": 0.09163802978235967,
+              "reference_count": 873,
+              "tp": 80
+            }
+          },
+          "pair_count": 21,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.13945684867562186,
+              "support": 21
+            },
+            "onset_pitch": {
+              "f1": 0.1025186882461405,
+              "support": 21
+            },
+            "onset_pitch_offset": {
+              "f1": 0.05399463933038653,
+              "support": 21
+            }
+          },
+          "successful_pair_count": 21
+        },
+        "Breakbeat / Breaks": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -10867,
+              "f1": 0.2469135802469136,
+              "false_negative_rate": 0.7949566194369889,
+              "false_positive_fraction": 0.689728453364817,
+              "fn": 25472,
+              "fp": 14605,
+              "precision": 0.310271546635183,
+              "prediction_count": 21175,
+              "recall": 0.20504338056301105,
+              "reference_count": 32042,
+              "tp": 6570
+            },
+            "onset_pitch": {
+              "count_bias": 109,
+              "f1": 0.15609756097560976,
+              "false_negative_rate": 0.8253275109170306,
+              "false_positive_fraction": 0.8589065255731922,
+              "fn": 378,
+              "fp": 487,
+              "precision": 0.14109347442680775,
+              "prediction_count": 567,
+              "recall": 0.17467248908296942,
+              "reference_count": 458,
+              "tp": 80
+            },
+            "onset_pitch_offset": {
+              "count_bias": 109,
+              "f1": 0.11317073170731706,
+              "false_negative_rate": 0.8733624454148472,
+              "false_positive_fraction": 0.8977072310405644,
+              "fn": 400,
+              "fp": 509,
+              "precision": 0.10229276895943562,
+              "prediction_count": 567,
+              "recall": 0.12663755458515283,
+              "reference_count": 458,
+              "tp": 58
+            }
+          },
+          "pair_count": 13,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.12248534723035413,
+              "support": 13
+            },
+            "onset_pitch": {
+              "f1": 0.11366758241758242,
+              "support": 13
+            },
+            "onset_pitch_offset": {
+              "f1": 0.06971153846153846,
+              "support": 13
+            }
+          },
+          "successful_pair_count": 13
+        },
+        "Cinematic": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -144569,
+              "f1": 0.31598386230123326,
+              "false_negative_rate": 0.7174262193409474,
+              "false_positive_fraction": 0.6416462151187489,
+              "fn": 490467,
+              "fp": 345898,
+              "precision": 0.3583537848812512,
+              "prediction_count": 539079,
+              "recall": 0.2825737806590526,
+              "reference_count": 683648,
+              "tp": 193181
+            },
+            "onset_pitch": {
+              "count_bias": 6139,
+              "f1": 0.13066583307283525,
+              "false_negative_rate": 0.8199827734711456,
+              "false_positive_fraction": 0.8974484789008832,
+              "fn": 6664,
+              "fp": 12803,
+              "precision": 0.10255152109911678,
+              "prediction_count": 14266,
+              "recall": 0.18001722652885443,
+              "reference_count": 8127,
+              "tp": 1463
+            },
+            "onset_pitch_offset": {
+              "count_bias": 6139,
+              "f1": 0.03259947304961372,
+              "false_negative_rate": 0.9550879783437923,
+              "false_positive_fraction": 0.9744146922753399,
+              "fn": 7762,
+              "fp": 13901,
+              "precision": 0.02558530772466003,
+              "prediction_count": 14266,
+              "recall": 0.0449120216562077,
+              "reference_count": 8127,
+              "tp": 365
+            }
+          },
+          "pair_count": 84,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.34004521096928075,
+              "support": 84
+            },
+            "onset_pitch": {
+              "f1": 0.12914275074389492,
+              "support": 84
+            },
+            "onset_pitch_offset": {
+              "f1": 0.03235435901926591,
+              "support": 84
+            }
+          },
+          "successful_pair_count": 84
+        },
+        "Drum and Bass": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 21444,
+              "f1": 0.2064273306311523,
+              "false_negative_rate": 0.7861124967979399,
+              "false_positive_fraction": 0.8005299753558316,
+              "fn": 233227,
+              "fp": 254671,
+              "precision": 0.19947002464416838,
+              "prediction_count": 318128,
+              "recall": 0.2138875032020601,
+              "reference_count": 296684,
+              "tp": 63457
+            },
+            "onset_pitch": {
+              "count_bias": -408,
+              "f1": 0.1651300113954211,
+              "false_negative_rate": 0.8382875114132089,
+              "false_positive_fraction": 0.8313048999894169,
+              "fn": 8263,
+              "fp": 7855,
+              "precision": 0.16869510001058313,
+              "prediction_count": 9449,
+              "recall": 0.1617124885867911,
+              "reference_count": 9857,
+              "tp": 1594
+            },
+            "onset_pitch_offset": {
+              "count_bias": -408,
+              "f1": 0.05884181083600953,
+              "false_negative_rate": 0.942375976463427,
+              "false_positive_fraction": 0.939887818816806,
+              "fn": 9289,
+              "fp": 8881,
+              "precision": 0.06011218118319399,
+              "prediction_count": 9449,
+              "recall": 0.05762402353657299,
+              "reference_count": 9857,
+              "tp": 568
+            }
+          },
+          "pair_count": 148,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.15420278474407262,
+              "support": 148
+            },
+            "onset_pitch": {
+              "f1": 0.08427911836099354,
+              "support": 148
+            },
+            "onset_pitch_offset": {
+              "f1": 0.0338338874639564,
+              "support": 148
+            }
+          },
+          "successful_pair_count": 148
+        },
+        "Dubstep": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -44824,
+              "f1": 0.38547326687488404,
+              "false_negative_rate": 0.6676421764525053,
+              "false_positive_fraction": 0.5412048274574373,
+              "fn": 108592,
+              "fp": 63768,
+              "precision": 0.45879517254256275,
+              "prediction_count": 117826,
+              "recall": 0.3323578235474946,
+              "reference_count": 162650,
+              "tp": 54058
+            },
+            "onset_pitch": {
+              "count_bias": -454,
+              "f1": 0.14544392523364488,
+              "false_negative_rate": 0.8635990139687757,
+              "false_positive_fraction": 0.8442289646543635,
+              "fn": 3153,
+              "fp": 2699,
+              "precision": 0.15577103534563652,
+              "prediction_count": 3197,
+              "recall": 0.13640098603122433,
+              "reference_count": 3651,
+              "tp": 498
+            },
+            "onset_pitch_offset": {
+              "count_bias": -454,
+              "f1": 0.056366822429906545,
+              "false_negative_rate": 0.9471377704738427,
+              "false_positive_fraction": 0.9396309039724742,
+              "fn": 3458,
+              "fp": 3004,
+              "precision": 0.060369096027525805,
+              "prediction_count": 3197,
+              "recall": 0.05286222952615722,
+              "reference_count": 3651,
+              "tp": 193
+            }
+          },
+          "pair_count": 67,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.2924409082810326,
+              "support": 67
+            },
+            "onset_pitch": {
+              "f1": 0.15204091710776724,
+              "support": 67
+            },
+            "onset_pitch_offset": {
+              "f1": 0.06802873622646566,
+              "support": 67
+            }
+          },
+          "successful_pair_count": 67
+        },
+        "Future Bass": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 18791,
+              "f1": 0.4168781148593322,
+              "false_negative_rate": 0.5549407854028463,
+              "false_positive_fraction": 0.6079466588919804,
+              "fn": 77129,
+              "fp": 95920,
+              "precision": 0.39205334110801954,
+              "prediction_count": 157777,
+              "recall": 0.4450592145971537,
+              "reference_count": 138986,
+              "tp": 61857
+            },
+            "onset_pitch": {
+              "count_bias": 1763,
+              "f1": 0.21975003433594287,
+              "false_negative_rate": 0.7100398695179413,
+              "false_positive_fraction": 0.8230871295886776,
+              "fn": 1959,
+              "fp": 3722,
+              "precision": 0.17691287041132242,
+              "prediction_count": 4522,
+              "recall": 0.2899601304820587,
+              "reference_count": 2759,
+              "tp": 800
+            },
+            "onset_pitch_offset": {
+              "count_bias": 1763,
+              "f1": 0.10740282928169208,
+              "false_negative_rate": 0.8582819862268938,
+              "false_positive_fraction": 0.9135338345864662,
+              "fn": 2368,
+              "fp": 4131,
+              "precision": 0.08646616541353383,
+              "prediction_count": 4522,
+              "recall": 0.1417180137731062,
+              "reference_count": 2759,
+              "tp": 391
+            }
+          },
+          "pair_count": 46,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.4476363829809205,
+              "support": 46
+            },
+            "onset_pitch": {
+              "f1": 0.2744647248429355,
+              "support": 46
+            },
+            "onset_pitch_offset": {
+              "f1": 0.1268490530103983,
+              "support": 46
+            }
+          },
+          "successful_pair_count": 46
+        },
+        "Halfstep": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -128,
+              "f1": 0.2805851063829788,
+              "false_negative_rate": 0.741421568627451,
+              "false_positive_fraction": 0.6933139534883721,
+              "fn": 605,
+              "fp": 477,
+              "precision": 0.3066860465116279,
+              "prediction_count": 688,
+              "recall": 0.25857843137254904,
+              "reference_count": 816,
+              "tp": 211
+            },
+            "onset_pitch": {
+              "count_bias": -9,
+              "f1": 0.0,
+              "false_negative_rate": 1.0,
+              "false_positive_fraction": 1.0,
+              "fn": 26,
+              "fp": 17,
+              "precision": 0.0,
+              "prediction_count": 17,
+              "recall": 0.0,
+              "reference_count": 26,
+              "tp": 0
+            },
+            "onset_pitch_offset": {
+              "count_bias": -9,
+              "f1": 0.0,
+              "false_negative_rate": 1.0,
+              "false_positive_fraction": 1.0,
+              "fn": 26,
+              "fp": 17,
+              "precision": 0.0,
+              "prediction_count": 17,
+              "recall": 0.0,
+              "reference_count": 26,
+              "tp": 0
+            }
+          },
+          "pair_count": 1,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.2805851063829788,
+              "support": 1
+            },
+            "onset_pitch": {
+              "f1": 0.0,
+              "support": 1
+            },
+            "onset_pitch_offset": {
+              "f1": 0.0,
+              "support": 1
+            }
+          },
+          "successful_pair_count": 1
+        },
+        "Hardcore / Hardstyle": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 62073,
+              "f1": 0.3396821849996132,
+              "false_negative_rate": 0.6197470906963857,
+              "false_positive_fraction": 0.6930658623485303,
+              "fn": 161045,
+              "fp": 223118,
+              "precision": 0.3069341376514697,
+              "prediction_count": 321929,
+              "recall": 0.38025290930361433,
+              "reference_count": 259856,
+              "tp": 98811
+            },
+            "onset_pitch": {
+              "count_bias": 737,
+              "f1": 0.3092955398082535,
+              "false_negative_rate": 0.6818181818181818,
+              "false_positive_fraction": 0.6991078669910786,
+              "fn": 8745,
+              "fp": 9482,
+              "precision": 0.3008921330089213,
+              "prediction_count": 13563,
+              "recall": 0.3181818181818182,
+              "reference_count": 12826,
+              "tp": 4081
+            },
+            "onset_pitch_offset": {
+              "count_bias": 737,
+              "f1": 0.13642047822956532,
+              "false_negative_rate": 0.8596600654919694,
+              "false_positive_fraction": 0.8672859986728599,
+              "fn": 11026,
+              "fp": 11763,
+              "precision": 0.13271400132714,
+              "prediction_count": 13563,
+              "recall": 0.14033993450803056,
+              "reference_count": 12826,
+              "tp": 1800
+            }
+          },
+          "pair_count": 143,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.2790517480500477,
+              "support": 143
+            },
+            "onset_pitch": {
+              "f1": 0.22000390995235208,
+              "support": 143
+            },
+            "onset_pitch_offset": {
+              "f1": 0.09969523474645743,
+              "support": 143
+            }
+          },
+          "successful_pair_count": 143
+        },
+        "Hip-Hop / R&B": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -1675,
+              "f1": 0.5674418188621527,
+              "false_negative_rate": 0.4339715793167853,
+              "false_positive_fraction": 0.43113770665263823,
+              "fn": 145916,
+              "fp": 144241,
+              "precision": 0.5688622933473617,
+              "prediction_count": 334559,
+              "recall": 0.5660284206832147,
+              "reference_count": 336234,
+              "tp": 190318
+            },
+            "onset_pitch": {
+              "count_bias": 3165,
+              "f1": 0.3486836996194766,
+              "false_negative_rate": 0.5376853377265239,
+              "false_positive_fraction": 0.7201097120059843,
+              "fn": 2611,
+              "fp": 5776,
+              "precision": 0.2798902879940157,
+              "prediction_count": 8021,
+              "recall": 0.4623146622734761,
+              "reference_count": 4856,
+              "tp": 2245
+            },
+            "onset_pitch_offset": {
+              "count_bias": 3165,
+              "f1": 0.14009474256426188,
+              "false_negative_rate": 0.8142504118616145,
+              "false_positive_fraction": 0.8875451938661015,
+              "fn": 3954,
+              "fp": 7119,
+              "precision": 0.11245480613389852,
+              "prediction_count": 8021,
+              "recall": 0.1857495881383855,
+              "reference_count": 4856,
+              "tp": 902
+            }
+          },
+          "pair_count": 92,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.4594412857715145,
+              "support": 92
+            },
+            "onset_pitch": {
+              "f1": 0.3526109121060113,
+              "support": 92
+            },
+            "onset_pitch_offset": {
+              "f1": 0.15722224132895302,
+              "support": 92
+            }
+          },
+          "successful_pair_count": 92
+        },
+        "House": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 5344,
+              "f1": 0.36395518274958666,
+              "false_negative_rate": 0.6323362290543272,
+              "false_positive_fraction": 0.6396793362484583,
+              "fn": 165815,
+              "fp": 171159,
+              "precision": 0.36032066375154165,
+              "prediction_count": 267570,
+              "recall": 0.3676637709456728,
+              "reference_count": 262226,
+              "tp": 96411
+            },
+            "onset_pitch": {
+              "count_bias": -117,
+              "f1": 0.3789289572508874,
+              "false_negative_rate": 0.6233381059521375,
+              "false_positive_fraction": 0.6187765241693407,
+              "fn": 6095,
+              "fp": 5978,
+              "precision": 0.38122347583065935,
+              "prediction_count": 9661,
+              "recall": 0.37666189404786254,
+              "reference_count": 9778,
+              "tp": 3683
+            },
+            "onset_pitch_offset": {
+              "count_bias": -117,
+              "f1": 0.15052214620093626,
+              "false_negative_rate": 0.850378400490898,
+              "false_positive_fraction": 0.848566400993686,
+              "fn": 8315,
+              "fp": 8198,
+              "precision": 0.15143359900631403,
+              "prediction_count": 9661,
+              "recall": 0.14962159950910206,
+              "reference_count": 9778,
+              "tp": 1463
+            }
+          },
+          "pair_count": 113,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.27524130261809854,
+              "support": 113
+            },
+            "onset_pitch": {
+              "f1": 0.284464377191277,
+              "support": 113
+            },
+            "onset_pitch_offset": {
+              "f1": 0.09473635503196827,
+              "support": 113
+            }
+          },
+          "successful_pair_count": 113
+        },
+        "Industrial": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 34,
+              "f1": 0.2100325713342239,
+              "false_negative_rate": 0.7899138215776357,
+              "false_positive_fraction": 0.7900210084033613,
+              "fn": 52613,
+              "fp": 52647,
+              "precision": 0.20997899159663866,
+              "prediction_count": 66640,
+              "recall": 0.21008617842236435,
+              "reference_count": 66606,
+              "tp": 13993
+            },
+            "onset_pitch": {
+              "count_bias": -80,
+              "f1": 0.0977121067683508,
+              "false_negative_rate": 0.9041159962581852,
+              "false_positive_fraction": 0.9003887269193391,
+              "fn": 1933,
+              "fp": 1853,
+              "precision": 0.09961127308066084,
+              "prediction_count": 2058,
+              "recall": 0.09588400374181479,
+              "reference_count": 2138,
+              "tp": 205
+            },
+            "onset_pitch_offset": {
+              "count_bias": -80,
+              "f1": 0.029551954242135366,
+              "false_negative_rate": 0.971000935453695,
+              "false_positive_fraction": 0.9698736637512148,
+              "fn": 2076,
+              "fp": 1996,
+              "precision": 0.03012633624878523,
+              "prediction_count": 2058,
+              "recall": 0.028999064546304958,
+              "reference_count": 2138,
+              "tp": 62
+            }
+          },
+          "pair_count": 24,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.2760070204030745,
+              "support": 24
+            },
+            "onset_pitch": {
+              "f1": 0.1370213500752895,
+              "support": 24
+            },
+            "onset_pitch_offset": {
+              "f1": 0.05631468674907122,
+              "support": 24
+            }
+          },
+          "successful_pair_count": 24
+        },
+        "Midtempo": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 11731,
+              "f1": 0.23335022807906738,
+              "false_negative_rate": 0.7539272368983659,
+              "false_positive_fraction": 0.7781214117489292,
+              "fn": 81109,
+              "fp": 92840,
+              "precision": 0.2218785882510707,
+              "prediction_count": 119313,
+              "recall": 0.2460727631016341,
+              "reference_count": 107582,
+              "tp": 26473
+            },
+            "onset_pitch": {
+              "count_bias": -272,
+              "f1": 0.15559484718363226,
+              "false_negative_rate": 0.8495726495726496,
+              "false_positive_fraction": 0.8388699973842532,
+              "fn": 3479,
+              "fp": 3207,
+              "precision": 0.1611300026157468,
+              "prediction_count": 3823,
+              "recall": 0.15042735042735042,
+              "reference_count": 4095,
+              "tp": 616
+            },
+            "onset_pitch_offset": {
+              "count_bias": -272,
+              "f1": 0.05203334175296793,
+              "false_negative_rate": 0.9496947496947497,
+              "false_positive_fraction": 0.9461156160083704,
+              "fn": 3889,
+              "fp": 3617,
+              "precision": 0.05388438399162961,
+              "prediction_count": 3823,
+              "recall": 0.05030525030525031,
+              "reference_count": 4095,
+              "tp": 206
+            }
+          },
+          "pair_count": 50,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.09901003368071981,
+              "support": 50
+            },
+            "onset_pitch": {
+              "f1": 0.07602106501022929,
+              "support": 50
+            },
+            "onset_pitch_offset": {
+              "f1": 0.021646591625854198,
+              "support": 50
+            }
+          },
+          "successful_pair_count": 50
+        },
+        "Moombahton / Reggae": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 453,
+              "f1": 0.48340815069096027,
+              "false_negative_rate": 0.4965163182984965,
+              "false_positive_fraction": 0.5351278144574234,
+              "fn": 2708,
+              "fp": 3161,
+              "precision": 0.4648721855425766,
+              "prediction_count": 5907,
+              "recall": 0.5034836817015035,
+              "reference_count": 5454,
+              "tp": 2746
+            },
+            "onset_pitch": {
+              "count_bias": -188,
+              "f1": 0.254601226993865,
+              "false_negative_rate": 0.8023809523809524,
+              "false_positive_fraction": 0.6422413793103449,
+              "fn": 337,
+              "fp": 149,
+              "precision": 0.3577586206896552,
+              "prediction_count": 232,
+              "recall": 0.1976190476190476,
+              "reference_count": 420,
+              "tp": 83
+            },
+            "onset_pitch_offset": {
+              "count_bias": -188,
+              "f1": 0.10122699386503067,
+              "false_negative_rate": 0.9214285714285714,
+              "false_positive_fraction": 0.8577586206896551,
+              "fn": 387,
+              "fp": 199,
+              "precision": 0.14224137931034483,
+              "prediction_count": 232,
+              "recall": 0.07857142857142857,
+              "reference_count": 420,
+              "tp": 33
+            }
+          },
+          "pair_count": 5,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.40619784057935854,
+              "support": 5
+            },
+            "onset_pitch": {
+              "f1": 0.2329082648591097,
+              "support": 5
+            },
+            "onset_pitch_offset": {
+              "f1": 0.12662803392962124,
+              "support": 5
+            }
+          },
+          "successful_pair_count": 5
+        },
+        "Multigenre": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 129233,
+              "f1": 0.4252167445299091,
+              "false_negative_rate": 0.5576879403941576,
+              "false_positive_fraction": 0.5906062801403777,
+              "fn": 896330,
+              "fp": 1025563,
+              "precision": 0.4093937198596223,
+              "prediction_count": 1736458,
+              "recall": 0.44231205960584236,
+              "reference_count": 1607225,
+              "tp": 710895
+            },
+            "onset_pitch": {
+              "count_bias": 12974,
+              "f1": 0.3131599047490677,
+              "false_negative_rate": 0.6334183606384937,
+              "false_positive_fraction": 0.7266720260387052,
+              "fn": 24087,
+              "fp": 37061,
+              "precision": 0.2733279739612949,
+              "prediction_count": 51001,
+              "recall": 0.3665816393615063,
+              "reference_count": 38027,
+              "tp": 13940
+            },
+            "onset_pitch_offset": {
+              "count_bias": 12974,
+              "f1": 0.11405400548142156,
+              "false_negative_rate": 0.8664895994950956,
+              "false_positive_fraction": 0.9004529322954452,
+              "fn": 32950,
+              "fp": 45924,
+              "precision": 0.0995470677045548,
+              "prediction_count": 51001,
+              "recall": 0.1335104005049044,
+              "reference_count": 38027,
+              "tp": 5077
+            }
+          },
+          "pair_count": 443,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.35407206069836367,
+              "support": 443
+            },
+            "onset_pitch": {
+              "f1": 0.26245133741549986,
+              "support": 443
+            },
+            "onset_pitch_offset": {
+              "f1": 0.09512921704709204,
+              "support": 443
+            }
+          },
+          "successful_pair_count": 443
+        },
+        "Other": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 249800,
+              "f1": 0.4084690661526881,
+              "false_negative_rate": 0.485140813496408,
+              "false_positive_fraction": 0.6614820350044904,
+              "fn": 232642,
+              "fp": 482442,
+              "precision": 0.3385179649955096,
+              "prediction_count": 729335,
+              "recall": 0.514859186503592,
+              "reference_count": 479535,
+              "tp": 246893
+            },
+            "onset_pitch": {
+              "count_bias": 5645,
+              "f1": 0.31815682074734436,
+              "false_negative_rate": 0.6197066150013839,
+              "false_positive_fraction": 0.7265263472160024,
+              "fn": 8956,
+              "fp": 14601,
+              "precision": 0.2734736527839976,
+              "prediction_count": 20097,
+              "recall": 0.3802933849986161,
+              "reference_count": 14452,
+              "tp": 5496
+            },
+            "onset_pitch_offset": {
+              "count_bias": 5645,
+              "f1": 0.10049494920258184,
+              "false_negative_rate": 0.8798782175477442,
+              "false_positive_fraction": 0.9136189481017067,
+              "fn": 12716,
+              "fp": 18361,
+              "precision": 0.08638105189829327,
+              "prediction_count": 20097,
+              "recall": 0.12012178245225574,
+              "reference_count": 14452,
+              "tp": 1736
+            }
+          },
+          "pair_count": 149,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.35274227487742804,
+              "support": 149
+            },
+            "onset_pitch": {
+              "f1": 0.2615456932513616,
+              "support": 149
+            },
+            "onset_pitch_offset": {
+              "f1": 0.09569680546774767,
+              "support": 149
+            }
+          },
+          "successful_pair_count": 149
+        },
+        "Psytrance": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -1557,
+              "f1": 0.4132802817820103,
+              "false_negative_rate": 0.6002523659305994,
+              "false_positive_fraction": 0.572238725357818,
+              "fn": 14271,
+              "fp": 12714,
+              "precision": 0.427761274642182,
+              "prediction_count": 22218,
+              "recall": 0.3997476340694006,
+              "reference_count": 23775,
+              "tp": 9504
+            },
+            "onset_pitch": {
+              "count_bias": -702,
+              "f1": 0.36426712922810056,
+              "false_negative_rate": 0.7207446808510638,
+              "false_positive_fraction": 0.4763092269326683,
+              "fn": 1084,
+              "fp": 382,
+              "precision": 0.5236907730673317,
+              "prediction_count": 802,
+              "recall": 0.27925531914893614,
+              "reference_count": 1504,
+              "tp": 420
+            },
+            "onset_pitch_offset": {
+              "count_bias": -702,
+              "f1": 0.03555941023417172,
+              "false_negative_rate": 0.9727393617021277,
+              "false_positive_fraction": 0.9488778054862843,
+              "fn": 1463,
+              "fp": 761,
+              "precision": 0.05112219451371571,
+              "prediction_count": 802,
+              "recall": 0.02726063829787234,
+              "reference_count": 1504,
+              "tp": 41
+            }
+          },
+          "pair_count": 15,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.23329565086657825,
+              "support": 15
+            },
+            "onset_pitch": {
+              "f1": 0.16918271485559533,
+              "support": 15
+            },
+            "onset_pitch_offset": {
+              "f1": 0.014188757803093586,
+              "support": 15
+            }
+          },
+          "successful_pair_count": 15
+        },
+        "Synthwave": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -22627,
+              "f1": 0.4927168374247728,
+              "false_negative_rate": 0.5172985637233236,
+              "false_positive_fraction": 0.49684334330303714,
+              "fn": 287917,
+              "fp": 265290,
+              "precision": 0.5031566566969629,
+              "prediction_count": 533951,
+              "recall": 0.4827014362766764,
+              "reference_count": 556578,
+              "tp": 268661
+            },
+            "onset_pitch": {
+              "count_bias": 1025,
+              "f1": 0.30594749658093995,
+              "false_negative_rate": 0.6832216619465359,
+              "false_positive_fraction": 0.7041672042317121,
+              "fn": 9891,
+              "fp": 10916,
+              "precision": 0.29583279576828797,
+              "prediction_count": 15502,
+              "recall": 0.3167783380534641,
+              "reference_count": 14477,
+              "tp": 4586
+            },
+            "onset_pitch_offset": {
+              "count_bias": 1025,
+              "f1": 0.09159745154941792,
+              "false_negative_rate": 0.9051599088208883,
+              "false_positive_fraction": 0.9114307831247581,
+              "fn": 13104,
+              "fp": 14129,
+              "precision": 0.0885692168752419,
+              "prediction_count": 15502,
+              "recall": 0.0948400911791117,
+              "reference_count": 14477,
+              "tp": 1373
+            }
+          },
+          "pair_count": 108,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.38251611236405614,
+              "support": 108
+            },
+            "onset_pitch": {
+              "f1": 0.2561214523736845,
+              "support": 108
+            },
+            "onset_pitch_offset": {
+              "f1": 0.10181181707260684,
+              "support": 108
+            }
+          },
+          "successful_pair_count": 108
+        },
+        "Tech House": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -3912,
+              "f1": 0.38228114320051076,
+              "false_negative_rate": 0.6438792289122905,
+              "false_positive_fraction": 0.5874103198086823,
+              "fn": 18404,
+              "fp": 14492,
+              "precision": 0.41258968019131775,
+              "prediction_count": 24671,
+              "recall": 0.35612077108770945,
+              "reference_count": 28583,
+              "tp": 10179
+            },
+            "onset_pitch": {
+              "count_bias": -26,
+              "f1": 0.36815920398009955,
+              "false_negative_rate": 0.6376988984088128,
+              "false_positive_fraction": 0.6257901390644753,
+              "fn": 521,
+              "fp": 495,
+              "precision": 0.37420986093552466,
+              "prediction_count": 791,
+              "recall": 0.3623011015911873,
+              "reference_count": 817,
+              "tp": 296
+            },
+            "onset_pitch_offset": {
+              "count_bias": -26,
+              "f1": 0.11194029850746269,
+              "false_negative_rate": 0.8898408812729498,
+              "false_positive_fraction": 0.8862199747155499,
+              "fn": 727,
+              "fp": 701,
+              "precision": 0.11378002528445007,
+              "prediction_count": 791,
+              "recall": 0.11015911872705018,
+              "reference_count": 817,
+              "tp": 90
+            }
+          },
+          "pair_count": 13,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.3376339180618737,
+              "support": 13
+            },
+            "onset_pitch": {
+              "f1": 0.2885641449460045,
+              "support": 13
+            },
+            "onset_pitch_offset": {
+              "f1": 0.07188215682598739,
+              "support": 13
+            }
+          },
+          "successful_pair_count": 13
+        },
+        "Techno": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 16094,
+              "f1": 0.3495727646364738,
+              "false_negative_rate": 0.6266345259240463,
+              "false_positive_fraction": 0.6713692266460201,
+              "fn": 74087,
+              "fp": 90181,
+              "precision": 0.32863077335397994,
+              "prediction_count": 134324,
+              "recall": 0.37336547407595366,
+              "reference_count": 118230,
+              "tp": 44143
+            },
+            "onset_pitch": {
+              "count_bias": -392,
+              "f1": 0.2764904386951631,
+              "false_negative_rate": 0.7351863822452058,
+              "false_positive_fraction": 0.7107554718757355,
+              "fn": 3412,
+              "fp": 3020,
+              "precision": 0.28924452812426454,
+              "prediction_count": 4249,
+              "recall": 0.26481361775479423,
+              "reference_count": 4641,
+              "tp": 1229
+            },
+            "onset_pitch_offset": {
+              "count_bias": -392,
+              "f1": 0.11586051743532058,
+              "false_negative_rate": 0.8890325360913596,
+              "false_positive_fraction": 0.8787950105907272,
+              "fn": 4126,
+              "fp": 3734,
+              "precision": 0.12120498940927277,
+              "prediction_count": 4249,
+              "recall": 0.11096746390864037,
+              "reference_count": 4641,
+              "tp": 515
+            }
+          },
+          "pair_count": 67,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.22901204880516043,
+              "support": 67
+            },
+            "onset_pitch": {
+              "f1": 0.18178088135989415,
+              "support": 67
+            },
+            "onset_pitch_offset": {
+              "f1": 0.07824621586989698,
+              "support": 67
+            }
+          },
+          "successful_pair_count": 67
+        },
+        "Trance": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 27585,
+              "f1": 0.4488808902653962,
+              "false_negative_rate": 0.4850628427544118,
+              "false_positive_fraction": 0.6021547922282399,
+              "fn": 45463,
+              "fp": 73048,
+              "precision": 0.3978452077717602,
+              "prediction_count": 121311,
+              "recall": 0.5149371572455882,
+              "reference_count": 93726,
+              "tp": 48263
+            },
+            "onset_pitch": {
+              "count_bias": -339,
+              "f1": 0.3305976634160471,
+              "false_negative_rate": 0.6798803290949887,
+              "false_positive_fraction": 0.6582152126172889,
+              "fn": 3636,
+              "fp": 3297,
+              "precision": 0.3417847873827111,
+              "prediction_count": 5009,
+              "recall": 0.3201196709050112,
+              "reference_count": 5348,
+              "tp": 1712
+            },
+            "onset_pitch_offset": {
+              "count_bias": -339,
+              "f1": 0.07048373081008014,
+              "false_negative_rate": 0.931750186985789,
+              "false_positive_fraction": 0.9271311639049711,
+              "fn": 4983,
+              "fp": 4644,
+              "precision": 0.07286883609502895,
+              "prediction_count": 5009,
+              "recall": 0.06824981301421092,
+              "reference_count": 5348,
+              "tp": 365
+            }
+          },
+          "pair_count": 40,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.3834320099288402,
+              "support": 40
+            },
+            "onset_pitch": {
+              "f1": 0.36093736259599357,
+              "support": 40
+            },
+            "onset_pitch_offset": {
+              "f1": 0.060928440816411786,
+              "support": 40
+            }
+          },
+          "successful_pair_count": 40
+        },
+        "Trap": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 10002,
+              "f1": 0.5095256980860471,
+              "false_negative_rate": 0.45007768160055805,
+              "false_positive_fraction": 0.5253420908593323,
+              "fn": 28390,
+              "fp": 38392,
+              "precision": 0.47465790914066774,
+              "prediction_count": 73080,
+              "recall": 0.549922318399442,
+              "reference_count": 63078,
+              "tp": 34688
+            },
+            "onset_pitch": {
+              "count_bias": 755,
+              "f1": 0.3284258210645526,
+              "false_negative_rate": 0.5406546990496304,
+              "false_positive_fraction": 0.7444183313748531,
+              "fn": 512,
+              "fp": 1267,
+              "precision": 0.25558166862514686,
+              "prediction_count": 1702,
+              "recall": 0.4593453009503696,
+              "reference_count": 947,
+              "tp": 435
+            },
+            "onset_pitch_offset": {
+              "count_bias": 755,
+              "f1": 0.08229520573801435,
+              "false_negative_rate": 0.8848996832101372,
+              "false_positive_fraction": 0.935957696827262,
+              "fn": 838,
+              "fp": 1593,
+              "precision": 0.06404230317273796,
+              "prediction_count": 1702,
+              "recall": 0.11510031678986272,
+              "reference_count": 947,
+              "tp": 109
+            }
+          },
+          "pair_count": 22,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.42605042307624336,
+              "support": 22
+            },
+            "onset_pitch": {
+              "f1": 0.29311356118241527,
+              "support": 22
+            },
+            "onset_pitch_offset": {
+              "f1": 0.08735740463567819,
+              "support": 22
+            }
+          },
+          "successful_pair_count": 22
+        },
+        "UK Garage": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 2394,
+              "f1": 0.3405045216563541,
+              "false_negative_rate": 0.6157069187795445,
+              "false_positive_fraction": 0.6943257562809776,
+              "fn": 5731,
+              "fp": 8125,
+              "precision": 0.3056742437190224,
+              "prediction_count": 11702,
+              "recall": 0.3842930812204555,
+              "reference_count": 9308,
+              "tp": 3577
+            },
+            "onset_pitch": {
+              "count_bias": 16,
+              "f1": 0.22394678492239464,
+              "false_negative_rate": 0.7720090293453724,
+              "false_positive_fraction": 0.7799564270152506,
+              "fn": 342,
+              "fp": 358,
+              "precision": 0.22004357298474944,
+              "prediction_count": 459,
+              "recall": 0.22799097065462753,
+              "reference_count": 443,
+              "tp": 101
+            },
+            "onset_pitch_offset": {
+              "count_bias": 16,
+              "f1": 0.06873614190687362,
+              "false_negative_rate": 0.9300225733634312,
+              "false_positive_fraction": 0.9324618736383442,
+              "fn": 412,
+              "fp": 428,
+              "precision": 0.06753812636165578,
+              "prediction_count": 459,
+              "recall": 0.06997742663656885,
+              "reference_count": 443,
+              "tp": 31
+            }
+          },
+          "pair_count": 6,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.3231106419069291,
+              "support": 6
+            },
+            "onset_pitch": {
+              "f1": 0.19145794693165655,
+              "support": 6
+            },
+            "onset_pitch_offset": {
+              "f1": 0.08859848376959374,
+              "support": 6
+            }
+          },
+          "successful_pair_count": 6
+        }
+      },
+      "instrument": {
+        "Vital": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 470072,
+              "f1": 0.3990833410507098,
+              "false_negative_rate": 0.584777605488303,
+              "false_positive_fraction": 0.6158480521159199,
+              "fn": 3398683,
+              "fp": 3868755,
+              "precision": 0.38415194788408014,
+              "prediction_count": 6281996,
+              "recall": 0.415222394511697,
+              "reference_count": 5811924,
+              "tp": 2413241
+            },
+            "onset_pitch": {
+              "count_bias": 36407,
+              "f1": 0.27814754113259677,
+              "false_negative_rate": 0.6873714604813337,
+              "false_positive_fraction": 0.7494829439724091,
+              "fn": 100935,
+              "fp": 137342,
+              "precision": 0.2505170560275909,
+              "prediction_count": 183249,
+              "recall": 0.3126285395186663,
+              "reference_count": 146842,
+              "tp": 45907
+            },
+            "onset_pitch_offset": {
+              "count_bias": 36407,
+              "f1": 0.09827592997082624,
+              "false_negative_rate": 0.889541139456014,
+              "false_positive_fraction": 0.9114865565432826,
+              "fn": 130622,
+              "fp": 167029,
+              "precision": 0.08851344345671737,
+              "prediction_count": 183249,
+              "recall": 0.11045886054398606,
+              "reference_count": 146842,
+              "tp": 16220
+            }
+          },
+          "pair_count": 1769,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.31551162219175916,
+              "support": 1769
+            },
+            "onset_pitch": {
+              "f1": 0.2232428171296013,
+              "support": 1769
+            },
+            "onset_pitch_offset": {
+              "f1": 0.08346016709387641,
+              "support": 1769
+            }
+          },
+          "successful_pair_count": 1769
+        }
+      },
+      "note_density_class": {
+        "high": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -28483,
+              "f1": 0.388158462295206,
+              "false_negative_rate": 0.6173401941056113,
+              "false_positive_fraction": 0.6061825507807781,
+              "fn": 620630,
+              "fp": 592147,
+              "precision": 0.39381744921922185,
+              "prediction_count": 976846,
+              "recall": 0.3826598058943888,
+              "reference_count": 1005329,
+              "tp": 384699
+            },
+            "onset_pitch": {
+              "count_bias": -18603,
+              "f1": 0.32849895049943567,
+              "false_negative_rate": 0.7253857684507539,
+              "false_positive_fraction": 0.5913075429111333,
+              "fn": 41133,
+              "fp": 22530,
+              "precision": 0.4086924570888667,
+              "prediction_count": 38102,
+              "recall": 0.2746142315492461,
+              "reference_count": 56705,
+              "tp": 15572
+            },
+            "onset_pitch_offset": {
+              "count_bias": -18603,
+              "f1": 0.10758699252164923,
+              "false_negative_rate": 0.9100608411956618,
+              "false_positive_fraction": 0.8661487585953493,
+              "fn": 51605,
+              "fp": 33002,
+              "precision": 0.13385124140465068,
+              "prediction_count": 38102,
+              "recall": 0.08993915880433824,
+              "reference_count": 56705,
+              "tp": 5100
+            }
+          },
+          "pair_count": 222,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.3509618950405999,
+              "support": 222
+            },
+            "onset_pitch": {
+              "f1": 0.31618707984832384,
+              "support": 222
+            },
+            "onset_pitch_offset": {
+              "f1": 0.10393497629148737,
+              "support": 222
+            }
+          },
+          "successful_pair_count": 222
+        },
+        "low": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -21969,
+              "f1": 0.38505465189669963,
+              "false_negative_rate": 0.6170499781059671,
+              "false_positive_fraction": 0.612817456863699,
+              "fn": 1240073,
+              "fp": 1218104,
+              "precision": 0.387182543136301,
+              "prediction_count": 1987711,
+              "recall": 0.3829500218940329,
+              "reference_count": 2009680,
+              "tp": 769607
+            },
+            "onset_pitch": {
+              "count_bias": 35012,
+              "f1": 0.10205527994330263,
+              "false_negative_rate": 0.7311928318088482,
+              "false_positive_fraction": 0.9370161396142238,
+              "fn": 7834,
+              "fp": 42846,
+              "precision": 0.06298386038577615,
+              "prediction_count": 45726,
+              "recall": 0.26880716819115175,
+              "reference_count": 10714,
+              "tp": 2880
+            },
+            "onset_pitch_offset": {
+              "count_bias": 35012,
+              "f1": 0.030687455705173634,
+              "false_negative_rate": 0.9191711778980772,
+              "false_positive_fraction": 0.9810611030923326,
+              "fn": 9848,
+              "fp": 44860,
+              "precision": 0.01893889690766741,
+              "prediction_count": 45726,
+              "recall": 0.08082882210192271,
+              "reference_count": 10714,
+              "tp": 866
+            }
+          },
+          "pair_count": 512,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.31273318512750325,
+              "support": 512
+            },
+            "onset_pitch": {
+              "f1": 0.1217155924693343,
+              "support": 512
+            },
+            "onset_pitch_offset": {
+              "f1": 0.046516871400339305,
+              "support": 512
+            }
+          },
+          "successful_pair_count": 512
+        },
+        "medium": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 520524,
+              "f1": 0.4117965691878488,
+              "false_negative_rate": 0.5498844262339041,
+              "false_positive_fraction": 0.6205099777267947,
+              "fn": 1537980,
+              "fp": 2058504,
+              "precision": 0.37949002227320533,
+              "prediction_count": 3317439,
+              "recall": 0.45011557376609584,
+              "reference_count": 2796915,
+              "tp": 1258935
+            },
+            "onset_pitch": {
+              "count_bias": 19998,
+              "f1": 0.3070273534476975,
+              "false_negative_rate": 0.6543192777910681,
+              "false_positive_fraction": 0.7238510978565896,
+              "fn": 51968,
+              "fp": 71966,
+              "precision": 0.27614890214341037,
+              "prediction_count": 99421,
+              "recall": 0.3456807222089319,
+              "reference_count": 79423,
+              "tp": 27455
+            },
+            "onset_pitch_offset": {
+              "count_bias": 19998,
+              "f1": 0.11466976806602401,
+              "false_negative_rate": 0.8708938216889314,
+              "false_positive_fraction": 0.8968628358193943,
+              "fn": 69169,
+              "fp": 89167,
+              "precision": 0.1031371641806057,
+              "prediction_count": 99421,
+              "recall": 0.12910617831106858,
+              "reference_count": 79423,
+              "tp": 10254
+            }
+          },
+          "pair_count": 1035,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.30928224944244165,
+              "support": 1035
+            },
+            "onset_pitch": {
+              "f1": 0.2535310419629349,
+              "support": 1035
+            },
+            "onset_pitch_offset": {
+              "f1": 0.09734379970568452,
+              "support": 1035
+            }
+          },
+          "successful_pair_count": 1035
+        }
+      },
+      "pitch_register_class": {
+        "high": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 104476,
+              "f1": 0.33113801030864554,
+              "false_negative_rate": 0.630657611396389,
+              "false_positive_fraction": 0.6999036340894857,
+              "fn": 285546,
+              "fp": 390022,
+              "precision": 0.3000963659105143,
+              "prediction_count": 557251,
+              "recall": 0.36934238860361107,
+              "reference_count": 452775,
+              "tp": 167229
+            },
+            "onset_pitch": {
+              "count_bias": 6116,
+              "f1": 0.2812680115273775,
+              "false_negative_rate": 0.6392533727591942,
+              "false_positive_fraction": 0.7695123391191404,
+              "fn": 6918,
+              "fp": 13034,
+              "precision": 0.23048766088085962,
+              "prediction_count": 16938,
+              "recall": 0.36074662724080575,
+              "reference_count": 10822,
+              "tp": 3904
+            },
+            "onset_pitch_offset": {
+              "count_bias": 6116,
+              "f1": 0.10389048991354467,
+              "false_negative_rate": 0.8667529107373868,
+              "false_positive_fraction": 0.914865981816035,
+              "fn": 9380,
+              "fp": 15496,
+              "precision": 0.08513401818396504,
+              "prediction_count": 16938,
+              "recall": 0.1332470892626132,
+              "reference_count": 10822,
+              "tp": 1442
+            }
+          },
+          "pair_count": 155,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.3100195880619799,
+              "support": 155
+            },
+            "onset_pitch": {
+              "f1": 0.2711665689645073,
+              "support": 155
+            },
+            "onset_pitch_offset": {
+              "f1": 0.11123027113079387,
+              "support": 155
+            }
+          },
+          "successful_pair_count": 155
+        },
+        "low": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 12980,
+              "f1": 0.2789213777478849,
+              "false_negative_rate": 0.7178373829432936,
+              "false_positive_fraction": 0.7242462421474443,
+              "fn": 400905,
+              "fp": 413885,
+              "precision": 0.2757537578525557,
+              "prediction_count": 571470,
+              "recall": 0.2821626170567065,
+              "reference_count": 558490,
+              "tp": 157585
+            },
+            "onset_pitch": {
+              "count_bias": 985,
+              "f1": 0.17311256266140057,
+              "false_negative_rate": 0.8215471343564046,
+              "false_positive_fraction": 0.8319174041297935,
+              "fn": 13116,
+              "fp": 14101,
+              "precision": 0.1680825958702065,
+              "prediction_count": 16950,
+              "recall": 0.17845286564359536,
+              "reference_count": 15965,
+              "tp": 2849
+            },
+            "onset_pitch_offset": {
+              "count_bias": 985,
+              "f1": 0.06203858423211302,
+              "false_negative_rate": 0.9360476041340432,
+              "false_positive_fraction": 0.93976401179941,
+              "fn": 14944,
+              "fp": 15929,
+              "precision": 0.06023598820058997,
+              "prediction_count": 16950,
+              "recall": 0.06395239586595677,
+              "reference_count": 15965,
+              "tp": 1021
+            }
+          },
+          "pair_count": 322,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.278486734591454,
+              "support": 322
+            },
+            "onset_pitch": {
+              "f1": 0.16989255545321058,
+              "support": 322
+            },
+            "onset_pitch_offset": {
+              "f1": 0.06724574741465744,
+              "support": 322
+            }
+          },
+          "successful_pair_count": 322
+        },
+        "mid": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 352616,
+              "f1": 0.41961841418679285,
+              "false_negative_rate": 0.5649707675550377,
+              "false_positive_fraction": 0.5947379093877194,
+              "fn": 2712232,
+              "fp": 3064848,
+              "precision": 0.4052620906122805,
+              "prediction_count": 5153275,
+              "recall": 0.4350292324449622,
+              "reference_count": 4800659,
+              "tp": 2088427
+            },
+            "onset_pitch": {
+              "count_bias": 29306,
+              "f1": 0.2906583127950827,
+              "false_negative_rate": 0.6738661446836867,
+              "false_positive_fraction": 0.7378566024598121,
+              "fn": 80901,
+              "fp": 110207,
+              "precision": 0.2621433975401879,
+              "prediction_count": 149361,
+              "recall": 0.32613385531631334,
+              "reference_count": 120055,
+              "tp": 39154
+            },
+            "onset_pitch_offset": {
+              "count_bias": 29306,
+              "f1": 0.10212459542120736,
+              "false_negative_rate": 0.8854108533588771,
+              "false_positive_fraction": 0.9078942963691995,
+              "fn": 106298,
+              "fp": 135604,
+              "precision": 0.09210570363080055,
+              "prediction_count": 149361,
+              "recall": 0.11458914664112282,
+              "reference_count": 120055,
+              "tp": 13757
+            }
+          },
+          "pair_count": 1292,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.32539806112164615,
+              "support": 1292
+            },
+            "onset_pitch": {
+              "f1": 0.2307897232638021,
+              "support": 1292
+            },
+            "onset_pitch_offset": {
+              "f1": 0.08416966942436119,
+              "support": 1292
+            }
+          },
+          "successful_pair_count": 1292
+        }
+      },
+      "polyphony_class": {
+        "monophonic": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 363409,
+              "f1": 0.2662991089503279,
+              "false_negative_rate": 0.6503114110522488,
+              "false_positive_fraction": 0.7849769676084144,
+              "fn": 377351,
+              "fp": 740760,
+              "precision": 0.21502303239158563,
+              "prediction_count": 943671,
+              "recall": 0.3496885889477512,
+              "reference_count": 580262,
+              "tp": 202911
+            },
+            "onset_pitch": {
+              "count_bias": 2069,
+              "f1": 0.27701177035791497,
+              "false_negative_rate": 0.7134954286471445,
+              "false_positive_fraction": 0.7318721517810087,
+              "fn": 21539,
+              "fp": 23608,
+              "precision": 0.2681278482189912,
+              "prediction_count": 32257,
+              "recall": 0.28650457135285545,
+              "reference_count": 30188,
+              "tp": 8649
+            },
+            "onset_pitch_offset": {
+              "count_bias": 2069,
+              "f1": 0.10028024661702298,
+              "false_negative_rate": 0.8962832913740559,
+              "false_positive_fraction": 0.9029357968812971,
+              "fn": 27057,
+              "fp": 29126,
+              "precision": 0.09706420311870291,
+              "prediction_count": 32257,
+              "recall": 0.10371670862594408,
+              "reference_count": 30188,
+              "tp": 3131
+            }
+          },
+          "pair_count": 619,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.23754317080779094,
+              "support": 619
+            },
+            "onset_pitch": {
+              "f1": 0.2103802204062786,
+              "support": 619
+            },
+            "onset_pitch_offset": {
+              "f1": 0.08235298778639413,
+              "support": 619
+            }
+          },
+          "successful_pair_count": 619
+        },
+        "polyphonic": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 106663,
+              "f1": 0.41822757208689093,
+              "false_negative_rate": 0.5775090210338512,
+              "false_positive_fraction": 0.5859506493141575,
+              "fn": 3021332,
+              "fp": 3127995,
+              "precision": 0.4140493506858425,
+              "prediction_count": 5338325,
+              "recall": 0.4224909789661488,
+              "reference_count": 5231662,
+              "tp": 2210330
+            },
+            "onset_pitch": {
+              "count_bias": 34338,
+              "f1": 0.2784125299836351,
+              "false_negative_rate": 0.680611037769815,
+              "false_positive_fraction": 0.7532452050439759,
+              "fn": 79396,
+              "fp": 113734,
+              "precision": 0.24675479495602415,
+              "prediction_count": 150992,
+              "recall": 0.319388962230185,
+              "reference_count": 116654,
+              "tp": 37258
+            },
+            "onset_pitch_offset": {
+              "count_bias": 34338,
+              "f1": 0.09780829902184228,
+              "false_negative_rate": 0.8877963893222692,
+              "false_positive_fraction": 0.9133132881212249,
+              "fn": 103565,
+              "fp": 137903,
+              "precision": 0.08668671187877504,
+              "prediction_count": 150992,
+              "recall": 0.11220361067773073,
+              "reference_count": 116654,
+              "tp": 13089
+            }
+          },
+          "pair_count": 1150,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.3574789886323472,
+              "support": 1150
+            },
+            "onset_pitch": {
+              "f1": 0.2301662496267637,
+              "support": 1150
+            },
+            "onset_pitch_offset": {
+              "f1": 0.08405611839068645,
+              "support": 1150
+            }
+          },
+          "successful_pair_count": 1150
+        }
+      },
+      "type": {
+        "Arp": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 18035,
+              "f1": 0.39911802324212775,
+              "false_negative_rate": 0.5350894832093304,
+              "false_positive_fraction": 0.650361571668179,
+              "fn": 29271,
+              "fp": 47306,
+              "precision": 0.34963842833182107,
+              "prediction_count": 72738,
+              "recall": 0.46491051679066964,
+              "reference_count": 54703,
+              "tp": 25432
+            },
+            "onset_pitch": {
+              "count_bias": 333,
+              "f1": 0.33099730458221027,
+              "false_negative_rate": 0.6479357798165137,
+              "false_positive_fraction": 0.6876907426246185,
+              "fn": 1695,
+              "fp": 2028,
+              "precision": 0.3123092573753815,
+              "prediction_count": 2949,
+              "recall": 0.35206422018348627,
+              "reference_count": 2616,
+              "tp": 921
+            },
+            "onset_pitch_offset": {
+              "count_bias": 333,
+              "f1": 0.15345911949685537,
+              "false_negative_rate": 0.8367737003058104,
+              "false_positive_fraction": 0.8552051542895897,
+              "fn": 2189,
+              "fp": 2522,
+              "precision": 0.14479484571041032,
+              "prediction_count": 2949,
+              "recall": 0.1632262996941896,
+              "reference_count": 2616,
+              "tp": 427
+            }
+          },
+          "pair_count": 25,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.32821312836653754,
+              "support": 25
+            },
+            "onset_pitch": {
+              "f1": 0.2425812425230687,
+              "support": 25
+            },
+            "onset_pitch_offset": {
+              "f1": 0.0867809219641187,
+              "support": 25
+            }
+          },
+          "successful_pair_count": 25
+        },
+        "Atmosphere": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 24627,
+              "f1": 0.3011101365299595,
+              "false_negative_rate": 0.6752723103382381,
+              "false_positive_fraction": 0.719304910883893,
+              "fn": 106011,
+              "fp": 130638,
+              "precision": 0.28069508911610697,
+              "prediction_count": 181617,
+              "recall": 0.3247276896617619,
+              "reference_count": 156990,
+              "tp": 50979
+            },
+            "onset_pitch": {
+              "count_bias": 2656,
+              "f1": 0.10230607966457021,
+              "false_negative_rate": 0.7691579943235572,
+              "false_positive_fraction": 0.9342849447885807,
+              "fn": 813,
+              "fp": 3469,
+              "precision": 0.06571505521141933,
+              "prediction_count": 3713,
+              "recall": 0.23084200567644275,
+              "reference_count": 1057,
+              "tp": 244
+            },
+            "onset_pitch_offset": {
+              "count_bias": 2656,
+              "f1": 0.02976939203354298,
+              "false_negative_rate": 0.9328287606433302,
+              "false_positive_fraction": 0.980877996229464,
+              "fn": 986,
+              "fp": 3642,
+              "precision": 0.019122003770535956,
+              "prediction_count": 3713,
+              "recall": 0.06717123935666983,
+              "reference_count": 1057,
+              "tp": 71
+            }
+          },
+          "pair_count": 27,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.2502705506047882,
+              "support": 27
+            },
+            "onset_pitch": {
+              "f1": 0.1174793579531821,
+              "support": 27
+            },
+            "onset_pitch_offset": {
+              "f1": 0.04552800314519884,
+              "support": 27
+            }
+          },
+          "successful_pair_count": 27
+        },
+        "Bass": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -44643,
+              "f1": 0.15029167448509523,
+              "false_negative_rate": 0.8545999084305166,
+              "false_positive_fraction": 0.8444761570554061,
+              "fn": 586100,
+              "fp": 541457,
+              "precision": 0.1555238429445939,
+              "prediction_count": 641175,
+              "recall": 0.14540009156948344,
+              "reference_count": 685818,
+              "tp": 99718
+            },
+            "onset_pitch": {
+              "count_bias": -4585,
+              "f1": 0.11564641872953813,
+              "false_negative_rate": 0.8956251860039964,
+              "false_positive_fraction": 0.8703527672158851,
+              "fn": 21066,
+              "fp": 16481,
+              "precision": 0.1296472327841149,
+              "prediction_count": 18936,
+              "recall": 0.10437481399600357,
+              "reference_count": 23521,
+              "tp": 2455
+            },
+            "onset_pitch_offset": {
+              "count_bias": -4585,
+              "f1": 0.05638646159643875,
+              "false_negative_rate": 0.9491093065771014,
+              "false_positive_fraction": 0.936787072243346,
+              "fn": 22324,
+              "fp": 17739,
+              "precision": 0.06321292775665399,
+              "prediction_count": 18936,
+              "recall": 0.05089069342289869,
+              "reference_count": 23521,
+              "tp": 1197
+            }
+          },
+          "pair_count": 446,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.15308621088239058,
+              "support": 446
+            },
+            "onset_pitch": {
+              "f1": 0.10177507529634205,
+              "support": 446
+            },
+            "onset_pitch_offset": {
+              "f1": 0.046222272764059165,
+              "support": 446
+            }
+          },
+          "successful_pair_count": 446
+        },
+        "Chord": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 4110,
+              "f1": 0.4255705422468406,
+              "false_negative_rate": 0.5696074809640121,
+              "false_positive_fraction": 0.5791445839645886,
+              "fn": 103308,
+              "fp": 107418,
+              "precision": 0.4208554160354114,
+              "prediction_count": 185477,
+              "recall": 0.4303925190359878,
+              "reference_count": 181367,
+              "tp": 78059
+            },
+            "onset_pitch": {
+              "count_bias": 1439,
+              "f1": 0.19059433855870078,
+              "false_negative_rate": 0.7724824986537426,
+              "false_positive_fraction": 0.8360178536774694,
+              "fn": 2869,
+              "fp": 4308,
+              "precision": 0.16398214632253055,
+              "prediction_count": 5153,
+              "recall": 0.2275175013462574,
+              "reference_count": 3714,
+              "tp": 845
+            },
+            "onset_pitch_offset": {
+              "count_bias": 1439,
+              "f1": 0.054584414119769935,
+              "false_negative_rate": 0.934841141626279,
+              "false_positive_fraction": 0.9530370657869203,
+              "fn": 3472,
+              "fp": 4911,
+              "precision": 0.04696293421307976,
+              "prediction_count": 5153,
+              "recall": 0.06515885837372105,
+              "reference_count": 3714,
+              "tp": 242
+            }
+          },
+          "pair_count": 32,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.3695592940825482,
+              "support": 32
+            },
+            "onset_pitch": {
+              "f1": 0.18323870103556178,
+              "support": 32
+            },
+            "onset_pitch_offset": {
+              "f1": 0.05692407642884057,
+              "support": 32
+            }
+          },
+          "successful_pair_count": 32
+        },
+        "Drone": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 1934,
+              "f1": 0.20338137472283815,
+              "false_negative_rate": 0.7850992795642242,
+              "false_positive_fraction": 0.8069658546851161,
+              "fn": 13404,
+              "fp": 15338,
+              "precision": 0.193034145314884,
+              "prediction_count": 19007,
+              "recall": 0.2149007204357758,
+              "reference_count": 17073,
+              "tp": 3669
+            },
+            "onset_pitch": {
+              "count_bias": 254,
+              "f1": 0.03910614525139664,
+              "false_negative_rate": 0.8653846153846154,
+              "false_positive_fraction": 0.9771241830065359,
+              "fn": 45,
+              "fp": 299,
+              "precision": 0.02287581699346405,
+              "prediction_count": 306,
+              "recall": 0.1346153846153846,
+              "reference_count": 52,
+              "tp": 7
+            },
+            "onset_pitch_offset": {
+              "count_bias": 254,
+              "f1": 0.0,
+              "false_negative_rate": 1.0,
+              "false_positive_fraction": 1.0,
+              "fn": 52,
+              "fp": 306,
+              "precision": 0.0,
+              "prediction_count": 306,
+              "recall": 0.0,
+              "reference_count": 52,
+              "tp": 0
+            }
+          },
+          "pair_count": 4,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.2710744475883858,
+              "support": 4
+            },
+            "onset_pitch": {
+              "f1": 0.03181818181818181,
+              "support": 4
+            },
+            "onset_pitch_offset": {
+              "f1": 0.0,
+              "support": 4
+            }
+          },
+          "successful_pair_count": 4
+        },
+        "Drums": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -69302,
+              "f1": 0.01430564562086109,
+              "false_negative_rate": 0.9914893617021276,
+              "false_positive_fraction": 0.9551668924744426,
+              "fn": 84812,
+              "fp": 15510,
+              "precision": 0.04483310752555734,
+              "prediction_count": 16238,
+              "recall": 0.00851063829787234,
+              "reference_count": 85540,
+              "tp": 728
+            },
+            "onset_pitch": {
+              "count_bias": -2462,
+              "f1": 0.0012300123001230013,
+              "false_negative_rate": 0.9992999649982499,
+              "false_positive_fraction": 0.9949367088607595,
+              "fn": 2855,
+              "fp": 393,
+              "precision": 0.005063291139240506,
+              "prediction_count": 395,
+              "recall": 0.0007000350017500875,
+              "reference_count": 2857,
+              "tp": 2
+            },
+            "onset_pitch_offset": {
+              "count_bias": -2462,
+              "f1": 0.0012300123001230013,
+              "false_negative_rate": 0.9992999649982499,
+              "false_positive_fraction": 0.9949367088607595,
+              "fn": 2855,
+              "fp": 393,
+              "precision": 0.005063291139240506,
+              "prediction_count": 395,
+              "recall": 0.0007000350017500875,
+              "reference_count": 2857,
+              "tp": 2
+            }
+          },
+          "pair_count": 45,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.038255943105130454,
+              "support": 45
+            },
+            "onset_pitch": {
+              "f1": 0.0026143790849673205,
+              "support": 45
+            },
+            "onset_pitch_offset": {
+              "f1": 0.0026143790849673205,
+              "support": 45
+            }
+          },
+          "successful_pair_count": 45
+        },
+        "FX": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -50057,
+              "f1": 0.05656038876377859,
+              "false_negative_rate": 0.9594704776572374,
+              "false_positive_fraction": 0.9064289262464378,
+              "fn": 84727,
+              "fp": 34670,
+              "precision": 0.09357107375356219,
+              "prediction_count": 38249,
+              "recall": 0.040529522342762664,
+              "reference_count": 88306,
+              "tp": 3579
+            },
+            "onset_pitch": {
+              "count_bias": -1529,
+              "f1": 0.044815256257449344,
+              "false_negative_rate": 0.9671558350803634,
+              "false_positive_fraction": 0.9294823705926482,
+              "fn": 2768,
+              "fp": 1239,
+              "precision": 0.07051762940735183,
+              "prediction_count": 1333,
+              "recall": 0.03284416491963662,
+              "reference_count": 2862,
+              "tp": 94
+            },
+            "onset_pitch_offset": {
+              "count_bias": -1529,
+              "f1": 0.011442193087008343,
+              "false_negative_rate": 0.9916142557651991,
+              "false_positive_fraction": 0.9819954988747187,
+              "fn": 2838,
+              "fp": 1309,
+              "precision": 0.01800450112528132,
+              "prediction_count": 1333,
+              "recall": 0.008385744234800839,
+              "reference_count": 2862,
+              "tp": 24
+            }
+          },
+          "pair_count": 39,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.038403085330614345,
+              "support": 39
+            },
+            "onset_pitch": {
+              "f1": 0.03414060276346953,
+              "support": 39
+            },
+            "onset_pitch_offset": {
+              "f1": 0.005917801552162571,
+              "support": 39
+            }
+          },
+          "successful_pair_count": 39
+        },
+        "Keys": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 424454,
+              "f1": 0.4871647748084234,
+              "false_negative_rate": 0.4415529527917354,
+              "false_positive_fraction": 0.5679798898915023,
+              "fn": 640439,
+              "fp": 1064893,
+              "precision": 0.4320201101084977,
+              "prediction_count": 1874878,
+              "recall": 0.5584470472082647,
+              "reference_count": 1450424,
+              "tp": 809985
+            },
+            "onset_pitch": {
+              "count_bias": 14298,
+              "f1": 0.36449480642115206,
+              "false_negative_rate": 0.5656995901309974,
+              "false_positive_fraction": 0.6859782671857749,
+              "fn": 21117,
+              "fp": 35415,
+              "precision": 0.31402173281422513,
+              "prediction_count": 51627,
+              "recall": 0.43430040986900265,
+              "reference_count": 37329,
+              "tp": 16212
+            },
+            "onset_pitch_offset": {
+              "count_bias": 14298,
+              "f1": 0.12233014074373848,
+              "false_negative_rate": 0.8542420102333307,
+              "false_positive_fraction": 0.8946094098049471,
+              "fn": 31888,
+              "fp": 46186,
+              "precision": 0.10539059019505298,
+              "prediction_count": 51627,
+              "recall": 0.14575798976666934,
+              "reference_count": 37329,
+              "tp": 5441
+            }
+          },
+          "pair_count": 281,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.46207768999495263,
+              "support": 281
+            },
+            "onset_pitch": {
+              "f1": 0.38088947645319365,
+              "support": 281
+            },
+            "onset_pitch_offset": {
+              "f1": 0.12548324543237258,
+              "support": 281
+            }
+          },
+          "successful_pair_count": 281
+        },
+        "Lead": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 295940,
+              "f1": 0.4491524778265655,
+              "false_negative_rate": 0.47719711963616457,
+              "false_positive_fraction": 0.6063091345760669,
+              "fn": 430616,
+              "fp": 726556,
+              "precision": 0.39369086542393306,
+              "prediction_count": 1198326,
+              "recall": 0.5228028803638355,
+              "reference_count": 902386,
+              "tp": 471770
+            },
+            "onset_pitch": {
+              "count_bias": 5612,
+              "f1": 0.38073094711441785,
+              "false_negative_rate": 0.5903780626318351,
+              "false_positive_fraction": 0.6443531345386241,
+              "fn": 21831,
+              "fp": 27443,
+              "precision": 0.3556468654613759,
+              "prediction_count": 42590,
+              "recall": 0.4096219373681649,
+              "reference_count": 36978,
+              "tp": 15147
+            },
+            "onset_pitch_offset": {
+              "count_bias": 5612,
+              "f1": 0.13837220993364166,
+              "false_negative_rate": 0.8511276975498945,
+              "false_positive_fraction": 0.8707443061751585,
+              "fn": 31473,
+              "fp": 37085,
+              "precision": 0.1292556938248415,
+              "prediction_count": 42590,
+              "recall": 0.14887230245010546,
+              "reference_count": 36978,
+              "tp": 5505
+            }
+          },
+          "pair_count": 393,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.395044277333154,
+              "support": 393
+            },
+            "onset_pitch": {
+              "f1": 0.3279901381077993,
+              "support": 393
+            },
+            "onset_pitch_offset": {
+              "f1": 0.13010901932365407,
+              "support": 393
+            }
+          },
+          "successful_pair_count": 393
+        },
+        "Miscellaneous": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -17558,
+              "f1": 0.43061086090872736,
+              "false_negative_rate": 0.6264180545498431,
+              "false_positive_fraction": 0.49181202544633695,
+              "fn": 41524,
+              "fp": 23966,
+              "precision": 0.508187974553663,
+              "prediction_count": 48730,
+              "recall": 0.3735819454501569,
+              "reference_count": 66288,
+              "tp": 24764
+            },
+            "onset_pitch": {
+              "count_bias": 36,
+              "f1": 0.18744142455482662,
+              "false_negative_rate": 0.8093422306959008,
+              "false_positive_fraction": 0.815668202764977,
+              "fn": 849,
+              "fp": 885,
+              "precision": 0.18433179723502305,
+              "prediction_count": 1085,
+              "recall": 0.19065776930409914,
+              "reference_count": 1049,
+              "tp": 200
+            },
+            "onset_pitch_offset": {
+              "count_bias": 36,
+              "f1": 0.061855670103092786,
+              "false_negative_rate": 0.9370829361296473,
+              "false_positive_fraction": 0.9391705069124424,
+              "fn": 983,
+              "fp": 1019,
+              "precision": 0.060829493087557605,
+              "prediction_count": 1085,
+              "recall": 0.06291706387035272,
+              "reference_count": 1049,
+              "tp": 66
+            }
+          },
+          "pair_count": 16,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.44190327227047144,
+              "support": 16
+            },
+            "onset_pitch": {
+              "f1": 0.20939348017032347,
+              "support": 16
+            },
+            "onset_pitch_offset": {
+              "f1": 0.09351282049308904,
+              "support": 16
+            }
+          },
+          "successful_pair_count": 16
+        },
+        "Other": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -335,
+              "f1": 0.43976458909451893,
+              "false_negative_rate": 0.5623147494707128,
+              "false_positive_fraction": 0.5581362211456256,
+              "fn": 19920,
+              "fp": 19585,
+              "precision": 0.44186377885437444,
+              "prediction_count": 35090,
+              "recall": 0.43768525052928725,
+              "reference_count": 35425,
+              "tp": 15505
+            },
+            "onset_pitch": {
+              "count_bias": 474,
+              "f1": 0.047304730473047306,
+              "false_negative_rate": 0.9360119047619048,
+              "false_positive_fraction": 0.962478184991274,
+              "fn": 629,
+              "fp": 1103,
+              "precision": 0.037521815008726006,
+              "prediction_count": 1146,
+              "recall": 0.06398809523809523,
+              "reference_count": 672,
+              "tp": 43
+            },
+            "onset_pitch_offset": {
+              "count_bias": 474,
+              "f1": 0.007700770077007701,
+              "false_negative_rate": 0.9895833333333334,
+              "false_positive_fraction": 0.993891797556719,
+              "fn": 665,
+              "fp": 1139,
+              "precision": 0.006108202443280977,
+              "prediction_count": 1146,
+              "recall": 0.010416666666666666,
+              "reference_count": 672,
+              "tp": 7
+            }
+          },
+          "pair_count": 18,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.32895169526972584,
+              "support": 18
+            },
+            "onset_pitch": {
+              "f1": 0.07031684840525328,
+              "support": 18
+            },
+            "onset_pitch_offset": {
+              "f1": 0.00617283950617284,
+              "support": 18
+            }
+          },
+          "successful_pair_count": 18
+        },
+        "Pad": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 3099,
+              "f1": 0.41882327187282503,
+              "false_negative_rate": 0.580603104620514,
+              "false_positive_fraction": 0.5817487846479997,
+              "fn": 656863,
+              "fp": 659962,
+              "precision": 0.4182512153520003,
+              "prediction_count": 1134445,
+              "recall": 0.41939689537948605,
+              "reference_count": 1131346,
+              "tp": 474483
+            },
+            "onset_pitch": {
+              "count_bias": 19164,
+              "f1": 0.07372087711283691,
+              "false_negative_rate": 0.8372005044136192,
+              "false_positive_fraction": 0.9523510740385325,
+              "fn": 6639,
+              "fp": 25803,
+              "precision": 0.047648925961467484,
+              "prediction_count": 27094,
+              "recall": 0.16279949558638082,
+              "reference_count": 7930,
+              "tp": 1291
+            },
+            "onset_pitch_offset": {
+              "count_bias": 19164,
+              "f1": 0.02786660575605299,
+              "false_negative_rate": 0.9384615384615385,
+              "false_positive_fraction": 0.9819886321694841,
+              "fn": 7442,
+              "fp": 26606,
+              "precision": 0.018011367830515983,
+              "prediction_count": 27094,
+              "recall": 0.06153846153846154,
+              "reference_count": 7930,
+              "tp": 488
+            }
+          },
+          "pair_count": 161,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.3914057373204397,
+              "support": 161
+            },
+            "onset_pitch": {
+              "f1": 0.08348111243082441,
+              "support": 161
+            },
+            "onset_pitch_offset": {
+              "f1": 0.03304619619348477,
+              "support": 161
+            }
+          },
+          "successful_pair_count": 161
+        },
+        "Pluck": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -55698,
+              "f1": 0.4579961711182755,
+              "false_negative_rate": 0.5832985291594226,
+              "false_positive_fraction": 0.4916243043294506,
+              "fn": 180164,
+              "fp": 124466,
+              "precision": 0.5083756956705494,
+              "prediction_count": 253173,
+              "recall": 0.41670147084057746,
+              "reference_count": 308871,
+              "tp": 128707
+            },
+            "onset_pitch": {
+              "count_bias": 388,
+              "f1": 0.5097887401836081,
+              "false_negative_rate": 0.47903244037526843,
+              "false_positive_fraction": 0.5009204114780725,
+              "fn": 4238,
+              "fp": 4626,
+              "precision": 0.49907958852192746,
+              "prediction_count": 9235,
+              "recall": 0.5209675596247315,
+              "reference_count": 8847,
+              "tp": 4609
+            },
+            "onset_pitch_offset": {
+              "count_bias": 388,
+              "f1": 0.19013383475279283,
+              "false_negative_rate": 0.8056968463886063,
+              "false_positive_fraction": 0.8138603140227396,
+              "fn": 7128,
+              "fp": 7516,
+              "precision": 0.1861396859772604,
+              "prediction_count": 9235,
+              "recall": 0.1943031536113937,
+              "reference_count": 8847,
+              "tp": 1719
+            }
+          },
+          "pair_count": 107,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.41305942811891966,
+              "support": 107
+            },
+            "onset_pitch": {
+              "f1": 0.4501888935661268,
+              "support": 107
+            },
+            "onset_pitch_offset": {
+              "f1": 0.1627651713696936,
+              "support": 107
+            }
+          },
+          "successful_pair_count": 107
+        },
+        "Reese": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -2516,
+              "f1": 0.13678110112469918,
+              "false_negative_rate": 0.8711781303483047,
+              "false_positive_fraction": 0.8542113804114537,
+              "fn": 18834,
+              "fp": 16318,
+              "precision": 0.1457886195885463,
+              "prediction_count": 19103,
+              "recall": 0.12882186965169526,
+              "reference_count": 21619,
+              "tp": 2785
+            },
+            "onset_pitch": {
+              "count_bias": -35,
+              "f1": 0.020887728459530026,
+              "false_negative_rate": 0.9797297297297297,
+              "false_positive_fraction": 0.9784560143626571,
+              "fn": 580,
+              "fp": 545,
+              "precision": 0.02154398563734291,
+              "prediction_count": 557,
+              "recall": 0.02027027027027027,
+              "reference_count": 592,
+              "tp": 12
+            },
+            "onset_pitch_offset": {
+              "count_bias": -35,
+              "f1": 0.008703220191470844,
+              "false_negative_rate": 0.9915540540540541,
+              "false_positive_fraction": 0.9910233393177738,
+              "fn": 587,
+              "fp": 552,
+              "precision": 0.008976660682226212,
+              "prediction_count": 557,
+              "recall": 0.008445945945945946,
+              "reference_count": 592,
+              "tp": 5
+            }
+          },
+          "pair_count": 16,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.13431273592213064,
+              "support": 16
+            },
+            "onset_pitch": {
+              "f1": 0.025784335643490572,
+              "support": 16
+            },
+            "onset_pitch_offset": {
+              "f1": 0.011243386243386243,
+              "support": 16
+            }
+          },
+          "successful_pair_count": 16
+        },
+        "Seq": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -9611,
+              "f1": 0.17266381987967222,
+              "false_negative_rate": 0.8352800382958353,
+              "false_positive_fraction": 0.8185872900389081,
+              "fn": 87245,
+              "fp": 77634,
+              "precision": 0.18141270996109196,
+              "prediction_count": 94839,
+              "recall": 0.16471996170416467,
+              "reference_count": 104450,
+              "tp": 17205
+            },
+            "onset_pitch": {
+              "count_bias": 1273,
+              "f1": 0.09331852086970321,
+              "false_negative_rate": 0.883054892601432,
+              "false_positive_fraction": 0.922365988909427,
+              "fn": 2220,
+              "fp": 3493,
+              "precision": 0.07763401109057301,
+              "prediction_count": 3787,
+              "recall": 0.11694510739856802,
+              "reference_count": 2514,
+              "tp": 294
+            },
+            "onset_pitch_offset": {
+              "count_bias": 1273,
+              "f1": 0.028249484208855737,
+              "false_negative_rate": 0.9645982498011137,
+              "false_positive_fraction": 0.9764985476630579,
+              "fn": 2425,
+              "fp": 3698,
+              "precision": 0.02350145233694217,
+              "prediction_count": 3787,
+              "recall": 0.03540175019888624,
+              "reference_count": 2514,
+              "tp": 89
+            }
+          },
+          "pair_count": 42,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.1655316105228706,
+              "support": 42
+            },
+            "onset_pitch": {
+              "f1": 0.10089655807193389,
+              "support": 42
+            },
+            "onset_pitch_offset": {
+              "f1": 0.024349694483749282,
+              "support": 42
+            }
+          },
+          "successful_pair_count": 42
+        },
+        "Stab": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 3583,
+              "f1": 0.35777286505458444,
+              "false_negative_rate": 0.6104134610612002,
+              "false_positive_fraction": 0.6692372524230932,
+              "fn": 12298,
+              "fp": 15881,
+              "precision": 0.3307627475769069,
+              "prediction_count": 23730,
+              "recall": 0.3895865389387998,
+              "reference_count": 20147,
+              "tp": 7849
+            },
+            "onset_pitch": {
+              "count_bias": -74,
+              "f1": 0.3121516164994426,
+              "false_negative_rate": 0.7002141327623126,
+              "false_positive_fraction": 0.6744186046511628,
+              "fn": 654,
+              "fp": 580,
+              "precision": 0.32558139534883723,
+              "prediction_count": 860,
+              "recall": 0.29978586723768735,
+              "reference_count": 934,
+              "tp": 280
+            },
+            "onset_pitch_offset": {
+              "count_bias": -74,
+              "f1": 0.1393534002229654,
+              "false_negative_rate": 0.8661670235546038,
+              "false_positive_fraction": 0.8546511627906976,
+              "fn": 809,
+              "fp": 735,
+              "precision": 0.14534883720930233,
+              "prediction_count": 860,
+              "recall": 0.13383297644539616,
+              "reference_count": 934,
+              "tp": 125
+            }
+          },
+          "pair_count": 17,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.26642355347237123,
+              "support": 17
+            },
+            "onset_pitch": {
+              "f1": 0.22013518519213918,
+              "support": 17
+            },
+            "onset_pitch_offset": {
+              "f1": 0.10998719419961668,
+              "support": 17
+            }
+          },
+          "successful_pair_count": 17
+        },
+        "Sub": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 274,
+              "f1": 0.9398865784499055,
+              "false_negative_rate": 0.008771929824561403,
+              "false_positive_fraction": 0.10639827462257369,
+              "fn": 22,
+              "fp": 296,
+              "precision": 0.8936017253774263,
+              "prediction_count": 2782,
+              "recall": 0.9912280701754386,
+              "reference_count": 2508,
+              "tp": 2486
+            },
+            "onset_pitch": {
+              "count_bias": 6,
+              "f1": 0.7272727272727272,
+              "false_negative_rate": 0.2,
+              "false_positive_fraction": 0.3333333333333333,
+              "fn": 6,
+              "fp": 12,
+              "precision": 0.6666666666666666,
+              "prediction_count": 36,
+              "recall": 0.8,
+              "reference_count": 30,
+              "tp": 24
+            },
+            "onset_pitch_offset": {
+              "count_bias": 6,
+              "f1": 0.42424242424242425,
+              "false_negative_rate": 0.5333333333333333,
+              "false_positive_fraction": 0.6111111111111112,
+              "fn": 16,
+              "fp": 22,
+              "precision": 0.3888888888888889,
+              "prediction_count": 36,
+              "recall": 0.4666666666666667,
+              "reference_count": 30,
+              "tp": 14
+            }
+          },
+          "pair_count": 2,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.9378866059494577,
+              "support": 2
+            },
+            "onset_pitch": {
+              "f1": 0.7142857142857143,
+              "support": 2
+            },
+            "onset_pitch_offset": {
+              "f1": 0.44047619047619047,
+              "support": 2
+            }
+          },
+          "successful_pair_count": 2
+        },
+        "Synth": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -54567,
+              "f1": 0.4230839979864892,
+              "false_negative_rate": 0.6009035424766789,
+              "false_positive_fraction": 0.5498605414273995,
+              "fn": 289165,
+              "fp": 234598,
+              "precision": 0.4501394585726005,
+              "prediction_count": 426650,
+              "recall": 0.39909645752332107,
+              "reference_count": 481217,
+              "tp": 192052
+            },
+            "onset_pitch": {
+              "count_bias": -1152,
+              "f1": 0.25569218564061885,
+              "false_negative_rate": 0.7554813747060163,
+              "false_positive_fraction": 0.7320641782359298,
+              "fn": 9958,
+              "fp": 8806,
+              "precision": 0.26793582176407016,
+              "prediction_count": 12029,
+              "recall": 0.24451862529398377,
+              "reference_count": 13181,
+              "tp": 3223
+            },
+            "onset_pitch_offset": {
+              "count_bias": -1152,
+              "f1": 0.0633082110273701,
+              "false_negative_rate": 0.9394583112055231,
+              "false_positive_fraction": 0.9336603208911797,
+              "fn": 12383,
+              "fp": 11231,
+              "precision": 0.06633967910882035,
+              "prediction_count": 12029,
+              "recall": 0.0605416887944769,
+              "reference_count": 13181,
+              "tp": 798
+            }
+          },
+          "pair_count": 95,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.39437300362882216,
+              "support": 95
+            },
+            "onset_pitch": {
+              "f1": 0.2193824860227013,
+              "support": 95
+            },
+            "onset_pitch_offset": {
+              "f1": 0.07122664508667195,
+              "support": 95
+            }
+          },
+          "successful_pair_count": 95
+        },
+        "Vox": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": -1697,
+              "f1": 0.21003163126976954,
+              "false_negative_rate": 0.8001834231342428,
+              "false_positive_fraction": 0.7786526128643089,
+              "fn": 13960,
+              "fp": 12263,
+              "precision": 0.22134738713569116,
+              "prediction_count": 15749,
+              "recall": 0.19981657686575718,
+              "reference_count": 17446,
+              "tp": 3486
+            },
+            "onset_pitch": {
+              "count_bias": 311,
+              "f1": 0.015238095238095236,
+              "false_negative_rate": 0.9626168224299065,
+              "false_positive_fraction": 0.9904306220095693,
+              "fn": 103,
+              "fp": 414,
+              "precision": 0.009569377990430622,
+              "prediction_count": 418,
+              "recall": 0.037383177570093455,
+              "reference_count": 107,
+              "tp": 4
+            },
+            "onset_pitch_offset": {
+              "count_bias": 311,
+              "f1": 0.0,
+              "false_negative_rate": 1.0,
+              "false_positive_fraction": 1.0,
+              "fn": 107,
+              "fp": 418,
+              "precision": 0.0,
+              "prediction_count": 418,
+              "recall": 0.0,
+              "reference_count": 107,
+              "tp": 0
+            }
+          },
+          "pair_count": 3,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.1661019693906927,
+              "support": 3
+            },
+            "onset_pitch": {
+              "f1": 0.009732360097323601,
+              "support": 3
+            },
+            "onset_pitch_offset": {
+              "f1": 0.0,
+              "support": 3
+            }
+          },
+          "successful_pair_count": 3
+        }
+      },
+      "vital_style": {
+        "unknown": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "micro": {
+            "frames": {
+              "count_bias": 470072,
+              "f1": 0.3990833410507098,
+              "false_negative_rate": 0.584777605488303,
+              "false_positive_fraction": 0.6158480521159199,
+              "fn": 3398683,
+              "fp": 3868755,
+              "precision": 0.38415194788408014,
+              "prediction_count": 6281996,
+              "recall": 0.415222394511697,
+              "reference_count": 5811924,
+              "tp": 2413241
+            },
+            "onset_pitch": {
+              "count_bias": 36407,
+              "f1": 0.27814754113259677,
+              "false_negative_rate": 0.6873714604813337,
+              "false_positive_fraction": 0.7494829439724091,
+              "fn": 100935,
+              "fp": 137342,
+              "precision": 0.2505170560275909,
+              "prediction_count": 183249,
+              "recall": 0.3126285395186663,
+              "reference_count": 146842,
+              "tp": 45907
+            },
+            "onset_pitch_offset": {
+              "count_bias": 36407,
+              "f1": 0.09827592997082624,
+              "false_negative_rate": 0.889541139456014,
+              "false_positive_fraction": 0.9114865565432826,
+              "fn": 130622,
+              "fp": 167029,
+              "precision": 0.08851344345671737,
+              "prediction_count": 183249,
+              "recall": 0.11045886054398606,
+              "reference_count": 146842,
+              "tp": 16220
+            }
+          },
+          "pair_count": 1769,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.31551162219175916,
+              "support": 1769
+            },
+            "onset_pitch": {
+              "f1": 0.2232428171296013,
+              "support": 1769
+            },
+            "onset_pitch_offset": {
+              "f1": 0.08346016709387641,
+              "support": 1769
+            }
+          },
+          "successful_pair_count": 1769
+        }
+      }
+    },
+    "micro": {
+      "frames": {
+        "count_bias": 470072,
+        "f1": 0.3990833410507098,
+        "false_negative_rate": 0.584777605488303,
+        "false_positive_fraction": 0.6158480521159199,
+        "fn": 3398683,
+        "fp": 3868755,
+        "precision": 0.38415194788408014,
+        "prediction_count": 6281996,
+        "recall": 0.415222394511697,
+        "reference_count": 5811924,
+        "tp": 2413241
+      },
+      "onset_pitch": {
+        "count_bias": 36407,
+        "f1": 0.27814754113259677,
+        "false_negative_rate": 0.6873714604813337,
+        "false_positive_fraction": 0.7494829439724091,
+        "fn": 100935,
+        "fp": 137342,
+        "precision": 0.2505170560275909,
+        "prediction_count": 183249,
+        "recall": 0.3126285395186663,
+        "reference_count": 146842,
+        "tp": 45907
+      },
+      "onset_pitch_offset": {
+        "count_bias": 36407,
+        "f1": 0.09827592997082624,
+        "false_negative_rate": 0.889541139456014,
+        "false_positive_fraction": 0.9114865565432826,
+        "fn": 130622,
+        "fp": 167029,
+        "precision": 0.08851344345671737,
+        "prediction_count": 183249,
+        "recall": 0.11045886054398606,
+        "reference_count": 146842,
+        "tp": 16220
+      }
+    },
+    "pair_count": 1769,
+    "pair_macro": {
+      "frames": {
+        "f1": 0.31551162219175916,
+        "support": 1769
+      },
+      "onset_pitch": {
+        "f1": 0.2232428171296013,
+        "support": 1769
+      },
+      "onset_pitch_offset": {
+        "f1": 0.08346016709387641,
+        "support": 1769
+      }
+    },
+    "polyphony_by_source_role": {
+      "Vital": {
+        "monophonic": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "failure_analysis": {
+            "note": {
+              "additional_offset_false_negatives": 5518,
+              "onset_pitch_false_negatives": 21539,
+              "onset_pitch_false_positives": 23608
+            },
+            "pitch": {
+              "assigned_near_onset_errors": 6653,
+              "octave_error_count": 5059,
+              "unassigned_near_onset_errors": 31841
+            },
+            "timing": {
+              "duration": {
+                "mae": 0.1393134535750786,
+                "signed_mean": 0.09137453460832004,
+                "support": 8649
+              },
+              "offset": {
+                "mae": 0.14045023324100342,
+                "signed_mean": 0.0947182934033627,
+                "support": 8649
+              },
+              "onset": {
+                "mae": 0.011180433610099412,
+                "signed_mean": 0.0033437587950427795,
+                "support": 8649
+              }
+            },
+            "velocity": {
+              "mae": 30.74378540871777,
+              "signed_mean": -26.696612325124292,
+              "support": 8649
+            }
+          },
+          "micro": {
+            "frames": {
+              "count_bias": 363409,
+              "f1": 0.2662991089503279,
+              "false_negative_rate": 0.6503114110522488,
+              "false_positive_fraction": 0.7849769676084144,
+              "fn": 377351,
+              "fp": 740760,
+              "precision": 0.21502303239158563,
+              "prediction_count": 943671,
+              "recall": 0.3496885889477512,
+              "reference_count": 580262,
+              "tp": 202911
+            },
+            "onset_pitch": {
+              "count_bias": 2069,
+              "f1": 0.27701177035791497,
+              "false_negative_rate": 0.7134954286471445,
+              "false_positive_fraction": 0.7318721517810087,
+              "fn": 21539,
+              "fp": 23608,
+              "precision": 0.2681278482189912,
+              "prediction_count": 32257,
+              "recall": 0.28650457135285545,
+              "reference_count": 30188,
+              "tp": 8649
+            },
+            "onset_pitch_offset": {
+              "count_bias": 2069,
+              "f1": 0.10028024661702298,
+              "false_negative_rate": 0.8962832913740559,
+              "false_positive_fraction": 0.9029357968812971,
+              "fn": 27057,
+              "fp": 29126,
+              "precision": 0.09706420311870291,
+              "prediction_count": 32257,
+              "recall": 0.10371670862594408,
+              "reference_count": 30188,
+              "tp": 3131
+            }
+          },
+          "pair_count": 619,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.23754317080779094,
+              "support": 619
+            },
+            "onset_pitch": {
+              "f1": 0.2103802204062786,
+              "support": 619
+            },
+            "onset_pitch_offset": {
+              "f1": 0.08235298778639413,
+              "support": 619
+            }
+          },
+          "successful_pair_count": 619
+        },
+        "polyphonic": {
+          "coverage": 1.0,
+          "failed_pair_count": 0,
+          "failure_analysis": {
+            "note": {
+              "additional_offset_false_negatives": 24169,
+              "onset_pitch_false_negatives": 79396,
+              "onset_pitch_false_positives": 113734
+            },
+            "pitch": {
+              "assigned_near_onset_errors": 9517,
+              "octave_error_count": 6359,
+              "unassigned_near_onset_errors": 174096
+            },
+            "timing": {
+              "duration": {
+                "mae": 0.2991222896508473,
+                "signed_mean": -0.09927343756007145,
+                "support": 37258
+              },
+              "offset": {
+                "mae": 0.29914565183193176,
+                "signed_mean": -0.09541132364872935,
+                "support": 37258
+              },
+              "onset": {
+                "mae": 0.011145341352061695,
+                "signed_mean": 0.0038621139113420664,
+                "support": 37258
+              }
+            },
+            "velocity": {
+              "mae": 29.872081163776908,
+              "signed_mean": -20.81630790702668,
+              "support": 37258
+            }
+          },
+          "micro": {
+            "frames": {
+              "count_bias": 106663,
+              "f1": 0.41822757208689093,
+              "false_negative_rate": 0.5775090210338512,
+              "false_positive_fraction": 0.5859506493141575,
+              "fn": 3021332,
+              "fp": 3127995,
+              "precision": 0.4140493506858425,
+              "prediction_count": 5338325,
+              "recall": 0.4224909789661488,
+              "reference_count": 5231662,
+              "tp": 2210330
+            },
+            "onset_pitch": {
+              "count_bias": 34338,
+              "f1": 0.2784125299836351,
+              "false_negative_rate": 0.680611037769815,
+              "false_positive_fraction": 0.7532452050439759,
+              "fn": 79396,
+              "fp": 113734,
+              "precision": 0.24675479495602415,
+              "prediction_count": 150992,
+              "recall": 0.319388962230185,
+              "reference_count": 116654,
+              "tp": 37258
+            },
+            "onset_pitch_offset": {
+              "count_bias": 34338,
+              "f1": 0.09780829902184228,
+              "false_negative_rate": 0.8877963893222692,
+              "false_positive_fraction": 0.9133132881212249,
+              "fn": 103565,
+              "fp": 137903,
+              "precision": 0.08668671187877504,
+              "prediction_count": 150992,
+              "recall": 0.11220361067773073,
+              "reference_count": 116654,
+              "tp": 13089
+            }
+          },
+          "pair_count": 1150,
+          "pair_macro": {
+            "frames": {
+              "f1": 0.3574789886323472,
+              "support": 1150
+            },
+            "onset_pitch": {
+              "f1": 0.2301662496267637,
+              "support": 1150
+            },
+            "onset_pitch_offset": {
+              "f1": 0.08405611839068645,
+              "support": 1150
+            }
+          },
+          "successful_pair_count": 1150
+        }
+      }
+    },
+    "successful_pair_count": 1769
+  },
+  "backend": {
+    "backend_id": "pytorch_xpu",
+    "boundary": "end_to_end_audio_to_note_event",
+    "contract_version": 1,
+    "device": "xpu:0",
+    "precision": "float32"
+  },
+  "category_findings": {
+    "duration_class": {
+      "highest": {
+        "category": "medium",
+        "onset_pitch_f1": 0.3332361637446383,
+        "pair_count": 388,
+        "support": "well_supported"
+      },
+      "highest_well_supported": {
+        "category": "medium",
+        "onset_pitch_f1": 0.3332361637446383,
+        "pair_count": 388,
+        "support": "well_supported"
+      },
+      "lowest": {
+        "category": "short",
+        "onset_pitch_f1": 0.16513761467889912,
+        "pair_count": 13,
+        "support": "small_subset"
+      },
+      "lowest_well_supported": {
+        "category": "long",
+        "onset_pitch_f1": 0.27390309291832865,
+        "pair_count": 1368,
+        "support": "well_supported"
+      },
+      "metric": "onset_pitch_f1",
+      "support_rule": "well_supported >=100 pairs; moderately_supported 30-99; small_subset <30"
+    },
+    "note_density_class": {
+      "highest": {
+        "category": "high",
+        "onset_pitch_f1": 0.32849895049943567,
+        "pair_count": 222,
+        "support": "well_supported"
+      },
+      "highest_well_supported": {
+        "category": "high",
+        "onset_pitch_f1": 0.32849895049943567,
+        "pair_count": 222,
+        "support": "well_supported"
+      },
+      "lowest": {
+        "category": "low",
+        "onset_pitch_f1": 0.10205527994330263,
+        "pair_count": 512,
+        "support": "well_supported"
+      },
+      "lowest_well_supported": {
+        "category": "low",
+        "onset_pitch_f1": 0.10205527994330263,
+        "pair_count": 512,
+        "support": "well_supported"
+      },
+      "metric": "onset_pitch_f1",
+      "support_rule": "well_supported >=100 pairs; moderately_supported 30-99; small_subset <30"
+    },
+    "pitch_register_class": {
+      "highest": {
+        "category": "mid",
+        "onset_pitch_f1": 0.2906583127950827,
+        "pair_count": 1292,
+        "support": "well_supported"
+      },
+      "highest_well_supported": {
+        "category": "mid",
+        "onset_pitch_f1": 0.2906583127950827,
+        "pair_count": 1292,
+        "support": "well_supported"
+      },
+      "lowest": {
+        "category": "low",
+        "onset_pitch_f1": 0.17311256266140057,
+        "pair_count": 322,
+        "support": "well_supported"
+      },
+      "lowest_well_supported": {
+        "category": "low",
+        "onset_pitch_f1": 0.17311256266140057,
+        "pair_count": 322,
+        "support": "well_supported"
+      },
+      "metric": "onset_pitch_f1",
+      "support_rule": "well_supported >=100 pairs; moderately_supported 30-99; small_subset <30"
+    },
+    "polyphony_class": {
+      "highest": {
+        "category": "polyphonic",
+        "onset_pitch_f1": 0.2784125299836351,
+        "pair_count": 1150,
+        "support": "well_supported"
+      },
+      "highest_well_supported": {
+        "category": "polyphonic",
+        "onset_pitch_f1": 0.2784125299836351,
+        "pair_count": 1150,
+        "support": "well_supported"
+      },
+      "lowest": {
+        "category": "monophonic",
+        "onset_pitch_f1": 0.27701177035791497,
+        "pair_count": 619,
+        "support": "well_supported"
+      },
+      "lowest_well_supported": {
+        "category": "monophonic",
+        "onset_pitch_f1": 0.27701177035791497,
+        "pair_count": 619,
+        "support": "well_supported"
+      },
+      "metric": "onset_pitch_f1",
+      "support_rule": "well_supported >=100 pairs; moderately_supported 30-99; small_subset <30"
+    },
+    "type": {
+      "highest": {
+        "category": "Sub",
+        "onset_pitch_f1": 0.7272727272727272,
+        "pair_count": 2,
+        "support": "small_subset"
+      },
+      "highest_well_supported": {
+        "category": "Pluck",
+        "onset_pitch_f1": 0.5097887401836081,
+        "pair_count": 107,
+        "support": "well_supported"
+      },
+      "lowest": {
+        "category": "Drums",
+        "onset_pitch_f1": 0.0012300123001230013,
+        "pair_count": 45,
+        "support": "moderately_supported"
+      },
+      "lowest_well_supported": {
+        "category": "Pad",
+        "onset_pitch_f1": 0.07372087711283691,
+        "pair_count": 161,
+        "support": "well_supported"
+      },
+      "metric": "onset_pitch_f1",
+      "support_rule": "well_supported >=100 pairs; moderately_supported 30-99; small_subset <30"
+    }
+  },
+  "decoder": {
+    "frame_threshold": 0.3,
+    "infer_onsets": true,
+    "maximum_frequency": null,
+    "melodia_trick": true,
+    "minimum_frequency": null,
+    "minimum_note_length_frames": 11,
+    "onset_threshold": 0.5
+  },
+  "failure_code": null,
+  "format_version": 1,
+  "interpretation": {
+    "meaning": "Quality describes the frozen Basic Pitch performance prior; it is not a claim about source audio reconstruction or an OBRUXO training objective.",
+    "measured": "Aggregate values are computed from successful pair results using fixed stock Basic Pitch decoding and no threshold tuning."
+  },
+  "model": {
+    "model_id": "spotify-basic-pitch-icassp-2022-v0.4.0",
+    "source_git_blob_sha1": "c30e5f9438e798604b7177aa26be1fe64482f767"
+  },
+  "pairing": {
+    "ambiguous_count": 14,
+    "candidate_count": 9620,
+    "corpus_layout": "direct child directory with exact one-to-one extensions",
+    "derived_render_opt_in": true,
+    "eligible_count": 1769,
+    "excluded_by_reason": {
+      "pair.ambiguous": 14,
+      "pair.derived_render_failed": 1,
+      "pair.empty_reference": 75,
+      "pair.invalid_midi": 23,
+      "pair.missing_midi": 7738
+    },
+    "excluded_count": 7837,
+    "selected_pairing_methods": [
+      "same_directory_exact_one_midi_derived_render"
+    ],
+    "source_stat_mismatches": 0,
+    "source_stat_records": 11518,
+    "spot_check": {
+      "count": 8,
+      "discrepancies": 0,
+      "status": "passed"
+    }
+  },
+  "runtime_provenance": {
+    "consistency": "exact_issue_24_decision_consumed",
+    "decision_identity_match": true,
+    "interpretation": "The full-corpus quality result is attributed to the exact #24-selected runtime. It does not establish quality equivalence for any other backend.",
+    "issue_24_observed_highest_batch_1_audio_seconds_per_second": 238.367657286303,
+    "issue_24_observed_highest_batch_1_route": "pytorch_xpu",
+    "issue_24_observed_highest_end_to_end_audio_seconds_per_wall_second": 96.02734978647123,
+    "issue_24_observed_highest_end_to_end_route": "pytorch_xpu",
+    "selected_backend": "pytorch_xpu",
+    "selected_contract": "end_to_end_audio_to_note_event",
+    "selected_device": "xpu:0",
+    "selection_rationale": "#24 selected `pytorch_xpu` by the recorded rule: highest median end-to-end audio-seconds/wall-second among successful parity-safe inference routes. #25 consumed that backend, device, precision, boundary, and supporting run identity exactly; no fallback was used.",
+    "selection_rule": "highest median end-to-end audio-seconds/wall-second among successful parity-safe inference routes",
+    "selection_source": "#24 corpus_inference_decision",
+    "supporting_measurement": {
+      "audio_seconds_per_wall_second_median": 96.02734978647123,
+      "model_call_batch_1_audio_seconds_per_second_median": 238.367657286303
+    }
+  },
+  "status": "ok"
+}

@@ -14,4 +14,5 @@ dependencies:
       - onnxruntime==1.26.0
       - openvino==2026.2.1
       - psutil==7.2.2
+      - mir_eval==0.8.2
       - pedalboard==0.9.24

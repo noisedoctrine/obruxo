@@ -557,6 +557,7 @@ class PedalboardVitalRenderer:
     sample_rate = 44_100
     channels = 2
     tail_seconds = 2.0
+    midi_timestamp_epsilon_seconds = 1e-9
 
     def __init__(
         self,
@@ -671,9 +672,24 @@ class PedalboardVitalRenderer:
         self, performance: Any, tempo_map: Any
     ) -> list[tuple[bytes, float]]:
         messages: list[tuple[bytes, float]] = []
+        previous_source_timestamp = -float("inf")
+        previous_emitted_timestamp = -float("inf")
         for event in performance.canonical_events():
+            if event.kind.value in {"tempo", "time_signature", "opaque"}:
+                continue
             channel = 0 if event.channel is None else int(event.channel)
-            timestamp = float(tempo_map.tick_to_seconds(event.tick))
+            source_timestamp = float(tempo_map.tick_to_seconds(event.tick))
+            if source_timestamp < previous_source_timestamp:
+                raise ValueError(
+                    "Performance events are not ordered by absolute timestamp"
+                )
+            timestamp = source_timestamp
+            if timestamp <= previous_emitted_timestamp:
+                timestamp = (
+                    previous_emitted_timestamp + self.midi_timestamp_epsilon_seconds
+                )
+            previous_source_timestamp = source_timestamp
+            previous_emitted_timestamp = timestamp
             if event.kind.value == "note_on":
                 message = bytes(
                     (0x90 | channel, int(event.data[0]), int(event.data[1]))
@@ -697,6 +713,71 @@ class PedalboardVitalRenderer:
                 raise ValueError(f"unsupported MIDI event kind: {event.kind.value}")
             messages.append((message, timestamp))
         return messages
+
+    def _process_exact_frames(
+        self,
+        state: bytes,
+        messages: list[tuple[bytes, float]],
+        frame_count: int,
+        np: Any,
+    ) -> tuple[Any, float, str]:
+        semantic_duration = frame_count / self.sample_rate
+
+        def process(duration: float) -> Any:
+            self._plugin.reset()
+            self._plugin.raw_state = state
+            self._plugin.reset()
+            return np.asarray(
+                self._plugin.process(
+                    messages,
+                    duration=duration,
+                    sample_rate=self.sample_rate,
+                    num_channels=self.channels,
+                    buffer_size=self.buffer_size,
+                    reset=True,
+                ),
+                dtype=np.float32,
+            )
+
+        audio = process(semantic_duration)
+        if audio.ndim != 2 or audio.shape[0] != self.channels:
+            raise ValueError("Pedalboard returned an unexpected channel layout")
+        observed_frames = int(audio.shape[1])
+        if observed_frames == frame_count:
+            return audio, semantic_duration, "none"
+        if abs(observed_frames - frame_count) != 1:
+            raise ValueError(
+                f"Pedalboard returned an unexpected frame count ({observed_frames} != {frame_count})"
+            )
+        if observed_frames > frame_count:
+            return (
+                audio[:, :frame_count],
+                semantic_duration,
+                f"host-boundary trim ({observed_frames}->{frame_count})",
+            )
+        correction = 0.5 if observed_frames < frame_count else -0.5
+        corrected_duration = (frame_count + correction) / self.sample_rate
+        audio = process(corrected_duration)
+        if audio.ndim != 2 or audio.shape[0] != self.channels:
+            raise ValueError(
+                "Pedalboard returned an unexpected corrected channel layout"
+            )
+        corrected_frames = int(audio.shape[1])
+        if corrected_frames == frame_count:
+            return (
+                audio,
+                corrected_duration,
+                f"half-frame correction ({observed_frames}->{frame_count})",
+            )
+        if observed_frames < frame_count and corrected_frames == frame_count + 1:
+            return (
+                audio[:, :frame_count],
+                corrected_duration,
+                f"host-boundary trim ({corrected_frames}->{frame_count})",
+            )
+        raise ValueError(
+            f"Pedalboard returned an unexpected corrected frame count ({corrected_frames} != {frame_count})"
+        )
 
     def render(
         self, preset_path: Path, midi_path: Path, destination: Path, output_root: Path
@@ -738,24 +819,24 @@ class PedalboardVitalRenderer:
                 for event in performance.canonical_events()
                 if event.kind.value == "tempo"
             ]
+            tempo_setting_status = "not_applicable"
+            tempo_bpm = None
             if tempo_events and hasattr(self._plugin, "beats_per_minute"):
-                self._plugin.beats_per_minute = 60_000_000 / tempo_events[0].data[0]
+                tempo_bpm = 60_000_000 / tempo_events[0].data[0]
+                try:
+                    self._plugin.beats_per_minute = tempo_bpm
+                    tempo_setting_status = "applied"
+                except (TypeError, ValueError):
+                    tempo_setting_status = "host_rejected_value_not_clamped"
             frame_count = timing.render_frame_count(
                 performance.end_tick, self.tail_seconds, self.sample_rate
             )
             duration = frame_count / self.sample_rate
-            host_duration = (frame_count + 0.5) / self.sample_rate
-            audio = self._plugin.process(
-                self._timestamped_midi(performance, timing),
-                duration=host_duration,
-                sample_rate=self.sample_rate,
-                num_channels=self.channels,
-                buffer_size=self.buffer_size,
-                reset=True,
+            channel_first, host_duration, duration_rounding = (
+                self._process_exact_frames(
+                    state, self._timestamped_midi(performance, timing), frame_count, np
+                )
             )
-            channel_first = np.asarray(audio, dtype=np.float32)
-            if channel_first.ndim != 2 or channel_first.shape[0] != self.channels:
-                raise ValueError("Pedalboard returned an unexpected channel layout")
             rendered = np.ascontiguousarray(channel_first.T)
             if rendered.shape != (frame_count, self.channels) or not bool(
                 np.isfinite(rendered).all()
@@ -799,8 +880,12 @@ class PedalboardVitalRenderer:
                 "tail_seconds": self.tail_seconds,
                 "duration_seconds": duration,
                 "host_duration_seconds": host_duration,
-                "duration_rounding": "half-frame guard to preserve the exact frame count in Pedalboard",
+                "duration_rounding": duration_rounding,
                 "event_timing": "TempoMap tick-to-second timestamped MIDI",
+                "source_tempo_bpm": tempo_bpm,
+                "host_tempo_setting_status": tempo_setting_status,
+                "midi_timestamp_epsilon_seconds": self.midi_timestamp_epsilon_seconds,
+                "midi_timestamp_policy": "duplicate absolute timestamps separated only for Pedalboard host compatibility",
                 "source_preset_path": str(preset_path.resolve()),
                 "source_midi_path": str(midi_path.resolve()),
                 "audio_label": "derived_render",
