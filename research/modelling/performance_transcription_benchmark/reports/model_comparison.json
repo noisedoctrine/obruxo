@@ -4,18 +4,35 @@
     "no_composite_winner": true,
     "quality_contract": "landed_issue_25_metrics_and_10000_replicate_seed_0_bootstrap",
     "quantization_contract": "cpu_dynamic_qint8_ordinary_linear_only",
-    "status": "comparative_partial_measured"
+    "same_successful_population": {
+      "basic_pitch_note": "Basic Pitch is excluded because its inherited #25 public aggregate does not expose row-level results for constructing this intersection; its full-population baseline is reported separately.",
+      "frame_comparable": {
+        "eligible_pairs": 0,
+        "interpretation": "Diagnostic success-only comparison on the exact pair intersection completed by every listed candidate; it does not replace full-population coverage or failure-penalized views.",
+        "model_ids": [],
+        "models": [],
+        "scope": "alternative_candidates_with_frame_or_note_event_outputs"
+      },
+      "note_event": {
+        "eligible_pairs": 0,
+        "interpretation": "Diagnostic success-only comparison on the exact pair intersection completed by every listed candidate; it does not replace full-population coverage or failure-penalized views.",
+        "model_ids": [],
+        "models": [],
+        "scope": "alternative_candidates_with_native_note_events"
+      }
+    },
+    "status": "partial_executable_candidates"
   },
   "conclusion": {
     "bounded_diagnostic": "A separate bounded #24 diagnostic compiled OpenVINO GPU with INFERENCE_PRECISION_HINT=float32 while retaining PERFORMANCE and passed parity on five public synthetic windows. This is a parity result, not a performance/resource result.",
-    "cost": "Cost rows remain separate by route and are unavailable when the fixed smoke input or candidate runtime is unavailable.",
+    "cost": "Cost rows remain separate by candidate route, with unsupported or failed routes explicitly reported rather than replaced by fallback measurements.",
     "later_integration": "No candidate is promoted without executable common-corpus evidence.",
-    "measured": "Directly measured evidence exists for basic_pitch, timbre_trap_base, muscriptor_small, muscriptor_medium. Basic Pitch retains the landed #24/#25 route and corpus evidence; alternative rows are limited to the successful candidate executions recorded in this report.",
-    "not_measured": "No executable comparative result is available for ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_large; those candidates remain blocked or unavailable.",
-    "quality": "No quality score is published for unavailable models or an empty eligible population.",
+    "measured": "Measured evidence exists for basic_pitch, timbre_trap_base, muscriptor_small, muscriptor_medium. Basic Pitch contributes the inherited #25 quality and #24 route/cost baseline; executable alternatives contribute #26 corpus-quality evidence, but no standardized alternative-model cost row was completed. Partial scored populations are not complete correctness results, and their unscored rows are not treated as failures.",
+    "not_measured": "The remaining candidate execution states are ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_large; their quality, cost, memory, backward, and quantization results are not inferred from metadata or from other models. Partial scored-population candidates still require full-population correctness confirmation.",
+    "quality": "Quality is published only for candidates with an executed #25-compatible population; globally unavailable models receive no invented F1.",
     "representation": "Representation and licensing are inventories, not an integration decision.",
     "sourced": "The candidate inventory establishes model identity, representation, architecture boundary, native rate/batch semantics, and licensing where verified, but none of these facts ranks execution quality or cost.",
-    "unresolved": "Quality/cost questions remain unresolved for ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_large, and any execution/resource quantity not present in a candidate's recorded output remains unmeasured."
+    "unresolved": "Comparative questions remain for unavailable candidates `ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_large` and partial scored populations `timbre_trap_base, muscriptor_medium`; measured candidates must be compared by separate quality and cost evidence rather than a composite winner."
   },
   "evidence": {
     "adapter_scope": "The repository contains an implemented pinned-official adapter path for every required candidate family. An implemented adapter is not treated as executed when its source, checkpoint, dependency, or credential prerequisite is unavailable.",
@@ -26,27 +43,34 @@
       "muscriptor_small",
       "muscriptor_medium"
     ],
-    "measured_scope": "Executable evidence exists for basic_pitch, timbre_trap_base, muscriptor_small, muscriptor_medium. Basic Pitch quality/cost evidence is inherited from #24/#25; alternative-model rows are consumed from their recorded pair evaluations.",
+    "measured_scope": "Executable evidence is present for basic_pitch, timbre_trap_base, muscriptor_small, muscriptor_medium. Basic Pitch quality and cost evidence are inherited from #25/#24; timbre_trap_base, muscriptor_small, muscriptor_medium produced new #26 evidence in the unchanged py312 runtime. Partial scored populations are explicitly identified for timbre_trap_base, muscriptor_medium; rows not reached before the experiment ended are unscored, not failures.",
     "metadata_only_models": [
       "ymt3_plus",
       "yptf_multi",
       "yptf_moe_multi",
       "muscriptor_large"
     ],
-    "not_measured_scope": "No executable comparative result is available for ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_large; those candidates remain blocked or unavailable.",
+    "not_measured_scope": "No quality/cost conclusion is available for ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_large; these candidates were either externally blocked or failed before producing executable evidence.",
+    "partial_measurement_models": [
+      "timbre_trap_base",
+      "muscriptor_medium"
+    ],
     "sourced_scope": "Candidate source, checkpoint, representation, architecture boundary, native sample rate, batch semantics, and license fields are verified inventory facts; they are not performance measurements.",
-    "unresolved_scope": "Quality/cost questions remain unresolved for ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_large, and any execution/resource quantity not present in a candidate's recorded output remains unmeasured."
+    "unresolved_scope": "The intended comparative benchmark remains incomplete for unavailable candidates `ymt3_plus, yptf_multi, yptf_moe_multi, muscriptor_large` and partial scored populations `timbre_trap_base, muscriptor_medium`; measured candidates are reported separately and no unavailable candidate receives a fabricated score."
   },
   "format_version": 1,
   "models": [
     {
       "availability_reason": null,
       "execution": {
+        "adapter_configuration": null,
         "adapter_status": "landed_baseline",
         "backend_routes": null,
         "backward": null,
+        "cache_reuse_policy": null,
         "devices": null,
         "eligible_pairs": null,
+        "execution_note": null,
         "failed_pairs": null,
         "failure_code": null,
         "measured_pairs": null,
@@ -2853,6 +2877,7 @@
             "status": "ok"
           }
         ],
+        "segment_batch_sizes_observed": null,
         "source": "landed_issue_24_report",
         "status": "measured",
         "successful_pairs": null,
@@ -2978,6 +3003,7 @@
         "quality_failure_code": null,
         "quality_status": "ok"
       },
+      "measurement_status": "complete",
       "model_id": "basic_pitch",
       "output_contract": "note_and_frame",
       "publication_year": 2022,
@@ -13592,24 +13618,29 @@
         "event": "stock_polyphonic_decoder"
       },
       "resources": null,
+      "scoring_note": null,
+      "scoring_status": null,
       "status": "ok"
     },
     {
       "availability_reason": "approved py312 storage has no pinned Timbre-Trap checkout or checkpoint",
       "execution": {
+        "adapter_configuration": null,
         "adapter_status": "implemented_official_path",
         "backend_routes": [
           "pytorch_cuda"
         ],
         "backward": null,
+        "cache_reuse_policy": null,
         "devices": [
           "cuda"
         ],
         "eligible_pairs": 1769,
+        "execution_note": null,
         "failed_pairs": 54,
         "failure_code": null,
         "measured_pairs": 1715,
-        "measurement_status": null,
+        "measurement_status": "partial_unscored_population",
         "missing_pairs": 54,
         "native_batch_sizes": [
           1
@@ -13622,6 +13653,7 @@
         "resources": null,
         "route_failures": [],
         "routes": [],
+        "segment_batch_sizes_observed": null,
         "source": "cached_remote_timbre_trap_native_outputs",
         "status": "measured_partial_cached",
         "successful_pairs": 1715,
@@ -13673,6 +13705,7 @@
         "unavailability_reason": "approved py312 storage has no pinned Timbre-Trap checkout or checkpoint",
         "weight_license": "upstream_space_license_not_separately_declared"
       },
+      "measurement_status": "partial_unscored_population",
       "model_id": "timbre_trap_base",
       "output_contract": "frame_pitch",
       "publication_year": 2024,
@@ -13868,8 +13901,14 @@
                   "tp": 0
                 }
               },
-              "successful_pairs": 1715
+              "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "scored_pairs": 1715,
+              "status": "not_applicable_unscored_only",
+              "successful_pairs": 1715,
+              "unscored_pairs": 54
             },
+            "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+            "scoring_status": "partial_unscored_population",
             "success_only": {
               "aggregate": {
                 "bootstrap": {
@@ -13896,6 +13935,7 @@
                   "seed": 0
                 },
                 "coverage": 0.9694742792538157,
+                "eligible_pair_count": 1769,
                 "failed_pair_count": 54,
                 "failure_analysis": {
                   "note": {
@@ -13987,7 +14027,9 @@
                     "support": 0
                   }
                 },
-                "successful_pair_count": 1715
+                "scored_pair_count": 1715,
+                "successful_pair_count": 1715,
+                "unscored_pair_count": 54
               },
               "bootstrap": {
                 "cluster_count": 1715,
@@ -14056,7 +14098,11 @@
                   "tp": 0
                 }
               },
-              "successful_pairs": 1715
+              "scored_pairs": 1715,
+              "successful_pairs": 1715,
+              "unscored_pairs": 54,
+              "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "view_status": "scored_only"
             }
           },
           "shared_population": {
@@ -14249,8 +14295,14 @@
                   "tp": 0
                 }
               },
-              "successful_pairs": 1715
+              "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "scored_pairs": 1715,
+              "status": "not_applicable_unscored_only",
+              "successful_pairs": 1715,
+              "unscored_pairs": 0
             },
+            "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+            "scoring_status": "partial_unscored_population",
             "success_only": {
               "aggregate": {
                 "bootstrap": {
@@ -14277,6 +14329,7 @@
                   "seed": 0
                 },
                 "coverage": 1.0,
+                "eligible_pair_count": 1715,
                 "failed_pair_count": 0,
                 "failure_analysis": {
                   "note": {
@@ -14368,7 +14421,9 @@
                     "support": 0
                   }
                 },
-                "successful_pair_count": 1715
+                "scored_pair_count": 1715,
+                "successful_pair_count": 1715,
+                "unscored_pair_count": 0
               },
               "bootstrap": {
                 "cluster_count": 1715,
@@ -14437,7 +14492,11 @@
                   "tp": 0
                 }
               },
-              "successful_pairs": 1715
+              "scored_pairs": 1715,
+              "successful_pairs": 1715,
+              "unscored_pairs": 0,
+              "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "view_status": "scored_only"
             }
           },
           "shared_under_10_seconds": {
@@ -14630,8 +14689,14 @@
                   "tp": 0
                 }
               },
-              "successful_pairs": 558
+              "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "scored_pairs": 558,
+              "status": "not_applicable_unscored_only",
+              "successful_pairs": 558,
+              "unscored_pairs": 0
             },
+            "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+            "scoring_status": "partial_unscored_population",
             "success_only": {
               "aggregate": {
                 "bootstrap": {
@@ -14658,6 +14723,7 @@
                   "seed": 0
                 },
                 "coverage": 1.0,
+                "eligible_pair_count": 558,
                 "failed_pair_count": 0,
                 "failure_analysis": {
                   "note": {
@@ -14749,7 +14815,9 @@
                     "support": 0
                   }
                 },
-                "successful_pair_count": 558
+                "scored_pair_count": 558,
+                "successful_pair_count": 558,
+                "unscored_pair_count": 0
               },
               "bootstrap": {
                 "cluster_count": 558,
@@ -14818,7 +14886,11 @@
                   "tp": 0
                 }
               },
-              "successful_pairs": 558
+              "scored_pairs": 558,
+              "successful_pairs": 558,
+              "unscored_pairs": 0,
+              "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "view_status": "scored_only"
             }
           },
           "shared_under_15_seconds": {
@@ -15011,8 +15083,14 @@
                   "tp": 0
                 }
               },
-              "successful_pairs": 843
+              "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "scored_pairs": 843,
+              "status": "not_applicable_unscored_only",
+              "successful_pairs": 843,
+              "unscored_pairs": 0
             },
+            "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+            "scoring_status": "partial_unscored_population",
             "success_only": {
               "aggregate": {
                 "bootstrap": {
@@ -15039,6 +15117,7 @@
                   "seed": 0
                 },
                 "coverage": 1.0,
+                "eligible_pair_count": 843,
                 "failed_pair_count": 0,
                 "failure_analysis": {
                   "note": {
@@ -15130,7 +15209,9 @@
                     "support": 0
                   }
                 },
-                "successful_pair_count": 843
+                "scored_pair_count": 843,
+                "successful_pair_count": 843,
+                "unscored_pair_count": 0
               },
               "bootstrap": {
                 "cluster_count": 843,
@@ -15199,7 +15280,11 @@
                   "tp": 0
                 }
               },
-              "successful_pairs": 843
+              "scored_pairs": 843,
+              "successful_pairs": 843,
+              "unscored_pairs": 0,
+              "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "view_status": "scored_only"
             }
           },
           "shared_under_5_seconds": {
@@ -15392,8 +15477,14 @@
                   "tp": 0
                 }
               },
-              "successful_pairs": 97
+              "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "scored_pairs": 97,
+              "status": "not_applicable_unscored_only",
+              "successful_pairs": 97,
+              "unscored_pairs": 0
             },
+            "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+            "scoring_status": "partial_unscored_population",
             "success_only": {
               "aggregate": {
                 "bootstrap": {
@@ -15420,6 +15511,7 @@
                   "seed": 0
                 },
                 "coverage": 1.0,
+                "eligible_pair_count": 97,
                 "failed_pair_count": 0,
                 "failure_analysis": {
                   "note": {
@@ -15511,7 +15603,9 @@
                     "support": 0
                   }
                 },
-                "successful_pair_count": 97
+                "scored_pair_count": 97,
+                "successful_pair_count": 97,
+                "unscored_pair_count": 0
               },
               "bootstrap": {
                 "cluster_count": 97,
@@ -15580,7 +15674,11 @@
                   "tp": 0
                 }
               },
-              "successful_pairs": 97
+              "scored_pairs": 97,
+              "successful_pairs": 97,
+              "unscored_pairs": 0,
+              "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "view_status": "scored_only"
             }
           },
           "under_10_seconds": {
@@ -15773,8 +15871,14 @@
                   "tp": 0
                 }
               },
-              "successful_pairs": 558
+              "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "scored_pairs": 558,
+              "status": "not_applicable_unscored_only",
+              "successful_pairs": 558,
+              "unscored_pairs": 0
             },
+            "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+            "scoring_status": "partial_unscored_population",
             "success_only": {
               "aggregate": {
                 "bootstrap": {
@@ -15801,6 +15905,7 @@
                   "seed": 0
                 },
                 "coverage": 1.0,
+                "eligible_pair_count": 558,
                 "failed_pair_count": 0,
                 "failure_analysis": {
                   "note": {
@@ -15892,7 +15997,9 @@
                     "support": 0
                   }
                 },
-                "successful_pair_count": 558
+                "scored_pair_count": 558,
+                "successful_pair_count": 558,
+                "unscored_pair_count": 0
               },
               "bootstrap": {
                 "cluster_count": 558,
@@ -15961,7 +16068,11 @@
                   "tp": 0
                 }
               },
-              "successful_pairs": 558
+              "scored_pairs": 558,
+              "successful_pairs": 558,
+              "unscored_pairs": 0,
+              "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "view_status": "scored_only"
             }
           },
           "under_15_seconds": {
@@ -16154,8 +16265,14 @@
                   "tp": 0
                 }
               },
-              "successful_pairs": 843
+              "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "scored_pairs": 843,
+              "status": "not_applicable_unscored_only",
+              "successful_pairs": 843,
+              "unscored_pairs": 0
             },
+            "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+            "scoring_status": "partial_unscored_population",
             "success_only": {
               "aggregate": {
                 "bootstrap": {
@@ -16182,6 +16299,7 @@
                   "seed": 0
                 },
                 "coverage": 1.0,
+                "eligible_pair_count": 843,
                 "failed_pair_count": 0,
                 "failure_analysis": {
                   "note": {
@@ -16273,7 +16391,9 @@
                     "support": 0
                   }
                 },
-                "successful_pair_count": 843
+                "scored_pair_count": 843,
+                "successful_pair_count": 843,
+                "unscored_pair_count": 0
               },
               "bootstrap": {
                 "cluster_count": 843,
@@ -16342,7 +16462,11 @@
                   "tp": 0
                 }
               },
-              "successful_pairs": 843
+              "scored_pairs": 843,
+              "successful_pairs": 843,
+              "unscored_pairs": 0,
+              "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "view_status": "scored_only"
             }
           },
           "under_5_seconds": {
@@ -16535,8 +16659,14 @@
                   "tp": 0
                 }
               },
-              "successful_pairs": 97
+              "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "scored_pairs": 97,
+              "status": "not_applicable_unscored_only",
+              "successful_pairs": 97,
+              "unscored_pairs": 0
             },
+            "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+            "scoring_status": "partial_unscored_population",
             "success_only": {
               "aggregate": {
                 "bootstrap": {
@@ -16563,6 +16693,7 @@
                   "seed": 0
                 },
                 "coverage": 1.0,
+                "eligible_pair_count": 97,
                 "failed_pair_count": 0,
                 "failure_analysis": {
                   "note": {
@@ -16654,7 +16785,9 @@
                     "support": 0
                   }
                 },
-                "successful_pair_count": 97
+                "scored_pair_count": 97,
+                "successful_pair_count": 97,
+                "unscored_pair_count": 0
               },
               "bootstrap": {
                 "cluster_count": 97,
@@ -16723,7 +16856,11 @@
                   "tp": 0
                 }
               },
-              "successful_pairs": 97
+              "scored_pairs": 97,
+              "successful_pairs": 97,
+              "unscored_pairs": 0,
+              "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "view_status": "scored_only"
             }
           }
         },
@@ -22451,7 +22588,11 @@
           "coverage": 0.9694742792538157,
           "eligible_pairs": 1769,
           "failed_pairs": 54,
-          "successful_pairs": 1715
+          "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+          "scored_pairs": 1715,
+          "status": "not_applicable_unscored_only",
+          "successful_pairs": 1715,
+          "unscored_pairs": 54
         },
         "population_views": {
           "cached_output_population": {
@@ -22522,7 +22663,10 @@
                 "tp": 0
               }
             },
-            "successful_pairs": 1715
+            "scored_pairs": 1715,
+            "successful_pairs": 1715,
+            "unscored_pairs": 54,
+            "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures."
           },
           "full_eligible_population": {
             "bootstrap": {
@@ -22592,7 +22736,10 @@
                 "tp": 0
               }
             },
-            "successful_pairs": 1715
+            "scored_pairs": 1715,
+            "successful_pairs": 1715,
+            "unscored_pairs": 54,
+            "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures."
           },
           "shared_tt_small_population": {
             "bootstrap": {
@@ -22662,9 +22809,14 @@
                 "tp": 0
               }
             },
-            "successful_pairs": 1715
+            "scored_pairs": 1715,
+            "successful_pairs": 1715,
+            "unscored_pairs": 0,
+            "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures."
           }
         },
+        "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+        "scoring_status": "partial_unscored_population",
         "success_only": {
           "aggregate": {
             "bootstrap": {
@@ -22691,6 +22843,7 @@
               "seed": 0
             },
             "coverage": 0.9694742792538157,
+            "eligible_pair_count": 1769,
             "failed_pair_count": 54,
             "failure_analysis": {
               "note": {
@@ -28384,12 +28537,18 @@
                 }
               }
             },
-            "successful_pair_count": 1715
+            "scored_pair_count": 1715,
+            "successful_pair_count": 1715,
+            "unscored_pair_count": 54
           },
           "coverage": 0.9694742792538157,
           "eligible_pairs": 1769,
           "failed_pairs": 54,
-          "successful_pairs": 1715
+          "scored_pairs": 1715,
+          "successful_pairs": 1715,
+          "unscored_pairs": 54,
+          "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+          "view_status": "scored_only"
         }
       },
       "quality_provenance": {
@@ -28402,6 +28561,7 @@
             "pytorch_cuda"
           ]
         },
+        "metric_contract": "issue_25_note_frame_metrics_v1",
         "runtime_provenance": {
           "measurement_status": null,
           "reporting_note": "Quality is computed from cached native salience outputs only; 1,715 of 1,769 eligible pairs were available. No new inference or speed measurement was run in this analysis.",
@@ -28414,20 +28574,25 @@
       "quantization": null,
       "representation": {},
       "resources": null,
+      "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+      "scoring_status": "partial_unscored_population",
       "status": "ok"
     },
     {
       "availability_reason": "official source and checkpoint are not present in permitted local storage",
       "execution": {
+        "adapter_configuration": null,
         "adapter_status": "implemented_official_path",
         "backend_routes": null,
         "backward": null,
+        "cache_reuse_policy": null,
         "devices": null,
         "eligible_pairs": null,
+        "execution_note": null,
         "failed_pairs": null,
         "failure_code": null,
         "measured_pairs": null,
-        "measurement_status": null,
+        "measurement_status": "not_measured",
         "missing_pairs": null,
         "native_batch_sizes": [
           1
@@ -28440,6 +28605,7 @@
         "resources": null,
         "route_failures": [],
         "routes": [],
+        "segment_batch_sizes_observed": null,
         "source": null,
         "status": "unavailable",
         "successful_pairs": null,
@@ -28484,6 +28650,7 @@
         "unavailability_reason": "official source and checkpoint are not present in permitted local storage",
         "weight_license": "Apache-2.0"
       },
+      "measurement_status": "not_measured",
       "model_id": "ymt3_plus",
       "output_contract": "note_events",
       "publication_year": 2024,
@@ -28492,20 +28659,25 @@
       "quantization": null,
       "representation": {},
       "resources": null,
+      "scoring_note": null,
+      "scoring_status": null,
       "status": "unavailable"
     },
     {
       "availability_reason": "official source and checkpoint are not present in permitted local storage",
       "execution": {
+        "adapter_configuration": null,
         "adapter_status": "implemented_official_path",
         "backend_routes": null,
         "backward": null,
+        "cache_reuse_policy": null,
         "devices": null,
         "eligible_pairs": null,
+        "execution_note": null,
         "failed_pairs": null,
         "failure_code": null,
         "measured_pairs": null,
-        "measurement_status": null,
+        "measurement_status": "not_measured",
         "missing_pairs": null,
         "native_batch_sizes": [
           1
@@ -28518,6 +28690,7 @@
         "resources": null,
         "route_failures": [],
         "routes": [],
+        "segment_batch_sizes_observed": null,
         "source": null,
         "status": "unavailable",
         "successful_pairs": null,
@@ -28562,6 +28735,7 @@
         "unavailability_reason": "official source and checkpoint are not present in permitted local storage",
         "weight_license": "Apache-2.0"
       },
+      "measurement_status": "not_measured",
       "model_id": "yptf_multi",
       "output_contract": "note_events",
       "publication_year": 2024,
@@ -28570,20 +28744,25 @@
       "quantization": null,
       "representation": {},
       "resources": null,
+      "scoring_note": null,
+      "scoring_status": null,
       "status": "unavailable"
     },
     {
       "availability_reason": "official source and checkpoint are not present in permitted local storage",
       "execution": {
+        "adapter_configuration": null,
         "adapter_status": "implemented_official_path",
         "backend_routes": null,
         "backward": null,
+        "cache_reuse_policy": null,
         "devices": null,
         "eligible_pairs": null,
+        "execution_note": null,
         "failed_pairs": null,
         "failure_code": null,
         "measured_pairs": null,
-        "measurement_status": null,
+        "measurement_status": "not_measured",
         "missing_pairs": null,
         "native_batch_sizes": [
           1
@@ -28596,6 +28775,7 @@
         "resources": null,
         "route_failures": [],
         "routes": [],
+        "segment_batch_sizes_observed": null,
         "source": null,
         "status": "unavailable",
         "successful_pairs": null,
@@ -28640,6 +28820,7 @@
         "unavailability_reason": "official source and checkpoint are not present in permitted local storage",
         "weight_license": "Apache-2.0"
       },
+      "measurement_status": "not_measured",
       "model_id": "yptf_moe_multi",
       "output_contract": "note_events",
       "publication_year": 2024,
@@ -28648,26 +28829,31 @@
       "quantization": null,
       "representation": {},
       "resources": null,
+      "scoring_note": null,
+      "scoring_status": null,
       "status": "unavailable"
     },
     {
       "availability_reason": null,
       "execution": {
+        "adapter_configuration": null,
         "adapter_status": "implemented_official_path",
         "backend_routes": [
           "pytorch_cuda",
           "pytorch_xpu"
         ],
         "backward": null,
+        "cache_reuse_policy": null,
         "devices": [
           "cuda",
           "xpu"
         ],
         "eligible_pairs": 1769,
+        "execution_note": null,
         "failed_pairs": 0,
         "failure_code": null,
         "measured_pairs": 1769,
-        "measurement_status": null,
+        "measurement_status": "complete",
         "missing_pairs": 0,
         "native_batch_sizes": [
           1
@@ -28680,6 +28866,7 @@
         "resources": null,
         "route_failures": [],
         "routes": [],
+        "segment_batch_sizes_observed": null,
         "source": "cached_local_and_remote_muscriptor_pair_outputs",
         "status": "measured_cached_assembled",
         "successful_pairs": 1769,
@@ -28729,6 +28916,7 @@
         "unavailability_reason": null,
         "weight_license": "CC-BY-NC-4.0"
       },
+      "measurement_status": "complete",
       "model_id": "muscriptor_small",
       "output_contract": "note_events",
       "publication_year": 2026,
@@ -43390,6 +43578,7 @@
             "pytorch_xpu"
           ]
         },
+        "metric_contract": "issue_25_note_frame_metrics_v1",
         "runtime_provenance": {
           "measurement_status": null,
           "reporting_note": "Full-population quality is assembled from already-completed per-pair outputs across cached CUDA/XPU runs; no new inference was run in this analysis. The shared view uses the same 1,715 pairs for which cached Timbre-Trap output exists.",
@@ -43402,24 +43591,29 @@
       "quantization": null,
       "representation": {},
       "resources": null,
+      "scoring_note": null,
+      "scoring_status": null,
       "status": "ok"
     },
     {
       "availability_reason": null,
       "execution": {
+        "adapter_configuration": null,
         "adapter_status": "implemented_official_path",
         "backend_routes": [
           "pytorch_cuda"
         ],
         "backward": null,
+        "cache_reuse_policy": null,
         "devices": [
           "cuda"
         ],
         "eligible_pairs": 1769,
+        "execution_note": null,
         "failed_pairs": 886,
         "failure_code": null,
         "measured_pairs": 883,
-        "measurement_status": null,
+        "measurement_status": "partial_unscored_population",
         "missing_pairs": 886,
         "native_batch_sizes": [
           1
@@ -43432,6 +43626,7 @@
         "resources": null,
         "route_failures": [],
         "routes": [],
+        "segment_batch_sizes_observed": null,
         "source": "cached_local_and_remote_muscriptor_medium_pair_outputs",
         "status": "measured_cached_partial",
         "successful_pairs": 883,
@@ -43481,6 +43676,7 @@
         "unavailability_reason": null,
         "weight_license": "CC-BY-NC-4.0"
       },
+      "measurement_status": "partial_unscored_population",
       "model_id": "muscriptor_medium",
       "output_contract": "note_events",
       "publication_year": 2026,
@@ -43676,8 +43872,14 @@
                   "tp": 7407
                 }
               },
-              "successful_pairs": 883
+              "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "scored_pairs": 883,
+              "status": "not_applicable_unscored_only",
+              "successful_pairs": 883,
+              "unscored_pairs": 886
             },
+            "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+            "scoring_status": "partial_unscored_population",
             "success_only": {
               "aggregate": {
                 "bootstrap": {
@@ -43704,6 +43906,7 @@
                   "seed": 0
                 },
                 "coverage": 0.499152063312606,
+                "eligible_pair_count": 1769,
                 "failed_pair_count": 886,
                 "failure_analysis": {
                   "note": {
@@ -43795,7 +43998,9 @@
                     "support": 883
                   }
                 },
-                "successful_pair_count": 883
+                "scored_pair_count": 883,
+                "successful_pair_count": 883,
+                "unscored_pair_count": 886
               },
               "bootstrap": {
                 "cluster_count": 883,
@@ -43864,7 +44069,11 @@
                   "tp": 7407
                 }
               },
-              "successful_pairs": 883
+              "scored_pairs": 883,
+              "successful_pairs": 883,
+              "unscored_pairs": 886,
+              "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "view_status": "scored_only"
             }
           },
           "shared_population": {
@@ -44057,8 +44266,14 @@
                   "tp": 7407
                 }
               },
-              "successful_pairs": 883
+              "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "scored_pairs": 883,
+              "status": "not_applicable_unscored_only",
+              "successful_pairs": 883,
+              "unscored_pairs": 832
             },
+            "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+            "scoring_status": "partial_unscored_population",
             "success_only": {
               "aggregate": {
                 "bootstrap": {
@@ -44085,6 +44300,7 @@
                   "seed": 0
                 },
                 "coverage": 0.5148688046647231,
+                "eligible_pair_count": 1715,
                 "failed_pair_count": 832,
                 "failure_analysis": {
                   "note": {
@@ -44176,7 +44392,9 @@
                     "support": 883
                   }
                 },
-                "successful_pair_count": 883
+                "scored_pair_count": 883,
+                "successful_pair_count": 883,
+                "unscored_pair_count": 832
               },
               "bootstrap": {
                 "cluster_count": 883,
@@ -44245,7 +44463,11 @@
                   "tp": 7407
                 }
               },
-              "successful_pairs": 883
+              "scored_pairs": 883,
+              "successful_pairs": 883,
+              "unscored_pairs": 832,
+              "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "view_status": "scored_only"
             }
           },
           "shared_under_10_seconds": {
@@ -44438,8 +44660,14 @@
                   "tp": 2926
                 }
               },
-              "successful_pairs": 495
+              "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "scored_pairs": 495,
+              "status": "not_applicable_unscored_only",
+              "successful_pairs": 495,
+              "unscored_pairs": 63
             },
+            "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+            "scoring_status": "partial_unscored_population",
             "success_only": {
               "aggregate": {
                 "bootstrap": {
@@ -44466,6 +44694,7 @@
                   "seed": 0
                 },
                 "coverage": 0.8870967741935484,
+                "eligible_pair_count": 558,
                 "failed_pair_count": 63,
                 "failure_analysis": {
                   "note": {
@@ -44557,7 +44786,9 @@
                     "support": 495
                   }
                 },
-                "successful_pair_count": 495
+                "scored_pair_count": 495,
+                "successful_pair_count": 495,
+                "unscored_pair_count": 63
               },
               "bootstrap": {
                 "cluster_count": 495,
@@ -44626,7 +44857,11 @@
                   "tp": 2926
                 }
               },
-              "successful_pairs": 495
+              "scored_pairs": 495,
+              "successful_pairs": 495,
+              "unscored_pairs": 63,
+              "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "view_status": "scored_only"
             }
           },
           "shared_under_15_seconds": {
@@ -44819,8 +45054,14 @@
                   "tp": 4289
                 }
               },
-              "successful_pairs": 590
+              "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "scored_pairs": 590,
+              "status": "not_applicable_unscored_only",
+              "successful_pairs": 590,
+              "unscored_pairs": 253
             },
+            "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+            "scoring_status": "partial_unscored_population",
             "success_only": {
               "aggregate": {
                 "bootstrap": {
@@ -44847,6 +45088,7 @@
                   "seed": 0
                 },
                 "coverage": 0.6998813760379596,
+                "eligible_pair_count": 843,
                 "failed_pair_count": 253,
                 "failure_analysis": {
                   "note": {
@@ -44938,7 +45180,9 @@
                     "support": 590
                   }
                 },
-                "successful_pair_count": 590
+                "scored_pair_count": 590,
+                "successful_pair_count": 590,
+                "unscored_pair_count": 253
               },
               "bootstrap": {
                 "cluster_count": 590,
@@ -45007,7 +45251,11 @@
                   "tp": 4289
                 }
               },
-              "successful_pairs": 590
+              "scored_pairs": 590,
+              "successful_pairs": 590,
+              "unscored_pairs": 253,
+              "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "view_status": "scored_only"
             }
           },
           "shared_under_5_seconds": {
@@ -45200,8 +45448,14 @@
                   "tp": 224
                 }
               },
-              "successful_pairs": 97
+              "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "scored_pairs": 97,
+              "status": "not_applicable_unscored_only",
+              "successful_pairs": 97,
+              "unscored_pairs": 0
             },
+            "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+            "scoring_status": "partial_unscored_population",
             "success_only": {
               "aggregate": {
                 "bootstrap": {
@@ -45228,6 +45482,7 @@
                   "seed": 0
                 },
                 "coverage": 1.0,
+                "eligible_pair_count": 97,
                 "failed_pair_count": 0,
                 "failure_analysis": {
                   "note": {
@@ -45319,7 +45574,9 @@
                     "support": 97
                   }
                 },
-                "successful_pair_count": 97
+                "scored_pair_count": 97,
+                "successful_pair_count": 97,
+                "unscored_pair_count": 0
               },
               "bootstrap": {
                 "cluster_count": 97,
@@ -45388,7 +45645,11 @@
                   "tp": 224
                 }
               },
-              "successful_pairs": 97
+              "scored_pairs": 97,
+              "successful_pairs": 97,
+              "unscored_pairs": 0,
+              "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "view_status": "scored_only"
             }
           },
           "under_10_seconds": {
@@ -45581,8 +45842,14 @@
                   "tp": 2926
                 }
               },
-              "successful_pairs": 495
+              "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "scored_pairs": 495,
+              "status": "not_applicable_unscored_only",
+              "successful_pairs": 495,
+              "unscored_pairs": 63
             },
+            "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+            "scoring_status": "partial_unscored_population",
             "success_only": {
               "aggregate": {
                 "bootstrap": {
@@ -45609,6 +45876,7 @@
                   "seed": 0
                 },
                 "coverage": 0.8870967741935484,
+                "eligible_pair_count": 558,
                 "failed_pair_count": 63,
                 "failure_analysis": {
                   "note": {
@@ -45700,7 +45968,9 @@
                     "support": 495
                   }
                 },
-                "successful_pair_count": 495
+                "scored_pair_count": 495,
+                "successful_pair_count": 495,
+                "unscored_pair_count": 63
               },
               "bootstrap": {
                 "cluster_count": 495,
@@ -45769,7 +46039,11 @@
                   "tp": 2926
                 }
               },
-              "successful_pairs": 495
+              "scored_pairs": 495,
+              "successful_pairs": 495,
+              "unscored_pairs": 63,
+              "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "view_status": "scored_only"
             }
           },
           "under_15_seconds": {
@@ -45962,8 +46236,14 @@
                   "tp": 4289
                 }
               },
-              "successful_pairs": 590
+              "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "scored_pairs": 590,
+              "status": "not_applicable_unscored_only",
+              "successful_pairs": 590,
+              "unscored_pairs": 253
             },
+            "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+            "scoring_status": "partial_unscored_population",
             "success_only": {
               "aggregate": {
                 "bootstrap": {
@@ -45990,6 +46270,7 @@
                   "seed": 0
                 },
                 "coverage": 0.6998813760379596,
+                "eligible_pair_count": 843,
                 "failed_pair_count": 253,
                 "failure_analysis": {
                   "note": {
@@ -46081,7 +46362,9 @@
                     "support": 590
                   }
                 },
-                "successful_pair_count": 590
+                "scored_pair_count": 590,
+                "successful_pair_count": 590,
+                "unscored_pair_count": 253
               },
               "bootstrap": {
                 "cluster_count": 590,
@@ -46150,7 +46433,11 @@
                   "tp": 4289
                 }
               },
-              "successful_pairs": 590
+              "scored_pairs": 590,
+              "successful_pairs": 590,
+              "unscored_pairs": 253,
+              "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "view_status": "scored_only"
             }
           },
           "under_5_seconds": {
@@ -46343,8 +46630,14 @@
                   "tp": 224
                 }
               },
-              "successful_pairs": 97
+              "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "scored_pairs": 97,
+              "status": "not_applicable_unscored_only",
+              "successful_pairs": 97,
+              "unscored_pairs": 0
             },
+            "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+            "scoring_status": "partial_unscored_population",
             "success_only": {
               "aggregate": {
                 "bootstrap": {
@@ -46371,6 +46664,7 @@
                   "seed": 0
                 },
                 "coverage": 1.0,
+                "eligible_pair_count": 97,
                 "failed_pair_count": 0,
                 "failure_analysis": {
                   "note": {
@@ -46462,7 +46756,9 @@
                     "support": 97
                   }
                 },
-                "successful_pair_count": 97
+                "scored_pair_count": 97,
+                "successful_pair_count": 97,
+                "unscored_pair_count": 0
               },
               "bootstrap": {
                 "cluster_count": 97,
@@ -46531,7 +46827,11 @@
                   "tp": 224
                 }
               },
-              "successful_pairs": 97
+              "scored_pairs": 97,
+              "successful_pairs": 97,
+              "unscored_pairs": 0,
+              "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+              "view_status": "scored_only"
             }
           }
         },
@@ -46721,8 +47021,14 @@
               "tp": 7407
             }
           },
-          "successful_pairs": 883
+          "reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+          "scored_pairs": 883,
+          "status": "not_applicable_unscored_only",
+          "successful_pairs": 883,
+          "unscored_pairs": 886
         },
+        "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+        "scoring_status": "partial_unscored_population",
         "success_only": {
           "aggregate": {
             "bootstrap": {
@@ -46749,6 +47055,7 @@
               "seed": 0
             },
             "coverage": 0.499152063312606,
+            "eligible_pair_count": 1769,
             "failed_pair_count": 886,
             "failure_analysis": {
               "note": {
@@ -46840,7 +47147,9 @@
                 "support": 883
               }
             },
-            "successful_pair_count": 883
+            "scored_pair_count": 883,
+            "successful_pair_count": 883,
+            "unscored_pair_count": 886
           },
           "bootstrap": {
             "cluster_count": 883,
@@ -46909,7 +47218,11 @@
               "tp": 7407
             }
           },
-          "successful_pairs": 883
+          "scored_pairs": 883,
+          "successful_pairs": 883,
+          "unscored_pairs": 886,
+          "unscored_reason": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+          "view_status": "scored_only"
         }
       },
       "quality_provenance": {
@@ -46922,6 +47235,7 @@
             "pytorch_cuda"
           ]
         },
+        "metric_contract": "issue_25_note_frame_metrics_v1",
         "runtime_provenance": {
           "measurement_status": null,
           "reporting_note": "Quality is assembled from cached MuScriptor-medium pair outputs; missing pairs are failure-penalized. No new inference was run.",
@@ -46934,20 +47248,25 @@
       "quantization": null,
       "representation": {},
       "resources": null,
+      "scoring_note": "The bounded experiment ended before these pairs were scored; missing rows are unscored, not inference failures.",
+      "scoring_status": "partial_unscored_population",
       "status": "ok"
     },
     {
       "availability_reason": "checkpoint is gated and no approved credential or local copy is available",
       "execution": {
+        "adapter_configuration": null,
         "adapter_status": "implemented_official_path",
         "backend_routes": null,
         "backward": null,
+        "cache_reuse_policy": null,
         "devices": null,
         "eligible_pairs": null,
+        "execution_note": null,
         "failed_pairs": null,
         "failure_code": null,
         "measured_pairs": null,
-        "measurement_status": null,
+        "measurement_status": "not_measured",
         "missing_pairs": null,
         "native_batch_sizes": [
           1
@@ -46960,6 +47279,7 @@
         "resources": null,
         "route_failures": [],
         "routes": [],
+        "segment_batch_sizes_observed": null,
         "source": null,
         "status": "unavailable",
         "successful_pairs": null,
@@ -47007,6 +47327,7 @@
         "unavailability_reason": "checkpoint is gated and no approved credential or local copy is available",
         "weight_license": "CC-BY-NC-4.0"
       },
+      "measurement_status": "not_measured",
       "model_id": "muscriptor_large",
       "output_contract": "note_events",
       "publication_year": 2026,
@@ -47015,7 +47336,29 @@
       "quantization": null,
       "representation": {},
       "resources": null,
+      "scoring_note": null,
+      "scoring_status": null,
       "status": "unavailable"
     }
-  ]
+  ],
+  "report_assets": {
+    "charts": [
+      {
+        "path": "charts/quality_by_duration.svg",
+        "title": "Primary scored F1 by duration"
+      },
+      {
+        "path": "charts/coverage_by_duration.svg",
+        "title": "Scored coverage by duration"
+      },
+      {
+        "path": "charts/event_f1_population.svg",
+        "title": "Event-model F1 by population"
+      },
+      {
+        "path": "charts/frame_f1_population.svg",
+        "title": "Frame-model F1 by population"
+      }
+    ]
+  }
 }
