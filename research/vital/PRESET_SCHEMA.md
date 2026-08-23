@@ -12,6 +12,48 @@ The maximal `settings` schema is therefore best understood as four layers. First
 
 For an audio→`.vital` model under your stated constraints—**default sample oscillator** and **default wavetables only**—the cleanest target representation is: emit raw scalar controls exactly as Vital stores them; emit modulation connections explicitly; and either hold `settings.sample`, `settings.wavetables`, and the custom drawable `settings.lfos` at canonical defaults or predict them in a constrained secondary stage. That avoids unit-conversion ambiguity and prevents display-space errors. citeturn36view0turn24view3turn22view5
 
+## Revision-scoped source and corpus audit (2026-08-06)
+
+The reproducible atlas target for this iteration is the Vital source snapshot
+`mtytel/vital@636ca0ef517a4db087a6a08a6a8a5e704e21f836` (commit date
+2022-04-20). The repository has no release tags in the fetched history, and
+the source tree does not provide a reliable binary-release mapping, so this
+is an exact source target rather than a claim that the snapshot is binary
+Vital 1.5.5. The corpus is a compatibility supplement and is explicitly
+mixed-version.
+
+The source-derived artifacts are [the extractor](extract_vital_parameter_atlas.py),
+[the parameter atlas](vital_source_parameter_atlas.json), [the corpus-version
+analyzer](analyze_vital_corpus_versions.py), and [its result](vital_corpus_version_shapes.json).
+The modulation identity extractor and its set-difference result are
+[here](extract_vital_modulation_vocab.py) and
+[here](vital_modulation_vocab.json); source-trace canonicalization examples are
+[here](canonicalization_examples.json).
+The broad corpus scan is the existing
+`research/vital/build_vital_corpus_audit.py`; its generated audit was run over
+9,620 files, with 9,618 parsed and two malformed inputs.
+
+There are two useful scalar counts, and they must not be conflated:
+
+| Scope | Count | Interpretation |
+|---|---:|---|
+| `ValueDetails` expanded registry | 794 | 145 global entries + 54 envelopes + 96 drawable-LFO controls + 32 random-LFO controls + 87 oscillator controls + 60 filter-family registry entries + 320 modulation-slot scalars. This includes migration-only definitions. |
+| Reconciled current serialized baseline for this source era | 772 | The registry minus 22 legacy/migration-only fields; this matches the 772-scalar shape observed for corpus versions 1.0.5 and 1.0.8. It is a source/corpus reconciliation result, not yet a headless `stateToJson()` build count. |
+
+The 22 registry-only fields are the eight `sub_*` fields,
+`compressor_low_band_unused`, eight old `filter_1_*`/`filter_2_*` oscillator
+and sample routing fields, and five old `filter_fx_*` routing fields. They are
+important for migration but should not be treated as current model outputs.
+
+The corpus confirms a version boundary: 1.0.0–1.0.4 carry 771 scalar fields;
+1.0.5, 1.0.7, and 1.0.8 carry the 772-scalar baseline; 1.5.1–1.5.5 carry
+777 scalars by adding `custom_warps`, `random_values`, and three
+`osc_<n>_spectral_morph_phase` fields; and 1.6.x carries 905 scalars by adding
+`modulation_<n>_ramp_up` and `modulation_<n>_ramp_down` for all 64 slots. The
+two 1.0.7 files with 773 scalars contain an isolated `flanger_depth` extension.
+Do not train a mixed revision union as one fixed schema without version
+conditioning or canonicalization.
+
 ## Schema overview
 
 Vital’s save path makes the outer preset schema relatively clear. `LoadSave::stateToJson` serializes all controls into `settings_data`, then appends `sample`, `modulations`, `wavetables`, and `lfos`, and finally wraps that `settings` object with preset-level metadata. citeturn36view0turn36view1
@@ -58,24 +100,24 @@ A breadth-first inventory of the `settings` object is below.
 | Settings substructure | Shape | Status | Notes | Source |
 |---|---|---:|---|---|
 | Flat scalar controls | object mapping control-name → number | Resolved | Vital iterates all controls and writes their raw numeric value. | `load_save.cpp` `stateToJson` citeturn36view0 |
-| `sample` | object | Partly unresolved | Serialized from `sample->stateToJson()`. Exact inner field schema was not fully recoverable from accessed sources. | `load_save.cpp` citeturn36view0turn35view7 |
+| `sample` | object | Resolved | `{name, length, sample_rate, samples}` plus optional `samples_stereo`; `samples` fields are base64 PCM payloads. | `sample_source.cpp`; corpus audit |
 | `modulations` | array of objects | Resolved | Each element stores `source`, `destination`, and optional `line_mapping`. | `load_save.cpp` citeturn39view4 |
-| `wavetables` | array of objects | Partly unresolved | One element per wavetable oscillator; exact wavetable object schema not fully recovered here. | `load_save.cpp` citeturn36view1turn39view5 |
-| `lfos` | array of objects | Partly unresolved | One drawable shape object per LFO, serialized via `LineGenerator::stateToJson()`. Exact inner point schema unresolved in accessed sources. | `load_save.cpp` citeturn36view1turn39view5 |
+| `wavetables` | array of objects | Resolved | Three objects; each has `groups`, `name`, `author`, `version`, `remove_all_dc`, and `full_normalize`; groups contain components and keyframes. | `wavetable_creator.cpp`; corpus audit |
+| `lfos` | array of objects | Resolved | Eight `LineGenerator` objects with `num_points`, flat `points`, `powers`, `name`, and `smooth`. | `line_generator.cpp`; corpus audit |
 
 The scalar-family expansion is where most of the size lives. A practical count table is:
 
 | Major component | Pattern | Scalars per instance | Resolved instance count | Resolved scalar total | Confidence |
 |---|---|---:|---:|---:|---|
-| Global and top-level unique controls | exact keys | — | — | 143 | High citeturn44view0turn29view0turn32view1turn32view2turn32view3turn31view0turn31view1turn31view2turn31view3turn31view4turn32view0turn30view6turn30view7 |
+| Global and top-level unique controls | exact keys | — | — | 136 current baseline (145 registry entries) | High for source registry; nine global entries are migration-only in the current module graph |
 | Oscillators | `osc_<n>_<field>` | 29 | 3 | 87 | High for count of 3 oscillators; field family resolved citeturn10view0turn10view1turn10view2turn10view3turn10view4turn36view3 |
-| Filters | `filter_1_*`, `filter_2_*`, `filter_fx_*` | 20 | 3 families | 60 | High citeturn11view2turn9view4turn9view5turn8view5 |
-| Envelopes | `env_<n>_<field>` | 9 | 6 | 54 | Medium; field family primary, count of 6 from community documentation/forum discussion rather than accessed source header citeturn9view0turn11view3turn42search3 |
-| Drawable LFOs | `lfo_<n>_<field>` | 11 | 8 | 88 | Medium; field family primary, count of 8 from community/forum evidence citeturn9view1turn9view2turn11view4turn42search8 |
-| Random modulators | `random_<n>_<field>` | 8 | unresolved | unresolved | Field family resolved; number of random slots not recovered from accessed primary sources citeturn11view0 |
+| Filters | `filter_1_*`, `filter_2_*`, `filter_fx_*` | 20 registry / 47 current baseline | 3 families | 47 current baseline (60 registry entries) | High; 13 old routing fields are migration-only |
+| Envelopes | `env_<n>_<field>` | 9 | 6 | 54 | High; `kNumEnvelopes = 6` in source |
+| Drawable LFOs | `lfo_<n>_<field>` | 12 | 8 | 96 | High; `kNumLfos = 8` in source |
+| Random modulators | `random_<n>_<field>` | 8 | 4 | 32 | High; `kNumRandomLfos = 4` in source |
 | Mod-matrix slot scalars | `modulation_<n>_<field>` | 5 | 64 | 320 | Medium; family resolved, 64-slot count from community/forum evidence citeturn11view1turn44view0turn43search7 |
 
-Two operational conclusions follow from that table. First, the **flat scalar namespace alone is already large**: a lower bound of `143 + 87 + 60 + 54 + 88 + 320 = 752` raw scalars, before counting random modulator families and before unpacking nested `sample`, `wavetables`, `lfos`, and modulation `line_mapping` shapes. Second, the nested shape-bearing objects are structurally important but are a bad first target for an ML model unless you constrain them tightly. citeturn36view0turn39view5turn43search7
+The source-era current flat scalar baseline is **772 raw scalars**. The 794-entry registry is larger because it retains migration-only definitions. Later corpus revisions are larger still: 777 scalars in 1.5.x and 905 in 1.6.x. Nested shape-bearing objects remain structurally important but are a bad first target for an ML model unless you constrain them tightly.
 
 ## Scaling and value semantics
 
@@ -123,12 +165,12 @@ The tables below list the `settings` fields breadth-first, beginning with top-le
 | `legato` | indexed ordinal | boolean-like | `0..1` | same | `0` | off/on | `parameter_list` middle citeturn29view0 |
 | `macro_control_1`..`macro_control_4` | float | continuous | `0..1` | same | `0` | 4 macro values; names live at preset top level as `macro1..macro4` | `parameter_list`; top-level metadata loop citeturn29view0turn36view1 |
 | `pitch_bend_range` | indexed ordinal | categorical | `0..48` | semitones | `2 → 2 semitones` | integer semitone span | `parameter_list` citeturn29view0 |
-| `polyphony` | indexed ordinal | categorical | `1..kMaxPolyphony-1` | voices | `8` | exact max unresolved in accessed sources | `parameter_list` citeturn32view1 |
+| `polyphony` | indexed ordinal | categorical | `1..32` | voices | `8` | `kMaxPolyphony = 33`, so the raw maximum is 32 | `parameter_list`, `synth_constants.h` |
 | `voice_tune` | float | continuous | `-1..1` | `×100 cents` | `0 → 0` | fractional semitone stored; cents displayed | `parameter_list` citeturn32view1 |
 | `voice_transpose` | indexed ordinal | categorical | `-48..48` | same | `0` | semitones | `parameter_list` citeturn32view1 |
 | `voice_amplitude` | float | continuous | `0..1` | same | `1` | global voice gain | `parameter_list` citeturn32view1 |
 | `stereo_routing` | float | continuous | `0..1` | `%` | `1 → 100%` | stereo routing amount | `parameter_list` citeturn32view1 |
-| `stereo_mode` | indexed ordinal | categorical | `0..1` | same | `0` | label ordering unresolved; lookup present | `parameter_list` citeturn32view1 |
+| `stereo_mode` | indexed ordinal | categorical | `0..1` | same | `0` | `SPREAD`, `ROTATE` | `parameter_list`, `synth_strings.h` |
 | `portamento_time` | float | continuous | `-10..4` | exponential seconds | `-10` | display range is nonlinear; raw exponent better for ML | `parameter_list` citeturn32view1 |
 | `portamento_slope` | float | continuous | `-8..8` | same | `0` | slope shaping | `parameter_list` citeturn32view1 |
 | `portamento_force` | indexed ordinal | boolean-like | `0..1` | same | `0` | off/on | `parameter_list` citeturn32view1 |
@@ -138,7 +180,7 @@ The tables below list the `settings` fields breadth-first, beginning with top-le
 | `effect_chain_order` | indexed ordinal | categorical | `0..factorial(kNumEffects)-1` | same | `0` | permutation index over the effect chain; with 9 effects, this is `0..362879` | `parameter_list`; Vita effect enum citeturn30view6turn24view0 |
 | `voice_priority` | indexed ordinal | categorical | `0..kNumVoicePriorities-1` | same | `RoundRobin` ordinal | `Newest, Oldest, Highest, Lowest, RoundRobin` | `parameter_list`; Vita enum citeturn30view6turn26view0 |
 | `voice_override` | indexed ordinal | categorical | `0..kNumVoiceOverrides-1` | same | `Kill` ordinal | `Kill, Steal` | `parameter_list`; Vita enum citeturn9view0turn26view0 |
-| `oversampling` | indexed ordinal | categorical | `0..3` | same | `1` | exact label order unresolved in accessed sources | `parameter_list` citeturn30view7 |
+| `oversampling` | indexed ordinal | categorical | `0..3` | same | `1` | `1x`, `2x`, `4x`, `8x` | `parameter_list`, `synth_strings.h` |
 | `pitch_wheel` | float | continuous | `-1..1` | same | `0` | live control source | `parameter_list` citeturn30view7 |
 | `mod_wheel` | float | continuous | `0..1` | same | `0` | live control source | `parameter_list` citeturn30view7 |
 | `mpe_enabled` | indexed ordinal | boolean-like | `0..1` | same | `0` | off/on | `parameter_list` citeturn9view0 |
@@ -149,13 +191,13 @@ The tables below list the `settings` fields breadth-first, beginning with top-le
 | Block | Keys | Scalars | Notes |
 |---|---|---:|---|
 | Delay | `delay_dry_wet`, `delay_feedback`, `delay_frequency`, `delay_aux_frequency`, `delay_on`, `delay_style`, `delay_filter_cutoff`, `delay_filter_spread`, `delay_sync`, `delay_tempo`, `delay_aux_sync`, `delay_aux_tempo` | 12 | `delay_frequency` and `delay_aux_frequency` use exponential inverted seconds; the two tempo controls are indexed subsets of synced-rate names. `delay_style` has four ordinals, but exact labels were not recovered here. citeturn44view0 |
-| Distortion | `distortion_on`, `distortion_type`, `distortion_drive`, `distortion_mix`, `distortion_filter_order`, `distortion_filter_cutoff`, `distortion_filter_resonance`, `distortion_filter_blend` | 8 | `distortion_type` has six ordinals. DSP header confirms the drive range is `-30..30 dB`. Exact `distortion_filter_order` label order unresolved. citeturn29view0turn28view1 |
+| Distortion | `distortion_on`, `distortion_type`, `distortion_drive`, `distortion_mix`, `distortion_filter_order`, `distortion_filter_cutoff`, `distortion_filter_resonance`, `distortion_filter_blend` | 8 | `distortion_type`: `Soft Clip`, `Hard Clip`, `Linear Fold`, `Sine Fold`, `Bit Crush`, `Down Sample`; `distortion_filter_order`: `None`, `Pre`, `Post`; drive is `-30..30 dB` | `parameter_list`, `synth_strings.h` |
 | Reverb | `reverb_pre_low_cutoff`, `reverb_pre_high_cutoff`, `reverb_low_shelf_cutoff`, `reverb_low_shelf_gain`, `reverb_high_shelf_cutoff`, `reverb_high_shelf_gain`, `reverb_dry_wet`, `reverb_delay`, `reverb_decay_time`, `reverb_size`, `reverb_chorus_amount`, `reverb_chorus_frequency`, `reverb_on` | 13 | Mix, pre/post tonal shaping, size, delay, decay, and internal chorus controls. citeturn32view1turn32view2 |
 | Phaser | `phaser_on`, `phaser_dry_wet`, `phaser_feedback`, `phaser_frequency`, `phaser_sync`, `phaser_tempo`, `phaser_center`, `phaser_mod_depth`, `phaser_phase_offset` | 9 | Frequency uses exponential inverted seconds; sync is a 4-way indexed family. citeturn31view0turn31view1 |
 | Flanger | `flanger_on`, `flanger_dry_wet`, `flanger_feedback`, `flanger_frequency`, `flanger_sync`, `flanger_tempo`, `flanger_center`, `flanger_mod_depth`, `flanger_phase_offset` | 9 | `flanger_dry_wet` is unusual: raw `0..0.5`, displayed as `0..100%` because `display_multiply = 200`. citeturn31view1 |
 | Chorus | `chorus_on`, `chorus_dry_wet`, `chorus_feedback`, `chorus_cutoff`, `chorus_spread`, `chorus_voices`, `chorus_frequency`, `chorus_sync`, `chorus_tempo`, `chorus_delay_1`, `chorus_delay_2` | 11 | Chorus is the effect block called out on Vital’s press material as a multi-voice chorus. `chorus_delay_*` are exponential milliseconds. citeturn31view2turn31view3turn42search13 |
 | Compressor | `compressor_on`, 6 thresholds, 6 ratios, 3 gains, `compressor_attack`, `compressor_release`, `compressor_enabled_bands`, `compressor_mix`, `compressor_low_band_unused` | 21 | This is the corrected compressor inventory. `compressor_enabled_bands` labels are `Multiband`, `LowBand`, `HighBand`, `SingleBand`. citeturn31view3turn40view0turn31view4turn26view0 |
-| EQ | `eq_on`, `eq_low_mode`, `eq_low_cutoff`, `eq_low_gain`, `eq_low_resonance`, `eq_band_mode`, `eq_band_cutoff`, `eq_band_gain`, `eq_band_resonance`, `eq_high_mode`, `eq_high_cutoff`, `eq_high_gain`, `eq_high_resonance` | 13 | Three bands, each with mode/cutoff/gain/resonance, plus on/off. Exact low/band/high mode label ordering unresolved in accessed sources. citeturn31view4turn32view0turn30view6 |
+| EQ | `eq_on`, `eq_low_mode`, `eq_low_cutoff`, `eq_low_gain`, `eq_low_resonance`, `eq_band_mode`, `eq_band_cutoff`, `eq_band_gain`, `eq_band_resonance`, `eq_high_mode`, `eq_high_cutoff`, `eq_high_gain`, `eq_high_resonance` | 13 | Low mode: `Shelf`, `High Pass`; band: `Shelf`, `Notch`; high: `Shelf`, `Low Pass` | `parameter_list`, `synth_strings.h` |
 
 **Oscillator, sample, and filter families**
 
@@ -188,12 +230,24 @@ The tables below list the `settings` fields breadth-first, beginning with top-le
 |  | `osc_<n>_spectral_morph_type` | indexed, categorical | `0..kNumSpectralMorphTypes-1` | `0` | `NoSpectralMorph, Vocode, FormScale, HarmonicScale, InharmonicScale, Smear, RandomAmplitudes, LowPass, HighPass, PhaseDisperse, ShepardTone, Skew` | citeturn10view2turn25view0 |
 |  | `osc_<n>_spectral_morph_amount` | float, continuous | `0..1` | `0.5` | `%` | citeturn10view3 |
 |  | `osc_<n>_spectral_morph_spread` | float, continuous | `-0.5..0.5` | `0` | displayed `%` with `×200` | citeturn10view3 |
-|  | `osc_<n>_destination` | indexed, categorical | `0..kNumSourceDestinations + kNumEffects` | osc1 `0?`, osc2 `1`, osc3 `3` after defaults | first confirmed labels are `Filter1, Filter2, DualFilters, Effects, DirectOut`; higher ordinals likely correspond to direct injection into effect positions, but exact extended ordering was not recovered here | citeturn10view3turn24view0turn10view4turn36view4 |
+|  | `osc_<n>_destination` | indexed, categorical | raw metadata `0..14`; labeled source table `0..13` | osc1 `0?`, osc2 `1`, osc3 `3` after defaults | labels `Filter 1, Filter 2, Filter 1+2, Effects, Direct Out, Chorus, Compressor, Delay, Distortion, EQ, FX Filter, Flanger, Phaser, Reverb`; ordinal `14` is a source-level off-by-one/inconsistency until runtime-verified | source `synth_parameters.cpp`, `synth_strings.h`, `vital_source_parameter_atlas.json` |
 |  | `osc_<n>_view_2d` | indexed, categorical | `0..2` | `1` | semantics unresolved; lookup appears inconsistent with 3 ordinals | citeturn10view3 |
 | Sample oscillator scalar layer | `sample_on`, `sample_random_phase`, `sample_keytrack`, `sample_loop`, `sample_bounce`, `sample_transpose`, `sample_transpose_quantize`, `sample_tune`, `sample_level`, `sample_destination`, `sample_pan` | mixed | see source | see source | `sample_destination` follows the same destination family as `osc_<n>_destination` | citeturn32view3turn30view2 |
-| Sample oscillator nested object | `settings.sample` | object | — | — | exact inner schema unresolved in accessed sources; important only if you allow non-default sample content | citeturn36view0turn35view7 |
-| Sub oscillator compatibility layer | `sub_*` | mixed | see source | see source | Present in current top-level controls; older presets are converted into `osc_3_*` and destinations during load | citeturn32view2turn36view3turn36view4 |
+| Sample oscillator nested object | `settings.sample` | object | — | — | `{name, length, sample_rate, samples}` plus optional stereo payload; source default is generated `White Noise`, 44,100 samples at 44.1 kHz | `sample_source.cpp`; corpus audit |
+| Sub oscillator compatibility layer | `sub_*` | mixed | see source | see source | Migration-only fields in this source-era module graph; older presets are converted into `osc_3_*` and destinations during load | `load_save.cpp`; source/corpus reconciliation |
 | Filter families | `filter_1_*`, `filter_2_*`, `filter_fx_*` | mixed | see below | varies | Same 20-field schema reused for both main filters and the FX filter block | citeturn8view5turn11view2turn9view4turn9view5 |
+
+Revision note: the 20-field list below is the `ValueDetails` registry shape.
+For the current source-era serialized baseline, 13 old oscillator/sample
+routing fields are migration-only, leaving 47 serialized filter-family
+scalars. Keep the registry table when implementing legacy migration, but use
+the 47-field baseline for the current model output.
+
+Source correction: `filter_<n>_style` has raw range `0..9`, while the generic
+`kFilterStyleNames` table has five labels and model-specific tables also exist
+for diode and comb filters. Preserve the raw ordinal and condition its label
+interpretation on `filter_<n>_model`; do not treat one five-label table as a
+complete global enum.
 
 The per-filter field inventory is:
 
@@ -204,12 +258,29 @@ The per-filter field inventory is:
 | Family | Key pattern | Scalars per instance | Raw ranges and categorical values | Source |
 |---|---|---:|---|---|
 | Envelope | `env_<n>_delay`, `attack`, `hold`, `decay`, `release`, `attack_power`, `decay_power`, `release_power`, `sustain` | 9 | Delay/Hold `0..1.4142135624` quartic secs; Attack/Decay/Release `0..2.37842` quartic secs; power fields `-20..20`; Sustain `0..1` | `env_parameter_list` citeturn9view0turn11view3 |
-| Drawable LFO | `lfo_<n>_phase`, `sync_type`, `frequency`, `sync`, `tempo`, `fade_time`, `smooth_mode`, `smooth_time`, `delay_time`, `stereo`, `keytrack_transpose`, `keytrack_tune` | 11 | `sync_type`: `Trigger, Sync, Envelope, SustainEnvelope, LoopPoint, LoopHold`; `sync`: `Time, Tempo, DottedTempo, TripletTempo, Keytrack`; `tempo` uses synced-rate ordinals; frequency is exponential inverted seconds | `lfo_parameter_list`; Vita enums citeturn9view1turn9view2turn26view0turn26view1 |
-| Drawable LFO shape object | `settings.lfos[i]` | object | Separate line-drawing state object serialized by `LineGenerator::stateToJson()`; exact inner point schema unresolved in accessed sources | `load_save.cpp` citeturn36view1turn39view5 |
+| Drawable LFO | `lfo_<n>_phase`, `sync_type`, `frequency`, `sync`, `tempo`, `fade_time`, `smooth_mode`, `smooth_time`, `delay_time`, `stereo`, `keytrack_transpose`, `keytrack_tune` | 12 | `sync_type`: `Trigger, Sync, Envelope, Sustain Envelope, Loop Point, Loop Hold`; `sync`: `Seconds, Tempo, Tempo Dotted, Tempo Triplets, Keytrack`; `tempo` uses 13 synced-rate ordinals; frequency is exponential inverted seconds | `lfo_parameter_list`; source string tables |
+| Drawable LFO shape object | `settings.lfos[i]` | object | `{num_points, points[2*num_points], powers[num_points], name, smooth}`; source default is a three-point `Triangle` shape | `line_generator.cpp`; corpus audit |
 | Random source | `random_<n>_style`, `frequency`, `sync`, `tempo`, `stereo`, `sync_type`, `keytrack_transpose`, `keytrack_tune` | 8 | Styles: `Perlin, SampleAndHold, SinInterpolate, LorenzAttractor`. `frequency`, `sync`, `tempo` semantics parallel LFO/rate families | `random_lfo_parameter_list`; Vita enum citeturn11view0turn25view3 |
 | Mod slot scalar family | `modulation_<n>_amount`, `power`, `bipolar`, `stereo`, `bypass` | 5 | Amount `-1..1`; Power `-10..10`; Boolean-like flags `0..1` | `mod_parameter_list`; prefix construction | citeturn11view1turn44view0 |
 | Mod connection object | `settings.modulations[i]` | object | `source`, `destination`, optional `line_mapping` only when non-linear | `load_save.cpp` citeturn39view4 |
-| Mod remap object | `line_mapping` | object | Same drawable-line family used for LFO shapes; exact inner schema unresolved in accessed sources | `load_save.cpp` citeturn39view4 |
+| Mod remap object | `line_mapping` | object | Same line schema as LFO shapes; omitted when linear, otherwise `{num_points, points, powers, name, smooth}` | `load_save.cpp`, `line_generator.cpp`; corpus audit |
+
+### Modulation source and destination identity
+
+The source-derived [modulation vocabulary artifact](vital_modulation_vocab.json)
+is the authority for legal names at the pinned source revision. It finds 32
+modulation sources: `aftertouch`, `env_1..env_6`, `lfo_1..lfo_8`, `lift`,
+`macro_control_1..macro_control_4`, `mod_wheel`, `note`, `note_in_octave`,
+`pitch_wheel`, `random`, `random_1..random_4`, `slide`, `stereo`, and
+`velocity`. The corpus contains the same 32 non-empty source names.
+
+The source graph expands to 428 legal modulation destination names from
+`create*ModControl` calls and prefix/generated controls. The audit observes
+366 non-empty destination names because it counts only serialized connection
+usage. Its three extra names, `osc_1..3_spectral_morph_phase`, are 1.5.x
+version extensions absent from the pinned source snapshot; its source-only
+names are not evidence of rejection. Keep the full source-derived destination
+set as the model constraint and use corpus counts only as frequency evidence.
 
 ## Interdependencies and routing
 
@@ -254,7 +325,9 @@ flowchart LR
   ORDER --> OUT[Main output]
 ```
 
-The confirmed destination ordinals are the first five: `Filter1`, `Filter2`, `DualFilters`, `Effects`, `DirectOut`, coming from the Vita binding of `constants::SourceDestination`. The Vital loader’s legacy conversion logic also proves those raw ordinals in practice when it maps old `sub_*` and old filter-input routing into `osc_<n>_destination` values `0..4`. What remains unresolved from the accessed sources is the exact label ordering for any **higher destination ordinals** above those first five, even though the raw range extends upward by `kNumEffects`. That strongly suggests direct routing into specific effect positions is represented numerically, but the exact full ordinal map is not exposed in the snippets recovered here. citeturn24view0turn36view3turn36view4turn10view3
+Source correction: the string table resolves destination labels for ordinals `0..13` in this order: `Filter 1`, `Filter 2`, `Filter 1+2`, `Effects`, `Direct Out`, `Chorus`, `Compressor`, `Delay`, `Distortion`, `EQ`, `FX Filter`, `Flanger`, `Phaser`, `Reverb`. The parameter metadata advertises a raw maximum of `kNumSourceDestinations + kNumEffects = 14`, while the lookup table has only 14 entries (`0..13`). Treat ordinal `14` as a source-level off-by-one/inconsistency and constrain model outputs to the labeled `0..13` set until a runtime build proves otherwise. The corpus only observes `0..4` for `sample_destination` and `0..9` for oscillator destinations.
+
+The first five destination ordinals are `Filter1`, `Filter2`, `DualFilters`, `Effects`, and `DirectOut`, as also used by the legacy conversion logic. The complete source label table and its ordinal-14 inconsistency are recorded in the source correction immediately above.
 
 The effects system itself contains nine effect identities in the Vita constants: `Chorus`, `Compressor`, `Delay`, `Distortion`, `Eq`, `FilterFx`, `Flanger`, `Phaser`, and `Reverb`. `effect_chain_order` is therefore a permutation index over those nine effects, with raw range `0..factorial(9)-1 = 362879`. Effect on/off controls and mix controls interact with that permutation: the chain order sets the serial order, while each block’s `*_on` and `*_dry_wet` or `*_mix` determine whether and how much of that effect contributes. citeturn24view0turn30view6turn31view0turn31view1turn31view2turn31view3turn32view2
 
@@ -294,18 +367,29 @@ A few key interdependencies matter operationally:
 - Modulation remaps are sparse: `line_mapping` appears only when the remap is non-linear. Linear remaps are implicit. citeturn39view4
 - LFO and modulation-remap shapes both serialize through the same line-generator family. Structurally, those are cousins, not unrelated blobs. citeturn39view4turn39view5
 
+Source-trace before/after examples for default filling, implicit linear maps,
+legacy field renames, sub-oscillator migration, and tempo-index shifts are
+recorded in `canonicalization_examples.json`. They are source-trace evidence,
+not runtime-verified round trips.
+
 ## Corrections, unresolved items, and modeling implications
 
 The strongest corrections and errata are all source-backed. `beats_per_minute` is raw `0.333333333..5.0` with display multiplier `60`, so it is a **stored BPS parameter mislabeled as BPM** in the control name. `voice_priority` and `voice_override` are numeric enum indices, with Vita exposing the concrete label sets `Newest/Oldest/Highest/Lowest/RoundRobin` and `Kill/Steal`. `distortion_drive` inherits `-30..30 dB` from `Distortion::kMinDrive` and `kMaxDrive`. The compressor family spans **21 scalar controls**, not a minimal three- or four-knob abstraction. citeturn44view0turn26view0turn28view1turn40view0
 
-Several items remain unresolved and should be treated explicitly as such in any schema document or dataset:
+Remaining uncertainties after this source/corpus pass should be treated explicitly:
 
-- The exact inner schema of `settings.sample`.
-- The exact inner schema of each `settings.wavetables[i]` object.
-- The exact inner schema of `settings.lfos[i]` and modulation `line_mapping`.
-- The exact current number of `random_<n>_*` families in the standard build, from the accessed primary files.
-- The exact label ordering for several Vital string lookups not surfaced in the accessed snippets, including `delay_style`, `oversampling`, `stereo_mode`, EQ band modes, `distortion_filter_order`, and the full extended `destination` list beyond the first five confirmed ordinals.
-- The semantics of some three-state UI-like fields whose lookup table reference appears inconsistent in the recovered lines, especially `view_spectrogram` and `osc_<n>_view_2d`. citeturn36view0turn39view5turn29view0turn30view7turn10view3
+- The exact binary release/build corresponding to the source snapshot; no
+  release tag or reliable source-to-binary mapping was recovered.
+- A headless runtime verification of the 772 current-control count, omitted
+  nested-state behavior, destination ordinal 14, and save/load canonicalization.
+- The source revision that introduced the five 1.5.x fields and the 128 1.6.x
+  modulation-ramp fields.
+- The semantics of three-state UI-like fields whose lookup table reference is
+  inconsistent with the raw range, especially `view_spectrogram` and
+  `osc_<n>_view_2d`.
+- A stable default sample payload: source initialization generates random
+  white noise, so the default must be represented by a fixed exemplar or
+  excluded as an opaque payload.
 
 For your training setup—default sample oscillator and default wavetables only—the best ML output format is:
 

@@ -258,7 +258,7 @@ models:
     source_url: https://github.com/muscriptor/muscriptor
     checkpoint_url: https://huggingface.co/MuScriptor/muscriptor-large
     availability: unavailable
-    unavailability_reason: exact pinned checkpoint acquisition returned gated access (HTTP 403); no authorized account access is available
+    unavailability_reason: checkpoint is gated and no approved credential or local copy is available
     stock_inference:
       use_sampling: false
       temperature: 1.0
