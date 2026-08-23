@@ -82,7 +82,7 @@ These are verified inventory facts, separated from observations produced by exec
 | `yptf_moe_multi` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | `mimbres/YourMT3 @ 5e66c1ea173a8186e0d20432b841d3180cc015b5` | official source and checkpoint are not present in permitted local storage |
 | `muscriptor_small` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-small @ 8c127f603b807520fa465c838e9bfee8a91ada4e` | available and verified for this run |
 | `muscriptor_medium` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-medium @ f32236969308476e01fd3aae67357de5feb05a2d` | available and verified for this run |
-| `muscriptor_large` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-large @ 8809fdfbed2affa7ade94a7059e746e3880720e7` | exact pinned checkpoint acquisition returned gated access (HTTP 403); no authorized account access is available |
+| `muscriptor_large` | `muscriptor/muscriptor @ c3a50ec3f7a54361495b79ed8875ba330240324c` | `MuScriptor/muscriptor-large @ 8809fdfbed2affa7ade94a7059e746e3880720e7` | checkpoint is gated and no approved credential or local copy is available |
 
 Checkpoint lock status is explicit in the JSON source of truth: `locked` means the public digest and byte size are fixed; `gated_digest_not_exposed_without_access` means the immutable model revision and public size are recorded but the upstream gated service did not expose a digest without access. Neither state implies local executability.
 
@@ -199,7 +199,7 @@ The table distinguishes a genuine candidate-level blocker or load failure from a
 | `ymt3_plus` | `unavailable` | official source and checkpoint are not present in permitted local storage | no comparative quality/cost result |
 | `yptf_multi` | `unavailable` | official source and checkpoint are not present in permitted local storage | no comparative quality/cost result |
 | `yptf_moe_multi` | `unavailable` | official source and checkpoint are not present in permitted local storage | no comparative quality/cost result |
-| `muscriptor_large` | `unavailable` | exact pinned checkpoint acquisition returned gated access (HTTP 403); no authorized account access is available | no comparative quality/cost result |
+| `muscriptor_large` | `unavailable` | checkpoint is gated and no approved credential or local copy is available | no comparative quality/cost result |
 
 ## Partial or incomplete candidate execution
 
@@ -242,7 +242,7 @@ The remaining blocked candidates require the following concrete external prerequ
 - `ymt3_plus`: official source and checkpoint are not present in permitted local storage.
 - `yptf_multi`: official source and checkpoint are not present in permitted local storage.
 - `yptf_moe_multi`: official source and checkpoint are not present in permitted local storage.
-- `muscriptor_large`: exact pinned checkpoint acquisition returned gated access (HTTP 403); no authorized account access is available.
+- `muscriptor_large`: checkpoint is gated and no approved credential or local copy is available.
 - After those prerequisites become available, run only the fixed common #25 population and applicable #24 cost routes; do not infer their results from measured candidates.
 
 ## Contract and privacy limits
