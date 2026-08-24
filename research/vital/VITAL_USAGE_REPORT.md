@@ -48,6 +48,14 @@ Figure 7 is a cumulative head-versus-tail view. The x-axis is the rank of a para
 
 The prevalence figures above answer whether a control changed. The companion [parameter value distribution report](VITAL_PARAMETER_DISTRIBUTIONS.md) adds exact frequencies for **351 categorical/enum parameters** and scale-aware distributions for **553 continuous parameters**.
 
+![Categorical value concentration](vital_usage_figures/12_categorical_value_concentration.png)
+
+The categorical summary chart shows the modal value and its observed share for the 20 least concentrated (most varied) categorical/enum parameters, alongside the modal-share distribution across all **351** categorical/enum parameters. Labels use the pinned atlas option names where available; the full frequency table remains in the companion CSV.
+
+![Continuous dominant-bin concentration](vital_usage_figures/13_continuous_dominant_bin_concentration.png)
+
+The continuous summary chart shows the largest 64-bin mass for the 20 least concentrated (most varied) continuous parameters with at least 100 observations, alongside the distribution of largest-bin share across all **553** continuous parameters. Each bar represents a range rather than an exact floating-point mode; raw/normalized edges, quantiles, defaults, zero prevalence, sparse controls, and fallback notes remain in the companion report and CSV.
+
 The complete categorical value table is `vital_usage_categorical_values.csv`; the complete continuous 64-bin table is `vital_usage_continuous_bins.csv`. The main parameter CSV also carries per-parameter summaries and dominant-bin JSON.
 
 ![Modulation family matrix](vital_usage_figures/08_modulation_family_matrix.png)

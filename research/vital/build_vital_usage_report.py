@@ -427,6 +427,87 @@ def make_figures(data: dict[str, Any], figures: Path, weight: str) -> dict[str, 
     save_figure(fig, path)
     paths["duplicate_sensitivity"] = path.name
 
+    categorical_modes = []
+    continuous_modes = []
+    continuous_all_shares = []
+    for name, parameter in aggregate["parameters"].items():
+        parameter_type = parameter.get("parameter_type")
+        if parameter_type == "categorical":
+            frequencies = parameter.get("value_frequencies", [])
+            if frequencies:
+                mode = frequencies[0]
+                categorical_modes.append({
+                    "name": name,
+                    "label": f"{name} = {value_text(mode)}",
+                    "share": mode["frequency"] * 100,
+                    "count": mode["count"],
+                })
+        elif parameter_type == "continuous":
+            dominant_bins = parameter.get("distribution", {}).get("dominant_bins", [])
+            if dominant_bins:
+                mode = dominant_bins[0]
+                continuous_all_shares.append(mode["frequency"] * 100)
+                if parameter.get("observed", 0) < 100:
+                    continue
+                continuous_modes.append({
+                    "name": name,
+                    "share": mode["frequency"] * 100,
+                    "count": mode["count"],
+                })
+
+    categorical_modes.sort(key=lambda row: (row["share"], -row["count"], row["name"]))
+    categorical_top = list(reversed(categorical_modes[:20]))
+    categorical_shares = [row["share"] for row in categorical_modes]
+    categorical_median = float(np.median(categorical_shares)) if categorical_shares else 0.0
+    fig, axes = plt.subplots(1, 2, figsize=(15, 9), gridspec_kw={"width_ratios": [2.3, 1.0]})
+    categorical_labels = [row["label"] for row in categorical_top]
+    categorical_values = [row["share"] for row in categorical_top]
+    categorical_counts = [row["count"] for row in categorical_top]
+    bars = axes[0].barh(categorical_labels, categorical_values, color="#8c5b9e")
+    axes[0].set_title("Broadest categorical value distributions")
+    axes[0].set_xlabel("Modal value share (%)")
+    axes[0].set_xlim(0, 105)
+    axes[0].tick_params(axis="y", labelsize=8)
+    annotate_bars(axes[0], bars, categorical_labels, categorical_values, categorical_counts)
+    axes[1].hist(categorical_shares, bins=np.linspace(0, 100, 11), color="#c39b4d", edgecolor="white")
+    axes[1].axvline(categorical_median, color="#5b3d72", linestyle="--", linewidth=1.5, label=f"median {categorical_median:.1f}%")
+    axes[1].set_title(f"All {len(categorical_modes):,} categorical parameters")
+    axes[1].set_xlabel("Modal value share (%)")
+    axes[1].set_ylabel("Parameters")
+    axes[1].set_xlim(0, 100)
+    axes[1].legend(fontsize=8)
+    fig.suptitle("Categorical/enum value concentration", y=1.01)
+    fig.tight_layout()
+    path = figures / "12_categorical_value_concentration.png"
+    save_figure(fig, path)
+    paths["categorical_value_concentration"] = path.name
+
+    continuous_modes.sort(key=lambda row: (row["share"], -row["count"], row["name"]))
+    continuous_top = list(reversed(continuous_modes[:20]))
+    continuous_shares = continuous_all_shares
+    continuous_median = float(np.median(continuous_shares)) if continuous_shares else 0.0
+    fig, axes = plt.subplots(1, 2, figsize=(14, 8), gridspec_kw={"width_ratios": [2.0, 1.0]})
+    continuous_labels = [row["name"] for row in continuous_top]
+    continuous_values = [row["share"] for row in continuous_top]
+    continuous_counts = [row["count"] for row in continuous_top]
+    bars = axes[0].barh(continuous_labels, continuous_values, color="#426b9a")
+    axes[0].set_title("Broadest continuous distributions")
+    axes[0].set_xlabel("Largest 64-bin share (%)")
+    axes[0].set_xlim(0, 105)
+    annotate_bars(axes[0], bars, continuous_labels, continuous_values, continuous_counts)
+    axes[1].hist(continuous_shares, bins=np.linspace(0, 100, 11), color="#bd5b4b", edgecolor="white")
+    axes[1].axvline(continuous_median, color="#71302c", linestyle="--", linewidth=1.5, label=f"median {continuous_median:.1f}%")
+    axes[1].set_title(f"All {len(continuous_shares):,} continuous parameters")
+    axes[1].set_xlabel("Largest 64-bin share (%)")
+    axes[1].set_ylabel("Parameters")
+    axes[1].set_xlim(0, 100)
+    axes[1].legend(fontsize=8)
+    fig.suptitle("Continuous dominant-range concentration", y=1.01)
+    fig.tight_layout()
+    path = figures / "13_continuous_dominant_bin_concentration.png"
+    save_figure(fig, path)
+    paths["continuous_dominant_bin_concentration"] = path.name
+
     return paths
 
 
@@ -514,6 +595,14 @@ def build_report(census_path: Path, report_path: Path, figures_path: Path, weigh
         "## Parameter value distributions",
         "",
         f"The prevalence figures above answer whether a control changed. The companion [parameter value distribution report]({distribution_report_link}) adds exact frequencies for **{categorical_count:,} categorical/enum parameters** and scale-aware distributions for **{continuous_count:,} continuous parameters**.",
+        "",
+        f"![Categorical value concentration]({figure_link('categorical_value_concentration')})",
+        "",
+        f"The categorical summary chart shows the modal value and its observed share for the 20 least concentrated (most varied) categorical/enum parameters, alongside the modal-share distribution across all **{categorical_count:,}** categorical/enum parameters. Labels use the pinned atlas option names where available; the full frequency table remains in the companion CSV.",
+        "",
+        f"![Continuous dominant-bin concentration]({figure_link('continuous_dominant_bin_concentration')})",
+        "",
+        f"The continuous summary chart shows the largest 64-bin mass for the 20 least concentrated (most varied) continuous parameters with at least 100 observations, alongside the distribution of largest-bin share across all **{continuous_count:,}** continuous parameters. Each bar represents a range rather than an exact floating-point mode; raw/normalized edges, quantiles, defaults, zero prevalence, sparse controls, and fallback notes remain in the companion report and CSV.",
         "",
         "The complete categorical value table is `vital_usage_categorical_values.csv`; the complete continuous 64-bin table is `vital_usage_continuous_bins.csv`. The main parameter CSV also carries per-parameter summaries and dominant-bin JSON.",
         "",
