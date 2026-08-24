@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import sys
 from pathlib import Path
@@ -17,7 +18,7 @@ if str(repository_root) not in sys.path:
 from research.vital.build_vital_usage_census import MAJOR_FAMILIES
 
 
-REPORT_VERSION = "1.0.0"
+REPORT_VERSION = "1.1.0"
 DEFAULT_CENSUS = Path("research") / "vital" / "vital_usage_census.json"
 DEFAULT_REPORT = Path("research") / "vital" / "VITAL_USAGE_REPORT.md"
 DEFAULT_FIGURES = Path("research") / "vital" / "vital_usage_figures"
@@ -70,6 +71,125 @@ def parameter_rows(data: dict[str, Any], weight: str) -> list[dict[str, Any]]:
             "family": values["introduced_feature"] or "shared",
         })
     return rows
+
+
+def format_number(value: Any) -> str:
+    if value is None:
+        return "—"
+    value = float(value)
+    if value == 0:
+        return "0"
+    if abs(value) >= 1000 or abs(value) < 0.001:
+        return f"{value:.4g}"
+    return f"{value:.5f}".rstrip("0").rstrip(".")
+
+
+def raw_from_normalized(value: float | None, parameter: dict[str, Any]) -> float | None:
+    if value is None or parameter.get("minimum") is None or parameter.get("maximum") is None:
+        return value
+    position = value
+    scale = parameter.get("scale")
+    if scale == "Quadratic":
+        position = math.sqrt(max(0.0, value))
+    elif scale == "Cubic":
+        position = value ** (1.0 / 3.0)
+    elif scale == "Quartic":
+        position = value ** 0.25
+    elif scale == "SquareRoot":
+        position = value * value
+    span = parameter["maximum"] - parameter["minimum"]
+    return parameter["minimum"] + position * span
+
+
+def value_text(row: dict[str, Any]) -> str:
+    value = format_number(row.get("value"))
+    label = row.get("label")
+    return f"{value} ({label})" if label else value
+
+
+def dominant_bin_text(parameter: dict[str, Any], row: dict[str, Any]) -> str:
+    domain = parameter.get("distribution", {}).get("domain")
+    lower = row.get("lower")
+    upper = row.get("upper")
+    if domain == "normalized":
+        raw_lower = raw_from_normalized(lower, parameter)
+        raw_upper = raw_from_normalized(upper, parameter)
+        interval = f"{format_number(raw_lower)}–{format_number(raw_upper)} raw / {format_number(lower)}–{format_number(upper)} norm"
+    else:
+        interval = f"{format_number(lower)}–{format_number(upper)} raw"
+    return f"{interval}: {row['count']:,} ({row['frequency'] * 100:.1f}%)"
+
+
+def write_parameter_distribution_report(data: dict[str, Any], path: Path, weight: str) -> None:
+    aggregate = data[weight]
+    parameters = aggregate["parameters"]
+    categorical = [(name, values) for name, values in parameters.items() if values.get("parameter_type") == "categorical"]
+    continuous = [(name, values) for name, values in parameters.items() if values.get("parameter_type") == "continuous"]
+    categorical.sort(key=lambda item: item[0])
+    continuous.sort(key=lambda item: item[0])
+    raw_fallback_count = sum("distribution_note" in values for _, values in continuous)
+    lines = [
+        "# Vital Parameter Value Distributions",
+        "",
+        f"This companion report uses the **{weight.replace('_', ' ')}** aggregate ({aggregate['parsed_files']:,} parsed presets). It adds value-level frequencies and distributions to the prevalence census.",
+        "",
+        "The row-oriented exports are the complete machine-readable detail: [`vital_usage_categorical_values.csv`](vital_usage_categorical_values.csv) contains one row per categorical value, and [`vital_usage_continuous_bins.csv`](vital_usage_continuous_bins.csv) contains all 64 histogram bins for each continuous parameter, with both file-weighted and exact-deduplicated counts.",
+        "",
+        "Categorical values are Vital's raw numeric ordinals. Labels are included when the pinned atlas provides an option list. Their denominator is the observed value count under the existing policy that fills missing common scalar keys with the atlas default.",
+        "",
+        f"Continuous parameters include raw-value min/max/mean/stddev, histogram quantiles, default and zero prevalence, and dominant bins. Atlas-backed controls use 64 bins in normalized control position, preserving the parameter's scale metadata; version-introduced controls without atlas bounds use adaptive raw-value bins. {raw_fallback_count} atlas-backed controls also use complete raw-value bins because their corpus observations exceed the pinned bounds; their partial normalized histograms remain in the JSON. For an `Exponential` parameter, the raw Vital value is already the logarithmic storage domain.",
+        "",
+        f"## Categorical and enum frequencies ({len(categorical):,} parameters)",
+        "",
+        "The table shows every parameter's most frequent values; the CSV retains every observed ordinal, including the tail.",
+        "",
+        "| Parameter | Scale | Observed | Distinct | Modal values |",
+        "|---|---|---:|---:|---|",
+    ]
+    for name, values in categorical:
+        frequencies = values.get("value_frequencies", [])
+        modal = "; ".join(f"{value_text(row)}: {row['count']:,} ({row['frequency'] * 100:.1f}%)" for row in frequencies[:8]) or "—"
+        if len(frequencies) > 8:
+            modal += f"; … {len(frequencies) - 8:,} more in CSV"
+        lines.append(f"| `{name}` | {values.get('scale') or '—'} | {values.get('observed', 0):,} | {len(frequencies):,} | {modal} |")
+
+    lines.extend([
+        "",
+        f"## Continuous parameter distributions ({len(continuous):,} parameters)",
+        "",
+        "Quantiles are reported in the distribution domain shown in the `Domain` column. The raw range and raw mean remain visible even when the histogram uses normalized position.",
+        "",
+        "| Parameter | Scale | Observed | Raw range | Raw mean ± sd | Default | Zero | Domain | p05 / p50 / p95 | Dominant bins |",
+        "|---|---|---:|---|---|---:|---:|---|---|---|",
+    ])
+    for name, values in continuous:
+        summary = values.get("observed_value_summary", {})
+        distribution = values.get("distribution", {})
+        quantiles = distribution.get("quantiles", {})
+        dominant = distribution.get("dominant_bins", [])
+        default_frequency = values.get("default_frequency")
+        zero_frequency = (values.get("observed", 0) - values.get("nonzero", 0)) / values["observed"] if values.get("observed") else None
+        if distribution.get("domain") == "normalized":
+            quantile_text = " / ".join(format_number(raw_from_normalized(quantiles.get(key), values)) for key in ("p05", "p50", "p95"))
+        else:
+            quantile_text = " / ".join(format_number(quantiles.get(key)) for key in ("p05", "p50", "p95"))
+        dominant_text = "<br>".join(dominant_bin_text(values, row) for row in dominant[:3]) or "—"
+        lines.append(
+            f"| `{name}` | {values.get('scale') or '—'} | {values.get('observed', 0):,} | {format_number(summary.get('min'))}–{format_number(summary.get('max'))} | {format_number(summary.get('mean'))} ± {format_number(summary.get('stddev'))} | {format_number(default_frequency * 100 if default_frequency is not None else None)}% | {format_number(zero_frequency * 100 if zero_frequency is not None else None)}% | {distribution.get('domain', '—')} | {quantile_text} | {dominant_text} |"
+        )
+
+    lines.extend([
+        "",
+        "## Interpretation cautions",
+        "",
+        "- A categorical mode is a storage-value mode, not a claim that the corresponding UI choice is perceptually dominant.",
+        "- A continuous dominant bin is a range, not an exact mode. This avoids pretending that arbitrary floating-point values have exact categorical semantics.",
+        "- The normalized histogram follows Vital's raw control scale. It is useful for comparing differently ranged controls, while the raw summary preserves the actual serialized values.",
+        "- These aggregates contain no preset paths, names, authors, raw wavetable/sample payloads, or per-file records.",
+        "",
+    ])
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines), encoding="utf-8")
 
 
 def make_figures(data: dict[str, Any], figures: Path, weight: str) -> dict[str, str]:
@@ -317,6 +437,9 @@ def build_report(census_path: Path, report_path: Path, figures_path: Path, weigh
     unique_denominator = data["exact_deduplicated"]["parsed_files"]
     figures = make_figures(data, figures_path, weight)
     figure_link = lambda name: os.path.relpath(figures_path / figures[name], report_path.parent).replace(os.sep, "/")
+    distribution_report_path = report_path.with_name("VITAL_PARAMETER_DISTRIBUTIONS.md")
+    write_parameter_distribution_report(data, distribution_report_path, weight)
+    distribution_report_link = os.path.relpath(distribution_report_path, report_path.parent).replace(os.sep, "/")
 
     families = component_family_rows(data, weight)
     top_family = families[0] if families else ("unknown", 0.0, 0)
@@ -324,6 +447,8 @@ def build_report(census_path: Path, report_path: Path, figures_path: Path, weigh
     top_pattern = next(iter(patterns.items()), ("none", 0))
     params = parameter_rows(data, weight)
     top_parameter = sorted(params, key=lambda row: (-row["non_default"], row["name"]))[0] if params else None
+    categorical_count = sum(values.get("parameter_type") == "categorical" for values in aggregate["parameters"].values())
+    continuous_count = sum(values.get("parameter_type") == "continuous" for values in aggregate["parameters"].values())
     introduced = {
         name: values
         for name, values in aggregate["parameters"].items()
@@ -386,6 +511,12 @@ def build_report(census_path: Path, report_path: Path, figures_path: Path, weigh
         "",
         "Figure 7 is a cumulative head-versus-tail view. The x-axis is the rank of a parameter by non-default count; the y-axis is the share of all counted non-default observations covered by that prefix. It shows concentration without imposing an arbitrary prevalence cutoff.",
         "",
+        "## Parameter value distributions",
+        "",
+        f"The prevalence figures above answer whether a control changed. The companion [parameter value distribution report]({distribution_report_link}) adds exact frequencies for **{categorical_count:,} categorical/enum parameters** and scale-aware distributions for **{continuous_count:,} continuous parameters**.",
+        "",
+        "The complete categorical value table is `vital_usage_categorical_values.csv`; the complete continuous 64-bin table is `vital_usage_continuous_bins.csv`. The main parameter CSV also carries per-parameter summaries and dominant-bin JSON.",
+        "",
         f"![Modulation family matrix]({figure_link('modulation_family_matrix')})",
         "",
         f"Figure 8 counts live routes only: connected routes that are not bypassed and have non-zero amount. The census separately retains connected-route source/destination vocabularies, connected, bypassed, zero-amount, non-zero-amount, bipolar, stereo, explicit-linear, and custom-remap counts. In this view, the plotted source/destination prevalence is therefore about operational routing, while a populated but bypassed or zero-amount connection remains visible in the supporting JSON.",
@@ -424,7 +555,7 @@ def build_report(census_path: Path, report_path: Path, figures_path: Path, weigh
         "python research/vital/build_vital_usage_census.py",
         "python research/vital/build_vital_usage_report.py",
         "```",
-        "The aggregate source of truth is [`vital_usage_census.json`](vital_usage_census.json); the complete scalar lookup table is [`vital_usage_parameters.csv`](vital_usage_parameters.csv).",
+        "The aggregate source of truth is [`vital_usage_census.json`](vital_usage_census.json); the complete scalar lookup table is [`vital_usage_parameters.csv`](vital_usage_parameters.csv), with row-level categorical and continuous distribution exports beside it.",
         "",
     ]
     report_path.parent.mkdir(parents=True, exist_ok=True)

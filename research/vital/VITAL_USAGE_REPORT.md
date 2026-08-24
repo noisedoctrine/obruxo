@@ -44,6 +44,12 @@ Figure 6 ranks atlas-backed scalar changes globally and conditional on an active
 
 Figure 7 is a cumulative head-versus-tail view. The x-axis is the rank of a parameter by non-default count; the y-axis is the share of all counted non-default observations covered by that prefix. It shows concentration without imposing an arbitrary prevalence cutoff.
 
+## Parameter value distributions
+
+The prevalence figures above answer whether a control changed. The companion [parameter value distribution report](VITAL_PARAMETER_DISTRIBUTIONS.md) adds exact frequencies for **351 categorical/enum parameters** and scale-aware distributions for **553 continuous parameters**.
+
+The complete categorical value table is `vital_usage_categorical_values.csv`; the complete continuous 64-bin table is `vital_usage_continuous_bins.csv`. The main parameter CSV also carries per-parameter summaries and dominant-bin JSON.
+
 ![Modulation family matrix](vital_usage_figures/08_modulation_family_matrix.png)
 
 Figure 8 counts live routes only: connected routes that are not bypassed and have non-zero amount. The census separately retains connected-route source/destination vocabularies, connected, bypassed, zero-amount, non-zero-amount, bipolar, stereo, explicit-linear, and custom-remap counts. In this view, the plotted source/destination prevalence is therefore about operational routing, while a populated but bypassed or zero-amount connection remains visible in the supporting JSON.
@@ -82,4 +88,4 @@ conda activate py312
 python research/vital/build_vital_usage_census.py
 python research/vital/build_vital_usage_report.py
 ```
-The aggregate source of truth is [`vital_usage_census.json`](vital_usage_census.json); the complete scalar lookup table is [`vital_usage_parameters.csv`](vital_usage_parameters.csv).
+The aggregate source of truth is [`vital_usage_census.json`](vital_usage_census.json); the complete scalar lookup table is [`vital_usage_parameters.csv`](vital_usage_parameters.csv), with row-level categorical and continuous distribution exports beside it.

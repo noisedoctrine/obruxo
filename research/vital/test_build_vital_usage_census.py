@@ -8,6 +8,8 @@ from research.vital.build_vital_usage_census import (
     build_census,
     line_mapping_is_linear,
     semantic_nested_state,
+    write_categorical_values_csv,
+    write_continuous_bins_csv,
 )
 from research.data_generation.obruxo_data.vital.atlas import VitalSchema
 
@@ -93,6 +95,58 @@ def test_version_introduced_parameters_use_restricted_denominators_and_unknown_d
     assert ramp["eligible"] == 1
     assert ramp["nonzero"] == 1
     assert ramp["non_default"] is None
+    assert spectral["parameter_type"] == "continuous"
+    assert spectral["distribution"]["domain"] == "raw"
+    assert spectral["observed_value_summary"]["count"] == 1
+
+
+def test_parameter_distributions_cover_enum_frequencies_and_continuous_modes(tmp_path) -> None:
+    schema, first_document = make_document()
+    first_document["settings"]["chorus_on"] = 0.0
+    first_document["settings"]["osc_1_level"] = schema.parameters["osc_1_level"].default
+    (tmp_path / "first.vital").write_text(json.dumps(first_document), encoding="utf-8")
+
+    _, second_document = make_document()
+    second_document["settings"]["chorus_on"] = 1.0
+    second_document["settings"]["osc_1_level"] = 0.25
+    (tmp_path / "second.vital").write_text(json.dumps(second_document), encoding="utf-8")
+
+    census = build_census(tmp_path, schema=schema, progress_every=0)
+    categorical = census["file_weighted"]["parameters"]["chorus_on"]
+    frequencies = {row["value"]: row for row in categorical["value_frequencies"]}
+    assert categorical["parameter_type"] == "categorical"
+    assert categorical["options"] == ["Off", "On"]
+    assert frequencies[0.0]["count"] == 1
+    assert frequencies[0.0]["label"] == "Off"
+    assert frequencies[1.0]["count"] == 1
+    assert frequencies[1.0]["label"] == "On"
+    assert sum(row["frequency"] for row in categorical["value_frequencies"]) == 1.0
+
+    continuous = census["file_weighted"]["parameters"]["osc_1_level"]
+    assert continuous["parameter_type"] == "continuous"
+    assert continuous["distribution"]["domain"] == "normalized"
+    assert continuous["observed_value_summary"]["count"] == 2
+    assert continuous["default_count"] == 1
+    assert sum(continuous["distribution"]["counts"]) == 2
+    assert set(continuous["distribution"]["quantiles"]) == {"p01", "p05", "p25", "p50", "p75", "p95", "p99"}
+    assert continuous["distribution"]["dominant_bins"]
+
+
+def test_distribution_exports_are_row_oriented(tmp_path) -> None:
+    schema, document = make_document()
+    document["settings"]["chorus_on"] = 1.0
+    document["settings"]["osc_1_level"] = 0.25
+    (tmp_path / "one.vital").write_text(json.dumps(document), encoding="utf-8")
+    census = build_census(tmp_path, schema=schema, progress_every=0)
+    categorical_path = tmp_path / "categorical.csv"
+    continuous_path = tmp_path / "continuous.csv"
+    write_categorical_values_csv(categorical_path, census)
+    write_continuous_bins_csv(continuous_path, census)
+
+    categorical_text = categorical_path.read_text(encoding="utf-8")
+    assert "chorus_on,Chorus Switch,Indexed,0.0,1.0,1.0,On" in categorical_text
+    continuous_rows = continuous_path.read_text(encoding="utf-8").splitlines()
+    assert sum(row.startswith("osc_1_level,") for row in continuous_rows) == 64
 
 
 def test_duplicate_and_payload_policies(tmp_path) -> None:

@@ -39,12 +39,13 @@ from research.data_generation.obruxo_data.vital.components import (
 from research.vital.build_vital_corpus_audit import iter_vital_files, load_json_bytes
 
 
-SCRIPT_VERSION = "1.0.0"
+SCRIPT_VERSION = "1.1.0"
 DEFAULT_ROOT = Path("datasets") / "presetshare" / "raw" / "presetshare_files" / "data"
 DEFAULT_OUTPUT = Path("research") / "vital" / "vital_usage_census.json"
 DEFAULT_REPORT = Path("research") / "vital" / "VITAL_USAGE_REPORT.md"
 DEFAULT_FIGURES = Path("research") / "vital" / "vital_usage_figures"
 FLOAT_TOLERANCE = 1e-7
+DISTRIBUTION_BIN_COUNT = 64
 FEATURE_DEFAULT_UNAVAILABLE = object()
 PAYLOAD_KEYS = frozenset({"audio_file", "samples", "samples_stereo", "wave_data", "line"})
 STOCK_SAMPLE_NAMES = frozenset({
@@ -357,6 +358,17 @@ def default_for_parameter(name: str, schema: VitalSchema, parameter_specs: dict[
     return FEATURE_DEFAULT_UNAVAILABLE, introduced_feature(name)
 
 
+def normalized_parameter_value(parameter: Any, value: float) -> float:
+    """Convert a raw value to atlas position, including the Quartic scale."""
+    if parameter.scale == "Quartic":
+        span = parameter.maximum - parameter.minimum
+        if span == 0:
+            return 0.0
+        position = (value - parameter.minimum) / span
+        return position ** 4
+    return parameter.normalized_from_raw(value)
+
+
 @dataclass
 class RouteObservation:
     slot: int
@@ -541,6 +553,137 @@ def analyze_document(
 
 
 @dataclass
+class DistributionHistogram:
+    """A bounded histogram for normalized or raw scalar observations."""
+
+    fixed_minimum: float | None = None
+    fixed_maximum: float | None = None
+    bin_count: int = DISTRIBUTION_BIN_COUNT
+    counts: list[int] = field(default_factory=lambda: [0] * DISTRIBUTION_BIN_COUNT)
+    minimum: float | None = None
+    maximum: float | None = None
+    total: int = 0
+
+    def __post_init__(self) -> None:
+        if len(self.counts) != self.bin_count:
+            self.counts = [0] * self.bin_count
+        if self.fixed_minimum is not None:
+            self.minimum = self.fixed_minimum
+            self.maximum = self.fixed_maximum
+
+    @property
+    def fixed(self) -> bool:
+        return self.fixed_minimum is not None and self.fixed_maximum is not None
+
+    @property
+    def count(self) -> int:
+        return self.total
+
+    def _index(self, value: float, minimum: float, maximum: float) -> int:
+        if maximum <= minimum:
+            return 0
+        position = (value - minimum) / (maximum - minimum)
+        return max(0, min(self.bin_count - 1, int(position * self.bin_count)))
+
+    def _add_to_domain(self, value: float, minimum: float, maximum: float) -> None:
+        self.counts[self._index(value, minimum, maximum)] += 1
+
+    def add(self, value: float) -> None:
+        if not math.isfinite(value):
+            return
+        if self.fixed:
+            self._add_to_domain(value, float(self.fixed_minimum), float(self.fixed_maximum))
+            self.total += 1
+            return
+        if self.count == 0:
+            self.minimum = value
+            self.maximum = value
+            self.counts[0] = 1
+            self.total = 1
+            return
+        assert self.minimum is not None and self.maximum is not None
+        if value < self.minimum or value > self.maximum:
+            old_minimum, old_maximum = self.minimum, self.maximum
+            old_counts = self.counts
+            self.minimum = min(self.minimum, value)
+            self.maximum = max(self.maximum, value)
+            self.counts = [0] * self.bin_count
+            old_total = sum(old_counts)
+            if old_maximum == old_minimum:
+                self._add_to_domain(old_minimum, self.minimum, self.maximum)
+                self.counts[self._index(old_minimum, self.minimum, self.maximum)] += old_total - 1
+            else:
+                for index, count in enumerate(old_counts):
+                    if not count:
+                        continue
+                    center = old_minimum + (index + 0.5) * (old_maximum - old_minimum) / self.bin_count
+                    self.counts[self._index(center, self.minimum, self.maximum)] += count
+        self._add_to_domain(value, self.minimum, self.maximum)
+        self.total += 1
+
+    def _bounds(self, index: int) -> tuple[float, float] | None:
+        if self.minimum is None or self.maximum is None:
+            return None
+        if self.maximum <= self.minimum:
+            return self.minimum, self.maximum
+        width = (self.maximum - self.minimum) / self.bin_count
+        return self.minimum + index * width, self.minimum + (index + 1) * width
+
+    def quantile(self, quantile: float) -> float | None:
+        if not self.count:
+            return None
+        target = max(0.0, min(1.0, quantile)) * (self.count - 1)
+        cumulative = 0
+        for index, count in enumerate(self.counts):
+            if not count:
+                continue
+            if cumulative + count > target:
+                bounds = self._bounds(index)
+                if bounds is None:
+                    return None
+                fraction = (target - cumulative) / count
+                return bounds[0] + (bounds[1] - bounds[0]) * fraction
+            cumulative += count
+        return self.maximum
+
+    def dominant_bins(self, limit: int = 5) -> list[dict[str, float | int]]:
+        if not self.count:
+            return []
+        total = self.count
+        rows = []
+        for index, count in sorted(enumerate(self.counts), key=lambda item: (-item[1], item[0]))[:limit]:
+            if not count:
+                continue
+            bounds = self._bounds(index)
+            if bounds is None:
+                continue
+            rows.append({
+                "bin": index,
+                "lower": bounds[0],
+                "upper": bounds[1],
+                "count": count,
+                "frequency": count / total,
+            })
+        return rows
+
+    def as_dict(self) -> dict[str, Any]:
+        quantiles = {
+            f"p{int(level * 100):02d}": self.quantile(level)
+            for level in (0.01, 0.05, 0.25, 0.50, 0.75, 0.95, 0.99)
+        }
+        return {
+            "domain": "normalized" if self.fixed else "raw",
+            "bin_count": self.bin_count,
+            "count": self.count,
+            "minimum": self.minimum,
+            "maximum": self.maximum,
+            "counts": self.counts,
+            "quantiles": quantiles,
+            "dominant_bins": self.dominant_bins(),
+        }
+
+
+@dataclass
 class NumericSummary:
     count: int = 0
     minimum: float | None = None
@@ -575,6 +718,13 @@ class ParameterAggregate:
     default_source: str | None
     feature: str | None
     track_value_counts: bool
+    parameter_type: str = "continuous"
+    display_name: str = ""
+    display_units: str = ""
+    scale: str | None = None
+    minimum: float | None = None
+    maximum: float | None = None
+    options: tuple[str, ...] = ()
     eligible: int = 0
     observed: int = 0
     missing: int = 0
@@ -583,8 +733,20 @@ class ParameterAggregate:
     active_eligible: int = 0
     active_non_default: int = 0
     modulated: int = 0
+    default_count: int = 0
     value_counts: Counter[str] = field(default_factory=Counter)
+    observed_values: NumericSummary = field(default_factory=NumericSummary)
     non_default_values: NumericSummary = field(default_factory=NumericSummary)
+    distribution: DistributionHistogram | None = None
+    raw_distribution: DistributionHistogram | None = None
+
+    def __post_init__(self) -> None:
+        if self.parameter_type == "continuous" and self.distribution is None:
+            if self.minimum is not None and self.maximum is not None:
+                self.distribution = DistributionHistogram(fixed_minimum=0.0, fixed_maximum=1.0)
+                self.raw_distribution = DistributionHistogram()
+            else:
+                self.distribution = DistributionHistogram()
 
     @property
     def default_known(self) -> bool:
@@ -598,6 +760,7 @@ class ParameterAggregate:
         modulated: bool,
         missing: bool = False,
         use_default: float | object = FEATURE_DEFAULT_UNAVAILABLE,
+        distribution_value: float | None = None,
     ) -> None:
         self.eligible += 1
         if owner_active:
@@ -608,10 +771,16 @@ class ParameterAggregate:
         if value is None:
             return
         self.observed += 1
+        self.observed_values.add(value)
         if abs(value) > FLOAT_TOLERANCE:
             self.nonzero += 1
         if self.track_value_counts:
             self.value_counts[json.dumps(value, separators=(",", ":"))] += 1
+        elif self.distribution is not None:
+            if self.raw_distribution is not None:
+                self.raw_distribution.add(value)
+            if distribution_value is not None:
+                self.distribution.add(distribution_value)
         if use_default is not FEATURE_DEFAULT_UNAVAILABLE:
             changed = not math.isclose(value, float(use_default), abs_tol=FLOAT_TOLERANCE)
             if changed:
@@ -619,13 +788,42 @@ class ParameterAggregate:
                 self.non_default_values.add(value)
             if owner_active and changed:
                 self.active_non_default += 1
+            if not changed:
+                self.default_count += 1
+
+    def _value_label(self, value: float) -> str | None:
+        if not self.options or self.minimum is None:
+            return None
+        index = int(round(value - self.minimum))
+        if abs(value - (self.minimum + index)) > FLOAT_TOLERANCE or not 0 <= index < len(self.options):
+            return None
+        return self.options[index]
+
+    def value_frequency_rows(self) -> list[dict[str, Any]]:
+        total = sum(self.value_counts.values())
+        rows = []
+        for raw, count in sorted(self.value_counts.items(), key=lambda item: (-item[1], item[0])):
+            value = json.loads(raw)
+            row = {"value": value, "count": count, "frequency": count / total if total else 0.0}
+            label = self._value_label(float(value)) if is_number(value) else None
+            if label is not None:
+                row["label"] = label
+            rows.append(row)
+        return rows
 
     def as_dict(self) -> dict[str, Any]:
-        return {
+        values = {
             "default": self.default,
             "default_known": self.default_known,
             "default_source": self.default_source,
             "introduced_feature": self.feature,
+            "parameter_type": self.parameter_type,
+            "display_name": self.display_name,
+            "display_units": self.display_units,
+            "scale": self.scale,
+            "minimum": self.minimum,
+            "maximum": self.maximum,
+            "options": list(self.options),
             "value_counts_supported": self.track_value_counts,
             "eligible": self.eligible,
             "observed": self.observed,
@@ -635,9 +833,27 @@ class ParameterAggregate:
             "active_eligible": self.active_eligible,
             "active_non_default": self.active_non_default if self.default_known else None,
             "modulated": self.modulated,
+            "default_count": self.default_count if self.default_known else None,
+            "default_frequency": self.default_count / self.observed if self.default_known and self.observed else None,
             "value_counts": dict(sorted(self.value_counts.items())),
+            "value_frequencies": self.value_frequency_rows(),
+            "observed_value_summary": self.observed_values.as_dict(),
             "non_default_value_summary": self.non_default_values.as_dict() if self.default_known else None,
         }
+        if self.distribution is not None:
+            normalized = self.distribution.as_dict()
+            if self.raw_distribution is not None:
+                raw = self.raw_distribution.as_dict()
+                if normalized["count"] != self.observed:
+                    values["distribution"] = raw
+                    values["normalized_distribution"] = normalized
+                    values["distribution_note"] = "raw fallback because observations exceeded pinned atlas bounds"
+                else:
+                    values["distribution"] = normalized
+                    values["raw_distribution"] = raw
+            else:
+                values["distribution"] = normalized
+        return values
 
 
 @dataclass
@@ -805,25 +1021,42 @@ class Aggregate:
                 continue
             default, default_source = default_for_parameter(name, schema, parameter_specs)
             if name not in self.parameters:
+                spec = parameter_specs.get(name)
+                parameter_type = "categorical" if spec is not None and (spec.is_discrete or spec.scale == "Indexed") else "continuous"
                 self.parameters[name] = ParameterAggregate(
                     default=float(default) if default is not FEATURE_DEFAULT_UNAVAILABLE else None,
                     default_source=default_source if default is not FEATURE_DEFAULT_UNAVAILABLE else None,
                     feature=feature,
-                    track_value_counts=bool(
-                        name in parameter_specs
-                        and (parameter_specs[name].is_discrete or parameter_specs[name].scale == "Indexed")
-                    ),
+                    track_value_counts=parameter_type == "categorical",
+                    parameter_type=parameter_type,
+                    display_name=spec.display_name if spec is not None else name,
+                    display_units=spec.display_units if spec is not None else "",
+                    scale=spec.scale if spec is not None else None,
+                    minimum=spec.minimum if spec is not None else None,
+                    maximum=spec.maximum if spec is not None else None,
+                    options=spec.options if spec is not None else (),
                 )
             parameter = self.parameters[name]
             value = observation.scalar_values.get(name)
             if value is None and default is not FEATURE_DEFAULT_UNAVAILABLE:
                 value = float(default)
+            distribution_value = None
+            if value is not None and parameter.parameter_type == "continuous":
+                spec = parameter_specs.get(name)
+                if spec is None:
+                    distribution_value = value
+                else:
+                    try:
+                        distribution_value = normalized_parameter_value(spec, value)
+                    except ValueError:
+                        distribution_value = None
             parameter.add(
                 value,
                 owner_active=owner_is_active(name, observation, registry),
                 modulated=name in modulated_destinations,
                 missing=name not in observation.scalar_values,
                 use_default=default,
+                distribution_value=distribution_value,
             )
 
     def as_dict(self) -> dict[str, Any]:
@@ -886,7 +1119,7 @@ def build_census(root: Path, schema: VitalSchema | None = None, progress_every: 
             print(f"[{file_id:,}/{len(files):,}] parsed={weighted.parsed_files:,} failed={weighted.failed_files:,} rate={rate:.1f} files/s", flush=True)
 
     return {
-        "artifact_schema": "obruxo_vital_usage_census_v1",
+        "artifact_schema": "obruxo_vital_usage_census_v2",
         "script_version": SCRIPT_VERSION,
         "created_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "corpus_root_policy": "local external input; paths and raw payloads are not retained",
@@ -904,6 +1137,8 @@ def build_census(root: Path, schema: VitalSchema | None = None, progress_every: 
             "zero_amount_route": "connected route whose modulation amount is zero or unavailable",
             "operational_envelope_lfo_random": "the source appears in at least one live route; always-wired synth behavior is not inferred",
             "non_default": "scalar differs from the pinned atlas default; missing common scalar keys are treated as defaults",
+            "categorical_value_frequency": "exact raw ordinal frequency among observed values; atlas options are included when available",
+            "continuous_distribution": "64-bin distribution in normalized atlas control position when bounds are known, otherwise adaptive raw-value bins; quantiles are histogram estimates",
             "custom_lfo_shape": "shape descriptor differs from the canonical init shape, ignoring display name",
             "non_init_wavetable": "semantic descriptor differs from the canonical init wavetable, with payloads represented only by in-process hashes; this is diagnostic and is not itself a custom-content claim",
             "wavetable_content": "active wavetable slots are classified by known stock names or left unresolved; names do not prove payload provenance",
@@ -927,21 +1162,67 @@ def write_parameter_csv(path: Path, census: dict[str, Any]) -> None:
     rows = []
     for name, values in census["file_weighted"]["parameters"].items():
         unique = census["exact_deduplicated"]["parameters"].get(name, {})
+        distribution = values.get("distribution", {})
+        summary = values.get("observed_value_summary", {})
+        unique_distribution = unique.get("distribution", {})
+        unique_summary = unique.get("observed_value_summary", {})
         rows.append({
             "parameter": name,
             "introduced_feature": values["introduced_feature"] or "shared",
+            "parameter_type": values.get("parameter_type", "continuous"),
+            "display_name": values.get("display_name", name),
+            "display_units": values.get("display_units", ""),
+            "scale": values.get("scale", ""),
+            "minimum": values.get("minimum"),
+            "maximum": values.get("maximum"),
+            "default": values.get("default"),
+            "options": json.dumps(values.get("options", []), ensure_ascii=False),
             "default_known": values["default_known"],
             "file_weighted_eligible": values["eligible"],
+            "file_weighted_observed": values["observed"],
+            "file_weighted_missing": values["missing"],
+            "file_weighted_default_count": values.get("default_count"),
+            "file_weighted_default_frequency": values.get("default_frequency"),
             "file_weighted_non_default": values["non_default"],
             "file_weighted_active_eligible": values["active_eligible"],
             "file_weighted_active_non_default": values["active_non_default"],
             "file_weighted_modulated": values["modulated"],
             "file_weighted_nonzero": values["nonzero"],
+            "file_weighted_observed_min": summary.get("min"),
+            "file_weighted_observed_max": summary.get("max"),
+            "file_weighted_observed_mean": summary.get("mean"),
+            "file_weighted_observed_stddev": summary.get("stddev"),
+            "file_weighted_distribution_domain": distribution.get("domain"),
+            "file_weighted_p01": distribution.get("quantiles", {}).get("p01"),
+            "file_weighted_p05": distribution.get("quantiles", {}).get("p05"),
+            "file_weighted_p25": distribution.get("quantiles", {}).get("p25"),
+            "file_weighted_p50": distribution.get("quantiles", {}).get("p50"),
+            "file_weighted_p75": distribution.get("quantiles", {}).get("p75"),
+            "file_weighted_p95": distribution.get("quantiles", {}).get("p95"),
+            "file_weighted_p99": distribution.get("quantiles", {}).get("p99"),
+            "file_weighted_dominant_bins": json.dumps(distribution.get("dominant_bins", []), separators=(",", ":")),
             "deduplicated_eligible": unique.get("eligible", 0),
+            "deduplicated_observed": unique.get("observed", 0),
+            "deduplicated_missing": unique.get("missing", 0),
+            "deduplicated_default_count": unique.get("default_count"),
+            "deduplicated_default_frequency": unique.get("default_frequency"),
             "deduplicated_non_default": unique.get("non_default"),
             "deduplicated_active_non_default": unique.get("active_non_default"),
             "deduplicated_modulated": unique.get("modulated", 0),
             "deduplicated_nonzero": unique.get("nonzero", 0),
+            "deduplicated_observed_min": unique_summary.get("min"),
+            "deduplicated_observed_max": unique_summary.get("max"),
+            "deduplicated_observed_mean": unique_summary.get("mean"),
+            "deduplicated_observed_stddev": unique_summary.get("stddev"),
+            "deduplicated_distribution_domain": unique_distribution.get("domain"),
+            "deduplicated_p01": unique_distribution.get("quantiles", {}).get("p01"),
+            "deduplicated_p05": unique_distribution.get("quantiles", {}).get("p05"),
+            "deduplicated_p25": unique_distribution.get("quantiles", {}).get("p25"),
+            "deduplicated_p50": unique_distribution.get("quantiles", {}).get("p50"),
+            "deduplicated_p75": unique_distribution.get("quantiles", {}).get("p75"),
+            "deduplicated_p95": unique_distribution.get("quantiles", {}).get("p95"),
+            "deduplicated_p99": unique_distribution.get("quantiles", {}).get("p99"),
+            "deduplicated_dominant_bins": json.dumps(unique_distribution.get("dominant_bins", []), separators=(",", ":")),
         })
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(path.name + ".tmp")
@@ -952,11 +1233,118 @@ def write_parameter_csv(path: Path, census: dict[str, Any]) -> None:
     temporary.replace(path)
 
 
+def write_categorical_values_csv(path: Path, census: dict[str, Any]) -> None:
+    rows = []
+    weighted_parameters = census["file_weighted"]["parameters"]
+    unique_parameters = census["exact_deduplicated"]["parameters"]
+    for name, values in weighted_parameters.items():
+        if values.get("parameter_type") != "categorical":
+            continue
+        weighted_rows = {json.dumps(row["value"], separators=(",", ":")): row for row in values.get("value_frequencies", [])}
+        unique_rows = {
+            json.dumps(row["value"], separators=(",", ":")): row
+            for row in unique_parameters.get(name, {}).get("value_frequencies", [])
+        }
+        for raw in sorted(set(weighted_rows) | set(unique_rows)):
+            weighted = weighted_rows.get(raw, {})
+            unique = unique_rows.get(raw, {})
+            rows.append({
+                "parameter": name,
+                "display_name": values.get("display_name", name),
+                "scale": values.get("scale", ""),
+                "minimum": values.get("minimum"),
+                "maximum": values.get("maximum"),
+                "value": json.loads(raw),
+                "label": weighted.get("label", unique.get("label", "")),
+                "file_weighted_count": weighted.get("count", 0),
+                "file_weighted_frequency": weighted.get("frequency", 0.0),
+                "deduplicated_count": unique.get("count", 0),
+                "deduplicated_frequency": unique.get("frequency", 0.0),
+            })
+    fieldnames = [
+        "parameter", "display_name", "scale", "minimum", "maximum", "value", "label",
+        "file_weighted_count", "file_weighted_frequency", "deduplicated_count", "deduplicated_frequency",
+    ]
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".tmp")
+    with temporary.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+    temporary.replace(path)
+
+
+def histogram_bin_rows(distribution: dict[str, Any]) -> list[dict[str, Any]]:
+    counts = distribution.get("counts", [])
+    minimum = distribution.get("minimum")
+    maximum = distribution.get("maximum")
+    if not counts or minimum is None or maximum is None:
+        return []
+    bin_count = len(counts)
+    width = (maximum - minimum) / bin_count if maximum > minimum else 0.0
+    return [
+        {
+            "bin": index,
+            "lower": minimum + index * width,
+            "upper": minimum + (index + 1) * width,
+            "count": count,
+        }
+        for index, count in enumerate(counts)
+    ]
+
+
+def write_continuous_bins_csv(path: Path, census: dict[str, Any]) -> None:
+    rows = []
+    weighted_parameters = census["file_weighted"]["parameters"]
+    unique_parameters = census["exact_deduplicated"]["parameters"]
+    for name, values in weighted_parameters.items():
+        if values.get("parameter_type") != "continuous":
+            continue
+        weighted_distribution = values.get("distribution", {})
+        unique_distribution = unique_parameters.get(name, {}).get("distribution", {})
+        weighted_bins = {row["bin"]: row for row in histogram_bin_rows(weighted_distribution)}
+        unique_bins = {row["bin"]: row for row in histogram_bin_rows(unique_distribution)}
+        for index in range(max(len(weighted_distribution.get("counts", [])), len(unique_distribution.get("counts", [])))):
+            weighted = weighted_bins.get(index, {})
+            unique = unique_bins.get(index, {})
+            rows.append({
+                "parameter": name,
+                "display_name": values.get("display_name", name),
+                "scale": values.get("scale", ""),
+                "minimum": values.get("minimum"),
+                "maximum": values.get("maximum"),
+                "domain": weighted_distribution.get("domain", unique_distribution.get("domain", "")),
+                "bin": index,
+                "file_weighted_lower": weighted.get("lower"),
+                "file_weighted_upper": weighted.get("upper"),
+                "file_weighted_count": weighted.get("count", 0),
+                "file_weighted_frequency": weighted.get("count", 0) / values.get("observed", 1) if values.get("observed") else 0.0,
+                "deduplicated_lower": unique.get("lower"),
+                "deduplicated_upper": unique.get("upper"),
+                "deduplicated_count": unique.get("count", 0),
+                "deduplicated_frequency": unique.get("count", 0) / unique_parameters.get(name, {}).get("observed", 1) if unique_parameters.get(name, {}).get("observed") else 0.0,
+            })
+    fieldnames = [
+        "parameter", "display_name", "scale", "minimum", "maximum", "domain", "bin",
+        "file_weighted_lower", "file_weighted_upper", "file_weighted_count", "file_weighted_frequency",
+        "deduplicated_lower", "deduplicated_upper", "deduplicated_count", "deduplicated_frequency",
+    ]
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".tmp")
+    with temporary.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+    temporary.replace(path)
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build a sanitized semantic Vital preset usage census.")
     parser.add_argument("root", nargs="?", type=Path, default=DEFAULT_ROOT)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--parameter-csv", type=Path, default=Path("research") / "vital" / "vital_usage_parameters.csv")
+    parser.add_argument("--categorical-csv", type=Path, default=Path("research") / "vital" / "vital_usage_categorical_values.csv")
+    parser.add_argument("--continuous-csv", type=Path, default=Path("research") / "vital" / "vital_usage_continuous_bins.csv")
     parser.add_argument("--progress-every", type=int, default=250)
     return parser.parse_args(argv)
 
@@ -973,6 +1361,8 @@ def main(argv: list[str] | None = None) -> int:
     census = build_census(root, progress_every=args.progress_every)
     write_json(args.output.expanduser().resolve(), census)
     write_parameter_csv(args.parameter_csv.expanduser().resolve(), census)
+    write_categorical_values_csv(args.categorical_csv.expanduser().resolve(), census)
+    write_continuous_bins_csv(args.continuous_csv.expanduser().resolve(), census)
     print(f"Wrote {args.output.resolve()}")
     print(f"Parsed files: {census['file_weighted']['parsed_files']:,}; exact unique parsed content: {census['exact_unique_parsed_content_groups']:,}")
     return 0 if census["file_weighted"]["parsed_files"] else 1
