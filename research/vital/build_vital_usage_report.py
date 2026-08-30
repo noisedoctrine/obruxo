@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 import math
 import os
 import re
@@ -21,11 +20,11 @@ data_generation_root = repository_root / "research" / "data_generation"
 if str(data_generation_root) not in sys.path:
     sys.path.insert(0, str(data_generation_root))
 from research.data_generation.obruxo_data.vital.components import ComponentKind, ComponentRef, component_registry
-from research.vital.build_vital_usage_census import MAJOR_FAMILIES
+from research.vital.build_vital_usage_census import MAJOR_FAMILIES, read_json
 
 
 REPORT_VERSION = "1.1.0"
-DEFAULT_CENSUS = Path("research") / "vital" / "vital_usage_census.json"
+DEFAULT_CENSUS = Path("research") / "vital" / "vital_usage_census.json.gz"
 DEFAULT_REPORT = Path("research") / "vital" / "VITAL_USAGE_REPORT.md"
 DEFAULT_FIGURES = Path("research") / "vital" / "vital_usage_figures"
 COMPONENT_FAMILY_ORDER = ("global", "oscillator", "sampler", "filter", "envelope", "lfo", "random", "effect", "modulation_slot")
@@ -337,57 +336,6 @@ def component_family_nested_lines(family: str, aggregate: dict[str, Any]) -> lis
     return lines
 
 
-def write_component_distribution_report(data: dict[str, Any], path: Path, weight: str) -> None:
-    aggregate = data[weight]
-    registry, groups, family_refs = component_parameter_groups(data, weight)
-    continuous = [values for values in aggregate["parameters"].values() if values.get("parameter_type") == "continuous"]
-    raw_fallback_count = sum("distribution_note" in values for values in continuous)
-    lines = [
-        "# Vital Component-by-Component Value Distributions",
-        "",
-        f"This companion report uses the **{weight.replace('_', ' ')}** aggregate ({aggregate['parsed_files']:,} parsed presets). It is organized by the pinned Vital component registry rather than pooling unrelated parameter names.",
-        "",
-        "The row-oriented exports are the complete machine-readable detail: [`vital_usage_categorical_values.csv`](vital_usage_categorical_values.csv) contains one row per categorical value, and [`vital_usage_continuous_bins.csv`](vital_usage_continuous_bins.csv) contains all 64 histogram bins for each continuous parameter, with both file-weighted and exact-deduplicated counts.",
-        "",
-        "Categorical values are Vital's raw numeric ordinals. Labels are included when the pinned atlas provides an option list. Their denominator is the observed value count under the existing policy that fills missing common scalar keys with the atlas default.",
-        "",
-        f"Continuous parameters include raw-value min/max/mean/stddev, histogram quantiles, default and zero prevalence, and dominant bins. Atlas-backed controls use 64 bins in normalized control position, preserving the parameter's scale metadata; version-introduced controls without atlas bounds use adaptive raw-value bins. {raw_fallback_count} atlas-backed controls also use complete raw-value bins because their corpus observations exceed the pinned bounds; their partial normalized histograms remain in the JSON. For an `Exponential` parameter, the raw Vital value is already the logarithmic storage domain.",
-        "",
-    ]
-    for family in COMPONENT_FAMILY_ORDER:
-        refs = family_refs.get(family, [])
-        if not refs:
-            continue
-        lines.extend([f"## {COMPONENT_FAMILY_LABELS[family]}", "", COMPONENT_FAMILY_DESCRIPTIONS[family], ""])
-        for ref in refs:
-            definition = registry.get(ref)
-            parameters = groups.get(ref, [])
-            component = aggregate.get("components", {}).get(str(ref), {})
-            categorical_count = sum(values.get("parameter_type") == "categorical" for _, values in parameters)
-            continuous_count = sum(values.get("parameter_type") == "continuous" for _, values in parameters)
-            lines.extend([
-                f"### {component_display_name(ref)}",
-                "",
-                f"{len(parameters):,} scalar parameters: {categorical_count:,} categorical/enum and {continuous_count:,} continuous. {component_state_text(ref, definition, component, aggregate['parsed_files'])}.",
-                "",
-            ])
-            lines.extend(component_parameter_lines(ref, parameters))
-        lines.extend(component_family_nested_lines(family, aggregate))
-
-    lines.extend([
-        "## Interpretation cautions",
-        "",
-        "- A categorical mode is a storage-value mode, not a claim that the corresponding UI choice is perceptually dominant.",
-        "- A continuous dominant bin is a range, not an exact mode. This avoids pretending that arbitrary floating-point values have exact categorical semantics.",
-        "- The normalized histogram follows Vital's raw control scale. It is useful for comparing differently ranged controls, while the raw summary preserves the actual serialized values.",
-        "- Wavetable and sample payloads are not included. Wavetable editor component-type counts are structural occurrences only; they do not expose embedded waveform/audio data.",
-        "- These aggregates contain no preset paths, names, authors, raw wavetable/sample payloads, or per-file records.",
-        "",
-    ])
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("\n".join(lines), encoding="utf-8")
-
-
 def make_component_family_figure(
     data: dict[str, Any],
     weight: str,
@@ -514,12 +462,19 @@ def make_component_family_figure(
 def component_main_report_lines(data: dict[str, Any], weight: str, figure_link: Any) -> list[str]:
     aggregate = data[weight]
     registry, groups, family_refs = component_parameter_groups(data, weight)
+    raw_fallback_count = sum("distribution_note" in values for values in aggregate["parameters"].values())
     lines = [
         "## Component-by-component value analysis",
         "",
         "The global prevalence charts are orientation only. The sections below keep each component's scalar controls together, then separate categorical frequencies from continuous distributions. Every repeated slot has its own subsection; no oscillator, filter, effect, LFO, random source, or modulation slot is pooled into a misleading global top-20 list.",
         "",
         "The family chart above each section summarizes component state and the broadest observed value distributions within that family. The tables beneath it retain every parameter assigned to each component, including modal values, quantiles, default/zero prevalence, and dominant ranges.",
+        "",
+        "Categorical tables show the three most frequent raw ordinals, with atlas option labels where available. Frequencies use observed counts, including atlas-default fills for missing common scalar keys. Every observed ordinal remains in the aggregate.",
+        "",
+        f"Continuous quantiles are histogram estimates, shown in raw storage units. Atlas-backed controls use 64 bins in normalized control position; controls without atlas bounds use adaptive raw-value bins. {raw_fallback_count} atlas-backed controls also use raw-value bins because observations exceed the pinned bounds; their partial normalized histograms remain in the aggregate. For an `Exponential` parameter, the raw value is already logarithmic. The aggregate retains all bins and raw min/max/mean/stddev.",
+        "",
+        "A continuous dominant bin is a range, not an exact value mode. Neither categorical modes nor continuous concentration establish perceptual importance.",
         "",
     ]
     for family in COMPONENT_FAMILY_ORDER:
@@ -818,15 +773,13 @@ def make_figures(data: dict[str, Any], figures: Path, weight: str) -> dict[str, 
 
 
 def build_report(census_path: Path, report_path: Path, figures_path: Path, weight: str = "file_weighted") -> None:
-    data = json.loads(census_path.read_text(encoding="utf-8"))
+    data = read_json(census_path)
     aggregate = data[weight]
     denominator = aggregate["parsed_files"]
     unique_denominator = data["exact_deduplicated"]["parsed_files"]
     figures = make_figures(data, figures_path, weight)
     figure_link = lambda name: os.path.relpath(figures_path / figures[name], report_path.parent).replace(os.sep, "/")
-    distribution_report_path = report_path.with_name("VITAL_PARAMETER_DISTRIBUTIONS.md")
-    write_component_distribution_report(data, distribution_report_path, weight)
-    distribution_report_link = os.path.relpath(distribution_report_path, report_path.parent).replace(os.sep, "/")
+    census_link = os.path.relpath(census_path, report_path.parent).replace(os.sep, "/")
 
     families = component_family_rows(data, weight)
     top_family = families[0] if families else ("unknown", 0.0, 0)
@@ -909,7 +862,7 @@ def build_report(census_path: Path, report_path: Path, figures_path: Path, weigh
         "",
         "The left panels rank atlas-backed scalar changes globally and conditional on an active owner. The right panel is the cumulative head-versus-tail view: the x-axis is parameter rank by non-default count and the y-axis is the share of all counted non-default observations covered by that prefix. For LFO, envelope, random, and modulation-slot parameters, the conditional denominator is the operationally routed/connected slot population.",
         "",
-        f"The detailed component-by-component value tables are in the companion [parameter distribution report]({distribution_report_link}), with complete categorical and continuous row exports beside it.",
+        "The [component-by-component value analysis](#component-by-component-value-analysis) below contains the detailed tables. Complete categorical frequencies and continuous histogram bins remain in the aggregate; CSV exports can be generated on demand using the commands at the end of this report.",
         "",
         "**Figure 8. Live modulation source-family to destination-family routes.**",
         "",
@@ -939,7 +892,7 @@ def build_report(census_path: Path, report_path: Path, figures_path: Path, weigh
         "",
         f"![Duplicate sensitivity]({figure_link('duplicate_sensitivity')})",
         "",
-        "Figure 11 compares the file-weighted and exact-deduplicated estimates for the most edited shared parameters. The JSON and parameter CSV retain the complete comparison, including numerator and denominator for every parameter; the figure is only a readable headline slice.",
+        "Figure 11 compares the file-weighted and exact-deduplicated estimates for the most edited shared parameters. The aggregate retains the complete comparison, including numerator and denominator for every parameter; the figure is only a readable headline slice.",
         "",
         *component_lines,
         "",
@@ -948,18 +901,42 @@ def build_report(census_path: Path, report_path: Path, figures_path: Path, weigh
         "- The corpus is scanned recursively one `.vital` file at a time and is never rewritten.",
         "- File-weighted aggregates include every successfully parsed file. Exact-deduplicated aggregates include one representative for each raw-byte SHA-256; this is analysis-only and does not remove or alter source files.",
         "- Direct component usage is `*_on != 0`. Modulation `connected`, `bypassed`, `amount_zero`, `amount_nonzero`, and `live` are separate counters. A live route is connected, not bypassed, and non-zero amount.",
-        "- Every scalar percentage has an eligible count in `vital_usage_parameters.csv` and the JSON. Atlas-backed defaults come from `VitalSchema.parameters`; missing common scalar keys are filled with that default for comparison.",
+        "- Every scalar percentage has an eligible count in the aggregate. Atlas-backed defaults come from `VitalSchema.parameters`; missing common scalar keys are filled with that default for comparison.",
         "- Custom LFO shapes, wavetable name/content statuses, non-init wavetable descriptors, route remaps, and sampler statuses are aggregate semantic labels only. Raw preset paths, names, authors, payloads, and per-file records are not report content.",
         "- The pinned source/schema context is documented in [`PRESET_SCHEMA.md`](PRESET_SCHEMA.md) and [`VITAL_CORPUS_AUDIT.md`](VITAL_CORPUS_AUDIT.md).",
         "",
         "## Reproduction and artifacts",
         "",
+        f"The source of truth is the committed [compressed JSON aggregate]({census_link}). It contains the complete sanitized census, including both weighting schemes, all categorical frequencies, and all continuous histogram bins. Compact JSON plus gzip is lossless; CSV exports are generated locally rather than duplicated in Git.",
+        "",
+        "Regenerate the report and figures from the snapshot without access to the original presets:",
+        "",
         "```powershell",
         "conda activate py312",
-        "python research/vital/build_vital_usage_census.py",
         "python research/vital/build_vital_usage_report.py",
         "```",
-        "The aggregate source of truth is [`vital_usage_census.json`](vital_usage_census.json); the complete scalar lookup table is [`vital_usage_parameters.csv`](vital_usage_parameters.csv), with row-level categorical and continuous distribution exports beside it.",
+        "",
+        "Generate optional CSV exports from the same snapshot:",
+        "",
+        "```powershell",
+        "python research/vital/build_vital_usage_census.py `",
+        "  --from-census research/vital/vital_usage_census.json.gz `",
+        "  --parameter-csv research/vital/vital_usage_parameters.csv `",
+        "  --categorical-csv research/vital/vital_usage_categorical_values.csv `",
+        "  --continuous-csv research/vital/vital_usage_continuous_bins.csv",
+        "```",
+        "",
+        "Read the snapshot programmatically with Python's standard library:",
+        "",
+        "```python",
+        "import gzip",
+        "import json",
+        "",
+        "with gzip.open(\"research/vital/vital_usage_census.json.gz\", \"rt\", encoding=\"utf-8\") as handle:",
+        "    census = json.load(handle)",
+        "```",
+        "",
+        "To recompute the aggregate from the read-only local corpus, run `python research/vital/build_vital_usage_census.py` (or supply a corpus root). It writes `.json.gz` by default; an explicit `--output path.json` writes compact plain JSON. Report input and `--from-census` accept either format. Gzip uses a fixed header timestamp so unchanged aggregate data produces identical compressed bytes.",
         "",
     ]
     report_path.parent.mkdir(parents=True, exist_ok=True)

@@ -56,7 +56,7 @@ The live-route panel keeps counts 0–20 as individual bars, then groups 21 and 
 
 The left panels rank atlas-backed scalar changes globally and conditional on an active owner. The right panel is the cumulative head-versus-tail view: the x-axis is parameter rank by non-default count and the y-axis is the share of all counted non-default observations covered by that prefix. For LFO, envelope, random, and modulation-slot parameters, the conditional denominator is the operationally routed/connected slot population.
 
-The detailed component-by-component value tables are in the companion [parameter distribution report](VITAL_PARAMETER_DISTRIBUTIONS.md), with complete categorical and continuous row exports beside it.
+The [component-by-component value analysis](#component-by-component-value-analysis) below contains the detailed tables. Complete categorical frequencies and continuous histogram bins remain in the aggregate; CSV exports can be generated on demand using the commands at the end of this report.
 
 **Figure 8. Live modulation source-family to destination-family routes.**
 
@@ -86,13 +86,19 @@ The version-introduced parameter groups contain **132 scalar names** in the pool
 
 ![Duplicate sensitivity](vital_usage_figures/11_duplicate_sensitivity.png)
 
-Figure 11 compares the file-weighted and exact-deduplicated estimates for the most edited shared parameters. The JSON and parameter CSV retain the complete comparison, including numerator and denominator for every parameter; the figure is only a readable headline slice.
+Figure 11 compares the file-weighted and exact-deduplicated estimates for the most edited shared parameters. The aggregate retains the complete comparison, including numerator and denominator for every parameter; the figure is only a readable headline slice.
 
 ## Component-by-component value analysis
 
 The global prevalence charts are orientation only. The sections below keep each component's scalar controls together, then separate categorical frequencies from continuous distributions. Every repeated slot has its own subsection; no oscillator, filter, effect, LFO, random source, or modulation slot is pooled into a misleading global top-20 list.
 
 The family chart above each section summarizes component state and the broadest observed value distributions within that family. The tables beneath it retain every parameter assigned to each component, including modal values, quantiles, default/zero prevalence, and dominant ranges.
+
+Categorical tables show the three most frequent raw ordinals, with atlas option labels where available. Frequencies use observed counts, including atlas-default fills for missing common scalar keys. Every observed ordinal remains in the aggregate.
+
+Continuous quantiles are histogram estimates, shown in raw storage units. Atlas-backed controls use 64 bins in normalized control position; controls without atlas bounds use adaptive raw-value bins. 16 atlas-backed controls also use raw-value bins because observations exceed the pinned bounds; their partial normalized histograms remain in the aggregate. For an `Exponential` parameter, the raw value is already logarithmic. The aggregate retains all bins and raw min/max/mean/stddev.
+
+A continuous dominant bin is a range, not an exact value mode. Neither categorical modes nor continuous concentration establish perceptual importance.
 
 ### Global controls
 
@@ -2452,15 +2458,39 @@ The corpus contains **93,308** connected routes, **86,212** live routes, **416**
 - The corpus is scanned recursively one `.vital` file at a time and is never rewritten.
 - File-weighted aggregates include every successfully parsed file. Exact-deduplicated aggregates include one representative for each raw-byte SHA-256; this is analysis-only and does not remove or alter source files.
 - Direct component usage is `*_on != 0`. Modulation `connected`, `bypassed`, `amount_zero`, `amount_nonzero`, and `live` are separate counters. A live route is connected, not bypassed, and non-zero amount.
-- Every scalar percentage has an eligible count in `vital_usage_parameters.csv` and the JSON. Atlas-backed defaults come from `VitalSchema.parameters`; missing common scalar keys are filled with that default for comparison.
+- Every scalar percentage has an eligible count in the aggregate. Atlas-backed defaults come from `VitalSchema.parameters`; missing common scalar keys are filled with that default for comparison.
 - Custom LFO shapes, wavetable name/content statuses, non-init wavetable descriptors, route remaps, and sampler statuses are aggregate semantic labels only. Raw preset paths, names, authors, payloads, and per-file records are not report content.
 - The pinned source/schema context is documented in [`PRESET_SCHEMA.md`](PRESET_SCHEMA.md) and [`VITAL_CORPUS_AUDIT.md`](VITAL_CORPUS_AUDIT.md).
 
 ## Reproduction and artifacts
 
+The source of truth is the committed [compressed JSON aggregate](vital_usage_census.json.gz). It contains the complete sanitized census, including both weighting schemes, all categorical frequencies, and all continuous histogram bins. Compact JSON plus gzip is lossless; CSV exports are generated locally rather than duplicated in Git.
+
+Regenerate the report and figures from the snapshot without access to the original presets:
+
 ```powershell
 conda activate py312
-python research/vital/build_vital_usage_census.py
 python research/vital/build_vital_usage_report.py
 ```
-The aggregate source of truth is [`vital_usage_census.json`](vital_usage_census.json); the complete scalar lookup table is [`vital_usage_parameters.csv`](vital_usage_parameters.csv), with row-level categorical and continuous distribution exports beside it.
+
+Generate optional CSV exports from the same snapshot:
+
+```powershell
+python research/vital/build_vital_usage_census.py `
+  --from-census research/vital/vital_usage_census.json.gz `
+  --parameter-csv research/vital/vital_usage_parameters.csv `
+  --categorical-csv research/vital/vital_usage_categorical_values.csv `
+  --continuous-csv research/vital/vital_usage_continuous_bins.csv
+```
+
+Read the snapshot programmatically with Python's standard library:
+
+```python
+import gzip
+import json
+
+with gzip.open("research/vital/vital_usage_census.json.gz", "rt", encoding="utf-8") as handle:
+    census = json.load(handle)
+```
+
+To recompute the aggregate from the read-only local corpus, run `python research/vital/build_vital_usage_census.py` (or supply a corpus root). It writes `.json.gz` by default; an explicit `--output path.json` writes compact plain JSON. Report input and `--from-census` accept either format. Gzip uses a fixed header timestamp so unchanged aggregate data produces identical compressed bytes.

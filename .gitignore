@@ -10,6 +10,12 @@ venv/
 htmlcov/
 
 # Local datasets and generated research outputs
+# Vital census exports are regenerated from the committed .json.gz snapshot.
+research/vital/vital_usage_census.json
+research/vital/vital_usage_parameters.csv
+research/vital/vital_usage_categorical_values.csv
+research/vital/vital_usage_continuous_bins.csv
+research/vital/VITAL_PARAMETER_DISTRIBUTIONS.md
 datasets/
 research/experiments/neural_proxy/generated_midi/
 research/experiments/lfo_representation/era2/artifacts/

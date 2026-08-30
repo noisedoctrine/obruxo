@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import gzip
 import hashlib
 import json
 import math
@@ -41,7 +42,7 @@ from research.vital.build_vital_corpus_audit import iter_vital_files, load_json_
 
 SCRIPT_VERSION = "1.1.0"
 DEFAULT_ROOT = Path("datasets") / "presetshare" / "raw" / "presetshare_files" / "data"
-DEFAULT_OUTPUT = Path("research") / "vital" / "vital_usage_census.json"
+DEFAULT_OUTPUT = Path("research") / "vital" / "vital_usage_census.json.gz"
 DEFAULT_REPORT = Path("research") / "vital" / "VITAL_USAGE_REPORT.md"
 DEFAULT_FIGURES = Path("research") / "vital" / "vital_usage_figures"
 FLOAT_TOLERANCE = 1e-7
@@ -1151,10 +1152,18 @@ def build_census(root: Path, schema: VitalSchema | None = None, progress_every: 
     }
 
 
+def read_json(path: Path) -> Any:
+    opener = gzip.open if path.suffix == ".gz" else open
+    with opener(path, "rt", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
 def write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(path.name + ".tmp")
-    temporary.write_text(json.dumps(value, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
+    payload = json.dumps(value, separators=(",", ":"), sort_keys=True, ensure_ascii=False).encode("utf-8")
+    # A fixed timestamp keeps unchanged snapshots byte-identical across runs.
+    temporary.write_bytes(gzip.compress(payload, compresslevel=9, mtime=0) if path.suffix == ".gz" else payload)
     temporary.replace(path)
 
 
@@ -1340,30 +1349,38 @@ def write_continuous_bins_csv(path: Path, census: dict[str, Any]) -> None:
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build a sanitized semantic Vital preset usage census.")
-    parser.add_argument("root", nargs="?", type=Path, default=DEFAULT_ROOT)
-    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
-    parser.add_argument("--parameter-csv", type=Path, default=Path("research") / "vital" / "vital_usage_parameters.csv")
-    parser.add_argument("--categorical-csv", type=Path, default=Path("research") / "vital" / "vital_usage_categorical_values.csv")
-    parser.add_argument("--continuous-csv", type=Path, default=Path("research") / "vital" / "vital_usage_continuous_bins.csv")
+    source = parser.add_mutually_exclusive_group()
+    source.add_argument("root", nargs="?", type=Path, help=f"Read-only corpus root (default: {DEFAULT_ROOT})")
+    source.add_argument("--from-census", type=Path, help="Read an existing .json or .json.gz aggregate without scanning the corpus")
+    parser.add_argument("--output", type=Path, help=f"Write aggregate as .json.gz or .json (default when scanning: {DEFAULT_OUTPUT})")
+    parser.add_argument("--parameter-csv", type=Path, help="Optionally export the per-parameter summary CSV")
+    parser.add_argument("--categorical-csv", type=Path, help="Optionally export categorical value frequencies as CSV")
+    parser.add_argument("--continuous-csv", type=Path, help="Optionally export continuous histogram bins as CSV")
     parser.add_argument("--progress-every", type=int, default=250)
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    root = args.root.expanduser().resolve()
-    if not root.is_dir():
-        print(f"error: corpus root does not exist or is not a directory: {root}", file=sys.stderr)
-        return 2
     if args.progress_every < 0:
         print("error: --progress-every cannot be negative", file=sys.stderr)
         return 2
-    census = build_census(root, progress_every=args.progress_every)
-    write_json(args.output.expanduser().resolve(), census)
-    write_parameter_csv(args.parameter_csv.expanduser().resolve(), census)
-    write_categorical_values_csv(args.categorical_csv.expanduser().resolve(), census)
-    write_continuous_bins_csv(args.continuous_csv.expanduser().resolve(), census)
-    print(f"Wrote {args.output.resolve()}")
+    if args.from_census:
+        census = read_json(args.from_census.expanduser().resolve())
+    else:
+        root = (args.root or DEFAULT_ROOT).expanduser().resolve()
+        if not root.is_dir():
+            print(f"error: corpus root does not exist or is not a directory: {root}", file=sys.stderr)
+            return 2
+        census = build_census(root, progress_every=args.progress_every)
+    output = args.output or (DEFAULT_OUTPUT if not args.from_census else None)
+    if output:
+        write_json(output.expanduser().resolve(), census)
+        print(f"Wrote {output.resolve()}")
+    for path, writer in ((args.parameter_csv, write_parameter_csv), (args.categorical_csv, write_categorical_values_csv), (args.continuous_csv, write_continuous_bins_csv)):
+        if path:
+            writer(path.expanduser().resolve(), census)
+            print(f"Wrote {path.resolve()}")
     print(f"Parsed files: {census['file_weighted']['parsed_files']:,}; exact unique parsed content: {census['exact_unique_parsed_content_groups']:,}")
     return 0 if census["file_weighted"]["parsed_files"] else 1
 
