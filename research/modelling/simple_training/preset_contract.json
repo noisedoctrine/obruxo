@@ -1,0 +1,14 @@
+{
+  "id": "oscillator-only-v1",
+  "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+  "template_sha256": "f1cd75d890e8c13c825184e530b8d6d896d4bf9247076cdb8a45621ec0ba3159",
+  "preset_version": "1.5.5",
+  "plugin_version": "1.6.4",
+  "max_file_bytes": 4194304,
+  "variable_controls": {
+    "osc_1_transpose": {"values": [-12, 0, 12]},
+    "osc_1_level": {"minimum": 0.2, "maximum": 0.8}
+  },
+  "fixed_fields": "Every other field, key, array element and embedded payload must match the pinned template.",
+  "scope": "Generated 1.5.5-labelled oscillator-only subset with 772 supplied scalars, verified in Vital 1.6.4; omitted newer settings use measured plugin defaults. Not arbitrary community presets."
+}

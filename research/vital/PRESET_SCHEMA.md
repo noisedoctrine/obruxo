@@ -1,5 +1,10 @@
 # Vital Preset JSON and Settings Schema
 
+For the executable **full 1.5.5 field contract**, corpus verification, and measured
+1.6.4 renderer bounds, see [Full contract verification](FULL_CONTRACT_1_5_5.md).
+The source-era inventory below remains historical context; its ranges do not
+describe every later control choice.
+
 ## Executive summary
 
 A `.vital` preset is a JSON document. At the outermost level, Vital writes preset metadata such as `synth_version`, `preset_name`, `author`, `comments`, `preset_style`, and `macro1` through `macro4`, plus a large `settings` object. When loading a preset, Vital parses the JSON text directly and then applies `settings` into the synth state; any missing scalar control key falls back to the parameter metadata default from the built-in parameter table.

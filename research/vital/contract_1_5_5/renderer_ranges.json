@@ -1,0 +1,6209 @@
+{
+  "matched_count": 775,
+  "parameters": {
+    "beats_per_minute": {
+      "default": 0.01666666753590107,
+      "display_name": "Beats Per Minute",
+      "is_discrete": false,
+      "max": 5.0,
+      "min": 0.3333333432674408,
+      "parameter_index": 0
+    },
+    "bypass": {
+      "default": 0.0,
+      "display_name": "Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 727
+    },
+    "chorus_cutoff": {
+      "default": 60.0,
+      "display_name": "Chorus Filter Cutoff",
+      "is_discrete": false,
+      "max": 136.0,
+      "min": 8.0,
+      "parameter_index": 1
+    },
+    "chorus_delay_1": {
+      "default": -9.0,
+      "display_name": "Chorus Delay 1",
+      "is_discrete": false,
+      "max": -5.64385986328125,
+      "min": -10.0,
+      "parameter_index": 2
+    },
+    "chorus_delay_2": {
+      "default": -7.0,
+      "display_name": "Chorus Delay 2",
+      "is_discrete": false,
+      "max": -5.64385986328125,
+      "min": -10.0,
+      "parameter_index": 3
+    },
+    "chorus_dry_wet": {
+      "default": 0.5,
+      "display_name": "Chorus Mix",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 4
+    },
+    "chorus_feedback": {
+      "default": 0.4000000059604645,
+      "display_name": "Chorus Feedback",
+      "is_discrete": false,
+      "max": 0.949999988079071,
+      "min": -0.949999988079071,
+      "parameter_index": 5
+    },
+    "chorus_frequency": {
+      "default": -3.0,
+      "display_name": "Chorus Frequency",
+      "is_discrete": false,
+      "max": 3.0,
+      "min": -6.0,
+      "parameter_index": 6
+    },
+    "chorus_mod_depth": {
+      "default": 0.5,
+      "display_name": "Chorus Mod Depth",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 7
+    },
+    "chorus_on": {
+      "default": 0.0,
+      "display_name": "Chorus Switch",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 8
+    },
+    "chorus_spread": {
+      "default": 1.0,
+      "display_name": "Chorus Filter Spread",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 724
+    },
+    "chorus_sync": {
+      "default": 1.0,
+      "display_name": "Chorus Sync",
+      "is_discrete": true,
+      "max": 3.0,
+      "min": 0.0,
+      "parameter_index": 9
+    },
+    "chorus_tempo": {
+      "default": 4.0,
+      "display_name": "Chorus Tempo",
+      "is_discrete": true,
+      "max": 10.0,
+      "min": 0.0,
+      "parameter_index": 10
+    },
+    "chorus_voices": {
+      "default": 4.0,
+      "display_name": "Chorus Voices",
+      "is_discrete": true,
+      "max": 4.0,
+      "min": 1.0,
+      "parameter_index": 554
+    },
+    "compressor_attack": {
+      "default": 0.5,
+      "display_name": "Compressor Attack",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 11
+    },
+    "compressor_band_gain": {
+      "default": 11.699999809265137,
+      "display_name": "Compressor Band Gain",
+      "is_discrete": false,
+      "max": 30.0,
+      "min": -30.0,
+      "parameter_index": 12
+    },
+    "compressor_band_lower_ratio": {
+      "default": 0.800000011920929,
+      "display_name": "Band Lower Ratio",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 13
+    },
+    "compressor_band_lower_threshold": {
+      "default": -36.0,
+      "display_name": "Band Lower Threshold",
+      "is_discrete": false,
+      "max": 0.0,
+      "min": -80.0,
+      "parameter_index": 14
+    },
+    "compressor_band_upper_ratio": {
+      "default": 0.8569999933242798,
+      "display_name": "Band Upper Ratio",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 15
+    },
+    "compressor_band_upper_threshold": {
+      "default": -25.0,
+      "display_name": "Band Upper Threshold",
+      "is_discrete": false,
+      "max": 0.0,
+      "min": -80.0,
+      "parameter_index": 16
+    },
+    "compressor_enabled_bands": {
+      "default": 0.0,
+      "display_name": "Compressor Enabled Bands",
+      "is_discrete": true,
+      "max": 3.0,
+      "min": 0.0,
+      "parameter_index": 17
+    },
+    "compressor_high_gain": {
+      "default": 16.299999237060547,
+      "display_name": "Compressor High Gain",
+      "is_discrete": false,
+      "max": 30.0,
+      "min": -30.0,
+      "parameter_index": 18
+    },
+    "compressor_high_lower_ratio": {
+      "default": 0.800000011920929,
+      "display_name": "High Lower Ratio",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 19
+    },
+    "compressor_high_lower_threshold": {
+      "default": -35.0,
+      "display_name": "High Lower Threshold",
+      "is_discrete": false,
+      "max": 0.0,
+      "min": -80.0,
+      "parameter_index": 20
+    },
+    "compressor_high_upper_ratio": {
+      "default": 1.0,
+      "display_name": "High Upper Ratio",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 21
+    },
+    "compressor_high_upper_threshold": {
+      "default": -30.0,
+      "display_name": "High Upper Threshold",
+      "is_discrete": false,
+      "max": 0.0,
+      "min": -80.0,
+      "parameter_index": 22
+    },
+    "compressor_low_gain": {
+      "default": 16.299999237060547,
+      "display_name": "Compressor Low Gain",
+      "is_discrete": false,
+      "max": 30.0,
+      "min": -30.0,
+      "parameter_index": 23
+    },
+    "compressor_low_lower_ratio": {
+      "default": 0.800000011920929,
+      "display_name": "Low Lower Ratio",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 24
+    },
+    "compressor_low_lower_threshold": {
+      "default": -35.0,
+      "display_name": "Low Lower Threshold",
+      "is_discrete": false,
+      "max": 0.0,
+      "min": -80.0,
+      "parameter_index": 25
+    },
+    "compressor_low_upper_ratio": {
+      "default": 0.8999999761581421,
+      "display_name": "Low Upper Ratio",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 26
+    },
+    "compressor_low_upper_threshold": {
+      "default": -28.0,
+      "display_name": "Low Upper Threshold",
+      "is_discrete": false,
+      "max": 0.0,
+      "min": -80.0,
+      "parameter_index": 27
+    },
+    "compressor_mix": {
+      "default": 1.0,
+      "display_name": "Compressor Mix",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 720
+    },
+    "compressor_on": {
+      "default": 0.0,
+      "display_name": "Compressor Switch",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 28
+    },
+    "compressor_release": {
+      "default": 0.5,
+      "display_name": "Compressor Release",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 29
+    },
+    "delay_aux_frequency": {
+      "default": 2.0,
+      "display_name": "Delay Frequency 2",
+      "is_discrete": false,
+      "max": 9.0,
+      "min": -2.0,
+      "parameter_index": 551
+    },
+    "delay_aux_sync": {
+      "default": 1.0,
+      "display_name": "Delay Sync 2",
+      "is_discrete": true,
+      "max": 3.0,
+      "min": 0.0,
+      "parameter_index": 552
+    },
+    "delay_aux_tempo": {
+      "default": 9.0,
+      "display_name": "Delay Tempo 2",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 4.0,
+      "parameter_index": 553
+    },
+    "delay_dry_wet": {
+      "default": 0.33340001106262207,
+      "display_name": "Delay Mix",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 30
+    },
+    "delay_feedback": {
+      "default": 0.5,
+      "display_name": "Delay Feedback",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 31
+    },
+    "delay_filter_cutoff": {
+      "default": 60.0,
+      "display_name": "Delay Filter Cutoff",
+      "is_discrete": false,
+      "max": 136.0,
+      "min": 8.0,
+      "parameter_index": 32
+    },
+    "delay_filter_spread": {
+      "default": 1.0,
+      "display_name": "Delay Filter Spread",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 33
+    },
+    "delay_frequency": {
+      "default": 2.0,
+      "display_name": "Delay Frequency",
+      "is_discrete": false,
+      "max": 9.0,
+      "min": -2.0,
+      "parameter_index": 34
+    },
+    "delay_on": {
+      "default": 0.0,
+      "display_name": "Delay Switch",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 35
+    },
+    "delay_style": {
+      "default": 0.0,
+      "display_name": "Delay Style",
+      "is_discrete": true,
+      "max": 3.0,
+      "min": 0.0,
+      "parameter_index": 36
+    },
+    "delay_sync": {
+      "default": 1.0,
+      "display_name": "Delay Sync",
+      "is_discrete": true,
+      "max": 3.0,
+      "min": 0.0,
+      "parameter_index": 37
+    },
+    "delay_tempo": {
+      "default": 9.0,
+      "display_name": "Delay Tempo",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 4.0,
+      "parameter_index": 38
+    },
+    "distortion_drive": {
+      "default": 0.0,
+      "display_name": "Distortion Drive",
+      "is_discrete": false,
+      "max": 30.0,
+      "min": -30.0,
+      "parameter_index": 39
+    },
+    "distortion_filter_blend": {
+      "default": 0.0,
+      "display_name": "Distortion Filter Blend",
+      "is_discrete": false,
+      "max": 2.0,
+      "min": 0.0,
+      "parameter_index": 40
+    },
+    "distortion_filter_cutoff": {
+      "default": 80.0,
+      "display_name": "Distortion Filter Cutoff",
+      "is_discrete": false,
+      "max": 136.0,
+      "min": 8.0,
+      "parameter_index": 41
+    },
+    "distortion_filter_order": {
+      "default": 0.0,
+      "display_name": "Distortion Filter Order",
+      "is_discrete": true,
+      "max": 2.0,
+      "min": 0.0,
+      "parameter_index": 42
+    },
+    "distortion_filter_resonance": {
+      "default": 0.5,
+      "display_name": "Distortion Filter Resonance",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 43
+    },
+    "distortion_mix": {
+      "default": 1.0,
+      "display_name": "Distortion Mix",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 44
+    },
+    "distortion_on": {
+      "default": 0.0,
+      "display_name": "Distortion Switch",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 45
+    },
+    "distortion_type": {
+      "default": 0.0,
+      "display_name": "Distortion Type",
+      "is_discrete": true,
+      "max": 5.0,
+      "min": 0.0,
+      "parameter_index": 46
+    },
+    "effect_chain_order": {
+      "default": 0.0,
+      "display_name": "Effect Chain Order",
+      "is_discrete": false,
+      "max": 362879.0,
+      "min": 0.0,
+      "parameter_index": 47
+    },
+    "env_1_attack": {
+      "default": 0.14949999749660492,
+      "display_name": "Envelope 1 Attack",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 48
+    },
+    "env_1_attack_power": {
+      "default": 0.0,
+      "display_name": "Envelope 1 Attack Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 49
+    },
+    "env_1_decay": {
+      "default": 1.0,
+      "display_name": "Envelope 1 Decay",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 50
+    },
+    "env_1_decay_power": {
+      "default": -2.0,
+      "display_name": "Envelope 1 Decay Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 51
+    },
+    "env_1_delay": {
+      "default": 0.0,
+      "display_name": "Envelope 1 Delay",
+      "is_discrete": false,
+      "max": 1.4142135381698608,
+      "min": 0.0,
+      "parameter_index": 536
+    },
+    "env_1_hold": {
+      "default": 0.0,
+      "display_name": "Envelope 1 Hold",
+      "is_discrete": false,
+      "max": 1.4142135381698608,
+      "min": 0.0,
+      "parameter_index": 542
+    },
+    "env_1_release": {
+      "default": 0.5475999712944031,
+      "display_name": "Envelope 1 Release",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 52
+    },
+    "env_1_release_power": {
+      "default": -2.0,
+      "display_name": "Envelope 1 Release Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 53
+    },
+    "env_1_sustain": {
+      "default": 1.0,
+      "display_name": "Envelope 1 Sustain",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 54
+    },
+    "env_2_attack": {
+      "default": 0.14949999749660492,
+      "display_name": "Envelope 2 Attack",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 55
+    },
+    "env_2_attack_power": {
+      "default": 0.0,
+      "display_name": "Envelope 2 Attack Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 56
+    },
+    "env_2_decay": {
+      "default": 1.0,
+      "display_name": "Envelope 2 Decay",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 57
+    },
+    "env_2_decay_power": {
+      "default": -2.0,
+      "display_name": "Envelope 2 Decay Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 58
+    },
+    "env_2_delay": {
+      "default": 0.0,
+      "display_name": "Envelope 2 Delay",
+      "is_discrete": false,
+      "max": 1.4142135381698608,
+      "min": 0.0,
+      "parameter_index": 537
+    },
+    "env_2_hold": {
+      "default": 0.0,
+      "display_name": "Envelope 2 Hold",
+      "is_discrete": false,
+      "max": 1.4142135381698608,
+      "min": 0.0,
+      "parameter_index": 543
+    },
+    "env_2_release": {
+      "default": 0.5475999712944031,
+      "display_name": "Envelope 2 Release",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 59
+    },
+    "env_2_release_power": {
+      "default": -2.0,
+      "display_name": "Envelope 2 Release Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 60
+    },
+    "env_2_sustain": {
+      "default": 1.0,
+      "display_name": "Envelope 2 Sustain",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 61
+    },
+    "env_3_attack": {
+      "default": 0.14949999749660492,
+      "display_name": "Envelope 3 Attack",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 62
+    },
+    "env_3_attack_power": {
+      "default": 0.0,
+      "display_name": "Envelope 3 Attack Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 63
+    },
+    "env_3_decay": {
+      "default": 1.0,
+      "display_name": "Envelope 3 Decay",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 64
+    },
+    "env_3_decay_power": {
+      "default": -2.0,
+      "display_name": "Envelope 3 Decay Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 65
+    },
+    "env_3_delay": {
+      "default": 0.0,
+      "display_name": "Envelope 3 Delay",
+      "is_discrete": false,
+      "max": 1.4142135381698608,
+      "min": 0.0,
+      "parameter_index": 538
+    },
+    "env_3_hold": {
+      "default": 0.0,
+      "display_name": "Envelope 3 Hold",
+      "is_discrete": false,
+      "max": 1.4142135381698608,
+      "min": 0.0,
+      "parameter_index": 544
+    },
+    "env_3_release": {
+      "default": 0.5475999712944031,
+      "display_name": "Envelope 3 Release",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 66
+    },
+    "env_3_release_power": {
+      "default": -2.0,
+      "display_name": "Envelope 3 Release Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 67
+    },
+    "env_3_sustain": {
+      "default": 1.0,
+      "display_name": "Envelope 3 Sustain",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 68
+    },
+    "env_4_attack": {
+      "default": 0.14949999749660492,
+      "display_name": "Envelope 4 Attack",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 69
+    },
+    "env_4_attack_power": {
+      "default": 0.0,
+      "display_name": "Envelope 4 Attack Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 70
+    },
+    "env_4_decay": {
+      "default": 1.0,
+      "display_name": "Envelope 4 Decay",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 71
+    },
+    "env_4_decay_power": {
+      "default": -2.0,
+      "display_name": "Envelope 4 Decay Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 72
+    },
+    "env_4_delay": {
+      "default": 0.0,
+      "display_name": "Envelope 4 Delay",
+      "is_discrete": false,
+      "max": 1.4142135381698608,
+      "min": 0.0,
+      "parameter_index": 539
+    },
+    "env_4_hold": {
+      "default": 0.0,
+      "display_name": "Envelope 4 Hold",
+      "is_discrete": false,
+      "max": 1.4142135381698608,
+      "min": 0.0,
+      "parameter_index": 545
+    },
+    "env_4_release": {
+      "default": 0.5475999712944031,
+      "display_name": "Envelope 4 Release",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 73
+    },
+    "env_4_release_power": {
+      "default": -2.0,
+      "display_name": "Envelope 4 Release Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 74
+    },
+    "env_4_sustain": {
+      "default": 1.0,
+      "display_name": "Envelope 4 Sustain",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 75
+    },
+    "env_5_attack": {
+      "default": 0.14949999749660492,
+      "display_name": "Envelope 5 Attack",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 76
+    },
+    "env_5_attack_power": {
+      "default": 0.0,
+      "display_name": "Envelope 5 Attack Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 77
+    },
+    "env_5_decay": {
+      "default": 1.0,
+      "display_name": "Envelope 5 Decay",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 78
+    },
+    "env_5_decay_power": {
+      "default": -2.0,
+      "display_name": "Envelope 5 Decay Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 79
+    },
+    "env_5_delay": {
+      "default": 0.0,
+      "display_name": "Envelope 5 Delay",
+      "is_discrete": false,
+      "max": 1.4142135381698608,
+      "min": 0.0,
+      "parameter_index": 540
+    },
+    "env_5_hold": {
+      "default": 0.0,
+      "display_name": "Envelope 5 Hold",
+      "is_discrete": false,
+      "max": 1.4142135381698608,
+      "min": 0.0,
+      "parameter_index": 546
+    },
+    "env_5_release": {
+      "default": 0.5475999712944031,
+      "display_name": "Envelope 5 Release",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 80
+    },
+    "env_5_release_power": {
+      "default": -2.0,
+      "display_name": "Envelope 5 Release Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 81
+    },
+    "env_5_sustain": {
+      "default": 1.0,
+      "display_name": "Envelope 5 Sustain",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 82
+    },
+    "env_6_attack": {
+      "default": 0.14949999749660492,
+      "display_name": "Envelope 6 Attack",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 83
+    },
+    "env_6_attack_power": {
+      "default": 0.0,
+      "display_name": "Envelope 6 Attack Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 84
+    },
+    "env_6_decay": {
+      "default": 1.0,
+      "display_name": "Envelope 6 Decay",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 85
+    },
+    "env_6_decay_power": {
+      "default": -2.0,
+      "display_name": "Envelope 6 Decay Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 86
+    },
+    "env_6_delay": {
+      "default": 0.0,
+      "display_name": "Envelope 6 Delay",
+      "is_discrete": false,
+      "max": 1.4142135381698608,
+      "min": 0.0,
+      "parameter_index": 541
+    },
+    "env_6_hold": {
+      "default": 0.0,
+      "display_name": "Envelope 6 Hold",
+      "is_discrete": false,
+      "max": 1.4142135381698608,
+      "min": 0.0,
+      "parameter_index": 547
+    },
+    "env_6_release": {
+      "default": 0.5475999712944031,
+      "display_name": "Envelope 6 Release",
+      "is_discrete": false,
+      "max": 2.378420114517212,
+      "min": 0.0,
+      "parameter_index": 87
+    },
+    "env_6_release_power": {
+      "default": -2.0,
+      "display_name": "Envelope 6 Release Power",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": -20.0,
+      "parameter_index": 88
+    },
+    "env_6_sustain": {
+      "default": 1.0,
+      "display_name": "Envelope 6 Sustain",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 89
+    },
+    "eq_band_cutoff": {
+      "default": 80.0,
+      "display_name": "EQ Band Cutoff",
+      "is_discrete": false,
+      "max": 136.0,
+      "min": 8.0,
+      "parameter_index": 90
+    },
+    "eq_band_gain": {
+      "default": 0.0,
+      "display_name": "EQ Band Gain",
+      "is_discrete": false,
+      "max": 15.0,
+      "min": -15.0,
+      "parameter_index": 91
+    },
+    "eq_band_mode": {
+      "default": 0.0,
+      "display_name": "EQ Band Mode",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 549
+    },
+    "eq_band_resonance": {
+      "default": 0.447299987077713,
+      "display_name": "EQ Band Resonance",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 92
+    },
+    "eq_high_cutoff": {
+      "default": 100.0,
+      "display_name": "EQ High Cutoff",
+      "is_discrete": false,
+      "max": 136.0,
+      "min": 8.0,
+      "parameter_index": 93
+    },
+    "eq_high_gain": {
+      "default": 0.0,
+      "display_name": "EQ High Gain",
+      "is_discrete": false,
+      "max": 15.0,
+      "min": -15.0,
+      "parameter_index": 94
+    },
+    "eq_high_mode": {
+      "default": 0.0,
+      "display_name": "EQ High Mode",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 95
+    },
+    "eq_high_resonance": {
+      "default": 0.31630000472068787,
+      "display_name": "EQ High Resonance",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 96
+    },
+    "eq_low_cutoff": {
+      "default": 40.0,
+      "display_name": "EQ Low Cutoff",
+      "is_discrete": false,
+      "max": 136.0,
+      "min": 8.0,
+      "parameter_index": 97
+    },
+    "eq_low_gain": {
+      "default": 0.0,
+      "display_name": "EQ Low Gain",
+      "is_discrete": false,
+      "max": 15.0,
+      "min": -15.0,
+      "parameter_index": 98
+    },
+    "eq_low_mode": {
+      "default": 0.0,
+      "display_name": "EQ Low Mode",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 99
+    },
+    "eq_low_resonance": {
+      "default": 0.31630000472068787,
+      "display_name": "EQ Low Resonance",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 100
+    },
+    "eq_on": {
+      "default": 0.0,
+      "display_name": "EQ Switch",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 101
+    },
+    "filter_1_blend": {
+      "default": 0.0,
+      "display_name": "Filter 1 Blend",
+      "is_discrete": false,
+      "max": 2.0,
+      "min": 0.0,
+      "parameter_index": 102
+    },
+    "filter_1_blend_transpose": {
+      "default": 42.0,
+      "display_name": "Filter 1 Comb Blend Offset",
+      "is_discrete": false,
+      "max": 84.0,
+      "min": 0.0,
+      "parameter_index": 103
+    },
+    "filter_1_cutoff": {
+      "default": 60.0,
+      "display_name": "Filter 1 Cutoff",
+      "is_discrete": false,
+      "max": 136.0,
+      "min": 8.0,
+      "parameter_index": 104
+    },
+    "filter_1_drive": {
+      "default": 0.0,
+      "display_name": "Filter 1 Drive",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": 0.0,
+      "parameter_index": 105
+    },
+    "filter_1_filter_input": {
+      "default": 0.0,
+      "display_name": "Filter 1 FILTER Input",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 106
+    },
+    "filter_1_formant_resonance": {
+      "default": 0.8500000238418579,
+      "display_name": "Filter 1 Formant Resonance",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.30000001192092896,
+      "parameter_index": 107
+    },
+    "filter_1_formant_spread": {
+      "default": 0.0,
+      "display_name": "Filter 1 Formant Spread",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 752
+    },
+    "filter_1_formant_transpose": {
+      "default": 0.0,
+      "display_name": "Filter 1 Formant Transpose",
+      "is_discrete": false,
+      "max": 12.0,
+      "min": -12.0,
+      "parameter_index": 108
+    },
+    "filter_1_formant_x": {
+      "default": 0.5,
+      "display_name": "Filter 1 Formant X",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 109
+    },
+    "filter_1_formant_y": {
+      "default": 0.5,
+      "display_name": "Filter 1 Formant Y",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 110
+    },
+    "filter_1_keytrack": {
+      "default": 0.0,
+      "display_name": "Filter 1 Key Track",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 111
+    },
+    "filter_1_mix": {
+      "default": 1.0,
+      "display_name": "Filter 1 Mix",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 112
+    },
+    "filter_1_model": {
+      "default": 0.0,
+      "display_name": "Filter 1 Model",
+      "is_discrete": true,
+      "max": 7.0,
+      "min": 0.0,
+      "parameter_index": 113
+    },
+    "filter_1_on": {
+      "default": 0.0,
+      "display_name": "Filter 1 Switch",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 114
+    },
+    "filter_1_resonance": {
+      "default": 0.5,
+      "display_name": "Filter 1 Resonance",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 115
+    },
+    "filter_1_style": {
+      "default": 0.0,
+      "display_name": "Filter 1 Style",
+      "is_discrete": true,
+      "max": 8.0,
+      "min": 0.0,
+      "parameter_index": 116
+    },
+    "filter_2_blend": {
+      "default": 0.0,
+      "display_name": "Filter 2 Blend",
+      "is_discrete": false,
+      "max": 2.0,
+      "min": 0.0,
+      "parameter_index": 117
+    },
+    "filter_2_blend_transpose": {
+      "default": 42.0,
+      "display_name": "Filter 2 Comb Blend Offset",
+      "is_discrete": false,
+      "max": 84.0,
+      "min": 0.0,
+      "parameter_index": 118
+    },
+    "filter_2_cutoff": {
+      "default": 60.0,
+      "display_name": "Filter 2 Cutoff",
+      "is_discrete": false,
+      "max": 136.0,
+      "min": 8.0,
+      "parameter_index": 119
+    },
+    "filter_2_drive": {
+      "default": 0.0,
+      "display_name": "Filter 2 Drive",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": 0.0,
+      "parameter_index": 120
+    },
+    "filter_2_filter_input": {
+      "default": 0.0,
+      "display_name": "Filter 2 FILTER Input",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 121
+    },
+    "filter_2_formant_resonance": {
+      "default": 0.8500000238418579,
+      "display_name": "Filter 2 Formant Resonance",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.30000001192092896,
+      "parameter_index": 122
+    },
+    "filter_2_formant_spread": {
+      "default": 0.0,
+      "display_name": "Filter 2 Formant Spread",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 753
+    },
+    "filter_2_formant_transpose": {
+      "default": 0.0,
+      "display_name": "Filter 2 Formant Transpose",
+      "is_discrete": false,
+      "max": 12.0,
+      "min": -12.0,
+      "parameter_index": 123
+    },
+    "filter_2_formant_x": {
+      "default": 0.5,
+      "display_name": "Filter 2 Formant X",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 124
+    },
+    "filter_2_formant_y": {
+      "default": 0.5,
+      "display_name": "Filter 2 Formant Y",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 125
+    },
+    "filter_2_keytrack": {
+      "default": 0.0,
+      "display_name": "Filter 2 Key Track",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 126
+    },
+    "filter_2_mix": {
+      "default": 1.0,
+      "display_name": "Filter 2 Mix",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 127
+    },
+    "filter_2_model": {
+      "default": 0.0,
+      "display_name": "Filter 2 Model",
+      "is_discrete": true,
+      "max": 7.0,
+      "min": 0.0,
+      "parameter_index": 128
+    },
+    "filter_2_on": {
+      "default": 0.0,
+      "display_name": "Filter 2 Switch",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 129
+    },
+    "filter_2_resonance": {
+      "default": 0.5,
+      "display_name": "Filter 2 Resonance",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 130
+    },
+    "filter_2_style": {
+      "default": 0.0,
+      "display_name": "Filter 2 Style",
+      "is_discrete": true,
+      "max": 8.0,
+      "min": 0.0,
+      "parameter_index": 131
+    },
+    "filter_fx_blend": {
+      "default": 0.0,
+      "display_name": "Filter fx Blend",
+      "is_discrete": false,
+      "max": 2.0,
+      "min": 0.0,
+      "parameter_index": 132
+    },
+    "filter_fx_blend_transpose": {
+      "default": 42.0,
+      "display_name": "Filter fx Comb Blend Offset",
+      "is_discrete": false,
+      "max": 84.0,
+      "min": 0.0,
+      "parameter_index": 133
+    },
+    "filter_fx_cutoff": {
+      "default": 60.0,
+      "display_name": "Filter fx Cutoff",
+      "is_discrete": false,
+      "max": 136.0,
+      "min": 8.0,
+      "parameter_index": 134
+    },
+    "filter_fx_drive": {
+      "default": 0.0,
+      "display_name": "Filter fx Drive",
+      "is_discrete": false,
+      "max": 20.0,
+      "min": 0.0,
+      "parameter_index": 135
+    },
+    "filter_fx_formant_resonance": {
+      "default": 0.8500000238418579,
+      "display_name": "Filter fx Formant Resonance",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.30000001192092896,
+      "parameter_index": 136
+    },
+    "filter_fx_formant_spread": {
+      "default": 0.0,
+      "display_name": "Filter fx Formant Spread",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 754
+    },
+    "filter_fx_formant_transpose": {
+      "default": 0.0,
+      "display_name": "Filter fx Formant Transpose",
+      "is_discrete": false,
+      "max": 12.0,
+      "min": -12.0,
+      "parameter_index": 137
+    },
+    "filter_fx_formant_x": {
+      "default": 0.5,
+      "display_name": "Filter fx Formant X",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 138
+    },
+    "filter_fx_formant_y": {
+      "default": 0.5,
+      "display_name": "Filter fx Formant Y",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 139
+    },
+    "filter_fx_keytrack": {
+      "default": 0.0,
+      "display_name": "Filter fx Key Track",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 140
+    },
+    "filter_fx_mix": {
+      "default": 1.0,
+      "display_name": "Filter fx Mix",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 141
+    },
+    "filter_fx_model": {
+      "default": 0.0,
+      "display_name": "Filter fx Model",
+      "is_discrete": true,
+      "max": 7.0,
+      "min": 0.0,
+      "parameter_index": 142
+    },
+    "filter_fx_on": {
+      "default": 0.0,
+      "display_name": "Filter fx Switch",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 143
+    },
+    "filter_fx_resonance": {
+      "default": 0.5,
+      "display_name": "Filter fx Resonance",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 144
+    },
+    "filter_fx_style": {
+      "default": 0.0,
+      "display_name": "Filter fx Style",
+      "is_discrete": true,
+      "max": 8.0,
+      "min": 0.0,
+      "parameter_index": 145
+    },
+    "flanger_center": {
+      "default": 64.0,
+      "display_name": "Flanger Center",
+      "is_discrete": false,
+      "max": 136.0,
+      "min": 8.0,
+      "parameter_index": 548
+    },
+    "flanger_dry_wet": {
+      "default": 0.5,
+      "display_name": "Flanger Mix",
+      "is_discrete": false,
+      "max": 0.5,
+      "min": 0.0,
+      "parameter_index": 146
+    },
+    "flanger_feedback": {
+      "default": 0.5,
+      "display_name": "Flanger Feedback",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 147
+    },
+    "flanger_frequency": {
+      "default": 2.0,
+      "display_name": "Flanger Frequency",
+      "is_discrete": false,
+      "max": 2.0,
+      "min": -5.0,
+      "parameter_index": 148
+    },
+    "flanger_mod_depth": {
+      "default": 0.5,
+      "display_name": "Flanger Mod Depth",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 149
+    },
+    "flanger_on": {
+      "default": 0.0,
+      "display_name": "Flanger Switch",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 150
+    },
+    "flanger_phase_offset": {
+      "default": 0.3333333432674408,
+      "display_name": "Flanger Phase Offset",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 151
+    },
+    "flanger_sync": {
+      "default": 1.0,
+      "display_name": "Flanger Sync",
+      "is_discrete": true,
+      "max": 3.0,
+      "min": 0.0,
+      "parameter_index": 152
+    },
+    "flanger_tempo": {
+      "default": 4.0,
+      "display_name": "Flanger Tempo",
+      "is_discrete": true,
+      "max": 10.0,
+      "min": 0.0,
+      "parameter_index": 153
+    },
+    "legato": {
+      "default": 0.0,
+      "display_name": "Legato",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 154
+    },
+    "lfo_1_delay_time": {
+      "default": 0.0,
+      "display_name": "LFO 1 Delay",
+      "is_discrete": false,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 155
+    },
+    "lfo_1_fade_time": {
+      "default": 0.0,
+      "display_name": "LFO 1 Fade In",
+      "is_discrete": false,
+      "max": 8.0,
+      "min": 0.0,
+      "parameter_index": 156
+    },
+    "lfo_1_frequency": {
+      "default": 1.0,
+      "display_name": "LFO 1 Frequency",
+      "is_discrete": false,
+      "max": 9.0,
+      "min": -7.0,
+      "parameter_index": 157
+    },
+    "lfo_1_keytrack_transpose": {
+      "default": -12.0,
+      "display_name": "LFO 1 Transpose",
+      "is_discrete": true,
+      "max": 36.0,
+      "min": -60.0,
+      "parameter_index": 728
+    },
+    "lfo_1_keytrack_tune": {
+      "default": 0.0,
+      "display_name": "LFO 1 Tune",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 729
+    },
+    "lfo_1_phase": {
+      "default": 0.0,
+      "display_name": "LFO 1 Phase",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 158
+    },
+    "lfo_1_smooth_mode": {
+      "default": 1.0,
+      "display_name": "LFO 1 Smooth Mode",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 755
+    },
+    "lfo_1_smooth_time": {
+      "default": -7.5,
+      "display_name": "LFO 1 Smooth Time",
+      "is_discrete": false,
+      "max": 4.0,
+      "min": -10.0,
+      "parameter_index": 756
+    },
+    "lfo_1_stereo": {
+      "default": 0.0,
+      "display_name": "LFO 1 Stereo",
+      "is_discrete": false,
+      "max": 0.5,
+      "min": -0.5,
+      "parameter_index": 487
+    },
+    "lfo_1_sync": {
+      "default": 1.0,
+      "display_name": "LFO 1 Sync",
+      "is_discrete": true,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 159
+    },
+    "lfo_1_sync_type": {
+      "default": 0.0,
+      "display_name": "LFO 1 Sync Type",
+      "is_discrete": true,
+      "max": 6.0,
+      "min": 0.0,
+      "parameter_index": 160
+    },
+    "lfo_1_tempo": {
+      "default": 7.0,
+      "display_name": "LFO 1 Tempo",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 161
+    },
+    "lfo_2_delay_time": {
+      "default": 0.0,
+      "display_name": "LFO 2 Delay",
+      "is_discrete": false,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 162
+    },
+    "lfo_2_fade_time": {
+      "default": 0.0,
+      "display_name": "LFO 2 Fade In",
+      "is_discrete": false,
+      "max": 8.0,
+      "min": 0.0,
+      "parameter_index": 163
+    },
+    "lfo_2_frequency": {
+      "default": 1.0,
+      "display_name": "LFO 2 Frequency",
+      "is_discrete": false,
+      "max": 9.0,
+      "min": -7.0,
+      "parameter_index": 164
+    },
+    "lfo_2_keytrack_transpose": {
+      "default": -12.0,
+      "display_name": "LFO 2 Transpose",
+      "is_discrete": true,
+      "max": 36.0,
+      "min": -60.0,
+      "parameter_index": 730
+    },
+    "lfo_2_keytrack_tune": {
+      "default": 0.0,
+      "display_name": "LFO 2 Tune",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 731
+    },
+    "lfo_2_phase": {
+      "default": 0.0,
+      "display_name": "LFO 2 Phase",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 165
+    },
+    "lfo_2_smooth_mode": {
+      "default": 1.0,
+      "display_name": "LFO 2 Smooth Mode",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 757
+    },
+    "lfo_2_smooth_time": {
+      "default": -7.5,
+      "display_name": "LFO 2 Smooth Time",
+      "is_discrete": false,
+      "max": 4.0,
+      "min": -10.0,
+      "parameter_index": 758
+    },
+    "lfo_2_stereo": {
+      "default": 0.0,
+      "display_name": "LFO 2 Stereo",
+      "is_discrete": false,
+      "max": 0.5,
+      "min": -0.5,
+      "parameter_index": 488
+    },
+    "lfo_2_sync": {
+      "default": 1.0,
+      "display_name": "LFO 2 Sync",
+      "is_discrete": true,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 166
+    },
+    "lfo_2_sync_type": {
+      "default": 0.0,
+      "display_name": "LFO 2 Sync Type",
+      "is_discrete": true,
+      "max": 6.0,
+      "min": 0.0,
+      "parameter_index": 167
+    },
+    "lfo_2_tempo": {
+      "default": 7.0,
+      "display_name": "LFO 2 Tempo",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 168
+    },
+    "lfo_3_delay_time": {
+      "default": 0.0,
+      "display_name": "LFO 3 Delay",
+      "is_discrete": false,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 169
+    },
+    "lfo_3_fade_time": {
+      "default": 0.0,
+      "display_name": "LFO 3 Fade In",
+      "is_discrete": false,
+      "max": 8.0,
+      "min": 0.0,
+      "parameter_index": 170
+    },
+    "lfo_3_frequency": {
+      "default": 1.0,
+      "display_name": "LFO 3 Frequency",
+      "is_discrete": false,
+      "max": 9.0,
+      "min": -7.0,
+      "parameter_index": 171
+    },
+    "lfo_3_keytrack_transpose": {
+      "default": -12.0,
+      "display_name": "LFO 3 Transpose",
+      "is_discrete": true,
+      "max": 36.0,
+      "min": -60.0,
+      "parameter_index": 732
+    },
+    "lfo_3_keytrack_tune": {
+      "default": 0.0,
+      "display_name": "LFO 3 Tune",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 733
+    },
+    "lfo_3_phase": {
+      "default": 0.0,
+      "display_name": "LFO 3 Phase",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 172
+    },
+    "lfo_3_smooth_mode": {
+      "default": 1.0,
+      "display_name": "LFO 3 Smooth Mode",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 759
+    },
+    "lfo_3_smooth_time": {
+      "default": -7.5,
+      "display_name": "LFO 3 Smooth Time",
+      "is_discrete": false,
+      "max": 4.0,
+      "min": -10.0,
+      "parameter_index": 760
+    },
+    "lfo_3_stereo": {
+      "default": 0.0,
+      "display_name": "LFO 3 Stereo",
+      "is_discrete": false,
+      "max": 0.5,
+      "min": -0.5,
+      "parameter_index": 489
+    },
+    "lfo_3_sync": {
+      "default": 1.0,
+      "display_name": "LFO 3 Sync",
+      "is_discrete": true,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 173
+    },
+    "lfo_3_sync_type": {
+      "default": 0.0,
+      "display_name": "LFO 3 Sync Type",
+      "is_discrete": true,
+      "max": 6.0,
+      "min": 0.0,
+      "parameter_index": 174
+    },
+    "lfo_3_tempo": {
+      "default": 7.0,
+      "display_name": "LFO 3 Tempo",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 175
+    },
+    "lfo_4_delay_time": {
+      "default": 0.0,
+      "display_name": "LFO 4 Delay",
+      "is_discrete": false,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 176
+    },
+    "lfo_4_fade_time": {
+      "default": 0.0,
+      "display_name": "LFO 4 Fade In",
+      "is_discrete": false,
+      "max": 8.0,
+      "min": 0.0,
+      "parameter_index": 177
+    },
+    "lfo_4_frequency": {
+      "default": 1.0,
+      "display_name": "LFO 4 Frequency",
+      "is_discrete": false,
+      "max": 9.0,
+      "min": -7.0,
+      "parameter_index": 178
+    },
+    "lfo_4_keytrack_transpose": {
+      "default": -12.0,
+      "display_name": "LFO 4 Transpose",
+      "is_discrete": true,
+      "max": 36.0,
+      "min": -60.0,
+      "parameter_index": 734
+    },
+    "lfo_4_keytrack_tune": {
+      "default": 0.0,
+      "display_name": "LFO 4 Tune",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 735
+    },
+    "lfo_4_phase": {
+      "default": 0.0,
+      "display_name": "LFO 4 Phase",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 179
+    },
+    "lfo_4_smooth_mode": {
+      "default": 1.0,
+      "display_name": "LFO 4 Smooth Mode",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 761
+    },
+    "lfo_4_smooth_time": {
+      "default": -7.5,
+      "display_name": "LFO 4 Smooth Time",
+      "is_discrete": false,
+      "max": 4.0,
+      "min": -10.0,
+      "parameter_index": 762
+    },
+    "lfo_4_stereo": {
+      "default": 0.0,
+      "display_name": "LFO 4 Stereo",
+      "is_discrete": false,
+      "max": 0.5,
+      "min": -0.5,
+      "parameter_index": 490
+    },
+    "lfo_4_sync": {
+      "default": 1.0,
+      "display_name": "LFO 4 Sync",
+      "is_discrete": true,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 180
+    },
+    "lfo_4_sync_type": {
+      "default": 0.0,
+      "display_name": "LFO 4 Sync Type",
+      "is_discrete": true,
+      "max": 6.0,
+      "min": 0.0,
+      "parameter_index": 181
+    },
+    "lfo_4_tempo": {
+      "default": 7.0,
+      "display_name": "LFO 4 Tempo",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 182
+    },
+    "lfo_5_delay_time": {
+      "default": 0.0,
+      "display_name": "LFO 5 Delay",
+      "is_discrete": false,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 183
+    },
+    "lfo_5_fade_time": {
+      "default": 0.0,
+      "display_name": "LFO 5 Fade In",
+      "is_discrete": false,
+      "max": 8.0,
+      "min": 0.0,
+      "parameter_index": 184
+    },
+    "lfo_5_frequency": {
+      "default": 1.0,
+      "display_name": "LFO 5 Frequency",
+      "is_discrete": false,
+      "max": 9.0,
+      "min": -7.0,
+      "parameter_index": 185
+    },
+    "lfo_5_keytrack_transpose": {
+      "default": -12.0,
+      "display_name": "LFO 5 Transpose",
+      "is_discrete": true,
+      "max": 36.0,
+      "min": -60.0,
+      "parameter_index": 736
+    },
+    "lfo_5_keytrack_tune": {
+      "default": 0.0,
+      "display_name": "LFO 5 Tune",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 737
+    },
+    "lfo_5_phase": {
+      "default": 0.0,
+      "display_name": "LFO 5 Phase",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 186
+    },
+    "lfo_5_smooth_mode": {
+      "default": 1.0,
+      "display_name": "LFO 5 Smooth Mode",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 763
+    },
+    "lfo_5_smooth_time": {
+      "default": -7.5,
+      "display_name": "LFO 5 Smooth Time",
+      "is_discrete": false,
+      "max": 4.0,
+      "min": -10.0,
+      "parameter_index": 764
+    },
+    "lfo_5_stereo": {
+      "default": 0.0,
+      "display_name": "LFO 5 Stereo",
+      "is_discrete": false,
+      "max": 0.5,
+      "min": -0.5,
+      "parameter_index": 491
+    },
+    "lfo_5_sync": {
+      "default": 1.0,
+      "display_name": "LFO 5 Sync",
+      "is_discrete": true,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 187
+    },
+    "lfo_5_sync_type": {
+      "default": 0.0,
+      "display_name": "LFO 5 Sync Type",
+      "is_discrete": true,
+      "max": 6.0,
+      "min": 0.0,
+      "parameter_index": 188
+    },
+    "lfo_5_tempo": {
+      "default": 7.0,
+      "display_name": "LFO 5 Tempo",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 189
+    },
+    "lfo_6_delay_time": {
+      "default": 0.0,
+      "display_name": "LFO 6 Delay",
+      "is_discrete": false,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 190
+    },
+    "lfo_6_fade_time": {
+      "default": 0.0,
+      "display_name": "LFO 6 Fade In",
+      "is_discrete": false,
+      "max": 8.0,
+      "min": 0.0,
+      "parameter_index": 191
+    },
+    "lfo_6_frequency": {
+      "default": 1.0,
+      "display_name": "LFO 6 Frequency",
+      "is_discrete": false,
+      "max": 9.0,
+      "min": -7.0,
+      "parameter_index": 192
+    },
+    "lfo_6_keytrack_transpose": {
+      "default": -12.0,
+      "display_name": "LFO 6 Transpose",
+      "is_discrete": true,
+      "max": 36.0,
+      "min": -60.0,
+      "parameter_index": 738
+    },
+    "lfo_6_keytrack_tune": {
+      "default": 0.0,
+      "display_name": "LFO 6 Tune",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 739
+    },
+    "lfo_6_phase": {
+      "default": 0.0,
+      "display_name": "LFO 6 Phase",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 193
+    },
+    "lfo_6_smooth_mode": {
+      "default": 1.0,
+      "display_name": "LFO 6 Smooth Mode",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 765
+    },
+    "lfo_6_smooth_time": {
+      "default": -7.5,
+      "display_name": "LFO 6 Smooth Time",
+      "is_discrete": false,
+      "max": 4.0,
+      "min": -10.0,
+      "parameter_index": 766
+    },
+    "lfo_6_stereo": {
+      "default": 0.0,
+      "display_name": "LFO 6 Stereo",
+      "is_discrete": false,
+      "max": 0.5,
+      "min": -0.5,
+      "parameter_index": 492
+    },
+    "lfo_6_sync": {
+      "default": 1.0,
+      "display_name": "LFO 6 Sync",
+      "is_discrete": true,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 194
+    },
+    "lfo_6_sync_type": {
+      "default": 0.0,
+      "display_name": "LFO 6 Sync Type",
+      "is_discrete": true,
+      "max": 6.0,
+      "min": 0.0,
+      "parameter_index": 195
+    },
+    "lfo_6_tempo": {
+      "default": 7.0,
+      "display_name": "LFO 6 Tempo",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 196
+    },
+    "lfo_7_delay_time": {
+      "default": 0.0,
+      "display_name": "LFO 7 Delay",
+      "is_discrete": false,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 197
+    },
+    "lfo_7_fade_time": {
+      "default": 0.0,
+      "display_name": "LFO 7 Fade In",
+      "is_discrete": false,
+      "max": 8.0,
+      "min": 0.0,
+      "parameter_index": 198
+    },
+    "lfo_7_frequency": {
+      "default": 1.0,
+      "display_name": "LFO 7 Frequency",
+      "is_discrete": false,
+      "max": 9.0,
+      "min": -7.0,
+      "parameter_index": 199
+    },
+    "lfo_7_keytrack_transpose": {
+      "default": -12.0,
+      "display_name": "LFO 7 Transpose",
+      "is_discrete": true,
+      "max": 36.0,
+      "min": -60.0,
+      "parameter_index": 740
+    },
+    "lfo_7_keytrack_tune": {
+      "default": 0.0,
+      "display_name": "LFO 7 Tune",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 741
+    },
+    "lfo_7_phase": {
+      "default": 0.0,
+      "display_name": "LFO 7 Phase",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 200
+    },
+    "lfo_7_smooth_mode": {
+      "default": 1.0,
+      "display_name": "LFO 7 Smooth Mode",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 767
+    },
+    "lfo_7_smooth_time": {
+      "default": -7.5,
+      "display_name": "LFO 7 Smooth Time",
+      "is_discrete": false,
+      "max": 4.0,
+      "min": -10.0,
+      "parameter_index": 768
+    },
+    "lfo_7_stereo": {
+      "default": 0.0,
+      "display_name": "LFO 7 Stereo",
+      "is_discrete": false,
+      "max": 0.5,
+      "min": -0.5,
+      "parameter_index": 493
+    },
+    "lfo_7_sync": {
+      "default": 1.0,
+      "display_name": "LFO 7 Sync",
+      "is_discrete": true,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 201
+    },
+    "lfo_7_sync_type": {
+      "default": 0.0,
+      "display_name": "LFO 7 Sync Type",
+      "is_discrete": true,
+      "max": 6.0,
+      "min": 0.0,
+      "parameter_index": 202
+    },
+    "lfo_7_tempo": {
+      "default": 7.0,
+      "display_name": "LFO 7 Tempo",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 203
+    },
+    "lfo_8_delay_time": {
+      "default": 0.0,
+      "display_name": "LFO 8 Delay",
+      "is_discrete": false,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 204
+    },
+    "lfo_8_fade_time": {
+      "default": 0.0,
+      "display_name": "LFO 8 Fade In",
+      "is_discrete": false,
+      "max": 8.0,
+      "min": 0.0,
+      "parameter_index": 205
+    },
+    "lfo_8_frequency": {
+      "default": 1.0,
+      "display_name": "LFO 8 Frequency",
+      "is_discrete": false,
+      "max": 9.0,
+      "min": -7.0,
+      "parameter_index": 206
+    },
+    "lfo_8_keytrack_transpose": {
+      "default": -12.0,
+      "display_name": "LFO 8 Transpose",
+      "is_discrete": true,
+      "max": 36.0,
+      "min": -60.0,
+      "parameter_index": 742
+    },
+    "lfo_8_keytrack_tune": {
+      "default": 0.0,
+      "display_name": "LFO 8 Tune",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 743
+    },
+    "lfo_8_phase": {
+      "default": 0.0,
+      "display_name": "LFO 8 Phase",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 207
+    },
+    "lfo_8_smooth_mode": {
+      "default": 1.0,
+      "display_name": "LFO 8 Smooth Mode",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 769
+    },
+    "lfo_8_smooth_time": {
+      "default": -7.5,
+      "display_name": "LFO 8 Smooth Time",
+      "is_discrete": false,
+      "max": 4.0,
+      "min": -10.0,
+      "parameter_index": 770
+    },
+    "lfo_8_stereo": {
+      "default": 0.0,
+      "display_name": "LFO 8 Stereo",
+      "is_discrete": false,
+      "max": 0.5,
+      "min": -0.5,
+      "parameter_index": 494
+    },
+    "lfo_8_sync": {
+      "default": 1.0,
+      "display_name": "LFO 8 Sync",
+      "is_discrete": true,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 208
+    },
+    "lfo_8_sync_type": {
+      "default": 0.0,
+      "display_name": "LFO 8 Sync Type",
+      "is_discrete": true,
+      "max": 6.0,
+      "min": 0.0,
+      "parameter_index": 209
+    },
+    "lfo_8_tempo": {
+      "default": 7.0,
+      "display_name": "LFO 8 Tempo",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 210
+    },
+    "macro_control_1": {
+      "default": 0.0,
+      "display_name": "Macro 1",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 211
+    },
+    "macro_control_2": {
+      "default": 0.0,
+      "display_name": "Macro 2",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 212
+    },
+    "macro_control_3": {
+      "default": 0.0,
+      "display_name": "Macro 3",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 213
+    },
+    "macro_control_4": {
+      "default": 0.0,
+      "display_name": "Macro 4",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 214
+    },
+    "mod_wheel": {
+      "default": 0.0,
+      "display_name": "Mod Wheel",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 463
+    },
+    "modulation_10_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 10 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 215
+    },
+    "modulation_10_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 10 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 216
+    },
+    "modulation_10_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 10 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 217
+    },
+    "modulation_10_power": {
+      "default": 0.0,
+      "display_name": "Modulation 10 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 218
+    },
+    "modulation_10_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 10 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 219
+    },
+    "modulation_11_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 11 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 220
+    },
+    "modulation_11_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 11 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 221
+    },
+    "modulation_11_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 11 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 222
+    },
+    "modulation_11_power": {
+      "default": 0.0,
+      "display_name": "Modulation 11 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 223
+    },
+    "modulation_11_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 11 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 224
+    },
+    "modulation_12_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 12 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 225
+    },
+    "modulation_12_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 12 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 226
+    },
+    "modulation_12_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 12 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 227
+    },
+    "modulation_12_power": {
+      "default": 0.0,
+      "display_name": "Modulation 12 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 228
+    },
+    "modulation_12_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 12 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 229
+    },
+    "modulation_13_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 13 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 230
+    },
+    "modulation_13_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 13 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 231
+    },
+    "modulation_13_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 13 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 232
+    },
+    "modulation_13_power": {
+      "default": 0.0,
+      "display_name": "Modulation 13 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 233
+    },
+    "modulation_13_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 13 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 234
+    },
+    "modulation_14_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 14 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 235
+    },
+    "modulation_14_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 14 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 236
+    },
+    "modulation_14_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 14 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 237
+    },
+    "modulation_14_power": {
+      "default": 0.0,
+      "display_name": "Modulation 14 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 238
+    },
+    "modulation_14_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 14 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 239
+    },
+    "modulation_15_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 15 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 240
+    },
+    "modulation_15_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 15 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 241
+    },
+    "modulation_15_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 15 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 242
+    },
+    "modulation_15_power": {
+      "default": 0.0,
+      "display_name": "Modulation 15 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 243
+    },
+    "modulation_15_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 15 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 244
+    },
+    "modulation_16_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 16 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 245
+    },
+    "modulation_16_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 16 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 246
+    },
+    "modulation_16_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 16 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 247
+    },
+    "modulation_16_power": {
+      "default": 0.0,
+      "display_name": "Modulation 16 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 248
+    },
+    "modulation_16_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 16 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 249
+    },
+    "modulation_17_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 17 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 250
+    },
+    "modulation_17_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 17 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 251
+    },
+    "modulation_17_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 17 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 252
+    },
+    "modulation_17_power": {
+      "default": 0.0,
+      "display_name": "Modulation 17 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 253
+    },
+    "modulation_17_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 17 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 254
+    },
+    "modulation_18_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 18 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 255
+    },
+    "modulation_18_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 18 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 256
+    },
+    "modulation_18_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 18 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 257
+    },
+    "modulation_18_power": {
+      "default": 0.0,
+      "display_name": "Modulation 18 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 258
+    },
+    "modulation_18_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 18 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 259
+    },
+    "modulation_19_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 19 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 260
+    },
+    "modulation_19_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 19 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 261
+    },
+    "modulation_19_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 19 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 262
+    },
+    "modulation_19_power": {
+      "default": 0.0,
+      "display_name": "Modulation 19 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 263
+    },
+    "modulation_19_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 19 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 264
+    },
+    "modulation_1_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 1 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 265
+    },
+    "modulation_1_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 1 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 266
+    },
+    "modulation_1_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 1 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 267
+    },
+    "modulation_1_power": {
+      "default": 0.0,
+      "display_name": "Modulation 1 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 268
+    },
+    "modulation_1_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 1 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 269
+    },
+    "modulation_20_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 20 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 270
+    },
+    "modulation_20_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 20 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 271
+    },
+    "modulation_20_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 20 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 272
+    },
+    "modulation_20_power": {
+      "default": 0.0,
+      "display_name": "Modulation 20 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 273
+    },
+    "modulation_20_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 20 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 274
+    },
+    "modulation_21_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 21 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 275
+    },
+    "modulation_21_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 21 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 276
+    },
+    "modulation_21_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 21 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 277
+    },
+    "modulation_21_power": {
+      "default": 0.0,
+      "display_name": "Modulation 21 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 278
+    },
+    "modulation_21_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 21 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 279
+    },
+    "modulation_22_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 22 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 280
+    },
+    "modulation_22_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 22 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 281
+    },
+    "modulation_22_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 22 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 282
+    },
+    "modulation_22_power": {
+      "default": 0.0,
+      "display_name": "Modulation 22 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 283
+    },
+    "modulation_22_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 22 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 284
+    },
+    "modulation_23_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 23 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 285
+    },
+    "modulation_23_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 23 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 286
+    },
+    "modulation_23_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 23 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 287
+    },
+    "modulation_23_power": {
+      "default": 0.0,
+      "display_name": "Modulation 23 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 288
+    },
+    "modulation_23_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 23 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 289
+    },
+    "modulation_24_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 24 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 290
+    },
+    "modulation_24_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 24 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 291
+    },
+    "modulation_24_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 24 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 292
+    },
+    "modulation_24_power": {
+      "default": 0.0,
+      "display_name": "Modulation 24 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 293
+    },
+    "modulation_24_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 24 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 294
+    },
+    "modulation_25_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 25 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 295
+    },
+    "modulation_25_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 25 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 296
+    },
+    "modulation_25_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 25 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 297
+    },
+    "modulation_25_power": {
+      "default": 0.0,
+      "display_name": "Modulation 25 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 298
+    },
+    "modulation_25_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 25 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 299
+    },
+    "modulation_26_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 26 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 300
+    },
+    "modulation_26_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 26 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 301
+    },
+    "modulation_26_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 26 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 302
+    },
+    "modulation_26_power": {
+      "default": 0.0,
+      "display_name": "Modulation 26 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 303
+    },
+    "modulation_26_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 26 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 304
+    },
+    "modulation_27_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 27 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 305
+    },
+    "modulation_27_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 27 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 306
+    },
+    "modulation_27_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 27 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 307
+    },
+    "modulation_27_power": {
+      "default": 0.0,
+      "display_name": "Modulation 27 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 308
+    },
+    "modulation_27_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 27 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 309
+    },
+    "modulation_28_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 28 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 310
+    },
+    "modulation_28_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 28 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 311
+    },
+    "modulation_28_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 28 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 312
+    },
+    "modulation_28_power": {
+      "default": 0.0,
+      "display_name": "Modulation 28 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 313
+    },
+    "modulation_28_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 28 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 314
+    },
+    "modulation_29_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 29 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 315
+    },
+    "modulation_29_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 29 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 316
+    },
+    "modulation_29_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 29 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 317
+    },
+    "modulation_29_power": {
+      "default": 0.0,
+      "display_name": "Modulation 29 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 318
+    },
+    "modulation_29_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 29 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 319
+    },
+    "modulation_2_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 2 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 320
+    },
+    "modulation_2_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 2 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 321
+    },
+    "modulation_2_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 2 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 322
+    },
+    "modulation_2_power": {
+      "default": 0.0,
+      "display_name": "Modulation 2 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 323
+    },
+    "modulation_2_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 2 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 324
+    },
+    "modulation_30_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 30 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 325
+    },
+    "modulation_30_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 30 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 326
+    },
+    "modulation_30_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 30 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 327
+    },
+    "modulation_30_power": {
+      "default": 0.0,
+      "display_name": "Modulation 30 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 328
+    },
+    "modulation_30_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 30 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 329
+    },
+    "modulation_31_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 31 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 330
+    },
+    "modulation_31_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 31 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 331
+    },
+    "modulation_31_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 31 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 332
+    },
+    "modulation_31_power": {
+      "default": 0.0,
+      "display_name": "Modulation 31 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 333
+    },
+    "modulation_31_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 31 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 334
+    },
+    "modulation_32_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 32 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 335
+    },
+    "modulation_32_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 32 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 336
+    },
+    "modulation_32_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 32 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 337
+    },
+    "modulation_32_power": {
+      "default": 0.0,
+      "display_name": "Modulation 32 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 338
+    },
+    "modulation_32_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 32 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 339
+    },
+    "modulation_33_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 33 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 560
+    },
+    "modulation_33_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 33 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 561
+    },
+    "modulation_33_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 33 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 562
+    },
+    "modulation_33_power": {
+      "default": 0.0,
+      "display_name": "Modulation 33 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 563
+    },
+    "modulation_33_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 33 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 564
+    },
+    "modulation_34_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 34 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 565
+    },
+    "modulation_34_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 34 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 566
+    },
+    "modulation_34_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 34 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 567
+    },
+    "modulation_34_power": {
+      "default": 0.0,
+      "display_name": "Modulation 34 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 568
+    },
+    "modulation_34_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 34 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 569
+    },
+    "modulation_35_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 35 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 570
+    },
+    "modulation_35_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 35 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 571
+    },
+    "modulation_35_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 35 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 572
+    },
+    "modulation_35_power": {
+      "default": 0.0,
+      "display_name": "Modulation 35 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 573
+    },
+    "modulation_35_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 35 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 574
+    },
+    "modulation_36_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 36 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 575
+    },
+    "modulation_36_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 36 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 576
+    },
+    "modulation_36_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 36 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 577
+    },
+    "modulation_36_power": {
+      "default": 0.0,
+      "display_name": "Modulation 36 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 578
+    },
+    "modulation_36_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 36 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 579
+    },
+    "modulation_37_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 37 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 580
+    },
+    "modulation_37_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 37 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 581
+    },
+    "modulation_37_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 37 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 582
+    },
+    "modulation_37_power": {
+      "default": 0.0,
+      "display_name": "Modulation 37 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 583
+    },
+    "modulation_37_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 37 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 584
+    },
+    "modulation_38_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 38 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 585
+    },
+    "modulation_38_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 38 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 586
+    },
+    "modulation_38_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 38 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 587
+    },
+    "modulation_38_power": {
+      "default": 0.0,
+      "display_name": "Modulation 38 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 588
+    },
+    "modulation_38_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 38 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 589
+    },
+    "modulation_39_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 39 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 590
+    },
+    "modulation_39_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 39 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 591
+    },
+    "modulation_39_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 39 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 592
+    },
+    "modulation_39_power": {
+      "default": 0.0,
+      "display_name": "Modulation 39 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 593
+    },
+    "modulation_39_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 39 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 594
+    },
+    "modulation_3_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 3 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 340
+    },
+    "modulation_3_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 3 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 341
+    },
+    "modulation_3_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 3 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 342
+    },
+    "modulation_3_power": {
+      "default": 0.0,
+      "display_name": "Modulation 3 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 343
+    },
+    "modulation_3_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 3 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 344
+    },
+    "modulation_40_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 40 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 595
+    },
+    "modulation_40_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 40 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 596
+    },
+    "modulation_40_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 40 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 597
+    },
+    "modulation_40_power": {
+      "default": 0.0,
+      "display_name": "Modulation 40 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 598
+    },
+    "modulation_40_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 40 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 599
+    },
+    "modulation_41_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 41 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 600
+    },
+    "modulation_41_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 41 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 601
+    },
+    "modulation_41_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 41 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 602
+    },
+    "modulation_41_power": {
+      "default": 0.0,
+      "display_name": "Modulation 41 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 603
+    },
+    "modulation_41_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 41 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 604
+    },
+    "modulation_42_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 42 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 605
+    },
+    "modulation_42_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 42 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 606
+    },
+    "modulation_42_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 42 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 607
+    },
+    "modulation_42_power": {
+      "default": 0.0,
+      "display_name": "Modulation 42 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 608
+    },
+    "modulation_42_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 42 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 609
+    },
+    "modulation_43_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 43 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 610
+    },
+    "modulation_43_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 43 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 611
+    },
+    "modulation_43_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 43 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 612
+    },
+    "modulation_43_power": {
+      "default": 0.0,
+      "display_name": "Modulation 43 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 613
+    },
+    "modulation_43_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 43 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 614
+    },
+    "modulation_44_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 44 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 615
+    },
+    "modulation_44_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 44 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 616
+    },
+    "modulation_44_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 44 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 617
+    },
+    "modulation_44_power": {
+      "default": 0.0,
+      "display_name": "Modulation 44 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 618
+    },
+    "modulation_44_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 44 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 619
+    },
+    "modulation_45_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 45 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 620
+    },
+    "modulation_45_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 45 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 621
+    },
+    "modulation_45_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 45 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 622
+    },
+    "modulation_45_power": {
+      "default": 0.0,
+      "display_name": "Modulation 45 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 623
+    },
+    "modulation_45_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 45 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 624
+    },
+    "modulation_46_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 46 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 625
+    },
+    "modulation_46_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 46 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 626
+    },
+    "modulation_46_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 46 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 627
+    },
+    "modulation_46_power": {
+      "default": 0.0,
+      "display_name": "Modulation 46 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 628
+    },
+    "modulation_46_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 46 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 629
+    },
+    "modulation_47_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 47 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 630
+    },
+    "modulation_47_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 47 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 631
+    },
+    "modulation_47_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 47 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 632
+    },
+    "modulation_47_power": {
+      "default": 0.0,
+      "display_name": "Modulation 47 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 633
+    },
+    "modulation_47_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 47 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 634
+    },
+    "modulation_48_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 48 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 635
+    },
+    "modulation_48_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 48 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 636
+    },
+    "modulation_48_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 48 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 637
+    },
+    "modulation_48_power": {
+      "default": 0.0,
+      "display_name": "Modulation 48 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 638
+    },
+    "modulation_48_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 48 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 639
+    },
+    "modulation_49_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 49 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 640
+    },
+    "modulation_49_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 49 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 641
+    },
+    "modulation_49_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 49 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 642
+    },
+    "modulation_49_power": {
+      "default": 0.0,
+      "display_name": "Modulation 49 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 643
+    },
+    "modulation_49_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 49 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 644
+    },
+    "modulation_4_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 4 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 345
+    },
+    "modulation_4_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 4 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 346
+    },
+    "modulation_4_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 4 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 347
+    },
+    "modulation_4_power": {
+      "default": 0.0,
+      "display_name": "Modulation 4 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 348
+    },
+    "modulation_4_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 4 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 349
+    },
+    "modulation_50_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 50 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 645
+    },
+    "modulation_50_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 50 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 646
+    },
+    "modulation_50_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 50 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 647
+    },
+    "modulation_50_power": {
+      "default": 0.0,
+      "display_name": "Modulation 50 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 648
+    },
+    "modulation_50_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 50 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 649
+    },
+    "modulation_51_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 51 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 650
+    },
+    "modulation_51_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 51 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 651
+    },
+    "modulation_51_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 51 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 652
+    },
+    "modulation_51_power": {
+      "default": 0.0,
+      "display_name": "Modulation 51 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 653
+    },
+    "modulation_51_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 51 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 654
+    },
+    "modulation_52_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 52 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 655
+    },
+    "modulation_52_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 52 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 656
+    },
+    "modulation_52_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 52 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 657
+    },
+    "modulation_52_power": {
+      "default": 0.0,
+      "display_name": "Modulation 52 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 658
+    },
+    "modulation_52_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 52 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 659
+    },
+    "modulation_53_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 53 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 660
+    },
+    "modulation_53_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 53 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 661
+    },
+    "modulation_53_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 53 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 662
+    },
+    "modulation_53_power": {
+      "default": 0.0,
+      "display_name": "Modulation 53 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 663
+    },
+    "modulation_53_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 53 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 664
+    },
+    "modulation_54_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 54 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 665
+    },
+    "modulation_54_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 54 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 666
+    },
+    "modulation_54_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 54 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 667
+    },
+    "modulation_54_power": {
+      "default": 0.0,
+      "display_name": "Modulation 54 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 668
+    },
+    "modulation_54_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 54 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 669
+    },
+    "modulation_55_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 55 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 670
+    },
+    "modulation_55_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 55 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 671
+    },
+    "modulation_55_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 55 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 672
+    },
+    "modulation_55_power": {
+      "default": 0.0,
+      "display_name": "Modulation 55 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 673
+    },
+    "modulation_55_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 55 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 674
+    },
+    "modulation_56_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 56 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 675
+    },
+    "modulation_56_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 56 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 676
+    },
+    "modulation_56_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 56 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 677
+    },
+    "modulation_56_power": {
+      "default": 0.0,
+      "display_name": "Modulation 56 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 678
+    },
+    "modulation_56_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 56 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 679
+    },
+    "modulation_57_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 57 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 680
+    },
+    "modulation_57_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 57 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 681
+    },
+    "modulation_57_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 57 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 682
+    },
+    "modulation_57_power": {
+      "default": 0.0,
+      "display_name": "Modulation 57 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 683
+    },
+    "modulation_57_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 57 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 684
+    },
+    "modulation_58_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 58 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 685
+    },
+    "modulation_58_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 58 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 686
+    },
+    "modulation_58_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 58 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 687
+    },
+    "modulation_58_power": {
+      "default": 0.0,
+      "display_name": "Modulation 58 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 688
+    },
+    "modulation_58_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 58 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 689
+    },
+    "modulation_59_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 59 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 690
+    },
+    "modulation_59_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 59 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 691
+    },
+    "modulation_59_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 59 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 692
+    },
+    "modulation_59_power": {
+      "default": 0.0,
+      "display_name": "Modulation 59 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 693
+    },
+    "modulation_59_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 59 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 694
+    },
+    "modulation_5_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 5 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 350
+    },
+    "modulation_5_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 5 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 351
+    },
+    "modulation_5_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 5 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 352
+    },
+    "modulation_5_power": {
+      "default": 0.0,
+      "display_name": "Modulation 5 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 353
+    },
+    "modulation_5_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 5 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 354
+    },
+    "modulation_60_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 60 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 695
+    },
+    "modulation_60_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 60 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 696
+    },
+    "modulation_60_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 60 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 697
+    },
+    "modulation_60_power": {
+      "default": 0.0,
+      "display_name": "Modulation 60 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 698
+    },
+    "modulation_60_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 60 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 699
+    },
+    "modulation_61_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 61 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 700
+    },
+    "modulation_61_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 61 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 701
+    },
+    "modulation_61_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 61 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 702
+    },
+    "modulation_61_power": {
+      "default": 0.0,
+      "display_name": "Modulation 61 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 703
+    },
+    "modulation_61_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 61 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 704
+    },
+    "modulation_62_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 62 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 705
+    },
+    "modulation_62_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 62 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 706
+    },
+    "modulation_62_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 62 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 707
+    },
+    "modulation_62_power": {
+      "default": 0.0,
+      "display_name": "Modulation 62 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 708
+    },
+    "modulation_62_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 62 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 709
+    },
+    "modulation_63_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 63 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 710
+    },
+    "modulation_63_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 63 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 711
+    },
+    "modulation_63_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 63 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 712
+    },
+    "modulation_63_power": {
+      "default": 0.0,
+      "display_name": "Modulation 63 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 713
+    },
+    "modulation_63_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 63 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 714
+    },
+    "modulation_64_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 64 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 715
+    },
+    "modulation_64_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 64 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 716
+    },
+    "modulation_64_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 64 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 717
+    },
+    "modulation_64_power": {
+      "default": 0.0,
+      "display_name": "Modulation 64 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 718
+    },
+    "modulation_64_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 64 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 719
+    },
+    "modulation_6_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 6 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 355
+    },
+    "modulation_6_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 6 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 356
+    },
+    "modulation_6_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 6 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 357
+    },
+    "modulation_6_power": {
+      "default": 0.0,
+      "display_name": "Modulation 6 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 358
+    },
+    "modulation_6_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 6 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 359
+    },
+    "modulation_7_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 7 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 360
+    },
+    "modulation_7_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 7 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 361
+    },
+    "modulation_7_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 7 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 362
+    },
+    "modulation_7_power": {
+      "default": 0.0,
+      "display_name": "Modulation 7 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 363
+    },
+    "modulation_7_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 7 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 364
+    },
+    "modulation_8_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 8 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 365
+    },
+    "modulation_8_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 8 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 366
+    },
+    "modulation_8_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 8 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 367
+    },
+    "modulation_8_power": {
+      "default": 0.0,
+      "display_name": "Modulation 8 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 368
+    },
+    "modulation_8_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 8 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 369
+    },
+    "modulation_9_amount": {
+      "default": 0.0,
+      "display_name": "Modulation 9 Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 370
+    },
+    "modulation_9_bipolar": {
+      "default": 0.0,
+      "display_name": "Modulation 9 Bipolar",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 371
+    },
+    "modulation_9_bypass": {
+      "default": 0.0,
+      "display_name": "Modulation 9 Bypass",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 372
+    },
+    "modulation_9_power": {
+      "default": 0.0,
+      "display_name": "Modulation 9 Power",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": -10.0,
+      "parameter_index": 373
+    },
+    "modulation_9_stereo": {
+      "default": 0.0,
+      "display_name": "Modulation 9 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 374
+    },
+    "mpe_enabled": {
+      "default": 0.0,
+      "display_name": "MPE Enabled",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 535
+    },
+    "osc_1_destination": {
+      "default": 0.0,
+      "display_name": "Oscillator 1 Destination",
+      "is_discrete": true,
+      "max": 14.0,
+      "min": 0.0,
+      "parameter_index": 501
+    },
+    "osc_1_detune_power": {
+      "default": 1.5,
+      "display_name": "Oscillator 1 Detune Power",
+      "is_discrete": false,
+      "max": 5.0,
+      "min": -5.0,
+      "parameter_index": 375
+    },
+    "osc_1_detune_range": {
+      "default": 2.0,
+      "display_name": "Oscillator 1 Detune Range",
+      "is_discrete": false,
+      "max": 48.0,
+      "min": 0.0,
+      "parameter_index": 376
+    },
+    "osc_1_distortion_amount": {
+      "default": 0.5,
+      "display_name": "Oscillator 1 Distortion Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 377
+    },
+    "osc_1_distortion_phase": {
+      "default": 0.5,
+      "display_name": "Oscillator 1 Distortion Phase",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 378
+    },
+    "osc_1_distortion_spread": {
+      "default": 0.0,
+      "display_name": "Oscillator 1 Distortion Spread",
+      "is_discrete": false,
+      "max": 0.5,
+      "min": -0.5,
+      "parameter_index": 379
+    },
+    "osc_1_distortion_type": {
+      "default": 0.0,
+      "display_name": "Oscillator 1 Distortion Type",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 380
+    },
+    "osc_1_frame_spread": {
+      "default": 0.0,
+      "display_name": "Oscillator 1 Unison Frame Spread",
+      "is_discrete": false,
+      "max": 128.0,
+      "min": -128.0,
+      "parameter_index": 381
+    },
+    "osc_1_level": {
+      "default": 0.7071067690849304,
+      "display_name": "Oscillator 1 Level",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 382
+    },
+    "osc_1_midi_track": {
+      "default": 1.0,
+      "display_name": "Oscillator 1 Midi Track",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 383
+    },
+    "osc_1_on": {
+      "default": 1.0,
+      "display_name": "Oscillator 1 Switch",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 384
+    },
+    "osc_1_pan": {
+      "default": 0.0,
+      "display_name": "Oscillator 1 Pan",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 385
+    },
+    "osc_1_phase": {
+      "default": 0.5,
+      "display_name": "Oscillator 1 Phase",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 386
+    },
+    "osc_1_random_phase": {
+      "default": 1.0,
+      "display_name": "Oscillator 1 Phase Randomization",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 387
+    },
+    "osc_1_smooth_interpolation": {
+      "default": 0.0,
+      "display_name": "Oscillator 1 Smooth Interpolation",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 388
+    },
+    "osc_1_spectral_morph_amount": {
+      "default": 0.5,
+      "display_name": "Oscillator 1 Frequency Morph Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 495
+    },
+    "osc_1_spectral_morph_phase": {
+      "default": 0.5,
+      "display_name": "Oscillator 1 Frequency Morph Phase",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 772
+    },
+    "osc_1_spectral_morph_spread": {
+      "default": 0.0,
+      "display_name": "Oscillator 1 Frequency Morph Spread",
+      "is_discrete": false,
+      "max": 0.5,
+      "min": -0.5,
+      "parameter_index": 496
+    },
+    "osc_1_spectral_morph_type": {
+      "default": 0.0,
+      "display_name": "Oscillator 1 Frequency Morph Type",
+      "is_discrete": true,
+      "max": 16.0,
+      "min": 0.0,
+      "parameter_index": 497
+    },
+    "osc_1_spectral_unison": {
+      "default": 1.0,
+      "display_name": "Oscillator 1 Spectral Unison",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 502
+    },
+    "osc_1_stack_style": {
+      "default": 0.0,
+      "display_name": "Oscillator 1 Stack Style",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 389
+    },
+    "osc_1_stereo_spread": {
+      "default": 1.0,
+      "display_name": "Oscillator 1 Stereo Spread",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 390
+    },
+    "osc_1_transpose": {
+      "default": 0.0,
+      "display_name": "Oscillator 1 Transpose",
+      "is_discrete": true,
+      "max": 48.0,
+      "min": -48.0,
+      "parameter_index": 391
+    },
+    "osc_1_transpose_quantize": {
+      "default": 0.0,
+      "display_name": "Oscillator 1 Transpose Quantize",
+      "is_discrete": false,
+      "max": 8191.0,
+      "min": 0.0,
+      "parameter_index": 392
+    },
+    "osc_1_tune": {
+      "default": 0.0,
+      "display_name": "Oscillator 1 Tune",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 393
+    },
+    "osc_1_unison_blend": {
+      "default": 0.800000011920929,
+      "display_name": "Oscillator 1 Blend",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 394
+    },
+    "osc_1_unison_detune": {
+      "default": 4.4721360206604,
+      "display_name": "Oscillator 1 Unison Detune",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": 0.0,
+      "parameter_index": 395
+    },
+    "osc_1_unison_voices": {
+      "default": 1.0,
+      "display_name": "Oscillator 1 Unison Voices",
+      "is_discrete": true,
+      "max": 16.0,
+      "min": 1.0,
+      "parameter_index": 396
+    },
+    "osc_1_view_2d": {
+      "default": 1.0,
+      "display_name": "Oscillator 1 View 2D",
+      "is_discrete": true,
+      "max": 2.0,
+      "min": 0.0,
+      "parameter_index": 485
+    },
+    "osc_1_wave_frame": {
+      "default": 0.0,
+      "display_name": "Oscillator 1 Wave Frame",
+      "is_discrete": false,
+      "max": 256.0,
+      "min": 0.0,
+      "parameter_index": 397
+    },
+    "osc_2_destination": {
+      "default": 1.0,
+      "display_name": "Oscillator 2 Destination",
+      "is_discrete": true,
+      "max": 14.0,
+      "min": 0.0,
+      "parameter_index": 503
+    },
+    "osc_2_detune_power": {
+      "default": 1.5,
+      "display_name": "Oscillator 2 Detune Power",
+      "is_discrete": false,
+      "max": 5.0,
+      "min": -5.0,
+      "parameter_index": 398
+    },
+    "osc_2_detune_range": {
+      "default": 2.0,
+      "display_name": "Oscillator 2 Detune Range",
+      "is_discrete": false,
+      "max": 48.0,
+      "min": 0.0,
+      "parameter_index": 399
+    },
+    "osc_2_distortion_amount": {
+      "default": 0.5,
+      "display_name": "Oscillator 2 Distortion Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 400
+    },
+    "osc_2_distortion_phase": {
+      "default": 0.5,
+      "display_name": "Oscillator 2 Distortion Phase",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 401
+    },
+    "osc_2_distortion_spread": {
+      "default": 0.0,
+      "display_name": "Oscillator 2 Distortion Spread",
+      "is_discrete": false,
+      "max": 0.5,
+      "min": -0.5,
+      "parameter_index": 402
+    },
+    "osc_2_distortion_type": {
+      "default": 0.0,
+      "display_name": "Oscillator 2 Distortion Type",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 403
+    },
+    "osc_2_frame_spread": {
+      "default": 0.0,
+      "display_name": "Oscillator 2 Unison Frame Spread",
+      "is_discrete": false,
+      "max": 128.0,
+      "min": -128.0,
+      "parameter_index": 404
+    },
+    "osc_2_level": {
+      "default": 0.7071067690849304,
+      "display_name": "Oscillator 2 Level",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 405
+    },
+    "osc_2_midi_track": {
+      "default": 1.0,
+      "display_name": "Oscillator 2 Midi Track",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 406
+    },
+    "osc_2_on": {
+      "default": 0.0,
+      "display_name": "Oscillator 2 Switch",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 407
+    },
+    "osc_2_pan": {
+      "default": 0.0,
+      "display_name": "Oscillator 2 Pan",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 408
+    },
+    "osc_2_phase": {
+      "default": 0.5,
+      "display_name": "Oscillator 2 Phase",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 409
+    },
+    "osc_2_random_phase": {
+      "default": 1.0,
+      "display_name": "Oscillator 2 Phase Randomization",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 410
+    },
+    "osc_2_smooth_interpolation": {
+      "default": 0.0,
+      "display_name": "Oscillator 2 Smooth Interpolation",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 411
+    },
+    "osc_2_spectral_morph_amount": {
+      "default": 0.5,
+      "display_name": "Oscillator 2 Frequency Morph Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 498
+    },
+    "osc_2_spectral_morph_phase": {
+      "default": 0.5,
+      "display_name": "Oscillator 2 Frequency Morph Phase",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 773
+    },
+    "osc_2_spectral_morph_spread": {
+      "default": 0.0,
+      "display_name": "Oscillator 2 Frequency Morph Spread",
+      "is_discrete": false,
+      "max": 0.5,
+      "min": -0.5,
+      "parameter_index": 499
+    },
+    "osc_2_spectral_morph_type": {
+      "default": 0.0,
+      "display_name": "Oscillator 2 Frequency Morph Type",
+      "is_discrete": true,
+      "max": 16.0,
+      "min": 0.0,
+      "parameter_index": 500
+    },
+    "osc_2_spectral_unison": {
+      "default": 1.0,
+      "display_name": "Oscillator 2 Spectral Unison",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 504
+    },
+    "osc_2_stack_style": {
+      "default": 0.0,
+      "display_name": "Oscillator 2 Stack Style",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 412
+    },
+    "osc_2_stereo_spread": {
+      "default": 1.0,
+      "display_name": "Oscillator 2 Stereo Spread",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 413
+    },
+    "osc_2_transpose": {
+      "default": 0.0,
+      "display_name": "Oscillator 2 Transpose",
+      "is_discrete": true,
+      "max": 48.0,
+      "min": -48.0,
+      "parameter_index": 414
+    },
+    "osc_2_transpose_quantize": {
+      "default": 0.0,
+      "display_name": "Oscillator 2 Transpose Quantize",
+      "is_discrete": false,
+      "max": 8191.0,
+      "min": 0.0,
+      "parameter_index": 415
+    },
+    "osc_2_tune": {
+      "default": 0.0,
+      "display_name": "Oscillator 2 Tune",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 416
+    },
+    "osc_2_unison_blend": {
+      "default": 0.800000011920929,
+      "display_name": "Oscillator 2 Blend",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 417
+    },
+    "osc_2_unison_detune": {
+      "default": 4.4721360206604,
+      "display_name": "Oscillator 2 Unison Detune",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": 0.0,
+      "parameter_index": 418
+    },
+    "osc_2_unison_voices": {
+      "default": 1.0,
+      "display_name": "Oscillator 2 Unison Voices",
+      "is_discrete": true,
+      "max": 16.0,
+      "min": 1.0,
+      "parameter_index": 419
+    },
+    "osc_2_view_2d": {
+      "default": 1.0,
+      "display_name": "Oscillator 2 View 2D",
+      "is_discrete": true,
+      "max": 2.0,
+      "min": 0.0,
+      "parameter_index": 486
+    },
+    "osc_2_wave_frame": {
+      "default": 0.0,
+      "display_name": "Oscillator 2 Wave Frame",
+      "is_discrete": false,
+      "max": 256.0,
+      "min": 0.0,
+      "parameter_index": 420
+    },
+    "osc_3_destination": {
+      "default": 3.0,
+      "display_name": "Oscillator 3 Destination",
+      "is_discrete": true,
+      "max": 14.0,
+      "min": 0.0,
+      "parameter_index": 505
+    },
+    "osc_3_detune_power": {
+      "default": 1.5,
+      "display_name": "Oscillator 3 Detune Power",
+      "is_discrete": false,
+      "max": 5.0,
+      "min": -5.0,
+      "parameter_index": 506
+    },
+    "osc_3_detune_range": {
+      "default": 2.0,
+      "display_name": "Oscillator 3 Detune Range",
+      "is_discrete": false,
+      "max": 48.0,
+      "min": 0.0,
+      "parameter_index": 507
+    },
+    "osc_3_distortion_amount": {
+      "default": 0.5,
+      "display_name": "Oscillator 3 Distortion Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 508
+    },
+    "osc_3_distortion_phase": {
+      "default": 0.5,
+      "display_name": "Oscillator 3 Distortion Phase",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 509
+    },
+    "osc_3_distortion_spread": {
+      "default": 0.0,
+      "display_name": "Oscillator 3 Distortion Spread",
+      "is_discrete": false,
+      "max": 0.5,
+      "min": -0.5,
+      "parameter_index": 510
+    },
+    "osc_3_distortion_type": {
+      "default": 0.0,
+      "display_name": "Oscillator 3 Distortion Type",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 511
+    },
+    "osc_3_frame_spread": {
+      "default": 0.0,
+      "display_name": "Oscillator 3 Unison Frame Spread",
+      "is_discrete": false,
+      "max": 128.0,
+      "min": -128.0,
+      "parameter_index": 512
+    },
+    "osc_3_level": {
+      "default": 0.7071067690849304,
+      "display_name": "Oscillator 3 Level",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 513
+    },
+    "osc_3_midi_track": {
+      "default": 1.0,
+      "display_name": "Oscillator 3 Midi Track",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 514
+    },
+    "osc_3_on": {
+      "default": 0.0,
+      "display_name": "Oscillator 3 Switch",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 515
+    },
+    "osc_3_pan": {
+      "default": 0.0,
+      "display_name": "Oscillator 3 Pan",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 516
+    },
+    "osc_3_phase": {
+      "default": 0.5,
+      "display_name": "Oscillator 3 Phase",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 517
+    },
+    "osc_3_random_phase": {
+      "default": 1.0,
+      "display_name": "Oscillator 3 Phase Randomization",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 518
+    },
+    "osc_3_smooth_interpolation": {
+      "default": 0.0,
+      "display_name": "Oscillator 3 Smooth Interpolation",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 519
+    },
+    "osc_3_spectral_morph_amount": {
+      "default": 0.5,
+      "display_name": "Oscillator 3 Frequency Morph Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 520
+    },
+    "osc_3_spectral_morph_phase": {
+      "default": 0.5,
+      "display_name": "Oscillator 3 Frequency Morph Phase",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 774
+    },
+    "osc_3_spectral_morph_spread": {
+      "default": 0.0,
+      "display_name": "Oscillator 3 Frequency Morph Spread",
+      "is_discrete": false,
+      "max": 0.5,
+      "min": -0.5,
+      "parameter_index": 521
+    },
+    "osc_3_spectral_morph_type": {
+      "default": 0.0,
+      "display_name": "Oscillator 3 Frequency Morph Type",
+      "is_discrete": true,
+      "max": 16.0,
+      "min": 0.0,
+      "parameter_index": 522
+    },
+    "osc_3_spectral_unison": {
+      "default": 1.0,
+      "display_name": "Oscillator 3 Spectral Unison",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 523
+    },
+    "osc_3_stack_style": {
+      "default": 0.0,
+      "display_name": "Oscillator 3 Stack Style",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 524
+    },
+    "osc_3_stereo_spread": {
+      "default": 1.0,
+      "display_name": "Oscillator 3 Stereo Spread",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 525
+    },
+    "osc_3_transpose": {
+      "default": 0.0,
+      "display_name": "Oscillator 3 Transpose",
+      "is_discrete": true,
+      "max": 48.0,
+      "min": -48.0,
+      "parameter_index": 526
+    },
+    "osc_3_transpose_quantize": {
+      "default": 0.0,
+      "display_name": "Oscillator 3 Transpose Quantize",
+      "is_discrete": false,
+      "max": 8191.0,
+      "min": 0.0,
+      "parameter_index": 527
+    },
+    "osc_3_tune": {
+      "default": 0.0,
+      "display_name": "Oscillator 3 Tune",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 528
+    },
+    "osc_3_unison_blend": {
+      "default": 0.800000011920929,
+      "display_name": "Oscillator 3 Blend",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 529
+    },
+    "osc_3_unison_detune": {
+      "default": 4.4721360206604,
+      "display_name": "Oscillator 3 Unison Detune",
+      "is_discrete": false,
+      "max": 10.0,
+      "min": 0.0,
+      "parameter_index": 530
+    },
+    "osc_3_unison_voices": {
+      "default": 1.0,
+      "display_name": "Oscillator 3 Unison Voices",
+      "is_discrete": true,
+      "max": 16.0,
+      "min": 1.0,
+      "parameter_index": 531
+    },
+    "osc_3_view_2d": {
+      "default": 1.0,
+      "display_name": "Oscillator 3 View 2D",
+      "is_discrete": true,
+      "max": 2.0,
+      "min": 0.0,
+      "parameter_index": 532
+    },
+    "osc_3_wave_frame": {
+      "default": 0.0,
+      "display_name": "Oscillator 3 Wave Frame",
+      "is_discrete": false,
+      "max": 256.0,
+      "min": 0.0,
+      "parameter_index": 533
+    },
+    "oversampling": {
+      "default": 1.0,
+      "display_name": "Oversampling",
+      "is_discrete": true,
+      "max": 3.0,
+      "min": 0.0,
+      "parameter_index": 421
+    },
+    "phaser_blend": {
+      "default": 1.0,
+      "display_name": "Phaser Blend",
+      "is_discrete": false,
+      "max": 2.0,
+      "min": 0.0,
+      "parameter_index": 555
+    },
+    "phaser_center": {
+      "default": 80.0,
+      "display_name": "Phaser Center",
+      "is_discrete": false,
+      "max": 136.0,
+      "min": 8.0,
+      "parameter_index": 422
+    },
+    "phaser_dry_wet": {
+      "default": 1.0,
+      "display_name": "Phaser Mix",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 423
+    },
+    "phaser_feedback": {
+      "default": 0.5,
+      "display_name": "Phaser Feedback",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 424
+    },
+    "phaser_frequency": {
+      "default": -3.0,
+      "display_name": "Phaser Frequency",
+      "is_discrete": false,
+      "max": 2.0,
+      "min": -5.0,
+      "parameter_index": 425
+    },
+    "phaser_mod_depth": {
+      "default": 24.0,
+      "display_name": "Phaser Mod Depth",
+      "is_discrete": false,
+      "max": 48.0,
+      "min": 0.0,
+      "parameter_index": 426
+    },
+    "phaser_on": {
+      "default": 0.0,
+      "display_name": "Phaser Switch",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 427
+    },
+    "phaser_phase_offset": {
+      "default": 0.3333333432674408,
+      "display_name": "Phaser Phase Offset",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 428
+    },
+    "phaser_sync": {
+      "default": 1.0,
+      "display_name": "Phaser Sync",
+      "is_discrete": true,
+      "max": 3.0,
+      "min": 0.0,
+      "parameter_index": 429
+    },
+    "phaser_tempo": {
+      "default": 3.0,
+      "display_name": "Phaser Tempo",
+      "is_discrete": true,
+      "max": 10.0,
+      "min": 0.0,
+      "parameter_index": 430
+    },
+    "pitch_bend_range": {
+      "default": 2.0,
+      "display_name": "Pitch Bend Range",
+      "is_discrete": true,
+      "max": 48.0,
+      "min": 0.0,
+      "parameter_index": 431
+    },
+    "pitch_wheel": {
+      "default": 0.0,
+      "display_name": "Pitch Wheel",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 464
+    },
+    "polyphony": {
+      "default": 8.0,
+      "display_name": "Polyphony",
+      "is_discrete": true,
+      "max": 32.0,
+      "min": 1.0,
+      "parameter_index": 432
+    },
+    "portamento_force": {
+      "default": 0.0,
+      "display_name": "Portamento Force",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 433
+    },
+    "portamento_scale": {
+      "default": 0.0,
+      "display_name": "Portamento Scale",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 434
+    },
+    "portamento_slope": {
+      "default": 0.0,
+      "display_name": "Portamento Slope",
+      "is_discrete": false,
+      "max": 8.0,
+      "min": -8.0,
+      "parameter_index": 435
+    },
+    "portamento_time": {
+      "default": -10.0,
+      "display_name": "Portamento Time",
+      "is_discrete": false,
+      "max": 4.0,
+      "min": -10.0,
+      "parameter_index": 436
+    },
+    "random_1_frequency": {
+      "default": 1.0,
+      "display_name": "Random LFO 1 Frequency",
+      "is_discrete": false,
+      "max": 9.0,
+      "min": -7.0,
+      "parameter_index": 465
+    },
+    "random_1_keytrack_transpose": {
+      "default": -12.0,
+      "display_name": "Random LFO 1 Transpose",
+      "is_discrete": true,
+      "max": 36.0,
+      "min": -60.0,
+      "parameter_index": 744
+    },
+    "random_1_keytrack_tune": {
+      "default": 0.0,
+      "display_name": "Random LFO 1 Tune",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 745
+    },
+    "random_1_stereo": {
+      "default": 0.0,
+      "display_name": "Random LFO 1 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 466
+    },
+    "random_1_style": {
+      "default": 0.0,
+      "display_name": "Random LFO 1 Style",
+      "is_discrete": true,
+      "max": 3.0,
+      "min": 0.0,
+      "parameter_index": 467
+    },
+    "random_1_sync": {
+      "default": 1.0,
+      "display_name": "Random LFO 1 Sync",
+      "is_discrete": true,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 468
+    },
+    "random_1_sync_type": {
+      "default": 0.0,
+      "display_name": "Random LFO 1 Sync Type",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 556
+    },
+    "random_1_tempo": {
+      "default": 8.0,
+      "display_name": "Random LFO 1 Tempo",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 469
+    },
+    "random_2_frequency": {
+      "default": 1.0,
+      "display_name": "Random LFO 2 Frequency",
+      "is_discrete": false,
+      "max": 9.0,
+      "min": -7.0,
+      "parameter_index": 470
+    },
+    "random_2_keytrack_transpose": {
+      "default": -12.0,
+      "display_name": "Random LFO 2 Transpose",
+      "is_discrete": true,
+      "max": 36.0,
+      "min": -60.0,
+      "parameter_index": 746
+    },
+    "random_2_keytrack_tune": {
+      "default": 0.0,
+      "display_name": "Random LFO 2 Tune",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 747
+    },
+    "random_2_stereo": {
+      "default": 0.0,
+      "display_name": "Random LFO 2 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 471
+    },
+    "random_2_style": {
+      "default": 0.0,
+      "display_name": "Random LFO 2 Style",
+      "is_discrete": true,
+      "max": 3.0,
+      "min": 0.0,
+      "parameter_index": 472
+    },
+    "random_2_sync": {
+      "default": 1.0,
+      "display_name": "Random LFO 2 Sync",
+      "is_discrete": true,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 473
+    },
+    "random_2_sync_type": {
+      "default": 0.0,
+      "display_name": "Random LFO 2 Sync Type",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 557
+    },
+    "random_2_tempo": {
+      "default": 8.0,
+      "display_name": "Random LFO 2 Tempo",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 474
+    },
+    "random_3_frequency": {
+      "default": 1.0,
+      "display_name": "Random LFO 3 Frequency",
+      "is_discrete": false,
+      "max": 9.0,
+      "min": -7.0,
+      "parameter_index": 475
+    },
+    "random_3_keytrack_transpose": {
+      "default": -12.0,
+      "display_name": "Random LFO 3 Transpose",
+      "is_discrete": true,
+      "max": 36.0,
+      "min": -60.0,
+      "parameter_index": 748
+    },
+    "random_3_keytrack_tune": {
+      "default": 0.0,
+      "display_name": "Random LFO 3 Tune",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 749
+    },
+    "random_3_stereo": {
+      "default": 0.0,
+      "display_name": "Random LFO 3 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 476
+    },
+    "random_3_style": {
+      "default": 0.0,
+      "display_name": "Random LFO 3 Style",
+      "is_discrete": true,
+      "max": 3.0,
+      "min": 0.0,
+      "parameter_index": 477
+    },
+    "random_3_sync": {
+      "default": 1.0,
+      "display_name": "Random LFO 3 Sync",
+      "is_discrete": true,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 478
+    },
+    "random_3_sync_type": {
+      "default": 0.0,
+      "display_name": "Random LFO 3 Sync Type",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 558
+    },
+    "random_3_tempo": {
+      "default": 8.0,
+      "display_name": "Random LFO 3 Tempo",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 479
+    },
+    "random_4_frequency": {
+      "default": 1.0,
+      "display_name": "Random LFO 4 Frequency",
+      "is_discrete": false,
+      "max": 9.0,
+      "min": -7.0,
+      "parameter_index": 480
+    },
+    "random_4_keytrack_transpose": {
+      "default": -12.0,
+      "display_name": "Random LFO 4 Transpose",
+      "is_discrete": true,
+      "max": 36.0,
+      "min": -60.0,
+      "parameter_index": 750
+    },
+    "random_4_keytrack_tune": {
+      "default": 0.0,
+      "display_name": "Random LFO 4 Tune",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 751
+    },
+    "random_4_stereo": {
+      "default": 0.0,
+      "display_name": "Random LFO 4 Stereo",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 481
+    },
+    "random_4_style": {
+      "default": 0.0,
+      "display_name": "Random LFO 4 Style",
+      "is_discrete": true,
+      "max": 3.0,
+      "min": 0.0,
+      "parameter_index": 482
+    },
+    "random_4_sync": {
+      "default": 1.0,
+      "display_name": "Random LFO 4 Sync",
+      "is_discrete": true,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 483
+    },
+    "random_4_sync_type": {
+      "default": 0.0,
+      "display_name": "Random LFO 4 Sync Type",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 559
+    },
+    "random_4_tempo": {
+      "default": 8.0,
+      "display_name": "Random LFO 4 Tempo",
+      "is_discrete": true,
+      "max": 12.0,
+      "min": 0.0,
+      "parameter_index": 484
+    },
+    "reverb_chorus_amount": {
+      "default": 0.22360700368881226,
+      "display_name": "Reverb Chorus Amount",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 437
+    },
+    "reverb_chorus_frequency": {
+      "default": -2.0,
+      "display_name": "Reverb Chorus Frequency",
+      "is_discrete": false,
+      "max": 3.0,
+      "min": -8.0,
+      "parameter_index": 438
+    },
+    "reverb_decay_time": {
+      "default": 0.0,
+      "display_name": "Reverb Decay Time",
+      "is_discrete": false,
+      "max": 6.0,
+      "min": -6.0,
+      "parameter_index": 439
+    },
+    "reverb_delay": {
+      "default": 0.0,
+      "display_name": "Reverb Delay",
+      "is_discrete": false,
+      "max": 0.30000001192092896,
+      "min": 0.0,
+      "parameter_index": 725
+    },
+    "reverb_dry_wet": {
+      "default": 0.25,
+      "display_name": "Reverb Mix",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 440
+    },
+    "reverb_high_shelf_cutoff": {
+      "default": 90.0,
+      "display_name": "Reverb High Cutoff",
+      "is_discrete": false,
+      "max": 128.0,
+      "min": 0.0,
+      "parameter_index": 441
+    },
+    "reverb_high_shelf_gain": {
+      "default": -1.0,
+      "display_name": "Reverb High Gain",
+      "is_discrete": false,
+      "max": 0.0,
+      "min": -6.0,
+      "parameter_index": 442
+    },
+    "reverb_low_shelf_cutoff": {
+      "default": 0.0,
+      "display_name": "Reverb Low Cutoff",
+      "is_discrete": false,
+      "max": 128.0,
+      "min": 0.0,
+      "parameter_index": 443
+    },
+    "reverb_low_shelf_gain": {
+      "default": 0.0,
+      "display_name": "Reverb Low Gain",
+      "is_discrete": false,
+      "max": 0.0,
+      "min": -6.0,
+      "parameter_index": 444
+    },
+    "reverb_on": {
+      "default": 0.0,
+      "display_name": "Reverb Switch",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 445
+    },
+    "reverb_pre_high_cutoff": {
+      "default": 110.0,
+      "display_name": "Reverb Pre High Cutoff",
+      "is_discrete": false,
+      "max": 128.0,
+      "min": 0.0,
+      "parameter_index": 446
+    },
+    "reverb_pre_low_cutoff": {
+      "default": 0.0,
+      "display_name": "Reverb Pre Low Cutoff",
+      "is_discrete": false,
+      "max": 128.0,
+      "min": 0.0,
+      "parameter_index": 447
+    },
+    "reverb_size": {
+      "default": 0.5,
+      "display_name": "Reverb Size",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 550
+    },
+    "sample_bounce": {
+      "default": 0.0,
+      "display_name": "Sample Bounce",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 721
+    },
+    "sample_destination": {
+      "default": 3.0,
+      "display_name": "Sample Destination",
+      "is_discrete": true,
+      "max": 14.0,
+      "min": 0.0,
+      "parameter_index": 534
+    },
+    "sample_keytrack": {
+      "default": 0.0,
+      "display_name": "Sample Keytrack",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 448
+    },
+    "sample_level": {
+      "default": 0.7071067690849304,
+      "display_name": "Sample Level",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 449
+    },
+    "sample_loop": {
+      "default": 1.0,
+      "display_name": "Sample Loop",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 450
+    },
+    "sample_on": {
+      "default": 0.0,
+      "display_name": "Sample Switch",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 451
+    },
+    "sample_pan": {
+      "default": 0.0,
+      "display_name": "Sample Pan",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 452
+    },
+    "sample_random_phase": {
+      "default": 0.0,
+      "display_name": "Sample Random Phase",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 453
+    },
+    "sample_transpose": {
+      "default": 0.0,
+      "display_name": "Sample Transpose",
+      "is_discrete": true,
+      "max": 48.0,
+      "min": -48.0,
+      "parameter_index": 454
+    },
+    "sample_transpose_quantize": {
+      "default": 0.0,
+      "display_name": "Sample Transpose Quantize",
+      "is_discrete": false,
+      "max": 8191.0,
+      "min": 0.0,
+      "parameter_index": 455
+    },
+    "sample_tune": {
+      "default": 0.0,
+      "display_name": "Sample Tune",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 456
+    },
+    "stereo_mode": {
+      "default": 0.0,
+      "display_name": "Stereo Mode",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 723
+    },
+    "stereo_routing": {
+      "default": 1.0,
+      "display_name": "Stereo Routing",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 457
+    },
+    "velocity_track": {
+      "default": 0.0,
+      "display_name": "Velocity Track",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 458
+    },
+    "view_spectrogram": {
+      "default": 0.0,
+      "display_name": "View Spectrogram",
+      "is_discrete": true,
+      "max": 2.0,
+      "min": 0.0,
+      "parameter_index": 771
+    },
+    "voice_amplitude": {
+      "default": 1.0,
+      "display_name": "Voice Amplitude",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 459
+    },
+    "voice_override": {
+      "default": 0.0,
+      "display_name": "Voice Override",
+      "is_discrete": true,
+      "max": 1.0,
+      "min": 0.0,
+      "parameter_index": 726
+    },
+    "voice_priority": {
+      "default": 4.0,
+      "display_name": "Voice Priority",
+      "is_discrete": true,
+      "max": 4.0,
+      "min": 0.0,
+      "parameter_index": 460
+    },
+    "voice_transpose": {
+      "default": 0.0,
+      "display_name": "Voice Transpose",
+      "is_discrete": true,
+      "max": 48.0,
+      "min": -48.0,
+      "parameter_index": 722
+    },
+    "voice_tune": {
+      "default": 0.0,
+      "display_name": "Voice Tune",
+      "is_discrete": false,
+      "max": 1.0,
+      "min": -1.0,
+      "parameter_index": 461
+    },
+    "volume": {
+      "default": 5473.04052734375,
+      "display_name": "Volume",
+      "is_discrete": false,
+      "max": 7399.4404296875,
+      "min": 0.0,
+      "parameter_index": 462
+    }
+  },
+  "plugin_version": "1.6.4",
+  "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-v2",
+  "scope": "Raw saved-state endpoints for uniquely named exposed parameters; historical 1.5.5 bounds are not asserted.",
+  "unmatched": []
+}

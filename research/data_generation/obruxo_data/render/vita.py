@@ -66,6 +66,8 @@ class VitalVst3StateTemplate:
         separator = chunk.find(b"\x00")
         if separator < 0:
             raise ValueError("Vital component state has no JSON terminator")
+        self.preset_document = json.loads(chunk[:separator])
+        self.plugin_version = self.preset_document.get("synth_version")
         self._private_tail = chunk[separator + 1 :]
 
     @staticmethod
@@ -93,7 +95,17 @@ class VitalVst3StateTemplate:
         return component[:chunk_size_offset], component[chunk_start:chunk_end], component[chunk_end:], bank_size_offset
 
     def build(self, preset_json: str) -> bytes:
-        canonical = json.dumps(json.loads(preset_json), ensure_ascii=False, allow_nan=False, sort_keys=True, separators=(",", ":"))
+        document = json.loads(preset_json)
+        # Vita's development-version sentinel is rejected as a future preset by official Vital.
+        # Adapt only the reviewed schema -> reviewed plugin pair; never relabel arbitrary future presets.
+        if document.get("synth_version") == "99999.9.9":
+            if self.plugin_version != "1.6.4":
+                raise ValueError("Vita init export requires the reviewed Vital 1.6.4 state adapter")
+            document["synth_version"] = self.plugin_version
+            for table in document["settings"].get("wavetables", []):
+                if table.get("version") == "99999.9.9":
+                    table["version"] = self.plugin_version
+        canonical = json.dumps(document, ensure_ascii=False, allow_nan=False, sort_keys=True, separators=(",", ":"))
         chunk = canonical.encode("utf-8") + b"\x00" + self._private_tail
         component = bytearray(self._component_prefix + len(chunk).to_bytes(4, "big") + chunk + self._component_suffix)
         bank_size = len(component) - (self._bank_size_offset + 4)
@@ -112,6 +124,18 @@ def _sha256_file(path: Path) -> str:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def verify_loaded_scalars(requested: dict[str, Any], loaded: dict[str, Any]) -> int:
+    """Detect silent preset rejection or changed controls in the actual plugin state."""
+    expected = {name: value for name, value in requested["settings"].items() if type(value) in (int, float)}
+    actual = loaded.get("settings", {})
+    mismatches = [name for name, value in expected.items()
+                  if type(actual.get(name)) not in (int, float)
+                  or not math.isclose(value, actual[name], rel_tol=1e-6, abs_tol=1e-7)]
+    if mismatches:
+        raise RuntimeError(f"Vital did not load the requested scalar controls: {', '.join(sorted(mismatches)[:8])}")
+    return len(expected)
 
 
 def _default_plugin_path() -> Path | None:
@@ -219,6 +243,10 @@ class VitalRenderer(Renderer):
             template = VitalVst3StateTemplate(template_path.read_bytes())
             state_path.write_bytes(template.build(request.preset_json))
             synth.load_state(str(state_path))
+            loaded_path = root / "loaded.state"
+            synth.save_state(str(loaded_path))
+            loaded = VitalVst3StateTemplate(loaded_path.read_bytes()).preset_document
+            checked_scalars = verify_loaded_scalars(json.loads(request.preset_json), loaded)
             for span in performance.note_spans():
                 start_sample = timing.tick_to_sample(span.start_tick, request.sample_rate)
                 end_sample = timing.tick_to_sample(span.end_tick, request.sample_rate)
@@ -247,6 +275,7 @@ class VitalRenderer(Renderer):
                 "plugin_name": self.plugin_path.name,
                 "buffer_size": self.buffer_size,
                 "schema_id": VitalSchema.load().schema_id,
+                "verified_loaded_scalars": checked_scalars,
                 "event_timing": "absolute ticks to half-even sample offsets",
                 "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
             },

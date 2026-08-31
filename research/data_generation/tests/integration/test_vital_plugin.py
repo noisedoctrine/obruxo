@@ -11,7 +11,7 @@ from obruxo_data.cli import DEFAULT_RENDERER, main
 from obruxo_data.midi import Performance, TempoMap
 from obruxo_data.render import RenderRequest, VitalRenderer, run_batch
 from obruxo_data.render.qa import compare_audio
-from obruxo_data.vital import VitalPreset
+from obruxo_data.vital import ComponentProfile, VitalPreset
 
 
 pytestmark = [pytest.mark.integration, pytest.mark.vita, pytest.mark.reference_plugin]
@@ -76,6 +76,29 @@ def test_vital_batch_rejects_unsafe_in_process_concurrency(tmp_path) -> None:
     assert (summary.rendered, summary.skipped) == (2, 0)
     assert summary.request_ids == tuple(request.request_id for request in requests)
     assert all((tmp_path / "batch" / f"{request.request_id}.wav").is_file() for request in requests)
+
+
+def test_canonical_vita_preset_controls_change_official_vital_audio() -> None:
+    pytest.importorskip("vita")
+    pytest.importorskip("dawdreamer")
+    renderer = VitalRenderer(_plugin_path())
+    performance = Performance(ticks_per_beat=480, bpm=120)
+    performance.add_note(pitch=60, velocity=100, start_tick=0, duration_ticks=480)
+    performance.end_tick = 480
+
+    def render(octave, level):
+        preset = VitalPreset.init()  # Deliberately retains the development-version headers.
+        preset.apply_profile(ComponentProfile.only(oscillators=[1]))
+        for name, value in {"osc_1_transpose": octave, "osc_1_level": level,
+                            "osc_1_destination": 4, "osc_1_random_phase": 0}.items():
+            preset.set_raw(name, value)
+        result = renderer.render(RenderRequest(preset=preset, performance=performance, sample_rate=22_050, tail_seconds=0.1))
+        return result.audio.mean(axis=1)
+
+    quiet, loud, octave = render(0, 0.2), render(0, 0.8), render(-12, 0.8)
+    assert np.sqrt(np.mean(loud ** 2) / np.mean(quiet ** 2)) > 2
+    frequency = np.fft.rfftfreq(len(octave), 1 / 22_050)[np.abs(np.fft.rfft(octave)).argmax()]
+    assert frequency == pytest.approx(130.8128, abs=3)
 
 
 def test_offline_cli_smoke(tmp_path) -> None:

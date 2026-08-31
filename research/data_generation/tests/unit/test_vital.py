@@ -165,3 +165,20 @@ def test_runtime_round_trip_classifies_numeric_drift_and_reports_missing_fields(
     by_code = {item.code: item for item in report.diagnostics}
     assert by_code["vital.runtime.numeric_canonicalization"].context["pointers"] == ["/settings/level"]
     assert by_code["vital.runtime.unclassified_drift"].context["pointers"] == ["/settings/removed"]
+
+
+@pytest.mark.parametrize("version, valid", [("1.5.5", True), ("1.6.4", True), ("1.7.0", False)])
+def test_only_reviewed_plugin_version_rewrite_is_classified(monkeypatch, version, valid) -> None:
+    from obruxo_data.vital.validation import validate_runtime
+
+    class FakeSynth:
+        def load_json(self, text):
+            self.document = json.loads(text)
+            return True
+
+        def to_json(self):
+            self.document["synth_version"] = "99999.9.9"
+            return json.dumps(self.document)
+
+    monkeypatch.setitem(sys.modules, "vita", SimpleNamespace(Synth=FakeSynth))
+    assert validate_runtime(json.dumps({"synth_version": version, "settings": {}})).valid is valid
