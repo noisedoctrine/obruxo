@@ -77,7 +77,7 @@ Commands return non-zero on invalid input or rendering failure. Output commands 
 
 ## Schema bundle and probing
 
-`obruxo_data/vital/schema/vital-1.0.8-vita-0.1.0/` is the executable schema contract. It contains the pinned runtime init document, 772-control inventory, legal modulation vocabulary, source/runtime reconciliation, exact revisions, and content hashes. The fixed `load_init_preset()` white-noise sampler payload is committed as the legal deterministic init asset. Runtime re-encoding of `/settings/sample/samples` and float32 control quantization within `1e-6` relative/`1e-7` absolute tolerance are explicitly classified warning diagnostics; any other round-trip drift is an error.
+`obruxo_data/vital/schema/vital-1.0.8-vita-0.1.0/` is the executable schema contract. It contains the pinned runtime init document, 772-control inventory, legal modulation vocabulary, source/runtime reconciliation, exact revisions, and content hashes. The fixed `load_init_preset()` white-noise sampler payload is committed as the legal deterministic init asset. Runtime re-encoding of `/settings/sample/samples`, `/settings/sample/samples_stereo`, embedded wavetable `audio_file` payloads, and runtime-owned version fields (`/synth_version` and `/settings/wavetables/*/version`) is explicitly classified as warning-level canonicalization. Float32 control quantization within `1e-6` relative/`1e-7` absolute tolerance is also a warning; any other round-trip drift remains an error.
 
 Probe a candidate bundle without overwriting reviewed output:
 

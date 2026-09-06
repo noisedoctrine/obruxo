@@ -165,3 +165,40 @@ def test_runtime_round_trip_classifies_numeric_drift_and_reports_missing_fields(
     by_code = {item.code: item for item in report.diagnostics}
     assert by_code["vital.runtime.numeric_canonicalization"].context["pointers"] == ["/settings/level"]
     assert by_code["vital.runtime.unclassified_drift"].context["pointers"] == ["/settings/removed"]
+
+
+def test_runtime_round_trip_classifies_vital_owned_payload_migrations(monkeypatch) -> None:
+    from obruxo_data.vital.validation import validate_runtime
+
+    class FakeSynth:
+        def load_json(self, document_json: str) -> bool:
+            self.document = json.loads(document_json)
+            return True
+
+        def to_json(self) -> str:
+            document = json.loads(json.dumps(self.document))
+            document["synth_version"] = "99999.9.9"
+            document["settings"]["sample"]["samples_stereo"] = "stereo-canonical"
+            document["settings"]["wavetables"][0]["version"] = "99999.9.9"
+            document["settings"]["wavetables"][0]["groups"][0]["components"][0]["audio_file"] = "audio-canonical"
+            document["settings"]["unknown"] = 1
+            return json.dumps(document)
+
+    source = {
+        "synth_version": "1.0.7",
+        "settings": {
+            "sample": {"samples_stereo": "stereo-source"},
+            "wavetables": [{"version": "1.0.7", "groups": [{"components": [{"audio_file": "audio-source"}]}]}],
+        },
+    }
+    monkeypatch.setitem(sys.modules, "vita", SimpleNamespace(Synth=FakeSynth))
+    report = validate_runtime(json.dumps(source))
+    by_code = {item.code: item for item in report.diagnostics}
+    assert "vital.runtime.unclassified_drift" in by_code
+    assert by_code["vital.runtime.unclassified_drift"].context["pointers"] == ["/settings/unknown"]
+    assert [item.pointer for item in report.diagnostics if item.code == "vital.runtime.canonicalization"] == [
+        "/settings/sample/samples_stereo",
+        "/settings/wavetables/0/groups/0/components/0/audio_file",
+        "/settings/wavetables/0/version",
+        "/synth_version",
+    ]
