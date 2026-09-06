@@ -1,6 +1,6 @@
 # Issue #38 quick-research results
 
-These are the reviewed, sanitized results from the bounded issue #38 run. Every task used a 30-minute supervisor budget; the four completed in about 282, 160, 66, and 2 seconds respectively. Raw presets, source paths, rendered audio, feature caches, native logs, and source checkouts remain ignored local artifacts.
+These are the reviewed, sanitized results from the bounded issue #38 run. Every command used a 30-minute supervisor budget. Recorded worker wall times were about 282 seconds for A, 160 seconds for B, and 66 seconds for C. D's citation validator and report formatter took about 2 seconds after reviewer-led source inspection; manual review time was separate and was not recorded. Raw presets, source paths, rendered audio, feature caches, native logs, and source checkouts remain ignored local artifacts.
 
 | Task | Outcome | Useful conclusion |
 |---|---|---|
