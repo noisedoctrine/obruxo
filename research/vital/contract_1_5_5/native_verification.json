@@ -1,0 +1,92 @@
+{
+  "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-v2",
+  "plugin_version": "1.6.4",
+  "preset_version": "1.5.5",
+  "cases": [
+    {
+      "phase": 0.0,
+      "shepard_source": false,
+      "provided_scalars_verified": 775,
+      "ramp_defaults_verified": 128,
+      "sample_max_pcm16_delta": 58566,
+      "sample_readback_shift_samples": 4,
+      "sample_shift_aligned_max_pcm16_delta": 1,
+      "nested_changes": {
+        "sample": [
+          "/samples"
+        ],
+        "wavetables": [
+          "/0/version",
+          "/1/version",
+          "/2/version"
+        ]
+      },
+      "finite_nonsilent_audio": true,
+      "rms": 0.05969801004838951
+    },
+    {
+      "phase": 0.5,
+      "shepard_source": false,
+      "provided_scalars_verified": 775,
+      "ramp_defaults_verified": 128,
+      "sample_max_pcm16_delta": 58566,
+      "sample_readback_shift_samples": 4,
+      "sample_shift_aligned_max_pcm16_delta": 1,
+      "nested_changes": {
+        "sample": [
+          "/samples"
+        ],
+        "wavetables": [
+          "/0/version",
+          "/1/version",
+          "/2/version"
+        ]
+      },
+      "finite_nonsilent_audio": true,
+      "rms": 0.06040649377494913
+    },
+    {
+      "phase": 1.0,
+      "shepard_source": false,
+      "provided_scalars_verified": 775,
+      "ramp_defaults_verified": 128,
+      "sample_max_pcm16_delta": 58566,
+      "sample_readback_shift_samples": 4,
+      "sample_shift_aligned_max_pcm16_delta": 1,
+      "nested_changes": {
+        "sample": [
+          "/samples"
+        ],
+        "wavetables": [
+          "/0/version",
+          "/1/version",
+          "/2/version"
+        ]
+      },
+      "finite_nonsilent_audio": true,
+      "rms": 0.06038286454217652
+    },
+    {
+      "phase": 0.5,
+      "shepard_source": true,
+      "provided_scalars_verified": 775,
+      "ramp_defaults_verified": 128,
+      "sample_max_pcm16_delta": 58566,
+      "sample_readback_shift_samples": 4,
+      "sample_shift_aligned_max_pcm16_delta": 1,
+      "nested_changes": {
+        "sample": [
+          "/samples"
+        ],
+        "wavetables": [
+          "/0/version",
+          "/1/version",
+          "/2/version"
+        ]
+      },
+      "finite_nonsilent_audio": true,
+      "rms": 0.02837303223353774
+    }
+  ],
+  "scope": "Four full factory-based authoring cases; not a native validation of the entire corpus or the 1.5.5 binary."
+}

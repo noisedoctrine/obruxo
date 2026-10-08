@@ -199,6 +199,29 @@ def test_runtime_round_trip_classifies_vital_owned_payload_migrations(monkeypatc
     assert [item.pointer for item in report.diagnostics if item.code == "vital.runtime.canonicalization"] == [
         "/settings/sample/samples_stereo",
         "/settings/wavetables/0/groups/0/components/0/audio_file",
-        "/settings/wavetables/0/version",
-        "/synth_version",
     ]
+    assert by_code["vital.runtime.version_canonicalization"].context["pointers"] == [
+        "/settings/wavetables/0/version", "/synth_version",
+    ]
+
+
+@pytest.mark.parametrize("version, valid", [("1.0.7", True), ("1.5.5", True), ("1.6.4", True), ("1.7.0", False), ("garbage", False)])
+@pytest.mark.parametrize("nested", [False, True])
+def test_only_reviewed_plugin_version_rewrite_is_classified(monkeypatch, version, valid, nested) -> None:
+    from obruxo_data.vital.validation import validate_runtime
+
+    class FakeSynth:
+        def load_json(self, text):
+            self.document = json.loads(text)
+            return True
+
+        def to_json(self):
+            if nested:
+                self.document["settings"]["wavetables"][0]["version"] = "99999.9.9"
+            else:
+                self.document["synth_version"] = "99999.9.9"
+            return json.dumps(self.document)
+
+    source = {"synth_version": version, "settings": {"wavetables": [{"version": version}]}}
+    monkeypatch.setitem(sys.modules, "vita", SimpleNamespace(Synth=FakeSynth))
+    assert validate_runtime(json.dumps(source)).valid is valid

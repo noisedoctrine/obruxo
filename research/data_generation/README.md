@@ -93,6 +93,10 @@ The production backend is one locally installed Vital VST3 instance per render, 
 
 DawDreamer injects the complete MIDI note stream into one continuously running Vital plugin graph. A fresh plugin instance is created for every request, its JUCE VST3 state template is loaded with the complete canonical `.vital` JSON, and absolute ticks are converted to half-even-rounded sample offsets. Stereo `float32` is returned as `[frames, channels]` through the explicit performance end plus release tail.
 
+The `state-v2` renderer adapts the schema's Vita development-version headers (`99999.9.9`) to the reviewed official plugin's `1.6.4` headers. Without this adapter, official Vital silently rejects the future-version preset and continues playing its initial state. The adapter only handles that reviewed pair; the validator classifies Vita's reverse header rewrite separately and still rejects unexplained drift. The new renderer identity prevents reuse of pre-fix cached renders. Earlier reference metrics below predate this correction and must not be treated as evidence that the requested preset was applied; the simple-training experiment adds direct octave/level response checks.
+
+The renderer now also reads back every supplied scalar from the loaded plugin state and fails if a control is missing or changed beyond float32 tolerance. The simple-training output contract pins a 1.5.5-labelled subset, verified in Vital 1.6.4; Vita's known re-export of 1.5.5/1.6.4 version headers is classified explicitly. This does not make the static schema a validator for the full mixed-version corpus. See the [scoped preset contract](../modelling/simple_training/PRESET_CONTRACT.md).
+
 The initial capability contract supports notes, polyphony, one fixed tempo, MIDI channel 0, and an explicit end plus tail. Tempo changes, pitch bend, pressure, CC messages, other channels, and opaque events fail validation before the plugin opens. `renderer.yaml` declares this boundary and is checked against the implemented backend rather than trusted silently.
 
 Pinned implementation references:

@@ -13,10 +13,6 @@ from .atlas import VitalSchema
 CLASSIFIED_RUNTIME_CANONICALIZATIONS = frozenset({
     "/settings/sample/samples",
     "/settings/sample/samples_stereo",
-    "/settings/wavetables/0/version",
-    "/settings/wavetables/1/version",
-    "/settings/wavetables/2/version",
-    "/synth_version",
 })
 _MISSING = object()
 
@@ -180,6 +176,12 @@ def validate_runtime(document_json: str) -> ValidationReport:
         and isinstance(_pointer_value(source, pointer), str) and isinstance(_pointer_value(exported, pointer), str)
     }
     numeric_canonicalizations = set()
+    # Retain the reviewed legacy Vita migration and the native-compatible modern headers.
+    version_pointers = {"/synth_version", *(f"/settings/wavetables/{index}/version" for index in range(3))}
+    version_canonicalizations = {
+        pointer for pointer in differences & version_pointers
+        if _pointer_value(source, pointer) in ("1.0.7", "1.5.5", "1.6.4") and _pointer_value(exported, pointer) == "99999.9.9"
+    }
     for pointer in differences - classified_canonicalizations:
         left = _pointer_value(source, pointer)
         right = _pointer_value(exported, pointer)
@@ -189,8 +191,14 @@ def validate_runtime(document_json: str) -> ValidationReport:
             and math.isclose(float(left), float(right), rel_tol=1e-6, abs_tol=1e-7)
         ):
             numeric_canonicalizations.add(pointer)
-    unexplained = sorted(differences - classified_canonicalizations - numeric_canonicalizations)
+    unexplained = sorted(differences - classified_canonicalizations - numeric_canonicalizations - version_canonicalizations)
     diagnostics = []
+    if version_canonicalizations:
+        diagnostics.append(Diagnostic(
+            "vital.runtime.version_canonicalization", Severity.WARNING,
+            "Vita re-exported reviewed Vital preset headers using its development version",
+            context={"pointers": sorted(version_canonicalizations)},
+        ))
     if unexplained:
         diagnostics.append(_error(
             "vital.runtime.unclassified_drift", "Vita changed unclassified fields during canonical round trip",
