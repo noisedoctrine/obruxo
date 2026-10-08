@@ -1,1 +1,5 @@
 *.html linguist-detectable=false
+research/vital/contract_1_5_5/*.vital -text linguist-generated=true
+research/vital/contract_1_5_5/*.json text eol=lf
+research/vital/contract_1_5_5/contract.json linguist-generated=true
+research/vital/contract_1_5_5/renderer_ranges.json linguist-generated=true

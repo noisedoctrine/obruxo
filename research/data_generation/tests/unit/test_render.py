@@ -15,7 +15,7 @@ from obruxo_data.render import (
     write_requests,
 )
 from obruxo_data.render.qa import AudioQualityConfig, analyze_audio, audio_float32_sha256, compare_audio
-from obruxo_data.render.vita import VitalVst3StateTemplate, juce_memory_block_decode, juce_memory_block_encode
+from obruxo_data.render.vita import VitalVst3StateTemplate, juce_memory_block_decode, juce_memory_block_encode, verify_loaded_scalars
 from obruxo_data.vital import VitalPreset
 
 
@@ -55,6 +55,20 @@ def test_vital_vst3_state_template_replaces_only_component_json() -> None:
     VitalVst3StateTemplate(updated)
 
 
+def test_vita_development_version_is_adapted_only_for_reviewed_plugin() -> None:
+    template = VitalVst3StateTemplate(_template_state({"synth_version": "1.6.4", "settings": {}}))
+    preset = VitalPreset.init()
+    preset.set_raw("osc_1_transpose", -12)
+    adapted = _extract_vital_json(template.build(preset.to_json()))
+    assert adapted["synth_version"] == "1.6.4"
+    assert all(table["version"] == "1.6.4" for table in adapted["settings"]["wavetables"])
+    assert adapted["settings"]["osc_1_transpose"] == -12
+    assert preset.to_dict()["synth_version"] == "99999.9.9"
+    unknown = VitalVst3StateTemplate(_template_state({"synth_version": "1.7.0", "settings": {}}))
+    with pytest.raises(ValueError, match="reviewed"):
+        unknown.build(preset.to_json())
+
+
 def test_render_request_accepts_preset_and_has_stable_identity() -> None:
     preset = VitalPreset.init()
     performance = Performance(bpm=120)
@@ -65,6 +79,14 @@ def test_render_request_accepts_preset_and_has_stable_identity() -> None:
     assert RenderRequest.from_dict(first.to_dict()).request_id == first.request_id
     preset.set_raw("osc_1_level", 0.25)
     assert RenderRequest(preset=preset, performance=performance).request_id != first.request_id
+
+
+def test_plugin_scalar_readback_detects_rejection_and_accepts_float32_rounding():
+    expected = {"settings": {"osc_1_level": 0.3, "osc_1_transpose": -12., "wavetables": []}}
+    assert verify_loaded_scalars(expected, {"settings": {"osc_1_level": 0.3000000119, "osc_1_transpose": -12}}) == 2
+    for actual in ({}, {"osc_1_level": 0.3, "osc_1_transpose": 0}, {"osc_1_level": True, "osc_1_transpose": -12}):
+        with pytest.raises(RuntimeError, match="did not load"):
+            verify_loaded_scalars(expected, {"settings": actual})
 
 
 def test_audio_qa_reports_shape_nonfinite_silence_clipping_and_tail() -> None:

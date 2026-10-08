@@ -26,7 +26,9 @@ The system is intended to remain fully local and open source: no cloud dependenc
 - [Modelling research tracker](research/modelling/RESEARCH_TRACKER.md)
 - [Model architecture](research/modelling/MODEL_ARCHITECTURE.md)
 - [Training-data generation foundation](research/data_generation/README.md)
+- [Minimal audio-to-Vital training pipeline](research/modelling/simple_training/README.md)
 - [Vital preset schema](research/vital/PRESET_SCHEMA.md)
+- [Full Vital 1.5.5 contract verification](research/vital/FULL_CONTRACT_1_5_5.md)
 
 ## Community
 
