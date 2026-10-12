@@ -1,0 +1,74 @@
+{
+  "complete": true,
+  "difference_from_reference": 0,
+  "excluded_files": 2,
+  "introduced_examples": [
+    {
+      "changed_json_pointers": [
+        "/preset_name"
+      ],
+      "group_id": "1acbf0118eae68c78d597413dbf4d261223bcbf3a2d40577f3d17016b6122882",
+      "interpretation": "declared display fields only",
+      "level": "state"
+    },
+    {
+      "changed_json_pointers": [
+        "/preset_name"
+      ],
+      "group_id": "7019a0eae61bea100dea424f6c59839bb4510e1543323ba1b5ca210867cdc057",
+      "interpretation": "declared display fields only",
+      "level": "state"
+    },
+    {
+      "changed_json_pointers": [
+        "/preset_name"
+      ],
+      "group_id": "f2d2f408c2a0d29580d4d1d366778a6a6e831cceea3dc51a9f02b69f80ea40ef",
+      "interpretation": "declared display fields only",
+      "level": "state"
+    }
+  ],
+  "levels": {
+    "canonical": {
+      "crossing_files": 17,
+      "crossing_groups": 8,
+      "duplicate_excess": 23,
+      "group_size_counts": {
+        "1": 9573,
+        "2": 21,
+        "3": 1
+      },
+      "groups": 9595,
+      "introduced_groups": 0
+    },
+    "raw": {
+      "crossing_files": 17,
+      "crossing_groups": 8,
+      "duplicate_excess": 23,
+      "group_size_counts": {
+        "1": 9573,
+        "2": 21,
+        "3": 1
+      },
+      "groups": 9595,
+      "introduced_groups": 0
+    },
+    "state": {
+      "crossing_files": 19,
+      "crossing_groups": 9,
+      "duplicate_excess": 26,
+      "group_size_counts": {
+        "1": 9567,
+        "2": 24,
+        "3": 1
+      },
+      "groups": 9592,
+      "introduced_groups": 3
+    }
+  },
+  "reference_census_valid_files": 9618,
+  "rule": "patch_identity_v1",
+  "seed": 0,
+  "split_policy": "simulated file-relative-path hash, expected 80/10/10; not an existing training split",
+  "valid_files": 9618
+}

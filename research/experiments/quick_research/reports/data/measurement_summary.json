@@ -1,0 +1,39 @@
+{
+  "attempted": 54,
+  "bank_sha256": "6c1fe1b179b2f11e7e7966a7304beaf47985202fd023669a91566b464aa13cd8",
+  "comparison_rows": 33,
+  "complete": true,
+  "expected_renders": 54,
+  "metrics": {
+    "boundary": null,
+    "envelope_hop": 256,
+    "envelope_window": 1024,
+    "epsilon": 1e-07,
+    "fft_sizes": [
+      512,
+      1024,
+      2048
+    ],
+    "hop_fraction": 0.25,
+    "normalization": "none",
+    "padded": false,
+    "stft_scaling": "spectrum",
+    "tolerance_absolute": 1e-10,
+    "tolerance_relative": 1e-06,
+    "version": "quick_metrics_v1",
+    "window": "hann_periodic"
+  },
+  "observed_separations": 9,
+  "outcomes": {
+    "ok": 33,
+    "qa_failed": 21
+  },
+  "rehearsal_render_seconds": [
+    2.0780000002123415,
+    2.3910000000614673,
+    2.202999999979511
+  ],
+  "render_manifest_sha256": "c2164aa8e81fde10ec36ab66fd1b6a39ed7bd54e75365367228ae4f001953776",
+  "state": "complete_with_failures",
+  "valid": 33
+}

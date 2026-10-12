@@ -1,0 +1,27 @@
+{
+  "attempted": 24,
+  "complete": true,
+  "expected": 24,
+  "feature_config": {
+    "backend": "pytorch_xpu",
+    "checkpoint_sha256": "6c8869af67af45472827bb68b4d1a99e78fe3d5e7b6dd41132ac5df609f0cb55",
+    "cpu_fallback": false,
+    "decoder": {
+      "frame_threshold": 0.3,
+      "include_pitch_bends": true,
+      "infer_onsets": true,
+      "melodia_trick": true,
+      "min_note_length_frames": 11,
+      "multiple_pitch_bends": false,
+      "onset_threshold": 0.5
+    },
+    "device_request": "xpu",
+    "implementation_hash": "f7a34da8d6a10b9bb27ce0bd47f548149de7006b717245656a68308d147bf0a0",
+    "precision": "float32",
+    "preparation": "prepare_wav + unwrap_window_outputs; pinned stock frontend",
+    "schema": "quick_basic_pitch_features_v1",
+    "torch_version": "2.12.1+xpu"
+  },
+  "scored": 15,
+  "state": "complete_with_failures"
+}

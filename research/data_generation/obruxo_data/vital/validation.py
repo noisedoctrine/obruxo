@@ -10,8 +10,22 @@ from obruxo_data.hashing import canonical_sha256
 from .atlas import VitalSchema
 
 
-CLASSIFIED_RUNTIME_CANONICALIZATIONS = frozenset({"/settings/sample/samples"})
+CLASSIFIED_RUNTIME_CANONICALIZATIONS = frozenset({
+    "/settings/sample/samples",
+    "/settings/sample/samples_stereo",
+})
 _MISSING = object()
+
+
+def _is_classified_runtime_canonicalization(pointer: str) -> bool:
+    if pointer in CLASSIFIED_RUNTIME_CANONICALIZATIONS:
+        return True
+    tokens = pointer.strip("/").split("/")
+    return (
+        len(tokens) == 8 and tokens[0:2] == ["settings", "wavetables"]
+        and tokens[2].isdigit() and tokens[3] == "groups" and tokens[4].isdigit()
+        and tokens[5] == "components" and tokens[6].isdigit() and tokens[7] == "audio_file"
+    )
 
 
 def _error(code: str, message: str, *, pointer: str | None = None, parameter: str | None = None,
@@ -158,15 +172,15 @@ def validate_runtime(document_json: str) -> ValidationReport:
         return ValidationReport((_error("vital.runtime.export_json", "Vita returned invalid JSON", context={"error": str(error)}),))
     differences = _difference_pointers(source, exported)
     classified_canonicalizations = {
-        pointer for pointer in differences & CLASSIFIED_RUNTIME_CANONICALIZATIONS
-        if isinstance(_pointer_value(source, pointer), str) and isinstance(_pointer_value(exported, pointer), str)
+        pointer for pointer in differences if _is_classified_runtime_canonicalization(pointer)
+        and isinstance(_pointer_value(source, pointer), str) and isinstance(_pointer_value(exported, pointer), str)
     }
     numeric_canonicalizations = set()
-    # Native compatibility probes verified these headers for the supported subset in Vital 1.6.4.
+    # Retain the reviewed legacy Vita migration and the native-compatible modern headers.
     version_pointers = {"/synth_version", *(f"/settings/wavetables/{index}/version" for index in range(3))}
     version_canonicalizations = {
         pointer for pointer in differences & version_pointers
-        if _pointer_value(source, pointer) in ("1.5.5", "1.6.4") and _pointer_value(exported, pointer) == "99999.9.9"
+        if _pointer_value(source, pointer) in ("1.0.7", "1.5.5", "1.6.4") and _pointer_value(exported, pointer) == "99999.9.9"
     }
     for pointer in differences - classified_canonicalizations:
         left = _pointer_value(source, pointer)
@@ -195,7 +209,7 @@ def validate_runtime(document_json: str) -> ValidationReport:
         output_value = _pointer_value(exported, pointer)
         diagnostics.append(Diagnostic(
             "vital.runtime.canonicalization", Severity.WARNING,
-            "Vita re-encoded the deterministic init sampler payload during round trip",
+            "Vita changed a reviewed runtime-owned field during canonical round trip",
             pointer=pointer,
             context={
                 "input_sha256": None if input_value is _MISSING else canonical_sha256(input_value),
