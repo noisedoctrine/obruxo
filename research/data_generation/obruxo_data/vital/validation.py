@@ -180,7 +180,7 @@ def validate_runtime(document_json: str) -> ValidationReport:
     version_pointers = {"/synth_version", *(f"/settings/wavetables/{index}/version" for index in range(3))}
     version_canonicalizations = {
         pointer for pointer in differences & version_pointers
-        if _pointer_value(source, pointer) in ("1.0.7", "1.5.5", "1.6.4") and _pointer_value(exported, pointer) == "99999.9.9"
+        if _pointer_value(source, pointer) in ("1.0.7", "1.0.8", "1.5.5", "1.6.4") and _pointer_value(exported, pointer) == "99999.9.9"
     }
     for pointer in differences - classified_canonicalizations:
         left = _pointer_value(source, pointer)

@@ -305,6 +305,42 @@ def test_named_comparison_pins_external_retrieval_and_resumes_across_training_co
         evaluate_comparison(pool, dict(reversed(candidates.items())), source, output, count=1, resume=True)
 
 
+def test_fresh_validation_cli_excludes_parent_and_test_states_and_resumes(pool, trained, tmp_path, monkeypatch):
+    root, _, _, _, _ = trained
+    source = root / "full/checkpoint.pt"
+    expanded = pool.expand(48)
+    parent_ids = {entry.state_id for entry in pool.entries}
+    expected = {entry.state_id for entry in expanded.manifest.assignments
+                if entry.split == "validation" and entry.state_id not in parent_ids}
+    assert expected
+    pool.save(tmp_path / "parent.json")
+    expanded.save(tmp_path / "expanded.json")
+    monkeypatch.setattr("obruxo_training.stream.NativeRendererFactory", lambda _=None: FakeRendererFactory())
+    output = tmp_path / "fresh"
+    args = ["compare", "--pool", str(tmp_path / "parent.json"), "--validation-pool", str(tmp_path / "expanded.json"),
+            "--checkpoints", f"one={source}", f"repeat={source}", "--retrieval-checkpoint", str(source),
+            "--output", str(output), "--count", str(len(expected))]
+    assert main(args) == 0
+    first = json.loads((output / "summary.json").read_text())
+    plan = json.loads((output / "plan.json").read_text())
+    assert {row["state_id"] for row in first["cases"]} == expected
+    assert first["pool_id"] == expanded.pool_id
+    assert first["retrieval_source"]["training_pool_id"] == pool.pool_id
+    assert first["retrieval_sha256"] == retrieval_digest(torch.load(source, weights_only=True)["replay"])
+    assert plan["validation_extension"]["parent_pool_id"] == pool.pool_id
+    assert first["renders_attempted"] == first["renders_accepted"] == len(expected) * 12
+    assert main([*args, "--resume"]) == 0
+    resumed = json.loads((output / "summary.json").read_text())
+    assert resumed["completed_cases_reused"] == len(expected) and resumed["renders_attempted_this_segment"] == 0
+    assert resumed["aggregates"] == first["aggregates"]
+    with pytest.raises(ValueError, match="plan changed"):
+        evaluate_comparison(pool, {"one": source, "repeat": source}, source, output, count=1, resume=True)
+    with pytest.raises(ValueError, match="every added validation"):
+        evaluate_comparison(pool, {"one": source, "repeat": source}, source, tmp_path / "partial",
+                            validation_pool=expanded, count=len(expected) - 1)
+    assert not (tmp_path / "partial").exists()
+
+
 def test_expanded_pool_cannot_resume_or_seed_parent_features(pool, trained, tmp_path):
     root, config, stream_config, _, _ = trained
     expanded = pool.expand(48)

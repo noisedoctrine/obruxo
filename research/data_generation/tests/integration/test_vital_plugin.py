@@ -10,6 +10,7 @@ from scipy.io import wavfile
 from obruxo_data.cli import DEFAULT_RENDERER, main
 from obruxo_data.midi import Performance, TempoMap
 from obruxo_data.render import RenderRequest, VitalRenderer, run_batch
+from obruxo_data.render.base import DEFAULT_RENDERER_ID, LEGACY_TRAINING_RENDERER_ID
 from obruxo_data.render.qa import compare_audio
 from obruxo_data.vital import ComponentProfile, VitalPreset
 
@@ -25,7 +26,8 @@ def _plugin_path() -> Path:
     return path
 
 
-def test_two_note_sequence_renders_continuously_with_qa_and_repeat_tolerance(tmp_path) -> None:
+@pytest.mark.parametrize("renderer_id,applied_version", [(DEFAULT_RENDERER_ID, "1.6.4"), (LEGACY_TRAINING_RENDERER_ID, "1.0.8")])
+def test_two_note_sequence_renders_continuously_with_qa_and_repeat_tolerance(tmp_path, renderer_id, applied_version) -> None:
     pytest.importorskip("vita")
     pytest.importorskip("dawdreamer")
     preset = VitalPreset.init()
@@ -34,13 +36,13 @@ def test_two_note_sequence_renders_continuously_with_qa_and_repeat_tolerance(tmp
     performance.add_note(pitch=60, velocity=100, start_tick=0, duration_ticks=360)
     performance.add_note(pitch=64, velocity=90, start_tick=480, duration_ticks=360)
     performance.end_tick = 960
-    request = RenderRequest(preset=preset, performance=performance, tail_seconds=0.25)
-    renderer = VitalRenderer(_plugin_path())
+    request = RenderRequest(preset=preset, performance=performance, tail_seconds=0.25, renderer_id=renderer_id)
+    renderer = VitalRenderer(_plugin_path(), renderer_id=renderer_id)
 
     first = renderer.render(request)
     intervening = VitalPreset.init()
     intervening.set_raw("osc_1_level", 0.1)
-    quiet = renderer.render(RenderRequest(preset=intervening, performance=performance, tail_seconds=0.25))
+    quiet = renderer.render(RenderRequest(preset=intervening, performance=performance, tail_seconds=0.25, renderer_id=renderer_id))
     second = renderer.render(request)
     expected = TempoMap.from_performance(performance).render_frame_count(960, 0.25, 44_100)
     assert first.audio.shape == (expected, 2)
@@ -49,7 +51,8 @@ def test_two_note_sequence_renders_continuously_with_qa_and_repeat_tolerance(tmp
     assert first.qa["rms"] > first.qa["silence_threshold"]
     assert quiet.qa["rms"] < first.qa["rms"] * 0.2
     assert first.qa["native_state"]["scalar_lfo_route_readback_verified"]
-    assert first.qa["native_state"]["applied_version"] == "1.6.4"
+    assert first.qa["native_state"]["applied_version"] == applied_version
+    assert ("verified_loaded_scalars" in first.provenance.settings) == (renderer_id == DEFAULT_RENDERER_ID)
     assert "vital.native.version_bridge" in {item.code for item in first.diagnostics}
     assert not [item for item in first.diagnostics if item.severity.value == "error"]
     assert "vital.runtime.canonicalization" in {item.code for item in first.diagnostics}

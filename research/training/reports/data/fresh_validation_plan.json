@@ -1,0 +1,374 @@
+{
+  "experiment": "fresh_validation_state_coverage_v1",
+  "frozen_at_utc": "2026-10-14T12:12:51.753857+00:00",
+  "question": "Do the paired 404-versus-205-state results persist on every previously unused validation state in the frozen expanded pool?",
+  "prior_replication_plan_sha256": "f178aa867177f245996438219d2365c1088565b526fd7c4deafcfbeee4bf5b2d",
+  "optimizer_updates": 0,
+  "new_training_features": 0,
+  "pools": {
+    "one": {
+      "path": "research/training/outputs/authored-pilot-v2-20261005/pool.json",
+      "sha256": "7ec6258b6aa7c2f3832ab7950aef962abf7d9f5283914854fb4d97fc2493623f",
+      "bytes": 196075,
+      "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f"
+    },
+    "expanded": {
+      "path": "research/training/outputs/authored-expanded-20261013/pool.json",
+      "sha256": "ed05cf3db0dd1862671a525a2c6fac2f7d9497633848246b330a2b544ae02e87",
+      "bytes": 387929,
+      "pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86"
+    }
+  },
+  "expansion_proof": {
+    "policy": "independent_authored_prefix_expansion_v1",
+    "parent_pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+    "expanded_pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+    "parent_manifest_id": "d211268d8eba99482b36d75378122587d66d050950b597bf9af46316d1c0b9a5",
+    "expanded_manifest_id": "c6f567ad416d90594e675fd34be3b28b4c1916be2e8110e5593e9d66a2677920",
+    "preserved_states": 256,
+    "added_states": 256,
+    "preserved_states_by_split": {
+      "train": 205,
+      "validation": 21,
+      "test": 30
+    },
+    "added_states_by_split": {
+      "train": 199,
+      "validation": 23,
+      "test": 34
+    },
+    "evaluation_policy": "fixed_parent_validation_recipes_and_parent_training_retrieval",
+    "feature_reuse": "cross_pool_seed_and_resume_forbidden_start_fresh"
+  },
+  "prior_case_files_checked": 105,
+  "prior_case_distinct_states": 21,
+  "validation_policy": "all_added_validation_states_v1",
+  "parent_states_excluded": 256,
+  "validation_count": 23,
+  "cases": [
+    {
+      "case": 0,
+      "state_id": "62339b1cfd5f15c0f51d374c79cc94b57f35401ee44166bc223678822101224f",
+      "recipe_id": "698fc12145ac26eab1963ff87773819d1b512deeaa07e34e85d59475e2bad1d1",
+      "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+    },
+    {
+      "case": 1,
+      "state_id": "5d49e4dc9d072359bedcf560215812cc0489a49a04963710929eee7acba9c242",
+      "recipe_id": "4bb34aa29ec043e446863fa6837ce65f99c3e2c91aebeab64d1bcc45ea8a307b",
+      "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+    },
+    {
+      "case": 2,
+      "state_id": "925b4de13d52724df2120a6863bddf71a0ed2c1ee6b5ad8683f778aaa9550846",
+      "recipe_id": "75727dce7603b27a70781cfd9359e0af7b29b50cd4e7969f1c74c0939e25fe4d",
+      "reference_performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+      "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+    },
+    {
+      "case": 3,
+      "state_id": "5bc2470951a854d9053a789e2bfcb7b1038745ee13d64a96b9df95c9b74057f1",
+      "recipe_id": "5f8ea6ef43e6efe64da644a62ca196752d3197ba9710e0a24e7ba8f82def8058",
+      "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+    },
+    {
+      "case": 4,
+      "state_id": "e01a5794bad6e7f800ff0f8711cab2f6421a2618c3c73e92eaa914f989aeec5e",
+      "recipe_id": "08b4ea80ee0ff33bee806f7f61e2b21e36b444e141c1d64ed3d28d05f6a5a682",
+      "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+    },
+    {
+      "case": 5,
+      "state_id": "e5ab56bd663b499fb2d7b656b30925504899324e6603c258ac53ba11d284b2dd",
+      "recipe_id": "9f943b6ed57233606f15b6e246b3c43fca11b50603cc355b20d6b95e84a564db",
+      "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+    },
+    {
+      "case": 6,
+      "state_id": "5acf0c7c1a56d768830250e3f62d57ec9424419e26345f86d1381366e79fd7e7",
+      "recipe_id": "2cd73ef246bfe439cf0c6d2cc06efebac689f8b7bc6c439b11c6565a14a0c1a3",
+      "reference_performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+      "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+    },
+    {
+      "case": 7,
+      "state_id": "82f4a2947fd5bb5e90a6da11fbafa8c720d775b921f42c40cc36d32d8383ad40",
+      "recipe_id": "a27637a5ff4a2b1c8751b5eb7a3103e3ee35c35b30862ea2f70932e9d0355959",
+      "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+    },
+    {
+      "case": 8,
+      "state_id": "5a22c85716fb78d5e9c4d00834d8a2d4c993d0e207f84b9c05befa38536a132a",
+      "recipe_id": "f45e4c7fc7bfbb326598e0f56ec5cbf5201d5a6a3bb9560bb8ab24ee09caf1a9",
+      "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+    },
+    {
+      "case": 9,
+      "state_id": "870379c41007363c403727fa0ebe9082f2116d972341b4f4960ccd0002bb9694",
+      "recipe_id": "42c12a2f069b14e756495ae980fb4386988a3c873c693bb9ee00fc79f34850da",
+      "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+    },
+    {
+      "case": 10,
+      "state_id": "cf723837e52c469f44503979f10d6b4c081786c526a043f634dbc659a10591bd",
+      "recipe_id": "859b834f65badd5d95a6c1129ccafda41a065fbe7b44fc42c480be29bb0ced7f",
+      "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+    },
+    {
+      "case": 11,
+      "state_id": "9ae5562d3031237c16fe975f0056a8a219dbdf9882fb28d5b2decb4255041dbc",
+      "recipe_id": "84dbc1bdf4001b3b5c6fa11b663fb966903b2adb453008046797bcc99db5f66c",
+      "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+    },
+    {
+      "case": 12,
+      "state_id": "83f127b0a175c7980b8b47ffbafd4a1d327bf5eedf5437a531d148ef8801d85a",
+      "recipe_id": "6a59d203762692406c908e8d8053e581b76db3b5a6e63e404733c738dd88e0f0",
+      "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+    },
+    {
+      "case": 13,
+      "state_id": "3dbc1b079bf2661154d296aad0d245d0e282deef7553d815c2a6334b48935b4d",
+      "recipe_id": "eaf69865064b925f08b2ba84974f25b043af8bc7e5b3df831aa159d8ebfc5f4c",
+      "reference_performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+      "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+    },
+    {
+      "case": 14,
+      "state_id": "670a8a40b8c3469163ab80a511986b0d4af676c1d87dc163ba487aeec0895458",
+      "recipe_id": "ed038f46cf08ef61a00ae2ad650173daec47b4221e1060b648c7aee8c4e46960",
+      "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+    },
+    {
+      "case": 15,
+      "state_id": "e363e82d5f13c7c2526995f2de6b6340a4bb2fbb949af68d4f1e95a9d97da639",
+      "recipe_id": "7679f4a82e1e5811ce634a6c8a80d980da896e210d5991c4702be18f2f55e585",
+      "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+    },
+    {
+      "case": 16,
+      "state_id": "362c287057576eafdf8717fb9952883acab0163af7ce4684ebbfa5f4f2f064df",
+      "recipe_id": "6f7056f710b64ab4645e7403ecbda9088de4cd7cca21ff10db13b9ace419be84",
+      "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+    },
+    {
+      "case": 17,
+      "state_id": "9fd33905dd5910488edc2c30a7968345553285b34a03517362423ca00f698b2d",
+      "recipe_id": "f7429eb442bb5a486119d99d6cfa8e6cecfc4dfd7d3990a6cdcd15b4a605ac6a",
+      "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+    },
+    {
+      "case": 18,
+      "state_id": "788abb33f61b83b6984800d901eb50efb9a1cf6fbf0e1a366ab951305988f021",
+      "recipe_id": "5db26463a96f8948dcb44aed0deed0d68f2ad69f1520da0f795a192c61049026",
+      "reference_performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+      "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+    },
+    {
+      "case": 19,
+      "state_id": "4fd8b07a3c590b12054ffe73c3176b556cb74b3c7dc26501e8d73c3c2970585d",
+      "recipe_id": "0bf9f84394e8667f886c032e64d41956726a5cb9b2a7bd46fe275f3adb230ffa",
+      "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+    },
+    {
+      "case": 20,
+      "state_id": "10b4ba40d1637df9e0a3074b319ac5b5a9e8b03dd1464eae7899bc35832b46e7",
+      "recipe_id": "aaa5460a0530bd9be8b6e0f4c06889ba1e00f08775d60cd911cff253aa716d8f",
+      "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+    },
+    {
+      "case": 21,
+      "state_id": "545ae27242313dd44bfd3c8002bff7f6162d0332f0aa56db6fec5b4d23cfbacc",
+      "recipe_id": "85d3558304998f32bad17dee829d3635d4df386cf80d4048d4922102a56fd2ac",
+      "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+    },
+    {
+      "case": 22,
+      "state_id": "12f6e526b5be5346f94b758602a16776d9e79339cd32e38baa7e9f2179a70a09",
+      "recipe_id": "ea6a7306e0505e3208ccac02956a2c4de6de9e7ad661ef016c69ee6200881064",
+      "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+    }
+  ],
+  "test_states_reserved": 64,
+  "test_split_evaluated": false,
+  "candidate_order": [
+    "incumbent",
+    "one_seed0_16000",
+    "expanded_seed0_16000",
+    "one_seed1_16000",
+    "expanded_seed1_16000",
+    "one_seed2_16000",
+    "expanded_seed2_16000"
+  ],
+  "candidates": {
+    "incumbent": {
+      "path": "research/training/outputs/two-view-train-20261010/checkpoint.pt",
+      "sha256": "07a5f637aaa3d98a4469fd7a046df0f5d58575fcb84b1328d090cb9548b3cee9",
+      "bytes": 20700629,
+      "training_pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+      "step": 4000,
+      "model_state_sha256": "291a35e4c230b5317b046305c0cb276e904b4eb98650e8cdc2e27e2261277f93",
+      "replay_digest": "fb9595eeeae00ede6d449ee2abdd416fd33f23b6ea87d443562ab58b994acaa8",
+      "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+    },
+    "one_seed0_16000": {
+      "path": "research/training/outputs/cached-curve-one-step16000-20261011/checkpoint.pt",
+      "sha256": "b5df523b46f63bb48dea67b6b2b1247b32af15076fc5dd45e1c27df6ac8f95e8",
+      "bytes": 12583881,
+      "training_pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+      "step": 16000,
+      "model_state_sha256": "a64e509920bef6468bbc61031d015b9a4fbfd204d381782b5f4af08622398fca",
+      "replay_digest": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+      "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+    },
+    "expanded_seed0_16000": {
+      "path": "research/training/outputs/state-coverage-expanded-16000-20261013/checkpoint.pt",
+      "sha256": "8231920789f8ef8c5bb7359613aa6c51b84cc193d24475ae5293a8cbeb17dece",
+      "bytes": 20463789,
+      "training_pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+      "step": 16000,
+      "model_state_sha256": "bb2dfed7dd9287217f98c17359c153f32b6afe31c292b0c3d9b8b154a2514231",
+      "replay_digest": "68baae68a584394755c48b46e5f680ec351703973da8e98480cade898ae3d77d",
+      "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+    },
+    "one_seed1_16000": {
+      "path": "research/training/outputs/state-coverage-replication-one-seed1-16000-20261014/checkpoint.pt",
+      "sha256": "6e4563a550ec766319826eb614d74ad05bc9f0cac51145ab5c7d0f39d6935e2c",
+      "bytes": 12583881,
+      "training_pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+      "step": 16000,
+      "model_state_sha256": "7b556386dd99bb6589df6b985b0488a814d532bc6d756140a009070c4580544b",
+      "replay_digest": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+      "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+    },
+    "expanded_seed1_16000": {
+      "path": "research/training/outputs/state-coverage-replication-expanded-seed1-16000-20261014/checkpoint.pt",
+      "sha256": "9899506e4dd70847c2cd296abfc7b5f85700cb51bd0ce968c5bba3a4644d2fb1",
+      "bytes": 20464237,
+      "training_pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+      "step": 16000,
+      "model_state_sha256": "6a3ae2bc2b61d956a9395fb0239e77d4f49b7182d07b41aa89b1092b056b32b0",
+      "replay_digest": "68baae68a584394755c48b46e5f680ec351703973da8e98480cade898ae3d77d",
+      "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+    },
+    "one_seed2_16000": {
+      "path": "research/training/outputs/state-coverage-replication-one-seed2-16000-20261014/checkpoint.pt",
+      "sha256": "99e5a8ebe9068966d57e15bf2745252db09aa164417b68c7382307a875d6cc98",
+      "bytes": 12583945,
+      "training_pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+      "step": 16000,
+      "model_state_sha256": "12fb6c53d13ff1a81f47902c61dc0d48c75ebef5767eca0c18ba0ef968ab1c83",
+      "replay_digest": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+      "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+    },
+    "expanded_seed2_16000": {
+      "path": "research/training/outputs/state-coverage-replication-expanded-seed2-16000-20261014/checkpoint.pt",
+      "sha256": "9056fc8f2585848a8a8b894eb76e6d0c5da495c5f3221794396ab69bb9e87000",
+      "bytes": 20464301,
+      "training_pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+      "step": 16000,
+      "model_state_sha256": "cd2c2f1fb42b670db8dc9f807ff0e122a6f8c88c653056d0a91f204b9a1c77dd",
+      "replay_digest": "68baae68a584394755c48b46e5f680ec351703973da8e98480cade898ae3d77d",
+      "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+    }
+  },
+  "fixed_retrieval": {
+    "path": "research/training/outputs/full-pilot-step4000-20261009/checkpoint.pt",
+    "sha256": "e66c50eab45fe3e3b3cff7b8baad6eaf688ed69ef3d60c442c6cedee89cfb723",
+    "bytes": 12583497,
+    "step": 4000,
+    "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+    "run_id": null,
+    "replay_examples": 205,
+    "replay_digest": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+    "sampler_id": "3010ceb8617bf77899c8f380bdfb46f7ffe10bbff3a54e8e880fc01ea6b8e572",
+    "population": "one",
+    "basic_pitch_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+  },
+  "primary": "equal-weight reference/transfer MR-STFT per state; report expanded minus one at matched learning seeds 1 and 2 separately; seed 0 is descriptive discovery",
+  "secondary": [
+    "active-control and per-control normalized MAE",
+    "unison and filter categorical accuracy",
+    "reference and transfer relative RMS error",
+    "statewise wins and losses"
+  ],
+  "bootstrap": {
+    "unit": "state",
+    "resamples": 2000,
+    "seed": 0,
+    "interval": "percentile_95",
+    "interpretation": "descriptive within-seed intervals; not learning-seed uncertainty; no significance claim"
+  },
+  "decision_rule": "Consistent improvement across seeds 1 and 2 would support prioritizing broader state coverage, subject to envelope, level and category tradeoffs. Mixed directions leave coverage unproven; prioritize a controlled targeted-loss diagnostic before more rendering. Two seeds and 23 states cannot establish general superiority.",
+  "promotion": "none; automatic best export is diagnostic only",
+  "retained_candidate": {
+    "path": "research/training/outputs/state-coverage-validation-20261013/selected-model.pt",
+    "sha256": "5517db59dec68f0daca30789d08e75f41183e5577ba5a2082a4dc9488da15d4f",
+    "bytes": 1585110
+  },
+  "render_budget": {
+    "per_case": 22,
+    "uninterrupted_maximum": 506,
+    "workers": 1,
+    "timeout_seconds": 30,
+    "audio_archive": "none; render on demand and discard after metrics",
+    "resume": "same immutable plan only; retain completed failures; rerender an interrupted case in full; log all attempts"
+  },
+  "failure_rule": "Keep all 23 planned cases in every denominator; a missing role makes that candidate incomplete; no replacement cases or outcome-driven retries.",
+  "runtime_source_sha256": {
+    "research/training/obruxo_training/cli.py": "480d8247083792013dcafbe1def8a1dbccfad3cd2bafdf709920b39faa237af7",
+    "research/training/obruxo_training/trainer.py": "3ab0f29e1ac069cceac743df915d7245e6b04d5b189ef4e3ce275eaf759fff62",
+    "research/training/obruxo_training/evaluate.py": "05860d80f2502d2b59d8e38189b503a240bfcdab033972e4ca1916a0486569bd",
+    "research/training/obruxo_training/features.py": "83ef8178442dc467b7985c67915a136650bc83e0248237f8bb12bdd452fae951",
+    "research/training/obruxo_training/model.py": "ee5cb2c6fcdc04e1ea327db3aa8cc08184dc0a4ee3a2bf2a481ceff227e1c4cb",
+    "research/training/obruxo_training/pilot.py": "c6e694fd99502a307044073d42cea19444a7792f2bbe34ce5b2c202c71346838",
+    "research/training/obruxo_training/codec.py": "a9e0095d0f45f80d25c1f30b0bc630b6ab93a41a4a62601d116db36d94435264",
+    "research/training/obruxo_training/stream.py": "241d651ab484fa336057aa3ff237932f3acfc65f84c623caf1592e7ee4320812",
+    "research/data_generation/obruxo_data/render/base.py": "d755087ea96d6e51c9e4b06940a633a10c5afff2b57de202a438b434a61339fa",
+    "research/data_generation/obruxo_data/render/vita.py": "74b7287234b857c0f4c21f33217ef464a394935b8ea7f50d52587be887625666",
+    "research/training/obruxo_training/contracts.py": "b8cb238a01723fb04960f7f7e4d69cc59a15a4d56ec9f576a0b041b041fa3b35",
+    "research/data_generation/obruxo_data/vital/validation.py": "8908bb8763d9d5f3fbe54aa95ec51eb12d9718a7c7f19a30638911b8da7c5cf2"
+  },
+  "runtime": {
+    "python": "3.12.13",
+    "torch": "2.12.1+xpu",
+    "numpy": "2.4.6",
+    "scipy": "1.18.0",
+    "device": "cpu",
+    "threads": 4,
+    "precision": "float32",
+    "renderer": {
+      "plugin": "C:/Program Files/Common Files/VST3/Vital.vst3",
+      "plugin_sha256": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+      "backend": "DawDreamer 0.8.3",
+      "timeout_seconds": 30,
+      "workers": 1
+    }
+  },
+  "renderer_qualification": {
+    "path": "research/training/reports/data/fresh_validation_renderer_qualification.json",
+    "sha256": "f0b854522fd7b80d9ddce1458ccdaf5dbe5b69f476ea450d6bc382174888f80a",
+    "training_cases": 6,
+    "exact_audio_and_all_features": true
+  },
+  "output": "research/training/outputs/fresh-validation-20261014"
+}

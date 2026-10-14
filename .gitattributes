@@ -1,4 +1,6 @@
 research/training/reports/data/state_coverage_replication_plan.json -text
+research/training/reports/data/fresh_validation_plan.json -text
+research/training/reports/data/fresh_validation_renderer_qualification.json text eol=crlf
 research/training/obruxo_training/cli.py -text
 research/training/obruxo_training/trainer.py -text
 research/training/obruxo_training/evaluate.py -text
@@ -7,5 +9,7 @@ research/training/obruxo_training/model.py -text
 research/training/obruxo_training/pilot.py -text
 research/training/obruxo_training/codec.py -text
 research/training/obruxo_training/stream.py -text
+research/training/obruxo_training/contracts.py -text
 research/data_generation/obruxo_data/render/base.py -text
 research/data_generation/obruxo_data/render/vita.py -text
+research/data_generation/obruxo_data/vital/validation.py text eol=crlf

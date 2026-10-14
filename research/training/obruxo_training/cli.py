@@ -104,7 +104,9 @@ def main(argv=None) -> int:
     compare.add_argument("--pool", type=Path, required=True)
     compare.add_argument("--checkpoints", nargs="+", required=True, help="Unique NAME=PATH checkpoint entries in tie-break order")
     compare.add_argument("--retrieval-checkpoint", type=Path, required=True)
-    compare.add_argument("--checkpoint-pools", nargs="+", default=[], help="NAME=PATH training pools for expanded candidates; --pool pins evaluation and retrieval")
+    compare.add_argument("--checkpoint-pools", nargs="+", default=[], help="NAME=PATH training pools for expanded candidates; --pool pins retrieval")
+    compare.add_argument("--validation-pool", type=Path,
+                         help="Verified parent-pool expansion; evaluate all its newly added validation states, never parent or test states")
     compare.add_argument("--output", type=Path, required=True)
     compare.add_argument("--count", type=int, default=21)
     compare.add_argument("--timeout", type=float, default=60)
@@ -160,6 +162,7 @@ def main(argv=None) -> int:
                 checkpoint_pools = {name: PilotPool.load(path) for name, path in _named_paths(args.checkpoint_pools, "pools").items()}
                 result = evaluate_comparison(pool, checkpoints, args.retrieval_checkpoint, args.output, count=args.count,
                                              checkpoint_pools=checkpoint_pools,
+                                             validation_pool=PilotPool.load(args.validation_pool) if args.validation_pool else None,
                                              renderer_factory=NativeRendererFactory(args.plugin_path), timeout=args.timeout,
                                              progress=lambda value: print(json.dumps(value), flush=True), resume=args.resume)
                 print(json.dumps(result["comparison"], indent=2))

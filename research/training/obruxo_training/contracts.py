@@ -6,7 +6,7 @@ import json
 
 from obruxo_data.hashing import canonical_json, canonical_sha256
 from obruxo_data.midi import Performance
-from obruxo_data.render.base import DEFAULT_RENDERER_ID, RenderRequest
+from obruxo_data.render.base import LEGACY_TRAINING_RENDERER_ID, RenderRequest
 from obruxo_data.vital import VitalSchema
 
 from .assets import ASSET_RULE, AssetCatalog
@@ -22,7 +22,7 @@ class TrainingContract:
     schema_sha256: str
     asset_catalog_id: str
     performance_bank_id: str
-    renderer_id: str = DEFAULT_RENDERER_ID
+    renderer_id: str = LEGACY_TRAINING_RENDERER_ID
     sample_rate: int = 44100
     channels: int = 2
     dtype: str = "float32"

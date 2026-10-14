@@ -18,7 +18,7 @@ from obruxo_data.errors import DependencyUnavailableError, Diagnostic, Severity
 from obruxo_data.midi import TempoMap
 from obruxo_data.vital import VitalPreset, VitalSchema
 
-from .base import DEFAULT_RENDERER_ID, RenderProvenance, RenderRequest, RenderResult, Renderer
+from .base import DEFAULT_RENDERER_ID, LEGACY_TRAINING_RENDERER_ID, RenderProvenance, RenderRequest, RenderResult, Renderer
 from .capabilities import RendererCapabilities
 from .qa import AudioQualityConfig, analyze_audio
 
@@ -138,14 +138,18 @@ def verify_loaded_scalars(requested: dict[str, Any], loaded: dict[str, Any]) -> 
     return len(expected)
 
 
-def native_preset_document(preset_json: str, plugin_version: str) -> tuple[dict[str, Any], tuple[Diagnostic, ...]]:
+def native_preset_document(preset_json: str, plugin_version: str, *, legacy_training: bool = False) -> tuple[dict[str, Any], tuple[Diagnostic, ...]]:
     """Adapt Vita's explicit development sentinel only for the reviewed native Vital."""
     document = json.loads(preset_json)
     version = document.get("synth_version", "")
     if version == "99999.9.9":
         if plugin_version != "1.6.4":
             raise ValueError("Vita init export requires the reviewed Vital 1.6.4 state adapter")
-        document["synth_version"] = plugin_version
+        document["synth_version"] = "1.0.8" if legacy_training else plugin_version
+        if legacy_training:
+            diagnostic = Diagnostic("vital.native.version_bridge", Severity.WARNING,
+                                    "Vita's synthetic 99999.9.9 marker was explicitly bridged to the reviewed 1.0.8 schema for native loading")
+            return document, (diagnostic,)
         for table in document.get("settings", {}).get("wavetables", []):
             if table.get("version") == "99999.9.9":
                 table["version"] = plugin_version
@@ -160,10 +164,19 @@ def native_preset_document(preset_json: str, plugin_version: str) -> tuple[dict[
     return document, ()
 
 
-def verify_loaded_controls(requested: dict[str, Any], loaded: dict[str, Any]) -> int:
+def verify_loaded_controls(requested: dict[str, Any], loaded: dict[str, Any], *, legacy_training: bool = False) -> int:
     """Verify scalar controls and exact LFO/modulation readback after native state load."""
-    checked = verify_loaded_scalars(requested, loaded)
     expected, actual = requested.get("settings", {}), loaded.get("settings", {})
+    if legacy_training:
+        # Preserve the tolerance used by the published v2 training artifacts.
+        scalars = {name: value for name, value in expected.items() if isinstance(value, (int, float))}
+        mismatches = [name for name, value in scalars.items() if not isinstance(actual.get(name), (int, float))
+                      or not math.isclose(value, actual[name], rel_tol=1e-5, abs_tol=1e-5)]
+        if mismatches:
+            raise RuntimeError("Vital did not apply the requested scalar controls: " + ", ".join(mismatches[:12]))
+        checked = len(scalars)
+    else:
+        checked = verify_loaded_scalars(requested, loaded)
     for name in ("lfos", "modulations"):
         if expected.get(name) != actual.get(name):
             raise RuntimeError(f"Vital did not load the requested {name}")
@@ -208,6 +221,7 @@ class VitalRenderer(Renderer):
             raise ValueError("renderer_id must include the complete accepted plugin SHA-256")
         self.buffer_size = buffer_size
         self.renderer_id = renderer_id
+        self.legacy_training = renderer_id == LEGACY_TRAINING_RENDERER_ID
         self.qa_config = qa_config or AudioQualityConfig()
         self._capabilities = RendererCapabilities(max_channels=1)
 
@@ -275,12 +289,13 @@ class VitalRenderer(Renderer):
             synth.save_state(str(template_path))
             template = VitalVst3StateTemplate(template_path.read_bytes())
             requested_document = json.loads(request.preset_json)
-            native_document, bridge_diagnostics = native_preset_document(request.preset_json, template.plugin_version)
+            native_document, bridge_diagnostics = native_preset_document(request.preset_json, template.plugin_version,
+                                                                        legacy_training=self.legacy_training)
             state_path.write_bytes(template.build(json.dumps(native_document)))
             synth.load_state(str(state_path))
             synth.save_state(str(loaded_path))
             loaded = VitalVst3StateTemplate(loaded_path.read_bytes()).preset_document
-            checked_scalars = verify_loaded_controls(native_document, loaded)
+            checked_scalars = verify_loaded_controls(native_document, loaded, legacy_training=self.legacy_training)
             for span in performance.note_spans():
                 start_sample = timing.tick_to_sample(span.start_tick, request.sample_rate)
                 end_sample = timing.tick_to_sample(span.end_tick, request.sample_rate)
@@ -309,9 +324,9 @@ class VitalRenderer(Renderer):
                 "plugin_name": self.plugin_path.name,
                 "buffer_size": self.buffer_size,
                 "schema_id": VitalSchema.load().schema_id,
-                "verified_loaded_scalars": checked_scalars,
-                "scalar_lfo_route_readback_verified": True,
-                "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2",
+                **({} if self.legacy_training else {"verified_loaded_scalars": checked_scalars, "scalar_lfo_route_readback_verified": True}),
+                "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2" if self.legacy_training
+                                 else "version_bridge_and_scalar_lfo_route_readback_v3",
                 "event_timing": "absolute ticks to half-even sample offsets",
                 "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
             },

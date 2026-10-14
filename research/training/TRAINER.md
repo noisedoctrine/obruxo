@@ -4,6 +4,14 @@ The trainer is a bounded, supervised bootstrap for the [pilot vocabulary](ONLINE
 
 ## Environment and commands
 
+The authored training contract and native factory pin historical renderer `state-verified-v2`, including its original header adapter, scalar tolerance and provenance. The general data-generation default is `state-verified-v3`; changing that default does not migrate training checkpoints. The [renderer documentation](../data_generation/README.md) describes both profiles and the exact retained-training replay qualification.
+
+GitHub Actions remains disabled for this repository by owner choice. Run the checks locally; workflow files describe available CI commands but are not evidence of a successful hosted run. With the native dependencies available on `PYTHONPATH`, enable the official-plugin boundary sweep with `OBRUXO_VALIDATE_NATIVE=1` and run:
+
+```sh
+python -m pytest research/training/tests research/data_generation/tests/unit research/data_generation/tests/integration research/modelling/simple_training/test_pipeline.py research/modelling/simple_training/test_preset_contract.py -q -rs
+```
+
 Use the existing Python 3.12 native rendering environment and its installed PyTorch. Training was measured on the local CPU with PyTorch 2.12.1+xpu; no environment replacement is needed. For a separate CPU environment, install `requirements-trainer.txt` and a CPU PyTorch wheel. CI pins `torch==2.12.1` from the [official CPU wheel index](https://download.pytorch.org/whl/cpu/torch/). Native synthesis additionally requires the reviewed plugin and the [renderer dependencies](../data_generation/README.md#setup). No network access is needed once dependencies, source code and the existing Basic Pitch checkpoint are available.
 
 Run these from the repository root; each output directory must be new:
@@ -129,6 +137,12 @@ Start fresh training with the expanded pool. Cross-pool resume and feature seedi
 For comparison, keep `--pool` set to the original evaluation/retrieval pool, and supply `--checkpoint-pools NAME=PATH` for each expanded candidate. Its checkpoint and replay are validated against that declared training pool; the pool must prove a strict extension preserving all original splits. The existing inference and renderer compatibility checks still apply. See the [complete command](reports/POOL_EXPANSION_READINESS.md#fixed-validation-across-training-pools).
 
 New comparison plans use `pilot_real_render_comparison_v2`, pinning training-pool bindings, candidate tie order and validation reference/transfer pairs. Changing them invalidates resume. V1 comparison plans need their earlier implementation for recovery or a new output directory; completed historical reports and bundles remain usable. The selected bundle records the winning model's training pool, while the report separately identifies the evaluation pool.
+
+### Evaluating every newly added validation state
+
+Add `--validation-pool EXPANDED_POOL` to `compare` to evaluate only states added to the validation split by a verified prefix expansion of `--pool`. `--count` must equal the entire added validation population; partial selection is rejected. The original parent states and every test state remain excluded. Each checkpoint still loads under its declared training pool, and the retrieval bank stays pinned to `--pool` and `--retrieval-checkpoint`.
+
+For the frozen 256-to-512-state expansion, use `--validation-pool research/training/outputs/authored-expanded-20261013/pool.json --count 23` with the existing checkpoint and retrieval arguments. The plan records the expansion proof, excluded parent states and exact reference/transfer pairs. Resume rejects any change to this selection. Seven candidates require 506 native renders, with no optimizer steps or audio archive. Freeze candidates and analysis rules before rendering; automatic best-checkpoint export alone is not a promotion decision.
 
 ## Model and loss
 
