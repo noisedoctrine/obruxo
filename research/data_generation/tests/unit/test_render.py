@@ -95,6 +95,21 @@ def test_native_readback_checks_lfo_and_modulation_routes() -> None:
             verify_loaded_controls(expected, loaded)
 
 
+def test_historical_training_profile_preserves_bridge_and_readback_tolerance() -> None:
+    original = VitalPreset.init().to_json()
+    legacy, _ = native_preset_document(original, "1.6.4", legacy_training=True)
+    current, _ = native_preset_document(original, "1.6.4")
+    assert legacy["synth_version"] == "1.0.8" and current["synth_version"] == "1.6.4"
+    assert legacy["settings"] == json.loads(original)["settings"]
+    requested = {"settings": {"osc_1_level": 1.0, "lfos": [], "modulations": []}}
+    loaded = {"settings": {**requested["settings"], "osc_1_level": 1.000005}}
+    assert verify_loaded_controls(requested, loaded, legacy_training=True) == 1
+    with pytest.raises(RuntimeError, match="scalar"):
+        verify_loaded_controls(requested, loaded)
+    with pytest.raises(RuntimeError, match="modulations"):
+        verify_loaded_controls(requested, {"settings": {**requested["settings"], "modulations": [{}]}}, legacy_training=True)
+
+
 def test_render_request_accepts_preset_and_has_stable_identity() -> None:
     preset = VitalPreset.init()
     performance = Performance(bpm=120)

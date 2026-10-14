@@ -205,7 +205,7 @@ def test_runtime_round_trip_classifies_vital_owned_payload_migrations(monkeypatc
     ]
 
 
-@pytest.mark.parametrize("version, valid", [("1.0.7", True), ("1.5.5", True), ("1.6.4", True), ("1.7.0", False), ("garbage", False)])
+@pytest.mark.parametrize("version, valid", [("1.0.7", True), ("1.0.8", True), ("1.5.5", True), ("1.6.4", True), ("1.7.0", False), ("garbage", False)])
 @pytest.mark.parametrize("nested", [False, True])
 def test_only_reviewed_plugin_version_rewrite_is_classified(monkeypatch, version, valid, nested) -> None:
     from obruxo_data.vital.validation import validate_runtime

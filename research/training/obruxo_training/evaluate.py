@@ -105,7 +105,7 @@ def evaluate_learning_curve(pool, checkpoints: list[Path], output: Path, *, coun
 
 def evaluate_comparison(pool, checkpoints: dict[str, Path], retrieval_checkpoint: Path, output: Path, *, count: int = 21,
                         renderer_factory=None, timeout: float = 60, progress=None, resume: bool = False,
-                        checkpoint_pools: dict[str, PilotPool] | None = None) -> dict:
+                        checkpoint_pools: dict[str, PilotPool] | None = None, validation_pool: PilotPool | None = None) -> dict:
     reserved = {"source", "fixed_template", "train_retrieval", "source_repeat"}
     if not 2 <= len(checkpoints) <= 8 or any(not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,63}", name)
                                            or name in reserved for name in checkpoints):
@@ -113,6 +113,13 @@ def evaluate_comparison(pool, checkpoints: dict[str, Path], retrieval_checkpoint
     checkpoint_pools = checkpoint_pools or {}
     if set(checkpoint_pools) - checkpoints.keys():
         raise ValueError("comparison pool names must identify candidate checkpoints")
+    extension = None
+    if validation_pool is not None:
+        proof = validation_pool.expansion_from(pool)
+        if count != proof["added_states_by_split"]["validation"]:
+            raise ValueError("fresh validation must cover every added validation state exactly once")
+        extension = {"policy": "all_added_validation_states_v1", "parent_pool_id": pool.pool_id, "expansion": proof,
+                     "excluded_state_ids": [entry.state_id for entry in pool.entries]}
     reference, _, frontend, sampler = load_evaluation_checkpoint(retrieval_checkpoint, pool)
     common_keys = ("contract", "codec", "model", "frontend", "precision")
     models, artifacts = {}, {}
@@ -129,9 +136,10 @@ def evaluate_comparison(pool, checkpoints: dict[str, Path], retrieval_checkpoint
     retrieval = {"replay": reference["replay"], "source": {"checkpoint": str(retrieval_checkpoint),
                   "file_sha256": sha256_bytes(retrieval_checkpoint.read_bytes()), "step": reference["step"],
                   "training_pool_id": pool.pool_id}}
-    return _evaluate_models(pool, models, frontend, sampler, output, count=count, split="validation", curve=True,
+    return _evaluate_models(validation_pool or pool, models, frontend, sampler, output, count=count, split="validation", curve=True,
                             comparison=True, artifacts=artifacts, retrieval=retrieval,
-                            renderer_factory=renderer_factory, timeout=timeout, progress=progress, resume=resume)
+                            renderer_factory=renderer_factory, timeout=timeout, progress=progress, resume=resume,
+                            validation_extension=extension)
 
 
 def _restore_evaluation(output: Path, plan: dict, renderer_identity: dict) -> tuple:
@@ -205,7 +213,8 @@ def curve_statistics(rows: list[dict], model_names: list[str], baseline_name: st
 
 
 def _evaluate_models(pool, models, frontend, training_sampler, output, *, count, split, curve=False, artifacts=None,
-                     renderer_factory=None, timeout=60, progress=None, resume=False, comparison=False, retrieval=None):
+                     renderer_factory=None, timeout=60, progress=None, resume=False, comparison=False, retrieval=None,
+                     validation_extension=None):
     if split not in {"train", "validation"} or type(count) is not int or count <= 0:
         raise ValueError("pilot diagnostics use a positive count from train or validation; final test stays reserved")
     torch.set_num_threads(4)
@@ -216,7 +225,7 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
     if split == "train":
         recipes = [sampler.recipe_at(item["sequence_id"]) for item in replay[:count]]
     else:
-        recipes, seen = [], set()
+        recipes, seen = [], set(validation_extension["excluded_state_ids"] if validation_extension else ())
         for sequence in range(sampler.epoch_size):
             recipe = sampler.recipe_at(sequence)
             if recipe.state_id not in seen:
@@ -234,6 +243,8 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
             "maximum_render_attempts": count * (8 + 2 * len(models)), "test_split_evaluated": False}
     if retrieval is not None:
         plan["retrieval_source"] = retrieval["source"]
+    if validation_extension is not None:
+        plan["validation_extension"] = validation_extension
     transfers = [entry for entry in initial_bank() if entry.role == "transfer"]
     if comparison:
         plan.update(evaluation="pilot_real_render_comparison_v2", candidate_order=list(models),
@@ -354,6 +365,9 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
                 summary["evaluation"] = "pilot_real_render_comparison_v2"
                 summary["retrieval_source"] = retrieval["source"]
                 summary["candidate_order"] = list(models)
+                if validation_extension is not None:
+                    summary["validation_extension"] = validation_extension
+                    summary["selection"] = "all_new_validation_states_from_verified_prefix_expansion"
                 statistics["selection_policy"] = "lowest_complete_validation_mean_input_order_breaks_ties"
             summary["comparison" if comparison else "learning_curve"] = statistics
             selected = statistics["selected"]

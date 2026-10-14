@@ -20,8 +20,9 @@ if TYPE_CHECKING:
 
 DEFAULT_RENDERER_ID = (
     "vital-1.6.4-vst3-sha256-"
-    "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2"
+    "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v3"
 )
+LEGACY_TRAINING_RENDERER_ID = DEFAULT_RENDERER_ID.removesuffix("v3") + "v2"
 
 
 @dataclass(frozen=True, init=False)

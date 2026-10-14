@@ -12,9 +12,12 @@ pytestmark = [pytest.mark.integration, pytest.mark.vita]
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures"
 
 
-def test_canonical_fixture_round_trips_through_pinned_vita() -> None:
+@pytest.mark.parametrize("version", ["99999.9.9", "1.0.8"])
+def test_canonical_fixture_round_trips_through_pinned_vita(version) -> None:
     pytest.importorskip("vita")
-    preset = VitalPreset.init()
+    document = VitalPreset.init().to_dict()
+    document["synth_version"] = version
+    preset = VitalPreset(document, VitalSchema.load())
     preset.set_raw("osc_1_level", 0.25)
     report = preset.validate(runtime=True)
     assert report.valid, report.to_dict()

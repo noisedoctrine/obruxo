@@ -14,7 +14,7 @@ import numpy as np
 from obruxo_data.errors import Severity
 from obruxo_data.hashing import canonical_sha256
 from obruxo_data.midi import TempoMap
-from obruxo_data.render.base import RenderRequest
+from obruxo_data.render.base import LEGACY_TRAINING_RENDERER_ID, RenderRequest
 from obruxo_data.render.qa import AudioQualityConfig, analyze_audio
 
 from .contracts import RenderRecipe
@@ -50,7 +50,7 @@ class NativeRendererFactory:
 
     def __call__(self):
         from obruxo_data.render import VitalRenderer
-        return VitalRenderer(plugin_path=self.plugin_path)
+        return VitalRenderer(plugin_path=self.plugin_path, renderer_id=LEGACY_TRAINING_RENDERER_ID)
 
 
 @dataclass(frozen=True)
