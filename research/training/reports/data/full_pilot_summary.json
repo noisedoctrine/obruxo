@@ -1,0 +1,567 @@
+{
+  "audio_files_written": 0,
+  "checkpoints": {
+    "step_1000": {
+      "bytes": 12582025,
+      "checkpoint": "outputs/full-pilot-step1000-20261009/checkpoint.pt",
+      "file_sha256": "de6c7418dfc74f71aa26f6fd67acf46a0b81bf900632c3a0168484e9db8e0c79",
+      "model_state_sha256": "d710c27274b4371a2e15464f4195ea24bc9a2f0e2f8862fc26a21fa96408ab94",
+      "step": 1000
+    },
+    "step_2000": {
+      "bytes": 12583433,
+      "checkpoint": "outputs/full-pilot-step2000-20261009/checkpoint.pt",
+      "file_sha256": "86c344c430eb2ffb8cd026a39e111ca92335be78e299767dd8056bf2d4814875",
+      "model_state_sha256": "7158e1d8691096e5955c445d60f29b56f9221ec46f2204ce5b6732735e6293ea",
+      "step": 2000
+    },
+    "step_4000": {
+      "bytes": 12583497,
+      "checkpoint": "outputs/full-pilot-step4000-20261009/checkpoint.pt",
+      "file_sha256": "e66c50eab45fe3e3b3cff7b8baad6eaf688ed69ef3d60c442c6cedee89cfb723",
+      "model_state_sha256": "e6fbd0548b97072e6a824810bb5aab55d95fb7427b19e46686069100ce8ccc75",
+      "step": 4000
+    }
+  },
+  "checks": {
+    "ruff_passed": true,
+    "training_and_data_unit_tests_passed": 132
+  },
+  "colab_qualified": false,
+  "completed_on": "2026-10-10",
+  "config": {
+    "batch_size": 32,
+    "checkpoint_every": 1000,
+    "cpu_threads": 4,
+    "fresh_examples": 205,
+    "learning_rate": 0.001,
+    "mode": "online",
+    "render_budget": 256,
+    "replay_capacity": 205,
+    "replay_mib": 16,
+    "sampling_policy": "state_round_robin",
+    "seed": 0,
+    "steps": 4000,
+    "updates_per_render": 4
+  },
+  "declared_on": "2026-10-09",
+  "declared_plan": {
+    "constraints": {
+      "audio_files_written": 0,
+      "coverage_requirement": "verify 205 distinct retained training states; report rejected or missing states explicitly",
+      "native_workers": 1,
+      "paid_compute": false,
+      "prefetch_clips": 1,
+      "prefetch_mib": 32
+    },
+    "declared_on": "2026-10-09",
+    "evaluation": {
+      "baselines": [
+        "fixed_template",
+        "train_retrieval",
+        "source_repeat"
+      ],
+      "cases": 21,
+      "checkpoint_selection": "lowest primary mean among checkpoints with all 21 paired cases scored",
+      "checkpoint_steps": [
+        1000,
+        2000,
+        4000
+      ],
+      "final_test_evaluated": false,
+      "maximum_render_attempts": 294,
+      "primary": "mean of per-state reference and transfer MR-STFT distances, equal weights",
+      "retrieval": "identical retained training features and targets across checkpoints",
+      "selection": "first unique states from validation sampler seed 0",
+      "split": "validation",
+      "transfer": "four reserved performances in round-robin order; reuse reference prediction",
+      "uncertainty": "paired state bootstrap against retrieval, seed 0, 2000 resamples; descriptive, unadjusted for checkpoint selection"
+    },
+    "experiment": "full_authored_pilot_learning_curve_v1",
+    "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+    "training": {
+      "batch_size": 32,
+      "checkpoint_every": 1000,
+      "cpu_threads": 4,
+      "device": "cpu",
+      "fresh_examples": 205,
+      "learning_rate": 0.001,
+      "mode": "online",
+      "render_budget": 256,
+      "replay_capacity": 205,
+      "replay_mib": 16,
+      "sampling_policy": "state_round_robin",
+      "seed": 0,
+      "steps": 4000,
+      "timeout_seconds": 30,
+      "updates_per_render": 4
+    }
+  },
+  "device": "cpu",
+  "evaluation_recovery": {
+    "committed_render_records": 182,
+    "complete_cases_preserved": 13,
+    "date": "2026-10-10",
+    "legacy_logged_renders": 189,
+    "original_uninterrupted_render_budget": 294,
+    "partial_render_records_to_repeat": 7,
+    "prediction_files_hash_verified": 39,
+    "prior_elapsed_seconds_measure": "sum_of_committed_render_wall_seconds_lower_bound",
+    "reason": "evaluation_process_interrupted",
+    "revised_logged_render_ceiling": 301
+  },
+  "experiment": "full_authored_pilot_learning_curve_v1",
+  "paid_compute_used": false,
+  "parameter_diagnostics": {
+    "step_1000": {
+      "active_continuous_mae": 0.22406233926538804,
+      "categorical_accuracy": {
+        "filter_1_on": 1.0,
+        "osc_1_unison_voices": 0.8095238095238095
+      },
+      "continuous": {
+        "env_1_attack": {
+          "active_cases": 21,
+          "mae": 0.21588226208706915
+        },
+        "env_1_decay": {
+          "active_cases": 21,
+          "mae": 0.30179969805041007
+        },
+        "env_1_release": {
+          "active_cases": 21,
+          "mae": 0.2861610127839261
+        },
+        "env_1_sustain": {
+          "active_cases": 21,
+          "mae": 0.20735626901409013
+        },
+        "filter_1_cutoff": {
+          "active_cases": 10,
+          "mae": 0.14681294968744624
+        },
+        "filter_1_resonance": {
+          "active_cases": 10,
+          "mae": 0.32779346964308037
+        },
+        "osc_1_level": {
+          "active_cases": 21,
+          "mae": 0.1973492790073194
+        },
+        "osc_1_pan": {
+          "active_cases": 21,
+          "mae": 0.1447905678612408
+        },
+        "osc_1_unison_detune": {
+          "active_cases": 13,
+          "mae": 0.18920976038509701
+        }
+      }
+    },
+    "step_2000": {
+      "active_continuous_mae": 0.21302607016487324,
+      "categorical_accuracy": {
+        "filter_1_on": 1.0,
+        "osc_1_unison_voices": 0.6666666666666666
+      },
+      "continuous": {
+        "env_1_attack": {
+          "active_cases": 21,
+          "mae": 0.2134792210846756
+        },
+        "env_1_decay": {
+          "active_cases": 21,
+          "mae": 0.255743641913016
+        },
+        "env_1_release": {
+          "active_cases": 21,
+          "mae": 0.29914039351710825
+        },
+        "env_1_sustain": {
+          "active_cases": 21,
+          "mae": 0.21143952655136547
+        },
+        "filter_1_cutoff": {
+          "active_cases": 10,
+          "mae": 0.12235856926840567
+        },
+        "filter_1_resonance": {
+          "active_cases": 10,
+          "mae": 0.29890337085395974
+        },
+        "osc_1_level": {
+          "active_cases": 21,
+          "mae": 0.19023598067328348
+        },
+        "osc_1_pan": {
+          "active_cases": 21,
+          "mae": 0.13745336599880564
+        },
+        "osc_1_unison_detune": {
+          "active_cases": 13,
+          "mae": 0.16932238696060364
+        }
+      }
+    },
+    "step_4000": {
+      "active_continuous_mae": 0.18820684170643184,
+      "categorical_accuracy": {
+        "filter_1_on": 1.0,
+        "osc_1_unison_voices": 0.6190476190476191
+      },
+      "continuous": {
+        "env_1_attack": {
+          "active_cases": 21,
+          "mae": 0.17663795849463662
+        },
+        "env_1_decay": {
+          "active_cases": 21,
+          "mae": 0.25314180231609434
+        },
+        "env_1_release": {
+          "active_cases": 21,
+          "mae": 0.33138445530277644
+        },
+        "env_1_sustain": {
+          "active_cases": 21,
+          "mae": 0.15171060271362943
+        },
+        "filter_1_cutoff": {
+          "active_cases": 10,
+          "mae": 0.07710566470526696
+        },
+        "filter_1_resonance": {
+          "active_cases": 10,
+          "mae": 0.32755032462572276
+        },
+        "osc_1_level": {
+          "active_cases": 21,
+          "mae": 0.13259149257369568
+        },
+        "osc_1_pan": {
+          "active_cases": 21,
+          "mae": 0.08808625380232782
+        },
+        "osc_1_unison_detune": {
+          "active_cases": 13,
+          "mae": 0.15951723605741538
+        }
+      }
+    }
+  },
+  "pool": {
+    "codec_id": "842fb3b3757e016c33efe296aa6ed355ac3a392e4c754035b4e3b41803a439bc",
+    "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+    "states": 256,
+    "states_by_split": {
+      "test": 30,
+      "train": 205,
+      "validation": 21
+    }
+  },
+  "run_id": "518c09e2c8b4dd0adc849c4d3c1f93c032adcfe407a54d5ee2466445e04b2b4d",
+  "scope": "single_view_per_state_narrow_pilot_validation_selection_only",
+  "selected_model": {
+    "bytes": 1585110,
+    "checkpoint_name": "step_4000",
+    "file_sha256": "aecfc85227450a2e55482e044168f755cccf9a6b31feef93d3bc8d0e5b53f558",
+    "path": "outputs/full-pilot-validation-20261009/selected-model.pt",
+    "schema_valid_predictions": 63,
+    "weights_match_selected_checkpoint": true
+  },
+  "torch": "2.12.1+xpu",
+  "trainable_parameters": 355806,
+  "training": [
+    {
+      "checkpoint_seconds_this_segment": 22.56695749773644,
+      "elapsed_seconds_this_segment": 487.6141188000329,
+      "feature_seconds_this_segment": 24.1581930979155,
+      "final_metrics": {
+        "categorical_accuracy": 0.9341463446617126,
+        "categorical_ce": 0.2436627894639969,
+        "continuous_mae": 0.17801395058631897,
+        "continuous_mse": 0.048555903136730194,
+        "loss": 0.2922186851501465
+      },
+      "fresh_accepted_this_segment": 205,
+      "model_state_sha256": "d710c27274b4371a2e15464f4195ea24bc9a2f0e2f8862fc26a21fa96408ab94",
+      "peak_process_tree_rss_bytes": 965414912,
+      "replay_bytes": 7925300,
+      "step": 1000,
+      "totals": {
+        "accepted": 205,
+        "errors": 0,
+        "feature_seconds": 24.1581930979155,
+        "maximum_gradient_norm": 32.9739990234375,
+        "optimizer_seconds": 15.017860303167254,
+        "rejected": 0,
+        "render_attempts": 205,
+        "reused_feature_draws": 31795,
+        "sampled_examples": 32000
+      }
+    },
+    {
+      "checkpoint_seconds_this_segment": 0.30076019978150725,
+      "elapsed_seconds_this_segment": 12.959224699996412,
+      "feature_seconds_this_segment": 0.0,
+      "final_metrics": {
+        "categorical_accuracy": 0.992682933807373,
+        "categorical_ce": 0.04222686588764191,
+        "continuous_mae": 0.14745929837226868,
+        "continuous_mse": 0.03507765009999275,
+        "loss": 0.07730451226234436
+      },
+      "fresh_accepted_this_segment": 0,
+      "model_state_sha256": "7158e1d8691096e5955c445d60f29b56f9221ec46f2204ce5b6732735e6293ea",
+      "peak_process_tree_rss_bytes": 597782528,
+      "replay_bytes": 7925300,
+      "step": 2000,
+      "totals": {
+        "accepted": 205,
+        "errors": 0,
+        "feature_seconds": 24.1581930979155,
+        "maximum_gradient_norm": 32.9739990234375,
+        "optimizer_seconds": 27.59708490106277,
+        "rejected": 0,
+        "render_attempts": 205,
+        "reused_feature_draws": 63795,
+        "sampled_examples": 64000
+      }
+    },
+    {
+      "checkpoint_seconds_this_segment": 0.5076253998558968,
+      "elapsed_seconds_this_segment": 28.526891499990597,
+      "feature_seconds_this_segment": 0.0,
+      "final_metrics": {
+        "categorical_accuracy": 1.0,
+        "categorical_ce": 0.00048070645425468683,
+        "continuous_mae": 0.09166141599416733,
+        "continuous_mse": 0.015727069228887558,
+        "loss": 0.016207775101065636
+      },
+      "fresh_accepted_this_segment": 0,
+      "model_state_sha256": "e6fbd0548b97072e6a824810bb5aab55d95fb7427b19e46686069100ce8ccc75",
+      "peak_process_tree_rss_bytes": 622276608,
+      "replay_bytes": 7925300,
+      "step": 4000,
+      "totals": {
+        "accepted": 205,
+        "errors": 0,
+        "feature_seconds": 24.1581930979155,
+        "maximum_gradient_norm": 32.9739990234375,
+        "optimizer_seconds": 55.46743270591833,
+        "rejected": 0,
+        "render_attempts": 205,
+        "reused_feature_draws": 127795,
+        "sampled_examples": 128000
+      }
+    }
+  ],
+  "training_elapsed_seconds": 529.1002350000199,
+  "training_reference_performance_counts": {
+    "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842": 51,
+    "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86": 52,
+    "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045": 51,
+    "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd": 51
+  },
+  "validation": {
+    "aggregates": {
+      "fixed_template": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 2.927469674320448,
+          "mean_rms_relative": 1.2921636454938423,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 3.274651199579239,
+          "mean_rms_relative": 1.3924794612186295,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "source_repeat": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.0,
+          "mean_rms_relative": 0.0,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.0,
+          "mean_rms_relative": 0.0,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "step_1000": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.1750304319910587,
+          "mean_rms_relative": 0.4149384202790402,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.180063033151248,
+          "mean_rms_relative": 0.30868454250906197,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "step_2000": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.1493819969750585,
+          "mean_rms_relative": 0.39065167999693323,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.1695704866969396,
+          "mean_rms_relative": 0.27725408177468036,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "step_4000": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.997204034870106,
+          "mean_rms_relative": 0.3118839485659486,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.0840394560779842,
+          "mean_rms_relative": 0.25334688861455235,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "train_retrieval": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.0762147254177503,
+          "mean_rms_relative": 0.12793441045851933,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.4729117272155625,
+          "mean_rms_relative": 0.26831889023915645,
+          "planned": 21,
+          "scored": 21
+        }
+      }
+    },
+    "audio_files_written": 0,
+    "completed_cases_reused": 13,
+    "elapsed_includes_uncommitted_interrupted_work": false,
+    "elapsed_seconds": 693.4681500005536,
+    "evaluation": "pilot_real_render_curve_v1",
+    "learning_curve": {
+      "bootstrap": {
+        "interval": "percentile_95",
+        "limit": "descriptive_validation_only_not_adjusted_for_checkpoint_selection",
+        "resamples": 2000,
+        "seed": 0,
+        "unit": "state"
+      },
+      "checkpoints": {
+        "step_1000": {
+          "against_train_retrieval": {
+            "ci95": [
+              -0.3432457298387789,
+              0.23349560083052706
+            ],
+            "mean_delta": -0.09701649374550297,
+            "paired": 21,
+            "planned": 21,
+            "ties": 0,
+            "wins": 16
+          },
+          "mean_reference_transfer_mrstft": 1.1775467325711535,
+          "paired_roles_scored": 21,
+          "planned": 21,
+          "selection_eligible": true
+        },
+        "step_2000": {
+          "against_train_retrieval": {
+            "ci95": [
+              -0.35241481170265215,
+              0.21714361660951106
+            ],
+            "mean_delta": -0.11508698448065731,
+            "paired": 21,
+            "planned": 21,
+            "ties": 0,
+            "wins": 16
+          },
+          "mean_reference_transfer_mrstft": 1.159476241835999,
+          "paired_roles_scored": 21,
+          "planned": 21,
+          "selection_eligible": true
+        },
+        "step_4000": {
+          "against_train_retrieval": {
+            "ci95": [
+              -0.4509335743063795,
+              0.035704365486486075
+            ],
+            "mean_delta": -0.23394148084261113,
+            "paired": 21,
+            "planned": 21,
+            "ties": 0,
+            "wins": 17
+          },
+          "mean_reference_transfer_mrstft": 1.0406217454740454,
+          "paired_roles_scored": 21,
+          "planned": 21,
+          "selection_eligible": true
+        }
+      },
+      "primary": "equal_weight_mean_of_reference_and_transfer_per_state_mrstft",
+      "selected": "step_4000",
+      "selection_policy": "lowest_complete_validation_mean_earliest_step_breaks_ties"
+    },
+    "metric": "mean_over_512_2048_8192_of_spectral_convergence_plus_log_magnitude_mae_stereo",
+    "metric_limit": "diagnostic_spectral_distance_not_a_calibrated_perceptual_score",
+    "planned_uninterrupted_render_attempts": 294,
+    "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+    "recovery": "reuse_committed_cases_rerender_entire_unfinished_case_with_all_checkpoints",
+    "render_wall_seconds": 703.7125781001523,
+    "renderer_identity": {
+      "backend_version": "0.8.3",
+      "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+      "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+      "settings": {
+        "buffer_size": 128,
+        "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+        "event_timing": "absolute ticks to half-even sample offsets",
+        "plugin_name": "Vital.vst3",
+        "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+        "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+      }
+    },
+    "renders_accepted": 301,
+    "renders_attempted": 301,
+    "renders_attempted_this_segment": 112,
+    "retrieval_distinct_train_states": 205,
+    "retrieval_examples": 205,
+    "retrieval_policy": "equal_branch_mean_squared_feature_distance_train_replay_only",
+    "retrieval_sha256": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+    "selection": "first_unique_validation_states_or_first_retained_training_views_no_best_of_k",
+    "split": "validation",
+    "test_split_evaluated": false,
+    "transfer": "same_patch_predicted_from_reference_audio_rendered_on_reserved_performance"
+  }
+}

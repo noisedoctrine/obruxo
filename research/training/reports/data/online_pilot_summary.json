@@ -1,0 +1,373 @@
+{
+  "benchmark": {
+    "accepted": 100,
+    "accepted_acknowledged": 100,
+    "accepted_clips_per_second": 0.47226632399969176,
+    "acknowledged": 100,
+    "audio_files_written": 0,
+    "benchmark": "native_renderer_and_cpu_spectral_consumer_v1",
+    "codec_id": "b44a06357b9a2202f8aaaae6b0f43b1749e5d42b2acb31af54095517e8fdf6c5",
+    "config": {
+      "max_retries": 0,
+      "prefetch_bytes": 33554432,
+      "prefetch_clips": 4,
+      "qa": {
+        "clipping_threshold": 1.0,
+        "silence_rms": 1e-06,
+        "tail_rms_warning": 0.001,
+        "tail_seconds": 0.25
+      },
+      "reject_audio_codes": [
+        "audio.clipping",
+        "audio.silence",
+        "audio.tail_truncation"
+      ],
+      "resume_audio": "regenerate_unacknowledged",
+      "stream": "isolated_online_render_v1",
+      "timeout_seconds": 30.0
+    },
+    "consumer_wait_fraction": 0.9675067498391204,
+    "consumer_wait_seconds": 204.86464959965087,
+    "contract_id": "75e64f048f3b2868fcb2bb704e2440650f9e4561f76bddbae44f2bb38f088983",
+    "distinct_states": 84,
+    "elapsed_seconds": 211.74493059993256,
+    "errors": 0,
+    "feature_seconds": 2.7343623993219808,
+    "job_latency_median_seconds": 2.0715199499973096,
+    "job_latency_p95_seconds": 2.626347854977939,
+    "numpy": "2.4.6",
+    "optimizer_steps": 0,
+    "peak_process_tree_rss_bytes": 402735104,
+    "peak_reserved_bytes": 1411200,
+    "peak_reserved_clips": 1,
+    "performance_role": "reference",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "pool_id": "218093714bdb46b421120e9c3be75b32ead11e7bb46e4ef62e096697af0cc74c",
+    "produced": 100,
+    "producer_wait_seconds": 0.0002520002890378237,
+    "python": "3.12.13",
+    "rejected": 0,
+    "renderer_factory": "NativeRendererFactory",
+    "requested": 100,
+    "resume_cursor": {
+      "audio_replay": "regenerate_unacknowledged_not_bit_exact",
+      "next_sequence_id": 100,
+      "stream_id": "3b41b2c9acfec7b0756f85cc64d156fb05335038bc66c4b8e87977125e962fee",
+      "version": 1
+    },
+    "rss_sampling_errors": 0,
+    "rss_scope": "sampled_every_50ms_sum_parent_and_children_not_unique_physical_memory",
+    "split": "train",
+    "split_manifest_id": "ceda5da4dca951e779b0c753e67977556e0d2af6b076df8e71a1695da8bd5fd0",
+    "stream_id": "3b41b2c9acfec7b0756f85cc64d156fb05335038bc66c4b8e87977125e962fee",
+    "version": 1
+  },
+  "codec_check": {
+    "accepted": 18,
+    "all_controls_equal_at_float32": true,
+    "audio_files_written": 0,
+    "cases": [
+      {
+        "categories": [
+          0,
+          0
+        ],
+        "controls_equal_at_float32": true,
+        "decoded_comparison": {
+          "log_spectral_rmse": 0.0,
+          "peak_absolute": 0.0,
+          "rms_relative": 0.0,
+          "tolerance": {
+            "log_spectral_rmse": 0.35,
+            "peak_absolute": 0.1,
+            "rms_relative": 0.01
+          },
+          "waveform_relative_rmse": 0.0,
+          "waveform_rmse": 0.0,
+          "within_tolerance": true
+        },
+        "decoded_state_id": "af93bbd87615b5f1672586e1b1ef646d8c02b6d7bd6a8434008b7a99bdf06e5d",
+        "source_repeat": {
+          "log_spectral_rmse": 0.0,
+          "peak_absolute": 0.0,
+          "rms_relative": 0.0,
+          "tolerance": {
+            "log_spectral_rmse": 0.35,
+            "peak_absolute": 0.1,
+            "rms_relative": 0.01
+          },
+          "waveform_relative_rmse": 0.0,
+          "waveform_rmse": 0.0,
+          "within_tolerance": true
+        },
+        "state_id": "af93bbd87615b5f1672586e1b1ef646d8c02b6d7bd6a8434008b7a99bdf06e5d"
+      },
+      {
+        "categories": [
+          0,
+          1
+        ],
+        "controls_equal_at_float32": true,
+        "decoded_comparison": {
+          "log_spectral_rmse": 0.0,
+          "peak_absolute": 0.0,
+          "rms_relative": 0.0,
+          "tolerance": {
+            "log_spectral_rmse": 0.35,
+            "peak_absolute": 0.1,
+            "rms_relative": 0.01
+          },
+          "waveform_relative_rmse": 0.0,
+          "waveform_rmse": 0.0,
+          "within_tolerance": true
+        },
+        "decoded_state_id": "e28b66b51cf3d33603a6d0fa134f24e0a42c8620d99956963de77de37b4069a6",
+        "source_repeat": {
+          "log_spectral_rmse": 0.0,
+          "peak_absolute": 0.0,
+          "rms_relative": 0.0,
+          "tolerance": {
+            "log_spectral_rmse": 0.35,
+            "peak_absolute": 0.1,
+            "rms_relative": 0.01
+          },
+          "waveform_relative_rmse": 0.0,
+          "waveform_rmse": 0.0,
+          "within_tolerance": true
+        },
+        "state_id": "e28b66b51cf3d33603a6d0fa134f24e0a42c8620d99956963de77de37b4069a6"
+      },
+      {
+        "categories": [
+          1,
+          0
+        ],
+        "controls_equal_at_float32": true,
+        "decoded_comparison": {
+          "log_spectral_rmse": 0.0,
+          "peak_absolute": 0.0,
+          "rms_relative": 0.0,
+          "tolerance": {
+            "log_spectral_rmse": 0.35,
+            "peak_absolute": 0.1,
+            "rms_relative": 0.01
+          },
+          "waveform_relative_rmse": 0.0,
+          "waveform_rmse": 0.0,
+          "within_tolerance": true
+        },
+        "decoded_state_id": "47006929e542cde7fd9c273076fa8d450553de9d65e1dcc45424bf291d6157cb",
+        "source_repeat": {
+          "log_spectral_rmse": 0.0,
+          "peak_absolute": 0.0,
+          "rms_relative": 0.0,
+          "tolerance": {
+            "log_spectral_rmse": 0.35,
+            "peak_absolute": 0.1,
+            "rms_relative": 0.01
+          },
+          "waveform_relative_rmse": 0.0,
+          "waveform_rmse": 0.0,
+          "within_tolerance": true
+        },
+        "state_id": "47006929e542cde7fd9c273076fa8d450553de9d65e1dcc45424bf291d6157cb"
+      },
+      {
+        "categories": [
+          1,
+          1
+        ],
+        "controls_equal_at_float32": true,
+        "decoded_comparison": {
+          "log_spectral_rmse": 0.0,
+          "peak_absolute": 0.0,
+          "rms_relative": 0.0,
+          "tolerance": {
+            "log_spectral_rmse": 0.35,
+            "peak_absolute": 0.1,
+            "rms_relative": 0.01
+          },
+          "waveform_relative_rmse": 0.0,
+          "waveform_rmse": 0.0,
+          "within_tolerance": true
+        },
+        "decoded_state_id": "05caa1f82cc1232e99c3e7edfd544a03355c3ffee048f7678f3a97639023a5d3",
+        "source_repeat": {
+          "log_spectral_rmse": 0.0,
+          "peak_absolute": 0.0,
+          "rms_relative": 0.0,
+          "tolerance": {
+            "log_spectral_rmse": 0.35,
+            "peak_absolute": 0.1,
+            "rms_relative": 0.01
+          },
+          "waveform_relative_rmse": 0.0,
+          "waveform_rmse": 0.0,
+          "within_tolerance": true
+        },
+        "state_id": "05caa1f82cc1232e99c3e7edfd544a03355c3ffee048f7678f3a97639023a5d3"
+      },
+      {
+        "categories": [
+          2,
+          0
+        ],
+        "controls_equal_at_float32": true,
+        "decoded_comparison": {
+          "log_spectral_rmse": 0.0,
+          "peak_absolute": 0.0,
+          "rms_relative": 0.0,
+          "tolerance": {
+            "log_spectral_rmse": 0.35,
+            "peak_absolute": 0.1,
+            "rms_relative": 0.01
+          },
+          "waveform_relative_rmse": 0.0,
+          "waveform_rmse": 0.0,
+          "within_tolerance": true
+        },
+        "decoded_state_id": "986bcdb07bfa2dceb2b6c389da049682c1feae55a1bdb035549d8b0b4a7da57a",
+        "source_repeat": {
+          "log_spectral_rmse": 0.0,
+          "peak_absolute": 0.0,
+          "rms_relative": 0.0,
+          "tolerance": {
+            "log_spectral_rmse": 0.35,
+            "peak_absolute": 0.1,
+            "rms_relative": 0.01
+          },
+          "waveform_relative_rmse": 0.0,
+          "waveform_rmse": 0.0,
+          "within_tolerance": true
+        },
+        "state_id": "986bcdb07bfa2dceb2b6c389da049682c1feae55a1bdb035549d8b0b4a7da57a"
+      },
+      {
+        "categories": [
+          2,
+          1
+        ],
+        "controls_equal_at_float32": true,
+        "decoded_comparison": {
+          "log_spectral_rmse": 0.0,
+          "peak_absolute": 0.0,
+          "rms_relative": 0.0,
+          "tolerance": {
+            "log_spectral_rmse": 0.35,
+            "peak_absolute": 0.1,
+            "rms_relative": 0.01
+          },
+          "waveform_relative_rmse": 0.0,
+          "waveform_rmse": 0.0,
+          "within_tolerance": true
+        },
+        "decoded_state_id": "946208ee1ad66e7dcef1d5f5b5a670bc28b45dc695ad789f94125e012de19b55",
+        "source_repeat": {
+          "log_spectral_rmse": 0.0,
+          "peak_absolute": 0.0,
+          "rms_relative": 0.0,
+          "tolerance": {
+            "log_spectral_rmse": 0.35,
+            "peak_absolute": 0.1,
+            "rms_relative": 0.01
+          },
+          "waveform_relative_rmse": 0.0,
+          "waveform_rmse": 0.0,
+          "within_tolerance": true
+        },
+        "state_id": "946208ee1ad66e7dcef1d5f5b5a670bc28b45dc695ad789f94125e012de19b55"
+      }
+    ],
+    "check": "pilot_codec_native_v1",
+    "codec_id": "b44a06357b9a2202f8aaaae6b0f43b1749e5d42b2acb31af54095517e8fdf6c5",
+    "covered_category_combinations": 6,
+    "decoded_within_reference_tolerance": 6,
+    "expected_category_combinations": 6,
+    "passed": true,
+    "pool_id": "218093714bdb46b421120e9c3be75b32ead11e7bb46e4ef62e096697af0cc74c",
+    "renderer_factory": "NativeRendererFactory",
+    "requested": 18,
+    "source_repeats_within_reference_tolerance": 6,
+    "version": 1
+  },
+  "measured_date": "2026-10-05",
+  "pilot": {
+    "audio_qa": "not_run",
+    "codec_id": "b44a06357b9a2202f8aaaae6b0f43b1749e5d42b2acb31af54095517e8fdf6c5",
+    "pool_id": "218093714bdb46b421120e9c3be75b32ead11e7bb46e4ef62e096697af0cc74c",
+    "states": 256,
+    "states_by_split": {
+      "test": 28,
+      "train": 206,
+      "validation": 22
+    }
+  },
+  "qualification_status": "superseded_native_patch_loading_bug",
+  "replacement_report": "first_trainer_summary.json",
+  "resume": {
+    "accepted": 4,
+    "accepted_acknowledged": 4,
+    "accepted_clips_per_second": 0.37277212043250235,
+    "acknowledged": 4,
+    "audio_files_written": 0,
+    "benchmark": "native_renderer_and_cpu_spectral_consumer_v1",
+    "codec_id": "b44a06357b9a2202f8aaaae6b0f43b1749e5d42b2acb31af54095517e8fdf6c5",
+    "config": {
+      "max_retries": 0,
+      "prefetch_bytes": 33554432,
+      "prefetch_clips": 4,
+      "qa": {
+        "clipping_threshold": 1.0,
+        "silence_rms": 1e-06,
+        "tail_rms_warning": 0.001,
+        "tail_seconds": 0.25
+      },
+      "reject_audio_codes": [
+        "audio.clipping",
+        "audio.silence",
+        "audio.tail_truncation"
+      ],
+      "resume_audio": "regenerate_unacknowledged",
+      "stream": "isolated_online_render_v1",
+      "timeout_seconds": 30.0
+    },
+    "consumer_wait_fraction": 0.9843046721727461,
+    "consumer_wait_seconds": 10.561998800025322,
+    "contract_id": "75e64f048f3b2868fcb2bb704e2440650f9e4561f76bddbae44f2bb38f088983",
+    "distinct_states": 4,
+    "elapsed_seconds": 10.730416200007312,
+    "errors": 0,
+    "feature_seconds": 0.06712399993557483,
+    "job_latency_median_seconds": 2.638974050001707,
+    "job_latency_p95_seconds": 2.937697804940399,
+    "numpy": "2.4.6",
+    "optimizer_steps": 0,
+    "peak_process_tree_rss_bytes": 393388032,
+    "peak_reserved_bytes": 1411200,
+    "peak_reserved_clips": 1,
+    "performance_role": "reference",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "pool_id": "218093714bdb46b421120e9c3be75b32ead11e7bb46e4ef62e096697af0cc74c",
+    "produced": 4,
+    "producer_wait_seconds": 2.4600070901215076e-05,
+    "python": "3.12.13",
+    "rejected": 0,
+    "renderer_factory": "NativeRendererFactory",
+    "requested": 4,
+    "resume_cursor": {
+      "audio_replay": "regenerate_unacknowledged_not_bit_exact",
+      "next_sequence_id": 104,
+      "stream_id": "3b41b2c9acfec7b0756f85cc64d156fb05335038bc66c4b8e87977125e962fee",
+      "version": 1
+    },
+    "rss_sampling_errors": 0,
+    "rss_scope": "sampled_every_50ms_sum_parent_and_children_not_unique_physical_memory",
+    "split": "train",
+    "split_manifest_id": "ceda5da4dca951e779b0c753e67977556e0d2af6b076df8e71a1695da8bd5fd0",
+    "stream_id": "3b41b2c9acfec7b0756f85cc64d156fb05335038bc66c4b8e87977125e962fee",
+    "version": 1
+  },
+  "resumed_recipe_ids_verified": true,
+  "superseded_reason": "Native Vital ignored the synthetic 99999.9.9 version and retained its default patch. Original QA and timing did not establish requested-state fidelity.",
+  "timezone": "Asia/Kuala_Lumpur"
+}

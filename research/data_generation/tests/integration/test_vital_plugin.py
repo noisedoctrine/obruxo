@@ -40,13 +40,17 @@ def test_two_note_sequence_renders_continuously_with_qa_and_repeat_tolerance(tmp
     first = renderer.render(request)
     intervening = VitalPreset.init()
     intervening.set_raw("osc_1_level", 0.1)
-    renderer.render(RenderRequest(preset=intervening, performance=performance, tail_seconds=0.25))
+    quiet = renderer.render(RenderRequest(preset=intervening, performance=performance, tail_seconds=0.25))
     second = renderer.render(request)
     expected = TempoMap.from_performance(performance).render_frame_count(960, 0.25, 44_100)
     assert first.audio.shape == (expected, 2)
     assert first.audio.dtype == np.float32
     assert np.isfinite(first.audio).all()
     assert first.qa["rms"] > first.qa["silence_threshold"]
+    assert quiet.qa["rms"] < first.qa["rms"] * 0.2
+    assert first.qa["native_state"]["scalar_lfo_route_readback_verified"]
+    assert first.qa["native_state"]["applied_version"] == "1.6.4"
+    assert "vital.native.version_bridge" in {item.code for item in first.diagnostics}
     assert not [item for item in first.diagnostics if item.severity.value == "error"]
     assert "vital.runtime.canonicalization" in {item.code for item in first.diagnostics}
     assert compare_audio(first.audio, second.audio)["within_tolerance"]

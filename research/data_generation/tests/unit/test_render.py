@@ -15,7 +15,10 @@ from obruxo_data.render import (
     write_requests,
 )
 from obruxo_data.render.qa import AudioQualityConfig, analyze_audio, audio_float32_sha256, compare_audio
-from obruxo_data.render.vita import VitalVst3StateTemplate, juce_memory_block_decode, juce_memory_block_encode, verify_loaded_scalars
+from obruxo_data.render.vita import (
+    VitalVst3StateTemplate, juce_memory_block_decode, juce_memory_block_encode, native_preset_document,
+    verify_loaded_controls, verify_loaded_scalars,
+)
 from obruxo_data.vital import VitalPreset
 
 
@@ -67,6 +70,29 @@ def test_vita_development_version_is_adapted_only_for_reviewed_plugin() -> None:
     unknown = VitalVst3StateTemplate(_template_state({"synth_version": "1.7.0", "settings": {}}))
     with pytest.raises(ValueError, match="reviewed"):
         unknown.build(preset.to_json())
+
+
+def test_native_preset_document_bridges_only_the_reviewed_version() -> None:
+    preset = VitalPreset.init()
+    document, diagnostics = native_preset_document(preset.to_json(), "1.6.4")
+    assert document["synth_version"] == "1.6.4"
+    assert all(table["version"] == "1.6.4" for table in document["settings"]["wavetables"])
+    assert [item.code for item in diagnostics] == ["vital.native.version_bridge"]
+    with pytest.raises(ValueError, match="reviewed Vital 1.6.4"):
+        native_preset_document(preset.to_json(), "1.7.0")
+    unknown = preset.to_dict()
+    unknown["synth_version"] = "1.7.0"
+    with pytest.raises(ValueError, match="pinned native"):
+        native_preset_document(json.dumps(unknown), "1.6.4")
+
+
+def test_native_readback_checks_lfo_and_modulation_routes() -> None:
+    expected = {"settings": {"osc_1_level": 0.3, "lfos": [], "modulations": []}}
+    assert verify_loaded_controls(expected, expected) == 1
+    for key in ("lfos", "modulations"):
+        loaded = {"settings": {**expected["settings"], key: [{}]}}
+        with pytest.raises(RuntimeError, match=f"requested {key}"):
+            verify_loaded_controls(expected, loaded)
 
 
 def test_render_request_accepts_preset_and_has_stable_identity() -> None:

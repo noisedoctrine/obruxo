@@ -1,0 +1,7 @@
+# Static contracts and tests only. Native rendering uses ../data_generation/environment.yml.
+mido==1.3.3
+numpy==2.4.6
+scipy==1.18.0
+PyYAML==6.0.3
+pytest==9.1.1
+ruff==0.12.2

@@ -1,0 +1,76 @@
+{
+  "experiment": "authored_cached_optimization_curve_v1",
+  "declared_on": "2026-10-11",
+  "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+  "feature_policy": "complete verified training feature prefix available before update one; fresh model, optimizer, RNG and usage counts",
+  "arms": {
+    "one": {
+      "seed_checkpoint": "outputs/full-pilot-step4000-20261009/checkpoint.pt",
+      "seed_checkpoint_sha256": "e66c50eab45fe3e3b3cff7b8baad6eaf688ed69ef3d60c442c6cedee89cfb723",
+      "examples": 205,
+      "reference_performances_per_state": 1
+    },
+    "two": {
+      "seed_checkpoint": "outputs/two-view-train-20261010/checkpoint.pt",
+      "seed_checkpoint_sha256": "07a5f637aaa3d98a4469fd7a046df0f5d58575fcb84b1328d090cb9548b3cee9",
+      "examples": 410,
+      "reference_performances_per_state": 2
+    }
+  },
+  "common_training": {
+    "device": "cpu",
+    "mode": "online",
+    "steps": 16000,
+    "seed": 0,
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "replay_capacity": 410,
+    "replay_mib": 32,
+    "sampling_policy": "state_round_robin",
+    "updates_per_render": 4,
+    "render_budget": 480,
+    "checkpoint_every": 4000,
+    "cpu_threads": 4,
+    "timeout_seconds": 30
+  },
+  "checkpoint_steps": [4000, 8000, 16000],
+  "training_checks": [
+    "no native training render or fresh feature extraction",
+    "identical initial model and frozen frontend weights across arms",
+    "unchanged retained features within each learning curve",
+    "one-view 4000-update weights reproduce the previous matched control",
+    "complete training-state reference-performance coverage and no held-out membership"
+  ],
+  "evaluation": {
+    "candidates_in_tie_order": ["incumbent", "one_4000", "two_4000", "one_8000", "two_8000", "one_16000", "two_16000"],
+    "incumbent_checkpoint": "outputs/two-view-train-20261010/checkpoint.pt",
+    "incumbent_checkpoint_sha256": "07a5f637aaa3d98a4469fd7a046df0f5d58575fcb84b1328d090cb9548b3cee9",
+    "validation_states": 21,
+    "recipes": "same fixed validation state/reference/transfer combinations as the two-view comparison",
+    "retrieval_checkpoint": "outputs/full-pilot-step4000-20261009/checkpoint.pt",
+    "retrieval_sha256": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+    "retrieval_examples": 205,
+    "maximum_uninterrupted_render_attempts": 462,
+    "primary": "equal-weight mean reference and transfer MR-STFT distance per state",
+    "selection": "lowest complete validation primary mean; declared input order breaks ties, preferring incumbent then fewer updates",
+    "planned_comparisons": [
+      "two minus one at each matched update count",
+      "8000 minus 4000 and 16000 minus 4000 within each arm",
+      "each new candidate minus incumbent",
+      "each candidate minus fixed train-only retrieval"
+    ],
+    "secondary": ["unison/filter categorical accuracy", "active-control and envelope MAE", "reference/transfer relative RMS error"],
+    "uncertainty": "paired state bootstrap, 2000 resamples, seed 0; descriptive validation intervals without selection or multiple-comparison adjustment",
+    "test_split_evaluated": false
+  },
+  "constraints": {
+    "additional_training_renders": 0,
+    "training_states": 205,
+    "native_evaluation_workers": 1,
+    "audio_archive": false,
+    "paid_compute": false,
+    "colab": false,
+    "no_architecture_loss_or_learning_rate_change": true,
+    "no_extension_or_early_selection_based_on_partial_validation": true
+  }
+}

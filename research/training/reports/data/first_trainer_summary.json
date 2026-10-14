@@ -1,0 +1,377 @@
+{
+  "artifact": {
+    "checkpoint_bytes": 5732669,
+    "model_bytes": 1585110,
+    "model_file_sha256": "80fa2b2093810df9f5fdf2ec5fedc6ede10162d5c81652eead50571b2acdae8c",
+    "model_path_relative_to_training": "outputs/tiny-train-v2-complete-20261005/model.pt"
+  },
+  "codec_check": {
+    "accepted": 18,
+    "all_controls_equal_at_float32": true,
+    "audio_files_written": 0,
+    "check": "pilot_codec_native_v1",
+    "codec_id": "842fb3b3757e016c33efe296aa6ed355ac3a392e4c754035b4e3b41803a439bc",
+    "covered_category_combinations": 6,
+    "decoded_within_reference_tolerance": 6,
+    "expected_category_combinations": 6,
+    "passed": true,
+    "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+    "renderer_factory": "NativeRendererFactory",
+    "requested": 18,
+    "source_repeats_within_reference_tolerance": 6,
+    "version": 1
+  },
+  "colab_qualified": false,
+  "contract_id": "f1eca221ab4ba871d8f415a28d81747a42629b2f2a74be566a967758afc32f12",
+  "date": "2026-10-05",
+  "interrupted_recovery": {
+    "equal": {
+      "batch_rng": true,
+      "cursor": true,
+      "model": true,
+      "optimizer": true,
+      "replay": true,
+      "rng": true
+    },
+    "failure_after_step": 605,
+    "final_step": 800,
+    "fresh_features_after_resume": 0.0,
+    "model_state_sha256": "4dbfa22831c618fbd9fda5223234de055a376a1704b1b856ce3b10aeb91118d8",
+    "native_audio_features_reused": true,
+    "new_native_audio_bit_equivalence_claimed": false,
+    "passed": true,
+    "restored_step": 600
+  },
+  "model_checksum_reverified_date": "2026-10-08",
+  "online_smoke": {
+    "accepted_clips_per_second": 0.4337669750416396,
+    "audio_files_written": 0,
+    "checkpoint_seconds_this_segment": 0.5632192001212388,
+    "complete": true,
+    "config": {
+      "batch_size": 4,
+      "checkpoint_every": 4,
+      "cpu_threads": 4,
+      "learning_rate": 0.003,
+      "mode": "online",
+      "render_budget": 32,
+      "replay_capacity": 8,
+      "replay_mib": 8,
+      "seed": 0,
+      "steps": 8
+    },
+    "cursor": {
+      "audio_replay": "regenerate_unacknowledged_not_bit_exact",
+      "next_sequence_id": 11,
+      "stream_id": "c5385d5ccbc29dc1ca084b00358e660906fa34a9436dc5c639e6c2da15f973fa",
+      "version": 1
+    },
+    "device": "cpu",
+    "elapsed_seconds_this_segment": 25.359238100005314,
+    "feature_seconds_this_segment": 0.9658078998327255,
+    "final_metrics": {
+      "categorical_accuracy": 0.5625,
+      "categorical_ce": 1.881838321685791,
+      "continuous_mae": 0.24013279378414154,
+      "continuous_mse": 0.07796060293912888,
+      "loss": 1.9597989320755005
+    },
+    "frontend": {
+      "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+      "device": "cpu",
+      "fft": 2048,
+      "frontend": "stereo_mel_and_frozen_basic_pitch_v1",
+      "hop": 441,
+      "input": "audio_only",
+      "log_scale": 10,
+      "maximum_audio_seconds": 16,
+      "normalization": "fixed_scaling_no_fitted_statistics",
+      "pitch_size": 3521,
+      "pitch_time_bins": 8,
+      "precision": "float32",
+      "sample_rate": 44100,
+      "timbre_shape": [
+        2,
+        96,
+        32
+      ]
+    },
+    "frozen_weights_and_buffers_unchanged": true,
+    "initial_metrics": {
+      "categorical_accuracy": 0.375,
+      "categorical_ce": 1.8085347414016724,
+      "continuous_mae": 0.226939857006073,
+      "continuous_mse": 0.06592853367328644,
+      "loss": 1.8744633197784424
+    },
+    "mode": "online",
+    "model_state_sha256": "3b890cab7744ce761e4ad8fc46769231274cbc9424ab3f490b59f1d3c79012e4",
+    "peak_process_tree_rss_bytes": 939732992,
+    "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+    "quality_claim": "supervised_bootstrap_only_real_render_validation_required",
+    "renderer_identity": {
+      "backend_version": "0.8.3",
+      "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+      "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+      "settings": {
+        "buffer_size": 128,
+        "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+        "event_timing": "absolute ticks to half-even sample offsets",
+        "plugin_name": "Vital.vst3",
+        "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+        "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+      }
+    },
+    "replay_bytes": 309280,
+    "replay_distinct_audio_buffers": 8,
+    "replay_distinct_states": 8,
+    "replay_examples": 8,
+    "rss_sampling_errors": 0,
+    "run_id": "9b23afa223b80dab3cba1868ae05e93640e97e3b436ed06e356eec2cac6828b8",
+    "step": 8,
+    "tiny_overfit_gate": false,
+    "torch": "2.12.1+xpu",
+    "totals": {
+      "accepted": 11,
+      "errors": 0,
+      "feature_seconds": 0.9658078998327255,
+      "maximum_gradient_norm": 6.25708532333374,
+      "optimizer_seconds": 0.15294169960543513,
+      "rejected": 0,
+      "render_attempts": 11,
+      "reused_feature_draws": 24,
+      "sampled_examples": 32
+    },
+    "trainable_parameters": 355806
+  },
+  "paid_compute_used": false,
+  "pool": {
+    "audio_qa": "not_run",
+    "codec_id": "842fb3b3757e016c33efe296aa6ed355ac3a392e4c754035b4e3b41803a439bc",
+    "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+    "states": 256,
+    "states_by_split": {
+      "test": 30,
+      "train": 205,
+      "validation": 21
+    }
+  },
+  "renderer_fix": {
+    "new_distinct_audio_buffers": 32,
+    "new_distinct_training_states": 30,
+    "old_distinct_audio_buffers": 4,
+    "old_native_qualification_superseded": true,
+    "old_training_views": 32,
+    "reason": "Vita synthetic version marker silently rejected by native Vital"
+  },
+  "report_completed_date": "2026-10-08",
+  "split_manifest_id": "d211268d8eba99482b36d75378122587d66d050950b597bf9af46316d1c0b9a5",
+  "status": "pipeline_proof_not_release_quality",
+  "tiny_overfit": {
+    "all_32_predictions_schema_valid": true,
+    "audio_files_written": 0,
+    "checkpoint_seconds_this_segment": 0.2729713001754135,
+    "complete": true,
+    "config": {
+      "batch_size": 16,
+      "checkpoint_every": 100,
+      "cpu_threads": 4,
+      "learning_rate": 0.003,
+      "mode": "overfit",
+      "render_budget": 512,
+      "replay_capacity": 32,
+      "replay_mib": 8,
+      "seed": 0,
+      "steps": 800
+    },
+    "cursor": {
+      "audio_replay": "regenerate_unacknowledged_not_bit_exact",
+      "next_sequence_id": 32,
+      "stream_id": "c5385d5ccbc29dc1ca084b00358e660906fa34a9436dc5c639e6c2da15f973fa",
+      "version": 1
+    },
+    "device": "cpu",
+    "elapsed_seconds_both_segments": 78.07601769990288,
+    "elapsed_seconds_this_segment": 3.272199499886483,
+    "feature_seconds_this_segment": 0.0,
+    "final_metrics": {
+      "categorical_accuracy": 1.0,
+      "categorical_ce": 0.00014365518291015178,
+      "continuous_mae": 0.024532565847039223,
+      "continuous_mse": 0.001041458803229034,
+      "loss": 0.0011851140297949314
+    },
+    "frontend": {
+      "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+      "device": "cpu",
+      "fft": 2048,
+      "frontend": "stereo_mel_and_frozen_basic_pitch_v1",
+      "hop": 441,
+      "input": "audio_only",
+      "log_scale": 10,
+      "maximum_audio_seconds": 16,
+      "normalization": "fixed_scaling_no_fitted_statistics",
+      "pitch_size": 3521,
+      "pitch_time_bins": 8,
+      "precision": "float32",
+      "sample_rate": 44100,
+      "timbre_shape": [
+        2,
+        96,
+        32
+      ]
+    },
+    "frozen_weights_and_buffers_unchanged": true,
+    "initial_metrics": {
+      "categorical_accuracy": 0.359375,
+      "categorical_ce": 1.792830228805542,
+      "continuous_mae": 0.24045716226100922,
+      "continuous_mse": 0.07901325076818466,
+      "loss": 1.8718434572219849
+    },
+    "mode": "overfit",
+    "model_state_sha256": "4dbfa22831c618fbd9fda5223234de055a376a1704b1b856ce3b10aeb91118d8",
+    "peak_process_tree_rss_bytes": 579325952,
+    "peak_process_tree_rss_bytes_both_segments": 898834432,
+    "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+    "quality_claim": "supervised_bootstrap_only_real_render_validation_required",
+    "renderer_identity": {
+      "backend_version": "0.8.3",
+      "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+      "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+      "settings": {
+        "buffer_size": 128,
+        "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+        "event_timing": "absolute ticks to half-even sample offsets",
+        "plugin_name": "Vital.vst3",
+        "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+        "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+      }
+    },
+    "replay_bytes": 1237120,
+    "replay_examples": 32,
+    "rss_sampling_errors": 0,
+    "run_id": "7b44b822e360dac4122fa2fcffdd4064c03207ecdc7f4f194c1a87ed86c8c066",
+    "step": 800,
+    "tiny_overfit_gate": true,
+    "torch": "2.12.1+xpu",
+    "totals": {
+      "accepted": 32,
+      "errors": 0,
+      "feature_seconds": 2.960602799896151,
+      "maximum_gradient_norm": 19.413036346435547,
+      "optimizer_seconds": 5.658511497545987,
+      "rejected": 0,
+      "render_attempts": 32,
+      "reused_feature_draws": 12768,
+      "sampled_examples": 12800
+    },
+    "trainable_parameters": 355806
+  },
+  "training_device": "cpu",
+  "validation": {
+    "aggregates": {
+      "fixed_template": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.5397584016124406,
+          "mean_rms_relative": 0.4622969813644886,
+          "planned": 4,
+          "scored": 4
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 2.012692096332709,
+          "mean_rms_relative": 0.733725406229496,
+          "planned": 4,
+          "scored": 4
+        }
+      },
+      "model": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.4982172201077144,
+          "mean_rms_relative": 0.30366358160972595,
+          "planned": 4,
+          "scored": 4
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.5184345816572506,
+          "mean_rms_relative": 0.2718038074672222,
+          "planned": 4,
+          "scored": 4
+        }
+      },
+      "source_repeat": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.0,
+          "mean_rms_relative": 0.0,
+          "planned": 4,
+          "scored": 4
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.0,
+          "mean_rms_relative": 0.0,
+          "planned": 4,
+          "scored": 4
+        }
+      },
+      "train_retrieval": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.3203795490165553,
+          "mean_rms_relative": 0.17055469821207225,
+          "planned": 4,
+          "scored": 4
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.5459729035695395,
+          "mean_rms_relative": 0.1669641025364399,
+          "planned": 4,
+          "scored": 4
+        }
+      }
+    },
+    "audio_files_written": 0,
+    "elapsed_seconds": 87.53940339991823,
+    "evaluation": "pilot_real_render_v1",
+    "metric": "mean_over_512_2048_8192_of_spectral_convergence_plus_log_magnitude_mae_stereo",
+    "metric_limit": "diagnostic_spectral_distance_not_a_calibrated_perceptual_score",
+    "model_state_sha256": "4dbfa22831c618fbd9fda5223234de055a376a1704b1b856ce3b10aeb91118d8",
+    "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+    "renderer_identity": {
+      "backend_version": "0.8.3",
+      "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+      "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+      "settings": {
+        "buffer_size": 128,
+        "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+        "event_timing": "absolute ticks to half-even sample offsets",
+        "plugin_name": "Vital.vst3",
+        "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+        "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+      }
+    },
+    "renders_accepted": 40,
+    "renders_attempted": 40,
+    "retrieval_distinct_train_states": 30,
+    "retrieval_examples": 32,
+    "retrieval_policy": "equal_branch_mean_squared_feature_distance_train_replay_only",
+    "selection": "first_unique_validation_states_or_first_retained_training_views_no_best_of_k",
+    "split": "validation",
+    "step": 800,
+    "test_split_evaluated": false,
+    "transfer": "same_patch_predicted_from_reference_audio_rendered_on_reserved_performance"
+  },
+  "verification": {
+    "native_integration_tests_passed": 3,
+    "non_native_tests_passed": 124,
+    "remote_ci_run": false,
+    "ruff_passed": true,
+    "tests_run_date": "2026-10-05"
+  }
+}

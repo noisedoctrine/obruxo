@@ -1,0 +1,345 @@
+{
+  "experiment": "authored_state_coverage_comparison_v1",
+  "declared_on": "2026-10-13",
+  "question": "Does one reference performance from 404 authored training states improve held-out real-render reconstruction over the matched 205-state one-performance learning curve?",
+  "scope": "single-seed validation comparison; no release-quality or final-test claim",
+  "pools": {
+    "evaluation_and_retrieval": {
+      "path": "research/training/outputs/authored-pilot-v2-20261005/pool.json",
+      "sha256": "7ec6258b6aa7c2f3832ab7950aef962abf7d9f5283914854fb4d97fc2493623f",
+      "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+      "train": 205,
+      "validation": 21,
+      "test_reserved": 30
+    },
+    "expanded_training": {
+      "path": "research/training/outputs/authored-expanded-20261013/pool.json",
+      "sha256": "ed05cf3db0dd1862671a525a2c6fac2f7d9497633848246b330a2b544ae02e87",
+      "pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+      "train": 404,
+      "validation": 44,
+      "test_reserved": 64,
+      "parent_expansion_verified": true
+    }
+  },
+  "common_model": {
+    "vocabulary": "same nine controls and two categories; same pool codec",
+    "architecture": "PilotInverse MODEL_SPEC unchanged",
+    "loss": "existing masked normalized-control MSE plus categorical cross-entropies",
+    "frontend": "frozen Basic Pitch plus existing AudioFeatures contract",
+    "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+    "initial_trainable_model_sha256": "91e6968ae5e73529ff43ce4f64c2927339573172b65a130dca89ee03ba2181b7",
+    "learning_rate": 0.001,
+    "precision": "float32",
+    "device": "cpu",
+    "seed": 0,
+    "initialization": "fresh PilotInverse initialization under seed 0; no weights or optimizer transferred",
+    "initial_trainable_model_sha256_verification": "verified with trainer order: set deterministic CPU settings, seed RNGs, instantiate frozen AudioFeatures, then PilotInverse"
+  },
+  "training": {
+    "expanded_arm": {
+      "pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+      "reference_performances_per_state": 1,
+      "replay_examples": 404,
+      "feature_bytes_estimate": 15618640,
+      "replay_mib": 32,
+      "mode": "overfit",
+      "sampling_policy": "state_round_robin",
+      "first_epoch_unique_state_reference_pairs": 404,
+      "features_available_before_update_one": true,
+      "feature_order": "first state_round_robin epoch order from the expanded pool sampler; keep renderer-accepted recipe order in replay",
+      "existing_205_training_states_rerendered": true
+    },
+    "common_contract": {
+      "steps": 16000,
+      "checkpoint_steps": [
+        4000,
+        8000,
+        16000
+      ],
+      "checkpoint_every": 4000,
+      "batch_size": 32,
+      "learning_rate": 0.001,
+      "seed": 0,
+      "cpu_threads": 4,
+      "precision": "float32",
+      "replay_capacity": 404,
+      "replay_mib": 32,
+      "sampling_policy": "state_round_robin",
+      "mode": "overfit",
+      "render_budget_attempts": 480,
+      "timeout_seconds": 30,
+      "updates_per_render": 1,
+      "fresh_examples": null,
+      "optimizer": "AdamW_weight_decay_0"
+    },
+    "resume_policy": "stop after 4000; resume unchanged total-step contract into distinct 8000 and 16000 output directories; do not extend budget based on partial validation",
+    "training_outputs": {
+      "expanded_4000": "outputs/state-coverage-expanded-4000-20261013",
+      "expanded_8000": "outputs/state-coverage-expanded-8000-20261013",
+      "expanded_16000": "outputs/state-coverage-expanded-16000-20261013"
+    },
+    "coverage_gate": {
+      "required_before_selection": true,
+      "exact_accepted_distinct_training_states": 404,
+      "reference_views_per_state": 1,
+      "rejected_attempts": 0,
+      "error_attempts": 0,
+      "holes": 0,
+      "heldout_or_transfer_recipes": 0,
+      "failure_policy": "record failed gate; do not replace states, increase render budget, or proceed to model selection"
+    },
+    "cached_control_provenance": {
+      "source_plan": "reports/data/cached_curve_plan.json",
+      "source_summary": "reports/data/cached_curve_summary.json",
+      "verified_training_check": "outputs/cached-curve-training-verification-20261011.json",
+      "weights_and_features_reused_without_rerender": true,
+      "initial_model_sha256": "91e6968ae5e73529ff43ce4f64c2927339573172b65a130dca89ee03ba2181b7",
+      "feature_replay_digest": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+      "ordering_limit": "205-state cached controls retain verified prior feature-prefix ordering; expanded replay uses new 404-state round-robin recipe order. All features are present before update one in each arm, but minibatch index-to-state mapping differs.",
+      "shared_state_audio_policy": "expanded training freshly renders its one reference performance for all 404 states, including the 205 parent training states; the cached one-view controls reuse the old 205 features/audio identities without rendering them again.",
+      "initial_checkpoint": {
+        "path": "outputs/cached-curve-one-step4000-20261011/checkpoint.previous.pt",
+        "sha256": "c11de96f76212cb62346a23c1a7ba8655e13746fa4bf7283e8dd0d300ab62db3",
+        "step": 0,
+        "model_state_sha256": "91e6968ae5e73529ff43ce4f64c2927339573172b65a130dca89ee03ba2181b7"
+      }
+    },
+    "post_warmup_shared_state_check": "Before model selection, pair retained records by state_id across expanded and cached-control checkpoints; report matching reference performance IDs, audio SHA-256 equality, feature tensor equality/digest when practical, and the resulting subset counts. These are expected independent native renders, so differences remain a declared cross-run limit."
+  },
+  "evaluation": {
+    "candidate_order_tie_break": [
+      "incumbent",
+      "one_4000",
+      "expanded_4000",
+      "one_8000",
+      "expanded_8000",
+      "one_16000",
+      "expanded_16000"
+    ],
+    "checkpoints": {
+      "incumbent": {
+        "path": "research/training/outputs/two-view-train-20261010/checkpoint.pt",
+        "sha256": "07a5f637aaa3d98a4469fd7a046df0f5d58575fcb84b1328d090cb9548b3cee9",
+        "step": 4000
+      },
+      "one_4000": {
+        "path": "research/training/outputs/cached-curve-one-step4000-20261011/checkpoint.pt",
+        "sha256": "0ee14fe9b2a7d46efb3fa40804c2d550f90d50bd5daa404a973a2261e7fe3aa5",
+        "model_state_sha256": "5137139cb63fcdd0756350a14c42ad1dce29b292c17c38656765e11010d106ef",
+        "step": 4000
+      },
+      "one_8000": {
+        "path": "research/training/outputs/cached-curve-one-step8000-20261011/checkpoint.pt",
+        "sha256": "8e55c351656e1b606f99ac0ae1df7444ef1f2e546357cba7d89db961df3862ca",
+        "model_state_sha256": "d00646e87780adba49b91f7b277eb1a841eb93834b499c53539b3a4d9bdebcac",
+        "step": 8000
+      },
+      "one_16000": {
+        "path": "research/training/outputs/cached-curve-one-step16000-20261011/checkpoint.pt",
+        "sha256": "b5df523b46f63bb48dea67b6b2b1247b32af15076fc5dd45e1c27df6ac8f95e8",
+        "model_state_sha256": "a64e509920bef6468bbc61031d015b9a4fbfd204d381782b5f4af08622398fca",
+        "step": 16000
+      },
+      "expanded_4000": {
+        "path": "research/training/outputs/state-coverage-expanded-4000-20261013/checkpoint.pt",
+        "training_pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+        "step": 4000
+      },
+      "expanded_8000": {
+        "path": "research/training/outputs/state-coverage-expanded-8000-20261013/checkpoint.pt",
+        "training_pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+        "step": 8000
+      },
+      "expanded_16000": {
+        "path": "research/training/outputs/state-coverage-expanded-16000-20261013/checkpoint.pt",
+        "training_pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+        "step": 16000
+      }
+    },
+    "evaluation_pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+    "checkpoint_pool_binding": "each expanded_* candidate binds to outputs/authored-expanded-20261013/pool.json; all other candidates bind to original 205-state pool",
+    "validation_count": 21,
+    "validation_cases": [
+      {
+        "recipe_id": "16122318e32ed0d52ecd48314cc44ebf0ea83c8688b1bd29368b99adc2ee04aa",
+        "state_id": "6b80fef15d547ae821b21171866c1046424dd3066a3bd27c979f3ebbce13c375",
+        "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+        "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+      },
+      {
+        "recipe_id": "17bfe5eca52aa61a95095b3cc12db0d927af8be8d15c651842d82374713a5ef1",
+        "state_id": "fb80c3992ccaa6e324253d2df5897aab3b99b9dd59fc8766de739a715b3fef48",
+        "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+        "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+      },
+      {
+        "recipe_id": "0d3a5ddb4d149570b6dfcdf64924fac42f369c5a81dc0e4c45e911ba88b3205a",
+        "state_id": "f2b021f8389b31a032303a8ab27a29578fc9747e3e594794e3a28e76b0dd8279",
+        "reference_performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+        "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+      },
+      {
+        "recipe_id": "3b65e548ae13f601d2c0789c3040066800af087b33c81945356cee5e096f4dad",
+        "state_id": "a1122703d92cfdecb797e19b569ba3348d598830653311377e33e32c6fe1985d",
+        "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+        "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+      },
+      {
+        "recipe_id": "413eb6cb456f825b8bfa0cc60132b1f44f0a5c71755679539332ef1514beda21",
+        "state_id": "a3ab25f778e3e04300ac5dca4ded2afdc948f23f753df40625a3ad76635594ec",
+        "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+        "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+      },
+      {
+        "recipe_id": "0c393d27f50e3db963fdfc02d102b522e432cd570abfae500f682be7d271e312",
+        "state_id": "cec6700f895b3028246ec1c552c2df2cbab2ed7fa29c6c6cf0d58aafb81e9873",
+        "reference_performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+        "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+      },
+      {
+        "recipe_id": "35c2ffe2ab50884c37ea1dc0fa76ff81c93f5e5051989837198640e3fc908df2",
+        "state_id": "03227a3623949baf7f30aeae68f338cc1dcad8c4d3a2eae48365c84c516bb389",
+        "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+        "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+      },
+      {
+        "recipe_id": "376ffa02ffad84c24b2d2b95c31d2bca0c713bcd4ceb186a9d9b42cb2ed94e6a",
+        "state_id": "7ab23cf98c8a1cdb42183f1d44d5961737d985fc167f9ce6e5284f1e32b35f2b",
+        "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+        "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+      },
+      {
+        "recipe_id": "d66e0ce7c4b50ef0f10a396592e005e266194f5291ee51fb93dc0a5f5be5b947",
+        "state_id": "9f1153c6ba2bb3372a03846d2966a69b8481b2304ba228ca9b0792b0d88d4f74",
+        "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+        "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+      },
+      {
+        "recipe_id": "8a0160c91d62301451b989c2f43e764c4f9308b793c168ebe9de4e478d99cd26",
+        "state_id": "c2f64e673a8cc51c56e260b04ee39c9e59a05dfff07f05e48ee8e6a8bbaeb298",
+        "reference_performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+        "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+      },
+      {
+        "recipe_id": "2d0000cc4857109e76ab72ba2f72be5ecb3159b8ca147662d20d102afa853489",
+        "state_id": "e7449e562a3c10e61fbba75f38119746d6372e60437d6f2881304af4765a395f",
+        "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+        "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+      },
+      {
+        "recipe_id": "ccd96626c2c6d582d43e64ac3e9b416f790ed16b2453e57c850b0eb90b863c80",
+        "state_id": "85e3cac6f5185b14b41b716834ff0b796eb656df9b122b7e57c73800b8f9b45e",
+        "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+        "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+      },
+      {
+        "recipe_id": "51b74fb3c260348e3da10be9a5f79d4e493f84254a43f42aad00dacfd9959dcd",
+        "state_id": "20bf67c35644e663d0cc79f4f8364a5a49cd60f9bea22685a43f2a83f48a5096",
+        "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+        "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+      },
+      {
+        "recipe_id": "8946a67417e6ce0104bda5b139e8460248b88b5305737bb71ac5cfb1a33510d6",
+        "state_id": "868b0a4c4dc90526bd336cd8453dd60fd5d790bc05e768f3e45909d588ac4681",
+        "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+        "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+      },
+      {
+        "recipe_id": "d837ab44f444b427874a1416747ba6704c979acbde99790b667853c263b9c5f6",
+        "state_id": "9908d309c791b13e91196778f15409456ddad5ae69e55944ff573648240eb50a",
+        "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+        "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+      },
+      {
+        "recipe_id": "fc3bedaec3466b69d8e338fab6cbebf4c4eb8e223bad97a143e102fd2c9dcec8",
+        "state_id": "4fb111682a20129ed42fe0251a82fd23fdcb1168344abe4951c0f98536b15339",
+        "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+        "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+      },
+      {
+        "recipe_id": "2d84ec797f05cb9f67e08ec4fa3208b301a990ffa9457a4aa0893f601883ab96",
+        "state_id": "9fcd25a332ad2d874f70065b1fe8c6d79619f858bb22d63447d7da3cfc836bc3",
+        "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+        "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+      },
+      {
+        "recipe_id": "f2b9dc79520806d32e6ecaae93358053347264233d33648af5db43359846ce93",
+        "state_id": "16489e4a31e3008ae347a1adc220b4c396c4db62250660a3b3bf5a95eb23e076",
+        "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+        "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+      },
+      {
+        "recipe_id": "55dd7a4ddcbae5c5547208a1ad2dc4693a508bb12b718633533c0dff538b9b99",
+        "state_id": "22b3cb59aa7d578f64e589a2ba07d23b4893e6fbc1a47d21a06fead7151e1299",
+        "reference_performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+        "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+      },
+      {
+        "recipe_id": "62209d4f79468ca374ca97fe73b67b6be35b5a6491338792912a82793f785ff3",
+        "state_id": "ce2a862a2ac2327a70fc73b3f9cce558114b761935f37998e3f71aa77b8fa3dd",
+        "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+        "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+      },
+      {
+        "recipe_id": "034b825581328c89ad83a7de2e59a186718d814a88ffa48152883e17ef5a3a4e",
+        "state_id": "5a90dfd94d0ab2cdab2402e77bbf393273c7075ecedc4adeeb1bfc38591bae59",
+        "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+        "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+      }
+    ],
+    "validation_case_source": "outputs/two-view-validation-20261010/summary.json; exact original 21 state/reference/transfer cases",
+    "retrieval_checkpoint": {
+      "path": "research/training/outputs/full-pilot-step4000-20261009/checkpoint.pt",
+      "sha256": "e66c50eab45fe3e3b3cff7b8baad6eaf688ed69ef3d60c442c6cedee89cfb723",
+      "feature_digest": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+      "examples": 205,
+      "distinct_training_states": 205
+    },
+    "max_uninterrupted_native_evaluation_render_attempts": 462,
+    "primary": "equal-weight mean of reference and transfer MR-STFT per validation state; all 21 states must be scorable in both roles; lowest mean wins; candidate order breaks ties",
+    "comparisons": [
+      "expanded minus one at matched 4000, 8000, 16000 update counts",
+      "8000 and 16000 minus 4000 within expanded arm",
+      "each expanded and cached candidate minus incumbent",
+      "all candidates minus fixed 205-record retrieval"
+    ],
+    "secondary": [
+      "active-control and envelope MAE",
+      "unison and filter categorical accuracy",
+      "reference and transfer relative RMS error"
+    ],
+    "uncertainty": "paired state bootstrap, 2000 resamples, seed 0; descriptive only, no adjustment for model selection or multiple comparisons",
+    "selected_export": "outputs/state-coverage-validation-20261013/selected-model.pt",
+    "test_split_evaluated": false
+  },
+  "limits": [
+    "one random seed",
+    "205 cached controls use verified retained feature ordering; expanded records use sampler round-robin order",
+    "all 21 validation states and their performances are independently re-rendered in this comparison; native rendering may vary numerically within declared renderer contract",
+    "state coverage changes pool population and minibatch membership simultaneously; conclusion is scoped to this protocol",
+    "no final-test access, no paid compute, no audio archive"
+  ],
+  "renderer": {
+    "plugin": "C:/Program Files/Common Files/VST3/Vital.vst3",
+    "plugin_sha256": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+    "backend": "DawDreamer 0.8.3",
+    "timeout_seconds": 30,
+    "workers": 1
+  },
+  "runtime_source_sha256": {
+    "obruxo_training/cli.py": "e70ca35a3c5c6621de6a546178e7a32be45dc47ab26de8196c9f970c6a1c8b3e",
+    "obruxo_training/codec.py": "a9e0095d0f45f80d25c1f30b0bc630b6ab93a41a4a62601d116db36d94435264",
+    "obruxo_training/evaluate.py": "5d6d573736b9c3b62f35f33240bf1ca6481a0d8c2a5ee8c7630222ce1a93bf2a",
+    "obruxo_training/features.py": "83ef8178442dc467b7985c67915a136650bc83e0248237f8bb12bdd452fae951",
+    "obruxo_training/model.py": "ee5cb2c6fcdc04e1ea327db3aa8cc08184dc0a4ee3a2bf2a481ceff227e1c4cb",
+    "obruxo_training/pilot.py": "c6e694fd99502a307044073d42cea19444a7792f2bbe34ce5b2c202c71346838",
+    "obruxo_training/stream.py": "9e2e89bc954f2d50f88d6af08a6727bd286339eed6550c77e6cbb55f43a7dbc4",
+    "obruxo_training/trainer.py": "2542db8bc08bcc03143a5669f8c7d23cb1f34fd747ee25eb55dcf7e75c0e4fbe"
+  },
+  "plan_hashes": {
+    "cached_curve_plan_sha256": "063700b2b2f885d56c73d7551726c52ab1deeca1c014ab0d6f762aa1fc670238",
+    "cached_curve_summary_sha256": "df937b08d7986a97ca74b2e04fb0c040d7531de08c5ec086ff6317528f1c148d",
+    "previous_comparison_summary_sha256": "2da91ecf3f53cd910d40af6f1971f1bbf709e5e81af7d074c058eaf19e35888f"
+  }
+}
