@@ -1,0 +1,418 @@
+"""Bounded online/replay bootstrap training with checkpoints at optimizer boundaries."""
+
+from __future__ import annotations
+
+from contextlib import ExitStack
+from dataclasses import asdict, dataclass, fields
+import json
+import math
+import os
+from pathlib import Path
+import random
+import shutil
+from time import perf_counter
+
+import numpy as np
+import torch
+
+from obruxo_data.hashing import canonical_sha256, sha256_bytes
+
+from .audit import write_json
+from .benchmark import MemoryMonitor
+from .codec import PilotCodec, PilotTarget
+from .features import AudioFeatures, tensor_digest, validate_features
+from .model import MODEL_SPEC, PilotInverse, batch_features, loss_terms, predicted_targets
+from .pilot import PilotPool, PilotSampler
+from .stream import OnlineRenderStream, StreamConfig
+
+
+@dataclass(frozen=True)
+class TrainConfig:
+    mode: str = "overfit"
+    steps: int = 400
+    replay_capacity: int = 32
+    replay_mib: int = 8
+    batch_size: int = 16
+    learning_rate: float = 0.003
+    seed: int = 0
+    learning_seed_override: int | None = None
+    checkpoint_every: int = 50
+    render_budget: int = 512
+    cpu_threads: int = 4
+    sampling_policy: str = "pairs"
+    updates_per_render: int = 1
+    fresh_examples: int | None = None
+
+    def __post_init__(self):
+        positive = (self.steps, self.replay_capacity, self.replay_mib, self.batch_size,
+                    self.checkpoint_every, self.render_budget, self.cpu_threads, self.updates_per_render)
+        if any(type(value) is not int or value <= 0 for value in positive) or type(self.seed) is not int:
+            raise ValueError("training counts must be positive integers and seed an integer")
+        if self.learning_seed_override is not None and type(self.learning_seed_override) is not int:
+            raise ValueError("learning_seed_override must be an integer or None")
+        if self.mode not in {"overfit", "online"} or self.replay_capacity > 512 or self.replay_mib > 256:
+            raise ValueError("pilot mode must be overfit/online with replay at most 512 examples and 256 MiB")
+        if self.batch_size > self.replay_capacity or self.render_budget < self.replay_capacity:
+            raise ValueError("batch must fit replay and render budget must cover initial replay")
+        if not math.isfinite(self.learning_rate) or self.learning_rate <= 0:
+            raise ValueError("learning rate must be positive and finite")
+        if self.sampling_policy not in {"pairs", "state_round_robin"}:
+            raise ValueError("unknown pilot sampling policy")
+        if self.fresh_examples is not None and (type(self.fresh_examples) is not int
+                                                or not self.batch_size <= self.fresh_examples <= self.render_budget):
+            raise ValueError("fresh_examples must cover the warmup and fit the render-attempt budget")
+        if self.mode != "online" and (self.updates_per_render != 1 or self.fresh_examples is not None):
+            raise ValueError("bounded refresh settings apply to online mode only")
+        if self.fresh_examples is not None and self.steps < 1 + (self.fresh_examples - self.batch_size) * self.updates_per_render:
+            raise ValueError("optimizer step budget cannot reach the requested fresh-example target")
+
+
+def atomic_torch_save(path: Path, value: dict) -> None:
+    temporary = path.with_suffix(path.suffix + ".partial")
+    try:
+        with temporary.open("wb") as handle:
+            torch.save(value, handle)
+            handle.flush()
+            os.fsync(handle.fileno())
+        # Verify a weights-only round trip before promoting a recovery point.
+        torch.load(temporary, map_location="cpu", weights_only=True)
+        if path.exists():
+            previous = path.with_name(path.stem + ".previous.pt")
+            previous_tmp = previous.with_suffix(".partial")
+            shutil.copyfile(path, previous_tmp)
+            os.replace(previous_tmp, previous)
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def capture_rng(device: str) -> dict:
+    numpy_state = np.random.get_state()
+    result = {"python": random.getstate(), "numpy": [numpy_state[0], numpy_state[1].tolist(), *numpy_state[2:]],
+              "torch": torch.get_rng_state(), "device": device, "accelerator": None}
+    kind = torch.device(device).type
+    if kind in {"cuda", "xpu"}:
+        result["accelerator"] = getattr(torch, kind).get_rng_state(device).cpu()
+    return result
+
+
+def restore_rng(value: dict, device: str) -> None:
+    random.setstate(value["python"])
+    name, keys, position, gaussian, cached = value["numpy"]
+    np.random.set_state((name, np.array(keys, dtype=np.uint32), position, gaussian, cached))
+    torch.set_rng_state(value["torch"])
+    kind = torch.device(device).type
+    if device == value["device"] and value["accelerator"] is not None:
+        getattr(torch, kind).set_rng_state(value["accelerator"], device)
+
+
+def replay_bytes(items: list[dict]) -> int:
+    return sum(tensor.numel() * tensor.element_size() for item in items for tensor in item["features"].values())
+
+
+def validate_replay(items: list[dict], sampler: PilotSampler, cursor: dict, config: TrainConfig) -> None:
+    if len(items) > config.replay_capacity or replay_bytes(items) > config.replay_mib * 1024 * 1024:
+        raise ValueError("saved replay exceeds its budget")
+    sequences = [item["sequence_id"] for item in items]
+    if sequences != sorted(set(sequences)) or any(not 0 <= value < cursor["next_sequence_id"] for value in sequences):
+        raise ValueError("saved replay and acknowledged cursor disagree")
+    targets = {entry.state_id: entry.target.to_dict() for entry in sampler.pool.entries}
+    for item in items:
+        recipe = sampler.recipe_at(item["sequence_id"])
+        if recipe.split != "train" or recipe.performance_role != "reference":
+            raise ValueError("replay contains held-out data")
+        if item["recipe_id"] != recipe.recipe_id or item["state_id"] != recipe.state_id or item["target"] != targets[recipe.state_id]:
+            raise ValueError("saved replay does not match its training recipe")
+        validate_features(item["features"])
+
+
+@torch.no_grad()
+def replay_metrics(model, items, codec, device) -> dict:
+    model.eval()
+    prediction = model(batch_features(items, device))
+    targets = [PilotTarget.from_dict(item["target"]) for item in items]
+    return {name: float(value) for name, value in loss_terms(prediction, targets, codec).items()}
+
+
+def _run_contract(pool, sampler, frontend, config, stream_config, replay_seed=None) -> dict:
+    training = asdict(config)
+    # Preserve the existing v1 contract for the unchanged legacy schedule.
+    for name, default in (("sampling_policy", "pairs"), ("updates_per_render", 1), ("fresh_examples", None)):
+        if training[name] == default:
+            del training[name]
+    if training["learning_seed_override"] is None:
+        del training["learning_seed_override"]
+    contract = {"trainer": "pilot_supervised_bootstrap_v1", "pool_id": pool.pool_id,
+            "contract": pool.codec.contract.to_dict(), "codec": pool.codec.to_dict(), "sampler_id": sampler.sampler_id,
+            "model": MODEL_SPEC, "frontend": frontend.describe(), "training": training,
+            "stream": stream_config.to_dict(), "optimizer": "AdamW_weight_decay_0", "precision": "float32",
+            "scheduler": None, "scaler": None,
+            "replay_policy": "bounded_refresh_then_replay_v1" if config.fresh_examples is not None or config.updates_per_render != 1
+                             else "fixed_overfit_or_fifo_online_v1"}
+    if replay_seed is not None:
+        contract["replay_seed"] = replay_seed
+    return contract
+
+
+def load_replay_seed(path: Path, pool, sampler, frontend, config, stream_config) -> tuple:
+    raw = path.read_bytes()
+    source = torch.load(path, map_location="cpu", weights_only=True)
+    if source.get("format") != "obruxo_pilot_training_v1" or source["step"] < 1:
+        raise ValueError("feature seeding needs a trained pilot checkpoint")
+    contract = source["run_contract"]
+    source_config = TrainConfig(**contract["training"])
+    source_stream = StreamConfig(**{field.name: contract["stream"][field.name] for field in fields(StreamConfig)})
+    expected = _run_contract(pool, sampler, frontend, source_config, source_stream, contract.get("replay_seed"))
+    if contract != expected or tensor_digest(source["basic_pitch"]) != frontend.frozen_digest:
+        raise ValueError("feature seed has incompatible pool, sampler or frozen frontend contracts")
+    replay, cursor = source["replay"], source["cursor"]
+    validate_replay(replay, sampler, cursor, source_config)
+    validate_replay(replay, sampler, cursor, config)
+    OnlineRenderStream(sampler, 1, config=stream_config, resume=cursor)
+    if not replay or [item["sequence_id"] for item in replay] != list(range(cursor["next_sequence_id"])):
+        raise ValueError("feature seed must retain a complete accepted recipe prefix")
+    if config.fresh_examples is not None and len(replay) > config.fresh_examples:
+        raise ValueError("feature seed exceeds the accepted-example target")
+    if cursor["next_sequence_id"] > config.render_budget or not source["renderer_identity"]:
+        raise ValueError("feature seed exceeds the recipe budget or has no renderer provenance")
+    descriptor = {"policy": "features_only_fresh_model_optimizer_rng_v1", "checkpoint_sha256": sha256_bytes(raw),
+                  "source_run_id": canonical_sha256(contract), "examples": len(replay),
+                  "acknowledged_recipes": cursor["next_sequence_id"]}
+    return source, descriptor
+
+
+def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = None, device: str = "cpu",
+                stream_config: StreamConfig | None = None, renderer_factory=None, resume: Path | None = None,
+                stop_after: int | None = None, progress=None, after_step=None, seed_replay: Path | None = None) -> dict:
+    """Train with fresh renders inside the loop. after_step supports interruption testing."""
+    config, stream_config = config or TrainConfig(), stream_config or StreamConfig(prefetch_clips=1)
+    if resume is not None and seed_replay is not None:
+        raise ValueError("resume embeds its replay seed; do not supply seed_replay again")
+    if torch.device(device).type not in {"cpu", "cuda", "xpu"}:
+        raise ValueError("pilot supports CPU, CUDA or XPU explicitly; no automatic fallback")
+    learning_seed = config.seed if config.learning_seed_override is None else config.learning_seed_override
+    torch.set_num_threads(config.cpu_threads)
+    torch.use_deterministic_algorithms(True)
+    random.seed(learning_seed)
+    np.random.seed(learning_seed % 2**32)
+    torch.manual_seed(learning_seed)
+    saved = torch.load(resume, map_location="cpu", weights_only=True) if resume else None
+    frontend = AudioFeatures(saved["basic_pitch"] if saved else None)
+    sampler = PilotSampler(pool, seed=config.seed, policy=config.sampling_policy)
+    source, replay_seed = None, saved["run_contract"].get("replay_seed") if saved else None
+    if seed_replay is not None:
+        source, replay_seed = load_replay_seed(seed_replay, pool, sampler, frontend, config, stream_config)
+    contract = _run_contract(pool, sampler, frontend, config, stream_config, replay_seed)
+    if saved and (saved.get("format") != "obruxo_pilot_training_v1" or saved["run_contract"] != contract):
+        raise ValueError("checkpoint training contract changed; start an explicit new run")
+    model = PilotInverse().to(device)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate, weight_decay=0)
+    generator = torch.Generator().manual_seed(learning_seed)
+    replay, step, initial, render_ready, renderer_identity = [], 0, None, False, None
+    totals = {"render_attempts": 0, "accepted": 0, "rejected": 0, "errors": 0, "feature_seconds": 0.0,
+              "optimizer_seconds": 0.0, "sampled_examples": 0, "reused_feature_draws": 0, "maximum_gradient_norm": 0.0}
+    cursor = OnlineRenderStream(sampler, 1, config=stream_config).state_dict()
+    seeded_recipes = replay_seed["acknowledged_recipes"] if replay_seed else 0
+    if source is not None:
+        replay = [{**item, "uses": 0} for item in source["replay"]]
+        cursor, renderer_identity = source["cursor"], source["renderer_identity"]
+        totals["accepted"] = len(replay)
+    if saved:
+        model.load_state_dict(saved["model"], strict=True)
+        optimizer.load_state_dict(saved["optimizer"])
+        replay, step, initial, totals, cursor = (saved[key] for key in ("replay", "step", "initial_metrics", "totals", "cursor"))
+        render_ready, renderer_identity = saved["render_ready"], saved["renderer_identity"]
+        if not 0 <= step <= config.steps or totals["render_attempts"] + seeded_recipes != cursor["next_sequence_id"]:
+            raise ValueError("checkpoint step/cursor/counters disagree")
+        OnlineRenderStream(sampler, 1, config=stream_config, resume=cursor)
+        validate_replay(replay, sampler, cursor, config)
+        generator.set_state(saved["batch_rng"])
+        restore_rng(saved["rng"], device)
+    limit = config.steps if stop_after is None else stop_after
+    if type(limit) is not int or not step < limit <= config.steps:
+        raise ValueError("stop_after must follow the saved step and not exceed total steps")
+    output.mkdir(parents=True, exist_ok=False)
+    started, checkpoint_seconds, feature_seconds_start = perf_counter(), 0.0, totals["feature_seconds"]
+    accepted_start = totals["accepted"]
+    monitor = MemoryMonitor()
+    monitor.start()
+    write_json(output / "status.json", {"complete": False, "stage": "training"})
+
+    def checkpoint():
+        nonlocal checkpoint_seconds
+        tick = perf_counter()
+        frontend.require_frozen()
+        value = {"format": "obruxo_pilot_training_v1", "run_contract": contract, "step": step,
+                 "model": model.state_dict(), "optimizer": optimizer.state_dict(), "scheduler": None, "scaler": None,
+                 "rng": capture_rng(device), "batch_rng": generator.get_state(), "cursor": cursor,
+                 "replay": replay, "basic_pitch": frontend.basic_pitch.state_dict(), "initial_metrics": initial,
+                 "render_ready": render_ready, "renderer_identity": renderer_identity,
+                 "totals": totals, "runtime": {"torch": str(torch.__version__), "device": device},
+                 "recovery": "exact_retained_features_same_runtime_new_native_audio_recipe_equivalence_only"}
+        atomic_torch_save(output / "checkpoint.pt", value)
+        checkpoint_seconds += perf_counter() - tick
+
+    try:
+        checkpoint()
+        with ExitStack() as stack:
+            stream = None
+
+            def ingest():
+                nonlocal cursor, stream, render_ready, renderer_identity
+                if stream is None:
+                    remaining = config.render_budget - cursor["next_sequence_id"]
+                    if remaining <= 0:
+                        raise RuntimeError("fresh-render budget exhausted")
+                    stream = stack.enter_context(OnlineRenderStream(sampler, remaining, config=stream_config,
+                                                 renderer_factory=renderer_factory, resume=cursor))
+                for outcome in stream:
+                    totals["render_attempts"] += 1
+                    status = outcome.metadata["status"]
+                    totals[{"accepted": "accepted", "rejected": "rejected", "error": "errors"}[status]] += 1
+                    if outcome.audio is not None:
+                        identity = {key: value for key, value in outcome.metadata["provenance"].items() if key != "request_id"}
+                        if renderer_identity is not None and identity != renderer_identity:
+                            raise ValueError("renderer provenance changed during training or recovery")
+                        renderer_identity = identity
+                        tick = perf_counter()
+                        features = frontend(outcome.audio)
+                        totals["feature_seconds"] += perf_counter() - tick
+                        recipe = outcome.recipe
+                        target = next(entry.target for entry in pool.entries if entry.state_id == recipe.state_id)
+                        item = {"features": features, "target": target.to_dict(), "sequence_id": recipe.sequence_id,
+                                "state_id": recipe.state_id, "recipe_id": recipe.recipe_id,
+                                "audio_sha256": outcome.metadata["qa"]["audio_float32_sha256"], "uses": 0}
+                        candidate = [*replay, item][-config.replay_capacity:]
+                        if replay_bytes(candidate) > config.replay_mib * 1024 * 1024:
+                            raise ValueError("feature replay exceeds its byte budget")
+                        replay[:] = candidate
+                        render_ready = True
+                    # Persist diagnostics before the cursor; a failed feature extraction is never acknowledged.
+                    with (output / "renders.jsonl").open("a", encoding="utf-8") as handle:
+                        handle.write(json.dumps({"sequence_id": outcome.recipe.sequence_id,
+                                                 "recipe_id": outcome.recipe.recipe_id, **outcome.metadata}) + "\n")
+                        handle.flush()
+                        os.fsync(handle.fileno())
+                    stream.acknowledge(outcome.recipe.sequence_id)
+                    cursor = stream.state_dict()
+                    checkpoint()
+                    if progress:
+                        progress({"stage": "render", "sequence_id": outcome.recipe.sequence_id, "status": status,
+                                  "replay_examples": len(replay), "step": step})
+                    if outcome.audio is not None:
+                        return
+                raise RuntimeError("fresh-render budget exhausted before the next usable example")
+
+            warmup = config.replay_capacity if config.mode == "overfit" else config.batch_size
+            while len(replay) < warmup:
+                ingest()
+            if config.mode == "overfit" and stream is not None:
+                stream.close()
+            if initial is None:
+                initial = replay_metrics(model, replay, pool.codec, device)
+                checkpoint()
+            while step < limit:
+                refresh_due = config.mode == "online" and step > 0 and step % config.updates_per_render == 0
+                refresh_allowed = config.fresh_examples is None or totals["accepted"] < config.fresh_examples
+                if refresh_due and refresh_allowed and not render_ready:
+                    ingest()
+                if stream is not None and config.fresh_examples is not None and totals["accepted"] >= config.fresh_examples:
+                    stream.close()
+                    stream = None
+                tick = perf_counter()
+                indices = torch.randperm(len(replay), generator=generator)[:config.batch_size].tolist()
+                items = [replay[index] for index in indices]
+                model.train()
+                optimizer.zero_grad(set_to_none=True)
+                terms = loss_terms(model(batch_features(items, device)),
+                                   [PilotTarget.from_dict(item["target"]) for item in items], pool.codec)
+                if not torch.isfinite(terms["loss"]):
+                    raise RuntimeError("nonfinite training loss")
+                terms["loss"].backward()
+                if any(parameter.grad is None for parameter in model.parameters()):
+                    raise RuntimeError("a trainable parameter is disconnected from the loss")
+                norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 5, error_if_nonfinite=True)
+                optimizer.step()
+                # Force the asynchronous accelerator boundary before committing a consumed optimizer step.
+                values = {name: float(value.detach()) for name, value in terms.items()}
+                if any(not torch.isfinite(parameter).all() for parameter in model.parameters()):
+                    raise RuntimeError("nonfinite model weights after update")
+                totals["maximum_gradient_norm"] = max(totals["maximum_gradient_norm"], float(norm))
+                totals["optimizer_seconds"] += perf_counter() - tick
+                totals["sampled_examples"] += len(items)
+                for item in items:
+                    totals["reused_feature_draws"] += item["uses"] > 0
+                    item["uses"] += 1
+                step += 1
+                render_ready = False
+                if step % config.checkpoint_every == 0 or step == limit:
+                    checkpoint()
+                    if progress:
+                        progress({"stage": "optimizer", "step": step, **values})
+                if after_step:
+                    after_step(step)
+        final = replay_metrics(model, replay, pool.codec, device)
+        frontend.require_frozen()
+        complete = step == config.steps
+        if complete:
+            export_model(output / "model.pt", model, frontend, pool.codec, pool.pool_id)
+        summary = {"run_id": canonical_sha256(contract), "mode": config.mode, "complete": complete, "step": step,
+                   "device": device, "torch": str(torch.__version__), "config": asdict(config), "totals": totals,
+                   "replay_examples": len(replay), "replay_bytes": replay_bytes(replay), "initial_metrics": initial,
+                   "replay_distinct_states": len({item["state_id"] for item in replay}),
+                   "replay_distinct_audio_buffers": len({item["audio_sha256"] for item in replay}),
+                   "final_metrics": final, "frozen_weights_and_buffers_unchanged": True,
+                   "trainable_parameters": sum(parameter.numel() for parameter in model.parameters()),
+                   "model_state_sha256": tensor_digest(model.state_dict()), "frontend": frontend.describe(),
+                   "elapsed_seconds_this_segment": perf_counter() - started, "checkpoint_seconds_this_segment": checkpoint_seconds,
+                   "feature_seconds_this_segment": totals["feature_seconds"] - feature_seconds_start,
+                   "fresh_accepted_this_segment": totals["accepted"] - accepted_start,
+                   "seeded_feature_examples": replay_seed["examples"] if replay_seed else 0,
+                   "replay_seed": replay_seed,
+                   "fresh_example_target_reached": config.fresh_examples is None or totals["accepted"] >= config.fresh_examples,
+                   "peak_process_tree_rss_bytes": monitor.peak_bytes, "rss_sampling_errors": monitor.errors,
+                   "audio_files_written": 0, "cursor": cursor, "pool_id": pool.pool_id,
+                   "renderer_identity": renderer_identity,
+                   "tiny_overfit_gate": config.mode == "overfit" and final["continuous_mae"] < 0.05
+                                        and final["categorical_accuracy"] == 1.0 and final["loss"] < initial["loss"] * 0.05,
+                   "quality_claim": "supervised_bootstrap_only_real_render_validation_required"}
+        write_json(output / "summary.json", summary)
+        write_json(output / "status.json", {"complete": complete, "stage": "complete" if complete else "preempted", "step": step})
+        return summary
+    except BaseException as error:
+        write_json(output / "status.json", {"complete": False, "stage": "interrupted", "error_type": type(error).__name__})
+        raise
+    finally:
+        monitor.close()
+
+
+def export_model(path: Path, model, frontend, codec, pool_id: str) -> None:
+    frontend.require_frozen()
+    atomic_torch_save(path, {"format": "obruxo_pilot_inference_v1", "model_spec": MODEL_SPEC,
+                            "model": model.state_dict(), "basic_pitch": frontend.basic_pitch.state_dict(),
+                            "frontend": frontend.describe(), "contract": codec.contract.to_dict(),
+                            "codec": codec.to_dict(), "training_pool_id": pool_id, "input": "audio_only"})
+
+
+def load_model(path: Path, device: str = "cpu") -> tuple:
+    saved = torch.load(path, map_location="cpu", weights_only=True)
+    codec = PilotCodec()
+    if saved.get("format") != "obruxo_pilot_inference_v1" or saved["model_spec"] != MODEL_SPEC:
+        raise ValueError("unsupported inference artifact")
+    codec.contract.require_match(saved["contract"])
+    if saved["codec"] != codec.to_dict():
+        raise ValueError("inference codec changed")
+    frontend = AudioFeatures(saved["basic_pitch"])
+    if frontend.describe() != saved["frontend"]:
+        raise ValueError("inference frontend or frozen weights changed")
+    model = PilotInverse().to(device).eval()
+    model.load_state_dict(saved["model"], strict=True)
+    return model, frontend, codec
+
+
+@torch.no_grad()
+def predict_audio(model, frontend, codec, audio: np.ndarray, sample_rate: int = 44100) -> PilotTarget:
+    features = frontend(audio, sample_rate)
+    device = next(model.parameters()).device
+    model.eval()
+    return predicted_targets(model(batch_features([{"features": features}], device)), codec)[0]

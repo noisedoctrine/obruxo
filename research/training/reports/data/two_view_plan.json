@@ -1,0 +1,54 @@
+{
+  "experiment": "authored_two_view_controlled_comparison_v1",
+  "declared_on": "2026-10-10",
+  "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+  "feature_seed": {
+    "checkpoint": "outputs/full-pilot-step4000-20261009/checkpoint.pt",
+    "checkpoint_sha256": "e66c50eab45fe3e3b3cff7b8baad6eaf688ed69ef3d60c442c6cedee89cfb723",
+    "examples": 205,
+    "policy": "reuse verified feature prefix; reset model, optimizer, RNG and usage counts"
+  },
+  "common_training": {
+    "device": "cpu",
+    "mode": "online",
+    "steps": 4000,
+    "seed": 0,
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "replay_capacity": 410,
+    "replay_mib": 32,
+    "sampling_policy": "state_round_robin",
+    "updates_per_render": 4,
+    "render_budget": 480,
+    "checkpoint_every": 1000,
+    "cpu_threads": 4,
+    "timeout_seconds": 30
+  },
+  "arms": {
+    "single_view_control": {"accepted_example_target": 205, "additional_training_renders": 0},
+    "two_view": {"accepted_example_target": 410, "additional_training_renders": 205}
+  },
+  "evaluation": {
+    "candidates_in_tie_order": ["previous_selected", "single_view_control", "two_view"],
+    "candidate_steps": [4000, 4000, 4000],
+    "validation_states": 21,
+    "recipes": "same fixed unique validation states and reference/transfer performances as full_pilot_learning_curve_v1",
+    "retrieval_source": "feature_seed checkpoint, fixed 205 training examples",
+    "retrieval_sha256": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+    "maximum_uninterrupted_render_attempts": 294,
+    "primary": "equal-weight mean reference and transfer MR-STFT distance per state",
+    "selection": "lowest complete primary validation mean, input order breaks ties",
+    "planned_comparisons": ["two_view minus single_view_control", "two_view minus previous_selected", "each candidate minus train_retrieval"],
+    "secondary": ["unison and filter categorical accuracy", "active envelope/control error", "relative RMS error"],
+    "uncertainty": "paired state bootstrap, 2000 resamples, seed 0; descriptive validation intervals without selection adjustment",
+    "test_split_evaluated": false
+  },
+  "constraints": {
+    "native_workers": 1,
+    "prefetch_clips": 1,
+    "audio_archive": false,
+    "paid_compute": false,
+    "coverage_requirement": "two distinct reference performance IDs for each of the 205 training states in the two-view arm",
+    "render_attempt_budget_includes_seeded_prefix": true
+  }
+}

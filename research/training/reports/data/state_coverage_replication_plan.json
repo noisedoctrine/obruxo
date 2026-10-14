@@ -1,0 +1,478 @@
+{
+  "experiment": "authored_state_coverage_paired_seed_replication_v1",
+  "declared_on": "2026-10-14",
+  "question": "Across two prespecified paired learning seeds, does the expanded 404-state population improve the original 205-state one-view 16,000-update protocol?",
+  "scope": "two additional paired seeds; descriptive replication only; seed 0 remains discovery; no release/final-test claim",
+  "prior_discovery_plan_sha256": "eebef985adb7182f3adcece3b148d51f29a7c6e7e43aa7cd13828337e25a7246",
+  "pools": {
+    "one": {
+      "path": "research/training/outputs/authored-pilot-v2-20261005/pool.json",
+      "sha256": "7ec6258b6aa7c2f3832ab7950aef962abf7d9f5283914854fb4d97fc2493623f",
+      "bytes": 196075
+    },
+    "expanded": {
+      "path": "research/training/outputs/authored-expanded-20261013/pool.json",
+      "sha256": "ed05cf3db0dd1862671a525a2c6fac2f7d9497633848246b330a2b544ae02e87",
+      "bytes": 387929
+    }
+  },
+  "source_replay_checkpoints": {
+    "one": {
+      "path": "research/training/outputs/cached-curve-one-step16000-20261011/checkpoint.pt",
+      "sha256": "b5df523b46f63bb48dea67b6b2b1247b32af15076fc5dd45e1c27df6ac8f95e8",
+      "bytes": 12583881,
+      "step": 16000,
+      "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+      "run_id": null,
+      "replay_examples": 205,
+      "replay_digest": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+      "sampler_id": "3010ceb8617bf77899c8f380bdfb46f7ffe10bbff3a54e8e880fc01ea6b8e572",
+      "population": "one",
+      "basic_pitch_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+    },
+    "expanded": {
+      "path": "research/training/outputs/state-coverage-expanded-16000-20261013/checkpoint.pt",
+      "sha256": "8231920789f8ef8c5bb7359613aa6c51b84cc193d24475ae5293a8cbeb17dece",
+      "bytes": 20463789,
+      "step": 16000,
+      "pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+      "run_id": null,
+      "replay_examples": 404,
+      "replay_digest": "68baae68a584394755c48b46e5f680ec351703973da8e98480cade898ae3d77d",
+      "sampler_id": "b65f8295dc475b7596eaf82c9dabcd9166ca802ef94683dba5efbc0830aac680",
+      "population": "expanded",
+      "basic_pitch_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+    }
+  },
+  "fixed_initialization_expectation": "For each learning seed, fresh PilotInverse initialization is identical across populations; training replay remains population-specific.",
+  "training": {
+    "paired_seeds": [
+      1,
+      2
+    ],
+    "data_sampler_seed": 0,
+    "learning_seed_override": "paired seed; controls Python, NumPy, Torch initialization and batch Generator",
+    "updates_per_run": 16000,
+    "checkpoint_steps": [
+      4000,
+      8000,
+      16000
+    ],
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "cpu_threads": 4,
+    "precision": "float32",
+    "optimizer": "AdamW_weight_decay_0",
+    "architecture": "PilotInverse MODEL_SPEC unchanged",
+    "frontend": "frozen Basic Pitch and AudioFeatures unchanged",
+    "loss": "existing masked normalized-control MSE plus categorical cross-entropies",
+    "training_mode": "overfit",
+    "sampling_policy": "state_round_robin",
+    "replay_capacity": {
+      "one": 205,
+      "expanded": 404
+    },
+    "replay_mib": 32,
+    "native_training_renders": 0,
+    "data_policy": "reuse the complete frozen feature replay in each seed's same-population source checkpoint; replay order and sampler seed remain fixed",
+    "reset_policy": "fresh model, optimizer, learning RNG per seed; source weights and optimizer are discarded",
+    "train_config": {
+      "mode": "overfit",
+      "steps": 16000,
+      "replay_capacity": {
+        "one": 205,
+        "expanded": 404
+      },
+      "replay_mib": 32,
+      "batch_size": 32,
+      "learning_rate": 0.001,
+      "seed": 0,
+      "learning_seed_override": "1 or 2",
+      "checkpoint_every": 4000,
+      "render_budget": 480,
+      "cpu_threads": 4,
+      "sampling_policy": "state_round_robin",
+      "updates_per_render": 1,
+      "fresh_examples": null
+    },
+    "stream_config": {
+      "prefetch_clips": 1,
+      "prefetch_bytes": 33554432,
+      "timeout_seconds": 30.0,
+      "max_retries": 0
+    },
+    "budgets": {
+      "steps_per_seed_population": 16000,
+      "total_new_optimizer_steps": 64000,
+      "render_attempts": 0,
+      "validation_render_attempts": 462,
+      "training_replay_bytes_max": 33554432,
+      "evaluation_case_count": 21,
+      "uninterrupted_native_evaluation_max": 462
+    },
+    "outputs": {
+      "one_seed1_4000": "outputs/state-coverage-replication-one-seed1-4000-20261014",
+      "one_seed1_8000": "outputs/state-coverage-replication-one-seed1-8000-20261014",
+      "one_seed1_16000": "outputs/state-coverage-replication-one-seed1-16000-20261014",
+      "expanded_seed1_4000": "outputs/state-coverage-replication-expanded-seed1-4000-20261014",
+      "expanded_seed1_8000": "outputs/state-coverage-replication-expanded-seed1-8000-20261014",
+      "expanded_seed1_16000": "outputs/state-coverage-replication-expanded-seed1-16000-20261014",
+      "one_seed2_4000": "outputs/state-coverage-replication-one-seed2-4000-20261014",
+      "one_seed2_8000": "outputs/state-coverage-replication-one-seed2-8000-20261014",
+      "one_seed2_16000": "outputs/state-coverage-replication-one-seed2-16000-20261014",
+      "expanded_seed2_4000": "outputs/state-coverage-replication-expanded-seed2-4000-20261014",
+      "expanded_seed2_8000": "outputs/state-coverage-replication-expanded-seed2-8000-20261014",
+      "expanded_seed2_16000": "outputs/state-coverage-replication-expanded-seed2-16000-20261014"
+    },
+    "source_checkpoints": {
+      "one": {
+        "path": "research/training/outputs/cached-curve-one-step16000-20261011/checkpoint.pt",
+        "sha256": "b5df523b46f63bb48dea67b6b2b1247b32af15076fc5dd45e1c27df6ac8f95e8",
+        "bytes": 12583881,
+        "step": 16000,
+        "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+        "run_id": null,
+        "replay_examples": 205,
+        "replay_digest": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+        "sampler_id": "3010ceb8617bf77899c8f380bdfb46f7ffe10bbff3a54e8e880fc01ea6b8e572",
+        "population": "one",
+        "basic_pitch_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+      },
+      "expanded": {
+        "path": "research/training/outputs/state-coverage-expanded-16000-20261013/checkpoint.pt",
+        "sha256": "8231920789f8ef8c5bb7359613aa6c51b84cc193d24475ae5293a8cbeb17dece",
+        "bytes": 20463789,
+        "step": 16000,
+        "pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+        "run_id": null,
+        "replay_examples": 404,
+        "replay_digest": "68baae68a584394755c48b46e5f680ec351703973da8e98480cade898ae3d77d",
+        "sampler_id": "b65f8295dc475b7596eaf82c9dabcd9166ca802ef94683dba5efbc0830aac680",
+        "population": "expanded",
+        "basic_pitch_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+      }
+    },
+    "failure_rules": [
+      "Any source hash, pool identity, frontend hash, replay digest, runtime contract or candidate order mismatch aborts before work.",
+      "No renderer warmup is permitted; seed replay must fill the configured population before update one.",
+      "Do not extend a 16,000-update budget based on partial training or validation results.",
+      "Resume only from an exact hash-verified checkpoint under its frozen training contract; keep prior output directories immutable.",
+      "Native evaluation failure or an incomplete candidate case set is reported against the planned denominator; never rerender committed cases.",
+      "No candidate is promoted from this replication; the seed-0 selected bundle remains the current candidate."
+    ]
+  },
+  "evaluation": {
+    "candidate_order_tie_break": [
+      "incumbent",
+      "one_seed0_16000",
+      "expanded_seed0_16000",
+      "one_seed1_16000",
+      "expanded_seed1_16000",
+      "one_seed2_16000",
+      "expanded_seed2_16000"
+    ],
+    "candidates": {
+      "incumbent": {
+        "path": "research/training/outputs/two-view-train-20261010/checkpoint.pt",
+        "sha256": "07a5f637aaa3d98a4469fd7a046df0f5d58575fcb84b1328d090cb9548b3cee9",
+        "bytes": 20700629,
+        "step": 4000,
+        "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+        "run_id": null,
+        "replay_examples": 410,
+        "replay_digest": "fb9595eeeae00ede6d449ee2abdd416fd33f23b6ea87d443562ab58b994acaa8",
+        "sampler_id": "3010ceb8617bf77899c8f380bdfb46f7ffe10bbff3a54e8e880fc01ea6b8e572",
+        "population": "one",
+        "basic_pitch_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+      },
+      "one_seed0_16000": {
+        "path": "research/training/outputs/cached-curve-one-step16000-20261011/checkpoint.pt",
+        "sha256": "b5df523b46f63bb48dea67b6b2b1247b32af15076fc5dd45e1c27df6ac8f95e8",
+        "bytes": 12583881,
+        "step": 16000,
+        "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+        "run_id": null,
+        "replay_examples": 205,
+        "replay_digest": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+        "sampler_id": "3010ceb8617bf77899c8f380bdfb46f7ffe10bbff3a54e8e880fc01ea6b8e572",
+        "population": "one",
+        "basic_pitch_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+      },
+      "expanded_seed0_16000": {
+        "path": "research/training/outputs/state-coverage-expanded-16000-20261013/checkpoint.pt",
+        "sha256": "8231920789f8ef8c5bb7359613aa6c51b84cc193d24475ae5293a8cbeb17dece",
+        "bytes": 20463789,
+        "step": 16000,
+        "pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+        "run_id": null,
+        "replay_examples": 404,
+        "replay_digest": "68baae68a584394755c48b46e5f680ec351703973da8e98480cade898ae3d77d",
+        "sampler_id": "b65f8295dc475b7596eaf82c9dabcd9166ca802ef94683dba5efbc0830aac680",
+        "population": "expanded",
+        "basic_pitch_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+      },
+      "one_seed1_16000": {
+        "checkpoint": "outputs/state-coverage-replication-one-seed1-16000-20261014/checkpoint.pt",
+        "source_checkpoint": "research/training/outputs/cached-curve-one-step16000-20261011/checkpoint.pt",
+        "source_checkpoint_sha256": "b5df523b46f63bb48dea67b6b2b1247b32af15076fc5dd45e1c27df6ac8f95e8",
+        "pool": "research/training/outputs/authored-pilot-v2-20261005/pool.json",
+        "pool_sha256": "7ec6258b6aa7c2f3832ab7950aef962abf7d9f5283914854fb4d97fc2493623f",
+        "data_sampler_seed": 0,
+        "learning_seed_override": 1,
+        "step": 16000
+      },
+      "expanded_seed1_16000": {
+        "checkpoint": "outputs/state-coverage-replication-expanded-seed1-16000-20261014/checkpoint.pt",
+        "source_checkpoint": "research/training/outputs/state-coverage-expanded-16000-20261013/checkpoint.pt",
+        "source_checkpoint_sha256": "8231920789f8ef8c5bb7359613aa6c51b84cc193d24475ae5293a8cbeb17dece",
+        "pool": "research/training/outputs/authored-expanded-20261013/pool.json",
+        "pool_sha256": "ed05cf3db0dd1862671a525a2c6fac2f7d9497633848246b330a2b544ae02e87",
+        "data_sampler_seed": 0,
+        "learning_seed_override": 1,
+        "step": 16000
+      },
+      "one_seed2_16000": {
+        "checkpoint": "outputs/state-coverage-replication-one-seed2-16000-20261014/checkpoint.pt",
+        "source_checkpoint": "research/training/outputs/cached-curve-one-step16000-20261011/checkpoint.pt",
+        "source_checkpoint_sha256": "b5df523b46f63bb48dea67b6b2b1247b32af15076fc5dd45e1c27df6ac8f95e8",
+        "pool": "research/training/outputs/authored-pilot-v2-20261005/pool.json",
+        "pool_sha256": "7ec6258b6aa7c2f3832ab7950aef962abf7d9f5283914854fb4d97fc2493623f",
+        "data_sampler_seed": 0,
+        "learning_seed_override": 2,
+        "step": 16000
+      },
+      "expanded_seed2_16000": {
+        "checkpoint": "outputs/state-coverage-replication-expanded-seed2-16000-20261014/checkpoint.pt",
+        "source_checkpoint": "research/training/outputs/state-coverage-expanded-16000-20261013/checkpoint.pt",
+        "source_checkpoint_sha256": "8231920789f8ef8c5bb7359613aa6c51b84cc193d24475ae5293a8cbeb17dece",
+        "pool": "research/training/outputs/authored-expanded-20261013/pool.json",
+        "pool_sha256": "ed05cf3db0dd1862671a525a2c6fac2f7d9497633848246b330a2b544ae02e87",
+        "data_sampler_seed": 0,
+        "learning_seed_override": 2,
+        "step": 16000
+      }
+    },
+    "evaluation_pool": {
+      "path": "research/training/outputs/authored-pilot-v2-20261005/pool.json",
+      "sha256": "7ec6258b6aa7c2f3832ab7950aef962abf7d9f5283914854fb4d97fc2493623f",
+      "bytes": 196075
+    },
+    "retrieval_checkpoint": {
+      "path": "research/training/outputs/full-pilot-step4000-20261009/checkpoint.pt",
+      "sha256": "e66c50eab45fe3e3b3cff7b8baad6eaf688ed69ef3d60c442c6cedee89cfb723",
+      "bytes": 12583497,
+      "step": 4000,
+      "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+      "run_id": null,
+      "replay_examples": 205,
+      "replay_digest": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+      "sampler_id": "3010ceb8617bf77899c8f380bdfb46f7ffe10bbff3a54e8e880fc01ea6b8e572",
+      "population": "one",
+      "basic_pitch_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+    },
+    "retrieval_examples": 205,
+    "validation_count": 21,
+    "validation_cases": [
+      {
+        "recipe_id": "16122318e32ed0d52ecd48314cc44ebf0ea83c8688b1bd29368b99adc2ee04aa",
+        "state_id": "6b80fef15d547ae821b21171866c1046424dd3066a3bd27c979f3ebbce13c375",
+        "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+        "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+      },
+      {
+        "recipe_id": "17bfe5eca52aa61a95095b3cc12db0d927af8be8d15c651842d82374713a5ef1",
+        "state_id": "fb80c3992ccaa6e324253d2df5897aab3b99b9dd59fc8766de739a715b3fef48",
+        "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+        "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+      },
+      {
+        "recipe_id": "0d3a5ddb4d149570b6dfcdf64924fac42f369c5a81dc0e4c45e911ba88b3205a",
+        "state_id": "f2b021f8389b31a032303a8ab27a29578fc9747e3e594794e3a28e76b0dd8279",
+        "reference_performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+        "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+      },
+      {
+        "recipe_id": "3b65e548ae13f601d2c0789c3040066800af087b33c81945356cee5e096f4dad",
+        "state_id": "a1122703d92cfdecb797e19b569ba3348d598830653311377e33e32c6fe1985d",
+        "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+        "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+      },
+      {
+        "recipe_id": "413eb6cb456f825b8bfa0cc60132b1f44f0a5c71755679539332ef1514beda21",
+        "state_id": "a3ab25f778e3e04300ac5dca4ded2afdc948f23f753df40625a3ad76635594ec",
+        "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+        "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+      },
+      {
+        "recipe_id": "0c393d27f50e3db963fdfc02d102b522e432cd570abfae500f682be7d271e312",
+        "state_id": "cec6700f895b3028246ec1c552c2df2cbab2ed7fa29c6c6cf0d58aafb81e9873",
+        "reference_performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+        "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+      },
+      {
+        "recipe_id": "35c2ffe2ab50884c37ea1dc0fa76ff81c93f5e5051989837198640e3fc908df2",
+        "state_id": "03227a3623949baf7f30aeae68f338cc1dcad8c4d3a2eae48365c84c516bb389",
+        "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+        "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+      },
+      {
+        "recipe_id": "376ffa02ffad84c24b2d2b95c31d2bca0c713bcd4ceb186a9d9b42cb2ed94e6a",
+        "state_id": "7ab23cf98c8a1cdb42183f1d44d5961737d985fc167f9ce6e5284f1e32b35f2b",
+        "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+        "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+      },
+      {
+        "recipe_id": "d66e0ce7c4b50ef0f10a396592e005e266194f5291ee51fb93dc0a5f5be5b947",
+        "state_id": "9f1153c6ba2bb3372a03846d2966a69b8481b2304ba228ca9b0792b0d88d4f74",
+        "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+        "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+      },
+      {
+        "recipe_id": "8a0160c91d62301451b989c2f43e764c4f9308b793c168ebe9de4e478d99cd26",
+        "state_id": "c2f64e673a8cc51c56e260b04ee39c9e59a05dfff07f05e48ee8e6a8bbaeb298",
+        "reference_performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+        "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+      },
+      {
+        "recipe_id": "2d0000cc4857109e76ab72ba2f72be5ecb3159b8ca147662d20d102afa853489",
+        "state_id": "e7449e562a3c10e61fbba75f38119746d6372e60437d6f2881304af4765a395f",
+        "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+        "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+      },
+      {
+        "recipe_id": "ccd96626c2c6d582d43e64ac3e9b416f790ed16b2453e57c850b0eb90b863c80",
+        "state_id": "85e3cac6f5185b14b41b716834ff0b796eb656df9b122b7e57c73800b8f9b45e",
+        "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+        "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+      },
+      {
+        "recipe_id": "51b74fb3c260348e3da10be9a5f79d4e493f84254a43f42aad00dacfd9959dcd",
+        "state_id": "20bf67c35644e663d0cc79f4f8364a5a49cd60f9bea22685a43f2a83f48a5096",
+        "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+        "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+      },
+      {
+        "recipe_id": "8946a67417e6ce0104bda5b139e8460248b88b5305737bb71ac5cfb1a33510d6",
+        "state_id": "868b0a4c4dc90526bd336cd8453dd60fd5d790bc05e768f3e45909d588ac4681",
+        "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+        "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+      },
+      {
+        "recipe_id": "d837ab44f444b427874a1416747ba6704c979acbde99790b667853c263b9c5f6",
+        "state_id": "9908d309c791b13e91196778f15409456ddad5ae69e55944ff573648240eb50a",
+        "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+        "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+      },
+      {
+        "recipe_id": "fc3bedaec3466b69d8e338fab6cbebf4c4eb8e223bad97a143e102fd2c9dcec8",
+        "state_id": "4fb111682a20129ed42fe0251a82fd23fdcb1168344abe4951c0f98536b15339",
+        "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+        "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+      },
+      {
+        "recipe_id": "2d84ec797f05cb9f67e08ec4fa3208b301a990ffa9457a4aa0893f601883ab96",
+        "state_id": "9fcd25a332ad2d874f70065b1fe8c6d79619f858bb22d63447d7da3cfc836bc3",
+        "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+        "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+      },
+      {
+        "recipe_id": "f2b9dc79520806d32e6ecaae93358053347264233d33648af5db43359846ce93",
+        "state_id": "16489e4a31e3008ae347a1adc220b4c396c4db62250660a3b3bf5a95eb23e076",
+        "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+        "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+      },
+      {
+        "recipe_id": "55dd7a4ddcbae5c5547208a1ad2dc4693a508bb12b718633533c0dff538b9b99",
+        "state_id": "22b3cb59aa7d578f64e589a2ba07d23b4893e6fbc1a47d21a06fead7151e1299",
+        "reference_performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+        "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+      },
+      {
+        "recipe_id": "62209d4f79468ca374ca97fe73b67b6be35b5a6491338792912a82793f785ff3",
+        "state_id": "ce2a862a2ac2327a70fc73b3f9cce558114b761935f37998e3f71aa77b8fa3dd",
+        "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+        "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+      },
+      {
+        "recipe_id": "034b825581328c89ad83a7de2e59a186718d814a88ffa48152883e17ef5a3a4e",
+        "state_id": "5a90dfd94d0ab2cdab2402e77bbf393273c7075ecedc4adeeb1bfc38591bae59",
+        "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+        "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+      }
+    ],
+    "case_source": "outputs/two-view-validation-20261010/summary.json; exact original state/reference/transfer pairs",
+    "max_uninterrupted_native_render_attempts": 462,
+    "primary": "mean per state of equal-weight reference/transfer MR-STFT; every candidate must score all 21 cases in both roles; lower is better; candidate order breaks ties",
+    "prespecified_primary_contrast": "expanded minus one at matched seeds 1 and 2, shown separately for each seed and as descriptive mean of two deltas; seed 0 discovery contrast reported separately",
+    "secondary": [
+      "statewise wins/losses and variation",
+      "training replay MAE",
+      "validation active-control and envelope MAE",
+      "unison and filter categorical accuracy",
+      "reference/transfer relative RMS error"
+    ],
+    "uncertainty": "paired state bootstrap 2000 resamples with seed 0 for each paired seed, descriptive and selection-aware caveat; show across-seed values and range, no significance claim from n=3",
+    "test_split_evaluated": false,
+    "promotion": "none; preserve outputs/state-coverage-validation-20261013/selected-model.pt as current candidate",
+    "output": "outputs/state-coverage-replication-validation-20261014"
+  },
+  "source_artifacts": {
+    "discovery_plan_sha256": "eebef985adb7182f3adcece3b148d51f29a7c6e7e43aa7cd13828337e25a7246",
+    "discovery_summary_sha256": "e79b8d33d2a3fdbc1a6e32466a8a91ef6ade4c892d9b3a8d7f68567a363d608b",
+    "discovery_validation_sha256": "645ebb3f83a548a3e62323d8281b921e99d5357e2d474644f44b3249a0d345c6",
+    "selected_discovery_bundle": {
+      "path": "research/training/outputs/state-coverage-validation-20261013/selected-model.pt",
+      "sha256": "5517db59dec68f0daca30789d08e75f41183e5577ba5a2082a4dc9488da15d4f",
+      "bytes": 1585110
+    },
+    "fixed_retrieval": {
+      "path": "research/training/outputs/full-pilot-step4000-20261009/checkpoint.pt",
+      "sha256": "e66c50eab45fe3e3b3cff7b8baad6eaf688ed69ef3d60c442c6cedee89cfb723",
+      "bytes": 12583497,
+      "step": 4000,
+      "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+      "run_id": null,
+      "replay_examples": 205,
+      "replay_digest": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+      "sampler_id": "3010ceb8617bf77899c8f380bdfb46f7ffe10bbff3a54e8e880fc01ea6b8e572",
+      "population": "one",
+      "basic_pitch_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+    },
+    "fixed_case_source_sha256": "2da91ecf3f53cd910d40af6f1971f1bbf709e5e81af7d074c058eaf19e35888f"
+  },
+  "runtime_source_sha256": {
+    "research/training/obruxo_training/cli.py": "8c1dcfde27a63121608e52f3518ec660ff6ae159cd06eb5c292cbf649e7c0b82",
+    "research/training/obruxo_training/trainer.py": "3ab0f29e1ac069cceac743df915d7245e6b04d5b189ef4e3ce275eaf759fff62",
+    "research/training/obruxo_training/evaluate.py": "5d6d573736b9c3b62f35f33240bf1ca6481a0d8c2a5ee8c7630222ce1a93bf2a",
+    "research/training/obruxo_training/features.py": "83ef8178442dc467b7985c67915a136650bc83e0248237f8bb12bdd452fae951",
+    "research/training/obruxo_training/model.py": "ee5cb2c6fcdc04e1ea327db3aa8cc08184dc0a4ee3a2bf2a481ceff227e1c4cb",
+    "research/training/obruxo_training/pilot.py": "c6e694fd99502a307044073d42cea19444a7792f2bbe34ce5b2c202c71346838",
+    "research/training/obruxo_training/codec.py": "a9e0095d0f45f80d25c1f30b0bc630b6ab93a41a4a62601d116db36d94435264",
+    "research/training/obruxo_training/stream.py": "9e2e89bc954f2d50f88d6af08a6727bd286339eed6550c77e6cbb55f43a7dbc4",
+    "research/data_generation/obruxo_data/render/base.py": "65802e3f917a36362bb7eb72a586722372f8747bfcdc586129b63c5c8fcff5d3",
+    "research/data_generation/obruxo_data/render/vita.py": "68227e9867b1caa7d86a264ada8d0bd1cee49f6097b54dcf1968b00732ec4972"
+  },
+  "runtime": {
+    "python": "3.12.13",
+    "torch": "2.12.1+xpu",
+    "device": "cpu",
+    "numpy": "2.4.6",
+    "scipy": "1.18.0",
+    "threads": 4,
+    "renderer": {
+      "plugin": "C:/Program Files/Common Files/VST3/Vital.vst3",
+      "plugin_sha256": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+      "backend": "DawDreamer 0.8.3",
+      "timeout_seconds": 30,
+      "workers": 1
+    },
+    "native_training_render_policy": "none",
+    "training_audio_archive": "none"
+  },
+  "analysis_rules": [
+    "Report seeds 1 and 2 as replication; report seed 0 discovery separately.",
+    "Do not describe a favorable seed, best individual, or n=3 mean as proof.",
+    "Keep exact per-candidate outputs and all failures in denominators.",
+    "Report selection and repeated-validation caveats for any state bootstrap."
+  ]
+}

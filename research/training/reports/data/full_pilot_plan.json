@@ -1,0 +1,44 @@
+{
+  "experiment": "full_authored_pilot_learning_curve_v1",
+  "declared_on": "2026-10-09",
+  "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+  "training": {
+    "device": "cpu",
+    "mode": "online",
+    "steps": 4000,
+    "seed": 0,
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "replay_capacity": 205,
+    "replay_mib": 16,
+    "sampling_policy": "state_round_robin",
+    "updates_per_render": 4,
+    "fresh_examples": 205,
+    "render_budget": 256,
+    "checkpoint_every": 1000,
+    "cpu_threads": 4,
+    "timeout_seconds": 30
+  },
+  "evaluation": {
+    "checkpoint_steps": [1000, 2000, 4000],
+    "split": "validation",
+    "cases": 21,
+    "selection": "first unique states from validation sampler seed 0",
+    "transfer": "four reserved performances in round-robin order; reuse reference prediction",
+    "baselines": ["fixed_template", "train_retrieval", "source_repeat"],
+    "retrieval": "identical retained training features and targets across checkpoints",
+    "maximum_render_attempts": 294,
+    "primary": "mean of per-state reference and transfer MR-STFT distances, equal weights",
+    "checkpoint_selection": "lowest primary mean among checkpoints with all 21 paired cases scored",
+    "uncertainty": "paired state bootstrap against retrieval, seed 0, 2000 resamples; descriptive, unadjusted for checkpoint selection",
+    "final_test_evaluated": false
+  },
+  "constraints": {
+    "audio_files_written": 0,
+    "native_workers": 1,
+    "prefetch_clips": 1,
+    "prefetch_mib": 32,
+    "paid_compute": false,
+    "coverage_requirement": "verify 205 distinct retained training states; report rejected or missing states explicitly"
+  }
+}

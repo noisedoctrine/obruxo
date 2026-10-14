@@ -1,0 +1,1775 @@
+{
+  "audio_files_written": 0,
+  "checkpoints": {
+    "incumbent": {
+      "bytes": 20700629,
+      "checkpoint": "outputs/two-view-train-20261010/checkpoint.pt",
+      "file_sha256": "07a5f637aaa3d98a4469fd7a046df0f5d58575fcb84b1328d090cb9548b3cee9",
+      "model_state_sha256": "291a35e4c230b5317b046305c0cb276e904b4eb98650e8cdc2e27e2261277f93",
+      "step": 4000
+    },
+    "one_16000": {
+      "bytes": 12583881,
+      "checkpoint": "outputs/cached-curve-one-step16000-20261011/checkpoint.pt",
+      "file_sha256": "b5df523b46f63bb48dea67b6b2b1247b32af15076fc5dd45e1c27df6ac8f95e8",
+      "model_state_sha256": "a64e509920bef6468bbc61031d015b9a4fbfd204d381782b5f4af08622398fca",
+      "step": 16000
+    },
+    "one_4000": {
+      "bytes": 12583817,
+      "checkpoint": "outputs/cached-curve-one-step4000-20261011/checkpoint.pt",
+      "file_sha256": "0ee14fe9b2a7d46efb3fa40804c2d550f90d50bd5daa404a973a2261e7fe3aa5",
+      "model_state_sha256": "5137139cb63fcdd0756350a14c42ad1dce29b292c17c38656765e11010d106ef",
+      "step": 4000
+    },
+    "one_8000": {
+      "bytes": 12583881,
+      "checkpoint": "outputs/cached-curve-one-step8000-20261011/checkpoint.pt",
+      "file_sha256": "8e55c351656e1b606f99ac0ae1df7444ef1f2e546357cba7d89db961df3862ca",
+      "model_state_sha256": "d00646e87780adba49b91f7b277eb1a841eb93834b499c53539b3a4d9bdebcac",
+      "step": 8000
+    },
+    "two_16000": {
+      "bytes": 20701973,
+      "checkpoint": "outputs/cached-curve-two-step16000-20261011/checkpoint.pt",
+      "file_sha256": "2a6e00ff41433f2237343aa2eaab09c4b624c5963d852b970ea8341c557f9805",
+      "model_state_sha256": "8f52f15d50e557960ca87b9dc0b5c329311a12d55a63c891b8541c150644d1f9",
+      "step": 16000
+    },
+    "two_4000": {
+      "bytes": 20701909,
+      "checkpoint": "outputs/cached-curve-two-step4000-20261011/checkpoint.pt",
+      "file_sha256": "d2b25022d32f2c58530fa7255ca78b7749e9b963174e6c7ebc1fca7bcf964de0",
+      "model_state_sha256": "d675f89a5f24aa0e484804947d113659f2dd8e1d5740def4d37d78bfa28677e5",
+      "step": 4000
+    },
+    "two_8000": {
+      "bytes": 20701973,
+      "checkpoint": "outputs/cached-curve-two-step8000-20261011/checkpoint.pt",
+      "file_sha256": "2dc2a7b595ba38e50fcffa34032488c0bf42e08909c6889b72e90e103dd1c13d",
+      "model_state_sha256": "33a042e831cad0214bf8e10aa1280fe9c4c10fc2d1862409ebfec3a2d0cfaf01",
+      "step": 8000
+    }
+  },
+  "checks": {
+    "experiment_artifact_checks_passed": true,
+    "unchanged_runtime_from_137_test_and_ruff_pass": true
+  },
+  "colab_qualified": false,
+  "completed_on": "2026-10-13",
+  "declared_on": "2026-10-11",
+  "declared_plan": {
+    "arms": {
+      "one": {
+        "examples": 205,
+        "reference_performances_per_state": 1,
+        "seed_checkpoint": "outputs/full-pilot-step4000-20261009/checkpoint.pt",
+        "seed_checkpoint_sha256": "e66c50eab45fe3e3b3cff7b8baad6eaf688ed69ef3d60c442c6cedee89cfb723"
+      },
+      "two": {
+        "examples": 410,
+        "reference_performances_per_state": 2,
+        "seed_checkpoint": "outputs/two-view-train-20261010/checkpoint.pt",
+        "seed_checkpoint_sha256": "07a5f637aaa3d98a4469fd7a046df0f5d58575fcb84b1328d090cb9548b3cee9"
+      }
+    },
+    "checkpoint_steps": [
+      4000,
+      8000,
+      16000
+    ],
+    "common_training": {
+      "batch_size": 32,
+      "checkpoint_every": 4000,
+      "cpu_threads": 4,
+      "device": "cpu",
+      "learning_rate": 0.001,
+      "mode": "online",
+      "render_budget": 480,
+      "replay_capacity": 410,
+      "replay_mib": 32,
+      "sampling_policy": "state_round_robin",
+      "seed": 0,
+      "steps": 16000,
+      "timeout_seconds": 30,
+      "updates_per_render": 4
+    },
+    "constraints": {
+      "additional_training_renders": 0,
+      "audio_archive": false,
+      "colab": false,
+      "native_evaluation_workers": 1,
+      "no_architecture_loss_or_learning_rate_change": true,
+      "no_extension_or_early_selection_based_on_partial_validation": true,
+      "paid_compute": false,
+      "training_states": 205
+    },
+    "declared_on": "2026-10-11",
+    "evaluation": {
+      "candidates_in_tie_order": [
+        "incumbent",
+        "one_4000",
+        "two_4000",
+        "one_8000",
+        "two_8000",
+        "one_16000",
+        "two_16000"
+      ],
+      "incumbent_checkpoint": "outputs/two-view-train-20261010/checkpoint.pt",
+      "incumbent_checkpoint_sha256": "07a5f637aaa3d98a4469fd7a046df0f5d58575fcb84b1328d090cb9548b3cee9",
+      "maximum_uninterrupted_render_attempts": 462,
+      "planned_comparisons": [
+        "two minus one at each matched update count",
+        "8000 minus 4000 and 16000 minus 4000 within each arm",
+        "each new candidate minus incumbent",
+        "each candidate minus fixed train-only retrieval"
+      ],
+      "primary": "equal-weight mean reference and transfer MR-STFT distance per state",
+      "recipes": "same fixed validation state/reference/transfer combinations as the two-view comparison",
+      "retrieval_checkpoint": "outputs/full-pilot-step4000-20261009/checkpoint.pt",
+      "retrieval_examples": 205,
+      "retrieval_sha256": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+      "secondary": [
+        "unison/filter categorical accuracy",
+        "active-control and envelope MAE",
+        "reference/transfer relative RMS error"
+      ],
+      "selection": "lowest complete validation primary mean; declared input order breaks ties, preferring incumbent then fewer updates",
+      "test_split_evaluated": false,
+      "uncertainty": "paired state bootstrap, 2000 resamples, seed 0; descriptive validation intervals without selection or multiple-comparison adjustment",
+      "validation_states": 21
+    },
+    "experiment": "authored_cached_optimization_curve_v1",
+    "feature_policy": "complete verified training feature prefix available before update one; fresh model, optimizer, RNG and usage counts",
+    "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+    "training_checks": [
+      "no native training render or fresh feature extraction",
+      "identical initial model and frozen frontend weights across arms",
+      "unchanged retained features within each learning curve",
+      "one-view 4000-update weights reproduce the previous matched control",
+      "complete training-state reference-performance coverage and no held-out membership"
+    ]
+  },
+  "experiment": "authored_cached_optimization_curve_v1",
+  "paid_compute_used": false,
+  "parameter_diagnostics": {
+    "incumbent": {
+      "active_continuous_mae": 0.19380865589792645,
+      "categorical_accuracy": {
+        "filter_1_on": 1.0,
+        "osc_1_unison_voices": 0.8095238095238095
+      },
+      "continuous": {
+        "env_1_attack": {
+          "active_cases": 21,
+          "mae": 0.1682102112973575
+        },
+        "env_1_decay": {
+          "active_cases": 21,
+          "mae": 0.23154443592293927
+        },
+        "env_1_release": {
+          "active_cases": 21,
+          "mae": 0.332507343819804
+        },
+        "env_1_sustain": {
+          "active_cases": 21,
+          "mae": 0.2040521108409663
+        },
+        "filter_1_cutoff": {
+          "active_cases": 10,
+          "mae": 0.08216731540803038
+        },
+        "filter_1_resonance": {
+          "active_cases": 10,
+          "mae": 0.2919256890383355
+        },
+        "osc_1_level": {
+          "active_cases": 21,
+          "mae": 0.18389752166937925
+        },
+        "osc_1_pan": {
+          "active_cases": 21,
+          "mae": 0.09654360466417748
+        },
+        "osc_1_unison_detune": {
+          "active_cases": 13,
+          "mae": 0.11713741929227293
+        }
+      }
+    },
+    "one_16000": {
+      "active_continuous_mae": 0.2004183981991535,
+      "categorical_accuracy": {
+        "filter_1_on": 1.0,
+        "osc_1_unison_voices": 0.8095238095238095
+      },
+      "continuous": {
+        "env_1_attack": {
+          "active_cases": 21,
+          "mae": 0.17237101073338879
+        },
+        "env_1_decay": {
+          "active_cases": 21,
+          "mae": 0.23760131614309307
+        },
+        "env_1_release": {
+          "active_cases": 21,
+          "mae": 0.3112825457780665
+        },
+        "env_1_sustain": {
+          "active_cases": 21,
+          "mae": 0.23987640328695642
+        },
+        "filter_1_cutoff": {
+          "active_cases": 10,
+          "mae": 0.07812408940448815
+        },
+        "filter_1_resonance": {
+          "active_cases": 10,
+          "mae": 0.28278150571470745
+        },
+        "osc_1_level": {
+          "active_cases": 21,
+          "mae": 0.1568329773494548
+        },
+        "osc_1_pan": {
+          "active_cases": 21,
+          "mae": 0.11168325450075517
+        },
+        "osc_1_unison_detune": {
+          "active_cases": 13,
+          "mae": 0.18729782298826467
+        }
+      }
+    },
+    "one_4000": {
+      "active_continuous_mae": 0.21100419585153915,
+      "categorical_accuracy": {
+        "filter_1_on": 1.0,
+        "osc_1_unison_voices": 0.7142857142857143
+      },
+      "continuous": {
+        "env_1_attack": {
+          "active_cases": 21,
+          "mae": 0.19223324013289597
+        },
+        "env_1_decay": {
+          "active_cases": 21,
+          "mae": 0.3339492787877549
+        },
+        "env_1_release": {
+          "active_cases": 21,
+          "mae": 0.29524386879240594
+        },
+        "env_1_sustain": {
+          "active_cases": 21,
+          "mae": 0.17782481900644237
+        },
+        "filter_1_cutoff": {
+          "active_cases": 10,
+          "mae": 0.08766900425642381
+        },
+        "filter_1_resonance": {
+          "active_cases": 10,
+          "mae": 0.39832902347713633
+        },
+        "osc_1_level": {
+          "active_cases": 21,
+          "mae": 0.14525819990718297
+        },
+        "osc_1_pan": {
+          "active_cases": 21,
+          "mae": 0.11796124117516599
+        },
+        "osc_1_unison_detune": {
+          "active_cases": 13,
+          "mae": 0.1675233276323314
+        }
+      }
+    },
+    "one_8000": {
+      "active_continuous_mae": 0.20652105853284364,
+      "categorical_accuracy": {
+        "filter_1_on": 0.9523809523809523,
+        "osc_1_unison_voices": 0.6666666666666666
+      },
+      "continuous": {
+        "env_1_attack": {
+          "active_cases": 21,
+          "mae": 0.15884516223059883
+        },
+        "env_1_decay": {
+          "active_cases": 21,
+          "mae": 0.29013446444539986
+        },
+        "env_1_release": {
+          "active_cases": 21,
+          "mae": 0.3134195925660182
+        },
+        "env_1_sustain": {
+          "active_cases": 21,
+          "mae": 0.19929167959557195
+        },
+        "filter_1_cutoff": {
+          "active_cases": 10,
+          "mae": 0.08341281622848942
+        },
+        "filter_1_resonance": {
+          "active_cases": 10,
+          "mae": 0.35535052018067226
+        },
+        "osc_1_level": {
+          "active_cases": 21,
+          "mae": 0.17892934823140244
+        },
+        "osc_1_pan": {
+          "active_cases": 21,
+          "mae": 0.10645381396001358
+        },
+        "osc_1_unison_detune": {
+          "active_cases": 13,
+          "mae": 0.1738968970016475
+        }
+      }
+    },
+    "two_16000": {
+      "active_continuous_mae": 0.20212122266395527,
+      "categorical_accuracy": {
+        "filter_1_on": 1.0,
+        "osc_1_unison_voices": 0.6190476190476191
+      },
+      "continuous": {
+        "env_1_attack": {
+          "active_cases": 21,
+          "mae": 0.14517544457375606
+        },
+        "env_1_decay": {
+          "active_cases": 21,
+          "mae": 0.27640380276916576
+        },
+        "env_1_release": {
+          "active_cases": 21,
+          "mae": 0.33774834927583924
+        },
+        "env_1_sustain": {
+          "active_cases": 21,
+          "mae": 0.2498706456194101
+        },
+        "filter_1_cutoff": {
+          "active_cases": 10,
+          "mae": 0.05602518991436796
+        },
+        "filter_1_resonance": {
+          "active_cases": 10,
+          "mae": 0.2660976917802973
+        },
+        "osc_1_level": {
+          "active_cases": 21,
+          "mae": 0.17645921491620353
+        },
+        "osc_1_pan": {
+          "active_cases": 21,
+          "mae": 0.053894365897145705
+        },
+        "osc_1_unison_detune": {
+          "active_cases": 13,
+          "mae": 0.22195825404156208
+        }
+      }
+    },
+    "two_4000": {
+      "active_continuous_mae": 0.20759614917879413,
+      "categorical_accuracy": {
+        "filter_1_on": 1.0,
+        "osc_1_unison_voices": 0.6190476190476191
+      },
+      "continuous": {
+        "env_1_attack": {
+          "active_cases": 21,
+          "mae": 0.19818753414987314
+        },
+        "env_1_decay": {
+          "active_cases": 21,
+          "mae": 0.2714988662566203
+        },
+        "env_1_release": {
+          "active_cases": 21,
+          "mae": 0.29184815459556085
+        },
+        "env_1_sustain": {
+          "active_cases": 21,
+          "mae": 0.20112246325479094
+        },
+        "filter_1_cutoff": {
+          "active_cases": 10,
+          "mae": 0.10110247085120475
+        },
+        "filter_1_resonance": {
+          "active_cases": 10,
+          "mae": 0.27780487154884337
+        },
+        "osc_1_level": {
+          "active_cases": 21,
+          "mae": 0.16607853512443688
+        },
+        "osc_1_pan": {
+          "active_cases": 21,
+          "mae": 0.11289205635110304
+        },
+        "osc_1_unison_detune": {
+          "active_cases": 13,
+          "mae": 0.2418872685421302
+        }
+      }
+    },
+    "two_8000": {
+      "active_continuous_mae": 0.19035289199550884,
+      "categorical_accuracy": {
+        "filter_1_on": 1.0,
+        "osc_1_unison_voices": 0.6666666666666666
+      },
+      "continuous": {
+        "env_1_attack": {
+          "active_cases": 21,
+          "mae": 0.14316488049832762
+        },
+        "env_1_decay": {
+          "active_cases": 21,
+          "mae": 0.24413108720455035
+        },
+        "env_1_release": {
+          "active_cases": 21,
+          "mae": 0.3182632542876119
+        },
+        "env_1_sustain": {
+          "active_cases": 21,
+          "mae": 0.22998972985167998
+        },
+        "filter_1_cutoff": {
+          "active_cases": 10,
+          "mae": 0.08393110806371962
+        },
+        "filter_1_resonance": {
+          "active_cases": 10,
+          "mae": 0.22716875933017833
+        },
+        "osc_1_level": {
+          "active_cases": 21,
+          "mae": 0.15544608692482764
+        },
+        "osc_1_pan": {
+          "active_cases": 21,
+          "mae": 0.08277828854257961
+        },
+        "osc_1_unison_detune": {
+          "active_cases": 13,
+          "mae": 0.1927593292189081
+        }
+      }
+    }
+  },
+  "peak_training_process_tree_rss_bytes": 750305280,
+  "planned_pairwise_comparisons": {
+    "one_16000_minus_incumbent": {
+      "ci95": [
+        -0.12404658441830965,
+        0.13515408351603478
+      ],
+      "mean_delta": 0.0035805262270427675,
+      "paired": 21,
+      "planned": 21,
+      "ties": 0,
+      "wins": 11
+    },
+    "one_16000_minus_one_4000": {
+      "ci95": [
+        -0.18799502904423404,
+        0.011627609065423355
+      ],
+      "mean_delta": -0.08808582624982277,
+      "paired": 21,
+      "planned": 21,
+      "ties": 0,
+      "wins": 14
+    },
+    "one_4000_minus_incumbent": {
+      "ci95": [
+        -0.011084325460066664,
+        0.18987223042899534
+      ],
+      "mean_delta": 0.09166635247686553,
+      "paired": 21,
+      "planned": 21,
+      "ties": 0,
+      "wins": 6
+    },
+    "one_8000_minus_incumbent": {
+      "ci95": [
+        -0.08565345911811734,
+        0.16249149340012708
+      ],
+      "mean_delta": 0.03518351998239281,
+      "paired": 21,
+      "planned": 21,
+      "ties": 0,
+      "wins": 9
+    },
+    "one_8000_minus_one_4000": {
+      "ci95": [
+        -0.18012272082564845,
+        0.05949910597520917
+      ],
+      "mean_delta": -0.05648283249447271,
+      "paired": 21,
+      "planned": 21,
+      "ties": 0,
+      "wins": 15
+    },
+    "two_16000_minus_incumbent": {
+      "ci95": [
+        -0.17441175909757253,
+        0.17755335228118485
+      ],
+      "mean_delta": 0.006743350081027481,
+      "paired": 21,
+      "planned": 21,
+      "ties": 0,
+      "wins": 9
+    },
+    "two_16000_minus_one_16000": {
+      "ci95": [
+        -0.1386877533802319,
+        0.14500232853054526
+      ],
+      "mean_delta": 0.003162823853984719,
+      "paired": 21,
+      "planned": 21,
+      "ties": 0,
+      "wins": 11
+    },
+    "two_16000_minus_two_4000": {
+      "ci95": [
+        -0.5769235045028229,
+        -0.02662167734584766
+      ],
+      "mean_delta": -0.26551778919048724,
+      "paired": 21,
+      "planned": 21,
+      "ties": 0,
+      "wins": 13
+    },
+    "two_4000_minus_incumbent": {
+      "ci95": [
+        0.10353144313031358,
+        0.46559358645851384
+      ],
+      "mean_delta": 0.2722611392715147,
+      "paired": 21,
+      "planned": 21,
+      "ties": 0,
+      "wins": 5
+    },
+    "two_4000_minus_one_4000": {
+      "ci95": [
+        0.004983744932161153,
+        0.38893833090920754
+      ],
+      "mean_delta": 0.1805947867946492,
+      "paired": 21,
+      "planned": 21,
+      "ties": 0,
+      "wins": 7
+    },
+    "two_8000_minus_incumbent": {
+      "ci95": [
+        -0.148040193770199,
+        0.14493116889341118
+      ],
+      "mean_delta": 0.007371205659139755,
+      "paired": 21,
+      "planned": 21,
+      "ties": 0,
+      "wins": 10
+    },
+    "two_8000_minus_one_8000": {
+      "ci95": [
+        -0.1793790335116523,
+        0.11960258205968244
+      ],
+      "mean_delta": -0.027812314323253068,
+      "paired": 21,
+      "planned": 21,
+      "ties": 0,
+      "wins": 9
+    },
+    "two_8000_minus_two_4000": {
+      "ci95": [
+        -0.5652852635379759,
+        -0.06171619451442174
+      ],
+      "mean_delta": -0.26488993361237495,
+      "paired": 21,
+      "planned": 21,
+      "ties": 0,
+      "wins": 14
+    }
+  },
+  "pool": {
+    "codec_id": "842fb3b3757e016c33efe296aa6ed355ac3a392e4c754035b4e3b41803a439bc",
+    "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+    "states": 256,
+    "states_by_split": {
+      "test": 30,
+      "train": 205,
+      "validation": 21
+    }
+  },
+  "scope": "cached_feature_optimization_budget_narrow_pilot_validation_selection_only",
+  "selected_model": {
+    "bytes": 1585110,
+    "checkpoint_name": "incumbent",
+    "file_sha256": "b9e374b150c07409097ea2dde0283679d48279815828be60e597d3ed132fc77d",
+    "path": "outputs/cached-curve-validation-20261011/selected-model.pt",
+    "schema_valid_predictions": 147,
+    "weights_match_selected_checkpoint": true
+  },
+  "training": {
+    "one_16000": {
+      "audio_files_written": 0,
+      "checkpoint_seconds_this_segment": 0.4342896998859942,
+      "complete": true,
+      "config": {
+        "batch_size": 32,
+        "checkpoint_every": 4000,
+        "cpu_threads": 4,
+        "fresh_examples": 205,
+        "learning_rate": 0.001,
+        "mode": "online",
+        "render_budget": 480,
+        "replay_capacity": 410,
+        "replay_mib": 32,
+        "sampling_policy": "state_round_robin",
+        "seed": 0,
+        "steps": 16000,
+        "updates_per_render": 4
+      },
+      "cursor": {
+        "audio_replay": "regenerate_unacknowledged_not_bit_exact",
+        "next_sequence_id": 205,
+        "stream_id": "853ac7b8dec74828fab1ebc0f83a63afbc2733f6fee2d1003e9794252a09f775",
+        "version": 1
+      },
+      "device": "cpu",
+      "elapsed_seconds_this_segment": 76.83151639997959,
+      "feature_seconds_this_segment": 0.0,
+      "final_metrics": {
+        "categorical_accuracy": 1.0,
+        "categorical_ce": 1.753063224896323e-05,
+        "continuous_mae": 0.02250852808356285,
+        "continuous_mse": 0.0010600200621411204,
+        "loss": 0.001077550696209073
+      },
+      "fresh_accepted_this_segment": 0,
+      "fresh_example_target_reached": true,
+      "frontend": {
+        "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+        "device": "cpu",
+        "fft": 2048,
+        "frontend": "stereo_mel_and_frozen_basic_pitch_v1",
+        "hop": 441,
+        "input": "audio_only",
+        "log_scale": 10,
+        "maximum_audio_seconds": 16,
+        "normalization": "fixed_scaling_no_fitted_statistics",
+        "pitch_size": 3521,
+        "pitch_time_bins": 8,
+        "precision": "float32",
+        "sample_rate": 44100,
+        "timbre_shape": [
+          2,
+          96,
+          32
+        ]
+      },
+      "frozen_weights_and_buffers_unchanged": true,
+      "initial_metrics": {
+        "categorical_accuracy": 0.4243902564048767,
+        "categorical_ce": 1.7970106601715088,
+        "continuous_mae": 0.2456456869840622,
+        "continuous_mse": 0.08102984726428986,
+        "loss": 1.8780405521392822
+      },
+      "mode": "online",
+      "model_state_sha256": "a64e509920bef6468bbc61031d015b9a4fbfd204d381782b5f4af08622398fca",
+      "peak_process_tree_rss_bytes": 660713472,
+      "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+      "quality_claim": "supervised_bootstrap_only_real_render_validation_required",
+      "renderer_identity": {
+        "backend_version": "0.8.3",
+        "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+        "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+        "settings": {
+          "buffer_size": 128,
+          "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+          "event_timing": "absolute ticks to half-even sample offsets",
+          "plugin_name": "Vital.vst3",
+          "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+          "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+        }
+      },
+      "replay_bytes": 7925300,
+      "replay_distinct_audio_buffers": 205,
+      "replay_distinct_states": 205,
+      "replay_examples": 205,
+      "replay_seed": {
+        "acknowledged_recipes": 205,
+        "checkpoint_sha256": "e66c50eab45fe3e3b3cff7b8baad6eaf688ed69ef3d60c442c6cedee89cfb723",
+        "examples": 205,
+        "policy": "features_only_fresh_model_optimizer_rng_v1",
+        "source_run_id": "518c09e2c8b4dd0adc849c4d3c1f93c032adcfe407a54d5ee2466445e04b2b4d"
+      },
+      "rss_sampling_errors": 0,
+      "run_id": "97427553ce77587e46b797709d178942075af064a15335294a12547b8fae7ce6",
+      "seeded_feature_examples": 205,
+      "step": 16000,
+      "tiny_overfit_gate": false,
+      "torch": "2.12.1+xpu",
+      "totals": {
+        "accepted": 205,
+        "errors": 0,
+        "feature_seconds": 0.0,
+        "maximum_gradient_norm": 72.833740234375,
+        "optimizer_seconds": 134.1413798010908,
+        "rejected": 0,
+        "render_attempts": 0,
+        "reused_feature_draws": 511795,
+        "sampled_examples": 512000
+      },
+      "trainable_parameters": 355806
+    },
+    "one_4000": {
+      "audio_files_written": 0,
+      "checkpoint_seconds_this_segment": 0.3154787002131343,
+      "complete": false,
+      "config": {
+        "batch_size": 32,
+        "checkpoint_every": 4000,
+        "cpu_threads": 4,
+        "fresh_examples": 205,
+        "learning_rate": 0.001,
+        "mode": "online",
+        "render_budget": 480,
+        "replay_capacity": 410,
+        "replay_mib": 32,
+        "sampling_policy": "state_round_robin",
+        "seed": 0,
+        "steps": 16000,
+        "updates_per_render": 4
+      },
+      "cursor": {
+        "audio_replay": "regenerate_unacknowledged_not_bit_exact",
+        "next_sequence_id": 205,
+        "stream_id": "853ac7b8dec74828fab1ebc0f83a63afbc2733f6fee2d1003e9794252a09f775",
+        "version": 1
+      },
+      "device": "cpu",
+      "elapsed_seconds_this_segment": 29.131643199827522,
+      "feature_seconds_this_segment": 0.0,
+      "final_metrics": {
+        "categorical_accuracy": 1.0,
+        "categorical_ce": 0.00024347729049623013,
+        "continuous_mae": 0.0753394216299057,
+        "continuous_mse": 0.01075074914842844,
+        "loss": 0.010994226671755314
+      },
+      "fresh_accepted_this_segment": 0,
+      "fresh_example_target_reached": true,
+      "frontend": {
+        "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+        "device": "cpu",
+        "fft": 2048,
+        "frontend": "stereo_mel_and_frozen_basic_pitch_v1",
+        "hop": 441,
+        "input": "audio_only",
+        "log_scale": 10,
+        "maximum_audio_seconds": 16,
+        "normalization": "fixed_scaling_no_fitted_statistics",
+        "pitch_size": 3521,
+        "pitch_time_bins": 8,
+        "precision": "float32",
+        "sample_rate": 44100,
+        "timbre_shape": [
+          2,
+          96,
+          32
+        ]
+      },
+      "frozen_weights_and_buffers_unchanged": true,
+      "initial_metrics": {
+        "categorical_accuracy": 0.4243902564048767,
+        "categorical_ce": 1.7970106601715088,
+        "continuous_mae": 0.2456456869840622,
+        "continuous_mse": 0.08102984726428986,
+        "loss": 1.8780405521392822
+      },
+      "mode": "online",
+      "model_state_sha256": "5137139cb63fcdd0756350a14c42ad1dce29b292c17c38656765e11010d106ef",
+      "peak_process_tree_rss_bytes": 623337472,
+      "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+      "quality_claim": "supervised_bootstrap_only_real_render_validation_required",
+      "renderer_identity": {
+        "backend_version": "0.8.3",
+        "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+        "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+        "settings": {
+          "buffer_size": 128,
+          "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+          "event_timing": "absolute ticks to half-even sample offsets",
+          "plugin_name": "Vital.vst3",
+          "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+          "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+        }
+      },
+      "replay_bytes": 7925300,
+      "replay_distinct_audio_buffers": 205,
+      "replay_distinct_states": 205,
+      "replay_examples": 205,
+      "replay_seed": {
+        "acknowledged_recipes": 205,
+        "checkpoint_sha256": "e66c50eab45fe3e3b3cff7b8baad6eaf688ed69ef3d60c442c6cedee89cfb723",
+        "examples": 205,
+        "policy": "features_only_fresh_model_optimizer_rng_v1",
+        "source_run_id": "518c09e2c8b4dd0adc849c4d3c1f93c032adcfe407a54d5ee2466445e04b2b4d"
+      },
+      "rss_sampling_errors": 0,
+      "run_id": "97427553ce77587e46b797709d178942075af064a15335294a12547b8fae7ce6",
+      "seeded_feature_examples": 205,
+      "step": 4000,
+      "tiny_overfit_gate": false,
+      "torch": "2.12.1+xpu",
+      "totals": {
+        "accepted": 205,
+        "errors": 0,
+        "feature_seconds": 0.0,
+        "maximum_gradient_norm": 28.219629287719727,
+        "optimizer_seconds": 28.70096600148827,
+        "rejected": 0,
+        "render_attempts": 0,
+        "reused_feature_draws": 127795,
+        "sampled_examples": 128000
+      },
+      "trainable_parameters": 355806
+    },
+    "one_8000": {
+      "audio_files_written": 0,
+      "checkpoint_seconds_this_segment": 0.23256200016476214,
+      "complete": false,
+      "config": {
+        "batch_size": 32,
+        "checkpoint_every": 4000,
+        "cpu_threads": 4,
+        "fresh_examples": 205,
+        "learning_rate": 0.001,
+        "mode": "online",
+        "render_budget": 480,
+        "replay_capacity": 410,
+        "replay_mib": 32,
+        "sampling_policy": "state_round_robin",
+        "seed": 0,
+        "steps": 16000,
+        "updates_per_render": 4
+      },
+      "cursor": {
+        "audio_replay": "regenerate_unacknowledged_not_bit_exact",
+        "next_sequence_id": 205,
+        "stream_id": "853ac7b8dec74828fab1ebc0f83a63afbc2733f6fee2d1003e9794252a09f775",
+        "version": 1
+      },
+      "device": "cpu",
+      "elapsed_seconds_this_segment": 29.63413710007444,
+      "feature_seconds_this_segment": 0.0,
+      "final_metrics": {
+        "categorical_accuracy": 1.0,
+        "categorical_ce": 2.4238899641204625e-05,
+        "continuous_mae": 0.02921260893344879,
+        "continuous_mse": 0.0016153069445863366,
+        "loss": 0.0016395458951592445
+      },
+      "fresh_accepted_this_segment": 0,
+      "fresh_example_target_reached": true,
+      "frontend": {
+        "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+        "device": "cpu",
+        "fft": 2048,
+        "frontend": "stereo_mel_and_frozen_basic_pitch_v1",
+        "hop": 441,
+        "input": "audio_only",
+        "log_scale": 10,
+        "maximum_audio_seconds": 16,
+        "normalization": "fixed_scaling_no_fitted_statistics",
+        "pitch_size": 3521,
+        "pitch_time_bins": 8,
+        "precision": "float32",
+        "sample_rate": 44100,
+        "timbre_shape": [
+          2,
+          96,
+          32
+        ]
+      },
+      "frozen_weights_and_buffers_unchanged": true,
+      "initial_metrics": {
+        "categorical_accuracy": 0.4243902564048767,
+        "categorical_ce": 1.7970106601715088,
+        "continuous_mae": 0.2456456869840622,
+        "continuous_mse": 0.08102984726428986,
+        "loss": 1.8780405521392822
+      },
+      "mode": "online",
+      "model_state_sha256": "d00646e87780adba49b91f7b277eb1a841eb93834b499c53539b3a4d9bdebcac",
+      "peak_process_tree_rss_bytes": 637841408,
+      "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+      "quality_claim": "supervised_bootstrap_only_real_render_validation_required",
+      "renderer_identity": {
+        "backend_version": "0.8.3",
+        "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+        "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+        "settings": {
+          "buffer_size": 128,
+          "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+          "event_timing": "absolute ticks to half-even sample offsets",
+          "plugin_name": "Vital.vst3",
+          "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+          "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+        }
+      },
+      "replay_bytes": 7925300,
+      "replay_distinct_audio_buffers": 205,
+      "replay_distinct_states": 205,
+      "replay_examples": 205,
+      "replay_seed": {
+        "acknowledged_recipes": 205,
+        "checkpoint_sha256": "e66c50eab45fe3e3b3cff7b8baad6eaf688ed69ef3d60c442c6cedee89cfb723",
+        "examples": 205,
+        "policy": "features_only_fresh_model_optimizer_rng_v1",
+        "source_run_id": "518c09e2c8b4dd0adc849c4d3c1f93c032adcfe407a54d5ee2466445e04b2b4d"
+      },
+      "rss_sampling_errors": 0,
+      "run_id": "97427553ce77587e46b797709d178942075af064a15335294a12547b8fae7ce6",
+      "seeded_feature_examples": 205,
+      "step": 8000,
+      "tiny_overfit_gate": false,
+      "torch": "2.12.1+xpu",
+      "totals": {
+        "accepted": 205,
+        "errors": 0,
+        "feature_seconds": 0.0,
+        "maximum_gradient_norm": 28.219629287719727,
+        "optimizer_seconds": 58.002312602009624,
+        "rejected": 0,
+        "render_attempts": 0,
+        "reused_feature_draws": 255795,
+        "sampled_examples": 256000
+      },
+      "trainable_parameters": 355806
+    },
+    "two_16000": {
+      "audio_files_written": 0,
+      "checkpoint_seconds_this_segment": 0.7342906000558287,
+      "complete": true,
+      "config": {
+        "batch_size": 32,
+        "checkpoint_every": 4000,
+        "cpu_threads": 4,
+        "fresh_examples": 410,
+        "learning_rate": 0.001,
+        "mode": "online",
+        "render_budget": 480,
+        "replay_capacity": 410,
+        "replay_mib": 32,
+        "sampling_policy": "state_round_robin",
+        "seed": 0,
+        "steps": 16000,
+        "updates_per_render": 4
+      },
+      "cursor": {
+        "audio_replay": "regenerate_unacknowledged_not_bit_exact",
+        "next_sequence_id": 410,
+        "stream_id": "853ac7b8dec74828fab1ebc0f83a63afbc2733f6fee2d1003e9794252a09f775",
+        "version": 1
+      },
+      "device": "cpu",
+      "elapsed_seconds_this_segment": 81.77782960003242,
+      "feature_seconds_this_segment": 0.0,
+      "final_metrics": {
+        "categorical_accuracy": 1.0,
+        "categorical_ce": 3.221910083084367e-05,
+        "continuous_mae": 0.03262270614504814,
+        "continuous_mse": 0.001839956152252853,
+        "loss": 0.0018721752567216754
+      },
+      "fresh_accepted_this_segment": 0,
+      "fresh_example_target_reached": true,
+      "frontend": {
+        "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+        "device": "cpu",
+        "fft": 2048,
+        "frontend": "stereo_mel_and_frozen_basic_pitch_v1",
+        "hop": 441,
+        "input": "audio_only",
+        "log_scale": 10,
+        "maximum_audio_seconds": 16,
+        "normalization": "fixed_scaling_no_fitted_statistics",
+        "pitch_size": 3521,
+        "pitch_time_bins": 8,
+        "precision": "float32",
+        "sample_rate": 44100,
+        "timbre_shape": [
+          2,
+          96,
+          32
+        ]
+      },
+      "frozen_weights_and_buffers_unchanged": true,
+      "initial_metrics": {
+        "categorical_accuracy": 0.4243902564048767,
+        "categorical_ce": 1.7970075607299805,
+        "continuous_mae": 0.2456459254026413,
+        "continuous_mse": 0.08103035390377045,
+        "loss": 1.878037929534912
+      },
+      "mode": "online",
+      "model_state_sha256": "8f52f15d50e557960ca87b9dc0b5c329311a12d55a63c891b8541c150644d1f9",
+      "peak_process_tree_rss_bytes": 750305280,
+      "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+      "quality_claim": "supervised_bootstrap_only_real_render_validation_required",
+      "renderer_identity": {
+        "backend_version": "0.8.3",
+        "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+        "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+        "settings": {
+          "buffer_size": 128,
+          "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+          "event_timing": "absolute ticks to half-even sample offsets",
+          "plugin_name": "Vital.vst3",
+          "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+          "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+        }
+      },
+      "replay_bytes": 15850600,
+      "replay_distinct_audio_buffers": 410,
+      "replay_distinct_states": 205,
+      "replay_examples": 410,
+      "replay_seed": {
+        "acknowledged_recipes": 410,
+        "checkpoint_sha256": "07a5f637aaa3d98a4469fd7a046df0f5d58575fcb84b1328d090cb9548b3cee9",
+        "examples": 410,
+        "policy": "features_only_fresh_model_optimizer_rng_v1",
+        "source_run_id": "44179e3415c1df88ff00633192a5075da724345aa736602fa931f51bcdb0c6d4"
+      },
+      "rss_sampling_errors": 0,
+      "run_id": "2625dc0d324b518f5004576da1c96481116c006c8a3c5200892756c61f198488",
+      "seeded_feature_examples": 410,
+      "step": 16000,
+      "tiny_overfit_gate": false,
+      "torch": "2.12.1+xpu",
+      "totals": {
+        "accepted": 410,
+        "errors": 0,
+        "feature_seconds": 0.0,
+        "maximum_gradient_norm": 57.57320022583008,
+        "optimizer_seconds": 158.6852596849203,
+        "rejected": 0,
+        "render_attempts": 0,
+        "reused_feature_draws": 511590,
+        "sampled_examples": 512000
+      },
+      "trainable_parameters": 355806
+    },
+    "two_4000": {
+      "audio_files_written": 0,
+      "checkpoint_seconds_this_segment": 0.5678583001717925,
+      "complete": false,
+      "config": {
+        "batch_size": 32,
+        "checkpoint_every": 4000,
+        "cpu_threads": 4,
+        "fresh_examples": 410,
+        "learning_rate": 0.001,
+        "mode": "online",
+        "render_budget": 480,
+        "replay_capacity": 410,
+        "replay_mib": 32,
+        "sampling_policy": "state_round_robin",
+        "seed": 0,
+        "steps": 16000,
+        "updates_per_render": 4
+      },
+      "cursor": {
+        "audio_replay": "regenerate_unacknowledged_not_bit_exact",
+        "next_sequence_id": 410,
+        "stream_id": "853ac7b8dec74828fab1ebc0f83a63afbc2733f6fee2d1003e9794252a09f775",
+        "version": 1
+      },
+      "device": "cpu",
+      "elapsed_seconds_this_segment": 38.119175100000575,
+      "feature_seconds_this_segment": 0.0,
+      "final_metrics": {
+        "categorical_accuracy": 0.9804878234863281,
+        "categorical_ce": 0.08674662560224533,
+        "continuous_mae": 0.14202623069286346,
+        "continuous_mse": 0.03361445292830467,
+        "loss": 0.1203610748052597
+      },
+      "fresh_accepted_this_segment": 0,
+      "fresh_example_target_reached": true,
+      "frontend": {
+        "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+        "device": "cpu",
+        "fft": 2048,
+        "frontend": "stereo_mel_and_frozen_basic_pitch_v1",
+        "hop": 441,
+        "input": "audio_only",
+        "log_scale": 10,
+        "maximum_audio_seconds": 16,
+        "normalization": "fixed_scaling_no_fitted_statistics",
+        "pitch_size": 3521,
+        "pitch_time_bins": 8,
+        "precision": "float32",
+        "sample_rate": 44100,
+        "timbre_shape": [
+          2,
+          96,
+          32
+        ]
+      },
+      "frozen_weights_and_buffers_unchanged": true,
+      "initial_metrics": {
+        "categorical_accuracy": 0.4243902564048767,
+        "categorical_ce": 1.7970075607299805,
+        "continuous_mae": 0.2456459254026413,
+        "continuous_mse": 0.08103035390377045,
+        "loss": 1.878037929534912
+      },
+      "mode": "online",
+      "model_state_sha256": "d675f89a5f24aa0e484804947d113659f2dd8e1d5740def4d37d78bfa28677e5",
+      "peak_process_tree_rss_bytes": 701919232,
+      "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+      "quality_claim": "supervised_bootstrap_only_real_render_validation_required",
+      "renderer_identity": {
+        "backend_version": "0.8.3",
+        "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+        "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+        "settings": {
+          "buffer_size": 128,
+          "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+          "event_timing": "absolute ticks to half-even sample offsets",
+          "plugin_name": "Vital.vst3",
+          "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+          "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+        }
+      },
+      "replay_bytes": 15850600,
+      "replay_distinct_audio_buffers": 410,
+      "replay_distinct_states": 205,
+      "replay_examples": 410,
+      "replay_seed": {
+        "acknowledged_recipes": 410,
+        "checkpoint_sha256": "07a5f637aaa3d98a4469fd7a046df0f5d58575fcb84b1328d090cb9548b3cee9",
+        "examples": 410,
+        "policy": "features_only_fresh_model_optimizer_rng_v1",
+        "source_run_id": "44179e3415c1df88ff00633192a5075da724345aa736602fa931f51bcdb0c6d4"
+      },
+      "rss_sampling_errors": 0,
+      "run_id": "2625dc0d324b518f5004576da1c96481116c006c8a3c5200892756c61f198488",
+      "seeded_feature_examples": 410,
+      "step": 4000,
+      "tiny_overfit_gate": false,
+      "torch": "2.12.1+xpu",
+      "totals": {
+        "accepted": 410,
+        "errors": 0,
+        "feature_seconds": 0.0,
+        "maximum_gradient_norm": 28.754186630249023,
+        "optimizer_seconds": 37.40452949842438,
+        "rejected": 0,
+        "render_attempts": 0,
+        "reused_feature_draws": 127590,
+        "sampled_examples": 128000
+      },
+      "trainable_parameters": 355806
+    },
+    "two_8000": {
+      "audio_files_written": 0,
+      "checkpoint_seconds_this_segment": 0.45687699993140996,
+      "complete": false,
+      "config": {
+        "batch_size": 32,
+        "checkpoint_every": 4000,
+        "cpu_threads": 4,
+        "fresh_examples": 410,
+        "learning_rate": 0.001,
+        "mode": "online",
+        "render_budget": 480,
+        "replay_capacity": 410,
+        "replay_mib": 32,
+        "sampling_policy": "state_round_robin",
+        "seed": 0,
+        "steps": 16000,
+        "updates_per_render": 4
+      },
+      "cursor": {
+        "audio_replay": "regenerate_unacknowledged_not_bit_exact",
+        "next_sequence_id": 410,
+        "stream_id": "853ac7b8dec74828fab1ebc0f83a63afbc2733f6fee2d1003e9794252a09f775",
+        "version": 1
+      },
+      "device": "cpu",
+      "elapsed_seconds_this_segment": 41.142619099933654,
+      "feature_seconds_this_segment": 0.0,
+      "final_metrics": {
+        "categorical_accuracy": 1.0,
+        "categorical_ce": 0.0003438107669353485,
+        "continuous_mae": 0.0776844322681427,
+        "continuous_mse": 0.011408272199332714,
+        "loss": 0.011752082966268063
+      },
+      "fresh_accepted_this_segment": 0,
+      "fresh_example_target_reached": true,
+      "frontend": {
+        "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+        "device": "cpu",
+        "fft": 2048,
+        "frontend": "stereo_mel_and_frozen_basic_pitch_v1",
+        "hop": 441,
+        "input": "audio_only",
+        "log_scale": 10,
+        "maximum_audio_seconds": 16,
+        "normalization": "fixed_scaling_no_fitted_statistics",
+        "pitch_size": 3521,
+        "pitch_time_bins": 8,
+        "precision": "float32",
+        "sample_rate": 44100,
+        "timbre_shape": [
+          2,
+          96,
+          32
+        ]
+      },
+      "frozen_weights_and_buffers_unchanged": true,
+      "initial_metrics": {
+        "categorical_accuracy": 0.4243902564048767,
+        "categorical_ce": 1.7970075607299805,
+        "continuous_mae": 0.2456459254026413,
+        "continuous_mse": 0.08103035390377045,
+        "loss": 1.878037929534912
+      },
+      "mode": "online",
+      "model_state_sha256": "33a042e831cad0214bf8e10aa1280fe9c4c10fc2d1862409ebfec3a2d0cfaf01",
+      "peak_process_tree_rss_bytes": 739876864,
+      "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+      "quality_claim": "supervised_bootstrap_only_real_render_validation_required",
+      "renderer_identity": {
+        "backend_version": "0.8.3",
+        "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+        "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+        "settings": {
+          "buffer_size": 128,
+          "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+          "event_timing": "absolute ticks to half-even sample offsets",
+          "plugin_name": "Vital.vst3",
+          "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+          "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+        }
+      },
+      "replay_bytes": 15850600,
+      "replay_distinct_audio_buffers": 410,
+      "replay_distinct_states": 205,
+      "replay_examples": 410,
+      "replay_seed": {
+        "acknowledged_recipes": 410,
+        "checkpoint_sha256": "07a5f637aaa3d98a4469fd7a046df0f5d58575fcb84b1328d090cb9548b3cee9",
+        "examples": 410,
+        "policy": "features_only_fresh_model_optimizer_rng_v1",
+        "source_run_id": "44179e3415c1df88ff00633192a5075da724345aa736602fa931f51bcdb0c6d4"
+      },
+      "rss_sampling_errors": 0,
+      "run_id": "2625dc0d324b518f5004576da1c96481116c006c8a3c5200892756c61f198488",
+      "seeded_feature_examples": 410,
+      "step": 8000,
+      "tiny_overfit_gate": false,
+      "torch": "2.12.1+xpu",
+      "totals": {
+        "accepted": 410,
+        "errors": 0,
+        "feature_seconds": 0.0,
+        "maximum_gradient_norm": 38.07612609863281,
+        "optimizer_seconds": 77.93080138694495,
+        "rejected": 0,
+        "render_attempts": 0,
+        "reused_feature_draws": 255590,
+        "sampled_examples": 256000
+      },
+      "trainable_parameters": 355806
+    }
+  },
+  "training_elapsed_seconds": 296.6369204998482,
+  "training_verification": {
+    "initial_model_sha256": {
+      "one": "91e6968ae5e73529ff43ce4f64c2927339573172b65a130dca89ee03ba2181b7",
+      "two": "91e6968ae5e73529ff43ce4f64c2927339573172b65a130dca89ee03ba2181b7"
+    },
+    "native_training_renders": 0,
+    "orchestrator_elapsed_seconds": 346.34171220008284,
+    "segments": {
+      "one_16000": {
+        "checkpoint_sha256": "b5df523b46f63bb48dea67b6b2b1247b32af15076fc5dd45e1c27df6ac8f95e8",
+        "elapsed_seconds": 76.83151639997959,
+        "metrics": {
+          "categorical_accuracy": 1.0,
+          "categorical_ce": 1.753063224896323e-05,
+          "continuous_mae": 0.02250852808356285,
+          "continuous_mse": 0.0010600200621411204,
+          "loss": 0.001077550696209073
+        },
+        "model_state_sha256": "a64e509920bef6468bbc61031d015b9a4fbfd204d381782b5f4af08622398fca",
+        "retained_features_sha256": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+        "run_id": "97427553ce77587e46b797709d178942075af064a15335294a12547b8fae7ce6"
+      },
+      "one_4000": {
+        "checkpoint_sha256": "0ee14fe9b2a7d46efb3fa40804c2d550f90d50bd5daa404a973a2261e7fe3aa5",
+        "elapsed_seconds": 29.131643199827522,
+        "metrics": {
+          "categorical_accuracy": 1.0,
+          "categorical_ce": 0.00024347729049623013,
+          "continuous_mae": 0.0753394216299057,
+          "continuous_mse": 0.01075074914842844,
+          "loss": 0.010994226671755314
+        },
+        "model_state_sha256": "5137139cb63fcdd0756350a14c42ad1dce29b292c17c38656765e11010d106ef",
+        "retained_features_sha256": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+        "run_id": "97427553ce77587e46b797709d178942075af064a15335294a12547b8fae7ce6"
+      },
+      "one_8000": {
+        "checkpoint_sha256": "8e55c351656e1b606f99ac0ae1df7444ef1f2e546357cba7d89db961df3862ca",
+        "elapsed_seconds": 29.63413710007444,
+        "metrics": {
+          "categorical_accuracy": 1.0,
+          "categorical_ce": 2.4238899641204625e-05,
+          "continuous_mae": 0.02921260893344879,
+          "continuous_mse": 0.0016153069445863366,
+          "loss": 0.0016395458951592445
+        },
+        "model_state_sha256": "d00646e87780adba49b91f7b277eb1a841eb93834b499c53539b3a4d9bdebcac",
+        "retained_features_sha256": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+        "run_id": "97427553ce77587e46b797709d178942075af064a15335294a12547b8fae7ce6"
+      },
+      "two_16000": {
+        "checkpoint_sha256": "2a6e00ff41433f2237343aa2eaab09c4b624c5963d852b970ea8341c557f9805",
+        "elapsed_seconds": 81.77782960003242,
+        "metrics": {
+          "categorical_accuracy": 1.0,
+          "categorical_ce": 3.221910083084367e-05,
+          "continuous_mae": 0.03262270614504814,
+          "continuous_mse": 0.001839956152252853,
+          "loss": 0.0018721752567216754
+        },
+        "model_state_sha256": "8f52f15d50e557960ca87b9dc0b5c329311a12d55a63c891b8541c150644d1f9",
+        "retained_features_sha256": "fb9595eeeae00ede6d449ee2abdd416fd33f23b6ea87d443562ab58b994acaa8",
+        "run_id": "2625dc0d324b518f5004576da1c96481116c006c8a3c5200892756c61f198488"
+      },
+      "two_4000": {
+        "checkpoint_sha256": "d2b25022d32f2c58530fa7255ca78b7749e9b963174e6c7ebc1fca7bcf964de0",
+        "elapsed_seconds": 38.119175100000575,
+        "metrics": {
+          "categorical_accuracy": 0.9804878234863281,
+          "categorical_ce": 0.08674662560224533,
+          "continuous_mae": 0.14202623069286346,
+          "continuous_mse": 0.03361445292830467,
+          "loss": 0.1203610748052597
+        },
+        "model_state_sha256": "d675f89a5f24aa0e484804947d113659f2dd8e1d5740def4d37d78bfa28677e5",
+        "retained_features_sha256": "fb9595eeeae00ede6d449ee2abdd416fd33f23b6ea87d443562ab58b994acaa8",
+        "run_id": "2625dc0d324b518f5004576da1c96481116c006c8a3c5200892756c61f198488"
+      },
+      "two_8000": {
+        "checkpoint_sha256": "2dc2a7b595ba38e50fcffa34032488c0bf42e08909c6889b72e90e103dd1c13d",
+        "elapsed_seconds": 41.142619099933654,
+        "metrics": {
+          "categorical_accuracy": 1.0,
+          "categorical_ce": 0.0003438107669353485,
+          "continuous_mae": 0.0776844322681427,
+          "continuous_mse": 0.011408272199332714,
+          "loss": 0.011752082966268063
+        },
+        "model_state_sha256": "33a042e831cad0214bf8e10aa1280fe9c4c10fc2d1862409ebfec3a2d0cfaf01",
+        "retained_features_sha256": "fb9595eeeae00ede6d449ee2abdd416fd33f23b6ea87d443562ab58b994acaa8",
+        "run_id": "2625dc0d324b518f5004576da1c96481116c006c8a3c5200892756c61f198488"
+      }
+    },
+    "training_source_sha256": {
+      "obruxo_training/cli.py": "340bd60d2805f00a0833cd8a9c115599e2a47ff95170ff535b1e25186bc9e007",
+      "obruxo_training/codec.py": "a9e0095d0f45f80d25c1f30b0bc630b6ab93a41a4a62601d116db36d94435264",
+      "obruxo_training/evaluate.py": "f53b11eb100b5277829ec3523276522f539ac2b3dfccae8490ea3d41c2e805b7",
+      "obruxo_training/features.py": "83ef8178442dc467b7985c67915a136650bc83e0248237f8bb12bdd452fae951",
+      "obruxo_training/model.py": "ee5cb2c6fcdc04e1ea327db3aa8cc08184dc0a4ee3a2bf2a481ceff227e1c4cb",
+      "obruxo_training/pilot.py": "42627c95d5efad3db9e297b4e9305bf42ed3f82e6a7d7ff7e7993d6905b0dee4",
+      "obruxo_training/stream.py": "9e2e89bc954f2d50f88d6af08a6727bd286339eed6550c77e6cbb55f43a7dbc4",
+      "obruxo_training/trainer.py": "2542db8bc08bcc03143a5669f8c7d23cb1f34fd747ee25eb55dcf7e75c0e4fbe"
+    },
+    "unchanged_runtime_source": true
+  },
+  "validation": {
+    "aggregates": {
+      "fixed_template": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 2.927469674320448,
+          "mean_rms_relative": 1.2921636454938423,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 3.274651199579239,
+          "mean_rms_relative": 1.3924794612186295,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "incumbent": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.9307126100692484,
+          "mean_rms_relative": 0.28667235682119746,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.0432267453935413,
+          "mean_rms_relative": 0.2631722040740507,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "one_16000": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.91622886380979,
+          "mean_rms_relative": 0.2507022806620669,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.064871544107085,
+          "mean_rms_relative": 0.2595686623383136,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "one_4000": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.021405724365087,
+          "mean_rms_relative": 0.3255798801602352,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.1358663360514338,
+          "mean_rms_relative": 0.2761739232533035,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "one_8000": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.9452960184287458,
+          "mean_rms_relative": 0.2796332254961488,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.0990103769988293,
+          "mean_rms_relative": 0.22697011780525958,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "source_repeat": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.0,
+          "mean_rms_relative": 0.0,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.0,
+          "mean_rms_relative": 0.0,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "train_retrieval": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.0762147254177503,
+          "mean_rms_relative": 0.12793441045851933,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.4729117272155625,
+          "mean_rms_relative": 0.26831889023915645,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "two_16000": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.9581492772651097,
+          "mean_rms_relative": 0.3108780696278527,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.029276778359735,
+          "mean_rms_relative": 0.25622945797762703,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "two_4000": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.2234588582364339,
+          "mean_rms_relative": 0.43995614498410196,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.295002775769385,
+          "mean_rms_relative": 0.3853291654959321,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "two_8000": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.9517480030301071,
+          "mean_rms_relative": 0.2343310217506119,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.036933763750962,
+          "mean_rms_relative": 0.22016965101162592,
+          "planned": 21,
+          "scored": 21
+        }
+      }
+    },
+    "audio_files_written": 0,
+    "comparison": {
+      "bootstrap": {
+        "interval": "percentile_95",
+        "limit": "descriptive_validation_only_not_adjusted_for_checkpoint_selection",
+        "resamples": 2000,
+        "seed": 0,
+        "unit": "state"
+      },
+      "checkpoints": {
+        "incumbent": {
+          "against_train_retrieval": {
+            "ci95": [
+              -0.491632673615915,
+              -0.052634803135509854
+            ],
+            "mean_delta": -0.2875935485852616,
+            "paired": 21,
+            "planned": 21,
+            "ties": 0,
+            "wins": 17
+          },
+          "mean_reference_transfer_mrstft": 0.9869696777313948,
+          "paired_roles_scored": 21,
+          "planned": 21,
+          "selection_eligible": true
+        },
+        "one_16000": {
+          "against_train_retrieval": {
+            "ci95": [
+              -0.4779366095343399,
+              -0.08573397323415304
+            ],
+            "mean_delta": -0.28401302235821885,
+            "paired": 21,
+            "planned": 21,
+            "ties": 0,
+            "wins": 18
+          },
+          "mean_reference_transfer_mrstft": 0.9905502039584375,
+          "paired_roles_scored": 21,
+          "planned": 21,
+          "selection_eligible": true
+        },
+        "one_4000": {
+          "against_train_retrieval": {
+            "ci95": [
+              -0.4034155889429033,
+              0.045571535155324576
+            ],
+            "mean_delta": -0.19592719610839612,
+            "paired": 21,
+            "planned": 21,
+            "ties": 0,
+            "wins": 14
+          },
+          "mean_reference_transfer_mrstft": 1.0786360302082603,
+          "paired_roles_scored": 21,
+          "planned": 21,
+          "selection_eligible": true
+        },
+        "one_8000": {
+          "against_train_retrieval": {
+            "ci95": [
+              -0.40372860979525343,
+              -0.08885520208804384
+            ],
+            "mean_delta": -0.2524100286028688,
+            "paired": 21,
+            "planned": 21,
+            "ties": 0,
+            "wins": 20
+          },
+          "mean_reference_transfer_mrstft": 1.0221531977137874,
+          "paired_roles_scored": 21,
+          "planned": 21,
+          "selection_eligible": true
+        },
+        "two_16000": {
+          "against_train_retrieval": {
+            "ci95": [
+              -0.48822174033534443,
+              -0.07561505763895002
+            ],
+            "mean_delta": -0.2808501985042342,
+            "paired": 21,
+            "planned": 21,
+            "ties": 0,
+            "wins": 16
+          },
+          "mean_reference_transfer_mrstft": 0.9937130278124222,
+          "paired_roles_scored": 21,
+          "planned": 21,
+          "selection_eligible": true
+        },
+        "two_4000": {
+          "against_train_retrieval": {
+            "ci95": [
+              -0.3213788992799228,
+              0.37760335572862175
+            ],
+            "mean_delta": -0.015332409313746914,
+            "paired": 21,
+            "planned": 21,
+            "ties": 0,
+            "wins": 14
+          },
+          "mean_reference_transfer_mrstft": 1.2592308170029096,
+          "paired_roles_scored": 21,
+          "planned": 21,
+          "selection_eligible": true
+        },
+        "two_8000": {
+          "against_train_retrieval": {
+            "ci95": [
+              -0.4874218025111726,
+              -0.08086302115153225
+            ],
+            "mean_delta": -0.2802223429261219,
+            "paired": 21,
+            "planned": 21,
+            "ties": 0,
+            "wins": 16
+          },
+          "mean_reference_transfer_mrstft": 0.9943408833905345,
+          "paired_roles_scored": 21,
+          "planned": 21,
+          "selection_eligible": true
+        }
+      },
+      "primary": "equal_weight_mean_of_reference_and_transfer_per_state_mrstft",
+      "selected": "incumbent",
+      "selection_policy": "lowest_complete_validation_mean_input_order_breaks_ties"
+    },
+    "completed_cases_reused": 0,
+    "elapsed_includes_uncommitted_interrupted_work": true,
+    "elapsed_seconds": 1136.2237021001056,
+    "evaluation": "pilot_real_render_comparison_v1",
+    "metric": "mean_over_512_2048_8192_of_spectral_convergence_plus_log_magnitude_mae_stereo",
+    "metric_limit": "diagnostic_spectral_distance_not_a_calibrated_perceptual_score",
+    "planned_uninterrupted_render_attempts": 462,
+    "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+    "recovery": "reuse_committed_cases_rerender_entire_unfinished_case_with_all_checkpoints",
+    "render_wall_seconds": 1118.9354452989064,
+    "renderer_identity": {
+      "backend_version": "0.8.3",
+      "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+      "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+      "settings": {
+        "buffer_size": 128,
+        "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+        "event_timing": "absolute ticks to half-even sample offsets",
+        "plugin_name": "Vital.vst3",
+        "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+        "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+      }
+    },
+    "renders_accepted": 462,
+    "renders_attempted": 462,
+    "renders_attempted_this_segment": 462,
+    "retrieval_distinct_train_states": 205,
+    "retrieval_examples": 205,
+    "retrieval_policy": "equal_branch_mean_squared_feature_distance_train_replay_only",
+    "retrieval_sha256": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+    "retrieval_source": {
+      "checkpoint": "research\\training\\outputs\\full-pilot-step4000-20261009\\checkpoint.pt",
+      "file_sha256": "e66c50eab45fe3e3b3cff7b8baad6eaf688ed69ef3d60c442c6cedee89cfb723",
+      "step": 4000
+    },
+    "selection": "first_unique_validation_states_or_first_retained_training_views_no_best_of_k",
+    "split": "validation",
+    "test_split_evaluated": false,
+    "transfer": "same_patch_predicted_from_reference_audio_rendered_on_reserved_performance"
+  },
+  "verification": {
+    "declared_candidate_order_matches_native_render_order": true,
+    "previous_maximum_absolute_score_change": {
+      "incumbent": {
+        "reference": 0.0,
+        "transfer": 0.0
+      },
+      "one_4000": {
+        "reference": 0.0,
+        "transfer": 0.0
+      }
+    },
+    "same_previous_validation_recipes_and_transfer_performances": true,
+    "unchanged_205_record_retrieval_bank": true
+  }
+}

@@ -1,0 +1,782 @@
+{
+  "audio_files_written": 0,
+  "checkpoints": {
+    "previous_selected": {
+      "bytes": 12583497,
+      "checkpoint": "outputs/full-pilot-step4000-20261009/checkpoint.pt",
+      "file_sha256": "e66c50eab45fe3e3b3cff7b8baad6eaf688ed69ef3d60c442c6cedee89cfb723",
+      "model_state_sha256": "e6fbd0548b97072e6a824810bb5aab55d95fb7427b19e46686069100ce8ccc75"
+    },
+    "single_view_control": {
+      "bytes": 12583817,
+      "checkpoint": "outputs/two-view-control-20261010/checkpoint.pt",
+      "file_sha256": "460017ee8b6c6250678ae5238bc6429f1595999fa07ec0dc7fd65b75288b4ad7",
+      "model_state_sha256": "5137139cb63fcdd0756350a14c42ad1dce29b292c17c38656765e11010d106ef"
+    },
+    "two_view": {
+      "bytes": 20700629,
+      "checkpoint": "outputs/two-view-train-20261010/checkpoint.pt",
+      "file_sha256": "07a5f637aaa3d98a4469fd7a046df0f5d58575fcb84b1328d090cb9548b3cee9",
+      "model_state_sha256": "291a35e4c230b5317b046305c0cb276e904b4eb98650e8cdc2e27e2261277f93"
+    }
+  },
+  "checks": {
+    "ruff_passed": true,
+    "training_and_data_unit_tests_passed": 137
+  },
+  "colab_qualified": false,
+  "completed_on": "2026-10-11",
+  "declared_on": "2026-10-10",
+  "declared_plan": {
+    "arms": {
+      "single_view_control": {
+        "accepted_example_target": 205,
+        "additional_training_renders": 0
+      },
+      "two_view": {
+        "accepted_example_target": 410,
+        "additional_training_renders": 205
+      }
+    },
+    "common_training": {
+      "batch_size": 32,
+      "checkpoint_every": 1000,
+      "cpu_threads": 4,
+      "device": "cpu",
+      "learning_rate": 0.001,
+      "mode": "online",
+      "render_budget": 480,
+      "replay_capacity": 410,
+      "replay_mib": 32,
+      "sampling_policy": "state_round_robin",
+      "seed": 0,
+      "steps": 4000,
+      "timeout_seconds": 30,
+      "updates_per_render": 4
+    },
+    "constraints": {
+      "audio_archive": false,
+      "coverage_requirement": "two distinct reference performance IDs for each of the 205 training states in the two-view arm",
+      "native_workers": 1,
+      "paid_compute": false,
+      "prefetch_clips": 1,
+      "render_attempt_budget_includes_seeded_prefix": true
+    },
+    "declared_on": "2026-10-10",
+    "evaluation": {
+      "candidate_steps": [
+        4000,
+        4000,
+        4000
+      ],
+      "candidates_in_tie_order": [
+        "previous_selected",
+        "single_view_control",
+        "two_view"
+      ],
+      "maximum_uninterrupted_render_attempts": 294,
+      "planned_comparisons": [
+        "two_view minus single_view_control",
+        "two_view minus previous_selected",
+        "each candidate minus train_retrieval"
+      ],
+      "primary": "equal-weight mean reference and transfer MR-STFT distance per state",
+      "recipes": "same fixed unique validation states and reference/transfer performances as full_pilot_learning_curve_v1",
+      "retrieval_sha256": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+      "retrieval_source": "feature_seed checkpoint, fixed 205 training examples",
+      "secondary": [
+        "unison and filter categorical accuracy",
+        "active envelope/control error",
+        "relative RMS error"
+      ],
+      "selection": "lowest complete primary validation mean, input order breaks ties",
+      "test_split_evaluated": false,
+      "uncertainty": "paired state bootstrap, 2000 resamples, seed 0; descriptive validation intervals without selection adjustment",
+      "validation_states": 21
+    },
+    "experiment": "authored_two_view_controlled_comparison_v1",
+    "feature_seed": {
+      "checkpoint": "outputs/full-pilot-step4000-20261009/checkpoint.pt",
+      "checkpoint_sha256": "e66c50eab45fe3e3b3cff7b8baad6eaf688ed69ef3d60c442c6cedee89cfb723",
+      "examples": 205,
+      "policy": "reuse verified feature prefix; reset model, optimizer, RNG and usage counts"
+    },
+    "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f"
+  },
+  "experiment": "authored_two_view_controlled_comparison_v1",
+  "paid_compute_used": false,
+  "parameter_diagnostics": {
+    "previous_selected": {
+      "active_continuous_mae": 0.18820684170643184,
+      "categorical_accuracy": {
+        "filter_1_on": 1.0,
+        "osc_1_unison_voices": 0.6190476190476191
+      },
+      "continuous": {
+        "env_1_attack": {
+          "active_cases": 21,
+          "mae": 0.17663795849463662
+        },
+        "env_1_decay": {
+          "active_cases": 21,
+          "mae": 0.25314180231609434
+        },
+        "env_1_release": {
+          "active_cases": 21,
+          "mae": 0.33138445530277644
+        },
+        "env_1_sustain": {
+          "active_cases": 21,
+          "mae": 0.15171060271362943
+        },
+        "filter_1_cutoff": {
+          "active_cases": 10,
+          "mae": 0.07710566470526696
+        },
+        "filter_1_resonance": {
+          "active_cases": 10,
+          "mae": 0.32755032462572276
+        },
+        "osc_1_level": {
+          "active_cases": 21,
+          "mae": 0.13259149257369568
+        },
+        "osc_1_pan": {
+          "active_cases": 21,
+          "mae": 0.08808625380232782
+        },
+        "osc_1_unison_detune": {
+          "active_cases": 13,
+          "mae": 0.15951723605741538
+        }
+      }
+    },
+    "single_view_control": {
+      "active_continuous_mae": 0.21100419585153915,
+      "categorical_accuracy": {
+        "filter_1_on": 1.0,
+        "osc_1_unison_voices": 0.7142857142857143
+      },
+      "continuous": {
+        "env_1_attack": {
+          "active_cases": 21,
+          "mae": 0.19223324013289597
+        },
+        "env_1_decay": {
+          "active_cases": 21,
+          "mae": 0.3339492787877549
+        },
+        "env_1_release": {
+          "active_cases": 21,
+          "mae": 0.29524386879240594
+        },
+        "env_1_sustain": {
+          "active_cases": 21,
+          "mae": 0.17782481900644237
+        },
+        "filter_1_cutoff": {
+          "active_cases": 10,
+          "mae": 0.08766900425642381
+        },
+        "filter_1_resonance": {
+          "active_cases": 10,
+          "mae": 0.39832902347713633
+        },
+        "osc_1_level": {
+          "active_cases": 21,
+          "mae": 0.14525819990718297
+        },
+        "osc_1_pan": {
+          "active_cases": 21,
+          "mae": 0.11796124117516599
+        },
+        "osc_1_unison_detune": {
+          "active_cases": 13,
+          "mae": 0.1675233276323314
+        }
+      }
+    },
+    "two_view": {
+      "active_continuous_mae": 0.19380865589792645,
+      "categorical_accuracy": {
+        "filter_1_on": 1.0,
+        "osc_1_unison_voices": 0.8095238095238095
+      },
+      "continuous": {
+        "env_1_attack": {
+          "active_cases": 21,
+          "mae": 0.1682102112973575
+        },
+        "env_1_decay": {
+          "active_cases": 21,
+          "mae": 0.23154443592293927
+        },
+        "env_1_release": {
+          "active_cases": 21,
+          "mae": 0.332507343819804
+        },
+        "env_1_sustain": {
+          "active_cases": 21,
+          "mae": 0.2040521108409663
+        },
+        "filter_1_cutoff": {
+          "active_cases": 10,
+          "mae": 0.08216731540803038
+        },
+        "filter_1_resonance": {
+          "active_cases": 10,
+          "mae": 0.2919256890383355
+        },
+        "osc_1_level": {
+          "active_cases": 21,
+          "mae": 0.18389752166937925
+        },
+        "osc_1_pan": {
+          "active_cases": 21,
+          "mae": 0.09654360466417748
+        },
+        "osc_1_unison_detune": {
+          "active_cases": 13,
+          "mae": 0.11713741929227293
+        }
+      }
+    }
+  },
+  "planned_pairwise_comparisons": {
+    "two_view_minus_previous_selected": {
+      "ci95": [
+        -0.2068670390964678,
+        0.1385725496211162
+      ],
+      "mean_delta": -0.053652067742650494,
+      "paired": 21,
+      "planned": 21,
+      "ties": 0,
+      "wins": 13
+    },
+    "two_view_minus_single_view_control": {
+      "ci95": [
+        -0.18987223042899537,
+        0.011084325460066644
+      ],
+      "mean_delta": -0.09166635247686553,
+      "paired": 21,
+      "planned": 21,
+      "ties": 0,
+      "wins": 15
+    }
+  },
+  "pool": {
+    "codec_id": "842fb3b3757e016c33efe296aa6ed355ac3a392e4c754035b4e3b41803a439bc",
+    "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+    "states": 256,
+    "states_by_split": {
+      "test": 30,
+      "train": 205,
+      "validation": 21
+    }
+  },
+  "scope": "two_view_matched_control_narrow_pilot_validation_selection_only",
+  "selected_model": {
+    "bytes": 1585110,
+    "checkpoint_name": "two_view",
+    "file_sha256": "b9e374b150c07409097ea2dde0283679d48279815828be60e597d3ed132fc77d",
+    "path": "outputs/two-view-validation-20261010/selected-model.pt",
+    "schema_valid_predictions": 63,
+    "weights_match_selected_checkpoint": true
+  },
+  "training": {
+    "single_view_control": {
+      "artifact": {
+        "bytes": 12583817,
+        "checkpoint": "outputs/two-view-control-20261010/checkpoint.pt",
+        "file_sha256": "460017ee8b6c6250678ae5238bc6429f1595999fa07ec0dc7fd65b75288b4ad7",
+        "model_state_sha256": "5137139cb63fcdd0756350a14c42ad1dce29b292c17c38656765e11010d106ef"
+      },
+      "coverage": {
+        "distinct_audio_buffers": 205,
+        "examples": 205,
+        "reference_performance_counts": {
+          "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842": 51,
+          "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86": 52,
+          "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045": 51,
+          "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd": 51
+        },
+        "states": 205,
+        "views_per_state": 1
+      },
+      "summary": {
+        "audio_files_written": 0,
+        "checkpoint_seconds_this_segment": 0.8329632000532001,
+        "complete": true,
+        "config": {
+          "batch_size": 32,
+          "checkpoint_every": 1000,
+          "cpu_threads": 4,
+          "fresh_examples": 205,
+          "learning_rate": 0.001,
+          "mode": "online",
+          "render_budget": 480,
+          "replay_capacity": 410,
+          "replay_mib": 32,
+          "sampling_policy": "state_round_robin",
+          "seed": 0,
+          "steps": 4000,
+          "updates_per_render": 4
+        },
+        "cursor": {
+          "audio_replay": "regenerate_unacknowledged_not_bit_exact",
+          "next_sequence_id": 205,
+          "stream_id": "853ac7b8dec74828fab1ebc0f83a63afbc2733f6fee2d1003e9794252a09f775",
+          "version": 1
+        },
+        "device": "cpu",
+        "elapsed_seconds_this_segment": 37.43818450020626,
+        "feature_seconds_this_segment": 0.0,
+        "final_metrics": {
+          "categorical_accuracy": 1.0,
+          "categorical_ce": 0.00024347729049623013,
+          "continuous_mae": 0.0753394216299057,
+          "continuous_mse": 0.01075074914842844,
+          "loss": 0.010994226671755314
+        },
+        "fresh_accepted_this_segment": 0,
+        "fresh_example_target_reached": true,
+        "frontend": {
+          "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+          "device": "cpu",
+          "fft": 2048,
+          "frontend": "stereo_mel_and_frozen_basic_pitch_v1",
+          "hop": 441,
+          "input": "audio_only",
+          "log_scale": 10,
+          "maximum_audio_seconds": 16,
+          "normalization": "fixed_scaling_no_fitted_statistics",
+          "pitch_size": 3521,
+          "pitch_time_bins": 8,
+          "precision": "float32",
+          "sample_rate": 44100,
+          "timbre_shape": [
+            2,
+            96,
+            32
+          ]
+        },
+        "frozen_weights_and_buffers_unchanged": true,
+        "initial_metrics": {
+          "categorical_accuracy": 0.4243902564048767,
+          "categorical_ce": 1.7970106601715088,
+          "continuous_mae": 0.2456456869840622,
+          "continuous_mse": 0.08102984726428986,
+          "loss": 1.8780405521392822
+        },
+        "mode": "online",
+        "model_state_sha256": "5137139cb63fcdd0756350a14c42ad1dce29b292c17c38656765e11010d106ef",
+        "peak_process_tree_rss_bytes": 624095232,
+        "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+        "quality_claim": "supervised_bootstrap_only_real_render_validation_required",
+        "renderer_identity": {
+          "backend_version": "0.8.3",
+          "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+          "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+          "settings": {
+            "buffer_size": 128,
+            "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+            "event_timing": "absolute ticks to half-even sample offsets",
+            "plugin_name": "Vital.vst3",
+            "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+            "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+          }
+        },
+        "replay_bytes": 7925300,
+        "replay_distinct_audio_buffers": 205,
+        "replay_distinct_states": 205,
+        "replay_examples": 205,
+        "replay_seed": {
+          "acknowledged_recipes": 205,
+          "checkpoint_sha256": "e66c50eab45fe3e3b3cff7b8baad6eaf688ed69ef3d60c442c6cedee89cfb723",
+          "examples": 205,
+          "policy": "features_only_fresh_model_optimizer_rng_v1",
+          "source_run_id": "518c09e2c8b4dd0adc849c4d3c1f93c032adcfe407a54d5ee2466445e04b2b4d"
+        },
+        "rss_sampling_errors": 0,
+        "run_id": "8396537be77e9165d032d06353886abb9f10b74a4a806b4a3bf8bcf248d4c07a",
+        "seeded_feature_examples": 205,
+        "step": 4000,
+        "tiny_overfit_gate": false,
+        "torch": "2.12.1+xpu",
+        "totals": {
+          "accepted": 205,
+          "errors": 0,
+          "feature_seconds": 0.0,
+          "maximum_gradient_norm": 28.219629287719727,
+          "optimizer_seconds": 36.41883859387599,
+          "rejected": 0,
+          "render_attempts": 0,
+          "reused_feature_draws": 127795,
+          "sampled_examples": 128000
+        },
+        "trainable_parameters": 355806
+      }
+    },
+    "two_view": {
+      "artifact": {
+        "bytes": 20700629,
+        "checkpoint": "outputs/two-view-train-20261010/checkpoint.pt",
+        "file_sha256": "07a5f637aaa3d98a4469fd7a046df0f5d58575fcb84b1328d090cb9548b3cee9",
+        "model_state_sha256": "291a35e4c230b5317b046305c0cb276e904b4eb98650e8cdc2e27e2261277f93"
+      },
+      "coverage": {
+        "distinct_audio_buffers": 410,
+        "examples": 410,
+        "reference_performance_counts": {
+          "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842": 102,
+          "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86": 103,
+          "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045": 102,
+          "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd": 103
+        },
+        "states": 205,
+        "views_per_state": 2
+      },
+      "summary": {
+        "audio_files_written": 0,
+        "checkpoint_seconds_this_segment": 56.09404560085386,
+        "complete": true,
+        "config": {
+          "batch_size": 32,
+          "checkpoint_every": 1000,
+          "cpu_threads": 4,
+          "fresh_examples": 410,
+          "learning_rate": 0.001,
+          "mode": "online",
+          "render_budget": 480,
+          "replay_capacity": 410,
+          "replay_mib": 32,
+          "sampling_policy": "state_round_robin",
+          "seed": 0,
+          "steps": 4000,
+          "updates_per_render": 4
+        },
+        "cursor": {
+          "audio_replay": "regenerate_unacknowledged_not_bit_exact",
+          "next_sequence_id": 410,
+          "stream_id": "853ac7b8dec74828fab1ebc0f83a63afbc2733f6fee2d1003e9794252a09f775",
+          "version": 1
+        },
+        "device": "cpu",
+        "elapsed_seconds_this_segment": 619.8242403999902,
+        "feature_seconds_this_segment": 28.24976579914801,
+        "final_metrics": {
+          "categorical_accuracy": 1.0,
+          "categorical_ce": 0.01252670306712389,
+          "continuous_mae": 0.12818215787410736,
+          "continuous_mse": 0.02809029445052147,
+          "loss": 0.040616996586322784
+        },
+        "fresh_accepted_this_segment": 205,
+        "fresh_example_target_reached": true,
+        "frontend": {
+          "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+          "device": "cpu",
+          "fft": 2048,
+          "frontend": "stereo_mel_and_frozen_basic_pitch_v1",
+          "hop": 441,
+          "input": "audio_only",
+          "log_scale": 10,
+          "maximum_audio_seconds": 16,
+          "normalization": "fixed_scaling_no_fitted_statistics",
+          "pitch_size": 3521,
+          "pitch_time_bins": 8,
+          "precision": "float32",
+          "sample_rate": 44100,
+          "timbre_shape": [
+            2,
+            96,
+            32
+          ]
+        },
+        "frozen_weights_and_buffers_unchanged": true,
+        "initial_metrics": {
+          "categorical_accuracy": 0.4243902564048767,
+          "categorical_ce": 1.7970106601715088,
+          "continuous_mae": 0.2456456869840622,
+          "continuous_mse": 0.08102984726428986,
+          "loss": 1.8780405521392822
+        },
+        "mode": "online",
+        "model_state_sha256": "291a35e4c230b5317b046305c0cb276e904b4eb98650e8cdc2e27e2261277f93",
+        "peak_process_tree_rss_bytes": 964177920,
+        "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+        "quality_claim": "supervised_bootstrap_only_real_render_validation_required",
+        "renderer_identity": {
+          "backend_version": "0.8.3",
+          "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+          "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+          "settings": {
+            "buffer_size": 128,
+            "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+            "event_timing": "absolute ticks to half-even sample offsets",
+            "plugin_name": "Vital.vst3",
+            "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+            "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+          }
+        },
+        "replay_bytes": 15850600,
+        "replay_distinct_audio_buffers": 410,
+        "replay_distinct_states": 205,
+        "replay_examples": 410,
+        "replay_seed": {
+          "acknowledged_recipes": 205,
+          "checkpoint_sha256": "e66c50eab45fe3e3b3cff7b8baad6eaf688ed69ef3d60c442c6cedee89cfb723",
+          "examples": 205,
+          "policy": "features_only_fresh_model_optimizer_rng_v1",
+          "source_run_id": "518c09e2c8b4dd0adc849c4d3c1f93c032adcfe407a54d5ee2466445e04b2b4d"
+        },
+        "rss_sampling_errors": 0,
+        "run_id": "44179e3415c1df88ff00633192a5075da724345aa736602fa931f51bcdb0c6d4",
+        "seeded_feature_examples": 205,
+        "step": 4000,
+        "tiny_overfit_gate": false,
+        "torch": "2.12.1+xpu",
+        "totals": {
+          "accepted": 410,
+          "errors": 0,
+          "feature_seconds": 28.24976579914801,
+          "maximum_gradient_norm": 29.03239631652832,
+          "optimizer_seconds": 62.834316700696945,
+          "rejected": 0,
+          "render_attempts": 205,
+          "reused_feature_draws": 127590,
+          "sampled_examples": 128000
+        },
+        "trainable_parameters": 355806
+      }
+    }
+  },
+  "training_elapsed_seconds": 657.2624249001965,
+  "training_source_sha256": {
+    "obruxo_training/cli.py": "340bd60d2805f00a0833cd8a9c115599e2a47ff95170ff535b1e25186bc9e007",
+    "obruxo_training/codec.py": "a9e0095d0f45f80d25c1f30b0bc630b6ab93a41a4a62601d116db36d94435264",
+    "obruxo_training/evaluate.py": "f53b11eb100b5277829ec3523276522f539ac2b3dfccae8490ea3d41c2e805b7",
+    "obruxo_training/features.py": "83ef8178442dc467b7985c67915a136650bc83e0248237f8bb12bdd452fae951",
+    "obruxo_training/model.py": "ee5cb2c6fcdc04e1ea327db3aa8cc08184dc0a4ee3a2bf2a481ceff227e1c4cb",
+    "obruxo_training/pilot.py": "42627c95d5efad3db9e297b4e9305bf42ed3f82e6a7d7ff7e7993d6905b0dee4",
+    "obruxo_training/stream.py": "9e2e89bc954f2d50f88d6af08a6727bd286339eed6550c77e6cbb55f43a7dbc4",
+    "obruxo_training/trainer.py": "2542db8bc08bcc03143a5669f8c7d23cb1f34fd747ee25eb55dcf7e75c0e4fbe"
+  },
+  "validation": {
+    "aggregates": {
+      "fixed_template": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 2.927469674320448,
+          "mean_rms_relative": 1.2921636454938423,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 3.274651199579239,
+          "mean_rms_relative": 1.3924794612186295,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "previous_selected": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.997204034870106,
+          "mean_rms_relative": 0.3118839485659486,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.0840394560779842,
+          "mean_rms_relative": 0.25334688861455235,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "single_view_control": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.021405724365087,
+          "mean_rms_relative": 0.3255798801602352,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.1358663360514338,
+          "mean_rms_relative": 0.2761739232533035,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "source_repeat": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.0,
+          "mean_rms_relative": 0.0,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.0,
+          "mean_rms_relative": 0.0,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "train_retrieval": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.0762147254177503,
+          "mean_rms_relative": 0.12793441045851933,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.4729117272155625,
+          "mean_rms_relative": 0.26831889023915645,
+          "planned": 21,
+          "scored": 21
+        }
+      },
+      "two_view": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.9307126100692484,
+          "mean_rms_relative": 0.28667235682119746,
+          "planned": 21,
+          "scored": 21
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.0432267453935413,
+          "mean_rms_relative": 0.2631722040740507,
+          "planned": 21,
+          "scored": 21
+        }
+      }
+    },
+    "audio_files_written": 0,
+    "comparison": {
+      "bootstrap": {
+        "interval": "percentile_95",
+        "limit": "descriptive_validation_only_not_adjusted_for_checkpoint_selection",
+        "resamples": 2000,
+        "seed": 0,
+        "unit": "state"
+      },
+      "checkpoints": {
+        "previous_selected": {
+          "against_train_retrieval": {
+            "ci95": [
+              -0.4509335743063795,
+              0.035704365486486075
+            ],
+            "mean_delta": -0.23394148084261113,
+            "paired": 21,
+            "planned": 21,
+            "ties": 0,
+            "wins": 17
+          },
+          "mean_reference_transfer_mrstft": 1.0406217454740454,
+          "paired_roles_scored": 21,
+          "planned": 21,
+          "selection_eligible": true
+        },
+        "single_view_control": {
+          "against_train_retrieval": {
+            "ci95": [
+              -0.4034155889429033,
+              0.045571535155324576
+            ],
+            "mean_delta": -0.19592719610839612,
+            "paired": 21,
+            "planned": 21,
+            "ties": 0,
+            "wins": 14
+          },
+          "mean_reference_transfer_mrstft": 1.0786360302082603,
+          "paired_roles_scored": 21,
+          "planned": 21,
+          "selection_eligible": true
+        },
+        "two_view": {
+          "against_train_retrieval": {
+            "ci95": [
+              -0.491632673615915,
+              -0.052634803135509854
+            ],
+            "mean_delta": -0.2875935485852616,
+            "paired": 21,
+            "planned": 21,
+            "ties": 0,
+            "wins": 17
+          },
+          "mean_reference_transfer_mrstft": 0.9869696777313948,
+          "paired_roles_scored": 21,
+          "planned": 21,
+          "selection_eligible": true
+        }
+      },
+      "primary": "equal_weight_mean_of_reference_and_transfer_per_state_mrstft",
+      "selected": "two_view",
+      "selection_policy": "lowest_complete_validation_mean_input_order_breaks_ties"
+    },
+    "completed_cases_reused": 0,
+    "elapsed_includes_uncommitted_interrupted_work": true,
+    "elapsed_seconds": 718.0547007999849,
+    "evaluation": "pilot_real_render_comparison_v1",
+    "metric": "mean_over_512_2048_8192_of_spectral_convergence_plus_log_magnitude_mae_stereo",
+    "metric_limit": "diagnostic_spectral_distance_not_a_calibrated_perceptual_score",
+    "planned_uninterrupted_render_attempts": 294,
+    "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+    "recovery": "reuse_committed_cases_rerender_entire_unfinished_case_with_all_checkpoints",
+    "render_wall_seconds": 706.9716120972298,
+    "renderer_identity": {
+      "backend_version": "0.8.3",
+      "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+      "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+      "settings": {
+        "buffer_size": 128,
+        "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+        "event_timing": "absolute ticks to half-even sample offsets",
+        "plugin_name": "Vital.vst3",
+        "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+        "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+      }
+    },
+    "renders_accepted": 294,
+    "renders_attempted": 294,
+    "renders_attempted_this_segment": 294,
+    "retrieval_distinct_train_states": 205,
+    "retrieval_examples": 205,
+    "retrieval_policy": "equal_branch_mean_squared_feature_distance_train_replay_only",
+    "retrieval_sha256": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+    "retrieval_source": {
+      "checkpoint": "research\\training\\outputs\\full-pilot-step4000-20261009\\checkpoint.pt",
+      "file_sha256": "e66c50eab45fe3e3b3cff7b8baad6eaf688ed69ef3d60c442c6cedee89cfb723",
+      "step": 4000
+    },
+    "selection": "first_unique_validation_states_or_first_retained_training_views_no_best_of_k",
+    "split": "validation",
+    "test_split_evaluated": false,
+    "transfer": "same_patch_predicted_from_reference_audio_rendered_on_reserved_performance"
+  },
+  "verification": {
+    "identical_seed_feature_prefix": true,
+    "identical_training_initial_metrics": true,
+    "previous_selected_maximum_absolute_score_change": {
+      "reference": 0.0,
+      "transfer": 0.0
+    },
+    "same_previous_validation_recipes_and_transfer_performances": true,
+    "unchanged_205_record_retrieval_bank": true
+  }
+}
