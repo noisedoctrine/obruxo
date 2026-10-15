@@ -105,7 +105,8 @@ def evaluate_learning_curve(pool, checkpoints: list[Path], output: Path, *, coun
 
 def evaluate_comparison(pool, checkpoints: dict[str, Path], retrieval_checkpoint: Path, output: Path, *, count: int = 21,
                         renderer_factory=None, timeout: float = 60, progress=None, resume: bool = False,
-                        checkpoint_pools: dict[str, PilotPool] | None = None, validation_pool: PilotPool | None = None) -> dict:
+                        checkpoint_pools: dict[str, PilotPool] | None = None, validation_pool: PilotPool | None = None,
+                        identity_diagnostics: bool = False, validation_states: list[str] | None = None) -> dict:
     reserved = {"source", "fixed_template", "train_retrieval", "source_repeat"}
     if not 2 <= len(checkpoints) <= 8 or any(not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,63}", name)
                                            or name in reserved for name in checkpoints):
@@ -139,7 +140,7 @@ def evaluate_comparison(pool, checkpoints: dict[str, Path], retrieval_checkpoint
     return _evaluate_models(validation_pool or pool, models, frontend, sampler, output, count=count, split="validation", curve=True,
                             comparison=True, artifacts=artifacts, retrieval=retrieval,
                             renderer_factory=renderer_factory, timeout=timeout, progress=progress, resume=resume,
-                            validation_extension=extension)
+                            validation_extension=extension, identity_diagnostics=identity_diagnostics, validation_states=validation_states)
 
 
 def _restore_evaluation(output: Path, plan: dict, renderer_identity: dict) -> tuple:
@@ -214,9 +215,13 @@ def curve_statistics(rows: list[dict], model_names: list[str], baseline_name: st
 
 def _evaluate_models(pool, models, frontend, training_sampler, output, *, count, split, curve=False, artifacts=None,
                      renderer_factory=None, timeout=60, progress=None, resume=False, comparison=False, retrieval=None,
-                     validation_extension=None):
+                     validation_extension=None, identity_diagnostics=False, validation_states=None):
     if split not in {"train", "validation"} or type(count) is not int or count <= 0:
         raise ValueError("pilot diagnostics use a positive count from train or validation; final test stays reserved")
+    if validation_states is not None and (split != "validation" or not isinstance(validation_states, list)
+                                          or len(validation_states) != count or any(not isinstance(state, str) for state in validation_states)
+                                          or len(set(validation_states)) != count):
+        raise ValueError("explicit validation states must be a unique list matching the requested count")
     torch.set_num_threads(4)
     saved, _ = next(iter(models.values()))
     codec = pool.codec
@@ -226,8 +231,11 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
         recipes = [sampler.recipe_at(item["sequence_id"]) for item in replay[:count]]
     else:
         recipes, seen = [], set(validation_extension["excluded_state_ids"] if validation_extension else ())
+        wanted = set(validation_states) if validation_states is not None else None
         for sequence in range(sampler.epoch_size):
             recipe = sampler.recipe_at(sequence)
+            if wanted is not None and recipe.state_id not in wanted:
+                continue
             if recipe.state_id not in seen:
                 recipes.append(recipe)
                 seen.add(recipe.state_id)
@@ -235,6 +243,9 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
                 break
     if len(recipes) != count:
         raise ValueError("requested evaluation count exceeds available cases")
+    if validation_states is not None:
+        by_state = {recipe.state_id: recipe for recipe in recipes}
+        recipes = [by_state[state] for state in validation_states]
     model_info = {name: {"step": state["step"], "model_state_sha256": tensor_digest(model.state_dict()),
                          **(artifacts or {}).get(name, {})} for name, (state, model) in models.items()}
     plan = {"models": model_info, "pool_id": pool.pool_id, "recipe_ids": [recipe.recipe_id for recipe in recipes],
@@ -245,6 +256,10 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
         plan["retrieval_source"] = retrieval["source"]
     if validation_extension is not None:
         plan["validation_extension"] = validation_extension
+    if identity_diagnostics:
+        plan["identity_diagnostics"] = "heldout_state_reference_to_reserved_transfer_retrieval_v1"
+    if validation_states is not None:
+        plan["validation_states"] = validation_states
     transfers = [entry for entry in initial_bank() if entry.role == "transfer"]
     if comparison:
         plan.update(evaluation="pilot_real_render_comparison_v2", candidate_order=list(models),
@@ -309,9 +324,14 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
                 continue
             features = frontend(reference)
             targets = {}
+            if identity_diagnostics:
+                row["representations"] = {name: {} for name in models}
             for name, (_, model) in models.items():
                 with torch.no_grad():
-                    predicted = predicted_targets(model(batch_features([{"features": features}])), codec)[0]
+                    prediction = model(batch_features([{"features": features}]))
+                    predicted = predicted_targets(prediction, codec)[0]
+                if identity_diagnostics:
+                    row["representations"][name]["reference"] = prediction["representation"][0].cpu().tolist()
                 codec.preset(predicted).validate().require_valid()
                 filename = f"prediction-{name}-{index:03d}.vital" if curve else f"prediction-{index:03d}.vital"
                 (output / filename).write_bytes(codec.decode(predicted))
@@ -320,6 +340,11 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
                            source_repeat=codec.encode(source_raw))
             transfer = transfers[index % len(transfers)].performance()
             transfer_source = render(source_raw, transfer, index, "source", "transfer")
+            if identity_diagnostics and transfer_source is not None:
+                transfer_features = batch_features([{"features": frontend(transfer_source)}])
+                with torch.no_grad():
+                    for name, (_, model) in models.items():
+                        row["representations"][name]["transfer"] = model(transfer_features)["representation"][0].cpu().tolist()
             for name, target in targets.items():
                 scores = {}
                 for role, performance, source in (("reference", request.performance, reference), ("transfer", transfer, transfer_source)):
@@ -358,6 +383,9 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
                    "selection": "first_unique_validation_states_or_first_retained_training_views_no_best_of_k",
                    "transfer": "same_patch_predicted_from_reference_audio_rendered_on_reserved_performance",
                    "test_split_evaluated": False}
+        if identity_diagnostics:
+            from .paired import representation_statistics
+            summary["identity_diagnostics"] = representation_statistics(rows, list(models))
         if curve:
             summary["retrieval_sha256"] = retrieval_digest(replay)
             statistics = curve_statistics(rows, list(models))

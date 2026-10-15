@@ -20,3 +20,9 @@ research/training/reports/data/unison_release_diagnostics.json -text
 research/training/reports/data/cached_head_probe_plan.json -text
 research/training/reports/data/cached_head_probe_summary.json -text
 research/training/reports/data/release_intervention_plan.json -text
+research/training/obruxo_training/paired.py -text
+research/training/obruxo_training/paired_features.py -text
+research/training/reports/scripts/run_identity_screen.py -text
+research/training/reports/data/identity_screen_plan.json -text
+research/training/reports/data/identity_initial_feature_plan.json -text
+research/training/reports/data/identity_training_plan.json -text

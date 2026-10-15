@@ -78,7 +78,7 @@ Free Colab remains an optional optimizer host once a compatible feature prefix i
 
 The next screens should hold this broader vocabulary and a development panel fixed:
 
-1. **Synthesis identity:** learn a shared patch representation across different performances of the same training state; test unseen performances and report family-specific reconstruction. Merely adding two unrelated supervised examples is not an identity objective.
+1. **[Synthesis identity](PAIRED_IDENTITY.md):** the paired sampler and contrastive decoder-representation objective now support a fixed feasibility screen across different performances of the same training state. Test reserved performances and native reconstruction before interpreting a learned identity metric.
 2. **Audio-based objective:** screen a small render-supervised surrogate or render/distill loop that supplies audio similarity during learning. Measure surrogate agreement against real Vital before relying on its gradient.
 3. **Ambiguity and refinement:** predict several valid candidates, render them under an audio-derived performance estimate and refine within a fixed inference budget. Never use oracle MIDI in production inference.
 

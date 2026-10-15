@@ -146,7 +146,7 @@ class PilotSampler:
             raise ValueError("invalid pilot sampling policy")
         if split == "train" and role != "reference":
             raise ValueError("transfer performances are reserved for held-out evaluation")
-        if policy not in {"pairs", "state_round_robin"}:
+        if policy not in {"pairs", "state_round_robin", "paired_views"}:
             raise ValueError("unknown pilot sampling policy")
         self.pool, self.split, self.role, self.seed = pool, split, role, seed
         self.policy = policy
@@ -156,13 +156,14 @@ class PilotSampler:
         self._performances = tuple(entry for entry in initial_bank() if entry.role == role)
         self._ledger = SplitLedger(pool.manifest)
         self._epoch, self._order = None, []
-        rule = "shuffled_pilot_pairs_v1" if policy == "pairs" else "shuffled_states_rotating_performances_v1"
+        rule = {"pairs": "shuffled_pilot_pairs_v1", "state_round_robin": "shuffled_states_rotating_performances_v1",
+                "paired_views": "adjacent_state_views_rotating_performances_v1"}[policy]
         self.sampler_id = canonical_sha256({"sampler": rule, "pool_id": pool.pool_id,
                                            "split": split, "role": role, "seed": seed})
 
     @property
     def epoch_size(self) -> int:
-        return len(self._entries) * (len(self._performances) if self.policy == "pairs" else 1)
+        return len(self._entries) * (len(self._performances) if self.policy == "pairs" else 2 if self.policy == "paired_views" else 1)
 
     def recipe_at(self, sequence_id: int) -> RenderRecipe:
         if type(sequence_id) is not int or sequence_id < 0:
@@ -171,10 +172,16 @@ class PilotSampler:
         if self._epoch != epoch:
             if self.policy == "pairs":
                 self._order = [(entry, performance) for entry in self._entries for performance in self._performances]
-            else:
+            elif self.policy == "state_round_robin":
                 self._order = [(entry, self._performances[(index + epoch) % len(self._performances)])
                                for index, entry in enumerate(self._entries)]
-            seeded_random(self.sampler_id, epoch).shuffle(self._order)
+            else:
+                states = list(enumerate(self._entries))
+                seeded_random(self.sampler_id, epoch).shuffle(states)
+                self._order = [(entry, self._performances[(index + 2 * epoch + view) % len(self._performances)])
+                               for index, entry in states for view in range(2)]
+            if self.policy != "paired_views":
+                seeded_random(self.sampler_id, epoch).shuffle(self._order)
             self._epoch = epoch
         entry, performance = self._order[position]
         codec = self.pool.codec

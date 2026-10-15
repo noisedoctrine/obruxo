@@ -81,7 +81,9 @@ def main(argv=None) -> int:
     train.add_argument("--checkpoint-every", type=int, default=50)
     train.add_argument("--render-budget", type=int, default=512)
     train.add_argument("--cpu-threads", type=int, default=4)
-    train.add_argument("--sampling-policy", choices=("pairs", "state_round_robin"), default="pairs")
+    train.add_argument("--sampling-policy", choices=("pairs", "state_round_robin", "paired_views"), default="pairs")
+    train.add_argument("--identity-weight", type=float, default=0., help="Weight of paired identity contrastive loss; requires paired_views")
+    train.add_argument("--identity-temperature", type=float, default=.1)
     train.add_argument("--updates-per-render", type=int, default=1)
     train.add_argument("--fresh-examples", type=int, help="Stop adding fresh examples at this count, then continue bounded replay")
     train.add_argument("--device", default="cpu")
@@ -118,6 +120,8 @@ def main(argv=None) -> int:
     compare.add_argument("--timeout", type=float, default=60)
     compare.add_argument("--plugin-path", type=str)
     compare.add_argument("--resume", action="store_true")
+    compare.add_argument("--identity-diagnostics", action="store_true", help="Measure representations across reference and reserved transfer audio")
+    compare.add_argument("--validation-states", type=Path, help="JSON list of explicit validation state IDs in evaluation order")
     infer = commands.add_parser("infer", help="Export a pilot .vital prediction from a 44.1 kHz stereo WAV")
     infer.add_argument("--model", type=Path, required=True)
     infer.add_argument("--audio", type=Path, required=True)
@@ -172,6 +176,8 @@ def main(argv=None) -> int:
                 checkpoint_pools = {name: PilotPool.load(path) for name, path in _named_paths(args.checkpoint_pools, "pools").items()}
                 result = evaluate_comparison(pool, checkpoints, args.retrieval_checkpoint, args.output, count=args.count,
                                              checkpoint_pools=checkpoint_pools,
+                                             identity_diagnostics=args.identity_diagnostics,
+                                             validation_states=json.loads(args.validation_states.read_text(encoding="utf-8")) if args.validation_states else None,
                                              validation_pool=PilotPool.load(args.validation_pool) if args.validation_pool else None,
                                              renderer_factory=NativeRendererFactory(args.plugin_path), timeout=args.timeout,
                                              progress=lambda value: print(json.dumps(value), flush=True), resume=args.resume)

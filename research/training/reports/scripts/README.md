@@ -1,5 +1,7 @@
 # Archived diagnostic sources
 
+`run_identity_screen.py` runs the current frozen paired-identity feasibility screen from the checkout. It writes a plan before rendering, shares a bounded feature bank across both arms and measures native reconstruction plus reserved-performance representations. See [PAIRED_IDENTITY.md](../../PAIRED_IDENTITY.md).
+
 `qualify_alpha_imports.py` is the current portable factory-import check, run directly from the checkout. It compares three pinned original exports with the imported alpha assets using native audio. Its arguments and validation boundary are documented in [ALPHA.md](../../ALPHA.md); it does not use the historical directory layout below.
 
 These are the exact scripts used for the existing-artifact analysis and train-only feature probe on 2026-10-15 (Malaysia time). They preserve the original source bytes, including the script hash in `../data/cached_head_probe_plan.json`.

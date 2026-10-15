@@ -22,6 +22,7 @@ from .benchmark import MemoryMonitor
 from .codec import PilotTarget, load_codec
 from .features import AudioFeatures, tensor_digest, validate_features
 from .model import PilotInverse, batch_features, loss_terms, model_spec, predicted_targets
+from .paired import complete_pairs, identity_terms, paired_batch_indices
 from .pilot import PilotPool, PilotSampler
 from .stream import OnlineRenderStream, StreamConfig
 
@@ -42,6 +43,8 @@ class TrainConfig:
     sampling_policy: str = "pairs"
     updates_per_render: int = 1
     fresh_examples: int | None = None
+    identity_weight: float = 0.
+    identity_temperature: float = .1
 
     def __post_init__(self):
         positive = (self.steps, self.replay_capacity, self.replay_mib, self.batch_size,
@@ -56,8 +59,15 @@ class TrainConfig:
             raise ValueError("batch must fit replay and render budget must cover initial replay")
         if not math.isfinite(self.learning_rate) or self.learning_rate <= 0:
             raise ValueError("learning rate must be positive and finite")
-        if self.sampling_policy not in {"pairs", "state_round_robin"}:
+        if self.sampling_policy not in {"pairs", "state_round_robin", "paired_views"}:
             raise ValueError("unknown pilot sampling policy")
+        if (not math.isfinite(self.identity_weight) or self.identity_weight < 0
+                or not math.isfinite(self.identity_temperature) or self.identity_temperature <= 0):
+            raise ValueError("identity weight must be nonnegative and temperature positive and finite")
+        if self.identity_weight and self.sampling_policy != "paired_views":
+            raise ValueError("identity loss requires paired_views sampling")
+        if self.sampling_policy == "paired_views" and (self.batch_size < 4 or self.batch_size % 2 or self.replay_capacity % 2):
+            raise ValueError("paired views need an even batch of at least four and even replay capacity")
         if self.fresh_examples is not None and (type(self.fresh_examples) is not int
                                                 or not self.batch_size <= self.fresh_examples <= self.render_budget):
             raise ValueError("fresh_examples must cover the warmup and fit the render-attempt budget")
@@ -123,15 +133,24 @@ def validate_replay(items: list[dict], sampler: PilotSampler, cursor: dict, conf
             raise ValueError("replay contains held-out data")
         if item["recipe_id"] != recipe.recipe_id or item["state_id"] != recipe.state_id or item["target"] != targets[recipe.state_id]:
             raise ValueError("saved replay does not match its training recipe")
+        if config.sampling_policy == "paired_views" and item.get("performance_id") != recipe.performance_id:
+            raise ValueError("paired replay performance differs from its training recipe")
         validate_features(item["features"])
 
 
 @torch.no_grad()
-def replay_metrics(model, items, codec, device) -> dict:
+def replay_metrics(model, items, codec, device, config=None) -> dict:
     model.eval()
     prediction = model(batch_features(items, device))
     targets = [PilotTarget.from_dict(item["target"]) for item in items]
-    return {name: float(value) for name, value in loss_terms(prediction, targets, codec).items()}
+    terms = loss_terms(prediction, targets, codec)
+    if config is not None and config.sampling_policy == "paired_views":
+        indices = [index for pairs in complete_pairs(items).values() for index in pairs[0]]
+        if len(indices) >= 4:
+            identity = identity_terms(prediction["representation"][indices], config.identity_temperature)
+            terms["loss"] = terms["loss"] + config.identity_weight * identity["identity_loss"]
+            terms.update(identity)
+    return {name: float(value) for name, value in terms.items()}
 
 
 def _run_contract(pool, sampler, frontend, config, stream_config, replay_seed=None) -> dict:
@@ -142,6 +161,10 @@ def _run_contract(pool, sampler, frontend, config, stream_config, replay_seed=No
             del training[name]
     if training["learning_seed_override"] is None:
         del training["learning_seed_override"]
+    if training["identity_weight"] == 0:
+        del training["identity_weight"]
+    if training["identity_temperature"] == .1:
+        del training["identity_temperature"]
     contract = {"trainer": "pilot_supervised_bootstrap_v1", "pool_id": pool.pool_id,
             "contract": pool.codec.contract.to_dict(), "codec": pool.codec.to_dict(), "sampler_id": sampler.sampler_id,
             "model": model_spec(pool.codec), "frontend": frontend.describe(), "training": training,
@@ -151,12 +174,30 @@ def _run_contract(pool, sampler, frontend, config, stream_config, replay_seed=No
                              else "fixed_overfit_or_fifo_online_v1"}
     if replay_seed is not None:
         contract["replay_seed"] = replay_seed
+    if config.identity_weight:
+        contract["identity_objective"] = {"loss": "bidirectional_paired_info_nce_v1", "representation": "decoder_fusion_128",
+                                          "normalization": "l2", "negatives": "distinct_training_states_in_batch"}
     return contract
 
 
 def load_replay_seed(path: Path, pool, sampler, frontend, config, stream_config) -> tuple:
     raw = path.read_bytes()
     source = torch.load(path, map_location="cpu", weights_only=True)
+    if source.get("format") == "obruxo_paired_features_v1":
+        from .paired_features import validate_cache
+        if config.sampling_policy != "paired_views":
+            raise ValueError("paired feature cache requires the paired_views sampler")
+        accepted = validate_cache(source, pool, sampler, frontend, stream_config)
+        replay, cursor = source["replay"], source["cursor"]
+        if (len(replay) > config.replay_capacity or replay_bytes(replay) > config.replay_mib * 1024 * 1024
+                or cursor["next_sequence_id"] > config.render_budget or not replay
+                or (config.fresh_examples is not None and len(replay) > config.fresh_examples)):
+            raise ValueError("paired feature cache exceeds the training budget")
+        descriptor = {"policy": "qa_qualified_complete_pairs_fresh_learning_state_v1", "checkpoint_sha256": sha256_bytes(raw),
+                      "source_run_id": canonical_sha256({"features": source["features_sha256"], "history": source["history"]}),
+                      "examples": len(replay), "acknowledged_recipes": cursor["next_sequence_id"],
+                      "raw_accepted_views": accepted, "discarded_unpaired_accepted_views": accepted - len(replay)}
+        return source, descriptor
     if source.get("format") != "obruxo_pilot_training_v1" or source["step"] < 1:
         raise ValueError("feature seeding needs a trained pilot checkpoint")
     contract = source["run_contract"]
@@ -199,6 +240,9 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
     saved = torch.load(resume, map_location="cpu", weights_only=True) if resume else None
     frontend = AudioFeatures(saved["basic_pitch"] if saved else None)
     sampler = PilotSampler(pool, seed=config.seed, policy=config.sampling_policy)
+    paired = config.sampling_policy == "paired_views"
+    if paired and len({entry.state_id for entry in pool.entries if pool.manifest.by_state[entry.state_id].split == "train"}) < config.batch_size // 2:
+        raise ValueError("paired training needs enough distinct training states for its batch")
     source, replay_seed = None, saved["run_contract"].get("replay_seed") if saved else None
     if seed_replay is not None:
         source, replay_seed = load_replay_seed(seed_replay, pool, sampler, frontend, config, stream_config)
@@ -282,6 +326,8 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
                         item = {"features": features, "target": target.to_dict(), "sequence_id": recipe.sequence_id,
                                 "state_id": recipe.state_id, "recipe_id": recipe.recipe_id,
                                 "audio_sha256": outcome.metadata["qa"]["audio_float32_sha256"], "uses": 0}
+                        if paired:
+                            item["performance_id"] = recipe.performance_id
                         candidate = [*replay, item][-config.replay_capacity:]
                         if replay_bytes(candidate) > config.replay_mib * 1024 * 1024:
                             raise ValueError("feature replay exceeds its byte budget")
@@ -304,28 +350,37 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
                 raise RuntimeError("fresh-render budget exhausted before the next usable example")
 
             warmup = config.replay_capacity if config.mode == "overfit" else config.batch_size
-            while len(replay) < warmup:
+            while len(replay) < warmup or (paired and len(complete_pairs(replay)) < config.batch_size // 2):
                 ingest()
             if config.mode == "overfit" and stream is not None:
                 stream.close()
             if initial is None:
-                initial = replay_metrics(model, replay, pool.codec, device)
+                initial = replay_metrics(model, replay, pool.codec, device, config)
                 checkpoint()
             while step < limit:
                 refresh_due = config.mode == "online" and step > 0 and step % config.updates_per_render == 0
                 refresh_allowed = config.fresh_examples is None or totals["accepted"] < config.fresh_examples
                 if refresh_due and refresh_allowed and not render_ready:
                     ingest()
+                while paired and len(complete_pairs(replay)) < config.batch_size // 2:
+                    if config.fresh_examples is not None and totals["accepted"] >= config.fresh_examples:
+                        raise RuntimeError("accepted-example budget cannot supply a complete paired batch")
+                    ingest()
                 if stream is not None and config.fresh_examples is not None and totals["accepted"] >= config.fresh_examples:
                     stream.close()
                     stream = None
                 tick = perf_counter()
-                indices = torch.randperm(len(replay), generator=generator)[:config.batch_size].tolist()
+                indices = (paired_batch_indices(replay, config.batch_size, generator) if paired else
+                           torch.randperm(len(replay), generator=generator)[:config.batch_size].tolist())
                 items = [replay[index] for index in indices]
                 model.train()
                 optimizer.zero_grad(set_to_none=True)
-                terms = loss_terms(model(batch_features(items, device)),
-                                   [PilotTarget.from_dict(item["target"]) for item in items], pool.codec)
+                prediction = model(batch_features(items, device))
+                terms = loss_terms(prediction, [PilotTarget.from_dict(item["target"]) for item in items], pool.codec)
+                if paired:
+                    identity = identity_terms(prediction["representation"], config.identity_temperature)
+                    terms["loss"] = terms["loss"] + config.identity_weight * identity["identity_loss"]
+                    terms.update(identity)
                 if not torch.isfinite(terms["loss"]):
                     raise RuntimeError("nonfinite training loss")
                 terms["loss"].backward()
@@ -351,7 +406,7 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
                         progress({"stage": "optimizer", "step": step, **values})
                 if after_step:
                     after_step(step)
-        final = replay_metrics(model, replay, pool.codec, device)
+        final = replay_metrics(model, replay, pool.codec, device, config)
         frontend.require_frozen()
         complete = step == config.steps
         if complete:
