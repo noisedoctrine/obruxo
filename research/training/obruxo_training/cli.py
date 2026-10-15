@@ -22,6 +22,19 @@ def _named_paths(entries: list[str], label: str) -> dict[str, Path]:
     return result
 
 
+def _read_inference_audio(path):
+    import numpy as np
+    from scipy.io import wavfile
+    sample_rate, audio = wavfile.read(path)
+    if audio.dtype == np.uint8:
+        audio = (audio.astype(np.float32) - 128) / 128
+    elif np.issubdtype(audio.dtype, np.signedinteger):
+        audio = audio.astype(np.float32) / (float(np.iinfo(audio.dtype).max) + 1)
+    if audio.ndim == 1:
+        audio = np.stack((audio, audio), axis=1)
+    return sample_rate, audio.astype(np.float32)
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="OBRUXO training contracts, authored pilot and on-demand rendering.")
     parser.add_argument("--asset-references", type=Path, help="Hash-pinned, caller-reviewed reference export manifest")
@@ -60,6 +73,26 @@ def main(argv=None) -> int:
     candidate.add_argument("--timeout", type=float, default=30.)
     candidate.add_argument("--plugin-path")
     candidate.add_argument("--resume", action="store_true")
+    candidate_export = commands.add_parser("candidate-export", help="Export a diagnostic audio-only candidate bundle with a train-only bank")
+    candidate_export.add_argument("--pool", type=Path, required=True)
+    candidate_export.add_argument("--checkpoint", type=Path, required=True)
+    candidate_export.add_argument("--output", type=Path, required=True)
+    candidate_check = commands.add_parser("candidate-check", help="Qualify deployed audio-only ranking separately from evaluator best-of-four")
+    candidate_check.add_argument("--pool", type=Path, required=True)
+    candidate_check.add_argument("--checkpoint", type=Path, required=True)
+    candidate_check.add_argument("--output", type=Path, required=True)
+    candidate_check.add_argument("--count", type=int, default=10)
+    candidate_check.add_argument("--timeout", type=float, default=30.)
+    candidate_check.add_argument("--plugin-path")
+    candidate_check.add_argument("--resume", action="store_true")
+    candidate_infer = commands.add_parser("infer-candidates", help="Optionally rank four legal guesses from audio-derived notes and native renders")
+    candidate_infer.add_argument("--model", type=Path, required=True)
+    candidate_infer.add_argument("--audio", type=Path, required=True)
+    candidate_infer.add_argument("--output", type=Path, required=True)
+    candidate_infer.add_argument("--report", type=Path)
+    candidate_infer.add_argument("--timeout", type=float, default=30.)
+    candidate_infer.add_argument("--plugin-path")
+    candidate_infer.add_argument("--allow-unqualified", action="store_true", help="Explicit diagnostic use of an unqualified ranker")
     verify = commands.add_parser("verify", help="Verify a complete snapshot and its current executable contracts")
     verify.add_argument("--snapshot", type=Path, required=True)
     audit = commands.add_parser("audit", help="Inspect a corpus read-only and write a new contract snapshot")
@@ -162,6 +195,42 @@ def main(argv=None) -> int:
     infer.add_argument("--device", default="cpu")
     args = parser.parse_args(argv)
     try:
+        if args.command in {"candidate-export", "candidate-check", "infer-candidates"}:
+            import torch
+            from .audio_candidates import export_candidate_model, load_candidate_model, rank_audio
+            from .pilot import PilotPool
+            from .stream import NativeRendererFactory
+            if args.asset_references:
+                raise ValueError("candidate commands use the embedded source assets")
+            torch.set_num_threads(4)
+            if args.command == "candidate-export":
+                if args.output.exists():
+                    raise ValueError("candidate export output already exists")
+                args.output.parent.mkdir(parents=True, exist_ok=True)
+                identity = export_candidate_model(PilotPool.load(args.pool), args.checkpoint, args.output)
+                print(json.dumps({"output": str(args.output), "qualified": False, "identity": identity}, indent=2))
+                return 0
+            if args.command == "candidate-check":
+                from .ranking_check import check_audio_ranking
+                result = check_audio_ranking(PilotPool.load(args.pool), args.checkpoint, args.output, count=args.count,
+                                             renderer_factory=NativeRendererFactory(args.plugin_path), timeout=args.timeout, resume=args.resume,
+                                             progress=lambda event: print(json.dumps(event), flush=True))
+                print(json.dumps(result, indent=2))
+                return 0 if result["qualification"]["qualified"] else 2
+            report = args.report or args.output.with_suffix(".ranking.json")
+            if args.output.exists() or report.exists() or report.resolve() == args.output.resolve():
+                raise ValueError("candidate prediction/report output already exists or collides")
+            model, frontend, codec, bank, renderer = load_candidate_model(args.model, allow_unqualified=args.allow_unqualified)
+            sample_rate, audio = _read_inference_audio(args.audio)
+            target, result = rank_audio(model, frontend, codec, bank, audio, sample_rate=sample_rate,
+                                        renderer_factory=NativeRendererFactory(args.plugin_path), timeout=args.timeout, expected_renderer=renderer)
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            with args.output.open("xb") as handle:
+                handle.write(codec.decode(target))
+            report.parent.mkdir(parents=True, exist_ok=True)
+            write_json(report, result)
+            print(json.dumps({"output": str(args.output), "report": str(report), "ranked": result["ranked"], "selected": result["selected"]}))
+            return 0 if result["ranked"] else 2
         if args.command == "candidate-screen":
             from .candidate_data import CandidateConfig
             from .candidate_screen import run_candidate_screen
@@ -192,20 +261,14 @@ def main(argv=None) -> int:
             print(json.dumps(result, indent=2))
             return 0 if result["qualified_for_inverse_training"] else 2
         if args.command == "infer":
-            import numpy as np
             import torch
-            from scipy.io import wavfile
             from .trainer import load_model, predict_audio
             if args.asset_references:
                 raise ValueError("inference uses the bundle's embedded asset catalog")
             torch.set_num_threads(4)
-            sample_rate, audio = wavfile.read(args.audio)
-            if audio.dtype == np.uint8:
-                audio = (audio.astype(np.float32) - 128) / 128
-            elif np.issubdtype(audio.dtype, np.signedinteger):
-                audio = audio.astype(np.float32) / (float(np.iinfo(audio.dtype).max) + 1)
+            sample_rate, audio = _read_inference_audio(args.audio)
             model, frontend, codec = load_model(args.model, args.device)
-            target = predict_audio(model, frontend, codec, audio.astype(np.float32), sample_rate)
+            target = predict_audio(model, frontend, codec, audio, sample_rate)
             args.output.parent.mkdir(parents=True, exist_ok=True)
             with args.output.open("xb") as handle:
                 handle.write(codec.decode(target))
