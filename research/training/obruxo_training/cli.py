@@ -39,6 +39,12 @@ def main(argv=None) -> int:
     pilot.add_argument("--output", type=Path, required=True)
     pilot.add_argument("--count", type=int, default=256)
     pilot.add_argument("--seed", type=int, default=0)
+    alpha = commands.add_parser("alpha-pool", help="Author a broader pool from explicitly pinned wavetable exports")
+    alpha.add_argument("--wavetable-manifest", type=Path, required=True)
+    alpha.add_argument("--wavetable-root", type=Path, required=True)
+    alpha.add_argument("--output", type=Path, required=True)
+    alpha.add_argument("--count", type=int, default=256)
+    alpha.add_argument("--seed", type=int, default=0)
     expansion = commands.add_parser("expand-pilot", help="Append authored states while verifying every frozen parent split")
     expansion.add_argument("--pool", type=Path, required=True, help="Existing parent pool; its seed and vocabulary remain fixed")
     expansion.add_argument("--output", type=Path, required=True)
@@ -55,7 +61,7 @@ def main(argv=None) -> int:
     benchmark.add_argument("--max-retries", type=int, default=0)
     benchmark.add_argument("--plugin-path", type=str)
     benchmark.add_argument("--resume", type=Path, help="Acknowledged stream cursor; queued audio is regenerated")
-    codec_check = commands.add_parser("codec-check", help="Compare source/repeat/reconstructed renders across pilot categories")
+    codec_check = commands.add_parser("codec-check", help="Qualify native round trips and, for alpha, audible feature interventions")
     codec_check.add_argument("--pool", type=Path, required=True)
     codec_check.add_argument("--output", type=Path, required=True)
     codec_check.add_argument("--timeout", type=float, default=60.0)
@@ -125,7 +131,7 @@ def main(argv=None) -> int:
             from scipy.io import wavfile
             from .trainer import load_model, predict_audio
             if args.asset_references:
-                raise ValueError("pilot inference uses the embedded reviewed-init catalog")
+                raise ValueError("inference uses the bundle's embedded asset catalog")
             torch.set_num_threads(4)
             sample_rate, audio = wavfile.read(args.audio)
             if audio.dtype == np.uint8:
@@ -139,13 +145,17 @@ def main(argv=None) -> int:
                 handle.write(codec.decode(target))
             print(json.dumps({"output": str(args.output), "scope": codec.to_dict()["scope"], "target": target.to_dict()}))
             return 0
-        if args.command in {"pilot", "expand-pilot", "benchmark", "codec-check", "train", "evaluate", "evaluate-curve", "compare"}:
+        if args.command in {"pilot", "alpha-pool", "expand-pilot", "benchmark", "codec-check", "train", "evaluate", "evaluate-curve", "compare"}:
             from .pilot import PilotPool
             if args.asset_references:
-                raise ValueError("the authored pilot uses its fixed reviewed-init catalog")
-            if args.command in {"pilot", "expand-pilot"}:
+                raise ValueError("authored pools use their embedded catalog; alpha-pool takes --wavetable-manifest")
+            if args.command in {"pilot", "alpha-pool", "expand-pilot"}:
                 parent = PilotPool.load(args.pool) if args.command == "expand-pilot" else None
-                pool = parent.expand(args.count) if parent is not None else PilotPool.create(args.count, args.seed)
+                codec = None
+                if args.command == "alpha-pool":
+                    from .alpha import AlphaCodec, read_wavetable_bank
+                    codec = AlphaCodec(read_wavetable_bank(args.wavetable_manifest, args.wavetable_root))
+                pool = parent.expand(args.count) if parent is not None else PilotPool.create(args.count, args.seed, codec=codec)
                 args.output.mkdir(parents=True, exist_ok=False)
                 pool.save(args.output / "pool.json")
                 write_json(args.output / "summary.json", pool.summary())

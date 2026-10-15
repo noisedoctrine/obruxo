@@ -1,5 +1,7 @@
 # Archived diagnostic sources
 
+`qualify_alpha_imports.py` is the current portable factory-import check, run directly from the checkout. It compares three pinned original exports with the imported alpha assets using native audio. Its arguments and validation boundary are documented in [ALPHA.md](../../ALPHA.md); it does not use the historical directory layout below.
+
 These are the exact scripts used for the existing-artifact analysis and train-only feature probe on 2026-10-15 (Malaysia time). They preserve the original source bytes, including the script hash in `../data/cached_head_probe_plan.json`.
 
 They use the historical local layout: execute copies from `ARTIFACT_ROOT/tmp/`, with this code checkout at `ARTIFACT_ROOT/tmp/training-pipeline-pr/` and the ignored training outputs at `ARTIFACT_ROOT/research/training/outputs/`. They write their diagnostic JSON into the checkout. Reproduction requires the pinned local checkpoints, pools and completed evaluation artifacts, plus the Python dependencies documented in `../../TRAINER.md`. Do not overwrite the frozen results when reproducing them; use a separate checkout and artifact root.

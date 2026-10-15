@@ -9,7 +9,7 @@ import random
 from obruxo_data.hashing import canonical_sha256
 
 from .audit import write_json
-from .codec import CATEGORICAL, CONTINUOUS, PilotCodec, PilotTarget
+from .codec import CATEGORICAL, CONTINUOUS, PilotCodec, PilotTarget, load_codec
 from .contracts import RenderRecipe
 from .eligibility import inspect_preset
 from .identity import PresetIdentity
@@ -39,19 +39,20 @@ class PilotPool:
         return canonical_sha256(self.to_dict())
 
     def to_dict(self) -> dict:
-        return {"version": 1, "generator": "independent_authored_pilot_v1", "seed": self.seed,
+        return {"version": 1, "generator": self.codec.generator, "seed": self.seed,
                 "codec": self.codec.to_dict(), "contract": self.codec.contract.to_dict(), "splits": self.manifest.to_dict(),
                 "entries": [{"state_id": entry.state_id, "target": entry.target.to_dict()} for entry in self.entries]}
 
     @classmethod
-    def create(cls, count: int = 256, seed: int = 0) -> PilotPool:
+    def create(cls, count: int = 256, seed: int = 0, *, codec=None) -> PilotPool:
         if type(count) is not int or not 1 <= count <= 4096 or type(seed) is not int:
             raise ValueError("pilot needs an integer seed and 1..4096 independent states")
-        codec, entries = PilotCodec(), []
+        codec, entries = codec or PilotCodec(), []
         for index in range(count):
-            rng = seeded_random("independent_authored_pilot_v1", seed, index)
-            target = codec.canonical_target(PilotTarget(tuple(rng.random() for _ in CONTINUOUS),
-                                                       tuple(rng.randrange(len(options)) for _, options in CATEGORICAL)))
+            rng = seeded_random(codec.generator, seed, index)
+            target = (codec.sample_target(rng, index) if hasattr(codec, "sample_target") else
+                      codec.canonical_target(PilotTarget(tuple(rng.random() for _ in CONTINUOUS),
+                                                        tuple(rng.randrange(len(options)) for _, options in CATEGORICAL))))
             raw = codec.decode(target)
             inspection = inspect_preset(raw, codec.schema, codec.catalog)
             if not inspection["static_eligible"]:
@@ -71,7 +72,7 @@ class PilotPool:
     def expand(self, count: int) -> PilotPool:
         if type(count) is not int or not len(self.entries) < count <= 4096:
             raise ValueError("expanded pilot count must exceed the parent and remain at most 4096")
-        expanded = self.create(count, self.seed)
+        expanded = self.create(count, self.seed, codec=self.codec)
         expanded.expansion_from(self)
         return expanded
 
@@ -105,9 +106,11 @@ class PilotPool:
         value = saved["pool"]
         if saved["pool_id"] != canonical_sha256(value):
             raise ValueError("pilot pool artifact changed")
-        if value.get("version") != 1 or value.get("generator") != "independent_authored_pilot_v1" or type(value.get("seed")) is not int:
+        if value.get("version") != 1 or type(value.get("seed")) is not int:
             raise ValueError("unsupported pilot generator")
-        codec = PilotCodec()
+        codec = load_codec(value["codec"])
+        if value.get("generator") != codec.generator:
+            raise ValueError("unsupported pilot generator")
         codec.contract.require_match(value["contract"])
         if value["codec"] != codec.to_dict():
             raise ValueError("pilot codec changed")
@@ -125,9 +128,14 @@ class PilotPool:
         return cls(codec, value["seed"], manifest, entries)
 
     def summary(self) -> dict:
-        return {"pool_id": self.pool_id, "codec_id": self.codec.codec_id, "states": len(self.entries),
+        result = {"pool_id": self.pool_id, "codec_id": self.codec.codec_id, "states": len(self.entries),
                 "states_by_split": {split: sum(entry.split == split for entry in self.manifest.assignments)
                                     for split in ("train", "validation", "test")}, "audio_qa": "not_run"}
+        if hasattr(self.codec, "family"):
+            result["families_by_split"] = {split: {family: sum(self.codec.family(entry.target) == family
+                  and self.manifest.by_state[entry.state_id].split == split for entry in self.entries)
+                  for family in self.codec.to_dict()["families"]} for split in ("train", "validation", "test")}
+        return result
 
 
 class PilotSampler:

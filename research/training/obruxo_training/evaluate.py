@@ -15,7 +15,7 @@ from obruxo_data.hashing import canonical_sha256, sha256_bytes
 from obruxo_data.render.base import RenderRequest
 
 from .audit import write_json
-from .codec import CONTINUOUS, PilotTarget
+from .codec import PilotTarget
 from .features import AudioFeatures, tensor_digest
 from .model import PilotInverse, batch_features, predicted_targets
 from .performances import initial_bank
@@ -64,7 +64,7 @@ def load_evaluation_checkpoint(path: Path, pool):
     validate_replay(saved["replay"], sampler, saved["cursor"], config)
     if not saved["replay"]:
         raise ValueError("training-only retrieval memory is empty")
-    model = PilotInverse().eval()
+    model = PilotInverse(pool.codec).eval()
     model.load_state_dict(saved["model"], strict=True)
     return saved, model, frontend, sampler
 
@@ -259,7 +259,7 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
         output.mkdir(parents=True, exist_ok=False)
         write_json(output / "plan.json", plan)
     write_json(output / "status.json", {"complete": False, "stage": "real_render_evaluation"})
-    fixed = PilotTarget(tuple((default - lo) / (hi - lo) for _, lo, hi, default in CONTINUOUS), (0, 0))
+    fixed = codec.default_target()
     reused_cases, previous_renders, started = len(rows), len(renders), perf_counter()
 
     def save_progress(row=None):

@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "references": [
+    {"asset_id": "factory-basic-shapes", "path": "Basic/Basic Shapes.vitaltable", "provenance": "factory_export", "source_sha256": "4bc81073a8b6f12921d3bd3df4ce677ab313eefebc529018b0a2202b0282c834"},
+    {"asset_id": "factory-jaw-harp", "path": "Physical/Jaw Harp.vitaltable", "provenance": "factory_export", "source_sha256": "d3e99ef899b0d45c08e692fdd0cc7094dcaf8da5941257ae6d3f2ab8eeb7a266"},
+    {"asset_id": "factory-stabbed", "path": "Complex/Stabbed.vitaltable", "provenance": "factory_export", "source_sha256": "617cc3abb43b534532432b5fd435269c0b39bcfb509c085e0723ed671adf232f"}
+  ]
+}

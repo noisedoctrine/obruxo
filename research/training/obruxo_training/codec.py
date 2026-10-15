@@ -41,6 +41,10 @@ class PilotTarget:
 class PilotCodec:
     """Strict, limited proof-of-pipeline codec. Unsupported state is never projected away."""
 
+    continuous = CONTINUOUS
+    categorical = CATEGORICAL
+    generator = "independent_authored_pilot_v1"
+
     def __init__(self, schema: VitalSchema | None = None):
         self.schema = schema or VitalSchema.load()
         self.catalog = AssetCatalog.reviewed_init(self.schema)
@@ -75,12 +79,12 @@ class PilotCodec:
                 "scope": "one_init_oscillator_optional_filter1_env1_no_routes_or_effects"}
 
     def validate_target(self, target: PilotTarget) -> None:
-        if len(target.continuous) != len(CONTINUOUS) or len(target.categorical) != len(CATEGORICAL):
+        if len(target.continuous) != len(self.continuous) or len(target.categorical) != len(self.categorical):
             raise ValueError("pilot target shape mismatch")
         if any(type(value) not in {int, float} or not math.isfinite(value) or not 0 <= value <= 1 for value in target.continuous):
             raise ValueError("continuous targets must be finite numbers in [0, 1]")
         if any(type(index) is not int or not 0 <= index < len(options)
-               for index, (_, options) in zip(target.categorical, CATEGORICAL, strict=True)):
+               for index, (_, options) in zip(target.categorical, self.categorical, strict=True)):
             raise ValueError("categorical targets must be valid integer indices")
 
     def continuous_mask(self, target: PilotTarget) -> tuple[bool, ...]:
@@ -131,3 +135,18 @@ class PilotCodec:
 
     def preset(self, target: PilotTarget) -> VitalPreset:
         return VitalPreset(json.loads(self.decode(target)), self.schema)
+
+    def default_target(self) -> PilotTarget:
+        return self.canonical_target(PilotTarget(tuple((default - lo) / (hi - lo) for _, lo, hi, default in self.continuous),
+                                                 (0,) * len(self.categorical)))
+
+
+def load_codec(value: dict) -> PilotCodec:
+    if value.get("codec") == "authored_alpha_v1":
+        from .alpha import AlphaCodec
+        codec = AlphaCodec(value["wavetable_bank"])
+    else:
+        codec = PilotCodec()
+    if value != codec.to_dict():
+        raise ValueError("unsupported or changed codec contract")
+    return codec
