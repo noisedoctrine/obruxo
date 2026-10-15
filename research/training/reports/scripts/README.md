@@ -9,3 +9,7 @@ These are the exact scripts used for the existing-artifact analysis and train-on
 They use the historical local layout: execute copies from `ARTIFACT_ROOT/tmp/`, with this code checkout at `ARTIFACT_ROOT/tmp/training-pipeline-pr/` and the ignored training outputs at `ARTIFACT_ROOT/research/training/outputs/`. They write their diagnostic JSON into the checkout. Reproduction requires the pinned local checkpoints, pools and completed evaluation artifacts, plus the Python dependencies documented in `../../TRAINER.md`. Do not overwrite the frozen results when reproducing them; use a separate checkout and artifact root.
 
 The subsequent native intervention has a separate, portable runner, `../../release_probe.py`, which accepts `--artifact-root`, `--plan`, `--output` and `--resume`. See [the experiment report](../RELEASE_DIAGNOSTIC_RESULTS.md) for its exact invocation, frozen identities and interpretation.
+
+## Sound-helper evidence
+
+`summarize_sound_proxy.py --run /path/to/completed/screen --tests-passed N` checks the completed plan and source hashes, then publishes the sound-helper report, frozen plan, family summaries and a descriptive bootstrap over validation patches. Supply the actual completed local-test count.

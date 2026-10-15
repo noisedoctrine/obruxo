@@ -1,0 +1,257 @@
+{
+  "artifacts_sha256": {
+    "checkpoint.pt": "c39447c5d2ba5ccde6d7cd181cad253b1511d392751ba320dc15b9e64c9272f5",
+    "plan.json": "2e4fe7dcf1984d62c52d35ed55d736002b2a437c1e0537a70a829358058b3e07",
+    "proxy.pt": "d6233e5a50691b259034373cf3148fc1e5a2c8d472c82de82a289bfb854cb051",
+    "renders.jsonl": "dbc4caba2b57baf30665e2f1bf837ae6c178f6428e7c7629e653a8e68375117d",
+    "summary.json": "c56908405f9cd3b1e907eea2726588608c8317cfca4db1f38e4acbb71aef3e2e"
+  },
+  "audio_files_written": 0,
+  "by_family": {
+    "chorus": {
+      "mean_forward_errors": {
+        "five_neighbor_interpolation": 0.48846284416504204,
+        "nearest_training_patch_and_performance": 0.4993506541941315,
+        "proxy": 0.4850601290818304,
+        "training_mean": 0.499136577360332
+      },
+      "mean_native_gradient_delta": 1.207760979110996,
+      "planned_performances": 4,
+      "scored_forward": 4,
+      "scored_gradient": 4
+    },
+    "filtered": {
+      "mean_forward_errors": {
+        "five_neighbor_interpolation": 0.04706963011994958,
+        "nearest_training_patch_and_performance": 0.09557520970702171,
+        "proxy": 0.04043639847077429,
+        "training_mean": 0.038552019745111465
+      },
+      "mean_native_gradient_delta": 0.9875900237821043,
+      "planned_performances": 4,
+      "scored_forward": 4,
+      "scored_gradient": 4
+    },
+    "layered": {
+      "mean_forward_errors": {
+        "five_neighbor_interpolation": 0.2674263287335634,
+        "nearest_training_patch_and_performance": 0.3657887168228626,
+        "proxy": 0.2614532351726666,
+        "training_mean": 0.3092685155570507
+      },
+      "mean_native_gradient_delta": 1.4154081678910488,
+      "planned_performances": 4,
+      "scored_forward": 4,
+      "scored_gradient": 4
+    },
+    "modulated": {
+      "mean_forward_errors": {
+        "five_neighbor_interpolation": 0.37087997049093246,
+        "nearest_training_patch_and_performance": 0.2613571807742119,
+        "proxy": 0.2697229478508234,
+        "training_mean": 0.4137456528842449
+      },
+      "mean_native_gradient_delta": 0.644595880061388,
+      "planned_performances": 4,
+      "scored_forward": 4,
+      "scored_gradient": 4
+    },
+    "wavetable": {
+      "mean_forward_errors": {
+        "five_neighbor_interpolation": 0.16126404190436006,
+        "nearest_training_patch_and_performance": 0.20408460311591625,
+        "proxy": 0.23052445007488132,
+        "training_mean": 0.1979108415544033
+      },
+      "mean_native_gradient_delta": 0.3416538455057889,
+      "planned_performances": 4,
+      "scored_forward": 4,
+      "scored_gradient": 4
+    }
+  },
+  "candidate_ranking": {
+    "concordance": 0.5833333333333334,
+    "concordant": 35,
+    "noise_or_proxy_ties": 0,
+    "planned_comparisons": 60,
+    "scored": 60
+  },
+  "complete_panel": true,
+  "elapsed_seconds_this_segment": 1130.8728545999984,
+  "final_test_used": false,
+  "format": "obruxo_sound_proxy_screen_v1",
+  "forward_errors": {
+    "reference": {
+      "mean_errors": {
+        "five_neighbor_interpolation": 0.11282106908038259,
+        "nearest_training_patch_and_performance": 0.13075333992019295,
+        "proxy": 0.06451707412488758,
+        "training_mean": 0.1610425177961588
+      },
+      "passed": true,
+      "planned": 10,
+      "scored": 10
+    },
+    "transfer": {
+      "mean_errors": {
+        "five_neighbor_interpolation": 0.4212200570851564,
+        "nearest_training_patch_and_performance": 0.43970920592546464,
+        "proxy": 0.4503617901355028,
+        "training_mean": 0.42240292504429816
+      },
+      "passed": false,
+      "planned": 10,
+      "scored": 10
+    }
+  },
+  "gradient_probe": {
+    "improvement_fraction": 0.0,
+    "improvements_beyond_repeat_noise": 0,
+    "mean_native_mrstft_delta": 0.9194017792702652,
+    "planned": 20,
+    "scored": 20
+  },
+  "independent_validation_states": 10,
+  "inverse_model_trained": false,
+  "model_sha256": "dec7a5dcf27da0947364ee999886dab1a360de178d6815a5f89321627f0cc2ab",
+  "native_outcomes": {
+    "training": {
+      "accepted": 254,
+      "rejected": 2
+    },
+    "validation": {
+      "accepted": 120
+    }
+  },
+  "paired_state_gradient": {
+    "bootstrap_resamples": 2000,
+    "ci95": [
+      0.6507037287636195,
+      1.181922041243427
+    ],
+    "complete_states": 10,
+    "descriptive_only": true,
+    "mean_delta": 0.9194017792702652,
+    "planned_states": 10,
+    "seed": 0
+  },
+  "peak_process_tree_rss_bytes": 1198809088,
+  "plan_id": "6ddebc35cc9410f02a932bd66dec93ec5f721df610f64ba50410fdc011cd4aff",
+  "pool_id": "5ffac2ae5580d9ccf8dab5c23c186c387960a2fc624e72eb546ca45ba4d8e53b",
+  "proxy_connected_to_inverse": false,
+  "qualified_for_inverse_training": false,
+  "rejected_diagnostics": {
+    "audio.clipping": 2,
+    "vital.runtime.canonicalization": 2,
+    "vital.runtime.numeric_canonicalization": 2,
+    "vital.runtime.version_canonicalization": 2
+  },
+  "render_attempts": 376,
+  "render_wall_seconds": 1071.030352899943,
+  "renderer_identity": {
+    "backend_version": "0.8.3",
+    "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+    "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+    "settings": {
+      "buffer_size": 128,
+      "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+      "event_timing": "absolute ticks to half-even sample offsets",
+      "plugin_name": "Vital.vst3",
+      "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+      "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+    }
+  },
+  "renders_accepted": 374,
+  "retained_feature_bytes": 1267968,
+  "statistics_limit": "descriptive_paired_performances_not_independent_samples",
+  "trainable_parameters": 426464,
+  "training_families": {
+    "chorus": 12,
+    "filtered": 13,
+    "layered": 13,
+    "modulated": 13,
+    "wavetable": 13
+  },
+  "training_records": 254,
+  "training_states": 64,
+  "training_trace": [
+    {
+      "step": 0,
+      "training_error": 0.11373242735862732
+    },
+    {
+      "step": 250,
+      "training_error": 0.02835709974169731
+    },
+    {
+      "step": 500,
+      "training_error": 0.01689843088388443
+    },
+    {
+      "step": 750,
+      "training_error": 0.011152741499245167
+    },
+    {
+      "step": 1000,
+      "training_error": 0.007117631379514933
+    },
+    {
+      "step": 1250,
+      "training_error": 0.007034441456198692
+    },
+    {
+      "step": 1500,
+      "training_error": 0.005162146873772144
+    },
+    {
+      "step": 1750,
+      "training_error": 0.0036728628911077976
+    },
+    {
+      "step": 2000,
+      "training_error": 0.003553725080564618
+    },
+    {
+      "step": 2250,
+      "training_error": 0.0036541454028338194
+    },
+    {
+      "step": 2500,
+      "training_error": 0.002324542496353388
+    },
+    {
+      "step": 2750,
+      "training_error": 0.0020387996919453144
+    },
+    {
+      "step": 3000,
+      "training_error": 0.002379446057602763
+    },
+    {
+      "step": 3250,
+      "training_error": 0.0019086151150986552
+    },
+    {
+      "step": 3500,
+      "training_error": 0.0014857687056064606
+    },
+    {
+      "step": 3750,
+      "training_error": 0.001474760822020471
+    },
+    {
+      "step": 4000,
+      "training_error": 0.0012941777240484953
+    }
+  ],
+  "update_diagnostics": {
+    "higher_native_error": 20,
+    "lower_native_error": 0,
+    "lower_predicted_error": 20,
+    "scored": 20
+  },
+  "verification": {
+    "full_local_tests_passed": 164,
+    "github_actions": "disabled"
+  }
+}
