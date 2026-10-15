@@ -27,6 +27,21 @@ def main(argv=None) -> int:
     parser.add_argument("--asset-references", type=Path, help="Hash-pinned, caller-reviewed reference export manifest")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("describe", help="Print the initial schema, stream, asset and performance contracts")
+    proxy = commands.add_parser("proxy-screen", help="Train and qualify a small patch-to-sound helper against native audio")
+    proxy.add_argument("--pool", type=Path, required=True)
+    proxy.add_argument("--output", type=Path, required=True)
+    proxy.add_argument("--training-states", type=int, default=64)
+    proxy.add_argument("--validation-states", type=int, default=10)
+    proxy.add_argument("--steps", type=int, default=4000)
+    proxy.add_argument("--batch-size", type=int, default=32)
+    proxy.add_argument("--learning-rate", type=float, default=.001)
+    proxy.add_argument("--seed", type=int, default=0)
+    proxy.add_argument("--checkpoint-every", type=int, default=250)
+    proxy.add_argument("--replay-mib", type=int, default=8)
+    proxy.add_argument("--cpu-threads", type=int, default=4)
+    proxy.add_argument("--timeout", type=float, default=30.)
+    proxy.add_argument("--plugin-path")
+    proxy.add_argument("--resume", action="store_true")
     verify = commands.add_parser("verify", help="Verify a complete snapshot and its current executable contracts")
     verify.add_argument("--snapshot", type=Path, required=True)
     audit = commands.add_parser("audit", help="Inspect a corpus read-only and write a new contract snapshot")
@@ -129,6 +144,20 @@ def main(argv=None) -> int:
     infer.add_argument("--device", default="cpu")
     args = parser.parse_args(argv)
     try:
+        if args.command == "proxy-screen":
+            from .pilot import PilotPool
+            from .proxy_screen import ProxyConfig, run_proxy_screen
+            from .stream import NativeRendererFactory
+            if args.asset_references:
+                raise ValueError("proxy uses the pool's embedded asset catalog")
+            config = ProxyConfig(**{name: getattr(args, name) for name in ProxyConfig.__dataclass_fields__})
+            def proxy_progress(event):
+                if event["stage"] != "collect" or event["attempted"] % 16 == 0 or event["status"] != "accepted":
+                    print(json.dumps(event), flush=True)
+            result = run_proxy_screen(PilotPool.load(args.pool), args.output, config=config,
+                                      renderer_factory=NativeRendererFactory(args.plugin_path), resume=args.resume, progress=proxy_progress)
+            print(json.dumps(result, indent=2))
+            return 0 if result["qualified_for_inverse_training"] else 2
         if args.command == "infer":
             import numpy as np
             import torch

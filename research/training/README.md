@@ -1,5 +1,9 @@
 # Training contracts, online pilot and trainer
 
+The [sound-prediction helper](AUDIO_PROXY.md) implements the next audio-based learning step: learn patch-and-performance-to-sound measurements, then check its rankings and suggested changes against native Vital before connecting it to inverse training. `proxy-screen` provides bounded on-demand collection, resumable CPU learning and a reserved-performance validation panel.
+
+The [completed helper check](reports/SOUND_PROXY_RESULTS.md) passes familiar-performance prediction but fails transfer and native-update qualification. Its predicted error improves on all 20 guided cases while real sound error worsens on all 20. The helper remains disconnected from inverse training, and ordinary artifact loading refuses it. This is a limitation of the current helper/update, not a rejection of audio-based training.
+
 This workspace implements the training pipeline from the [training plan](../modelling/TRAINING_PLAN.md). It identifies and audits presets, resolves registered asset content, freezes ancestry-aware splits, reserves evaluation performances, and builds immutable on-demand render recipes using `obruxo_data`.
 
 The [authored online pilot](ONLINE_PILOT.md) supplies a limited codec and bounded rendering during training. The [trainer](TRAINER.md) adds audio-only prediction, frozen Basic Pitch features, bounded feature replay, optimizer recovery, resumable native evaluation and offline inference.

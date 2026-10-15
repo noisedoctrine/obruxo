@@ -1,5 +1,9 @@
 # OBRUXO training and release plan
 
+Implementation update, 2026-10-16: the [sound-prediction helper](../training/AUDIO_PROXY.md) now implements the forward-model part of Stage D. Its fixed native check compares held-out prediction against train-only baselines and verifies candidate rankings and input-gradient advice with real Vital audio. [Results](../training/reports/SOUND_PROXY_RESULTS.md) determine whether it can guide a later inverse-training comparison; inverse training is not enabled merely because forward regression works.
+
+The completed helper check passes reference prediction but fails transfer and native guidance: predicted error decreases on 20/20 updates while real error increases on 20/20. It remains disconnected from inverse training. The next broad capability is bounded render-based candidate improvement, which can also supply Stage D's fallback training targets; larger proxy runs and tuning remain deferred until that direction is screened.
+
 Implementation update, 2026-10-16: [paired synthesis-identity learning](../training/PAIRED_IDENTITY.md) now trains the decoder representation across distinct performances with explicit positives and distinct-state negatives. Its fixed alpha screen compares identical paired features/minibatches with weight zero versus weight one, including reserved-performance identity diagnostics and native reconstruction. Audio-based learning remains the next independent direction; detailed tuning and replication remain deferred.
 
 The [completed identity screen](../training/reports/PAIRED_IDENTITY_RESULTS.md) found no held-out benefit for that setting: native error rose 8.25% (paired interval includes zero), and representation retrieval fell from 25% to 20%. The identity objective remains opt-in with default weight zero; no model is promoted.
