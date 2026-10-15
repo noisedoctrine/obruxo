@@ -1,0 +1,294 @@
+{
+  "experiment": "pitch_neighbor_release_intervention_v1",
+  "frozen_at_utc": "2026-10-15T09:43:56.455112+00:00",
+  "question": "Does replacing only release with a training pitch-neighbor value improve native audio for both replication seeds?",
+  "exploratory": true,
+  "prior_plan": {
+    "path": "research/training/reports/data/fresh_validation_plan.json",
+    "sha256": "7dc79b0935bb0eda2c046dd54f77b051fa9f4c86686d96d107042c364018b90a"
+  },
+  "prior_progress": {
+    "path": "research/training/outputs/fresh-validation-20261014/progress.json",
+    "sha256": "240741ba033fa7007386b90358bc7d0ba4e572af8383abbf0d570ba1334572ca"
+  },
+  "prior_renders": {
+    "path": "research/training/outputs/fresh-validation-20261014/renders.jsonl",
+    "sha256": "8669aefa0306b314a73aba0eeb91171b344b6c0acdbfe1aa097e036446539959"
+  },
+  "rationale_evidence": [
+    {
+      "path": "research/training/reports/data/unison_release_diagnostics.json",
+      "sha256": "aa561c00a5d76b09068e84fcb29beb8ce44bb05ac3a9db44931c1cadf0c3e74c"
+    },
+    {
+      "path": "research/training/reports/data/cached_head_probe_plan.json",
+      "sha256": "da4bdf85fc6dfe093fa1432b7afbbec4aa3570eeadf8829851be714a5dcbc6ba"
+    },
+    {
+      "path": "research/training/reports/data/cached_head_probe_summary.json",
+      "sha256": "a3bff6db1b54068f940d8bfc28b21f6ff61c9c96082c135ec995c37093a282b7"
+    }
+  ],
+  "candidate_order": [
+    "expanded_seed1_16000",
+    "expanded_seed2_16000"
+  ],
+  "intervention": "Replace only normalized env_1_release using the single nearest retained training record's release target; all other preset fields unchanged.",
+  "retrieval": {
+    "distance": "float64 mean squared pitch feature distance",
+    "k": 1,
+    "tie_break": "first retained replay index",
+    "candidates": "all 404 unique train-only states",
+    "source": "identical verified replay in both replication checkpoints",
+    "validation_labels_used_for_selection": false
+  },
+  "training_states": 404,
+  "basic_pitch_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+  "cases": [
+    {
+      "case": 0,
+      "state_id": "62339b1cfd5f15c0f51d374c79cc94b57f35401ee44166bc223678822101224f",
+      "recipe_id": "698fc12145ac26eab1963ff87773819d1b512deeaa07e34e85d59475e2bad1d1",
+      "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+    },
+    {
+      "case": 1,
+      "state_id": "5d49e4dc9d072359bedcf560215812cc0489a49a04963710929eee7acba9c242",
+      "recipe_id": "4bb34aa29ec043e446863fa6837ce65f99c3e2c91aebeab64d1bcc45ea8a307b",
+      "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+    },
+    {
+      "case": 2,
+      "state_id": "925b4de13d52724df2120a6863bddf71a0ed2c1ee6b5ad8683f778aaa9550846",
+      "recipe_id": "75727dce7603b27a70781cfd9359e0af7b29b50cd4e7969f1c74c0939e25fe4d",
+      "reference_performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+      "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+    },
+    {
+      "case": 3,
+      "state_id": "5bc2470951a854d9053a789e2bfcb7b1038745ee13d64a96b9df95c9b74057f1",
+      "recipe_id": "5f8ea6ef43e6efe64da644a62ca196752d3197ba9710e0a24e7ba8f82def8058",
+      "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+    },
+    {
+      "case": 4,
+      "state_id": "e01a5794bad6e7f800ff0f8711cab2f6421a2618c3c73e92eaa914f989aeec5e",
+      "recipe_id": "08b4ea80ee0ff33bee806f7f61e2b21e36b444e141c1d64ed3d28d05f6a5a682",
+      "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+    },
+    {
+      "case": 5,
+      "state_id": "e5ab56bd663b499fb2d7b656b30925504899324e6603c258ac53ba11d284b2dd",
+      "recipe_id": "9f943b6ed57233606f15b6e246b3c43fca11b50603cc355b20d6b95e84a564db",
+      "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+    },
+    {
+      "case": 6,
+      "state_id": "5acf0c7c1a56d768830250e3f62d57ec9424419e26345f86d1381366e79fd7e7",
+      "recipe_id": "2cd73ef246bfe439cf0c6d2cc06efebac689f8b7bc6c439b11c6565a14a0c1a3",
+      "reference_performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+      "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+    },
+    {
+      "case": 7,
+      "state_id": "82f4a2947fd5bb5e90a6da11fbafa8c720d775b921f42c40cc36d32d8383ad40",
+      "recipe_id": "a27637a5ff4a2b1c8751b5eb7a3103e3ee35c35b30862ea2f70932e9d0355959",
+      "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+    },
+    {
+      "case": 8,
+      "state_id": "5a22c85716fb78d5e9c4d00834d8a2d4c993d0e207f84b9c05befa38536a132a",
+      "recipe_id": "f45e4c7fc7bfbb326598e0f56ec5cbf5201d5a6a3bb9560bb8ab24ee09caf1a9",
+      "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+    },
+    {
+      "case": 9,
+      "state_id": "870379c41007363c403727fa0ebe9082f2116d972341b4f4960ccd0002bb9694",
+      "recipe_id": "42c12a2f069b14e756495ae980fb4386988a3c873c693bb9ee00fc79f34850da",
+      "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+    },
+    {
+      "case": 10,
+      "state_id": "cf723837e52c469f44503979f10d6b4c081786c526a043f634dbc659a10591bd",
+      "recipe_id": "859b834f65badd5d95a6c1129ccafda41a065fbe7b44fc42c480be29bb0ced7f",
+      "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+    },
+    {
+      "case": 11,
+      "state_id": "9ae5562d3031237c16fe975f0056a8a219dbdf9882fb28d5b2decb4255041dbc",
+      "recipe_id": "84dbc1bdf4001b3b5c6fa11b663fb966903b2adb453008046797bcc99db5f66c",
+      "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+    },
+    {
+      "case": 12,
+      "state_id": "83f127b0a175c7980b8b47ffbafd4a1d327bf5eedf5437a531d148ef8801d85a",
+      "recipe_id": "6a59d203762692406c908e8d8053e581b76db3b5a6e63e404733c738dd88e0f0",
+      "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+    },
+    {
+      "case": 13,
+      "state_id": "3dbc1b079bf2661154d296aad0d245d0e282deef7553d815c2a6334b48935b4d",
+      "recipe_id": "eaf69865064b925f08b2ba84974f25b043af8bc7e5b3df831aa159d8ebfc5f4c",
+      "reference_performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+      "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+    },
+    {
+      "case": 14,
+      "state_id": "670a8a40b8c3469163ab80a511986b0d4af676c1d87dc163ba487aeec0895458",
+      "recipe_id": "ed038f46cf08ef61a00ae2ad650173daec47b4221e1060b648c7aee8c4e46960",
+      "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+    },
+    {
+      "case": 15,
+      "state_id": "e363e82d5f13c7c2526995f2de6b6340a4bb2fbb949af68d4f1e95a9d97da639",
+      "recipe_id": "7679f4a82e1e5811ce634a6c8a80d980da896e210d5991c4702be18f2f55e585",
+      "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+    },
+    {
+      "case": 16,
+      "state_id": "362c287057576eafdf8717fb9952883acab0163af7ce4684ebbfa5f4f2f064df",
+      "recipe_id": "6f7056f710b64ab4645e7403ecbda9088de4cd7cca21ff10db13b9ace419be84",
+      "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+    },
+    {
+      "case": 17,
+      "state_id": "9fd33905dd5910488edc2c30a7968345553285b34a03517362423ca00f698b2d",
+      "recipe_id": "f7429eb442bb5a486119d99d6cfa8e6cecfc4dfd7d3990a6cdcd15b4a605ac6a",
+      "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+    },
+    {
+      "case": 18,
+      "state_id": "788abb33f61b83b6984800d901eb50efb9a1cf6fbf0e1a366ab951305988f021",
+      "recipe_id": "5db26463a96f8948dcb44aed0deed0d68f2ad69f1520da0f795a192c61049026",
+      "reference_performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+      "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+    },
+    {
+      "case": 19,
+      "state_id": "4fd8b07a3c590b12054ffe73c3176b556cb74b3c7dc26501e8d73c3c2970585d",
+      "recipe_id": "0bf9f84394e8667f886c032e64d41956726a5cb9b2a7bd46fe275f3adb230ffa",
+      "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+    },
+    {
+      "case": 20,
+      "state_id": "10b4ba40d1637df9e0a3074b319ac5b5a9e8b03dd1464eae7899bc35832b46e7",
+      "recipe_id": "aaa5460a0530bd9be8b6e0f4c06889ba1e00f08775d60cd911cff253aa716d8f",
+      "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+    },
+    {
+      "case": 21,
+      "state_id": "545ae27242313dd44bfd3c8002bff7f6162d0332f0aa56db6fec5b4d23cfbacc",
+      "recipe_id": "85d3558304998f32bad17dee829d3635d4df386cf80d4048d4922102a56fd2ac",
+      "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+    },
+    {
+      "case": 22,
+      "state_id": "12f6e526b5be5346f94b758602a16776d9e79339cd32e38baa7e9f2179a70a09",
+      "recipe_id": "ea6a7306e0505e3208ccac02956a2c4de6de9e7ad661ef016c69ee6200881064",
+      "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+    }
+  ],
+  "recipe_ids": [
+    "698fc12145ac26eab1963ff87773819d1b512deeaa07e34e85d59475e2bad1d1",
+    "4bb34aa29ec043e446863fa6837ce65f99c3e2c91aebeab64d1bcc45ea8a307b",
+    "75727dce7603b27a70781cfd9359e0af7b29b50cd4e7969f1c74c0939e25fe4d",
+    "5f8ea6ef43e6efe64da644a62ca196752d3197ba9710e0a24e7ba8f82def8058",
+    "08b4ea80ee0ff33bee806f7f61e2b21e36b444e141c1d64ed3d28d05f6a5a682",
+    "9f943b6ed57233606f15b6e246b3c43fca11b50603cc355b20d6b95e84a564db",
+    "2cd73ef246bfe439cf0c6d2cc06efebac689f8b7bc6c439b11c6565a14a0c1a3",
+    "a27637a5ff4a2b1c8751b5eb7a3103e3ee35c35b30862ea2f70932e9d0355959",
+    "f45e4c7fc7bfbb326598e0f56ec5cbf5201d5a6a3bb9560bb8ab24ee09caf1a9",
+    "42c12a2f069b14e756495ae980fb4386988a3c873c693bb9ee00fc79f34850da",
+    "859b834f65badd5d95a6c1129ccafda41a065fbe7b44fc42c480be29bb0ced7f",
+    "84dbc1bdf4001b3b5c6fa11b663fb966903b2adb453008046797bcc99db5f66c",
+    "6a59d203762692406c908e8d8053e581b76db3b5a6e63e404733c738dd88e0f0",
+    "eaf69865064b925f08b2ba84974f25b043af8bc7e5b3df831aa159d8ebfc5f4c",
+    "ed038f46cf08ef61a00ae2ad650173daec47b4221e1060b648c7aee8c4e46960",
+    "7679f4a82e1e5811ce634a6c8a80d980da896e210d5991c4702be18f2f55e585",
+    "6f7056f710b64ab4645e7403ecbda9088de4cd7cca21ff10db13b9ace419be84",
+    "f7429eb442bb5a486119d99d6cfa8e6cecfc4dfd7d3990a6cdcd15b4a605ac6a",
+    "5db26463a96f8948dcb44aed0deed0d68f2ad69f1520da0f795a192c61049026",
+    "0bf9f84394e8667f886c032e64d41956726a5cb9b2a7bd46fe275f3adb230ffa",
+    "aaa5460a0530bd9be8b6e0f4c06889ba1e00f08775d60cd911cff253aa716d8f",
+    "85d3558304998f32bad17dee829d3635d4df386cf80d4048d4922102a56fd2ac",
+    "ea6a7306e0505e3208ccac02956a2c4de6de9e7ad661ef016c69ee6200881064"
+  ],
+  "validation_policy": "Reuse all 23 cases from the prior fresh panel as development validation; these are no longer fresh.",
+  "source_checks": "Require both source audio hashes and reinferred baseline preset hashes to match prior evidence; stop on mismatch.",
+  "primary": "Equal-weight reference/transfer MR-STFT per state; pitch-release minus original, separately for learning seeds 1 and 2.",
+  "secondary": [
+    "normalized stored-control release MAE (not seconds)",
+    "reference/transfer relative RMS error",
+    "unchanged unison accuracy",
+    "source-repeat distance"
+  ],
+  "bootstrap": {
+    "unit": "state",
+    "resamples": 2000,
+    "seed": 0,
+    "interval": "percentile_95",
+    "limit": "descriptive reused-development-state intervals; no seed-uncertainty or confirmatory significance claim"
+  },
+  "decision_rule": "Support further investigation only if mean native audio improves for both seeds with complete QA coverage. Label error alone is insufficient. No promotion from this reused panel.",
+  "planned_uninterrupted_render_attempts": 276,
+  "maximum_render_attempts": 288,
+  "recovery": "Hash-verified committed cases reused; rerender the whole unfinished case. At most 12 extra attempts for interruption; no automatic retries or budget extension.",
+  "failure_rule": "Log every attempted render and report all planned, scorable and failed denominators. Any QA failure prevents an all-pass decision. Hash/contract mismatch stops the run.",
+  "optimizer_updates": 0,
+  "new_training_features": 0,
+  "audio_archive": false,
+  "test_states_reserved": 64,
+  "test_split_evaluated": false,
+  "promotion": "none; retained selected-model.pt must remain byte-identical",
+  "runtime": {
+    "python": "3.12.13",
+    "torch": "2.12.1+xpu",
+    "numpy": "2.4.6",
+    "scipy": "1.18.0",
+    "device": "cpu",
+    "threads": 4,
+    "precision": "float32",
+    "renderer": {
+      "plugin": "C:/Program Files/Common Files/VST3/Vital.vst3",
+      "plugin_sha256": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+      "backend": "DawDreamer 0.8.3",
+      "timeout_seconds": 30,
+      "workers": 1
+    }
+  },
+  "runtime_source_sha256": {
+    "research/training/obruxo_training/cli.py": "480d8247083792013dcafbe1def8a1dbccfad3cd2bafdf709920b39faa237af7",
+    "research/training/obruxo_training/trainer.py": "3ab0f29e1ac069cceac743df915d7245e6b04d5b189ef4e3ce275eaf759fff62",
+    "research/training/obruxo_training/evaluate.py": "05860d80f2502d2b59d8e38189b503a240bfcdab033972e4ca1916a0486569bd",
+    "research/training/obruxo_training/features.py": "83ef8178442dc467b7985c67915a136650bc83e0248237f8bb12bdd452fae951",
+    "research/training/obruxo_training/model.py": "ee5cb2c6fcdc04e1ea327db3aa8cc08184dc0a4ee3a2bf2a481ceff227e1c4cb",
+    "research/training/obruxo_training/pilot.py": "c6e694fd99502a307044073d42cea19444a7792f2bbe34ce5b2c202c71346838",
+    "research/training/obruxo_training/codec.py": "a9e0095d0f45f80d25c1f30b0bc630b6ab93a41a4a62601d116db36d94435264",
+    "research/training/obruxo_training/stream.py": "241d651ab484fa336057aa3ff237932f3acfc65f84c623caf1592e7ee4320812",
+    "research/data_generation/obruxo_data/render/base.py": "d755087ea96d6e51c9e4b06940a633a10c5afff2b57de202a438b434a61339fa",
+    "research/data_generation/obruxo_data/render/vita.py": "74b7287234b857c0f4c21f33217ef464a394935b8ea7f50d52587be887625666",
+    "research/training/obruxo_training/contracts.py": "b8cb238a01723fb04960f7f7e4d69cc59a15a4d56ec9f576a0b041b041fa3b35",
+    "research/data_generation/obruxo_data/vital/validation.py": "8908bb8763d9d5f3fbe54aa95ec51eb12d9718a7c7f19a30638911b8da7c5cf2",
+    "research/training/release_probe.py": "06cc3a6c1f0365f00c830a5c9fef2fcf86892b30fff046d907b47b12bbecce73"
+  },
+  "output": "research/training/outputs/release-intervention-20261015"
+}
