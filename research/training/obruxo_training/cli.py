@@ -42,6 +42,24 @@ def main(argv=None) -> int:
     proxy.add_argument("--timeout", type=float, default=30.)
     proxy.add_argument("--plugin-path")
     proxy.add_argument("--resume", action="store_true")
+    candidate = commands.add_parser("candidate-screen", help="Improve training targets with native renders and compare matched learning arms")
+    candidate.add_argument("--pool", type=Path, required=True)
+    candidate.add_argument("--checkpoint", type=Path, required=True)
+    candidate.add_argument("--output", type=Path, required=True)
+    candidate.add_argument("--training-states", type=int, default=32)
+    candidate.add_argument("--validation-states", type=int, default=10)
+    candidate.add_argument("--steps", type=int, default=1500)
+    candidate.add_argument("--batch-size", type=int, default=16)
+    candidate.add_argument("--learning-rate", type=float, default=.0001)
+    candidate.add_argument("--candidate-weight", type=float, default=.5)
+    candidate.add_argument("--confirmation-margin", type=float, default=.05)
+    candidate.add_argument("--checkpoint-every", type=int, default=250)
+    candidate.add_argument("--replay-mib", type=int, default=8)
+    candidate.add_argument("--cpu-threads", type=int, default=4)
+    candidate.add_argument("--seed", type=int, default=0)
+    candidate.add_argument("--timeout", type=float, default=30.)
+    candidate.add_argument("--plugin-path")
+    candidate.add_argument("--resume", action="store_true")
     verify = commands.add_parser("verify", help="Verify a complete snapshot and its current executable contracts")
     verify.add_argument("--snapshot", type=Path, required=True)
     audit = commands.add_parser("audit", help="Inspect a corpus read-only and write a new contract snapshot")
@@ -144,6 +162,21 @@ def main(argv=None) -> int:
     infer.add_argument("--device", default="cpu")
     args = parser.parse_args(argv)
     try:
+        if args.command == "candidate-screen":
+            from .candidate_data import CandidateConfig
+            from .candidate_screen import run_candidate_screen
+            from .pilot import PilotPool
+            from .stream import NativeRendererFactory
+            if args.asset_references:
+                raise ValueError("candidate training uses the pool's embedded asset catalog")
+            config = CandidateConfig(**{name: getattr(args, name) for name in CandidateConfig.__dataclass_fields__})
+            def candidate_progress(event):
+                if event["stage"] != "evaluation" or event["method"] == "source_repeat":
+                    print(json.dumps(event), flush=True)
+            result = run_candidate_screen(PilotPool.load(args.pool), args.checkpoint, args.output, config=config,
+                                          renderer_factory=NativeRendererFactory(args.plugin_path), resume=args.resume, progress=candidate_progress)
+            print(json.dumps(result, indent=2))
+            return 0 if result["validation_renders_accepted"] == result["validation_renders_attempted"] else 2
         if args.command == "proxy-screen":
             from .pilot import PilotPool
             from .proxy_screen import ProxyConfig, run_proxy_screen
