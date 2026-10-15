@@ -1,5 +1,7 @@
 # Training contracts, online pilot and trainer
 
+The [direct-render training path](RENDER_SELECTED_TRAINING.md) collects bounded candidate guesses, confirms improvements with independent Vital renders and trains matched inverse models with unchanged source supervision. Its [completed comparison](reports/RENDER_SELECTED_RESULTS.md) found confirmed alternatives for 13/32 training recordings, but extra-target training raised held-out sound error by 12.56%. It remains a research option; no release model is promoted. The next independent capabilities are audio-only candidate ranking and a conditioning comparison. Renderer throughput is being measured before larger native runs.
+
 The [sound-prediction helper](AUDIO_PROXY.md) implements the next audio-based learning step: learn patch-and-performance-to-sound measurements, then check its rankings and suggested changes against native Vital before connecting it to inverse training. `proxy-screen` provides bounded on-demand collection, resumable CPU learning and a reserved-performance validation panel.
 
 The [completed helper check](reports/SOUND_PROXY_RESULTS.md) passes familiar-performance prediction but fails transfer and native-update qualification. Its predicted error improves on all 20 guided cases while real sound error worsens on all 20. The helper remains disconnected from inverse training, and ordinary artifact loading refuses it. This is a limitation of the current helper/update, not a rejection of audio-based training.
