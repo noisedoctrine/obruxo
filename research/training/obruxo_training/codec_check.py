@@ -49,6 +49,9 @@ class CodecCheckSampler:
 
 
 def check_codec_audio(pool, output: Path, *, renderer_factory=None, timeout: float = 60, progress=None) -> dict:
+    if pool.codec.generator == "independent_authored_alpha_v1":
+        from .alpha_check import check_alpha_audio
+        return check_alpha_audio(pool, output, renderer_factory=renderer_factory, timeout=timeout, progress=progress)
     sampler = CodecCheckSampler(pool)
     config = StreamConfig(prefetch_clips=1, timeout_seconds=timeout)
     output.mkdir(parents=True, exist_ok=False)

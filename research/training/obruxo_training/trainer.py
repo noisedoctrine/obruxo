@@ -19,9 +19,9 @@ from obruxo_data.hashing import canonical_sha256, sha256_bytes
 
 from .audit import write_json
 from .benchmark import MemoryMonitor
-from .codec import PilotCodec, PilotTarget
+from .codec import PilotTarget, load_codec
 from .features import AudioFeatures, tensor_digest, validate_features
-from .model import MODEL_SPEC, PilotInverse, batch_features, loss_terms, predicted_targets
+from .model import PilotInverse, batch_features, loss_terms, model_spec, predicted_targets
 from .pilot import PilotPool, PilotSampler
 from .stream import OnlineRenderStream, StreamConfig
 
@@ -144,7 +144,7 @@ def _run_contract(pool, sampler, frontend, config, stream_config, replay_seed=No
         del training["learning_seed_override"]
     contract = {"trainer": "pilot_supervised_bootstrap_v1", "pool_id": pool.pool_id,
             "contract": pool.codec.contract.to_dict(), "codec": pool.codec.to_dict(), "sampler_id": sampler.sampler_id,
-            "model": MODEL_SPEC, "frontend": frontend.describe(), "training": training,
+            "model": model_spec(pool.codec), "frontend": frontend.describe(), "training": training,
             "stream": stream_config.to_dict(), "optimizer": "AdamW_weight_decay_0", "precision": "float32",
             "scheduler": None, "scaler": None,
             "replay_policy": "bounded_refresh_then_replay_v1" if config.fresh_examples is not None or config.updates_per_render != 1
@@ -205,7 +205,7 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
     contract = _run_contract(pool, sampler, frontend, config, stream_config, replay_seed)
     if saved and (saved.get("format") != "obruxo_pilot_training_v1" or saved["run_contract"] != contract):
         raise ValueError("checkpoint training contract changed; start an explicit new run")
-    model = PilotInverse().to(device)
+    model = PilotInverse(pool.codec).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate, weight_decay=0)
     generator = torch.Generator().manual_seed(learning_seed)
     replay, step, initial, render_ready, renderer_identity = [], 0, None, False, None
@@ -388,7 +388,7 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
 
 def export_model(path: Path, model, frontend, codec, pool_id: str) -> None:
     frontend.require_frozen()
-    atomic_torch_save(path, {"format": "obruxo_pilot_inference_v1", "model_spec": MODEL_SPEC,
+    atomic_torch_save(path, {"format": "obruxo_pilot_inference_v1", "model_spec": model_spec(codec),
                             "model": model.state_dict(), "basic_pitch": frontend.basic_pitch.state_dict(),
                             "frontend": frontend.describe(), "contract": codec.contract.to_dict(),
                             "codec": codec.to_dict(), "training_pool_id": pool_id, "input": "audio_only"})
@@ -396,8 +396,8 @@ def export_model(path: Path, model, frontend, codec, pool_id: str) -> None:
 
 def load_model(path: Path, device: str = "cpu") -> tuple:
     saved = torch.load(path, map_location="cpu", weights_only=True)
-    codec = PilotCodec()
-    if saved.get("format") != "obruxo_pilot_inference_v1" or saved["model_spec"] != MODEL_SPEC:
+    codec = load_codec(saved["codec"])
+    if saved.get("format") != "obruxo_pilot_inference_v1" or saved["model_spec"] != model_spec(codec):
         raise ValueError("unsupported inference artifact")
     codec.contract.require_match(saved["contract"])
     if saved["codec"] != codec.to_dict():
@@ -405,7 +405,7 @@ def load_model(path: Path, device: str = "cpu") -> tuple:
     frontend = AudioFeatures(saved["basic_pitch"])
     if frontend.describe() != saved["frontend"]:
         raise ValueError("inference frontend or frozen weights changed")
-    model = PilotInverse().to(device).eval()
+    model = PilotInverse(codec).to(device).eval()
     model.load_state_dict(saved["model"], strict=True)
     return model, frontend, codec
 
