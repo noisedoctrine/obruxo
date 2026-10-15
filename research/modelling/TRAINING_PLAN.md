@@ -348,6 +348,8 @@ The C: drive had approximately 208 GB free, about 194 GiB, at inspection. Free s
 
 The existing [Basic Pitch benchmark](basic_pitch/reports/backend_benchmark.md) measured about 96 audio-seconds per wall-second for warm end-to-end XPU inference, and about 228 audio-seconds per second for the tested batch-8 forward/backward boundary. The latter did not perform optimizer updates. These are useful evidence that the device can support research work; they are not throughput estimates for the proposed inverse model or proxy.
 
+The [Vital latency measurement](../training/reports/VITAL_RENDER_LATENCY.md) separates offline synthesis from setup on five training patches. Four seconds of audio took 0.072–0.142 seconds to synthesize, while whole calls took several seconds. Bulk JUCE state conversion reduced mean conversion time from 1.450 to 0.0068 seconds and total fresh-process time by 20.9%, with identical audio and native state readback in all five cases. Process/plugin startup and state loading remain material costs; reusable-worker qualification is still required before scaling the on-demand pipeline.
+
 | Resource | Recommended work | Constraint |
 |---|---|---|
 | Local CPU | Online rendering, QA and optional feature extraction alongside training; schema/manifest work and tests | Reviewed renderer has one worker; plugin startup, CPU contention and long tails may dominate |
