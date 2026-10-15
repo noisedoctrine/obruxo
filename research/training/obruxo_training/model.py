@@ -34,7 +34,8 @@ class PilotInverse(nn.Module):
 
     def forward(self, features: dict) -> dict:
         hidden = self.fusion(torch.cat((self.timbre(features["timbre"]), self.pitch(features["pitch"])), dim=1))
-        return {"continuous": self.continuous(hidden).sigmoid(), "categorical": [head(hidden) for head in self.categorical]}
+        return {"continuous": self.continuous(hidden).sigmoid(), "categorical": [head(hidden) for head in self.categorical],
+                "representation": hidden}
 
 
 def batch_features(items: list[dict], device: str = "cpu") -> dict:
