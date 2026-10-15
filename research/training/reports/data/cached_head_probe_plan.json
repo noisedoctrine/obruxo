@@ -1,0 +1,66 @@
+{
+  "experiment": "cached_feature_head_probe_v1",
+  "frozen_at_utc": "2026-10-14T19:19:08.589238+00:00",
+  "exploratory": true,
+  "question": "How do fixed timbre, pitch and combined distances recover unison/release labels from a different training state?",
+  "populations": {
+    "one": {
+      "checkpoint": {
+        "path": "research/training/outputs/cached-curve-one-step16000-20261011/checkpoint.pt",
+        "sha256": "b5df523b46f63bb48dea67b6b2b1247b32af15076fc5dd45e1c27df6ac8f95e8",
+        "bytes": 12583881,
+        "training_pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f",
+        "step": 16000,
+        "model_state_sha256": "a64e509920bef6468bbc61031d015b9a4fbfd204d381782b5f4af08622398fca",
+        "replay_digest": "1831f6a3aeedfcd00991ab98fa8ee106bb4c70970d0c2686a3709e7b6b60d6ac",
+        "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+      },
+      "pool": {
+        "path": "research/training/outputs/authored-pilot-v2-20261005/pool.json",
+        "sha256": "7ec6258b6aa7c2f3832ab7950aef962abf7d9f5283914854fb4d97fc2493623f",
+        "bytes": 196075,
+        "pool_id": "ffb7b52c9c0a9fb40c7493767b012530da7668c9ca49d0057fdf9ba46798961f"
+      },
+      "states": 205
+    },
+    "expanded": {
+      "checkpoint": {
+        "path": "research/training/outputs/state-coverage-expanded-16000-20261013/checkpoint.pt",
+        "sha256": "8231920789f8ef8c5bb7359613aa6c51b84cc193d24475ae5293a8cbeb17dece",
+        "bytes": 20463789,
+        "training_pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+        "step": 16000,
+        "model_state_sha256": "bb2dfed7dd9287217f98c17359c153f32b6afe31c292b0c3d9b8b154a2514231",
+        "replay_digest": "68baae68a584394755c48b46e5f680ec351703973da8e98480cade898ae3d77d",
+        "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f"
+      },
+      "pool": {
+        "path": "research/training/outputs/authored-expanded-20261013/pool.json",
+        "sha256": "ed05cf3db0dd1862671a525a2c6fac2f7d9497633848246b330a2b544ae02e87",
+        "bytes": 387929,
+        "pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86"
+      },
+      "states": 404
+    }
+  },
+  "arms": [
+    "timbre",
+    "pitch",
+    "combined"
+  ],
+  "neighbor_count": 1,
+  "distance": "mean squared feature distance per branch; combined adds the two branch means; float64 distance computation",
+  "query_exclusion": "exclude the entire query state; inputs have exactly one retained feature record per state; assert train split for every row",
+  "controls": "per-query unison majority and release median estimated from all other states only; lowest category/index breaks ties",
+  "metrics": [
+    "unison accuracy and confusion",
+    "release normalized stored-control MAE",
+    "paired release MAE minus leave-one-state-out median"
+  ],
+  "decision_rule": "Branch results are descriptive. Do not change neural inputs or loss weights from this probe alone. If release remains worse than the median in all arms, prioritize a controlled native release intervention or envelope feature diagnostic; if class counts are balanced and training accuracy is perfect, do not claim ordinary class imbalance or an unfitted classifier.",
+  "optimizer_updates": 0,
+  "native_renders": 0,
+  "validation_or_test_used": false,
+  "promotion": "none",
+  "probe_script_sha256": "89fd885827ef347722834bb7416835a3733c5577b7cfcc00a7f325e8273b97c6"
+}

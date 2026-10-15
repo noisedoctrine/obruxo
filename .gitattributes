@@ -13,3 +13,10 @@ research/training/obruxo_training/contracts.py -text
 research/data_generation/obruxo_data/render/base.py -text
 research/data_generation/obruxo_data/render/vita.py -text
 research/data_generation/obruxo_data/vital/validation.py text eol=crlf
+research/training/release_probe.py -text
+research/training/reports/scripts/diagnose_unison_release.py -text
+research/training/reports/scripts/probe_cached_feature_branches.py -text
+research/training/reports/data/unison_release_diagnostics.json -text
+research/training/reports/data/cached_head_probe_plan.json -text
+research/training/reports/data/cached_head_probe_summary.json -text
+research/training/reports/data/release_intervention_plan.json -text
