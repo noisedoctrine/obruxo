@@ -51,6 +51,13 @@ def nearest_training_target(features: dict, replay: list[dict]) -> PilotTarget:
 
 def load_evaluation_checkpoint(path: Path, pool):
     saved = torch.load(path, map_location="cpu", weights_only=True)
+    return restore_evaluation_checkpoint(saved, pool)
+
+
+def restore_evaluation_checkpoint(saved, pool):
+    if saved.get("format") == "obruxo_render_selected_training_v1":
+        from .candidate_learning import restore_candidate_checkpoint
+        return restore_candidate_checkpoint(saved, pool)
     if saved.get("format") != "obruxo_pilot_training_v1" or saved["step"] < 1:
         raise ValueError("evaluation needs a trained pilot checkpoint")
     contract = saved["run_contract"]
@@ -106,7 +113,8 @@ def evaluate_learning_curve(pool, checkpoints: list[Path], output: Path, *, coun
 def evaluate_comparison(pool, checkpoints: dict[str, Path], retrieval_checkpoint: Path, output: Path, *, count: int = 21,
                         renderer_factory=None, timeout: float = 60, progress=None, resume: bool = False,
                         checkpoint_pools: dict[str, PilotPool] | None = None, validation_pool: PilotPool | None = None,
-                        identity_diagnostics: bool = False, validation_states: list[str] | None = None) -> dict:
+                        identity_diagnostics: bool = False, validation_states: list[str] | None = None,
+                        render_attempt_limit: int | None = None) -> dict:
     reserved = {"source", "fixed_template", "train_retrieval", "source_repeat"}
     if not 2 <= len(checkpoints) <= 8 or any(not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,63}", name)
                                            or name in reserved for name in checkpoints):
@@ -140,7 +148,8 @@ def evaluate_comparison(pool, checkpoints: dict[str, Path], retrieval_checkpoint
     return _evaluate_models(validation_pool or pool, models, frontend, sampler, output, count=count, split="validation", curve=True,
                             comparison=True, artifacts=artifacts, retrieval=retrieval,
                             renderer_factory=renderer_factory, timeout=timeout, progress=progress, resume=resume,
-                            validation_extension=extension, identity_diagnostics=identity_diagnostics, validation_states=validation_states)
+                            validation_extension=extension, identity_diagnostics=identity_diagnostics, validation_states=validation_states,
+                            render_attempt_limit=render_attempt_limit)
 
 
 def _restore_evaluation(output: Path, plan: dict, renderer_identity: dict) -> tuple:
@@ -215,9 +224,11 @@ def curve_statistics(rows: list[dict], model_names: list[str], baseline_name: st
 
 def _evaluate_models(pool, models, frontend, training_sampler, output, *, count, split, curve=False, artifacts=None,
                      renderer_factory=None, timeout=60, progress=None, resume=False, comparison=False, retrieval=None,
-                     validation_extension=None, identity_diagnostics=False, validation_states=None):
+                     validation_extension=None, identity_diagnostics=False, validation_states=None, render_attempt_limit=None):
     if split not in {"train", "validation"} or type(count) is not int or count <= 0:
         raise ValueError("pilot diagnostics use a positive count from train or validation; final test stays reserved")
+    if render_attempt_limit is not None and (type(render_attempt_limit) is not int or render_attempt_limit <= 0):
+        raise ValueError("native render-attempt limit must be a positive integer")
     if validation_states is not None and (split != "validation" or not isinstance(validation_states, list)
                                           or len(validation_states) != count or any(not isinstance(state, str) for state in validation_states)
                                           or len(set(validation_states)) != count):
@@ -254,6 +265,8 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
             "maximum_render_attempts": count * (8 + 2 * len(models)), "test_split_evaluated": False}
     if retrieval is not None:
         plan["retrieval_source"] = retrieval["source"]
+    if render_attempt_limit is not None:
+        plan["maximum_render_attempts_with_recovery"] = render_attempt_limit
     if validation_extension is not None:
         plan["validation_extension"] = validation_extension
     if identity_diagnostics:
@@ -294,6 +307,8 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
         save_progress()
 
     def render(raw, performance, case_index, method, role):
+        if render_attempt_limit is not None and len(renders) >= render_attempt_limit:
+            raise RuntimeError("frozen evaluation native-render attempt budget exhausted")
         request = RenderRequest(preset_json=raw.decode(), performance=performance, sample_rate=codec.contract.sample_rate,
                                 channels=2, tail_seconds=codec.contract.tail_seconds, renderer_id=codec.contract.renderer_id)
         audio, metadata = render_isolated(request, renderer_factory=renderer_factory, timeout=timeout)
