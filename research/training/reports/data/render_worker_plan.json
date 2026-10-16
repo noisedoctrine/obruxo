@@ -1,0 +1,85 @@
+{
+  "families": [
+    "wavetable",
+    "layered",
+    "filtered",
+    "modulated",
+    "chorus"
+  ],
+  "final_test_used": false,
+  "fresh_attempts": 33,
+  "max_jobs": 32,
+  "minimum_mean_wall_reduction": 0.1,
+  "phase_control": {
+    "osc_1_random_phase": 0.0,
+    "osc_2_random_phase": 0.0,
+    "osc_3_random_phase": 0.0
+  },
+  "pool_id": "5ffac2ae5580d9ccf8dab5c23c186c387960a2fc624e72eb546ca45ba4d8e53b",
+  "qualification": "fixed_phase_fresh_plugins_reusable_worker_v1",
+  "requests": [
+    "f9ab884be460c55a4943153cd6ff71d9ec26cf6276e41ada3e56172d998d3ed9",
+    "4027b692d3eba1563ba46b2d09bd1228d401086d15a565499743736c638f3184",
+    "3e3c7416c441e35a243af4dfee29889d13f099cd56657c60811b41ba776be05f",
+    "61097f15370339647ac3d852fbbbb4823a587e4a0f1c4dc92f7cd6081356e6f9",
+    "4026c06ae4919bcf162879cf20fe2081efc75017c4abcf110b7d78cbf7936226"
+  ],
+  "reuse_attempts": 33,
+  "reuse_order": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    0,
+    1,
+    2,
+    3,
+    4,
+    0,
+    1,
+    2,
+    3,
+    4,
+    0,
+    1,
+    2,
+    3,
+    4,
+    0,
+    1,
+    2,
+    3,
+    4,
+    0,
+    1,
+    2,
+    3,
+    4,
+    0,
+    1,
+    2
+  ],
+  "rss_limit_bytes": 8589934592,
+  "source": {
+    "data_generation\\obruxo_data\\render\\vita.py": "7874aaf59de491918e47d4ea6f1a91785464feca0c76f133abd6752a7084cbda",
+    "training\\obruxo_training\\stream.py": "8b9feab9141974e4064eca817ba0e54bd45a88607244ed0fc08967c4f31bdd76",
+    "training\\reports\\scripts\\qualify_render_worker.py": "a2ec998d282bf28f185a1c04f5c92e7ccc3d182c7356e43c09f62befce0f09be"
+  },
+  "source_training_states": [
+    "6aaab3a8ba4aa2f34d7badc41d28bf86794eb3b09b6d471fafdb6057edbe3ef1",
+    "461ee02b3896884d4e55039e4c6d960f7e7a60a6c477ccf2376bee61493a5954",
+    "aa5073d27ba4207bc1f696c8b5823add229cb467f178e77279926817d89a2d0e",
+    "93d46f0bfcfd44a2225f326fc290c3daa3ee2cfed6a35bc1c9f5daa0b229a45e",
+    "5aba9dd698b2646375ac9a74c34dd168e146e53d0ad62930155a1516c6b8c467"
+  ],
+  "split": "train",
+  "state_lineage": "diagnostic_phase_fixed_derivatives_of_train_only_sources",
+  "timing_design": "adjacent_fresh_reuse_pairs_with_alternating_order",
+  "tolerance": {
+    "log_spectral_rmse": 0.35,
+    "peak_absolute": 0.1,
+    "rms_relative": 0.01
+  },
+  "training_pool_changed": false
+}

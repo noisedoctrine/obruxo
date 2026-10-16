@@ -20,3 +20,7 @@ The worker check alternates five training families, compares fresh processes wit
 Vital's [oscillator reset](https://github.com/mtytel/vital/blob/main/src/synthesis/producers/synth_oscillator.cpp) draws random phases; its [random generator](https://github.com/mtytel/vital/blob/main/src/synthesis/framework/utils.h) seeds new generators using a process-wide incrementing counter. This source behavior is consistent with the observed differences when reusing processes with oscillator randomness enabled. Random-phase variation therefore belongs in a separate sampling check, rather than the fixed-input pipeline correctness gate.
 
 Actual training respects the requested patch's phase settings. A reuse contract records the process-scoped random-number policy. With random phases enabled, regenerated unconsumed audio need not be bit-identical after interruption; retained features, model, optimizer and training RNG still recover from the checkpoint. Cross-platform/native-version qualification remains separate.
+
+## Laptop execution
+
+Windows standby was observed during local checks. A long scheduling pause can expire the wall-clock render deadline; that failed attempt remains in the log and may advance the recipe cursor. Exact recovery comparisons require the same retained features and accepted recipe sequence. Long unattended local runs need a continuously awake host, or checkpointed recovery with the resulting render failures counted explicitly. The pipeline does not change global power settings.
