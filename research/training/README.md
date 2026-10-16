@@ -2,7 +2,7 @@
 
 The [completion ledger](IMPLEMENTATION_STATUS.md) tracks the remaining training and release work. [Learned factory choices](FACTORY_ASSETS.md) add registered wavetables for all three oscillator slots and registered sampler content. [Train-only Era2 curve assets](LFO_BANK.md) support fitting, saved-code decoding and native reconstruction checks.
 
-The [eight-curve training path](LFO_TRAINING.md) now predicts those shapes from audio, renders original source curves during training, and supervises their reconstruction without giving the model curve labels as inputs. Sixteen declared connections make the current authored curves audible; learning arbitrary ordered connections remains next.
+The [eight-curve training path](LFO_TRAINING.md) predicts those shapes from audio, renders original source curves during training, and supervises their reconstruction without giving the model curve labels as inputs. The [ordered connection model](ORDERED_ROUTING.md) adds all 64 positional connections and their optional mapping curves, replacing the earlier curve stage's fixed connections. Its initial five-pattern curriculum remains a small integration scope.
 
 The [full scalar training path](FULL_SCALAR_TRAINING.md) connects all 775 scalar fields to bounded audio-only learning, legal effect-order and pitch-mask outputs, modern render recipes and inference export. Nested assets, curves, seeds and connections remain explicitly fixed in this increment; learned structured coverage follows.
 

@@ -84,10 +84,12 @@ def evaluate_pilot(pool, checkpoint: Path, output: Path, *, count: int = 4, spli
 
 def retrieval_digest(replay: list[dict]) -> str:
     # Usage counters change during replay; the candidate audio, features and labels must not.
-    return canonical_sha256([{**{key: value for key, value in item.items() if key not in {"features", "uses", "curve_targets"}},
+    return canonical_sha256([{**{key: value for key, value in item.items() if key not in {"features", "uses", "curve_targets", "route_curve_targets"}},
                               "features_sha256": tensor_digest(item["features"]),
                               **({"curve_targets_sha256": tensor_digest({"original_curves": item["curve_targets"]})}
-                                 if "curve_targets" in item else {})} for item in replay])
+                                 if "curve_targets" in item else {}),
+                              **({"route_curve_targets_sha256": tensor_digest({"original_maps": item["route_curve_targets"]})}
+                                 if "route_curve_targets" in item else {})} for item in replay])
 
 
 def evaluate_learning_curve(pool, checkpoints: list[Path], output: Path, *, count: int = 21,

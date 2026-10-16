@@ -171,15 +171,19 @@ class LfoCurveCodec:
 
     def continuous_mask(self, target):
         base = self._base_target(target)
-        active, codes = self.active_lfos(target), self.codes(target)
+        active = self.active_lfos(target)
         mask = tuple(self._scalar_mask(name, active, value) for (name, *_), value in zip(self.base.continuous, self.base.continuous_mask(base)))
+        return mask + self.curve_parameter_masks(target, active)
+
+    def curve_parameter_masks(self, target, active):
+        codes = self.codes(target)
         phases, gains = [], []
         for slot, code in enumerate(codes):
             atoms = [self.lfo_bank.assets.base_dictionary[code.indices[0]],
                      *(layer[index] for layer, index in zip(self.lfo_bank.assets.residual_layer_dictionaries, code.indices[1:]))]
             phases.extend(bool(active[slot] and np.ptp(atom) != 0 and (layer == 0 or code.gains[layer - 1] != 0)) for layer, atom in enumerate(atoms))
             gains.extend(bool(active[slot] and np.any(atom != 0)) for atom in atoms[1:])
-        return mask + tuple(phases) + tuple(gains)
+        return tuple(phases) + tuple(gains)
 
     def categorical_mask(self, target):
         base = self._base_target(target)

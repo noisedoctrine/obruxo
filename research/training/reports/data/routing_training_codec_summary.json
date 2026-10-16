@@ -1,0 +1,2862 @@
+{
+  "accepted": 15,
+  "all_controls_equal_at_float32": true,
+  "audio_files_written": 0,
+  "cases": [
+    {
+      "controls_equal_at_float32": true,
+      "decoded_audio_exact": true,
+      "decoded_comparison": {
+        "log_spectral_rmse": 0.0,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      "decoded_state_id": "ae043843623091763d738ae8dada89eb3e8e0c6ad9900ad36705bc21e4ac2562",
+      "family": "dense",
+      "outcomes": [
+        {
+          "attempts": [
+            {
+              "attempt": 0,
+              "diagnostic_codes": [],
+              "provenance": {
+                "backend_version": "0.8.3",
+                "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+                "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+                "request_id": "f94d5a437a94bd330413dbfb6707ec1e51b7ee717d931bde1fcc55b93fa205cb",
+                "settings": {
+                  "buffer_size": 128,
+                  "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+                  "event_timing": "absolute ticks to half-even sample offsets",
+                  "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+                  "full_nested_readback_verified": true,
+                  "plugin_name": "Vital.vst3",
+                  "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+                  "scalar_lfo_route_readback_verified": true,
+                  "schema_id": "vital-1.5.5-fields-native-1.6.4",
+                  "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+                  "verified_loaded_scalars": 775
+                }
+              },
+              "qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "520ca87f107b2be3cd5a518690beb7a34075e94c0b7cdf9566954210c4b32725",
+                "clipping_count": 0,
+                "dc_offset": [
+                  0.0002918573966230503,
+                  0.0004865267813441334
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "peak": 0.5095319747924805,
+                "rms": 0.0066437926289865095,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "render_seconds": 0.9163105999905383,
+              "renderer_qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "520ca87f107b2be3cd5a518690beb7a34075e94c0b7cdf9566954210c4b32725",
+                "clipping_count": 0,
+                "dc_offset": [
+                  0.0002918573966230503,
+                  0.0004865267813441334
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "native_state": {
+                  "applied_preset_sha256": "25be2b629302180970ea4bb556ae82c6dcdd999046e58331194be34a7985b570",
+                  "applied_version": "1.5.5",
+                  "modulation_slots_verified": 64,
+                  "native_ramp_defaults_verified": 128,
+                  "nested_families_verified": [
+                    "lfos",
+                    "custom_warps",
+                    "random_values",
+                    "modulations",
+                    "wavetables",
+                    "sample"
+                  ],
+                  "requested_preset_sha256": "25be2b629302180970ea4bb556ae82c6dcdd999046e58331194be34a7985b570",
+                  "requested_version": "1.5.5",
+                  "sample_aligned_max_pcm16_delta": {
+                    "samples": 1
+                  },
+                  "sample_readback_byte_exact": false,
+                  "sample_readback_shift_samples": 4,
+                  "scalar_lfo_route_readback_verified": true,
+                  "verified_loaded_scalars": 775,
+                  "wavetable_version_migration": "1.6.4"
+                },
+                "peak": 0.5095319747924805,
+                "rms": 0.0066437926289865095,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "status": "accepted"
+            }
+          ],
+          "diagnostic_codes": [],
+          "provenance": {
+            "backend_version": "0.8.3",
+            "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+            "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+            "request_id": "f94d5a437a94bd330413dbfb6707ec1e51b7ee717d931bde1fcc55b93fa205cb",
+            "settings": {
+              "buffer_size": 128,
+              "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+              "event_timing": "absolute ticks to half-even sample offsets",
+              "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+              "full_nested_readback_verified": true,
+              "plugin_name": "Vital.vst3",
+              "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+              "scalar_lfo_route_readback_verified": true,
+              "schema_id": "vital-1.5.5-fields-native-1.6.4",
+              "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+              "verified_loaded_scalars": 775
+            }
+          },
+          "qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "520ca87f107b2be3cd5a518690beb7a34075e94c0b7cdf9566954210c4b32725",
+            "clipping_count": 0,
+            "dc_offset": [
+              0.0002918573966230503,
+              0.0004865267813441334
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "peak": 0.5095319747924805,
+            "rms": 0.0066437926289865095,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "render_seconds": 0.9163105999905383,
+          "renderer_qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "520ca87f107b2be3cd5a518690beb7a34075e94c0b7cdf9566954210c4b32725",
+            "clipping_count": 0,
+            "dc_offset": [
+              0.0002918573966230503,
+              0.0004865267813441334
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "native_state": {
+              "applied_preset_sha256": "25be2b629302180970ea4bb556ae82c6dcdd999046e58331194be34a7985b570",
+              "applied_version": "1.5.5",
+              "modulation_slots_verified": 64,
+              "native_ramp_defaults_verified": 128,
+              "nested_families_verified": [
+                "lfos",
+                "custom_warps",
+                "random_values",
+                "modulations",
+                "wavetables",
+                "sample"
+              ],
+              "requested_preset_sha256": "25be2b629302180970ea4bb556ae82c6dcdd999046e58331194be34a7985b570",
+              "requested_version": "1.5.5",
+              "sample_aligned_max_pcm16_delta": {
+                "samples": 1
+              },
+              "sample_readback_byte_exact": false,
+              "sample_readback_shift_samples": 4,
+              "scalar_lfo_route_readback_verified": true,
+              "verified_loaded_scalars": 775,
+              "wavetable_version_migration": "1.6.4"
+            },
+            "peak": 0.5095319747924805,
+            "rms": 0.0066437926289865095,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "status": "accepted",
+          "wall_seconds": 1.658287799989921
+        },
+        {
+          "attempts": [
+            {
+              "attempt": 0,
+              "diagnostic_codes": [],
+              "provenance": {
+                "backend_version": "0.8.3",
+                "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+                "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+                "request_id": "f94d5a437a94bd330413dbfb6707ec1e51b7ee717d931bde1fcc55b93fa205cb",
+                "settings": {
+                  "buffer_size": 128,
+                  "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+                  "event_timing": "absolute ticks to half-even sample offsets",
+                  "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+                  "full_nested_readback_verified": true,
+                  "plugin_name": "Vital.vst3",
+                  "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+                  "scalar_lfo_route_readback_verified": true,
+                  "schema_id": "vital-1.5.5-fields-native-1.6.4",
+                  "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+                  "verified_loaded_scalars": 775
+                }
+              },
+              "qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "520ca87f107b2be3cd5a518690beb7a34075e94c0b7cdf9566954210c4b32725",
+                "clipping_count": 0,
+                "dc_offset": [
+                  0.0002918573966230503,
+                  0.0004865267813441334
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "peak": 0.5095319747924805,
+                "rms": 0.0066437926289865095,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "render_seconds": 1.1273587000032421,
+              "renderer_qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "520ca87f107b2be3cd5a518690beb7a34075e94c0b7cdf9566954210c4b32725",
+                "clipping_count": 0,
+                "dc_offset": [
+                  0.0002918573966230503,
+                  0.0004865267813441334
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "native_state": {
+                  "applied_preset_sha256": "25be2b629302180970ea4bb556ae82c6dcdd999046e58331194be34a7985b570",
+                  "applied_version": "1.5.5",
+                  "modulation_slots_verified": 64,
+                  "native_ramp_defaults_verified": 128,
+                  "nested_families_verified": [
+                    "lfos",
+                    "custom_warps",
+                    "random_values",
+                    "modulations",
+                    "wavetables",
+                    "sample"
+                  ],
+                  "requested_preset_sha256": "25be2b629302180970ea4bb556ae82c6dcdd999046e58331194be34a7985b570",
+                  "requested_version": "1.5.5",
+                  "sample_aligned_max_pcm16_delta": {
+                    "samples": 1
+                  },
+                  "sample_readback_byte_exact": false,
+                  "sample_readback_shift_samples": 4,
+                  "scalar_lfo_route_readback_verified": true,
+                  "verified_loaded_scalars": 775,
+                  "wavetable_version_migration": "1.6.4"
+                },
+                "peak": 0.5095319747924805,
+                "rms": 0.0066437926289865095,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "status": "accepted"
+            }
+          ],
+          "diagnostic_codes": [],
+          "provenance": {
+            "backend_version": "0.8.3",
+            "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+            "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+            "request_id": "f94d5a437a94bd330413dbfb6707ec1e51b7ee717d931bde1fcc55b93fa205cb",
+            "settings": {
+              "buffer_size": 128,
+              "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+              "event_timing": "absolute ticks to half-even sample offsets",
+              "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+              "full_nested_readback_verified": true,
+              "plugin_name": "Vital.vst3",
+              "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+              "scalar_lfo_route_readback_verified": true,
+              "schema_id": "vital-1.5.5-fields-native-1.6.4",
+              "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+              "verified_loaded_scalars": 775
+            }
+          },
+          "qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "520ca87f107b2be3cd5a518690beb7a34075e94c0b7cdf9566954210c4b32725",
+            "clipping_count": 0,
+            "dc_offset": [
+              0.0002918573966230503,
+              0.0004865267813441334
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "peak": 0.5095319747924805,
+            "rms": 0.0066437926289865095,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "render_seconds": 1.1273587000032421,
+          "renderer_qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "520ca87f107b2be3cd5a518690beb7a34075e94c0b7cdf9566954210c4b32725",
+            "clipping_count": 0,
+            "dc_offset": [
+              0.0002918573966230503,
+              0.0004865267813441334
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "native_state": {
+              "applied_preset_sha256": "25be2b629302180970ea4bb556ae82c6dcdd999046e58331194be34a7985b570",
+              "applied_version": "1.5.5",
+              "modulation_slots_verified": 64,
+              "native_ramp_defaults_verified": 128,
+              "nested_families_verified": [
+                "lfos",
+                "custom_warps",
+                "random_values",
+                "modulations",
+                "wavetables",
+                "sample"
+              ],
+              "requested_preset_sha256": "25be2b629302180970ea4bb556ae82c6dcdd999046e58331194be34a7985b570",
+              "requested_version": "1.5.5",
+              "sample_aligned_max_pcm16_delta": {
+                "samples": 1
+              },
+              "sample_readback_byte_exact": false,
+              "sample_readback_shift_samples": 4,
+              "scalar_lfo_route_readback_verified": true,
+              "verified_loaded_scalars": 775,
+              "wavetable_version_migration": "1.6.4"
+            },
+            "peak": 0.5095319747924805,
+            "rms": 0.0066437926289865095,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "status": "accepted",
+          "wall_seconds": 1.8503562999976566
+        },
+        {
+          "attempts": [
+            {
+              "attempt": 0,
+              "diagnostic_codes": [],
+              "provenance": {
+                "backend_version": "0.8.3",
+                "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+                "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+                "request_id": "f94d5a437a94bd330413dbfb6707ec1e51b7ee717d931bde1fcc55b93fa205cb",
+                "settings": {
+                  "buffer_size": 128,
+                  "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+                  "event_timing": "absolute ticks to half-even sample offsets",
+                  "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+                  "full_nested_readback_verified": true,
+                  "plugin_name": "Vital.vst3",
+                  "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+                  "scalar_lfo_route_readback_verified": true,
+                  "schema_id": "vital-1.5.5-fields-native-1.6.4",
+                  "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+                  "verified_loaded_scalars": 775
+                }
+              },
+              "qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "520ca87f107b2be3cd5a518690beb7a34075e94c0b7cdf9566954210c4b32725",
+                "clipping_count": 0,
+                "dc_offset": [
+                  0.0002918573966230503,
+                  0.0004865267813441334
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "peak": 0.5095319747924805,
+                "rms": 0.0066437926289865095,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "render_seconds": 0.9212667999963742,
+              "renderer_qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "520ca87f107b2be3cd5a518690beb7a34075e94c0b7cdf9566954210c4b32725",
+                "clipping_count": 0,
+                "dc_offset": [
+                  0.0002918573966230503,
+                  0.0004865267813441334
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "native_state": {
+                  "applied_preset_sha256": "25be2b629302180970ea4bb556ae82c6dcdd999046e58331194be34a7985b570",
+                  "applied_version": "1.5.5",
+                  "modulation_slots_verified": 64,
+                  "native_ramp_defaults_verified": 128,
+                  "nested_families_verified": [
+                    "lfos",
+                    "custom_warps",
+                    "random_values",
+                    "modulations",
+                    "wavetables",
+                    "sample"
+                  ],
+                  "requested_preset_sha256": "25be2b629302180970ea4bb556ae82c6dcdd999046e58331194be34a7985b570",
+                  "requested_version": "1.5.5",
+                  "sample_aligned_max_pcm16_delta": {
+                    "samples": 1
+                  },
+                  "sample_readback_byte_exact": false,
+                  "sample_readback_shift_samples": 4,
+                  "scalar_lfo_route_readback_verified": true,
+                  "verified_loaded_scalars": 775,
+                  "wavetable_version_migration": "1.6.4"
+                },
+                "peak": 0.5095319747924805,
+                "rms": 0.0066437926289865095,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "status": "accepted"
+            }
+          ],
+          "diagnostic_codes": [],
+          "provenance": {
+            "backend_version": "0.8.3",
+            "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+            "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+            "request_id": "f94d5a437a94bd330413dbfb6707ec1e51b7ee717d931bde1fcc55b93fa205cb",
+            "settings": {
+              "buffer_size": 128,
+              "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+              "event_timing": "absolute ticks to half-even sample offsets",
+              "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+              "full_nested_readback_verified": true,
+              "plugin_name": "Vital.vst3",
+              "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+              "scalar_lfo_route_readback_verified": true,
+              "schema_id": "vital-1.5.5-fields-native-1.6.4",
+              "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+              "verified_loaded_scalars": 775
+            }
+          },
+          "qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "520ca87f107b2be3cd5a518690beb7a34075e94c0b7cdf9566954210c4b32725",
+            "clipping_count": 0,
+            "dc_offset": [
+              0.0002918573966230503,
+              0.0004865267813441334
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "peak": 0.5095319747924805,
+            "rms": 0.0066437926289865095,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "render_seconds": 0.9212667999963742,
+          "renderer_qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "520ca87f107b2be3cd5a518690beb7a34075e94c0b7cdf9566954210c4b32725",
+            "clipping_count": 0,
+            "dc_offset": [
+              0.0002918573966230503,
+              0.0004865267813441334
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "native_state": {
+              "applied_preset_sha256": "25be2b629302180970ea4bb556ae82c6dcdd999046e58331194be34a7985b570",
+              "applied_version": "1.5.5",
+              "modulation_slots_verified": 64,
+              "native_ramp_defaults_verified": 128,
+              "nested_families_verified": [
+                "lfos",
+                "custom_warps",
+                "random_values",
+                "modulations",
+                "wavetables",
+                "sample"
+              ],
+              "requested_preset_sha256": "25be2b629302180970ea4bb556ae82c6dcdd999046e58331194be34a7985b570",
+              "requested_version": "1.5.5",
+              "sample_aligned_max_pcm16_delta": {
+                "samples": 1
+              },
+              "sample_readback_byte_exact": false,
+              "sample_readback_shift_samples": 4,
+              "scalar_lfo_route_readback_verified": true,
+              "verified_loaded_scalars": 775,
+              "wavetable_version_migration": "1.6.4"
+            },
+            "peak": 0.5095319747924805,
+            "rms": 0.0066437926289865095,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "status": "accepted",
+          "wall_seconds": 1.6718662999919616
+        }
+      ],
+      "serialized_target_and_decoder_exact": true,
+      "source_repeat": {
+        "log_spectral_rmse": 0.0,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      "source_repeat_exact": true,
+      "state_id": "2985e839ab061fcfac2e3991d149a45528e7e39cf0cd1660ad0a4362542bf69a"
+    },
+    {
+      "controls_equal_at_float32": true,
+      "decoded_audio_exact": true,
+      "decoded_comparison": {
+        "log_spectral_rmse": 0.0,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      "decoded_state_id": "d35568411ee862062ac5956114e1ff489a492923c246d468c15bab86289c04fb",
+      "family": "direct",
+      "outcomes": [
+        {
+          "attempts": [
+            {
+              "attempt": 0,
+              "diagnostic_codes": [],
+              "provenance": {
+                "backend_version": "0.8.3",
+                "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+                "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+                "request_id": "782adceb3b6d6f2dc20fa2309d1754cde59be423c898301ec3f3cd81be003b6f",
+                "settings": {
+                  "buffer_size": 128,
+                  "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+                  "event_timing": "absolute ticks to half-even sample offsets",
+                  "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+                  "full_nested_readback_verified": true,
+                  "plugin_name": "Vital.vst3",
+                  "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+                  "scalar_lfo_route_readback_verified": true,
+                  "schema_id": "vital-1.5.5-fields-native-1.6.4",
+                  "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+                  "verified_loaded_scalars": 775
+                }
+              },
+              "qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "318ce7dc3a37cbbdd8c0b406bab87ba6bb4c1673966dea0f3e041dc7ecec7e4c",
+                "clipping_count": 0,
+                "dc_offset": [
+                  9.819732970005337e-06,
+                  9.899082657055855e-06
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "peak": 0.18153132498264313,
+                "rms": 0.0017277710436999487,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "render_seconds": 1.0257190999982413,
+              "renderer_qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "318ce7dc3a37cbbdd8c0b406bab87ba6bb4c1673966dea0f3e041dc7ecec7e4c",
+                "clipping_count": 0,
+                "dc_offset": [
+                  9.819732970005337e-06,
+                  9.899082657055855e-06
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "native_state": {
+                  "applied_preset_sha256": "7773edd425ee05365d9af218c67235472d194ec322a701e6fb473fe35111dd8d",
+                  "applied_version": "1.5.5",
+                  "modulation_slots_verified": 64,
+                  "native_ramp_defaults_verified": 128,
+                  "nested_families_verified": [
+                    "lfos",
+                    "custom_warps",
+                    "random_values",
+                    "modulations",
+                    "wavetables",
+                    "sample"
+                  ],
+                  "requested_preset_sha256": "7773edd425ee05365d9af218c67235472d194ec322a701e6fb473fe35111dd8d",
+                  "requested_version": "1.5.5",
+                  "sample_aligned_max_pcm16_delta": {
+                    "samples": 1
+                  },
+                  "sample_readback_byte_exact": false,
+                  "sample_readback_shift_samples": 4,
+                  "scalar_lfo_route_readback_verified": true,
+                  "verified_loaded_scalars": 775,
+                  "wavetable_version_migration": "1.6.4"
+                },
+                "peak": 0.18153132498264313,
+                "rms": 0.0017277710436999487,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "status": "accepted"
+            }
+          ],
+          "diagnostic_codes": [],
+          "provenance": {
+            "backend_version": "0.8.3",
+            "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+            "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+            "request_id": "782adceb3b6d6f2dc20fa2309d1754cde59be423c898301ec3f3cd81be003b6f",
+            "settings": {
+              "buffer_size": 128,
+              "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+              "event_timing": "absolute ticks to half-even sample offsets",
+              "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+              "full_nested_readback_verified": true,
+              "plugin_name": "Vital.vst3",
+              "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+              "scalar_lfo_route_readback_verified": true,
+              "schema_id": "vital-1.5.5-fields-native-1.6.4",
+              "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+              "verified_loaded_scalars": 775
+            }
+          },
+          "qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "318ce7dc3a37cbbdd8c0b406bab87ba6bb4c1673966dea0f3e041dc7ecec7e4c",
+            "clipping_count": 0,
+            "dc_offset": [
+              9.819732970005337e-06,
+              9.899082657055855e-06
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "peak": 0.18153132498264313,
+            "rms": 0.0017277710436999487,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "render_seconds": 1.0257190999982413,
+          "renderer_qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "318ce7dc3a37cbbdd8c0b406bab87ba6bb4c1673966dea0f3e041dc7ecec7e4c",
+            "clipping_count": 0,
+            "dc_offset": [
+              9.819732970005337e-06,
+              9.899082657055855e-06
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "native_state": {
+              "applied_preset_sha256": "7773edd425ee05365d9af218c67235472d194ec322a701e6fb473fe35111dd8d",
+              "applied_version": "1.5.5",
+              "modulation_slots_verified": 64,
+              "native_ramp_defaults_verified": 128,
+              "nested_families_verified": [
+                "lfos",
+                "custom_warps",
+                "random_values",
+                "modulations",
+                "wavetables",
+                "sample"
+              ],
+              "requested_preset_sha256": "7773edd425ee05365d9af218c67235472d194ec322a701e6fb473fe35111dd8d",
+              "requested_version": "1.5.5",
+              "sample_aligned_max_pcm16_delta": {
+                "samples": 1
+              },
+              "sample_readback_byte_exact": false,
+              "sample_readback_shift_samples": 4,
+              "scalar_lfo_route_readback_verified": true,
+              "verified_loaded_scalars": 775,
+              "wavetable_version_migration": "1.6.4"
+            },
+            "peak": 0.18153132498264313,
+            "rms": 0.0017277710436999487,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "status": "accepted",
+          "wall_seconds": 1.805006400012644
+        },
+        {
+          "attempts": [
+            {
+              "attempt": 0,
+              "diagnostic_codes": [],
+              "provenance": {
+                "backend_version": "0.8.3",
+                "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+                "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+                "request_id": "782adceb3b6d6f2dc20fa2309d1754cde59be423c898301ec3f3cd81be003b6f",
+                "settings": {
+                  "buffer_size": 128,
+                  "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+                  "event_timing": "absolute ticks to half-even sample offsets",
+                  "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+                  "full_nested_readback_verified": true,
+                  "plugin_name": "Vital.vst3",
+                  "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+                  "scalar_lfo_route_readback_verified": true,
+                  "schema_id": "vital-1.5.5-fields-native-1.6.4",
+                  "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+                  "verified_loaded_scalars": 775
+                }
+              },
+              "qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "318ce7dc3a37cbbdd8c0b406bab87ba6bb4c1673966dea0f3e041dc7ecec7e4c",
+                "clipping_count": 0,
+                "dc_offset": [
+                  9.819732970005337e-06,
+                  9.899082657055855e-06
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "peak": 0.18153132498264313,
+                "rms": 0.0017277710436999487,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "render_seconds": 1.5566402999975253,
+              "renderer_qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "318ce7dc3a37cbbdd8c0b406bab87ba6bb4c1673966dea0f3e041dc7ecec7e4c",
+                "clipping_count": 0,
+                "dc_offset": [
+                  9.819732970005337e-06,
+                  9.899082657055855e-06
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "native_state": {
+                  "applied_preset_sha256": "7773edd425ee05365d9af218c67235472d194ec322a701e6fb473fe35111dd8d",
+                  "applied_version": "1.5.5",
+                  "modulation_slots_verified": 64,
+                  "native_ramp_defaults_verified": 128,
+                  "nested_families_verified": [
+                    "lfos",
+                    "custom_warps",
+                    "random_values",
+                    "modulations",
+                    "wavetables",
+                    "sample"
+                  ],
+                  "requested_preset_sha256": "7773edd425ee05365d9af218c67235472d194ec322a701e6fb473fe35111dd8d",
+                  "requested_version": "1.5.5",
+                  "sample_aligned_max_pcm16_delta": {
+                    "samples": 1
+                  },
+                  "sample_readback_byte_exact": false,
+                  "sample_readback_shift_samples": 4,
+                  "scalar_lfo_route_readback_verified": true,
+                  "verified_loaded_scalars": 775,
+                  "wavetable_version_migration": "1.6.4"
+                },
+                "peak": 0.18153132498264313,
+                "rms": 0.0017277710436999487,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "status": "accepted"
+            }
+          ],
+          "diagnostic_codes": [],
+          "provenance": {
+            "backend_version": "0.8.3",
+            "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+            "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+            "request_id": "782adceb3b6d6f2dc20fa2309d1754cde59be423c898301ec3f3cd81be003b6f",
+            "settings": {
+              "buffer_size": 128,
+              "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+              "event_timing": "absolute ticks to half-even sample offsets",
+              "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+              "full_nested_readback_verified": true,
+              "plugin_name": "Vital.vst3",
+              "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+              "scalar_lfo_route_readback_verified": true,
+              "schema_id": "vital-1.5.5-fields-native-1.6.4",
+              "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+              "verified_loaded_scalars": 775
+            }
+          },
+          "qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "318ce7dc3a37cbbdd8c0b406bab87ba6bb4c1673966dea0f3e041dc7ecec7e4c",
+            "clipping_count": 0,
+            "dc_offset": [
+              9.819732970005337e-06,
+              9.899082657055855e-06
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "peak": 0.18153132498264313,
+            "rms": 0.0017277710436999487,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "render_seconds": 1.5566402999975253,
+          "renderer_qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "318ce7dc3a37cbbdd8c0b406bab87ba6bb4c1673966dea0f3e041dc7ecec7e4c",
+            "clipping_count": 0,
+            "dc_offset": [
+              9.819732970005337e-06,
+              9.899082657055855e-06
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "native_state": {
+              "applied_preset_sha256": "7773edd425ee05365d9af218c67235472d194ec322a701e6fb473fe35111dd8d",
+              "applied_version": "1.5.5",
+              "modulation_slots_verified": 64,
+              "native_ramp_defaults_verified": 128,
+              "nested_families_verified": [
+                "lfos",
+                "custom_warps",
+                "random_values",
+                "modulations",
+                "wavetables",
+                "sample"
+              ],
+              "requested_preset_sha256": "7773edd425ee05365d9af218c67235472d194ec322a701e6fb473fe35111dd8d",
+              "requested_version": "1.5.5",
+              "sample_aligned_max_pcm16_delta": {
+                "samples": 1
+              },
+              "sample_readback_byte_exact": false,
+              "sample_readback_shift_samples": 4,
+              "scalar_lfo_route_readback_verified": true,
+              "verified_loaded_scalars": 775,
+              "wavetable_version_migration": "1.6.4"
+            },
+            "peak": 0.18153132498264313,
+            "rms": 0.0017277710436999487,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "status": "accepted",
+          "wall_seconds": 2.374591400002828
+        },
+        {
+          "attempts": [
+            {
+              "attempt": 0,
+              "diagnostic_codes": [],
+              "provenance": {
+                "backend_version": "0.8.3",
+                "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+                "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+                "request_id": "782adceb3b6d6f2dc20fa2309d1754cde59be423c898301ec3f3cd81be003b6f",
+                "settings": {
+                  "buffer_size": 128,
+                  "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+                  "event_timing": "absolute ticks to half-even sample offsets",
+                  "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+                  "full_nested_readback_verified": true,
+                  "plugin_name": "Vital.vst3",
+                  "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+                  "scalar_lfo_route_readback_verified": true,
+                  "schema_id": "vital-1.5.5-fields-native-1.6.4",
+                  "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+                  "verified_loaded_scalars": 775
+                }
+              },
+              "qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "318ce7dc3a37cbbdd8c0b406bab87ba6bb4c1673966dea0f3e041dc7ecec7e4c",
+                "clipping_count": 0,
+                "dc_offset": [
+                  9.819732970005337e-06,
+                  9.899082657055855e-06
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "peak": 0.18153132498264313,
+                "rms": 0.0017277710436999487,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "render_seconds": 0.8881136999989394,
+              "renderer_qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "318ce7dc3a37cbbdd8c0b406bab87ba6bb4c1673966dea0f3e041dc7ecec7e4c",
+                "clipping_count": 0,
+                "dc_offset": [
+                  9.819732970005337e-06,
+                  9.899082657055855e-06
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "native_state": {
+                  "applied_preset_sha256": "7773edd425ee05365d9af218c67235472d194ec322a701e6fb473fe35111dd8d",
+                  "applied_version": "1.5.5",
+                  "modulation_slots_verified": 64,
+                  "native_ramp_defaults_verified": 128,
+                  "nested_families_verified": [
+                    "lfos",
+                    "custom_warps",
+                    "random_values",
+                    "modulations",
+                    "wavetables",
+                    "sample"
+                  ],
+                  "requested_preset_sha256": "7773edd425ee05365d9af218c67235472d194ec322a701e6fb473fe35111dd8d",
+                  "requested_version": "1.5.5",
+                  "sample_aligned_max_pcm16_delta": {
+                    "samples": 1
+                  },
+                  "sample_readback_byte_exact": false,
+                  "sample_readback_shift_samples": 4,
+                  "scalar_lfo_route_readback_verified": true,
+                  "verified_loaded_scalars": 775,
+                  "wavetable_version_migration": "1.6.4"
+                },
+                "peak": 0.18153132498264313,
+                "rms": 0.0017277710436999487,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "status": "accepted"
+            }
+          ],
+          "diagnostic_codes": [],
+          "provenance": {
+            "backend_version": "0.8.3",
+            "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+            "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+            "request_id": "782adceb3b6d6f2dc20fa2309d1754cde59be423c898301ec3f3cd81be003b6f",
+            "settings": {
+              "buffer_size": 128,
+              "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+              "event_timing": "absolute ticks to half-even sample offsets",
+              "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+              "full_nested_readback_verified": true,
+              "plugin_name": "Vital.vst3",
+              "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+              "scalar_lfo_route_readback_verified": true,
+              "schema_id": "vital-1.5.5-fields-native-1.6.4",
+              "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+              "verified_loaded_scalars": 775
+            }
+          },
+          "qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "318ce7dc3a37cbbdd8c0b406bab87ba6bb4c1673966dea0f3e041dc7ecec7e4c",
+            "clipping_count": 0,
+            "dc_offset": [
+              9.819732970005337e-06,
+              9.899082657055855e-06
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "peak": 0.18153132498264313,
+            "rms": 0.0017277710436999487,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "render_seconds": 0.8881136999989394,
+          "renderer_qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "318ce7dc3a37cbbdd8c0b406bab87ba6bb4c1673966dea0f3e041dc7ecec7e4c",
+            "clipping_count": 0,
+            "dc_offset": [
+              9.819732970005337e-06,
+              9.899082657055855e-06
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "native_state": {
+              "applied_preset_sha256": "7773edd425ee05365d9af218c67235472d194ec322a701e6fb473fe35111dd8d",
+              "applied_version": "1.5.5",
+              "modulation_slots_verified": 64,
+              "native_ramp_defaults_verified": 128,
+              "nested_families_verified": [
+                "lfos",
+                "custom_warps",
+                "random_values",
+                "modulations",
+                "wavetables",
+                "sample"
+              ],
+              "requested_preset_sha256": "7773edd425ee05365d9af218c67235472d194ec322a701e6fb473fe35111dd8d",
+              "requested_version": "1.5.5",
+              "sample_aligned_max_pcm16_delta": {
+                "samples": 1
+              },
+              "sample_readback_byte_exact": false,
+              "sample_readback_shift_samples": 4,
+              "scalar_lfo_route_readback_verified": true,
+              "verified_loaded_scalars": 775,
+              "wavetable_version_migration": "1.6.4"
+            },
+            "peak": 0.18153132498264313,
+            "rms": 0.0017277710436999487,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "status": "accepted",
+          "wall_seconds": 1.6984444999980042
+        }
+      ],
+      "serialized_target_and_decoder_exact": true,
+      "source_repeat": {
+        "log_spectral_rmse": 0.0,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      "source_repeat_exact": true,
+      "state_id": "cc20c587b4ab007f7e8df92e0c17532b88576433970468b01ef1e67ec41298c2"
+    },
+    {
+      "controls_equal_at_float32": true,
+      "decoded_audio_exact": true,
+      "decoded_comparison": {
+        "log_spectral_rmse": 0.0,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      "decoded_state_id": "fbd75e2c0348bfae20700e5c58c1727c27303a9813b470bd0c334956b05cf1f2",
+      "family": "indexed_amount",
+      "outcomes": [
+        {
+          "attempts": [
+            {
+              "attempt": 0,
+              "diagnostic_codes": [],
+              "provenance": {
+                "backend_version": "0.8.3",
+                "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+                "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+                "request_id": "7c64244cafd0c592f6f0b04936ee7e76b5d0670cdfbf56e7f147fa0836bcd36f",
+                "settings": {
+                  "buffer_size": 128,
+                  "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+                  "event_timing": "absolute ticks to half-even sample offsets",
+                  "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+                  "full_nested_readback_verified": true,
+                  "plugin_name": "Vital.vst3",
+                  "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+                  "scalar_lfo_route_readback_verified": true,
+                  "schema_id": "vital-1.5.5-fields-native-1.6.4",
+                  "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+                  "verified_loaded_scalars": 775
+                }
+              },
+              "qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "d8270cb8a437dc1ee4ba3ea6370b358c5a8fbe7378b2a788057fe5f8059f5d25",
+                "clipping_count": 0,
+                "dc_offset": [
+                  -1.6017026089514516e-07,
+                  -2.1224521506893876e-07
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "peak": 0.05590853467583656,
+                "rms": 0.000619163618139358,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "render_seconds": 1.693593999996665,
+              "renderer_qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "d8270cb8a437dc1ee4ba3ea6370b358c5a8fbe7378b2a788057fe5f8059f5d25",
+                "clipping_count": 0,
+                "dc_offset": [
+                  -1.6017026089514516e-07,
+                  -2.1224521506893876e-07
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "native_state": {
+                  "applied_preset_sha256": "817f43bc750ffe3c5ee43372b7f2ad4243a2c1102929c265672f5a216afdb8d3",
+                  "applied_version": "1.5.5",
+                  "modulation_slots_verified": 64,
+                  "native_ramp_defaults_verified": 128,
+                  "nested_families_verified": [
+                    "lfos",
+                    "custom_warps",
+                    "random_values",
+                    "modulations",
+                    "wavetables",
+                    "sample"
+                  ],
+                  "requested_preset_sha256": "817f43bc750ffe3c5ee43372b7f2ad4243a2c1102929c265672f5a216afdb8d3",
+                  "requested_version": "1.5.5",
+                  "sample_aligned_max_pcm16_delta": {
+                    "samples": 1
+                  },
+                  "sample_readback_byte_exact": false,
+                  "sample_readback_shift_samples": 4,
+                  "scalar_lfo_route_readback_verified": true,
+                  "verified_loaded_scalars": 775,
+                  "wavetable_version_migration": "1.6.4"
+                },
+                "peak": 0.05590853467583656,
+                "rms": 0.000619163618139358,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "status": "accepted"
+            }
+          ],
+          "diagnostic_codes": [],
+          "provenance": {
+            "backend_version": "0.8.3",
+            "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+            "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+            "request_id": "7c64244cafd0c592f6f0b04936ee7e76b5d0670cdfbf56e7f147fa0836bcd36f",
+            "settings": {
+              "buffer_size": 128,
+              "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+              "event_timing": "absolute ticks to half-even sample offsets",
+              "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+              "full_nested_readback_verified": true,
+              "plugin_name": "Vital.vst3",
+              "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+              "scalar_lfo_route_readback_verified": true,
+              "schema_id": "vital-1.5.5-fields-native-1.6.4",
+              "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+              "verified_loaded_scalars": 775
+            }
+          },
+          "qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "d8270cb8a437dc1ee4ba3ea6370b358c5a8fbe7378b2a788057fe5f8059f5d25",
+            "clipping_count": 0,
+            "dc_offset": [
+              -1.6017026089514516e-07,
+              -2.1224521506893876e-07
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "peak": 0.05590853467583656,
+            "rms": 0.000619163618139358,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "render_seconds": 1.693593999996665,
+          "renderer_qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "d8270cb8a437dc1ee4ba3ea6370b358c5a8fbe7378b2a788057fe5f8059f5d25",
+            "clipping_count": 0,
+            "dc_offset": [
+              -1.6017026089514516e-07,
+              -2.1224521506893876e-07
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "native_state": {
+              "applied_preset_sha256": "817f43bc750ffe3c5ee43372b7f2ad4243a2c1102929c265672f5a216afdb8d3",
+              "applied_version": "1.5.5",
+              "modulation_slots_verified": 64,
+              "native_ramp_defaults_verified": 128,
+              "nested_families_verified": [
+                "lfos",
+                "custom_warps",
+                "random_values",
+                "modulations",
+                "wavetables",
+                "sample"
+              ],
+              "requested_preset_sha256": "817f43bc750ffe3c5ee43372b7f2ad4243a2c1102929c265672f5a216afdb8d3",
+              "requested_version": "1.5.5",
+              "sample_aligned_max_pcm16_delta": {
+                "samples": 1
+              },
+              "sample_readback_byte_exact": false,
+              "sample_readback_shift_samples": 4,
+              "scalar_lfo_route_readback_verified": true,
+              "verified_loaded_scalars": 775,
+              "wavetable_version_migration": "1.6.4"
+            },
+            "peak": 0.05590853467583656,
+            "rms": 0.000619163618139358,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "status": "accepted",
+          "wall_seconds": 2.4517498000059277
+        },
+        {
+          "attempts": [
+            {
+              "attempt": 0,
+              "diagnostic_codes": [],
+              "provenance": {
+                "backend_version": "0.8.3",
+                "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+                "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+                "request_id": "7c64244cafd0c592f6f0b04936ee7e76b5d0670cdfbf56e7f147fa0836bcd36f",
+                "settings": {
+                  "buffer_size": 128,
+                  "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+                  "event_timing": "absolute ticks to half-even sample offsets",
+                  "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+                  "full_nested_readback_verified": true,
+                  "plugin_name": "Vital.vst3",
+                  "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+                  "scalar_lfo_route_readback_verified": true,
+                  "schema_id": "vital-1.5.5-fields-native-1.6.4",
+                  "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+                  "verified_loaded_scalars": 775
+                }
+              },
+              "qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "d8270cb8a437dc1ee4ba3ea6370b358c5a8fbe7378b2a788057fe5f8059f5d25",
+                "clipping_count": 0,
+                "dc_offset": [
+                  -1.6017026089514516e-07,
+                  -2.1224521506893876e-07
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "peak": 0.05590853467583656,
+                "rms": 0.000619163618139358,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "render_seconds": 0.9740262999985134,
+              "renderer_qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "d8270cb8a437dc1ee4ba3ea6370b358c5a8fbe7378b2a788057fe5f8059f5d25",
+                "clipping_count": 0,
+                "dc_offset": [
+                  -1.6017026089514516e-07,
+                  -2.1224521506893876e-07
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "native_state": {
+                  "applied_preset_sha256": "817f43bc750ffe3c5ee43372b7f2ad4243a2c1102929c265672f5a216afdb8d3",
+                  "applied_version": "1.5.5",
+                  "modulation_slots_verified": 64,
+                  "native_ramp_defaults_verified": 128,
+                  "nested_families_verified": [
+                    "lfos",
+                    "custom_warps",
+                    "random_values",
+                    "modulations",
+                    "wavetables",
+                    "sample"
+                  ],
+                  "requested_preset_sha256": "817f43bc750ffe3c5ee43372b7f2ad4243a2c1102929c265672f5a216afdb8d3",
+                  "requested_version": "1.5.5",
+                  "sample_aligned_max_pcm16_delta": {
+                    "samples": 1
+                  },
+                  "sample_readback_byte_exact": false,
+                  "sample_readback_shift_samples": 4,
+                  "scalar_lfo_route_readback_verified": true,
+                  "verified_loaded_scalars": 775,
+                  "wavetable_version_migration": "1.6.4"
+                },
+                "peak": 0.05590853467583656,
+                "rms": 0.000619163618139358,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "status": "accepted"
+            }
+          ],
+          "diagnostic_codes": [],
+          "provenance": {
+            "backend_version": "0.8.3",
+            "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+            "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+            "request_id": "7c64244cafd0c592f6f0b04936ee7e76b5d0670cdfbf56e7f147fa0836bcd36f",
+            "settings": {
+              "buffer_size": 128,
+              "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+              "event_timing": "absolute ticks to half-even sample offsets",
+              "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+              "full_nested_readback_verified": true,
+              "plugin_name": "Vital.vst3",
+              "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+              "scalar_lfo_route_readback_verified": true,
+              "schema_id": "vital-1.5.5-fields-native-1.6.4",
+              "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+              "verified_loaded_scalars": 775
+            }
+          },
+          "qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "d8270cb8a437dc1ee4ba3ea6370b358c5a8fbe7378b2a788057fe5f8059f5d25",
+            "clipping_count": 0,
+            "dc_offset": [
+              -1.6017026089514516e-07,
+              -2.1224521506893876e-07
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "peak": 0.05590853467583656,
+            "rms": 0.000619163618139358,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "render_seconds": 0.9740262999985134,
+          "renderer_qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "d8270cb8a437dc1ee4ba3ea6370b358c5a8fbe7378b2a788057fe5f8059f5d25",
+            "clipping_count": 0,
+            "dc_offset": [
+              -1.6017026089514516e-07,
+              -2.1224521506893876e-07
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "native_state": {
+              "applied_preset_sha256": "817f43bc750ffe3c5ee43372b7f2ad4243a2c1102929c265672f5a216afdb8d3",
+              "applied_version": "1.5.5",
+              "modulation_slots_verified": 64,
+              "native_ramp_defaults_verified": 128,
+              "nested_families_verified": [
+                "lfos",
+                "custom_warps",
+                "random_values",
+                "modulations",
+                "wavetables",
+                "sample"
+              ],
+              "requested_preset_sha256": "817f43bc750ffe3c5ee43372b7f2ad4243a2c1102929c265672f5a216afdb8d3",
+              "requested_version": "1.5.5",
+              "sample_aligned_max_pcm16_delta": {
+                "samples": 1
+              },
+              "sample_readback_byte_exact": false,
+              "sample_readback_shift_samples": 4,
+              "scalar_lfo_route_readback_verified": true,
+              "verified_loaded_scalars": 775,
+              "wavetable_version_migration": "1.6.4"
+            },
+            "peak": 0.05590853467583656,
+            "rms": 0.000619163618139358,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "status": "accepted",
+          "wall_seconds": 1.7202175999991596
+        },
+        {
+          "attempts": [
+            {
+              "attempt": 0,
+              "diagnostic_codes": [],
+              "provenance": {
+                "backend_version": "0.8.3",
+                "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+                "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+                "request_id": "7c64244cafd0c592f6f0b04936ee7e76b5d0670cdfbf56e7f147fa0836bcd36f",
+                "settings": {
+                  "buffer_size": 128,
+                  "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+                  "event_timing": "absolute ticks to half-even sample offsets",
+                  "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+                  "full_nested_readback_verified": true,
+                  "plugin_name": "Vital.vst3",
+                  "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+                  "scalar_lfo_route_readback_verified": true,
+                  "schema_id": "vital-1.5.5-fields-native-1.6.4",
+                  "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+                  "verified_loaded_scalars": 775
+                }
+              },
+              "qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "d8270cb8a437dc1ee4ba3ea6370b358c5a8fbe7378b2a788057fe5f8059f5d25",
+                "clipping_count": 0,
+                "dc_offset": [
+                  -1.6017026089514516e-07,
+                  -2.1224521506893876e-07
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "peak": 0.05590853467583656,
+                "rms": 0.000619163618139358,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "render_seconds": 2.221596600007615,
+              "renderer_qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "d8270cb8a437dc1ee4ba3ea6370b358c5a8fbe7378b2a788057fe5f8059f5d25",
+                "clipping_count": 0,
+                "dc_offset": [
+                  -1.6017026089514516e-07,
+                  -2.1224521506893876e-07
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "native_state": {
+                  "applied_preset_sha256": "817f43bc750ffe3c5ee43372b7f2ad4243a2c1102929c265672f5a216afdb8d3",
+                  "applied_version": "1.5.5",
+                  "modulation_slots_verified": 64,
+                  "native_ramp_defaults_verified": 128,
+                  "nested_families_verified": [
+                    "lfos",
+                    "custom_warps",
+                    "random_values",
+                    "modulations",
+                    "wavetables",
+                    "sample"
+                  ],
+                  "requested_preset_sha256": "817f43bc750ffe3c5ee43372b7f2ad4243a2c1102929c265672f5a216afdb8d3",
+                  "requested_version": "1.5.5",
+                  "sample_aligned_max_pcm16_delta": {
+                    "samples": 1
+                  },
+                  "sample_readback_byte_exact": false,
+                  "sample_readback_shift_samples": 4,
+                  "scalar_lfo_route_readback_verified": true,
+                  "verified_loaded_scalars": 775,
+                  "wavetable_version_migration": "1.6.4"
+                },
+                "peak": 0.05590853467583656,
+                "rms": 0.000619163618139358,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "status": "accepted"
+            }
+          ],
+          "diagnostic_codes": [],
+          "provenance": {
+            "backend_version": "0.8.3",
+            "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+            "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+            "request_id": "7c64244cafd0c592f6f0b04936ee7e76b5d0670cdfbf56e7f147fa0836bcd36f",
+            "settings": {
+              "buffer_size": 128,
+              "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+              "event_timing": "absolute ticks to half-even sample offsets",
+              "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+              "full_nested_readback_verified": true,
+              "plugin_name": "Vital.vst3",
+              "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+              "scalar_lfo_route_readback_verified": true,
+              "schema_id": "vital-1.5.5-fields-native-1.6.4",
+              "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+              "verified_loaded_scalars": 775
+            }
+          },
+          "qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "d8270cb8a437dc1ee4ba3ea6370b358c5a8fbe7378b2a788057fe5f8059f5d25",
+            "clipping_count": 0,
+            "dc_offset": [
+              -1.6017026089514516e-07,
+              -2.1224521506893876e-07
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "peak": 0.05590853467583656,
+            "rms": 0.000619163618139358,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "render_seconds": 2.221596600007615,
+          "renderer_qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "d8270cb8a437dc1ee4ba3ea6370b358c5a8fbe7378b2a788057fe5f8059f5d25",
+            "clipping_count": 0,
+            "dc_offset": [
+              -1.6017026089514516e-07,
+              -2.1224521506893876e-07
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "native_state": {
+              "applied_preset_sha256": "817f43bc750ffe3c5ee43372b7f2ad4243a2c1102929c265672f5a216afdb8d3",
+              "applied_version": "1.5.5",
+              "modulation_slots_verified": 64,
+              "native_ramp_defaults_verified": 128,
+              "nested_families_verified": [
+                "lfos",
+                "custom_warps",
+                "random_values",
+                "modulations",
+                "wavetables",
+                "sample"
+              ],
+              "requested_preset_sha256": "817f43bc750ffe3c5ee43372b7f2ad4243a2c1102929c265672f5a216afdb8d3",
+              "requested_version": "1.5.5",
+              "sample_aligned_max_pcm16_delta": {
+                "samples": 1
+              },
+              "sample_readback_byte_exact": false,
+              "sample_readback_shift_samples": 4,
+              "scalar_lfo_route_readback_verified": true,
+              "verified_loaded_scalars": 775,
+              "wavetable_version_migration": "1.6.4"
+            },
+            "peak": 0.05590853467583656,
+            "rms": 0.000619163618139358,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "status": "accepted",
+          "wall_seconds": 2.991988299996592
+        }
+      ],
+      "serialized_target_and_decoder_exact": true,
+      "source_repeat": {
+        "log_spectral_rmse": 0.0,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      "source_repeat_exact": true,
+      "state_id": "1dfd03cd3144d43e043f43974fb05272cf5b2c766aa80c7f4577a96f74020b13"
+    },
+    {
+      "controls_equal_at_float32": true,
+      "decoded_audio_exact": true,
+      "decoded_comparison": {
+        "log_spectral_rmse": 0.0,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      "decoded_state_id": "2e03908780be87ebf691c8e8a0372b9a95fa55c06729950315e834f457ee0c7b",
+      "family": "modulator_feedback",
+      "outcomes": [
+        {
+          "attempts": [
+            {
+              "attempt": 0,
+              "diagnostic_codes": [],
+              "provenance": {
+                "backend_version": "0.8.3",
+                "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+                "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+                "request_id": "d2de10121fb87f89b3bbba1352ecafd168eec896b891e46e79f23d585cb8f091",
+                "settings": {
+                  "buffer_size": 128,
+                  "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+                  "event_timing": "absolute ticks to half-even sample offsets",
+                  "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+                  "full_nested_readback_verified": true,
+                  "plugin_name": "Vital.vst3",
+                  "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+                  "scalar_lfo_route_readback_verified": true,
+                  "schema_id": "vital-1.5.5-fields-native-1.6.4",
+                  "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+                  "verified_loaded_scalars": 775
+                }
+              },
+              "qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "a55f5dc26cf18292b0887ae03229f272a3b91f0df87bcecf9f53f18ee900a22e",
+                "clipping_count": 0,
+                "dc_offset": [
+                  5.996610089625833e-06,
+                  -2.6753189265086636e-07
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "peak": 0.2619834840297699,
+                "rms": 0.003705817428806187,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "render_seconds": 1.119427799989353,
+              "renderer_qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "a55f5dc26cf18292b0887ae03229f272a3b91f0df87bcecf9f53f18ee900a22e",
+                "clipping_count": 0,
+                "dc_offset": [
+                  5.996610089625833e-06,
+                  -2.6753189265086636e-07
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "native_state": {
+                  "applied_preset_sha256": "16c54a764ee91698db5a75adb25edba155cdc2d1daa5d6df88b02a836bca1443",
+                  "applied_version": "1.5.5",
+                  "modulation_slots_verified": 64,
+                  "native_ramp_defaults_verified": 128,
+                  "nested_families_verified": [
+                    "lfos",
+                    "custom_warps",
+                    "random_values",
+                    "modulations",
+                    "wavetables",
+                    "sample"
+                  ],
+                  "requested_preset_sha256": "16c54a764ee91698db5a75adb25edba155cdc2d1daa5d6df88b02a836bca1443",
+                  "requested_version": "1.5.5",
+                  "sample_aligned_max_pcm16_delta": {
+                    "samples": 1
+                  },
+                  "sample_readback_byte_exact": false,
+                  "sample_readback_shift_samples": 4,
+                  "scalar_lfo_route_readback_verified": true,
+                  "verified_loaded_scalars": 775,
+                  "wavetable_version_migration": "1.6.4"
+                },
+                "peak": 0.2619834840297699,
+                "rms": 0.003705817428806187,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "status": "accepted"
+            }
+          ],
+          "diagnostic_codes": [],
+          "provenance": {
+            "backend_version": "0.8.3",
+            "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+            "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+            "request_id": "d2de10121fb87f89b3bbba1352ecafd168eec896b891e46e79f23d585cb8f091",
+            "settings": {
+              "buffer_size": 128,
+              "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+              "event_timing": "absolute ticks to half-even sample offsets",
+              "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+              "full_nested_readback_verified": true,
+              "plugin_name": "Vital.vst3",
+              "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+              "scalar_lfo_route_readback_verified": true,
+              "schema_id": "vital-1.5.5-fields-native-1.6.4",
+              "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+              "verified_loaded_scalars": 775
+            }
+          },
+          "qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "a55f5dc26cf18292b0887ae03229f272a3b91f0df87bcecf9f53f18ee900a22e",
+            "clipping_count": 0,
+            "dc_offset": [
+              5.996610089625833e-06,
+              -2.6753189265086636e-07
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "peak": 0.2619834840297699,
+            "rms": 0.003705817428806187,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "render_seconds": 1.119427799989353,
+          "renderer_qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "a55f5dc26cf18292b0887ae03229f272a3b91f0df87bcecf9f53f18ee900a22e",
+            "clipping_count": 0,
+            "dc_offset": [
+              5.996610089625833e-06,
+              -2.6753189265086636e-07
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "native_state": {
+              "applied_preset_sha256": "16c54a764ee91698db5a75adb25edba155cdc2d1daa5d6df88b02a836bca1443",
+              "applied_version": "1.5.5",
+              "modulation_slots_verified": 64,
+              "native_ramp_defaults_verified": 128,
+              "nested_families_verified": [
+                "lfos",
+                "custom_warps",
+                "random_values",
+                "modulations",
+                "wavetables",
+                "sample"
+              ],
+              "requested_preset_sha256": "16c54a764ee91698db5a75adb25edba155cdc2d1daa5d6df88b02a836bca1443",
+              "requested_version": "1.5.5",
+              "sample_aligned_max_pcm16_delta": {
+                "samples": 1
+              },
+              "sample_readback_byte_exact": false,
+              "sample_readback_shift_samples": 4,
+              "scalar_lfo_route_readback_verified": true,
+              "verified_loaded_scalars": 775,
+              "wavetable_version_migration": "1.6.4"
+            },
+            "peak": 0.2619834840297699,
+            "rms": 0.003705817428806187,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "status": "accepted",
+          "wall_seconds": 1.86804280000797
+        },
+        {
+          "attempts": [
+            {
+              "attempt": 0,
+              "diagnostic_codes": [],
+              "provenance": {
+                "backend_version": "0.8.3",
+                "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+                "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+                "request_id": "d2de10121fb87f89b3bbba1352ecafd168eec896b891e46e79f23d585cb8f091",
+                "settings": {
+                  "buffer_size": 128,
+                  "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+                  "event_timing": "absolute ticks to half-even sample offsets",
+                  "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+                  "full_nested_readback_verified": true,
+                  "plugin_name": "Vital.vst3",
+                  "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+                  "scalar_lfo_route_readback_verified": true,
+                  "schema_id": "vital-1.5.5-fields-native-1.6.4",
+                  "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+                  "verified_loaded_scalars": 775
+                }
+              },
+              "qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "a55f5dc26cf18292b0887ae03229f272a3b91f0df87bcecf9f53f18ee900a22e",
+                "clipping_count": 0,
+                "dc_offset": [
+                  5.996610089625833e-06,
+                  -2.6753189265086636e-07
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "peak": 0.2619834840297699,
+                "rms": 0.003705817428806187,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "render_seconds": 1.801559300001827,
+              "renderer_qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "a55f5dc26cf18292b0887ae03229f272a3b91f0df87bcecf9f53f18ee900a22e",
+                "clipping_count": 0,
+                "dc_offset": [
+                  5.996610089625833e-06,
+                  -2.6753189265086636e-07
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "native_state": {
+                  "applied_preset_sha256": "16c54a764ee91698db5a75adb25edba155cdc2d1daa5d6df88b02a836bca1443",
+                  "applied_version": "1.5.5",
+                  "modulation_slots_verified": 64,
+                  "native_ramp_defaults_verified": 128,
+                  "nested_families_verified": [
+                    "lfos",
+                    "custom_warps",
+                    "random_values",
+                    "modulations",
+                    "wavetables",
+                    "sample"
+                  ],
+                  "requested_preset_sha256": "16c54a764ee91698db5a75adb25edba155cdc2d1daa5d6df88b02a836bca1443",
+                  "requested_version": "1.5.5",
+                  "sample_aligned_max_pcm16_delta": {
+                    "samples": 1
+                  },
+                  "sample_readback_byte_exact": false,
+                  "sample_readback_shift_samples": 4,
+                  "scalar_lfo_route_readback_verified": true,
+                  "verified_loaded_scalars": 775,
+                  "wavetable_version_migration": "1.6.4"
+                },
+                "peak": 0.2619834840297699,
+                "rms": 0.003705817428806187,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "status": "accepted"
+            }
+          ],
+          "diagnostic_codes": [],
+          "provenance": {
+            "backend_version": "0.8.3",
+            "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+            "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+            "request_id": "d2de10121fb87f89b3bbba1352ecafd168eec896b891e46e79f23d585cb8f091",
+            "settings": {
+              "buffer_size": 128,
+              "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+              "event_timing": "absolute ticks to half-even sample offsets",
+              "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+              "full_nested_readback_verified": true,
+              "plugin_name": "Vital.vst3",
+              "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+              "scalar_lfo_route_readback_verified": true,
+              "schema_id": "vital-1.5.5-fields-native-1.6.4",
+              "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+              "verified_loaded_scalars": 775
+            }
+          },
+          "qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "a55f5dc26cf18292b0887ae03229f272a3b91f0df87bcecf9f53f18ee900a22e",
+            "clipping_count": 0,
+            "dc_offset": [
+              5.996610089625833e-06,
+              -2.6753189265086636e-07
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "peak": 0.2619834840297699,
+            "rms": 0.003705817428806187,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "render_seconds": 1.801559300001827,
+          "renderer_qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "a55f5dc26cf18292b0887ae03229f272a3b91f0df87bcecf9f53f18ee900a22e",
+            "clipping_count": 0,
+            "dc_offset": [
+              5.996610089625833e-06,
+              -2.6753189265086636e-07
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "native_state": {
+              "applied_preset_sha256": "16c54a764ee91698db5a75adb25edba155cdc2d1daa5d6df88b02a836bca1443",
+              "applied_version": "1.5.5",
+              "modulation_slots_verified": 64,
+              "native_ramp_defaults_verified": 128,
+              "nested_families_verified": [
+                "lfos",
+                "custom_warps",
+                "random_values",
+                "modulations",
+                "wavetables",
+                "sample"
+              ],
+              "requested_preset_sha256": "16c54a764ee91698db5a75adb25edba155cdc2d1daa5d6df88b02a836bca1443",
+              "requested_version": "1.5.5",
+              "sample_aligned_max_pcm16_delta": {
+                "samples": 1
+              },
+              "sample_readback_byte_exact": false,
+              "sample_readback_shift_samples": 4,
+              "scalar_lfo_route_readback_verified": true,
+              "verified_loaded_scalars": 775,
+              "wavetable_version_migration": "1.6.4"
+            },
+            "peak": 0.2619834840297699,
+            "rms": 0.003705817428806187,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "status": "accepted",
+          "wall_seconds": 2.5382170000084443
+        },
+        {
+          "attempts": [
+            {
+              "attempt": 0,
+              "diagnostic_codes": [],
+              "provenance": {
+                "backend_version": "0.8.3",
+                "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+                "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+                "request_id": "d2de10121fb87f89b3bbba1352ecafd168eec896b891e46e79f23d585cb8f091",
+                "settings": {
+                  "buffer_size": 128,
+                  "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+                  "event_timing": "absolute ticks to half-even sample offsets",
+                  "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+                  "full_nested_readback_verified": true,
+                  "plugin_name": "Vital.vst3",
+                  "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+                  "scalar_lfo_route_readback_verified": true,
+                  "schema_id": "vital-1.5.5-fields-native-1.6.4",
+                  "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+                  "verified_loaded_scalars": 775
+                }
+              },
+              "qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "a55f5dc26cf18292b0887ae03229f272a3b91f0df87bcecf9f53f18ee900a22e",
+                "clipping_count": 0,
+                "dc_offset": [
+                  5.996610089625833e-06,
+                  -2.6753189265086636e-07
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "peak": 0.2619834840297699,
+                "rms": 0.003705817428806187,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "render_seconds": 0.9223826999950688,
+              "renderer_qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "a55f5dc26cf18292b0887ae03229f272a3b91f0df87bcecf9f53f18ee900a22e",
+                "clipping_count": 0,
+                "dc_offset": [
+                  5.996610089625833e-06,
+                  -2.6753189265086636e-07
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "native_state": {
+                  "applied_preset_sha256": "16c54a764ee91698db5a75adb25edba155cdc2d1daa5d6df88b02a836bca1443",
+                  "applied_version": "1.5.5",
+                  "modulation_slots_verified": 64,
+                  "native_ramp_defaults_verified": 128,
+                  "nested_families_verified": [
+                    "lfos",
+                    "custom_warps",
+                    "random_values",
+                    "modulations",
+                    "wavetables",
+                    "sample"
+                  ],
+                  "requested_preset_sha256": "16c54a764ee91698db5a75adb25edba155cdc2d1daa5d6df88b02a836bca1443",
+                  "requested_version": "1.5.5",
+                  "sample_aligned_max_pcm16_delta": {
+                    "samples": 1
+                  },
+                  "sample_readback_byte_exact": false,
+                  "sample_readback_shift_samples": 4,
+                  "scalar_lfo_route_readback_verified": true,
+                  "verified_loaded_scalars": 775,
+                  "wavetable_version_migration": "1.6.4"
+                },
+                "peak": 0.2619834840297699,
+                "rms": 0.003705817428806187,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 0.0,
+                "tail_rms_warning": 0.001
+              },
+              "status": "accepted"
+            }
+          ],
+          "diagnostic_codes": [],
+          "provenance": {
+            "backend_version": "0.8.3",
+            "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+            "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+            "request_id": "d2de10121fb87f89b3bbba1352ecafd168eec896b891e46e79f23d585cb8f091",
+            "settings": {
+              "buffer_size": 128,
+              "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+              "event_timing": "absolute ticks to half-even sample offsets",
+              "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+              "full_nested_readback_verified": true,
+              "plugin_name": "Vital.vst3",
+              "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+              "scalar_lfo_route_readback_verified": true,
+              "schema_id": "vital-1.5.5-fields-native-1.6.4",
+              "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+              "verified_loaded_scalars": 775
+            }
+          },
+          "qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "a55f5dc26cf18292b0887ae03229f272a3b91f0df87bcecf9f53f18ee900a22e",
+            "clipping_count": 0,
+            "dc_offset": [
+              5.996610089625833e-06,
+              -2.6753189265086636e-07
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "peak": 0.2619834840297699,
+            "rms": 0.003705817428806187,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "render_seconds": 0.9223826999950688,
+          "renderer_qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "a55f5dc26cf18292b0887ae03229f272a3b91f0df87bcecf9f53f18ee900a22e",
+            "clipping_count": 0,
+            "dc_offset": [
+              5.996610089625833e-06,
+              -2.6753189265086636e-07
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "native_state": {
+              "applied_preset_sha256": "16c54a764ee91698db5a75adb25edba155cdc2d1daa5d6df88b02a836bca1443",
+              "applied_version": "1.5.5",
+              "modulation_slots_verified": 64,
+              "native_ramp_defaults_verified": 128,
+              "nested_families_verified": [
+                "lfos",
+                "custom_warps",
+                "random_values",
+                "modulations",
+                "wavetables",
+                "sample"
+              ],
+              "requested_preset_sha256": "16c54a764ee91698db5a75adb25edba155cdc2d1daa5d6df88b02a836bca1443",
+              "requested_version": "1.5.5",
+              "sample_aligned_max_pcm16_delta": {
+                "samples": 1
+              },
+              "sample_readback_byte_exact": false,
+              "sample_readback_shift_samples": 4,
+              "scalar_lfo_route_readback_verified": true,
+              "verified_loaded_scalars": 775,
+              "wavetable_version_migration": "1.6.4"
+            },
+            "peak": 0.2619834840297699,
+            "rms": 0.003705817428806187,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 0.0,
+            "tail_rms_warning": 0.001
+          },
+          "status": "accepted",
+          "wall_seconds": 1.6630623000091873
+        }
+      ],
+      "serialized_target_and_decoder_exact": true,
+      "source_repeat": {
+        "log_spectral_rmse": 0.0,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      "source_repeat_exact": true,
+      "state_id": "75dd64dc5f467fc432aa1c5c384cce5125c6f69d933d3ba16797f1a20d8dc0f8"
+    },
+    {
+      "controls_equal_at_float32": true,
+      "decoded_audio_exact": true,
+      "decoded_comparison": {
+        "log_spectral_rmse": 0.0,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      "decoded_state_id": "dc18f2951d81ed2c271ad17f9de24dd9a6fa5e5055d6db28b796f0530e000330",
+      "family": "parallel",
+      "outcomes": [
+        {
+          "attempts": [
+            {
+              "attempt": 0,
+              "diagnostic_codes": [],
+              "provenance": {
+                "backend_version": "0.8.3",
+                "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+                "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+                "request_id": "d0392f6d367a98e21ce61bfd9fa4131715b624ee940cbfc8144f4399498b4c60",
+                "settings": {
+                  "buffer_size": 128,
+                  "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+                  "event_timing": "absolute ticks to half-even sample offsets",
+                  "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+                  "full_nested_readback_verified": true,
+                  "plugin_name": "Vital.vst3",
+                  "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+                  "scalar_lfo_route_readback_verified": true,
+                  "schema_id": "vital-1.5.5-fields-native-1.6.4",
+                  "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+                  "verified_loaded_scalars": 775
+                }
+              },
+              "qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "3959603c7eb4a3d3b6785e1c5185920fa8fde116316ab8e96945c47be35a4fe5",
+                "clipping_count": 0,
+                "dc_offset": [
+                  -0.00046483877782338694,
+                  -0.00026136542427928337
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "peak": 0.09330347925424576,
+                "rms": 0.0039013159017728116,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 3.73132135669645e-16,
+                "tail_rms_warning": 0.001
+              },
+              "render_seconds": 1.794636000005994,
+              "renderer_qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "3959603c7eb4a3d3b6785e1c5185920fa8fde116316ab8e96945c47be35a4fe5",
+                "clipping_count": 0,
+                "dc_offset": [
+                  -0.00046483877782338694,
+                  -0.00026136542427928337
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "native_state": {
+                  "applied_preset_sha256": "bd92960cad03a78b3eadf7713c488fad4188de15158c72b92e41ffb24541e0f9",
+                  "applied_version": "1.5.5",
+                  "modulation_slots_verified": 64,
+                  "native_ramp_defaults_verified": 128,
+                  "nested_families_verified": [
+                    "lfos",
+                    "custom_warps",
+                    "random_values",
+                    "modulations",
+                    "wavetables",
+                    "sample"
+                  ],
+                  "requested_preset_sha256": "bd92960cad03a78b3eadf7713c488fad4188de15158c72b92e41ffb24541e0f9",
+                  "requested_version": "1.5.5",
+                  "sample_aligned_max_pcm16_delta": {
+                    "samples": 1
+                  },
+                  "sample_readback_byte_exact": false,
+                  "sample_readback_shift_samples": 4,
+                  "scalar_lfo_route_readback_verified": true,
+                  "verified_loaded_scalars": 775,
+                  "wavetable_version_migration": "1.6.4"
+                },
+                "peak": 0.09330347925424576,
+                "rms": 0.0039013159017728116,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 3.73132135669645e-16,
+                "tail_rms_warning": 0.001
+              },
+              "status": "accepted"
+            }
+          ],
+          "diagnostic_codes": [],
+          "provenance": {
+            "backend_version": "0.8.3",
+            "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+            "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+            "request_id": "d0392f6d367a98e21ce61bfd9fa4131715b624ee940cbfc8144f4399498b4c60",
+            "settings": {
+              "buffer_size": 128,
+              "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+              "event_timing": "absolute ticks to half-even sample offsets",
+              "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+              "full_nested_readback_verified": true,
+              "plugin_name": "Vital.vst3",
+              "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+              "scalar_lfo_route_readback_verified": true,
+              "schema_id": "vital-1.5.5-fields-native-1.6.4",
+              "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+              "verified_loaded_scalars": 775
+            }
+          },
+          "qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "3959603c7eb4a3d3b6785e1c5185920fa8fde116316ab8e96945c47be35a4fe5",
+            "clipping_count": 0,
+            "dc_offset": [
+              -0.00046483877782338694,
+              -0.00026136542427928337
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "peak": 0.09330347925424576,
+            "rms": 0.0039013159017728116,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 3.73132135669645e-16,
+            "tail_rms_warning": 0.001
+          },
+          "render_seconds": 1.794636000005994,
+          "renderer_qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "3959603c7eb4a3d3b6785e1c5185920fa8fde116316ab8e96945c47be35a4fe5",
+            "clipping_count": 0,
+            "dc_offset": [
+              -0.00046483877782338694,
+              -0.00026136542427928337
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "native_state": {
+              "applied_preset_sha256": "bd92960cad03a78b3eadf7713c488fad4188de15158c72b92e41ffb24541e0f9",
+              "applied_version": "1.5.5",
+              "modulation_slots_verified": 64,
+              "native_ramp_defaults_verified": 128,
+              "nested_families_verified": [
+                "lfos",
+                "custom_warps",
+                "random_values",
+                "modulations",
+                "wavetables",
+                "sample"
+              ],
+              "requested_preset_sha256": "bd92960cad03a78b3eadf7713c488fad4188de15158c72b92e41ffb24541e0f9",
+              "requested_version": "1.5.5",
+              "sample_aligned_max_pcm16_delta": {
+                "samples": 1
+              },
+              "sample_readback_byte_exact": false,
+              "sample_readback_shift_samples": 4,
+              "scalar_lfo_route_readback_verified": true,
+              "verified_loaded_scalars": 775,
+              "wavetable_version_migration": "1.6.4"
+            },
+            "peak": 0.09330347925424576,
+            "rms": 0.0039013159017728116,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 3.73132135669645e-16,
+            "tail_rms_warning": 0.001
+          },
+          "status": "accepted",
+          "wall_seconds": 2.5581243000051472
+        },
+        {
+          "attempts": [
+            {
+              "attempt": 0,
+              "diagnostic_codes": [],
+              "provenance": {
+                "backend_version": "0.8.3",
+                "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+                "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+                "request_id": "d0392f6d367a98e21ce61bfd9fa4131715b624ee940cbfc8144f4399498b4c60",
+                "settings": {
+                  "buffer_size": 128,
+                  "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+                  "event_timing": "absolute ticks to half-even sample offsets",
+                  "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+                  "full_nested_readback_verified": true,
+                  "plugin_name": "Vital.vst3",
+                  "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+                  "scalar_lfo_route_readback_verified": true,
+                  "schema_id": "vital-1.5.5-fields-native-1.6.4",
+                  "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+                  "verified_loaded_scalars": 775
+                }
+              },
+              "qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "3959603c7eb4a3d3b6785e1c5185920fa8fde116316ab8e96945c47be35a4fe5",
+                "clipping_count": 0,
+                "dc_offset": [
+                  -0.00046483877782338694,
+                  -0.00026136542427928337
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "peak": 0.09330347925424576,
+                "rms": 0.0039013159017728116,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 3.73132135669645e-16,
+                "tail_rms_warning": 0.001
+              },
+              "render_seconds": 1.123979000010877,
+              "renderer_qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "3959603c7eb4a3d3b6785e1c5185920fa8fde116316ab8e96945c47be35a4fe5",
+                "clipping_count": 0,
+                "dc_offset": [
+                  -0.00046483877782338694,
+                  -0.00026136542427928337
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "native_state": {
+                  "applied_preset_sha256": "bd92960cad03a78b3eadf7713c488fad4188de15158c72b92e41ffb24541e0f9",
+                  "applied_version": "1.5.5",
+                  "modulation_slots_verified": 64,
+                  "native_ramp_defaults_verified": 128,
+                  "nested_families_verified": [
+                    "lfos",
+                    "custom_warps",
+                    "random_values",
+                    "modulations",
+                    "wavetables",
+                    "sample"
+                  ],
+                  "requested_preset_sha256": "bd92960cad03a78b3eadf7713c488fad4188de15158c72b92e41ffb24541e0f9",
+                  "requested_version": "1.5.5",
+                  "sample_aligned_max_pcm16_delta": {
+                    "samples": 1
+                  },
+                  "sample_readback_byte_exact": false,
+                  "sample_readback_shift_samples": 4,
+                  "scalar_lfo_route_readback_verified": true,
+                  "verified_loaded_scalars": 775,
+                  "wavetable_version_migration": "1.6.4"
+                },
+                "peak": 0.09330347925424576,
+                "rms": 0.0039013159017728116,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 3.73132135669645e-16,
+                "tail_rms_warning": 0.001
+              },
+              "status": "accepted"
+            }
+          ],
+          "diagnostic_codes": [],
+          "provenance": {
+            "backend_version": "0.8.3",
+            "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+            "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+            "request_id": "d0392f6d367a98e21ce61bfd9fa4131715b624ee940cbfc8144f4399498b4c60",
+            "settings": {
+              "buffer_size": 128,
+              "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+              "event_timing": "absolute ticks to half-even sample offsets",
+              "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+              "full_nested_readback_verified": true,
+              "plugin_name": "Vital.vst3",
+              "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+              "scalar_lfo_route_readback_verified": true,
+              "schema_id": "vital-1.5.5-fields-native-1.6.4",
+              "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+              "verified_loaded_scalars": 775
+            }
+          },
+          "qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "3959603c7eb4a3d3b6785e1c5185920fa8fde116316ab8e96945c47be35a4fe5",
+            "clipping_count": 0,
+            "dc_offset": [
+              -0.00046483877782338694,
+              -0.00026136542427928337
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "peak": 0.09330347925424576,
+            "rms": 0.0039013159017728116,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 3.73132135669645e-16,
+            "tail_rms_warning": 0.001
+          },
+          "render_seconds": 1.123979000010877,
+          "renderer_qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "3959603c7eb4a3d3b6785e1c5185920fa8fde116316ab8e96945c47be35a4fe5",
+            "clipping_count": 0,
+            "dc_offset": [
+              -0.00046483877782338694,
+              -0.00026136542427928337
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "native_state": {
+              "applied_preset_sha256": "bd92960cad03a78b3eadf7713c488fad4188de15158c72b92e41ffb24541e0f9",
+              "applied_version": "1.5.5",
+              "modulation_slots_verified": 64,
+              "native_ramp_defaults_verified": 128,
+              "nested_families_verified": [
+                "lfos",
+                "custom_warps",
+                "random_values",
+                "modulations",
+                "wavetables",
+                "sample"
+              ],
+              "requested_preset_sha256": "bd92960cad03a78b3eadf7713c488fad4188de15158c72b92e41ffb24541e0f9",
+              "requested_version": "1.5.5",
+              "sample_aligned_max_pcm16_delta": {
+                "samples": 1
+              },
+              "sample_readback_byte_exact": false,
+              "sample_readback_shift_samples": 4,
+              "scalar_lfo_route_readback_verified": true,
+              "verified_loaded_scalars": 775,
+              "wavetable_version_migration": "1.6.4"
+            },
+            "peak": 0.09330347925424576,
+            "rms": 0.0039013159017728116,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 3.73132135669645e-16,
+            "tail_rms_warning": 0.001
+          },
+          "status": "accepted",
+          "wall_seconds": 1.919568099998287
+        },
+        {
+          "attempts": [
+            {
+              "attempt": 0,
+              "diagnostic_codes": [],
+              "provenance": {
+                "backend_version": "0.8.3",
+                "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+                "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+                "request_id": "d0392f6d367a98e21ce61bfd9fa4131715b624ee940cbfc8144f4399498b4c60",
+                "settings": {
+                  "buffer_size": 128,
+                  "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+                  "event_timing": "absolute ticks to half-even sample offsets",
+                  "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+                  "full_nested_readback_verified": true,
+                  "plugin_name": "Vital.vst3",
+                  "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+                  "scalar_lfo_route_readback_verified": true,
+                  "schema_id": "vital-1.5.5-fields-native-1.6.4",
+                  "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+                  "verified_loaded_scalars": 775
+                }
+              },
+              "qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "3959603c7eb4a3d3b6785e1c5185920fa8fde116316ab8e96945c47be35a4fe5",
+                "clipping_count": 0,
+                "dc_offset": [
+                  -0.00046483877782338694,
+                  -0.00026136542427928337
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "peak": 0.09330347925424576,
+                "rms": 0.0039013159017728116,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 3.73132135669645e-16,
+                "tail_rms_warning": 0.001
+              },
+              "render_seconds": 0.9882986000011442,
+              "renderer_qa": {
+                "actual_channels": 2,
+                "actual_frames": 176400,
+                "audio_float32_sha256": "3959603c7eb4a3d3b6785e1c5185920fa8fde116316ab8e96945c47be35a4fe5",
+                "clipping_count": 0,
+                "dc_offset": [
+                  -0.00046483877782338694,
+                  -0.00026136542427928337
+                ],
+                "expected_channels": 2,
+                "expected_frames": 176400,
+                "finite": true,
+                "native_state": {
+                  "applied_preset_sha256": "bd92960cad03a78b3eadf7713c488fad4188de15158c72b92e41ffb24541e0f9",
+                  "applied_version": "1.5.5",
+                  "modulation_slots_verified": 64,
+                  "native_ramp_defaults_verified": 128,
+                  "nested_families_verified": [
+                    "lfos",
+                    "custom_warps",
+                    "random_values",
+                    "modulations",
+                    "wavetables",
+                    "sample"
+                  ],
+                  "requested_preset_sha256": "bd92960cad03a78b3eadf7713c488fad4188de15158c72b92e41ffb24541e0f9",
+                  "requested_version": "1.5.5",
+                  "sample_aligned_max_pcm16_delta": {
+                    "samples": 1
+                  },
+                  "sample_readback_byte_exact": false,
+                  "sample_readback_shift_samples": 4,
+                  "scalar_lfo_route_readback_verified": true,
+                  "verified_loaded_scalars": 775,
+                  "wavetable_version_migration": "1.6.4"
+                },
+                "peak": 0.09330347925424576,
+                "rms": 0.0039013159017728116,
+                "silence_threshold": 1e-06,
+                "tail_frames": 11025,
+                "tail_rms": 3.73132135669645e-16,
+                "tail_rms_warning": 0.001
+              },
+              "status": "accepted"
+            }
+          ],
+          "diagnostic_codes": [],
+          "provenance": {
+            "backend_version": "0.8.3",
+            "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+            "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+            "request_id": "d0392f6d367a98e21ce61bfd9fa4131715b624ee940cbfc8144f4399498b4c60",
+            "settings": {
+              "buffer_size": 128,
+              "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+              "event_timing": "absolute ticks to half-even sample offsets",
+              "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+              "full_nested_readback_verified": true,
+              "plugin_name": "Vital.vst3",
+              "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+              "scalar_lfo_route_readback_verified": true,
+              "schema_id": "vital-1.5.5-fields-native-1.6.4",
+              "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+              "verified_loaded_scalars": 775
+            }
+          },
+          "qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "3959603c7eb4a3d3b6785e1c5185920fa8fde116316ab8e96945c47be35a4fe5",
+            "clipping_count": 0,
+            "dc_offset": [
+              -0.00046483877782338694,
+              -0.00026136542427928337
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "peak": 0.09330347925424576,
+            "rms": 0.0039013159017728116,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 3.73132135669645e-16,
+            "tail_rms_warning": 0.001
+          },
+          "render_seconds": 0.9882986000011442,
+          "renderer_qa": {
+            "actual_channels": 2,
+            "actual_frames": 176400,
+            "audio_float32_sha256": "3959603c7eb4a3d3b6785e1c5185920fa8fde116316ab8e96945c47be35a4fe5",
+            "clipping_count": 0,
+            "dc_offset": [
+              -0.00046483877782338694,
+              -0.00026136542427928337
+            ],
+            "expected_channels": 2,
+            "expected_frames": 176400,
+            "finite": true,
+            "native_state": {
+              "applied_preset_sha256": "bd92960cad03a78b3eadf7713c488fad4188de15158c72b92e41ffb24541e0f9",
+              "applied_version": "1.5.5",
+              "modulation_slots_verified": 64,
+              "native_ramp_defaults_verified": 128,
+              "nested_families_verified": [
+                "lfos",
+                "custom_warps",
+                "random_values",
+                "modulations",
+                "wavetables",
+                "sample"
+              ],
+              "requested_preset_sha256": "bd92960cad03a78b3eadf7713c488fad4188de15158c72b92e41ffb24541e0f9",
+              "requested_version": "1.5.5",
+              "sample_aligned_max_pcm16_delta": {
+                "samples": 1
+              },
+              "sample_readback_byte_exact": false,
+              "sample_readback_shift_samples": 4,
+              "scalar_lfo_route_readback_verified": true,
+              "verified_loaded_scalars": 775,
+              "wavetable_version_migration": "1.6.4"
+            },
+            "peak": 0.09330347925424576,
+            "rms": 0.0039013159017728116,
+            "silence_threshold": 1e-06,
+            "tail_frames": 11025,
+            "tail_rms": 3.73132135669645e-16,
+            "tail_rms_warning": 0.001
+          },
+          "status": "accepted",
+          "wall_seconds": 1.7629403000028105
+        }
+      ],
+      "serialized_target_and_decoder_exact": true,
+      "source_repeat": {
+        "log_spectral_rmse": 0.0,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      "source_repeat_exact": true,
+      "state_id": "52282717c2f9d110dcad9995aa693322484b3d5af2893d164cebc6ac0e4adc45"
+    }
+  ],
+  "check": "lfo_serialized_target_native_v1",
+  "codec_id": "363a5dc5012f6e05c2aba86fef3d2ee3c5b46a900e037f180143f5f2728e5b06",
+  "covered_families": [
+    "dense",
+    "direct",
+    "indexed_amount",
+    "modulator_feedback",
+    "parallel"
+  ],
+  "decoded_within_reference_tolerance": 5,
+  "expected_families": [
+    "direct",
+    "parallel",
+    "indexed_amount",
+    "modulator_feedback",
+    "dense"
+  ],
+  "passed": true,
+  "phase_control": {
+    "osc_1_random_phase": 0.0,
+    "osc_2_random_phase": 0.0,
+    "osc_3_random_phase": 0.0,
+    "sample_random_phase": 0.0
+  },
+  "pool_id": "3232cac1e1e619d27414901a5d9fac6c52d9ea0185b6b8e96fd080669970a267",
+  "renderer_factory": "NativeRendererFactory",
+  "representation_roundtrip": "serialized_targets_only_raw_curve_reencoding_is_lossy",
+  "requested": 15,
+  "source_repeats_within_reference_tolerance": 5,
+  "version": 1
+}
