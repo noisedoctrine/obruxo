@@ -49,3 +49,5 @@ research/data_generation/obruxo_data/vital/full_contract.py text eol=lf
 research/training/obruxo_training/full_check.py text eol=lf
 research/training/reports/data/full_native_profile_plan.json text eol=lf
 research/training/reports/data/full_native_profile_summary.json text eol=lf
+research/training/reports/scripts/run_conditioning_screen.py -text
+research/training/reports/data/conditioning_plan.json -text

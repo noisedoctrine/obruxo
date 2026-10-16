@@ -21,7 +21,7 @@ from .audit import write_json
 from .benchmark import MemoryMonitor
 from .codec import PilotTarget, load_codec
 from .features import AudioFeatures, tensor_digest, validate_features
-from .model import PilotInverse, batch_features, loss_terms, model_spec, predicted_targets
+from .model import PilotInverse, batch_features, conditioning_from_spec, loss_terms, model_spec, predicted_targets
 from .paired import complete_pairs, identity_terms, paired_batch_indices
 from .pilot import PilotPool, PilotSampler
 from .stream import OnlineRenderStream, StreamConfig
@@ -45,6 +45,7 @@ class TrainConfig:
     fresh_examples: int | None = None
     identity_weight: float = 0.
     identity_temperature: float = .1
+    conditioning: str = "concat"
 
     def __post_init__(self):
         positive = (self.steps, self.replay_capacity, self.replay_mib, self.batch_size,
@@ -61,6 +62,8 @@ class TrainConfig:
             raise ValueError("learning rate must be positive and finite")
         if self.sampling_policy not in {"pairs", "state_round_robin", "paired_views"}:
             raise ValueError("unknown pilot sampling policy")
+        if self.conditioning not in {"concat", "cross_attention"}:
+            raise ValueError("unsupported performance conditioning")
         if (not math.isfinite(self.identity_weight) or self.identity_weight < 0
                 or not math.isfinite(self.identity_temperature) or self.identity_temperature <= 0):
             raise ValueError("identity weight must be nonnegative and temperature positive and finite")
@@ -165,9 +168,11 @@ def _run_contract(pool, sampler, frontend, config, stream_config, replay_seed=No
         del training["identity_weight"]
     if training["identity_temperature"] == .1:
         del training["identity_temperature"]
+    if training["conditioning"] == "concat":
+        del training["conditioning"]
     contract = {"trainer": "pilot_supervised_bootstrap_v1", "pool_id": pool.pool_id,
             "contract": pool.codec.contract.to_dict(), "codec": pool.codec.to_dict(), "sampler_id": sampler.sampler_id,
-            "model": model_spec(pool.codec), "frontend": frontend.describe(), "training": training,
+            "model": model_spec(pool.codec, config.conditioning), "frontend": frontend.describe(), "training": training,
             "stream": stream_config.to_dict(), "optimizer": "AdamW_weight_decay_0", "precision": "float32",
             "scheduler": None, "scaler": None,
             "replay_policy": "bounded_refresh_then_replay_v1" if config.fresh_examples is not None or config.updates_per_render != 1
@@ -249,7 +254,7 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
     contract = _run_contract(pool, sampler, frontend, config, stream_config, replay_seed)
     if saved and (saved.get("format") != "obruxo_pilot_training_v1" or saved["run_contract"] != contract):
         raise ValueError("checkpoint training contract changed; start an explicit new run")
-    model = PilotInverse(pool.codec).to(device)
+    model = PilotInverse(pool.codec, config.conditioning).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate, weight_decay=0)
     generator = torch.Generator().manual_seed(learning_seed)
     replay, step, initial, render_ready, renderer_identity = [], 0, None, False, None
@@ -447,7 +452,7 @@ def export_model(path: Path, model, frontend, codec, pool_id: str) -> None:
 
 def inference_state(model, frontend, codec, pool_id: str) -> dict:
     frontend.require_frozen()
-    return {"format": "obruxo_pilot_inference_v1", "model_spec": model_spec(codec), "model": model.state_dict(),
+    return {"format": "obruxo_pilot_inference_v1", "model_spec": model_spec(codec, model.conditioning), "model": model.state_dict(),
             "basic_pitch": frontend.basic_pitch.state_dict(), "frontend": frontend.describe(), "contract": codec.contract.to_dict(),
             "codec": codec.to_dict(), "training_pool_id": pool_id, "input": "audio_only"}
 
@@ -459,7 +464,8 @@ def load_model(path: Path, device: str = "cpu") -> tuple:
 
 def restore_model(saved, device: str = "cpu") -> tuple:
     codec = load_codec(saved["codec"])
-    if saved.get("format") != "obruxo_pilot_inference_v1" or saved["model_spec"] != model_spec(codec):
+    conditioning = conditioning_from_spec(saved["model_spec"])
+    if saved.get("format") != "obruxo_pilot_inference_v1" or saved["model_spec"] != model_spec(codec, conditioning):
         raise ValueError("unsupported inference artifact")
     codec.contract.require_match(saved["contract"])
     if saved["codec"] != codec.to_dict():
@@ -467,7 +473,7 @@ def restore_model(saved, device: str = "cpu") -> tuple:
     frontend = AudioFeatures(saved["basic_pitch"])
     if frontend.describe() != saved["frontend"]:
         raise ValueError("inference frontend or frozen weights changed")
-    model = PilotInverse(codec).to(device).eval()
+    model = PilotInverse(codec, conditioning).to(device).eval()
     model.load_state_dict(saved["model"], strict=True)
     return model, frontend, codec
 
