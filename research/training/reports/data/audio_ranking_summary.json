@@ -2,6 +2,7 @@
   "artifact_sha256": "501ba85e9bc31b6763b368ec642683433fa00e4d7931bbc9eba57a0173e70849",
   "audio_files_written": 0,
   "cold_bundle_load_seconds": 0.7209858999995049,
+  "complete_evaluator_candidate_panels": 9,
   "compute_note": "Local CPU; independent regression suites and cached conditioning training overlapped this check. Latency is not an idle-machine benchmark.",
   "deployed_choices": {
     "category": 1,
@@ -12,6 +13,9 @@
   "deployed_relative_error_change_percent": -10.640393391736257,
   "elapsed_seconds": 965.7642314999975,
   "final_test_used": false,
+  "native_error_types": {
+    "RenderTimeout": 1
+  },
   "paired_deployed_vs_model": {
     "bootstrap": {
       "interval": "percentile_95",
