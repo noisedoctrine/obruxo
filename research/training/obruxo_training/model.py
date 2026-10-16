@@ -87,9 +87,9 @@ def batch_features(items: list[dict], device: str = "cpu") -> dict:
     return {name: torch.stack([item["features"][name] for item in items]).to(device) for name in ("timbre", "pitch")}
 
 
-def loss_terms(prediction: dict, targets: list[PilotTarget], codec: PilotCodec, *, curve_targets=None) -> dict:
+def loss_terms(prediction: dict, targets: list[PilotTarget], codec: PilotCodec, *, curve_targets=None, route_curve_targets=None) -> dict:
     if getattr(codec, "balanced_loss", False):
-        return _balanced_loss(prediction, targets, codec, curve_targets=curve_targets)
+        return _balanced_loss(prediction, targets, codec, curve_targets=curve_targets, route_curve_targets=route_curve_targets)
     device = prediction["continuous"].device
     values = torch.tensor([target.continuous for target in targets], dtype=torch.float32, device=device)
     mask = torch.tensor([codec.continuous_mask(target) for target in targets], dtype=torch.float32, device=device)
@@ -120,13 +120,15 @@ def _family_mean(errors, mask, groups):
     return torch.stack(totals).sum() / torch.stack(active).sum().clamp_min(1)
 
 
-def _balanced_loss(prediction, targets, codec, *, curve_targets=None):
+def _balanced_loss(prediction, targets, codec, *, curve_targets=None, route_curve_targets=None):
     targets = [codec.supervision_target(target) for target in targets]
     device = prediction["continuous"].device
     values = torch.tensor([target.continuous for target in targets], dtype=torch.float32, device=device)
     masks = torch.tensor([codec.continuous_mask(target) for target in targets], dtype=torch.float32, device=device)
     categories = torch.tensor([target.categorical for target in targets], dtype=torch.int64, device=device)
     cat_masks = torch.tensor([codec.categorical_mask(target) for target in targets], dtype=torch.float32, device=device)
+    if hasattr(codec, "categorical_weights"):
+        cat_masks = cat_masks * torch.tensor([codec.categorical_weights(target) for target in targets], dtype=torch.float32, device=device)
     error = prediction["continuous"] - values
     if codec.cyclic_indices:
         error = error.clone()
@@ -143,6 +145,15 @@ def _balanced_loss(prediction, targets, codec, *, curve_targets=None):
         from .lfo_loss import reconstruction_loss
         terms["curve_reconstruction_mse"] = reconstruction_loss(prediction, targets, codec, curve_targets)
         terms["loss"] = terms["loss"] + terms["curve_reconstruction_mse"]
+    if getattr(codec, "lossy_route_maps", False):
+        predicted = prediction["continuous"][:, codec._map_start:].reshape(len(targets), 64, 97)
+        if (not isinstance(route_curve_targets, torch.Tensor) or route_curve_targets.shape != predicted.shape
+                or route_curve_targets.dtype != torch.float32 or route_curve_targets.requires_grad
+                or not torch.isfinite(route_curve_targets).all() or torch.any((route_curve_targets < 0) | (route_curve_targets > 1))):
+            raise ValueError("original route maps must be frozen finite float32 [batch,64,97] values within [0,1]")
+        active = torch.tensor([codec.active_route_maps(target) for target in targets], dtype=torch.float32, device=device)
+        terms["route_map_mse"] = ((predicted - route_curve_targets.to(device)).square().mean(-1) * active).sum() / active.sum().clamp_min(1)
+        terms["loss"] = terms["loss"] + terms["route_map_mse"]
     return terms
 
 

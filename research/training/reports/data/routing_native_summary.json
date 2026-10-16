@@ -1,0 +1,4315 @@
+{
+  "accepted": 599,
+  "attempted": 601,
+  "audio_files_written": 0,
+  "checks": [
+    {
+      "accepted": false,
+      "attempted": 2,
+      "case": "empty_map",
+      "expected_rejection": true,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "self_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "modulator_cycle",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "amount_cycle",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_aftertouch",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_env_1",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_env_2",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_env_3",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_env_4",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_env_5",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_env_6",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_lfo_1",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_lfo_2",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_lfo_3",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_lfo_4",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_lfo_5",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_lfo_6",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_lfo_7",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_lfo_8",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_lift",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_macro_control_1",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_macro_control_2",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_macro_control_3",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_macro_control_4",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_mod_wheel",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_note",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_note_in_octave",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_pitch_wheel",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_random",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_random_1",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_random_2",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_random_3",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_random_4",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_slide",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_stereo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "source_velocity",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_beats_per_minute",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_chorus_cutoff",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_chorus_delay_1",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_chorus_delay_2",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_chorus_dry_wet",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_chorus_feedback",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_chorus_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_chorus_mod_depth",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_chorus_spread",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_chorus_tempo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_compressor_attack",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_compressor_band_gain",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_compressor_high_gain",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_compressor_low_gain",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_compressor_mix",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_compressor_release",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_delay_aux_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_delay_aux_tempo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_delay_dry_wet",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_delay_feedback",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_delay_filter_cutoff",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_delay_filter_spread",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_delay_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_delay_tempo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_distortion_drive",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_distortion_filter_blend",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_distortion_filter_cutoff",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_distortion_filter_resonance",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_distortion_mix",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_1_attack",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_1_decay",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_1_delay",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_1_hold",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_1_release",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_1_sustain",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_2_attack",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_2_decay",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_2_delay",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_2_hold",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_2_release",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_2_sustain",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_3_attack",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_3_decay",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_3_delay",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_3_hold",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_3_release",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_3_sustain",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_4_attack",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_4_decay",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_4_delay",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_4_hold",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_4_release",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_4_sustain",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_5_attack",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_5_decay",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_5_delay",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_5_hold",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_5_release",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_5_sustain",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_6_attack",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_6_decay",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_6_delay",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_6_hold",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_6_release",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_env_6_sustain",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_eq_band_cutoff",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_eq_band_gain",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_eq_band_resonance",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_eq_high_cutoff",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_eq_high_gain",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_eq_high_resonance",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_eq_low_cutoff",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_eq_low_gain",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_eq_low_resonance",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_1_blend",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_1_blend_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_1_cutoff",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_1_drive",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_1_formant_resonance",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_1_formant_spread",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_1_formant_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_1_formant_x",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_1_formant_y",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_1_keytrack",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_1_mix",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_1_resonance",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_2_blend",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_2_blend_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_2_cutoff",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_2_drive",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_2_formant_resonance",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_2_formant_spread",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_2_formant_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_2_formant_x",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_2_formant_y",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_2_keytrack",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_2_mix",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_2_resonance",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_fx_blend",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_fx_blend_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_fx_cutoff",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_fx_drive",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_fx_formant_resonance",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_fx_formant_spread",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_fx_formant_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_fx_formant_x",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_fx_formant_y",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_fx_keytrack",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_fx_mix",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_filter_fx_resonance",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_flanger_center",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_flanger_dry_wet",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_flanger_feedback",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_flanger_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_flanger_mod_depth",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_flanger_phase_offset",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_flanger_tempo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_1_delay_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_1_fade_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_1_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_1_keytrack_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_1_keytrack_tune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_1_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_1_smooth_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_1_stereo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_1_tempo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_2_delay_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_2_fade_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_2_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_2_keytrack_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_2_keytrack_tune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_2_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_2_smooth_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_2_stereo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_2_tempo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_3_delay_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_3_fade_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_3_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_3_keytrack_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_3_keytrack_tune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_3_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_3_smooth_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_3_stereo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_3_tempo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_4_delay_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_4_fade_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_4_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_4_keytrack_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_4_keytrack_tune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_4_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_4_smooth_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_4_stereo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_4_tempo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_5_delay_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_5_fade_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_5_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_5_keytrack_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_5_keytrack_tune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_5_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_5_smooth_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_5_stereo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_5_tempo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_6_delay_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_6_fade_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_6_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_6_keytrack_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_6_keytrack_tune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_6_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_6_smooth_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_6_stereo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_6_tempo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_7_delay_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_7_fade_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_7_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_7_keytrack_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_7_keytrack_tune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_7_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_7_smooth_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_7_stereo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_7_tempo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_8_delay_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_8_fade_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_8_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_8_keytrack_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_8_keytrack_tune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_8_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_8_smooth_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_8_stereo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_lfo_8_tempo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_macro_control_1",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_macro_control_2",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_macro_control_3",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_macro_control_4",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_10_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_10_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_11_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_11_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_12_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_12_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_13_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_13_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_14_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_14_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_15_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_15_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_16_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_16_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_17_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_17_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_18_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_18_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_19_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_19_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_1_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_1_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_20_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_20_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_21_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_21_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_22_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_22_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_23_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_23_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_24_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_24_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_25_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_25_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_26_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_26_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_27_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_27_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_28_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_28_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_29_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_29_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_2_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_2_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_30_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_30_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_31_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_31_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_32_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_32_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_33_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_33_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_34_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_34_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_35_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_35_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_36_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_36_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_37_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_37_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_38_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_38_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_39_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_39_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_3_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_3_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_40_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_40_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_41_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_41_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_42_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_42_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_43_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_43_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_44_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_44_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_45_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_45_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_46_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_46_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_47_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_47_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_48_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_48_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_49_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_49_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_4_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_4_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_50_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_50_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_51_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_51_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_52_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_52_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_53_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_53_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_54_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_54_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_55_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_55_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_56_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_56_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_57_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_57_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_58_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_58_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_59_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_59_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_5_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_5_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_60_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_60_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_61_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_61_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_62_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_62_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_63_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_63_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_64_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_64_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_6_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_6_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_7_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_7_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_8_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_8_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_9_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_modulation_9_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_detune_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_detune_range",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_distortion_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_distortion_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_distortion_spread",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_frame_spread",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_level",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_pan",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_random_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_spectral_morph_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_spectral_morph_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_spectral_morph_spread",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_stereo_spread",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_tune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_unison_blend",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_unison_detune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_unison_voices",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_1_wave_frame",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_detune_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_detune_range",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_distortion_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_distortion_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_distortion_spread",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_frame_spread",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_level",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_pan",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_random_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_spectral_morph_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_spectral_morph_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_spectral_morph_spread",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_stereo_spread",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_tune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_unison_blend",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_unison_detune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_unison_voices",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_2_wave_frame",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_detune_power",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_detune_range",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_distortion_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_distortion_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_distortion_spread",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_frame_spread",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_level",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_pan",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_random_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_spectral_morph_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_spectral_morph_phase",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_spectral_morph_spread",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_stereo_spread",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_tune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_unison_blend",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_unison_detune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_unison_voices",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_osc_3_wave_frame",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_phaser_blend",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_phaser_center",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_phaser_dry_wet",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_phaser_feedback",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_phaser_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_phaser_mod_depth",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_phaser_phase_offset",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_phaser_tempo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_pitch_bend_range",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_polyphony",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_portamento_slope",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_portamento_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_random_1_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_random_1_keytrack_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_random_1_keytrack_tune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_random_1_tempo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_random_2_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_random_2_keytrack_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_random_2_keytrack_tune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_random_2_tempo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_random_3_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_random_3_keytrack_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_random_3_keytrack_tune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_random_3_tempo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_random_4_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_random_4_keytrack_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_random_4_keytrack_tune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_random_4_tempo",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_reverb_chorus_amount",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_reverb_chorus_frequency",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_reverb_decay_time",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_reverb_delay",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_reverb_dry_wet",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_reverb_high_shelf_cutoff",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_reverb_high_shelf_gain",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_reverb_low_shelf_cutoff",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_reverb_low_shelf_gain",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_reverb_pre_high_cutoff",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_reverb_pre_low_cutoff",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_reverb_size",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_sample_level",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_sample_pan",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_sample_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_sample_tune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_stereo_routing",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_velocity_track",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_voice_amplitude",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_voice_transpose",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_voice_tune",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 1,
+      "case": "destination_volume",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": false,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_1",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_2",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_3",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_4",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_5",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_6",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_7",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_8",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_9",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_10",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_11",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_12",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_13",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_14",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_15",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_16",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_17",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_18",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_19",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_20",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_21",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_22",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_23",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_24",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_25",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_26",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_27",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_28",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_29",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_30",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_31",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_32",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_33",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_34",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_35",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_36",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_37",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_38",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_39",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_40",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_41",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_42",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_43",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_44",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_45",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_46",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_47",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_48",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_49",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_50",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_51",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_52",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_53",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_54",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_55",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_56",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_57",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_58",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_59",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_60",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_61",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_62",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_63",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "slot_64",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    },
+    {
+      "accepted": true,
+      "attempted": 2,
+      "case": "dense_64",
+      "expected_rejection": false,
+      "fixed_phase_repeat_exact": true,
+      "passed": true
+    }
+  ],
+  "elapsed_seconds": 987.7726549000072,
+  "expected_rejected": 2,
+  "expected_rejection_events": [
+    {
+      "case": "empty_map",
+      "error_type": "RuntimeError",
+      "message": "Vital did not load the requested modulations",
+      "repeat": 0,
+      "request_id": "f1ebaa15852da9d29673645305f134c76242344d5a76205bd30a4d184770cfc6",
+      "status": "error",
+      "wall_seconds": 2.316381199998432,
+      "worker_job": 1,
+      "worker_max_jobs": 4,
+      "worker_pid": 17668
+    },
+    {
+      "case": "empty_map",
+      "error_type": "RuntimeError",
+      "message": "Vital did not load the requested modulations",
+      "repeat": 1,
+      "request_id": "f1ebaa15852da9d29673645305f134c76242344d5a76205bd30a4d184770cfc6",
+      "status": "error",
+      "wall_seconds": 2.361052100008237,
+      "worker_job": 1,
+      "worker_max_jobs": 4,
+      "worker_pid": 11376
+    }
+  ],
+  "final_test_audio": false,
+  "gates": {
+    "memory_bounded": true,
+    "native_state_contract": true,
+    "repeats_exact": true,
+    "source_unchanged": true
+  },
+  "initial_probe": {
+    "accepted": 6,
+    "attempted": 8,
+    "plan_sha256": "0cbc119e3f3ff6419087f8780bbf427255fc1ffdf0935e3f9c033faeabecb8aa",
+    "reason": "Vital drops mappings on empty slots; encoder now refuses these and decoder gates maps on connection presence"
+  },
+  "lf_normalized_source_sha256": {
+    "data_generation/obruxo_data/render/full_state.py": "d0be7d4a3ed22bf37e101cc60ad0737913160f197147795982cdfbb96644939a",
+    "data_generation/obruxo_data/render/vita.py": "cd4e68a4385e22aa367ad28e5d0a85a8cbd190e19d6dffefa52dd3468983a0f8",
+    "training/obruxo_training/routing.py": "ec0e4ddf5f7151ed72168b35e6d75ab49cdeba04db7b97f8df7da25cfa0de98b",
+    "training/obruxo_training/routing_check.py": "4ceb464b457c45d08b11e7be3e87993f3bec4ffcf20a658c00abf79b2edb76e5",
+    "training/obruxo_training/stream.py": "008d5aed58f6dc81bba7e51754a728f2232ee7774bc206abc95cc74cd22ef753"
+  },
+  "memory_sampling_errors": 0,
+  "passed": true,
+  "peak_process_rss_bytes": 570269696,
+  "plan_sha256": "6c389b935e7b5dfa7bf1f012ad5229b668a28bc4ed026a9adb46f72f3f43d94e"
+}

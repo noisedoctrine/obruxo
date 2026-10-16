@@ -121,7 +121,7 @@ def restore_rng(value: dict, device: str) -> None:
 
 def replay_bytes(items: list[dict]) -> int:
     features = sum(tensor.numel() * tensor.element_size() for item in items for tensor in item["features"].values())
-    curves = [item["curve_targets"] for item in items if "curve_targets" in item]
+    curves = [item[name] for item in items for name in ("curve_targets", "route_curve_targets") if name in item]
     if any(not isinstance(value, torch.Tensor) for value in curves):
         raise ValueError("curve replay labels must be tensors")
     return features + sum(value.numel() * value.element_size() for value in curves)
@@ -150,10 +150,18 @@ def validate_replay(items: list[dict], sampler: PilotSampler, cursor: dict, conf
                 raise ValueError("saved original LFO curve targets differ from their source recipe")
         elif "curve_targets" in item:
             raise ValueError("unexpected curve supervision for this codec")
+        if getattr(sampler.pool.codec, "lossy_route_maps", False):
+            expected = torch.tensor(sampler.pool.codec.source_route_maps(recipe.render_request().preset_json), dtype=torch.float32)
+            actual = item.get("route_curve_targets")
+            if not isinstance(actual, torch.Tensor) or actual.dtype != torch.float32 or actual.requires_grad or not torch.equal(actual, expected):
+                raise ValueError("saved original route maps differ from their source recipe")
+        elif "route_curve_targets" in item:
+            raise ValueError("unexpected route-map supervision for this codec")
 
 
 def curve_loss_inputs(items, codec):
-    return {"curve_targets": torch.stack([item["curve_targets"] for item in items])} if getattr(codec, "lossy_curves", False) else {}
+    return {name: torch.stack([item[name] for item in items]) for flag, name in
+            (("lossy_curves", "curve_targets"), ("lossy_route_maps", "route_curve_targets")) if getattr(codec, flag, False)}
 
 
 @torch.no_grad()
@@ -351,6 +359,8 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
                             item["performance_id"] = recipe.performance_id
                         if getattr(pool.codec, "lossy_curves", False):
                             item["curve_targets"] = torch.tensor(pool.codec.source_curves(recipe.render_request().preset_json), dtype=torch.float32)
+                        if getattr(pool.codec, "lossy_route_maps", False):
+                            item["route_curve_targets"] = torch.tensor(pool.codec.source_route_maps(recipe.render_request().preset_json), dtype=torch.float32)
                         candidate = [*replay, item][-config.replay_capacity:]
                         if replay_bytes(candidate) > config.replay_mib * 1024 * 1024:
                             raise ValueError("feature replay exceeds its byte budget")
@@ -456,7 +466,8 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
                    "quality_claim": "supervised_bootstrap_only_real_render_validation_required"}
         if getattr(pool.codec, "lossy_curves", False):
             summary["curve_target_bytes"] = sum(item["curve_targets"].numel() * item["curve_targets"].element_size() for item in replay)
-            summary["feature_bytes"] = summary["replay_bytes"] - summary["curve_target_bytes"]
+            summary["route_curve_target_bytes"] = sum(item["route_curve_targets"].numel() * item["route_curve_targets"].element_size() for item in replay if "route_curve_targets" in item)
+            summary["feature_bytes"] = summary["replay_bytes"] - summary["curve_target_bytes"] - summary["route_curve_target_bytes"]
         write_json(output / "summary.json", summary)
         write_json(output / "status.json", {"complete": complete, "stage": "complete" if complete else "preempted", "step": step})
         return summary

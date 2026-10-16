@@ -22,7 +22,7 @@ def decoded_curves(prediction, codec):
     base, residuals = codec._tensor_dictionaries
     size = prediction["continuous"].shape[0]
     phases = prediction["continuous"][:, codec._ncont:codec._ncont + 136].reshape(size, 8, 17)
-    gains = prediction["continuous"][:, codec._ncont + 136:].reshape(size, 8, 16) * 4 - 2
+    gains = prediction["continuous"][:, codec._ncont + 136:codec._ncont + 264].reshape(size, 8, 16) * 4 - 2
     logits = prediction["categorical"][codec._ncat:]
 
     def mixed_atoms(layer, atoms):

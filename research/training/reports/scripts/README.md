@@ -1,5 +1,7 @@
 # Archived diagnostic sources
 
+`run_routing_check.py` and `run_routing_training_check.py` are current portable checks for [ordered connections](../../ORDERED_ROUTING.md). They write new output directories and fixed plans before native work. The first checks the complete declared vocabulary and all slot positions; the second runs bounded original-audio training and five validation families. Neither uses the historical layout below.
+
 `run_identity_screen.py` runs the current frozen paired-identity feasibility screen from the checkout. It writes a plan before rendering, shares a bounded feature bank across both arms and measures native reconstruction plus reserved-performance representations. See [PAIRED_IDENTITY.md](../../PAIRED_IDENTITY.md).
 
 `qualify_alpha_imports.py` is the current portable factory-import check, run directly from the checkout. It compares three pinned original exports with the imported alpha assets using native audio. Its arguments and validation boundary are documented in [ALPHA.md](../../ALPHA.md); it does not use the historical directory layout below.
