@@ -69,6 +69,8 @@ def validate_performance(performance: Performance, capabilities: Any | None = No
         if not capabilities.tempo_changes and (len(tempo_events) > 1 or any(event.tick != 0 for event in tempo_events)):
             diagnostics.append(_error("midi.capability.tempo_changes", "renderer supports one fixed tempo only"))
         for event in performance.events:
+            if event.kind == EventKind.NOTE_OFF and len(event.data) == 2 and event.data[1] != 0 and not capabilities.note_off_velocity:
+                diagnostics.append(_error("midi.capability.note_off_velocity", "renderer does not support release velocity"))
             if event.channel is not None and event.channel >= capabilities.max_channels:
                 diagnostics.append(_error("midi.capability.channel", "renderer channel limit exceeded", event=event.to_dict()))
             if event.kind == EventKind.PITCH_BEND and not capabilities.pitch_bend:

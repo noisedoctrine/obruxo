@@ -1,0 +1,233 @@
+{
+  "accepted": 91,
+  "attempted": 91,
+  "audio_files_written": 0,
+  "cases": [
+    {
+      "case": "held_mid",
+      "notes_audio_exact": true,
+      "repeat_exact": true
+    },
+    {
+      "case": "staccato_mid",
+      "notes_audio_exact": true,
+      "repeat_exact": true
+    },
+    {
+      "case": "melody_mid",
+      "notes_audio_exact": true,
+      "repeat_exact": true
+    },
+    {
+      "case": "chord_mid",
+      "notes_audio_exact": true,
+      "repeat_exact": true
+    },
+    {
+      "case": "held_low",
+      "notes_audio_exact": true,
+      "repeat_exact": true
+    },
+    {
+      "case": "staccato_high",
+      "notes_audio_exact": true,
+      "repeat_exact": true
+    },
+    {
+      "case": "melody_wide",
+      "notes_audio_exact": true,
+      "repeat_exact": true
+    },
+    {
+      "case": "chord_wide",
+      "notes_audio_exact": false,
+      "repeat_exact": true
+    },
+    {
+      "case": "sample_boundaries_44100",
+      "notes_audio_exact": true,
+      "repeat_exact": true
+    },
+    {
+      "case": "sample_boundaries_48000",
+      "notes_audio_exact": true,
+      "repeat_exact": true
+    },
+    {
+      "case": "sample_boundaries_96000",
+      "notes_audio_exact": true,
+      "repeat_exact": true
+    },
+    {
+      "case": "pitch_bend",
+      "causal_effect": true,
+      "first_changed_sample": 22022,
+      "relative_rms_change": 1.204185712513201,
+      "repeat_exact": true,
+      "requested_effect_sample": 22050,
+      "response_within_host_buffer": true
+    },
+    {
+      "case": "mod_wheel",
+      "causal_effect": true,
+      "first_changed_sample": 22017,
+      "relative_rms_change": 0.33240753094810993,
+      "repeat_exact": true,
+      "requested_effect_sample": 22050,
+      "response_within_host_buffer": true
+    },
+    {
+      "case": "pressure",
+      "causal_effect": true,
+      "first_changed_sample": 22017,
+      "relative_rms_change": 0.33240753094810993,
+      "repeat_exact": true,
+      "requested_effect_sample": 22050,
+      "response_within_host_buffer": true
+    },
+    {
+      "case": "slide_2",
+      "causal_effect": true,
+      "first_changed_sample": 22017,
+      "relative_rms_change": 0.33240753094810993,
+      "repeat_exact": true,
+      "requested_effect_sample": 22050,
+      "response_within_host_buffer": true
+    },
+    {
+      "case": "slide_16",
+      "causal_effect": true,
+      "first_changed_sample": 22017,
+      "relative_rms_change": 0.33240753094810993,
+      "repeat_exact": true,
+      "requested_effect_sample": 22050,
+      "response_within_host_buffer": true
+    },
+    {
+      "case": "pressure_2",
+      "causal_effect": true,
+      "first_changed_sample": 22017,
+      "relative_rms_change": 0.33240753094810993,
+      "repeat_exact": true,
+      "requested_effect_sample": 22050,
+      "response_within_host_buffer": true
+    },
+    {
+      "case": "pressure_16",
+      "causal_effect": true,
+      "first_changed_sample": 22017,
+      "relative_rms_change": 0.33240753094810993,
+      "repeat_exact": true,
+      "requested_effect_sample": 22050,
+      "response_within_host_buffer": true
+    },
+    {
+      "case": "bend_2",
+      "causal_effect": true,
+      "first_changed_sample": 22022,
+      "relative_rms_change": 1.204185712513201,
+      "repeat_exact": true,
+      "requested_effect_sample": 22050,
+      "response_within_host_buffer": true
+    },
+    {
+      "case": "bend_16",
+      "causal_effect": true,
+      "first_changed_sample": 22022,
+      "relative_rms_change": 1.204185712513201,
+      "repeat_exact": true,
+      "requested_effect_sample": 22050,
+      "response_within_host_buffer": true
+    },
+    {
+      "case": "release_velocity",
+      "causal_effect": true,
+      "first_changed_sample": 66113,
+      "relative_rms_change": 0.04481806139733869,
+      "repeat_exact": true,
+      "requested_effect_sample": 66150,
+      "response_within_host_buffer": true
+    },
+    {
+      "case": "sustain",
+      "causal_effect": true,
+      "first_changed_sample": 66155,
+      "relative_rms_change": 0.5767462954084048,
+      "repeat_exact": true,
+      "requested_effect_sample": 66150,
+      "response_within_host_buffer": true
+    },
+    {
+      "case": "mpe_slide_isolation",
+      "causal_effect": true,
+      "other_voice_preserved": true,
+      "other_voice_relative_amplitude_change": 1.0693774502525846e-07,
+      "relative_rms_change": 0.23583924827833502,
+      "repeat_exact": true
+    },
+    {
+      "case": "mpe_pressure_isolation",
+      "causal_effect": true,
+      "other_voice_preserved": true,
+      "other_voice_relative_amplitude_change": 1.0693774502525846e-07,
+      "relative_rms_change": 0.23583924827833502,
+      "repeat_exact": true
+    },
+    {
+      "case": "mpe_bend_isolation",
+      "causal_effect": true,
+      "other_voice_preserved": true,
+      "other_voice_relative_amplitude_change": 1.4915220450054677e-07,
+      "relative_rms_change": 0.8543556518552976,
+      "repeat_exact": true
+    },
+    {
+      "case": "expression_gestures_reference",
+      "repeat_exact": true
+    },
+    {
+      "case": "expression_poly_expression_reference",
+      "repeat_exact": true
+    },
+    {
+      "case": "expression_sustain_reference",
+      "repeat_exact": true
+    },
+    {
+      "case": "expression_release_reference",
+      "repeat_exact": true
+    },
+    {
+      "case": "expression_gestures_transfer",
+      "repeat_exact": true
+    },
+    {
+      "case": "expression_poly_expression_transfer",
+      "repeat_exact": true
+    },
+    {
+      "case": "expression_sustain_transfer",
+      "repeat_exact": true
+    },
+    {
+      "case": "expression_release_transfer",
+      "repeat_exact": true
+    }
+  ],
+  "elapsed_seconds": 90.01469850000285,
+  "final_test_audio": false,
+  "gates": {
+    "all_native_accepted": true,
+    "expression_effects": true,
+    "fixed_phase_repeats": true,
+    "memory_bounded": true,
+    "mpe_voice_isolation": true,
+    "native_control_response_window": true,
+    "note_api_audio_exact": false,
+    "source_unchanged": true
+  },
+  "memory_sampling_errors": 0,
+  "passed": false,
+  "peak_process_rss_bytes": 518647808,
+  "plan_sha256": "df20e813f9af2e26497714b8ded99d65d4c09806507ac1e043cd664a960fe706"
+}

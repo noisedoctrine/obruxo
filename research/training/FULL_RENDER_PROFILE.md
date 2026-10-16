@@ -1,5 +1,7 @@
 # Full-preset native rendering
 
+The [expression profile](EXPRESSIVE_MIDI.md) extends the seed-bit profile with an all-event MIDI transport and explicit controller capabilities. It has a separate identity and native timing/isolation qualification. Earlier profiles retain their note-only transport and reject unsupported expression.
+
 The [custom-curve and seed model](CUSTOM_CURVES_AND_SEEDS.md) adds a separate `full-1.5.5-state-verified-seed-bits-v2` profile. It recognizes Vital's exact signed 32-bit seed readback as the same unsigned bit pattern, with a distinct renderer/contract identity and dedicated native checks. The v1 profile documented below keeps its original strict nested comparison and artifact identities.
 
 `full-check` qualifies the rendering boundary needed before expanding the model beyond the authored alpha vocabulary. The separate profile accepts the complete **1.5.5 inventory: 775 scalars and all six nested structures**, rendered by the reviewed Vital 1.6.4 binary. It uses the existing strict [full preset contract](../vital/FULL_CONTRACT_1_5_5.md). It does not change the pilot/alpha codec, pools, checkpoints or default renderer identity.

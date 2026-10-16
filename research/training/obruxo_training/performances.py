@@ -54,3 +54,25 @@ def initial_bank() -> tuple[PerformanceEntry, ...]:
 
 def bank_document() -> dict:
     return {"version": 1, "bank": "initial_performance_bank_v1", "entries": [entry.to_dict() for entry in initial_bank()]}
+
+
+def bank_for(renderer_id):
+    from obruxo_data.render.base import FULL_EXPRESSION_RENDERER_ID
+    if renderer_id == FULL_EXPRESSION_RENDERER_ID:
+        from .expression_bank import expression_bank
+        return expression_bank()
+    return initial_bank()
+
+
+def bank_document_for(renderer_id):
+    from obruxo_data.render.base import FULL_EXPRESSION_RENDERER_ID
+    if renderer_id == FULL_EXPRESSION_RENDERER_ID:
+        from .expression_bank import expression_bank_document
+        return expression_bank_document()
+    return bank_document()
+
+
+def capabilities_for(renderer_id):
+    from obruxo_data.render.base import FULL_EXPRESSION_RENDERER_ID
+    from obruxo_data.render.capabilities import EXPRESSION_CAPABILITIES
+    return EXPRESSION_CAPABILITIES if renderer_id == FULL_EXPRESSION_RENDERER_ID else CAPABILITIES

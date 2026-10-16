@@ -148,7 +148,7 @@ def main(argv=None) -> int:
     train.add_argument("--checkpoint-every", type=int, default=50)
     train.add_argument("--render-budget", type=int, default=512)
     train.add_argument("--cpu-threads", type=int, default=4)
-    train.add_argument("--sampling-policy", choices=("pairs", "state_round_robin", "paired_views"), default="pairs")
+    train.add_argument("--sampling-policy", choices=("pairs", "state_round_robin", "paired_views", "performance_round_robin"), default="pairs")
     train.add_argument("--identity-weight", type=float, default=0., help="Weight of paired identity contrastive loss; requires paired_views")
     train.add_argument("--identity-temperature", type=float, default=.1)
     train.add_argument("--conditioning", choices=("concat", "cross_attention"), default="concat")
@@ -238,6 +238,12 @@ def main(argv=None) -> int:
     nested_pool.add_argument("--output", type=Path, required=True)
     nested_pool.add_argument("--count", type=int, default=256)
     nested_pool.add_argument("--seed", type=int, default=0)
+    expression_pool = commands.add_parser("expression-pool", help="Author nested-state patches with expressive reference/transfer performances")
+    expression_pool.add_argument("--asset-bank", type=Path, required=True)
+    expression_pool.add_argument("--lfo-bank", type=Path, required=True)
+    expression_pool.add_argument("--output", type=Path, required=True)
+    expression_pool.add_argument("--count", type=int, default=256)
+    expression_pool.add_argument("--seed", type=int, default=0)
     args = parser.parse_args(argv)
     try:
         if args.command == "lfo-fit":
@@ -347,11 +353,11 @@ def main(argv=None) -> int:
                 handle.write(codec.decode(target))
             print(json.dumps({"output": str(args.output), "scope": codec.to_dict()["scope"], "target": target.to_dict()}))
             return 0
-        if args.command in {"pilot", "alpha-pool", "full-scalar-pool", "factory-pool", "lfo-pool", "routing-pool", "nested-pool", "expand-pilot", "benchmark", "codec-check", "train", "evaluate", "evaluate-curve", "compare"}:
+        if args.command in {"pilot", "alpha-pool", "full-scalar-pool", "factory-pool", "lfo-pool", "routing-pool", "nested-pool", "expression-pool", "expand-pilot", "benchmark", "codec-check", "train", "evaluate", "evaluate-curve", "compare"}:
             from .pilot import PilotPool
             if args.asset_references:
                 raise ValueError("authored pools use their embedded catalog; alpha-pool takes --wavetable-manifest")
-            if args.command in {"pilot", "alpha-pool", "full-scalar-pool", "factory-pool", "lfo-pool", "routing-pool", "nested-pool", "expand-pilot"}:
+            if args.command in {"pilot", "alpha-pool", "full-scalar-pool", "factory-pool", "lfo-pool", "routing-pool", "nested-pool", "expression-pool", "expand-pilot"}:
                 parent = PilotPool.load(args.pool) if args.command == "expand-pilot" else None
                 codec = None
                 if args.command == "alpha-pool":
@@ -372,6 +378,9 @@ def main(argv=None) -> int:
                 if args.command == "nested-pool":
                     from .nested_codec import NestedStateCodec
                     codec = NestedStateCodec(json.loads(args.asset_bank.read_text(encoding="utf-8")), json.loads(args.lfo_bank.read_text(encoding="utf-8")))
+                if args.command == "expression-pool":
+                    from .expression_codec import ExpressionCodec
+                    codec = ExpressionCodec(json.loads(args.asset_bank.read_text(encoding="utf-8")), json.loads(args.lfo_bank.read_text(encoding="utf-8")))
                 pool = parent.expand(args.count) if parent is not None else PilotPool.create(args.count, args.seed, codec=codec)
                 args.output.mkdir(parents=True, exist_ok=False)
                 pool.save(args.output / "pool.json")

@@ -13,7 +13,7 @@ from .codec import CATEGORICAL, CONTINUOUS, PilotCodec, PilotTarget, load_codec
 from .contracts import RenderRecipe
 from .eligibility import inspect_preset
 from .identity import PresetIdentity
-from .performances import initial_bank
+from .performances import bank_for
 from .splits import FrozenVariantManifest, SplitLedger, SplitManifest, build_splits
 
 
@@ -158,7 +158,7 @@ class PilotSampler:
             raise ValueError("invalid pilot sampling policy")
         if split == "train" and role != "reference":
             raise ValueError("transfer performances are reserved for held-out evaluation")
-        if policy not in {"pairs", "state_round_robin", "paired_views"}:
+        if policy not in {"pairs", "state_round_robin", "paired_views", "performance_round_robin"}:
             raise ValueError("unknown pilot sampling policy")
         self.pool, self.split, self.role, self.seed = pool, split, role, seed
         self.policy = policy
@@ -166,17 +166,17 @@ class PilotSampler:
         self._source_indices = {entry.state_id: index for index, entry in enumerate(pool.entries)}
         if not self._entries:
             raise ValueError("selected split has no pilot states")
-        self._performances = tuple(entry for entry in initial_bank() if entry.role == role)
+        self._performances = tuple(entry for entry in bank_for(pool.codec.contract.renderer_id) if entry.role == role)
         self._ledger = SplitLedger(pool.manifest)
         self._epoch, self._order = None, []
         rule = {"pairs": "shuffled_pilot_pairs_v1", "state_round_robin": "shuffled_states_rotating_performances_v1",
-                "paired_views": "adjacent_state_views_rotating_performances_v1"}[policy]
+                "paired_views": "adjacent_state_views_rotating_performances_v1", "performance_round_robin": "complete_performance_sweeps_rotating_shuffled_states_v1"}[policy]
         self.sampler_id = canonical_sha256({"sampler": rule, "pool_id": pool.pool_id,
                                            "split": split, "role": role, "seed": seed})
 
     @property
     def epoch_size(self) -> int:
-        return len(self._entries) * (len(self._performances) if self.policy == "pairs" else 2 if self.policy == "paired_views" else 1)
+        return len(self._entries) * (len(self._performances) if self.policy in {"pairs", "performance_round_robin"} else 2 if self.policy == "paired_views" else 1)
 
     def recipe_at(self, sequence_id: int) -> RenderRecipe:
         if type(sequence_id) is not int or sequence_id < 0:
@@ -188,12 +188,17 @@ class PilotSampler:
             elif self.policy == "state_round_robin":
                 self._order = [(entry, self._performances[(index + epoch) % len(self._performances)])
                                for index, entry in enumerate(self._entries)]
+            elif self.policy == "performance_round_robin":
+                states = list(self._entries)
+                seeded_random(self.sampler_id, epoch).shuffle(states)
+                self._order = [(states[(offset + index) % len(states)], performance)
+                               for offset in range(len(states)) for index, performance in enumerate(self._performances)]
             else:
                 states = list(enumerate(self._entries))
                 seeded_random(self.sampler_id, epoch).shuffle(states)
                 self._order = [(entry, self._performances[(index + 2 * epoch + view) % len(self._performances)])
                                for index, entry in states for view in range(2)]
-            if self.policy != "paired_views":
+            if self.policy not in {"paired_views", "performance_round_robin"}:
                 seeded_random(self.sampler_id, epoch).shuffle(self._order)
             self._epoch = epoch
         entry, performance = self._order[position]
