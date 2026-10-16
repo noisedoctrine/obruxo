@@ -442,15 +442,22 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
 
 
 def export_model(path: Path, model, frontend, codec, pool_id: str) -> None:
+    atomic_torch_save(path, inference_state(model, frontend, codec, pool_id))
+
+
+def inference_state(model, frontend, codec, pool_id: str) -> dict:
     frontend.require_frozen()
-    atomic_torch_save(path, {"format": "obruxo_pilot_inference_v1", "model_spec": model_spec(codec),
-                            "model": model.state_dict(), "basic_pitch": frontend.basic_pitch.state_dict(),
-                            "frontend": frontend.describe(), "contract": codec.contract.to_dict(),
-                            "codec": codec.to_dict(), "training_pool_id": pool_id, "input": "audio_only"})
+    return {"format": "obruxo_pilot_inference_v1", "model_spec": model_spec(codec), "model": model.state_dict(),
+            "basic_pitch": frontend.basic_pitch.state_dict(), "frontend": frontend.describe(), "contract": codec.contract.to_dict(),
+            "codec": codec.to_dict(), "training_pool_id": pool_id, "input": "audio_only"}
 
 
 def load_model(path: Path, device: str = "cpu") -> tuple:
     saved = torch.load(path, map_location="cpu", weights_only=True)
+    return restore_model(saved, device)
+
+
+def restore_model(saved, device: str = "cpu") -> tuple:
     codec = load_codec(saved["codec"])
     if saved.get("format") != "obruxo_pilot_inference_v1" or saved["model_spec"] != model_spec(codec):
         raise ValueError("unsupported inference artifact")
