@@ -1,5 +1,7 @@
 # Training contracts, online pilot and trainer
 
+The [delivery status](TRAINING_STATUS.md) tracks the remaining training and release work. [Learned factory choices](FACTORY_ASSETS.md) add registered wavetables for all three oscillator slots and registered sampler content, with hash-pinned native import qualification. Curves and ordered modulation connections are the next missing capabilities.
+
 The [full scalar training path](FULL_SCALAR_TRAINING.md) connects all 775 scalar fields to bounded audio-only learning, legal effect-order and pitch-mask outputs, modern render recipes and inference export. Nested assets, curves, seeds and connections remain explicitly fixed in this increment; learned structured coverage follows.
 
 The [full-preset render profile](FULL_RENDER_PROFILE.md) adds an explicit path for all 775 controls and six nested structures in the reviewed 1.5.5 inventory. It checks the broader native state before broader model training; existing pilot and alpha artifacts retain their identities.

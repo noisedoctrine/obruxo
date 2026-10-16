@@ -54,5 +54,14 @@ research/training/reports/scripts/run_full_scalar_screen.py text eol=lf
 research/training/reports/data/full_scalar_plan.json text eol=lf
 research/training/reports/data/full_scalar_summary.json text eol=lf
 research/training/reports/data/full_scalar_codec_summary.json text eol=lf
+research/training/obruxo_training/factory_bank.py text eol=lf
+research/training/configs/factory-assets-v1.json text eol=lf
+research/training/obruxo_training/asset_codec.py text eol=lf
+research/training/reports/scripts/run_factory_asset_screen.py text eol=lf
+research/training/reports/data/factory_bank_plan.json text eol=lf
+research/training/reports/data/factory_bank_summary.json text eol=lf
+research/training/reports/data/factory_asset_plan.json text eol=lf
+research/training/reports/data/factory_asset_summary.json text eol=lf
+research/training/reports/data/factory_asset_codec_summary.json text eol=lf
 research/training/reports/scripts/run_conditioning_screen.py -text
 research/training/reports/data/conditioning_plan.json -text

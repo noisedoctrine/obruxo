@@ -21,7 +21,7 @@ def model_spec(codec=None, conditioning="concat"):
         spec.update(model="alpha_stereo_cnn_pooled_pitch_v1", continuous_heads=len(codec.continuous),
                     categorical_sizes=[len(options) for _, options in codec.categorical])
         if getattr(codec, "balanced_loss", False):
-            spec.update(model="full_scalar_stereo_cnn_pooled_pitch_v1", initialization="template_head_bias_zero_output_weights_v1",
+            spec.update(model=f"{getattr(codec, 'model_family', 'full_scalar')}_stereo_cnn_pooled_pitch_v1", initialization="template_head_bias_zero_output_weights_v1",
                         objective=codec.to_dict()["loss"])
     if conditioning == "cross_attention":
         spec.update(model=spec["model"].replace("pooled_pitch", "pitch_cross_attention"), conditioning="cross_attention_v1",

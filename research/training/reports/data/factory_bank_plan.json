@@ -1,0 +1,336 @@
+{
+  "absolute_peak_error_limit": 0.0001,
+  "audio_archive": false,
+  "counts": {
+    "lfo": 15,
+    "sample": 10,
+    "wavetable": 19
+  },
+  "maximum_native_attempts": 260,
+  "phase_control": "all_three_oscillator_random_phases_and_sampler_random_phase_zero",
+  "policy": "native_reexport_then_explicit_155_header_with_audio_equivalence_v1",
+  "references": {
+    "references": [
+      {
+        "asset_id": "factory-lfo-e0667db17d34dc7f",
+        "kind": "lfo",
+        "path": "LFOs/Basic/Saw Down.vitallfo",
+        "provenance": "factory_export",
+        "source_sha256": "e0667db17d34dc7f89887f1caf9a47f8cdd52f18b20236e399beb1ca9d07d5ef"
+      },
+      {
+        "asset_id": "factory-lfo-ffec39f8f4003ad7",
+        "kind": "lfo",
+        "path": "LFOs/Basic/Saw Up.vitallfo",
+        "provenance": "factory_export",
+        "source_sha256": "ffec39f8f4003ad70a2cf9ef66f5154eb6adfcbd26861ac2881b939dd2b2012a"
+      },
+      {
+        "asset_id": "factory-lfo-f6724821b4600659",
+        "kind": "lfo",
+        "path": "LFOs/Basic/Sin.vitallfo",
+        "provenance": "factory_export",
+        "source_sha256": "f6724821b46006593a77df27c316530e3b5709b30eee42b52d02a19c0f353a16"
+      },
+      {
+        "asset_id": "factory-lfo-3b790ed29d00025d",
+        "kind": "lfo",
+        "path": "LFOs/Basic/Square.vitallfo",
+        "provenance": "factory_export",
+        "source_sha256": "3b790ed29d00025d2ad99195e91e2eb3c54c2030e468c29b72c47c5e8df31063"
+      },
+      {
+        "asset_id": "factory-lfo-eb4c25472603dd6e",
+        "kind": "lfo",
+        "path": "LFOs/Basic/Staircase Down.vitallfo",
+        "provenance": "factory_export",
+        "source_sha256": "eb4c25472603dd6e606d3639ebc804f7040acd7665fd7143a0639507dbb4859f"
+      },
+      {
+        "asset_id": "factory-lfo-39feea9e0138a99f",
+        "kind": "lfo",
+        "path": "LFOs/Basic/Triangle.vitallfo",
+        "provenance": "factory_export",
+        "source_sha256": "39feea9e0138a99f5404fbc4c14be4d20c13cda33ac502e936d6f77d678b9392"
+      },
+      {
+        "asset_id": "factory-lfo-3dcac3c35384fef7",
+        "kind": "lfo",
+        "path": "LFOs/Pattern/Growing Oscillations.vitallfo",
+        "provenance": "factory_export",
+        "source_sha256": "3dcac3c35384fef787e871cd3924b1d0416c0e0f93fdeb1a530db5628ce49e53"
+      },
+      {
+        "asset_id": "factory-lfo-599e0aa591114e56",
+        "kind": "lfo",
+        "path": "LFOs/Pattern/Nervous Groove.vitallfo",
+        "provenance": "factory_export",
+        "source_sha256": "599e0aa591114e5628fd33425c2872e64331faaeeaf54902cd7afad0d3d8c40b"
+      },
+      {
+        "asset_id": "factory-lfo-22af5d6f5d0dc8ce",
+        "kind": "lfo",
+        "path": "LFOs/Pattern/Pulse Series.vitallfo",
+        "provenance": "factory_export",
+        "source_sha256": "22af5d6f5d0dc8ce8bf844751ba7cce0b854e0ad9527cb0ace79f7ec1c5162ea"
+      },
+      {
+        "asset_id": "factory-lfo-3c9722d9e163682d",
+        "kind": "lfo",
+        "path": "LFOs/Pattern/Random Pulses.vitallfo",
+        "provenance": "factory_export",
+        "source_sha256": "3c9722d9e163682d1988af027f70a70a749b89127e76245f007b362a36175a89"
+      },
+      {
+        "asset_id": "factory-lfo-293557bba1114b2f",
+        "kind": "lfo",
+        "path": "LFOs/Pattern/Shuffle Gate.vitallfo",
+        "provenance": "factory_export",
+        "source_sha256": "293557bba1114b2f3f68a551d895a18b5b13707239c2676d6b1457c5f4544320"
+      },
+      {
+        "asset_id": "factory-lfo-c4479fd4c557851e",
+        "kind": "lfo",
+        "path": "LFOs/Pattern/Side Chain 1.vitallfo",
+        "provenance": "factory_export",
+        "source_sha256": "c4479fd4c557851e5cef46f257c727da270649a0efae93ee873e46dc4766ff48"
+      },
+      {
+        "asset_id": "factory-lfo-7d2acbdfd1f28021",
+        "kind": "lfo",
+        "path": "LFOs/Pattern/Side Chain 2.vitallfo",
+        "provenance": "factory_export",
+        "source_sha256": "7d2acbdfd1f28021393ce5b32790c05f0ebddaaca608e63c0b96a1a30e29fbf8"
+      },
+      {
+        "asset_id": "factory-lfo-ada1531ee899a635",
+        "kind": "lfo",
+        "path": "LFOs/Pattern/Split Gate.vitallfo",
+        "provenance": "factory_export",
+        "source_sha256": "ada1531ee899a6356e15587942cbb9351c155882780390eec710f5af19a074a7"
+      },
+      {
+        "asset_id": "factory-lfo-28f78d036ce34eee",
+        "kind": "lfo",
+        "path": "LFOs/Pattern/Trance Gate.vitallfo",
+        "provenance": "factory_export",
+        "source_sha256": "28f78d036ce34eeeceadd7dda66984554e0e59ef91d0a8bb4b9a5922d7906c69"
+      },
+      {
+        "asset_id": "factory-sample-d638731a9e03013f",
+        "kind": "sample",
+        "path": "Samples/Field Recordings/BART.wav",
+        "provenance": "factory_export",
+        "source_sha256": "d638731a9e03013f80926b6e693b863e09cd0971ba4d52d9d4c6ff40cb016fc3"
+      },
+      {
+        "asset_id": "factory-sample-2d52e89fd492e6a9",
+        "kind": "sample",
+        "path": "Samples/Field Recordings/Box Fan.wav",
+        "provenance": "factory_export",
+        "source_sha256": "2d52e89fd492e6a997316a5a34533b88e205f04b1206e0b6014bf484d07b00cd"
+      },
+      {
+        "asset_id": "factory-sample-034127b5ed19de2e",
+        "kind": "sample",
+        "path": "Samples/Field Recordings/Grinder.wav",
+        "provenance": "factory_export",
+        "source_sha256": "034127b5ed19de2ed9848c0c4ac7414cdec77167c046de44ff5dd694b69b6d9d"
+      },
+      {
+        "asset_id": "factory-sample-504b677a7c063e51",
+        "kind": "sample",
+        "path": "Samples/Field Recordings/HVAC Unit.wav",
+        "provenance": "factory_export",
+        "source_sha256": "504b677a7c063e515d26897435119a6e11811170ef46d5c51feb21b7b170a504"
+      },
+      {
+        "asset_id": "factory-sample-ea5c759340253b6e",
+        "kind": "sample",
+        "path": "Samples/Field Recordings/Jack Hammer.wav",
+        "provenance": "factory_export",
+        "source_sha256": "ea5c759340253b6e55ca60adffd662c3fea8a400d2ca735741e915702d5dc9aa"
+      },
+      {
+        "asset_id": "factory-sample-9c695abc4d097e84",
+        "kind": "sample",
+        "path": "Samples/Field Recordings/River.wav",
+        "provenance": "factory_export",
+        "source_sha256": "9c695abc4d097e84e05573b75a948f9aa7ba987265476e8c8928fb6250687b87"
+      },
+      {
+        "asset_id": "factory-sample-3a1acf0bcffedf84",
+        "kind": "sample",
+        "path": "Samples/Field Recordings/Waves.wav",
+        "provenance": "factory_export",
+        "source_sha256": "3a1acf0bcffedf847f1f93e09be0ceef22fb7c960cdad6dda6f35ea5f4c34be4"
+      },
+      {
+        "asset_id": "factory-sample-a5ba95b4567693f9",
+        "kind": "sample",
+        "path": "Samples/Noise/Brown Noise.wav",
+        "provenance": "factory_export",
+        "source_sha256": "a5ba95b4567693f9fa6026d0d1f86772dec8e1245c3c8f64d8fa44a04db04945"
+      },
+      {
+        "asset_id": "factory-sample-8ff6580213b33440",
+        "kind": "sample",
+        "path": "Samples/Noise/Pink Noise.wav",
+        "provenance": "factory_export",
+        "source_sha256": "8ff6580213b3344079c0b94bcceb2f29393b5efd721a41872859dd86c1644fde"
+      },
+      {
+        "asset_id": "factory-sample-0d2bdb18bdb1f99b",
+        "kind": "sample",
+        "path": "Samples/Noise/White Noise.wav",
+        "provenance": "factory_export",
+        "source_sha256": "0d2bdb18bdb1f99ba1af727f6fc6259d6f3b3b3932d684ee300bbc30713a4caf"
+      },
+      {
+        "asset_id": "factory-wavetable-4bc81073a8b6f129",
+        "kind": "wavetable",
+        "path": "Wavetables/Basic/Basic Shapes.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "4bc81073a8b6f12921d3bd3df4ce677ab313eefebc529018b0a2202b0282c834"
+      },
+      {
+        "asset_id": "factory-wavetable-c9dc92a5c4680965",
+        "kind": "wavetable",
+        "path": "Wavetables/Basic/Brown Noise.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "c9dc92a5c46809655416e6d45b9152235165c07a9f19ddb1b34dba1a77039bb6"
+      },
+      {
+        "asset_id": "factory-wavetable-6426d0c7aadfa070",
+        "kind": "wavetable",
+        "path": "Wavetables/Basic/Classic Blend.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "6426d0c7aadfa0706f164fe03ed37e85de208481ab9dc32d2094706674ccd0ab"
+      },
+      {
+        "asset_id": "factory-wavetable-b2fa10b26b434b68",
+        "kind": "wavetable",
+        "path": "Wavetables/Basic/Classic Fade.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "b2fa10b26b434b6855164023dd48c259231eaa7544ccdbcec73214f5016622f4"
+      },
+      {
+        "asset_id": "factory-wavetable-2c2ea0a3c1634a0c",
+        "kind": "wavetable",
+        "path": "Wavetables/Basic/Harmonic Series.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "2c2ea0a3c1634a0ca97d0abc0303d4f18e58d849cc24b9e0f95d953a0c736c82"
+      },
+      {
+        "asset_id": "factory-wavetable-457b07de301d876c",
+        "kind": "wavetable",
+        "path": "Wavetables/Basic/Pink Noise.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "457b07de301d876cb04e777dbc1384fc9b7be8154fce45af5dafbb8a3cf30fe1"
+      },
+      {
+        "asset_id": "factory-wavetable-c677d58612176e04",
+        "kind": "wavetable",
+        "path": "Wavetables/Basic/Pulse Width.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "c677d58612176e04b566e39eee265952e44f93722d3fc197e9c129c1f18d51f1"
+      },
+      {
+        "asset_id": "factory-wavetable-07b48ca6000d9267",
+        "kind": "wavetable",
+        "path": "Wavetables/Basic/Quad Saw.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "07b48ca6000d9267aa1c8d815908786aa70b2e979592b4fe8c81ee83a7edd26b"
+      },
+      {
+        "asset_id": "factory-wavetable-4f71c1eebbf305cb",
+        "kind": "wavetable",
+        "path": "Wavetables/Basic/Three Graces.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "4f71c1eebbf305cb7b56ede7c96d199b9f2f51877a40cf4896cbf758ba25de77"
+      },
+      {
+        "asset_id": "factory-wavetable-ff2153c60e74d37d",
+        "kind": "wavetable",
+        "path": "Wavetables/Basic/White Noise.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "ff2153c60e74d37d8733e473215beed29b7de740d2444572b2e2f59df1089a88"
+      },
+      {
+        "asset_id": "factory-wavetable-86cf68f44c8d27fb",
+        "kind": "wavetable",
+        "path": "Wavetables/Complex/Drink the Juice.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "86cf68f44c8d27fbe14aa211b326f52e32745ad7c32124023ed348f3f13339a1"
+      },
+      {
+        "asset_id": "factory-wavetable-4260fdca9bd642f4",
+        "kind": "wavetable",
+        "path": "Wavetables/Complex/Low High Fold.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "4260fdca9bd642f437e5e9fd640eef30126fd6dade1809dbcd04bd324668a767"
+      },
+      {
+        "asset_id": "factory-wavetable-ae460d984b71d239",
+        "kind": "wavetable",
+        "path": "Wavetables/Complex/Post Modern Pulse.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "ae460d984b71d239eb349b71a8e7318ce90d4df3b74006ad47123cd34c49716d"
+      },
+      {
+        "asset_id": "factory-wavetable-996b0f6a0025e298",
+        "kind": "wavetable",
+        "path": "Wavetables/Complex/Saws for Days.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "996b0f6a0025e298784743a2c7a4fb8c68feb52a6c8f3d31370c3bad2b8e0999"
+      },
+      {
+        "asset_id": "factory-wavetable-617cc3abb43b5345",
+        "kind": "wavetable",
+        "path": "Wavetables/Complex/Stabbed.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "617cc3abb43b534532432b5fd435269c0b39bcfb509c085e0723ed671adf232f"
+      },
+      {
+        "asset_id": "factory-wavetable-e5e617e896290b63",
+        "kind": "wavetable",
+        "path": "Wavetables/Complex/Vital Sine 2.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "e5e617e896290b63aad24ee2b6495955e2073c0a345724623216f77669d2279e"
+      },
+      {
+        "asset_id": "factory-wavetable-fa59116d22cf72dc",
+        "kind": "wavetable",
+        "path": "Wavetables/Complex/Vital Sine.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "fa59116d22cf72dceb7a9dcea0697a65062239353187dda6da628d786f2a86a5"
+      },
+      {
+        "asset_id": "factory-wavetable-f645310a21d201fb",
+        "kind": "wavetable",
+        "path": "Wavetables/Physical/Didg.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "f645310a21d201fbbefd110d4ef84b6409bcceee1fd9217120e9f947491a1be4"
+      },
+      {
+        "asset_id": "factory-wavetable-d3e99ef899b0d45c",
+        "kind": "wavetable",
+        "path": "Wavetables/Physical/Jaw Harp.vitaltable",
+        "provenance": "factory_export",
+        "source_sha256": "d3e99ef899b0d45c08e692fdd0cc7094dcaf8da5941257ae6d3f2ab8eeb7a266"
+      }
+    ],
+    "scope": "Hash-pinned references from the reviewed installed Vital Factory directory; names alone confer no eligibility.",
+    "version": 1
+  },
+  "relative_rmse_limit": 0.001,
+  "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+  "rss_limit_bytes": 8589934592,
+  "source_sha256": {
+    "data_generation\\obruxo_data\\render\\full_state.py": "d0be7d4a3ed22bf37e101cc60ad0737913160f197147795982cdfbb96644939a",
+    "data_generation\\obruxo_data\\render\\vita.py": "cd4e68a4385e22aa367ad28e5d0a85a8cbd190e19d6dffefa52dd3468983a0f8",
+    "training\\obruxo_training\\factory_bank.py": "9d73ffdd10a2c4df7d4afdea623560961174cc2beea468583592f35544e28cf6"
+  },
+  "test_reserve_used": false,
+  "timeout_per_reference_seconds": 120.0
+}

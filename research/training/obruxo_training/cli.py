@@ -205,8 +205,26 @@ def main(argv=None) -> int:
     scalar_pool.add_argument("--output", type=Path, required=True)
     scalar_pool.add_argument("--count", type=int, default=256)
     scalar_pool.add_argument("--seed", type=int, default=0)
+    factory_bank = commands.add_parser("factory-bank", help="Import hash-pinned factory assets and qualify their native sound/readback")
+    factory_bank.add_argument("--factory-root", type=Path, required=True)
+    factory_bank.add_argument("--output", type=Path, required=True)
+    factory_bank.add_argument("--manifest", type=Path)
+    factory_bank.add_argument("--timeout", type=float, default=120.)
+    factory_pool = commands.add_parser("factory-pool", help="Author full-scalar states with learned qualified wavetable and sample choices")
+    factory_pool.add_argument("--bank", type=Path, required=True)
+    factory_pool.add_argument("--output", type=Path, required=True)
+    factory_pool.add_argument("--count", type=int, default=256)
+    factory_pool.add_argument("--seed", type=int, default=0)
     args = parser.parse_args(argv)
     try:
+        if args.command == "factory-bank":
+            from .factory_bank import MANIFEST, qualify_factory_bank
+            if args.asset_references:
+                raise ValueError("factory-bank uses its explicitly hash-pinned source manifest")
+            result = qualify_factory_bank(args.factory_root, args.output, manifest=args.manifest or MANIFEST, timeout=args.timeout,
+                                          progress=lambda event: print(json.dumps(event), flush=True))
+            print(json.dumps(result["qualification"], indent=2))
+            return 0 if result["qualification"]["qualified"] else 2
         if args.command == "full-check":
             from .full_check import check_full_render
             if args.asset_references:
@@ -294,11 +312,11 @@ def main(argv=None) -> int:
                 handle.write(codec.decode(target))
             print(json.dumps({"output": str(args.output), "scope": codec.to_dict()["scope"], "target": target.to_dict()}))
             return 0
-        if args.command in {"pilot", "alpha-pool", "full-scalar-pool", "expand-pilot", "benchmark", "codec-check", "train", "evaluate", "evaluate-curve", "compare"}:
+        if args.command in {"pilot", "alpha-pool", "full-scalar-pool", "factory-pool", "expand-pilot", "benchmark", "codec-check", "train", "evaluate", "evaluate-curve", "compare"}:
             from .pilot import PilotPool
             if args.asset_references:
                 raise ValueError("authored pools use their embedded catalog; alpha-pool takes --wavetable-manifest")
-            if args.command in {"pilot", "alpha-pool", "full-scalar-pool", "expand-pilot"}:
+            if args.command in {"pilot", "alpha-pool", "full-scalar-pool", "factory-pool", "expand-pilot"}:
                 parent = PilotPool.load(args.pool) if args.command == "expand-pilot" else None
                 codec = None
                 if args.command == "alpha-pool":
@@ -307,6 +325,9 @@ def main(argv=None) -> int:
                 if args.command == "full-scalar-pool":
                     from .full_scalar import FullScalarCodec
                     codec = FullScalarCodec()
+                if args.command == "factory-pool":
+                    from .asset_codec import FactoryAssetCodec
+                    codec = FactoryAssetCodec(json.loads(args.bank.read_text(encoding="utf-8")))
                 pool = parent.expand(args.count) if parent is not None else PilotPool.create(args.count, args.seed, codec=codec)
                 args.output.mkdir(parents=True, exist_ok=False)
                 pool.save(args.output / "pool.json")
