@@ -76,9 +76,66 @@ class SplitManifest:
 
     @classmethod
     def from_dict(cls, value: dict) -> SplitManifest:
+        if value.get("version") == 2:
+            return FrozenVariantManifest.from_dict(value)
         if (value.get("version"), value.get("identity_rule"), value.get("split_rule")) != (1, IDENTITY_RULE, SPLIT_RULE):
             raise ValueError("unsupported split contract")
         return cls(value["seed"], tuple(Assignment(**entry) for entry in value["assignments"]))
+
+
+@dataclass(frozen=True)
+class FrozenVariantManifest:
+    """A complete variant population inheriting a separately verified frozen root split."""
+    parent: SplitManifest
+    variants: tuple[tuple[str, str], ...]
+
+    def __post_init__(self):
+        if not isinstance(self.parent, SplitManifest):
+            raise ValueError("variant population requires an original root manifest")
+        parents, children = set(), set()
+        for state, parent in self.variants:
+            require_digest(state)
+            assignment = self.parent.by_state.get(parent)
+            if assignment is None or parent in parents or state in children:
+                raise ValueError("variant population must map unique children to every frozen parent")
+            collision = self.parent.by_state.get(state)
+            if collision is not None and collision != replace(assignment, state_id=state):
+                raise ValueError("variant collides with another frozen lineage")
+            parents.add(parent)
+            children.add(state)
+        if parents != set(self.parent.by_state):
+            raise ValueError("variant population must preserve every parent including the test reserve")
+        object.__setattr__(self, "variants", tuple(sorted(self.variants)))
+
+    @property
+    def seed(self):
+        return self.parent.seed
+
+    @cached_property
+    def assignments(self):
+        return tuple(replace(self.parent.by_state[parent], state_id=state) for state, parent in self.variants)
+
+    @cached_property
+    def by_state(self):
+        return MappingProxyType({entry.state_id: entry for entry in self.assignments})
+
+    @property
+    def manifest_id(self):
+        return canonical_sha256(self.to_dict())
+
+    def to_dict(self):
+        return {"version": 2, "identity_rule": IDENTITY_RULE, "split_rule": SPLIT_RULE,
+                "policy": "complete_variants_of_frozen_parent_v1", "parent": self.parent.to_dict(),
+                "variants": [{"state_id": state, "parent_state_id": parent} for state, parent in self.variants]}
+
+    @classmethod
+    def from_dict(cls, value):
+        if (value.get("identity_rule"), value.get("split_rule"), value.get("policy")) != (IDENTITY_RULE, SPLIT_RULE, "complete_variants_of_frozen_parent_v1"):
+            raise ValueError("unsupported variant split contract")
+        parent = SplitManifest.from_dict(value["parent"])
+        if not isinstance(parent, SplitManifest):
+            raise ValueError("variant population requires an original root manifest")
+        return cls(parent, tuple((entry["state_id"], entry["parent_state_id"]) for entry in value["variants"]))
 
 
 def build_splits(states, *, parents: dict[str, list[str]] | None = None, seed: int = 0) -> SplitManifest:

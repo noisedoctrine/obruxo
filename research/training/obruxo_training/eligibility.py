@@ -5,6 +5,7 @@ import json
 
 from obruxo_data.vital import VitalSchema
 from obruxo_data.vital.validation import validate_document
+from obruxo_data.vital.full_contract import FullPresetContract
 
 from .assets import AssetCatalog
 from .identity import PresetIdentity, parse_document
@@ -13,8 +14,9 @@ from .identity import PresetIdentity, parse_document
 REVIEWED_VERSIONS = frozenset({f"1.0.{index}" for index in range(9)} | {"99999.9.9"})
 
 
-def eligibility_policy() -> dict:
-    return {"rule": "static_eligibility_v1", "allowed_synth_versions": sorted(REVIEWED_VERSIONS),
+def eligibility_policy(*, full_profile=False) -> dict:
+    return {"rule": "full_static_eligibility_v1" if full_profile else "static_eligibility_v1",
+            "allowed_synth_versions": ["1.5.5"] if full_profile else sorted(REVIEWED_VERSIONS),
             "unknown_or_missing_controls": "reject", "unresolved_active_assets": "reject",
             "unresolved_inactive_assets": "record", "native_load_and_audio_qa": "required_after_static_gate"}
 
@@ -26,9 +28,10 @@ def inspect_preset(raw: bytes, schema: VitalSchema, catalog: AssetCatalog) -> di
     runtime_document = json.loads(raw.decode("utf-8-sig"))
     version = document.get("synth_version")
     reasons = []
-    if not isinstance(version, str) or version not in REVIEWED_VERSIONS:
+    full = isinstance(schema, FullPresetContract)
+    if not isinstance(version, str) or version not in ({"1.5.5"} if full else REVIEWED_VERSIONS):
         reasons.append("unreviewed_synth_version")
-    report = validate_document(runtime_document, schema)
+    report = schema.loads(raw)[1] if full else validate_document(runtime_document, schema)
     if not report.valid:
         reasons.append("schema_invalid")
     settings = document.get("settings", {})

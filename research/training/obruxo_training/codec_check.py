@@ -21,15 +21,16 @@ from .stream import NativeRendererFactory, OnlineRenderStream, StreamConfig
 class CodecCheckSampler:
     def __init__(self, pool):
         self.pool = pool
+        full = getattr(pool.codec, "balanced_loss", False)
         coverage = {}
         for entry in pool.entries:
             if pool.manifest.by_state[entry.state_id].split == "train":
-                coverage.setdefault(entry.target.categorical, entry)
+                coverage.setdefault(pool.codec.family(entry.target) if full else entry.target.categorical, entry)
         if not coverage:
             raise ValueError("codec qualification requires authored training states")
         codec, ledger, performance = pool.codec, SplitLedger(pool.manifest), initial_bank()[0].performance()
         self.recipes, self.cases = [], []
-        names = [entry[0] for entry in CONTINUOUS + CATEGORICAL]
+        names = sorted(codec.schema.scalar_names) if full else [entry[0] for entry in CONTINUOUS + CATEGORICAL]
         for categories, entry in sorted(coverage.items()):
             source = codec.decode(entry.target)
             decoded = codec.decode(codec.encode(source))
@@ -37,7 +38,7 @@ class CodecCheckSampler:
             ledger.register_variant(decoded_id, entry.state_id)
             left, right = json.loads(source)["settings"], json.loads(decoded)["settings"]
             equal = all(np.float32(left[name]) == np.float32(right[name]) for name in names)
-            self.cases.append({"state_id": entry.state_id, "categories": list(categories),
+            self.cases.append({"state_id": entry.state_id, **({"family": categories} if full else {"categories": list(categories)}),
                                "decoded_state_id": decoded_id, "controls_equal_at_float32": equal})
             for raw in (source, source, decoded):
                 raw = fixed_oscillator_phases(raw)
@@ -45,7 +46,8 @@ class CodecCheckSampler:
                 self.recipes.append(RenderRecipe.create(raw, performance, schema=codec.schema, catalog=codec.catalog,
                                                        contract=codec.contract, ledger=ledger, purpose="evaluate",
                                                        sequence_id=len(self.recipes)))
-        self.sampler_id = canonical_sha256({"check": "pilot_codec_native_v2", "pool_id": pool.pool_id, "cases": self.cases,
+        check = "full_scalar_codec_native_v1" if full else "pilot_codec_native_v2"
+        self.sampler_id = canonical_sha256({"check": check, "pool_id": pool.pool_id, "cases": self.cases,
                                            "phase_control": OSCILLATOR_PHASE_CONTROL})
 
     def recipe_at(self, sequence_id):
@@ -57,11 +59,13 @@ def check_codec_audio(pool, output: Path, *, renderer_factory=None, timeout: flo
         from .alpha_check import check_alpha_audio
         return check_alpha_audio(pool, output, renderer_factory=renderer_factory, timeout=timeout, progress=progress)
     sampler = CodecCheckSampler(pool)
+    full = getattr(pool.codec, "balanced_loss", False)
     config = StreamConfig(prefetch_clips=1, timeout_seconds=timeout)
     output.mkdir(parents=True, exist_ok=False)
     write_json(output / "status.json", {"complete": False})
     cases, group, accepted = [], [], 0
-    with OnlineRenderStream(sampler, len(sampler.recipes), config=config, renderer_factory=renderer_factory or NativeRendererFactory()) as stream:
+    with OnlineRenderStream(sampler, len(sampler.recipes), config=config,
+                             renderer_factory=renderer_factory or NativeRendererFactory(renderer_id=pool.codec.contract.renderer_id)) as stream:
         for outcome in stream:
             group.append(outcome)
             accepted += outcome.audio is not None
@@ -74,11 +78,14 @@ def check_codec_audio(pool, output: Path, *, renderer_factory=None, timeout: flo
             if all(item.audio is not None for item in group):
                 source, repeat, decoded = (item.audio for item in group)
                 case.update(source_repeat=compare_audio(source, repeat), decoded_comparison=compare_audio(source, decoded))
+                if full:
+                    case.update(source_repeat_exact=np.array_equal(source, repeat), decoded_audio_exact=np.array_equal(source, decoded))
                 del source, repeat, decoded
             cases.append(case)
             group.clear()
-    expected_coverage = len(CATEGORICAL[0][1]) * len(CATEGORICAL[1][1])
-    result = {"version": 2, "check": "pilot_codec_native_v2", "pool_id": pool.pool_id, "codec_id": pool.codec.codec_id,
+    expected_coverage = len(pool.codec.to_dict()["families"]) if full else len(CATEGORICAL[0][1]) * len(CATEGORICAL[1][1])
+    result = {"version": 1 if full else 2, "check": "full_scalar_codec_native_v1" if full else "pilot_codec_native_v2",
+              "pool_id": pool.pool_id, "codec_id": pool.codec.codec_id,
               "phase_control": OSCILLATOR_PHASE_CONTROL,
               "cases": cases, "covered_category_combinations": len(cases), "expected_category_combinations": expected_coverage,
               "requested": len(sampler.recipes), "accepted": accepted,
@@ -88,6 +95,12 @@ def check_codec_audio(pool, output: Path, *, renderer_factory=None, timeout: flo
               "renderer_factory": type(stream.factory).__name__, "audio_files_written": 0}
     result["passed"] = (accepted == len(sampler.recipes) and len(cases) == expected_coverage
                         and result["all_controls_equal_at_float32"] and result["decoded_within_reference_tolerance"] == len(cases))
+    if full:
+        result["covered_families"] = [case["family"] for case in cases]
+        result["expected_families"] = pool.codec.to_dict()["families"]
+        result.pop("covered_category_combinations")
+        result.pop("expected_category_combinations")
+        result["passed"] &= all(case.get("source_repeat_exact") and case.get("decoded_audio_exact") for case in cases)
     write_json(output / "summary.json", result)
     write_json(output / "status.json", {"complete": True, "passed": result["passed"]})
     return result

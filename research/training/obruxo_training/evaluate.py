@@ -76,10 +76,10 @@ def restore_evaluation_checkpoint(saved, pool):
 
 
 def evaluate_pilot(pool, checkpoint: Path, output: Path, *, count: int = 4, split: str = "validation",
-                   renderer_factory=None, timeout: float = 60, progress=None) -> dict:
+                   renderer_factory=None, timeout: float = 60, progress=None, validation_states=None) -> dict:
     saved, model, frontend, sampler = load_evaluation_checkpoint(checkpoint, pool)
     return _evaluate_models(pool, {"model": (saved, model)}, frontend, sampler, output, count=count, split=split,
-                            renderer_factory=renderer_factory, timeout=timeout, progress=progress)
+                            renderer_factory=renderer_factory, timeout=timeout, progress=progress, validation_states=validation_states)
 
 
 def retrieval_digest(replay: list[dict]) -> str:
@@ -351,7 +351,7 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
                     predicted = predicted_targets(prediction, codec)[0]
                 if identity_diagnostics:
                     row["representations"][name]["reference"] = prediction["representation"][0].cpu().tolist()
-                codec.preset(predicted).validate().require_valid()
+                codec.encode(codec.decode(predicted))  # Validate the exact output through its own versioned codec.
                 filename = f"prediction-{name}-{index:03d}.vital" if curve else f"prediction-{index:03d}.vital"
                 (output / filename).write_bytes(codec.decode(predicted))
                 targets[name] = predicted

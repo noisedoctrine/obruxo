@@ -1,0 +1,287 @@
+{
+  "authored_training_controls_varied": [
+    "chorus_dry_wet",
+    "chorus_on",
+    "distortion_mix",
+    "distortion_on",
+    "effect_chain_order",
+    "env_1_attack",
+    "env_1_decay",
+    "env_1_release",
+    "env_1_sustain",
+    "filter_1_cutoff",
+    "filter_1_on",
+    "filter_1_resonance",
+    "legato",
+    "osc_1_level",
+    "osc_1_pan",
+    "osc_1_unison_detune",
+    "osc_1_unison_voices",
+    "osc_2_level",
+    "osc_2_on",
+    "osc_2_transpose",
+    "osc_3_level",
+    "osc_3_on",
+    "portamento_time",
+    "voice_override",
+    "voice_priority"
+  ],
+  "final_test_used": false,
+  "gates": {
+    "active_effect_order_equivalent": true,
+    "codec_exact": true,
+    "frozen_frontend_unchanged": true,
+    "inference_bundle_restored": true,
+    "memory_bounded": true,
+    "native_validation_complete": true,
+    "source_unchanged": true,
+    "training_complete": true
+  },
+  "model_promotion": false,
+  "native_stage_counts": {
+    "active_order": {
+      "accepted": 2,
+      "attempts": 2
+    },
+    "codec": {
+      "accepted": 15,
+      "attempts": 15
+    },
+    "training": {
+      "accepted": 32,
+      "attempts": 34,
+      "clipping_rejections": 2
+    },
+    "validation": {
+      "accepted": 50,
+      "attempts": 50
+    }
+  },
+  "native_validation": {
+    "aggregates": {
+      "fixed_template": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 7.615318481127422,
+          "mean_rms_relative": 6.580370044708252,
+          "planned": 5,
+          "scored": 5
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 8.84458604256312,
+          "mean_rms_relative": 7.459581899642944,
+          "planned": 5,
+          "scored": 5
+        }
+      },
+      "model": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.0131785492102305,
+          "mean_rms_relative": 0.13481747768819333,
+          "planned": 5,
+          "scored": 5
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.038564184308052,
+          "mean_rms_relative": 0.1368869084864855,
+          "planned": 5,
+          "scored": 5
+        }
+      },
+      "source_repeat": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.0,
+          "mean_rms_relative": 0.0,
+          "planned": 5,
+          "scored": 5
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 0.0,
+          "mean_rms_relative": 0.0,
+          "planned": 5,
+          "scored": 5
+        }
+      },
+      "train_retrieval": {
+        "reference": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.3110084692637123,
+          "mean_rms_relative": 0.16600973764434457,
+          "planned": 5,
+          "scored": 5
+        },
+        "transfer": {
+          "failed_or_unscorable": 0,
+          "mean_mrstft": 1.4869077006975808,
+          "mean_rms_relative": 0.23304765112698078,
+          "planned": 5,
+          "scored": 5
+        }
+      }
+    },
+    "renders_accepted": 50,
+    "renders_attempted": 50
+  },
+  "pipeline_check_passed": true,
+  "plan_sha256": "c92db2ba9233672a30a5b49fdc2e35936c533e0ce2c0039331134f15c1328249",
+  "prototype_comparison_policy": "Integration defect and repair; no quality comparison or model selection across codec versions.",
+  "rejected_prototype": {
+    "failure": "near-zero reverb_low_shelf_gain failed strict native readback",
+    "loaded_gain": -0.0005998611450195312,
+    "model_renders_scored": 0,
+    "pipeline_check_passed": false,
+    "repair": "float32 control-grid serialization; readback tolerance unchanged",
+    "requested_gain": -0.0006000995635986328,
+    "validation_accepted": 40,
+    "validation_attempts": 50
+  },
+  "scalar_fields_represented": 775,
+  "software_validation": {
+    "complete_training_suite": {
+      "failed": 3,
+      "failure_reason": "three stale CLI factory stubs rejected the new renderer_id keyword",
+      "passed": 219,
+      "seconds": 1071.16
+    },
+    "count_policy": "combine complete run and focused checks; not a single clean 224-check command",
+    "distinct_checks_covered": 224,
+    "modern_cli_profile_passed": 1,
+    "modern_optimizer_rng_recovery_passed": 1,
+    "ruff": "passed",
+    "updated_cli_stub_reruns_passed": 3
+  },
+  "split_preservation": {
+    "all_root_manifest_assignments_identical": true,
+    "corrected_pool_id": "40dff5475f3665831b2214c596985a20d7cd6dc4ac899e583f5039b93944107b",
+    "final_test_rendered": false,
+    "original_pool_id": "86f64904addee3e158924e2c3144b8f224c49e6d364c487180abffc6cd9b0df6",
+    "original_validation_lineages_identical": true,
+    "states_by_split": {
+      "test": 24,
+      "train": 205,
+      "validation": 27
+    },
+    "states_preserved": 256
+  },
+  "training": {
+    "audio_files_written": 0,
+    "checkpoint_seconds_this_segment": 16.969156300023315,
+    "complete": true,
+    "config": {
+      "batch_size": 16,
+      "checkpoint_every": 100,
+      "conditioning": "concat",
+      "cpu_threads": 4,
+      "fresh_examples": null,
+      "identity_temperature": 0.1,
+      "identity_weight": 0.0,
+      "learning_rate": 0.003,
+      "learning_seed_override": null,
+      "mode": "overfit",
+      "render_budget": 64,
+      "replay_capacity": 32,
+      "replay_mib": 8,
+      "sampling_policy": "state_round_robin",
+      "seed": 0,
+      "steps": 400,
+      "updates_per_render": 1
+    },
+    "cursor": {
+      "audio_replay": "regenerate_unacknowledged_not_bit_exact",
+      "next_sequence_id": 34,
+      "stream_id": "cb738bad2e452168e2194fd67d4216f1abda4378d7baffd9aeb06e24aa7970a1",
+      "version": 1
+    },
+    "device": "cpu",
+    "elapsed_seconds_this_segment": 210.3731153999979,
+    "feature_seconds_this_segment": 7.785201299964683,
+    "final_metrics": {
+      "categorical_accuracy": 0.9989539980888367,
+      "categorical_ce": 0.0015140481991693377,
+      "continuous_mae": 0.007879115641117096,
+      "continuous_mse": 0.0007964690448716283,
+      "loss": 0.002310517244040966
+    },
+    "fresh_accepted_this_segment": 32,
+    "fresh_example_target_reached": true,
+    "frontend": {
+      "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+      "device": "cpu",
+      "fft": 2048,
+      "frontend": "stereo_mel_and_frozen_basic_pitch_v1",
+      "hop": 441,
+      "input": "audio_only",
+      "log_scale": 10,
+      "maximum_audio_seconds": 16,
+      "normalization": "fixed_scaling_no_fitted_statistics",
+      "pitch_size": 3521,
+      "pitch_time_bins": 8,
+      "precision": "float32",
+      "sample_rate": 44100,
+      "timbre_shape": [
+        2,
+        96,
+        32
+      ]
+    },
+    "frozen_weights_and_buffers_unchanged": true,
+    "initial_metrics": {
+      "categorical_accuracy": 0.9623430967330933,
+      "categorical_ce": 0.23517413437366486,
+      "continuous_mae": 0.03544824570417404,
+      "continuous_mse": 0.01786966063082218,
+      "loss": 0.2530438005924225
+    },
+    "mode": "overfit",
+    "model_state_sha256": "c675831ebd666596d3f06d6f2cc430e0a8dbf650536970fab60eb26b15384b1c",
+    "peak_process_tree_rss_bytes": 940503040,
+    "pool_id": "40dff5475f3665831b2214c596985a20d7cd6dc4ac899e583f5039b93944107b",
+    "quality_claim": "supervised_bootstrap_only_real_render_validation_required",
+    "renderer_identity": {
+      "backend_version": "0.8.3",
+      "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+      "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+      "settings": {
+        "buffer_size": 128,
+        "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+        "event_timing": "absolute ticks to half-even sample offsets",
+        "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+        "full_nested_readback_verified": true,
+        "plugin_name": "Vital.vst3",
+        "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+        "scalar_lfo_route_readback_verified": true,
+        "schema_id": "vital-1.5.5-fields-native-1.6.4",
+        "state_loading": "full_1_5_5_scalar_and_six_nested_readback_v1",
+        "verified_loaded_scalars": 775
+      }
+    },
+    "replay_bytes": 1237120,
+    "replay_distinct_audio_buffers": 32,
+    "replay_distinct_states": 32,
+    "replay_examples": 32,
+    "replay_seed": null,
+    "rss_sampling_errors": 0,
+    "run_id": "b3109cf585b6bac8b3e327499b928e98a851df4882e665c06e5c0f21c3bae17c",
+    "seeded_feature_examples": 0,
+    "step": 400,
+    "tiny_overfit_gate": false,
+    "torch": "2.12.1+xpu",
+    "totals": {
+      "accepted": 32,
+      "errors": 0,
+      "feature_seconds": 7.785201299964683,
+      "maximum_gradient_norm": 0.7357333302497864,
+      "optimizer_seconds": 123.0031132997974,
+      "rejected": 2,
+      "render_attempts": 34,
+      "reused_feature_draws": 6368,
+      "sampled_examples": 6400
+    },
+    "trainable_parameters": 803823
+  }
+}

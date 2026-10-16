@@ -6,14 +6,18 @@ import json
 
 from obruxo_data.hashing import canonical_json, canonical_sha256
 from obruxo_data.midi import Performance
-from obruxo_data.render.base import LEGACY_TRAINING_RENDERER_ID, RenderRequest
+from obruxo_data.render.base import FULL_PRESET_RENDERER_ID, LEGACY_TRAINING_RENDERER_ID, RenderRequest
 from obruxo_data.vital import VitalSchema
+from obruxo_data.vital.full_contract import FullPresetContract
 
 from .assets import ASSET_RULE, AssetCatalog
 from .eligibility import eligibility_policy, inspect_preset
 from .identity import IDENTITY_RULE
 from .performances import CAPABILITIES, bank_document, initial_bank
 from .splits import SPLIT_RULE, SplitLedger
+
+
+FULL_SCHEMA_ID = "vital-1.5.5-fields-native-1.6.4"
 
 
 @dataclass(frozen=True)
@@ -36,12 +40,17 @@ class TrainingContract:
         return canonical_sha256(self.to_dict())
 
     def to_dict(self) -> dict:
-        return {"version": 1, "identity_rule": IDENTITY_RULE, "asset_rule": ASSET_RULE, "split_rule": SPLIT_RULE,
-                "eligibility": eligibility_policy(), "midi": CAPABILITIES.to_dict(),
+        full = self.schema_id == FULL_SCHEMA_ID
+        return {"version": 2 if full else 1, "identity_rule": IDENTITY_RULE, "asset_rule": ASSET_RULE, "split_rule": SPLIT_RULE,
+                "eligibility": eligibility_policy(full_profile=full), "midi": CAPABILITIES.to_dict(),
                 "recipe_rule": "render_recipe_v1", "audio_mode": "on_demand", **asdict(self)}
 
     @classmethod
     def create(cls, schema: VitalSchema, catalog: AssetCatalog) -> TrainingContract:
+        if isinstance(schema, FullPresetContract):
+            schema.template()  # Verify the reviewed factory bytes, as for the legacy contract.
+            return cls(FULL_SCHEMA_ID, canonical_sha256(schema.spec), catalog.catalog_id,
+                       canonical_sha256(bank_document()), renderer_id=FULL_PRESET_RENDERER_ID)
         paths = (schema.init_preset_path, schema.parameter_atlas_path, schema.modulation_vocab_path,
                  schema.init_preset_path.parent / "manifest.json")
         schema.load_init_document()

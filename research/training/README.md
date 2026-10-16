@@ -1,5 +1,7 @@
 # Training contracts, online pilot and trainer
 
+The [full scalar training path](FULL_SCALAR_TRAINING.md) connects all 775 scalar fields to bounded audio-only learning, legal effect-order and pitch-mask outputs, modern render recipes and inference export. Nested assets, curves, seeds and connections remain explicitly fixed in this increment; learned structured coverage follows.
+
 The [full-preset render profile](FULL_RENDER_PROFILE.md) adds an explicit path for all 775 controls and six nested structures in the reviewed 1.5.5 inventory. It checks the broader native state before broader model training; existing pilot and alpha artifacts retain their identities.
 
 The [performance-conditioning comparison](CONDITIONING.md) is complete. Its [fixed result](reports/CONDITIONING_RESULTS.md) did not show a benefit from attention (+1.96% mean sound error, interval spanning zero), so the original model stays the default. The next major work is full declared synthesis/performance coverage, followed by data scaling and combined training; further narrow tuning remains deferred.

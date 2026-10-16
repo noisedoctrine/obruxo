@@ -291,7 +291,7 @@ def render_isolated(request: RenderRequest, *, renderer_factory=None, timeout: f
     if request_frames(request) * request.channels * 4 > config.prefetch_bytes:
         raise ValueError("evaluation render exceeds the one-clip memory budget")
     started = perf_counter()
-    audio, metadata = _render_once(request, renderer_factory or NativeRendererFactory(), timeout, Event())
+    audio, metadata = _render_once(request, renderer_factory or NativeRendererFactory(renderer_id=request.renderer_id), timeout, Event())
     return audio, {**metadata, "wall_seconds": perf_counter() - started}
 
 
@@ -306,7 +306,7 @@ class OnlineRenderStream:
         if type(count) is not int or count <= 0:
             raise ValueError("stream count must be a positive integer")
         self.sampler, self.count = sampler, count
-        self.factory = renderer_factory or NativeRendererFactory()
+        self.factory = renderer_factory or NativeRendererFactory(renderer_id=contract.renderer_id)
         self.stream_id = canonical_sha256({"sampler_id": sampler.sampler_id, "config": self.config.to_dict()})
         self._next_ack = 0
         if resume is not None:
