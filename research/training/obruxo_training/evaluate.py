@@ -84,8 +84,10 @@ def evaluate_pilot(pool, checkpoint: Path, output: Path, *, count: int = 4, spli
 
 def retrieval_digest(replay: list[dict]) -> str:
     # Usage counters change during replay; the candidate audio, features and labels must not.
-    return canonical_sha256([{**{key: value for key, value in item.items() if key not in {"features", "uses"}},
-                              "features_sha256": tensor_digest(item["features"])} for item in replay])
+    return canonical_sha256([{**{key: value for key, value in item.items() if key not in {"features", "uses", "curve_targets"}},
+                              "features_sha256": tensor_digest(item["features"]),
+                              **({"curve_targets_sha256": tensor_digest({"original_curves": item["curve_targets"]})}
+                                 if "curve_targets" in item else {})} for item in replay])
 
 
 def evaluate_learning_curve(pool, checkpoints: list[Path], output: Path, *, count: int = 21,
@@ -114,7 +116,7 @@ def evaluate_comparison(pool, checkpoints: dict[str, Path], retrieval_checkpoint
                         checkpoint_pools: dict[str, PilotPool] | None = None, validation_pool: PilotPool | None = None,
                         identity_diagnostics: bool = False, validation_states: list[str] | None = None,
                         render_attempt_limit: int | None = None, allow_architecture_comparison: bool = False) -> dict:
-    reserved = {"source", "fixed_template", "train_retrieval", "source_repeat"}
+    reserved = {"source", "fixed_template", "train_retrieval", "source_repeat", "codec_reconstruction"}
     if not 2 <= len(checkpoints) <= 8 or any(not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,63}", name)
                                            or name in reserved for name in checkpoints):
         raise ValueError("comparison needs two through eight unique, safe, non-reserved model names")
@@ -238,6 +240,8 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
     torch.set_num_threads(4)
     saved, _ = next(iter(models.values()))
     codec = pool.codec
+    lossy = getattr(codec, "lossy_curves", False)
+    source_targets = {entry.state_id: entry.target for entry in pool.entries} if lossy else {}
     replay = saved["replay"] if retrieval is None else retrieval["replay"]
     sampler = training_sampler if split == "train" else PilotSampler(pool, split="validation")
     if split == "train":
@@ -264,7 +268,10 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
     plan = {"models": model_info, "pool_id": pool.pool_id, "recipe_ids": [recipe.recipe_id for recipe in recipes],
             "retrieval_sha256": retrieval_digest(replay),
             "primary": "equal_weight_mean_of_reference_and_transfer_per_state_mrstft",
-            "maximum_render_attempts": count * (8 + 2 * len(models)), "test_split_evaluated": False}
+            "maximum_render_attempts": count * (8 + 2 * len(models) + (2 if lossy else 0)), "test_split_evaluated": False}
+    if lossy:
+        plan["source_repeat_policy"] = "literal_source_bytes_without_lossy_curve_reencoding_v1"
+        plan["codec_ceiling_policy"] = "source_label_decode_diagnostic_only_never_model_input_v1"
     if retrieval is not None:
         plan["retrieval_source"] = retrieval["source"]
     if render_attempt_limit is not None:
@@ -355,8 +362,11 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
                 filename = f"prediction-{name}-{index:03d}.vital" if curve else f"prediction-{index:03d}.vital"
                 (output / filename).write_bytes(codec.decode(predicted))
                 targets[name] = predicted
-            targets.update(fixed_template=fixed, train_retrieval=nearest_training_target(features, replay),
-                           source_repeat=codec.encode(source_raw))
+            targets.update(fixed_template=fixed, train_retrieval=nearest_training_target(features, replay), source_repeat=None)
+            if lossy:
+                targets = {"codec_reconstruction": source_targets[recipe.state_id], **targets}
+                row["prediction_to_codec"] = {name: {} for name in models}
+            code_audio = {}
             transfer = transfers[index % len(transfers)].performance()
             transfer_source = render(source_raw, transfer, index, "source", "transfer")
             if identity_diagnostics and transfer_source is not None:
@@ -370,12 +380,18 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
                     if source is None:
                         scores[role] = {"failure": "source_render_failed"}
                         continue
-                    candidate = render(codec.decode(target), performance, index, name, role)
+                    candidate = render(source_raw if name == "source_repeat" else codec.decode(target), performance, index, name, role)
                     scores[role] = {"failure": "candidate_render_failed"} if candidate is None else audio_distance(source, candidate)
+                    if lossy and name == "codec_reconstruction":
+                        code_audio[role] = candidate
+                    if lossy and name in models:
+                        row["prediction_to_codec"][name][role] = (audio_distance(code_audio[role], candidate)
+                            if code_audio.get(role) is not None and candidate is not None else {"failure": "codec_or_prediction_render_failed"})
                 row["methods"][name] = scores
             save_progress(row)
         aggregates = {}
-        for method in (*models, "fixed_template", "train_retrieval", "source_repeat"):
+        methods = (*models, "fixed_template", "train_retrieval", "source_repeat", *(("codec_reconstruction",) if lossy else ()))
+        for method in methods:
             aggregates[method] = {}
             for role in ("reference", "transfer"):
                 scores = [row["methods"].get(method, {}).get(role, {}) for row in rows]

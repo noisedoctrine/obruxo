@@ -9,11 +9,11 @@ from obruxo_data.hashing import canonical_sha256
 from obruxo_data.render.qa import compare_audio
 
 from .audit import write_json
-from .codec import CATEGORICAL, CONTINUOUS
+from .codec import CATEGORICAL, CONTINUOUS, PilotTarget, load_codec
 from .contracts import RenderRecipe
 from .identity import PresetIdentity
 from .performances import initial_bank
-from .reproducibility import OSCILLATOR_PHASE_CONTROL, fixed_oscillator_phases
+from .reproducibility import FULL_PHASE_CONTROL, OSCILLATOR_PHASE_CONTROL, fixed_generator_phases, fixed_oscillator_phases
 from .splits import SplitLedger
 from .stream import NativeRendererFactory, OnlineRenderStream, StreamConfig
 
@@ -29,26 +29,30 @@ class CodecCheckSampler:
         if not coverage:
             raise ValueError("codec qualification requires authored training states")
         codec, ledger, performance = pool.codec, SplitLedger(pool.manifest), initial_bank()[0].performance()
+        serialized = getattr(codec, "lossy_curves", False)
+        restored = load_codec(codec.to_dict()) if serialized else None
         self.recipes, self.cases = [], []
         names = sorted(codec.schema.scalar_names) if full else [entry[0] for entry in CONTINUOUS + CATEGORICAL]
         for categories, entry in sorted(coverage.items()):
             source = codec.decode(entry.target)
-            decoded = codec.decode(codec.encode(source))
+            decoded = (restored.decode(PilotTarget.from_dict(entry.target.to_dict())) if serialized else codec.decode(codec.encode(source)))
             decoded_id = PresetIdentity.from_bytes(decoded).state
             ledger.register_variant(decoded_id, entry.state_id)
             left, right = json.loads(source)["settings"], json.loads(decoded)["settings"]
             equal = all(np.float32(left[name]) == np.float32(right[name]) for name in names)
             self.cases.append({"state_id": entry.state_id, **({"family": categories} if full else {"categories": list(categories)}),
                                "decoded_state_id": decoded_id, "controls_equal_at_float32": equal})
+            if serialized:
+                self.cases[-1]["serialized_target_and_decoder_exact"] = source == decoded
             for raw in (source, source, decoded):
-                raw = fixed_oscillator_phases(raw)
+                raw = fixed_generator_phases(raw) if serialized else fixed_oscillator_phases(raw)
                 ledger.register_variant(PresetIdentity.from_bytes(raw).state, entry.state_id)
                 self.recipes.append(RenderRecipe.create(raw, performance, schema=codec.schema, catalog=codec.catalog,
                                                        contract=codec.contract, ledger=ledger, purpose="evaluate",
                                                        sequence_id=len(self.recipes)))
-        check = "full_scalar_codec_native_v1" if full else "pilot_codec_native_v2"
+        check = "lfo_serialized_target_native_v1" if serialized else "full_scalar_codec_native_v1" if full else "pilot_codec_native_v2"
         self.sampler_id = canonical_sha256({"check": check, "pool_id": pool.pool_id, "cases": self.cases,
-                                           "phase_control": OSCILLATOR_PHASE_CONTROL})
+                                           "phase_control": FULL_PHASE_CONTROL if serialized else OSCILLATOR_PHASE_CONTROL})
 
     def recipe_at(self, sequence_id):
         return self.recipes[sequence_id]
@@ -60,6 +64,7 @@ def check_codec_audio(pool, output: Path, *, renderer_factory=None, timeout: flo
         return check_alpha_audio(pool, output, renderer_factory=renderer_factory, timeout=timeout, progress=progress)
     sampler = CodecCheckSampler(pool)
     full = getattr(pool.codec, "balanced_loss", False)
+    serialized = getattr(pool.codec, "lossy_curves", False)
     config = StreamConfig(prefetch_clips=1, timeout_seconds=timeout)
     output.mkdir(parents=True, exist_ok=False)
     write_json(output / "status.json", {"complete": False})
@@ -84,9 +89,9 @@ def check_codec_audio(pool, output: Path, *, renderer_factory=None, timeout: flo
             cases.append(case)
             group.clear()
     expected_coverage = len(pool.codec.to_dict()["families"]) if full else len(CATEGORICAL[0][1]) * len(CATEGORICAL[1][1])
-    result = {"version": 1 if full else 2, "check": "full_scalar_codec_native_v1" if full else "pilot_codec_native_v2",
+    result = {"version": 1 if full else 2, "check": "lfo_serialized_target_native_v1" if serialized else "full_scalar_codec_native_v1" if full else "pilot_codec_native_v2",
               "pool_id": pool.pool_id, "codec_id": pool.codec.codec_id,
-              "phase_control": OSCILLATOR_PHASE_CONTROL,
+              "phase_control": FULL_PHASE_CONTROL if serialized else OSCILLATOR_PHASE_CONTROL,
               "cases": cases, "covered_category_combinations": len(cases), "expected_category_combinations": expected_coverage,
               "requested": len(sampler.recipes), "accepted": accepted,
               "all_controls_equal_at_float32": all(case["controls_equal_at_float32"] for case in cases),
@@ -101,6 +106,9 @@ def check_codec_audio(pool, output: Path, *, renderer_factory=None, timeout: flo
         result.pop("covered_category_combinations")
         result.pop("expected_category_combinations")
         result["passed"] &= all(case.get("source_repeat_exact") and case.get("decoded_audio_exact") for case in cases)
+    if serialized:
+        result["representation_roundtrip"] = "serialized_targets_only_raw_curve_reencoding_is_lossy"
+        result["passed"] &= all(case["serialized_target_and_decoder_exact"] for case in cases)
     write_json(output / "summary.json", result)
     write_json(output / "status.json", {"complete": True, "passed": result["passed"]})
     return result

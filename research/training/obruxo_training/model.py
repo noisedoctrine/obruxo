@@ -87,9 +87,9 @@ def batch_features(items: list[dict], device: str = "cpu") -> dict:
     return {name: torch.stack([item["features"][name] for item in items]).to(device) for name in ("timbre", "pitch")}
 
 
-def loss_terms(prediction: dict, targets: list[PilotTarget], codec: PilotCodec) -> dict:
+def loss_terms(prediction: dict, targets: list[PilotTarget], codec: PilotCodec, *, curve_targets=None) -> dict:
     if getattr(codec, "balanced_loss", False):
-        return _balanced_loss(prediction, targets, codec)
+        return _balanced_loss(prediction, targets, codec, curve_targets=curve_targets)
     device = prediction["continuous"].device
     values = torch.tensor([target.continuous for target in targets], dtype=torch.float32, device=device)
     mask = torch.tensor([codec.continuous_mask(target) for target in targets], dtype=torch.float32, device=device)
@@ -120,7 +120,7 @@ def _family_mean(errors, mask, groups):
     return torch.stack(totals).sum() / torch.stack(active).sum().clamp_min(1)
 
 
-def _balanced_loss(prediction, targets, codec):
+def _balanced_loss(prediction, targets, codec, *, curve_targets=None):
     targets = [codec.supervision_target(target) for target in targets]
     device = prediction["continuous"].device
     values = torch.tensor([target.continuous for target in targets], dtype=torch.float32, device=device)
@@ -136,9 +136,14 @@ def _balanced_loss(prediction, targets, codec):
                              for index, logits in enumerate(prediction["categorical"])], dim=1)
     categorical = _family_mean(cat_error, cat_masks, codec.categorical_groups)
     correct = torch.stack([logits.argmax(1) == categories[:, index] for index, logits in enumerate(prediction["categorical"])], dim=1)
-    return {"loss": continuous + categorical, "continuous_mse": continuous, "categorical_ce": categorical,
-            "continuous_mae": _family_mean(error.abs(), masks, codec.continuous_groups),
-            "categorical_accuracy": (correct * cat_masks).sum() / cat_masks.sum().clamp_min(1)}
+    terms = {"loss": continuous + categorical, "continuous_mse": continuous, "categorical_ce": categorical,
+             "continuous_mae": _family_mean(error.abs(), masks, codec.continuous_groups),
+             "categorical_accuracy": (correct * cat_masks).sum() / cat_masks.sum().clamp_min(1)}
+    if getattr(codec, "lossy_curves", False):
+        from .lfo_loss import reconstruction_loss
+        terms["curve_reconstruction_mse"] = reconstruction_loss(prediction, targets, codec, curve_targets)
+        terms["loss"] = terms["loss"] + terms["curve_reconstruction_mse"]
+    return terms
 
 
 def predicted_targets(prediction: dict, codec: PilotCodec) -> list[PilotTarget]:
