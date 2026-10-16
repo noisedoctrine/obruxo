@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from contextlib import ExitStack
-from dataclasses import asdict, dataclass, fields
+from dataclasses import asdict, dataclass
 import json
 import math
 import os
@@ -202,7 +202,7 @@ def load_replay_seed(path: Path, pool, sampler, frontend, config, stream_config)
         raise ValueError("feature seeding needs a trained pilot checkpoint")
     contract = source["run_contract"]
     source_config = TrainConfig(**contract["training"])
-    source_stream = StreamConfig(**{field.name: contract["stream"][field.name] for field in fields(StreamConfig)})
+    source_stream = StreamConfig.from_dict(contract["stream"])
     expected = _run_contract(pool, sampler, frontend, source_config, source_stream, contract.get("replay_seed"))
     if contract != expected or tensor_digest(source["basic_pitch"]) != frontend.frozen_digest:
         raise ValueError("feature seed has incompatible pool, sampler or frozen frontend contracts")

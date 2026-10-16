@@ -13,6 +13,7 @@ from .codec import CATEGORICAL, CONTINUOUS
 from .contracts import RenderRecipe
 from .identity import PresetIdentity
 from .performances import initial_bank
+from .reproducibility import OSCILLATOR_PHASE_CONTROL, fixed_oscillator_phases
 from .splits import SplitLedger
 from .stream import NativeRendererFactory, OnlineRenderStream, StreamConfig
 
@@ -39,10 +40,13 @@ class CodecCheckSampler:
             self.cases.append({"state_id": entry.state_id, "categories": list(categories),
                                "decoded_state_id": decoded_id, "controls_equal_at_float32": equal})
             for raw in (source, source, decoded):
+                raw = fixed_oscillator_phases(raw)
+                ledger.register_variant(PresetIdentity.from_bytes(raw).state, entry.state_id)
                 self.recipes.append(RenderRecipe.create(raw, performance, schema=codec.schema, catalog=codec.catalog,
                                                        contract=codec.contract, ledger=ledger, purpose="evaluate",
                                                        sequence_id=len(self.recipes)))
-        self.sampler_id = canonical_sha256({"check": "pilot_codec_native_v1", "pool_id": pool.pool_id, "cases": self.cases})
+        self.sampler_id = canonical_sha256({"check": "pilot_codec_native_v2", "pool_id": pool.pool_id, "cases": self.cases,
+                                           "phase_control": OSCILLATOR_PHASE_CONTROL})
 
     def recipe_at(self, sequence_id):
         return self.recipes[sequence_id]
@@ -74,7 +78,8 @@ def check_codec_audio(pool, output: Path, *, renderer_factory=None, timeout: flo
             cases.append(case)
             group.clear()
     expected_coverage = len(CATEGORICAL[0][1]) * len(CATEGORICAL[1][1])
-    result = {"version": 1, "check": "pilot_codec_native_v1", "pool_id": pool.pool_id, "codec_id": pool.codec.codec_id,
+    result = {"version": 2, "check": "pilot_codec_native_v2", "pool_id": pool.pool_id, "codec_id": pool.codec.codec_id,
+              "phase_control": OSCILLATOR_PHASE_CONTROL,
               "cases": cases, "covered_category_combinations": len(cases), "expected_category_combinations": expected_coverage,
               "requested": len(sampler.recipes), "accepted": accepted,
               "all_controls_equal_at_float32": all(case["controls_equal_at_float32"] for case in cases),

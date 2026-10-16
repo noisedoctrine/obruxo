@@ -74,6 +74,7 @@ def main(argv=None) -> int:
     benchmark.add_argument("--prefetch-mib", type=int, default=32)
     benchmark.add_argument("--timeout", type=float, default=60.0)
     benchmark.add_argument("--max-retries", type=int, default=0)
+    benchmark.add_argument("--worker-jobs", type=int, default=1, help="Jobs per isolated process, 1..128; each job still creates a fresh plugin")
     benchmark.add_argument("--plugin-path", type=str)
     benchmark.add_argument("--resume", type=Path, help="Acknowledged stream cursor; queued audio is regenerated")
     codec_check = commands.add_parser("codec-check", help="Qualify native round trips and, for alpha, audible feature interventions")
@@ -103,6 +104,7 @@ def main(argv=None) -> int:
     train.add_argument("--fresh-examples", type=int, help="Stop adding fresh examples at this count, then continue bounded replay")
     train.add_argument("--device", default="cpu")
     train.add_argument("--timeout", type=float, default=60)
+    train.add_argument("--worker-jobs", type=int, default=1, help="Jobs per isolated process, 1..128; frozen in the training contract")
     train.add_argument("--plugin-path", type=str)
     train.add_argument("--resume", type=Path)
     train.add_argument("--seed-replay", type=Path, help="Seed a new model from a verified training feature prefix; weights and optimizer reset")
@@ -230,7 +232,7 @@ def main(argv=None) -> int:
                 from .trainer import TrainConfig, train_pilot
                 config = TrainConfig(**{key: getattr(args, key) for key in TrainConfig.__dataclass_fields__})
                 result = train_pilot(pool, args.output, config=config, device=args.device,
-                                     stream_config=StreamConfig(prefetch_clips=1, timeout_seconds=args.timeout),
+                                     stream_config=StreamConfig(prefetch_clips=1, timeout_seconds=args.timeout, worker_jobs=args.worker_jobs),
                                      renderer_factory=NativeRendererFactory(args.plugin_path), resume=args.resume,
                                      seed_replay=args.seed_replay,
                                      stop_after=args.stop_after, progress=lambda value: print(json.dumps(value), flush=True))
@@ -243,7 +245,7 @@ def main(argv=None) -> int:
                                            progress=lambda done, total, status: print(f"Checked {done}/{total}: {status}", flush=True))
                 print(json.dumps({key: value for key, value in result.items() if key != "cases"}, indent=2))
                 return 0 if result["passed"] else 2
-            config = StreamConfig(args.prefetch_clips, args.prefetch_mib * 1024 * 1024, args.timeout, args.max_retries)
+            config = StreamConfig(args.prefetch_clips, args.prefetch_mib * 1024 * 1024, args.timeout, args.max_retries, args.worker_jobs)
             resume = json.loads(args.resume.read_text(encoding="utf-8")) if args.resume else None
             result = benchmark_stream(pool, args.output, count=args.count, split=args.split, role=args.role,
                                       config=config, renderer_factory=NativeRendererFactory(args.plugin_path), resume=resume,

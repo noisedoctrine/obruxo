@@ -29,3 +29,8 @@ research/training/reports/data/identity_training_plan.json -text
 research/training/obruxo_training/proxy.py -text
 research/training/obruxo_training/proxy_screen.py -text
 research/training/reports/data/sound_proxy_plan.json -text
+research/training/obruxo_training/reproducibility.py -text
+research/training/reports/scripts/qualify_render_worker.py -text
+research/training/reports/scripts/diagnose_worker_randomness.py -text
+research/training/reports/scripts/summarize_render_worker.py -text
+research/training/reports/data/render_worker_plan.json -text

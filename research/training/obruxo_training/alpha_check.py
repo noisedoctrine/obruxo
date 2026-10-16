@@ -13,6 +13,7 @@ from .codec import PilotTarget
 from .contracts import RenderRecipe
 from .identity import PresetIdentity
 from .performances import initial_bank
+from .reproducibility import OSCILLATOR_PHASE_CONTROL, fixed_oscillator_phases
 from .splits import SplitLedger
 from .stream import NativeRendererFactory, OnlineRenderStream, StreamConfig
 
@@ -56,6 +57,7 @@ class AlphaCheckSampler:
             case = {"label": label, "parent_state_id": parent.state_id, "controls_equal_at_float32": scalar_equal,
                     "nested_state_equal": nested_equal, "state_ids": []}
             for raw in (source, source, decoded, ablated):
+                raw = fixed_oscillator_phases(raw)
                 state = PresetIdentity.from_bytes(raw).state
                 ledger.register_variant(state, parent.state_id)
                 case["state_ids"].append(state)
@@ -76,8 +78,8 @@ class AlphaCheckSampler:
         for shape in ("ramp_up", "ramp_down"):
             add(f"lfo_shape:{shape}", {**moving, "lfo_1_shape": shape}, moving)
         add("chorus", {"chorus_on": 1, "chorus_dry_wet": .35, "chorus_mod_depth": .6}, {})
-        self.sampler_id = canonical_sha256({"check": "alpha_codec_native_v1", "pool_id": pool.pool_id,
-                                           "cases": self.cases, "audibility": AUDIBILITY})
+        self.sampler_id = canonical_sha256({"check": "alpha_codec_native_v2", "pool_id": pool.pool_id,
+                                           "cases": self.cases, "audibility": AUDIBILITY, "phase_control": OSCILLATOR_PHASE_CONTROL})
 
     def recipe_at(self, sequence_id):
         return self.recipes[sequence_id]
@@ -88,7 +90,7 @@ def check_alpha_audio(pool, output, *, renderer_factory=None, timeout=60., progr
     output.mkdir(parents=True, exist_ok=False)
     write_json(output / "status.json", {"complete": False})
     write_json(output / "plan.json", {"sampler_id": sampler.sampler_id, "cases": sampler.cases,
-                                      "requested": len(sampler.recipes), "audibility": AUDIBILITY})
+                                      "requested": len(sampler.recipes), "audibility": AUDIBILITY, "phase_control": OSCILLATOR_PHASE_CONTROL})
     started = perf_counter()
     cases, group, accepted = [], [], 0
     config = StreamConfig(prefetch_clips=1, timeout_seconds=timeout)
@@ -115,7 +117,8 @@ def check_alpha_audio(pool, output, *, renderer_factory=None, timeout=60., progr
                               and case.get("intervention_audible", False))
             cases.append(case)
             group.clear()
-    result = {"version": 1, "check": "alpha_codec_native_v1", "pool_id": pool.pool_id, "codec_id": pool.codec.codec_id,
+    result = {"version": 2, "check": "alpha_codec_native_v2", "pool_id": pool.pool_id, "codec_id": pool.codec.codec_id,
+              "phase_control": OSCILLATOR_PHASE_CONTROL,
               "sampler_id": sampler.sampler_id, "requested": len(sampler.recipes), "accepted": accepted, "cases": cases,
               "passed_cases": sum(case["passed"] for case in cases), "planned_cases": len(sampler.cases),
               "audibility": AUDIBILITY, "elapsed_seconds": perf_counter() - started,
