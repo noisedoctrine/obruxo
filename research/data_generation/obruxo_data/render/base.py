@@ -23,6 +23,7 @@ DEFAULT_RENDERER_ID = (
     "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v3"
 )
 LEGACY_TRAINING_RENDERER_ID = DEFAULT_RENDERER_ID.removesuffix("v3") + "v2"
+FULL_PRESET_RENDERER_ID = DEFAULT_RENDERER_ID.removesuffix("state-verified-v3") + "full-1.5.5-state-verified-v1"
 
 
 @dataclass(frozen=True, init=False)
@@ -43,7 +44,13 @@ class RenderRequest:
         if preset is not None:
             preset_json = preset.to_json(canonical=True)
         assert preset_json is not None
-        canonical_preset = canonical_json(json.loads(preset_json))
+        if renderer_id == FULL_PRESET_RENDERER_ID:
+            from obruxo_data.vital.full_contract import FullPresetContract
+            document, report = FullPresetContract().loads(preset_json)
+            report.require_valid()
+        else:
+            document = json.loads(preset_json)
+        canonical_preset = canonical_json(document)
         object.__setattr__(self, "preset_json", canonical_preset)
         object.__setattr__(self, "performance", performance)
         object.__setattr__(self, "sample_rate", sample_rate)

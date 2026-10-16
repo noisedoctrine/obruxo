@@ -195,8 +195,20 @@ def main(argv=None) -> int:
     infer.add_argument("--audio", type=Path, required=True)
     infer.add_argument("--output", type=Path, required=True)
     infer.add_argument("--device", default="cpu")
+    full_check = commands.add_parser("full-check", help="Qualify all 775 controls and six nested structures with authored native fixtures")
+    full_check.add_argument("--output", type=Path, required=True)
+    full_check.add_argument("--plugin-path")
+    full_check.add_argument("--timeout", type=float, default=30.)
     args = parser.parse_args(argv)
     try:
+        if args.command == "full-check":
+            from .full_check import check_full_render
+            if args.asset_references:
+                raise ValueError("full correctness fixtures use the pinned factory template")
+            result = check_full_render(args.output, plugin_path=args.plugin_path, timeout=args.timeout,
+                                       progress=lambda event: print(json.dumps(event), flush=True))
+            print(json.dumps(result, indent=2))
+            return 0 if result["qualified"] else 2
         if args.command in {"candidate-export", "candidate-check", "infer-candidates"}:
             import torch
             from .audio_candidates import export_candidate_model, load_candidate_model, rank_audio

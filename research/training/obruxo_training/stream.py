@@ -61,10 +61,11 @@ class StreamConfig:
 @dataclass(frozen=True)
 class NativeRendererFactory:
     plugin_path: str | None = None
+    renderer_id: str = LEGACY_TRAINING_RENDERER_ID
 
     def __call__(self):
         from obruxo_data.render import VitalRenderer
-        return VitalRenderer(plugin_path=self.plugin_path, renderer_id=LEGACY_TRAINING_RENDERER_ID)
+        return VitalRenderer(plugin_path=self.plugin_path, renderer_id=self.renderer_id)
 
 
 @dataclass(frozen=True)

@@ -43,3 +43,9 @@ research/training/reports/data/render_selected_data_plan.json -text
 research/training/obruxo_training/audio_candidates.py -text
 research/training/obruxo_training/ranking_check.py -text
 research/training/reports/data/audio_candidate_plan.json -text
+research/vital/contract_1_5_5/init.vital text eol=lf
+research/data_generation/obruxo_data/render/full_state.py text eol=lf
+research/data_generation/obruxo_data/vital/full_contract.py text eol=lf
+research/training/obruxo_training/full_check.py text eol=lf
+research/training/reports/data/full_native_profile_plan.json text eol=lf
+research/training/reports/data/full_native_profile_summary.json text eol=lf
