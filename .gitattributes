@@ -38,3 +38,5 @@ research/training/reports/data/render_selected_data_plan.json -text
 research/training/obruxo_training/audio_candidates.py -text
 research/training/obruxo_training/ranking_check.py -text
 research/training/reports/data/audio_candidate_plan.json -text
+research/training/reports/scripts/run_conditioning_screen.py -text
+research/training/reports/data/conditioning_plan.json -text

@@ -13,17 +13,32 @@ MODEL_SPEC = {"model": "pilot_stereo_cnn_pooled_pitch_v1", "timbre_channels": [1
               "continuous_heads": len(CONTINUOUS), "categorical_sizes": [len(options) for _, options in CATEGORICAL]}
 
 
-def model_spec(codec=None):
-    if codec is None or codec.generator == "independent_authored_pilot_v1":
-        return dict(MODEL_SPEC)
-    return {**MODEL_SPEC, "model": "alpha_stereo_cnn_pooled_pitch_v1", "continuous_heads": len(codec.continuous),
-            "categorical_sizes": [len(options) for _, options in codec.categorical]}
+def model_spec(codec=None, conditioning="concat"):
+    if conditioning not in {"concat", "cross_attention"}:
+        raise ValueError("unsupported performance conditioning")
+    spec = dict(MODEL_SPEC)
+    if codec is not None and codec.generator != "independent_authored_pilot_v1":
+        spec.update(model="alpha_stereo_cnn_pooled_pitch_v1", continuous_heads=len(codec.continuous),
+                    categorical_sizes=[len(options) for _, options in codec.categorical])
+    if conditioning == "cross_attention":
+        spec.update(model=spec["model"].replace("pooled_pitch", "pitch_cross_attention"), conditioning="cross_attention_v1",
+                    conditioning_heads=4, conditioning_width=64, conditioning_performance_bins=8, conditioning_initial_gain=0.)
+    return spec
+
+
+def conditioning_from_spec(spec):
+    if "conditioning" not in spec:
+        return "concat"
+    if spec["conditioning"] != "cross_attention_v1":
+        raise ValueError("unsupported saved performance conditioning")
+    return "cross_attention"
 
 
 class PilotInverse(nn.Module):
-    def __init__(self, codec=None):
+    def __init__(self, codec=None, conditioning="concat"):
         super().__init__()
-        spec = model_spec(codec)
+        spec = model_spec(codec, conditioning)
+        self.conditioning = conditioning
         self.timbre = nn.Sequential(nn.Conv2d(2, 16, 5, stride=2, padding=2), nn.GELU(),
                                     nn.Conv2d(16, 32, 3, stride=2, padding=1), nn.GELU(),
                                     nn.AdaptiveAvgPool2d((6, 4)), nn.Flatten())
@@ -31,9 +46,27 @@ class PilotInverse(nn.Module):
         self.fusion = nn.Sequential(nn.Linear(32 * 6 * 4 + 64, 128), nn.GELU(), nn.Linear(128, 128), nn.GELU())
         self.continuous = nn.Linear(128, spec["continuous_heads"])
         self.categorical = nn.ModuleList(nn.Linear(128, size) for size in spec["categorical_sizes"])
+        if conditioning == "cross_attention":
+            # Construct extras last so shared weights have exactly the baseline's seeded initialization.
+            self.performance_projection = nn.Sequential(nn.Linear(440, 64), nn.GELU())
+            self.timbre_projection = nn.Linear(32 * 6, 64)
+            self.conditioning_attention = nn.MultiheadAttention(64, 4, dropout=0., batch_first=True)
+            self.conditioning_projection = nn.Linear(64, 32 * 6)
+            self.performance_position = nn.Parameter(torch.randn(8, 64) * .02)
+            self.timbre_position = nn.Parameter(torch.randn(4, 64) * .02)
+            self.conditioning_gain = nn.Parameter(torch.zeros(()))
 
     def forward(self, features: dict) -> dict:
-        hidden = self.fusion(torch.cat((self.timbre(features["timbre"]), self.pitch(features["pitch"])), dim=1))
+        timbre = self.timbre(features["timbre"])
+        if self.conditioning == "cross_attention":
+            parts = features["pitch"][:, :-1].split((88 * 8, 88 * 8, 264 * 8), dim=1)
+            performance = torch.cat([part.reshape(len(timbre), -1, 8).transpose(1, 2) for part in parts], dim=2)
+            keys = self.performance_projection(performance) + self.performance_position
+            queries = self.timbre_projection(timbre.reshape(len(timbre), 32 * 6, 4).transpose(1, 2)) + self.timbre_position
+            conditioned, _ = self.conditioning_attention(queries, keys, keys, need_weights=False)
+            residual = self.conditioning_projection(conditioned).transpose(1, 2).flatten(1)
+            timbre = timbre + self.conditioning_gain * residual
+        hidden = self.fusion(torch.cat((timbre, self.pitch(features["pitch"])), dim=1))
         return {"continuous": self.continuous(hidden).sigmoid(), "categorical": [head(hidden) for head in self.categorical],
                 "representation": hidden}
 

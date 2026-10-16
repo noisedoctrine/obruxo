@@ -71,7 +71,7 @@ def restore_evaluation_checkpoint(saved, pool):
     validate_replay(saved["replay"], sampler, saved["cursor"], config)
     if not saved["replay"]:
         raise ValueError("training-only retrieval memory is empty")
-    model = PilotInverse(pool.codec).eval()
+    model = PilotInverse(pool.codec, config.conditioning).eval()
     model.load_state_dict(saved["model"], strict=True)
     return saved, model, frontend, sampler
 
@@ -114,7 +114,7 @@ def evaluate_comparison(pool, checkpoints: dict[str, Path], retrieval_checkpoint
                         renderer_factory=None, timeout: float = 60, progress=None, resume: bool = False,
                         checkpoint_pools: dict[str, PilotPool] | None = None, validation_pool: PilotPool | None = None,
                         identity_diagnostics: bool = False, validation_states: list[str] | None = None,
-                        render_attempt_limit: int | None = None) -> dict:
+                        render_attempt_limit: int | None = None, allow_architecture_comparison: bool = False) -> dict:
     reserved = {"source", "fixed_template", "train_retrieval", "source_repeat"}
     if not 2 <= len(checkpoints) <= 8 or any(not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,63}", name)
                                            or name in reserved for name in checkpoints):
@@ -131,6 +131,8 @@ def evaluate_comparison(pool, checkpoints: dict[str, Path], retrieval_checkpoint
                      "excluded_state_ids": [entry.state_id for entry in pool.entries]}
     reference, _, frontend, sampler = load_evaluation_checkpoint(retrieval_checkpoint, pool)
     common_keys = ("contract", "codec", "model", "frontend", "precision")
+    if allow_architecture_comparison:
+        common_keys = tuple(key for key in common_keys if key != "model")
     models, artifacts = {}, {}
     for name, path in checkpoints.items():
         training_pool = checkpoint_pools.get(name, pool)
@@ -149,7 +151,7 @@ def evaluate_comparison(pool, checkpoints: dict[str, Path], retrieval_checkpoint
                             comparison=True, artifacts=artifacts, retrieval=retrieval,
                             renderer_factory=renderer_factory, timeout=timeout, progress=progress, resume=resume,
                             validation_extension=extension, identity_diagnostics=identity_diagnostics, validation_states=validation_states,
-                            render_attempt_limit=render_attempt_limit)
+                            render_attempt_limit=render_attempt_limit, architecture_comparison=allow_architecture_comparison)
 
 
 def _restore_evaluation(output: Path, plan: dict, renderer_identity: dict) -> tuple:
@@ -224,7 +226,8 @@ def curve_statistics(rows: list[dict], model_names: list[str], baseline_name: st
 
 def _evaluate_models(pool, models, frontend, training_sampler, output, *, count, split, curve=False, artifacts=None,
                      renderer_factory=None, timeout=60, progress=None, resume=False, comparison=False, retrieval=None,
-                     validation_extension=None, identity_diagnostics=False, validation_states=None, render_attempt_limit=None):
+                     validation_extension=None, identity_diagnostics=False, validation_states=None, render_attempt_limit=None,
+                     architecture_comparison=False):
     if split not in {"train", "validation"} or type(count) is not int or count <= 0:
         raise ValueError("pilot diagnostics use a positive count from train or validation; final test stays reserved")
     if render_attempt_limit is not None and (type(render_attempt_limit) is not int or render_attempt_limit <= 0):
@@ -267,6 +270,8 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
         plan["retrieval_source"] = retrieval["source"]
     if render_attempt_limit is not None:
         plan["maximum_render_attempts_with_recovery"] = render_attempt_limit
+    if architecture_comparison:
+        plan["architecture_comparison"] = {name: state["run_contract"]["model"] for name, (state, _) in models.items()}
     if validation_extension is not None:
         plan["validation_extension"] = validation_extension
     if identity_diagnostics:
