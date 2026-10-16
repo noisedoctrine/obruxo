@@ -121,7 +121,9 @@
   "software_validation": {
     "final_checks_subset_of_regression": true,
     "final_full_profile_checks_passed": 17,
-    "regression_checks_passed": 130,
+    "includes_current_main_conditioning": true,
+    "regression_checks_passed": 135,
+    "regression_seconds": 112.2,
     "ruff": "passed"
   },
   "source_unchanged": true

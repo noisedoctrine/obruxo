@@ -13,10 +13,12 @@ Completed 2026-10-16 on the local Windows CPU. The separate full-profile rendere
 | Total qualification time | 97.56 seconds |
 | Peak process/application memory | 392.90 MiB, below the 8 GiB gate |
 | Memory sampling errors | 0 |
-| Local regression checks | 130 passed; final 17-check profile rerun also passed |
+| Local regression checks | 135 passed after integrating current main; final 17-check profile rerun also passed |
 | Static checks | Ruff and branch whitespace checks passed |
 
 The [frozen plan](data/full_native_profile_plan.json) pins the complete case order, request identities, source hashes, contract identity, phase controls, timeout, attempt and memory limits. The [summary](data/full_native_profile_summary.json) records every case and gate. The CLI preserves per-render readback and QA in the local run directory. The final source hashes match those used for qualification.
+
+State equality here compares the native verification records and requested/applied JSON hashes. It does not compare the entire saved VST3 byte stream.
 
 The fixtures exercise the third oscillator and expanded ordinals, LFO/custom curves, remapped routing and a connection in slot 64 to slot 1's amount, mono/stereo sampler playback, voice/portamento settings, two effect orders, explicit seeds and a Shepard component. All oscillator phase-randomization amounts and sampler random phase are zero for correctness. Uncontrolled-phase behavior is a separate question; training pools are not rewritten.
 
@@ -30,5 +32,5 @@ Reproduce from a full repository checkout with the pinned data-generation enviro
 
 ```powershell
 python research/training/run.py full-check --output research/training/outputs/my-full-profile-check
-python -m pytest research/training/tests/test_full_render.py research/training/tests/test_render_worker.py research/training/tests/test_stream.py research/vital/test_full_contract.py research/data_generation/tests/unit/test_render.py research/data_generation/tests/unit/test_juce_codec.py -q
+python -m pytest research/training/tests/test_full_render.py research/training/tests/test_render_worker.py research/training/tests/test_stream.py research/training/tests/test_conditioning.py research/vital/test_full_contract.py research/data_generation/tests/unit/test_render.py research/data_generation/tests/unit/test_juce_codec.py -q
 ```
