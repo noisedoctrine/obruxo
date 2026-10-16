@@ -934,6 +934,15 @@ def _encode_decode(
     return encoding, np.clip(raw, 0.0, 1.0).astype(np.float32), raw, time.perf_counter() - started
 
 
+def decode_component_encoding(spec: ComponentRowSpec, encoding: ComponentEncoding, assets: ReconstructionAssets) -> np.ndarray:
+    """Decode saved component choices without target curves or topology labels."""
+    prefix = circular_shift(assets.base_dictionary[encoding.base_index], encoding.base_phase) * encoding.base_gain[:, None]
+    for layer, dictionary in enumerate(assets.residual_layer_dictionaries):
+        addition = circular_shift(dictionary[encoding.residual_layer_indices[layer]], encoding.residual_layer_phases[layer])
+        prefix = _apply_layer_state_policy(prefix, addition * encoding.residual_layer_gains[layer][:, None], spec)
+    return _decoder_view(prefix, spec)
+
+
 def _encode_greedy(
     spec: ComponentRowSpec,
     targets: np.ndarray,
