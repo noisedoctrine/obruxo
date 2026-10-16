@@ -120,7 +120,11 @@ def restore_rng(value: dict, device: str) -> None:
 
 
 def replay_bytes(items: list[dict]) -> int:
-    return sum(tensor.numel() * tensor.element_size() for item in items for tensor in item["features"].values())
+    features = sum(tensor.numel() * tensor.element_size() for item in items for tensor in item["features"].values())
+    curves = [item["curve_targets"] for item in items if "curve_targets" in item]
+    if any(not isinstance(value, torch.Tensor) for value in curves):
+        raise ValueError("curve replay labels must be tensors")
+    return features + sum(value.numel() * value.element_size() for value in curves)
 
 
 def validate_replay(items: list[dict], sampler: PilotSampler, cursor: dict, config: TrainConfig) -> None:
@@ -139,6 +143,17 @@ def validate_replay(items: list[dict], sampler: PilotSampler, cursor: dict, conf
         if config.sampling_policy == "paired_views" and item.get("performance_id") != recipe.performance_id:
             raise ValueError("paired replay performance differs from its training recipe")
         validate_features(item["features"])
+        if getattr(sampler.pool.codec, "lossy_curves", False):
+            expected = torch.tensor(sampler.pool.codec.source_curves(recipe.render_request().preset_json), dtype=torch.float32)
+            actual = item.get("curve_targets")
+            if not isinstance(actual, torch.Tensor) or actual.dtype != torch.float32 or actual.requires_grad or not torch.equal(actual, expected):
+                raise ValueError("saved original LFO curve targets differ from their source recipe")
+        elif "curve_targets" in item:
+            raise ValueError("unexpected curve supervision for this codec")
+
+
+def curve_loss_inputs(items, codec):
+    return {"curve_targets": torch.stack([item["curve_targets"] for item in items])} if getattr(codec, "lossy_curves", False) else {}
 
 
 @torch.no_grad()
@@ -146,7 +161,7 @@ def replay_metrics(model, items, codec, device, config=None) -> dict:
     model.eval()
     prediction = model(batch_features(items, device))
     targets = [PilotTarget.from_dict(item["target"]) for item in items]
-    terms = loss_terms(prediction, targets, codec)
+    terms = loss_terms(prediction, targets, codec, **curve_loss_inputs(items, codec))
     if config is not None and config.sampling_policy == "paired_views":
         indices = [index for pairs in complete_pairs(items).values() for index in pairs[0]]
         if len(indices) >= 4:
@@ -203,8 +218,8 @@ def load_replay_seed(path: Path, pool, sampler, frontend, config, stream_config)
                       "examples": len(replay), "acknowledged_recipes": cursor["next_sequence_id"],
                       "raw_accepted_views": accepted, "discarded_unpaired_accepted_views": accepted - len(replay)}
         return source, descriptor
-    if source.get("format") != "obruxo_pilot_training_v1" or source["step"] < 1:
-        raise ValueError("feature seeding needs a trained pilot checkpoint")
+    if source.get("format") != "obruxo_pilot_training_v1" or type(source.get("step")) is not int or source["step"] < 0:
+        raise ValueError("feature seeding needs a collected pilot checkpoint")
     contract = source["run_contract"]
     source_config = TrainConfig(**contract["training"])
     source_stream = StreamConfig.from_dict(contract["stream"])
@@ -278,7 +293,8 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
         generator.set_state(saved["batch_rng"])
         restore_rng(saved["rng"], device)
     limit = config.steps if stop_after is None else stop_after
-    if type(limit) is not int or not step < limit <= config.steps:
+    collect_only = saved is None and step == limit == 0
+    if type(limit) is not int or not (step < limit <= config.steps or collect_only):
         raise ValueError("stop_after must follow the saved step and not exceed total steps")
     output.mkdir(parents=True, exist_ok=False)
     started, checkpoint_seconds, feature_seconds_start = perf_counter(), 0.0, totals["feature_seconds"]
@@ -333,6 +349,8 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
                                 "audio_sha256": outcome.metadata["qa"]["audio_float32_sha256"], "uses": 0}
                         if paired:
                             item["performance_id"] = recipe.performance_id
+                        if getattr(pool.codec, "lossy_curves", False):
+                            item["curve_targets"] = torch.tensor(pool.codec.source_curves(recipe.render_request().preset_json), dtype=torch.float32)
                         candidate = [*replay, item][-config.replay_capacity:]
                         if replay_bytes(candidate) > config.replay_mib * 1024 * 1024:
                             raise ValueError("feature replay exceeds its byte budget")
@@ -381,7 +399,7 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
                 model.train()
                 optimizer.zero_grad(set_to_none=True)
                 prediction = model(batch_features(items, device))
-                terms = loss_terms(prediction, [PilotTarget.from_dict(item["target"]) for item in items], pool.codec)
+                terms = loss_terms(prediction, [PilotTarget.from_dict(item["target"]) for item in items], pool.codec, **curve_loss_inputs(items, pool.codec))
                 if paired:
                     identity = identity_terms(prediction["representation"], config.identity_temperature)
                     terms["loss"] = terms["loss"] + config.identity_weight * identity["identity_loss"]
@@ -436,6 +454,9 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
                    "tiny_overfit_gate": config.mode == "overfit" and final["continuous_mae"] < 0.05
                                         and final["categorical_accuracy"] == 1.0 and final["loss"] < initial["loss"] * 0.05,
                    "quality_claim": "supervised_bootstrap_only_real_render_validation_required"}
+        if getattr(pool.codec, "lossy_curves", False):
+            summary["curve_target_bytes"] = sum(item["curve_targets"].numel() * item["curve_targets"].element_size() for item in replay)
+            summary["feature_bytes"] = summary["replay_bytes"] - summary["curve_target_bytes"]
         write_json(output / "summary.json", summary)
         write_json(output / "status.json", {"complete": complete, "stage": "complete" if complete else "preempted", "step": step})
         return summary

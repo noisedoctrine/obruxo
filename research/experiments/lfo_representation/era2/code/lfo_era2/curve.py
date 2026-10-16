@@ -43,9 +43,10 @@ def circular_shift(curves: np.ndarray, phases: np.ndarray | float) -> np.ndarray
     flat = array.reshape(-1, width)
 
     positions = (np.arange(width, dtype=np.float64)[None, :] - phase_array[:, None] * width) % width
-    left = np.floor(positions).astype(np.int64) % width
+    floor = np.floor(positions)
+    left = floor.astype(np.int64) % width
     right = (left + 1) % width
-    frac = positions - left
+    frac = positions - floor
 
     rows = np.arange(flat.shape[0])[:, None]
     shifted = flat[rows, left] * (1.0 - frac) + flat[rows, right] * frac

@@ -1,6 +1,8 @@
 # Training contracts, online pilot and trainer
 
-The [completion ledger](IMPLEMENTATION_STATUS.md) tracks the remaining training and release work. [Learned factory choices](FACTORY_ASSETS.md) add registered wavetables for all three oscillator slots and registered sampler content. [Train-only Era2 curve assets](LFO_BANK.md) now support fitting, saved-code decoding and native reconstruction checks. Connecting those curve outputs to the model and adding ordered modulation connections are the next missing capabilities.
+The [completion ledger](IMPLEMENTATION_STATUS.md) tracks the remaining training and release work. [Learned factory choices](FACTORY_ASSETS.md) add registered wavetables for all three oscillator slots and registered sampler content. [Train-only Era2 curve assets](LFO_BANK.md) support fitting, saved-code decoding and native reconstruction checks.
+
+The [eight-curve training path](LFO_TRAINING.md) now predicts those shapes from audio, renders original source curves during training, and supervises their reconstruction without giving the model curve labels as inputs. Sixteen declared connections make the current authored curves audible; learning arbitrary ordered connections remains next.
 
 The [full scalar training path](FULL_SCALAR_TRAINING.md) connects all 775 scalar fields to bounded audio-only learning, legal effect-order and pitch-mask outputs, modern render recipes and inference export. Nested assets, curves, seeds and connections remain explicitly fixed in this increment; learned structured coverage follows.
 

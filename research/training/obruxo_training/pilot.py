@@ -61,12 +61,14 @@ class PilotPool:
             target = (codec.sample_target(rng, index) if hasattr(codec, "sample_target") else
                       codec.canonical_target(PilotTarget(tuple(rng.random() for _ in CONTINUOUS),
                                                         tuple(rng.randrange(len(options)) for _, options in CATEGORICAL))))
-            raw = codec.decode(target)
+            raw = codec.source_preset(target, index) if hasattr(codec, "source_preset") else codec.decode(target)
             inspection = inspect_preset(raw, codec.schema, codec.catalog)
             if not inspection["static_eligible"]:
                 raise ValueError(f"generated pilot state is ineligible: {inspection['reasons']}")
             entries.append(PilotEntry(inspection["identity"]["state"], target))
         manifest = authored_manifest(codec, entries, seed)
+        if hasattr(codec, "validate_manifest"):
+            codec.validate_manifest(manifest)
         if len(manifest.assignments) != count:
             raise ValueError("pilot generator produced duplicate states")
         return cls(codec, seed, manifest, tuple(entries))
@@ -126,11 +128,13 @@ class PilotPool:
         entries = tuple(PilotEntry(entry["state_id"], PilotTarget.from_dict(entry["target"])) for entry in value["entries"])
         if not entries or len(entries) != len(manifest.assignments) or len({entry.state_id for entry in entries}) != len(entries):
             raise ValueError("pilot population is incomplete or duplicated")
-        for entry in entries:
-            raw = codec.decode(entry.target)
+        for index, entry in enumerate(entries):
+            raw = codec.source_preset(entry.target, index) if hasattr(codec, "source_preset") else codec.decode(entry.target)
             if codec.canonical_target(entry.target) != entry.target or PresetIdentity.from_bytes(raw).state != entry.state_id:
                 raise ValueError("pilot target does not match its source state")
         expected = authored_manifest(codec, entries, value["seed"])
+        if hasattr(codec, "validate_manifest"):
+            codec.validate_manifest(manifest)
         if expected.manifest_id != manifest.manifest_id:
             raise ValueError("pilot split manifest differs from its independent roots")
         return cls(codec, value["seed"], manifest, entries)
@@ -159,6 +163,7 @@ class PilotSampler:
         self.pool, self.split, self.role, self.seed = pool, split, role, seed
         self.policy = policy
         self._entries = tuple(entry for entry in pool.entries if pool.manifest.by_state[entry.state_id].split == split)
+        self._source_indices = {entry.state_id: index for index, entry in enumerate(pool.entries)}
         if not self._entries:
             raise ValueError("selected split has no pilot states")
         self._performances = tuple(entry for entry in initial_bank() if entry.role == role)
@@ -193,6 +198,7 @@ class PilotSampler:
             self._epoch = epoch
         entry, performance = self._order[position]
         codec = self.pool.codec
-        return RenderRecipe.create(codec.decode(entry.target), performance.performance(), schema=codec.schema,
+        raw = codec.source_preset(entry.target, self._source_indices[entry.state_id]) if hasattr(codec, "source_preset") else codec.decode(entry.target)
+        return RenderRecipe.create(raw, performance.performance(), schema=codec.schema,
                                    catalog=codec.catalog, contract=codec.contract, ledger=self._ledger,
                                    purpose="train" if self.split == "train" else "evaluate", sequence_id=sequence_id)

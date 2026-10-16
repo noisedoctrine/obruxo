@@ -2,7 +2,7 @@
 
 Current implementation status, 2026-10-16: the initial independent directions below are implemented and have bounded native checks. They establish working capabilities and starting evidence; they do not complete the broad-model or release gates. The [completion ledger](../training/IMPLEMENTATION_STATUS.md) tracks those remaining requirements.
 
-The current coverage work adds [qualified factory wavetable/sample outputs](../training/FACTORY_ASSETS.md) and [train-only Era2 curve assets](../training/LFO_BANK.md). Factory training/export works but its complete-audio gate failed on clipping. Curve fitting and decoding are separate from predicting curve codes from audio, which still needs integration. Custom warps/seeds, ordered routes, broad curriculum/scaling and release gates remain open.
+The current coverage work adds [qualified factory wavetable/sample outputs](../training/FACTORY_ASSETS.md), [train-only Era2 curve assets](../training/LFO_BANK.md) and [eight-curve training from original audio](../training/LFO_TRAINING.md). The curve path measures representation and prediction errors separately; its initial sixteen connections are fixed. Learned ordered routes, custom warps/seeds, broad curriculum/scaling and release gates remain open. Capability implementation does not complete the audio-quality gates.
 
 | Direction | Fixed authored-alpha result | Current policy |
 |---|---|---|

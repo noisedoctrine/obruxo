@@ -12,6 +12,8 @@ python research/training/run.py lfo-fit --presets path/to/train-a.vital path/to/
 
 The saved bank includes the full split manifest, selected state/lineage/slot identities, source and curve hashes, policies, source-code hashes and fitted arrays. Its ID covers that content. Source hashes normalize line endings and use portable relative paths. Loading verifies the current Era2 implementation, policy, dimensions, finite values, zero atoms and training-only membership. Execution timing is excluded. Runtime source files from the repository are still required; a separately packaged release runtime remains open work.
 
+The connected training work fixes a periodic interpolation boundary in the shared curve helper. Banks made before that repair have a different decoder fingerprint and must be rebuilt; the loader refuses them. The newer [training report](reports/LFO_TRAINING_RESULTS.md) records qualification under the corrected implementation.
+
 ```python
 import json
 from pathlib import Path
@@ -33,4 +35,4 @@ python research/training/reports/scripts/run_lfo_bank_check.py --output research
 
 The diagnostic retains the original 256 scalar roots and all split assignments. It fits at most 64 curves from 205 training presets, selects an eight-case train/validation panel before fitting, and caps native work at 80 attempts. No final-test audio, waveform archive, paid compute or Actions run is involved. It measures correctness and reconstruction effects; no perceptual threshold is calibrated here.
 
-The broad audio-to-patch model still needs these curve outputs, reconstruction supervision and slot activity masks connected to training. Custom warps, random seeds and ordered modulation routing also remain separate capability work. The [completion ledger](IMPLEMENTATION_STATUS.md) tracks those requirements.
+The [eight-curve training path](LFO_TRAINING.md) connects these outputs, reconstruction supervision and activity masks to original-audio training. Custom warps, random seeds and learned arbitrary modulation routing remain separate capability work. The [completion ledger](IMPLEMENTATION_STATUS.md) tracks those requirements.

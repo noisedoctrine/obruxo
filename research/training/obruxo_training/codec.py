@@ -142,7 +142,10 @@ class PilotCodec:
 
 
 def load_codec(value: dict) -> PilotCodec:
-    if value.get("codec") == "authored_factory_assets_v1":
+    if value.get("codec") == "authored_lfo_curves_v1":
+        from .lfo_codec import LfoCurveCodec
+        codec = LfoCurveCodec(value["asset_bank"], value["lfo_bank"])
+    elif value.get("codec") == "authored_factory_assets_v1":
         from .asset_codec import FactoryAssetCodec
         codec = FactoryAssetCodec(value["asset_bank"])
     elif value.get("codec") == "authored_full_scalar_v1":
