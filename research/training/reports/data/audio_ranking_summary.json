@@ -1,0 +1,152 @@
+{
+  "artifact_sha256": "501ba85e9bc31b6763b368ec642683433fa00e4d7931bbc9eba57a0173e70849",
+  "audio_files_written": 0,
+  "cold_bundle_load_seconds": 0.7209858999995049,
+  "compute_note": "Local CPU; independent regression suites and cached conditioning training overlapped this check. Latency is not an idle-machine benchmark.",
+  "deployed_choices": {
+    "category": 1,
+    "continuous": 5,
+    "model": 2,
+    "retrieval": 2
+  },
+  "deployed_relative_error_change_percent": -10.640393391736257,
+  "elapsed_seconds": 965.7642314999975,
+  "final_test_used": false,
+  "paired_deployed_vs_model": {
+    "bootstrap": {
+      "interval": "percentile_95",
+      "limit": "descriptive_validation_only_not_adjusted_for_checkpoint_selection",
+      "resamples": 2000,
+      "seed": 0,
+      "unit": "state"
+    },
+    "checkpoints": {
+      "deployed": {
+        "against_model": {
+          "ci95": [
+            -0.3298890538917233,
+            -0.06266083953281244
+          ],
+          "mean_delta": -0.19054742641746997,
+          "paired": 10,
+          "planned": 10,
+          "ties": 2,
+          "wins": 6
+        },
+        "mean_reference_transfer_mrstft": 1.6002456335971753,
+        "paired_roles_scored": 10,
+        "planned": 10,
+        "selection_eligible": true
+      }
+    },
+    "primary": "equal_weight_mean_of_reference_and_transfer_per_state_mrstft",
+    "selected": "deployed",
+    "selection_policy": "lowest_complete_validation_mean_earliest_step_breaks_ties"
+  },
+  "peak_process_tree_rss_bytes": 889180160,
+  "qualification": {
+    "gates": {
+      "mean_deployed_vs_model_ratio_max": 0.95,
+      "native_rejection_fraction_max": 0.01,
+      "peak_rss_bytes_max": 8589934592,
+      "ranked_coverage_min": 0.8,
+      "warm_ranking_p95_seconds_max": 20.0
+    },
+    "identity": {
+      "bank_sha256": "f774d5e89051a6273d5ebb29d3b7ee059ea6f559bd4457df0a0d9e75daa7cbe8",
+      "frontend": {
+        "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+        "device": "cpu",
+        "fft": 2048,
+        "frontend": "stereo_mel_and_frozen_basic_pitch_v1",
+        "hop": 441,
+        "input": "audio_only",
+        "log_scale": 10,
+        "maximum_audio_seconds": 16,
+        "normalization": "fixed_scaling_no_fitted_statistics",
+        "pitch_size": 3521,
+        "pitch_time_bins": 8,
+        "precision": "float32",
+        "sample_rate": 44100,
+        "timbre_shape": [
+          2,
+          96,
+          32
+        ]
+      },
+      "model_sha256": "2e4b2231bde11a054e2cafd71f67775cce9ed470d91efa64f523443f303a46ec",
+      "pool_id": "5ffac2ae5580d9ccf8dab5c23c186c387960a2fc624e72eb546ca45ba4d8e53b",
+      "ranking_spec": {
+        "failure": "explicit_unranked_model_prediction",
+        "input": "audio_only",
+        "maximum_bank_states": 32,
+        "maximum_candidates": 4,
+        "maximum_input_seconds": 16,
+        "maximum_notes": 32,
+        "performance": "stock_basic_pitch_notes_linear_posterior_amplitude_velocity_no_bends_tempo120",
+        "proposal": {
+          "category": "second_choice_of_lowest_probability_margin_active_head",
+          "continuous": "three_active_controls_random_sign_step_0.15",
+          "duplicates": "keep_first",
+          "maximum_candidates": 4,
+          "proposal": "model_retrieval_category_continuous_v1"
+        },
+        "ranker": "frozen_basic_pitch_native_four_candidates_v1",
+        "score": "mrstft_zero_pad_to_common_length_without_gain_alignment",
+        "ties": "proposal_order"
+      },
+      "renderer_identity": {
+        "backend_version": "0.8.3",
+        "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+        "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+        "settings": {
+          "buffer_size": 128,
+          "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+          "event_timing": "absolute ticks to half-even sample offsets",
+          "plugin_name": "Vital.vst3",
+          "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+          "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+        }
+      }
+    },
+    "means": {
+      "deployed": {
+        "mean_mrstft": 1.6002456335971753,
+        "planned": 10,
+        "scored": 10
+      },
+      "model": {
+        "mean_mrstft": 1.790793060014645,
+        "planned": 10,
+        "scored": 10
+      },
+      "oracle_best_four": {
+        "mean_mrstft": 1.5685806437085072,
+        "planned": 10,
+        "scored": 10
+      },
+      "source_repeat": {
+        "mean_mrstft": 0.0,
+        "planned": 10,
+        "scored": 10
+      },
+      "train_retrieval": {
+        "mean_mrstft": 2.138571597884099,
+        "planned": 10,
+        "scored": 10
+      }
+    },
+    "plan_id": "f77be51aae9e0dddaa067b23bc29050dc204516f04603be9e5dcf2a41b13fd72",
+    "qualified": true,
+    "ranked_coverage": 1.0,
+    "warm_p95_seconds": 15.992189035000047
+  },
+  "release_model_promoted": false,
+  "renders_accepted": 159,
+  "renders_attempted": 160,
+  "verification": {
+    "github_actions": "disabled",
+    "renderer_stream_suite_passed": 104,
+    "training_suite_passed": 182
+  }
+}

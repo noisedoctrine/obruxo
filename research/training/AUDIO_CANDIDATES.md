@@ -1,5 +1,7 @@
 # Optional candidate ranking from one recording
 
+The [completed alpha check](reports/AUDIO_RANKING_RESULTS.md) passed the initial optional-path gates: 10.64% lower mean sound error, 100% ranked coverage, 15.99s model-warm p95 and 159/160 accepted native attempts. These are bounded development results; broader coverage and release gates remain open.
+
 This implements the bounded candidate direction in Stage E of the [training plan](../modelling/TRAINING_PLAN.md). The model still accepts one audio clip. It can propose up to four legal patches and compare their rendered sounds using notes estimated internally from that same recording. The user does not supply MIDI.
 
 The existing frozen Basic Pitch pass now exposes its dense posteriors alongside the unchanged timbre/pitch features. Existing frontend IDs, feature values, model heads and ordinary inference bundles remain compatible. The same pass serves patch prediction and stock note decoding; no transcription model is trained or fine-tuned.
