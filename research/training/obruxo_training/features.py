@@ -88,6 +88,11 @@ class AudioFeatures(nn.Module):
 
     @torch.no_grad()
     def forward(self, audio: np.ndarray, sample_rate: int = 44100) -> dict:
+        return self.analyze(audio, sample_rate)[0]
+
+    @torch.no_grad()
+    def analyze(self, audio: np.ndarray, sample_rate: int = 44100) -> tuple[dict, dict]:
+        """Reuse the same frozen forward pass when an audio-only caller also needs note posteriors."""
         if sample_rate != 44100 or audio.dtype != np.float32 or audio.ndim != 2 or audio.shape[1] != 2:
             raise ValueError("frontend requires float32 stereo audio at 44100 Hz")
         if not 2048 <= len(audio) <= 16 * sample_rate or not np.isfinite(audio).all():
@@ -107,4 +112,4 @@ class AudioFeatures(nn.Module):
         pitch = torch.cat([*pooled, torch.tensor([len(audio) / sample_rate / 16], dtype=torch.float32)])
         features = {"timbre": timbre, "pitch": pitch}
         validate_features(features)
-        return features
+        return features, posterior
