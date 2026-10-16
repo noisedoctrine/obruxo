@@ -1,0 +1,130 @@
+{
+  "accepted": 36,
+  "attempts": 36,
+  "checks": [
+    {
+      "accepted": true,
+      "case": "factory",
+      "fixed_phase_audio_exact": true,
+      "provenance_exact": true,
+      "state_exact": true
+    },
+    {
+      "accepted": true,
+      "case": "third_oscillator_and_new_ordinals",
+      "fixed_phase_audio_exact": true,
+      "provenance_exact": true,
+      "state_exact": true
+    },
+    {
+      "accepted": true,
+      "case": "lfo_curve",
+      "fixed_phase_audio_exact": true,
+      "provenance_exact": true,
+      "state_exact": true
+    },
+    {
+      "accepted": true,
+      "case": "custom_warp",
+      "fixed_phase_audio_exact": true,
+      "provenance_exact": true,
+      "state_exact": true
+    },
+    {
+      "accepted": true,
+      "case": "indexed_routes_and_remap",
+      "fixed_phase_audio_exact": true,
+      "provenance_exact": true,
+      "state_exact": true
+    },
+    {
+      "accepted": true,
+      "case": "sampler_mono",
+      "fixed_phase_audio_exact": true,
+      "provenance_exact": true,
+      "state_exact": true
+    },
+    {
+      "accepted": true,
+      "case": "sampler_stereo",
+      "fixed_phase_audio_exact": true,
+      "provenance_exact": true,
+      "state_exact": true
+    },
+    {
+      "accepted": true,
+      "case": "voice_and_portamento",
+      "fixed_phase_audio_exact": true,
+      "provenance_exact": true,
+      "state_exact": true
+    },
+    {
+      "accepted": true,
+      "case": "effect_order_1",
+      "fixed_phase_audio_exact": true,
+      "provenance_exact": true,
+      "state_exact": true
+    },
+    {
+      "accepted": true,
+      "case": "effect_order_2",
+      "fixed_phase_audio_exact": true,
+      "provenance_exact": true,
+      "state_exact": true
+    },
+    {
+      "accepted": true,
+      "case": "random_seeds",
+      "fixed_phase_audio_exact": true,
+      "provenance_exact": true,
+      "state_exact": true
+    },
+    {
+      "accepted": true,
+      "case": "shepard_component",
+      "fixed_phase_audio_exact": true,
+      "provenance_exact": true,
+      "state_exact": true
+    }
+  ],
+  "elapsed_seconds": 97.55601839999144,
+  "final_test_used": false,
+  "gates": {
+    "all_775_scalars_verified": true,
+    "all_cases_exact": true,
+    "memory_bounded": true,
+    "renderer_identity_constant": true,
+    "source_unchanged": true,
+    "worker_lifetime_bounded": true
+  },
+  "memory_sampling_errors": 0,
+  "peak_process_rss_bytes": 411983872,
+  "plan_sha256": "f695d1fd13d47cefeaf175bed878fb8d0a4294bf0a7e33d1ea46ce1ff7241c34",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "qualified": true,
+  "readback": {
+    "modulation_slot_counts": [
+      64
+    ],
+    "native_ramp_counts": [
+      128
+    ],
+    "sample_aligned_max_pcm16_delta": 1,
+    "sample_readback_byte_exact": false,
+    "sample_shift_samples": [
+      4
+    ],
+    "scalar_counts": [
+      775
+    ]
+  },
+  "software_validation": {
+    "final_checks_subset_of_regression": true,
+    "final_full_profile_checks_passed": 17,
+    "includes_current_main_conditioning": true,
+    "regression_checks_passed": 135,
+    "regression_seconds": 112.2,
+    "ruff": "passed"
+  },
+  "source_unchanged": true
+}

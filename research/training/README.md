@@ -1,5 +1,7 @@
 # Training contracts, online pilot and trainer
 
+The [full-preset render profile](FULL_RENDER_PROFILE.md) adds an explicit path for all 775 controls and six nested structures in the reviewed 1.5.5 inventory. It checks the broader native state before broader model training; existing pilot and alpha artifacts retain their identities.
+
 The [performance-conditioning comparison](CONDITIONING.md) is complete. Its [fixed result](reports/CONDITIONING_RESULTS.md) did not show a benefit from attention (+1.96% mean sound error, interval spanning zero), so the original model stays the default. The next major work is full declared synthesis/performance coverage, followed by data scaling and combined training; further narrow tuning remains deferred.
 
 The [audio-only candidate ranker](AUDIO_CANDIDATES.md) can choose among up to four legal patches using notes estimated from the recording. Its [completed native check](reports/AUDIO_RANKING_RESULTS.md) reduced mean validation sound error by 10.64% against ordinary prediction, with full ranked coverage and a 15.99s model-warm p95. It passed the bounded optional-path gates; this is not a finished release model or final-test result.

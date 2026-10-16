@@ -1,0 +1,102 @@
+{
+  "attempt_budget": 36,
+  "audio_archive": false,
+  "cases": [
+    {
+      "name": "factory",
+      "request_id": "749d870e93d5d7a879f6db7b91c2a6e9fce4d35bee456196ecac823fe224afa1"
+    },
+    {
+      "name": "third_oscillator_and_new_ordinals",
+      "request_id": "adb29fddf00cdb3eb69540227af25b7316a6e9352cdcef7fcc822e762b8c5569"
+    },
+    {
+      "name": "lfo_curve",
+      "request_id": "570e69965ad5609fb1da17ec5e8cc0371c74259e57a284baefd494acc43f1e7f"
+    },
+    {
+      "name": "custom_warp",
+      "request_id": "21aa406c5a8fb021dc43b82bec905c98ba9613e977312ee49641130d1ec7fe66"
+    },
+    {
+      "name": "indexed_routes_and_remap",
+      "request_id": "54fe7cdd0a7088ad341b85c0e47f6f07f5804f317f2b97716a7299469bcabed4"
+    },
+    {
+      "name": "sampler_mono",
+      "request_id": "8888ee67e631210b89fb7918d7cbd302e6eec996b126305b85b370c036a6ee1f"
+    },
+    {
+      "name": "sampler_stereo",
+      "request_id": "7506075db59ba50f94198a1c4fbfa0ecb48c388cc8b80173f721fa31236d0d13"
+    },
+    {
+      "name": "voice_and_portamento",
+      "request_id": "3db896ff1a3cbf9087fb4cd30e2a28f9c6af5f58f6b445233012602f2eda64a0"
+    },
+    {
+      "name": "effect_order_1",
+      "request_id": "a3d9446b73a9c66520568cda1702ab3b557f60bca4112de9eb88cb0069918da2"
+    },
+    {
+      "name": "effect_order_2",
+      "request_id": "16f65604e01dd2f3a6f9841d9763766fd37e70fa0e636ccf68762a869b855d7f"
+    },
+    {
+      "name": "random_seeds",
+      "request_id": "f8dc3c41176e123c2f9d3aa770eb02893be61826df4192b0dc63d91a67fd4115"
+    },
+    {
+      "name": "shepard_component",
+      "request_id": "d034d0f8b354939d20a7dc16c14dfdd514b4e657627d52ae928e4e24570c29d8"
+    }
+  ],
+  "final_test_used": false,
+  "full_contract_sha256": "e7c8165b5f87f4a937e19c4ec3934c3b56c56297d3db38cb2bf1ca1d784f5cc1",
+  "phase_control": {
+    "osc_1_random_phase": 0.0,
+    "osc_2_random_phase": 0.0,
+    "osc_3_random_phase": 0.0
+  },
+  "purpose": "authored correctness fixtures; no training or reconstruction-quality claim",
+  "qualification": "full_1_5_5_native_profile_v1",
+  "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+  "reuse_order": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    11,
+    10,
+    9,
+    8,
+    7,
+    6,
+    5,
+    4,
+    3,
+    2,
+    1,
+    0
+  ],
+  "rss_limit_bytes": 8589934592,
+  "sample_random_phase": 0.0,
+  "source_sha256": {
+    "data_generation/obruxo_data/render/base.py": "2f360e84b51bff5ee685412c14dfbb3b191a90e5e84a3398f18288bfa320ad09",
+    "data_generation/obruxo_data/render/full_state.py": "d0be7d4a3ed22bf37e101cc60ad0737913160f197147795982cdfbb96644939a",
+    "data_generation/obruxo_data/render/vita.py": "cd4e68a4385e22aa367ad28e5d0a85a8cbd190e19d6dffefa52dd3468983a0f8",
+    "data_generation/obruxo_data/vital/full_contract.py": "ac64c06186423c29970d805edba2b0f8dd64ff85c9c9052cbebaac9895f1f4ec",
+    "training/obruxo_training/full_check.py": "4d20cbc92a6a82c55ebd676a9a0a0c42259238c0223db4eb79ff66b9184e0417",
+    "training/obruxo_training/stream.py": "13ad461bf835fbe6411fbf3bc8c3fd289cf669d5c671e0c904e1917ef47f74d3"
+  },
+  "timeout_seconds": 30.0,
+  "worker_max_jobs": 4
+}

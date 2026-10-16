@@ -52,6 +52,8 @@ Preserve the runtime aspiration already recorded in [ideas.txt](../ideas.txt): r
 
 ## 2. Readiness and consequential gaps
 
+The separate [full-preset rendering profile](../training/FULL_RENDER_PROFILE.md) now validates all 775 controls and six nested structures in the 1.5.5 inventory through the bounded native worker. This closes the broad rendering-boundary gap; the broad learned representation, registered asset vocabulary and curriculum remain open. Existing pilot/alpha profiles retain their saved identities.
+
 | Area | Evidence already present | Work needed before scaling |
 |---|---|---|
 | Preset/MIDI/render foundation | Typed authoring, validation, continuous VST3 rendering, provenance, QA, resumable batches | Curriculum sampler, ancestry tracking, split manifests, bounded online producer/consumer stream |

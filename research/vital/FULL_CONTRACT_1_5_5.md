@@ -109,6 +109,8 @@ signal. Output reports are never overwritten implicitly.
 
 Import `FullPresetContract` from `research/vital/full_contract.py` for authoring:
 
+The implementation is shared with the renderer at `obruxo_data.vital.full_contract`; the original import remains compatible. The training CLI's [full-profile check](../training/FULL_RENDER_PROFILE.md) exercises the complete contract through the bounded rendering worker. This does not expand the learned target automatically.
+
 ```python
 contract = FullPresetContract()
 preset = contract.decode_scalars({"osc_1_transpose": -12, "osc_1_level": 0.4})

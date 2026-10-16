@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 
 from full_contract import FullPresetContract, strict_json
+import obruxo_data.vital.full_contract as full_contract_module
 
 
 def audit(corpus):
@@ -52,7 +53,7 @@ def audit(corpus):
             "corpus_content_digest": digest, "matches_build_corpus": digest == contract.spec["evidence"]["corpus_content_digest"],
             "files_by_error_code": dict(errors.most_common()), "files_by_error_pointer": dict(fields.most_common()),
             "examples": examples, "native_rendering_performed": False,
-            "validator_sha256": hashlib.sha256(Path(__file__).with_name("full_contract.py").read_bytes().replace(b"\r\n", b"\n")).hexdigest(),
+            "validator_sha256": hashlib.sha256(Path(full_contract_module.__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest(),
             "interpretation": "Structural checks include payload lengths and relationships. Authoring additionally enforces measured renderer scalar bounds. A rejection can mean unsupported authoring data, not a broken Vital preset."}
 
 

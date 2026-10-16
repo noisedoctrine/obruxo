@@ -4,8 +4,8 @@ This ledger tracks the [training and release plan](../modelling/TRAINING_PLAN.md
 
 | Plan item | Completed evidence | Remaining work |
 |---|---|---|
-| M0: contracts and measurement | Frozen authored splits, asset/version checks, QA, local stream/resource measurements | Linux/Colab qualification or documented local-only execution; full eligible capability matrix |
-| M1: stream and codec | Bounded online rendering, acknowledged recovery, narrow and alpha codecs, five-family authored curriculum | Broad canonical assets, train-only LFO representation, sampler/voice/effect/order/routing coverage |
+| M0: contracts and measurement | Frozen authored splits, asset/version checks, QA, local stream/resource measurements; [full 775-control native profile](FULL_RENDER_PROFILE.md) | Linux/Colab qualification or documented local-only execution; full eligible capability matrix |
+| M1: stream and codec | Bounded online rendering, acknowledged recovery, narrow and alpha codecs, five-family authored curriculum; full-profile rendering boundary for all six nested structures | Broad learned codec/heads, canonical assets, train-only curve representation, sampler/voice/effect/order/routing training coverage |
 | M2: first trained model | Audio-only inverse model, frozen Basic Pitch, baselines, exports and native validation | Finished-model quality remains open |
 | M3: useful alpha | Wider oscillators/wavetables/LFO/effect vocabulary; paired identity and [one matched conditioning comparison](reports/CONDITIONING_RESULTS.md) implemented and measured | Broad performance curriculum and reliable transfer gains; small initial settings do not settle the component choices |
 | M4: sound-based training | Forward helper qualification in #45; direct-render fallback and matched learning implemented; [fixed fallback result](reports/RENDER_SELECTED_RESULTS.md) is +12.56% native error | Validated sound-quality gain; current unsuccessful options remain disabled by default |

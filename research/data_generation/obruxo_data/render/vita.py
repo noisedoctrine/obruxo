@@ -16,10 +16,11 @@ import xml.etree.ElementTree as ET
 import yaml
 
 from obruxo_data.errors import DependencyUnavailableError, Diagnostic, Severity
+from obruxo_data.hashing import canonical_sha256
 from obruxo_data.midi import TempoMap
 from obruxo_data.vital import VitalPreset, VitalSchema
 
-from .base import DEFAULT_RENDERER_ID, LEGACY_TRAINING_RENDERER_ID, RenderProvenance, RenderRequest, RenderResult, Renderer
+from .base import DEFAULT_RENDERER_ID, FULL_PRESET_RENDERER_ID, LEGACY_TRAINING_RENDERER_ID, RenderProvenance, RenderRequest, RenderResult, Renderer
 from .capabilities import RendererCapabilities
 from .qa import AudioQualityConfig, analyze_audio
 
@@ -224,6 +225,10 @@ class VitalRenderer(Renderer):
         self.buffer_size = buffer_size
         self.renderer_id = renderer_id
         self.legacy_training = renderer_id == LEGACY_TRAINING_RENDERER_ID
+        self.full_contract = None
+        if renderer_id == FULL_PRESET_RENDERER_ID:
+            from obruxo_data.vital.full_contract import FullPresetContract
+            self.full_contract = FullPresetContract()
         self.qa_config = qa_config or AudioQualityConfig()
         self._capabilities = RendererCapabilities(max_channels=1)
 
@@ -298,6 +303,10 @@ class VitalRenderer(Renderer):
             synth.save_state(str(loaded_path))
             loaded = VitalVst3StateTemplate(loaded_path.read_bytes()).preset_document
             checked_scalars = verify_loaded_controls(native_document, loaded, legacy_training=self.legacy_training)
+            full_readback = {}
+            if self.full_contract is not None:
+                from .full_state import verify_full_nested_state
+                full_readback = verify_full_nested_state(native_document, loaded, self.full_contract.spec["fixed_native_ramps"])
             for span in performance.note_spans():
                 start_sample = timing.tick_to_sample(span.start_tick, request.sample_rate)
                 end_sample = timing.tick_to_sample(span.end_tick, request.sample_rate)
@@ -325,10 +334,14 @@ class VitalRenderer(Renderer):
             settings={
                 "plugin_name": self.plugin_path.name,
                 "buffer_size": self.buffer_size,
-                "schema_id": VitalSchema.load().schema_id,
+                "schema_id": VitalSchema.load().schema_id if self.full_contract is None else "vital-1.5.5-fields-native-1.6.4",
+                **({} if self.full_contract is None else {"full_contract_sha256": canonical_sha256(self.full_contract.spec),
+                                                        "full_nested_readback_verified": True,
+                                                        "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one"}),
                 **({} if self.legacy_training else {"verified_loaded_scalars": checked_scalars, "scalar_lfo_route_readback_verified": True}),
-                "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2" if self.legacy_training
-                                 else "version_bridge_and_scalar_lfo_route_readback_v3",
+                "state_loading": ("full_1_5_5_scalar_and_six_nested_readback_v1" if self.full_contract is not None else
+                                  "version_bridge_and_scalar_lfo_route_readback_v2" if self.legacy_training
+                                  else "version_bridge_and_scalar_lfo_route_readback_v3"),
                 "event_timing": "absolute ticks to half-even sample offsets",
                 "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
             },
@@ -342,6 +355,7 @@ class VitalRenderer(Renderer):
             ).hexdigest(),
             "verified_loaded_scalars": checked_scalars,
             "scalar_lfo_route_readback_verified": True,
+            **full_readback,
         }
         diagnostics = validation_diagnostics + tuple(bridge_diagnostics) + audio_diagnostics
         return RenderResult(audio, request.sample_rate, diagnostics, provenance, qa)
@@ -358,8 +372,11 @@ class VitalRenderer(Renderer):
         end_tick = request.performance.end_tick if request.end_tick is None else request.end_tick
         if end_tick != request.performance.end_tick:
             raise ValueError("RenderRequest end_tick must match Performance.end_tick")
-        preset = VitalPreset(json.loads(request.preset_json), VitalSchema.load())
-        preset_report = preset.validate(runtime=True)
+        if self.full_contract is not None:
+            _, preset_report = self.full_contract.loads(request.preset_json)
+        else:
+            preset = VitalPreset(json.loads(request.preset_json), VitalSchema.load())
+            preset_report = preset.validate(runtime=True)
         preset_report.require_valid()
         performance_report = request.performance.validate(self.capabilities)
         performance_report.require_valid()
