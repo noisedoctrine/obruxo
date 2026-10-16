@@ -20,4 +20,4 @@ Dedicated checks cover fresh renderer instances, bounded process lifetimes, QA r
 
 This qualifies the pinned Windows Vital/DawDreamer path on five authored training families with a 32-job lifetime. It does not qualify Linux/Colab, unrestricted full-schema presets, random-phase bit reproducibility or finished-model quality. A sampled RSS maximum over this bounded run is not an unlimited-duration leak test. The previous one-job default remains unchanged; new runs opt in and freeze their worker policy.
 
-[Usage](../RENDER_WORKER.md) · [Frozen plan](data/render_worker_plan.json) · [Aggregate evidence](data/render_worker_summary.json)
+[Usage](../RENDER_WORKER.md) Â· [Frozen plan](data/render_worker_plan.json) Â· [Aggregate evidence](data/render_worker_summary.json)

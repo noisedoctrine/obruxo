@@ -46,7 +46,7 @@ def main():
                                         "cause": "Simulated render exceeded its 60s deadline after a 383s wall-clock scheduling gap; recorded Windows Modern Standby transitions accompanied the pause. The failed render correctly advanced the stream cursor, so that run could not match the no-error trajectory. Production deadlines were not changed."}
     reports = Path(__file__).resolve().parents[1]
     for name, value in (("render_worker_plan.json", plan), ("render_worker_summary.json", summary)):
-        (reports / "data" / name).write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
+        (reports / "data" / name).write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
     decision = "passed all local correctness, timing and memory gates" if summary["qualified"] else "passed correctness but did not pass every performance gate"
     rows = ["# Reusable render-worker qualification", "",
             f"The reusable worker **{decision}**. With oscillator phases fixed, all 33 reused-worker outputs matched fresh-process float32 audio, native state and provenance exactly, including the process restart after 32 jobs. All 66 native attempts passed QA.", "",
@@ -60,7 +60,7 @@ def main():
             "## Scope", "",
             "This qualifies the pinned Windows Vital/DawDreamer path on five authored training families with a 32-job lifetime. It does not qualify Linux/Colab, unrestricted full-schema presets, random-phase bit reproducibility or finished-model quality. A sampled RSS maximum over this bounded run is not an unlimited-duration leak test. The previous one-job default remains unchanged; new runs opt in and freeze their worker policy.", "",
             "[Usage](../RENDER_WORKER.md) · [Frozen plan](data/render_worker_plan.json) · [Aggregate evidence](data/render_worker_summary.json)", ""]
-    (reports / "RENDER_WORKER_RESULTS.md").write_text("\n".join(rows))
+    (reports / "RENDER_WORKER_RESULTS.md").write_text("\n".join(rows), encoding="utf-8", newline="\n")
     print(json.dumps({key: summary[key] for key in ("qualified", "gates", "mean_wall_reduction", "accepted")}, indent=2))
 
 
