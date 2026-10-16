@@ -1,0 +1,5005 @@
+{
+  "accepted": 80,
+  "aggregates": {
+    "train": {
+      "cases": 4,
+      "max_sampled_curve_rmse": 0.05400381237268448,
+      "mean_original_to_grid_dense_curve_rmse": 0.0005079423663119087,
+      "mean_sampled_curve_rmse": 0.04291865136474371,
+      "native_distances": {
+        "grid_to_code": 0.1291332038041825,
+        "original_to_code": 0.13202008459484205,
+        "original_to_grid": 0.01009513612492204
+      }
+    },
+    "validation": {
+      "cases": 4,
+      "max_sampled_curve_rmse": 0.04137454926967621,
+      "mean_original_to_grid_dense_curve_rmse": 0.00012096442912934435,
+      "mean_sampled_curve_rmse": 0.03284120932221413,
+      "native_distances": {
+        "grid_to_code": 0.1200412074686028,
+        "original_to_code": 0.12017676119770233,
+        "original_to_grid": 0.0016599270010715372
+      }
+    }
+  },
+  "attempted": 80,
+  "audio_files_written": 0,
+  "audio_to_code_training": false,
+  "bank_id": "21c49269186deec1142705404e291379e64b86b43154ceb11e8072ec297820dd",
+  "checks": [
+    {
+      "code": {
+        "gains": [
+          -0.6602312922477722,
+          0.6195045709609985,
+          -0.8558350205421448,
+          1.0111587047576904,
+          0.8557125329971313,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "indices": [
+          15,
+          1,
+          1,
+          7,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "phases": [
+          0.0824742242693901,
+          0.6804123520851135,
+          0.4845360815525055,
+          0.0,
+          0.10309278219938278,
+          0.5773195624351501,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "decoder_matches_encoder_exactly": true,
+      "original_to_grid_dense_curve_rmse": 0.00011775902385124937,
+      "performances": {
+        "held_low": {
+          "all_accepted": true,
+          "code_repeat_exact": true,
+          "distances": {
+            "grid_to_code": {
+              "mrstft": 0.11421968539555867,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.01114174909889698,
+                  "spectral_convergence": 0.02367926388978958
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.016368862241506577,
+                  "spectral_convergence": 0.020369896665215492
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.2546449303627014,
+                  "spectral_convergence": 0.01645435392856598
+                }
+              ],
+              "rms_relative": 0.0018074813997372985
+            },
+            "original_to_code": {
+              "mrstft": 0.11464230654140313,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.011282144114375114,
+                  "spectral_convergence": 0.023986585438251495
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.016564764082431793,
+                  "spectral_convergence": 0.02066992036998272
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.2546783983707428,
+                  "spectral_convergence": 0.016745107248425484
+                }
+              ],
+              "rms_relative": 0.00206689047627151
+            },
+            "original_to_grid": {
+              "mrstft": 0.001992988274044668,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.0003878848219756037,
+                  "spectral_convergence": 0.0011080746771767735
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.0004971624002791941,
+                  "spectral_convergence": 0.0010175065835937858
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.002091175876557827,
+                  "spectral_convergence": 0.0008771604625508189
+                }
+              ],
+              "rms_relative": 0.00025987872504629195
+            }
+          },
+          "original_repeat_exact": true
+        },
+        "held_mid": {
+          "all_accepted": true,
+          "code_repeat_exact": true,
+          "distances": {
+            "grid_to_code": {
+              "mrstft": 0.17826062720268965,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.013509460724890232,
+                  "spectral_convergence": 0.021377617493271828
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.06074182689189911,
+                  "spectral_convergence": 0.018418988212943077
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.40554720163345337,
+                  "spectral_convergence": 0.015186786651611328
+                }
+              ],
+              "rms_relative": 0.001467517577111721
+            },
+            "original_to_code": {
+              "mrstft": 0.17938354704529047,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.013695557601749897,
+                  "spectral_convergence": 0.021706873551011086
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.060716114938259125,
+                  "spectral_convergence": 0.01874874345958233
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.40778833627700806,
+                  "spectral_convergence": 0.015495015308260918
+                }
+              ],
+              "rms_relative": 0.0016658424865454435
+            },
+            "original_to_grid": {
+              "mrstft": 0.005935027574499448,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.0005057198577560484,
+                  "spectral_convergence": 0.0010326576884835958
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.0013602726394310594,
+                  "spectral_convergence": 0.0009598149918019772
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.013123947195708752,
+                  "spectral_convergence": 0.0008226703503169119
+                }
+              ],
+              "rms_relative": 0.00019861636974383146
+            }
+          },
+          "original_repeat_exact": true
+        }
+      },
+      "sampled_curve_rmse": 0.04761654511094093,
+      "slot": 1,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85"
+    },
+    {
+      "code": {
+        "gains": [
+          -0.9702214002609253,
+          1.0549312829971313,
+          -0.8522031903266907,
+          0.6201028823852539,
+          -1.18207585811615,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "indices": [
+          24,
+          1,
+          2,
+          1,
+          4,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "phases": [
+          0.0,
+          0.6907216310501099,
+          0.1649484485387802,
+          0.30927833914756775,
+          0.11340206116437912,
+          0.7835051417350769,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "decoder_matches_encoder_exactly": true,
+      "original_to_grid_dense_curve_rmse": 3.422320878598839e-05,
+      "performances": {
+        "held_low": {
+          "all_accepted": true,
+          "code_repeat_exact": true,
+          "distances": {
+            "grid_to_code": {
+              "mrstft": 0.11627806350588799,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.011552244424819946,
+                  "spectral_convergence": 0.02877410501241684
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.016461780294775963,
+                  "spectral_convergence": 0.02768617868423462
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.23794232308864594,
+                  "spectral_convergence": 0.026417559012770653
+                }
+              ],
+              "rms_relative": 0.01920742727816105
+            },
+            "original_to_code": {
+              "mrstft": 0.11627190373837948,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.011554133147001266,
+                  "spectral_convergence": 0.028774404898285866
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.016464876011013985,
+                  "spectral_convergence": 0.027686545625329018
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.2379179149866104,
+                  "spectral_convergence": 0.026417836546897888
+                }
+              ],
+              "rms_relative": 0.019211675971746445
+            },
+            "original_to_grid": {
+              "mrstft": 0.00022271089740873626,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 1.8044205717160366e-05,
+                  "spectral_convergence": 1.9380573576199822e-05
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 1.3139643670001533e-05,
+                  "spectral_convergence": 1.5718742361059412e-05
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.0005879305535927415,
+                  "spectral_convergence": 1.3918973309046123e-05
+                }
+              ],
+              "rms_relative": 4.1693183447932824e-06
+            }
+          },
+          "original_repeat_exact": true
+        },
+        "held_mid": {
+          "all_accepted": true,
+          "code_repeat_exact": true,
+          "distances": {
+            "grid_to_code": {
+              "mrstft": 0.1736652028436462,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.012794014997780323,
+                  "spectral_convergence": 0.0251688864082098
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.053559809923172,
+                  "spectral_convergence": 0.024597764015197754
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.38115882873535156,
+                  "spectral_convergence": 0.023716304451227188
+                }
+              ],
+              "rms_relative": 0.018665794283151627
+            },
+            "original_to_code": {
+              "mrstft": 0.17371675030638775,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.012796142138540745,
+                  "spectral_convergence": 0.025169290602207184
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.05368470400571823,
+                  "spectral_convergence": 0.024598143994808197
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.3811853528022766,
+                  "spectral_convergence": 0.02371661737561226
+                }
+              ],
+              "rms_relative": 0.018668122589588165
+            },
+            "original_to_grid": {
+              "mrstft": 0.0012572392342917738,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 1.3028910871071275e-05,
+                  "spectral_convergence": 1.285972393816337e-05
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.00048654910642653704,
+                  "spectral_convergence": 1.1233531949983444e-05
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.0032379135955125093,
+                  "spectral_convergence": 1.0132834177056793e-05
+                }
+              ],
+              "rms_relative": 2.2850019831821555e-06
+            }
+          },
+          "original_repeat_exact": true
+        }
+      },
+      "sampled_curve_rmse": 0.04137454926967621,
+      "slot": 2,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a"
+    },
+    {
+      "code": {
+        "gains": [
+          0.6734243035316467,
+          -0.5727547407150269,
+          -0.7161365747451782,
+          0.7686998844146729,
+          -1.342026948928833,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "indices": [
+          12,
+          2,
+          2,
+          4,
+          2,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "phases": [
+          0.36082473397254944,
+          0.7628865838050842,
+          0.1340206116437912,
+          0.8247422575950623,
+          0.7628865838050842,
+          0.5979381203651428,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "decoder_matches_encoder_exactly": true,
+      "original_to_grid_dense_curve_rmse": 0.0004408890672493726,
+      "performances": {
+        "held_low": {
+          "all_accepted": true,
+          "code_repeat_exact": true,
+          "distances": {
+            "grid_to_code": {
+              "mrstft": 0.10459429956972599,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.010878047905862331,
+                  "spectral_convergence": 0.027033496648073196
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.015277032740414143,
+                  "spectral_convergence": 0.026105213910341263
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.2101692110300064,
+                  "spectral_convergence": 0.02431989647448063
+                }
+              ],
+              "rms_relative": 0.015539315529167652
+            },
+            "original_to_code": {
+              "mrstft": 0.1051886606340607,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.011080070398747921,
+                  "spectral_convergence": 0.02737843245267868
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.015520889312028885,
+                  "spectral_convergence": 0.02640700712800026
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.21062739193439484,
+                  "spectral_convergence": 0.02455219067633152
+                }
+              ],
+              "rms_relative": 0.015406515449285507
+            },
+            "original_to_grid": {
+              "mrstft": 0.003625394582437972,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.00047522305976599455,
+                  "spectral_convergence": 0.001320298295468092
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.0006435117102228105,
+                  "spectral_convergence": 0.001190469367429614
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.006294153165072203,
+                  "spectral_convergence": 0.0009525281493552029
+                }
+              ],
+              "rms_relative": 0.0001348961959592998
+            }
+          },
+          "original_repeat_exact": true
+        },
+        "held_mid": {
+          "all_accepted": true,
+          "code_repeat_exact": true,
+          "distances": {
+            "grid_to_code": {
+              "mrstft": 0.15871524469306073,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.012092799879610538,
+                  "spectral_convergence": 0.025129638612270355
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.050339289009571075,
+                  "spectral_convergence": 0.024518225342035294
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.34090733528137207,
+                  "spectral_convergence": 0.023158445954322815
+                }
+              ],
+              "rms_relative": 0.017446396872401237
+            },
+            "original_to_code": {
+              "mrstft": 0.16256504195431867,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.012227995321154594,
+                  "spectral_convergence": 0.02534991316497326
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.05048549175262451,
+                  "spectral_convergence": 0.02471546083688736
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.35160496830940247,
+                  "spectral_convergence": 0.023311296477913857
+                }
+              ],
+              "rms_relative": 0.01738961972296238
+            },
+            "original_to_grid": {
+              "mrstft": 0.011714481108356267,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.0005119985435158014,
+                  "spectral_convergence": 0.0010518013732507825
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.002610720694065094,
+                  "spectral_convergence": 0.0009643590892665088
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.029241865500807762,
+                  "spectral_convergence": 0.0007626981241628528
+                }
+              ],
+              "rms_relative": 5.7784447562880814e-05
+            }
+          },
+          "original_repeat_exact": true
+        }
+      },
+      "sampled_curve_rmse": 0.04369029402732849,
+      "slot": 3,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85"
+    },
+    {
+      "code": {
+        "gains": [
+          -0.605876088142395,
+          0.6693284511566162,
+          -0.4216606914997101,
+          0.4833502769470215,
+          -0.8835328817367554,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "indices": [
+          29,
+          1,
+          1,
+          5,
+          2,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "phases": [
+          0.7319587469100952,
+          0.2680412232875824,
+          0.14432989060878754,
+          0.9793814420700073,
+          0.39175257086753845,
+          0.9484536051750183,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "decoder_matches_encoder_exactly": true,
+      "original_to_grid_dense_curve_rmse": 5.537438846658915e-05,
+      "performances": {
+        "held_low": {
+          "all_accepted": true,
+          "code_repeat_exact": true,
+          "distances": {
+            "grid_to_code": {
+              "mrstft": 0.08612643616894881,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.00784340500831604,
+                  "spectral_convergence": 0.01651225984096527
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.011324577033519745,
+                  "spectral_convergence": 0.015146668069064617
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.19412477314472198,
+                  "spectral_convergence": 0.01342762541025877
+                }
+              ],
+              "rms_relative": 0.005194271914660931
+            },
+            "original_to_code": {
+              "mrstft": 0.0861552506685257,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.007846742868423462,
+                  "spectral_convergence": 0.016517342999577522
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.011328908614814281,
+                  "spectral_convergence": 0.015150883235037327
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.19419151544570923,
+                  "spectral_convergence": 0.013430358842015266
+                }
+              ],
+              "rms_relative": 0.00519094942137599
+            },
+            "original_to_grid": {
+              "mrstft": 0.0003649745728277291,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 2.6337762392358854e-05,
+                  "spectral_convergence": 2.6871139198192395e-05
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 2.6467749194125645e-05,
+                  "spectral_convergence": 2.2962825823924504e-05
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.0009726789430715144,
+                  "spectral_convergence": 1.960529880307149e-05
+                }
+              ],
+              "rms_relative": 3.305047130197636e-06
+            }
+          },
+          "original_repeat_exact": true
+        },
+        "held_mid": {
+          "all_accepted": true,
+          "code_repeat_exact": true,
+          "distances": {
+            "grid_to_code": {
+              "mrstft": 0.1375766439984242,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.009283920750021935,
+                  "spectral_convergence": 0.014680711552500725
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.04213379696011543,
+                  "spectral_convergence": 0.013659285381436348
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.32070034742355347,
+                  "spectral_convergence": 0.01227186992764473
+                }
+              ],
+              "rms_relative": 0.005146938841789961
+            },
+            "original_to_code": {
+              "mrstft": 0.13770888280123472,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.009286937303841114,
+                  "spectral_convergence": 0.014685975387692451
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.04209478199481964,
+                  "spectral_convergence": 0.013663901947438717
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.3211197257041931,
+                  "spectral_convergence": 0.012275326065719128
+                }
+              ],
+              "rms_relative": 0.005143285728991032
+            },
+            "original_to_grid": {
+              "mrstft": 0.0030812855772334538,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 3.134762300760485e-05,
+                  "spectral_convergence": 2.261064582853578e-05
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.000911949435248971,
+                  "spectral_convergence": 2.0113366190344095e-05
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.008240788243710995,
+                  "spectral_convergence": 1.7047417713911273e-05
+                }
+              ],
+              "rms_relative": 3.634474069258431e-06
+            }
+          },
+          "original_repeat_exact": true
+        }
+      },
+      "sampled_curve_rmse": 0.0298067145049572,
+      "slot": 4,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a"
+    },
+    {
+      "code": {
+        "gains": [
+          0.7167618870735168,
+          1.0177583694458008,
+          -1.2392233610153198,
+          1.130163550376892,
+          -1.123725175857544,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "indices": [
+          25,
+          2,
+          1,
+          1,
+          4,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "phases": [
+          0.42268040776252747,
+          0.3814432919025421,
+          0.5876288414001465,
+          0.6597937941551208,
+          0.12371134012937546,
+          0.5979381203651428,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "decoder_matches_encoder_exactly": true,
+      "original_to_grid_dense_curve_rmse": 0.001243119710125029,
+      "performances": {
+        "held_low": {
+          "all_accepted": true,
+          "code_repeat_exact": true,
+          "distances": {
+            "grid_to_code": {
+              "mrstft": 0.12016959985097249,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.013784397393465042,
+                  "spectral_convergence": 0.03157941997051239
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.019860444590449333,
+                  "spectral_convergence": 0.02902706153690815
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.2404572069644928,
+                  "spectral_convergence": 0.025800269097089767
+                }
+              ],
+              "rms_relative": 0.01722113974392414
+            },
+            "original_to_code": {
+              "mrstft": 0.1204889202490449,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.013991915620863438,
+                  "spectral_convergence": 0.03193867579102516
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.020178990438580513,
+                  "spectral_convergence": 0.029336094856262207
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.24002593755722046,
+                  "spectral_convergence": 0.025995146483182907
+                }
+              ],
+              "rms_relative": 0.017225824296474457
+            },
+            "original_to_grid": {
+              "mrstft": 0.008149393989394108,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.0011396243935450912,
+                  "spectral_convergence": 0.002239179564639926
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.0015631874557584524,
+                  "spectral_convergence": 0.0019773610401898623
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.01599353738129139,
+                  "spectral_convergence": 0.0015352921327576041
+                }
+              ],
+              "rms_relative": 4.605139110935852e-06
+            }
+          },
+          "original_repeat_exact": true
+        },
+        "held_mid": {
+          "all_accepted": true,
+          "code_repeat_exact": true,
+          "distances": {
+            "grid_to_code": {
+              "mrstft": 0.1680270880460739,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.015555540099740028,
+                  "spectral_convergence": 0.02844770811498165
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.053467489778995514,
+                  "spectral_convergence": 0.02655978687107563
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.35578763484954834,
+                  "spectral_convergence": 0.024263104423880577
+                }
+              ],
+              "rms_relative": 0.017830053344368935
+            },
+            "original_to_code": {
+              "mrstft": 0.18359466021259627,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.015976548194885254,
+                  "spectral_convergence": 0.02890199050307274
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.054260313510894775,
+                  "spectral_convergence": 0.026964223012328148
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.400142639875412,
+                  "spectral_convergence": 0.02453826554119587
+                }
+              ],
+              "rms_relative": 0.017883021384477615
+            },
+            "original_to_grid": {
+              "mrstft": 0.0352414142107591,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.001388181233778596,
+                  "spectral_convergence": 0.0020124008879065514
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.010105602443218231,
+                  "spectral_convergence": 0.0018128764349967241
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.08897309750318527,
+                  "spectral_convergence": 0.001432084129191935
+                }
+              ],
+              "rms_relative": 5.204011176829226e-05
+            }
+          },
+          "original_repeat_exact": true
+        }
+      },
+      "sampled_curve_rmse": 0.05400381237268448,
+      "slot": 5,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85"
+    },
+    {
+      "code": {
+        "gains": [
+          0.6521404385566711,
+          0.8632833361625671,
+          -0.48630163073539734,
+          0.6568923592567444,
+          0.7475082278251648,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "indices": [
+          17,
+          7,
+          2,
+          1,
+          7,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "phases": [
+          0.36082473397254944,
+          0.8041236996650696,
+          0.6082473993301392,
+          0.20618556439876556,
+          0.4639175236225128,
+          0.3814432919025421,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "decoder_matches_encoder_exactly": true,
+      "original_to_grid_dense_curve_rmse": 0.00038995640352368355,
+      "performances": {
+        "held_low": {
+          "all_accepted": true,
+          "code_repeat_exact": true,
+          "distances": {
+            "grid_to_code": {
+              "mrstft": 0.09892833481232326,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.008716367185115814,
+                  "spectral_convergence": 0.019833290949463844
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.012860293500125408,
+                  "spectral_convergence": 0.01741115376353264
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.2230931669473648,
+                  "spectral_convergence": 0.014870732091367245
+                }
+              ],
+              "rms_relative": 0.008046534843742847
+            },
+            "original_to_code": {
+              "mrstft": 0.0988710355013609,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.008714158087968826,
+                  "spectral_convergence": 0.01983240433037281
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.012856204994022846,
+                  "spectral_convergence": 0.017408419400453568
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.2229345142841339,
+                  "spectral_convergence": 0.014867405407130718
+                }
+              ],
+              "rms_relative": 0.008060981519520283
+            },
+            "original_to_grid": {
+              "mrstft": 0.0012632354967839394,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 8.132830407703295e-05,
+                  "spectral_convergence": 0.00021253486920613796
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.0001024147859425284,
+                  "spectral_convergence": 0.00018643295334186405
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.0030539114959537983,
+                  "spectral_convergence": 0.00015308408183045685
+                }
+              ],
+              "rms_relative": 1.4331031707115471e-05
+            }
+          },
+          "original_repeat_exact": true
+        },
+        "held_mid": {
+          "all_accepted": true,
+          "code_repeat_exact": true,
+          "distances": {
+            "grid_to_code": {
+              "mrstft": 0.1293755884592732,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.010355361737310886,
+                  "spectral_convergence": 0.017371028661727905
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.04470342397689819,
+                  "spectral_convergence": 0.015607601962983608
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.2866303622722626,
+                  "spectral_convergence": 0.013458986766636372
+                }
+              ],
+              "rms_relative": 0.007279111538082361
+            },
+            "original_to_code": {
+              "mrstft": 0.13026898136983314,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.010358259081840515,
+                  "spectral_convergence": 0.017381493002176285
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.04473963752388954,
+                  "spectral_convergence": 0.015614303760230541
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.2892489433288574,
+                  "spectral_convergence": 0.01346430741250515
+                }
+              ],
+              "rms_relative": 0.007293233182281256
+            },
+            "original_to_grid": {
+              "mrstft": 0.006250337801854282,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.00011064584396081045,
+                  "spectral_convergence": 0.0001981003733817488
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.002549737459048629,
+                  "spectral_convergence": 0.00017584182205609977
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.015567933209240437,
+                  "spectral_convergence": 0.00014875469787511975
+                }
+              ],
+              "rms_relative": 1.4019480659044348e-05
+            }
+          },
+          "original_repeat_exact": true
+        }
+      },
+      "sampled_curve_rmse": 0.0358591191470623,
+      "slot": 6,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a"
+    },
+    {
+      "code": {
+        "gains": [
+          -0.6575427651405334,
+          0.5177334547042847,
+          -0.3812347948551178,
+          -0.4409613013267517,
+          0.7552959322929382,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "indices": [
+          2,
+          3,
+          2,
+          4,
+          3,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "phases": [
+          0.030927835032343864,
+          0.5257731676101685,
+          0.7628865838050842,
+          0.938144326210022,
+          0.3505154550075531,
+          0.10309278219938278,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "decoder_matches_encoder_exactly": true,
+      "original_to_grid_dense_curve_rmse": 0.00023000166402198374,
+      "performances": {
+        "held_low": {
+          "all_accepted": true,
+          "code_repeat_exact": true,
+          "distances": {
+            "grid_to_code": {
+              "mrstft": 0.07397721180071433,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.007061184383928776,
+                  "spectral_convergence": 0.012807019054889679
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.010075127705931664,
+                  "spectral_convergence": 0.010717681609094143
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.17242956161499023,
+                  "spectral_convergence": 0.008841061033308506
+                }
+              ],
+              "rms_relative": 0.0022463821806013584
+            },
+            "original_to_code": {
+              "mrstft": 0.0737426468792061,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.0070389811880886555,
+                  "spectral_convergence": 0.0126423928886652
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.009996452368795872,
+                  "spectral_convergence": 0.010564672760665417
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.17231154441833496,
+                  "spectral_convergence": 0.0086738970130682
+                }
+              ],
+              "rms_relative": 0.0018751004245132208
+            },
+            "original_to_grid": {
+              "mrstft": 0.0040945145301520824,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.0010663972934708,
+                  "spectral_convergence": 0.0020231539383530617
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.0013868006644770503,
+                  "spectral_convergence": 0.0018316030036658049
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.004424788989126682,
+                  "spectral_convergence": 0.0015507997013628483
+                }
+              ],
+              "rms_relative": 0.0003704497357830405
+            }
+          },
+          "original_repeat_exact": true
+        },
+        "held_mid": {
+          "all_accepted": true,
+          "code_repeat_exact": true,
+          "distances": {
+            "grid_to_code": {
+              "mrstft": 0.1151018738746643,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.008658293634653091,
+                  "spectral_convergence": 0.011160671710968018
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.03684098646044731,
+                  "spectral_convergence": 0.00965922512114048
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.2709095776081085,
+                  "spectral_convergence": 0.008076867088675499
+                }
+              ],
+              "rms_relative": 0.002543038921430707
+            },
+            "original_to_code": {
+              "mrstft": 0.11655489324281613,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.008600403554737568,
+                  "spectral_convergence": 0.011100389063358307
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.03681907430291176,
+                  "spectral_convergence": 0.00960567407310009
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.2755453586578369,
+                  "spectral_convergence": 0.007993780076503754
+                }
+              ],
+              "rms_relative": 0.0022707716561853886
+            },
+            "original_to_grid": {
+              "mrstft": 0.010007874729732672,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.0012868018820881844,
+                  "spectral_convergence": 0.0017408893909305334
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.0030314482282847166,
+                  "spectral_convergence": 0.001604346209205687
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.021007303148508072,
+                  "spectral_convergence": 0.0013528353301808238
+                }
+              ],
+              "rms_relative": 0.0002715768350753933
+            }
+          },
+          "original_repeat_exact": true
+        }
+      },
+      "sampled_curve_rmse": 0.026363953948020935,
+      "slot": 7,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85"
+    },
+    {
+      "code": {
+        "gains": [
+          -0.8428652882575989,
+          -0.8438937664031982,
+          -0.5499046444892883,
+          -0.4549294114112854,
+          -1.0809011459350586,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "indices": [
+          12,
+          1,
+          2,
+          1,
+          4,
+          4,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "phases": [
+          0.938144326210022,
+          0.41237112879753113,
+          0.1340206116437912,
+          0.5773195624351501,
+          0.36082473397254944,
+          0.7319587469100952,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "decoder_matches_encoder_exactly": true,
+      "original_to_grid_dense_curve_rmse": 4.303715741116321e-06,
+      "performances": {
+        "held_low": {
+          "all_accepted": true,
+          "code_repeat_exact": true,
+          "distances": {
+            "grid_to_code": {
+              "mrstft": 0.08031201657528679,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.006042991299182177,
+                  "spectral_convergence": 0.013163893483579159
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.008890893310308456,
+                  "spectral_convergence": 0.01146786194294691
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.19112485647201538,
+                  "spectral_convergence": 0.010245553217828274
+                }
+              ],
+              "rms_relative": 0.003374292980879545
+            },
+            "original_to_code": {
+              "mrstft": 0.08031217474490404,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.006043123081326485,
+                  "spectral_convergence": 0.013164045289158821
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.008890403434634209,
+                  "spectral_convergence": 0.01146796066313982
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.1911253035068512,
+                  "spectral_convergence": 0.010245688259601593
+                }
+              ],
+              "rms_relative": 0.003373698564246297
+            },
+            "original_to_grid": {
+              "mrstft": 7.139992233836286e-05,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 9.545657121634576e-06,
+                  "spectral_convergence": 3.131321136606857e-06
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 3.828571607300546e-06,
+                  "spectral_convergence": 2.5765352802409325e-06
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.000192849402083084,
+                  "spectral_convergence": 2.268279786221683e-06
+                }
+              ],
+              "rms_relative": 5.924312631577777e-07
+            }
+          },
+          "original_repeat_exact": true
+        },
+        "held_mid": {
+          "all_accepted": true,
+          "code_repeat_exact": true,
+          "distances": {
+            "grid_to_code": {
+              "mrstft": 0.13806737338503203,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.007100117392838001,
+                  "spectral_convergence": 0.01197134517133236
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.03711369261145592,
+                  "spectral_convergence": 0.010661185719072819
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.3376685380935669,
+                  "spectral_convergence": 0.009687241166830063
+                }
+              ],
+              "rms_relative": 0.004022669512778521
+            },
+            "original_to_code": {
+              "mrstft": 0.13810911045099297,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 0.007099995855242014,
+                  "spectral_convergence": 0.011971448548138142
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.037103403359651566,
+                  "spectral_convergence": 0.010661255568265915
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.3378039002418518,
+                  "spectral_convergence": 0.009687327779829502
+                }
+              ],
+              "rms_relative": 0.004022290930151939
+            },
+            "original_to_grid": {
+              "mrstft": 0.0007682325058340211,
+              "resolutions": [
+                {
+                  "fft": 512,
+                  "log_magnitude_mae": 4.620855179382488e-06,
+                  "spectral_convergence": 2.507994850020623e-06
+                },
+                {
+                  "fft": 2048,
+                  "log_magnitude_mae": 0.0002040203398792073,
+                  "spectral_convergence": 2.0884692730760435e-06
+                },
+                {
+                  "fft": 8192,
+                  "log_magnitude_mae": 0.002089518355205655,
+                  "spectral_convergence": 1.9415031147218542e-06
+                }
+              ],
+              "rms_relative": 3.768483622934582e-07
+            }
+          },
+          "original_repeat_exact": true
+        }
+      },
+      "sampled_curve_rmse": 0.024324454367160797,
+      "slot": 8,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a"
+    }
+  ],
+  "codec_quality_gate": "not_calibrated_or_passed",
+  "elapsed_seconds": 134.15391710000404,
+  "environment": {
+    "device": "cpu",
+    "numpy": "2.4.6",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13",
+    "torch": "2.12.1+xpu",
+    "torch_threads": 4
+  },
+  "failed_prototype": {
+    "accepted": 48,
+    "attempted": 80,
+    "bank_id": "b6567064f0dcc931ac4187333d40221ca8467910af0e3375a46c6792544574bb",
+    "gates": {
+      "all_train_only": true,
+      "decoder_exact": true,
+      "fixed_phase_repeats_exact": false,
+      "memory_bounded": true,
+      "native_accepted": false,
+      "restored_bank_identity": true,
+      "source_unchanged": true
+    },
+    "passed": false,
+    "plan_sha256": "c40e7e24c87951b11659bc22b90fe2b5d2be4b0696e59d78123b762ec946e0ee",
+    "raw_summary_sha256": "04ad4071ab98710bc6076cf4e5466dd2c445aea80c3f76b04b0c4d820e30ae15",
+    "reason": "Authored source points/powers were not float32 before identity; all 32 original/repeat requests failed strict LFO readback. Corrected authoring precision without weakening the renderer.",
+    "root_manifest_preserved": true
+  },
+  "final_test_audio": false,
+  "fit": {
+    "fitted_rows": [
+      {
+        "curve_sha256": "003b9dcbdb3642c1bbda91821c12b417bb39acca8e60b74345699b8d6b29026d",
+        "lineage_id": "01627ff77f8e7dc5ddf78c3bd98cd68b82a3040358cf87385f0d649fa2b2a1db",
+        "raw_sha256": "79b81b55fb1b3c17059eeb8e3419a3d4425070560896162277876a120c7ea0a4",
+        "slot": 7,
+        "state_id": "4d68c7128813b30c813490ccac43ca4c03389c1aca6e9d777951e558e24a95b1"
+      },
+      {
+        "curve_sha256": "00479909d99fb80ed44c829c4d4495d5d24c0e278e35fc975b05e7698ca22166",
+        "lineage_id": "6a94ac118c54ee47c7ca0b487a3ff8f11f5ee14317fa3c49bcc615b49bdd0f8c",
+        "raw_sha256": "f6c28eed5ae9a8cee737d6f375929ea84bc754b698641585049ade3640a64929",
+        "slot": 7,
+        "state_id": "5d24ebc8b6b0351ed4a8bbdac310456417073def617ea82668ce633c43d9fc23"
+      },
+      {
+        "curve_sha256": "00744476556d21a733506ae0e5f5713c75e98bf45775c5780710e6b88030a737",
+        "lineage_id": "bbe3144d0dfc24fab4d812319480d7ef19944571c3ccb551a65deae1e2b47217",
+        "raw_sha256": "b4ffe27cfc9db70dc2585b22a902b159077be6c1222b5c69bdf64e07202e6032",
+        "slot": 7,
+        "state_id": "e84104baeb18156d70b3c2cea65b7bb7c14a410ef870d574e6cd872196955cf3"
+      },
+      {
+        "curve_sha256": "00bc804dc150394b4567fe295051adda0b702b5728d65d013bccf677b70ce2ff",
+        "lineage_id": "1143aac7ca63d7e2ec26e51940a72037d98f4fb2a3c4034ca8ee1bc916bc2865",
+        "raw_sha256": "d499012f57027da66ffbbc4f558516bd500a79ecc28b37977a39c0812e571877",
+        "slot": 1,
+        "state_id": "9c3572c5e18259667c4b7b42de913e450e0b19b1a5595441932437c83086336d"
+      },
+      {
+        "curve_sha256": "00f4edc85b9f8d3f598589d48284d1394dce0056d186bb6343e740181b9f1a0e",
+        "lineage_id": "c2a0064cd9d009bce860c8023600f49ad231b3b0cb2a7d5ce82a477321249efc",
+        "raw_sha256": "0b052cd8f3797295729cf7252724c2ed131dcaef985d043c5f07616152c9a038",
+        "slot": 8,
+        "state_id": "3e945a70ce6211bdfb89ae42207e865cb42c7392bd4b79635b541b1a2a2576bf"
+      },
+      {
+        "curve_sha256": "010e21b5d172202e855ed1bc721e61a97478a2aa63267792b1f994665ad971db",
+        "lineage_id": "a26509eed3677c8c3ece1cf3791ecd6ef08d9fce2a187a0593c7d7598a8469e6",
+        "raw_sha256": "eb5154e2dfb85a53b8419e1c5e5d819b7f497c12df7cf375bef147191ace0103",
+        "slot": 3,
+        "state_id": "015cd8a512dbabe7f2e94fb3eef1a7a27b564bb571ae9557e6fe31e43e67c002"
+      },
+      {
+        "curve_sha256": "011ddc8750c2ff7cb42731756f4f4ddc9e1708aa1fd50060a25e48be486504cf",
+        "lineage_id": "656754d3de3886ea748882a843b6540c37774ce6d506a161d4ba3ea256b0ddff",
+        "raw_sha256": "ddf23859cd74b0d80a8272d9e5f3964c8e87181a9163e2d3795b7a82febf0c77",
+        "slot": 2,
+        "state_id": "6eca2a4f806cd7fbecf45832d5dcaabdff5c03f9019aadb0e9dffcef5fae6183"
+      },
+      {
+        "curve_sha256": "013214e308c37eca14613e7964a625cdd0719ea950b05fc02fbf15611a643c21",
+        "lineage_id": "45246c0fc887e4168aec0b894f709ce95e83f012531913c5714a65b52a12a740",
+        "raw_sha256": "732a3ab6607c81b7cbbb62982af98d14936e5b6bd882140bdbdd198127b4d796",
+        "slot": 8,
+        "state_id": "e1b519d5da1199356d0a100c8e181c146371408ffcd49db95a860db58ac075af"
+      },
+      {
+        "curve_sha256": "017269a5dac47be5fe24763f1a63818950a6a6175e5cf29d6bf52bd644fd1ce4",
+        "lineage_id": "01627ff77f8e7dc5ddf78c3bd98cd68b82a3040358cf87385f0d649fa2b2a1db",
+        "raw_sha256": "79b81b55fb1b3c17059eeb8e3419a3d4425070560896162277876a120c7ea0a4",
+        "slot": 5,
+        "state_id": "4d68c7128813b30c813490ccac43ca4c03389c1aca6e9d777951e558e24a95b1"
+      },
+      {
+        "curve_sha256": "0186f76aec793d179747390ae2283f5c8c437a90799fc1a5d5eadef333fb5e0a",
+        "lineage_id": "2ce4ea7c6fef3f3dff98e51220738a5fb58a031087b6f4a916978d4883da7dd7",
+        "raw_sha256": "7a71bbc9c780483fd7b31df643c938a4a23a11ab289547500a2e8f57800ef68a",
+        "slot": 6,
+        "state_id": "56a91428daefd0752dc2ee422d16573cc5056ff2fe59e8bf4d25954620e5386b"
+      },
+      {
+        "curve_sha256": "019f4827b3116cce2573dcac6439d2c421daa2ee170f0159a3ec47ff428e3c5b",
+        "lineage_id": "408bc057871ec01bc3968ffefc08606021ceee7d12848a26c21fa7f629f68b71",
+        "raw_sha256": "8a6adc6b321c243dc8ce414b32e5d11dcd46ba53562aa6ce2435a92faa6af3a9",
+        "slot": 1,
+        "state_id": "b833f8d2de5b6b8325d83c7ddad2851c6e2894a8e6aa623ade0e1ef5cb73612d"
+      },
+      {
+        "curve_sha256": "01c37f85cba711b617a42357a2bab5e6453ceec2eac0b3a1780f3ae5c8fed157",
+        "lineage_id": "3a0c87f2086fb845e4eb9ab99590a37fc830921ca83787427bbca64efeea2c63",
+        "raw_sha256": "40eeb3b634c6a64bec86f12a43f67e149b877f68e80c5e055d5a30166daa547f",
+        "slot": 8,
+        "state_id": "37e2262288c7fc23098b49374346aff6daf0e88f13a8c59e8ed4bf0a50bcc450"
+      },
+      {
+        "curve_sha256": "01d41597c44ed6ddc48d6bececb2d14585b039b768ddd7abbdd6af472bb382a8",
+        "lineage_id": "7bec1a32e9fe788be4af675a039d79b1f40f13fd8fce5398b7d28c4be381564b",
+        "raw_sha256": "12b86e29475433c93b3a2b50d6bf1b0710fa7657abf9f9749351afd058730353",
+        "slot": 6,
+        "state_id": "f4505f18ac595063ae26abcfa27de521e915143206cac81ec1333961cd6129ee"
+      },
+      {
+        "curve_sha256": "01dff5ade8e1dd81cf42381950ca017646c41b16c0f4b53c931890a2bcdf0512",
+        "lineage_id": "290e14fd4974270583bd28b8ecd571c78e447f26980d85225d79c7ba235acf7b",
+        "raw_sha256": "bb36fc6c816e45ec4917cb2620db3aaf5d3f1a3c38c648598c66d0711e375a1b",
+        "slot": 1,
+        "state_id": "19c4680aabcec80468f1cb42d56d1927141d65b8174b4a8d3ff88c7e03b5800e"
+      },
+      {
+        "curve_sha256": "01ea5ef4160ddfab85c40f01f043f745995d07ac74283090c1e2829728dfb6b0",
+        "lineage_id": "2ce4ea7c6fef3f3dff98e51220738a5fb58a031087b6f4a916978d4883da7dd7",
+        "raw_sha256": "7a71bbc9c780483fd7b31df643c938a4a23a11ab289547500a2e8f57800ef68a",
+        "slot": 2,
+        "state_id": "56a91428daefd0752dc2ee422d16573cc5056ff2fe59e8bf4d25954620e5386b"
+      },
+      {
+        "curve_sha256": "01fe9f8cd35dbcc670efe6c90e194b66985609ab269254ed466e2315648dd9ae",
+        "lineage_id": "25ea0ae755b6fea3d7291665e0ae4b58251b56dd9eedbf156a50306ad2145cb4",
+        "raw_sha256": "06e8ce0129facd8c14a52ee6a7c723c5c52caca206c1e4e4f6112aaa50df9d05",
+        "slot": 2,
+        "state_id": "d816268ab3888e6bad6ca3eb77a8862a0b4da6fe040fbdcac0059525a8316df9"
+      },
+      {
+        "curve_sha256": "0224b60d8be420c043665ace98c0f0e5f1109085e47a9ebcf91142c5d0e877b1",
+        "lineage_id": "bcf7bfd4659e0732fc0c41f91277537928e8878c878b058ee603c05757d52b50",
+        "raw_sha256": "5e52b5902ca9ba7fd2236a15565a21b1937b8a549c77377c499fbc67083f3dc0",
+        "slot": 2,
+        "state_id": "71e0a5c8fb8305dac68b1f298bfac543fd7230a945578e7d123ccc4dca37901e"
+      },
+      {
+        "curve_sha256": "02413b27b025ba628cca227ddbb77f2e8cbe6bd05ede5936b600cd722896fd3c",
+        "lineage_id": "3d2b88cd45e103ae1c592a78535f6ea458d86c4e817e98a86836ab94e61213c9",
+        "raw_sha256": "d7217ab3b3a4f828bc4ad9ae7b5aefe22f9b2a7b0de0fc2727b24f192d298673",
+        "slot": 2,
+        "state_id": "fb3e8ee4952ffcae49054b324f445d385a7e28e499fcf2434385a98bcedda7c6"
+      },
+      {
+        "curve_sha256": "02807ed859c20f4c598d5fd52603eb1d5b015d1017d149207241b36e8f366fd7",
+        "lineage_id": "585c51662745f05a9abf8f42546868ae4054b471f071bfd9797ce762999eaa15",
+        "raw_sha256": "ae511b2f3c0ad209333a3996d79eed02fc10e9b72dd70407181a3dcd9340ebd4",
+        "slot": 7,
+        "state_id": "b11cfd5da25f749b97b73ef620c12118d58973c6132d73cec2913f570bbadb3b"
+      },
+      {
+        "curve_sha256": "02943c21076b94cadf0f2cce537232ca97a9f1e4d73bdb49e59c474779ae161b",
+        "lineage_id": "781b6ee80c34b3428ad3a77cec5d8741e7e11ce76e6ad5061d5b01869b5d2f88",
+        "raw_sha256": "c7ca94ee9e3cea2d9158685fbc3897b4361950325386cecc4febf14bcbd8fdd5",
+        "slot": 6,
+        "state_id": "c897147e3234b978058b51a34725a9a1551e66439f78a3c72cf2a1ecbc26c6ae"
+      },
+      {
+        "curve_sha256": "02cd14af99860aa8801ae37767a7fdd4fa0a7d7d249c191ffb59512919a8f298",
+        "lineage_id": "408bc057871ec01bc3968ffefc08606021ceee7d12848a26c21fa7f629f68b71",
+        "raw_sha256": "8a6adc6b321c243dc8ce414b32e5d11dcd46ba53562aa6ce2435a92faa6af3a9",
+        "slot": 8,
+        "state_id": "b833f8d2de5b6b8325d83c7ddad2851c6e2894a8e6aa623ade0e1ef5cb73612d"
+      },
+      {
+        "curve_sha256": "02f3637a14b41f77740eae10ff78fae4a57d66f9367b9f4eee89a014dfbffaba",
+        "lineage_id": "ee6aecb07dc5b0b2c401b4590b8c552891a5c16771f9a34e636f335eeb4753ae",
+        "raw_sha256": "97f3d032212b17718ecabc3bdc6425b3d84efc59cb682bbf81b75b1c1cf56853",
+        "slot": 5,
+        "state_id": "6312e12716e385bc888e348838cc29570245027d1862a7d7aefb2d0a15eeff8c"
+      },
+      {
+        "curve_sha256": "0304633354216321d1206b6384adfb847ad4d2338bdaa4111e4f36f3f2abe0fc",
+        "lineage_id": "247889e38a03ccfecc4cd5f377fe9b7d1464976dc0b6afcae7144000c0e2140e",
+        "raw_sha256": "66aafcefc0e5881dca88bd558bc7cea174d0660dfca975c3973b7fa0e444f873",
+        "slot": 8,
+        "state_id": "35f6f05e0b53af16f135dd877a72ee63fed77ba1547417bb7aec8253a5f30365"
+      },
+      {
+        "curve_sha256": "0322ebcb4df169edd47c46470807d123cfaf27b28ded2a6496f84fe7a55aac8b",
+        "lineage_id": "cf1a6b4e4a63babee957eda416e950a50578f1ffed3ae91e44d61a3fa398803e",
+        "raw_sha256": "2af071beba6fdbec91afc0057ffbc02f450d806f5ca732f38da30c0111aefed0",
+        "slot": 3,
+        "state_id": "a38be06ee0a45da307b79f72a1df8a3fccb56e26ff274c2f33a8ba40ee72a0df"
+      },
+      {
+        "curve_sha256": "0328f96a3fc8b0e76a72cf4c64dac80979b2fa9492547d8b4bbaa3fd5dcec543",
+        "lineage_id": "4f959f2916588ac95b64f3e2bfffcc2b1c4b22b0a46f2d6bceebbd720dd4a647",
+        "raw_sha256": "15b43a8f7a275ee773bc926b88658fdf8d5f0a7e863d45589166954b0ccd44d1",
+        "slot": 8,
+        "state_id": "e78df7b870b228765f87523e7871b23a8504552a77c0af9bc7f489ff44fc5294"
+      },
+      {
+        "curve_sha256": "0333afcd67dc7347eb7a0124927c04dfe5c65666b5b7047da3514c45300d4526",
+        "lineage_id": "0b21e81d74392c4883d27eaa054c9e9665de3bd08447243d0e5042a3e9971068",
+        "raw_sha256": "721c9f1dc00ebb9be4fc77b1e6bd4eb477a53dc2b3a54e64b856fab8a0a1fc12",
+        "slot": 3,
+        "state_id": "337c2391e7173337d343293903c861b239b788f4fb91c45e45e2e77fae3ebdae"
+      },
+      {
+        "curve_sha256": "038cbf9d5240385374ae63a38fbe4ada350e482773b2b7e04274ccfa1af6f022",
+        "lineage_id": "884fd095502656bf2f9844b57c744ef4f745b5de2c3db220a0dd0c6b3b860eed",
+        "raw_sha256": "61af3f32f48ae1acb3c008373cb5580bffcb1575572009d6478b72284a125d92",
+        "slot": 6,
+        "state_id": "3fef061d2e13361fe469f28dc3b2d097480a0f2ee3f36017521358549340f7fe"
+      },
+      {
+        "curve_sha256": "03b2eafa954d09216274d03cbd2f9c37e9a37e753504102bfffd98b0b24e3b5a",
+        "lineage_id": "22063fd5f0002453e8e15d0dc190633642cd40c931e701b5a199592aa30bbc88",
+        "raw_sha256": "64fadd125425c9407ae5355b505063d64d1fe861b0a9b8a177e4d55e9a24d32c",
+        "slot": 4,
+        "state_id": "859e995858092bedfe25b70bdfbe17da90fcd91a6e5b65b96f824534c963cb78"
+      },
+      {
+        "curve_sha256": "03d39550746260ea56c8536a026f390799647d87c50421edd7790b9a9d22005c",
+        "lineage_id": "65b3a20a2ab824306c00c916327682080d084e91a711dc0bf70d0449e8902758",
+        "raw_sha256": "50240fcc3fbcd09fbc55a98a5521ea059e12407dfbb3ed3a4ebab580417cf8d1",
+        "slot": 3,
+        "state_id": "c0a31500fe7fa5d6e9b16a5450bea858292a109d1b4545908378c0a2872f55e7"
+      },
+      {
+        "curve_sha256": "03d55d681b78f7fbc4870eb36f70f0aeb03a32b6bba3b113600a53567fee1d85",
+        "lineage_id": "32b3f2749327e02247da2a1476c5c824b7c9237717cce0c5c35b39ea71242730",
+        "raw_sha256": "82d6a7058daaae6a65e60cfac6cfd40951dc42070a7ee110fbafdbd909ec3b55",
+        "slot": 6,
+        "state_id": "c0fae33ebe738de584cf89e12cce914dfd02a05bdb67fa8ded6f6820109db15c"
+      },
+      {
+        "curve_sha256": "03e8a28bf441bd02bf232c8967be1cf096346e89b0bbca52a40709d1cc9c4582",
+        "lineage_id": "3d2b88cd45e103ae1c592a78535f6ea458d86c4e817e98a86836ab94e61213c9",
+        "raw_sha256": "d7217ab3b3a4f828bc4ad9ae7b5aefe22f9b2a7b0de0fc2727b24f192d298673",
+        "slot": 1,
+        "state_id": "fb3e8ee4952ffcae49054b324f445d385a7e28e499fcf2434385a98bcedda7c6"
+      },
+      {
+        "curve_sha256": "03ee0f54d855a1641272196421f4ae849afc903b037dd079d8bd5947711514e0",
+        "lineage_id": "1143aac7ca63d7e2ec26e51940a72037d98f4fb2a3c4034ca8ee1bc916bc2865",
+        "raw_sha256": "d499012f57027da66ffbbc4f558516bd500a79ecc28b37977a39c0812e571877",
+        "slot": 5,
+        "state_id": "9c3572c5e18259667c4b7b42de913e450e0b19b1a5595441932437c83086336d"
+      },
+      {
+        "curve_sha256": "0405e45bec20f39d420a425b1cc1684fe679b2fdcfdc12dfc2bc68ea2d288dd7",
+        "lineage_id": "1808d0fbc0cfc13875729c10ca91359257f9c82190aa34120c1d84a24d9940c1",
+        "raw_sha256": "c48c1aaa8547c66af02bb4889cba798f948f70a2066bb7432cf4f80376d149dc",
+        "slot": 6,
+        "state_id": "67e2f40d2f9eea3ed1323ebbbb582d423dc7b3332f72c4a3d938e5ba634abe60"
+      },
+      {
+        "curve_sha256": "0414b565deb184f2cfd89f3c3b879f693788c52a3f0be0cf9f2c05a557317820",
+        "lineage_id": "0fbd74688cb17c32799e75e8ab970f7a0900cc2b80584cbfce07e742b33d8cf5",
+        "raw_sha256": "af91e96eb1343e6bb9dbf5ba8360c59b8f142715973a4b0e9095b15c05995c89",
+        "slot": 4,
+        "state_id": "9e3029e343085799bcf35c88ca347c5d0182ec8e20b9e40eb97f66ff523ef614"
+      },
+      {
+        "curve_sha256": "041c72cb86704219de60d2351628b48b628919d848b36dc0160c1540cb580438",
+        "lineage_id": "598dc7f66203f250fe6a98b313bea5d8042abd309638a0762e4e40231fd94f89",
+        "raw_sha256": "009b1c0a92df462cff36c12c6ed2f048fc3673bd98f3d8d141bc247d3a524287",
+        "slot": 2,
+        "state_id": "3a0461e889a405defb6979c284591c77518256456fdba043d837d7ce93c763c7"
+      },
+      {
+        "curve_sha256": "0425309de480a2d116310ff4639a507381df213f375975f1ea9cbc86fa3c3033",
+        "lineage_id": "5b2985fa26f83c1cdb8e7049aa4b05033edf07b0f806697b4eb29a25cf01ac6b",
+        "raw_sha256": "ddecea3e423fd0bdf85c50fa8a1ba2772b88d9ee01aa138c281bd27419a4203b",
+        "slot": 8,
+        "state_id": "7df88a98354ed35fa5dc308d156c66bf0783ed35559592e61d3f7be079b5cf52"
+      },
+      {
+        "curve_sha256": "042e7719b5a0102d348b9b280f7262492230cb62d3a7106916c7d36ed1db9273",
+        "lineage_id": "499ec3bd8029eefdb664de1cd21a7a1533b7d8498138ffb631661facf0f8cb1e",
+        "raw_sha256": "886518d25112bb33dfbde29ba3d2aec68c4fdd523ec89d30d283b28b65c9792a",
+        "slot": 6,
+        "state_id": "50602e27fda408032869d6ef41bbec480415cc315f39458e9bfbbdef639c6dc5"
+      },
+      {
+        "curve_sha256": "0448fbc5d2b798c12220d1dc671f1c845383b4b2ae70d55ef08615be3dbc64f2",
+        "lineage_id": "a13ccf48233fa76dcb4c1e89303086d67b033fe75eccfe31316d7cf10240034e",
+        "raw_sha256": "20d873702fa6d5f067a920c3da46497c9ce796319256959f5d792db6ae7194d0",
+        "slot": 7,
+        "state_id": "a0de7e18160b3883d121e51363f44f68edda246d80e38e3f06bbf3bdd122d899"
+      },
+      {
+        "curve_sha256": "04575db460e8852446c2e816f4a8bafb827a61ccaa34004847a68467fc9a3023",
+        "lineage_id": "39b6bb0cb4a72c30ac8c08b61b83dd1d185d2ad17a158b42f0ca3151c1e841a3",
+        "raw_sha256": "c82b076694d8ef21a446a70b5754f3ce5113de988ca952726645c27f7b8506a5",
+        "slot": 2,
+        "state_id": "9672e652f06e4758a1421bd6b72461c086b2de36c374fbc5313bb9e48413d231"
+      },
+      {
+        "curve_sha256": "046a5394e22848264e687822d96b17d757e606e7d01b0b3ec3a2b4834f6eed38",
+        "lineage_id": "21fc43d9248d9caea775882ce48f03a439a8fe626d00adfb56c6e27c650d1ef1",
+        "raw_sha256": "02063ad4396026fca7d1a0eb370b51e37b04be4b3c27eeefa6c7a334815b76e3",
+        "slot": 4,
+        "state_id": "048b24c7713dff2dd0347500001d1017c08fac0a7e9a3ab6feba2074bcaba726"
+      },
+      {
+        "curve_sha256": "04775893029b48c4043a0b0c92cb18f1b91efb938e7b1c10df67a116e99fe2c2",
+        "lineage_id": "5f8c3c3ca2e4949dfab2609f93d243577358c372929fc5884c2a0da28ecb33a0",
+        "raw_sha256": "03b194e4a342bd8f9031a0ac712b0d2d6c0d0ce31f71a4d8515c534deb65e709",
+        "slot": 4,
+        "state_id": "433f87e1817091e0bdc4f3ceceba5249dda9c6914a565f507e92c8e669555ffe"
+      },
+      {
+        "curve_sha256": "0489daaba2dd613ce8e4d4f34931bffa6e53f6b18e3d3d1947c412a688d17806",
+        "lineage_id": "a0ca81e80f5ba011c0240f3a42e630ec93b71c3761e9e0b39303229af3bf9d49",
+        "raw_sha256": "01b409ebcee89f599f3f26e37a6af6f6ecf8c8ba1ea8e08bf12a49ac52e0b82e",
+        "slot": 6,
+        "state_id": "1eef6347aaf25f54b7a18ede2a0d439cf277e4a698ccbcf1d9c257e270598ff6"
+      },
+      {
+        "curve_sha256": "04ad2c0846806b4afc17c7ad42817cdd37ffc09f681e91d5489e41fc88443a54",
+        "lineage_id": "87ddc05c63c15c42882e4c35a9cc7f9f527bfb31c2e652c6939bbb9363a5b637",
+        "raw_sha256": "419de13212c67553f4f2de980a4f065d6a0cb39f29fd2e08cb7f4ba7e1ac2a7b",
+        "slot": 8,
+        "state_id": "ded23fdfdc73399f4c56fd8be44203615addc1865ab38914773ddb9234625b16"
+      },
+      {
+        "curve_sha256": "04bc638d9831f1a0526309c6f9f09ba4e8903bb7f7a12e672c0bc79b6a85b2da",
+        "lineage_id": "87ddc05c63c15c42882e4c35a9cc7f9f527bfb31c2e652c6939bbb9363a5b637",
+        "raw_sha256": "419de13212c67553f4f2de980a4f065d6a0cb39f29fd2e08cb7f4ba7e1ac2a7b",
+        "slot": 5,
+        "state_id": "ded23fdfdc73399f4c56fd8be44203615addc1865ab38914773ddb9234625b16"
+      },
+      {
+        "curve_sha256": "04d4863be5b3ea7ed4e96333d8c01aacdb7bcd65fad0857f10ac354bf8c2f01a",
+        "lineage_id": "01627ff77f8e7dc5ddf78c3bd98cd68b82a3040358cf87385f0d649fa2b2a1db",
+        "raw_sha256": "79b81b55fb1b3c17059eeb8e3419a3d4425070560896162277876a120c7ea0a4",
+        "slot": 4,
+        "state_id": "4d68c7128813b30c813490ccac43ca4c03389c1aca6e9d777951e558e24a95b1"
+      },
+      {
+        "curve_sha256": "0516507db0203637535f611199d02f7e91e0f7248c13b69067bdee37f74113f2",
+        "lineage_id": "073190588c095425586b64b13559c712e378a339785aa6d01c7a4850e125bd65",
+        "raw_sha256": "d83d948a0b680da28d3c40f5ee1211af784ee5fad0787a7f40d87ad180e46ff4",
+        "slot": 3,
+        "state_id": "899fbc87baed81b7ef0ddfc0dfa2f881180433f48dc483daff9f471d8468bd3a"
+      },
+      {
+        "curve_sha256": "053e165daca13c040bab0c0df15d85bb1c01a621bcb33978866b4c5f13559378",
+        "lineage_id": "c4153e809e2bec0616e62ae02b83c7369eb340302beadba29cc99b6b4db10ee7",
+        "raw_sha256": "512541bbdd6e0f281d96f7a62091f8ea6598584af003b2110fe82ebc75f279df",
+        "slot": 8,
+        "state_id": "a23655e06be40b779b1a8bca1b9e106f9570db9d23f1050c75a4bfad385053b3"
+      },
+      {
+        "curve_sha256": "056474c2f4e3631023fc3454ab3511b874949532dc14366e0953ce0cd1368fbf",
+        "lineage_id": "7c5b3f0db581b7e03225d76d4d853cc776cd7dbbfe4309c6a2f612695c327e10",
+        "raw_sha256": "fe05fb81f4761b21d539ccf9da2bd034ba4099ed9e7edc4af62faa63bf9fa4a7",
+        "slot": 2,
+        "state_id": "c228d0aeadcd496a7e86b5b3805000491c7790698fd50d0136c200c141cb189e"
+      },
+      {
+        "curve_sha256": "05734d53e11bc91be8b0a1bd7db7fb55a6aa05e46efec8836ded987762637010",
+        "lineage_id": "76ddf50b135c04e5505169260f4bf55760f0d2a9a2f3c98421fab479b0e33467",
+        "raw_sha256": "a0cf1eab7edd5504d06fe3305d3bd5d29ca4edbe2597f1b8f519908e34449f57",
+        "slot": 1,
+        "state_id": "326039b2f66ecc4866a1555edf2793a2ae15aa18f03c9c84f48dffed1b3f67a9"
+      },
+      {
+        "curve_sha256": "057399f7b74eb5bc62c55051034639482b37f6575e90d8f8fee03c8ad7ab9dd7",
+        "lineage_id": "7e9f02ce51083c47cbd196f26516de071a1904f484cd4f05ab6ab49373cc6d82",
+        "raw_sha256": "d3ce8b5978e33250962b7364ab1b4a1cce894c0f708ccde260c141a9fe95e6e4",
+        "slot": 3,
+        "state_id": "2a445a96260c93024bcb09f26e456c5bf3e70089e2df5a5c6ffac56326a6556b"
+      },
+      {
+        "curve_sha256": "0574848fa23dc950c047c13004a12fc9bf8d03f95da346bf16310ddfbfb0f88b",
+        "lineage_id": "1689003bbecd03672c8546864eeafa5792f622ec3ecb9d13da93df126118e5d8",
+        "raw_sha256": "8347d132360648cd3839e437b836c7ac2d5da5050adf1374294c72f12a5c5375",
+        "slot": 2,
+        "state_id": "bf64fac25e059c5c3011899062b2354a60fb3037f250634b88b0f61fb03ea0fd"
+      },
+      {
+        "curve_sha256": "05994e6f893cce604e939fa56ab3893cb9c4886050188c0642afc581163e2e69",
+        "lineage_id": "ea21d3a0a8373ccb2ab1ec9b6904b2dfde52fb1990c424dfc5099bdb141091fd",
+        "raw_sha256": "70deeb93e123330c8dc6f6e93de13f480ad6b6ae3ff7969b64f6f087aa096096",
+        "slot": 6,
+        "state_id": "b31ec35cb44bf04f4c5adaeaf68b12ff155e8c23657c4e888f2f86024b097df9"
+      },
+      {
+        "curve_sha256": "059cc3de99cfea4a16715161dfff4218016f3b61e98dba82ee66c6fc65fe8947",
+        "lineage_id": "f57241d888bfc87a58cc0168b764365e816f9b170d64fa7915616d69f3ab8a98",
+        "raw_sha256": "889d2e64090c4de74901abfe95c9d4660312066b691b9458832cffeeab9f1c8b",
+        "slot": 8,
+        "state_id": "2ba53e4ce7a6bf6e60cebfa7890bab09bdd9c67b2b9bd11257aa036f1b5eadaa"
+      },
+      {
+        "curve_sha256": "05a554f912928af3d93028158e6946e420f09f1bb2defb4d88f23cb3595cc5a4",
+        "lineage_id": "0c26c33080e771a0e4edff26312744e51684fe9a06bcd4795e3384a931fcec48",
+        "raw_sha256": "543023240e0acccfb10618c15015af99729abccee5d56bedc910697aac994864",
+        "slot": 3,
+        "state_id": "a1537c5d65d86a794e37c7297d47900949c07a47ae6bb6c7687de61177609e07"
+      },
+      {
+        "curve_sha256": "05bb3005c5281458993813756cdab67f4ac984bf0c20df7724953ff67c30a17c",
+        "lineage_id": "5cbc2199eb83aac7a4f129c9f69d8f1b9e3dedf3eda64e6b9d4b27543a5f80cd",
+        "raw_sha256": "71f29cf22015e5dc974894327c5c105569b0a849d29d2c5815d31363816da9fb",
+        "slot": 3,
+        "state_id": "eb564f0a25896785c1466460d62b2b2d64944f45677f09b183800186b4cb6b18"
+      },
+      {
+        "curve_sha256": "05ce58caff1107407e0948ede205a78286e16d23a89afc41c1611c3599dbcabb",
+        "lineage_id": "ea66e4cfaedd5a7e18a12840a35ca1cad22e32272379d3321f6329f46f8a8807",
+        "raw_sha256": "b7df2daf6af781e8e40b6be5c9c9cac3e2a6fce88a9df64a976cb2604fea1704",
+        "slot": 5,
+        "state_id": "1cb1200ae85183745b0a56fc1ff233a82068d9bb3e2508811c7616deb659bcae"
+      },
+      {
+        "curve_sha256": "061479f2fb1ebdebdcfd4cfb57dc84bc7991c93f30bc500d26c02db6af5881d2",
+        "lineage_id": "953180ff4178ff9819c3f181b1d13d985b33fdbf14495700b230c26281c4e477",
+        "raw_sha256": "f7aaa664caa461ad1928ddd5d7b8d0cfe6f6ce21a15e83fe68842cc09a939b70",
+        "slot": 5,
+        "state_id": "ced8e82657bba27fbf269314a4b168c0845a23080edd05afcb4891f02e2e1d60"
+      },
+      {
+        "curve_sha256": "06205f62fdbb0b6edda10bcbf49d0f57b2361fd9aa02897ba2dcf3a646f81aeb",
+        "lineage_id": "af4222bfc8147dc84c3b77b94b89ed6d6fdab2709fcc20ddefc0ded885b9ecf3",
+        "raw_sha256": "98b2665b444e3883e796707d59f6d7c5614b1d58cfab344ce95e9730353dcd5c",
+        "slot": 4,
+        "state_id": "8be9f6eb610f16da7b1f220a8714a2ca91204e2ff4d6d0d96b3f7c9414c3ce47"
+      },
+      {
+        "curve_sha256": "064b86688e91bf94840f38b2cd036f4def28838371bb4975ae4be2c3da6c75c7",
+        "lineage_id": "44c0e8a9951640584fdb06cf1b3d115283f962c2d155e880a883cad44f84e508",
+        "raw_sha256": "95e2913157180e536d01c979102dbffacdf569599506d1cffe560c4e79f33413",
+        "slot": 4,
+        "state_id": "77288d424cf144a98b5886918682a4897609facc8598a61410a2c53689860469"
+      },
+      {
+        "curve_sha256": "066e286506995a75b9631c8744a9deb1695e8e2662acad0f50f2436919bd9668",
+        "lineage_id": "806d7ffb4c5b65728add64e3657d3a68a454d5eebd24c08b68f24648316d0250",
+        "raw_sha256": "170d1327251d158ff0776d20ea12846c66dfd3cdc7b25e8e4871f01f8f57a790",
+        "slot": 2,
+        "state_id": "94a24111b4d437498e3a547deff0deba46d6be9b61f83ae23cb3cd9023c69eed"
+      },
+      {
+        "curve_sha256": "069d58a5d2af2d7929c9d43b5a4de6ce14c59b19e44a23d7f9e410eb0d909ddd",
+        "lineage_id": "7db7e0963a3c1e796d4e77e5b0e8693c1d3547a1362f2ea90ede5193b6eb25f0",
+        "raw_sha256": "4e22090e22731a1f3f54f12df74f831f0437c7aa1c2c39afb0405b6e5b7bace9",
+        "slot": 7,
+        "state_id": "236de8a55c9788752ee83c335177893dfa10e81f0130e5eb6a334a01da8e9a3b"
+      },
+      {
+        "curve_sha256": "06af205f2018f408ff3bbc34bdb9f71450dce72041a1e5be9a7285109e4d9857",
+        "lineage_id": "3df895c68f208fd85b7e730e0a10391a42ce64ab4789d6a7c200aa954d5180f5",
+        "raw_sha256": "f35c0ee6653958ff14323ff13ae1e971699cfd5db53cea2d28be523b4ff40740",
+        "slot": 5,
+        "state_id": "71c624457e9bc3c0c7901e2e79fa5b772fdbe4f3059863843985cc0e1dc2836e"
+      },
+      {
+        "curve_sha256": "06b2244ec4dae4960ad6ba9db0ff225a3cba70e020e49ec4141556464c009278",
+        "lineage_id": "627d3b4217ecdb9326d0fb882b01a3783d8c41f0835ea242935ccc1b46fcf53a",
+        "raw_sha256": "3d2c95de5086150dbc63f77723429274266a88a1dc6aaf0f276d7f0c0dae7b4c",
+        "slot": 5,
+        "state_id": "5aa57e05cff127ebe8d419626fc88b46216c12c8b8ee492a4944a1e2fdff451c"
+      },
+      {
+        "curve_sha256": "06b62db9916b89cdf99fca2b713182c4cb27137fe599109337c6dd3cdd59e88d",
+        "lineage_id": "59b8929131b177c15a271af5c5fc19c31fb26ad01de0c84aaf47d15248b128b3",
+        "raw_sha256": "b56f2c935c692b2f962d7148dbb29c90fa67b3e9e3db3862ef8cf622cc19660f",
+        "slot": 3,
+        "state_id": "389fa8e0eeea5c9ad6aa46211b9cece2b9e60ca779977cbc58d1140d5a4fe464"
+      }
+    ],
+    "maximum_curves": 64,
+    "source_curve_rows": 1640,
+    "source_presets": 205,
+    "unique_training_curves": 1640
+  },
+  "gates": {
+    "all_train_only": true,
+    "decoder_exact": true,
+    "fixed_phase_repeats_exact": true,
+    "memory_bounded": true,
+    "native_accepted": true,
+    "restored_bank_identity": true,
+    "source_unchanged": true
+  },
+  "memory_sampling_errors": 0,
+  "native_events": [
+    {
+      "audio_float32_sha256": "05af57e74bbb9820422b2d242ec3cf0ba879ace9c2471958efadd127a5e97fc5",
+      "diagnostic_codes": [],
+      "kind": "original",
+      "native_state": {
+        "applied_preset_sha256": "c18b08d0e4968bf3d40e28fbe98091acd0ba96a4aeb8ca803b36e8318e51ed3d",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "c18b08d0e4968bf3d40e28fbe98091acd0ba96a4aeb8ca803b36e8318e51ed3d",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "f3dc4a54d2b0d121e68b0567650fd9b0e0156b4ab3bed2a9e594c60bb3ea1fba",
+      "slot": 1,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "05af57e74bbb9820422b2d242ec3cf0ba879ace9c2471958efadd127a5e97fc5",
+      "diagnostic_codes": [],
+      "kind": "original_repeat",
+      "native_state": {
+        "applied_preset_sha256": "c18b08d0e4968bf3d40e28fbe98091acd0ba96a4aeb8ca803b36e8318e51ed3d",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "c18b08d0e4968bf3d40e28fbe98091acd0ba96a4aeb8ca803b36e8318e51ed3d",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "f3dc4a54d2b0d121e68b0567650fd9b0e0156b4ab3bed2a9e594c60bb3ea1fba",
+      "slot": 1,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "fff6ddda9e22e35543242b6b5b2fce6fd5631d68624ea2cf0d0135f2f9b28cdc",
+      "diagnostic_codes": [],
+      "kind": "grid",
+      "native_state": {
+        "applied_preset_sha256": "adbec9df0075becac8f9cfc24763442f46bcfb630eaf9dbdd7d2f4bcc7748a0f",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "adbec9df0075becac8f9cfc24763442f46bcfb630eaf9dbdd7d2f4bcc7748a0f",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "eb04489b5ef2da8d5388a9260fd20ae4b176f50046496f374bc954c9a84c540d",
+      "slot": 1,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "0a805eba0a79ddb5054d7871b5a1fb179ce85016c0c9e6b0a1a52a5810e64dd1",
+      "diagnostic_codes": [],
+      "kind": "code",
+      "native_state": {
+        "applied_preset_sha256": "da24ec187c8b3a83eded65a2700e862804d5e7738273d92f4a659bae77b51493",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "da24ec187c8b3a83eded65a2700e862804d5e7738273d92f4a659bae77b51493",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "03332984b2bf8c30bed4f42ffd9231473bdd0875edd0429c202c0a8d5a85b623",
+      "slot": 1,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "0a805eba0a79ddb5054d7871b5a1fb179ce85016c0c9e6b0a1a52a5810e64dd1",
+      "diagnostic_codes": [],
+      "kind": "code_repeat",
+      "native_state": {
+        "applied_preset_sha256": "da24ec187c8b3a83eded65a2700e862804d5e7738273d92f4a659bae77b51493",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "da24ec187c8b3a83eded65a2700e862804d5e7738273d92f4a659bae77b51493",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "03332984b2bf8c30bed4f42ffd9231473bdd0875edd0429c202c0a8d5a85b623",
+      "slot": 1,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "a974000f14e7456c5f8912a85a9b5452d41b89c7649c5cb913933e77f54e43c9",
+      "diagnostic_codes": [],
+      "kind": "original",
+      "native_state": {
+        "applied_preset_sha256": "c18b08d0e4968bf3d40e28fbe98091acd0ba96a4aeb8ca803b36e8318e51ed3d",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "c18b08d0e4968bf3d40e28fbe98091acd0ba96a4aeb8ca803b36e8318e51ed3d",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "d259d475a2a250aff1d96c253dc74d80f8c2a05c1f04f998042ee490ccabe0fc",
+      "slot": 1,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "a974000f14e7456c5f8912a85a9b5452d41b89c7649c5cb913933e77f54e43c9",
+      "diagnostic_codes": [],
+      "kind": "original_repeat",
+      "native_state": {
+        "applied_preset_sha256": "c18b08d0e4968bf3d40e28fbe98091acd0ba96a4aeb8ca803b36e8318e51ed3d",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "c18b08d0e4968bf3d40e28fbe98091acd0ba96a4aeb8ca803b36e8318e51ed3d",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "d259d475a2a250aff1d96c253dc74d80f8c2a05c1f04f998042ee490ccabe0fc",
+      "slot": 1,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "fb4d70a43eaf030c80d797bcf239b63b1f33051450c1e422530928c7d06a7e74",
+      "diagnostic_codes": [],
+      "kind": "grid",
+      "native_state": {
+        "applied_preset_sha256": "adbec9df0075becac8f9cfc24763442f46bcfb630eaf9dbdd7d2f4bcc7748a0f",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "adbec9df0075becac8f9cfc24763442f46bcfb630eaf9dbdd7d2f4bcc7748a0f",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "b2fcee781b5f6b363cc6117709ba5f521c6dd185906bfb4dee4de75e7b0aa698",
+      "slot": 1,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "5acc8a4458ae595f3de79306ba3158ca02e3bf50ee5c0eca2fbb5dbbf8be7995",
+      "diagnostic_codes": [],
+      "kind": "code",
+      "native_state": {
+        "applied_preset_sha256": "da24ec187c8b3a83eded65a2700e862804d5e7738273d92f4a659bae77b51493",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "da24ec187c8b3a83eded65a2700e862804d5e7738273d92f4a659bae77b51493",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "aa8c4c40f2fe01a83efe4576ec395d2dc9de9b218eed22c57d63d6d868e1e554",
+      "slot": 1,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "5acc8a4458ae595f3de79306ba3158ca02e3bf50ee5c0eca2fbb5dbbf8be7995",
+      "diagnostic_codes": [],
+      "kind": "code_repeat",
+      "native_state": {
+        "applied_preset_sha256": "da24ec187c8b3a83eded65a2700e862804d5e7738273d92f4a659bae77b51493",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "da24ec187c8b3a83eded65a2700e862804d5e7738273d92f4a659bae77b51493",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "aa8c4c40f2fe01a83efe4576ec395d2dc9de9b218eed22c57d63d6d868e1e554",
+      "slot": 1,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "d204deb255f8a6a5e29f216898d1c49f3a0fae4d106f515d90ced1ef7cd42c54",
+      "diagnostic_codes": [],
+      "kind": "original",
+      "native_state": {
+        "applied_preset_sha256": "f02e479345c4d232b9d1fba40ecd586c2dc8a812e458437a666433a63c26a7b6",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "f02e479345c4d232b9d1fba40ecd586c2dc8a812e458437a666433a63c26a7b6",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "a5bbcfe15f89435e8eeeef5feb4fd0cc07a8b5567f7fc33f92bfe0de03fedd58",
+      "slot": 2,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "d204deb255f8a6a5e29f216898d1c49f3a0fae4d106f515d90ced1ef7cd42c54",
+      "diagnostic_codes": [],
+      "kind": "original_repeat",
+      "native_state": {
+        "applied_preset_sha256": "f02e479345c4d232b9d1fba40ecd586c2dc8a812e458437a666433a63c26a7b6",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "f02e479345c4d232b9d1fba40ecd586c2dc8a812e458437a666433a63c26a7b6",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "a5bbcfe15f89435e8eeeef5feb4fd0cc07a8b5567f7fc33f92bfe0de03fedd58",
+      "slot": 2,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "ef04f0b2990d658a3541ed3aa77d9495a86a853a29f03e6b687b979d0055c6aa",
+      "diagnostic_codes": [],
+      "kind": "grid",
+      "native_state": {
+        "applied_preset_sha256": "b139b177a3375cd84dfc8a6385cdfe5b059ad187ddf027ddd4ef7f65b095f888",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "b139b177a3375cd84dfc8a6385cdfe5b059ad187ddf027ddd4ef7f65b095f888",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "4ccc90727613b037ee1721acce314fd93c5aecc4da217acc2a607a60192cc703",
+      "slot": 2,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "1d11fb80384e1cc5789f52b73b1d4d2ea70b6cfcb3225c9dd19fbf11bf5f86c4",
+      "diagnostic_codes": [],
+      "kind": "code",
+      "native_state": {
+        "applied_preset_sha256": "baa34ea699da3c4d0e0004eab47694d1aab7633f564e20fb4f3df89983ec548a",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "baa34ea699da3c4d0e0004eab47694d1aab7633f564e20fb4f3df89983ec548a",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "574e5415331635370f59efae79bb29786bbdafc0be2e33e71d9d6d49661bc1ee",
+      "slot": 2,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "1d11fb80384e1cc5789f52b73b1d4d2ea70b6cfcb3225c9dd19fbf11bf5f86c4",
+      "diagnostic_codes": [],
+      "kind": "code_repeat",
+      "native_state": {
+        "applied_preset_sha256": "baa34ea699da3c4d0e0004eab47694d1aab7633f564e20fb4f3df89983ec548a",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "baa34ea699da3c4d0e0004eab47694d1aab7633f564e20fb4f3df89983ec548a",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "574e5415331635370f59efae79bb29786bbdafc0be2e33e71d9d6d49661bc1ee",
+      "slot": 2,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "1600ad72f453943a1d3129f3b44ea43062989d4d82256395a7eca26b420685ed",
+      "diagnostic_codes": [],
+      "kind": "original",
+      "native_state": {
+        "applied_preset_sha256": "f02e479345c4d232b9d1fba40ecd586c2dc8a812e458437a666433a63c26a7b6",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "f02e479345c4d232b9d1fba40ecd586c2dc8a812e458437a666433a63c26a7b6",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "2d486b51bce788c9b6cffc960742eb6d2d6bb2eb5881c76bb6b271cab562e324",
+      "slot": 2,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "1600ad72f453943a1d3129f3b44ea43062989d4d82256395a7eca26b420685ed",
+      "diagnostic_codes": [],
+      "kind": "original_repeat",
+      "native_state": {
+        "applied_preset_sha256": "f02e479345c4d232b9d1fba40ecd586c2dc8a812e458437a666433a63c26a7b6",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "f02e479345c4d232b9d1fba40ecd586c2dc8a812e458437a666433a63c26a7b6",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "2d486b51bce788c9b6cffc960742eb6d2d6bb2eb5881c76bb6b271cab562e324",
+      "slot": 2,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "8f9e0184c471087c585f0d77c31172e5ae32009a70a79a80e509fb483de8e347",
+      "diagnostic_codes": [],
+      "kind": "grid",
+      "native_state": {
+        "applied_preset_sha256": "b139b177a3375cd84dfc8a6385cdfe5b059ad187ddf027ddd4ef7f65b095f888",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "b139b177a3375cd84dfc8a6385cdfe5b059ad187ddf027ddd4ef7f65b095f888",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "df3d2a55bc1ab3a27cab8793b320517b4303e0faf868a6ac33621fc580d31901",
+      "slot": 2,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "1e49544e9150c70587810fc8e65754be596329e742191f05594c61225bced5b1",
+      "diagnostic_codes": [],
+      "kind": "code",
+      "native_state": {
+        "applied_preset_sha256": "baa34ea699da3c4d0e0004eab47694d1aab7633f564e20fb4f3df89983ec548a",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "baa34ea699da3c4d0e0004eab47694d1aab7633f564e20fb4f3df89983ec548a",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "f51da3257fdf932d441d08516978d8eb0cbf9b7a92448bc8936b3dc3bc3b6b29",
+      "slot": 2,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "1e49544e9150c70587810fc8e65754be596329e742191f05594c61225bced5b1",
+      "diagnostic_codes": [],
+      "kind": "code_repeat",
+      "native_state": {
+        "applied_preset_sha256": "baa34ea699da3c4d0e0004eab47694d1aab7633f564e20fb4f3df89983ec548a",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "baa34ea699da3c4d0e0004eab47694d1aab7633f564e20fb4f3df89983ec548a",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "f51da3257fdf932d441d08516978d8eb0cbf9b7a92448bc8936b3dc3bc3b6b29",
+      "slot": 2,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "ca259bf4896637ce3d86d279eb50f90853658eee5037f233ef4a8f72f22a8eea",
+      "diagnostic_codes": [],
+      "kind": "original",
+      "native_state": {
+        "applied_preset_sha256": "9b89e4dbce3f67d0ad8401dd46aa9cd26f7d3320baf62a899069256a998f9a71",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "9b89e4dbce3f67d0ad8401dd46aa9cd26f7d3320baf62a899069256a998f9a71",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "f457410e166b58cc7f02220569de4315db1bfef7c74badc83547837c4e57c07c",
+      "slot": 3,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "ca259bf4896637ce3d86d279eb50f90853658eee5037f233ef4a8f72f22a8eea",
+      "diagnostic_codes": [],
+      "kind": "original_repeat",
+      "native_state": {
+        "applied_preset_sha256": "9b89e4dbce3f67d0ad8401dd46aa9cd26f7d3320baf62a899069256a998f9a71",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "9b89e4dbce3f67d0ad8401dd46aa9cd26f7d3320baf62a899069256a998f9a71",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "f457410e166b58cc7f02220569de4315db1bfef7c74badc83547837c4e57c07c",
+      "slot": 3,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "318ef00844e107ce53f950a3bb1b05d8702ed96214e4150b314dd5a23310667a",
+      "diagnostic_codes": [],
+      "kind": "grid",
+      "native_state": {
+        "applied_preset_sha256": "1e27221d67d6f416a40d3ef2b6bb7dd57819cfefd4e41bcbcef0a1db8a28daed",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "1e27221d67d6f416a40d3ef2b6bb7dd57819cfefd4e41bcbcef0a1db8a28daed",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "13a4c51d7a5bb3a78764bb4aa861c80611dbb6b91ee1ec9c6adaded3b1c947fb",
+      "slot": 3,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "8a28f96fed0ac10adf512518e871b2616d680a7f7f09e477adaf5c2b6d9d701a",
+      "diagnostic_codes": [],
+      "kind": "code",
+      "native_state": {
+        "applied_preset_sha256": "97b1c0e692a321214e7dbe3c9c0feaa885a7218574789ffa046187090719fd5b",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "97b1c0e692a321214e7dbe3c9c0feaa885a7218574789ffa046187090719fd5b",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "978f3096f45db4b84e8c9a68c5434d48d2d3d137b675a3524f3fc830eb46ab14",
+      "slot": 3,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "8a28f96fed0ac10adf512518e871b2616d680a7f7f09e477adaf5c2b6d9d701a",
+      "diagnostic_codes": [],
+      "kind": "code_repeat",
+      "native_state": {
+        "applied_preset_sha256": "97b1c0e692a321214e7dbe3c9c0feaa885a7218574789ffa046187090719fd5b",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "97b1c0e692a321214e7dbe3c9c0feaa885a7218574789ffa046187090719fd5b",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "978f3096f45db4b84e8c9a68c5434d48d2d3d137b675a3524f3fc830eb46ab14",
+      "slot": 3,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "3ea6616704ea059f0e1f2c0300d9d37779bf8dc78679053bcb56812964e7665d",
+      "diagnostic_codes": [],
+      "kind": "original",
+      "native_state": {
+        "applied_preset_sha256": "9b89e4dbce3f67d0ad8401dd46aa9cd26f7d3320baf62a899069256a998f9a71",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "9b89e4dbce3f67d0ad8401dd46aa9cd26f7d3320baf62a899069256a998f9a71",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "31e023a4b89f621a2382c04c61eef0f31d69710fd387fb2b6b8c92b9f06fd00c",
+      "slot": 3,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "3ea6616704ea059f0e1f2c0300d9d37779bf8dc78679053bcb56812964e7665d",
+      "diagnostic_codes": [],
+      "kind": "original_repeat",
+      "native_state": {
+        "applied_preset_sha256": "9b89e4dbce3f67d0ad8401dd46aa9cd26f7d3320baf62a899069256a998f9a71",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "9b89e4dbce3f67d0ad8401dd46aa9cd26f7d3320baf62a899069256a998f9a71",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "31e023a4b89f621a2382c04c61eef0f31d69710fd387fb2b6b8c92b9f06fd00c",
+      "slot": 3,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "30d0ab7be7265b5cfaa6c59af52ffb150fa996e6949e3ee936aee4ef2c4f8321",
+      "diagnostic_codes": [],
+      "kind": "grid",
+      "native_state": {
+        "applied_preset_sha256": "1e27221d67d6f416a40d3ef2b6bb7dd57819cfefd4e41bcbcef0a1db8a28daed",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "1e27221d67d6f416a40d3ef2b6bb7dd57819cfefd4e41bcbcef0a1db8a28daed",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "c67133c9511c688347a43dbd1940c7a83296f4f9d454f28902b9262f61bdaec2",
+      "slot": 3,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "ca1692513c61a602684b439a88e4421a0b6fe342faa6d989e84cfc11e3660609",
+      "diagnostic_codes": [],
+      "kind": "code",
+      "native_state": {
+        "applied_preset_sha256": "97b1c0e692a321214e7dbe3c9c0feaa885a7218574789ffa046187090719fd5b",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "97b1c0e692a321214e7dbe3c9c0feaa885a7218574789ffa046187090719fd5b",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "2a2c768f5583413a37497517fef07a1182bdfafd6506b0368fcf6374632d7817",
+      "slot": 3,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "ca1692513c61a602684b439a88e4421a0b6fe342faa6d989e84cfc11e3660609",
+      "diagnostic_codes": [],
+      "kind": "code_repeat",
+      "native_state": {
+        "applied_preset_sha256": "97b1c0e692a321214e7dbe3c9c0feaa885a7218574789ffa046187090719fd5b",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "97b1c0e692a321214e7dbe3c9c0feaa885a7218574789ffa046187090719fd5b",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "2a2c768f5583413a37497517fef07a1182bdfafd6506b0368fcf6374632d7817",
+      "slot": 3,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "2ddbae7c276df624b6f3b12b73935438aa316af07ee02bb0897de4c160738c96",
+      "diagnostic_codes": [],
+      "kind": "original",
+      "native_state": {
+        "applied_preset_sha256": "072f6d1c3deaed2919f1f845267db7a103ed874aa2558e586c9634410a67a8cd",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "072f6d1c3deaed2919f1f845267db7a103ed874aa2558e586c9634410a67a8cd",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "cde6bdca10e8d1e15ac6ba4821e25f5e46bfee4a7e342be5fa04658d7eac88c5",
+      "slot": 4,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "2ddbae7c276df624b6f3b12b73935438aa316af07ee02bb0897de4c160738c96",
+      "diagnostic_codes": [],
+      "kind": "original_repeat",
+      "native_state": {
+        "applied_preset_sha256": "072f6d1c3deaed2919f1f845267db7a103ed874aa2558e586c9634410a67a8cd",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "072f6d1c3deaed2919f1f845267db7a103ed874aa2558e586c9634410a67a8cd",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "cde6bdca10e8d1e15ac6ba4821e25f5e46bfee4a7e342be5fa04658d7eac88c5",
+      "slot": 4,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "b2f3e3fa9a42d8c396e2eca47de5404169ddb1a13f0024c4d98ffd89d5bc97be",
+      "diagnostic_codes": [],
+      "kind": "grid",
+      "native_state": {
+        "applied_preset_sha256": "3198b1d716ce4334aebd6a4a37776f40ac1664e0f3370e91753318755eddf95e",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "3198b1d716ce4334aebd6a4a37776f40ac1664e0f3370e91753318755eddf95e",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "60ce830043401d8f69d460c13f5150596856793287e227af7c39fece68b4db34",
+      "slot": 4,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "6af554336c850ddc2be1ff1a6b92202b653f58c6e3db74a52bcbdd180ea484a5",
+      "diagnostic_codes": [],
+      "kind": "code",
+      "native_state": {
+        "applied_preset_sha256": "673a820304d23e46bf2a0e6b445dbe0a44b0e6f116bb590eab92a38a96896565",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "673a820304d23e46bf2a0e6b445dbe0a44b0e6f116bb590eab92a38a96896565",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "8a091a33c9ccb2276b4599b212bec339f5e0267a56acb97144cce9a905d84c30",
+      "slot": 4,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "6af554336c850ddc2be1ff1a6b92202b653f58c6e3db74a52bcbdd180ea484a5",
+      "diagnostic_codes": [],
+      "kind": "code_repeat",
+      "native_state": {
+        "applied_preset_sha256": "673a820304d23e46bf2a0e6b445dbe0a44b0e6f116bb590eab92a38a96896565",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "673a820304d23e46bf2a0e6b445dbe0a44b0e6f116bb590eab92a38a96896565",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "8a091a33c9ccb2276b4599b212bec339f5e0267a56acb97144cce9a905d84c30",
+      "slot": 4,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "f12ea904750f88078272c4f52a656da498d961c5ef57c30f8e0efee9d2642910",
+      "diagnostic_codes": [],
+      "kind": "original",
+      "native_state": {
+        "applied_preset_sha256": "072f6d1c3deaed2919f1f845267db7a103ed874aa2558e586c9634410a67a8cd",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "072f6d1c3deaed2919f1f845267db7a103ed874aa2558e586c9634410a67a8cd",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "242af74a42081a5350ac94494f338c386b482e0bcf931e03eb2c7c325c47dcd4",
+      "slot": 4,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "f12ea904750f88078272c4f52a656da498d961c5ef57c30f8e0efee9d2642910",
+      "diagnostic_codes": [],
+      "kind": "original_repeat",
+      "native_state": {
+        "applied_preset_sha256": "072f6d1c3deaed2919f1f845267db7a103ed874aa2558e586c9634410a67a8cd",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "072f6d1c3deaed2919f1f845267db7a103ed874aa2558e586c9634410a67a8cd",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "242af74a42081a5350ac94494f338c386b482e0bcf931e03eb2c7c325c47dcd4",
+      "slot": 4,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "438a9445d04c1c2f8b9697bc36c7f32d4b385994fcf8d18fc3bcfd6707554bfc",
+      "diagnostic_codes": [],
+      "kind": "grid",
+      "native_state": {
+        "applied_preset_sha256": "3198b1d716ce4334aebd6a4a37776f40ac1664e0f3370e91753318755eddf95e",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "3198b1d716ce4334aebd6a4a37776f40ac1664e0f3370e91753318755eddf95e",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "3d8947e9d7705c82352f4d346f19ac7b48932e48fcb43fe7ad2dae2a863fcffd",
+      "slot": 4,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "2af7abe608f2e067591e650f0afbfb300e09b5647e99f0facfe0be79e3ca9043",
+      "diagnostic_codes": [],
+      "kind": "code",
+      "native_state": {
+        "applied_preset_sha256": "673a820304d23e46bf2a0e6b445dbe0a44b0e6f116bb590eab92a38a96896565",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "673a820304d23e46bf2a0e6b445dbe0a44b0e6f116bb590eab92a38a96896565",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "713a508ec6b8072f923cad5b7385ca86e2df8623ad39e965bd0e45be1d4de0a4",
+      "slot": 4,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "2af7abe608f2e067591e650f0afbfb300e09b5647e99f0facfe0be79e3ca9043",
+      "diagnostic_codes": [],
+      "kind": "code_repeat",
+      "native_state": {
+        "applied_preset_sha256": "673a820304d23e46bf2a0e6b445dbe0a44b0e6f116bb590eab92a38a96896565",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "673a820304d23e46bf2a0e6b445dbe0a44b0e6f116bb590eab92a38a96896565",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "713a508ec6b8072f923cad5b7385ca86e2df8623ad39e965bd0e45be1d4de0a4",
+      "slot": 4,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "3bf259bfecc44d5ae9214cd136287b24b1756f26d66737e5b90f1d515cbceda3",
+      "diagnostic_codes": [],
+      "kind": "original",
+      "native_state": {
+        "applied_preset_sha256": "b656070dbf00b60ce788d8ab1ad282523de0db941ab942666b0b675854116567",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "b656070dbf00b60ce788d8ab1ad282523de0db941ab942666b0b675854116567",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "643c34b2ed52c5d132da3bae8c6cd1f12a62ef59bf8852c24feb957bdb9de0bd",
+      "slot": 5,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "3bf259bfecc44d5ae9214cd136287b24b1756f26d66737e5b90f1d515cbceda3",
+      "diagnostic_codes": [],
+      "kind": "original_repeat",
+      "native_state": {
+        "applied_preset_sha256": "b656070dbf00b60ce788d8ab1ad282523de0db941ab942666b0b675854116567",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "b656070dbf00b60ce788d8ab1ad282523de0db941ab942666b0b675854116567",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "643c34b2ed52c5d132da3bae8c6cd1f12a62ef59bf8852c24feb957bdb9de0bd",
+      "slot": 5,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "70f062bff57aea332ef598312dc25c1612c83362b2fbef5886dff20faf8f03d6",
+      "diagnostic_codes": [],
+      "kind": "grid",
+      "native_state": {
+        "applied_preset_sha256": "44d964083ad9c94119cfdc268ba8745585552222cff5997f554996fec44265ce",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "44d964083ad9c94119cfdc268ba8745585552222cff5997f554996fec44265ce",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "ccd81bdeaef401e63ee25090de7c7e3b81f7031d7b7e37aa4a4dcd5f47f383bf",
+      "slot": 5,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "908569e6a50530b35969e6b456dad1928049d2b499d7f41c6f183578befeadfa",
+      "diagnostic_codes": [],
+      "kind": "code",
+      "native_state": {
+        "applied_preset_sha256": "4f5eb78fce8154023794aadd13a9ee32f49e0c01ff3da54b5448b64dc5048f11",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "4f5eb78fce8154023794aadd13a9ee32f49e0c01ff3da54b5448b64dc5048f11",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "94c0c012776f34eaf4ae32f2b8300e534d7f84bf42269dce8ab2497674ebdb6f",
+      "slot": 5,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "908569e6a50530b35969e6b456dad1928049d2b499d7f41c6f183578befeadfa",
+      "diagnostic_codes": [],
+      "kind": "code_repeat",
+      "native_state": {
+        "applied_preset_sha256": "4f5eb78fce8154023794aadd13a9ee32f49e0c01ff3da54b5448b64dc5048f11",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "4f5eb78fce8154023794aadd13a9ee32f49e0c01ff3da54b5448b64dc5048f11",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "94c0c012776f34eaf4ae32f2b8300e534d7f84bf42269dce8ab2497674ebdb6f",
+      "slot": 5,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "14055948ec63cfe39eecaf7b7e4a505ceb9f960b997d583cf0200608a8999c78",
+      "diagnostic_codes": [],
+      "kind": "original",
+      "native_state": {
+        "applied_preset_sha256": "b656070dbf00b60ce788d8ab1ad282523de0db941ab942666b0b675854116567",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "b656070dbf00b60ce788d8ab1ad282523de0db941ab942666b0b675854116567",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "a668c02332e66d02dc3bf30b81f203fc59c89b38f64f5409868645a2165b983b",
+      "slot": 5,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "14055948ec63cfe39eecaf7b7e4a505ceb9f960b997d583cf0200608a8999c78",
+      "diagnostic_codes": [],
+      "kind": "original_repeat",
+      "native_state": {
+        "applied_preset_sha256": "b656070dbf00b60ce788d8ab1ad282523de0db941ab942666b0b675854116567",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "b656070dbf00b60ce788d8ab1ad282523de0db941ab942666b0b675854116567",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "a668c02332e66d02dc3bf30b81f203fc59c89b38f64f5409868645a2165b983b",
+      "slot": 5,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "0b72ad3c381f3ac8a0847ed92d91129c699f523811d7de3eedb0934c011c3487",
+      "diagnostic_codes": [],
+      "kind": "grid",
+      "native_state": {
+        "applied_preset_sha256": "44d964083ad9c94119cfdc268ba8745585552222cff5997f554996fec44265ce",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "44d964083ad9c94119cfdc268ba8745585552222cff5997f554996fec44265ce",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "4fee912265d3202a84c5cfaf904c58db5ea6288eebc066dc85d390e6db9be5e3",
+      "slot": 5,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "4e31adc2987201938c8dd4bb19375fa266fe40b60c8bb0ea394a35e96f1dbd59",
+      "diagnostic_codes": [],
+      "kind": "code",
+      "native_state": {
+        "applied_preset_sha256": "4f5eb78fce8154023794aadd13a9ee32f49e0c01ff3da54b5448b64dc5048f11",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "4f5eb78fce8154023794aadd13a9ee32f49e0c01ff3da54b5448b64dc5048f11",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "931e858b534d8668a10519c6b55ac32047dfe807491bf56a7bf2da5272d4c337",
+      "slot": 5,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "4e31adc2987201938c8dd4bb19375fa266fe40b60c8bb0ea394a35e96f1dbd59",
+      "diagnostic_codes": [],
+      "kind": "code_repeat",
+      "native_state": {
+        "applied_preset_sha256": "4f5eb78fce8154023794aadd13a9ee32f49e0c01ff3da54b5448b64dc5048f11",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "4f5eb78fce8154023794aadd13a9ee32f49e0c01ff3da54b5448b64dc5048f11",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "931e858b534d8668a10519c6b55ac32047dfe807491bf56a7bf2da5272d4c337",
+      "slot": 5,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "33c9cc2001173f552b5a9305d2b34b37c97f848565f30985bf238050bfd656a7",
+      "diagnostic_codes": [],
+      "kind": "original",
+      "native_state": {
+        "applied_preset_sha256": "16edda79998d1ef2430f25d7e01039f869a3df48dcc5f597b715b90df444dda2",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "16edda79998d1ef2430f25d7e01039f869a3df48dcc5f597b715b90df444dda2",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "fae952f93c90a9d1741b54eb37fd4e9963d6d2ed8bcabb9d71d3066d6aa99a61",
+      "slot": 6,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "33c9cc2001173f552b5a9305d2b34b37c97f848565f30985bf238050bfd656a7",
+      "diagnostic_codes": [],
+      "kind": "original_repeat",
+      "native_state": {
+        "applied_preset_sha256": "16edda79998d1ef2430f25d7e01039f869a3df48dcc5f597b715b90df444dda2",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "16edda79998d1ef2430f25d7e01039f869a3df48dcc5f597b715b90df444dda2",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "fae952f93c90a9d1741b54eb37fd4e9963d6d2ed8bcabb9d71d3066d6aa99a61",
+      "slot": 6,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "05c9cca1630bfd28b44a2877fe73eba5e36fa7a01b240f19eabcaadfaaadba7f",
+      "diagnostic_codes": [],
+      "kind": "grid",
+      "native_state": {
+        "applied_preset_sha256": "c0192f40e374d6b243dc30121da1ceb3b77b0bb70d827c909ff4e9c6789bd414",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "c0192f40e374d6b243dc30121da1ceb3b77b0bb70d827c909ff4e9c6789bd414",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "5651118ff5b4f06f8030b1b3b9af147171c7ccd2aaa9cd1c2505b679f6a03768",
+      "slot": 6,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "cba5bc4902c05eaf6f46a09ff0d34a0e1cf7978a74c0ee5f8f114449a276a45f",
+      "diagnostic_codes": [],
+      "kind": "code",
+      "native_state": {
+        "applied_preset_sha256": "358cfd658d6c6914c1ca200fa4e8283617d75875cdf239eeac18ea03b5e0ea46",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "358cfd658d6c6914c1ca200fa4e8283617d75875cdf239eeac18ea03b5e0ea46",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "a1ccaa874079c4f32257bf7d5d80a082c8b2184a5b153de346a4a719edb5131d",
+      "slot": 6,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "cba5bc4902c05eaf6f46a09ff0d34a0e1cf7978a74c0ee5f8f114449a276a45f",
+      "diagnostic_codes": [],
+      "kind": "code_repeat",
+      "native_state": {
+        "applied_preset_sha256": "358cfd658d6c6914c1ca200fa4e8283617d75875cdf239eeac18ea03b5e0ea46",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "358cfd658d6c6914c1ca200fa4e8283617d75875cdf239eeac18ea03b5e0ea46",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "a1ccaa874079c4f32257bf7d5d80a082c8b2184a5b153de346a4a719edb5131d",
+      "slot": 6,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "89c137d3c8945be6ab1054d701cef6f8f6f4eef20f862403f9b3890865450605",
+      "diagnostic_codes": [],
+      "kind": "original",
+      "native_state": {
+        "applied_preset_sha256": "16edda79998d1ef2430f25d7e01039f869a3df48dcc5f597b715b90df444dda2",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "16edda79998d1ef2430f25d7e01039f869a3df48dcc5f597b715b90df444dda2",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "62ea61d0308c63657f845c7f365c517679f26471f68282930b80589961d90aa0",
+      "slot": 6,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "89c137d3c8945be6ab1054d701cef6f8f6f4eef20f862403f9b3890865450605",
+      "diagnostic_codes": [],
+      "kind": "original_repeat",
+      "native_state": {
+        "applied_preset_sha256": "16edda79998d1ef2430f25d7e01039f869a3df48dcc5f597b715b90df444dda2",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "16edda79998d1ef2430f25d7e01039f869a3df48dcc5f597b715b90df444dda2",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "62ea61d0308c63657f845c7f365c517679f26471f68282930b80589961d90aa0",
+      "slot": 6,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "5d77dc434438e857becbd0f505022802f6ad3f51ba8af3299391f28f187b399a",
+      "diagnostic_codes": [],
+      "kind": "grid",
+      "native_state": {
+        "applied_preset_sha256": "c0192f40e374d6b243dc30121da1ceb3b77b0bb70d827c909ff4e9c6789bd414",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "c0192f40e374d6b243dc30121da1ceb3b77b0bb70d827c909ff4e9c6789bd414",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "ccdf4dabc02a48b999a27963de90199018fffada743e5b2369623ef2e9ea4cc6",
+      "slot": 6,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "8420e831f8976fb1b10c7fb49f768f8489cf1b0a2d29a0e5e535e207e55679a1",
+      "diagnostic_codes": [],
+      "kind": "code",
+      "native_state": {
+        "applied_preset_sha256": "358cfd658d6c6914c1ca200fa4e8283617d75875cdf239eeac18ea03b5e0ea46",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "358cfd658d6c6914c1ca200fa4e8283617d75875cdf239eeac18ea03b5e0ea46",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "86790d61a0db18fcbe1b54401d97676e5e96f38ec2188e4a29d4a2c695d4cc96",
+      "slot": 6,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "8420e831f8976fb1b10c7fb49f768f8489cf1b0a2d29a0e5e535e207e55679a1",
+      "diagnostic_codes": [],
+      "kind": "code_repeat",
+      "native_state": {
+        "applied_preset_sha256": "358cfd658d6c6914c1ca200fa4e8283617d75875cdf239eeac18ea03b5e0ea46",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "358cfd658d6c6914c1ca200fa4e8283617d75875cdf239eeac18ea03b5e0ea46",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "86790d61a0db18fcbe1b54401d97676e5e96f38ec2188e4a29d4a2c695d4cc96",
+      "slot": 6,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "21ad70a6793e08f7be937610c50af6098e7243ec124fe12aedc32e234fefa0da",
+      "diagnostic_codes": [],
+      "kind": "original",
+      "native_state": {
+        "applied_preset_sha256": "afe4db2561d7e999954b91dc1cfb2f3d1ba42521aad9e7a758f99357f6013d6f",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "afe4db2561d7e999954b91dc1cfb2f3d1ba42521aad9e7a758f99357f6013d6f",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "c065a941fa38a7ff09f5951eeeb43d6742276aa1f864b2bcbb7de8716084c78b",
+      "slot": 7,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "21ad70a6793e08f7be937610c50af6098e7243ec124fe12aedc32e234fefa0da",
+      "diagnostic_codes": [],
+      "kind": "original_repeat",
+      "native_state": {
+        "applied_preset_sha256": "afe4db2561d7e999954b91dc1cfb2f3d1ba42521aad9e7a758f99357f6013d6f",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "afe4db2561d7e999954b91dc1cfb2f3d1ba42521aad9e7a758f99357f6013d6f",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "c065a941fa38a7ff09f5951eeeb43d6742276aa1f864b2bcbb7de8716084c78b",
+      "slot": 7,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "a3133fe9b84311338a03ff642afb3b90c9f14dd5381eeff0b31c6ef2cadf7b25",
+      "diagnostic_codes": [],
+      "kind": "grid",
+      "native_state": {
+        "applied_preset_sha256": "8896178f35fbfd41fbe6b7480fe1bf107e1acc83b1a5a514f27cdae178361ad7",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "8896178f35fbfd41fbe6b7480fe1bf107e1acc83b1a5a514f27cdae178361ad7",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "d36345b7b74945f0b423bc25a2d9b326cf2450874fed2c2338832e974501e8c7",
+      "slot": 7,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "b3704003d4cebe2cbf8a86425799432507ce899de232cd0575e0b748ee077e5c",
+      "diagnostic_codes": [],
+      "kind": "code",
+      "native_state": {
+        "applied_preset_sha256": "c2194e4db1cb7d0706cf5e876d2622e7884ab27251e54c21ac48d7ec4ea52f2d",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "c2194e4db1cb7d0706cf5e876d2622e7884ab27251e54c21ac48d7ec4ea52f2d",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "3399585e46f357700ee05c4dcd95314ab8b34a5d2f12588fad86d4a7ef741936",
+      "slot": 7,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "b3704003d4cebe2cbf8a86425799432507ce899de232cd0575e0b748ee077e5c",
+      "diagnostic_codes": [],
+      "kind": "code_repeat",
+      "native_state": {
+        "applied_preset_sha256": "c2194e4db1cb7d0706cf5e876d2622e7884ab27251e54c21ac48d7ec4ea52f2d",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "c2194e4db1cb7d0706cf5e876d2622e7884ab27251e54c21ac48d7ec4ea52f2d",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "3399585e46f357700ee05c4dcd95314ab8b34a5d2f12588fad86d4a7ef741936",
+      "slot": 7,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "4275f12b1244af5c35ccd7371cce9166f1e31eeffbc4113757acd7aa00706862",
+      "diagnostic_codes": [],
+      "kind": "original",
+      "native_state": {
+        "applied_preset_sha256": "afe4db2561d7e999954b91dc1cfb2f3d1ba42521aad9e7a758f99357f6013d6f",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "afe4db2561d7e999954b91dc1cfb2f3d1ba42521aad9e7a758f99357f6013d6f",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "d8f97332546f9f42b6168dbe5397766210f917bd0d0b2622ee157a5d051fd5fb",
+      "slot": 7,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "4275f12b1244af5c35ccd7371cce9166f1e31eeffbc4113757acd7aa00706862",
+      "diagnostic_codes": [],
+      "kind": "original_repeat",
+      "native_state": {
+        "applied_preset_sha256": "afe4db2561d7e999954b91dc1cfb2f3d1ba42521aad9e7a758f99357f6013d6f",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "afe4db2561d7e999954b91dc1cfb2f3d1ba42521aad9e7a758f99357f6013d6f",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "d8f97332546f9f42b6168dbe5397766210f917bd0d0b2622ee157a5d051fd5fb",
+      "slot": 7,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "e55cf1bc3ec494a3e0a1152844e8bb14abe515aa84adba1b27d3248b6fb4773d",
+      "diagnostic_codes": [],
+      "kind": "grid",
+      "native_state": {
+        "applied_preset_sha256": "8896178f35fbfd41fbe6b7480fe1bf107e1acc83b1a5a514f27cdae178361ad7",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "8896178f35fbfd41fbe6b7480fe1bf107e1acc83b1a5a514f27cdae178361ad7",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "5eb2ceab5002f12d309cbf1c53654d5c1ebf028cc348d34f423c36cb590b8b09",
+      "slot": 7,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "cb3f400244987d7e8650bbf2ee5e49b59001b56b9f203a1fa34f207728b52fe3",
+      "diagnostic_codes": [],
+      "kind": "code",
+      "native_state": {
+        "applied_preset_sha256": "c2194e4db1cb7d0706cf5e876d2622e7884ab27251e54c21ac48d7ec4ea52f2d",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "c2194e4db1cb7d0706cf5e876d2622e7884ab27251e54c21ac48d7ec4ea52f2d",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "7e1fdfe1b6f1eade4b6862fdcad3d543ef00ec838e726f8d50c2f84bc3d40f1f",
+      "slot": 7,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "cb3f400244987d7e8650bbf2ee5e49b59001b56b9f203a1fa34f207728b52fe3",
+      "diagnostic_codes": [],
+      "kind": "code_repeat",
+      "native_state": {
+        "applied_preset_sha256": "c2194e4db1cb7d0706cf5e876d2622e7884ab27251e54c21ac48d7ec4ea52f2d",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "c2194e4db1cb7d0706cf5e876d2622e7884ab27251e54c21ac48d7ec4ea52f2d",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "7e1fdfe1b6f1eade4b6862fdcad3d543ef00ec838e726f8d50c2f84bc3d40f1f",
+      "slot": 7,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "666ce8583aed453fc7e475bb0ed66cf6aa0c96fa884722e3128acda5aaa49cd1",
+      "diagnostic_codes": [],
+      "kind": "original",
+      "native_state": {
+        "applied_preset_sha256": "6e3f99488696fc6611ad923eaa63445a3346b7c727c4e23f48451140e6106224",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "6e3f99488696fc6611ad923eaa63445a3346b7c727c4e23f48451140e6106224",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "71e3a77e0295af5c0255b9caeb1ebf55116555890454da9ce6b64c7f24bf9a05",
+      "slot": 8,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "666ce8583aed453fc7e475bb0ed66cf6aa0c96fa884722e3128acda5aaa49cd1",
+      "diagnostic_codes": [],
+      "kind": "original_repeat",
+      "native_state": {
+        "applied_preset_sha256": "6e3f99488696fc6611ad923eaa63445a3346b7c727c4e23f48451140e6106224",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "6e3f99488696fc6611ad923eaa63445a3346b7c727c4e23f48451140e6106224",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "71e3a77e0295af5c0255b9caeb1ebf55116555890454da9ce6b64c7f24bf9a05",
+      "slot": 8,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "d93a9367b3f28a41649b992f1e0d6fcceb6b123b899a1d07e5886422f2399032",
+      "diagnostic_codes": [],
+      "kind": "grid",
+      "native_state": {
+        "applied_preset_sha256": "220ff4b14af153b49be8541e7389b5d1b3a023d26b4fe319343015f7fb4039ee",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "220ff4b14af153b49be8541e7389b5d1b3a023d26b4fe319343015f7fb4039ee",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "0638fb80b966e0ea66a3201b865745d231ee2d8946cfa66d3d8d732bf0a7dcd0",
+      "slot": 8,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "2a13ed1e1bef36813cd28b9905d0e7dde0e707f31d6b87783426fbddf74a7de1",
+      "diagnostic_codes": [],
+      "kind": "code",
+      "native_state": {
+        "applied_preset_sha256": "e07695d32342e1788d8c77f1062494013aea330eefaa146a3c5aff5e9624909f",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "e07695d32342e1788d8c77f1062494013aea330eefaa146a3c5aff5e9624909f",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "d40cb2c53553ba0b4ee46f6d891fd1d0e4d6bec7acc2e2edb5560f8209fe2636",
+      "slot": 8,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "2a13ed1e1bef36813cd28b9905d0e7dde0e707f31d6b87783426fbddf74a7de1",
+      "diagnostic_codes": [],
+      "kind": "code_repeat",
+      "native_state": {
+        "applied_preset_sha256": "e07695d32342e1788d8c77f1062494013aea330eefaa146a3c5aff5e9624909f",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "e07695d32342e1788d8c77f1062494013aea330eefaa146a3c5aff5e9624909f",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_mid",
+      "request_id": "d40cb2c53553ba0b4ee46f6d891fd1d0e4d6bec7acc2e2edb5560f8209fe2636",
+      "slot": 8,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "a9ecfac1af46ddd3ef1fd22608e82acd1b9d8c6788a8ae6fe10ac60d9c57d292",
+      "diagnostic_codes": [],
+      "kind": "original",
+      "native_state": {
+        "applied_preset_sha256": "6e3f99488696fc6611ad923eaa63445a3346b7c727c4e23f48451140e6106224",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "6e3f99488696fc6611ad923eaa63445a3346b7c727c4e23f48451140e6106224",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "ca638add4896668a9c5e7ee49d2e1ef44d4e4be8ec3960f6bacdafc2d4dd1e42",
+      "slot": 8,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "a9ecfac1af46ddd3ef1fd22608e82acd1b9d8c6788a8ae6fe10ac60d9c57d292",
+      "diagnostic_codes": [],
+      "kind": "original_repeat",
+      "native_state": {
+        "applied_preset_sha256": "6e3f99488696fc6611ad923eaa63445a3346b7c727c4e23f48451140e6106224",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "6e3f99488696fc6611ad923eaa63445a3346b7c727c4e23f48451140e6106224",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "ca638add4896668a9c5e7ee49d2e1ef44d4e4be8ec3960f6bacdafc2d4dd1e42",
+      "slot": 8,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "49b253b3f8aa3e4a7a10360579ffd33a486bc82a56ace4816cc1c178668cadde",
+      "diagnostic_codes": [],
+      "kind": "grid",
+      "native_state": {
+        "applied_preset_sha256": "220ff4b14af153b49be8541e7389b5d1b3a023d26b4fe319343015f7fb4039ee",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "220ff4b14af153b49be8541e7389b5d1b3a023d26b4fe319343015f7fb4039ee",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "5ec9a54a1ed8fd5119ef4568fb2301704921fbc5dc6f0514be2dfdcca4988683",
+      "slot": 8,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "dbf0d9897bd294dea6fc6122b00750fe3982aed54b4ab7fc6234ceebd4bd4fe4",
+      "diagnostic_codes": [],
+      "kind": "code",
+      "native_state": {
+        "applied_preset_sha256": "e07695d32342e1788d8c77f1062494013aea330eefaa146a3c5aff5e9624909f",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "e07695d32342e1788d8c77f1062494013aea330eefaa146a3c5aff5e9624909f",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "17fc1bd8d0069ed6394e210460f57d02afea1ec106d788546d477e6cd2b8f9c1",
+      "slot": 8,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    },
+    {
+      "audio_float32_sha256": "dbf0d9897bd294dea6fc6122b00750fe3982aed54b4ab7fc6234ceebd4bd4fe4",
+      "diagnostic_codes": [],
+      "kind": "code_repeat",
+      "native_state": {
+        "applied_preset_sha256": "e07695d32342e1788d8c77f1062494013aea330eefaa146a3c5aff5e9624909f",
+        "applied_version": "1.5.5",
+        "modulation_slots_verified": 64,
+        "native_ramp_defaults_verified": 128,
+        "nested_families_verified": [
+          "lfos",
+          "custom_warps",
+          "random_values",
+          "modulations",
+          "wavetables",
+          "sample"
+        ],
+        "requested_preset_sha256": "e07695d32342e1788d8c77f1062494013aea330eefaa146a3c5aff5e9624909f",
+        "requested_version": "1.5.5",
+        "sample_aligned_max_pcm16_delta": {
+          "samples": 1
+        },
+        "sample_readback_byte_exact": false,
+        "sample_readback_shift_samples": 4,
+        "scalar_lfo_route_readback_verified": true,
+        "verified_loaded_scalars": 775,
+        "wavetable_version_migration": "1.6.4"
+      },
+      "performance": "held_low",
+      "request_id": "17fc1bd8d0069ed6394e210460f57d02afea1ec106d788546d477e6cd2b8f9c1",
+      "slot": 8,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a",
+      "status": "accepted"
+    }
+  ],
+  "passed": true,
+  "peak_process_rss_bytes": 894681088,
+  "plan_sha256": "be71ad70799e48d6a7a36d05646816f1fe5f706c1b4176ed672aeed45306d653",
+  "raw_native_events_sha256": "633610191b8c437d03b356b7c3664775d15da6f7debd82fed8c130053b626efd",
+  "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+  "software_checks": {
+    "affected_compatibility_passed": 37,
+    "ruff_passed": true,
+    "separate_native_fixture_precision_check_passed": true
+  }
+}

@@ -1,0 +1,222 @@
+{
+  "authored_point_precision": "float32_before_state_identity_and_fitting",
+  "check": "train_only_lfo_bank_native_v1",
+  "final_test_audio": false,
+  "manifest_id": "4f870244e0991c8b398c0b4fd1bb6cc1e2045d310b5fb3390039a3861a600857",
+  "maximum_curves": 64,
+  "model_training": false,
+  "native_attempt_budget": 80,
+  "panel": [
+    {
+      "slot": 1,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85"
+    },
+    {
+      "slot": 2,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a"
+    },
+    {
+      "slot": 3,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85"
+    },
+    {
+      "slot": 4,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a"
+    },
+    {
+      "slot": 5,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85"
+    },
+    {
+      "slot": 6,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a"
+    },
+    {
+      "slot": 7,
+      "split": "train",
+      "state_id": "7e1302047b5ba06a0244f7137426f3a9eedcdb9fa41b3c685db545e1f970dd85"
+    },
+    {
+      "slot": 8,
+      "split": "validation",
+      "state_id": "147ab1b8b252ff9e4e42e99f6d7f24ee0cff8b61b665c9511602f6436f50b89a"
+    }
+  ],
+  "performances": [
+    {
+      "name": "held_mid",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              96
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "role": "reference"
+    },
+    {
+      "name": "held_low",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              666667
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              36,
+              64
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              36,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541",
+      "role": "transfer"
+    }
+  ],
+  "phase_control": {
+    "osc_1_random_phase": 0.0,
+    "osc_2_random_phase": 0.0,
+    "osc_3_random_phase": 0.0,
+    "sample_random_phase": 0.0
+  },
+  "quality_threshold_calibrated": false,
+  "root_manifest_id": "cdf627a54cac7f5f906d2aa331095717c7b34461865466b23ee65986c0e5e8c9",
+  "rss_limit_bytes": 8589934592,
+  "runtime_sources": {
+    "experiments/lfo_representation/era2/code/lfo_era2/__init__.py": "1ea8f7a7a5ec211b9c345fd9b4147dac18a3b019b10f926833f08b986481a54c",
+    "experiments/lfo_representation/era2/code/lfo_era2/accelerator.py": "71f77e77ac4ea4c329e7696cb180d59233466112952869f9fe58e0e09767407c",
+    "experiments/lfo_representation/era2/code/lfo_era2/accounting.py": "256277c602ec79bcfcdad2dc150bba1b8ddb3d035443b3098b2bd447f910e4bc",
+    "experiments/lfo_representation/era2/code/lfo_era2/alignment.py": "bf43c430acd47554fed3d826182917862a0916d9b658bf35d273c847a4407022",
+    "experiments/lfo_representation/era2/code/lfo_era2/analytics.py": "5ffeb1fd39303ea7fbf8a628c43f9fae55a4b8db8d73e8267177f49834f5234e",
+    "experiments/lfo_representation/era2/code/lfo_era2/assets.py": "9215764516c9a769462bb49840b17f5c2559593e00e2303013c9dc684e2d21da",
+    "experiments/lfo_representation/era2/code/lfo_era2/cli.py": "e2c452f30e3e732f3702a301b76f8eabdb63c48f31eb8d3af6ec1f7ec69f5de2",
+    "experiments/lfo_representation/era2/code/lfo_era2/component_ladder.py": "4f233fa6c0902d308b971fbbb479789ad629e1af06208df533202bd65e5c34ff",
+    "experiments/lfo_representation/era2/code/lfo_era2/contracts.py": "c101d05c94eb537fc3987fd75ee9ede5e66365eaf209eafc71bf988ac52631b1",
+    "experiments/lfo_representation/era2/code/lfo_era2/curve.py": "8aec51ce2b35ea5c727d7ba0df2f6e01f25054d559dc0ed5c305c48e86f869b1",
+    "experiments/lfo_representation/era2/code/lfo_era2/dataset.py": "d5fd2a85478206d6c81f9da3bfd9ca6702ec0f428002545263ffae225a379ded",
+    "experiments/lfo_representation/era2/code/lfo_era2/deviation_audit.py": "2252a3d06fb473e26aeb0714fdc51003ac69b8ed803f6c592f03b3b135de397e",
+    "experiments/lfo_representation/era2/code/lfo_era2/flat.py": "321ca9d04ead86742c248f47235cf30b4fafc00928d73a64574158a6992582d9",
+    "experiments/lfo_representation/era2/code/lfo_era2/manifest.py": "9a83559f4d4208a88b09a23f9f45173dc48983cd6f7d2a6ac2384992ab3357f5",
+    "experiments/lfo_representation/era2/code/lfo_era2/metrics.py": "99ba24e6f47327abb621ae598dddc01e0ca5805d0acec26e2ca47f9a8cf0bda1",
+    "experiments/lfo_representation/era2/code/lfo_era2/processed_corpus.py": "8dcb1542580a57cbc6048a0c15548634e912c596d65d475179dc5a445a051345",
+    "experiments/lfo_representation/era2/code/lfo_era2/rmse_gap_audit.py": "e041a9e918d435d2c00bb7eeb28ea62a5e31907e0d49b47d6621aa0a3c2c976b",
+    "experiments/lfo_representation/era2/code/lfo_era2/runner.py": "75f0c0e08c724290597b49ed4b777f4290ce3cc6271d0dc0ecdaa0e3a60904fb",
+    "experiments/lfo_representation/era2/code/lfo_era2/strategy_grid.py": "b1088e413c293ff0083e8b141d6c4818f4cf01ed8c6219a67fa893f5a3a84d35",
+    "experiments/lfo_representation/era2/code/lfo_era2/strategy_grid_execution.py": "6dbb0a81bd1508295388cac8a9359629b73028eb4da6eaab8e3e5fe86d050253",
+    "experiments/lfo_representation/era2/code/lfo_era2/strategy_grid_report.py": "17b07ae2049c6ae967a8b8df40d66d5c1580de631e3d450b2fa110af7ce2e489",
+    "experiments/lfo_representation/era2/code/lfo_era2/strategy_grid_runtime.py": "e39abdbc4995604b7a2ca82a547dd5ab95d43b19ec31d49095ad6744a5a015a5",
+    "experiments/lfo_representation/era2/code/lfo_era2/strategy_grid_thresholds.py": "9a0db3c40ab09cdd8de9a893be51f81729672ad44b85ecf2675b6c4430e969f7",
+    "training/obruxo_training/lfo_bank.py": "07d8e616f428de299d3a6bed4a8ac033e6cb5270079463eeb331fbf5304fc0d3"
+  },
+  "source_sha256": {
+    "data_generation/obruxo_data/render/__init__.py": "249a42793c50a08baaf07bdb626c058c29200b3e4acd354d15abe294de896996",
+    "data_generation/obruxo_data/render/base.py": "2f360e84b51bff5ee685412c14dfbb3b191a90e5e84a3398f18288bfa320ad09",
+    "data_generation/obruxo_data/render/batch.py": "49f19e99fb0f8660bcc640e888c6be2e50a48ab918fc8e17fcaf9f57ad07e54b",
+    "data_generation/obruxo_data/render/capabilities.py": "4a5ed73bd70a7a7625213b72ffdc35965ee2844e52a5884687eb9c8fbed2278e",
+    "data_generation/obruxo_data/render/full_state.py": "d0be7d4a3ed22bf37e101cc60ad0737913160f197147795982cdfbb96644939a",
+    "data_generation/obruxo_data/render/qa.py": "e89f632c61cc6dc06813321c63ff1dd276b1c787e7687cff4762566a521d3d83",
+    "data_generation/obruxo_data/render/vita.py": "cd4e68a4385e22aa367ad28e5d0a85a8cbd190e19d6dffefa52dd3468983a0f8",
+    "data_generation/obruxo_data/vital/full_contract.py": "ac64c06186423c29970d805edba2b0f8dd64ff85c9c9052cbebaac9895f1f4ec",
+    "training/obruxo_training/__init__.py": "870911d7f2fae584b19627fe09cdc155f6b9a1a929472467dfba2c72ae2751ca",
+    "training/obruxo_training/alpha.py": "128b6b65b4a0dbccae33bd005c9bcb4652280e004e940fe4416890db44560987",
+    "training/obruxo_training/alpha_check.py": "349bb348898fb6a663eb46de7b9de088a4f41aefcfb70629f580c44eef539b3e",
+    "training/obruxo_training/asset_codec.py": "f92aa078b0aa30fb05bee0d5713fd1d8a587f0f4f08f7fe8fa4432d4b38751f1",
+    "training/obruxo_training/assets.py": "196ca1009b7e6cf4f8e3fa2741bff7114997ea397a8951a544366a445b72ab87",
+    "training/obruxo_training/audio_candidates.py": "4e2d166f4fac96cd4d354d1bc119b1d97bbad7abf8ec1eca553dc2cfd0bf1243",
+    "training/obruxo_training/audit.py": "90d3aa95107d2ec8bc28217afccfda194fa236ce54b3dd09df55a0cbacc1d330",
+    "training/obruxo_training/benchmark.py": "fc8fd09154a4122a026e52b1b0dc6cbd6e77e84fe87586474fc9013a0e90eb5d",
+    "training/obruxo_training/candidate_data.py": "ff1aae5abac5e83a129a607cc0a43a0b0708002eff412f99c1ea7b9e5a474804",
+    "training/obruxo_training/candidate_learning.py": "608029baf041b956ac3fcce98a3d52572d2d41011d3208a145e15b8755c341aa",
+    "training/obruxo_training/candidate_screen.py": "20eb8b163014298968a438ec25e0acd31d9fae39d8902966209f154fe0b5c7d4",
+    "training/obruxo_training/candidates.py": "a26e4512330645b4522f4ebd3112cc60fdd18c2309998cb26b78362a40e96165",
+    "training/obruxo_training/cli.py": "40c79ac3800c0f9b9e97fc13fa21816e282d426ac1cb09bcbd1e3fea0e6f116d",
+    "training/obruxo_training/codec.py": "90dfc96ec55e037e9d9ff9d3ce9f8163d659c01d6cbda00449b8b6ead1ac69a4",
+    "training/obruxo_training/codec_check.py": "eacc8626906abd176732dd0f71c2763245295c3e9d5c0064737911f4518ba05e",
+    "training/obruxo_training/contracts.py": "86aa9e9fe0e9cedabd817a390fdd9382cfe3ce264415b40f2ff508e61b931459",
+    "training/obruxo_training/eligibility.py": "17554058fe739d2e9b58efb207e91da4c9e851cad1de00fde58969310ef74a41",
+    "training/obruxo_training/evaluate.py": "68a8b7c4521be8ff9d43e5965ea7b552b9bd7c1fdd9cabcc65dc6b7b5a06e3a6",
+    "training/obruxo_training/factory_bank.py": "9d73ffdd10a2c4df7d4afdea623560961174cc2beea468583592f35544e28cf6",
+    "training/obruxo_training/features.py": "61f5d5d98aee7504c3fa96f648e2dc6382624332e1a05ef558b2f79365ff13b0",
+    "training/obruxo_training/full_check.py": "4d20cbc92a6a82c55ebd676a9a0a0c42259238c0223db4eb79ff66b9184e0417",
+    "training/obruxo_training/full_scalar.py": "532a12126bb44500dc80e718ec56d8d21f309158220be8eaea52ec4dde8bbf8c",
+    "training/obruxo_training/identity.py": "0454a56f73cec939d2f2079cb33c8fbf95be189b286e6debbcc0bdb027dbdf27",
+    "training/obruxo_training/lfo_bank.py": "07d8e616f428de299d3a6bed4a8ac033e6cb5270079463eeb331fbf5304fc0d3",
+    "training/obruxo_training/model.py": "a774ce6be7c8c176e2ee36dd3bad1cdc5cbf90d84dd12e6fb507820c37d67062",
+    "training/obruxo_training/paired.py": "1c5d8c69d92151b40418e8bc949630a306686740025a22a31eea2147f4a89025",
+    "training/obruxo_training/paired_features.py": "7bd3f560bfbf684387f02eb916b252c8f7d29a03f0595ffc59ccb7d955bfbc2c",
+    "training/obruxo_training/performances.py": "45f228fd178c3ab8e746c8893b843255b4c99e36215c676137664c26eb0e60d6",
+    "training/obruxo_training/pilot.py": "593e3a152d8c6481fbbfbce1bbab24929d12ee037efb164414cea9f757af3e01",
+    "training/obruxo_training/proxy.py": "a82364d7dd406b6949bb6dfdfaa23b873035bade3e6771b238cda712a366abfb",
+    "training/obruxo_training/proxy_screen.py": "b1a2c7ffcb6662a933c182810db8eb35529669975f3fdc78991fa0667b7e0290",
+    "training/obruxo_training/ranking_check.py": "afb67588a697ef4bee3e1d41dd5a1da5d80bf500df6351dabdaaf0459f2686c8",
+    "training/obruxo_training/reproducibility.py": "da268fc655d5ecff48356a367c7e3fe6224a8a68623df163b0edff0798f50b43",
+    "training/obruxo_training/splits.py": "6c86a9de08a05ab330a53104585af38bfe0b999f0c6d34d310431fa78a9751ec",
+    "training/obruxo_training/stream.py": "008d5aed58f6dc81bba7e51754a728f2232ee7774bc206abc95cc74cd22ef753",
+    "training/obruxo_training/trainer.py": "f235e47652ddf7dd1a981ed35f367f2009dd0874b182f5efb7172bebfe7c81c1",
+    "training/reports/scripts/run_lfo_bank_check.py": "e86829a5b8dec83702fd255e90a9509c9cbafbcedb9a854ffc581eb05bc5e1d9"
+  },
+  "states_by_split": {
+    "test": 24,
+    "train": 205,
+    "validation": 27
+  },
+  "timeout_seconds": 30,
+  "worker_jobs": 4
+}

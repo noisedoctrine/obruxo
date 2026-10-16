@@ -1,6 +1,6 @@
 # Training contracts, online pilot and trainer
 
-The [delivery status](TRAINING_STATUS.md) tracks the remaining training and release work. [Learned factory choices](FACTORY_ASSETS.md) add registered wavetables for all three oscillator slots and registered sampler content, with hash-pinned native import qualification. Curves and ordered modulation connections are the next missing capabilities.
+The [completion ledger](IMPLEMENTATION_STATUS.md) tracks the remaining training and release work. [Learned factory choices](FACTORY_ASSETS.md) add registered wavetables for all three oscillator slots and registered sampler content. [Train-only Era2 curve assets](LFO_BANK.md) now support fitting, saved-code decoding and native reconstruction checks. Connecting those curve outputs to the model and adding ordered modulation connections are the next missing capabilities.
 
 The [full scalar training path](FULL_SCALAR_TRAINING.md) connects all 775 scalar fields to bounded audio-only learning, legal effect-order and pitch-mask outputs, modern render recipes and inference export. Nested assets, curves, seeds and connections remain explicitly fixed in this increment; learned structured coverage follows.
 
@@ -51,7 +51,7 @@ python -m pytest research/training/tests -q
 ruff check research/training/obruxo_training research/training/tests research/training/run.py
 ```
 
-These commands do not need PyTorch, a GPU, Vita, a Vital installation, Colab, or rendered audio. Native rendering later uses the separately pinned [data-generation environment](../data_generation/environment.yml). The [CI workflow](../../.github/workflows/training-contracts.yml) runs static contract tests on Linux; passing it does **not** qualify the Linux synth.
+Contract inspection and auditing do not need PyTorch, a GPU, Vita, a Vital installation, Colab, or rendered audio. Model/evaluation tests use PyTorch; native checks use the separately pinned [data-generation environment](../data_generation/environment.yml). The [CI workflow](../../.github/workflows/training-contracts.yml) defines static contract tests on Linux; GitHub Actions stays disabled by user choice, so current verification runs locally. Static tests do **not** qualify the Linux synth.
 
 `audit` never edits source presets. Its output must be a **new directory outside the corpus**. Source traversal errors and skipped linked directories prevent a complete snapshot. `--limit N` supports a bounded diagnostic, marked partial if it omits files. Exit status is 0 for a complete audit, 2 for a partial audit, and 1 for a command failure. A complete audit can have zero eligible states.
 

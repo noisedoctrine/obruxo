@@ -215,8 +215,25 @@ def main(argv=None) -> int:
     factory_pool.add_argument("--output", type=Path, required=True)
     factory_pool.add_argument("--count", type=int, default=256)
     factory_pool.add_argument("--seed", type=int, default=0)
+    lfo_fit = commands.add_parser("lfo-fit", help="Fit the existing Era2 curve dictionaries from registered training presets only")
+    lfo_fit.add_argument("--presets", type=Path, nargs="+", required=True)
+    lfo_fit.add_argument("--split-manifest", type=Path, required=True)
+    lfo_fit.add_argument("--output", type=Path, required=True)
+    lfo_fit.add_argument("--maximum-curves", type=int, default=256)
     args = parser.parse_args(argv)
     try:
+        if args.command == "lfo-fit":
+            from .lfo_bank import fit_lfo_bank
+            from .splits import SplitManifest
+            if args.asset_references or args.output.exists():
+                raise ValueError("lfo-fit uses registered source states and requires a new output directory")
+            manifest = SplitManifest.from_dict(json.loads(args.split_manifest.read_text(encoding="utf-8")))
+            bank = fit_lfo_bank((path.read_bytes() for path in args.presets), manifest, maximum_curves=args.maximum_curves,
+                                progress=lambda event: print(event, flush=True))
+            args.output.mkdir(parents=True, exist_ok=False)
+            write_json(args.output / "bank.json", bank.to_dict())
+            print(json.dumps({"bank_id": bank.bank_id, "fitted_curves": len(bank.to_dict()["bank"]["fitted_rows"])}))
+            return 0
         if args.command == "factory-bank":
             from .factory_bank import MANIFEST, qualify_factory_bank
             if args.asset_references:
