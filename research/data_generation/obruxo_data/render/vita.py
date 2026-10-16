@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 from copy import deepcopy
 import hashlib
 import importlib.metadata
@@ -24,31 +25,32 @@ from .qa import AudioQualityConfig, analyze_audio
 
 
 JUCE_BASE64_ALPHABET = ".ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+"
+_BASE64_ALPHABET = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+_JUCE_ALPHABET = JUCE_BASE64_ALPHABET.encode("ascii")
+_REVERSE_BITS = bytes(int(f"{value:08b}"[::-1], 2) for value in range(256))
+_BASE64_TO_JUCE = bytes.maketrans(_BASE64_ALPHABET, bytes(_JUCE_ALPHABET[_REVERSE_BITS[index] >> 2] for index in range(64)))
+_JUCE_TO_BASE64 = bytes.maketrans(_JUCE_ALPHABET, bytes(_BASE64_ALPHABET[_REVERSE_BITS[index] >> 2] for index in range(64)))
 DEFAULT_PLUGIN_SHA256 = "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1"
 
 
 def juce_memory_block_encode(value: bytes) -> str:
-    characters = []
-    for bit_offset in range(0, len(value) * 8, 6):
-        byte_offset, shift = divmod(bit_offset, 8)
-        window = int.from_bytes(value[byte_offset : byte_offset + 2], "little")
-        characters.append(JUCE_BASE64_ALPHABET[(window >> shift) & 0x3F])
-    return f"{len(value)}.{''.join(characters)}"
+    # JUCE consumes least-significant bits first; RFC base64 consumes most-significant bits first.
+    encoded = base64.b64encode(value.translate(_REVERSE_BITS)).rstrip(b"=").translate(_BASE64_TO_JUCE)
+    return f"{len(value)}.{encoded.decode('ascii')}"
 
 
 def juce_memory_block_decode(value: str) -> bytes:
     size_text, encoded = value.split(".", 1)
-    output = bytearray(int(size_text))
-    for index, character in enumerate(encoded):
-        bits = JUCE_BASE64_ALPHABET.index(character)
-        bit_offset = index * 6
-        for bit in range(6):
-            target = bit_offset + bit
-            if target >= len(output) * 8:
-                break
-            if bits & (1 << bit):
-                output[target // 8] |= 1 << (target % 8)
-    return bytes(output)
+    size = int(size_text)
+    if size < 0:
+        raise ValueError("negative memory block size")
+    payload = encoded.encode("ascii")
+    if payload.translate(None, _JUCE_ALPHABET):
+        raise ValueError("invalid JUCE memory block character")
+    payload = payload[:(size * 8 + 5) // 6].translate(_JUCE_TO_BASE64)
+    # Preserve JUCE's declared-size behavior: missing bits are zero, excess bits are ignored.
+    decoded = base64.b64decode(payload + b"A" * (-len(payload) % 4)).translate(_REVERSE_BITS)
+    return decoded[:size].ljust(size, b"\x00")
 
 
 class VitalVst3StateTemplate:

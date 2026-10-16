@@ -1,0 +1,106 @@
+{
+  "accepted": 10,
+  "after_codec_mean_seconds": 0.00677397999970708,
+  "after_wall_seconds": 19.798434399999678,
+  "audio_files_written": 0,
+  "before_codec_mean_seconds": 1.4503827799970168,
+  "before_wall_seconds": 25.035635800006276,
+  "cases": [
+    {
+      "after_codec_seconds": 0.005106400007207412,
+      "after_synthesis_seconds": 0.0781795000002603,
+      "after_wall_seconds": 4.211724299995694,
+      "audio_float32_identical": true,
+      "audio_seconds": 4.0,
+      "before_codec_seconds": 1.323431700002402,
+      "before_synthesis_seconds": 0.07576320000225678,
+      "before_wall_seconds": 4.66643660000409,
+      "family": "wavetable",
+      "native_state_identical": true,
+      "request_id": "8a59ac21b5710e81a2e360471523e1d1848bd0dbfce461f8cc019ea0c8f2a9cb"
+    },
+    {
+      "after_codec_seconds": 0.008632699995359872,
+      "after_synthesis_seconds": 0.07206240000232356,
+      "after_wall_seconds": 3.6121816000013496,
+      "audio_float32_identical": true,
+      "audio_seconds": 4.0,
+      "before_codec_seconds": 1.6650765999947907,
+      "before_synthesis_seconds": 0.07668749999720603,
+      "before_wall_seconds": 5.131755800000974,
+      "family": "layered",
+      "native_state_identical": true,
+      "request_id": "1b8350c148e46bd0ee9cbf56fffbd9709ed94cfff4f0b6ca9c7df3652691bec3"
+    },
+    {
+      "after_codec_seconds": 0.006454999995185062,
+      "after_synthesis_seconds": 0.0868378999948618,
+      "after_wall_seconds": 3.81073219999962,
+      "audio_float32_identical": true,
+      "audio_seconds": 4.0,
+      "before_codec_seconds": 1.4371558999991976,
+      "before_synthesis_seconds": 0.0979871000017738,
+      "before_wall_seconds": 5.395557300005748,
+      "family": "filtered",
+      "native_state_identical": true,
+      "request_id": "c66b77e082813f37041791de7e5882e9628bbb61e86f5f63922420940da6e481"
+    },
+    {
+      "after_codec_seconds": 0.006287499993050005,
+      "after_synthesis_seconds": 0.09171020000212593,
+      "after_wall_seconds": 4.33696520000376,
+      "audio_float32_identical": true,
+      "audio_seconds": 4.0,
+      "before_codec_seconds": 1.3711400999964098,
+      "before_synthesis_seconds": 0.12036329999682494,
+      "before_wall_seconds": 5.0564569999987725,
+      "family": "modulated",
+      "native_state_identical": true,
+      "request_id": "faa7a425a9ebe7746d1663510eff069d1786ca00d70ad8263a6a5ecc4f9039d6"
+    },
+    {
+      "after_codec_seconds": 0.007388300007733051,
+      "after_synthesis_seconds": 0.14225059999444056,
+      "after_wall_seconds": 3.8268310999992536,
+      "audio_float32_identical": true,
+      "audio_seconds": 4.0,
+      "before_codec_seconds": 1.4551095999922836,
+      "before_synthesis_seconds": 0.14289329999883194,
+      "before_wall_seconds": 4.785429099996691,
+      "family": "chorus",
+      "native_state_identical": true,
+      "request_id": "922858a94788d2cd73049538eace1b9e6e46d871fc6b8d1e307161a9ad8e8f64"
+    }
+  ],
+  "final_test_used": false,
+  "format": "obruxo_vital_latency_comparison_v1",
+  "github_actions": "disabled",
+  "limits": "Five fixed training cases, one cold process per case, serial before/after Windows CPU timing; not a scaling or quality claim.",
+  "local_tests_passed": 104,
+  "native_attempts": 10,
+  "panel_sha256": "119cbd1b7176ccee7da3ad8cdcd23cb6b66baed8f2fce4ac179646db1572accf",
+  "process_mode": "fresh_process_and_plugin_per_render",
+  "raw_evidence_sha256": {
+    "after": "fc18198885096d572b5a28a8e00d3ddd015f4a993aafd7f19aab2562899e31b4",
+    "before": "ea0b92166242814590576f214c7c0429b59306e62d06cd9deb20293beb7592d9"
+  },
+  "renderer_identity": {
+    "backend_version": "0.8.3",
+    "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+    "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+    "settings": {
+      "buffer_size": 128,
+      "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+      "event_timing": "absolute ticks to half-even sample offsets",
+      "plugin_name": "Vital.vst3",
+      "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+      "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+    }
+  },
+  "source_sha256": {
+    "after": "7874aaf59de491918e47d4ea6f1a91785464feca0c76f133abd6752a7084cbda",
+    "before": "74b7287234b857c0f4c21f33217ef464a394935b8ea7f50d52587be887625666"
+  },
+  "training_only": true,
+  "wall_reduction_percent": 20.91898700653444
+}
