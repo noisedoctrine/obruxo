@@ -55,7 +55,11 @@ def pointer(parent, key):
 
 
 class FullPresetContract:
-    def __init__(self):
+    def __init__(self, *, renderer_id=None):
+        from obruxo_data.render.base import FULL_PRESET_RENDERER_ID, FULL_SEED_RENDERER_ID
+        self.renderer_id = FULL_PRESET_RENDERER_ID if renderer_id is None else renderer_id
+        if self.renderer_id not in {FULL_PRESET_RENDERER_ID, FULL_SEED_RENDERER_ID}:
+            raise ValueError("unsupported full native profile")
         self.spec = strict_json((DIRECTORY / "contract.json").read_bytes())
         raw = (BASE / "parameter_inventory.json").read_bytes()
         if json_digest(raw) != self.spec["baseline_inventory_sha256"]:

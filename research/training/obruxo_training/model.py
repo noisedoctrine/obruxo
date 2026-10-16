@@ -87,9 +87,9 @@ def batch_features(items: list[dict], device: str = "cpu") -> dict:
     return {name: torch.stack([item["features"][name] for item in items]).to(device) for name in ("timbre", "pitch")}
 
 
-def loss_terms(prediction: dict, targets: list[PilotTarget], codec: PilotCodec, *, curve_targets=None, route_curve_targets=None) -> dict:
+def loss_terms(prediction: dict, targets: list[PilotTarget], codec: PilotCodec, *, curve_targets=None, route_curve_targets=None, warp_curve_targets=None) -> dict:
     if getattr(codec, "balanced_loss", False):
-        return _balanced_loss(prediction, targets, codec, curve_targets=curve_targets, route_curve_targets=route_curve_targets)
+        return _balanced_loss(prediction, targets, codec, curve_targets=curve_targets, route_curve_targets=route_curve_targets, warp_curve_targets=warp_curve_targets)
     device = prediction["continuous"].device
     values = torch.tensor([target.continuous for target in targets], dtype=torch.float32, device=device)
     mask = torch.tensor([codec.continuous_mask(target) for target in targets], dtype=torch.float32, device=device)
@@ -120,7 +120,15 @@ def _family_mean(errors, mask, groups):
     return torch.stack(totals).sum() / torch.stack(active).sum().clamp_min(1)
 
 
-def _balanced_loss(prediction, targets, codec, *, curve_targets=None, route_curve_targets=None):
+def _sampled_curve_loss(predicted, expected, active, label):
+    if (not isinstance(expected, torch.Tensor) or expected.shape != predicted.shape or expected.dtype != torch.float32
+            or expected.requires_grad or not torch.isfinite(expected).all() or torch.any((expected < 0) | (expected > 1))):
+        raise ValueError(f"{label} must be frozen finite float32 {list(predicted.shape)} values within [0,1]")
+    active = torch.tensor(active, dtype=torch.float32, device=predicted.device)
+    return ((predicted - expected.to(predicted.device)).square().mean(-1) * active).sum() / active.sum().clamp_min(1)
+
+
+def _balanced_loss(prediction, targets, codec, *, curve_targets=None, route_curve_targets=None, warp_curve_targets=None):
     targets = [codec.supervision_target(target) for target in targets]
     device = prediction["continuous"].device
     values = torch.tensor([target.continuous for target in targets], dtype=torch.float32, device=device)
@@ -146,14 +154,13 @@ def _balanced_loss(prediction, targets, codec, *, curve_targets=None, route_curv
         terms["curve_reconstruction_mse"] = reconstruction_loss(prediction, targets, codec, curve_targets)
         terms["loss"] = terms["loss"] + terms["curve_reconstruction_mse"]
     if getattr(codec, "lossy_route_maps", False):
-        predicted = prediction["continuous"][:, codec._map_start:].reshape(len(targets), 64, 97)
-        if (not isinstance(route_curve_targets, torch.Tensor) or route_curve_targets.shape != predicted.shape
-                or route_curve_targets.dtype != torch.float32 or route_curve_targets.requires_grad
-                or not torch.isfinite(route_curve_targets).all() or torch.any((route_curve_targets < 0) | (route_curve_targets > 1))):
-            raise ValueError("original route maps must be frozen finite float32 [batch,64,97] values within [0,1]")
-        active = torch.tensor([codec.active_route_maps(target) for target in targets], dtype=torch.float32, device=device)
-        terms["route_map_mse"] = ((predicted - route_curve_targets.to(device)).square().mean(-1) * active).sum() / active.sum().clamp_min(1)
+        predicted = prediction["continuous"][:, codec._map_start:codec._map_start + 64 * 97].reshape(len(targets), 64, 97)
+        terms["route_map_mse"] = _sampled_curve_loss(predicted, route_curve_targets, [codec.active_route_maps(target) for target in targets], "original route maps")
         terms["loss"] = terms["loss"] + terms["route_map_mse"]
+    if getattr(codec, "lossy_warps", False):
+        predicted = prediction["continuous"][:, codec._warp_start:].reshape(len(targets), 3, 97)
+        terms["warp_curve_mse"] = _sampled_curve_loss(predicted, warp_curve_targets, [codec.active_warps(target) for target in targets], "original custom warp curves")
+        terms["loss"] = terms["loss"] + terms["warp_curve_mse"]
     return terms
 
 
