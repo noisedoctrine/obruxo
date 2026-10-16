@@ -142,7 +142,10 @@ class PilotCodec:
 
 
 def load_codec(value: dict) -> PilotCodec:
-    if value.get("codec") == "authored_alpha_v1":
+    if value.get("codec") == "authored_full_scalar_v1":
+        from .full_scalar import FullScalarCodec
+        codec = FullScalarCodec()
+    elif value.get("codec") == "authored_alpha_v1":
         from .alpha import AlphaCodec
         codec = AlphaCodec(value["wavetable_bank"])
     else:

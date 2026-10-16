@@ -54,6 +54,8 @@ Preserve the runtime aspiration already recorded in [ideas.txt](../ideas.txt): r
 
 The separate [full-preset rendering profile](../training/FULL_RENDER_PROFILE.md) now validates all 775 controls and six nested structures in the 1.5.5 inventory through the bounded native worker. This closes the broad rendering-boundary gap; the broad learned representation, registered asset vocabulary and curriculum remain open. Existing pilot/alpha profiles retain their saved identities.
 
+The [full scalar training integration](../training/FULL_SCALAR_TRAINING.md) now supplies outputs for all 775 fields, with legal effect ordering, binary pitch masks, family-balanced losses, exact native codec checks, frozen split inheritance and an audio-only export. Its authored pool currently varies 25 scalar controls and fixes the six nested structures. Learned assets/curves/routing and measured broad coverage remain open; this does not complete the canonical-vocabulary model.
+
 | Area | Evidence already present | Work needed before scaling |
 |---|---|---|
 | Preset/MIDI/render foundation | Typed authoring, validation, continuous VST3 rendering, provenance, QA, resumable batches | Curriculum sampler, ancestry tracking, split manifests, bounded online producer/consumer stream |

@@ -201,6 +201,10 @@ def main(argv=None) -> int:
     full_check.add_argument("--output", type=Path, required=True)
     full_check.add_argument("--plugin-path")
     full_check.add_argument("--timeout", type=float, default=30.)
+    scalar_pool = commands.add_parser("full-scalar-pool", help="Author full 775-scalar targets; nested structures remain explicitly fixed")
+    scalar_pool.add_argument("--output", type=Path, required=True)
+    scalar_pool.add_argument("--count", type=int, default=256)
+    scalar_pool.add_argument("--seed", type=int, default=0)
     args = parser.parse_args(argv)
     try:
         if args.command == "full-check":
@@ -290,16 +294,19 @@ def main(argv=None) -> int:
                 handle.write(codec.decode(target))
             print(json.dumps({"output": str(args.output), "scope": codec.to_dict()["scope"], "target": target.to_dict()}))
             return 0
-        if args.command in {"pilot", "alpha-pool", "expand-pilot", "benchmark", "codec-check", "train", "evaluate", "evaluate-curve", "compare"}:
+        if args.command in {"pilot", "alpha-pool", "full-scalar-pool", "expand-pilot", "benchmark", "codec-check", "train", "evaluate", "evaluate-curve", "compare"}:
             from .pilot import PilotPool
             if args.asset_references:
                 raise ValueError("authored pools use their embedded catalog; alpha-pool takes --wavetable-manifest")
-            if args.command in {"pilot", "alpha-pool", "expand-pilot"}:
+            if args.command in {"pilot", "alpha-pool", "full-scalar-pool", "expand-pilot"}:
                 parent = PilotPool.load(args.pool) if args.command == "expand-pilot" else None
                 codec = None
                 if args.command == "alpha-pool":
                     from .alpha import AlphaCodec, read_wavetable_bank
                     codec = AlphaCodec(read_wavetable_bank(args.wavetable_manifest, args.wavetable_root))
+                if args.command == "full-scalar-pool":
+                    from .full_scalar import FullScalarCodec
+                    codec = FullScalarCodec()
                 pool = parent.expand(args.count) if parent is not None else PilotPool.create(args.count, args.seed, codec=codec)
                 args.output.mkdir(parents=True, exist_ok=False)
                 pool.save(args.output / "pool.json")
@@ -311,6 +318,7 @@ def main(argv=None) -> int:
             from .benchmark import benchmark_stream
             from .stream import NativeRendererFactory, StreamConfig
             pool = PilotPool.load(args.pool)
+            factory = NativeRendererFactory(args.plugin_path, renderer_id=pool.codec.contract.renderer_id)
             if args.command == "compare":
                 from .evaluate import evaluate_comparison
                 checkpoints = _named_paths(args.checkpoints, "checkpoints")
@@ -321,21 +329,21 @@ def main(argv=None) -> int:
                                              allow_architecture_comparison=args.allow_architecture_comparison,
                                              validation_states=json.loads(args.validation_states.read_text(encoding="utf-8")) if args.validation_states else None,
                                              validation_pool=PilotPool.load(args.validation_pool) if args.validation_pool else None,
-                                             renderer_factory=NativeRendererFactory(args.plugin_path), timeout=args.timeout,
+                                             renderer_factory=factory, timeout=args.timeout,
                                              progress=lambda value: print(json.dumps(value), flush=True), resume=args.resume)
                 print(json.dumps(result["comparison"], indent=2))
                 return 0 if result["renders_accepted"] == result["renders_attempted"] else 2
             if args.command == "evaluate-curve":
                 from .evaluate import evaluate_learning_curve
                 result = evaluate_learning_curve(pool, args.checkpoints, args.output, count=args.count,
-                                                 renderer_factory=NativeRendererFactory(args.plugin_path), timeout=args.timeout,
+                                                 renderer_factory=factory, timeout=args.timeout,
                                                  progress=lambda value: print(json.dumps(value), flush=True), resume=args.resume)
                 print(json.dumps(result["learning_curve"], indent=2))
                 return 0 if result["renders_accepted"] == result["renders_attempted"] else 2
             if args.command == "evaluate":
                 from .evaluate import evaluate_pilot
                 result = evaluate_pilot(pool, args.checkpoint, args.output, count=args.count, split=args.split,
-                                        renderer_factory=NativeRendererFactory(args.plugin_path), timeout=args.timeout,
+                                        renderer_factory=factory, timeout=args.timeout,
                                         progress=lambda value: print(json.dumps(value), flush=True))
                 print(json.dumps(result["aggregates"], indent=2))
                 return 0 if result["renders_accepted"] == result["renders_attempted"] else 2
@@ -344,14 +352,14 @@ def main(argv=None) -> int:
                 config = TrainConfig(**{key: getattr(args, key) for key in TrainConfig.__dataclass_fields__})
                 result = train_pilot(pool, args.output, config=config, device=args.device,
                                      stream_config=StreamConfig(prefetch_clips=1, timeout_seconds=args.timeout, worker_jobs=args.worker_jobs),
-                                     renderer_factory=NativeRendererFactory(args.plugin_path), resume=args.resume,
+                                     renderer_factory=factory, resume=args.resume,
                                      seed_replay=args.seed_replay,
                                      stop_after=args.stop_after, progress=lambda value: print(json.dumps(value), flush=True))
                 print(json.dumps(result, indent=2))
                 return 2 if result["complete"] and config.mode == "overfit" and not result["tiny_overfit_gate"] else 0
             if args.command == "codec-check":
                 from .codec_check import check_codec_audio
-                result = check_codec_audio(pool, args.output, renderer_factory=NativeRendererFactory(args.plugin_path),
+                result = check_codec_audio(pool, args.output, renderer_factory=factory,
                                            timeout=args.timeout,
                                            progress=lambda done, total, status: print(f"Checked {done}/{total}: {status}", flush=True))
                 print(json.dumps({key: value for key, value in result.items() if key != "cases"}, indent=2))
@@ -359,7 +367,7 @@ def main(argv=None) -> int:
             config = StreamConfig(args.prefetch_clips, args.prefetch_mib * 1024 * 1024, args.timeout, args.max_retries, args.worker_jobs)
             resume = json.loads(args.resume.read_text(encoding="utf-8")) if args.resume else None
             result = benchmark_stream(pool, args.output, count=args.count, split=args.split, role=args.role,
-                                      config=config, renderer_factory=NativeRendererFactory(args.plugin_path), resume=resume,
+                                      config=config, renderer_factory=factory, resume=resume,
                                       progress=lambda done, total, status: print(f"Handled {done}/{total}: {status}", flush=True))
             print(json.dumps({key: result[key] for key in ("requested", "accepted", "rejected", "errors", "elapsed_seconds",
                              "accepted_clips_per_second", "peak_reserved_bytes", "peak_process_tree_rss_bytes")}, indent=2))

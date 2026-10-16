@@ -58,7 +58,8 @@ class MemoryMonitor:
 def benchmark_stream(pool: PilotPool, output: Path, *, count: int = 32, split: str = "train", role: str = "reference",
                      config: StreamConfig | None = None, renderer_factory=None, resume: dict | None = None, progress=None) -> dict:
     sampler = PilotSampler(pool, split=split, role=role)
-    stream = OnlineRenderStream(sampler, count, config=config, renderer_factory=renderer_factory or NativeRendererFactory(), resume=resume)
+    stream = OnlineRenderStream(sampler, count, config=config,
+                                renderer_factory=renderer_factory or NativeRendererFactory(renderer_id=pool.codec.contract.renderer_id), resume=resume)
     output.mkdir(parents=True, exist_ok=False)
     write_json(output / "status.json", {"complete": False, "stage": "render_and_feature_consumer"})
     write_json(output / "cursor.json", stream.state_dict())

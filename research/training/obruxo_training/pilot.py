@@ -14,11 +14,19 @@ from .contracts import RenderRecipe
 from .eligibility import inspect_preset
 from .identity import PresetIdentity
 from .performances import initial_bank
-from .splits import SplitLedger, SplitManifest, build_splits
+from .splits import FrozenVariantManifest, SplitLedger, SplitManifest, build_splits
 
 
 def seeded_random(*parts) -> random.Random:
     return random.Random(int(hashlib.sha256(":".join(map(str, parts)).encode()).hexdigest(), 16))
+
+
+def authored_manifest(codec, entries, seed):
+    if not hasattr(codec, "lineage_root"):
+        return build_splits((entry.state_id for entry in entries), seed=seed)
+    roots = [codec.lineage_root(seeded_random(codec.generator, seed, index), index) for index in range(len(entries))]
+    parent = build_splits(roots, seed=seed)
+    return FrozenVariantManifest(parent, tuple((entry.state_id, root) for entry, root in zip(entries, roots, strict=True)))
 
 
 @dataclass(frozen=True)
@@ -58,7 +66,7 @@ class PilotPool:
             if not inspection["static_eligible"]:
                 raise ValueError(f"generated pilot state is ineligible: {inspection['reasons']}")
             entries.append(PilotEntry(inspection["identity"]["state"], target))
-        manifest = build_splits((entry.state_id for entry in entries), seed=seed)
+        manifest = authored_manifest(codec, entries, seed)
         if len(manifest.assignments) != count:
             raise ValueError("pilot generator produced duplicate states")
         return cls(codec, seed, manifest, tuple(entries))
@@ -88,7 +96,7 @@ class PilotPool:
             raise ValueError("pool expansion moved or removed a frozen lineage or split")
         if (len(self.manifest.assignments) != len(self.entries)
                 or len({entry.state_id for entry in self.entries}) != len(self.entries)
-                or self.manifest.manifest_id != build_splits((entry.state_id for entry in self.entries), seed=self.seed).manifest_id):
+                or self.manifest.manifest_id != authored_manifest(self.codec, self.entries, self.seed).manifest_id):
             raise ValueError("pool expansion has an invalid independent-root population or split manifest")
         added = self.entries[size:]
         return {"policy": "independent_authored_prefix_expansion_v1", "parent_pool_id": parent.pool_id,
@@ -122,7 +130,7 @@ class PilotPool:
             raw = codec.decode(entry.target)
             if codec.canonical_target(entry.target) != entry.target or PresetIdentity.from_bytes(raw).state != entry.state_id:
                 raise ValueError("pilot target does not match its source state")
-        expected = build_splits((entry.state_id for entry in entries), seed=value["seed"])
+        expected = authored_manifest(codec, entries, value["seed"])
         if expected.manifest_id != manifest.manifest_id:
             raise ValueError("pilot split manifest differs from its independent roots")
         return cls(codec, value["seed"], manifest, entries)

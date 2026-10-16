@@ -219,7 +219,7 @@ def test_learning_seed_override_cli_and_validation(pool, trained, tmp_path, monk
     with pytest.raises(ValueError, match="integer or None"):
         TrainConfig(learning_seed_override=True)
     pool.save(tmp_path / "pool.json")
-    monkeypatch.setattr("obruxo_training.stream.NativeRendererFactory", lambda _=None: FakeRendererFactory())
+    monkeypatch.setattr("obruxo_training.stream.NativeRendererFactory", lambda _=None, **_settings: FakeRendererFactory())
     output = tmp_path / "cli-learning-seed"
     assert main(["train", "--pool", str(tmp_path / "pool.json"), "--output", str(output),
                  "--steps", str(config.steps), "--replay-capacity", str(config.replay_capacity),
@@ -315,7 +315,7 @@ def test_fresh_validation_cli_excludes_parent_and_test_states_and_resumes(pool, 
     assert expected
     pool.save(tmp_path / "parent.json")
     expanded.save(tmp_path / "expanded.json")
-    monkeypatch.setattr("obruxo_training.stream.NativeRendererFactory", lambda _=None: FakeRendererFactory())
+    monkeypatch.setattr("obruxo_training.stream.NativeRendererFactory", lambda _=None, **_settings: FakeRendererFactory())
     output = tmp_path / "fresh"
     args = ["compare", "--pool", str(tmp_path / "parent.json"), "--validation-pool", str(tmp_path / "expanded.json"),
             "--checkpoints", f"one={source}", f"repeat={source}", "--retrieval-checkpoint", str(source),
@@ -364,7 +364,7 @@ def test_expanded_comparison_cli_keeps_parent_cases_retrieval_and_selected_train
     checkpoint = tmp_path / "candidate/checkpoint.pt"
     pool.save(tmp_path / "parent.json")
     expanded.save(tmp_path / "expanded.json")
-    monkeypatch.setattr("obruxo_training.stream.NativeRendererFactory", lambda _=None: FakeRendererFactory())
+    monkeypatch.setattr("obruxo_training.stream.NativeRendererFactory", lambda _=None, **_settings: FakeRendererFactory())
     output = tmp_path / "comparison"
     assert main(["compare", "--pool", str(tmp_path / "parent.json"), "--checkpoints", f"expanded={checkpoint}",
                  f"previous={source}", "--checkpoint-pools", f"expanded={tmp_path / 'expanded.json'}",
