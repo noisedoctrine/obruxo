@@ -170,6 +170,9 @@ def test_qualification_is_bounded_and_uses_only_training_lineage(alpha_pool):
     assert all(case["controls_equal_at_float32"] and case["nested_state_equal"] for case in sampler.cases)
     assert all(case["state_ids"][0] != case["state_ids"][3] for case in sampler.cases)
     assert sampler.sampler_id == AlphaCheckSampler(alpha_pool).sampler_id
+    for recipe in sampler.recipes:
+        settings = json.loads(recipe.render_request().preset_json)["settings"]
+        assert all(settings[f"osc_{index}_random_phase"] == 0 for index in range(1, 4))
 
 
 @pytest.mark.parametrize("rejected", [False, True])

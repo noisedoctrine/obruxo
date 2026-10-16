@@ -156,7 +156,9 @@ Request and recipe hashes identify experimental conditions, **not exact audio by
 
 ## Compute and next implementation boundary
 
-The [native latency report](reports/VITAL_RENDER_LATENCY.md) shows Vital synthesis running well above playback speed. Repeated process/plugin setup and patch-state handling dominate short clips. Bulk state conversion reduced the measured five-case wall time by 20.9%, preserving identical native state and audio. Worker reuse remains a separate qualification task.
+The [native latency report](reports/VITAL_RENDER_LATENCY.md) shows Vital synthesis running well above playback speed. Repeated process/plugin setup and patch-state handling dominate short clips. Bulk state conversion reduced the measured five-case wall time by 20.9%, preserving identical native state and audio. The worker measurement below covers the next source of setup overhead.
+
+The [reusable worker](RENDER_WORKER.md) now keeps Python imports alive while constructing a fresh Vital instance for every patch. The phase-controlled local check accepted all 66 native renders, matched fresh-process audio exactly across 32 jobs and a restart, and reduced paired mean call time by 16.7%. New runs can opt in with `--worker-jobs 32`; existing contracts retain one-job processes. Pipeline correctness checks fix oscillator phases; random-phase variation is tested separately.
 
 The contract declares **one render worker, at most 32 prefetched clips and at most 256 MiB of prefetched audio**. The online stream now enforces both limits, with a smaller 4-clip/32 MiB default. These are buffer budgets, not total application memory estimates. Training audio is rendered in memory on demand; no pre-rendered audio archive or GPU allocation is needed for the contracts and pipeline checks.
 

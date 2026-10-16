@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from dataclasses import fields
 import json
 from pathlib import Path
 import re
@@ -62,7 +61,7 @@ def restore_evaluation_checkpoint(saved, pool):
         raise ValueError("evaluation needs a trained pilot checkpoint")
     contract = saved["run_contract"]
     config = TrainConfig(**contract["training"])
-    stream_config = StreamConfig(**{field.name: contract["stream"][field.name] for field in fields(StreamConfig)})
+    stream_config = StreamConfig.from_dict(contract["stream"])
     frontend = AudioFeatures(saved["basic_pitch"])
     sampler = PilotSampler(pool, seed=config.seed, policy=config.sampling_policy)
     if contract != _run_contract(pool, sampler, frontend, config, stream_config, contract.get("replay_seed")):

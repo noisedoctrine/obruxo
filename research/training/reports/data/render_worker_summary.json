@@ -1,0 +1,812 @@
+{
+  "accepted": 66,
+  "attempted": 66,
+  "audio_files_written": 0,
+  "checks": [
+    {
+      "audio_float32_identical": true,
+      "case": 0,
+      "family": "wavetable",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 1,
+      "family": "layered",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 2,
+      "family": "filtered",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 3,
+      "family": "modulated",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 4,
+      "family": "chorus",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 5,
+      "family": "wavetable",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 6,
+      "family": "layered",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 7,
+      "family": "filtered",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 8,
+      "family": "modulated",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 9,
+      "family": "chorus",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 10,
+      "family": "wavetable",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 11,
+      "family": "layered",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 12,
+      "family": "filtered",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 13,
+      "family": "modulated",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 14,
+      "family": "chorus",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 15,
+      "family": "wavetable",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 16,
+      "family": "layered",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 17,
+      "family": "filtered",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 18,
+      "family": "modulated",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 19,
+      "family": "chorus",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 20,
+      "family": "wavetable",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 21,
+      "family": "layered",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 22,
+      "family": "filtered",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 23,
+      "family": "modulated",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 24,
+      "family": "chorus",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 25,
+      "family": "wavetable",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 26,
+      "family": "layered",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 27,
+      "family": "filtered",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 28,
+      "family": "modulated",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 29,
+      "family": "chorus",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 30,
+      "family": "wavetable",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 31,
+      "family": "layered",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    },
+    {
+      "audio_float32_identical": true,
+      "case": 32,
+      "family": "filtered",
+      "log_spectral_rmse": 0.0,
+      "native_state_identical": true,
+      "peak_absolute": 0.0,
+      "provenance_identical": true,
+      "rms_relative": 0.0,
+      "tolerance": {
+        "log_spectral_rmse": 0.35,
+        "peak_absolute": 0.1,
+        "rms_relative": 0.01
+      },
+      "waveform_relative_rmse": 0.0,
+      "waveform_rmse": 0.0,
+      "within_tolerance": true
+    }
+  ],
+  "elapsed_seconds": 150.8337470999977,
+  "final_test_used": false,
+  "format": "obruxo_render_worker_qualification_v1",
+  "gates": {
+    "bounded_lifetime_and_cleanup": true,
+    "memory": true,
+    "native_equivalence": true,
+    "wall_reduction": true
+  },
+  "github_actions": "disabled",
+  "limit": "Fixed-phase reproducibility on local Windows pinned Vital/DawDreamer, five training families and 32-job lifetime; random-phase draws are separate, and this is not Linux qualification or a model-quality claim.",
+  "local_tests_passed": 251,
+  "matched_fresh_mean_seconds": 2.461076136362945,
+  "mean_wall_reduction": 0.16650178006308836,
+  "peak_process_tree_rss_bytes": 671412224,
+  "phase_probe": {
+    "accepted": 15,
+    "all_audio_identical": true,
+    "all_native_states_identical": true,
+    "all_within_tolerance": true,
+    "checks": [
+      {
+        "audio_float32_identical": true,
+        "case": 0,
+        "family": "wavetable",
+        "log_spectral_rmse": 0.0,
+        "native_state_identical": true,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      {
+        "audio_float32_identical": true,
+        "case": 1,
+        "family": "layered",
+        "log_spectral_rmse": 0.0,
+        "native_state_identical": true,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      {
+        "audio_float32_identical": true,
+        "case": 2,
+        "family": "filtered",
+        "log_spectral_rmse": 0.0,
+        "native_state_identical": true,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      {
+        "audio_float32_identical": true,
+        "case": 3,
+        "family": "modulated",
+        "log_spectral_rmse": 0.0,
+        "native_state_identical": true,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      {
+        "audio_float32_identical": true,
+        "case": 4,
+        "family": "chorus",
+        "log_spectral_rmse": 0.0,
+        "native_state_identical": true,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      {
+        "audio_float32_identical": true,
+        "case": 5,
+        "family": "wavetable",
+        "log_spectral_rmse": 0.0,
+        "native_state_identical": true,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      {
+        "audio_float32_identical": true,
+        "case": 6,
+        "family": "layered",
+        "log_spectral_rmse": 0.0,
+        "native_state_identical": true,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      {
+        "audio_float32_identical": true,
+        "case": 7,
+        "family": "filtered",
+        "log_spectral_rmse": 0.0,
+        "native_state_identical": true,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      {
+        "audio_float32_identical": true,
+        "case": 8,
+        "family": "modulated",
+        "log_spectral_rmse": 0.0,
+        "native_state_identical": true,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      },
+      {
+        "audio_float32_identical": true,
+        "case": 9,
+        "family": "chorus",
+        "log_spectral_rmse": 0.0,
+        "native_state_identical": true,
+        "peak_absolute": 0.0,
+        "rms_relative": 0.0,
+        "tolerance": {
+          "log_spectral_rmse": 0.35,
+          "peak_absolute": 0.1,
+          "rms_relative": 0.01
+        },
+        "waveform_relative_rmse": 0.0,
+        "waveform_rmse": 0.0,
+        "within_tolerance": true
+      }
+    ],
+    "final_test_used": false,
+    "format": "obruxo_worker_phase_control_v1",
+    "intervention": "osc_1/2/3_random_phase_zero_only",
+    "native_attempts": 15,
+    "panel_sha256": "119cbd1b7176ccee7da3ad8cdcd23cb6b66baed8f2fce4ac179646db1572accf",
+    "training_pool_changed": false
+  },
+  "plan_sha256": "638fbc33bf79666a20e3c7b6a4c3f58fcf7152bf67acc3612db3751f0b3763ef",
+  "qualified": true,
+  "raw_evidence_sha256": "f808339c3e089fe3c97f96a43cece68a91bdf55cfe6a0a2872ebee426feaa53c",
+  "reuse_mean_seconds": 2.051302578787727,
+  "rss_sampling_errors": 0,
+  "software_verification": {
+    "affected_test_rerun_passed": 1,
+    "affected_test_rerun_seconds": 15.6,
+    "cause": "Simulated render exceeded its 60s deadline after a 383s wall-clock scheduling gap; recorded Windows Modern Standby transitions accompanied the pause. The failed render correctly advanced the stream cursor, so that run could not match the no-error trajectory. Production deadlines were not changed.",
+    "initial_full_suite_failed": 1,
+    "initial_full_suite_passed": 250
+  }
+}

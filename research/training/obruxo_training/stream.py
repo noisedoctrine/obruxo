@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from collections import deque
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields
 import json
 import math
 import multiprocessing as mp
 from multiprocessing import shared_memory
-from threading import Condition, Event, Thread
+from threading import Condition, Event, Lock, Thread
 from time import perf_counter
 
 import numpy as np
@@ -29,6 +29,7 @@ class StreamConfig:
     prefetch_bytes: int = 32 * 1024 * 1024
     timeout_seconds: float = 60.0
     max_retries: int = 0
+    worker_jobs: int = 1
 
     def __post_init__(self):
         if any(type(value) is not int or value <= 0 for value in (self.prefetch_clips, self.prefetch_bytes)):
@@ -37,11 +38,24 @@ class StreamConfig:
             raise ValueError("worker timeout must be positive and finite")
         if type(self.max_retries) is not int or not 0 <= self.max_retries <= 1:
             raise ValueError("max_retries must be 0 or 1")
+        if type(self.worker_jobs) is not int or not 1 <= self.worker_jobs <= 128:
+            raise ValueError("worker_jobs must be an integer from 1 to 128")
         object.__setattr__(self, "timeout_seconds", float(self.timeout_seconds))
 
     def to_dict(self) -> dict:
-        return {"stream": "isolated_online_render_v1", **asdict(self), "qa": asdict(AudioQualityConfig()),
+        settings = asdict(self)
+        if self.worker_jobs == 1:
+            settings.pop("worker_jobs")
+        else:
+            settings.update(plugin_lifetime="fresh_instance_per_job", native_rng="process_scoped_counter_random_phases_vary")
+        version = "isolated_online_render_v1" if self.worker_jobs == 1 else "reusable_isolated_online_render_v1"
+        return {"stream": version, **settings, "qa": asdict(AudioQualityConfig()),
                 "reject_audio_codes": sorted(REJECT_AUDIO_CODES), "resume_audio": "regenerate_unacknowledged"}
+
+    @classmethod
+    def from_dict(cls, document):
+        settings = {field.name: document[field.name] for field in fields(cls) if field.name != "worker_jobs"}
+        return cls(**settings, worker_jobs=document.get("worker_jobs", 1))
 
 
 @dataclass(frozen=True)
@@ -65,8 +79,8 @@ def request_frames(request: RenderRequest) -> int:
     return TempoMap.from_performance(request.performance).render_frame_count(end_tick, request.tail_seconds, request.sample_rate)
 
 
-def _render_job(connection, factory, request_json: str, memory_name: str, frames: int):
-    """One native process per job; only small metadata crosses the pipe, audio uses bounded shared memory."""
+def _render_payload(factory, request_json: str, memory_name: str, frames: int):
+    """Always construct a fresh renderer/engine/plugin; audio uses bounded shared memory."""
     segment = None
     try:
         request = RenderRequest.from_dict(json.loads(request_json))
@@ -90,15 +104,137 @@ def _render_job(connection, factory, request_json: str, memory_name: str, frames
             buffer = np.ndarray((frames, request.channels), dtype=np.float32, buffer=segment.buf)
             buffer[:] = result.audio
             del buffer
-        connection.send({"status": "rejected" if rejected else "accepted", "qa": qa, "renderer_qa": result.qa,
-                         "diagnostic_codes": codes,
-                         "render_seconds": render_seconds, "provenance": result.provenance.to_dict()})
+        return {"status": "rejected" if rejected else "accepted", "qa": qa, "renderer_qa": result.qa,
+                "diagnostic_codes": codes, "render_seconds": render_seconds, "provenance": result.provenance.to_dict()}
     except Exception as error:
-        connection.send({"status": "error", "error_type": type(error).__name__, "message": str(error)[:1000]})
+        return {"status": "error", "error_type": type(error).__name__, "message": str(error)[:1000]}
     finally:
         if segment is not None:
             segment.close()
+
+
+def _render_job(connection, factory, request_json: str, memory_name: str, frames: int):
+    try:
+        connection.send(_render_payload(factory, request_json, memory_name, frames))
+    finally:
         connection.close()
+
+
+def _render_loop(connection, factory, max_jobs):
+    try:
+        for job in range(1, max_jobs + 1):
+            command = connection.recv()
+            if command is None:
+                break
+            metadata = _render_payload(factory, **command)
+            connection.send({**metadata, "worker_job": job})
+            if metadata["status"] == "error":
+                break
+    except (EOFError, BrokenPipeError):
+        pass
+    finally:
+        connection.close()
+
+
+class RenderWorker:
+    """Sequential isolated jobs with fresh plugin instances and a bounded process lifetime."""
+
+    def __init__(self, *, renderer_factory=None, max_jobs=32, max_bytes=32 * 1024 * 1024):
+        StreamConfig(prefetch_bytes=max_bytes, worker_jobs=max_jobs)
+        self.factory = renderer_factory or NativeRendererFactory()
+        self.max_jobs, self.max_bytes = max_jobs, max_bytes
+        self._process, self._connection, self._jobs = None, None, 0
+        self._closed, self._lock = False, Lock()
+
+    def __enter__(self):
+        if self._closed:
+            raise RuntimeError("render worker is closed")
+        return self
+
+    def __exit__(self, *_):
+        self.close()
+
+    def _start(self):
+        context = mp.get_context("spawn")
+        self._connection, child = context.Pipe()
+        self._process = context.Process(target=_render_loop, args=(child, self.factory, self.max_jobs), daemon=True)
+        try:
+            self._process.start()
+        finally:
+            child.close()
+
+    def _reset(self):
+        if self._connection is not None:
+            try:
+                self._connection.send(None)
+            except (BrokenPipeError, EOFError, OSError):
+                pass
+            self._connection.close()
+        if self._process is not None:
+            if self._process.pid is not None:
+                self._process.join(.2)
+                if self._process.is_alive():
+                    self._process.terminate()
+                    self._process.join(1)
+                if self._process.is_alive():
+                    self._process.kill()
+                    self._process.join(1)
+            self._process.close()
+        self._process, self._connection, self._jobs = None, None, 0
+
+    def close(self):
+        with self._lock:
+            self._reset()
+            self._closed = True
+
+    def render(self, request, *, timeout=60., cancel=None):
+        StreamConfig(timeout_seconds=timeout)
+        if not self._lock.acquire(blocking=False):
+            raise RuntimeError("render worker only accepts one job at a time")
+        try:
+            if self._closed:
+                raise RuntimeError("render worker is closed")
+            return self._render(request, timeout, cancel if cancel is not None else Event())
+        finally:
+            self._lock.release()
+
+    def _render(self, request, timeout, cancel):
+        frames = request_frames(request)
+        if frames * request.channels * 4 > self.max_bytes:
+            raise ValueError("render exceeds the one-clip memory budget")
+        memory = shared_memory.SharedMemory(create=True, size=frames * request.channels * 4)
+        started, metadata, audio = perf_counter(), {"status": "error", "error_type": "Cancelled"}, None
+        try:
+            if not cancel.is_set():
+                if self._process is None:
+                    self._start()
+                self._jobs += 1
+                self._connection.send({"request_json": json.dumps(request.to_dict()), "memory_name": memory.name, "frames": frames})
+                while not cancel.is_set():
+                    remaining = timeout - (perf_counter() - started)
+                    if remaining <= 0:
+                        metadata = {"status": "error", "error_type": "RenderTimeout"}
+                        break
+                    if self._connection.poll(min(.1, remaining)):
+                        metadata = self._connection.recv()
+                        if metadata.get("worker_job") != self._jobs:
+                            metadata = {"status": "error", "error_type": "WorkerProtocolError"}
+                        if metadata["status"] == "accepted":
+                            audio = np.ndarray((frames, request.channels), dtype=np.float32, buffer=memory.buf).copy()
+                            audio.setflags(write=False)
+                        break
+                    if not self._process.is_alive():
+                        metadata = {"status": "error", "error_type": "WorkerExited", "exit_code": self._process.exitcode}
+                        break
+                metadata = {**metadata, "worker_pid": self._process.pid, "worker_job": self._jobs, "worker_max_jobs": self.max_jobs}
+        except (EOFError, BrokenPipeError, OSError):
+            metadata = {"status": "error", "error_type": "WorkerExited"}
+        finally:
+            if metadata["status"] == "error" or self._jobs >= self.max_jobs:
+                self._reset()
+            memory.close()
+            memory.unlink()
+        return audio, {**metadata, "wall_seconds": perf_counter() - started}
 
 
 def _render_once(request: RenderRequest, factory, timeout: float, cancel: Event) -> tuple[np.ndarray | None, dict]:
@@ -144,8 +280,12 @@ def _render_once(request: RenderRequest, factory, timeout: float, cancel: Event)
         memory.unlink()
 
 
-def render_isolated(request: RenderRequest, *, renderer_factory=None, timeout: float = 60) -> tuple[np.ndarray | None, dict]:
+def render_isolated(request: RenderRequest, *, renderer_factory=None, timeout: float = 60, worker=None) -> tuple[np.ndarray | None, dict]:
     """One QA-gated evaluator render without assigning a prediction to a source split."""
+    if worker is not None:
+        if renderer_factory is not None and renderer_factory != worker.factory:
+            raise ValueError("render factory differs from the reusable worker")
+        return worker.render(request, timeout=timeout)
     config = StreamConfig(prefetch_clips=1, timeout_seconds=timeout)
     if request_frames(request) * request.channels * 4 > config.prefetch_bytes:
         raise ValueError("evaluation render exceeds the one-clip memory budget")
@@ -264,6 +404,8 @@ class OnlineRenderStream:
             return True
 
     def _produce(self) -> None:
+        worker = RenderWorker(renderer_factory=self.factory, max_jobs=self.config.worker_jobs,
+                              max_bytes=self.config.prefetch_bytes) if self.config.worker_jobs > 1 else None
         try:
             for sequence in range(self._start, self._start + self.count):
                 if self._stop.is_set():
@@ -275,7 +417,10 @@ class OnlineRenderStream:
                     break
                 started, attempts, audio = perf_counter(), [], None
                 for attempt in range(self.config.max_retries + 1):
-                    audio, metadata = _render_once(request, self.factory, self.config.timeout_seconds, self._stop)
+                    if worker is None:
+                        audio, metadata = _render_once(request, self.factory, self.config.timeout_seconds, self._stop)
+                    else:
+                        audio, metadata = worker.render(request, timeout=self.config.timeout_seconds, cancel=self._stop)
                     attempts.append({"attempt": attempt, **metadata})
                     if metadata["status"] != "error" or self._stop.is_set():
                         break
@@ -293,6 +438,8 @@ class OnlineRenderStream:
         except Exception as error:
             self._error = error
         finally:
+            if worker is not None:
+                worker.close()
             with self._condition:
                 self._done = True
                 self._condition.notify_all()
