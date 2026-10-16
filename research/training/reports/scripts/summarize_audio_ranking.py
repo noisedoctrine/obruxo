@@ -42,7 +42,11 @@ def main():
             raise ValueError("deployed choice differs from the actual audio-only ranker")
     means = qualification["means"]
     change = 100 * (means["deployed"]["mean_mrstft"] / means["model"]["mean_mrstft"] - 1)
+    complete_panels = sum(all(all("mrstft" in scores.get(role, {}) for role in ("reference", "transfer"))
+                              for scores in row.get("candidate_scores_under_evaluator_notes", {}).values()) for row in cases)
     summary.update(deployed_relative_error_change_percent=change,
+                   complete_evaluator_candidate_panels=complete_panels,
+                   native_error_types=dict(Counter(row["error_type"] for row in events if row["status"] == "error")),
                    deployed_choices=dict(Counter(row.get("deployed", "source_failed") for row in cases)),
                    artifact_sha256=hashlib.sha256((args.run / "candidate-model.pt").read_bytes()).hexdigest(),
                    verification={"training_suite_passed": args.training_tests_passed, "renderer_stream_suite_passed": args.renderer_tests_passed,
@@ -61,6 +65,7 @@ def main():
     rows += ["", f"Deployed-minus-model paired mean: {paired['mean_delta']:+.4f}; descriptive 95% state-bootstrap interval: {paired['ci95']}. Wins: {paired['wins']}/{paired['planned']}; ties: {paired['ties']}. The two performances of each patch stay together. These are reused development states, not a fresh final test.", "",
              f"Ranked coverage: {100 * qualification['ranked_coverage']:.1f}%. Model-warm ranking p95: {qualification['warm_p95_seconds']:.2f}s; bundle cold load: {summary['cold_bundle_load_seconds']:.2f}s. Each candidate render still starts a fresh native process. Accepted native attempts: {summary['renders_accepted']}/{summary['renders_attempted']}. Sampled process-tree peak: {summary['peak_process_tree_rss_bytes'] / 2**20:.1f} MiB. Elapsed check time excludes initial bundle creation and includes partial recovery when present.", "",
              "Independent local checks overlapped this CPU run, so these times describe that workload rather than an idle-machine throughput benchmark. No audio archive, test-split evaluation or paid compute was used. The ordinary top-1 path remains available. Inferred notes and heuristic velocities can limit ranking quality; diagnostic best-of-four must not be mistaken for deployed performance.", "",
+             f"Only {complete_panels}/{len(cases)} evaluator candidate panels completed every proposed patch under both performances. The one failed attempt was a transfer evaluation of a categorical alternative: a RenderTimeout after a long host scheduling pause, with Windows Modern Standby observed. It remains counted. The chosen deployed patch and ordinary-model comparison were fully scored on all ten states. The diagnostic oracle uses accepted candidates, so it is not a complete four-way ceiling for the affected case.", "",
              f"Validation: the training suite passed {args.training_tests_passed} tests; the renderer/stream suite passed {args.renderer_tests_passed} tests. Counts describe separate overlapping suites. Dedicated checks cover audio-only note estimation, four-render caps, invalid/no-note fallbacks, mono WAV handling, frontend equivalence, state/identity rejection, qualification guards and recovery caps. Ruff/diff checks pass; GitHub Actions stays disabled.", "",
              "[Usage and gates](../AUDIO_CANDIDATES.md) · [Frozen plan](data/audio_ranking_plan.json) · [Aggregate evidence](data/audio_ranking_summary.json)", ""]
     (reports / "AUDIO_RANKING_RESULTS.md").write_text("\n".join(rows))
