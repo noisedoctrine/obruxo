@@ -16,6 +16,8 @@ The [attack-compatible sampler](SOURCE_PERFORMANCE_SAMPLING.md) selects referenc
 
 The [collection checkpoint path](CHECKPOINT_STORAGE.md) saves unchanged initial state once while persisting features and cursor after every acknowledged attempt. Its [completed check](reports/CHECKPOINT_STORAGE_RESULTS.md) cuts paired write time by 61% and verifies exact recovery from 64 native examples. Collection recovery requires the sibling initial-state file; completed training checkpoints remain self-contained.
 
+The [curve-input path](CURVE_INPUTS.md) renders original one-point sources through an explicit constant/float32 import rule. Its [completed check](reports/CURVE_INPUT_RESULTS.md) covers 174 positive native requests, preserves the native LFO failure controls, and verifies active supervision for all three curve families during real-audio training and recovery.
+
 The [full scalar training path](FULL_SCALAR_TRAINING.md) connects all 775 scalar fields to bounded audio-only learning, legal effect-order and pitch-mask outputs, modern render recipes and inference export. Nested assets, curves, seeds and connections remain explicitly fixed in this increment; learned structured coverage follows.
 
 The [full-preset render profile](FULL_RENDER_PROFILE.md) adds an explicit path for all 775 controls and six nested structures in the reviewed 1.5.5 inventory. It checks the broader native state before broader model training; existing pilot and alpha artifacts retain their identities.

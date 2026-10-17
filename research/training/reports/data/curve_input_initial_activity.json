@@ -1,0 +1,21 @@
+{
+  "codec_id": "a51633467fde0faf3681d81a1d49b94a55c777bdf53ddfc33b3fa3c9f36d72be",
+  "counts": {
+    "custom_warps": {
+      "active_singletons": 0,
+      "stored_singletons": 12
+    },
+    "lfos": {
+      "active_singletons": 0,
+      "stored_singletons": 9
+    },
+    "modulations": {
+      "active_singletons": 5,
+      "stored_singletons": 9
+    }
+  },
+  "pool_id": "f0e62059604bbfbae435e2a3df88ac8284409405b5f281ed8fee9e93d827c034",
+  "replay_examples": 16,
+  "scope": "initial_transport_panel_not_complete_active_supervision",
+  "source_snapshot": "10bd631f60f41e8e76e2739af15ee8f04f327843"
+}

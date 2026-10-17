@@ -1,0 +1,24 @@
+{
+  "attempt_budget": 9,
+  "discovery": "native_singleton_expected_failure_controls_v1",
+  "expected": "two_worker_exits_for_active_singleton_lfo_seven_accepted_controls",
+  "final_test_audio": false,
+  "model_promotion": false,
+  "phase_control": "all_four_generator_random_phases_zero",
+  "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-seed-bits-v2-expression-midi-v1",
+  "source_sha256_lf": {
+    "data_generation/obruxo_data/render/__init__.py": "15b14494598c55f9a4f160f7992896b36c351cb65e0f2ed98c4d03235956bb82",
+    "data_generation/obruxo_data/render/base.py": "423f27e6e374994b6a2bcde7b9db379f56de946ece2f7ea9760eb6bdf272a0ab",
+    "data_generation/obruxo_data/render/batch.py": "8aa0ac5d01587ccff7e7992c29fe79f275f6190dde6b889187e261fb66cc59f4",
+    "data_generation/obruxo_data/render/capabilities.py": "7fb505b169b6cf097d19b55e30059ee4dc6684a080ee67cbd942541d3c84bb87",
+    "data_generation/obruxo_data/render/curve_inputs.py": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe",
+    "data_generation/obruxo_data/render/full_state.py": "dbcc375b136ff3002020bf587061520581a38c8399c655efa099aac06cce8749",
+    "data_generation/obruxo_data/render/midi_transport.py": "55d5b6ace126b45e38635c707f00006596dd7db1a61d59da13f2f220b8f0ef59",
+    "data_generation/obruxo_data/render/qa.py": "d536b111c5a7bfc104b7924d12cf3dca0958b2c75b51a22bcc0ab3adf3689c38",
+    "data_generation/obruxo_data/render/vita.py": "43491582ac7bae8af44b443cc16e1b31abb1c83f1aa7c3e778b0be088c14b0ff",
+    "data_generation/obruxo_data/vital/full_contract.py": "e1db5ed60a2d84734fef876a3aeddae4e976f8f2b385d747a099355ea6c309fa",
+    "training/reports/scripts/run_curve_input_check.py": "3c320aa366076f7823c602a5fd5c9fec7205be7558da8d347a240a96e609ff88",
+    "training/reports/scripts/run_curve_input_discovery.py": "b00b1a7ea7b5a9e450bf8cb5344d4685cf7afb534453abfb85b514dafb69bc0c"
+  },
+  "worker_jobs": 1
+}
