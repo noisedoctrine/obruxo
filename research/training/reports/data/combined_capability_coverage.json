@@ -1,0 +1,7144 @@
+{
+  "audit": "nested_training_recipe_coverage_v1",
+  "audited_train_states": 205,
+  "claim": "declared_output_and_training_supervision_coverage_only_not_native_audibility_or_learning",
+  "codec_id": "373f2fe6be492fe8966d359bf341f8bdf51b867898cd1afb15adc0c9a695c7e5",
+  "effects": {
+    "distinct_enabled_sets": 2,
+    "enabled_state_counts": {
+      "chorus": 40,
+      "distortion": 40
+    }
+  },
+  "elapsed_seconds": 115.35285450000083,
+  "limits": {
+    "final_test_audio": false,
+    "mask_policy_is_not_audibility": true,
+    "model_promotion": false,
+    "optimizer_steps": 0,
+    "range_and_combination_completeness": false,
+    "raw_corpus_layout_coverage": "not_audited",
+    "render_attempts": 0
+  },
+  "performances": {
+    "bank_id": "5e684d136bd440949a1497eb8204b5a0d6cf4d9fab53e1f911684e67a803720f",
+    "capabilities": {
+      "channel_pressure": true,
+      "control_changes": [
+        1,
+        64,
+        74
+      ],
+      "max_channels": 16,
+      "note_off_velocity": true,
+      "notes": true,
+      "pitch_bend": true,
+      "polyphony": true,
+      "tempo_changes": false
+    },
+    "reference": [
+      "held_mid",
+      "staccato_mid",
+      "melody_mid",
+      "chord_mid",
+      "expression_gestures_reference",
+      "expression_poly_expression_reference",
+      "expression_sustain_reference",
+      "expression_release_reference"
+    ],
+    "transfer": [
+      "held_low",
+      "staccato_high",
+      "melody_wide",
+      "chord_wide",
+      "expression_gestures_transfer",
+      "expression_poly_expression_transfer",
+      "expression_sustain_transfer",
+      "expression_release_transfer"
+    ]
+  },
+  "pool_file_sha256": "a36e297cf652af513018bf374a2886d91b91f4b0c55dd53bebd3d6288e52f873",
+  "pool_id": "261b4f9b2a4db62afbe7a08c006ee1b6682e24e2d7b38cf04e9d8bd7d8f154a1",
+  "runtime_source_sha256_lf": {
+    "data_generation/obruxo_data/render/base.py": "9a2358b6ba7372f6c0f5edcaacbb049570c6dcc6fab1789d7bb9e5916944b2b1",
+    "data_generation/obruxo_data/render/capabilities.py": "7fb505b169b6cf097d19b55e30059ee4dc6684a080ee67cbd942541d3c84bb87",
+    "data_generation/obruxo_data/vital/full_contract.py": "6446f851a051d16283734c377d392e058ea1335cb463912b50d3b47cc74da74c",
+    "training/obruxo_training/__init__.py": "80bb66f20b0cc165dd6a028b1fd5fa123d45bfebe8137b4e5e9602acfd68afea",
+    "training/obruxo_training/alpha.py": "100d39b844c35a8ff796b80c42df3b394770e1f5c12ce7524335c5d8b9369b82",
+    "training/obruxo_training/alpha_check.py": "02742c531d3197c86e1b0f3ea785f59d665d2acaeed3959d0a40e171b523c429",
+    "training/obruxo_training/asset_codec.py": "f92aa078b0aa30fb05bee0d5713fd1d8a587f0f4f08f7fe8fa4432d4b38751f1",
+    "training/obruxo_training/assets.py": "85a49d979b8206520dbe4ec8a1b19730774acb39519c1a4bf103d87837731071",
+    "training/obruxo_training/audio_candidates.py": "4e2d166f4fac96cd4d354d1bc119b1d97bbad7abf8ec1eca553dc2cfd0bf1243",
+    "training/obruxo_training/audit.py": "f54ff67a2fd446f95d0aae324df4f7de43e5d3244c768ba447e594e21731d26c",
+    "training/obruxo_training/benchmark.py": "1941574c1f9295dd9d136a131ea58f514b53db9298d133e8f988a514668d9ad0",
+    "training/obruxo_training/candidate_data.py": "ff1aae5abac5e83a129a607cc0a43a0b0708002eff412f99c1ea7b9e5a474804",
+    "training/obruxo_training/candidate_learning.py": "608029baf041b956ac3fcce98a3d52572d2d41011d3208a145e15b8755c341aa",
+    "training/obruxo_training/candidate_screen.py": "20eb8b163014298968a438ec25e0acd31d9fae39d8902966209f154fe0b5c7d4",
+    "training/obruxo_training/candidates.py": "a26e4512330645b4522f4ebd3112cc60fdd18c2309998cb26b78362a40e96165",
+    "training/obruxo_training/capability_audit.py": "94ed6602c40b59d3a692af8b23183cffb712dd621dc129b449a620c7777149e2",
+    "training/obruxo_training/cli.py": "4f68fddcc4e4ca794010ddb56bf7b19bdaddb03728c7a62b6216ad411ef820a5",
+    "training/obruxo_training/codec.py": "98204dab40d5132a171571f84feeac17457e70111b33b577ecbec0c73cd15591",
+    "training/obruxo_training/codec_check.py": "647734635b1da35fec45c44906dc519e2aac6c1592509016a072472c520f17ee",
+    "training/obruxo_training/contracts.py": "50757c7883067df47b3595aed52bcc0a6d253f79313e72b61217c6a369144c5b",
+    "training/obruxo_training/curve_labels.py": "c00bdfefa7b69901e7d224f656d59a442fc73aa5317e702bf95d11b66b24fe2c",
+    "training/obruxo_training/eligibility.py": "d95eff39be0b1dbaeba49a37231ce7295ee27c064e28ef0a1a184a21b6fb36eb",
+    "training/obruxo_training/evaluate.py": "3b398f95af2fb2be48e4ec7f40641697cc5f00bee6db12c33cb8086430ebaffc",
+    "training/obruxo_training/expression_bank.py": "f0edfe633c8a2413883985f7568df5bf2b6b2ce61b6fa848055e2edfeff8fb6a",
+    "training/obruxo_training/expression_check.py": "34271dd33487f476428f7f1157533679712714ea6f44fb3ad0d48a8b96afbc10",
+    "training/obruxo_training/expression_codec.py": "2db9b8baf408d96fb6349036a9083f355cb29f0d98d4163ae1dbdf7d5bdb2ac6",
+    "training/obruxo_training/factory_bank.py": "9d73ffdd10a2c4df7d4afdea623560961174cc2beea468583592f35544e28cf6",
+    "training/obruxo_training/features.py": "61f5d5d98aee7504c3fa96f648e2dc6382624332e1a05ef558b2f79365ff13b0",
+    "training/obruxo_training/full_check.py": "4d20cbc92a6a82c55ebd676a9a0a0c42259238c0223db4eb79ff66b9184e0417",
+    "training/obruxo_training/full_scalar.py": "532a12126bb44500dc80e718ec56d8d21f309158220be8eaea52ec4dde8bbf8c",
+    "training/obruxo_training/identity.py": "2a0513450a4df452dd8821bd1fd764f5d307c653c2b485c5ba384519af33830a",
+    "training/obruxo_training/lfo_bank.py": "07d8e616f428de299d3a6bed4a8ac033e6cb5270079463eeb331fbf5304fc0d3",
+    "training/obruxo_training/lfo_codec.py": "d41da86ac468dcf2821b41d6ce66c02b630d72fdf660adbbf6cd3bb4c89aabaf",
+    "training/obruxo_training/lfo_curriculum.py": "167517d692e002086b3a36c252767339a2bdc1d28eb31abd1d52ef6ea65a62ba",
+    "training/obruxo_training/lfo_loss.py": "9a56fb32ac06b9e44cc6a01a3336847d2abc35e6e0ca6fe53367f4ac480a6a4e",
+    "training/obruxo_training/model.py": "30209d9c2df64326794f4e472559e4c46d7816ca139220293bc44b2ac4a4abe6",
+    "training/obruxo_training/nested_check.py": "b9009b469364fa396f1e14a8db76b9600b23f9e3c453846ee179d376f8d3763e",
+    "training/obruxo_training/nested_codec.py": "2f8da9bed308fa4582d5b9568d4064fafdb518d201b31ffc92dfbedb9a3b075a",
+    "training/obruxo_training/paired.py": "1c5d8c69d92151b40418e8bc949630a306686740025a22a31eea2147f4a89025",
+    "training/obruxo_training/paired_features.py": "7bd3f560bfbf684387f02eb916b252c8f7d29a03f0595ffc59ccb7d955bfbc2c",
+    "training/obruxo_training/performances.py": "6db679632cb55849fc9b121ce3ba1e19144dc72a470072fb50d032720855c302",
+    "training/obruxo_training/pilot.py": "76530223b9476986d25ad62713f706b7e2d5b03b7b2f2bc4a981542a74102c10",
+    "training/obruxo_training/proxy.py": "a82364d7dd406b6949bb6dfdfaa23b873035bade3e6771b238cda712a366abfb",
+    "training/obruxo_training/proxy_screen.py": "b1a2c7ffcb6662a933c182810db8eb35529669975f3fdc78991fa0667b7e0290",
+    "training/obruxo_training/ranking_check.py": "afb67588a697ef4bee3e1d41dd5a1da5d80bf500df6351dabdaaf0459f2686c8",
+    "training/obruxo_training/reproducibility.py": "9326793bdbc629be7c29584329b182dcb93b6fd91c270f180b24a0a6fe885729",
+    "training/obruxo_training/routing.py": "ec0e4ddf5f7151ed72168b35e6d75ab49cdeba04db7b97f8df7da25cfa0de98b",
+    "training/obruxo_training/routing_check.py": "4ceb464b457c45d08b11e7be3e87993f3bec4ffcf20a658c00abf79b2edb76e5",
+    "training/obruxo_training/splits.py": "e99d1c9afd2658b0229fa69664a3fe6ae9d666c407c67a4839d018c98222da25",
+    "training/obruxo_training/stream.py": "008d5aed58f6dc81bba7e51754a728f2232ee7774bc206abc95cc74cd22ef753",
+    "training/obruxo_training/trainer.py": "53b9a42f4566f654767cfdee57e0d6fea4d3ef59f140b86bdb11a1575e6a8eb0",
+    "training/reports/scripts/audit_capabilities.py": "5ba96bea965ae6815579ed8e0cb6345be7ef9ad268a1df090aacd8c5c141760a"
+  },
+  "scalar_count": 775,
+  "scalar_families": {
+    "effects": {
+      "constant": 24,
+      "masked": 85,
+      "varied": 4
+    },
+    "envelopes": {
+      "constant": 5,
+      "masked": 45,
+      "varied": 4
+    },
+    "filters": {
+      "constant": 14,
+      "masked": 15,
+      "varied": 3
+    },
+    "modulation": {
+      "constant": 128,
+      "varied": 192
+    },
+    "modulators": {
+      "constant": 96,
+      "masked": 32
+    },
+    "oscillators": {
+      "constant": 83,
+      "varied": 7
+    },
+    "sampler": {
+      "constant": 1,
+      "masked": 10
+    },
+    "voice_global": {
+      "constant": 23,
+      "varied": 4
+    }
+  },
+  "scalar_inventory_sha256": "251df36fe9f4bcc045c87d65a50d1337dd553e35f05a7e9e5ff157f9ab94e523",
+  "scalar_status_counts": {
+    "constant": 374,
+    "masked": 187,
+    "varied": 214
+  },
+  "scalars": [
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "beats_per_minute",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "bypass",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "chorus_cutoff",
+      "status": "constant",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "chorus_delay_1",
+      "status": "constant",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "chorus_delay_2",
+      "status": "constant",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 41,
+      "distinct_supervised_values": 40,
+      "family": "effects",
+      "name": "chorus_dry_wet",
+      "status": "varied",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "chorus_feedback",
+      "status": "constant",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "chorus_frequency",
+      "status": "constant",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "chorus_mod_depth",
+      "status": "constant",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "effects",
+      "name": "chorus_on",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "chorus_spread",
+      "status": "constant",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "chorus_sync",
+      "status": "constant",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "chorus_tempo",
+      "status": "constant",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "chorus_voices",
+      "status": "constant",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_attack",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_band_gain",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_band_lower_ratio",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_band_lower_threshold",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_band_upper_ratio",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_band_upper_threshold",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_enabled_bands",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_high_gain",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_high_lower_ratio",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_high_lower_threshold",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_high_upper_ratio",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_high_upper_threshold",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_low_gain",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_low_lower_ratio",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_low_lower_threshold",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_low_upper_ratio",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_low_upper_threshold",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_mix",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "compressor_on",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "compressor_release",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "delay_aux_frequency",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "delay_aux_sync",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "delay_aux_tempo",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "delay_dry_wet",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "delay_feedback",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "delay_filter_cutoff",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "delay_filter_spread",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "delay_frequency",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "delay_on",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "delay_style",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "delay_sync",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "delay_tempo",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "distortion_drive",
+      "status": "constant",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "distortion_filter_blend",
+      "status": "constant",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "distortion_filter_cutoff",
+      "status": "constant",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "distortion_filter_order",
+      "status": "constant",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "distortion_filter_resonance",
+      "status": "constant",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "distortion_mix",
+      "status": "constant",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "effects",
+      "name": "distortion_on",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "distortion_type",
+      "status": "constant",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 41,
+      "distinct_supervised_values": 40,
+      "family": "effects",
+      "name": "effect_chain_order",
+      "status": "varied",
+      "supervised_states": 40
+    },
+    {
+      "distinct_stored_values": 40,
+      "distinct_supervised_values": 40,
+      "family": "envelopes",
+      "name": "env_1_attack",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "envelopes",
+      "name": "env_1_attack_power",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 40,
+      "distinct_supervised_values": 40,
+      "family": "envelopes",
+      "name": "env_1_decay",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "envelopes",
+      "name": "env_1_decay_power",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "envelopes",
+      "name": "env_1_delay",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "envelopes",
+      "name": "env_1_hold",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 40,
+      "distinct_supervised_values": 40,
+      "family": "envelopes",
+      "name": "env_1_release",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "envelopes",
+      "name": "env_1_release_power",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 40,
+      "distinct_supervised_values": 40,
+      "family": "envelopes",
+      "name": "env_1_sustain",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_2_attack",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_2_attack_power",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_2_decay",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_2_decay_power",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_2_delay",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_2_hold",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_2_release",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_2_release_power",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_2_sustain",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_3_attack",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_3_attack_power",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_3_decay",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_3_decay_power",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_3_delay",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_3_hold",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_3_release",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_3_release_power",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_3_sustain",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_4_attack",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_4_attack_power",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_4_decay",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_4_decay_power",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_4_delay",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_4_hold",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_4_release",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_4_release_power",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_4_sustain",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_5_attack",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_5_attack_power",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_5_decay",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_5_decay_power",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_5_delay",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_5_hold",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_5_release",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_5_release_power",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_5_sustain",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_6_attack",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_6_attack_power",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_6_decay",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_6_decay_power",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_6_delay",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_6_hold",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_6_release",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_6_release_power",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "envelopes",
+      "name": "env_6_sustain",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "eq_band_cutoff",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "eq_band_gain",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "eq_band_mode",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "eq_band_resonance",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "eq_high_cutoff",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "eq_high_gain",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "eq_high_mode",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "eq_high_resonance",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "eq_low_cutoff",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "eq_low_gain",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "eq_low_mode",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "eq_low_resonance",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "eq_on",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "filters",
+      "name": "filter_1_blend",
+      "status": "constant",
+      "supervised_states": 45
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "filters",
+      "name": "filter_1_blend_transpose",
+      "status": "constant",
+      "supervised_states": 45
+    },
+    {
+      "distinct_stored_values": 46,
+      "distinct_supervised_values": 45,
+      "family": "filters",
+      "name": "filter_1_cutoff",
+      "status": "varied",
+      "supervised_states": 45
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "filters",
+      "name": "filter_1_drive",
+      "status": "constant",
+      "supervised_states": 45
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "filters",
+      "name": "filter_1_filter_input",
+      "status": "constant",
+      "supervised_states": 45
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "filters",
+      "name": "filter_1_formant_resonance",
+      "status": "constant",
+      "supervised_states": 45
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "filters",
+      "name": "filter_1_formant_spread",
+      "status": "constant",
+      "supervised_states": 45
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "filters",
+      "name": "filter_1_formant_transpose",
+      "status": "constant",
+      "supervised_states": 45
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "filters",
+      "name": "filter_1_formant_x",
+      "status": "constant",
+      "supervised_states": 45
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "filters",
+      "name": "filter_1_formant_y",
+      "status": "constant",
+      "supervised_states": 45
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "filters",
+      "name": "filter_1_keytrack",
+      "status": "constant",
+      "supervised_states": 45
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "filters",
+      "name": "filter_1_mix",
+      "status": "constant",
+      "supervised_states": 45
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "filters",
+      "name": "filter_1_model",
+      "status": "constant",
+      "supervised_states": 45
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "filters",
+      "name": "filter_1_on",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 46,
+      "distinct_supervised_values": 45,
+      "family": "filters",
+      "name": "filter_1_resonance",
+      "status": "varied",
+      "supervised_states": 45
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "filters",
+      "name": "filter_1_style",
+      "status": "constant",
+      "supervised_states": 45
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "filters",
+      "name": "filter_2_blend",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "filters",
+      "name": "filter_2_blend_transpose",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "filters",
+      "name": "filter_2_cutoff",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "filters",
+      "name": "filter_2_drive",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "filters",
+      "name": "filter_2_filter_input",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "filters",
+      "name": "filter_2_formant_resonance",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "filters",
+      "name": "filter_2_formant_spread",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "filters",
+      "name": "filter_2_formant_transpose",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "filters",
+      "name": "filter_2_formant_x",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "filters",
+      "name": "filter_2_formant_y",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "filters",
+      "name": "filter_2_keytrack",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "filters",
+      "name": "filter_2_mix",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "filters",
+      "name": "filter_2_model",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "filters",
+      "name": "filter_2_on",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "filters",
+      "name": "filter_2_resonance",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "filters",
+      "name": "filter_2_style",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "filter_fx_blend",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "filter_fx_blend_transpose",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "filter_fx_cutoff",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "filter_fx_drive",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "filter_fx_formant_resonance",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "filter_fx_formant_spread",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "filter_fx_formant_transpose",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "filter_fx_formant_x",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "filter_fx_formant_y",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "filter_fx_keytrack",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "filter_fx_mix",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "filter_fx_model",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "filter_fx_on",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "filter_fx_resonance",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "filter_fx_style",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "flanger_center",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "flanger_dry_wet",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "flanger_feedback",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "flanger_frequency",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "flanger_mod_depth",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "flanger_on",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "flanger_phase_offset",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "flanger_sync",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "flanger_tempo",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "voice_global",
+      "name": "legato",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_1_delay_time",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_1_fade_time",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_1_frequency",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_1_keytrack_transpose",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_1_keytrack_tune",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_1_phase",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_1_smooth_mode",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_1_smooth_time",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_1_stereo",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_1_sync",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_1_sync_type",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_1_tempo",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_2_delay_time",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_2_fade_time",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_2_frequency",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_2_keytrack_transpose",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_2_keytrack_tune",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_2_phase",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_2_smooth_mode",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_2_smooth_time",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_2_stereo",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_2_sync",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_2_sync_type",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_2_tempo",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_3_delay_time",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_3_fade_time",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_3_frequency",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_3_keytrack_transpose",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_3_keytrack_tune",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_3_phase",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_3_smooth_mode",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_3_smooth_time",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_3_stereo",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_3_sync",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_3_sync_type",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_3_tempo",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_4_delay_time",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_4_fade_time",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_4_frequency",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_4_keytrack_transpose",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_4_keytrack_tune",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_4_phase",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_4_smooth_mode",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_4_smooth_time",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_4_stereo",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_4_sync",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_4_sync_type",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_4_tempo",
+      "status": "constant",
+      "supervised_states": 78
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_5_delay_time",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_5_fade_time",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_5_frequency",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_5_keytrack_transpose",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_5_keytrack_tune",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_5_phase",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_5_smooth_mode",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_5_smooth_time",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_5_stereo",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_5_sync",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_5_sync_type",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_5_tempo",
+      "status": "constant",
+      "supervised_states": 77
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_6_delay_time",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_6_fade_time",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_6_frequency",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_6_keytrack_transpose",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_6_keytrack_tune",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_6_phase",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_6_smooth_mode",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_6_smooth_time",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_6_stereo",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_6_sync",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_6_sync_type",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_6_tempo",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_7_delay_time",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_7_fade_time",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_7_frequency",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_7_keytrack_transpose",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_7_keytrack_tune",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_7_phase",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_7_smooth_mode",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_7_smooth_time",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_7_stereo",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_7_sync",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_7_sync_type",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_7_tempo",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_8_delay_time",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_8_fade_time",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_8_frequency",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_8_keytrack_transpose",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_8_keytrack_tune",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_8_phase",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_8_smooth_mode",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_8_smooth_time",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_8_stereo",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_8_sync",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_8_sync_type",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulators",
+      "name": "lfo_8_tempo",
+      "status": "constant",
+      "supervised_states": 76
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "macro_control_1",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "macro_control_2",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "macro_control_3",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "macro_control_4",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "mod_wheel",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_10_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_10_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_10_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_10_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_10_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_11_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_11_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_11_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_11_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_11_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_12_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_12_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_12_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_12_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_12_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_13_amount",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_13_bipolar",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_13_bypass",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_13_power",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_13_stereo",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_14_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_14_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_14_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_14_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_14_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_15_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_15_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_15_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_15_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_15_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_16_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_16_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_16_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_16_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_16_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_17_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_17_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_17_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_17_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_17_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_18_amount",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_18_bipolar",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_18_bypass",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_18_power",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_18_stereo",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_19_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_19_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_19_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_19_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_19_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_1_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_1_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_1_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_1_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_1_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_20_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_20_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_20_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_20_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_20_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_21_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_21_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_21_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_21_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_21_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_22_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_22_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_22_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_22_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_22_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_23_amount",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_23_bipolar",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_23_bypass",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_23_power",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_23_stereo",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_24_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_24_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_24_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_24_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_24_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_25_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_25_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_25_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_25_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_25_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_26_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_26_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_26_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_26_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_26_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_27_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_27_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_27_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_27_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_27_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_28_amount",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_28_bipolar",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_28_bypass",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_28_power",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_28_stereo",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_29_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_29_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_29_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_29_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_29_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_2_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_2_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_2_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_2_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_2_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_30_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_30_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_30_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_30_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_30_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_31_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_31_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_31_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_31_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_31_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_32_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_32_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_32_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_32_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_32_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_33_amount",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_33_bipolar",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_33_bypass",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_33_power",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_33_stereo",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_34_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_34_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_34_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_34_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_34_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_35_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_35_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_35_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_35_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_35_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_36_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_36_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_36_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_36_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_36_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_37_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_37_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_37_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_37_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_37_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_38_amount",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_38_bipolar",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_38_bypass",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_38_power",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_38_stereo",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_39_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_39_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_39_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_39_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_39_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_3_amount",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_3_bipolar",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_3_bypass",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_3_power",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_3_stereo",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_40_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_40_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_40_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_40_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_40_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_41_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_41_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_41_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_41_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_41_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_42_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_42_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_42_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_42_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_42_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_43_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_43_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_43_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_43_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_43_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_44_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_44_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_44_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_44_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_44_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_45_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_45_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_45_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_45_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_45_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_46_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_46_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_46_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_46_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_46_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_47_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_47_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_47_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_47_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_47_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_48_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_48_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_48_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_48_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_48_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_49_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_49_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_49_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_49_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_49_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_4_amount",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_4_bipolar",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_4_bypass",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_4_power",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_4_stereo",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_50_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_50_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_50_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_50_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_50_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_51_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_51_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_51_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_51_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_51_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_52_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_52_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_52_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_52_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_52_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_53_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_53_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_53_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_53_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_53_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_54_amount",
+      "status": "varied",
+      "supervised_states": 15
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_54_bipolar",
+      "status": "varied",
+      "supervised_states": 15
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_54_bypass",
+      "status": "constant",
+      "supervised_states": 15
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_54_power",
+      "status": "varied",
+      "supervised_states": 15
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_54_stereo",
+      "status": "constant",
+      "supervised_states": 15
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_55_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_55_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_55_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_55_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_55_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_56_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_56_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_56_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_56_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_56_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 7,
+      "distinct_supervised_values": 6,
+      "family": "modulation",
+      "name": "modulation_57_amount",
+      "status": "varied",
+      "supervised_states": 19
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_57_bipolar",
+      "status": "varied",
+      "supervised_states": 19
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_57_bypass",
+      "status": "constant",
+      "supervised_states": 19
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_57_power",
+      "status": "varied",
+      "supervised_states": 19
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_57_stereo",
+      "status": "constant",
+      "supervised_states": 19
+    },
+    {
+      "distinct_stored_values": 7,
+      "distinct_supervised_values": 6,
+      "family": "modulation",
+      "name": "modulation_58_amount",
+      "status": "varied",
+      "supervised_states": 30
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_58_bipolar",
+      "status": "varied",
+      "supervised_states": 30
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_58_bypass",
+      "status": "constant",
+      "supervised_states": 30
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_58_power",
+      "status": "varied",
+      "supervised_states": 30
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_58_stereo",
+      "status": "constant",
+      "supervised_states": 30
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_59_amount",
+      "status": "varied",
+      "supervised_states": 28
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_59_bipolar",
+      "status": "varied",
+      "supervised_states": 28
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_59_bypass",
+      "status": "constant",
+      "supervised_states": 28
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_59_power",
+      "status": "varied",
+      "supervised_states": 28
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_59_stereo",
+      "status": "constant",
+      "supervised_states": 28
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 4,
+      "family": "modulation",
+      "name": "modulation_5_amount",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_5_bipolar",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_5_bypass",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_5_power",
+      "status": "varied",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_5_stereo",
+      "status": "constant",
+      "supervised_states": 16
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_60_amount",
+      "status": "varied",
+      "supervised_states": 53
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_60_bipolar",
+      "status": "varied",
+      "supervised_states": 53
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_60_bypass",
+      "status": "constant",
+      "supervised_states": 53
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_60_power",
+      "status": "varied",
+      "supervised_states": 53
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_60_stereo",
+      "status": "constant",
+      "supervised_states": 53
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 6,
+      "family": "modulation",
+      "name": "modulation_61_amount",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_61_bipolar",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_61_bypass",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_61_power",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_61_stereo",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 6,
+      "family": "modulation",
+      "name": "modulation_62_amount",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_62_bipolar",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_62_bypass",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_62_power",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_62_stereo",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 6,
+      "family": "modulation",
+      "name": "modulation_63_amount",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_63_bipolar",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_63_bypass",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_63_power",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_63_stereo",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_64_amount",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_64_bipolar",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_64_bypass",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_64_power",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_64_stereo",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_6_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_6_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_6_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_6_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_6_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_7_amount",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_7_bipolar",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_7_bypass",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_7_power",
+      "status": "varied",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_7_stereo",
+      "status": "constant",
+      "supervised_states": 17
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_8_amount",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_8_bipolar",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_8_bypass",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_8_power",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_8_stereo",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 6,
+      "distinct_supervised_values": 5,
+      "family": "modulation",
+      "name": "modulation_9_amount",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "modulation",
+      "name": "modulation_9_bipolar",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_9_bypass",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "modulation",
+      "name": "modulation_9_power",
+      "status": "varied",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "modulation",
+      "name": "modulation_9_stereo",
+      "status": "constant",
+      "supervised_states": 18
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "mpe_enabled",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_destination",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_detune_power",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_detune_range",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_distortion_amount",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_distortion_phase",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_distortion_spread",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_distortion_type",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_frame_spread",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_level",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_midi_track",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_on",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 205,
+      "distinct_supervised_values": 205,
+      "family": "oscillators",
+      "name": "osc_1_pan",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_phase",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_random_phase",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_smooth_interpolation",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_spectral_morph_amount",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_spectral_morph_phase",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_spectral_morph_spread",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 5,
+      "family": "oscillators",
+      "name": "osc_1_spectral_morph_type",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_spectral_unison",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_stack_style",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_stereo_spread",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_transpose",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_transpose_quantize",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_tune",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_unison_blend",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 205,
+      "distinct_supervised_values": 205,
+      "family": "oscillators",
+      "name": "osc_1_unison_detune",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "oscillators",
+      "name": "osc_1_unison_voices",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_view_2d",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_1_wave_frame",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_destination",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_detune_power",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_detune_range",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_distortion_amount",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_distortion_phase",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_distortion_spread",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_distortion_type",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_frame_spread",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_level",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_midi_track",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_on",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_pan",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_phase",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_random_phase",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_smooth_interpolation",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_spectral_morph_amount",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_spectral_morph_phase",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_spectral_morph_spread",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 5,
+      "family": "oscillators",
+      "name": "osc_2_spectral_morph_type",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_spectral_unison",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_stack_style",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_stereo_spread",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 3,
+      "distinct_supervised_values": 3,
+      "family": "oscillators",
+      "name": "osc_2_transpose",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_transpose_quantize",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_tune",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_unison_blend",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_unison_detune",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_unison_voices",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_view_2d",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_2_wave_frame",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_destination",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_detune_power",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_detune_range",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_distortion_amount",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_distortion_phase",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_distortion_spread",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_distortion_type",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_frame_spread",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_level",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_midi_track",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_on",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_pan",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_phase",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_random_phase",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_smooth_interpolation",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_spectral_morph_amount",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_spectral_morph_phase",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_spectral_morph_spread",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 5,
+      "family": "oscillators",
+      "name": "osc_3_spectral_morph_type",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_spectral_unison",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_stack_style",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_stereo_spread",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_transpose",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_transpose_quantize",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_tune",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_unison_blend",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_unison_detune",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_unison_voices",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_view_2d",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "oscillators",
+      "name": "osc_3_wave_frame",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "oversampling",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "phaser_blend",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "phaser_center",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "phaser_dry_wet",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "phaser_feedback",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "phaser_frequency",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "phaser_mod_depth",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "phaser_on",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "phaser_phase_offset",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "phaser_sync",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "phaser_tempo",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "pitch_bend_range",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "pitch_wheel",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "polyphony",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "portamento_force",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "portamento_scale",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "portamento_slope",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 42,
+      "distinct_supervised_values": 42,
+      "family": "voice_global",
+      "name": "portamento_time",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_1_frequency",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_1_keytrack_transpose",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_1_keytrack_tune",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_1_stereo",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_1_style",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_1_sync",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_1_sync_type",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_1_tempo",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_2_frequency",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_2_keytrack_transpose",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_2_keytrack_tune",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_2_stereo",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_2_style",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_2_sync",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_2_sync_type",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_2_tempo",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_3_frequency",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_3_keytrack_transpose",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_3_keytrack_tune",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_3_stereo",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_3_style",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_3_sync",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_3_sync_type",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_3_tempo",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_4_frequency",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_4_keytrack_transpose",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_4_keytrack_tune",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_4_stereo",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_4_style",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_4_sync",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_4_sync_type",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "modulators",
+      "name": "random_4_tempo",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "reverb_chorus_amount",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "reverb_chorus_frequency",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "reverb_decay_time",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "reverb_delay",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "reverb_dry_wet",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "reverb_high_shelf_cutoff",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "reverb_high_shelf_gain",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "reverb_low_shelf_cutoff",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "reverb_low_shelf_gain",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "effects",
+      "name": "reverb_on",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "reverb_pre_high_cutoff",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "reverb_pre_low_cutoff",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "effects",
+      "name": "reverb_size",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "sampler",
+      "name": "sample_bounce",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "sampler",
+      "name": "sample_destination",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 0,
+      "family": "sampler",
+      "name": "sample_keytrack",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 55,
+      "distinct_supervised_values": 0,
+      "family": "sampler",
+      "name": "sample_level",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 0,
+      "family": "sampler",
+      "name": "sample_loop",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "sampler",
+      "name": "sample_on",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "sampler",
+      "name": "sample_pan",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "sampler",
+      "name": "sample_random_phase",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "sampler",
+      "name": "sample_transpose",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "sampler",
+      "name": "sample_transpose_quantize",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 0,
+      "family": "sampler",
+      "name": "sample_tune",
+      "status": "masked",
+      "supervised_states": 0
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "stereo_mode",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "stereo_routing",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "velocity_track",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "view_spectrogram",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "voice_amplitude",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 2,
+      "distinct_supervised_values": 2,
+      "family": "voice_global",
+      "name": "voice_override",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 5,
+      "distinct_supervised_values": 5,
+      "family": "voice_global",
+      "name": "voice_priority",
+      "status": "varied",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "voice_transpose",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "voice_tune",
+      "status": "constant",
+      "supervised_states": 205
+    },
+    {
+      "distinct_stored_values": 1,
+      "distinct_supervised_values": 1,
+      "family": "voice_global",
+      "name": "volume",
+      "status": "constant",
+      "supervised_states": 205
+    }
+  ],
+  "source_sha256_lf": "94ed6602c40b59d3a692af8b23183cffb712dd621dc129b449a620c7777149e2",
+  "source_unchanged": true,
+  "split_manifest_id": "c1cd749fb1d2f6a4b71f1a442828bd013493134492d9a1f2fbaaabac78846046",
+  "states_by_split": {
+    "test": 24,
+    "train": 205,
+    "validation": 27
+  },
+  "structured": {
+    "connections": {
+      "destination_vocabulary_size": 431,
+      "destinations": [
+        "lfo_1_frequency",
+        "lfo_2_frequency",
+        "lfo_3_frequency",
+        "lfo_4_frequency",
+        "lfo_5_frequency",
+        "lfo_6_frequency",
+        "lfo_7_frequency",
+        "lfo_8_frequency",
+        "modulation_10_amount",
+        "modulation_11_amount",
+        "modulation_13_amount",
+        "modulation_14_amount",
+        "modulation_15_amount",
+        "modulation_18_amount",
+        "modulation_19_amount",
+        "modulation_1_amount",
+        "modulation_20_amount",
+        "modulation_23_amount",
+        "modulation_24_amount",
+        "modulation_25_amount",
+        "modulation_28_amount",
+        "modulation_29_amount",
+        "modulation_30_amount",
+        "modulation_33_amount",
+        "modulation_34_amount",
+        "modulation_35_amount",
+        "modulation_38_amount",
+        "modulation_39_amount",
+        "modulation_3_amount",
+        "modulation_40_amount",
+        "modulation_43_amount",
+        "modulation_44_amount",
+        "modulation_45_amount",
+        "modulation_48_amount",
+        "modulation_49_amount",
+        "modulation_4_amount",
+        "modulation_50_amount",
+        "modulation_53_amount",
+        "modulation_54_amount",
+        "modulation_55_amount",
+        "modulation_58_amount",
+        "modulation_59_amount",
+        "modulation_5_amount",
+        "modulation_60_amount",
+        "modulation_63_amount",
+        "modulation_64_amount",
+        "modulation_6_amount",
+        "modulation_8_amount",
+        "modulation_9_amount",
+        "osc_1_pan",
+        "osc_2_pan",
+        "osc_3_pan"
+      ],
+      "distinct_stored_topologies": 205,
+      "mapping_slots": [
+        {
+          "distinct_supervised_shapes": 6,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 8
+        },
+        {
+          "distinct_supervised_shapes": 3,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 5,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 6
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 5
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 5
+        },
+        {
+          "distinct_supervised_shapes": 6,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 7
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 5,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 6
+        },
+        {
+          "distinct_supervised_shapes": 5,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 5
+        },
+        {
+          "distinct_supervised_shapes": 3,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 5
+        },
+        {
+          "distinct_supervised_shapes": 5,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 7
+        },
+        {
+          "distinct_supervised_shapes": 3,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 5,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 6
+        },
+        {
+          "distinct_supervised_shapes": 3,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 5,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 5
+        },
+        {
+          "distinct_supervised_shapes": 6,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 6
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 5
+        },
+        {
+          "distinct_supervised_shapes": 3,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 3,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 5
+        },
+        {
+          "distinct_supervised_shapes": 5,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 6
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 3,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 5
+        },
+        {
+          "distinct_supervised_shapes": 3,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 3,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 5
+        },
+        {
+          "distinct_supervised_shapes": 3,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 6
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 5,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 6
+        },
+        {
+          "distinct_supervised_shapes": 3,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 6,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 6
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 6
+        },
+        {
+          "distinct_supervised_shapes": 3,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 7
+        },
+        {
+          "distinct_supervised_shapes": 2,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 5,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 6
+        },
+        {
+          "distinct_supervised_shapes": 5,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 6
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 7
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 5,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 6
+        },
+        {
+          "distinct_supervised_shapes": 5,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 5
+        },
+        {
+          "distinct_supervised_shapes": 3,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 6
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 7
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 5,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 6
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 5,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 7
+        },
+        {
+          "distinct_supervised_shapes": 3,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 6,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 6
+        },
+        {
+          "distinct_supervised_shapes": 3,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 5,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 7
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 3,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 5
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 5
+        },
+        {
+          "distinct_supervised_shapes": 2,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 5,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 7
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        },
+        {
+          "distinct_supervised_shapes": 3,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 5
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 5
+        },
+        {
+          "distinct_supervised_shapes": 4,
+          "supervised_point_counts": [
+            3
+          ],
+          "supervised_states": 4
+        }
+      ],
+      "slot_state_counts": [
+        17,
+        17,
+        18,
+        18,
+        16,
+        17,
+        17,
+        18,
+        18,
+        16,
+        17,
+        17,
+        18,
+        17,
+        16,
+        17,
+        17,
+        18,
+        17,
+        16,
+        16,
+        17,
+        18,
+        17,
+        16,
+        16,
+        17,
+        18,
+        16,
+        16,
+        16,
+        17,
+        18,
+        16,
+        16,
+        16,
+        17,
+        18,
+        16,
+        16,
+        16,
+        17,
+        17,
+        16,
+        16,
+        16,
+        17,
+        17,
+        16,
+        16,
+        16,
+        17,
+        17,
+        15,
+        16,
+        16,
+        19,
+        30,
+        28,
+        53,
+        205,
+        205,
+        205,
+        205
+      ],
+      "source_vocabulary_size": 32,
+      "sources": [
+        "aftertouch",
+        "env_1",
+        "lfo_1",
+        "lfo_2",
+        "lfo_3",
+        "lfo_4",
+        "lfo_5",
+        "lfo_6",
+        "lfo_7",
+        "lfo_8",
+        "lift",
+        "mod_wheel",
+        "slide",
+        "velocity"
+      ],
+      "supervised_slots": 64
+    },
+    "custom_warps": [
+      {
+        "distinct_supervised_shapes": 63,
+        "supervised_point_counts": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "supervised_states": 63
+      },
+      {
+        "distinct_supervised_shapes": 48,
+        "supervised_point_counts": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "supervised_states": 48
+      },
+      {
+        "distinct_supervised_shapes": 63,
+        "supervised_point_counts": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "supervised_states": 63
+      }
+    ],
+    "lfos": [
+      {
+        "distinct_supervised_shapes": 77,
+        "supervised_point_counts": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "supervised_states": 77
+      },
+      {
+        "distinct_supervised_shapes": 77,
+        "supervised_point_counts": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "supervised_states": 77
+      },
+      {
+        "distinct_supervised_shapes": 78,
+        "supervised_point_counts": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "supervised_states": 78
+      },
+      {
+        "distinct_supervised_shapes": 78,
+        "supervised_point_counts": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "supervised_states": 78
+      },
+      {
+        "distinct_supervised_shapes": 77,
+        "supervised_point_counts": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "supervised_states": 77
+      },
+      {
+        "distinct_supervised_shapes": 76,
+        "supervised_point_counts": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "supervised_states": 76
+      },
+      {
+        "distinct_supervised_shapes": 76,
+        "supervised_point_counts": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "supervised_states": 76
+      },
+      {
+        "distinct_supervised_shapes": 76,
+        "supervised_point_counts": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "supervised_states": 76
+      }
+    ],
+    "seed_slots": [
+      {
+        "distinct_supervised_seeds": 16,
+        "supervised_states": 16
+      },
+      {
+        "distinct_supervised_seeds": 30,
+        "supervised_states": 30
+      },
+      {
+        "distinct_supervised_seeds": 15,
+        "supervised_states": 15
+      }
+    ],
+    "wavetables_and_sample": [
+      {
+        "distinct_supervised_choices": 1,
+        "slot": "osc_1",
+        "supervised_asset_ids": [
+          "factory-wavetable-4bc81073a8b6f129"
+        ],
+        "supervised_states": 205,
+        "vocabulary_size": 20
+      },
+      {
+        "distinct_supervised_choices": 1,
+        "slot": "osc_2",
+        "supervised_asset_ids": [
+          "factory-wavetable-4bc81073a8b6f129"
+        ],
+        "supervised_states": 205,
+        "vocabulary_size": 20
+      },
+      {
+        "distinct_supervised_choices": 1,
+        "slot": "osc_3",
+        "supervised_asset_ids": [
+          "factory-wavetable-4bc81073a8b6f129"
+        ],
+        "supervised_states": 205,
+        "vocabulary_size": 20
+      },
+      {
+        "distinct_supervised_choices": 0,
+        "slot": "sample",
+        "supervised_asset_ids": [],
+        "supervised_states": 0,
+        "vocabulary_size": 11
+      }
+    ]
+  }
+}

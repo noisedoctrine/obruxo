@@ -8,6 +8,8 @@ The [custom-curve and seed outputs](CUSTOM_CURVES_AND_SEEDS.md) complete the ini
 
 The [expressive MIDI path](EXPRESSIVE_MIDI.md) adds pitch bend, pressure, modulation wheel, pedal, slide and release velocity through all sixteen MIDI channels. Its separate profile and expanded performance bank passed local native and training-ingestion checks. The model still receives audio-derived features only; useful transfer quality remains open.
 
+The [combined recipe matrix](COMBINED_COVERAGE.md) audits the complete training pool. It separates represented outputs from controls actually varied under supervision and records the remaining sampler, asset, playback, voice and effect gaps before data scaling.
+
 The [full scalar training path](FULL_SCALAR_TRAINING.md) connects all 775 scalar fields to bounded audio-only learning, legal effect-order and pitch-mask outputs, modern render recipes and inference export. Nested assets, curves, seeds and connections remain explicitly fixed in this increment; learned structured coverage follows.
 
 The [full-preset render profile](FULL_RENDER_PROFILE.md) adds an explicit path for all 775 controls and six nested structures in the reviewed 1.5.5 inventory. It checks the broader native state before broader model training; existing pilot and alpha artifacts retain their identities.
