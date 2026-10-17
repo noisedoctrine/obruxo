@@ -1,5 +1,7 @@
 # Archived diagnostic sources
 
+`run_expression_check.py` and `run_expression_integration.py` are current portable checks for [expressive MIDI](../../EXPRESSIVE_MIDI.md). They qualify note timing, controller effects, MPE isolation and fixed-phase repeats, then verify collection across all eight reference performances, original labels, audio-only inputs, updates and export reload. The integration is a pipeline check without model promotion.
+
 `run_nested_check.py`, `confirm_seed_bit_alias.py` and `run_nested_training_check.py` are current portable checks for [custom curves and seed outputs](../../CUSTOM_CURVES_AND_SEEDS.md). They preserve exact seed bits under a separate native profile, check oscillator-slot effects and run original-audio training across thirteen families. The alias script directly compares both JSON encodings in the pinned native engine; signed JSON is confined to that diagnostic and is not accepted by the unsigned public preset API.
 
 `run_routing_check.py` and `run_routing_training_check.py` are current portable checks for [ordered connections](../../ORDERED_ROUTING.md). They write new output directories and fixed plans before native work. The first checks the complete declared vocabulary and all slot positions; the second runs bounded original-audio training and five validation families. Neither uses the historical layout below.

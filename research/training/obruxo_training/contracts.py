@@ -13,7 +13,7 @@ from obruxo_data.vital.full_contract import FullPresetContract
 from .assets import ASSET_RULE, AssetCatalog
 from .eligibility import eligibility_policy, inspect_preset
 from .identity import IDENTITY_RULE
-from .performances import CAPABILITIES, bank_document, initial_bank
+from .performances import bank_document, bank_document_for, bank_for, capabilities_for
 from .splits import SPLIT_RULE, SplitLedger
 
 
@@ -42,7 +42,7 @@ class TrainingContract:
     def to_dict(self) -> dict:
         full = self.schema_id == FULL_SCHEMA_ID
         return {"version": 2 if full else 1, "identity_rule": IDENTITY_RULE, "asset_rule": ASSET_RULE, "split_rule": SPLIT_RULE,
-                "eligibility": eligibility_policy(full_profile=full), "midi": CAPABILITIES.to_dict(),
+                "eligibility": eligibility_policy(full_profile=full), "midi": capabilities_for(self.renderer_id).to_dict(),
                 "recipe_rule": "render_recipe_v1", "audio_mode": "on_demand", **asdict(self)}
 
     @classmethod
@@ -50,7 +50,7 @@ class TrainingContract:
         if isinstance(schema, FullPresetContract):
             schema.template()  # Verify the reviewed factory bytes, as for the legacy contract.
             return cls(FULL_SCHEMA_ID, canonical_sha256(schema.spec), catalog.catalog_id,
-                       canonical_sha256(bank_document()), renderer_id=schema.renderer_id)
+                       canonical_sha256(bank_document_for(schema.renderer_id)), renderer_id=schema.renderer_id)
         paths = (schema.init_preset_path, schema.parameter_atlas_path, schema.modulation_vocab_path,
                  schema.init_preset_path.parent / "manifest.json")
         schema.load_init_document()
@@ -94,11 +94,11 @@ class RenderRecipe:
         if not inspection["static_eligible"]:
             raise ValueError("preset is not statically eligible: " + ", ".join(inspection["reasons"]))
         assignment = ledger.lookup(inspection["identity"]["state"])
-        performance.validate(CAPABILITIES).require_valid()
+        performance.validate(capabilities_for(contract.renderer_id)).require_valid()
         performance_id = canonical_sha256(performance.to_dict())
-        entry = next((entry for entry in initial_bank() if entry.performance_id == performance_id), None)
+        entry = next((entry for entry in bank_for(contract.renderer_id) if entry.performance_id == performance_id), None)
         if entry is None:
-            raise ValueError("performance is outside the frozen initial bank")
+            raise ValueError("performance is outside the frozen initial bank for this renderer")
         if purpose == "train" and (assignment.split != "train" or entry.role != "reference"):
             raise ValueError("training cannot consume a held-out state or transfer performance")
         request = RenderRequest(preset_json=raw_preset.decode("utf-8-sig"), performance=performance,

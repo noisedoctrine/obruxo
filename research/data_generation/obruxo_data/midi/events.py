@@ -107,14 +107,14 @@ class Performance:
         self.events.append(MidiEvent(tick, self._next_order(), EventKind.TEMPO, None, (microseconds,)))
         self.end_tick = max(self.end_tick, tick)
 
-    def add_note(self, *, pitch: int, velocity: int, start_tick: int, duration_ticks: int, channel: int = 0) -> None:
+    def add_note(self, *, pitch: int, velocity: int, start_tick: int, duration_ticks: int, channel: int = 0, release_velocity: int = 0) -> None:
         if duration_ticks <= 0:
             raise ValueError("duration_ticks must be positive")
         order = self._next_order()
         end_tick = start_tick + duration_ticks
         self.events.extend([
             MidiEvent(start_tick, order, EventKind.NOTE_ON, channel, (pitch, velocity)),
-            MidiEvent(end_tick, order + 1, EventKind.NOTE_OFF, channel, (pitch, 0)),
+            MidiEvent(end_tick, order + 1, EventKind.NOTE_OFF, channel, (pitch, release_velocity)),
         ])
         self.end_tick = max(self.end_tick, end_tick)
 

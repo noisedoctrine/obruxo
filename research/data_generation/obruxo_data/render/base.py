@@ -25,6 +25,7 @@ DEFAULT_RENDERER_ID = (
 LEGACY_TRAINING_RENDERER_ID = DEFAULT_RENDERER_ID.removesuffix("v3") + "v2"
 FULL_PRESET_RENDERER_ID = DEFAULT_RENDERER_ID.removesuffix("state-verified-v3") + "full-1.5.5-state-verified-v1"
 FULL_SEED_RENDERER_ID = FULL_PRESET_RENDERER_ID.removesuffix("v1") + "seed-bits-v2"
+FULL_EXPRESSION_RENDERER_ID = FULL_SEED_RENDERER_ID + "-expression-midi-v1"
 
 
 @dataclass(frozen=True, init=False)
@@ -45,7 +46,7 @@ class RenderRequest:
         if preset is not None:
             preset_json = preset.to_json(canonical=True)
         assert preset_json is not None
-        if renderer_id in {FULL_PRESET_RENDERER_ID, FULL_SEED_RENDERER_ID}:
+        if renderer_id in {FULL_PRESET_RENDERER_ID, FULL_SEED_RENDERER_ID, FULL_EXPRESSION_RENDERER_ID}:
             from obruxo_data.vital.full_contract import FullPresetContract
             document, report = FullPresetContract().loads(preset_json)
             report.require_valid()

@@ -1,0 +1,60 @@
+{
+  "attempt_budget": 93,
+  "buffer_size": 128,
+  "check": "expressive_midi_native_v1",
+  "comparison_renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-seed-bits-v2",
+  "control_response_window_samples": 128,
+  "expression_cases": [
+    "pitch_bend",
+    "mod_wheel",
+    "pressure",
+    "slide_2",
+    "slide_16",
+    "pressure_2",
+    "pressure_16",
+    "bend_2",
+    "bend_16",
+    "release_velocity",
+    "sustain"
+  ],
+  "final_test_audio": false,
+  "legacy_rounding_probe": "chord_wide_old_API_repeat_and_one_sample_earlier_SMF_noteoffs",
+  "minimum_relative_rms_change": 0.005,
+  "mpe_unaffected_voice_relative_limit": 0.03,
+  "note_compatibility_cases": [
+    "held_mid",
+    "staccato_mid",
+    "melody_mid",
+    "chord_mid",
+    "held_low",
+    "staccato_high",
+    "melody_wide",
+    "chord_wide",
+    "sample_boundaries_44100",
+    "sample_boundaries_48000",
+    "sample_boundaries_96000"
+  ],
+  "phase_control": {
+    "osc_1_random_phase": 0.0,
+    "osc_2_random_phase": 0.0,
+    "osc_3_random_phase": 0.0,
+    "sample_random_phase": 0.0
+  },
+  "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-seed-bits-v2-expression-midi-v1",
+  "rss_limit_bytes": 8589934592,
+  "source_sha256": {
+    "data_generation/obruxo_data/midi/events.py": "d6987a8a09c7350cad6cce7ce0f5e183fde6a3bed8f9fabf6b035df5fbc4aad9",
+    "data_generation/obruxo_data/midi/validation.py": "2bd0ec89fbdaae207c53788a2d313785074b4a168e6c1f20101a8543a6ec23dd",
+    "data_generation/obruxo_data/render/base.py": "9a2358b6ba7372f6c0f5edcaacbb049570c6dcc6fab1789d7bb9e5916944b2b1",
+    "data_generation/obruxo_data/render/capabilities.py": "d602ac7f6914a8cd255790e41aae3ac15a800ea2392ea5d685d75178a70e03d0",
+    "data_generation/obruxo_data/render/full_state.py": "dbcc375b136ff3002020bf587061520581a38c8399c655efa099aac06cce8749",
+    "data_generation/obruxo_data/render/midi_transport.py": "55d5b6ace126b45e38635c707f00006596dd7db1a61d59da13f2f220b8f0ef59",
+    "data_generation/obruxo_data/render/vita.py": "5b835baf8ea2b5e7eb3d712a52b5d4ba14cec50f51e6e0704e59ef2ecdfd5a1d",
+    "data_generation/obruxo_data/vital/full_contract.py": "6446f851a051d16283734c377d392e058ea1335cb463912b50d3b47cc74da74c",
+    "training/obruxo_training/expression_bank.py": "f0edfe633c8a2413883985f7568df5bf2b6b2ce61b6fa848055e2edfeff8fb6a",
+    "training/obruxo_training/expression_check.py": "34271dd33487f476428f7f1157533679712714ea6f44fb3ad0d48a8b96afbc10",
+    "training/obruxo_training/performances.py": "6a98729d122890982f1c60b67e413cc2fc48377743348543445630e78db24b34"
+  },
+  "timeout_seconds": 30.0,
+  "worker_jobs": 4
+}

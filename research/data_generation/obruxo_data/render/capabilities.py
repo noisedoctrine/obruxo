@@ -13,6 +13,7 @@ class RendererCapabilities:
     channel_pressure: bool = False
     control_changes: frozenset[int] = frozenset()
     max_channels: int = 16
+    note_off_velocity: bool = False
 
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> "RendererCapabilities":
@@ -24,6 +25,7 @@ class RendererCapabilities:
             channel_pressure=bool(value.get("channel_pressure", False)),
             control_changes=frozenset(int(item) for item in value.get("control_changes", [])),
             max_channels=int(value.get("max_channels", 16)),
+            note_off_velocity=bool(value.get("note_off_velocity", False)),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -35,4 +37,9 @@ class RendererCapabilities:
             "channel_pressure": self.channel_pressure,
             "control_changes": sorted(self.control_changes),
             "max_channels": self.max_channels,
+            **({"note_off_velocity": True} if self.note_off_velocity else {}),
         }
+
+
+EXPRESSION_CAPABILITIES = RendererCapabilities(pitch_bend=True, channel_pressure=True, control_changes=frozenset({1, 64, 74}),
+                                              max_channels=16, note_off_velocity=True)

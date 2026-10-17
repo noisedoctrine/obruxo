@@ -20,8 +20,8 @@ from obruxo_data.hashing import canonical_sha256
 from obruxo_data.midi import TempoMap
 from obruxo_data.vital import VitalPreset, VitalSchema
 
-from .base import DEFAULT_RENDERER_ID, FULL_PRESET_RENDERER_ID, FULL_SEED_RENDERER_ID, LEGACY_TRAINING_RENDERER_ID, RenderProvenance, RenderRequest, RenderResult, Renderer
-from .capabilities import RendererCapabilities
+from .base import DEFAULT_RENDERER_ID, FULL_EXPRESSION_RENDERER_ID, FULL_PRESET_RENDERER_ID, FULL_SEED_RENDERER_ID, LEGACY_TRAINING_RENDERER_ID, RenderProvenance, RenderRequest, RenderResult, Renderer
+from .capabilities import EXPRESSION_CAPABILITIES, RendererCapabilities
 from .qa import AudioQualityConfig, analyze_audio
 
 
@@ -226,11 +226,11 @@ class VitalRenderer(Renderer):
         self.renderer_id = renderer_id
         self.legacy_training = renderer_id == LEGACY_TRAINING_RENDERER_ID
         self.full_contract = None
-        if renderer_id in {FULL_PRESET_RENDERER_ID, FULL_SEED_RENDERER_ID}:
+        if renderer_id in {FULL_PRESET_RENDERER_ID, FULL_SEED_RENDERER_ID, FULL_EXPRESSION_RENDERER_ID}:
             from obruxo_data.vital.full_contract import FullPresetContract
             self.full_contract = FullPresetContract(renderer_id=renderer_id)
         self.qa_config = qa_config or AudioQualityConfig()
-        self._capabilities = RendererCapabilities(max_channels=1)
+        self._capabilities = EXPRESSION_CAPABILITIES if renderer_id == FULL_EXPRESSION_RENDERER_ID else RendererCapabilities(max_channels=1)
 
     @classmethod
     def from_config(cls, path: Path | str, *, plugin_path: Path | str | None = None) -> "VitalRenderer":
@@ -238,7 +238,7 @@ class VitalRenderer(Renderer):
         if not isinstance(document, dict) or document.get("version") != 1 or document.get("backend") != "dawdreamer":
             raise ValueError("unsupported renderer configuration")
         capabilities = RendererCapabilities.from_dict(document.get("capabilities", {}))
-        supported = RendererCapabilities(max_channels=1)
+        supported = EXPRESSION_CAPABILITIES if document.get("renderer_id") == FULL_EXPRESSION_RENDERER_ID else RendererCapabilities(max_channels=1)
         if capabilities != supported:
             raise ValueError("renderer capabilities do not match the implemented DawDreamer backend")
         if document.get("max_workers") != 1:
@@ -307,16 +307,21 @@ class VitalRenderer(Renderer):
             if self.full_contract is not None:
                 from .full_state import verify_full_nested_state
                 full_readback = verify_full_nested_state(native_document, loaded, self.full_contract.spec["fixed_native_ramps"],
-                                                        signed_seed_bits=self.renderer_id == FULL_SEED_RENDERER_ID)
-            for span in performance.note_spans():
-                start_sample = timing.tick_to_sample(span.start_tick, request.sample_rate)
-                end_sample = timing.tick_to_sample(span.end_tick, request.sample_rate)
-                if end_sample <= start_sample:
-                    raise ValueError("note duration rounds to zero samples")
-                synth.add_midi_note(
-                    span.pitch, span.velocity, start_sample / request.sample_rate,
-                    (end_sample - start_sample) / request.sample_rate,
-                )
+                                                        signed_seed_bits=self.renderer_id in {FULL_SEED_RENDERER_ID, FULL_EXPRESSION_RENDERER_ID})
+            midi_transport = None
+            if self.renderer_id == FULL_EXPRESSION_RENDERER_ID:
+                from .midi_transport import write_sample_midi
+                midi_path = root / "performance.mid"
+                midi_transport = write_sample_midi(performance, midi_path, request.sample_rate)
+                if not synth.load_midi(str(midi_path), clear_previous=True, beats=False, all_events=True):
+                    raise RuntimeError("DawDreamer failed to load the expressive MIDI file")
+            else:
+                for span in performance.note_spans():
+                    start_sample = timing.tick_to_sample(span.start_tick, request.sample_rate)
+                    end_sample = timing.tick_to_sample(span.end_tick, request.sample_rate)
+                    if end_sample <= start_sample:
+                        raise ValueError("note duration rounds to zero samples")
+                    synth.add_midi_note(span.pitch, span.velocity, start_sample / request.sample_rate, (end_sample - start_sample) / request.sample_rate)
             engine.load_graph([(synth, [])])
             if not engine.render(frame_count / request.sample_rate):
                 raise RuntimeError("DawDreamer failed to render the Vital graph")
@@ -340,11 +345,12 @@ class VitalRenderer(Renderer):
                                                         "full_nested_readback_verified": True,
                                                         "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one"}),
                 **({} if self.legacy_training else {"verified_loaded_scalars": checked_scalars, "scalar_lfo_route_readback_verified": True}),
-                "state_loading": ("full_1_5_5_scalar_six_nested_and_seed_bits_v2" if self.renderer_id == FULL_SEED_RENDERER_ID else
+                "state_loading": ("full_1_5_5_scalar_six_nested_and_seed_bits_v2" if self.renderer_id in {FULL_SEED_RENDERER_ID, FULL_EXPRESSION_RENDERER_ID} else
                                   "full_1_5_5_scalar_and_six_nested_readback_v1" if self.full_contract is not None else
                                   "version_bridge_and_scalar_lfo_route_readback_v2" if self.legacy_training
                                   else "version_bridge_and_scalar_lfo_route_readback_v3"),
                 "event_timing": "absolute ticks to half-even sample offsets",
+                **({"midi_transport": midi_transport["transport"], "control_response": "native_control_rate_processing_not_sample_exact"} if midi_transport else {}),
                 "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
             },
         )
@@ -359,6 +365,8 @@ class VitalRenderer(Renderer):
             "scalar_lfo_route_readback_verified": True,
             **full_readback,
         }
+        if midi_transport is not None:
+            qa["midi_transport"] = midi_transport
         diagnostics = validation_diagnostics + tuple(bridge_diagnostics) + audio_diagnostics
         return RenderResult(audio, request.sample_rate, diagnostics, provenance, qa)
 
