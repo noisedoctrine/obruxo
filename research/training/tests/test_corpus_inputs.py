@@ -71,13 +71,33 @@ def test_invalid_controls_and_versions_are_not_repaired(corpus):
         corpus.encode(canonical_json(document).encode())
 
 
-def test_original_authored_targets_and_parent_identities_are_unchanged(corpus):
+def test_original_authored_targets_and_other_codec_instances_are_unchanged(corpus, layout_codec):  # noqa: F811
+    legacy_id = layout_codec.codec_id
     parent_id = corpus.parent.codec_id
     for index in range(8):
         target = corpus.parent.sample_target(seeded_random(corpus.generator, 0, index), index)
         raw = corpus.parent.source_preset(target, index)
         assert corpus.encode(raw) == target and corpus.source_preset(target, index) == raw
-    assert corpus.parent.codec_id == parent_id and corpus.codec_id != parent_id
+    assert corpus.parent.codec_id == parent_id and corpus.codec_id != parent_id and layout_codec.codec_id == legacy_id
+    assert dict(layout_codec.categorical)["osc_2_destination"] == tuple(range(5))
+    assert dict(corpus.categorical)["osc_2_destination"] == tuple(range(15))
+
+
+def test_modulator_only_destination_is_preserved_and_only_empty_maps_are_omitted(corpus):
+    document = source(corpus)
+    settings = document["settings"]
+    settings.update(osc_2_on=1., osc_2_destination=9., osc_2_level=0., osc_1_distortion_type=7., osc_1_distortion_amount=.3)
+    mapping = deepcopy(settings["lfos"][0])
+    settings["modulations"][62] = {"source": "lfo_1", "destination": "osc_1_pan", "line_mapping": deepcopy(mapping)}
+    settings["modulations"][63] = {"source": "", "destination": "", "line_mapping": deepcopy(mapping)}
+    original = deepcopy(document)
+    prepared, changes = prepare_corpus_labels(document, corpus.base, corpus.schema)
+    assert document == original and prepared["settings"]["modulations"][62] == settings["modulations"][62]
+    assert prepared["settings"]["modulations"][63] == {"source": "", "destination": ""}
+    assert changes == [{"path": "/settings/modulations/63/line_mapping", "reason": "ignored_empty_connection_mapping"}]
+    target = corpus.encode(canonical_json(document).encode())
+    decoded = json.loads(corpus.decode(target))["settings"]
+    assert decoded["osc_2_on"] == 1. and decoded["osc_2_destination"] == 9. and decoded["osc_2_level"] == 0.
 
 
 def test_full_snapshot_saves_its_declared_performance_bank_and_rejects_legacy_replacement(corpus, tmp_path):
@@ -99,3 +119,15 @@ def test_full_snapshot_saves_its_declared_performance_bank_and_rejects_legacy_re
     write_json(output / "status.json", status)
     with pytest.raises(ValueError, match="performance bank changed"):
         load_snapshot(output, corpus.schema)
+
+
+def test_full_domain_model_trains_and_exports_with_its_own_codec(corpus, tmp_path):
+    from obruxo_training.pilot import PilotPool
+    from obruxo_training.trainer import TrainConfig, load_model, train_pilot
+    from test_stream import FakeRendererFactory
+    pool = PilotPool.create(8, codec=corpus)
+    config = TrainConfig(steps=2, replay_capacity=4, batch_size=2, render_budget=4, checkpoint_every=1, cpu_threads=2)
+    result = train_pilot(pool, tmp_path / "training", config=config, renderer_factory=FakeRendererFactory())
+    _, _, restored = load_model(tmp_path / "training/model.pt")
+    assert result["complete"] and result["frozen_weights_and_buffers_unchanged"]
+    assert restored.codec_id == corpus.codec_id and dict(restored.categorical)["osc_2_destination"] == tuple(range(15))

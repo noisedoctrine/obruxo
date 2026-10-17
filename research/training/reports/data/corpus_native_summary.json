@@ -1,0 +1,206 @@
+{
+  "accepted_pairs": 6,
+  "attempts": 19,
+  "checks": [
+    {
+      "accepted_pair": false,
+      "label_changes": [
+        {
+          "path": "/preset_style",
+          "reason": "display_metadata"
+        },
+        {
+          "kind": "sample",
+          "path": "/settings/sample",
+          "reason": "unregistered_disabled_asset"
+        }
+      ],
+      "performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "source_failure": {
+        "error_type": "RuntimeError",
+        "message": "Vital did not load the requested scalar controls: lfo_1_smooth_time"
+      },
+      "source_prepared_repeat_exact": false,
+      "state_id": "00084aa654184d7508e6c3a5cb74791bcfbf9995cf653f1a877e6c7c9a5e9fc0",
+      "statuses": [
+        "error"
+      ]
+    },
+    {
+      "accepted_pair": true,
+      "label_changes": [
+        {
+          "path": "/preset_style",
+          "reason": "display_metadata"
+        },
+        {
+          "kind": "sample",
+          "path": "/settings/sample",
+          "reason": "unregistered_disabled_asset"
+        }
+      ],
+      "performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "source_failure": {},
+      "source_prepared_repeat_exact": true,
+      "state_id": "002496bb2784bd4dde23da35f4d8539f87b64ed8621314e167cf2fc5a32ca73a",
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted_pair": true,
+      "label_changes": [
+        {
+          "path": "/preset_style",
+          "reason": "display_metadata"
+        },
+        {
+          "kind": "wavetable",
+          "path": "/settings/wavetables/1",
+          "reason": "unregistered_disabled_asset"
+        },
+        {
+          "kind": "wavetable",
+          "path": "/settings/wavetables/2",
+          "reason": "unregistered_disabled_asset"
+        },
+        {
+          "kind": "sample",
+          "path": "/settings/sample",
+          "reason": "unregistered_disabled_asset"
+        }
+      ],
+      "performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "source_failure": {},
+      "source_prepared_repeat_exact": true,
+      "state_id": "0116774d72d973f8c97ff6ea8269f7beede076c5f9d467b39fa0bd80707d38b4",
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted_pair": true,
+      "label_changes": [
+        {
+          "kind": "wavetable",
+          "path": "/settings/wavetables/2",
+          "reason": "unregistered_disabled_asset"
+        },
+        {
+          "kind": "sample",
+          "path": "/settings/sample",
+          "reason": "unregistered_disabled_asset"
+        }
+      ],
+      "performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "source_failure": {},
+      "source_prepared_repeat_exact": true,
+      "state_id": "017c6596b5733b13f0fc6b59d504c4cea73514af37fcb875e2cd1806ddf9f98b",
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted_pair": true,
+      "label_changes": [
+        {
+          "path": "/preset_style",
+          "reason": "display_metadata"
+        },
+        {
+          "kind": "sample",
+          "path": "/settings/sample",
+          "reason": "unregistered_disabled_asset"
+        }
+      ],
+      "performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "source_failure": {},
+      "source_prepared_repeat_exact": true,
+      "state_id": "0368d9ba71e1b11f2b354c6a8024a4bcfd6d1669bb011b01a9f89b63d082e63b",
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted_pair": true,
+      "label_changes": [
+        {
+          "path": "/preset_style",
+          "reason": "display_metadata"
+        },
+        {
+          "kind": "wavetable",
+          "path": "/settings/wavetables/1",
+          "reason": "unregistered_disabled_asset"
+        },
+        {
+          "kind": "wavetable",
+          "path": "/settings/wavetables/2",
+          "reason": "unregistered_disabled_asset"
+        },
+        {
+          "kind": "sample",
+          "path": "/settings/sample",
+          "reason": "unregistered_disabled_asset"
+        }
+      ],
+      "performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "source_failure": {},
+      "source_prepared_repeat_exact": true,
+      "state_id": "03dc39b5d23a6b10787706214912da41573f896b35ae8158aabe68cdfa506f77",
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted_pair": true,
+      "label_changes": [
+        {
+          "kind": "sample",
+          "path": "/settings/sample",
+          "reason": "unregistered_disabled_asset"
+        }
+      ],
+      "performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "source_failure": {},
+      "source_prepared_repeat_exact": true,
+      "state_id": "03e6f4d1e647164b4d881fa2a4aa9cca7ea25aba1ccd732232cd3998ca555e91",
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    }
+  ],
+  "claim": "bounded_label_copy_equivalence_not_complete_corpus_native_admission",
+  "elapsed_seconds": 35.855324699998164,
+  "final_test_audio": false,
+  "fits_assets_or_decoders": false,
+  "gates": {
+    "accepted_originals_keep_prepared_and_repeat": true,
+    "all_positive_pairs_exact": true,
+    "attempts_bounded": true,
+    "bounded_positive_panel_complete": true,
+    "memory_bounded": true,
+    "source_unchanged": true
+  },
+  "label_copy_panel_passed": true,
+  "model_promotion": false,
+  "peak_process_rss_bytes": 494366720,
+  "plan_sha256": "f18406b642fec0fb3657963dea30edfada500187c4349d6d17b1c85222293a67",
+  "skipped": [],
+  "source_candidates": 7,
+  "unadmitted_native_sources": [
+    "00084aa654184d7508e6c3a5cb74791bcfbf9995cf653f1a877e6c7c9a5e9fc0"
+  ]
+}

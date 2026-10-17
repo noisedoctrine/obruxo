@@ -16,6 +16,8 @@ def corpus_input_policy():
             "source_sha256_lf": hashlib.sha256(Path(__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest(),
             "display_metadata": list(DISPLAY_METADATA), "unknown_active_assets": "reject",
             "unknown_disabled_assets": "reviewed_init_for_masked_labels_only", "scalar_changes": False,
+            "empty_connection_maps": "omit_ignored_mapping_from_labels_only",
+            "audio_destination_domain": "complete_registered_ranges_including_modulator_only_paths",
             "original_audio_source": "required_preserve_literal_source_bytes"}
 
 
@@ -44,6 +46,10 @@ def prepare_corpus_labels(document, assets, schema):
     for slot, value in enumerate(settings["wavetables"]):
         settings["wavetables"][slot] = replace_unknown("wavetable", slot, settings[f"osc_{slot + 1}_on"], value, assets._waves[0])
     settings["sample"] = replace_unknown("sample", 0, settings["sample_on"], settings["sample"], assets._samples[0])
+    for slot, route in enumerate(settings["modulations"]):
+        if not route["source"] and not route["destination"] and "line_mapping" in route:
+            del route["line_mapping"]
+            changes.append({"path": f"/settings/modulations/{slot}/line_mapping", "reason": "ignored_empty_connection_mapping"})
     schema.validate(prepared).require_valid()
     return prepared, changes
 
@@ -53,6 +59,10 @@ class CorpusInputCodec:
 
     def __init__(self, asset_bank, lfo_bank):
         self.parent = CurveInputCodec(asset_bank, lfo_bank)
+        # Only this owned decoder gets the full domain; older authored codecs stay unchanged.
+        domains = {name: values for name, values in self.base.scalar.categorical if name.endswith("_destination")}
+        combined = self.parent.parent
+        combined.categorical = tuple((name, domains.get(name, values)) for name, values in combined.categorical)
 
     def __getattr__(self, name):
         return getattr(self.parent, name)

@@ -1,0 +1,25 @@
+{
+  "attempted": 10,
+  "elapsed_seconds": 17.343159700001706,
+  "final_test_audio": false,
+  "gates": {
+    "active_modulators_and_direct_route_matter": true,
+    "all_native_accepted": true,
+    "disabled_assets_and_fixed_phase_repeat_exact": true,
+    "memory_bounded": true,
+    "source_unchanged": true
+  },
+  "model_promotion": false,
+  "passed": true,
+  "peak_process_rss_bytes": 474398720,
+  "plan_sha256": "263d1c074ee6e0f06033db17c6d130222d080568d4e342805cfbf96e92419ace",
+  "relative_rms_changes": {
+    "osc_off__osc_off_ratio": 0.0,
+    "osc_on__osc_direct": 1.525742201337813,
+    "osc_on__osc_off": 1.6843857279788619,
+    "osc_on__osc_ratio": 1.7057619214188078,
+    "osc_on__osc_repeat": 0.0,
+    "sample_off_a__sample_off_b": 0.0,
+    "sample_on_a__sample_on_b": 1.3494470685398336
+  }
+}

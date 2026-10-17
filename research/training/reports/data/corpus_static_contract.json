@@ -1,0 +1,44 @@
+{
+  "asset_catalog_id": "dc3ddf948d01ca7adf9064c7943820806c8db06507a590a318e73497731bcd2d",
+  "asset_rule": "asset_content_v1",
+  "audio_mode": "on_demand",
+  "channels": 2,
+  "dtype": "float32",
+  "eligibility": {
+    "allowed_synth_versions": [
+      "1.5.5"
+    ],
+    "native_load_and_audio_qa": "required_after_static_gate",
+    "rule": "full_static_eligibility_v1",
+    "unknown_or_missing_controls": "reject",
+    "unresolved_active_assets": "reject",
+    "unresolved_inactive_assets": "record"
+  },
+  "identity_rule": "patch_identity_v1",
+  "midi": {
+    "channel_pressure": true,
+    "control_changes": [
+      1,
+      64,
+      74
+    ],
+    "max_channels": 16,
+    "note_off_velocity": true,
+    "notes": true,
+    "pitch_bend": true,
+    "polyphony": true,
+    "tempo_changes": false
+  },
+  "performance_bank_id": "5e684d136bd440949a1497eb8204b5a0d6cf4d9fab53e1f911684e67a803720f",
+  "prefetch_bytes": 268435456,
+  "prefetch_clips": 32,
+  "recipe_rule": "render_recipe_v1",
+  "render_workers": 1,
+  "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-seed-bits-v2-expression-midi-v1-curve-input-v1",
+  "sample_rate": 44100,
+  "schema_id": "vital-1.5.5-fields-native-1.6.4",
+  "schema_sha256": "0b38711de5db628841b11a2d60bbe5c32f56ba0ba25f625f278cd43fc477801d",
+  "split_rule": "lineage_hash_80_10_10_v1",
+  "tail_seconds": 2.0,
+  "version": 2
+}
