@@ -14,7 +14,7 @@ from .contracts import RenderRecipe
 from .eligibility import inspect_preset
 from .identity import PresetIdentity
 from .performances import bank_for
-from .splits import FrozenVariantManifest, SplitLedger, SplitManifest, build_splits
+from .splits import FrozenMultiVariantManifest, FrozenVariantManifest, SplitLedger, SplitManifest, build_splits
 
 
 def seeded_random(*parts) -> random.Random:
@@ -26,7 +26,8 @@ def authored_manifest(codec, entries, seed):
         return build_splits((entry.state_id for entry in entries), seed=seed)
     roots = [codec.lineage_root(seeded_random(codec.generator, seed, index), index) for index in range(len(entries))]
     parent = build_splits(roots, seed=seed)
-    return FrozenVariantManifest(parent, tuple((entry.state_id, root) for entry, root in zip(entries, roots, strict=True)))
+    manifest = FrozenMultiVariantManifest if getattr(codec, "multiple_variants_per_root", False) else FrozenVariantManifest
+    return manifest(parent, tuple((entry.state_id, root) for entry, root in zip(entries, roots, strict=True)))
 
 
 @dataclass(frozen=True)

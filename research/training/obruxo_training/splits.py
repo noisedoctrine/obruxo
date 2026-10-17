@@ -76,6 +76,8 @@ class SplitManifest:
 
     @classmethod
     def from_dict(cls, value: dict) -> SplitManifest:
+        if value.get("version") == 3:
+            return FrozenMultiVariantManifest.from_dict(value)
         if value.get("version") == 2:
             return FrozenVariantManifest.from_dict(value)
         if (value.get("version"), value.get("identity_rule"), value.get("split_rule")) != (1, IDENTITY_RULE, SPLIT_RULE):
@@ -135,6 +137,40 @@ class FrozenVariantManifest:
         parent = SplitManifest.from_dict(value["parent"])
         if not isinstance(parent, SplitManifest):
             raise ValueError("variant population requires an original root manifest")
+        return cls(parent, tuple((entry["state_id"], entry["parent_state_id"]) for entry in value["variants"]))
+
+
+@dataclass(frozen=True)
+class FrozenMultiVariantManifest(FrozenVariantManifest):
+    """Several distinct children per frozen root, retaining every held-out root."""
+
+    def __post_init__(self):
+        if not isinstance(self.parent, SplitManifest):
+            raise ValueError("variant population requires an original root manifest")
+        parents, children = set(), set()
+        for state, parent in self.variants:
+            require_digest(state)
+            assignment = self.parent.by_state.get(parent)
+            if assignment is None or state in children:
+                raise ValueError("multi-variant population requires unique children of known frozen roots")
+            collision = self.parent.by_state.get(state)
+            if collision is not None and collision != replace(assignment, state_id=state):
+                raise ValueError("variant collides with another frozen lineage")
+            parents.add(parent)
+            children.add(state)
+        if parents != set(self.parent.by_state):
+            raise ValueError("variant population must preserve every parent including the test reserve")
+        object.__setattr__(self, "variants", tuple(sorted(self.variants)))
+
+    def to_dict(self):
+        return {**super().to_dict(), "version": 3, "policy": "multiple_variants_of_every_frozen_parent_v1"}
+
+    @classmethod
+    def from_dict(cls, value):
+        if (value.get("version"), value.get("identity_rule"), value.get("split_rule"), value.get("policy")) != (
+                3, IDENTITY_RULE, SPLIT_RULE, "multiple_variants_of_every_frozen_parent_v1"):
+            raise ValueError("unsupported multi-variant split contract")
+        parent = SplitManifest.from_dict(value["parent"])
         return cls(parent, tuple((entry["state_id"], entry["parent_state_id"]) for entry in value["variants"]))
 
 

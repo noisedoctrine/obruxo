@@ -193,15 +193,22 @@ def _restore_evaluation(output: Path, plan: dict, renderer_identity: dict) -> tu
 
 
 def curve_statistics(rows: list[dict], model_names: list[str], baseline_name: str = "train_retrieval") -> dict:
-    """Paired state bootstrap; selection is descriptive validation, not a final-test claim."""
+    """Pair and resample independent roots; legacy single-state cases stay unchanged."""
     if not rows:
         raise ValueError("curve statistics require planned cases")
+    grouped = any("lineage_id" in row for row in rows)
+    groups = {}
+    for index, row in enumerate(rows):
+        key = row.get("lineage_id") if grouped else index
+        if grouped and (not isinstance(key, str) or not key):
+            raise ValueError("every related evaluation case requires its frozen lineage")
+        groups.setdefault(key, []).append(row)
 
     def paired_scores(name):
         scores = []
-        for row in rows:
-            roles = row["methods"].get(name, {})
-            values = [roles.get(role, {}).get("mrstft") for role in ("reference", "transfer")]
+        for members in groups.values():
+            values = [row["methods"].get(name, {}).get(role, {}).get("mrstft")
+                      for row in members for role in ("reference", "transfer")]
             scores.append(float(np.mean(values)) if all(value is not None and np.isfinite(value) for value in values) else None)
         return scores
 
@@ -212,22 +219,24 @@ def curve_statistics(rows: list[dict], model_names: list[str], baseline_name: st
         paired = [(value, baseline[index]) for index, value in enumerate(scores)
                   if value is not None and baseline[index] is not None]
         valid = [value for value in scores if value is not None]
-        comparison = {"planned": len(rows), "paired": len(paired), "mean_delta": None, "ci95": None, "wins": 0, "ties": 0}
+        comparison = {"planned": len(groups), "paired": len(paired), "mean_delta": None, "ci95": None, "wins": 0, "ties": 0}
         if paired:
             deltas = np.array([value - reference for value, reference in paired])
             indices = np.random.default_rng(0).integers(len(deltas), size=(2000, len(deltas)))
             means = deltas[indices].mean(axis=1)
             comparison.update(mean_delta=float(deltas.mean()), ci95=np.quantile(means, [.025, .975]).tolist(),
                               wins=int((deltas < 0).sum()), ties=int((deltas == 0).sum()))
-        summaries[name] = {"planned": len(rows), "paired_roles_scored": len(valid),
-                           "selection_eligible": len(valid) == len(rows),
+        summaries[name] = {"planned": len(groups), "paired_roles_scored": len(valid),
+                           "selection_eligible": len(valid) == len(groups),
                            "mean_reference_transfer_mrstft": float(np.mean(valid)) if valid else None,
                            f"against_{baseline_name}": comparison}
     eligible = [name for name in model_names if summaries[name]["selection_eligible"]]
     selected = min(eligible, key=lambda name: summaries[name]["mean_reference_transfer_mrstft"]) if eligible else None
-    return {"primary": "equal_weight_mean_of_reference_and_transfer_per_state_mrstft", "checkpoints": summaries,
+    unit = "lineage" if grouped else "state"
+    return {"primary": f"equal_weight_mean_of_reference_and_transfer_per_{unit}_mrstft", "checkpoints": summaries,
+            **({"planned_cases": len(rows), "independent_lineages": len(groups)} if grouped else {}),
             "selected": selected, "selection_policy": "lowest_complete_validation_mean_earliest_step_breaks_ties",
-            "bootstrap": {"unit": "state", "seed": 0, "resamples": 2000, "interval": "percentile_95",
+            "bootstrap": {"unit": unit, "seed": 0, "resamples": 2000, "interval": "percentile_95",
                           "limit": "descriptive_validation_only_not_adjusted_for_checkpoint_selection"}}
 
 
@@ -246,6 +255,7 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
     torch.set_num_threads(4)
     saved, _ = next(iter(models.values()))
     codec = pool.codec
+    grouped_variants = getattr(codec, "multiple_variants_per_root", False)
     lossy = getattr(codec, "lossy_curves", False)
     source_targets = {entry.state_id: entry.target for entry in pool.entries} if lossy else {}
     replay = saved["replay"] if retrieval is None else retrieval["replay"]
@@ -275,6 +285,9 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
             "retrieval_sha256": retrieval_digest(replay),
             "primary": "equal_weight_mean_of_reference_and_transfer_per_state_mrstft",
             "maximum_render_attempts": count * (8 + 2 * len(models) + (2 if lossy else 0)), "test_split_evaluated": False}
+    if grouped_variants:
+        plan.update(primary="equal_weight_mean_of_reference_and_transfer_per_lineage_mrstft",
+                    case_lineages={recipe.state_id: pool.manifest.by_state[recipe.state_id].lineage_id for recipe in recipes})
     if lossy:
         plan["source_repeat_policy"] = "literal_source_bytes_without_lossy_curve_reencoding_v1"
         plan["codec_ceiling_policy"] = "source_label_decode_diagnostic_only_never_model_input_v1"
@@ -349,6 +362,8 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
             reference = render(source_raw, request.performance, index, "source", "reference")
             row = {"case": index, "state_id": recipe.state_id, "reference_performance_id": recipe.performance_id,
                    "transfer_performance_id": transfers[index % len(transfers)].performance_id, "methods": {}}
+            if grouped_variants:
+                row["lineage_id"] = plan["case_lineages"][recipe.state_id]
             rows.append(row)
             if reference is None:
                 row["failure"] = "reference_render_failed"
