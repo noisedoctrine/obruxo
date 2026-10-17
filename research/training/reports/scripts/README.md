@@ -1,5 +1,7 @@
 # Archived diagnostic sources
 
+`run_destination_check.py`, `run_combined_check.py` and `run_combined_integration.py` qualify the [combined curriculum](../../COMBINED_CURRICULUM.md). They check native routing domains, all registered assets, phase-controlled fresh-process repeats, audible family effects, bounded on-demand collection and exact optimizer/RNG recovery. `summarize_combined_exposure.py` reports actual retained supervision without a learning-quality claim.
+
 `audit_capabilities.py --pool PATH --output NEW_DIRECTORY` produces the [combined recipe matrix](../../COMBINED_COVERAGE.md) for a frozen nested-state/expression pool. It counts all 775 scalars and six nested families on training states only, with no native renders or optimizer updates. It refuses narrow codecs and records runtime hashes. The counts do not qualify audibility or learning.
 
 `run_expression_check.py` and `run_expression_integration.py` are current portable checks for [expressive MIDI](../../EXPRESSIVE_MIDI.md). They qualify note timing, controller effects, MPE isolation and fixed-phase repeats, then verify collection across all eight reference performances, original labels, audio-only inputs, updates and export reload. The integration is a pipeline check without model promotion.

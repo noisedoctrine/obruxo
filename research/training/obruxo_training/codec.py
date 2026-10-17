@@ -142,7 +142,10 @@ class PilotCodec:
 
 
 def load_codec(value: dict) -> PilotCodec:
-    if value.get("codec") == "authored_expression_nested_state_v1":
+    if value.get("codec") == "authored_combined_nested_state_v1":
+        from .combined_codec import CombinedCodec
+        codec = CombinedCodec(value["asset_bank"], value["lfo_bank"])
+    elif value.get("codec") == "authored_expression_nested_state_v1":
         from .expression_codec import ExpressionCodec
         codec = ExpressionCodec(value["asset_bank"], value["lfo_bank"])
     elif value.get("codec") == "authored_nested_state_v1":

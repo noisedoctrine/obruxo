@@ -1,0 +1,79 @@
+{
+  "all_effects_off_destinations": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "all_effects_on_destinations": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "attempt_budget": 100,
+  "expected_audible": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "expected_exact_zero": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "final_test_audio": false,
+  "performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+  "phase_control": {
+    "osc_1_random_phase": 0.0,
+    "osc_2_random_phase": 0.0,
+    "osc_3_random_phase": 0.0,
+    "sample_random_phase": 0.0
+  },
+  "qualification": "native_source_audio_destination_domains_v1",
+  "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-seed-bits-v2-expression-midi-v1",
+  "rss_limit_bytes": 8589934592,
+  "source_sha256_lf": {
+    "data_generation/obruxo_data/render/base.py": "9a2358b6ba7372f6c0f5edcaacbb049570c6dcc6fab1789d7bb9e5916944b2b1",
+    "data_generation/obruxo_data/render/full_state.py": "dbcc375b136ff3002020bf587061520581a38c8399c655efa099aac06cce8749",
+    "data_generation/obruxo_data/render/midi_transport.py": "55d5b6ace126b45e38635c707f00006596dd7db1a61d59da13f2f220b8f0ef59",
+    "data_generation/obruxo_data/render/vita.py": "5b835baf8ea2b5e7eb3d712a52b5d4ba14cec50f51e6e0704e59ef2ecdfd5a1d",
+    "data_generation/obruxo_data/vital/full_contract.py": "6446f851a051d16283734c377d392e058ea1335cb463912b50d3b47cc74da74c",
+    "training/obruxo_training/full_scalar.py": "532a12126bb44500dc80e718ec56d8d21f309158220be8eaea52ec4dde8bbf8c",
+    "training/reports/scripts/run_destination_check.py": "d8faea06cd81d6275edba0a172234967a15dd73be590cad025f6b73d18aef712"
+  },
+  "sources": [
+    "osc_1",
+    "osc_2",
+    "osc_3",
+    "sample"
+  ],
+  "tail_seconds": 4.0,
+  "worker_jobs": 4
+}

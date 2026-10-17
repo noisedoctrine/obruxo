@@ -1,10 +1,12 @@
 # Combined training coverage
 
+This is the pre-expansion expression-pool baseline. The [combined curriculum](COMBINED_CURRICULUM.md) and its [results](reports/COMBINED_CURRICULUM_RESULTS.md) record the subsequent increase to 769 varied scalar controls and the completed native/training checks.
+
 The model has outputs for all 775 scalar controls and all six nested state families. This does not mean the training recipes teach every capability. The [coverage inventory](reports/data/combined_capability_coverage.json) counts variation in the complete frozen expressive recipe pool, using training states only. It separates controls masked out of supervision, controls with one supervised value, and controls with multiple supervised values.
 
 These are recipe and supervision counts. A mask is the codec's declared eligibility rule; it does not prove that changing the control affects the sound, that its full range is covered, or that the model learns it. The audit makes zero render requests and zero optimizer updates. Native acceptance and useful reconstruction require separate checks. Validation/test recipes remain excluded from the coverage totals, and their audio stays reserved.
 
-## Current recipe matrix
+## Baseline recipe matrix
 
 The 2026-10-17 audit covers all 205 training states in the frozen 256-state expression pool. The other 27 validation and 24 test states do not contribute. The earlier 32-state integration prefix and its root/split assignments are preserved. Across all scalar controls, 214 have multiple supervised values, 374 have one supervised value and 187 are masked throughout this pool. Of the varied controls, 192 are connection settings; 22 belong to the other families. Curves, assets, seeds and connection endpoints are counted separately below.
 
