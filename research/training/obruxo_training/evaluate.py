@@ -50,7 +50,8 @@ def nearest_training_target(features: dict, replay: list[dict]) -> PilotTarget:
 
 
 def load_evaluation_checkpoint(path: Path, pool):
-    saved = torch.load(path, map_location="cpu", weights_only=True)
+    from .checkpoints import load_training_checkpoint
+    saved = load_training_checkpoint(path)
     return restore_evaluation_checkpoint(saved, pool)
 
 

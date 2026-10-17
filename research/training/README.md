@@ -14,6 +14,8 @@ The [combined curriculum](COMBINED_CURRICULUM.md) now varies 769 scalar controls
 
 The [attack-compatible sampler](SOURCE_PERFORMANCE_SAMPLING.md) selects reference notes long enough for each patch's amplitude attack without changing its controls. Native QA still rejects silent combinations; all training states remain in the schedule.
 
+The [collection checkpoint path](CHECKPOINT_STORAGE.md) saves unchanged initial state once while persisting features and cursor after every acknowledged attempt. Its [completed check](reports/CHECKPOINT_STORAGE_RESULTS.md) cuts paired write time by 61% and verifies exact recovery from 64 native examples. Collection recovery requires the sibling initial-state file; completed training checkpoints remain self-contained.
+
 The [full scalar training path](FULL_SCALAR_TRAINING.md) connects all 775 scalar fields to bounded audio-only learning, legal effect-order and pitch-mask outputs, modern render recipes and inference export. Nested assets, curves, seeds and connections remain explicitly fixed in this increment; learned structured coverage follows.
 
 The [full-preset render profile](FULL_RENDER_PROFILE.md) adds an explicit path for all 775 controls and six nested structures in the reviewed 1.5.5 inventory. It checks the broader native state before broader model training; existing pilot and alpha artifacts retain their identities.

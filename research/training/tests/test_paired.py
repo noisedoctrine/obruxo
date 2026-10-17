@@ -177,7 +177,8 @@ def test_paired_training_recovers_from_a_pending_view_and_reuses_features(pool, 
 
     with pytest.raises(InterruptedError):
         run("crash", progress=interrupt)
-    pending = torch.load(tmp_path / "crash/checkpoint.pt", weights_only=True)
+    from obruxo_training.checkpoints import load_training_checkpoint
+    pending = load_training_checkpoint(tmp_path / "crash/checkpoint.pt")
     assert pending["cursor"]["next_sequence_id"] == 5
     resumed = run("resumed", resume=tmp_path / "crash/checkpoint.pt")
     assert full["model_state_sha256"] == resumed["model_state_sha256"]

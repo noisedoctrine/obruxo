@@ -14,6 +14,7 @@ from obruxo_training.model import loss_terms  # noqa: E402
 from obruxo_training.pilot import PilotPool, PilotSampler  # noqa: E402
 from obruxo_training.stream import StreamConfig  # noqa: E402
 from obruxo_training.trainer import TrainConfig, load_model, predict_audio, train_pilot  # noqa: E402
+from obruxo_training.checkpoints import load_training_checkpoint  # noqa: E402
 from test_stream import FakeRendererFactory  # noqa: E402
 
 
@@ -511,7 +512,7 @@ def test_feature_errors_and_failed_render_never_advance_a_saved_training_cursor(
     monkeypatch.setattr(AudioFeatures, "forward", broken)
     with pytest.raises(RuntimeError, match="feature extraction failed"):
         train_pilot(pool, tmp_path / "broken", config=config, renderer_factory=FakeRendererFactory())
-    saved = torch.load(tmp_path / "broken/checkpoint.pt", weights_only=True)
+    saved = load_training_checkpoint(tmp_path / "broken/checkpoint.pt")
     assert saved["step"] == saved["cursor"]["next_sequence_id"] == 0 and saved["replay"] == []
     assert json.loads((tmp_path / "broken/status.json").read_text())["complete"] is False
 
@@ -520,7 +521,7 @@ def test_rejected_render_budget_stops_without_an_optimizer_update(pool, tmp_path
     config = TrainConfig(steps=1, replay_capacity=1, batch_size=1, render_budget=1)
     with pytest.raises(RuntimeError, match="budget exhausted"):
         train_pilot(pool, tmp_path / "rejected", config=config, renderer_factory=FakeRendererFactory("silence"))
-    saved = torch.load(tmp_path / "rejected/checkpoint.pt", weights_only=True)
+    saved = load_training_checkpoint(tmp_path / "rejected/checkpoint.pt")
     assert saved["step"] == 0 and saved["cursor"]["next_sequence_id"] == 1
     assert saved["replay"] == [] and saved["totals"]["rejected"] == 1
 

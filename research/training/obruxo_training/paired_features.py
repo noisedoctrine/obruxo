@@ -4,8 +4,6 @@ import json
 from pathlib import Path
 from time import perf_counter
 
-import torch
-
 from obruxo_data.hashing import canonical_sha256, sha256_bytes
 
 from .audit import write_json
@@ -59,7 +57,7 @@ def validate_cache(saved, pool, sampler, frontend, stream_config):
 def prepare_paired_features(pool, output: Path, *, states=64, renderer_factory=None, stream_config=None,
                             recover_checkpoint: Path | None = None, recover_log: Path | None = None, progress=None):
     """Recover an audited render prefix or collect it directly; never extend the attempt budget."""
-    from .trainer import atomic_torch_save
+    from .checkpoints import atomic_torch_save, load_training_checkpoint
     if type(states) is not int or not 2 <= states <= 256 or (recover_checkpoint is None) != (recover_log is None):
         raise ValueError("paired cache needs 2..256 states and both recovery inputs together")
     started = perf_counter()
@@ -67,7 +65,7 @@ def prepare_paired_features(pool, output: Path, *, states=64, renderer_factory=N
     if 2 * states > sampler.epoch_size:
         raise ValueError("paired cache cannot repeat training states within its attempt prefix")
     stream_config = stream_config or StreamConfig(prefetch_clips=1, timeout_seconds=30)
-    source = torch.load(recover_checkpoint, weights_only=True) if recover_checkpoint else None
+    source = load_training_checkpoint(recover_checkpoint) if recover_checkpoint else None
     frontend = AudioFeatures(source["basic_pitch"] if source else None)
     replay, history, renderer_identity, origin = [], [], None, None
     if source is not None:
