@@ -9,7 +9,6 @@ import math
 import os
 from pathlib import Path
 import random
-import shutil
 from time import perf_counter
 
 import numpy as np
@@ -19,6 +18,7 @@ from obruxo_data.hashing import canonical_sha256, sha256_bytes
 
 from .audit import write_json
 from .benchmark import MemoryMonitor
+from .checkpoints import TrainingCheckpointWriter, atomic_torch_save, load_training_checkpoint
 from .codec import PilotTarget, load_codec
 from .curve_labels import CURVE_LABEL_KEYS, SOURCE_CURVES
 from .features import AudioFeatures, tensor_digest, validate_features
@@ -79,25 +79,6 @@ class TrainConfig:
             raise ValueError("bounded refresh settings apply to online mode only")
         if self.fresh_examples is not None and self.steps < 1 + (self.fresh_examples - self.batch_size) * self.updates_per_render:
             raise ValueError("optimizer step budget cannot reach the requested fresh-example target")
-
-
-def atomic_torch_save(path: Path, value: dict) -> None:
-    temporary = path.with_suffix(path.suffix + ".partial")
-    try:
-        with temporary.open("wb") as handle:
-            torch.save(value, handle)
-            handle.flush()
-            os.fsync(handle.fileno())
-        # Verify a weights-only round trip before promoting a recovery point.
-        torch.load(temporary, map_location="cpu", weights_only=True)
-        if path.exists():
-            previous = path.with_name(path.stem + ".previous.pt")
-            previous_tmp = previous.with_suffix(".partial")
-            shutil.copyfile(path, previous_tmp)
-            os.replace(previous_tmp, previous)
-        os.replace(temporary, path)
-    finally:
-        temporary.unlink(missing_ok=True)
 
 
 def capture_rng(device: str) -> dict:
@@ -206,7 +187,7 @@ def _run_contract(pool, sampler, frontend, config, stream_config, replay_seed=No
 
 def load_replay_seed(path: Path, pool, sampler, frontend, config, stream_config) -> tuple:
     raw = path.read_bytes()
-    source = torch.load(path, map_location="cpu", weights_only=True)
+    source = load_training_checkpoint(path)
     if source.get("format") == "obruxo_paired_features_v1":
         from .paired_features import validate_cache
         if config.sampling_policy != "paired_views":
@@ -261,7 +242,7 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
     random.seed(learning_seed)
     np.random.seed(learning_seed % 2**32)
     torch.manual_seed(learning_seed)
-    saved = torch.load(resume, map_location="cpu", weights_only=True) if resume else None
+    saved = load_training_checkpoint(resume) if resume else None
     frontend = AudioFeatures(saved["basic_pitch"] if saved else None)
     sampler = PilotSampler(pool, seed=config.seed, policy=config.sampling_policy)
     paired = config.sampling_policy == "paired_views"
@@ -301,6 +282,7 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
     if type(limit) is not int or not (step < limit <= config.steps or collect_only):
         raise ValueError("stop_after must follow the saved step and not exceed total steps")
     output.mkdir(parents=True, exist_ok=False)
+    checkpoint_writer = TrainingCheckpointWriter(output)
     started, checkpoint_seconds, feature_seconds_start = perf_counter(), 0.0, totals["feature_seconds"]
     accepted_start = totals["accepted"]
     monitor = MemoryMonitor()
@@ -318,7 +300,7 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
                  "render_ready": render_ready, "renderer_identity": renderer_identity,
                  "totals": totals, "runtime": {"torch": str(torch.__version__), "device": device},
                  "recovery": "exact_retained_features_same_runtime_new_native_audio_recipe_equivalence_only"}
-        atomic_torch_save(output / "checkpoint.pt", value)
+        checkpoint_writer.save(value)
         checkpoint_seconds += perf_counter() - tick
 
     try:
@@ -448,6 +430,7 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
                    "trainable_parameters": sum(parameter.numel() for parameter in model.parameters()),
                    "model_state_sha256": tensor_digest(model.state_dict()), "frontend": frontend.describe(),
                    "elapsed_seconds_this_segment": perf_counter() - started, "checkpoint_seconds_this_segment": checkpoint_seconds,
+                   "checkpoint_storage": checkpoint_writer.statistics,
                    "feature_seconds_this_segment": totals["feature_seconds"] - feature_seconds_start,
                    "fresh_accepted_this_segment": totals["accepted"] - accepted_start,
                    "seeded_feature_examples": replay_seed["examples"] if replay_seed else 0,
