@@ -48,7 +48,9 @@ def _shape_report(stats):
 def audit_capabilities(pool):
     """Only frozen training states contribute; masks are declarations, not audibility."""
     codec = pool.codec
-    if not isinstance(codec, NestedStateCodec):
+    from .curve_codec import CurveInputCodec
+    from .graph_codec import GraphCoverageCodec
+    if not isinstance(codec, (NestedStateCodec, CurveInputCodec, GraphCoverageCodec)):
         raise ValueError("coverage audit requires the complete nested-state codec")
     counts, values, stored = Counter(), defaultdict(set), defaultdict(set)
     names = sorted(codec.schema.scalar_names)
@@ -105,6 +107,8 @@ def audit_capabilities(pool):
     bank = bank_for(codec.contract.renderer_id)
     return {"audit": "nested_training_recipe_coverage_v1", "pool_id": pool.pool_id, "codec_id": codec.codec_id,
             "split_manifest_id": pool.manifest.manifest_id, "states_by_split": pool.summary()["states_by_split"], "audited_train_states": trained_states,
+            **({"independent_roots_by_split": {split: sum(entry.split == split for entry in pool.manifest.parent.assignments)
+                 for split in ("train", "validation", "test")}} if getattr(codec, "multiple_variants_per_root", False) else {}),
             "claim": "declared_output_and_training_supervision_coverage_only_not_native_audibility_or_learning",
             "source_sha256_lf": hashlib.sha256(Path(__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest(),
             "scalar_inventory_sha256": canonical_sha256(names), "scalar_count": len(rows), "scalar_status_counts": dict(Counter(row["status"] for row in rows)),

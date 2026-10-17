@@ -1,5 +1,7 @@
 # Training contracts, online pilot and trainer
 
+The [complete connection curriculum](GRAPH_COVERAGE.md) schedules all 431 destinations under the existing frozen patch families. Its [native and recovery report](reports/GRAPH_COVERAGE_RESULTS.md) separates active labels, observed sound changes and model quality; related variants share one evaluation/bootstrap unit.
+
 The [completion ledger](IMPLEMENTATION_STATUS.md) tracks the remaining training and release work. [Learned factory choices](FACTORY_ASSETS.md) add registered wavetables for all three oscillator slots and registered sampler content. [Train-only Era2 curve assets](LFO_BANK.md) support fitting, saved-code decoding and native reconstruction checks.
 
 The [eight-curve training path](LFO_TRAINING.md) predicts those shapes from audio, renders original source curves during training, and supervises their reconstruction without giving the model curve labels as inputs. The [ordered connection model](ORDERED_ROUTING.md) adds all 64 positional connections and their optional mapping curves, replacing the earlier curve stage's fixed connections. Its initial five-pattern curriculum remains a small integration scope.

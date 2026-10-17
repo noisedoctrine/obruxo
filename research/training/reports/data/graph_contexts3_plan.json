@@ -1,0 +1,134 @@
+{
+  "attempt_budget": 66,
+  "bank_id": "1f512c5134c259cbbcdb9c4df1d14fe2b40dc0290fcfdb604c740efc54112e40",
+  "claim": "response_in_declared_context_zero_is_unresolved_not_unsupported",
+  "destination_inventory_size": 431,
+  "destinations": [
+    "filter_1_blend_transpose",
+    "filter_2_blend_transpose",
+    "filter_fx_blend_transpose",
+    "osc_1_detune_power",
+    "osc_1_distortion_spread",
+    "osc_1_frame_spread",
+    "osc_1_spectral_morph_phase",
+    "osc_1_spectral_morph_spread",
+    "osc_1_unison_blend",
+    "osc_2_detune_power",
+    "osc_2_distortion_spread",
+    "osc_2_frame_spread",
+    "osc_2_spectral_morph_phase",
+    "osc_2_spectral_morph_spread",
+    "osc_2_unison_blend",
+    "osc_3_detune_power",
+    "osc_3_distortion_spread",
+    "osc_3_frame_spread",
+    "osc_3_spectral_morph_phase",
+    "osc_3_spectral_morph_spread",
+    "osc_3_unison_blend",
+    "reverb_low_shelf_cutoff"
+  ],
+  "driver": "CC1_127_before_note_on_mod_wheel_source",
+  "final_test_audio": false,
+  "minimum_relative_rms_response": 1e-05,
+  "model_promotion": false,
+  "overrides": {
+    "filter_1_blend_transpose": {
+      "filter_1_blend": 1.0,
+      "filter_1_model": 7.0
+    },
+    "filter_2_blend_transpose": {
+      "filter_2_blend": 1.0,
+      "filter_2_model": 7.0
+    },
+    "filter_fx_blend_transpose": {
+      "filter_fx_blend": 1.0,
+      "filter_fx_model": 7.0
+    },
+    "osc_1_detune_power": {
+      "osc_1_unison_voices": 4.0
+    },
+    "osc_1_distortion_spread": {
+      "osc_1_unison_voices": 4.0
+    },
+    "osc_1_frame_spread": {
+      "osc_1_unison_voices": 4.0
+    },
+    "osc_1_spectral_morph_phase": {
+      "osc_1_spectral_morph_amount": 0.5,
+      "osc_1_spectral_morph_type": 6.0,
+      "osc_1_unison_voices": 4.0
+    },
+    "osc_1_spectral_morph_spread": {
+      "osc_1_unison_voices": 4.0
+    },
+    "osc_1_unison_blend": {
+      "osc_1_unison_voices": 4.0
+    },
+    "osc_2_detune_power": {
+      "osc_2_unison_voices": 4.0
+    },
+    "osc_2_distortion_spread": {
+      "osc_2_unison_voices": 4.0
+    },
+    "osc_2_frame_spread": {
+      "osc_2_unison_voices": 4.0
+    },
+    "osc_2_spectral_morph_phase": {
+      "osc_2_spectral_morph_amount": 0.5,
+      "osc_2_spectral_morph_type": 6.0,
+      "osc_2_unison_voices": 4.0
+    },
+    "osc_2_spectral_morph_spread": {
+      "osc_2_unison_voices": 4.0
+    },
+    "osc_2_unison_blend": {
+      "osc_2_unison_voices": 4.0
+    },
+    "osc_3_detune_power": {
+      "osc_3_unison_voices": 4.0
+    },
+    "osc_3_distortion_spread": {
+      "osc_3_unison_voices": 4.0
+    },
+    "osc_3_frame_spread": {
+      "osc_3_unison_voices": 4.0
+    },
+    "osc_3_spectral_morph_phase": {
+      "osc_3_spectral_morph_amount": 0.5,
+      "osc_3_spectral_morph_type": 6.0,
+      "osc_3_unison_voices": 4.0
+    },
+    "osc_3_spectral_morph_spread": {
+      "osc_3_unison_voices": 4.0
+    },
+    "osc_3_unison_blend": {
+      "osc_3_unison_voices": 4.0
+    },
+    "reverb_low_shelf_cutoff": {
+      "reverb_low_shelf_gain": -6.0
+    }
+  },
+  "phase_control": {
+    "osc_1_random_phase": 0.0,
+    "osc_2_random_phase": 0.0,
+    "osc_3_random_phase": 0.0,
+    "sample_random_phase": 0.0
+  },
+  "qualification": "native_connection_destination_response_v1",
+  "rss_limit_bytes": 8589934592,
+  "source_sha256_lf": {
+    "data_generation/obruxo_data/render/__init__.py": "15b14494598c55f9a4f160f7992896b36c351cb65e0f2ed98c4d03235956bb82",
+    "data_generation/obruxo_data/render/base.py": "423f27e6e374994b6a2bcde7b9db379f56de946ece2f7ea9760eb6bdf272a0ab",
+    "data_generation/obruxo_data/render/batch.py": "8aa0ac5d01587ccff7e7992c29fe79f275f6190dde6b889187e261fb66cc59f4",
+    "data_generation/obruxo_data/render/capabilities.py": "7fb505b169b6cf097d19b55e30059ee4dc6684a080ee67cbd942541d3c84bb87",
+    "data_generation/obruxo_data/render/curve_inputs.py": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe",
+    "data_generation/obruxo_data/render/full_state.py": "dbcc375b136ff3002020bf587061520581a38c8399c655efa099aac06cce8749",
+    "data_generation/obruxo_data/render/midi_transport.py": "55d5b6ace126b45e38635c707f00006596dd7db1a61d59da13f2f220b8f0ef59",
+    "data_generation/obruxo_data/render/qa.py": "d536b111c5a7bfc104b7924d12cf3dca0958b2c75b51a22bcc0ab3adf3689c38",
+    "data_generation/obruxo_data/render/vita.py": "43491582ac7bae8af44b443cc16e1b31abb1c83f1aa7c3e778b0be088c14b0ff",
+    "data_generation/obruxo_data/vital/full_contract.py": "e1db5ed60a2d84734fef876a3aeddae4e976f8f2b385d747a099355ea6c309fa",
+    "training/obruxo_training/graph_context.py": "94100ebf0f82baea2a4ed3d8bb339851bfa5ee926afca00dcd665ec7b0b8d4ad",
+    "training/obruxo_training/graph_native.py": "140c0941383556ea22ad4ecbea86f5c4fb137f7a8e7da9e4d89f3eaa83bfcb6e"
+  },
+  "worker_jobs": 1
+}

@@ -142,7 +142,10 @@ class PilotCodec:
 
 
 def load_codec(value: dict) -> PilotCodec:
-    if value.get("codec") == "authored_curve_inputs_v1":
+    if value.get("codec") == "authored_complete_graph_v1":
+        from .graph_codec import GraphCoverageCodec
+        codec = GraphCoverageCodec(value["asset_bank"], value["lfo_bank"])
+    elif value.get("codec") == "authored_curve_inputs_v1":
         from .curve_codec import CurveInputCodec
         codec = CurveInputCodec(value["asset_bank"], value["lfo_bank"])
     elif value.get("codec") == "authored_combined_nested_state_v1":

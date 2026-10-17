@@ -1,0 +1,226 @@
+{
+  "attempted": 51,
+  "audio_files_written": 0,
+  "checks": [
+    {
+      "accepted": true,
+      "destination": "delay_aux_frequency",
+      "relative_rms_change": 0.4335906956511635,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "delay_aux_tempo",
+      "relative_rms_change": 0.778408063510608,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "distortion_filter_blend",
+      "relative_rms_change": 0.632838444568199,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "distortion_filter_cutoff",
+      "relative_rms_change": 0.9782996546858235,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "distortion_filter_resonance",
+      "relative_rms_change": 0.3873639301106129,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_2_decay",
+      "relative_rms_change": 0.08465438569540969,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_2_hold",
+      "relative_rms_change": 0.08478151003815604,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_3_decay",
+      "relative_rms_change": 0.08465438569540969,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_3_hold",
+      "relative_rms_change": 0.08478151003815604,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_4_decay",
+      "relative_rms_change": 0.08465438569540969,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_4_hold",
+      "relative_rms_change": 0.08478151003815604,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_5_decay",
+      "relative_rms_change": 0.08465438569540969,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_5_hold",
+      "relative_rms_change": 0.08478151003815604,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_6_decay",
+      "relative_rms_change": 0.08465438569540969,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_6_hold",
+      "relative_rms_change": 0.08478151003815604,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "eq_band_cutoff",
+      "relative_rms_change": 0.3440172626495251,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "eq_band_resonance",
+      "relative_rms_change": 0.027061823381548177,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    }
+  ],
+  "destinations_checked": 17,
+  "elapsed_seconds": 95.2461772000006,
+  "final_test_audio": false,
+  "gates": {
+    "all_attempts_accounted": true,
+    "all_native_accepted": true,
+    "fixed_phase_repeats": true,
+    "memory_bounded": true,
+    "source_unchanged": true
+  },
+  "model_promotion": false,
+  "passed": true,
+  "peak_process_rss_bytes": 450506752,
+  "plan_sha256": "1e2ac5395aa7b2fd14ed5ce6afea5aaad33d074967f3200fcf86c8570a639942",
+  "responses_observed": 17,
+  "unresolved_destinations": []
+}

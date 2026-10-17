@@ -16,6 +16,7 @@ def main():
     from obruxo_data.render.curve_inputs import prepare_curve_inputs
     from obruxo_training.audit import write_json
     from obruxo_training.curve_codec import CurveInputCodec
+    from obruxo_training.graph_codec import GraphCoverageCodec
     from obruxo_training.pilot import PilotPool, PilotSampler
     from obruxo_training.stream import NativeRendererFactory, StreamConfig
     from obruxo_training.trainer import TrainConfig, load_model, train_pilot, validate_replay
@@ -36,8 +37,9 @@ def main():
             raise ValueError("native curve qualification differs from the runtime")
         qualifications[name] = canonical_sha256(summary)
     pool = PilotPool.load(args.pool)
-    if not isinstance(pool.codec, CurveInputCodec):
-        raise ValueError("integration requires an original singleton-source pool")
+    if not isinstance(pool.codec, (CurveInputCodec, GraphCoverageCodec)):
+        raise ValueError("integration requires an original curve-source or connection-coverage pool")
+    graph = isinstance(pool.codec, GraphCoverageCodec)
     config = TrainConfig(steps=3, replay_capacity=16, replay_mib=8, batch_size=16, render_budget=64,
                          checkpoint_every=1, cpu_threads=4, sampling_policy="attack_compatible")
     stream = StreamConfig(prefetch_clips=1, worker_jobs=4)
@@ -47,7 +49,7 @@ def main():
     def sources():
         return {path.relative_to(RESEARCH).as_posix(): hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest() for path in sorted(set(files))}
 
-    plan = {"integration": "original_singleton_sources_on_demand_training_v1", "source_sha256_lf": sources(),
+    plan = {"integration": "graph_variants_on_demand_training_v1" if graph else "original_singleton_sources_on_demand_training_v1", "source_sha256_lf": sources(),
             "pool_id": pool.pool_id, "codec_id": pool.codec.codec_id, "training_contract": pool.codec.contract.to_dict(),
             "native_qualifications": qualifications, "retained_examples": 16, "attempt_budget": 64, "updates": 3,
             "sampling_policy": config.sampling_policy, "stream": stream.to_dict(), "states_by_split": pool.summary()["states_by_split"],
@@ -72,12 +74,22 @@ def main():
     families = {change["path"].split("/")[2] for change in changes if change["singleton_expanded"]}
     event_by_sequence = {event["sequence_id"]: event for event in events}
     source_checks = []
+    source_indices = {entry.state_id: index for index, entry in enumerate(pool.entries)}
+    variant_counts = {"original": 0, "connection_coverage": 0}
+    graph_checks = []
     active_counts = {family: 0 for family in ("lfos", "modulations", "custom_warps")}
     for item in left["replay"]:
         request = sampler.recipe_at(item["sequence_id"]).render_request()
         native = event_by_sequence[item["sequence_id"]]["renderer_qa"]["native_state"]
         applied, ledger = prepare_curve_inputs(json.loads(request.preset_json))
         target = next(entry.target for entry in pool.entries if entry.state_id == item["state_id"])
+        if graph:
+            variant = source_indices[item["state_id"]] % pool.codec.variants_per_root
+            variant_counts["connection_coverage" if variant else "original"] += 1
+            if variant:
+                routes = applied["settings"]["modulations"]
+                graph_checks.append(all(pool.codec.routing.active_routes(pool.codec._routing_target(target)))
+                    and set(pool.codec.sources) <= {route["source"] for route in routes})
         flags = {"lfos": pool.codec.active_lfos(target), "modulations": pool.codec.active_route_maps(target), "custom_warps": pool.codec.active_warps(target)}
         supervised = []
         for change in ledger:
@@ -115,10 +127,15 @@ def main():
              "frozen_frontend": full["frozen_weights_and_buffers_unchanged"] and recovered["frozen_weights_and_buffers_unchanged"],
              "source_unchanged": sources() == plan["source_sha256_lf"],
              "memory_bounded": peak > 0 and peak <= plan["rss_limit_bytes"] and full["rss_sampling_errors"] == recovered["rss_sampling_errors"] == 0}
+    if graph:
+        gates.update(original_and_connection_variants_consumed=all(variant_counts.values()),
+                     consumed_graphs_keep_all_slots_and_sources=bool(graph_checks) and all(graph_checks))
     summary = {"plan_sha256": canonical_sha256(plan), "passed": all(gates.values()), "gates": gates, "training": full, "recovery": recovered,
                "singleton_families_consumed": sorted(families), "active_singletons_by_family": active_counts,
                "source_checks": source_checks, "peak_process_tree_rss_bytes": peak,
                "final_test_audio": False, "model_promotion": False}
+    if graph:
+        summary["retained_variants"] = variant_counts
     write_json(args.output / "summary.json", summary)
     print(json.dumps({"passed": summary["passed"], "gates": gates}), flush=True)
     return 0 if summary["passed"] else 2

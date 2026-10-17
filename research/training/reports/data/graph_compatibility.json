@@ -1,0 +1,61 @@
+{
+  "codec_id": "82bbe98c2f681253123cc496e3385e5e9dff5a92f990d8d564a37cdae046e1aa",
+  "coverage_claim": "declared_training_coverage_and_observed_contextual_responses_not_useful_reconstruction",
+  "destinations_with_observed_native_response": 431,
+  "difference_scope": "diagnostic_native_checker_only_adds_macro_exits_explicit_performance_probe_direction_and_phase_override_guard",
+  "final_test_audio": false,
+  "historical_source_snapshot": "bbc5d5b8498c0d24d3179772aeac398aaad441bc",
+  "lfo_bank_id": "2aac62a02d780ee330173c1e1f3cbf5b282c9cf5c7ee17d0d638148f72cc0c31",
+  "model_promotion": false,
+  "native_attempts": 1506,
+  "native_panels": [
+    {
+      "attempted": 1293,
+      "destinations_checked": 431,
+      "elapsed_seconds": 2664.0109345,
+      "panel": "base",
+      "peak_process_rss_bytes": 504266752,
+      "responses_observed": 369
+    },
+    {
+      "attempted": 51,
+      "destinations_checked": 17,
+      "elapsed_seconds": 95.2461772000006,
+      "panel": "contexts1",
+      "peak_process_rss_bytes": 450506752,
+      "responses_observed": 17
+    },
+    {
+      "attempted": 54,
+      "destinations_checked": 18,
+      "elapsed_seconds": 103.46464709999964,
+      "panel": "contexts2",
+      "peak_process_rss_bytes": 451760128,
+      "responses_observed": 15
+    },
+    {
+      "attempted": 66,
+      "destinations_checked": 22,
+      "elapsed_seconds": 117.62856160000229,
+      "panel": "contexts3",
+      "peak_process_rss_bytes": 451133440,
+      "responses_observed": 16
+    },
+    {
+      "attempted": 42,
+      "destinations_checked": 14,
+      "elapsed_seconds": 78.86983450000116,
+      "panel": "contexts4",
+      "peak_process_rss_bytes": 447422464,
+      "responses_observed": 14
+    }
+  ],
+  "old_codecs_and_bank_unchanged": true,
+  "parent_combined_codec_id": "9f183fc14324940fe80cecb7aae7494a596880ec70059f3e1348a180cf2303b7",
+  "parent_curve_codec_id": "515537f08c42a1827e65742174a919ba4048dc18ae339048a1a90f4732789ea5",
+  "pool_id": "1dee23e59169bbcf282f191b24c71ea7398f0d1240a8799717d4f91c8698e712",
+  "unresolved_destinations": [],
+  "verified_historical_source_differences": [
+    "training/obruxo_training/graph_native.py"
+  ]
+}

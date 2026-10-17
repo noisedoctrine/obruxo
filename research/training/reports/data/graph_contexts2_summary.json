@@ -1,0 +1,242 @@
+{
+  "attempted": 54,
+  "audio_files_written": 0,
+  "checks": [
+    {
+      "accepted": true,
+      "destination": "eq_high_cutoff",
+      "relative_rms_change": 0.21229022535591657,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "eq_high_resonance",
+      "relative_rms_change": 0.03761255383116465,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "eq_low_cutoff",
+      "relative_rms_change": 0.24045869060488947,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "eq_low_resonance",
+      "relative_rms_change": 0.04146397393534232,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_1_blend_transpose",
+      "relative_rms_change": 3.8704481603257585e-08,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_1_keytrack",
+      "relative_rms_change": 0.49645193986792335,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_2_blend_transpose",
+      "relative_rms_change": 3.8704481603257585e-08,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_2_keytrack",
+      "relative_rms_change": 0.49645193986792335,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_fx_blend_transpose",
+      "relative_rms_change": 3.9077732893112984e-08,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_fx_keytrack",
+      "relative_rms_change": 0.49616993833322764,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_1_fade_time",
+      "relative_rms_change": 0.07533263250050132,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_2_fade_time",
+      "relative_rms_change": 0.07533263250050132,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_3_fade_time",
+      "relative_rms_change": 0.07533263250050132,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_4_fade_time",
+      "relative_rms_change": 0.07533263250050132,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_5_fade_time",
+      "relative_rms_change": 0.07533263250050132,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_6_fade_time",
+      "relative_rms_change": 0.07533263250050132,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_7_fade_time",
+      "relative_rms_change": 0.07533263250050132,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_8_fade_time",
+      "relative_rms_change": 0.07533263250050132,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    }
+  ],
+  "destinations_checked": 18,
+  "elapsed_seconds": 103.46464709999964,
+  "final_test_audio": false,
+  "gates": {
+    "all_attempts_accounted": true,
+    "all_native_accepted": true,
+    "fixed_phase_repeats": true,
+    "memory_bounded": true,
+    "source_unchanged": true
+  },
+  "model_promotion": false,
+  "passed": true,
+  "peak_process_rss_bytes": 451760128,
+  "plan_sha256": "14f646801398a8ccbb3a6f8cd432b81faebbded0e2dbcbd71af410b9529c5003",
+  "responses_observed": 15,
+  "unresolved_destinations": [
+    "filter_1_blend_transpose",
+    "filter_2_blend_transpose",
+    "filter_fx_blend_transpose"
+  ]
+}
