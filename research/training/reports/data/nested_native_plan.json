@@ -1,0 +1,48 @@
+{
+  "attempt_budget": 150,
+  "causal_relative_rms_minimum": 0.001,
+  "check": "three_warps_and_uint32_seeds_native_v1",
+  "expected_silent_seeds": [
+    0,
+    1,
+    16777217
+  ],
+  "factory_bank_id": "1f512c5134c259cbbcdb9c4df1d14fe2b40dc0290fcfdb604c740efc54112e40",
+  "final_test_audio": false,
+  "phase_control": {
+    "osc_1_random_phase": 0.0,
+    "osc_2_random_phase": 0.0,
+    "osc_3_random_phase": 0.0,
+    "sample_random_phase": 0.0
+  },
+  "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-seed-bits-v2",
+  "representation_error": "measured_diagnostic_not_general_curve_fidelity_or_model_quality_qualification",
+  "rss_limit_bytes": 8589934592,
+  "seed_edges": [
+    0,
+    1,
+    4,
+    16777217,
+    2147483647,
+    2147483648,
+    4294967294,
+    4294967295
+  ],
+  "seed_mode": 6,
+  "silence_scope": "Basic_Shapes_frame128_mode6_amount0.6_only",
+  "source_sha256": {
+    "data_generation/obruxo_data/render/base.py": "d596afd643876474dffaff32ab02948fc19d21a34847cf48d352201f032a93cf",
+    "data_generation/obruxo_data/render/full_state.py": "dbcc375b136ff3002020bf587061520581a38c8399c655efa099aac06cce8749",
+    "data_generation/obruxo_data/render/vita.py": "e6cec8a0235fbb293f9f99efcfdc4e419b0eb6e7f7d4411b172a35757841bb47",
+    "data_generation/obruxo_data/vital/full_contract.py": "dc5b775fbbb24bca2a0c20b86102675a43c8535649eae53a6cce64e14c5e81eb",
+    "training/obruxo_training/contracts.py": "1bb345fda28f864e8120816b82e609530ef6f6c924e49ab528454ae16733aebd",
+    "training/obruxo_training/nested_check.py": "b9009b469364fa396f1e14a8db76b9600b23f9e3c453846ee179d376f8d3763e",
+    "training/obruxo_training/nested_codec.py": "2f8da9bed308fa4582d5b9568d4064fafdb518d201b31ffc92dfbedb9a3b075a",
+    "training/obruxo_training/stream.py": "008d5aed58f6dc81bba7e51754a728f2232ee7774bc206abc95cc74cd22ef753"
+  },
+  "warp_modes": [
+    13,
+    14,
+    15
+  ]
+}

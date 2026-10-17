@@ -1,0 +1,164 @@
+{
+  "attempted": 16,
+  "audio_files_written": 0,
+  "cases": [
+    {
+      "exact_repeated_audio_and_readback": true,
+      "int32": -2147483648,
+      "outcomes": [
+        {
+          "audio_sha256": "f50d8d38144b6ead803c6411746c6e1027a39c3c63c35f362717a695ee56ff8f",
+          "input": 2147483648,
+          "loaded": -2147483648,
+          "peak": 0.015595974400639534
+        },
+        {
+          "audio_sha256": "f50d8d38144b6ead803c6411746c6e1027a39c3c63c35f362717a695ee56ff8f",
+          "input": 2147483648,
+          "loaded": -2147483648,
+          "peak": 0.015595974400639534
+        },
+        {
+          "audio_sha256": "f50d8d38144b6ead803c6411746c6e1027a39c3c63c35f362717a695ee56ff8f",
+          "input": -2147483648,
+          "loaded": -2147483648,
+          "peak": 0.015595974400639534
+        },
+        {
+          "audio_sha256": "f50d8d38144b6ead803c6411746c6e1027a39c3c63c35f362717a695ee56ff8f",
+          "input": -2147483648,
+          "loaded": -2147483648,
+          "peak": 0.015595974400639534
+        }
+      ],
+      "uint32": 2147483648
+    },
+    {
+      "exact_repeated_audio_and_readback": true,
+      "int32": -2024026859,
+      "outcomes": [
+        {
+          "audio_sha256": "a8df041925e5c1bb9388fc80d5664827c8ca7ee6a7feff2deb78210b103d95af",
+          "input": 2270940437,
+          "loaded": -2024026859,
+          "peak": 0.0
+        },
+        {
+          "audio_sha256": "a8df041925e5c1bb9388fc80d5664827c8ca7ee6a7feff2deb78210b103d95af",
+          "input": 2270940437,
+          "loaded": -2024026859,
+          "peak": 0.0
+        },
+        {
+          "audio_sha256": "a8df041925e5c1bb9388fc80d5664827c8ca7ee6a7feff2deb78210b103d95af",
+          "input": -2024026859,
+          "loaded": -2024026859,
+          "peak": 0.0
+        },
+        {
+          "audio_sha256": "a8df041925e5c1bb9388fc80d5664827c8ca7ee6a7feff2deb78210b103d95af",
+          "input": -2024026859,
+          "loaded": -2024026859,
+          "peak": 0.0
+        }
+      ],
+      "uint32": 2270940437
+    },
+    {
+      "exact_repeated_audio_and_readback": true,
+      "int32": -2,
+      "outcomes": [
+        {
+          "audio_sha256": "a8df041925e5c1bb9388fc80d5664827c8ca7ee6a7feff2deb78210b103d95af",
+          "input": 4294967294,
+          "loaded": -2,
+          "peak": 0.0
+        },
+        {
+          "audio_sha256": "a8df041925e5c1bb9388fc80d5664827c8ca7ee6a7feff2deb78210b103d95af",
+          "input": 4294967294,
+          "loaded": -2,
+          "peak": 0.0
+        },
+        {
+          "audio_sha256": "a8df041925e5c1bb9388fc80d5664827c8ca7ee6a7feff2deb78210b103d95af",
+          "input": -2,
+          "loaded": -2,
+          "peak": 0.0
+        },
+        {
+          "audio_sha256": "a8df041925e5c1bb9388fc80d5664827c8ca7ee6a7feff2deb78210b103d95af",
+          "input": -2,
+          "loaded": -2,
+          "peak": 0.0
+        }
+      ],
+      "uint32": 4294967294
+    },
+    {
+      "exact_repeated_audio_and_readback": true,
+      "int32": -1,
+      "outcomes": [
+        {
+          "audio_sha256": "43fa3244d9218bae7123931a5b34260f91c6f94325b7b916f1eff7aa113fde63",
+          "input": 4294967295,
+          "loaded": -1,
+          "peak": 0.1465366929769516
+        },
+        {
+          "audio_sha256": "43fa3244d9218bae7123931a5b34260f91c6f94325b7b916f1eff7aa113fde63",
+          "input": 4294967295,
+          "loaded": -1,
+          "peak": 0.1465366929769516
+        },
+        {
+          "audio_sha256": "43fa3244d9218bae7123931a5b34260f91c6f94325b7b916f1eff7aa113fde63",
+          "input": -1,
+          "loaded": -1,
+          "peak": 0.1465366929769516
+        },
+        {
+          "audio_sha256": "43fa3244d9218bae7123931a5b34260f91c6f94325b7b916f1eff7aa113fde63",
+          "input": -1,
+          "loaded": -1,
+          "peak": 0.1465366929769516
+        }
+      ],
+      "uint32": 4294967295
+    }
+  ],
+  "final_test_audio": false,
+  "lf_normalized_source_sha256": "cb2249b8bbf611772b9a0e98c11104de2536acecd08acbdddf3599c2f5c445b2",
+  "passed": true,
+  "plan": {
+    "attempt_budget": 16,
+    "check": "native_int32_uint32_seed_alias_v1",
+    "claim": "exact_readback_and_audio_alias_in_fixed_native_context",
+    "factory_bank_id": "1f512c5134c259cbbcdb9c4df1d14fe2b40dc0290fcfdb604c740efc54112e40",
+    "final_test_audio": false,
+    "performance": {
+      "duration_seconds": 0.5,
+      "note": 60,
+      "render_seconds": 0.75,
+      "start_seconds": 0.0,
+      "velocity": 100
+    },
+    "phase_control": {
+      "osc_1_random_phase": 0.0,
+      "osc_2_random_phase": 0.0,
+      "osc_3_random_phase": 0.0,
+      "sample_random_phase": 0.0
+    },
+    "plugin_sha256": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+    "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-seed-bits-v2",
+    "source_sha256": "cb2249b8bbf611772b9a0e98c11104de2536acecd08acbdddf3599c2f5c445b2",
+    "uint32_cases": [
+      2147483648,
+      2270940437,
+      4294967294,
+      4294967295
+    ]
+  },
+  "plan_sha256": "1551d473b3ba11d6e82a43ba1541cabea2e76390fae8adf628ff7525ef58aea5",
+  "source_file": "training/reports/scripts/confirm_seed_bit_alias.py"
+}

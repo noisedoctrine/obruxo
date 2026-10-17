@@ -6,7 +6,7 @@ import json
 
 from obruxo_data.hashing import canonical_json, canonical_sha256
 from obruxo_data.midi import Performance
-from obruxo_data.render.base import FULL_PRESET_RENDERER_ID, LEGACY_TRAINING_RENDERER_ID, RenderRequest
+from obruxo_data.render.base import LEGACY_TRAINING_RENDERER_ID, RenderRequest
 from obruxo_data.vital import VitalSchema
 from obruxo_data.vital.full_contract import FullPresetContract
 
@@ -50,7 +50,7 @@ class TrainingContract:
         if isinstance(schema, FullPresetContract):
             schema.template()  # Verify the reviewed factory bytes, as for the legacy contract.
             return cls(FULL_SCHEMA_ID, canonical_sha256(schema.spec), catalog.catalog_id,
-                       canonical_sha256(bank_document()), renderer_id=FULL_PRESET_RENDERER_ID)
+                       canonical_sha256(bank_document()), renderer_id=schema.renderer_id)
         paths = (schema.init_preset_path, schema.parameter_atlas_path, schema.modulation_vocab_path,
                  schema.init_preset_path.parent / "manifest.json")
         schema.load_init_document()

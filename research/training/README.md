@@ -4,6 +4,8 @@ The [completion ledger](IMPLEMENTATION_STATUS.md) tracks the remaining training 
 
 The [eight-curve training path](LFO_TRAINING.md) predicts those shapes from audio, renders original source curves during training, and supervises their reconstruction without giving the model curve labels as inputs. The [ordered connection model](ORDERED_ROUTING.md) adds all 64 positional connections and their optional mapping curves, replacing the earlier curve stage's fixed connections. Its initial five-pattern curriculum remains a small integration scope.
 
+The [custom-curve and seed outputs](CUSTOM_CURVES_AND_SEEDS.md) complete the initial representation of the six nested state families, adding each oscillator's custom curve and exact 32-bit seed. A separate native profile verifies Vital's signed seed readback. Broader combined curriculum, input-layout coverage and model quality remain open.
+
 The [full scalar training path](FULL_SCALAR_TRAINING.md) connects all 775 scalar fields to bounded audio-only learning, legal effect-order and pitch-mask outputs, modern render recipes and inference export. Nested assets, curves, seeds and connections remain explicitly fixed in this increment; learned structured coverage follows.
 
 The [full-preset render profile](FULL_RENDER_PROFILE.md) adds an explicit path for all 775 controls and six nested structures in the reviewed 1.5.5 inventory. It checks the broader native state before broader model training; existing pilot and alpha artifacts retain their identities.

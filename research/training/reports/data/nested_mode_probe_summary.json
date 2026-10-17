@@ -1,0 +1,181 @@
+{
+  "accepted": 68,
+  "attempted": 68,
+  "cases": [
+    {
+      "all_accepted": true,
+      "mode": 0,
+      "repeat_exact": true,
+      "seed_rms_delta": 0.0,
+      "seed_rms_relative": 0.0,
+      "warp_rms_delta": 0.0,
+      "warp_rms_relative": 0.0
+    },
+    {
+      "all_accepted": true,
+      "mode": 1,
+      "repeat_exact": true,
+      "seed_rms_delta": 0.0,
+      "seed_rms_relative": 0.0,
+      "warp_rms_delta": 0.0,
+      "warp_rms_relative": 0.0
+    },
+    {
+      "all_accepted": true,
+      "mode": 2,
+      "repeat_exact": true,
+      "seed_rms_delta": 0.0,
+      "seed_rms_relative": 0.0,
+      "warp_rms_delta": 0.0,
+      "warp_rms_relative": 0.0
+    },
+    {
+      "all_accepted": true,
+      "mode": 3,
+      "repeat_exact": true,
+      "seed_rms_delta": 0.0,
+      "seed_rms_relative": 0.0,
+      "warp_rms_delta": 0.0,
+      "warp_rms_relative": 0.0
+    },
+    {
+      "all_accepted": true,
+      "mode": 4,
+      "repeat_exact": true,
+      "seed_rms_delta": 0.0,
+      "seed_rms_relative": 0.0,
+      "warp_rms_delta": 0.0,
+      "warp_rms_relative": 0.0
+    },
+    {
+      "all_accepted": true,
+      "mode": 5,
+      "repeat_exact": true,
+      "seed_rms_delta": 0.0,
+      "seed_rms_relative": 0.0,
+      "warp_rms_delta": 0.0,
+      "warp_rms_relative": 0.0
+    },
+    {
+      "all_accepted": true,
+      "mode": 6,
+      "repeat_exact": true,
+      "seed_rms_delta": 0.002770415285771956,
+      "seed_rms_relative": 1.1006840189306275,
+      "warp_rms_delta": 0.0,
+      "warp_rms_relative": 0.0
+    },
+    {
+      "all_accepted": true,
+      "mode": 7,
+      "repeat_exact": true,
+      "seed_rms_delta": 0.0,
+      "seed_rms_relative": 0.0,
+      "warp_rms_delta": 0.0,
+      "warp_rms_relative": 0.0
+    },
+    {
+      "all_accepted": true,
+      "mode": 8,
+      "repeat_exact": true,
+      "seed_rms_delta": 0.0,
+      "seed_rms_relative": 0.0,
+      "warp_rms_delta": 0.0,
+      "warp_rms_relative": 0.0
+    },
+    {
+      "all_accepted": true,
+      "mode": 9,
+      "repeat_exact": true,
+      "seed_rms_delta": 0.0,
+      "seed_rms_relative": 0.0,
+      "warp_rms_delta": 0.0,
+      "warp_rms_relative": 0.0
+    },
+    {
+      "all_accepted": true,
+      "mode": 10,
+      "repeat_exact": true,
+      "seed_rms_delta": 0.0,
+      "seed_rms_relative": 0.0,
+      "warp_rms_delta": 0.0,
+      "warp_rms_relative": 0.0
+    },
+    {
+      "all_accepted": true,
+      "mode": 11,
+      "repeat_exact": true,
+      "seed_rms_delta": 0.0,
+      "seed_rms_relative": 0.0,
+      "warp_rms_delta": 0.0,
+      "warp_rms_relative": 0.0
+    },
+    {
+      "all_accepted": true,
+      "mode": 12,
+      "repeat_exact": true,
+      "seed_rms_delta": 0.0,
+      "seed_rms_relative": 0.0,
+      "warp_rms_delta": 0.0,
+      "warp_rms_relative": 0.0
+    },
+    {
+      "all_accepted": true,
+      "mode": 13,
+      "repeat_exact": true,
+      "seed_rms_delta": 0.0,
+      "seed_rms_relative": 0.0,
+      "warp_rms_delta": 0.0009401547818097812,
+      "warp_rms_relative": 0.7969468052330672
+    },
+    {
+      "all_accepted": true,
+      "mode": 14,
+      "repeat_exact": true,
+      "seed_rms_delta": 0.0,
+      "seed_rms_relative": 0.0,
+      "warp_rms_delta": 0.001436287554238902,
+      "warp_rms_relative": 0.4484332924565052
+    },
+    {
+      "all_accepted": true,
+      "mode": 15,
+      "repeat_exact": true,
+      "seed_rms_delta": 0.0,
+      "seed_rms_relative": 0.0,
+      "warp_rms_delta": 0.0021083683827407334,
+      "warp_rms_relative": 0.6512954301329305
+    },
+    {
+      "all_accepted": true,
+      "mode": 16,
+      "repeat_exact": true,
+      "seed_rms_delta": 0.0,
+      "seed_rms_relative": 0.0,
+      "warp_rms_delta": 0.0,
+      "warp_rms_relative": 0.0
+    }
+  ],
+  "failed_float64_probe": {
+    "accepted": 51,
+    "attempted": 68,
+    "plan_sha256": "4c909d1c5502f0618c61dd7a6b99b826326031c9208f961c820f4f16d9bfe20e",
+    "reason": "Custom warp .8 must be encoded on native float32 grid",
+    "state_errors": 17
+  },
+  "final_test_audio": false,
+  "plan": {
+    "attempt_budget": 68,
+    "factory_bank_id": "1f512c5134c259cbbcdb9c4df1d14fe2b40dc0290fcfdb604c740efc54112e40",
+    "final_test_audio": false,
+    "phase_control": {
+      "osc_1_random_phase": 0.0,
+      "osc_2_random_phase": 0.0,
+      "osc_3_random_phase": 0.0,
+      "sample_random_phase": 0.0
+    },
+    "probe_sha256": "0a42a7eab71cb1a4f70273d16b719eae538d2ed5bcde6e3921184208016aacbb",
+    "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-v1",
+    "wave_asset_id": "factory-wavetable-4bc81073a8b6f129"
+  }
+}

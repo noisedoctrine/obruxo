@@ -31,11 +31,22 @@ def _verify_sample(expected, actual):
     return deltas
 
 
-def verify_full_nested_state(requested, loaded, ramps):
+def verify_full_nested_state(requested, loaded, ramps, *, signed_seed_bits=False):
     expected, actual = requested["settings"], loaded.get("settings", {})
-    for name in ("lfos", "custom_warps", "random_values", "modulations"):
+    for name in ("lfos", "custom_warps", "modulations"):
         if expected[name] != actual.get(name):
             raise RuntimeError(f"Vital did not load the requested {name}")
+    seeds = actual.get("random_values")
+    converted = 0
+    if signed_seed_bits and isinstance(seeds, list):
+        seeds = deepcopy(seeds)
+        for value in seeds:
+            seed = value.get("seed") if isinstance(value, dict) else None
+            if type(seed) is int and -2147483648 <= seed < 0:
+                value["seed"] = seed + 2**32
+                converted += 1
+    if expected["random_values"] != seeds:
+        raise RuntimeError("Vital did not load the requested random_values")
     waves = actual.get("wavetables")
     if not isinstance(waves, list) or len(waves) != 3 or any(not isinstance(wave, dict) for wave in waves):
         raise RuntimeError("Vital did not load the requested wavetables")
@@ -48,6 +59,7 @@ def verify_full_nested_state(requested, loaded, ramps):
     if any(actual.get(name) != value for name, value in ramps.items()):
         raise RuntimeError("Vital did not supply the reviewed modulation ramp defaults")
     return {"nested_families_verified": list(NESTED_FAMILIES), "modulation_slots_verified": 64,
+            **({"seed_readback_policy": "signed_int32_to_uint32_exact_bits", "signed_seed_slots_converted": converted} if signed_seed_bits else {}),
             "native_ramp_defaults_verified": len(ramps), "wavetable_version_migration": "1.6.4",
             "sample_readback_shift_samples": 4, "sample_aligned_max_pcm16_delta": deltas,
             "sample_readback_byte_exact": False}

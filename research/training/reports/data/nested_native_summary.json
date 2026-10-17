@@ -1,0 +1,342 @@
+{
+  "accepted": 132,
+  "attempted": 150,
+  "audio_files_written": 0,
+  "cases": [
+    {
+      "case": "warp_1_mode_13",
+      "causal_effect": true,
+      "changed_curve_relative_rms": 4.342353146347012,
+      "other_slot_unchanged": true,
+      "projection_relative_rms": [
+        0.00015963444639425063,
+        0.0016524613781538065
+      ],
+      "repeats_exact": true
+    },
+    {
+      "case": "warp_1_mode_14",
+      "causal_effect": true,
+      "changed_curve_relative_rms": 0.598165876963396,
+      "other_slot_unchanged": true,
+      "projection_relative_rms": [
+        1.657970244906974e-05,
+        0.01236557709718528
+      ],
+      "repeats_exact": true
+    },
+    {
+      "case": "warp_1_mode_15",
+      "causal_effect": true,
+      "changed_curve_relative_rms": 0.6325226911357921,
+      "other_slot_unchanged": true,
+      "projection_relative_rms": [
+        5.903371672485848e-06,
+        0.008282263613529017
+      ],
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_1_0",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_1_1",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_1_4",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_1_16777217",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_1_2147483647",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_1_2147483648",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_1_4294967294",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_1_4294967295",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_effect_1",
+      "causal_effect": true,
+      "changed_seed_relative_rms": 1.1006840189306275,
+      "other_slot_unchanged": true,
+      "repeats_exact": true
+    },
+    {
+      "case": "silent_seed_1_0",
+      "expected_exact_silence": true,
+      "training_audio_eligible": false
+    },
+    {
+      "case": "silent_seed_1_1",
+      "expected_exact_silence": true,
+      "training_audio_eligible": false
+    },
+    {
+      "case": "silent_seed_1_16777217",
+      "expected_exact_silence": true,
+      "training_audio_eligible": false
+    },
+    {
+      "case": "inactive_1",
+      "inactive_audio_exact": true
+    },
+    {
+      "case": "warp_2_mode_13",
+      "causal_effect": true,
+      "changed_curve_relative_rms": 4.342353146347012,
+      "other_slot_unchanged": true,
+      "projection_relative_rms": [
+        0.00015963444639425063,
+        0.0016524613781538065
+      ],
+      "repeats_exact": true
+    },
+    {
+      "case": "warp_2_mode_14",
+      "causal_effect": true,
+      "changed_curve_relative_rms": 0.598165876963396,
+      "other_slot_unchanged": true,
+      "projection_relative_rms": [
+        1.657970244906974e-05,
+        0.01236557709718528
+      ],
+      "repeats_exact": true
+    },
+    {
+      "case": "warp_2_mode_15",
+      "causal_effect": true,
+      "changed_curve_relative_rms": 0.6325226911357921,
+      "other_slot_unchanged": true,
+      "projection_relative_rms": [
+        5.903371672485848e-06,
+        0.008282263613529017
+      ],
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_2_0",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_2_1",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_2_4",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_2_16777217",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_2_2147483647",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_2_2147483648",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_2_4294967294",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_2_4294967295",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_effect_2",
+      "causal_effect": true,
+      "changed_seed_relative_rms": 1.1006840189306275,
+      "other_slot_unchanged": true,
+      "repeats_exact": true
+    },
+    {
+      "case": "silent_seed_2_0",
+      "expected_exact_silence": true,
+      "training_audio_eligible": false
+    },
+    {
+      "case": "silent_seed_2_1",
+      "expected_exact_silence": true,
+      "training_audio_eligible": false
+    },
+    {
+      "case": "silent_seed_2_16777217",
+      "expected_exact_silence": true,
+      "training_audio_eligible": false
+    },
+    {
+      "case": "inactive_2",
+      "inactive_audio_exact": true
+    },
+    {
+      "case": "warp_3_mode_13",
+      "causal_effect": true,
+      "changed_curve_relative_rms": 4.342353146347012,
+      "other_slot_unchanged": true,
+      "projection_relative_rms": [
+        0.00015963444639425063,
+        0.0016524613781538065
+      ],
+      "repeats_exact": true
+    },
+    {
+      "case": "warp_3_mode_14",
+      "causal_effect": true,
+      "changed_curve_relative_rms": 0.598165876963396,
+      "other_slot_unchanged": true,
+      "projection_relative_rms": [
+        1.657970244906974e-05,
+        0.01236557709718528
+      ],
+      "repeats_exact": true
+    },
+    {
+      "case": "warp_3_mode_15",
+      "causal_effect": true,
+      "changed_curve_relative_rms": 0.6325226911357921,
+      "other_slot_unchanged": true,
+      "projection_relative_rms": [
+        5.903371672485848e-06,
+        0.008282263613529017
+      ],
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_3_0",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_3_1",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_3_4",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_3_16777217",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_3_2147483647",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_3_2147483648",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_3_4294967294",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_3_4294967295",
+      "claim": "exact_seed_state_with_audible_carrier",
+      "repeats_exact": true
+    },
+    {
+      "case": "seed_effect_3",
+      "causal_effect": true,
+      "changed_seed_relative_rms": 1.1006840189306275,
+      "other_slot_unchanged": true,
+      "repeats_exact": true
+    },
+    {
+      "case": "silent_seed_3_0",
+      "expected_exact_silence": true,
+      "training_audio_eligible": false
+    },
+    {
+      "case": "silent_seed_3_1",
+      "expected_exact_silence": true,
+      "training_audio_eligible": false
+    },
+    {
+      "case": "silent_seed_3_16777217",
+      "expected_exact_silence": true,
+      "training_audio_eligible": false
+    },
+    {
+      "case": "inactive_3",
+      "inactive_audio_exact": true
+    }
+  ],
+  "elapsed_seconds": 155.43392419999873,
+  "expected_silence_rejections": 18,
+  "failed_initial_qualification": {
+    "accepted": 75,
+    "attempted": 114,
+    "plan_sha256": "4f06b1cdf8ea89d6816c7a159412af8417526fe8d2be8fea4f50e3c110aa9785",
+    "reason": "Old exact-JSON profile rejects signed seed readback; silent seeds require explicit rejected-audio accounting",
+    "statuses": {
+      "accepted": 75,
+      "error": 21,
+      "rejected": 18
+    }
+  },
+  "final_test_audio": false,
+  "gates": {
+    "causal_effects": true,
+    "fixed_phase_repeats": true,
+    "inactive_audio_exact": true,
+    "known_silent_states_rejected": true,
+    "memory_bounded": true,
+    "native_state_and_qa": true,
+    "slot_isolation": true,
+    "source_unchanged": true
+  },
+  "lf_normalized_source_sha256": {
+    "data_generation/obruxo_data/render/base.py": "d596afd643876474dffaff32ab02948fc19d21a34847cf48d352201f032a93cf",
+    "data_generation/obruxo_data/render/full_state.py": "dbcc375b136ff3002020bf587061520581a38c8399c655efa099aac06cce8749",
+    "data_generation/obruxo_data/render/vita.py": "e6cec8a0235fbb293f9f99efcfdc4e419b0eb6e7f7d4411b172a35757841bb47",
+    "data_generation/obruxo_data/vital/full_contract.py": "dc5b775fbbb24bca2a0c20b86102675a43c8535649eae53a6cce64e14c5e81eb",
+    "training/obruxo_training/contracts.py": "1bb345fda28f864e8120816b82e609530ef6f6c924e49ab528454ae16733aebd",
+    "training/obruxo_training/nested_check.py": "b9009b469364fa396f1e14a8db76b9600b23f9e3c453846ee179d376f8d3763e",
+    "training/obruxo_training/nested_codec.py": "2f8da9bed308fa4582d5b9568d4064fafdb518d201b31ffc92dfbedb9a3b075a",
+    "training/obruxo_training/stream.py": "008d5aed58f6dc81bba7e51754a728f2232ee7774bc206abc95cc74cd22ef753"
+  },
+  "memory_sampling_errors": 0,
+  "passed": true,
+  "peak_process_rss_bytes": 434880512,
+  "plan_sha256": "78569d706544c57c1690c7303c58cf238c0b98b84965cbace2a90cea73b91f11"
+}

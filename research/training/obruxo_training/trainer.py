@@ -20,6 +20,7 @@ from obruxo_data.hashing import canonical_sha256, sha256_bytes
 from .audit import write_json
 from .benchmark import MemoryMonitor
 from .codec import PilotTarget, load_codec
+from .curve_labels import CURVE_LABEL_KEYS, SOURCE_CURVES
 from .features import AudioFeatures, tensor_digest, validate_features
 from .model import PilotInverse, batch_features, conditioning_from_spec, loss_terms, model_spec, predicted_targets
 from .paired import complete_pairs, identity_terms, paired_batch_indices
@@ -121,7 +122,7 @@ def restore_rng(value: dict, device: str) -> None:
 
 def replay_bytes(items: list[dict]) -> int:
     features = sum(tensor.numel() * tensor.element_size() for item in items for tensor in item["features"].values())
-    curves = [item[name] for item in items for name in ("curve_targets", "route_curve_targets") if name in item]
+    curves = [item[name] for item in items for name in CURVE_LABEL_KEYS if name in item]
     if any(not isinstance(value, torch.Tensor) for value in curves):
         raise ValueError("curve replay labels must be tensors")
     return features + sum(value.numel() * value.element_size() for value in curves)
@@ -143,25 +144,19 @@ def validate_replay(items: list[dict], sampler: PilotSampler, cursor: dict, conf
         if config.sampling_policy == "paired_views" and item.get("performance_id") != recipe.performance_id:
             raise ValueError("paired replay performance differs from its training recipe")
         validate_features(item["features"])
-        if getattr(sampler.pool.codec, "lossy_curves", False):
-            expected = torch.tensor(sampler.pool.codec.source_curves(recipe.render_request().preset_json), dtype=torch.float32)
-            actual = item.get("curve_targets")
+        for flag, key, method, label, unexpected in SOURCE_CURVES:
+            if not getattr(sampler.pool.codec, flag, False):
+                if key in item:
+                    raise ValueError(f"unexpected {unexpected} supervision for this codec")
+                continue
+            expected = torch.tensor(getattr(sampler.pool.codec, method)(recipe.render_request().preset_json), dtype=torch.float32)
+            actual = item.get(key)
             if not isinstance(actual, torch.Tensor) or actual.dtype != torch.float32 or actual.requires_grad or not torch.equal(actual, expected):
-                raise ValueError("saved original LFO curve targets differ from their source recipe")
-        elif "curve_targets" in item:
-            raise ValueError("unexpected curve supervision for this codec")
-        if getattr(sampler.pool.codec, "lossy_route_maps", False):
-            expected = torch.tensor(sampler.pool.codec.source_route_maps(recipe.render_request().preset_json), dtype=torch.float32)
-            actual = item.get("route_curve_targets")
-            if not isinstance(actual, torch.Tensor) or actual.dtype != torch.float32 or actual.requires_grad or not torch.equal(actual, expected):
-                raise ValueError("saved original route maps differ from their source recipe")
-        elif "route_curve_targets" in item:
-            raise ValueError("unexpected route-map supervision for this codec")
+                raise ValueError(f"saved {label} differ from their source recipe")
 
 
 def curve_loss_inputs(items, codec):
-    return {name: torch.stack([item[name] for item in items]) for flag, name in
-            (("lossy_curves", "curve_targets"), ("lossy_route_maps", "route_curve_targets")) if getattr(codec, flag, False)}
+    return {key: torch.stack([item[key] for item in items]) for flag, key, *_ in SOURCE_CURVES if getattr(codec, flag, False)}
 
 
 @torch.no_grad()
@@ -357,10 +352,9 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
                                 "audio_sha256": outcome.metadata["qa"]["audio_float32_sha256"], "uses": 0}
                         if paired:
                             item["performance_id"] = recipe.performance_id
-                        if getattr(pool.codec, "lossy_curves", False):
-                            item["curve_targets"] = torch.tensor(pool.codec.source_curves(recipe.render_request().preset_json), dtype=torch.float32)
-                        if getattr(pool.codec, "lossy_route_maps", False):
-                            item["route_curve_targets"] = torch.tensor(pool.codec.source_route_maps(recipe.render_request().preset_json), dtype=torch.float32)
+                        for flag, key, method, *_ in SOURCE_CURVES:
+                            if getattr(pool.codec, flag, False):
+                                item[key] = torch.tensor(getattr(pool.codec, method)(recipe.render_request().preset_json), dtype=torch.float32)
                         candidate = [*replay, item][-config.replay_capacity:]
                         if replay_bytes(candidate) > config.replay_mib * 1024 * 1024:
                             raise ValueError("feature replay exceeds its byte budget")
@@ -467,7 +461,9 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
         if getattr(pool.codec, "lossy_curves", False):
             summary["curve_target_bytes"] = sum(item["curve_targets"].numel() * item["curve_targets"].element_size() for item in replay)
             summary["route_curve_target_bytes"] = sum(item["route_curve_targets"].numel() * item["route_curve_targets"].element_size() for item in replay if "route_curve_targets" in item)
-            summary["feature_bytes"] = summary["replay_bytes"] - summary["curve_target_bytes"] - summary["route_curve_target_bytes"]
+            if getattr(pool.codec, "lossy_warps", False):
+                summary["warp_curve_target_bytes"] = sum(item["warp_curve_targets"].numel() * item["warp_curve_targets"].element_size() for item in replay)
+            summary["feature_bytes"] = summary["replay_bytes"] - summary["curve_target_bytes"] - summary["route_curve_target_bytes"] - summary.get("warp_curve_target_bytes", 0)
         write_json(output / "summary.json", summary)
         write_json(output / "status.json", {"complete": complete, "stage": "complete" if complete else "preempted", "step": step})
         return summary
