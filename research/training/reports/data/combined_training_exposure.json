@@ -1,0 +1,62 @@
+{
+  "active_asset_choices_by_slot": [
+    19,
+    19,
+    16,
+    11
+  ],
+  "analysis": "retained_supervision_exposure_not_learning_v1",
+  "checkpoint_sha256": "e97febeae56155cc0bb43530a5d3c5d03f818b99205499c252b8ec534575de48",
+  "codec_id": "9f183fc14324940fe80cecb7aae7494a596880ec70059f3e1348a180cf2303b7",
+  "distinct_states": 64,
+  "enabled_effect_state_counts": {
+    "chorus": 29,
+    "compressor": 24,
+    "delay": 18,
+    "distortion": 22,
+    "eq": 32,
+    "filter_fx": 26,
+    "flanger": 19,
+    "phaser": 22,
+    "reverb": 27
+  },
+  "examples": 64,
+  "final_test_audio": false,
+  "model_promotion": false,
+  "optimizer_steps": 0,
+  "pool_id": "bfe52afe8c95e2d90df5fd120d60e4f128bd3508ffca4c37d22f968a03128fb5",
+  "render_attempts": 0,
+  "scalar_families": {
+    "effects": {
+      "varied": 113
+    },
+    "envelopes": {
+      "varied": 54
+    },
+    "filters": {
+      "varied": 32
+    },
+    "modulation": {
+      "varied": 320
+    },
+    "modulators": {
+      "varied": 128
+    },
+    "oscillators": {
+      "constant": 3,
+      "varied": 87
+    },
+    "sampler": {
+      "varied": 11
+    },
+    "voice_global": {
+      "constant": 3,
+      "varied": 24
+    }
+  },
+  "scalar_status_counts": {
+    "constant": 6,
+    "varied": 769
+  },
+  "script_sha256_lf": "b32aabf79d41a494ebd1753b1c8b8871beb98abb5b53af22fd7b2211963abf05"
+}

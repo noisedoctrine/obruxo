@@ -1,0 +1,287 @@
+{
+  "accepted": 103,
+  "attempted": 103,
+  "audio_files_written": 0,
+  "checks": [
+    {
+      "case": "source_11",
+      "family": "sampler",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_16",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_26",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_30",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_32",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_44",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_50",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_51",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_53",
+      "family": "oscillators",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_56",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_70",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_77",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_103",
+      "family": "oscillators",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_111",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_115",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_121",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_131",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_137",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_139",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_147",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_168",
+      "family": "sampler",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_188",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_198",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_208",
+      "family": "sampler",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_218",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_224",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_240",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_245",
+      "family": "hybrid",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "source_252",
+      "family": "oscillators",
+      "repeat_exact": true,
+      "source_labels_exact": true
+    },
+    {
+      "case": "chorus",
+      "effect_present": true,
+      "relative_rms_change": 0.5558626506172228,
+      "repeat_exact": true
+    },
+    {
+      "case": "compressor",
+      "effect_present": true,
+      "relative_rms_change": 0.8234540850274067,
+      "repeat_exact": true
+    },
+    {
+      "case": "delay",
+      "effect_present": true,
+      "relative_rms_change": 0.5033400429648284,
+      "repeat_exact": true
+    },
+    {
+      "case": "distortion",
+      "effect_present": true,
+      "relative_rms_change": 0.17912830170138502,
+      "repeat_exact": true
+    },
+    {
+      "case": "eq",
+      "effect_present": true,
+      "relative_rms_change": 0.8594449965874593,
+      "repeat_exact": true
+    },
+    {
+      "case": "filter_fx",
+      "effect_present": true,
+      "relative_rms_change": 0.478460802569319,
+      "repeat_exact": true
+    },
+    {
+      "case": "flanger",
+      "effect_present": true,
+      "relative_rms_change": 0.5068721521235541,
+      "repeat_exact": true
+    },
+    {
+      "case": "phaser",
+      "effect_present": true,
+      "relative_rms_change": 0.323455829884221,
+      "repeat_exact": true
+    },
+    {
+      "case": "reverb",
+      "effect_present": true,
+      "relative_rms_change": 0.5785957827690578,
+      "repeat_exact": true
+    },
+    {
+      "case": "sample_content",
+      "effect_present": true,
+      "relative_rms_change": 0.9750376408984378,
+      "repeat_exact": true
+    },
+    {
+      "case": "voice_polyphony",
+      "effect_present": true,
+      "relative_rms_change": 0.645794897859613,
+      "repeat_exact": true
+    },
+    {
+      "case": "portamento",
+      "effect_present": true,
+      "relative_rms_change": 0.271570617118506,
+      "repeat_exact": true
+    },
+    {
+      "case": "lfo_playback",
+      "effect_present": true,
+      "relative_rms_change": 0.041961763103604076,
+      "repeat_exact": true
+    },
+    {
+      "case": "random_playback",
+      "effect_present": true,
+      "relative_rms_change": 0.06574388589762614,
+      "repeat_exact": true
+    },
+    {
+      "case": "secondary_envelope",
+      "effect_present": true,
+      "relative_rms_change": 0.2844953240157013,
+      "repeat_exact": true
+    }
+  ],
+  "elapsed_seconds": 238.0991997000001,
+  "final_test_audio": false,
+  "gates": {
+    "all_native_accepted": true,
+    "family_effects": true,
+    "fixed_phase_repeats": true,
+    "memory_bounded": true,
+    "original_source_labels": true,
+    "registered_choices_covered": true,
+    "source_unchanged": true
+  },
+  "memory_sampling_errors": 0,
+  "model_promotion": false,
+  "passed": true,
+  "peak_process_rss_bytes": 629293056,
+  "plan_sha256": "b9ac2c00777ef11ebf37fd62cc29d58e889a1a3e52807aced3d1ff5a7b6b8e86"
+}

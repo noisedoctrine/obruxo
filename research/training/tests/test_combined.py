@@ -7,7 +7,7 @@ import torch
 from obruxo_training.codec import load_codec
 from obruxo_training.combined_codec import CombinedCodec
 from obruxo_training.combined_policy import FIXED
-from obruxo_training.pilot import PilotPool
+from obruxo_training.pilot import PilotPool, seeded_random
 from test_expression import codec as expression  # noqa: F401
 from test_factory_assets import bank  # noqa: F401
 from test_lfo_bank import population  # noqa: F401
@@ -74,6 +74,20 @@ def test_original_curves_maps_seeds_and_positional_references_survive(codec, poo
     target = pool.entries[0].target
     with pytest.raises(ValueError, match="original source policy"):
         codec.source_preset(replace(target, continuous=(1. - target.continuous[0], *target.continuous[1:])), 0)
+
+
+def test_sparse_sources_stay_sparse_while_dense_sources_cover_all_named_inputs(codec, pool, expression):  # noqa: F811
+    for index, entry in enumerate(pool.entries):
+        routes = json.loads(codec.source_preset(entry.target, index))["settings"]["modulations"]
+        connected = [route for route in routes if route["source"]]
+        ordinal = codec.routing._ordinal[codec._root(index)]
+        if ordinal % 4 == 3:
+            assert len(connected) == 64
+            assert {route["source"] for route in connected} == set(codec.routing.sources) - {""}
+        else:
+            parent = expression.sample_target(seeded_random(codec.generator, codec.roots.seed, index), index)
+            original = json.loads(expression.source_preset(parent, index))["settings"]["modulations"]
+            assert len(connected) == sum(bool(route["source"]) for route in original) + 2
 
 
 def test_combined_pool_roundtrip_and_cli(codec, pool, tmp_path):

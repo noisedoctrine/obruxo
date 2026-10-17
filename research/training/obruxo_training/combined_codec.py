@@ -31,11 +31,13 @@ class CombinedCodec(ExpressionCodec):
         spec = super().to_dict()
         sources = {name: hashlib.sha256(Path(__file__).with_name(name).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
                    for name in ("combined_codec.py", "combined_policy.py")}
-        spec.update(codec="authored_combined_nested_state_v1", contract_id=self.contract.contract_id,
+        spec.update(codec="authored_combined_nested_state_v1", contract_id=self.contract.contract_id, source_policy=POLICY,
+                    inherited_curricula="parent_source_construction_before_combined_control_overrides",
                     combined_curriculum={"policy": POLICY, "source_sha256_lf": sources, "controls": self.policy,
                         "raw_source_cache_entries": 16, "tail_seconds": 4., "source_bindings": "original_LFO_map_warp_and_uint32_seed_labels",
                         "scenes": ["oscillator", "sampler", "hybrid", "dense_all_modules"],
                         "audio_destination_values": list(range(5)), "inactive_native_destination_values": list(range(5, 15)),
+                        "master_gain_db": [-29., -24.], "sparse_additional_sources": 2,
                         "dense_destination_stride": 24, "full_range_coverage_claim": False},
                     families=["oscillators", "sampler", "hybrid"], scope=spec["scope"] + "_combined_control_and_factory_asset_curriculum")
         return spec
@@ -78,7 +80,10 @@ class CombinedCodec(ExpressionCodec):
         rng.shuffle(free)
         present = {route["source"] for route in routes}
         audible = next((f"osc_{slot}_pan" for slot in range(1, 4) if settings[f"osc_{slot}_on"]), "sample_pan")
-        for source in sorted(set(self.routing.sources) - {""} - present):
+        missing = sorted(set(self.routing.sources) - {""} - present)
+        if ordinal % 4 != 3:
+            missing = [missing[((ordinal // 4) * 2 + offset) % len(missing)] for offset in range(min(2, len(missing)))]
+        for source in missing:
             slot = free.pop()
             routes[slot] = {"source": source, "destination": audible}
         if ordinal % 4 == 3:

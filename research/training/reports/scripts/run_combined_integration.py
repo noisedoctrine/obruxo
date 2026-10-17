@@ -43,7 +43,10 @@ def main():
     stream = StreamConfig(prefetch_clips=1, timeout_seconds=60, worker_jobs=4)
     sampler = PilotSampler(pool, policy=config.sampling_policy)
     references = {entry.performance_id: entry.name for entry in bank_for(codec.contract.renderer_id) if entry.role == "reference"}
-    prospective = [(sampler.recipe_at(index).state_id, sampler.recipe_at(index).performance_id) for index in range(64)]
+    prospective = []
+    for index in range(64):
+        recipe = sampler.recipe_at(index)
+        prospective.append((recipe.state_id, recipe.performance_id))
     if len({state for state, _ in prospective}) != 64 or {performance for _, performance in prospective} != set(references):
         raise ValueError("the frozen first 64 recipes must cover distinct states and every reference performance")
     files = [Path(__file__), *(RESEARCH / "training/obruxo_training").glob("*.py"),

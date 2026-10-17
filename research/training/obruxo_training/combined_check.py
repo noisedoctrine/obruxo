@@ -92,10 +92,24 @@ def check_combined(pool, output, *, progress=None):
         return {path.relative_to(research).as_posix(): hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest() for path in sorted(files)}
 
     indices, families = source_indices(pool), family_cases(codec)
+    asset_offset = len(codec.base.scalar.categorical)
+    choices = [set() for _ in range(4)]
+    for index in indices:
+        target = pool.entries[index].target
+        flags = codec.categorical_mask(target)[asset_offset:asset_offset + 4]
+        for seen, choice, enabled in zip(choices, target.categorical[asset_offset:asset_offset + 4], flags, strict=True):
+            if enabled:
+                seen.add(choice)
+    asset_sizes = [len(codec.base._waves)] * 3 + [len(codec.base._samples)]
+    assets_covered = all(seen == set(range(size)) for seen, size in zip(choices, asset_sizes, strict=True))
+    if not assets_covered:
+        raise ValueError("native source fixtures must cover every registered choice in every active slot")
     plan = {"qualification": "combined_source_and_family_native_v1", "pool_id": pool.pool_id, "codec_id": codec.codec_id,
             "source_sha256_lf": sources(), "training_contract": codec.contract.to_dict(), "source_indices": indices,
             "family_cases": [name for name, *_ in families], "attempt_budget": len(indices) * 2 + len(families) * 3,
-            "phase_control": FULL_PHASE_CONTROL, "minimum_effect_relative_rms": .005, "worker_jobs": 4,
+            "registered_choices_by_slot": asset_sizes,
+            "phase_control": FULL_PHASE_CONTROL, "minimum_effect_relative_rms": .005, "worker_jobs": 1,
+            "random_generator_policy": "fresh_process_per_request_preserve_all_requested_random_routes",
             "rss_limit_bytes": 8 * 1024**3, "final_test_audio": False, "model_promotion": False}
     write_json(output / "plan.json", plan)
     references = [entry for entry in bank_for(codec.contract.renderer_id) if entry.role == "reference"]
@@ -103,7 +117,7 @@ def check_combined(pool, output, *, progress=None):
     monitor, started = MemoryMonitor(), perf_counter()
     monitor.start()
     try:
-        with RenderWorker(renderer_factory=NativeRendererFactory(renderer_id=codec.contract.renderer_id), max_jobs=4) as worker:
+        with RenderWorker(renderer_factory=NativeRendererFactory(renderer_id=codec.contract.renderer_id), max_jobs=1) as worker:
             def render(name, role, raw, performance):
                 request = RenderRequest(preset_json=fixed_generator_phases(raw).decode(), performance=performance, tail_seconds=4., renderer_id=codec.contract.renderer_id)
                 audio, metadata = worker.render(request, timeout=60.)
@@ -139,6 +153,7 @@ def check_combined(pool, output, *, progress=None):
     finally:
         monitor.close()
     gates = {"all_native_accepted": len(events) == plan["attempt_budget"] and all(row["status"] == "accepted" for row in events),
+             "registered_choices_covered": assets_covered,
              "original_source_labels": all(label_checks), "fixed_phase_repeats": all(row["repeat_exact"] for row in checks),
              "family_effects": all(row.get("effect_present", True) for row in checks), "source_unchanged": sources() == plan["source_sha256_lf"],
              "memory_bounded": monitor.errors == 0 and monitor.peak_bytes is not None and monitor.peak_bytes <= plan["rss_limit_bytes"]}

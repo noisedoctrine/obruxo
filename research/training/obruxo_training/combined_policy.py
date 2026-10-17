@@ -7,7 +7,7 @@ from .full_scalar import QUANTIZE, scalar_family
 POLICY = "combined_all_scalar_families_original_nested_sources_v1"
 FIXED = {"bypass": (0., "non_silent_training_eligibility"), "beats_per_minute": (2., "host_performance_tempo_supplies_the_clock"),
          "view_spectrogram": (0., "display_state"), **{f"osc_{slot}_view_2d": (1., "display_state") for slot in range(1, 4)}}
-RANGES = {"volume": (2025., 2500.), "voice_amplitude": (.6, 1.), "portamento_time": (-9., -4.), "portamento_slope": (-2., 2.),
+RANGES = {"volume": (2601., 3136.), "voice_amplitude": (.6, 1.), "portamento_time": (-9., -4.), "portamento_slope": (-2., 2.),
           "voice_tune": (-.25, .25), "pitch_wheel": (-.25, .25), "velocity_track": (-.4, .4),
           "eq_low_cutoff": (24., 60.), "eq_high_cutoff": (84., 120.), "eq_band_cutoff": (48., 108.),
           "delay_frequency": (2., 6.), "delay_aux_frequency": (2., 6.), "reverb_decay_time": (-3., -.25),
