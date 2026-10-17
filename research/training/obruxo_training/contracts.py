@@ -46,11 +46,15 @@ class TrainingContract:
                 "recipe_rule": "render_recipe_v1", "audio_mode": "on_demand", **asdict(self)}
 
     @classmethod
-    def create(cls, schema: VitalSchema, catalog: AssetCatalog) -> TrainingContract:
+    def create(cls, schema: VitalSchema, catalog: AssetCatalog, *, tail_seconds=2.0) -> TrainingContract:
+        if type(tail_seconds) not in {int, float} or tail_seconds not in (2., 4.):
+            raise ValueError("training tail must use the reviewed two- or four-second budget")
         if isinstance(schema, FullPresetContract):
             schema.template()  # Verify the reviewed factory bytes, as for the legacy contract.
             return cls(FULL_SCHEMA_ID, canonical_sha256(schema.spec), catalog.catalog_id,
-                       canonical_sha256(bank_document_for(schema.renderer_id)), renderer_id=schema.renderer_id)
+                       canonical_sha256(bank_document_for(schema.renderer_id)), renderer_id=schema.renderer_id, tail_seconds=float(tail_seconds))
+        if tail_seconds != 2.:
+            raise ValueError("extended training tails require the full preset profile")
         paths = (schema.init_preset_path, schema.parameter_atlas_path, schema.modulation_vocab_path,
                  schema.init_preset_path.parent / "manifest.json")
         schema.load_init_document()
@@ -89,7 +93,7 @@ class RenderRecipe:
                contract: TrainingContract, ledger: SplitLedger, purpose: str, sequence_id: int) -> RenderRecipe:
         if purpose not in {"train", "evaluate"} or type(sequence_id) is not int or sequence_id < 0:
             raise ValueError("recipe requires a valid purpose and nonnegative sequence ID")
-        TrainingContract.create(schema, catalog).require_match(contract.to_dict())
+        TrainingContract.create(schema, catalog, tail_seconds=contract.tail_seconds).require_match(contract.to_dict())
         inspection = inspect_preset(raw_preset, schema, catalog)
         if not inspection["static_eligible"]:
             raise ValueError("preset is not statically eligible: " + ", ".join(inspection["reasons"]))

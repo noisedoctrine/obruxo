@@ -244,6 +244,12 @@ def main(argv=None) -> int:
     expression_pool.add_argument("--output", type=Path, required=True)
     expression_pool.add_argument("--count", type=int, default=256)
     expression_pool.add_argument("--seed", type=int, default=0)
+    combined_pool = commands.add_parser("combined-pool", help="Author combined scalar, asset, curve, connection and expression recipes")
+    combined_pool.add_argument("--asset-bank", type=Path, required=True)
+    combined_pool.add_argument("--lfo-bank", type=Path, required=True)
+    combined_pool.add_argument("--output", type=Path, required=True)
+    combined_pool.add_argument("--count", type=int, default=256)
+    combined_pool.add_argument("--seed", type=int, default=0)
     args = parser.parse_args(argv)
     try:
         if args.command == "lfo-fit":
@@ -353,11 +359,11 @@ def main(argv=None) -> int:
                 handle.write(codec.decode(target))
             print(json.dumps({"output": str(args.output), "scope": codec.to_dict()["scope"], "target": target.to_dict()}))
             return 0
-        if args.command in {"pilot", "alpha-pool", "full-scalar-pool", "factory-pool", "lfo-pool", "routing-pool", "nested-pool", "expression-pool", "expand-pilot", "benchmark", "codec-check", "train", "evaluate", "evaluate-curve", "compare"}:
+        if args.command in {"pilot", "alpha-pool", "full-scalar-pool", "factory-pool", "lfo-pool", "routing-pool", "nested-pool", "expression-pool", "combined-pool", "expand-pilot", "benchmark", "codec-check", "train", "evaluate", "evaluate-curve", "compare"}:
             from .pilot import PilotPool
             if args.asset_references:
                 raise ValueError("authored pools use their embedded catalog; alpha-pool takes --wavetable-manifest")
-            if args.command in {"pilot", "alpha-pool", "full-scalar-pool", "factory-pool", "lfo-pool", "routing-pool", "nested-pool", "expression-pool", "expand-pilot"}:
+            if args.command in {"pilot", "alpha-pool", "full-scalar-pool", "factory-pool", "lfo-pool", "routing-pool", "nested-pool", "expression-pool", "combined-pool", "expand-pilot"}:
                 parent = PilotPool.load(args.pool) if args.command == "expand-pilot" else None
                 codec = None
                 if args.command == "alpha-pool":
@@ -381,6 +387,9 @@ def main(argv=None) -> int:
                 if args.command == "expression-pool":
                     from .expression_codec import ExpressionCodec
                     codec = ExpressionCodec(json.loads(args.asset_bank.read_text(encoding="utf-8")), json.loads(args.lfo_bank.read_text(encoding="utf-8")))
+                if args.command == "combined-pool":
+                    from .combined_codec import CombinedCodec
+                    codec = CombinedCodec(json.loads(args.asset_bank.read_text(encoding="utf-8")), json.loads(args.lfo_bank.read_text(encoding="utf-8")))
                 pool = parent.expand(args.count) if parent is not None else PilotPool.create(args.count, args.seed, codec=codec)
                 args.output.mkdir(parents=True, exist_ok=False)
                 pool.save(args.output / "pool.json")

@@ -1,0 +1,30 @@
+# Combined control and asset curriculum
+
+The combined codec authors sampler, oscillator, voice, filter, envelope, modulator, effect and ordered-connection behavior together. It retains the original authored LFOs, mapping curves, custom curves and uint32 seeds. Static coverage across the frozen 205 training roots rises from 214 to 769 varied scalar controls. Six controls stay fixed: global bypass for non-silent eligibility, stored tempo because the host performance supplies the clock, and four display controls. Native qualification and bounded training still need to pass before this curriculum is qualified.
+
+Every scalar has a serialized sampling policy, including its choices or raw bounds. This is a bounded initial curriculum, not a claim that every range, mode combination or graph is covered. Polyphony is sampled from 1/4/8, unison from 1/2/4/8 and oversampling from 0/1 for the free local CPU budget. Model heads retain other supported values where appropriate; useful prediction beyond the sampled domain is unqualified. The new codec has its own identity. Earlier codecs and saved artifacts retain their source policies.
+
+The four source scenes cover oscillators, sampler, hybrid synthesis and dense combinations of all modules/effects. Every registered wavetable and sample is available. Original connected slots and positional amount references remain intact; additional sources occupy empty slots. Dense scenes fill all 64 slots and cycle through the complete declared modulation-destination vocabulary. All 32 named sources are represented. Supervision masks still express declared eligibility rather than proven audibility for every combination.
+
+The training contract explicitly budgets a four-second release/effect tail. The previous two-second default stays unchanged, and legacy profiles refuse the extension. Recipes reconstruct the complete contract including the declared tail; changing other format, renderer or split fields still fails verification. Audio remains in memory and is rendered during training. Replay stores only bounded features and original-source labels.
+
+## Native routing and repeatability
+
+The installed Vital build accepts destination values 5–14 in saved state but produces exact silence for isolated oscillators or sampler sent there, including with every effect enabled. A fifty-attempt diagnostic tests values 0–14 with all nine effects enabled and 5–14 with them disabled. The published [routing implementation](https://github.com/mtytel/vital/blob/636ca0ef517a4db087a6a08a6a8a5e704e21f836/src/synthesis/modules/producers_module.cpp) only forwards the five standard destinations; this older source is explanatory, while the installed-binary measurements establish current behavior. The new codec uses the five functioning destination values and excludes the inactive choices from its prediction heads. It does not relabel imported values. All nine effect families remain available through the ordinary effect chain. Other profiles retain their raw metadata domains.
+
+Correctness checks fix all three oscillator random phases and sampler random phase while preserving the musical phase knobs and other requested state. Random modulators also carry process-scoped generator state. A diagnostic on a combined source shows that reused processes differ, whereas fresh processes reproduce the complete requested random routing exactly. Full qualification must therefore verify phase-controlled fresh-process repeats with those sources still active. Actual training preserves its requested random controls and may use bounded worker reuse.
+
+Initial failed checks are retained. The first four-scene probe accepted only one source pair because the destination metadata included inactive buses. After correcting that source domain, the first 103-attempt panel accepted 101 attempts, rejected one quiet source twice, and exposed reused-process random-state differences. It passed original-label and family-effect checks. Neither failed run qualifies the final curriculum.
+
+## Run locally
+
+```powershell
+python research/training/run.py combined-pool --asset-bank research/training/outputs/factory-bank/bank.json --lfo-bank research/training/outputs/lfo-bank-check/bank.json --output research/training/outputs/combined --count 256
+python research/training/reports/scripts/audit_capabilities.py --pool research/training/outputs/combined/pool.json --output research/training/outputs/combined-coverage
+python research/training/reports/scripts/run_combined_check.py --pool research/training/outputs/combined/pool.json --output research/training/outputs/combined-native
+python research/training/reports/scripts/run_combined_integration.py --pool research/training/outputs/combined/pool.json --native-qualification research/training/outputs/combined-native --output research/training/outputs/combined-integration
+```
+
+The native runner checks all registered choices in combined contexts, fixed-phase repeats and audible interventions for every effect family, sampler content, voice/polyphony, portamento, LFO/random playback and a secondary envelope. The integration plans 64 retained examples from distinct training states, all eight reference performances and twelve CPU updates. It saves update six and resumes it against the uninterrupted run using the same retained audio features, checking model, optimizer, RNG, replay and cursor equality without new renders. This proves ingestion/recovery, not useful sound reconstruction.
+
+Keep final-test audio reserved and GitHub Actions disabled. Free local CPU is the qualified platform so far; Linux/Colab remains open. Input-layout gaps including one-point curves, broader range/combination coverage, corpus eligibility, scaling beyond the frozen roots, useful quality and release gates remain open in the [completion ledger](IMPLEMENTATION_STATUS.md).
