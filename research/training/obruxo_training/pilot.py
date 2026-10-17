@@ -158,7 +158,7 @@ class PilotSampler:
             raise ValueError("invalid pilot sampling policy")
         if split == "train" and role != "reference":
             raise ValueError("transfer performances are reserved for held-out evaluation")
-        if policy not in {"pairs", "state_round_robin", "paired_views", "performance_round_robin"}:
+        if policy not in {"pairs", "state_round_robin", "paired_views", "performance_round_robin", "attack_compatible"}:
             raise ValueError("unknown pilot sampling policy")
         self.pool, self.split, self.role, self.seed = pool, split, role, seed
         self.policy = policy
@@ -170,9 +170,18 @@ class PilotSampler:
         self._ledger = SplitLedger(pool.manifest)
         self._epoch, self._order = None, []
         rule = {"pairs": "shuffled_pilot_pairs_v1", "state_round_robin": "shuffled_states_rotating_performances_v1",
-                "paired_views": "adjacent_state_views_rotating_performances_v1", "performance_round_robin": "complete_performance_sweeps_rotating_shuffled_states_v1"}[policy]
-        self.sampler_id = canonical_sha256({"sampler": rule, "pool_id": pool.pool_id,
-                                           "split": split, "role": role, "seed": seed})
+                "paired_views": "adjacent_state_views_rotating_performances_v1", "performance_round_robin": "complete_performance_sweeps_rotating_shuffled_states_v1",
+                "attack_compatible": "shuffled_states_rotating_attack_compatible_performances_v1"}[policy]
+        self._eligible = None
+        descriptor = {"sampler": rule, "pool_id": pool.pool_id, "split": split, "role": role, "seed": seed}
+        if policy == "attack_compatible":
+            from .performance_eligibility import eligible, rule_document
+            self._eligible = {entry.state_id: tuple(index for index, performance in enumerate(self._performances)
+                              if eligible(pool.codec, entry.target, performance.performance())) for entry in self._entries}
+            if any(not choices for choices in self._eligible.values()):
+                raise ValueError("a selected state has no performance long enough for its amplitude attack")
+            descriptor["performance_eligibility"] = rule_document()
+        self.sampler_id = canonical_sha256(descriptor)
 
     @property
     def epoch_size(self) -> int:
@@ -187,6 +196,9 @@ class PilotSampler:
                 self._order = [(entry, performance) for entry in self._entries for performance in self._performances]
             elif self.policy == "state_round_robin":
                 self._order = [(entry, self._performances[(index + epoch) % len(self._performances)])
+                               for index, entry in enumerate(self._entries)]
+            elif self.policy == "attack_compatible":
+                self._order = [(entry, self._performances[self._eligible[entry.state_id][(index + epoch) % len(self._eligible[entry.state_id])]])
                                for index, entry in enumerate(self._entries)]
             elif self.policy == "performance_round_robin":
                 states = list(self._entries)

@@ -12,6 +12,8 @@ The [combined recipe matrix](COMBINED_COVERAGE.md) audits the complete training 
 
 The [combined curriculum](COMBINED_CURRICULUM.md) now varies 769 scalar controls, all registered asset choices and all synthesis families, retaining original source curves and frozen ancestry. Its [completed native and pipeline checks](reports/COMBINED_CURRICULUM_RESULTS.md) include exact phase-controlled repeats, 64 distinct training states and exact checkpoint recovery. Range/graph coverage, source robustness, useful quality and release remain open.
 
+The [attack-compatible sampler](SOURCE_PERFORMANCE_SAMPLING.md) selects reference notes long enough for each patch's amplitude attack without changing its controls. Native QA still rejects silent combinations; all training states remain in the schedule.
+
 The [full scalar training path](FULL_SCALAR_TRAINING.md) connects all 775 scalar fields to bounded audio-only learning, legal effect-order and pitch-mask outputs, modern render recipes and inference export. Nested assets, curves, seeds and connections remain explicitly fixed in this increment; learned structured coverage follows.
 
 The [full-preset render profile](FULL_RENDER_PROFILE.md) adds an explicit path for all 775 controls and six nested structures in the reviewed 1.5.5 inventory. It checks the broader native state before broader model training; existing pilot and alpha artifacts retain their identities.
