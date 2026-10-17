@@ -57,22 +57,22 @@ def bank_document() -> dict:
 
 
 def bank_for(renderer_id):
-    from obruxo_data.render.base import FULL_CURVE_RENDERER_ID, FULL_EXPRESSION_RENDERER_ID
-    if renderer_id in {FULL_EXPRESSION_RENDERER_ID, FULL_CURVE_RENDERER_ID}:
+    from obruxo_data.render.base import FULL_CORPUS_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_EXPRESSION_RENDERER_ID
+    if renderer_id in {FULL_EXPRESSION_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_CORPUS_RENDERER_ID}:
         from .expression_bank import expression_bank
         return expression_bank()
     return initial_bank()
 
 
 def bank_document_for(renderer_id):
-    from obruxo_data.render.base import FULL_CURVE_RENDERER_ID, FULL_EXPRESSION_RENDERER_ID
-    if renderer_id in {FULL_EXPRESSION_RENDERER_ID, FULL_CURVE_RENDERER_ID}:
+    from obruxo_data.render.base import FULL_CORPUS_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_EXPRESSION_RENDERER_ID
+    if renderer_id in {FULL_EXPRESSION_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_CORPUS_RENDERER_ID}:
         from .expression_bank import expression_bank_document
         return expression_bank_document()
     return bank_document()
 
 
 def capabilities_for(renderer_id):
-    from obruxo_data.render.base import FULL_CURVE_RENDERER_ID, FULL_EXPRESSION_RENDERER_ID
+    from obruxo_data.render.base import FULL_CORPUS_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_EXPRESSION_RENDERER_ID
     from obruxo_data.render.capabilities import EXPRESSION_CAPABILITIES
-    return EXPRESSION_CAPABILITIES if renderer_id in {FULL_EXPRESSION_RENDERER_ID, FULL_CURVE_RENDERER_ID} else CAPABILITIES
+    return EXPRESSION_CAPABILITIES if renderer_id in {FULL_EXPRESSION_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_CORPUS_RENDERER_ID} else CAPABILITIES
