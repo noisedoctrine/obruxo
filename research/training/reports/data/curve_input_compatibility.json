@@ -1,0 +1,11 @@
+{
+  "codec_id": "515537f08c42a1827e65742174a919ba4048dc18ae339048a1a90f4732789ea5",
+  "final_test_audio": false,
+  "initial_source_snapshot": "10bd631f60f41e8e76e2739af15ee8f04f327843",
+  "lfo_bank_id": "2aac62a02d780ee330173c1e1f3cbf5b282c9cf5c7ee17d0d638148f72cc0c31",
+  "model_promotion": false,
+  "parent_codec_id": "9f183fc14324940fe80cecb7aae7494a596880ec70059f3e1348a180cf2303b7",
+  "pool_id": "b90930125f136cc6816f4e0f0c56cba4a23d3a5efda582a1e096768b5ad54383",
+  "raw_pool_sha256": "24b030677639a26796c263477e49a80e63fa95bd9e2625ab44071fee8f884256",
+  "unchanged_parent_matches_prior_qualification": true
+}

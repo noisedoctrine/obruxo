@@ -1,0 +1,648 @@
+{
+  "accepted": 144,
+  "attempted": 144,
+  "audio_files_written": 0,
+  "checks": [
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "lfo_1_mode_None_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "lfo",
+      "rms": 0.000648540484392921,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "lfo_1_mode_None_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "lfo",
+      "rms": 0.0006486007493547037,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "lfo_2_mode_None_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "lfo",
+      "rms": 0.000648540484392921,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "lfo_2_mode_None_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "lfo",
+      "rms": 0.0006486007493547037,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "lfo_3_mode_None_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "lfo",
+      "rms": 0.000648540484392921,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "lfo_3_mode_None_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "lfo",
+      "rms": 0.0006486007493547037,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "lfo_4_mode_None_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "lfo",
+      "rms": 0.000648540484392921,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "lfo_4_mode_None_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "lfo",
+      "rms": 0.0006486007493547037,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "lfo_5_mode_None_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "lfo",
+      "rms": 0.000648540484392921,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "lfo_5_mode_None_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "lfo",
+      "rms": 0.0006486007493547037,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "lfo_6_mode_None_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "lfo",
+      "rms": 0.000648540484392921,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "lfo_6_mode_None_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "lfo",
+      "rms": 0.0006486007493547037,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "lfo_7_mode_None_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "lfo",
+      "rms": 0.000648540484392921,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "lfo_7_mode_None_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "lfo",
+      "rms": 0.0006486007493547037,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "lfo_8_mode_None_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "lfo",
+      "rms": 0.000648540484392921,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "lfo_8_mode_None_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "lfo",
+      "rms": 0.0006486007493547037,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "mapping_1_mode_None_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "mapping",
+      "rms": 0.0006486046399151376,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "mapping_1_mode_None_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "mapping",
+      "rms": 0.0006486048886114175,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "mapping_32_mode_None_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "mapping",
+      "rms": 0.0006486046399151376,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "mapping_32_mode_None_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "mapping",
+      "rms": 0.0006486048886114175,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "mapping_64_mode_None_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "mapping",
+      "rms": 0.0006486046399151376,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "mapping_64_mode_None_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "mapping",
+      "rms": 0.0006486048886114175,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_1_mode_13_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.0007852374694730226,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_1_mode_13_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.00039261866135624523,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_1_mode_14_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.0005801291927850201,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_1_mode_14_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.0002900645946291648,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_1_mode_15_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.0005801291991422524,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_1_mode_15_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.0002900645651323525,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_2_mode_13_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.0007852374694730226,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_2_mode_13_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.00039261866135624523,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_2_mode_14_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.0005801291927850201,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_2_mode_14_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.0002900645946291648,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_2_mode_15_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.0005801291991422524,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_2_mode_15_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.0002900645651323525,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_3_mode_13_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.0007852374694730226,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_3_mode_13_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.00039261866135624523,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_3_mode_14_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.0005801291927850201,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_3_mode_14_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.0002900645946291648,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_3_mode_15_y_0.2",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.0005801291991422524,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "applied_structure_verified": true,
+      "audio_qa_as_declared": true,
+      "case": "warp_3_mode_15_y_0.8",
+      "change_ledger_exact": true,
+      "exact_audio_equivalence": true,
+      "family": "warp",
+      "rms": 0.0002900645651323525,
+      "source_preserved": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    }
+  ],
+  "elapsed_seconds": 339.44279650000135,
+  "errors": 0,
+  "final_test_audio": false,
+  "gates": {
+    "all_attempts_accounted": true,
+    "exact_applied_state_and_change_ledger": true,
+    "exact_native_equivalence_and_repeats": true,
+    "finite_audio_and_declared_qa": true,
+    "memory_bounded": true,
+    "original_source_preserved": true,
+    "source_unchanged": true
+  },
+  "model_promotion": false,
+  "passed": true,
+  "peak_process_rss_bytes": 418848768,
+  "plan_sha256": "d84018e655e476d9d37044e110893cc3e905bd067fe90362b3dea65078163ae1",
+  "rejected": 0
+}

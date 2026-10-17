@@ -1,0 +1,44 @@
+{
+  "accepted": 7,
+  "attempted": 9,
+  "audio_files_written": 0,
+  "checks": [
+    {
+      "expected_outcomes": true,
+      "family": "lfo",
+      "statuses": [
+        "error",
+        "accepted",
+        "error"
+      ]
+    },
+    {
+      "expected_outcomes": true,
+      "family": "mapping",
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "expected_outcomes": true,
+      "family": "warp",
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    }
+  ],
+  "expected_errors": 2,
+  "final_test_audio": false,
+  "gates": {
+    "all_attempts_accounted": true,
+    "expected_failure_and_positive_controls": true,
+    "source_unchanged": true
+  },
+  "model_promotion": false,
+  "passed": true,
+  "plan_sha256": "2747163d57fa32f10dd27796e56fe0ae1f83198157edbdddde6b35909fd4f752"
+}

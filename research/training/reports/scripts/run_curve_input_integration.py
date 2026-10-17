@@ -38,7 +38,7 @@ def main():
     pool = PilotPool.load(args.pool)
     if not isinstance(pool.codec, CurveInputCodec):
         raise ValueError("integration requires an original singleton-source pool")
-    config = TrainConfig(steps=3, replay_capacity=16, replay_mib=8, batch_size=4, render_budget=64,
+    config = TrainConfig(steps=3, replay_capacity=16, replay_mib=8, batch_size=16, render_budget=64,
                          checkpoint_every=1, cpu_threads=4, sampling_policy="attack_compatible")
     stream = StreamConfig(prefetch_clips=1, worker_jobs=4)
     files = [Path(__file__), *(RESEARCH / "training/obruxo_training").glob("*.py"),
@@ -72,14 +72,25 @@ def main():
     families = {change["path"].split("/")[2] for change in changes if change["singleton_expanded"]}
     event_by_sequence = {event["sequence_id"]: event for event in events}
     source_checks = []
+    active_counts = {family: 0 for family in ("lfos", "modulations", "custom_warps")}
     for item in left["replay"]:
         request = sampler.recipe_at(item["sequence_id"]).render_request()
         native = event_by_sequence[item["sequence_id"]]["renderer_qa"]["native_state"]
         applied, ledger = prepare_curve_inputs(json.loads(request.preset_json))
+        target = next(entry.target for entry in pool.entries if entry.state_id == item["state_id"])
+        flags = {"lfos": pool.codec.active_lfos(target), "modulations": pool.codec.active_route_maps(target), "custom_warps": pool.codec.active_warps(target)}
+        supervised = []
+        for change in ledger:
+            if not change["singleton_expanded"]:
+                continue
+            _, _, family, position, *_ = change["path"].split("/")
+            enabled = bool(flags[family][int(position)])
+            active_counts[family] += enabled
+            supervised.append(enabled)
         source_checks.append({"sequence_id": item["sequence_id"], "original_source_exact":
             native["requested_preset_sha256"] == hashlib.sha256(request.preset_json.encode()).hexdigest(),
             "applied_source_exact": native["applied_preset_sha256"] == hashlib.sha256(canonical_json(applied).encode()).hexdigest(),
-            "ledger_exact": native["curve_changes"] == ledger})
+            "ledger_exact": native["curve_changes"] == ledger, "all_singletons_supervised": all(supervised)})
 
     def equal(a, b):
         if torch.is_tensor(a):
@@ -95,6 +106,8 @@ def main():
     gates = {"complete": full["complete"] and recovered["complete"], "all_curve_families_consumed": families == {"lfos", "modulations", "custom_warps"},
              "distinct_training_states": full["replay_distinct_states"] == 16,
              "original_raw_sources_and_labels": all(row["original_source_exact"] and row["applied_source_exact"] and row["ledger_exact"] for row in source_checks),
+             "all_singleton_families_actively_sampled": all(active_counts.values()) and all(row["all_singletons_supervised"] for row in source_checks)
+                 and all(item["uses"] == config.steps for item in left["replay"]),
              "audio_only_inputs": all(set(item["features"]) == {"timbre", "pitch"} for item in left["replay"]),
              "exact_recovery": all(equal(left[key], right[key]) for key in ("model", "optimizer", "rng", "batch_rng", "replay", "cursor")),
              "no_recovery_renders": recovered["fresh_accepted_this_segment"] == 0,
@@ -103,7 +116,8 @@ def main():
              "source_unchanged": sources() == plan["source_sha256_lf"],
              "memory_bounded": peak > 0 and peak <= plan["rss_limit_bytes"] and full["rss_sampling_errors"] == recovered["rss_sampling_errors"] == 0}
     summary = {"plan_sha256": canonical_sha256(plan), "passed": all(gates.values()), "gates": gates, "training": full, "recovery": recovered,
-               "singleton_families_consumed": sorted(families), "source_checks": source_checks, "peak_process_tree_rss_bytes": peak,
+               "singleton_families_consumed": sorted(families), "active_singletons_by_family": active_counts,
+               "source_checks": source_checks, "peak_process_tree_rss_bytes": peak,
                "final_test_audio": False, "model_promotion": False}
     write_json(args.output / "summary.json", summary)
     print(json.dumps({"passed": summary["passed"], "gates": gates}), flush=True)

@@ -105,6 +105,9 @@ def test_codec_and_pool_roundtrip_preserve_original_singleton_sources_and_old_ba
         seen.update(change["path"].split("/")[2] for change in changes)
         assert source_codec.encode(raw) == entry.target
         assert source_codec.parent.encode(canonical_json(applied).encode()) == entry.target
+        active = {"lfos": source_codec.active_lfos(entry.target), "custom_warps": source_codec.active_warps(entry.target),
+                  "modulations": source_codec.active_route_maps(entry.target)}
+        assert all(active[change["path"].split("/")[2]][int(change["path"].split("/")[3])] for change in changes if change["singleton_expanded"])
         for family, method in (("lfos", "source_curves"), ("custom_warps", "source_warp_curves")):
             values = getattr(source_codec, method)(raw)
             for slot, shape in enumerate(original["settings"][family]):

@@ -1,0 +1,88 @@
+{
+  "attempted": 30,
+  "audio_files_written": 0,
+  "checks": [
+    {
+      "accepted": true,
+      "case": "lfo_8_mode_None_y_0.2_smooth_False",
+      "exact_audio_equivalence": true,
+      "ledger_exact": true,
+      "precision_only": true
+    },
+    {
+      "accepted": true,
+      "case": "lfo_8_mode_None_y_0.2_smooth_True",
+      "exact_audio_equivalence": true,
+      "ledger_exact": true,
+      "precision_only": true
+    },
+    {
+      "accepted": true,
+      "case": "mapping_64_mode_None_y_0.2_smooth_False",
+      "exact_audio_equivalence": true,
+      "ledger_exact": true,
+      "precision_only": true
+    },
+    {
+      "accepted": true,
+      "case": "mapping_64_mode_None_y_0.2_smooth_True",
+      "exact_audio_equivalence": true,
+      "ledger_exact": true,
+      "precision_only": true
+    },
+    {
+      "accepted": true,
+      "case": "warp_1_mode_13_y_0.2_smooth_False",
+      "exact_audio_equivalence": true,
+      "ledger_exact": true,
+      "precision_only": true
+    },
+    {
+      "accepted": true,
+      "case": "warp_1_mode_13_y_0.2_smooth_True",
+      "exact_audio_equivalence": true,
+      "ledger_exact": true,
+      "precision_only": true
+    },
+    {
+      "accepted": true,
+      "case": "warp_1_mode_14_y_0.2_smooth_False",
+      "exact_audio_equivalence": true,
+      "ledger_exact": true,
+      "precision_only": true
+    },
+    {
+      "accepted": true,
+      "case": "warp_1_mode_14_y_0.2_smooth_True",
+      "exact_audio_equivalence": true,
+      "ledger_exact": true,
+      "precision_only": true
+    },
+    {
+      "accepted": true,
+      "case": "warp_1_mode_15_y_0.2_smooth_False",
+      "exact_audio_equivalence": true,
+      "ledger_exact": true,
+      "precision_only": true
+    },
+    {
+      "accepted": true,
+      "case": "warp_1_mode_15_y_0.2_smooth_True",
+      "exact_audio_equivalence": true,
+      "ledger_exact": true,
+      "precision_only": true
+    }
+  ],
+  "elapsed_seconds": 78.05292569999983,
+  "final_test_audio": false,
+  "gates": {
+    "all_accepted": true,
+    "all_attempts_accounted": true,
+    "exact_audio_equivalence_and_repeats": true,
+    "precision_only_and_exact_ledger": true,
+    "source_unchanged": true
+  },
+  "model_promotion": false,
+  "passed": true,
+  "plan_sha256": "24e6a4c92784ffcf518dcb200265e87b1ed5ad3aede6369fc7bc9a7aa0bc6873"
+}
