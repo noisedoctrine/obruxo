@@ -1,0 +1,361 @@
+{
+  "audio_files_written": 0,
+  "codec_id": "9f183fc14324940fe80cecb7aae7494a596880ec70059f3e1348a180cf2303b7",
+  "context_interventions": {
+    "artifact_sha256": "c917ee6a80f5ff1258f8754c457cd9726dcf60d9a480bf0c75bef0e2ef8009a0",
+    "checks": [
+      {
+        "peak": 0.0,
+        "request_id": "ddd76f3d0bc33385f53d9372a528b904c341f24ed20596b2ac866a052b33bd0a",
+        "rms": 0.0,
+        "sequence": 6,
+        "status": "rejected",
+        "variant": "original_held"
+      },
+      {
+        "peak": 0.004119299817830324,
+        "request_id": "e602eb2ea36c5c28d4aece0db2640358271e2884e27a5417fc4c54993c7a5a36",
+        "rms": 5.048017916197837e-05,
+        "sequence": 6,
+        "status": "accepted",
+        "variant": "low_register"
+      },
+      {
+        "peak": 0.0,
+        "request_id": "30f5011a7a64dc8c71ceae4d29e373fd6d69287a511082baf43d9b52c3222485",
+        "rms": 0.0,
+        "sequence": 6,
+        "status": "rejected",
+        "variant": "high_frame"
+      },
+      {
+        "peak": 0.003366390010342002,
+        "request_id": "f240fa45980f8c674f74a57f2da77fca20a79847371a0f8c2e22206f29e23afc",
+        "rms": 4.915797558553761e-05,
+        "sequence": 6,
+        "status": "accepted",
+        "variant": "low_register_high_frame"
+      },
+      {
+        "peak": 0.0004164409765508026,
+        "request_id": "e9deba2ce849d469ae49c52f8fd32493df45e396d806e8fc9b8b02afaec8827a",
+        "rms": 6.616362796713645e-06,
+        "sequence": 6,
+        "status": "accepted",
+        "variant": "highpass_quarter"
+      },
+      {
+        "peak": 0.0,
+        "request_id": "a19ecba83d7b8c71a18b832621043a7ff944d580ddadc06438ea0674122cae97",
+        "rms": 0.0,
+        "sequence": 15,
+        "status": "rejected",
+        "variant": "original_held"
+      },
+      {
+        "peak": 2.6420096665979997e-10,
+        "request_id": "fa45dbe378b8c075aa3fca5237cc60e382efa29f871073cb10eb9684e26ec394",
+        "rms": 5.9263078029634945e-12,
+        "sequence": 15,
+        "status": "rejected",
+        "variant": "low_register"
+      },
+      {
+        "peak": 0.0,
+        "request_id": "9324ce4b074ec03f3e833d450f03cb910848c299b772de975beaa3041d329722",
+        "rms": 0.0,
+        "sequence": 15,
+        "status": "rejected",
+        "variant": "high_frame"
+      },
+      {
+        "peak": 1.2027354112653654e-10,
+        "request_id": "feaf7cbe2244bccd7f73f6a0c935d29112f357c75f2c72ec9c5a578c8c2073b5",
+        "rms": 5.1591981040288734e-12,
+        "sequence": 15,
+        "status": "rejected",
+        "variant": "low_register_high_frame"
+      },
+      {
+        "peak": 0.0005675832508131862,
+        "request_id": "be9a077c8d7645408b111995a9b607275b010c844706a467f6085ed44ed92d52",
+        "rms": 3.40621230432073e-05,
+        "sequence": 15,
+        "status": "accepted",
+        "variant": "highpass_quarter"
+      },
+      {
+        "peak": 0.0007121609523892403,
+        "request_id": "178809a58c84a16e02ead75cc006507c13e165086bdd6b5e57c3f78f8898356b",
+        "rms": 1.3342757949712857e-05,
+        "sequence": 45,
+        "status": "accepted",
+        "variant": "original_held"
+      },
+      {
+        "peak": 3.9448252209695056e-05,
+        "request_id": "af68e5c3ce7f70753e707d5f9895f9d2ad9a664f60c63fe391e007eb9f82599e",
+        "rms": 5.960842800759213e-07,
+        "sequence": 45,
+        "status": "rejected",
+        "variant": "low_register"
+      },
+      {
+        "peak": 3.9448252209695056e-05,
+        "request_id": "101dceb867b72cb99a46795b4b6a3c219ded693f9d14aa36bbfee01d87a346d5",
+        "rms": 5.960842800759213e-07,
+        "sequence": 45,
+        "status": "rejected",
+        "variant": "high_frame"
+      },
+      {
+        "peak": 3.9448252209695056e-05,
+        "request_id": "5b7abdc545f80321324bd9f144909c82d645c6cc2e46178a5079519a4df9cb14",
+        "rms": 5.960842800759213e-07,
+        "sequence": 45,
+        "status": "rejected",
+        "variant": "low_register_high_frame"
+      },
+      {
+        "peak": 3.9448252209695056e-05,
+        "request_id": "f3231f7a7f982113eeb743198d0635dc4f244ab5950bfa26fc23a5e438a5feff",
+        "rms": 5.960842800759213e-07,
+        "sequence": 45,
+        "status": "rejected",
+        "variant": "highpass_quarter"
+      }
+    ]
+  },
+  "control_interventions": {
+    "artifact_sha256": "05c4771768c8ccfa6a3fa3ed973d2d9f920e9aedba1e6c0fc97755f503128b0d",
+    "checks": [
+      {
+        "peak": 0.0,
+        "request_id": "91c69fcf4c38bca7a443ebae761c70a444970e91036804f427e499493270ae64",
+        "rms": 0.0,
+        "sequence_id": 6,
+        "source_mpe_enabled": 0.0,
+        "status": "rejected",
+        "variant": "baseline"
+      },
+      {
+        "peak": 0.0005918644019402564,
+        "request_id": "2e63b3ed49561ac47cc6fdd369183cbfe8dce56ffcf1e3e72e102ed1cb601790",
+        "rms": 8.135600484992806e-06,
+        "sequence_id": 6,
+        "source_mpe_enabled": 0.0,
+        "status": "accepted",
+        "variant": "spectral_off"
+      },
+      {
+        "peak": 0.0005759225459769368,
+        "request_id": "168675cc09a0d8ee72117e781aba3a646ef422c8973596451d7b585837db6e4b",
+        "rms": 7.973988350225971e-06,
+        "sequence_id": 6,
+        "source_mpe_enabled": 0.0,
+        "status": "accepted",
+        "variant": "spectral_amount_low"
+      },
+      {
+        "peak": 0.0,
+        "request_id": "e317ca4ae9fcb86c4bf3f83bccd957383551d6833aebdfb04f5022ef1ee30bf7",
+        "rms": 0.0,
+        "sequence_id": 6,
+        "source_mpe_enabled": 0.0,
+        "status": "rejected",
+        "variant": "no_filtering"
+      },
+      {
+        "peak": 0.0,
+        "request_id": "bc4881a92658c610a5ebd27cf443940a589153c69713927cbdb229eb6c855fbe",
+        "rms": 0.0,
+        "sequence_id": 6,
+        "source_mpe_enabled": 0.0,
+        "status": "rejected",
+        "variant": "no_matrix"
+      },
+      {
+        "peak": 0.0,
+        "request_id": "2fff93680ee22443b1ca004c43e81b69b4e6d7fc57f13487fe339b1f75de5643",
+        "rms": 0.0,
+        "sequence_id": 6,
+        "source_mpe_enabled": 0.0,
+        "status": "rejected",
+        "variant": "stereo_default"
+      },
+      {
+        "peak": 0.0,
+        "request_id": "769b6cc4f91866b378c99aeb2b1d478e1f31159eb376c5c78b7719767c9755e3",
+        "rms": 0.0,
+        "sequence_id": 6,
+        "source_mpe_enabled": 0.0,
+        "status": "rejected",
+        "variant": "envelope_fast"
+      },
+      {
+        "peak": 0.0,
+        "request_id": "7b48b5bb258d6775ad773f20e82786479b45fc930ac8f87be3063f9736e2fe2b",
+        "rms": 0.0,
+        "sequence_id": 6,
+        "source_mpe_enabled": 0.0,
+        "status": "rejected",
+        "variant": "mpe_flip"
+      },
+      {
+        "peak": 0.0,
+        "request_id": "c0c6aac3639734a1759ce1b0cebece6c64e30a5cd6ba2bf6b60c6ba1b93314d9",
+        "rms": 0.0,
+        "sequence_id": 15,
+        "source_mpe_enabled": 1.0,
+        "status": "rejected",
+        "variant": "baseline"
+      },
+      {
+        "peak": 0.0005675832508131862,
+        "request_id": "de64235bf423ebebed610e30563a589a311aaa8b617a0a1dd0698b99214d1223",
+        "rms": 3.406212303198679e-05,
+        "sequence_id": 15,
+        "source_mpe_enabled": 1.0,
+        "status": "accepted",
+        "variant": "spectral_off"
+      },
+      {
+        "peak": 0.0005675832508131862,
+        "request_id": "b6c072b402108154b1fa65daa23329e1dadf402dd1b016726b3e861aa4f7de6d",
+        "rms": 3.4062123044769754e-05,
+        "sequence_id": 15,
+        "source_mpe_enabled": 1.0,
+        "status": "accepted",
+        "variant": "spectral_amount_low"
+      },
+      {
+        "peak": 0.0,
+        "request_id": "87c50dc49598a804ee46bbd0bc3009597bb752fe59a4d89e48ea95802fa9a974",
+        "rms": 0.0,
+        "sequence_id": 15,
+        "source_mpe_enabled": 1.0,
+        "status": "rejected",
+        "variant": "no_filtering"
+      },
+      {
+        "peak": 0.0,
+        "request_id": "a6ab70168c4c207f22ce465d9e172e17be4f3504d2b431125c3cd86c76c94d21",
+        "rms": 0.0,
+        "sequence_id": 15,
+        "source_mpe_enabled": 1.0,
+        "status": "rejected",
+        "variant": "no_matrix"
+      },
+      {
+        "peak": 0.0,
+        "request_id": "be752f5245f3056338cd7fead62f39fc0f6bcc4a231bc5b8d7da612c6693b8fb",
+        "rms": 0.0,
+        "sequence_id": 15,
+        "source_mpe_enabled": 1.0,
+        "status": "rejected",
+        "variant": "stereo_default"
+      },
+      {
+        "peak": 0.0,
+        "request_id": "5964be46f0da147768224140ebbec16097703ec15bda728c354acb0312c15f48",
+        "rms": 0.0,
+        "sequence_id": 15,
+        "source_mpe_enabled": 1.0,
+        "status": "rejected",
+        "variant": "envelope_fast"
+      },
+      {
+        "peak": 0.0,
+        "request_id": "a8313f2faf70fdda0e2c81db4a867c4f274293081a046090b04cf63ba454e7e2",
+        "rms": 0.0,
+        "sequence_id": 15,
+        "source_mpe_enabled": 1.0,
+        "status": "rejected",
+        "variant": "mpe_flip"
+      },
+      {
+        "peak": 3.9448252209695056e-05,
+        "request_id": "0b5cd487840157111f5b36ea03aea0c0a819ba7a2f7392c73fb6754e6ecddf61",
+        "rms": 5.960842800759213e-07,
+        "sequence_id": 45,
+        "source_mpe_enabled": 1.0,
+        "status": "rejected",
+        "variant": "baseline"
+      },
+      {
+        "peak": 3.9448252209695056e-05,
+        "request_id": "cab3b49fb9c16a6bb8782b9326ec90bab6987a6259ceb9a79ef9de6e66c77c58",
+        "rms": 5.960842800759213e-07,
+        "sequence_id": 45,
+        "source_mpe_enabled": 1.0,
+        "status": "rejected",
+        "variant": "spectral_off"
+      },
+      {
+        "peak": 3.9448252209695056e-05,
+        "request_id": "38244aeb6c6143d829689db6888c0fa0965eb55df7fe88d259088128a1a3e7c9",
+        "rms": 5.960842800759213e-07,
+        "sequence_id": 45,
+        "source_mpe_enabled": 1.0,
+        "status": "rejected",
+        "variant": "spectral_amount_low"
+      },
+      {
+        "peak": 4.502308729570359e-05,
+        "request_id": "26535558533b13e86690b77e51fb237e73c65b4c24a88c9fc09e3a8bc961033a",
+        "rms": 6.634048184807838e-07,
+        "sequence_id": 45,
+        "source_mpe_enabled": 1.0,
+        "status": "rejected",
+        "variant": "no_filtering"
+      },
+      {
+        "peak": 3.943109913961962e-05,
+        "request_id": "434704c6dcb8cc36119ddc7e7ddb854c90381c84b709a9554fad8c146ab715c3",
+        "rms": 5.966971450225358e-07,
+        "sequence_id": 45,
+        "source_mpe_enabled": 1.0,
+        "status": "rejected",
+        "variant": "no_matrix"
+      },
+      {
+        "peak": 3.8811431295471266e-05,
+        "request_id": "e5cfd455a6a76f0620764a198b254f537de263317e695be788e322994efed70f",
+        "rms": 5.960842730066882e-07,
+        "sequence_id": 45,
+        "source_mpe_enabled": 1.0,
+        "status": "rejected",
+        "variant": "stereo_default"
+      },
+      {
+        "peak": 0.007465297356247902,
+        "request_id": "33989539a4f6ef073d05ec257dc3985cd2161af97901413de45151f2df53d883",
+        "rms": 7.845285352791614e-05,
+        "sequence_id": 45,
+        "source_mpe_enabled": 1.0,
+        "status": "accepted",
+        "variant": "envelope_fast"
+      },
+      {
+        "peak": 3.9448252209695056e-05,
+        "request_id": "13c79ceb90095e476f3994284eaa7ff4a8417754790b62ddb607e8b1c7361148",
+        "rms": 5.960842800759213e-07,
+        "sequence_id": 45,
+        "source_mpe_enabled": 1.0,
+        "status": "rejected",
+        "variant": "mpe_flip"
+      }
+    ]
+  },
+  "final_test_audio": false,
+  "phase_control": {
+    "osc_1_random_phase": 0.0,
+    "osc_2_random_phase": 0.0,
+    "osc_3_random_phase": 0.0,
+    "sample_random_phase": 0.0
+  },
+  "pool_id": "bfe52afe8c95e2d90df5fd120d60e4f128bd3508ffca4c37d22f968a03128fb5",
+  "scope": "exploratory_interventions_not_a_model_quality_or_source_population_gate",
+  "source_snapshot": "d51813ec1c1d2234dee7121c060c30768479ae32",
+  "worker_jobs": 1
+}

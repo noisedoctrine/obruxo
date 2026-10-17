@@ -148,7 +148,7 @@ def main(argv=None) -> int:
     train.add_argument("--checkpoint-every", type=int, default=50)
     train.add_argument("--render-budget", type=int, default=512)
     train.add_argument("--cpu-threads", type=int, default=4)
-    train.add_argument("--sampling-policy", choices=("pairs", "state_round_robin", "paired_views", "performance_round_robin"), default="pairs")
+    train.add_argument("--sampling-policy", choices=("pairs", "state_round_robin", "paired_views", "performance_round_robin", "attack_compatible"), default="pairs")
     train.add_argument("--identity-weight", type=float, default=0., help="Weight of paired identity contrastive loss; requires paired_views")
     train.add_argument("--identity-temperature", type=float, default=.1)
     train.add_argument("--conditioning", choices=("concat", "cross_attention"), default="concat")
