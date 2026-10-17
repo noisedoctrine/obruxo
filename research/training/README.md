@@ -1,5 +1,7 @@
 # Training contracts, online pilot and trainer
 
+The [corpus input path](CORPUS_INPUTS.md) now verifies the complete modern snapshot, encodes all 904 eligible training states and preserves silent FM sources through the full destination domain. Its [report](reports/CORPUS_INPUT_RESULTS.md) keeps static eligibility, label compatibility and the outstanding native loading check separate.
+
 The [complete connection curriculum](GRAPH_COVERAGE.md) schedules all 431 destinations under the existing frozen patch families. Its [native and recovery report](reports/GRAPH_COVERAGE_RESULTS.md) separates active labels, observed sound changes and model quality; related variants share one evaluation/bootstrap unit.
 
 The [completion ledger](IMPLEMENTATION_STATUS.md) tracks the remaining training and release work. [Learned factory choices](FACTORY_ASSETS.md) add registered wavetables for all three oscillator slots and registered sampler content. [Train-only Era2 curve assets](LFO_BANK.md) support fitting, saved-code decoding and native reconstruction checks.

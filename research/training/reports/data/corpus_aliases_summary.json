@@ -1,0 +1,35 @@
+{
+  "alias_groups": {
+    "255d958c78358a0b54b58f42e6ca5d7f00183d305c358e32af15f080910a0d1f": [
+      {
+        "split": "train",
+        "state_id": "5109f0c0cdca08be1ea7404d34904d064c42d404b8e4fb75c66bb21e4c51dfd6"
+      },
+      {
+        "split": "train",
+        "state_id": "be57acee27aa86ea4f6ec0fb4d0dcff6f068b85fed764ab1df2d33b2e8f242f7"
+      }
+    ],
+    "699a86e114674fa825ce3fde0216ffc747fabb497048c30a2dbee59af61ce990": [
+      {
+        "split": "train",
+        "state_id": "6e6e05548e1c1a6319d0301556b1c6c2d5452bc5011e0b7317539521db0944e3"
+      },
+      {
+        "split": "train",
+        "state_id": "f0ad9496efd81124f0729e28201d2eeaa831fd936e1c71eab42cec0a58082695"
+      }
+    ]
+  },
+  "cross_split_alias_groups": {},
+  "distinct_programs_before_lossy_encoding": 1151,
+  "elapsed_seconds": 39.183136899999226,
+  "eligible_states": 1153,
+  "final_test_audio": false,
+  "fits_or_renders": false,
+  "passed": true,
+  "plan_sha256": "7dba8d4680b8f93d7263f4925983254d93bc2adaafc8982c823a7e621cfc01c9",
+  "source_presets_modified": false,
+  "source_unchanged": true,
+  "splits_changed": false
+}

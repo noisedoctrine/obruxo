@@ -1,0 +1,1636 @@
+{
+  "bank": "initial_plus_expression_performance_bank_v1",
+  "capabilities": {
+    "channel_pressure": true,
+    "control_changes": [
+      1,
+      64,
+      74
+    ],
+    "max_channels": 16,
+    "note_off_velocity": true,
+    "notes": true,
+    "pitch_bend": true,
+    "polyphony": true,
+    "tempo_changes": false
+  },
+  "entries": [
+    {
+      "name": "held_mid",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              96
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "role": "reference"
+    },
+    {
+      "name": "staccato_mid",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 120
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 600
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 960
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1080
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 1560
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "role": "reference"
+    },
+    {
+      "name": "melody_mid",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              96
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 360
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              96
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 840
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              96
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 960
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1320
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              96
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 1800
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "role": "reference"
+    },
+    {
+      "name": "chord_mid",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              80
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              80
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+      "role": "reference"
+    },
+    {
+      "name": "held_low",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              666667
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              36,
+              64
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              36,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541",
+      "role": "transfer"
+    },
+    {
+      "name": "staccato_high",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              400000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              112
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 180
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              112
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 360
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 540
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              112
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 960
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1140
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              112
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1560
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 1740
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8",
+      "role": "transfer"
+    },
+    {
+      "name": "melody_wide",
+      "performance": {
+        "end_tick": 2040,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              666667
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              48,
+              72
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              72
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 0,
+            "data": [
+              48,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 600
+          },
+          {
+            "channel": 0,
+            "data": [
+              55,
+              72
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 960
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1080
+          },
+          {
+            "channel": 0,
+            "data": [
+              72,
+              72
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              55,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1560
+          },
+          {
+            "channel": 0,
+            "data": [
+              72,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 2040
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b",
+      "role": "transfer"
+    },
+    {
+      "name": "chord_wide",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              400000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              36,
+              112
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              55,
+              112
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              76,
+              112
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              36,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1680
+          },
+          {
+            "channel": 0,
+            "data": [
+              55,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1680
+          },
+          {
+            "channel": 0,
+            "data": [
+              76,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1680
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b",
+      "role": "transfer"
+    },
+    {
+      "name": "expression_gestures_reference",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 1,
+            "data": [
+              60,
+              88
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 120
+          },
+          {
+            "channel": 1,
+            "data": [
+              74,
+              32
+            ],
+            "kind": "control_change",
+            "order": 5,
+            "tick": 240
+          },
+          {
+            "channel": 0,
+            "data": [
+              1,
+              32
+            ],
+            "kind": "control_change",
+            "order": 9,
+            "tick": 360
+          },
+          {
+            "channel": 1,
+            "data": [
+              1024
+            ],
+            "kind": "pitch_bend",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 1,
+            "data": [
+              74,
+              112
+            ],
+            "kind": "control_change",
+            "order": 6,
+            "tick": 720
+          },
+          {
+            "channel": 0,
+            "data": [
+              1,
+              112
+            ],
+            "kind": "control_change",
+            "order": 10,
+            "tick": 840
+          },
+          {
+            "channel": 1,
+            "data": [
+              0
+            ],
+            "kind": "pitch_bend",
+            "order": 4,
+            "tick": 960
+          },
+          {
+            "channel": 1,
+            "data": [
+              96
+            ],
+            "kind": "channel_pressure",
+            "order": 7,
+            "tick": 1080
+          },
+          {
+            "channel": 1,
+            "data": [
+              16
+            ],
+            "kind": "channel_pressure",
+            "order": 8,
+            "tick": 1440
+          },
+          {
+            "channel": 1,
+            "data": [
+              60,
+              72
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1560
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "2de632ba842cc9d219d9199e43138857211536e7865667eb43b60f7354576d95",
+      "role": "reference"
+    },
+    {
+      "name": "expression_poly_expression_reference",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 1,
+            "data": [
+              60,
+              88
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 120
+          },
+          {
+            "channel": 15,
+            "data": [
+              67,
+              88
+            ],
+            "kind": "note_on",
+            "order": 9,
+            "tick": 120
+          },
+          {
+            "channel": 1,
+            "data": [
+              74,
+              32
+            ],
+            "kind": "control_change",
+            "order": 5,
+            "tick": 240
+          },
+          {
+            "channel": 15,
+            "data": [
+              74,
+              32
+            ],
+            "kind": "control_change",
+            "order": 13,
+            "tick": 240
+          },
+          {
+            "channel": 0,
+            "data": [
+              1,
+              32
+            ],
+            "kind": "control_change",
+            "order": 17,
+            "tick": 360
+          },
+          {
+            "channel": 1,
+            "data": [
+              1024
+            ],
+            "kind": "pitch_bend",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 15,
+            "data": [
+              -1024
+            ],
+            "kind": "pitch_bend",
+            "order": 11,
+            "tick": 480
+          },
+          {
+            "channel": 1,
+            "data": [
+              74,
+              112
+            ],
+            "kind": "control_change",
+            "order": 6,
+            "tick": 720
+          },
+          {
+            "channel": 15,
+            "data": [
+              74,
+              112
+            ],
+            "kind": "control_change",
+            "order": 14,
+            "tick": 720
+          },
+          {
+            "channel": 0,
+            "data": [
+              1,
+              112
+            ],
+            "kind": "control_change",
+            "order": 18,
+            "tick": 840
+          },
+          {
+            "channel": 1,
+            "data": [
+              0
+            ],
+            "kind": "pitch_bend",
+            "order": 4,
+            "tick": 960
+          },
+          {
+            "channel": 15,
+            "data": [
+              0
+            ],
+            "kind": "pitch_bend",
+            "order": 12,
+            "tick": 960
+          },
+          {
+            "channel": 1,
+            "data": [
+              96
+            ],
+            "kind": "channel_pressure",
+            "order": 7,
+            "tick": 1080
+          },
+          {
+            "channel": 15,
+            "data": [
+              96
+            ],
+            "kind": "channel_pressure",
+            "order": 15,
+            "tick": 1080
+          },
+          {
+            "channel": 1,
+            "data": [
+              16
+            ],
+            "kind": "channel_pressure",
+            "order": 8,
+            "tick": 1440
+          },
+          {
+            "channel": 15,
+            "data": [
+              16
+            ],
+            "kind": "channel_pressure",
+            "order": 16,
+            "tick": 1440
+          },
+          {
+            "channel": 1,
+            "data": [
+              60,
+              72
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1560
+          },
+          {
+            "channel": 15,
+            "data": [
+              67,
+              72
+            ],
+            "kind": "note_off",
+            "order": 10,
+            "tick": 1560
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "1db6623be3538173dabd8a88470041f297ffa420f69fadb4939fa193f8b2faf2",
+      "role": "reference"
+    },
+    {
+      "name": "expression_sustain_reference",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 1,
+            "data": [
+              60,
+              88
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 120
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              127
+            ],
+            "kind": "control_change",
+            "order": 7,
+            "tick": 240
+          },
+          {
+            "channel": 1,
+            "data": [
+              60,
+              48
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 360
+          },
+          {
+            "channel": 2,
+            "data": [
+              64,
+              88
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 360
+          },
+          {
+            "channel": 2,
+            "data": [
+              64,
+              48
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 600
+          },
+          {
+            "channel": 3,
+            "data": [
+              67,
+              88
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 600
+          },
+          {
+            "channel": 3,
+            "data": [
+              67,
+              48
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 840
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              0
+            ],
+            "kind": "control_change",
+            "order": 8,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "3d6da9f4d1fddcde3719378bce14ef89f2f3441d0d0d4e9262124188cc019fde",
+      "role": "reference"
+    },
+    {
+      "name": "expression_release_reference",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 1,
+            "data": [
+              60,
+              88
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 120
+          },
+          {
+            "channel": 1,
+            "data": [
+              60,
+              16
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 420
+          },
+          {
+            "channel": 2,
+            "data": [
+              64,
+              88
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 600
+          },
+          {
+            "channel": 2,
+            "data": [
+              64,
+              64
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 900
+          },
+          {
+            "channel": 3,
+            "data": [
+              68,
+              88
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 1080
+          },
+          {
+            "channel": 3,
+            "data": [
+              68,
+              112
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1380
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "068dbe3df4e54f3d85d9b5b3bf171f7f576d00f7a32ba4e54ee40e94aa0d89eb",
+      "role": "reference"
+    },
+    {
+      "name": "expression_gestures_transfer",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              666667
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 1,
+            "data": [
+              48,
+              104
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 120
+          },
+          {
+            "channel": 1,
+            "data": [
+              74,
+              32
+            ],
+            "kind": "control_change",
+            "order": 5,
+            "tick": 240
+          },
+          {
+            "channel": 0,
+            "data": [
+              1,
+              32
+            ],
+            "kind": "control_change",
+            "order": 9,
+            "tick": 360
+          },
+          {
+            "channel": 1,
+            "data": [
+              768
+            ],
+            "kind": "pitch_bend",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 1,
+            "data": [
+              74,
+              112
+            ],
+            "kind": "control_change",
+            "order": 6,
+            "tick": 720
+          },
+          {
+            "channel": 0,
+            "data": [
+              1,
+              112
+            ],
+            "kind": "control_change",
+            "order": 10,
+            "tick": 840
+          },
+          {
+            "channel": 1,
+            "data": [
+              0
+            ],
+            "kind": "pitch_bend",
+            "order": 4,
+            "tick": 960
+          },
+          {
+            "channel": 1,
+            "data": [
+              112
+            ],
+            "kind": "channel_pressure",
+            "order": 7,
+            "tick": 1080
+          },
+          {
+            "channel": 1,
+            "data": [
+              16
+            ],
+            "kind": "channel_pressure",
+            "order": 8,
+            "tick": 1440
+          },
+          {
+            "channel": 1,
+            "data": [
+              48,
+              72
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1560
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "c88fe600d0062b3905acabfeae571c2e10f20e5afacf6a83fcdf70d80cce2b66",
+      "role": "transfer"
+    },
+    {
+      "name": "expression_poly_expression_transfer",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              666667
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 1,
+            "data": [
+              48,
+              104
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 120
+          },
+          {
+            "channel": 15,
+            "data": [
+              55,
+              104
+            ],
+            "kind": "note_on",
+            "order": 9,
+            "tick": 120
+          },
+          {
+            "channel": 1,
+            "data": [
+              74,
+              32
+            ],
+            "kind": "control_change",
+            "order": 5,
+            "tick": 240
+          },
+          {
+            "channel": 15,
+            "data": [
+              74,
+              32
+            ],
+            "kind": "control_change",
+            "order": 13,
+            "tick": 240
+          },
+          {
+            "channel": 0,
+            "data": [
+              1,
+              32
+            ],
+            "kind": "control_change",
+            "order": 17,
+            "tick": 360
+          },
+          {
+            "channel": 1,
+            "data": [
+              768
+            ],
+            "kind": "pitch_bend",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 15,
+            "data": [
+              -768
+            ],
+            "kind": "pitch_bend",
+            "order": 11,
+            "tick": 480
+          },
+          {
+            "channel": 1,
+            "data": [
+              74,
+              112
+            ],
+            "kind": "control_change",
+            "order": 6,
+            "tick": 720
+          },
+          {
+            "channel": 15,
+            "data": [
+              74,
+              112
+            ],
+            "kind": "control_change",
+            "order": 14,
+            "tick": 720
+          },
+          {
+            "channel": 0,
+            "data": [
+              1,
+              112
+            ],
+            "kind": "control_change",
+            "order": 18,
+            "tick": 840
+          },
+          {
+            "channel": 1,
+            "data": [
+              0
+            ],
+            "kind": "pitch_bend",
+            "order": 4,
+            "tick": 960
+          },
+          {
+            "channel": 15,
+            "data": [
+              0
+            ],
+            "kind": "pitch_bend",
+            "order": 12,
+            "tick": 960
+          },
+          {
+            "channel": 1,
+            "data": [
+              112
+            ],
+            "kind": "channel_pressure",
+            "order": 7,
+            "tick": 1080
+          },
+          {
+            "channel": 15,
+            "data": [
+              112
+            ],
+            "kind": "channel_pressure",
+            "order": 15,
+            "tick": 1080
+          },
+          {
+            "channel": 1,
+            "data": [
+              16
+            ],
+            "kind": "channel_pressure",
+            "order": 8,
+            "tick": 1440
+          },
+          {
+            "channel": 15,
+            "data": [
+              16
+            ],
+            "kind": "channel_pressure",
+            "order": 16,
+            "tick": 1440
+          },
+          {
+            "channel": 1,
+            "data": [
+              48,
+              72
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1560
+          },
+          {
+            "channel": 15,
+            "data": [
+              55,
+              72
+            ],
+            "kind": "note_off",
+            "order": 10,
+            "tick": 1560
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "20f3a3a8af3aa41ee33442ab7714c7fb61a156d757cea48eb5e9a35c7aeb09a7",
+      "role": "transfer"
+    },
+    {
+      "name": "expression_sustain_transfer",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              666667
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 1,
+            "data": [
+              48,
+              104
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 120
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              127
+            ],
+            "kind": "control_change",
+            "order": 7,
+            "tick": 240
+          },
+          {
+            "channel": 1,
+            "data": [
+              48,
+              48
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 360
+          },
+          {
+            "channel": 2,
+            "data": [
+              52,
+              104
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 360
+          },
+          {
+            "channel": 2,
+            "data": [
+              52,
+              48
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 600
+          },
+          {
+            "channel": 3,
+            "data": [
+              55,
+              104
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 600
+          },
+          {
+            "channel": 3,
+            "data": [
+              55,
+              48
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 840
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              0
+            ],
+            "kind": "control_change",
+            "order": 8,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "4a3f05827633ed2bead67f5b8a216811b2cb7b7d2c59ae8fae84fca77bdcb875",
+      "role": "transfer"
+    },
+    {
+      "name": "expression_release_transfer",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              666667
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 1,
+            "data": [
+              48,
+              104
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 120
+          },
+          {
+            "channel": 1,
+            "data": [
+              48,
+              16
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 420
+          },
+          {
+            "channel": 2,
+            "data": [
+              52,
+              104
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 600
+          },
+          {
+            "channel": 2,
+            "data": [
+              52,
+              64
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 900
+          },
+          {
+            "channel": 3,
+            "data": [
+              56,
+              104
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 1080
+          },
+          {
+            "channel": 3,
+            "data": [
+              56,
+              112
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1380
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "3074e65a96a867ba89c84c619e36f8d60c8e3156f1ce746589f7619c76206d66",
+      "role": "transfer"
+    }
+  ],
+  "version": 2
+}

@@ -1,0 +1,23 @@
+{
+  "codec_id": "ddf7dac736e725011b97200c2bbd3ce7b9e84f73db39cb591c765ed8d584cce8",
+  "coupled_corpus_training": "not_yet_run",
+  "cross_split_program_alias_groups": 0,
+  "difference_scope": "static_audit_did_not_use_label_adapter; later_adapter_restores_registered_destinations_and_omits_ignored_empty_maps",
+  "final_test_audio": false,
+  "fm_native_attempts": 10,
+  "historical_source_snapshot": "3c3260b2f7b6e8ce3d7d5559a7abec6b0422f3dc",
+  "label_compatible_training_states": 904,
+  "legacy_codecs_and_bank_unchanged": true,
+  "legacy_combined_codec_id": "9f183fc14324940fe80cecb7aae7494a596880ec70059f3e1348a180cf2303b7",
+  "legacy_curve_codec_id": "515537f08c42a1827e65742174a919ba4048dc18ae339048a1a90f4732789ea5",
+  "lfo_bank_id": "2aac62a02d780ee330173c1e1f3cbf5b282c9cf5c7ee17d0d638148f72cc0c31",
+  "model_promotion": false,
+  "native_label_pairs": 6,
+  "native_source_failures": 1,
+  "original_corpus_manifest_and_identities_preserved": true,
+  "published_files": 14,
+  "static_eligible_states": 1153,
+  "verified_historical_differences": [
+    "training/obruxo_training/corpus_inputs.py"
+  ]
+}

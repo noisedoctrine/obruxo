@@ -13,7 +13,7 @@ from .assets import AssetCatalog, AssetReference
 from .contracts import TrainingContract
 from .eligibility import inspect_preset
 from .identity import PresetIdentity
-from .performances import bank_document
+from .performances import bank_document_for
 from .splits import SplitManifest, build_splits, normalize_parents
 
 
@@ -98,7 +98,7 @@ def audit_corpus(corpus: Path, output: Path, *, schema: VitalSchema, catalog: As
     summary.update(contract_id=contract.contract_id, split_manifest_id=manifest.manifest_id, catalog_id=catalog.catalog_id)
     write_json(output / "contract.json", contract.to_dict())
     write_json(output / "assets.json", catalog.to_dict())
-    write_json(output / "performances.json", bank_document())
+    write_json(output / "performances.json", bank_document_for(contract.renderer_id))
     write_json(output / "splits.json", manifest.to_dict())
     write_json(output / "members.json", {"version": 1, "parents": parents, "records": rows, "exclusions": exclusions})
     write_json(output / "summary.json", summary)
@@ -127,7 +127,7 @@ def load_snapshot(root: Path, schema: VitalSchema) -> tuple[TrainingContract, As
         raise ValueError("unsupported asset catalog contract")
     contract = TrainingContract.create(schema, catalog)
     contract.require_match(documents["contract.json"])
-    if documents["performances.json"] != bank_document():
+    if documents["performances.json"] != bank_document_for(contract.renderer_id):
         raise ValueError("performance bank changed")
     manifest = SplitManifest.from_dict(documents["splits.json"])
     members = documents["members.json"]
