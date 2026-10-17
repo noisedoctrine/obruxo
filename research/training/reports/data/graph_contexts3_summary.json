@@ -1,0 +1,293 @@
+{
+  "attempted": 66,
+  "audio_files_written": 0,
+  "checks": [
+    {
+      "accepted": true,
+      "destination": "filter_1_blend_transpose",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_2_blend_transpose",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_fx_blend_transpose",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_detune_power",
+      "relative_rms_change": 0.9518269475930972,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_distortion_spread",
+      "relative_rms_change": 0.05463471754814791,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_frame_spread",
+      "relative_rms_change": 0.4293903706766554,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_spectral_morph_phase",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_spectral_morph_spread",
+      "relative_rms_change": 0.05345113540298919,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_unison_blend",
+      "relative_rms_change": 0.08174714681265786,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_detune_power",
+      "relative_rms_change": 0.9518269475930972,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_distortion_spread",
+      "relative_rms_change": 0.05463471754814791,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_frame_spread",
+      "relative_rms_change": 0.4293903706766554,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_spectral_morph_phase",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_spectral_morph_spread",
+      "relative_rms_change": 0.05345113540298919,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_unison_blend",
+      "relative_rms_change": 0.08174714681265786,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_detune_power",
+      "relative_rms_change": 0.9518269475930972,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_distortion_spread",
+      "relative_rms_change": 0.05463471754814791,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_frame_spread",
+      "relative_rms_change": 0.4293903706766554,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_spectral_morph_phase",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_spectral_morph_spread",
+      "relative_rms_change": 0.05345113540298919,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_unison_blend",
+      "relative_rms_change": 0.08174714681265786,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "reverb_low_shelf_cutoff",
+      "relative_rms_change": 0.0028552099358533658,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    }
+  ],
+  "destinations_checked": 22,
+  "elapsed_seconds": 117.62856160000229,
+  "final_test_audio": false,
+  "gates": {
+    "all_attempts_accounted": true,
+    "all_native_accepted": true,
+    "fixed_phase_repeats": true,
+    "memory_bounded": true,
+    "source_unchanged": true
+  },
+  "model_promotion": false,
+  "passed": true,
+  "peak_process_rss_bytes": 451133440,
+  "plan_sha256": "fd56cb6f58be3aca206c0e5d2f23723fc623fa5c07812a59ccc82353937233b3",
+  "responses_observed": 16,
+  "unresolved_destinations": [
+    "filter_1_blend_transpose",
+    "filter_2_blend_transpose",
+    "filter_fx_blend_transpose",
+    "osc_1_spectral_morph_phase",
+    "osc_2_spectral_morph_phase",
+    "osc_3_spectral_morph_phase"
+  ]
+}

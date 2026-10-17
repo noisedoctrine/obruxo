@@ -160,3 +160,17 @@ def test_context_selects_rate_keytrack_and_formant_prerequisites(graph):
     settings = graph.schema.template()["settings"]
     prepare_destination_context(settings, "filter_2_formant_spread", graph.base._waves, graph.base._samples)
     assert settings["filter_2_model"] == 5. and settings["filter_2_on"] == 1.
+
+
+def test_native_probes_keep_macro_exits_and_choose_direction_after_overrides(graph):
+    from obruxo_training.graph_native import destination_fixture
+    from obruxo_training.reproducibility import FULL_PHASE_CONTROL
+    for name in ("macro_control_1", "macro_control_4"):
+        document, owner = destination_fixture(name, graph.base)
+        settings = document["settings"]
+        assert settings["modulations"][0] == {"source": name, "destination": "osc_1_pan"} and owner != 0
+        assert all(settings[key] == value for key, value in FULL_PHASE_CONTROL.items())
+    document, owner = destination_fixture("polyphony", graph.base, {"polyphony": 1.})
+    assert document["settings"][f"modulation_{owner + 1}_amount"] > 0.
+    with pytest.raises(ValueError, match="fixed random phases"):
+        destination_fixture("volume", graph.base, {"sample_random_phase": 1.})

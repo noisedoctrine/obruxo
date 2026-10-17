@@ -50,8 +50,8 @@ def destination_fixture(destination, assets, overrides=None):
     prepare_destination_context(settings, destination, assets._waves, assets._samples)
     # A downstream modulation path makes envelope/rate/phase targets observable.
     module = re.match(r"(lfo_[1-8]|random_[1-4]|env_[2-6])_", destination)
-    if module or destination == "beats_per_minute":
-        source = module[1] if module else "lfo_1"
+    if module or destination == "beats_per_minute" or destination.startswith("macro_control_"):
+        source = module[1] if module else destination if destination.startswith("macro_control_") else "lfo_1"
         settings["modulations"][0] = {"source": source, "destination": "osc_1_pan"}
         settings["modulation_1_amount"] = .3
     referenced = re.fullmatch(r"modulation_(\d+)_(?:amount|power)", destination)
@@ -61,19 +61,21 @@ def destination_fixture(destination, assets, overrides=None):
         settings[f"modulation_{child + 1}_amount"] = .3
     owner = next(slot for slot in range(63, 0, -1) if slot != child)
     settings["modulations"][owner] = {"source": "mod_wheel", "destination": destination}
-    metadata = assets.scalar._parameters[destination]
-    position = (settings[destination] - metadata.minimum) / (metadata.maximum - metadata.minimum)
-    settings[f"modulation_{owner + 1}_amount"] = .1 if position < .5 else -.1
     if overrides:
         if set(overrides) - schema.scalar_names:
             raise ValueError("native response overrides must name registered scalar controls")
+        if any(name in overrides and overrides[name] != value for name, value in FULL_PHASE_CONTROL.items()):
+            raise ValueError("native correctness overrides must preserve fixed random phases")
         settings.update(overrides)
+    metadata = assets.scalar._parameters[destination]
+    position = (settings[destination] - metadata.minimum) / (metadata.maximum - metadata.minimum)
+    settings[f"modulation_{owner + 1}_amount"] = .1 if position < .5 else -.1
     settings.update(assets.scalar._values(assets.scalar._target(settings)))
     schema.validate(document).require_valid()
     return document, owner
 
 
-def check_destinations(bank, output, *, destinations=None, overrides=None, progress=None):
+def check_destinations(bank, output, *, destinations=None, overrides=None, performance=None, progress=None):
     assets = FactoryAssetCodec(bank)
     schema = FullPresetContract(renderer_id=FULL_CURVE_RENDERER_ID)
     names = tuple(sorted(schema.destinations)) if destinations is None else tuple(destinations)
@@ -88,17 +90,18 @@ def check_destinations(bank, output, *, destinations=None, overrides=None, progr
     def sources():
         return {path.relative_to(research).as_posix(): hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest() for path in sorted(set(files))}
 
-    plan = {"qualification": "native_connection_destination_response_v1", "source_sha256_lf": sources(), "bank_id": bank["bank_id"],
+    if performance is None:
+        performance = Performance(bpm=120)
+        performance.events.append(MidiEvent(0, 1, EventKind.CONTROL_CHANGE, 0, (1, 127)))
+        performance.add_note(pitch=60, velocity=90, start_tick=240, duration_ticks=1440)
+        performance.end_tick = 2400
+    plan = {"qualification": "native_connection_destination_response_v2", "source_sha256_lf": sources(), "bank_id": bank["bank_id"],
             "destinations": list(names), "destination_inventory_size": len(schema.destinations), "attempt_budget": 3 * len(names),
             "phase_control": FULL_PHASE_CONTROL, "worker_jobs": 1, "overrides": overrides or {},
-            "driver": "CC1_127_before_note_on_mod_wheel_source", "minimum_relative_rms_response": 1e-5,
+            "driver": "declared_performance_mod_wheel_source", "performance": performance.to_dict(), "minimum_relative_rms_response": 1e-5,
             "claim": "response_in_declared_context_zero_is_unresolved_not_unsupported", "rss_limit_bytes": 8 * 1024**3,
             "final_test_audio": False, "model_promotion": False}
     write_json(output / "plan.json", plan)
-    performance = Performance(bpm=120)
-    performance.events.append(MidiEvent(0, 1, EventKind.CONTROL_CHANGE, 0, (1, 127)))
-    performance.add_note(pitch=60, velocity=90, start_tick=240, duration_ticks=1440)
-    performance.end_tick = 2400
     rows, checks = [], []
     monitor, started = MemoryMonitor(), perf_counter()
     monitor.start()

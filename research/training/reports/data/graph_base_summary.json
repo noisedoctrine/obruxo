@@ -1,0 +1,5257 @@
+{
+  "attempted": 1293,
+  "audio_files_written": 0,
+  "checks": [
+    {
+      "accepted": true,
+      "destination": "beats_per_minute",
+      "relative_rms_change": 0.1956731714407607,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "chorus_cutoff",
+      "relative_rms_change": 0.005868171420243699,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "chorus_delay_1",
+      "relative_rms_change": 0.8117754859143582,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "chorus_delay_2",
+      "relative_rms_change": 1.1961776862270688,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "chorus_dry_wet",
+      "relative_rms_change": 0.1702362471331008,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "chorus_feedback",
+      "relative_rms_change": 0.22078584248491634,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "chorus_frequency",
+      "relative_rms_change": 1.2768241940450888,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "chorus_mod_depth",
+      "relative_rms_change": 1.1556686734448571,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "chorus_spread",
+      "relative_rms_change": 0.004274108584737581,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "chorus_tempo",
+      "relative_rms_change": 1.288498850295393,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "compressor_attack",
+      "relative_rms_change": 0.027925414633564866,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "compressor_band_gain",
+      "relative_rms_change": 0.25682142620351844,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "compressor_high_gain",
+      "relative_rms_change": 0.08816347206369898,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "compressor_low_gain",
+      "relative_rms_change": 0.12077842450111198,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "compressor_mix",
+      "relative_rms_change": 0.0338601681293935,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "compressor_release",
+      "relative_rms_change": 0.04154540807097401,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "delay_aux_frequency",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "delay_aux_tempo",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "delay_dry_wet",
+      "relative_rms_change": 0.24855745228729922,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "delay_feedback",
+      "relative_rms_change": 0.1292034539530159,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "delay_filter_cutoff",
+      "relative_rms_change": 0.002272269235108923,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "delay_filter_spread",
+      "relative_rms_change": 0.0018050976566875575,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "delay_frequency",
+      "relative_rms_change": 0.9978060248617588,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "delay_tempo",
+      "relative_rms_change": 1.1008352404772794,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "distortion_drive",
+      "relative_rms_change": 0.49862686304282877,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "distortion_filter_blend",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "distortion_filter_cutoff",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "distortion_filter_resonance",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "distortion_mix",
+      "relative_rms_change": 0.0004122643470487372,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_1_attack",
+      "relative_rms_change": 0.09318370720024302,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_1_decay",
+      "relative_rms_change": 0.133306161527459,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_1_delay",
+      "relative_rms_change": 0.03644479324686463,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_1_hold",
+      "relative_rms_change": 0.00046056645626382396,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_1_release",
+      "relative_rms_change": 0.07522774097912634,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_1_sustain",
+      "relative_rms_change": 0.17479591395626318,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_2_attack",
+      "relative_rms_change": 0.045159114048626034,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_2_decay",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_2_delay",
+      "relative_rms_change": 0.0201388684486409,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_2_hold",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_2_release",
+      "relative_rms_change": 0.0010961803987675097,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_2_sustain",
+      "relative_rms_change": 0.03571918741051443,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_3_attack",
+      "relative_rms_change": 0.045159114048626034,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_3_decay",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_3_delay",
+      "relative_rms_change": 0.0201388684486409,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_3_hold",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_3_release",
+      "relative_rms_change": 0.0010961803987675097,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_3_sustain",
+      "relative_rms_change": 0.03571918741051443,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_4_attack",
+      "relative_rms_change": 0.045159114048626034,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_4_decay",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_4_delay",
+      "relative_rms_change": 0.0201388684486409,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_4_hold",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_4_release",
+      "relative_rms_change": 0.0010961803987675097,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_4_sustain",
+      "relative_rms_change": 0.03571918741051443,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_5_attack",
+      "relative_rms_change": 0.045159114048626034,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_5_decay",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_5_delay",
+      "relative_rms_change": 0.0201388684486409,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_5_hold",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_5_release",
+      "relative_rms_change": 0.0010961803987675097,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_5_sustain",
+      "relative_rms_change": 0.03571918741051443,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_6_attack",
+      "relative_rms_change": 0.045159114048626034,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_6_decay",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_6_delay",
+      "relative_rms_change": 0.0201388684486409,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_6_hold",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_6_release",
+      "relative_rms_change": 0.0010961803987675097,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "env_6_sustain",
+      "relative_rms_change": 0.03571918741051443,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "eq_band_cutoff",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "eq_band_gain",
+      "relative_rms_change": 0.16574283198142511,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "eq_band_resonance",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "eq_high_cutoff",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "eq_high_gain",
+      "relative_rms_change": 0.07391670786503568,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "eq_high_resonance",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "eq_low_cutoff",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "eq_low_gain",
+      "relative_rms_change": 0.08467092143426268,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "eq_low_resonance",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_1_blend",
+      "relative_rms_change": 0.3182981116011743,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_1_blend_transpose",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_1_cutoff",
+      "relative_rms_change": 0.46523601280491694,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_1_drive",
+      "relative_rms_change": 0.10197090901058649,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_1_formant_resonance",
+      "relative_rms_change": 0.07403025093103624,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_1_formant_spread",
+      "relative_rms_change": 0.4803391575589997,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_1_formant_transpose",
+      "relative_rms_change": 0.5343640882573595,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_1_formant_x",
+      "relative_rms_change": 0.06271166328886037,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_1_formant_y",
+      "relative_rms_change": 0.05922814825692887,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_1_keytrack",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_1_mix",
+      "relative_rms_change": 0.0918422774707519,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_1_resonance",
+      "relative_rms_change": 0.09704428947311709,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_2_blend",
+      "relative_rms_change": 0.3182981116011743,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_2_blend_transpose",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_2_cutoff",
+      "relative_rms_change": 0.46523601280491694,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_2_drive",
+      "relative_rms_change": 0.10197090901058649,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_2_formant_resonance",
+      "relative_rms_change": 0.07403025093103624,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_2_formant_spread",
+      "relative_rms_change": 0.4803391575589997,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_2_formant_transpose",
+      "relative_rms_change": 0.5343640882573595,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_2_formant_x",
+      "relative_rms_change": 0.06271166328886037,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_2_formant_y",
+      "relative_rms_change": 0.05922814825692887,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_2_keytrack",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_2_mix",
+      "relative_rms_change": 0.0918422774707519,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_2_resonance",
+      "relative_rms_change": 0.09704428947311709,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_fx_blend",
+      "relative_rms_change": 0.31822355575723543,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_fx_blend_transpose",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_fx_cutoff",
+      "relative_rms_change": 0.4651515561508872,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_fx_drive",
+      "relative_rms_change": 0.10198217771736391,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_fx_formant_resonance",
+      "relative_rms_change": 0.07417559885578992,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_fx_formant_spread",
+      "relative_rms_change": 0.47932440555906725,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_fx_formant_transpose",
+      "relative_rms_change": 0.533615504299479,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_fx_formant_x",
+      "relative_rms_change": 0.0636259063328736,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_fx_formant_y",
+      "relative_rms_change": 0.05955815163789853,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_fx_keytrack",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_fx_mix",
+      "relative_rms_change": 0.09173222291588867,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "filter_fx_resonance",
+      "relative_rms_change": 0.09710049724472862,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "flanger_center",
+      "relative_rms_change": 0.9270601821018684,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "flanger_dry_wet",
+      "relative_rms_change": 0.06281066228035359,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "flanger_feedback",
+      "relative_rms_change": 0.1838862538570292,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "flanger_frequency",
+      "relative_rms_change": 0.9377948430509471,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "flanger_mod_depth",
+      "relative_rms_change": 0.4851995961265099,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "flanger_phase_offset",
+      "relative_rms_change": 0.5636694473312572,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "flanger_tempo",
+      "relative_rms_change": 0.9446140593247508,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_1_delay_time",
+      "relative_rms_change": 0.20065109987279292,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_1_fade_time",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_1_frequency",
+      "relative_rms_change": 0.1748556518893542,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_1_keytrack_transpose",
+      "relative_rms_change": 0.13100377185882775,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_1_keytrack_tune",
+      "relative_rms_change": 0.1053118039444883,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_1_phase",
+      "relative_rms_change": 0.08898068346185666,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_1_smooth_time",
+      "relative_rms_change": 0.0016794705279484063,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_1_stereo",
+      "relative_rms_change": 0.04490890284454496,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_1_tempo",
+      "relative_rms_change": 0.19065908557402408,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_2_delay_time",
+      "relative_rms_change": 0.20065109987279292,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_2_fade_time",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_2_frequency",
+      "relative_rms_change": 0.1748556518893542,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_2_keytrack_transpose",
+      "relative_rms_change": 0.13100377185882775,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_2_keytrack_tune",
+      "relative_rms_change": 0.1053118039444883,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_2_phase",
+      "relative_rms_change": 0.08898068346185666,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_2_smooth_time",
+      "relative_rms_change": 0.0016794705279484063,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_2_stereo",
+      "relative_rms_change": 0.04490890284454496,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_2_tempo",
+      "relative_rms_change": 0.19065908557402408,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_3_delay_time",
+      "relative_rms_change": 0.20065109987279292,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_3_fade_time",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_3_frequency",
+      "relative_rms_change": 0.1748556518893542,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_3_keytrack_transpose",
+      "relative_rms_change": 0.13100377185882775,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_3_keytrack_tune",
+      "relative_rms_change": 0.1053118039444883,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_3_phase",
+      "relative_rms_change": 0.08898068346185666,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_3_smooth_time",
+      "relative_rms_change": 0.0016794705279484063,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_3_stereo",
+      "relative_rms_change": 0.04490890284454496,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_3_tempo",
+      "relative_rms_change": 0.19065908557402408,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_4_delay_time",
+      "relative_rms_change": 0.20065109987279292,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_4_fade_time",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_4_frequency",
+      "relative_rms_change": 0.1748556518893542,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_4_keytrack_transpose",
+      "relative_rms_change": 0.13100377185882775,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_4_keytrack_tune",
+      "relative_rms_change": 0.1053118039444883,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_4_phase",
+      "relative_rms_change": 0.08898068346185666,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_4_smooth_time",
+      "relative_rms_change": 0.0016794705279484063,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_4_stereo",
+      "relative_rms_change": 0.04490890284454496,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_4_tempo",
+      "relative_rms_change": 0.19065908557402408,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_5_delay_time",
+      "relative_rms_change": 0.20065109987279292,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_5_fade_time",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_5_frequency",
+      "relative_rms_change": 0.1748556518893542,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_5_keytrack_transpose",
+      "relative_rms_change": 0.13100377185882775,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_5_keytrack_tune",
+      "relative_rms_change": 0.1053118039444883,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_5_phase",
+      "relative_rms_change": 0.08898068346185666,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_5_smooth_time",
+      "relative_rms_change": 0.0016794705279484063,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_5_stereo",
+      "relative_rms_change": 0.04490890284454496,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_5_tempo",
+      "relative_rms_change": 0.19065908557402408,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_6_delay_time",
+      "relative_rms_change": 0.20065109987279292,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_6_fade_time",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_6_frequency",
+      "relative_rms_change": 0.1748556518893542,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_6_keytrack_transpose",
+      "relative_rms_change": 0.13100377185882775,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_6_keytrack_tune",
+      "relative_rms_change": 0.1053118039444883,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_6_phase",
+      "relative_rms_change": 0.08898068346185666,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_6_smooth_time",
+      "relative_rms_change": 0.0016794705279484063,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_6_stereo",
+      "relative_rms_change": 0.04490890284454496,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_6_tempo",
+      "relative_rms_change": 0.19065908557402408,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_7_delay_time",
+      "relative_rms_change": 0.20065109987279292,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_7_fade_time",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_7_frequency",
+      "relative_rms_change": 0.1748556518893542,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_7_keytrack_transpose",
+      "relative_rms_change": 0.13100377185882775,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_7_keytrack_tune",
+      "relative_rms_change": 0.1053118039444883,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_7_phase",
+      "relative_rms_change": 0.08898068346185666,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_7_smooth_time",
+      "relative_rms_change": 0.0016794705279484063,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_7_stereo",
+      "relative_rms_change": 0.04490890284454496,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_7_tempo",
+      "relative_rms_change": 0.19065908557402408,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_8_delay_time",
+      "relative_rms_change": 0.20065109987279292,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_8_fade_time",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_8_frequency",
+      "relative_rms_change": 0.1748556518893542,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_8_keytrack_transpose",
+      "relative_rms_change": 0.13100377185882775,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_8_keytrack_tune",
+      "relative_rms_change": 0.1053118039444883,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_8_phase",
+      "relative_rms_change": 0.08898068346185666,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_8_smooth_time",
+      "relative_rms_change": 0.0016794705279484063,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_8_stereo",
+      "relative_rms_change": 0.04490890284454496,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "lfo_8_tempo",
+      "relative_rms_change": 0.19065908557402408,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "macro_control_1",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "macro_control_2",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "macro_control_3",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "macro_control_4",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_10_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_10_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_11_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_11_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_12_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_12_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_13_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_13_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_14_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_14_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_15_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_15_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_16_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_16_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_17_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_17_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_18_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_18_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_19_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_19_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_1_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_1_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_20_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_20_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_21_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_21_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_22_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_22_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_23_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_23_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_24_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_24_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_25_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_25_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_26_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_26_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_27_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_27_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_28_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_28_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_29_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_29_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_2_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_2_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_30_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_30_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_31_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_31_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_32_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_32_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_33_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_33_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_34_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_34_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_35_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_35_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_36_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_36_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_37_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_37_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_38_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_38_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_39_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_39_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_3_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_3_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_40_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_40_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_41_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_41_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_42_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_42_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_43_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_43_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_44_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_44_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_45_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_45_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_46_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_46_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_47_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_47_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_48_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_48_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_49_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_49_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_4_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_4_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_50_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_50_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_51_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_51_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_52_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_52_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_53_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_53_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_54_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_54_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_55_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_55_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_56_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_56_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_57_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_57_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_58_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_58_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_59_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_59_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_5_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_5_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_60_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_60_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_61_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_61_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_62_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_62_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_63_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_63_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_64_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_64_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_6_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_6_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_7_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_7_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_8_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_8_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_9_amount",
+      "relative_rms_change": 0.16786259729898367,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "modulation_9_power",
+      "relative_rms_change": 0.07740355630234165,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_detune_power",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_detune_range",
+      "relative_rms_change": 1.4163546777040659,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_distortion_amount",
+      "relative_rms_change": 0.008302450429539095,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_distortion_phase",
+      "relative_rms_change": 1.1010879870266344,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_distortion_spread",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_frame_spread",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_level",
+      "relative_rms_change": 1.7776665089879926,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_pan",
+      "relative_rms_change": 0.15691680023885252,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_phase",
+      "relative_rms_change": 0.8913980405066375,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_random_phase",
+      "relative_rms_change": 0.45330903169231723,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_spectral_morph_amount",
+      "relative_rms_change": 0.03779228298366869,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_spectral_morph_phase",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_spectral_morph_spread",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_stereo_spread",
+      "relative_rms_change": 0.07850429203096469,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_transpose",
+      "relative_rms_change": 1.4148450596736577,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_tune",
+      "relative_rms_change": 1.4116918994216918,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_unison_blend",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_unison_detune",
+      "relative_rms_change": 1.4114420720949399,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_unison_voices",
+      "relative_rms_change": 1.405131613447398,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_1_wave_frame",
+      "relative_rms_change": 0.5765807296618407,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_detune_power",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_detune_range",
+      "relative_rms_change": 1.4163546777040659,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_distortion_amount",
+      "relative_rms_change": 0.008302450429539095,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_distortion_phase",
+      "relative_rms_change": 1.1010879870266344,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_distortion_spread",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_frame_spread",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_level",
+      "relative_rms_change": 1.7776665089879926,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_pan",
+      "relative_rms_change": 0.15691680023885252,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_phase",
+      "relative_rms_change": 0.8913980405066375,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_random_phase",
+      "relative_rms_change": 0.33112222928845003,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_spectral_morph_amount",
+      "relative_rms_change": 0.03779228298366869,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_spectral_morph_phase",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_spectral_morph_spread",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_stereo_spread",
+      "relative_rms_change": 0.07850429203096469,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_transpose",
+      "relative_rms_change": 1.4148450596736577,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_tune",
+      "relative_rms_change": 1.4116918994216918,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_unison_blend",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_unison_detune",
+      "relative_rms_change": 1.4114420720949399,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_unison_voices",
+      "relative_rms_change": 1.405131613447398,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_2_wave_frame",
+      "relative_rms_change": 0.5765807296618407,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_detune_power",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_detune_range",
+      "relative_rms_change": 1.4163546777040659,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_distortion_amount",
+      "relative_rms_change": 0.008302450429539095,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_distortion_phase",
+      "relative_rms_change": 1.1010879870266344,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_distortion_spread",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_frame_spread",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_level",
+      "relative_rms_change": 1.7776665089879926,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_pan",
+      "relative_rms_change": 0.15691680023885252,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_phase",
+      "relative_rms_change": 0.8913980405066375,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_random_phase",
+      "relative_rms_change": 0.38011886405377193,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_spectral_morph_amount",
+      "relative_rms_change": 0.03779228298366869,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_spectral_morph_phase",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_spectral_morph_spread",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_stereo_spread",
+      "relative_rms_change": 0.07850429203096469,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_transpose",
+      "relative_rms_change": 1.4148450596736577,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_tune",
+      "relative_rms_change": 1.4116918994216918,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_unison_blend",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_unison_detune",
+      "relative_rms_change": 1.4114420720949399,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_unison_voices",
+      "relative_rms_change": 1.405131613447398,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "osc_3_wave_frame",
+      "relative_rms_change": 0.5765807296618407,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "phaser_blend",
+      "relative_rms_change": 0.16886329927188154,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "phaser_center",
+      "relative_rms_change": 1.3379935060462267,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "phaser_dry_wet",
+      "relative_rms_change": 0.10630603753670624,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "phaser_feedback",
+      "relative_rms_change": 0.12377678431817153,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "phaser_frequency",
+      "relative_rms_change": 1.2041531663461855,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "phaser_mod_depth",
+      "relative_rms_change": 1.134236246771559,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "phaser_phase_offset",
+      "relative_rms_change": 1.1638265900519968,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "phaser_tempo",
+      "relative_rms_change": 1.141552161710862,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "pitch_bend_range",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "polyphony",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "portamento_slope",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "portamento_time",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "random_1_frequency",
+      "relative_rms_change": 0.03420548956014752,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "random_1_keytrack_transpose",
+      "relative_rms_change": 0.09374888832575473,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "random_1_keytrack_tune",
+      "relative_rms_change": 0.0928824542822939,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "random_1_tempo",
+      "relative_rms_change": 0.02408559469421992,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "random_2_frequency",
+      "relative_rms_change": 0.0653704074739146,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "random_2_keytrack_transpose",
+      "relative_rms_change": 0.08540384890172163,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "random_2_keytrack_tune",
+      "relative_rms_change": 0.08725220950790584,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "random_2_tempo",
+      "relative_rms_change": 0.025495379242974042,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "random_3_frequency",
+      "relative_rms_change": 0.08877680515470872,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "random_3_keytrack_transpose",
+      "relative_rms_change": 0.08451438101940745,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "random_3_keytrack_tune",
+      "relative_rms_change": 0.07829884975688266,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "random_3_tempo",
+      "relative_rms_change": 0.08137295901606847,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "random_4_frequency",
+      "relative_rms_change": 0.06632714699403647,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "random_4_keytrack_transpose",
+      "relative_rms_change": 0.09429221531830904,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "random_4_keytrack_tune",
+      "relative_rms_change": 0.08957949257528934,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "random_4_tempo",
+      "relative_rms_change": 0.01797382785115223,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "reverb_chorus_amount",
+      "relative_rms_change": 0.061007047261851834,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "reverb_chorus_frequency",
+      "relative_rms_change": 0.021438996052728816,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "reverb_decay_time",
+      "relative_rms_change": 0.06307213040428228,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "reverb_delay",
+      "relative_rms_change": 0.2119275650753493,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "reverb_dry_wet",
+      "relative_rms_change": 0.09299507310941235,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "reverb_high_shelf_cutoff",
+      "relative_rms_change": 0.005038589064289673,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "reverb_high_shelf_gain",
+      "relative_rms_change": 0.004892677469559198,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "reverb_low_shelf_cutoff",
+      "relative_rms_change": 0.0,
+      "repeat_exact": true,
+      "response_observed": false,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "reverb_low_shelf_gain",
+      "relative_rms_change": 0.00035982714700207296,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "reverb_pre_high_cutoff",
+      "relative_rms_change": 0.03129540951699342,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "reverb_pre_low_cutoff",
+      "relative_rms_change": 0.005638571793682258,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "reverb_size",
+      "relative_rms_change": 0.060337913837392544,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "sample_level",
+      "relative_rms_change": 1.7769628095228376,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "sample_pan",
+      "relative_rms_change": 0.1572546857241228,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "sample_transpose",
+      "relative_rms_change": 1.4152232893160461,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "sample_tune",
+      "relative_rms_change": 1.3883272551331434,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "stereo_routing",
+      "relative_rms_change": 0.07528585576308729,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "velocity_track",
+      "relative_rms_change": 0.11993053728521853,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "voice_amplitude",
+      "relative_rms_change": 0.19000006614694492,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "voice_transpose",
+      "relative_rms_change": 1.4147433045539335,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "voice_tune",
+      "relative_rms_change": 1.4126000353829868,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    },
+    {
+      "accepted": true,
+      "destination": "volume",
+      "relative_rms_change": 1.2179611982960048,
+      "repeat_exact": true,
+      "response_observed": true,
+      "statuses": [
+        "accepted",
+        "accepted",
+        "accepted"
+      ]
+    }
+  ],
+  "destinations_checked": 431,
+  "elapsed_seconds": 2664.0109345,
+  "final_test_audio": false,
+  "gates": {
+    "all_attempts_accounted": true,
+    "all_native_accepted": true,
+    "fixed_phase_repeats": true,
+    "memory_bounded": true,
+    "source_unchanged": true
+  },
+  "model_promotion": false,
+  "passed": true,
+  "peak_process_rss_bytes": 504266752,
+  "plan_sha256": "b2fca82683e030b6def90a9338c584a95c6150685ca4ace1baa03efa709450ef",
+  "responses_observed": 369,
+  "unresolved_destinations": [
+    "delay_aux_frequency",
+    "delay_aux_tempo",
+    "distortion_filter_blend",
+    "distortion_filter_cutoff",
+    "distortion_filter_resonance",
+    "env_2_decay",
+    "env_2_hold",
+    "env_3_decay",
+    "env_3_hold",
+    "env_4_decay",
+    "env_4_hold",
+    "env_5_decay",
+    "env_5_hold",
+    "env_6_decay",
+    "env_6_hold",
+    "eq_band_cutoff",
+    "eq_band_resonance",
+    "eq_high_cutoff",
+    "eq_high_resonance",
+    "eq_low_cutoff",
+    "eq_low_resonance",
+    "filter_1_blend_transpose",
+    "filter_1_keytrack",
+    "filter_2_blend_transpose",
+    "filter_2_keytrack",
+    "filter_fx_blend_transpose",
+    "filter_fx_keytrack",
+    "lfo_1_fade_time",
+    "lfo_2_fade_time",
+    "lfo_3_fade_time",
+    "lfo_4_fade_time",
+    "lfo_5_fade_time",
+    "lfo_6_fade_time",
+    "lfo_7_fade_time",
+    "lfo_8_fade_time",
+    "macro_control_1",
+    "macro_control_2",
+    "macro_control_3",
+    "macro_control_4",
+    "osc_1_detune_power",
+    "osc_1_distortion_spread",
+    "osc_1_frame_spread",
+    "osc_1_spectral_morph_phase",
+    "osc_1_spectral_morph_spread",
+    "osc_1_unison_blend",
+    "osc_2_detune_power",
+    "osc_2_distortion_spread",
+    "osc_2_frame_spread",
+    "osc_2_spectral_morph_phase",
+    "osc_2_spectral_morph_spread",
+    "osc_2_unison_blend",
+    "osc_3_detune_power",
+    "osc_3_distortion_spread",
+    "osc_3_frame_spread",
+    "osc_3_spectral_morph_phase",
+    "osc_3_spectral_morph_spread",
+    "osc_3_unison_blend",
+    "pitch_bend_range",
+    "polyphony",
+    "portamento_slope",
+    "portamento_time",
+    "reverb_low_shelf_cutoff"
+  ]
+}

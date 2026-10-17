@@ -1,0 +1,198 @@
+{
+  "attempt_budget": 42,
+  "bank_id": "1f512c5134c259cbbcdb9c4df1d14fe2b40dc0290fcfdb604c740efc54112e40",
+  "claim": "response_in_declared_context_zero_is_unresolved_not_unsupported",
+  "destination_inventory_size": 431,
+  "destinations": [
+    "filter_1_blend_transpose",
+    "filter_2_blend_transpose",
+    "filter_fx_blend_transpose",
+    "macro_control_1",
+    "macro_control_2",
+    "macro_control_3",
+    "macro_control_4",
+    "osc_1_spectral_morph_phase",
+    "osc_2_spectral_morph_phase",
+    "osc_3_spectral_morph_phase",
+    "pitch_bend_range",
+    "polyphony",
+    "portamento_slope",
+    "portamento_time"
+  ],
+  "driver": "declared_performance_mod_wheel_source",
+  "final_test_audio": false,
+  "minimum_relative_rms_response": 1e-05,
+  "model_promotion": false,
+  "overrides": {
+    "filter_1_blend_transpose": {
+      "filter_1_blend": 0.2,
+      "filter_1_model": 6.0,
+      "filter_1_resonance": 0.7,
+      "filter_1_style": 2.0
+    },
+    "filter_2_blend_transpose": {
+      "filter_2_blend": 0.2,
+      "filter_2_model": 6.0,
+      "filter_2_resonance": 0.7,
+      "filter_2_style": 2.0
+    },
+    "filter_fx_blend_transpose": {
+      "filter_fx_blend": 0.2,
+      "filter_fx_model": 6.0,
+      "filter_fx_resonance": 0.7,
+      "filter_fx_style": 2.0
+    },
+    "macro_control_1": {},
+    "macro_control_2": {},
+    "macro_control_3": {},
+    "macro_control_4": {},
+    "osc_1_spectral_morph_phase": {
+      "osc_1_spectral_morph_amount": 0.5,
+      "osc_1_spectral_morph_type": 13.0,
+      "osc_1_unison_voices": 4.0
+    },
+    "osc_2_spectral_morph_phase": {
+      "osc_2_spectral_morph_amount": 0.5,
+      "osc_2_spectral_morph_type": 13.0,
+      "osc_2_unison_voices": 4.0
+    },
+    "osc_3_spectral_morph_phase": {
+      "osc_3_spectral_morph_amount": 0.5,
+      "osc_3_spectral_morph_type": 13.0,
+      "osc_3_unison_voices": 4.0
+    },
+    "pitch_bend_range": {
+      "pitch_bend_range": 2.0
+    },
+    "polyphony": {
+      "polyphony": 1.0
+    },
+    "portamento_slope": {
+      "polyphony": 1.0,
+      "portamento_force": 1.0,
+      "portamento_time": -2.0
+    },
+    "portamento_time": {
+      "polyphony": 1.0,
+      "portamento_force": 1.0,
+      "portamento_time": -2.0
+    }
+  },
+  "performance": {
+    "end_tick": 2400,
+    "events": [
+      {
+        "channel": null,
+        "data": [
+          500000
+        ],
+        "kind": "tempo",
+        "order": 0,
+        "tick": 0
+      },
+      {
+        "channel": 0,
+        "data": [
+          1,
+          127
+        ],
+        "kind": "control_change",
+        "order": 1,
+        "tick": 0
+      },
+      {
+        "channel": 0,
+        "data": [
+          48,
+          90
+        ],
+        "kind": "note_on",
+        "order": 101,
+        "tick": 240
+      },
+      {
+        "channel": 0,
+        "data": [
+          4096
+        ],
+        "kind": "pitch_bend",
+        "order": 100,
+        "tick": 360
+      },
+      {
+        "channel": 0,
+        "data": [
+          67,
+          90
+        ],
+        "kind": "note_on",
+        "order": 103,
+        "tick": 480
+      },
+      {
+        "channel": 0,
+        "data": [
+          76,
+          90
+        ],
+        "kind": "note_on",
+        "order": 105,
+        "tick": 960
+      },
+      {
+        "channel": 0,
+        "data": [
+          48,
+          0
+        ],
+        "kind": "note_off",
+        "order": 102,
+        "tick": 1200
+      },
+      {
+        "channel": 0,
+        "data": [
+          67,
+          0
+        ],
+        "kind": "note_off",
+        "order": 104,
+        "tick": 1440
+      },
+      {
+        "channel": 0,
+        "data": [
+          76,
+          0
+        ],
+        "kind": "note_off",
+        "order": 106,
+        "tick": 1920
+      }
+    ],
+    "ticks_per_beat": 480
+  },
+  "phase_control": {
+    "osc_1_random_phase": 0.0,
+    "osc_2_random_phase": 0.0,
+    "osc_3_random_phase": 0.0,
+    "sample_random_phase": 0.0
+  },
+  "qualification": "native_connection_destination_response_v2",
+  "rss_limit_bytes": 8589934592,
+  "source_sha256_lf": {
+    "data_generation/obruxo_data/render/__init__.py": "15b14494598c55f9a4f160f7992896b36c351cb65e0f2ed98c4d03235956bb82",
+    "data_generation/obruxo_data/render/base.py": "423f27e6e374994b6a2bcde7b9db379f56de946ece2f7ea9760eb6bdf272a0ab",
+    "data_generation/obruxo_data/render/batch.py": "8aa0ac5d01587ccff7e7992c29fe79f275f6190dde6b889187e261fb66cc59f4",
+    "data_generation/obruxo_data/render/capabilities.py": "7fb505b169b6cf097d19b55e30059ee4dc6684a080ee67cbd942541d3c84bb87",
+    "data_generation/obruxo_data/render/curve_inputs.py": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe",
+    "data_generation/obruxo_data/render/full_state.py": "dbcc375b136ff3002020bf587061520581a38c8399c655efa099aac06cce8749",
+    "data_generation/obruxo_data/render/midi_transport.py": "55d5b6ace126b45e38635c707f00006596dd7db1a61d59da13f2f220b8f0ef59",
+    "data_generation/obruxo_data/render/qa.py": "d536b111c5a7bfc104b7924d12cf3dca0958b2c75b51a22bcc0ab3adf3689c38",
+    "data_generation/obruxo_data/render/vita.py": "43491582ac7bae8af44b443cc16e1b31abb1c83f1aa7c3e778b0be088c14b0ff",
+    "data_generation/obruxo_data/vital/full_contract.py": "e1db5ed60a2d84734fef876a3aeddae4e976f8f2b385d747a099355ea6c309fa",
+    "training/obruxo_training/graph_context.py": "94100ebf0f82baea2a4ed3d8bb339851bfa5ee926afca00dcd665ec7b0b8d4ad",
+    "training/obruxo_training/graph_native.py": "05635a44c89017c83c0d6a4f397f624b7a9a51d42b50e7f56336b4004570f711"
+  },
+  "worker_jobs": 1
+}
