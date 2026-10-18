@@ -1,0 +1,1198 @@
+{
+  "accepted": 26,
+  "attempts": 28,
+  "claim": "bounded_native_contract_qualification_not_complete_corpus_admission_or_model_quality",
+  "elapsed_seconds": 48.563478699998086,
+  "exact_groups": {
+    "authored_13_decimal": true,
+    "authored_13_singleton": true,
+    "authored_14_decimal": true,
+    "authored_14_singleton": true,
+    "authored_15_decimal": true,
+    "authored_15_singleton": true,
+    "empty_map": true,
+    "scalar": true
+  },
+  "final_test_audio": false,
+  "gates": {
+    "all_positive_requests_accepted": true,
+    "attempt_budget_respected": true,
+    "corpus_bytes_unchanged": true,
+    "empty_mapping_ledger_present": true,
+    "every_profile_reference_and_fresh_repeat_exact": true,
+    "full_readback_retained": true,
+    "legacy_negative_controls_retained": true,
+    "memory_bounded": true,
+    "scalar_roundtrip_ledger_present": true,
+    "source_implementation_unchanged": true
+  },
+  "model_promotion": false,
+  "native_state_checks": {
+    "authored_13_decimal:original": {
+      "applied_preset_sha256": "08e695caa18682e1cee9e83476fcd5e3a9f2bdadce0c8b017c2e81024ea38cc8",
+      "applied_version": "1.5.5",
+      "corpus_changes": [],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/lfos/0",
+          "singleton_expanded": false
+        },
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/custom_warps/0",
+          "singleton_expanded": false
+        },
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/modulations/0/line_mapping",
+          "singleton_expanded": false
+        }
+      ],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "2847b1cd317b9c70b79c45f95642cefec2c02b064a596e19f1e07833bd8388e5",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 1
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    },
+    "authored_13_decimal:repeat": {
+      "applied_preset_sha256": "08e695caa18682e1cee9e83476fcd5e3a9f2bdadce0c8b017c2e81024ea38cc8",
+      "applied_version": "1.5.5",
+      "corpus_changes": [],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/lfos/0",
+          "singleton_expanded": false
+        },
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/custom_warps/0",
+          "singleton_expanded": false
+        },
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/modulations/0/line_mapping",
+          "singleton_expanded": false
+        }
+      ],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "2847b1cd317b9c70b79c45f95642cefec2c02b064a596e19f1e07833bd8388e5",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 1
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    },
+    "authored_13_singleton:original": {
+      "applied_preset_sha256": "e8946939fd9c341d439084db980dbdd1646adddb9e0a4431b888adcac8789e29",
+      "applied_version": "1.5.5",
+      "corpus_changes": [],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/lfos/0",
+          "singleton_expanded": true
+        },
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/custom_warps/0",
+          "singleton_expanded": true
+        },
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/modulations/0/line_mapping",
+          "singleton_expanded": true
+        }
+      ],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "44a9dd708b08a3c37f001a020311d95c521ddbe57673dd62d92d0d2233a354b9",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 1
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    },
+    "authored_13_singleton:repeat": {
+      "applied_preset_sha256": "e8946939fd9c341d439084db980dbdd1646adddb9e0a4431b888adcac8789e29",
+      "applied_version": "1.5.5",
+      "corpus_changes": [],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/lfos/0",
+          "singleton_expanded": true
+        },
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/custom_warps/0",
+          "singleton_expanded": true
+        },
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/modulations/0/line_mapping",
+          "singleton_expanded": true
+        }
+      ],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "44a9dd708b08a3c37f001a020311d95c521ddbe57673dd62d92d0d2233a354b9",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 1
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    },
+    "authored_14_decimal:original": {
+      "applied_preset_sha256": "40b9f280851e49e194be2c14d5d10724b3c0c882b5578b2a2745471c8faa591e",
+      "applied_version": "1.5.5",
+      "corpus_changes": [],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/lfos/0",
+          "singleton_expanded": false
+        },
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/custom_warps/0",
+          "singleton_expanded": false
+        },
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/modulations/0/line_mapping",
+          "singleton_expanded": false
+        }
+      ],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "85d97d27f26eedcac65e618034e2e4047fd76a32e14dccad6eedd42b327ba3f9",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 1
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    },
+    "authored_14_decimal:repeat": {
+      "applied_preset_sha256": "40b9f280851e49e194be2c14d5d10724b3c0c882b5578b2a2745471c8faa591e",
+      "applied_version": "1.5.5",
+      "corpus_changes": [],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/lfos/0",
+          "singleton_expanded": false
+        },
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/custom_warps/0",
+          "singleton_expanded": false
+        },
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/modulations/0/line_mapping",
+          "singleton_expanded": false
+        }
+      ],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "85d97d27f26eedcac65e618034e2e4047fd76a32e14dccad6eedd42b327ba3f9",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 1
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    },
+    "authored_14_singleton:original": {
+      "applied_preset_sha256": "e8148e61b7bcbf506f9d2f874390394da2360cac21a2aebed9623f4aaeacc991",
+      "applied_version": "1.5.5",
+      "corpus_changes": [],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/lfos/0",
+          "singleton_expanded": true
+        },
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/custom_warps/0",
+          "singleton_expanded": true
+        },
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/modulations/0/line_mapping",
+          "singleton_expanded": true
+        }
+      ],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "672f215f02c49c3eb3eac07beaec7f3e8690cea448bd52e0f70871108fdd6947",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 1
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    },
+    "authored_14_singleton:repeat": {
+      "applied_preset_sha256": "e8148e61b7bcbf506f9d2f874390394da2360cac21a2aebed9623f4aaeacc991",
+      "applied_version": "1.5.5",
+      "corpus_changes": [],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/lfos/0",
+          "singleton_expanded": true
+        },
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/custom_warps/0",
+          "singleton_expanded": true
+        },
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/modulations/0/line_mapping",
+          "singleton_expanded": true
+        }
+      ],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "672f215f02c49c3eb3eac07beaec7f3e8690cea448bd52e0f70871108fdd6947",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 1
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    },
+    "authored_15_decimal:original": {
+      "applied_preset_sha256": "89d0fc9151eff6b61fea572b799db7eb7f4620a6da8a4e0dafc152d049e92ab1",
+      "applied_version": "1.5.5",
+      "corpus_changes": [],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/lfos/0",
+          "singleton_expanded": false
+        },
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/custom_warps/0",
+          "singleton_expanded": false
+        },
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/modulations/0/line_mapping",
+          "singleton_expanded": false
+        }
+      ],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "d9b1b7c2b61ee4a179481a9879f35a9b6885abbbe968a10adad990582160b293",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 1
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    },
+    "authored_15_decimal:repeat": {
+      "applied_preset_sha256": "89d0fc9151eff6b61fea572b799db7eb7f4620a6da8a4e0dafc152d049e92ab1",
+      "applied_version": "1.5.5",
+      "corpus_changes": [],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/lfos/0",
+          "singleton_expanded": false
+        },
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/custom_warps/0",
+          "singleton_expanded": false
+        },
+        {
+          "applied_points": 3,
+          "before_points": 3,
+          "path": "/settings/modulations/0/line_mapping",
+          "singleton_expanded": false
+        }
+      ],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "d9b1b7c2b61ee4a179481a9879f35a9b6885abbbe968a10adad990582160b293",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 1
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    },
+    "authored_15_singleton:original": {
+      "applied_preset_sha256": "0d956ad61539a821b9c2f48f000535a2ca761bc55edacfcb6860130e4c635db3",
+      "applied_version": "1.5.5",
+      "corpus_changes": [],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/lfos/0",
+          "singleton_expanded": true
+        },
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/custom_warps/0",
+          "singleton_expanded": true
+        },
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/modulations/0/line_mapping",
+          "singleton_expanded": true
+        }
+      ],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "69db937babdf7249f83d71e7026f2ac218fab9ead7a99b1a85a378840ba1362b",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 1
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    },
+    "authored_15_singleton:repeat": {
+      "applied_preset_sha256": "0d956ad61539a821b9c2f48f000535a2ca761bc55edacfcb6860130e4c635db3",
+      "applied_version": "1.5.5",
+      "corpus_changes": [],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/lfos/0",
+          "singleton_expanded": true
+        },
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/custom_warps/0",
+          "singleton_expanded": true
+        },
+        {
+          "applied_points": 2,
+          "before_points": 1,
+          "path": "/settings/modulations/0/line_mapping",
+          "singleton_expanded": true
+        }
+      ],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "69db937babdf7249f83d71e7026f2ac218fab9ead7a99b1a85a378840ba1362b",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 1
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    },
+    "empty_map:labels": {
+      "applied_preset_sha256": "beafeeade4c5de75e3af77b74a9dcf06dfb892b572d8d6061942fb341f95cb27",
+      "applied_version": "1.5.5",
+      "corpus_changes": [],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "beafeeade4c5de75e3af77b74a9dcf06dfb892b572d8d6061942fb341f95cb27",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 1
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    },
+    "empty_map:original": {
+      "applied_preset_sha256": "7ae1d9312666a16bf5fcea144818b9ad45c40b31c855824dac3641c9c916647f",
+      "applied_version": "1.5.5",
+      "corpus_changes": [
+        {
+          "path": "/settings/modulations/7/line_mapping",
+          "reason": "native_ignores_empty_connection_mapping"
+        }
+      ],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "e78479b81667f22d4292eab9eeb0064dfaa1f43a7b55f19980888a9dcfd07125",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 0
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    },
+    "empty_map:repeat": {
+      "applied_preset_sha256": "7ae1d9312666a16bf5fcea144818b9ad45c40b31c855824dac3641c9c916647f",
+      "applied_version": "1.5.5",
+      "corpus_changes": [
+        {
+          "path": "/settings/modulations/7/line_mapping",
+          "reason": "native_ignores_empty_connection_mapping"
+        }
+      ],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "e78479b81667f22d4292eab9eeb0064dfaa1f43a7b55f19980888a9dcfd07125",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 0
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    },
+    "scalar:labels": {
+      "applied_preset_sha256": "36d2a96092d618a4ba3fa856c61076ad88fe44d87aa756971cd40cdfc0732ba2",
+      "applied_version": "1.5.5",
+      "corpus_changes": [],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "36d2a96092d618a4ba3fa856c61076ad88fe44d87aa756971cd40cdfc0732ba2",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 1
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [
+        {
+          "exact_native_grid": 0.41464805603027344,
+          "loaded": 0.41464805603027344,
+          "name": "lfo_1_smooth_time",
+          "requested": 0.41464757919311523
+        }
+      ],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    },
+    "scalar:original": {
+      "applied_preset_sha256": "3e18e89baf9dbc200a02ee31c46db7c78ec29dcafb56ce9f95514cf61e837dfc",
+      "applied_version": "1.5.5",
+      "corpus_changes": [],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "3e18e89baf9dbc200a02ee31c46db7c78ec29dcafb56ce9f95514cf61e837dfc",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 0
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [
+        {
+          "exact_native_grid": 0.41464805603027344,
+          "loaded": 0.41464805603027344,
+          "name": "lfo_1_smooth_time",
+          "requested": 0.41464757919311523
+        }
+      ],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    },
+    "scalar:repeat": {
+      "applied_preset_sha256": "3e18e89baf9dbc200a02ee31c46db7c78ec29dcafb56ce9f95514cf61e837dfc",
+      "applied_version": "1.5.5",
+      "corpus_changes": [],
+      "corpus_native_policy": {
+        "discrete_acceptance": "exact_requested_ordinal",
+        "empty_connection_map": "omit_before_curve_import_only_when_source_and_destination_empty",
+        "extra_continuous_acceptance": "loaded_equals_exact_declared_normalized_float32_roundtrip",
+        "ordinary_absolute_tolerance": 1e-07,
+        "ordinary_relative_tolerance": 1e-06,
+        "policy": "exact_normalized_float32_scalar_readback_and_ignored_empty_maps_v1",
+        "scalar_input_changes": false,
+        "source_sha256_lf": {
+          "render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+          "vital/atlas.py": "134f769691b2133377992b2146a0e628db6439ec6bff1e821e29a47c8a026b45"
+        }
+      },
+      "curve_changes": [],
+      "curve_input_policy": {
+        "precision": "finite_float32",
+        "raw_source_preserved": true,
+        "rule": "float32_curves_singletons_to_constant_endpoints_v1",
+        "singleton": "constant_y_at_x_0_and_1_zero_powers",
+        "source_sha256_lf": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe"
+      },
+      "modulation_slots_verified": 64,
+      "native_ramp_defaults_verified": 128,
+      "nested_families_verified": [
+        "lfos",
+        "custom_warps",
+        "random_values",
+        "modulations",
+        "wavetables",
+        "sample"
+      ],
+      "requested_preset_sha256": "3e18e89baf9dbc200a02ee31c46db7c78ec29dcafb56ce9f95514cf61e837dfc",
+      "requested_version": "1.5.5",
+      "sample_aligned_max_pcm16_delta": {
+        "samples": 0
+      },
+      "sample_readback_byte_exact": false,
+      "sample_readback_shift_samples": 4,
+      "scalar_lfo_route_readback_verified": true,
+      "scalar_native_roundtrips": [
+        {
+          "exact_native_grid": 0.41464805603027344,
+          "loaded": 0.41464805603027344,
+          "name": "lfo_1_smooth_time",
+          "requested": 0.41464757919311523
+        }
+      ],
+      "seed_readback_policy": "signed_int32_to_uint32_exact_bits",
+      "signed_seed_slots_converted": 0,
+      "verified_loaded_scalars": 775,
+      "wavetable_version_migration": "1.6.4"
+    }
+  },
+  "negative_controls": {
+    "empty_map": {
+      "error_type": "RuntimeError",
+      "message": "Vital did not load the requested modulations",
+      "request_id": "c3c39326ca68a0dd00fc6d35d1f9702cff420c06a18add909cb46fb03b421ab6",
+      "status": "error",
+      "wall_seconds": 1.4849088000009942,
+      "worker_job": 1,
+      "worker_max_jobs": 1,
+      "worker_pid": 3180
+    },
+    "scalar": {
+      "error_type": "RuntimeError",
+      "message": "Vital did not load the requested scalar controls: lfo_1_smooth_time",
+      "request_id": "edc5c309216019e62801e370948a9b1f379e2b47b1525fc7fd3af1bc9ff24a46",
+      "status": "error",
+      "wall_seconds": 1.4688525999990816,
+      "worker_job": 1,
+      "worker_max_jobs": 1,
+      "worker_pid": 10324
+    }
+  },
+  "passed": true,
+  "peak_process_rss_bytes": 497639424,
+  "plan_sha256": "a7fcc2cd2bfd0f956da386f5ddf5ca36e7489927c5a03e83858b56b3fe9d75b6"
+}
