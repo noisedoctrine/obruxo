@@ -1,6 +1,8 @@
 # Sound prediction before audio-based inverse training
 
-The next stage of the [training plan](../modelling/TRAINING_PLAN.md#stage-d-add-perceptual-credit-assignment) needs a way to tell the inverse model how changing its predicted patch changes the sound. Vital cannot supply those gradients. This increment builds a separate, small forward model and checks its advice against real Vital renders before allowing it to guide inverse training.
+This documents the historical alpha helper, which [failed native qualification](reports/SOUND_PROXY_RESULTS.md). The active [training plan](../modelling/TRAINING_PLAN.md#sound-loss-training-path) and [basic-stage protocol](STAGED_RECONSTRUCTION.md) now require a new small-scope spectral helper before inverse integration. The old artifact remains unqualified. Its implementation and original experiment protocol follow.
+
+The inverse model needs a way to relate changing its predicted patch to changing the sound. Vital cannot supply those gradients. This increment built a separate small forward model and checked its advice against real Vital renders before allowing it to guide inverse training.
 
 The helper takes canonical patch controls, hard categorical choices, and the actual notes, velocities and timing. It predicts fixed multiscale spectral, stereo envelope and side-energy measurements. It receives no patch IDs, performance IDs, audio encoder states or validation labels as network inputs. The inverse model remains audio-only. Known notes belong to the training/evaluation forward path.
 
