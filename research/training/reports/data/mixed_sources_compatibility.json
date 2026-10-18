@@ -1,0 +1,137 @@
+{
+  "authored_training_targets_and_masks_checked": 820,
+  "frozen_parent_manifests_unchanged": true,
+  "inherited_coverage": {
+    "assets": [
+      {
+        "distinct_supervised_choices": 20,
+        "slot": "osc_1",
+        "supervised_asset_ids": [
+          "full-init-wavetable-0",
+          "factory-wavetable-4bc81073a8b6f129",
+          "factory-wavetable-c9dc92a5c4680965",
+          "factory-wavetable-6426d0c7aadfa070",
+          "factory-wavetable-b2fa10b26b434b68",
+          "factory-wavetable-2c2ea0a3c1634a0c",
+          "factory-wavetable-457b07de301d876c",
+          "factory-wavetable-c677d58612176e04",
+          "factory-wavetable-07b48ca6000d9267",
+          "factory-wavetable-4f71c1eebbf305cb",
+          "factory-wavetable-ff2153c60e74d37d",
+          "factory-wavetable-86cf68f44c8d27fb",
+          "factory-wavetable-4260fdca9bd642f4",
+          "factory-wavetable-ae460d984b71d239",
+          "factory-wavetable-996b0f6a0025e298",
+          "factory-wavetable-617cc3abb43b5345",
+          "factory-wavetable-e5e617e896290b63",
+          "factory-wavetable-fa59116d22cf72dc",
+          "factory-wavetable-f645310a21d201fb",
+          "factory-wavetable-d3e99ef899b0d45c"
+        ],
+        "supervised_states": 754,
+        "vocabulary_size": 20
+      },
+      {
+        "distinct_supervised_choices": 20,
+        "slot": "osc_2",
+        "supervised_asset_ids": [
+          "full-init-wavetable-0",
+          "factory-wavetable-4bc81073a8b6f129",
+          "factory-wavetable-c9dc92a5c4680965",
+          "factory-wavetable-6426d0c7aadfa070",
+          "factory-wavetable-b2fa10b26b434b68",
+          "factory-wavetable-2c2ea0a3c1634a0c",
+          "factory-wavetable-457b07de301d876c",
+          "factory-wavetable-c677d58612176e04",
+          "factory-wavetable-07b48ca6000d9267",
+          "factory-wavetable-4f71c1eebbf305cb",
+          "factory-wavetable-ff2153c60e74d37d",
+          "factory-wavetable-86cf68f44c8d27fb",
+          "factory-wavetable-4260fdca9bd642f4",
+          "factory-wavetable-ae460d984b71d239",
+          "factory-wavetable-996b0f6a0025e298",
+          "factory-wavetable-617cc3abb43b5345",
+          "factory-wavetable-e5e617e896290b63",
+          "factory-wavetable-fa59116d22cf72dc",
+          "factory-wavetable-f645310a21d201fb",
+          "factory-wavetable-d3e99ef899b0d45c"
+        ],
+        "supervised_states": 733,
+        "vocabulary_size": 20
+      },
+      {
+        "distinct_supervised_choices": 20,
+        "slot": "osc_3",
+        "supervised_asset_ids": [
+          "full-init-wavetable-0",
+          "factory-wavetable-4bc81073a8b6f129",
+          "factory-wavetable-c9dc92a5c4680965",
+          "factory-wavetable-6426d0c7aadfa070",
+          "factory-wavetable-b2fa10b26b434b68",
+          "factory-wavetable-2c2ea0a3c1634a0c",
+          "factory-wavetable-457b07de301d876c",
+          "factory-wavetable-c677d58612176e04",
+          "factory-wavetable-07b48ca6000d9267",
+          "factory-wavetable-4f71c1eebbf305cb",
+          "factory-wavetable-ff2153c60e74d37d",
+          "factory-wavetable-86cf68f44c8d27fb",
+          "factory-wavetable-4260fdca9bd642f4",
+          "factory-wavetable-ae460d984b71d239",
+          "factory-wavetable-996b0f6a0025e298",
+          "factory-wavetable-617cc3abb43b5345",
+          "factory-wavetable-e5e617e896290b63",
+          "factory-wavetable-fa59116d22cf72dc",
+          "factory-wavetable-f645310a21d201fb",
+          "factory-wavetable-d3e99ef899b0d45c"
+        ],
+        "supervised_states": 707,
+        "vocabulary_size": 20
+      },
+      {
+        "distinct_supervised_choices": 11,
+        "slot": "sample",
+        "supervised_asset_ids": [
+          "full-init-sample-0",
+          "factory-sample-d638731a9e03013f",
+          "factory-sample-2d52e89fd492e6a9",
+          "factory-sample-034127b5ed19de2e",
+          "factory-sample-504b677a7c063e51",
+          "factory-sample-ea5c759340253b6e",
+          "factory-sample-9c695abc4d097e84",
+          "factory-sample-3a1acf0bcffedf84",
+          "factory-sample-a5ba95b4567693f9",
+          "factory-sample-8ff6580213b33440",
+          "factory-sample-0d2bdb18bdb1f99b"
+        ],
+        "supervised_states": 768,
+        "vocabulary_size": 11
+      }
+    ],
+    "claim": "declared_supervision_preserved_not_new_native_audibility_or_model_quality",
+    "connection_destinations": 431,
+    "connection_slots": 64,
+    "connection_sources": 32,
+    "scalar_count": 775,
+    "scalar_status_counts": {
+      "constant": 6,
+      "varied": 769
+    }
+  },
+  "mixed_pool_id": "fcc146cd1fb1cb06659b25f0710c9a6995c0837f5b9e0973dd4056eb3ba07e3f",
+  "source_artifacts": {
+    "authored": {
+      "codec_id": "82bbe98c2f681253123cc496e3385e5e9dff5a92f990d8d564a37cdae046e1aa",
+      "entries": 1024,
+      "manifest_id": "0004bd6200338db650638f8336eb27a0442c25b54ec43a99a860df0609083f49",
+      "pool_id": "1dee23e59169bbcf282f191b24c71ea7398f0d1240a8799717d4f91c8698e712"
+    },
+    "corpus": {
+      "codec_id": "488866264bcc25bc08d2aa87d89908827d6a3ac741cab201d2ec71d5ac08de1b",
+      "entries": 904,
+      "manifest_id": "6929fc181f3344b7b84022ca6ff097efb10b079d37befa136af05aeb977b9242",
+      "pool_id": "6a4f199d27395989a470e9e6491450319f320afd30bac16e05c3d1690573d892"
+    }
+  },
+  "source_paths_excluded_from_pool_identity": true,
+  "target_codec_id": "488866264bcc25bc08d2aa87d89908827d6a3ac741cab201d2ec71d5ac08de1b"
+}

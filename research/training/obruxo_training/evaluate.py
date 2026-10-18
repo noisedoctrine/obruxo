@@ -255,7 +255,7 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
     torch.set_num_threads(4)
     saved, _ = next(iter(models.values()))
     codec = pool.codec
-    grouped_variants = getattr(codec, "multiple_variants_per_root", False)
+    grouped_variants = getattr(codec, "multiple_variants_per_root", False) or hasattr(pool, "evaluation_group")
     lossy = getattr(codec, "lossy_curves", False)
     source_targets = {entry.state_id: entry.target for entry in pool.entries} if lossy else {}
     replay = saved["replay"] if retrieval is None else retrieval["replay"]
@@ -287,7 +287,8 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
             "maximum_render_attempts": count * (8 + 2 * len(models) + (2 if lossy else 0)), "test_split_evaluated": False}
     if grouped_variants:
         plan.update(primary="equal_weight_mean_of_reference_and_transfer_per_lineage_mrstft",
-                    case_lineages={recipe.state_id: pool.manifest.by_state[recipe.state_id].lineage_id for recipe in recipes})
+                    case_lineages={recipe.state_id: pool.evaluation_group(recipe.state_id) if hasattr(pool, "evaluation_group") else
+                                   pool.manifest.by_state[recipe.state_id].lineage_id for recipe in recipes})
     if lossy:
         plan["source_repeat_policy"] = "literal_source_bytes_without_lossy_curve_reencoding_v1"
         plan["codec_ceiling_policy"] = "source_label_decode_diagnostic_only_never_model_input_v1"

@@ -1,5 +1,7 @@
 # Training contracts, online pilot and trainer
 
+The [mixed-source path](MIXED_SOURCES.md) now combines original corpus presets with authored coverage under unchanged frozen splits. It schedules both sources, adds corpus validation, checks program aliases and retains supervision for the sampler, effects, curves and all connection destinations. Its [bounded native/training report](reports/MIXED_SOURCE_RESULTS.md) verifies ingestion and recovery; broad model quality remains open.
+
 The [corpus input path](CORPUS_INPUTS.md) verifies the complete modern snapshot, encodes all 904 eligible training states and preserves silent FM sources through the full destination domain. Its private source pool reads original presets during training, verifies their bytes and labels, and retains the full frozen split ledger. The separate native profile qualifies exact float32 readback and ignored empty mappings. The [long-observation profile](LONG_OBSERVATIONS.md) covers slow attacks/releases with bounded full-recording features and exact training recovery. These bounded checks remain separate from population-wide audio admission and model quality.
 
 The [complete connection curriculum](GRAPH_COVERAGE.md) schedules all 431 destinations under the existing frozen patch families. Its [native and recovery report](reports/GRAPH_COVERAGE_RESULTS.md) separates active labels, observed sound changes and model quality; related variants share one evaluation/bootstrap unit.

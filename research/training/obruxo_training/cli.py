@@ -46,6 +46,9 @@ def main(argv=None) -> int:
     observations = commands.add_parser("extend-observations", help="Add bounded long-note observations to an original corpus source pool")
     observations.add_argument("--pool", type=Path, required=True)
     observations.add_argument("--output", type=Path, required=True)
+    mixed = commands.add_parser("mix-sources", help="Combine original corpus and authored coverage under frozen source splits")
+    for name in ("corpus-pool", "authored-pool", "snapshot", "output"):
+        mixed.add_argument("--" + name, type=Path, required=True)
     proxy = commands.add_parser("proxy-screen", help="Train and qualify a small patch-to-sound helper against native audio")
     proxy.add_argument("--pool", type=Path, required=True)
     proxy.add_argument("--output", type=Path, required=True)
@@ -154,7 +157,7 @@ def main(argv=None) -> int:
     train.add_argument("--checkpoint-every", type=int, default=50)
     train.add_argument("--render-budget", type=int, default=512)
     train.add_argument("--cpu-threads", type=int, default=4)
-    train.add_argument("--sampling-policy", choices=("pairs", "state_round_robin", "paired_views", "performance_round_robin", "attack_compatible"), default="pairs")
+    train.add_argument("--sampling-policy", choices=("pairs", "state_round_robin", "paired_views", "performance_round_robin", "attack_compatible", "source_balanced"), default="pairs")
     train.add_argument("--identity-weight", type=float, default=0., help="Weight of paired identity contrastive loss; requires paired_views")
     train.add_argument("--identity-temperature", type=float, default=.1)
     train.add_argument("--conditioning", choices=("concat", "cross_attention"), default="concat")
@@ -270,6 +273,14 @@ def main(argv=None) -> int:
     graph_pool.add_argument("--seed", type=int, default=0)
     args = parser.parse_args(argv)
     try:
+        if args.command == "mix-sources":
+            from .mixed_pool import MixedPool
+            if args.asset_references:
+                raise ValueError("mixed sources retain their hash-pinned source assets")
+            pool = MixedPool.create(args.corpus_pool, args.authored_pool, args.snapshot, progress=lambda row: print(json.dumps(row), flush=True))
+            pool.save(args.output)
+            print(json.dumps(pool.summary(), indent=2))
+            return 0
         if args.command == "extend-observations":
             from .observation_codec import extend_observations
             from .pilot import PilotPool

@@ -1,0 +1,376 @@
+{
+  "claim": "bounded_mixed_training_and_validation_ingestion_not_population_admission_or_model_quality",
+  "elapsed_seconds": 277.20589330000803,
+  "final_test_audio": false,
+  "fits_assets_or_decoders": false,
+  "gates": {
+    "audio_only_inputs": true,
+    "authored_supervision_preserved": true,
+    "balanced_attempt_schedule": true,
+    "both_sources_consumed": true,
+    "complete": true,
+    "eight_distinct_training_sources": true,
+    "exact_recovery": true,
+    "exported_codec": true,
+    "frozen_frontend": true,
+    "memory_bounded": true,
+    "no_recovery_renders": true,
+    "original_sources_and_full_readback": true,
+    "source_unchanged": true,
+    "validation_attempt_budget": true,
+    "validation_sources_sealed_from_training": true
+  },
+  "model_promotion": false,
+  "passed": true,
+  "peak_process_tree_rss_bytes": 2734231552,
+  "plan_sha256": "e2e8c74b6d3c34d23e7614363715d80002840aee155e08424d697b898f03064b",
+  "recovery": {
+    "audio_files_written": 0,
+    "checkpoint_seconds_this_segment": 5.729657999996562,
+    "checkpoint_storage": {
+      "collection_writes": 0,
+      "full_writes": 3,
+      "initial_writes": 0,
+      "serialized_bytes": 261372522
+    },
+    "complete": true,
+    "config": {
+      "batch_size": 8,
+      "checkpoint_every": 1,
+      "conditioning": "concat",
+      "cpu_threads": 2,
+      "fresh_examples": null,
+      "identity_temperature": 0.1,
+      "identity_weight": 0.0,
+      "learning_rate": 0.003,
+      "learning_seed_override": null,
+      "mode": "overfit",
+      "render_budget": 32,
+      "replay_capacity": 8,
+      "replay_mib": 8,
+      "sampling_policy": "source_balanced",
+      "seed": 0,
+      "steps": 3,
+      "updates_per_render": 1
+    },
+    "cursor": {
+      "audio_replay": "regenerate_unacknowledged_not_bit_exact",
+      "next_sequence_id": 9,
+      "stream_id": "a05115c1151b1eb0e5d067cf2b1a52a5c7cee52e6ed9329974b33985c89b3d94",
+      "version": 1
+    },
+    "curve_target_bytes": 24832,
+    "device": "cpu",
+    "elapsed_seconds_this_segment": 7.712546599999769,
+    "feature_bytes": 309280,
+    "feature_seconds_this_segment": 0.0,
+    "final_metrics": {
+      "categorical_accuracy": 0.5361998081207275,
+      "categorical_ce": 2.461146354675293,
+      "continuous_mae": 0.17718346416950226,
+      "continuous_mse": 0.07590426504611969,
+      "curve_reconstruction_mse": 0.11621201783418655,
+      "loss": 2.9689743518829346,
+      "route_map_mse": 0.05446762219071388,
+      "warp_curve_mse": 0.2612437605857849
+    },
+    "fresh_accepted_this_segment": 0,
+    "fresh_example_target_reached": true,
+    "frontend": {
+      "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+      "device": "cpu",
+      "duration_scale_seconds": 16,
+      "fft": 2048,
+      "frontend": "stereo_mel_and_frozen_basic_pitch_80s_v1",
+      "hop": 441,
+      "input": "audio_only",
+      "log_scale": 10,
+      "maximum_audio_seconds": 80,
+      "normalization": "fixed_scaling_no_fitted_statistics",
+      "pitch_size": 3521,
+      "pitch_time_bins": 8,
+      "precision": "float32",
+      "sample_rate": 44100,
+      "source_sha256_lf": {
+        "extended_features.py": "f068e0347d543849751e1b2571dc74f214a95c29d15868e0b1c31fd7c573d566",
+        "features.py": "895a736257041013f6b3e3ce260ed6a7bef2c94d51390f5f1a5492a78b737501"
+      },
+      "temporal_policy": "entire_recording_same_fixed_output_bins_no_truncation_one_basic_pitch_window_at_a_time",
+      "timbre_shape": [
+        2,
+        96,
+        32
+      ]
+    },
+    "frozen_weights_and_buffers_unchanged": true,
+    "initial_metrics": {
+      "categorical_accuracy": 0.5361998081207275,
+      "categorical_ce": 2.5590152740478516,
+      "continuous_mae": 0.18186746537685394,
+      "continuous_mse": 0.07904649525880814,
+      "curve_reconstruction_mse": 0.12796001136302948,
+      "loss": 3.0995724201202393,
+      "route_map_mse": 0.05838346853852272,
+      "warp_curve_mse": 0.27516722679138184
+    },
+    "mode": "overfit",
+    "model_state_sha256": "3c88013ea1c85056fb8c8f732b27185545b1e4e9b0d36199d6a0a4499cac7a1c",
+    "peak_process_tree_rss_bytes": 2107404288,
+    "pool_id": "fcc146cd1fb1cb06659b25f0710c9a6995c0837f5b9e0973dd4056eb3ba07e3f",
+    "quality_claim": "supervised_bootstrap_only_real_render_validation_required",
+    "renderer_identity": {
+      "backend_version": "0.8.3",
+      "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+      "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-seed-bits-v2-expression-midi-v1-curve-input-v1-corpus-readback-v1",
+      "settings": {
+        "buffer_size": 128,
+        "control_response": "native_control_rate_processing_not_sample_exact",
+        "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+        "event_timing": "absolute ticks to half-even sample offsets",
+        "full_contract_sha256": "2b66d6c8f71507484be4352082e61154681262f7e38860268cf216c6d1c37a57",
+        "full_nested_readback_verified": true,
+        "midi_transport": "half_even_sample_offsets_quarter_sample_smf_clock_v1",
+        "plugin_name": "Vital.vst3",
+        "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+        "scalar_lfo_route_readback_verified": true,
+        "schema_id": "vital-1.5.5-fields-native-1.6.4",
+        "state_loading": "full_1_5_5_exact_corpus_readback_v1",
+        "verified_loaded_scalars": 775
+      }
+    },
+    "replay_bytes": 542080,
+    "replay_distinct_audio_buffers": 8,
+    "replay_distinct_states": 8,
+    "replay_examples": 8,
+    "replay_seed": null,
+    "route_curve_target_bytes": 198656,
+    "rss_sampling_errors": 0,
+    "run_id": "dee4ea076acac97fcc3157b245623308e8b65f1004e8fe61e389fe00d10a96b3",
+    "seeded_feature_examples": 0,
+    "step": 3,
+    "tiny_overfit_gate": false,
+    "torch": "2.12.1+xpu",
+    "totals": {
+      "accepted": 8,
+      "errors": 0,
+      "feature_seconds": 16.280177199994796,
+      "maximum_gradient_norm": 0.09707039594650269,
+      "optimizer_seconds": 1.3427610999933677,
+      "rejected": 1,
+      "render_attempts": 9,
+      "reused_feature_draws": 16,
+      "sampled_examples": 24
+    },
+    "trainable_parameters": 5730849,
+    "warp_curve_target_bytes": 9312
+  },
+  "retained_sources": {
+    "authored": 5,
+    "corpus": 3
+  },
+  "source_checks": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+  ],
+  "training": {
+    "audio_files_written": 0,
+    "checkpoint_seconds_this_segment": 8.622542199998861,
+    "checkpoint_storage": {
+      "collection_writes": 10,
+      "full_writes": 4,
+      "initial_writes": 1,
+      "serialized_bytes": 345367220
+    },
+    "complete": true,
+    "config": {
+      "batch_size": 8,
+      "checkpoint_every": 1,
+      "conditioning": "concat",
+      "cpu_threads": 2,
+      "fresh_examples": null,
+      "identity_temperature": 0.1,
+      "identity_weight": 0.0,
+      "learning_rate": 0.003,
+      "learning_seed_override": null,
+      "mode": "overfit",
+      "render_budget": 32,
+      "replay_capacity": 8,
+      "replay_mib": 8,
+      "sampling_policy": "source_balanced",
+      "seed": 0,
+      "steps": 3,
+      "updates_per_render": 1
+    },
+    "cursor": {
+      "audio_replay": "regenerate_unacknowledged_not_bit_exact",
+      "next_sequence_id": 9,
+      "stream_id": "a05115c1151b1eb0e5d067cf2b1a52a5c7cee52e6ed9329974b33985c89b3d94",
+      "version": 1
+    },
+    "curve_target_bytes": 24832,
+    "device": "cpu",
+    "elapsed_seconds_this_segment": 46.42545129999053,
+    "feature_bytes": 309280,
+    "feature_seconds_this_segment": 16.280177199994796,
+    "final_metrics": {
+      "categorical_accuracy": 0.5361998081207275,
+      "categorical_ce": 2.461146354675293,
+      "continuous_mae": 0.17718346416950226,
+      "continuous_mse": 0.07590426504611969,
+      "curve_reconstruction_mse": 0.11621201783418655,
+      "loss": 2.9689743518829346,
+      "route_map_mse": 0.05446762219071388,
+      "warp_curve_mse": 0.2612437605857849
+    },
+    "fresh_accepted_this_segment": 8,
+    "fresh_example_target_reached": true,
+    "frontend": {
+      "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+      "device": "cpu",
+      "duration_scale_seconds": 16,
+      "fft": 2048,
+      "frontend": "stereo_mel_and_frozen_basic_pitch_80s_v1",
+      "hop": 441,
+      "input": "audio_only",
+      "log_scale": 10,
+      "maximum_audio_seconds": 80,
+      "normalization": "fixed_scaling_no_fitted_statistics",
+      "pitch_size": 3521,
+      "pitch_time_bins": 8,
+      "precision": "float32",
+      "sample_rate": 44100,
+      "source_sha256_lf": {
+        "extended_features.py": "f068e0347d543849751e1b2571dc74f214a95c29d15868e0b1c31fd7c573d566",
+        "features.py": "895a736257041013f6b3e3ce260ed6a7bef2c94d51390f5f1a5492a78b737501"
+      },
+      "temporal_policy": "entire_recording_same_fixed_output_bins_no_truncation_one_basic_pitch_window_at_a_time",
+      "timbre_shape": [
+        2,
+        96,
+        32
+      ]
+    },
+    "frozen_weights_and_buffers_unchanged": true,
+    "initial_metrics": {
+      "categorical_accuracy": 0.5361998081207275,
+      "categorical_ce": 2.5590152740478516,
+      "continuous_mae": 0.18186746537685394,
+      "continuous_mse": 0.07904649525880814,
+      "curve_reconstruction_mse": 0.12796001136302948,
+      "loss": 3.0995724201202393,
+      "route_map_mse": 0.05838346853852272,
+      "warp_curve_mse": 0.27516722679138184
+    },
+    "mode": "overfit",
+    "model_state_sha256": "3c88013ea1c85056fb8c8f732b27185545b1e4e9b0d36199d6a0a4499cac7a1c",
+    "peak_process_tree_rss_bytes": 2425286656,
+    "pool_id": "fcc146cd1fb1cb06659b25f0710c9a6995c0837f5b9e0973dd4056eb3ba07e3f",
+    "quality_claim": "supervised_bootstrap_only_real_render_validation_required",
+    "renderer_identity": {
+      "backend_version": "0.8.3",
+      "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+      "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-full-1.5.5-state-verified-seed-bits-v2-expression-midi-v1-curve-input-v1-corpus-readback-v1",
+      "settings": {
+        "buffer_size": 128,
+        "control_response": "native_control_rate_processing_not_sample_exact",
+        "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+        "event_timing": "absolute ticks to half-even sample offsets",
+        "full_contract_sha256": "2b66d6c8f71507484be4352082e61154681262f7e38860268cf216c6d1c37a57",
+        "full_nested_readback_verified": true,
+        "midi_transport": "half_even_sample_offsets_quarter_sample_smf_clock_v1",
+        "plugin_name": "Vital.vst3",
+        "sample_readback_policy": "four_zero_prefix_pcm16_rounding_at_most_one",
+        "scalar_lfo_route_readback_verified": true,
+        "schema_id": "vital-1.5.5-fields-native-1.6.4",
+        "state_loading": "full_1_5_5_exact_corpus_readback_v1",
+        "verified_loaded_scalars": 775
+      }
+    },
+    "replay_bytes": 542080,
+    "replay_distinct_audio_buffers": 8,
+    "replay_distinct_states": 8,
+    "replay_examples": 8,
+    "replay_seed": null,
+    "route_curve_target_bytes": 198656,
+    "rss_sampling_errors": 0,
+    "run_id": "dee4ea076acac97fcc3157b245623308e8b65f1004e8fe61e389fe00d10a96b3",
+    "seeded_feature_examples": 0,
+    "step": 3,
+    "tiny_overfit_gate": false,
+    "torch": "2.12.1+xpu",
+    "totals": {
+      "accepted": 8,
+      "errors": 0,
+      "feature_seconds": 16.280177199994796,
+      "maximum_gradient_norm": 0.09707039594650269,
+      "optimizer_seconds": 1.3288353999814717,
+      "rejected": 1,
+      "render_attempts": 9,
+      "reused_feature_draws": 16,
+      "sampled_examples": 24
+    },
+    "trainable_parameters": 5730849,
+    "warp_curve_target_bytes": 9312
+  },
+  "training_attempts": 9,
+  "unadmitted_training_attempts": [
+    {
+      "diagnostic_codes": [
+        "audio.clipping"
+      ],
+      "sequence_id": 3,
+      "source": "corpus",
+      "state_id": "4cc2d852b63f1283777ccf099a9aecaf4ab6dadabe9d35bcd6f68bc36f153854",
+      "status": "rejected"
+    }
+  ],
+  "unadmitted_validation_attempts": [],
+  "validation_candidates": {
+    "authored": 2,
+    "corpus": 2
+  },
+  "validation_checks": [
+    {
+      "evaluation_group": "82dfef486c175c70f4ccd33efb3e01d0a87bab8aacdd5e4c36a15cc32a166a19",
+      "feature_sha256": "5b1d36c28f317b032a64e633e288c2298118d61de73969291f1f4fff0c6596ec",
+      "held_out": true,
+      "not_in_training": true,
+      "repeat_exact": true,
+      "source": "corpus",
+      "state_id": "82dfef486c175c70f4ccd33efb3e01d0a87bab8aacdd5e4c36a15cc32a166a19"
+    },
+    {
+      "evaluation_group": "d55a7e037b77d85c3818c8d73e2a36129d770a8659c5e0eefcba25639f1336a3",
+      "feature_sha256": "4bb0b16bc9115243cc17de3bb97f233a89749035350f19fc0db678c2dd7c7842",
+      "held_out": true,
+      "not_in_training": true,
+      "repeat_exact": true,
+      "source": "authored",
+      "state_id": "eb82c9680b03f93467fbd5052f10f3709342ad8495f234fb9c18e457801596ca"
+    },
+    {
+      "evaluation_group": "fcdaa1ac83f29a63b60218004995b0aebd2d3f6653a310c6f29bcfd28ca8e86d",
+      "feature_sha256": "05f695ade24c8eb018f2bddcbc5ba467a6b235eea89450865bc4ba3b9366f9d5",
+      "held_out": true,
+      "not_in_training": true,
+      "repeat_exact": true,
+      "source": "corpus",
+      "state_id": "fcdaa1ac83f29a63b60218004995b0aebd2d3f6653a310c6f29bcfd28ca8e86d"
+    },
+    {
+      "evaluation_group": "a9a1a6c8eb7fc91ee35572d637ae76b27d821e83b6d7609b2e749132a2dfb0ed",
+      "feature_sha256": "c81381429e648095f4fdc77642ac1485ac1472ce3b698ca8664ce4e1a62660f1",
+      "held_out": true,
+      "not_in_training": true,
+      "repeat_exact": true,
+      "source": "authored",
+      "state_id": "80cd99160de14b44e56e26039ee31b3fa09f6ea225f64efa08640bd083e97733"
+    }
+  ]
+}
