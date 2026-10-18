@@ -142,7 +142,10 @@ class PilotCodec:
 
 
 def load_codec(value: dict) -> PilotCodec:
-    if value.get("codec") == "canonical_corpus_native_v1":
+    if value.get("codec") == "canonical_corpus_observations_v1":
+        from .observation_codec import ObservationCodec
+        codec = ObservationCodec(value["asset_bank"], value["lfo_bank"])
+    elif value.get("codec") == "canonical_corpus_native_v1":
         from .corpus_codec import CorpusNativeCodec
         codec = CorpusNativeCodec(value["asset_bank"], value["lfo_bank"])
     elif value.get("codec") == "canonical_corpus_inputs_v1":

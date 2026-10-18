@@ -1,0 +1,2111 @@
+{
+  "bank": [
+    {
+      "name": "held_mid",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              96
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "role": "reference"
+    },
+    {
+      "name": "staccato_mid",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 120
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 600
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 960
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1080
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 1560
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "role": "reference"
+    },
+    {
+      "name": "melody_mid",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              96
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 360
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              96
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 840
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              96
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 960
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1320
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              96
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 1800
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "role": "reference"
+    },
+    {
+      "name": "chord_mid",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              80
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              80
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "6d51961d687f3a0b7e852a21f704e76a098403729a8d025c7d2319c2ec186045",
+      "role": "reference"
+    },
+    {
+      "name": "held_low",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              666667
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              36,
+              64
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              36,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541",
+      "role": "transfer"
+    },
+    {
+      "name": "staccato_high",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              400000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              112
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 180
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              112
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 360
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 540
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              112
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 960
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1140
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              112
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1560
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 1740
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8",
+      "role": "transfer"
+    },
+    {
+      "name": "melody_wide",
+      "performance": {
+        "end_tick": 2040,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              666667
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              48,
+              72
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              72
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 0,
+            "data": [
+              48,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 600
+          },
+          {
+            "channel": 0,
+            "data": [
+              55,
+              72
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 960
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1080
+          },
+          {
+            "channel": 0,
+            "data": [
+              72,
+              72
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              55,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1560
+          },
+          {
+            "channel": 0,
+            "data": [
+              72,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 2040
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b",
+      "role": "transfer"
+    },
+    {
+      "name": "chord_wide",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              400000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              36,
+              112
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              55,
+              112
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              76,
+              112
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              36,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1680
+          },
+          {
+            "channel": 0,
+            "data": [
+              55,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1680
+          },
+          {
+            "channel": 0,
+            "data": [
+              76,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1680
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b",
+      "role": "transfer"
+    },
+    {
+      "name": "expression_gestures_reference",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 1,
+            "data": [
+              60,
+              88
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 120
+          },
+          {
+            "channel": 1,
+            "data": [
+              74,
+              32
+            ],
+            "kind": "control_change",
+            "order": 5,
+            "tick": 240
+          },
+          {
+            "channel": 0,
+            "data": [
+              1,
+              32
+            ],
+            "kind": "control_change",
+            "order": 9,
+            "tick": 360
+          },
+          {
+            "channel": 1,
+            "data": [
+              1024
+            ],
+            "kind": "pitch_bend",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 1,
+            "data": [
+              74,
+              112
+            ],
+            "kind": "control_change",
+            "order": 6,
+            "tick": 720
+          },
+          {
+            "channel": 0,
+            "data": [
+              1,
+              112
+            ],
+            "kind": "control_change",
+            "order": 10,
+            "tick": 840
+          },
+          {
+            "channel": 1,
+            "data": [
+              0
+            ],
+            "kind": "pitch_bend",
+            "order": 4,
+            "tick": 960
+          },
+          {
+            "channel": 1,
+            "data": [
+              96
+            ],
+            "kind": "channel_pressure",
+            "order": 7,
+            "tick": 1080
+          },
+          {
+            "channel": 1,
+            "data": [
+              16
+            ],
+            "kind": "channel_pressure",
+            "order": 8,
+            "tick": 1440
+          },
+          {
+            "channel": 1,
+            "data": [
+              60,
+              72
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1560
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "2de632ba842cc9d219d9199e43138857211536e7865667eb43b60f7354576d95",
+      "role": "reference"
+    },
+    {
+      "name": "expression_poly_expression_reference",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 1,
+            "data": [
+              60,
+              88
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 120
+          },
+          {
+            "channel": 15,
+            "data": [
+              67,
+              88
+            ],
+            "kind": "note_on",
+            "order": 9,
+            "tick": 120
+          },
+          {
+            "channel": 1,
+            "data": [
+              74,
+              32
+            ],
+            "kind": "control_change",
+            "order": 5,
+            "tick": 240
+          },
+          {
+            "channel": 15,
+            "data": [
+              74,
+              32
+            ],
+            "kind": "control_change",
+            "order": 13,
+            "tick": 240
+          },
+          {
+            "channel": 0,
+            "data": [
+              1,
+              32
+            ],
+            "kind": "control_change",
+            "order": 17,
+            "tick": 360
+          },
+          {
+            "channel": 1,
+            "data": [
+              1024
+            ],
+            "kind": "pitch_bend",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 15,
+            "data": [
+              -1024
+            ],
+            "kind": "pitch_bend",
+            "order": 11,
+            "tick": 480
+          },
+          {
+            "channel": 1,
+            "data": [
+              74,
+              112
+            ],
+            "kind": "control_change",
+            "order": 6,
+            "tick": 720
+          },
+          {
+            "channel": 15,
+            "data": [
+              74,
+              112
+            ],
+            "kind": "control_change",
+            "order": 14,
+            "tick": 720
+          },
+          {
+            "channel": 0,
+            "data": [
+              1,
+              112
+            ],
+            "kind": "control_change",
+            "order": 18,
+            "tick": 840
+          },
+          {
+            "channel": 1,
+            "data": [
+              0
+            ],
+            "kind": "pitch_bend",
+            "order": 4,
+            "tick": 960
+          },
+          {
+            "channel": 15,
+            "data": [
+              0
+            ],
+            "kind": "pitch_bend",
+            "order": 12,
+            "tick": 960
+          },
+          {
+            "channel": 1,
+            "data": [
+              96
+            ],
+            "kind": "channel_pressure",
+            "order": 7,
+            "tick": 1080
+          },
+          {
+            "channel": 15,
+            "data": [
+              96
+            ],
+            "kind": "channel_pressure",
+            "order": 15,
+            "tick": 1080
+          },
+          {
+            "channel": 1,
+            "data": [
+              16
+            ],
+            "kind": "channel_pressure",
+            "order": 8,
+            "tick": 1440
+          },
+          {
+            "channel": 15,
+            "data": [
+              16
+            ],
+            "kind": "channel_pressure",
+            "order": 16,
+            "tick": 1440
+          },
+          {
+            "channel": 1,
+            "data": [
+              60,
+              72
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1560
+          },
+          {
+            "channel": 15,
+            "data": [
+              67,
+              72
+            ],
+            "kind": "note_off",
+            "order": 10,
+            "tick": 1560
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "1db6623be3538173dabd8a88470041f297ffa420f69fadb4939fa193f8b2faf2",
+      "role": "reference"
+    },
+    {
+      "name": "expression_sustain_reference",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 1,
+            "data": [
+              60,
+              88
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 120
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              127
+            ],
+            "kind": "control_change",
+            "order": 7,
+            "tick": 240
+          },
+          {
+            "channel": 1,
+            "data": [
+              60,
+              48
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 360
+          },
+          {
+            "channel": 2,
+            "data": [
+              64,
+              88
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 360
+          },
+          {
+            "channel": 2,
+            "data": [
+              64,
+              48
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 600
+          },
+          {
+            "channel": 3,
+            "data": [
+              67,
+              88
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 600
+          },
+          {
+            "channel": 3,
+            "data": [
+              67,
+              48
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 840
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              0
+            ],
+            "kind": "control_change",
+            "order": 8,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "3d6da9f4d1fddcde3719378bce14ef89f2f3441d0d0d4e9262124188cc019fde",
+      "role": "reference"
+    },
+    {
+      "name": "expression_release_reference",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 1,
+            "data": [
+              60,
+              88
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 120
+          },
+          {
+            "channel": 1,
+            "data": [
+              60,
+              16
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 420
+          },
+          {
+            "channel": 2,
+            "data": [
+              64,
+              88
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 600
+          },
+          {
+            "channel": 2,
+            "data": [
+              64,
+              64
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 900
+          },
+          {
+            "channel": 3,
+            "data": [
+              68,
+              88
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 1080
+          },
+          {
+            "channel": 3,
+            "data": [
+              68,
+              112
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1380
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "068dbe3df4e54f3d85d9b5b3bf171f7f576d00f7a32ba4e54ee40e94aa0d89eb",
+      "role": "reference"
+    },
+    {
+      "name": "expression_gestures_transfer",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              666667
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 1,
+            "data": [
+              48,
+              104
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 120
+          },
+          {
+            "channel": 1,
+            "data": [
+              74,
+              32
+            ],
+            "kind": "control_change",
+            "order": 5,
+            "tick": 240
+          },
+          {
+            "channel": 0,
+            "data": [
+              1,
+              32
+            ],
+            "kind": "control_change",
+            "order": 9,
+            "tick": 360
+          },
+          {
+            "channel": 1,
+            "data": [
+              768
+            ],
+            "kind": "pitch_bend",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 1,
+            "data": [
+              74,
+              112
+            ],
+            "kind": "control_change",
+            "order": 6,
+            "tick": 720
+          },
+          {
+            "channel": 0,
+            "data": [
+              1,
+              112
+            ],
+            "kind": "control_change",
+            "order": 10,
+            "tick": 840
+          },
+          {
+            "channel": 1,
+            "data": [
+              0
+            ],
+            "kind": "pitch_bend",
+            "order": 4,
+            "tick": 960
+          },
+          {
+            "channel": 1,
+            "data": [
+              112
+            ],
+            "kind": "channel_pressure",
+            "order": 7,
+            "tick": 1080
+          },
+          {
+            "channel": 1,
+            "data": [
+              16
+            ],
+            "kind": "channel_pressure",
+            "order": 8,
+            "tick": 1440
+          },
+          {
+            "channel": 1,
+            "data": [
+              48,
+              72
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1560
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "c88fe600d0062b3905acabfeae571c2e10f20e5afacf6a83fcdf70d80cce2b66",
+      "role": "transfer"
+    },
+    {
+      "name": "expression_poly_expression_transfer",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              666667
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 1,
+            "data": [
+              48,
+              104
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 120
+          },
+          {
+            "channel": 15,
+            "data": [
+              55,
+              104
+            ],
+            "kind": "note_on",
+            "order": 9,
+            "tick": 120
+          },
+          {
+            "channel": 1,
+            "data": [
+              74,
+              32
+            ],
+            "kind": "control_change",
+            "order": 5,
+            "tick": 240
+          },
+          {
+            "channel": 15,
+            "data": [
+              74,
+              32
+            ],
+            "kind": "control_change",
+            "order": 13,
+            "tick": 240
+          },
+          {
+            "channel": 0,
+            "data": [
+              1,
+              32
+            ],
+            "kind": "control_change",
+            "order": 17,
+            "tick": 360
+          },
+          {
+            "channel": 1,
+            "data": [
+              768
+            ],
+            "kind": "pitch_bend",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 15,
+            "data": [
+              -768
+            ],
+            "kind": "pitch_bend",
+            "order": 11,
+            "tick": 480
+          },
+          {
+            "channel": 1,
+            "data": [
+              74,
+              112
+            ],
+            "kind": "control_change",
+            "order": 6,
+            "tick": 720
+          },
+          {
+            "channel": 15,
+            "data": [
+              74,
+              112
+            ],
+            "kind": "control_change",
+            "order": 14,
+            "tick": 720
+          },
+          {
+            "channel": 0,
+            "data": [
+              1,
+              112
+            ],
+            "kind": "control_change",
+            "order": 18,
+            "tick": 840
+          },
+          {
+            "channel": 1,
+            "data": [
+              0
+            ],
+            "kind": "pitch_bend",
+            "order": 4,
+            "tick": 960
+          },
+          {
+            "channel": 15,
+            "data": [
+              0
+            ],
+            "kind": "pitch_bend",
+            "order": 12,
+            "tick": 960
+          },
+          {
+            "channel": 1,
+            "data": [
+              112
+            ],
+            "kind": "channel_pressure",
+            "order": 7,
+            "tick": 1080
+          },
+          {
+            "channel": 15,
+            "data": [
+              112
+            ],
+            "kind": "channel_pressure",
+            "order": 15,
+            "tick": 1080
+          },
+          {
+            "channel": 1,
+            "data": [
+              16
+            ],
+            "kind": "channel_pressure",
+            "order": 8,
+            "tick": 1440
+          },
+          {
+            "channel": 15,
+            "data": [
+              16
+            ],
+            "kind": "channel_pressure",
+            "order": 16,
+            "tick": 1440
+          },
+          {
+            "channel": 1,
+            "data": [
+              48,
+              72
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1560
+          },
+          {
+            "channel": 15,
+            "data": [
+              55,
+              72
+            ],
+            "kind": "note_off",
+            "order": 10,
+            "tick": 1560
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "20f3a3a8af3aa41ee33442ab7714c7fb61a156d757cea48eb5e9a35c7aeb09a7",
+      "role": "transfer"
+    },
+    {
+      "name": "expression_sustain_transfer",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              666667
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 1,
+            "data": [
+              48,
+              104
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 120
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              127
+            ],
+            "kind": "control_change",
+            "order": 7,
+            "tick": 240
+          },
+          {
+            "channel": 1,
+            "data": [
+              48,
+              48
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 360
+          },
+          {
+            "channel": 2,
+            "data": [
+              52,
+              104
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 360
+          },
+          {
+            "channel": 2,
+            "data": [
+              52,
+              48
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 600
+          },
+          {
+            "channel": 3,
+            "data": [
+              55,
+              104
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 600
+          },
+          {
+            "channel": 3,
+            "data": [
+              55,
+              48
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 840
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              0
+            ],
+            "kind": "control_change",
+            "order": 8,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "4a3f05827633ed2bead67f5b8a216811b2cb7b7d2c59ae8fae84fca77bdcb875",
+      "role": "transfer"
+    },
+    {
+      "name": "expression_release_transfer",
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              666667
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 1,
+            "data": [
+              48,
+              104
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 120
+          },
+          {
+            "channel": 1,
+            "data": [
+              48,
+              16
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 420
+          },
+          {
+            "channel": 2,
+            "data": [
+              52,
+              104
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 600
+          },
+          {
+            "channel": 2,
+            "data": [
+              52,
+              64
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 900
+          },
+          {
+            "channel": 3,
+            "data": [
+              56,
+              104
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 1080
+          },
+          {
+            "channel": 3,
+            "data": [
+              56,
+              112
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1380
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "3074e65a96a867ba89c84c619e36f8d60c8e3156f1ce746589f7619c76206d66",
+      "role": "transfer"
+    },
+    {
+      "name": "held_4s_reference_v32",
+      "performance": {
+        "end_tick": 4560,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              32
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 240
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 4080
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "25ea1f1ec86410de8a4309cdb74a7f8d22519fea95bbb51cfa13cfb391e0d32b",
+      "role": "reference"
+    },
+    {
+      "name": "held_4s_reference_v64",
+      "performance": {
+        "end_tick": 4560,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              64
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 240
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 4080
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "f7668e90e6d6daaba014ac16bd87f8b9c9f1721a32d70ca995845eb258a9dfb0",
+      "role": "reference"
+    },
+    {
+      "name": "held_4s_transfer_v80",
+      "performance": {
+        "end_tick": 4560,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              72,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 240
+          },
+          {
+            "channel": 0,
+            "data": [
+              72,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 4080
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "ea9055ff77c1749af931b483ada15cca9915b466a274d66a950fdeb749f23477",
+      "role": "transfer"
+    },
+    {
+      "name": "held_12s_reference_v32",
+      "performance": {
+        "end_tick": 12240,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              32
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 240
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 11760
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "86ec5fabf24598e2f5887e5680e5a45468ad04abaed556aa0f81ee90fc537a97",
+      "role": "reference"
+    },
+    {
+      "name": "held_12s_reference_v64",
+      "performance": {
+        "end_tick": 12240,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              64
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 240
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 11760
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "1a4d4de19362589ed4d09ca1e73ec1d92d719ce22faf2c77e224709eba10881e",
+      "role": "reference"
+    },
+    {
+      "name": "held_12s_transfer_v80",
+      "performance": {
+        "end_tick": 12240,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              72,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 240
+          },
+          {
+            "channel": 0,
+            "data": [
+              72,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 11760
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "f10eb3232571a6147a033a375ea43b957c8fab16e0be690b10d5424a8cca4fc5",
+      "role": "transfer"
+    },
+    {
+      "name": "held_40s_reference_v32",
+      "performance": {
+        "end_tick": 39120,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              32
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 240
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 38640
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "e4950f76908a80e0d8e5643713624f78e93295766a51da69f6f28e7b7f298f83",
+      "role": "reference"
+    },
+    {
+      "name": "held_40s_reference_v64",
+      "performance": {
+        "end_tick": 39120,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              64
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 240
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 38640
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "da5e28d650143c740253f1b523a19c217ab00e8ea026aa96f57f1e81c0b8cb91",
+      "role": "reference"
+    },
+    {
+      "name": "held_40s_transfer_v80",
+      "performance": {
+        "end_tick": 39120,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              72,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 240
+          },
+          {
+            "channel": 0,
+            "data": [
+              72,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 38640
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "5104a47df0dc04053b488403dd47cf0eacf4ee0d25d553bd7dbe8e8eff1dd5da",
+      "role": "transfer"
+    }
+  ],
+  "codec_id": "488866264bcc25bc08d2aa87d89908827d6a3ac741cab201d2ec71d5ac08de1b",
+  "diagnostic_attempt_budget": 12,
+  "final_test_audio": false,
+  "frontend": {
+    "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+    "device": "cpu",
+    "duration_scale_seconds": 16,
+    "fft": 2048,
+    "frontend": "stereo_mel_and_frozen_basic_pitch_80s_v1",
+    "hop": 441,
+    "input": "audio_only",
+    "log_scale": 10,
+    "maximum_audio_seconds": 80,
+    "normalization": "fixed_scaling_no_fitted_statistics",
+    "pitch_size": 3521,
+    "pitch_time_bins": 8,
+    "precision": "float32",
+    "sample_rate": 44100,
+    "source_sha256_lf": {
+      "extended_features.py": "f068e0347d543849751e1b2571dc74f214a95c29d15868e0b1c31fd7c573d566",
+      "features.py": "895a736257041013f6b3e3ce260ed6a7bef2c94d51390f5f1a5492a78b737501"
+    },
+    "temporal_policy": "entire_recording_same_fixed_output_bins_no_truncation_one_basic_pitch_window_at_a_time",
+    "timbre_shape": [
+      2,
+      96,
+      32
+    ]
+  },
+  "model_promotion": false,
+  "native_diagnostic_phase_control": {
+    "osc_1_random_phase": 0.0,
+    "osc_2_random_phase": 0.0,
+    "osc_3_random_phase": 0.0,
+    "sample_random_phase": 0.0
+  },
+  "native_selection": "shortest_adequate_reference_then_lowest_velocity_then_performance_id",
+  "panel_id": "186691b4aa8652b4a5692888fdb1829449c05df10b0fe5f8f0c34f65078c9256",
+  "pool_id": "6a4f199d27395989a470e9e6491450319f320afd30bac16e05c3d1690573d892",
+  "previous_maximum_reference_seconds": 1.5,
+  "qualification": "long_observation_sources_features_and_training_v1",
+  "rss_limit_bytes": 8589934592,
+  "slow_training_states": [
+    "06d0b93567a6accd5dd61ea3e87dcb3aada93eaae53347a270fb9e1d23351320",
+    "14d36a0a09dc2e6e35fd43a3d1678d4c7b2bb1290376ecad9b3608985ac4d265",
+    "221f3511b96c32f67c86af984b40ed48ae7cb9f6045cfdc834c5254a8d98729f",
+    "4c941402bef940ed0b9cd3a58b8eae317182d25a49cf4dc06bbc74502b229876",
+    "965b9342837b4a714e464f33db8adeda2c54e6f1d87622adf3597eb69c8875e0",
+    "db1cdcacf4c4b82ef3e3b033ff85ff8120e9cfef9025a13a876e5ced4aef3707"
+  ],
+  "source_sha256_lf": {
+    "data_generation/obruxo_data/render/__init__.py": "15b14494598c55f9a4f160f7992896b36c351cb65e0f2ed98c4d03235956bb82",
+    "data_generation/obruxo_data/render/base.py": "655a672779f37960c06e592cad83572149da3c2e7bd11bf91075d220b4b5efa8",
+    "data_generation/obruxo_data/render/batch.py": "8aa0ac5d01587ccff7e7992c29fe79f275f6190dde6b889187e261fb66cc59f4",
+    "data_generation/obruxo_data/render/capabilities.py": "7fb505b169b6cf097d19b55e30059ee4dc6684a080ee67cbd942541d3c84bb87",
+    "data_generation/obruxo_data/render/corpus_inputs.py": "91d31903ddd21ed3494ca5eca96e346bb3a14ae000f32e9633c2968597f4b92f",
+    "data_generation/obruxo_data/render/curve_inputs.py": "cb451ff5019038829a004b50b024edb2c639cbb783dcc3d0a31de0fb18fbffbe",
+    "data_generation/obruxo_data/render/full_state.py": "dbcc375b136ff3002020bf587061520581a38c8399c655efa099aac06cce8749",
+    "data_generation/obruxo_data/render/midi_transport.py": "55d5b6ace126b45e38635c707f00006596dd7db1a61d59da13f2f220b8f0ef59",
+    "data_generation/obruxo_data/render/qa.py": "d536b111c5a7bfc104b7924d12cf3dca0958b2c75b51a22bcc0ab3adf3689c38",
+    "data_generation/obruxo_data/render/vita.py": "0685740a9d246c4a6291162f01e9b9a4249093324f430815b579fb0fabc669fa",
+    "data_generation/obruxo_data/vital/full_contract.py": "8cb6e2c8b017e8bd1c59f86430c6c1d33af53ef0426c3a1f05cbf1509c5e96e5",
+    "training/obruxo_training/__init__.py": "80bb66f20b0cc165dd6a028b1fd5fa123d45bfebe8137b4e5e9602acfd68afea",
+    "training/obruxo_training/alpha.py": "100d39b844c35a8ff796b80c42df3b394770e1f5c12ce7524335c5d8b9369b82",
+    "training/obruxo_training/alpha_check.py": "02742c531d3197c86e1b0f3ea785f59d665d2acaeed3959d0a40e171b523c429",
+    "training/obruxo_training/asset_codec.py": "f92aa078b0aa30fb05bee0d5713fd1d8a587f0f4f08f7fe8fa4432d4b38751f1",
+    "training/obruxo_training/assets.py": "85a49d979b8206520dbe4ec8a1b19730774acb39519c1a4bf103d87837731071",
+    "training/obruxo_training/audio_candidates.py": "4e2d166f4fac96cd4d354d1bc119b1d97bbad7abf8ec1eca553dc2cfd0bf1243",
+    "training/obruxo_training/audit.py": "d872cccf3ee6511a431af8090c9de91c5227a1a4e201298897211c549fb43f82",
+    "training/obruxo_training/benchmark.py": "1941574c1f9295dd9d136a131ea58f514b53db9298d133e8f988a514668d9ad0",
+    "training/obruxo_training/candidate_data.py": "ff1aae5abac5e83a129a607cc0a43a0b0708002eff412f99c1ea7b9e5a474804",
+    "training/obruxo_training/candidate_learning.py": "608029baf041b956ac3fcce98a3d52572d2d41011d3208a145e15b8755c341aa",
+    "training/obruxo_training/candidate_screen.py": "20eb8b163014298968a438ec25e0acd31d9fae39d8902966209f154fe0b5c7d4",
+    "training/obruxo_training/candidates.py": "a26e4512330645b4522f4ebd3112cc60fdd18c2309998cb26b78362a40e96165",
+    "training/obruxo_training/capability_audit.py": "565b0a09b06e9aab8063f9820718069dd7dacad0005bf281438f51d573d7df3b",
+    "training/obruxo_training/checkpoints.py": "1b65d17129dfadff08b1b07f9c48ede36aacb09133b4388adab38aa53e83088b",
+    "training/obruxo_training/cli.py": "a54fbf42790226ba2ef0a56c638152c9be8c72afab69f946e76087142790661b",
+    "training/obruxo_training/codec.py": "62e915fd0aae9d7e77644771deb4fc216ac2f614f930628f7aaa9fa63e23edb8",
+    "training/obruxo_training/codec_check.py": "647734635b1da35fec45c44906dc519e2aac6c1592509016a072472c520f17ee",
+    "training/obruxo_training/combined_check.py": "8cd09ed1834417c76d5997ff930e205e603fab41e308e909b19f72155c146e53",
+    "training/obruxo_training/combined_codec.py": "5d56d8d8e4861cb07b551c358f95600eaadb43ca6e4ed3f52eac510e906a6d4b",
+    "training/obruxo_training/combined_policy.py": "1d631728d2fc4c744e16333496fd20ee209d7e764d2d9dcad4b2fe17f16e98cf",
+    "training/obruxo_training/contracts.py": "e88498e27bdda24375c4d393d2be90e93087b9e34bf108940717f5097fc37ede",
+    "training/obruxo_training/corpus_codec.py": "4eed71f2739a04f8fad1f7ebd4860808350bf9702cee8e7362c0e66b4d0dc685",
+    "training/obruxo_training/corpus_inputs.py": "bbf34a67c6c190f5263eec8089e4e11f93e8826539642c2f0c840b46dbece385",
+    "training/obruxo_training/corpus_pool.py": "5c06a4d0ea5ae2206274e9b96974e4e147a739619367eb12fc613db81ec509fe",
+    "training/obruxo_training/curve_codec.py": "e0fe22965137b5b048390e8027b77f80ea3286735dceeefd44cc12b73a94a385",
+    "training/obruxo_training/curve_labels.py": "c00bdfefa7b69901e7d224f656d59a442fc73aa5317e702bf95d11b66b24fe2c",
+    "training/obruxo_training/eligibility.py": "d95eff39be0b1dbaeba49a37231ce7295ee27c064e28ef0a1a184a21b6fb36eb",
+    "training/obruxo_training/evaluate.py": "f9341c73edb90061b2c9582db447bfb3145e11dcdf4bca0bafc3f525faa9fadc",
+    "training/obruxo_training/expression_bank.py": "f0edfe633c8a2413883985f7568df5bf2b6b2ce61b6fa848055e2edfeff8fb6a",
+    "training/obruxo_training/expression_check.py": "34271dd33487f476428f7f1157533679712714ea6f44fb3ad0d48a8b96afbc10",
+    "training/obruxo_training/expression_codec.py": "2db9b8baf408d96fb6349036a9083f355cb29f0d98d4163ae1dbdf7d5bdb2ac6",
+    "training/obruxo_training/extended_features.py": "f068e0347d543849751e1b2571dc74f214a95c29d15868e0b1c31fd7c573d566",
+    "training/obruxo_training/factory_bank.py": "9d73ffdd10a2c4df7d4afdea623560961174cc2beea468583592f35544e28cf6",
+    "training/obruxo_training/features.py": "895a736257041013f6b3e3ce260ed6a7bef2c94d51390f5f1a5492a78b737501",
+    "training/obruxo_training/full_check.py": "4d20cbc92a6a82c55ebd676a9a0a0c42259238c0223db4eb79ff66b9184e0417",
+    "training/obruxo_training/full_scalar.py": "532a12126bb44500dc80e718ec56d8d21f309158220be8eaea52ec4dde8bbf8c",
+    "training/obruxo_training/graph_codec.py": "7537c6d1a4fe0cf8231220ef5ea58031f729085dfec9157d197e2728aa31413f",
+    "training/obruxo_training/graph_context.py": "94100ebf0f82baea2a4ed3d8bb339851bfa5ee926afca00dcd665ec7b0b8d4ad",
+    "training/obruxo_training/graph_native.py": "05635a44c89017c83c0d6a4f397f624b7a9a51d42b50e7f56336b4004570f711",
+    "training/obruxo_training/identity.py": "2a0513450a4df452dd8821bd1fd764f5d307c653c2b485c5ba384519af33830a",
+    "training/obruxo_training/lfo_bank.py": "07d8e616f428de299d3a6bed4a8ac033e6cb5270079463eeb331fbf5304fc0d3",
+    "training/obruxo_training/lfo_codec.py": "d41da86ac468dcf2821b41d6ce66c02b630d72fdf660adbbf6cd3bb4c89aabaf",
+    "training/obruxo_training/lfo_curriculum.py": "167517d692e002086b3a36c252767339a2bdc1d28eb31abd1d52ef6ea65a62ba",
+    "training/obruxo_training/lfo_loss.py": "9a56fb32ac06b9e44cc6a01a3336847d2abc35e6e0ca6fe53367f4ac480a6a4e",
+    "training/obruxo_training/model.py": "30209d9c2df64326794f4e472559e4c46d7816ca139220293bc44b2ac4a4abe6",
+    "training/obruxo_training/nested_check.py": "b9009b469364fa396f1e14a8db76b9600b23f9e3c453846ee179d376f8d3763e",
+    "training/obruxo_training/nested_codec.py": "2f8da9bed308fa4582d5b9568d4064fafdb518d201b31ffc92dfbedb9a3b075a",
+    "training/obruxo_training/observation_bank.py": "3881f97098a9db05883030b304373e7917dd336e6aca328ed142c4970efc7a21",
+    "training/obruxo_training/observation_codec.py": "81168e57afd1d340ca1f66727242647e88d0ed5afca2f4e8d35ca919296d8dd1",
+    "training/obruxo_training/paired.py": "1c5d8c69d92151b40418e8bc949630a306686740025a22a31eea2147f4a89025",
+    "training/obruxo_training/paired_features.py": "d4ffe2081a82c39cc86f8db03e780c07c444d27507da945f16bf644d7bf221d3",
+    "training/obruxo_training/performance_eligibility.py": "2c7e10355c06390589a4a5469d66e6efa62c7ac06c171eb4a79a3a589265ff47",
+    "training/obruxo_training/performances.py": "8d593b95653cb764a78fa1ea7dc7359a2be8bd50e379dbacab0321a6178af1e8",
+    "training/obruxo_training/pilot.py": "90a3c833d481e9a0d278babed9005be75cb0a68b013cbd7382d5c31f2f8e1739",
+    "training/obruxo_training/proxy.py": "a82364d7dd406b6949bb6dfdfaa23b873035bade3e6771b238cda712a366abfb",
+    "training/obruxo_training/proxy_screen.py": "b1a2c7ffcb6662a933c182810db8eb35529669975f3fdc78991fa0667b7e0290",
+    "training/obruxo_training/ranking_check.py": "afb67588a697ef4bee3e1d41dd5a1da5d80bf500df6351dabdaaf0459f2686c8",
+    "training/obruxo_training/reproducibility.py": "9326793bdbc629be7c29584329b182dcb93b6fd91c270f180b24a0a6fe885729",
+    "training/obruxo_training/routing.py": "ec0e4ddf5f7151ed72168b35e6d75ab49cdeba04db7b97f8df7da25cfa0de98b",
+    "training/obruxo_training/routing_check.py": "4ceb464b457c45d08b11e7be3e87993f3bec4ffcf20a658c00abf79b2edb76e5",
+    "training/obruxo_training/splits.py": "4c87600db3bfa8aff07472861b2dfc52d0dc77f74a695827197ea2b4a1c5231d",
+    "training/obruxo_training/stream.py": "008d5aed58f6dc81bba7e51754a728f2232ee7774bc206abc95cc74cd22ef753",
+    "training/obruxo_training/trainer.py": "688ce8c8e566ce34b554e9df977f5a9e8e2bab2cc03fb5291086c3a0f19963cc",
+    "training/reports/scripts/qualify_long_observations.py": "5e4c0e91cdcdaaf9dd39433f00419c2b4e32353f12c2b6e08fd8ff7086a089a2"
+  },
+  "split_manifest_id": "6929fc181f3344b7b84022ca6ff097efb10b079d37befa136af05aeb977b9242",
+  "training_attempt_budget": 24,
+  "training_phase_control": "original_requested_values_unchanged",
+  "training_states": 904
+}

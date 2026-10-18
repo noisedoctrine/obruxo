@@ -1,0 +1,100 @@
+{
+  "accepted": 2,
+  "diagnostic_attempts": 12,
+  "final_test_audio": false,
+  "initial_plan_sha256": "7e8c35b51853d7b28013759623910434abcbc2ff4a49e84f8bf5b8e3b43be921",
+  "interpretation": "five_valid_sources_need_more_than_four_seconds_of_tail_no_threshold_or_patch_change",
+  "rejected": [
+    {
+      "audio_float32_sha256": "70128b83678dfd49bc8e8a07cd14987faadbad28c93872f5651689de0480310d",
+      "diagnostic_codes": [
+        "audio.tail_truncation"
+      ],
+      "role": "long",
+      "state_id": "06d0b93567a6accd5dd61ea3e87dcb3aada93eaae53347a270fb9e1d23351320",
+      "tail_rms": 0.003031342930206841
+    },
+    {
+      "audio_float32_sha256": "70128b83678dfd49bc8e8a07cd14987faadbad28c93872f5651689de0480310d",
+      "diagnostic_codes": [
+        "audio.tail_truncation"
+      ],
+      "role": "repeat",
+      "state_id": "06d0b93567a6accd5dd61ea3e87dcb3aada93eaae53347a270fb9e1d23351320",
+      "tail_rms": 0.003031342930206841
+    },
+    {
+      "audio_float32_sha256": "2a65e22de8a451384a42a53cb6cbaa092c06a5de4a1fd0b260bfb2addc2c274b",
+      "diagnostic_codes": [
+        "audio.tail_truncation"
+      ],
+      "role": "long",
+      "state_id": "14d36a0a09dc2e6e35fd43a3d1678d4c7b2bb1290376ecad9b3608985ac4d265",
+      "tail_rms": 0.011162465844045085
+    },
+    {
+      "audio_float32_sha256": "2a65e22de8a451384a42a53cb6cbaa092c06a5de4a1fd0b260bfb2addc2c274b",
+      "diagnostic_codes": [
+        "audio.tail_truncation"
+      ],
+      "role": "repeat",
+      "state_id": "14d36a0a09dc2e6e35fd43a3d1678d4c7b2bb1290376ecad9b3608985ac4d265",
+      "tail_rms": 0.011162465844045085
+    },
+    {
+      "audio_float32_sha256": "84d8daff93048816f23dffc97432fc1c719b4bfa14e49e8b315cbafcca91d97b",
+      "diagnostic_codes": [
+        "audio.tail_truncation"
+      ],
+      "role": "long",
+      "state_id": "221f3511b96c32f67c86af984b40ed48ae7cb9f6045cfdc834c5254a8d98729f",
+      "tail_rms": 0.002452977864848675
+    },
+    {
+      "audio_float32_sha256": "84d8daff93048816f23dffc97432fc1c719b4bfa14e49e8b315cbafcca91d97b",
+      "diagnostic_codes": [
+        "audio.tail_truncation"
+      ],
+      "role": "repeat",
+      "state_id": "221f3511b96c32f67c86af984b40ed48ae7cb9f6045cfdc834c5254a8d98729f",
+      "tail_rms": 0.002452977864848675
+    },
+    {
+      "audio_float32_sha256": "77ccc0e45c02f43bd8eeca7e90821bb1bfc855b3db5b1aa7b31b955dbcedf8b7",
+      "diagnostic_codes": [
+        "audio.tail_truncation"
+      ],
+      "role": "long",
+      "state_id": "4c941402bef940ed0b9cd3a58b8eae317182d25a49cf4dc06bbc74502b229876",
+      "tail_rms": 0.004102658126255922
+    },
+    {
+      "audio_float32_sha256": "77ccc0e45c02f43bd8eeca7e90821bb1bfc855b3db5b1aa7b31b955dbcedf8b7",
+      "diagnostic_codes": [
+        "audio.tail_truncation"
+      ],
+      "role": "repeat",
+      "state_id": "4c941402bef940ed0b9cd3a58b8eae317182d25a49cf4dc06bbc74502b229876",
+      "tail_rms": 0.004102658126255922
+    },
+    {
+      "audio_float32_sha256": "95df845e8fd47e01b1bf5ea141e11bca8938a36669381526718bd0e1966cf34e",
+      "diagnostic_codes": [
+        "audio.tail_truncation"
+      ],
+      "role": "long",
+      "state_id": "db1cdcacf4c4b82ef3e3b033ff85ff8120e9cfef9025a13a876e5ced4aef3707",
+      "tail_rms": 0.004738077097581285
+    },
+    {
+      "audio_float32_sha256": "95df845e8fd47e01b1bf5ea141e11bca8938a36669381526718bd0e1966cf34e",
+      "diagnostic_codes": [
+        "audio.tail_truncation"
+      ],
+      "role": "repeat",
+      "state_id": "db1cdcacf4c4b82ef3e3b033ff85ff8120e9cfef9025a13a876e5ced4aef3707",
+      "tail_rms": 0.004738077097581285
+    }
+  ],
+  "tail_seconds": 4
+}

@@ -7,7 +7,8 @@ from time import perf_counter
 from obruxo_data.hashing import canonical_sha256, sha256_bytes
 
 from .audit import write_json
-from .features import AudioFeatures, tensor_digest, validate_features
+from .features import tensor_digest, validate_features
+from .extended_features import features_for
 from .paired import complete_pairs
 from .pilot import PilotSampler
 from .stream import NativeRendererFactory, OnlineRenderStream, StreamConfig
@@ -66,7 +67,7 @@ def prepare_paired_features(pool, output: Path, *, states=64, renderer_factory=N
         raise ValueError("paired cache cannot repeat training states within its attempt prefix")
     stream_config = stream_config or StreamConfig(prefetch_clips=1, timeout_seconds=30)
     source = load_training_checkpoint(recover_checkpoint) if recover_checkpoint else None
-    frontend = AudioFeatures(source["basic_pitch"] if source else None)
+    frontend = features_for(pool.codec, source["basic_pitch"] if source else None)
     replay, history, renderer_identity, origin = [], [], None, None
     if source is not None:
         contract = source["run_contract"]

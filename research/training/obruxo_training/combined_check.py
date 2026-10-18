@@ -14,7 +14,6 @@ from .audit import write_json
 from .benchmark import MemoryMonitor
 from .combined_codec import CombinedCodec
 from .full_scalar import EFFECTS
-from .performances import bank_for
 from .reproducibility import FULL_PHASE_CONTROL, fixed_generator_phases
 from .stream import NativeRendererFactory, RenderWorker
 
@@ -35,7 +34,7 @@ def family_cases(codec):
     base = codec.schema.template()
     base["settings"].update(FULL_PHASE_CONTROL)
     base["settings"].update(volume=2500., osc_1_level=.15, osc_1_destination=3., sample_on=0.)
-    references = [entry.performance() for entry in bank_for(codec.contract.renderer_id) if entry.role == "reference"]
+    references = [entry.performance() for entry in codec.contract.performances() if entry.role == "reference"]
     cases = []
     controls = {"chorus": {"chorus_dry_wet": .3}, "compressor": {"compressor_mix": .7, "compressor_low_gain": 0.,
         "compressor_band_gain": 0., "compressor_high_gain": 0., "compressor_low_upper_threshold": -50.,
@@ -112,7 +111,7 @@ def check_combined(pool, output, *, progress=None):
             "random_generator_policy": "fresh_process_per_request_preserve_all_requested_random_routes",
             "rss_limit_bytes": 8 * 1024**3, "final_test_audio": False, "model_promotion": False}
     write_json(output / "plan.json", plan)
-    references = [entry for entry in bank_for(codec.contract.renderer_id) if entry.role == "reference"]
+    references = [entry for entry in codec.contract.performances() if entry.role == "reference"]
     events, checks, label_checks = [], [], []
     monitor, started = MemoryMonitor(), perf_counter()
     monitor.start()

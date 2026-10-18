@@ -97,6 +97,9 @@ class AudioFeatures(nn.Module):
             raise ValueError("frontend requires float32 stereo audio at 44100 Hz")
         if not 2048 <= len(audio) <= 16 * sample_rate or not np.isfinite(audio).all():
             raise ValueError("audio must be finite and between 2048 samples and 16 seconds")
+        return self._analyze_validated(audio, sample_rate)
+
+    def _analyze_validated(self, audio, sample_rate):
         stereo = torch.from_numpy(audio.copy()).T.contiguous()
         spectrum = torch.stft(stereo, n_fft=2048, hop_length=441, window=self.window, return_complex=True)
         mel = torch.log1p(10 * (self.bands @ (spectrum.abs() / np.sqrt(2048))))

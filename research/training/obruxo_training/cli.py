@@ -43,6 +43,9 @@ def main(argv=None) -> int:
     corpus = commands.add_parser("create-corpus-pool", help="Connect frozen training labels to original sources for on-demand rendering")
     for name in ("snapshot", "corpus", "candidates", "output"):
         corpus.add_argument("--" + name, type=Path, required=True)
+    observations = commands.add_parser("extend-observations", help="Add bounded long-note observations to an original corpus source pool")
+    observations.add_argument("--pool", type=Path, required=True)
+    observations.add_argument("--output", type=Path, required=True)
     proxy = commands.add_parser("proxy-screen", help="Train and qualify a small patch-to-sound helper against native audio")
     proxy.add_argument("--pool", type=Path, required=True)
     proxy.add_argument("--output", type=Path, required=True)
@@ -267,6 +270,15 @@ def main(argv=None) -> int:
     graph_pool.add_argument("--seed", type=int, default=0)
     args = parser.parse_args(argv)
     try:
+        if args.command == "extend-observations":
+            from .observation_codec import extend_observations
+            from .pilot import PilotPool
+            if args.asset_references:
+                raise ValueError("observation extension retains the source pool's registered assets")
+            pool = extend_observations(PilotPool.load(args.pool))
+            pool.save(args.output)
+            print(json.dumps(pool.summary(), indent=2))
+            return 0
         if args.command == "create-corpus-pool":
             from .corpus_pool import CorpusPool
             if args.asset_references:
