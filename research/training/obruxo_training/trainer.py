@@ -21,7 +21,8 @@ from .benchmark import MemoryMonitor
 from .checkpoints import TrainingCheckpointWriter, atomic_torch_save, load_training_checkpoint
 from .codec import PilotTarget, load_codec
 from .curve_labels import CURVE_LABEL_KEYS, SOURCE_CURVES
-from .features import AudioFeatures, tensor_digest, validate_features
+from .features import tensor_digest, validate_features
+from .extended_features import features_for
 from .model import PilotInverse, batch_features, conditioning_from_spec, loss_terms, model_spec, predicted_targets
 from .paired import complete_pairs, identity_terms, paired_batch_indices
 from .pilot import PilotPool, PilotSampler
@@ -243,7 +244,7 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
     np.random.seed(learning_seed % 2**32)
     torch.manual_seed(learning_seed)
     saved = load_training_checkpoint(resume) if resume else None
-    frontend = AudioFeatures(saved["basic_pitch"] if saved else None)
+    frontend = features_for(pool.codec, saved["basic_pitch"] if saved else None)
     sampler = PilotSampler(pool, seed=config.seed, policy=config.sampling_policy)
     paired = config.sampling_policy == "paired_views"
     if paired and len({entry.state_id for entry in pool.entries if pool.manifest.by_state[entry.state_id].split == "train"}) < config.batch_size // 2:
@@ -482,7 +483,7 @@ def restore_model(saved, device: str = "cpu") -> tuple:
     codec.contract.require_match(saved["contract"])
     if saved["codec"] != codec.to_dict():
         raise ValueError("inference codec changed")
-    frontend = AudioFeatures(saved["basic_pitch"])
+    frontend = features_for(codec, saved["basic_pitch"])
     if frontend.describe() != saved["frontend"]:
         raise ValueError("inference frontend or frozen weights changed")
     model = PilotInverse(codec, conditioning).to(device).eval()

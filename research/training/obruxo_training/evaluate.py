@@ -16,9 +16,9 @@ from obruxo_data.render.base import RenderRequest
 from .audit import write_json
 from .codec import PilotTarget
 from .curve_labels import CURVE_LABEL_KEYS
-from .features import AudioFeatures, tensor_digest
+from .features import tensor_digest
+from .extended_features import features_for
 from .model import PilotInverse, batch_features, predicted_targets
-from .performances import bank_for
 from .pilot import PilotPool, PilotSampler
 from .stream import OnlineRenderStream, StreamConfig, render_isolated
 from .trainer import TrainConfig, _run_contract, export_model, validate_replay
@@ -64,7 +64,7 @@ def restore_evaluation_checkpoint(saved, pool):
     contract = saved["run_contract"]
     config = TrainConfig(**contract["training"])
     stream_config = StreamConfig.from_dict(contract["stream"])
-    frontend = AudioFeatures(saved["basic_pitch"])
+    frontend = features_for(pool.codec, saved["basic_pitch"])
     sampler = PilotSampler(pool, seed=config.seed, policy=config.sampling_policy)
     if contract != _run_contract(pool, sampler, frontend, config, stream_config, contract.get("replay_seed")):
         raise ValueError("evaluation checkpoint belongs to incompatible contracts or a different pool")
@@ -303,7 +303,7 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
         plan["identity_diagnostics"] = "heldout_state_reference_to_reserved_transfer_retrieval_v1"
     if validation_states is not None:
         plan["validation_states"] = validation_states
-    transfers = [entry for entry in bank_for(pool.codec.contract.renderer_id) if entry.role == "transfer"]
+    transfers = [entry for entry in pool.codec.contract.performances() if entry.role == "transfer"]
     if comparison:
         plan.update(evaluation="pilot_real_render_comparison_v2", candidate_order=list(models),
                     cases=[{"state_id": recipe.state_id, "reference_performance_id": recipe.performance_id,

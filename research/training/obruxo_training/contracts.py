@@ -34,6 +34,7 @@ class TrainingContract:
     render_workers: int = 1
     prefetch_clips: int = 32
     prefetch_bytes: int = 256 * 1024 * 1024
+    performance_profile: str | None = None
 
     @property
     def contract_id(self) -> str:
@@ -41,18 +42,28 @@ class TrainingContract:
 
     def to_dict(self) -> dict:
         full = self.schema_id == FULL_SCHEMA_ID
-        return {"version": 2 if full else 1, "identity_rule": IDENTITY_RULE, "asset_rule": ASSET_RULE, "split_rule": SPLIT_RULE,
+        values = asdict(self)
+        if self.performance_profile is None:
+            del values["performance_profile"]
+        return {"version": 3 if self.performance_profile else 2 if full else 1, "identity_rule": IDENTITY_RULE, "asset_rule": ASSET_RULE, "split_rule": SPLIT_RULE,
                 "eligibility": eligibility_policy(full_profile=full), "midi": capabilities_for(self.renderer_id).to_dict(),
-                "recipe_rule": "render_recipe_v1", "audio_mode": "on_demand", **asdict(self)}
+                "recipe_rule": "render_recipe_v1", "audio_mode": "on_demand", **values}
+
+    def performances(self):
+        return bank_for(self.renderer_id, profile=self.performance_profile)
 
     @classmethod
-    def create(cls, schema: VitalSchema, catalog: AssetCatalog, *, tail_seconds=2.0) -> TrainingContract:
-        if type(tail_seconds) not in {int, float} or tail_seconds not in (2., 4.):
-            raise ValueError("training tail must use the reviewed two- or four-second budget")
+    def create(cls, schema: VitalSchema, catalog: AssetCatalog, *, tail_seconds=2.0, performance_profile=None) -> TrainingContract:
+        allowed_tails = (2., 4., 32.) if performance_profile == "bounded_long_observations_v1" else (2., 4.)
+        if type(tail_seconds) not in {int, float} or tail_seconds not in allowed_tails:
+            raise ValueError("training tail must use a reviewed budget for its observation profile")
         if isinstance(schema, FullPresetContract):
             schema.template()  # Verify the reviewed factory bytes, as for the legacy contract.
             return cls(FULL_SCHEMA_ID, canonical_sha256(schema.spec), catalog.catalog_id,
-                       canonical_sha256(bank_document_for(schema.renderer_id)), renderer_id=schema.renderer_id, tail_seconds=float(tail_seconds))
+                       canonical_sha256(bank_document_for(schema.renderer_id, profile=performance_profile)), renderer_id=schema.renderer_id,
+                       tail_seconds=float(tail_seconds), performance_profile=performance_profile)
+        if performance_profile is not None:
+            raise ValueError("extended performance profiles require the qualified full corpus renderer")
         if tail_seconds != 2.:
             raise ValueError("extended training tails require the full preset profile")
         paths = (schema.init_preset_path, schema.parameter_atlas_path, schema.modulation_vocab_path,
@@ -93,14 +104,14 @@ class RenderRecipe:
                contract: TrainingContract, ledger: SplitLedger, purpose: str, sequence_id: int) -> RenderRecipe:
         if purpose not in {"train", "evaluate"} or type(sequence_id) is not int or sequence_id < 0:
             raise ValueError("recipe requires a valid purpose and nonnegative sequence ID")
-        TrainingContract.create(schema, catalog, tail_seconds=contract.tail_seconds).require_match(contract.to_dict())
+        TrainingContract.create(schema, catalog, tail_seconds=contract.tail_seconds, performance_profile=contract.performance_profile).require_match(contract.to_dict())
         inspection = inspect_preset(raw_preset, schema, catalog)
         if not inspection["static_eligible"]:
             raise ValueError("preset is not statically eligible: " + ", ".join(inspection["reasons"]))
         assignment = ledger.lookup(inspection["identity"]["state"])
         performance.validate(capabilities_for(contract.renderer_id)).require_valid()
         performance_id = canonical_sha256(performance.to_dict())
-        entry = next((entry for entry in bank_for(contract.renderer_id) if entry.performance_id == performance_id), None)
+        entry = next((entry for entry in contract.performances() if entry.performance_id == performance_id), None)
         if entry is None:
             raise ValueError("performance is outside the frozen initial bank for this renderer")
         if purpose == "train" and (assignment.split != "train" or entry.role != "reference"):

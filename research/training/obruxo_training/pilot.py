@@ -13,7 +13,6 @@ from .codec import CATEGORICAL, CONTINUOUS, PilotCodec, PilotTarget, load_codec
 from .contracts import RenderRecipe
 from .eligibility import inspect_preset
 from .identity import PresetIdentity
-from .performances import bank_for
 from .splits import FrozenMultiVariantManifest, FrozenVariantManifest, SplitLedger, SplitManifest, build_splits
 
 
@@ -175,7 +174,7 @@ class PilotSampler:
         self._source_indices = {entry.state_id: index for index, entry in enumerate(pool.entries)}
         if not self._entries:
             raise ValueError("selected split has no pilot states")
-        self._performances = tuple(entry for entry in bank_for(pool.codec.contract.renderer_id) if entry.role == role)
+        self._performances = tuple(entry for entry in pool.codec.contract.performances() if entry.role == role)
         self._ledger = SplitLedger(pool.manifest)
         self._epoch, self._order = None, []
         rule = {"pairs": "shuffled_pilot_pairs_v1", "state_round_robin": "shuffled_states_rotating_performances_v1",

@@ -1,0 +1,12 @@
+{
+  "entries_unchanged": true,
+  "frozen_manifest_states": 9592,
+  "manifest_unchanged": true,
+  "new_codec_id": "488866264bcc25bc08d2aa87d89908827d6a3ac741cab201d2ec71d5ac08de1b",
+  "new_pool_id": "6a4f199d27395989a470e9e6491450319f320afd30bac16e05c3d1690573d892",
+  "old_bank_prefix_unchanged": true,
+  "old_codec_id": "67dad993dec79e66b3000ae589b9e5ff6a306c1c4cb565f4a4b8e16c54913b40",
+  "old_pool_id": "fb2a7c16b14f177be68bdf09ce4035a079c2fc698238bef583d9b56c11127f3a",
+  "old_source_contract_unchanged": true,
+  "states": 904
+}

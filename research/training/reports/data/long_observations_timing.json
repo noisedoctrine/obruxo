@@ -1,0 +1,7 @@
+{
+  "audio_seconds": 513.0,
+  "audio_seconds_per_renderer_second": 16.386576734762357,
+  "diagnostic_requests": 12,
+  "renderer_seconds_including_state_loading": 31.30611159997352,
+  "scope": "native_diagnostic_renders_excludes_spawn_feature_extraction_training_and_checkpoint_io"
+}

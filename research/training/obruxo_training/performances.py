@@ -56,7 +56,11 @@ def bank_document() -> dict:
     return {"version": 1, "bank": "initial_performance_bank_v1", "entries": [entry.to_dict() for entry in initial_bank()]}
 
 
-def bank_for(renderer_id):
+def bank_for(renderer_id, *, profile=None):
+    if profile is not None:
+        from .observation_bank import observation_bank, require_profile
+        require_profile(renderer_id, profile)
+        return observation_bank()
     from obruxo_data.render.base import FULL_CORPUS_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_EXPRESSION_RENDERER_ID
     if renderer_id in {FULL_EXPRESSION_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_CORPUS_RENDERER_ID}:
         from .expression_bank import expression_bank
@@ -64,7 +68,11 @@ def bank_for(renderer_id):
     return initial_bank()
 
 
-def bank_document_for(renderer_id):
+def bank_document_for(renderer_id, *, profile=None):
+    if profile is not None:
+        from .observation_bank import observation_bank_document, require_profile
+        require_profile(renderer_id, profile)
+        return observation_bank_document()
     from obruxo_data.render.base import FULL_CORPUS_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_EXPRESSION_RENDERER_ID
     if renderer_id in {FULL_EXPRESSION_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_CORPUS_RENDERER_ID}:
         from .expression_bank import expression_bank_document

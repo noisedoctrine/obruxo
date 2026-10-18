@@ -9,7 +9,7 @@ from obruxo_data.hashing import canonical_sha256
 from .codec import PilotTarget
 from .full_scalar import EFFECTS, scalar_family
 from .nested_codec import NestedStateCodec
-from .performances import bank_for, capabilities_for
+from .performances import capabilities_for
 
 
 def _scalar_view(codec, target):
@@ -104,7 +104,7 @@ def audit_capabilities(pool):
              "distinct_stored_values": len(stored[name]), "distinct_supervised_values": len(values[name]),
              "status": "masked" if counts[name] == 0 else "constant" if len(values[name]) == 1 else "varied"} for name in names]
     families = {family: dict(Counter(row["status"] for row in rows if row["family"] == family)) for family in sorted({row["family"] for row in rows})}
-    bank = bank_for(codec.contract.renderer_id)
+    bank = codec.contract.performances()
     return {"audit": "nested_training_recipe_coverage_v1", "pool_id": pool.pool_id, "codec_id": codec.codec_id,
             "split_manifest_id": pool.manifest.manifest_id, "states_by_split": pool.summary()["states_by_split"], "audited_train_states": trained_states,
             **({"independent_roots_by_split": {split: sum(entry.split == split for entry in pool.manifest.parent.assignments)
