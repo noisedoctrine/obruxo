@@ -1,0 +1,48 @@
+{
+  "checkpoint_sha256": "20277ed1ebc378e1f31eb1f29de930602a0f87c028c89ea3e33c090ebdc087e3",
+  "codec_id": "488866264bcc25bc08d2aa87d89908827d6a3ac741cab201d2ec71d5ac08de1b",
+  "diagnostic_phase_control": {
+    "osc_1_random_phase": 0.0,
+    "osc_2_random_phase": 0.0,
+    "osc_3_random_phase": 0.0,
+    "sample_random_phase": 0.0
+  },
+  "examples": 8,
+  "final_test_audio": false,
+  "fits_assets_or_decoders": false,
+  "model_promotion": false,
+  "native_requests": 16,
+  "pool_id": "fcc146cd1fb1cb06659b25f0710c9a6995c0837f5b9e0973dd4056eb3ba07e3f",
+  "qualification": "mixed_retained_feature_overfit_and_native_predictions_v1",
+  "source_checkpoint_sha256": "02796dff831cc81551a903a1cc09e630373ccc29ae356131f262bb2e766d86c4",
+  "source_counts": {
+    "authored": 5,
+    "corpus": 3
+  },
+  "source_sha256_lf": {
+    "training/obruxo_training/model.py": "ed009cd8a42f287de97e7348ea4cbce1f5ffcb5e028cf3d2385f835718ecaa68",
+    "training/obruxo_training/trainer.py": "bd9bd2cd6dfe599570ba967cafb71fb81a56dd6ec89d839ec59322c15c971719",
+    "training/reports/scripts/qualify_mixed_overfit.py": "16b563b784c8d636d0ae9639288b2892b4c96004407cbd8276d8ac64752c9687"
+  },
+  "training_config": {
+    "batch_size": 8,
+    "checkpoint_every": 100,
+    "conditioning": "concat",
+    "cpu_threads": 2,
+    "cyclic_head": "periodic",
+    "fresh_examples": null,
+    "identity_temperature": 0.1,
+    "identity_weight": 0.0,
+    "learning_rate": 0.003,
+    "learning_seed_override": null,
+    "mode": "overfit",
+    "render_budget": 32,
+    "replay_capacity": 8,
+    "replay_mib": 8,
+    "sampling_policy": "source_balanced",
+    "seed": 0,
+    "steps": 1000,
+    "updates_per_render": 1
+  },
+  "training_phase_control": "original_requested_values_unchanged"
+}

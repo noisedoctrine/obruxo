@@ -72,7 +72,7 @@ def restore_evaluation_checkpoint(saved, pool):
     validate_replay(saved["replay"], sampler, saved["cursor"], config)
     if not saved["replay"]:
         raise ValueError("training-only retrieval memory is empty")
-    model = PilotInverse(pool.codec, config.conditioning).eval()
+    model = PilotInverse(pool.codec, config.conditioning, config.cyclic_head).eval()
     model.load_state_dict(saved["model"], strict=True)
     return saved, model, frontend, sampler
 

@@ -23,7 +23,7 @@ from .codec import PilotTarget, load_codec
 from .curve_labels import CURVE_LABEL_KEYS, SOURCE_CURVES
 from .features import tensor_digest, validate_features
 from .extended_features import features_for
-from .model import PilotInverse, batch_features, conditioning_from_spec, loss_terms, model_spec, predicted_targets
+from .model import PilotInverse, batch_features, conditioning_from_spec, cyclic_head_from_spec, loss_terms, model_spec, predicted_targets
 from .paired import complete_pairs, identity_terms, paired_batch_indices
 from .pilot import PilotPool, PilotSampler
 from .stream import OnlineRenderStream, StreamConfig
@@ -48,6 +48,7 @@ class TrainConfig:
     identity_weight: float = 0.
     identity_temperature: float = .1
     conditioning: str = "concat"
+    cyclic_head: str = "sigmoid"
 
     def __post_init__(self):
         positive = (self.steps, self.replay_capacity, self.replay_mib, self.batch_size,
@@ -66,6 +67,8 @@ class TrainConfig:
             raise ValueError("unknown pilot sampling policy")
         if self.conditioning not in {"concat", "cross_attention"}:
             raise ValueError("unsupported performance conditioning")
+        if self.cyclic_head not in {"sigmoid", "periodic"}:
+            raise ValueError("unsupported cyclic output head")
         if (not math.isfinite(self.identity_weight) or self.identity_weight < 0
                 or not math.isfinite(self.identity_temperature) or self.identity_temperature <= 0):
             raise ValueError("identity weight must be nonnegative and temperature positive and finite")
@@ -171,9 +174,11 @@ def _run_contract(pool, sampler, frontend, config, stream_config, replay_seed=No
         del training["identity_temperature"]
     if training["conditioning"] == "concat":
         del training["conditioning"]
+    if training["cyclic_head"] == "sigmoid":
+        del training["cyclic_head"]
     contract = {"trainer": "pilot_supervised_bootstrap_v1", "pool_id": pool.pool_id,
             "contract": pool.codec.contract.to_dict(), "codec": pool.codec.to_dict(), "sampler_id": sampler.sampler_id,
-            "model": model_spec(pool.codec, config.conditioning), "frontend": frontend.describe(), "training": training,
+            "model": model_spec(pool.codec, config.conditioning, config.cyclic_head), "frontend": frontend.describe(), "training": training,
             "stream": stream_config.to_dict(), "optimizer": "AdamW_weight_decay_0", "precision": "float32",
             "scheduler": None, "scaler": None,
             "replay_policy": "bounded_refresh_then_replay_v1" if config.fresh_examples is not None or config.updates_per_render != 1
@@ -184,6 +189,43 @@ def _run_contract(pool, sampler, frontend, config, stream_config, replay_seed=No
         contract["identity_objective"] = {"loss": "bidirectional_paired_info_nce_v1", "representation": "decoder_fusion_128",
                                           "normalization": "l2", "negatives": "distinct_training_states_in_batch"}
     return contract
+
+
+def _rejected_prefix_history(path, source, sampler):
+    """Require every accepted feature and its original acknowledged attempt ledger."""
+    message = "feature seed must retain a complete accepted recipe prefix or a verified complete attempt history"
+    history_path = path.with_name("renders.jsonl")
+    if source["run_contract"].get("replay_seed") or not history_path.is_file():
+        raise ValueError(message)
+    raw = history_path.read_bytes()
+    history = [json.loads(line) for line in raw.decode("utf-8").splitlines()]
+    if len(history) != source["cursor"]["next_sequence_id"]:
+        raise ValueError(message)
+    accepted, counts = [], {"accepted": 0, "rejected": 0, "error": 0}
+    for sequence, row in enumerate(history):
+        recipe = sampler.recipe_at(sequence)
+        status = row.get("status")
+        if (type(row.get("sequence_id")) is not int or row["sequence_id"] != sequence
+                or row.get("recipe_id") != recipe.recipe_id or status not in counts):
+            raise ValueError("feature seed attempt history differs from its scheduled recipes")
+        if status != "error":
+            identity = {key: value for key, value in row.get("provenance", {}).items() if key != "request_id"}
+            if identity != source["renderer_identity"]:
+                raise ValueError("feature seed attempt history has different renderer provenance")
+        counts[status] += 1
+        if status == "accepted":
+            accepted.append(row)
+    totals = source["totals"]
+    if (totals["render_attempts"] != len(history) or totals["accepted"] != counts["accepted"]
+            or totals["rejected"] != counts["rejected"] or totals["errors"] != counts["error"]):
+        raise ValueError("feature seed attempt history and checkpoint counters disagree")
+    if [item["sequence_id"] for item in source["replay"]] != [row["sequence_id"] for row in accepted]:
+        raise ValueError(message)
+    for item, row in zip(source["replay"], accepted, strict=True):
+        if item["audio_sha256"] != row.get("qa", {}).get("audio_float32_sha256"):
+            raise ValueError("feature seed audio digest differs from its accepted attempt")
+    return {"render_log_sha256": sha256_bytes(raw), "accepted": counts["accepted"],
+            "rejected": counts["rejected"], "errors": counts["error"]}
 
 
 def load_replay_seed(path: Path, pool, sampler, frontend, config, stream_config) -> tuple:
@@ -216,8 +258,11 @@ def load_replay_seed(path: Path, pool, sampler, frontend, config, stream_config)
     validate_replay(replay, sampler, cursor, source_config)
     validate_replay(replay, sampler, cursor, config)
     OnlineRenderStream(sampler, 1, config=stream_config, resume=cursor)
-    if not replay or [item["sequence_id"] for item in replay] != list(range(cursor["next_sequence_id"])):
+    if not replay:
         raise ValueError("feature seed must retain a complete accepted recipe prefix")
+    history = None
+    if [item["sequence_id"] for item in replay] != list(range(cursor["next_sequence_id"])):
+        history = _rejected_prefix_history(path, source, sampler)
     if config.fresh_examples is not None and len(replay) > config.fresh_examples:
         raise ValueError("feature seed exceeds the accepted-example target")
     if cursor["next_sequence_id"] > config.render_budget or not source["renderer_identity"]:
@@ -225,6 +270,8 @@ def load_replay_seed(path: Path, pool, sampler, frontend, config, stream_config)
     descriptor = {"policy": "features_only_fresh_model_optimizer_rng_v1", "checkpoint_sha256": sha256_bytes(raw),
                   "source_run_id": canonical_sha256(contract), "examples": len(replay),
                   "acknowledged_recipes": cursor["next_sequence_id"]}
+    if history is not None:
+        descriptor.update(policy="qa_qualified_complete_attempt_prefix_fresh_learning_state_v1", history=history)
     return source, descriptor
 
 
@@ -255,7 +302,7 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
     contract = _run_contract(pool, sampler, frontend, config, stream_config, replay_seed)
     if saved and (saved.get("format") != "obruxo_pilot_training_v1" or saved["run_contract"] != contract):
         raise ValueError("checkpoint training contract changed; start an explicit new run")
-    model = PilotInverse(pool.codec, config.conditioning).to(device)
+    model = PilotInverse(pool.codec, config.conditioning, config.cyclic_head).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate, weight_decay=0)
     generator = torch.Generator().manual_seed(learning_seed)
     replay, step, initial, render_ready, renderer_identity = [], 0, None, False, None
@@ -465,7 +512,7 @@ def export_model(path: Path, model, frontend, codec, pool_id: str) -> None:
 
 def inference_state(model, frontend, codec, pool_id: str) -> dict:
     frontend.require_frozen()
-    return {"format": "obruxo_pilot_inference_v1", "model_spec": model_spec(codec, model.conditioning), "model": model.state_dict(),
+    return {"format": "obruxo_pilot_inference_v1", "model_spec": model_spec(codec, model.conditioning, model.cyclic_head), "model": model.state_dict(),
             "basic_pitch": frontend.basic_pitch.state_dict(), "frontend": frontend.describe(), "contract": codec.contract.to_dict(),
             "codec": codec.to_dict(), "training_pool_id": pool_id, "input": "audio_only"}
 
@@ -478,7 +525,8 @@ def load_model(path: Path, device: str = "cpu") -> tuple:
 def restore_model(saved, device: str = "cpu") -> tuple:
     codec = load_codec(saved["codec"])
     conditioning = conditioning_from_spec(saved["model_spec"])
-    if saved.get("format") != "obruxo_pilot_inference_v1" or saved["model_spec"] != model_spec(codec, conditioning):
+    cyclic_head = cyclic_head_from_spec(saved["model_spec"])
+    if saved.get("format") != "obruxo_pilot_inference_v1" or saved["model_spec"] != model_spec(codec, conditioning, cyclic_head):
         raise ValueError("unsupported inference artifact")
     codec.contract.require_match(saved["contract"])
     if saved["codec"] != codec.to_dict():
@@ -486,7 +534,7 @@ def restore_model(saved, device: str = "cpu") -> tuple:
     frontend = features_for(codec, saved["basic_pitch"])
     if frontend.describe() != saved["frontend"]:
         raise ValueError("inference frontend or frozen weights changed")
-    model = PilotInverse(codec, conditioning).to(device).eval()
+    model = PilotInverse(codec, conditioning, cyclic_head).to(device).eval()
     model.load_state_dict(saved["model"], strict=True)
     return model, frontend, codec
 

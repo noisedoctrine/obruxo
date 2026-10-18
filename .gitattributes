@@ -204,3 +204,10 @@ research/training/reports/data/factory_asset_summary.json text eol=lf
 research/training/reports/data/factory_asset_codec_summary.json text eol=lf
 research/training/reports/scripts/run_conditioning_screen.py -text
 research/training/reports/data/conditioning_plan.json -text
+research/training/MIXED_OVERFIT.md text eol=lf
+research/training/reports/MIXED_OVERFIT_RESULTS.md text eol=lf
+research/training/reports/scripts/qualify_mixed_overfit.py text eol=lf
+research/training/reports/data/mixed_overfit_plan.json text eol=lf
+research/training/reports/data/mixed_overfit_summary.json text eol=lf
+research/training/tests/test_periodic_heads.py text eol=lf
+research/training/tests/test_rejected_seed.py text eol=lf
