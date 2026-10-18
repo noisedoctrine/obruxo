@@ -112,9 +112,14 @@ class PilotPool:
                 "feature_reuse": "cross_pool_seed_and_resume_forbidden_start_fresh"}
 
     @classmethod
-    def load(cls, path: Path) -> PilotPool:
+    def load(cls, path: Path, *, corpus_root=None) -> PilotPool:
         saved = json.loads(path.read_text(encoding="utf-8"))
         value = saved["pool"]
+        if value.get("generator") == "frozen_original_corpus_training_v1":
+            from .corpus_pool import CorpusPool
+            return CorpusPool.from_saved(saved, corpus_root=corpus_root)
+        if corpus_root is not None:
+            raise ValueError("corpus root mapping applies only to original corpus pools")
         if saved["pool_id"] != canonical_sha256(value):
             raise ValueError("pilot pool artifact changed")
         if value.get("version") != 1 or type(value.get("seed")) is not int:
@@ -149,6 +154,9 @@ class PilotPool:
                   and self.manifest.by_state[entry.state_id].split == split for entry in self.entries)
                   for family in self.codec.to_dict()["families"]} for split in ("train", "validation", "test")}
         return result
+
+    def source_preset(self, target, index):
+        return self.codec.source_preset(target, index) if hasattr(self.codec, "source_preset") else self.codec.decode(target)
 
 
 class PilotSampler:
@@ -216,7 +224,7 @@ class PilotSampler:
             self._epoch = epoch
         entry, performance = self._order[position]
         codec = self.pool.codec
-        raw = codec.source_preset(entry.target, self._source_indices[entry.state_id]) if hasattr(codec, "source_preset") else codec.decode(entry.target)
+        raw = self.pool.source_preset(entry.target, self._source_indices[entry.state_id])
         return RenderRecipe.create(raw, performance.performance(), schema=codec.schema,
                                    catalog=codec.catalog, contract=codec.contract, ledger=self._ledger,
                                    purpose="train" if self.split == "train" else "evaluate", sequence_id=sequence_id)

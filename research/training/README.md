@@ -1,6 +1,6 @@
 # Training contracts, online pilot and trainer
 
-The [corpus input path](CORPUS_INPUTS.md) verifies the complete modern snapshot, encodes all 904 eligible training states and preserves silent FM sources through the full destination domain. Its separate native profile qualifies exact float32 readback and ignored empty mappings while preserving original source controls. The [report](reports/CORPUS_INPUT_RESULTS.md) separates these bounded checks from population-wide audio admission and model quality.
+The [corpus input path](CORPUS_INPUTS.md) verifies the complete modern snapshot, encodes all 904 eligible training states and preserves silent FM sources through the full destination domain. Its private source pool reads original presets during training, verifies their bytes and labels, and retains the full frozen split ledger. The separate native profile qualifies exact float32 readback and ignored empty mappings. The [report](reports/CORPUS_INPUT_RESULTS.md) separates these bounded checks from longer-note coverage, population-wide audio admission and model quality.
 
 The [complete connection curriculum](GRAPH_COVERAGE.md) schedules all 431 destinations under the existing frozen patch families. Its [native and recovery report](reports/GRAPH_COVERAGE_RESULTS.md) separates active labels, observed sound changes and model quality; related variants share one evaluation/bootstrap unit.
 

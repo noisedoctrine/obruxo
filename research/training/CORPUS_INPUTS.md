@@ -37,4 +37,19 @@ The native probe uses training reference performances, original versus prepared 
 
 `inspect_corpus_readback.py --snapshot AUDIT/snapshot --corpus CORPUS --state TRAINING_STATE_SHA --output DIAGNOSIS.json` captures loaded scalar values without changing tolerances or rendering audio. This historical diagnosis motivated the separate native corpus profile. Its qualification retains both legacy failures as negative controls and checks the corrected original requests, label copies, fresh repeats and precise legacy references. It also checks singleton/decimal active LFOs, mappings and custom modes 13–15 across both profiles.
 
-Raw presets, candidate labels, source paths, audio and weights remain local. Corpus streaming, population-wide native/audio admission, mixed authored/corpus coverage, decoder refit policy, useful model training and release remain open. Final-test audio stays reserved and GitHub Actions stays disabled.
+Raw presets, candidate labels, source paths, audio and weights remain local. Population-wide native/audio admission, mixed authored/corpus coverage, decoder refit policy, useful model training and release remain open. Final-test audio stays reserved and GitHub Actions stays disabled.
+
+## Train from original sources
+
+`CorpusPool` connects the qualified candidate labels to every statically eligible training member in the original snapshot. Its separate dataset identity includes the complete original split ledger, source contract, candidate digest, targets, relative paths and raw byte hashes. It never rebuilds or filters that ledger. Validation and test sources have no entries in this training-only pool and are never opened by its reader. The builder rejects missing/duplicate members, changed ancestry, codec mismatches and incomplete candidate coverage.
+
+Every scheduled read verifies its relative path, rejects links and root escapes, checks the original byte hash/state identity and re-encodes the source to verify its target before rendering. The provider returns the original bytes. The existing render request canonicalizes JSON formatting; its complete original document, assets, display labels and phase values remain the audio source. Label-prepared or decoded presets are never substituted. Audio is generated during training and bounded feature replay supplies recovery.
+
+```text
+python research/training/run.py create-corpus-pool --snapshot AUDIT/snapshot --corpus CORPUS --candidates LABELS/candidates.json --output PRIVATE_POOL.json
+python research/training/reports/scripts/run_corpus_source_integration.py --pool PRIVATE_POOL.json --output INTEGRATION
+```
+
+The existing `train --pool PRIVATE_POOL.json` command loads this dataset type. The absolute source root appears only in the private wrapper, outside the dataset identity, so `PilotPool.load(path, corpus_root=NEW_ROOT)` can relocate identical source files. This still checks bytes and labels on every read. No corpus paths or dataset payloads enter the exported model codec. Earlier authored pools retain their exact identities and source behavior.
+
+The current sixteen-performance bank has a longest held reference note of 1.5 seconds. Six of the 904 training states need longer for their complete amplitude attack; the maximum requested delay-plus-attack is about 32 seconds. They remain in the dataset. Consequently `attack_compatible` refuses the complete current corpus, and the bounded source-integration check uses the existing `state_round_robin` schedule. The current frontend also rejects audio longer than sixteen seconds; longer observations require explicit bounded feature handling. This check does not establish adequate temporal observations or native/audio acceptance for the whole corpus. A separately declared longer-note performance path, authored/corpus mixing, decoder refitting and useful broad training remain required.
