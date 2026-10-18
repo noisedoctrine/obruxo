@@ -45,12 +45,13 @@ def _shape_report(stats):
             "supervised_point_counts": sorted(stats["point_counts"])}
 
 
-def audit_capabilities(pool):
+def audit_capabilities(pool, *, progress=None):
     """Only frozen training states contribute; masks are declarations, not audibility."""
     codec = pool.codec
     from .curve_codec import CurveInputCodec
     from .graph_codec import GraphCoverageCodec
-    if not isinstance(codec, (NestedStateCodec, CurveInputCodec, GraphCoverageCodec)):
+    from .corpus_codec import CorpusNativeCodec
+    if not isinstance(codec, (NestedStateCodec, CurveInputCodec, GraphCoverageCodec, CorpusNativeCodec)):
         raise ValueError("coverage audit requires the complete nested-state codec")
     counts, values, stored = Counter(), defaultdict(set), defaultdict(set)
     names = sorted(codec.schema.scalar_names)
@@ -70,7 +71,7 @@ def audit_capabilities(pool):
             if mask[name]:
                 counts[name] += 1
                 values[name].add(settings[name])
-        document = json.loads(codec.source_preset(entry.target, index))["settings"]
+        document = json.loads(pool.source_preset(entry.target, index))["settings"]
         for stats, shape, enabled in zip(lfos, document["lfos"], codec.active_lfos(entry.target), strict=True):
             _record_shape(stats, shape, enabled)
         for stats, shape, enabled in zip(warps, document["custom_warps"], codec.active_warps(entry.target), strict=True):
@@ -98,6 +99,8 @@ def audit_capabilities(pool):
         effects = tuple(effect for effect in EFFECTS if settings[effect + "_on"])
         effect_sets.add(effects)
         enabled_effects.update(effects)
+        if progress and trained_states % 250 == 0:
+            progress({"audited_training_states": trained_states})
     if not trained_states:
         raise ValueError("coverage audit needs at least one training state")
     rows = [{"name": name, "family": scalar_family(name), "supervised_states": counts[name],

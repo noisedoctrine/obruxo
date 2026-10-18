@@ -76,6 +76,9 @@ class SplitManifest:
 
     @classmethod
     def from_dict(cls, value: dict) -> SplitManifest:
+        if value.get("version") == 4:
+            from .mixed_manifest import MixedManifest
+            return MixedManifest.from_dict(value)
         if value.get("version") == 3:
             return FrozenMultiVariantManifest.from_dict(value)
         if value.get("version") == 2:

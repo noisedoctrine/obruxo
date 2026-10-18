@@ -62,7 +62,7 @@ class TrainConfig:
             raise ValueError("batch must fit replay and render budget must cover initial replay")
         if not math.isfinite(self.learning_rate) or self.learning_rate <= 0:
             raise ValueError("learning rate must be positive and finite")
-        if self.sampling_policy not in {"pairs", "state_round_robin", "paired_views", "performance_round_robin", "attack_compatible"}:
+        if self.sampling_policy not in {"pairs", "state_round_robin", "paired_views", "performance_round_robin", "attack_compatible", "source_balanced"}:
             raise ValueError("unknown pilot sampling policy")
         if self.conditioning not in {"concat", "cross_attention"}:
             raise ValueError("unsupported performance conditioning")
@@ -123,7 +123,7 @@ def validate_replay(items: list[dict], sampler: PilotSampler, cursor: dict, conf
             raise ValueError("replay contains held-out data")
         if item["recipe_id"] != recipe.recipe_id or item["state_id"] != recipe.state_id or item["target"] != targets[recipe.state_id]:
             raise ValueError("saved replay does not match its training recipe")
-        if config.sampling_policy in {"paired_views", "performance_round_robin", "attack_compatible"} and item.get("performance_id") != recipe.performance_id:
+        if config.sampling_policy in {"paired_views", "performance_round_robin", "attack_compatible", "source_balanced"} and item.get("performance_id") != recipe.performance_id:
             label = "paired" if config.sampling_policy == "paired_views" else "performance-balanced"
             raise ValueError(f"{label} replay performance differs from its training recipe")
         validate_features(item["features"])
@@ -334,7 +334,7 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
                         item = {"features": features, "target": target.to_dict(), "sequence_id": recipe.sequence_id,
                                 "state_id": recipe.state_id, "recipe_id": recipe.recipe_id,
                                 "audio_sha256": outcome.metadata["qa"]["audio_float32_sha256"], "uses": 0}
-                        if paired or config.sampling_policy in {"performance_round_robin", "attack_compatible"}:
+                        if paired or config.sampling_policy in {"performance_round_robin", "attack_compatible", "source_balanced"}:
                             item["performance_id"] = recipe.performance_id
                         for flag, key, method, *_ in SOURCE_CURVES:
                             if getattr(pool.codec, flag, False):

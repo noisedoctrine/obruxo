@@ -1,0 +1,36 @@
+{
+  "alias_groups": [
+    {
+      "members": [
+        [
+          "corpus",
+          "5109f0c0cdca08be1ea7404d34904d064c42d404b8e4fb75c66bb21e4c51dfd6"
+        ],
+        [
+          "corpus",
+          "be57acee27aa86ea4f6ec0fb4d0dcff6f068b85fed764ab1df2d33b2e8f242f7"
+        ]
+      ],
+      "program_id": "255d958c78358a0b54b58f42e6ca5d7f00183d305c358e32af15f080910a0d1f"
+    },
+    {
+      "members": [
+        [
+          "corpus",
+          "6e6e05548e1c1a6319d0301556b1c6c2d5452bc5011e0b7317539521db0944e3"
+        ],
+        [
+          "corpus",
+          "f0ad9496efd81124f0729e28201d2eeaa831fd936e1c71eab42cec0a58082695"
+        ]
+      ],
+      "program_id": "699a86e114674fa825ce3fde0216ffc747fabb497048c30a2dbee59af61ce990"
+    }
+  ],
+  "checked_source_states": 2177,
+  "claim": "declared_program_canonicalization_before_lossy_encoding_not_acoustic_or_near_duplicate_detection",
+  "cross_split_alias_groups": 0,
+  "final_test_audio": false,
+  "programs": 2175,
+  "scheduled_final_test_states": 0
+}

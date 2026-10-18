@@ -111,9 +111,14 @@ class PilotPool:
                 "feature_reuse": "cross_pool_seed_and_resume_forbidden_start_fresh"}
 
     @classmethod
-    def load(cls, path: Path, *, corpus_root=None) -> PilotPool:
+    def load(cls, path: Path, *, corpus_root=None, verify_sources=True) -> PilotPool:
+        if type(verify_sources) is not bool:
+            raise ValueError("source verification mode must be boolean")
         saved = json.loads(path.read_text(encoding="utf-8"))
         value = saved["pool"]
+        if value.get("generator") == "frozen_authored_and_original_corpus_v1":
+            from .mixed_pool import MixedPool
+            return MixedPool.from_saved(saved, corpus_root=corpus_root)
         if value.get("generator") == "frozen_original_corpus_training_v1":
             from .corpus_pool import CorpusPool
             return CorpusPool.from_saved(saved, corpus_root=corpus_root)
@@ -134,9 +139,12 @@ class PilotPool:
         if not entries or len(entries) != len(manifest.assignments) or len({entry.state_id for entry in entries}) != len(entries):
             raise ValueError("pilot population is incomplete or duplicated")
         for index, entry in enumerate(entries):
-            raw = codec.source_preset(entry.target, index) if hasattr(codec, "source_preset") else codec.decode(entry.target)
-            if codec.canonical_target(entry.target) != entry.target or PresetIdentity.from_bytes(raw).state != entry.state_id:
+            if codec.canonical_target(entry.target) != entry.target:
                 raise ValueError("pilot target does not match its source state")
+            if verify_sources:
+                raw = codec.source_preset(entry.target, index) if hasattr(codec, "source_preset") else codec.decode(entry.target)
+                if PresetIdentity.from_bytes(raw).state != entry.state_id:
+                    raise ValueError("pilot target does not match its source state")
         expected = authored_manifest(codec, entries, value["seed"])
         if hasattr(codec, "validate_manifest"):
             codec.validate_manifest(manifest)
@@ -155,7 +163,12 @@ class PilotPool:
         return result
 
     def source_preset(self, target, index):
-        return self.codec.source_preset(target, index) if hasattr(self.codec, "source_preset") else self.codec.decode(target)
+        if type(index) is not int or not 0 <= index < len(self.entries) or target != self.entries[index].target:
+            raise ValueError("pilot source differs from its frozen entry")
+        raw = self.codec.source_preset(target, index) if hasattr(self.codec, "source_preset") else self.codec.decode(target)
+        if PresetIdentity.from_bytes(raw).state != self.entries[index].state_id:
+            raise ValueError("pilot source state changed")
+        return raw
 
 
 class PilotSampler:
@@ -166,7 +179,7 @@ class PilotSampler:
             raise ValueError("invalid pilot sampling policy")
         if split == "train" and role != "reference":
             raise ValueError("transfer performances are reserved for held-out evaluation")
-        if policy not in {"pairs", "state_round_robin", "paired_views", "performance_round_robin", "attack_compatible"}:
+        if policy not in {"pairs", "state_round_robin", "paired_views", "performance_round_robin", "attack_compatible", "source_balanced"}:
             raise ValueError("unknown pilot sampling policy")
         self.pool, self.split, self.role, self.seed = pool, split, role, seed
         self.policy = policy
@@ -179,20 +192,39 @@ class PilotSampler:
         self._epoch, self._order = None, []
         rule = {"pairs": "shuffled_pilot_pairs_v1", "state_round_robin": "shuffled_states_rotating_performances_v1",
                 "paired_views": "adjacent_state_views_rotating_performances_v1", "performance_round_robin": "complete_performance_sweeps_rotating_shuffled_states_v1",
-                "attack_compatible": "shuffled_states_rotating_attack_compatible_performances_v1"}[policy]
+                "attack_compatible": "shuffled_states_rotating_attack_compatible_performances_v1",
+                "source_balanced": "equal_source_attempts_shuffled_states_base_references_then_shortest_adequate_long_notes_v1"}[policy]
         self._eligible = None
         descriptor = {"sampler": rule, "pool_id": pool.pool_id, "split": split, "role": role, "seed": seed}
-        if policy == "attack_compatible":
+        if policy in {"attack_compatible", "source_balanced"}:
             from .performance_eligibility import eligible, rule_document
             self._eligible = {entry.state_id: tuple(index for index, performance in enumerate(self._performances)
                               if eligible(pool.codec, entry.target, performance.performance())) for entry in self._entries}
             if any(not choices for choices in self._eligible.values()):
                 raise ValueError("a selected state has no performance long enough for its amplitude attack")
             descriptor["performance_eligibility"] = rule_document()
+        if policy == "source_balanced":
+            from .performance_eligibility import longest_held_seconds
+            from .performances import bank_for
+            if split != "train" or not hasattr(pool, "sampling_group"):
+                raise ValueError("source-balanced sampling requires a mixed training pool")
+            self._source_groups = {name: tuple(entry for entry in self._entries if pool.sampling_group(entry) == name) for name in ("authored", "corpus")}
+            if any(not entries for entries in self._source_groups.values()):
+                raise ValueError("source-balanced sampling requires both training sources")
+            base_ids = {entry.performance_id for entry in bank_for(pool.codec.contract.renderer_id) if entry.role == role}
+            for state, choices in self._eligible.items():
+                preferred = tuple(index for index in choices if self._performances[index].performance_id in base_ids)
+                shortest = min(longest_held_seconds(self._performances[index].performance()) for index in choices)
+                self._eligible[state] = preferred or tuple(index for index in choices if longest_held_seconds(self._performances[index].performance()) == shortest)
+            descriptor["source_schedule"] = {"attempts": "alternate_authored_corpus", "per_epoch_per_source": max(map(len, self._source_groups.values())),
+                                             "qa_failures": "record_without_changing_scheduled_source_ratio",
+                                             "implementation_sha256_lf": hashlib.sha256(Path(__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest()}
         self.sampler_id = canonical_sha256(descriptor)
 
     @property
     def epoch_size(self) -> int:
+        if self.policy == "source_balanced":
+            return 2 * max(map(len, self._source_groups.values()))
         return len(self._entries) * (len(self._performances) if self.policy in {"pairs", "performance_round_robin"} else 2 if self.policy == "paired_views" else 1)
 
     def recipe_at(self, sequence_id: int) -> RenderRecipe:
@@ -200,7 +232,19 @@ class PilotSampler:
             raise ValueError("sequence ID must be a nonnegative integer")
         epoch, position = divmod(sequence_id, self.epoch_size)
         if self._epoch != epoch:
-            if self.policy == "pairs":
+            if self.policy == "source_balanced":
+                order = {}
+                for name, entries in self._source_groups.items():
+                    values = list(entries)
+                    seeded_random(self.sampler_id, epoch, name).shuffle(values)
+                    order[name] = values
+                self._order = []
+                for offset in range(self.epoch_size // 2):
+                    for name in ("authored", "corpus"):
+                        entry = order[name][offset % len(order[name])]
+                        choices = self._eligible[entry.state_id]
+                        self._order.append((entry, self._performances[choices[(offset + epoch) % len(choices)]]))
+            elif self.policy == "pairs":
                 self._order = [(entry, performance) for entry in self._entries for performance in self._performances]
             elif self.policy == "state_round_robin":
                 self._order = [(entry, self._performances[(index + epoch) % len(self._performances)])
@@ -218,7 +262,7 @@ class PilotSampler:
                 seeded_random(self.sampler_id, epoch).shuffle(states)
                 self._order = [(entry, self._performances[(index + 2 * epoch + view) % len(self._performances)])
                                for index, entry in states for view in range(2)]
-            if self.policy not in {"paired_views", "performance_round_robin"}:
+            if self.policy not in {"paired_views", "performance_round_robin", "source_balanced"}:
                 seeded_random(self.sampler_id, epoch).shuffle(self._order)
             self._epoch = epoch
         entry, performance = self._order[position]
