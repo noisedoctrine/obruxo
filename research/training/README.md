@@ -4,6 +4,8 @@ The active work follows the [staged reconstruction plan](../modelling/TRAINING_P
 
 The [completion ledger](IMPLEMENTATION_STATUS.md) separates current quality gates from implemented capabilities. Both earlier basic validation panels are development data; final-test states remain reserved.
 
+The [basic sound diagnosis](reports/BASIC_SOUND_DIAGNOSIS.md) completed 70 native requests and 10 exact phase-fixed repeats. Source-value corrections point toward unison/stereo reconstruction as the next investigation while retaining the compact prediction space; no model improvement is claimed yet.
+
 ## Historical capability work
 
 The entries below describe implemented experiments in reverse chronology. Their original next-step suggestions are superseded by the active staged plan.

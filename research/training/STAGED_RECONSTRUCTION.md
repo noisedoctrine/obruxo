@@ -25,7 +25,7 @@ Retain the selected seed-0 checkpoint at `outputs/state-coverage-expanded-16000-
 
 The [evidence audit](reports/BASIC_RECONSTRUCTION_AUDIT.md) reuses the published 21- and 23-patch development results. Its machine-readable report records input hashes and selects five diagnostic cases at the minimum, lower quartile, median, upper quartile and maximum of the additional panel's existing sound error, with deterministic tie handling. This selection is fixed before any new intervention render. It samples a range of errors, not just the worst examples.
 
-Next native diagnostic, before another training run:
+The native diagnostic below is now [complete](reports/BASIC_SOUND_DIAGNOSIS.md): 70 accepted requests, 10 exact repeat pairs and no training updates. The unison/stereo correction improves all five cases, supporting a focused investigation of stereo/width and detuning evidence in the existing compact model. Listening and new-model confirmation remain pending. The original pre-render protocol follows:
 
 - For each selected case, retrieve the original patch and saved baseline prediction by the recorded identities. Verify the historical checkpoint, case and prediction receipts.
 - Under each recorded reference/transfer performance, render source, source repeat, baseline prediction, and four separate diagnostic corrections. Each correction replaces one control group with its source values: amplitude envelope; oscillator level; filter enable/cutoff/resonance; or unison voices/detune/pan. Canonicalize inactive values and validate the resulting patch.
