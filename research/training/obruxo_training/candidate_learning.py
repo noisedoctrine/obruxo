@@ -53,7 +53,7 @@ def restore_candidate_checkpoint(saved, pool):
     from .evaluate import retrieval_digest
     if retrieval_digest(saved["replay"]) != retrieval_digest(source["replay"]):
         raise ValueError("candidate checkpoint changed the fixed retrieval bank")
-    model = PilotInverse(pool.codec, original.conditioning).eval()
+    model = PilotInverse(pool.codec, original.conditioning, original.cyclic_head).eval()
     model.load_state_dict(saved["model"], strict=True)
     return saved, model, frontend, sampler
 
@@ -72,7 +72,7 @@ def train_candidates(pool, source, data, output, *, config=None, auxiliary_weigh
     torch.set_num_threads(config.cpu_threads)
     torch.manual_seed(config.seed)
     contract = learning_contract(source, data, config, auxiliary_weight)
-    model = PilotInverse(pool.codec, initial.conditioning)
+    model = PilotInverse(pool.codec, initial.conditioning, initial.cyclic_head)
     model.load_state_dict(source["model"], strict=True)
     optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate, weight_decay=0)
     generator = torch.Generator().manual_seed(config.seed)

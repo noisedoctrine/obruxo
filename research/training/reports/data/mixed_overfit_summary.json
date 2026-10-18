@@ -1,0 +1,449 @@
+{
+  "baseline": {
+    "all_native_pairs_repeat_exact": true,
+    "fit_by_family": {
+      "categorical": {
+        "effects": {
+          "active_choices": 227,
+          "wrong_choices": 0
+        },
+        "filters": {
+          "active_choices": 52,
+          "wrong_choices": 0
+        },
+        "lfo_curves": {
+          "active_choices": 629,
+          "wrong_choices": 16
+        },
+        "modulation": {
+          "active_choices": 726,
+          "wrong_choices": 0
+        },
+        "modulators": {
+          "active_choices": 269,
+          "wrong_choices": 0
+        },
+        "oscillator_seeds": {
+          "active_choices": 0,
+          "wrong_choices": 0
+        },
+        "oscillators": {
+          "active_choices": 408,
+          "wrong_choices": 0
+        },
+        "route_map_presence": {
+          "active_choices": 224,
+          "wrong_choices": 0
+        },
+        "route_presence": {
+          "active_choices": 494,
+          "wrong_choices": 0
+        },
+        "route_structure": {
+          "active_choices": 448,
+          "wrong_choices": 0
+        },
+        "sampler": {
+          "active_choices": 68,
+          "wrong_choices": 0
+        },
+        "voice_global": {
+          "active_choices": 104,
+          "wrong_choices": 0
+        }
+      },
+      "continuous": {
+        "custom_warps": {
+          "active_values": 194,
+          "mae": 0.00461453665047884
+        },
+        "effects": {
+          "active_values": 435,
+          "mae": 0.036025311797857285
+        },
+        "envelopes": {
+          "active_values": 207,
+          "mae": 0.014037412591278553
+        },
+        "filters": {
+          "active_values": 144,
+          "mae": 0.023571308702230453
+        },
+        "lfo_curves": {
+          "active_values": 397,
+          "mae": 0.18526121973991394
+        },
+        "modulation": {
+          "active_values": 484,
+          "mae": 0.018302366137504578
+        },
+        "modulators": {
+          "active_values": 287,
+          "mae": 0.02239186502993107
+        },
+        "oscillators": {
+          "active_values": 288,
+          "mae": 0.029375407844781876
+        },
+        "route_maps": {
+          "active_values": 1067,
+          "mae": 0.003297693096101284
+        },
+        "sampler": {
+          "active_values": 9,
+          "mae": 0.003981481771916151
+        },
+        "voice_global": {
+          "active_values": 112,
+          "mae": 0.021513013169169426
+        }
+      }
+    },
+    "gates_as_recorded": {
+      "both_training_sources": true,
+      "export_weights_match": true,
+      "frozen_decoder_and_assets": true,
+      "frozen_frontend": true,
+      "native_full_readback": true,
+      "native_prediction_repeats_exact": false,
+      "native_predictions_accepted": false,
+      "no_training_renders": true,
+      "retained_features_and_labels_unchanged": true,
+      "strict_overfit": false,
+      "training_reference_recipes_only": true,
+      "within_memory_budget": true
+    },
+    "native_accepted": 14,
+    "native_events_sha256": "040b46ee2a1d413f651087b8bc9d98c6eadb9d69c385359f8d23d90bd23ee455",
+    "native_rejected": [
+      {
+        "diagnostic_codes": [
+          "audio.clipping",
+          "vital.native.curve_input_bridge"
+        ],
+        "role": "prediction",
+        "sequence_id": 7,
+        "status": "rejected"
+      },
+      {
+        "diagnostic_codes": [
+          "audio.clipping",
+          "vital.native.curve_input_bridge"
+        ],
+        "role": "repeat",
+        "sequence_id": 7,
+        "status": "rejected"
+      }
+    ],
+    "native_requests": 16,
+    "perfect_label_curve_floor": {
+      "categorical_accuracy": 1.0,
+      "categorical_ce": 0.0,
+      "continuous_mae": 0.0,
+      "continuous_mse": 0.0,
+      "curve_reconstruction_mse": 0.001550246961414814,
+      "loss": 0.001550246961414814,
+      "route_map_mse": 0.0,
+      "warp_curve_mse": 0.0
+    },
+    "qualification_peak_process_tree_rss_bytes": 1931935744,
+    "training": {
+      "checkpoint_seconds_this_segment": 21.239458699987154,
+      "complete": true,
+      "config": {
+        "batch_size": 8,
+        "checkpoint_every": 100,
+        "conditioning": "concat",
+        "cpu_threads": 2,
+        "fresh_examples": null,
+        "identity_temperature": 0.1,
+        "identity_weight": 0.0,
+        "learning_rate": 0.003,
+        "learning_seed_override": null,
+        "mode": "overfit",
+        "render_budget": 32,
+        "replay_capacity": 8,
+        "replay_mib": 8,
+        "sampling_policy": "source_balanced",
+        "seed": 0,
+        "steps": 1000,
+        "updates_per_render": 1
+      },
+      "elapsed_seconds_this_segment": 479.06705919999513,
+      "feature_seconds_this_segment": 0.0,
+      "final_metrics": {
+        "categorical_accuracy": 0.9949415326118469,
+        "categorical_ce": 0.004038075916469097,
+        "continuous_mae": 0.03294287249445915,
+        "continuous_mse": 0.008875289000570774,
+        "curve_reconstruction_mse": 0.012631473131477833,
+        "loss": 0.025640249252319336,
+        "route_map_mse": 3.6861929402220994e-05,
+        "warp_curve_mse": 5.8549521781969815e-05
+      },
+      "fresh_accepted_this_segment": 0,
+      "initial_metrics": {
+        "categorical_accuracy": 0.5361998081207275,
+        "categorical_ce": 2.5590152740478516,
+        "continuous_mae": 0.18186746537685394,
+        "continuous_mse": 0.07904649525880814,
+        "curve_reconstruction_mse": 0.12796001136302948,
+        "loss": 3.0995724201202393,
+        "route_map_mse": 0.05838346853852272,
+        "warp_curve_mse": 0.27516722679138184
+      },
+      "model_state_sha256": "07c4c33a13d60a486037d05907abae3da6141a0fd11c5a526c95f8a8c22b50cc",
+      "peak_process_tree_rss_bytes": 1732390912,
+      "pool_id": "fcc146cd1fb1cb06659b25f0710c9a6995c0837f5b9e0973dd4056eb3ba07e3f",
+      "replay_distinct_states": 8,
+      "replay_examples": 8,
+      "replay_seed": {
+        "acknowledged_recipes": 9,
+        "checkpoint_sha256": "02796dff831cc81551a903a1cc09e630373ccc29ae356131f262bb2e766d86c4",
+        "examples": 8,
+        "history": {
+          "accepted": 8,
+          "errors": 0,
+          "rejected": 1,
+          "render_log_sha256": "9b7faaaa19c67edb2c54b237fc2c5980ab811decfc542a69ce515a102f58a8f7"
+        },
+        "policy": "qa_qualified_complete_attempt_prefix_fresh_learning_state_v1",
+        "source_run_id": "dee4ea076acac97fcc3157b245623308e8b65f1004e8fe61e389fe00d10a96b3"
+      },
+      "run_id": "e63baf191948836842a0da4871997345e06f1d7505982cf529f3c29b77b095bf",
+      "step": 1000,
+      "tiny_overfit_gate": false,
+      "totals": {
+        "accepted": 8,
+        "errors": 0,
+        "feature_seconds": 0.0,
+        "maximum_gradient_norm": 10.045893669128418,
+        "optimizer_seconds": 456.2601291000319,
+        "rejected": 0,
+        "render_attempts": 0,
+        "reused_feature_draws": 7992,
+        "sampled_examples": 8000
+      },
+      "trainable_parameters": 5730849
+    }
+  },
+  "baseline_repeat_note": "Initial helper required audio QA acceptance for its repeat flag; audio hashes separately confirm exact repeats including clipping rejections.",
+  "claim": "eight_training_examples_only_not_validation_or_release_evidence",
+  "decoder_policy": "retain_frozen_train_only_bank_for_first_mixed_baseline",
+  "final_test_audio": false,
+  "fits_assets_or_decoders": false,
+  "matched_configuration_except_cyclic_head": true,
+  "model_promotion": false,
+  "periodic": {
+    "all_native_pairs_repeat_exact": true,
+    "fit_by_family": {
+      "categorical": {
+        "effects": {
+          "active_choices": 227,
+          "wrong_choices": 0
+        },
+        "filters": {
+          "active_choices": 52,
+          "wrong_choices": 0
+        },
+        "lfo_curves": {
+          "active_choices": 629,
+          "wrong_choices": 8
+        },
+        "modulation": {
+          "active_choices": 726,
+          "wrong_choices": 0
+        },
+        "modulators": {
+          "active_choices": 269,
+          "wrong_choices": 0
+        },
+        "oscillator_seeds": {
+          "active_choices": 0,
+          "wrong_choices": 0
+        },
+        "oscillators": {
+          "active_choices": 408,
+          "wrong_choices": 0
+        },
+        "route_map_presence": {
+          "active_choices": 224,
+          "wrong_choices": 0
+        },
+        "route_presence": {
+          "active_choices": 494,
+          "wrong_choices": 0
+        },
+        "route_structure": {
+          "active_choices": 448,
+          "wrong_choices": 0
+        },
+        "sampler": {
+          "active_choices": 68,
+          "wrong_choices": 0
+        },
+        "voice_global": {
+          "active_choices": 104,
+          "wrong_choices": 0
+        }
+      },
+      "continuous": {
+        "custom_warps": {
+          "active_values": 194,
+          "mae": 0.0030816271901130676
+        },
+        "effects": {
+          "active_values": 435,
+          "mae": 0.010190741159021854
+        },
+        "envelopes": {
+          "active_values": 207,
+          "mae": 0.007083065342158079
+        },
+        "filters": {
+          "active_values": 144,
+          "mae": 0.009498517960309982
+        },
+        "lfo_curves": {
+          "active_values": 397,
+          "mae": 0.13654565811157227
+        },
+        "modulation": {
+          "active_values": 484,
+          "mae": 0.003788132918998599
+        },
+        "modulators": {
+          "active_values": 287,
+          "mae": 0.005943013820797205
+        },
+        "oscillators": {
+          "active_values": 288,
+          "mae": 0.009774280712008476
+        },
+        "route_maps": {
+          "active_values": 1067,
+          "mae": 0.002454842207953334
+        },
+        "sampler": {
+          "active_values": 9,
+          "mae": 0.005129124503582716
+        },
+        "voice_global": {
+          "active_values": 112,
+          "mae": 0.008753414265811443
+        }
+      }
+    },
+    "gates_as_recorded": {
+      "both_training_sources": true,
+      "export_weights_match": true,
+      "frozen_decoder_and_assets": true,
+      "frozen_frontend": true,
+      "native_full_readback": true,
+      "native_prediction_repeats_exact": true,
+      "native_predictions_accepted": true,
+      "no_training_renders": true,
+      "retained_features_and_labels_unchanged": true,
+      "strict_overfit": false,
+      "training_reference_recipes_only": true,
+      "within_memory_budget": true
+    },
+    "native_accepted": 16,
+    "native_events_sha256": "6aa464ac56028b31f962811685cf3b7b75f4e386bf1f8704ffb9b1e87b1c0d6f",
+    "native_rejected": [],
+    "native_requests": 16,
+    "perfect_label_curve_floor": {
+      "categorical_accuracy": 1.0,
+      "categorical_ce": 0.0,
+      "continuous_mae": 0.0,
+      "continuous_mse": 0.0,
+      "curve_reconstruction_mse": 0.001550246961414814,
+      "loss": 0.001550246961414814,
+      "route_map_mse": 0.0,
+      "warp_curve_mse": 0.0
+    },
+    "qualification_peak_process_tree_rss_bytes": 1923985408,
+    "training": {
+      "checkpoint_seconds_this_segment": 21.220212799977162,
+      "complete": true,
+      "config": {
+        "batch_size": 8,
+        "checkpoint_every": 100,
+        "conditioning": "concat",
+        "cpu_threads": 2,
+        "cyclic_head": "periodic",
+        "fresh_examples": null,
+        "identity_temperature": 0.1,
+        "identity_weight": 0.0,
+        "learning_rate": 0.003,
+        "learning_seed_override": null,
+        "mode": "overfit",
+        "render_budget": 32,
+        "replay_capacity": 8,
+        "replay_mib": 8,
+        "sampling_policy": "source_balanced",
+        "seed": 0,
+        "steps": 1000,
+        "updates_per_render": 1
+      },
+      "elapsed_seconds_this_segment": 425.5037491000112,
+      "feature_seconds_this_segment": 0.0,
+      "final_metrics": {
+        "categorical_accuracy": 0.9974707365036011,
+        "categorical_ce": 0.0034976815804839134,
+        "continuous_mae": 0.01838567480444908,
+        "continuous_mse": 0.0031651570461690426,
+        "curve_reconstruction_mse": 0.009724123403429985,
+        "loss": 0.016421394422650337,
+        "route_map_mse": 1.655703817959875e-05,
+        "warp_curve_mse": 1.7876489437185228e-05
+      },
+      "fresh_accepted_this_segment": 0,
+      "initial_metrics": {
+        "categorical_accuracy": 0.5361998081207275,
+        "categorical_ce": 2.5590152740478516,
+        "continuous_mae": 0.18186737596988678,
+        "continuous_mse": 0.07904645800590515,
+        "curve_reconstruction_mse": 0.12796004116535187,
+        "loss": 3.0995724201202393,
+        "route_map_mse": 0.05838346853852272,
+        "warp_curve_mse": 0.27516722679138184
+      },
+      "model_state_sha256": "2a66f3b413d7a4df518bde594d91448dffb4e49bc9cfcedafb3d133b36ea5f16",
+      "peak_process_tree_rss_bytes": 1720524800,
+      "pool_id": "fcc146cd1fb1cb06659b25f0710c9a6995c0837f5b9e0973dd4056eb3ba07e3f",
+      "replay_distinct_states": 8,
+      "replay_examples": 8,
+      "replay_seed": {
+        "acknowledged_recipes": 9,
+        "checkpoint_sha256": "02796dff831cc81551a903a1cc09e630373ccc29ae356131f262bb2e766d86c4",
+        "examples": 8,
+        "history": {
+          "accepted": 8,
+          "errors": 0,
+          "rejected": 1,
+          "render_log_sha256": "9b7faaaa19c67edb2c54b237fc2c5980ab811decfc542a69ce515a102f58a8f7"
+        },
+        "policy": "qa_qualified_complete_attempt_prefix_fresh_learning_state_v1",
+        "source_run_id": "dee4ea076acac97fcc3157b245623308e8b65f1004e8fe61e389fe00d10a96b3"
+      },
+      "run_id": "70ae90196460a838af0438a85e4f2a74eb0367f76d08ae2cbcf8235fe4bf84f9",
+      "step": 1000,
+      "tiny_overfit_gate": false,
+      "totals": {
+        "accepted": 8,
+        "errors": 0,
+        "feature_seconds": 0.0,
+        "maximum_gradient_norm": 22.83461570739746,
+        "optimizer_seconds": 402.7358191999956,
+        "rejected": 0,
+        "render_attempts": 0,
+        "reused_feature_draws": 7992,
+        "sampled_examples": 8000
+      },
+      "trainable_parameters": 5730849
+    }
+  },
+  "periodic_all_gates_pass": false,
+  "qualification": "mixed_retained_feature_overfit_and_native_predictions_v1"
+}

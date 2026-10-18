@@ -13,9 +13,11 @@ MODEL_SPEC = {"model": "pilot_stereo_cnn_pooled_pitch_v1", "timbre_channels": [1
               "continuous_heads": len(CONTINUOUS), "categorical_sizes": [len(options) for _, options in CATEGORICAL]}
 
 
-def model_spec(codec=None, conditioning="concat"):
+def model_spec(codec=None, conditioning="concat", cyclic_head="sigmoid"):
     if conditioning not in {"concat", "cross_attention"}:
         raise ValueError("unsupported performance conditioning")
+    if cyclic_head not in {"sigmoid", "periodic"}:
+        raise ValueError("unsupported cyclic output head")
     spec = dict(MODEL_SPEC)
     if codec is not None and codec.generator != "independent_authored_pilot_v1":
         spec.update(model="alpha_stereo_cnn_pooled_pitch_v1", continuous_heads=len(codec.continuous),
@@ -26,6 +28,10 @@ def model_spec(codec=None, conditioning="concat"):
     if conditioning == "cross_attention":
         spec.update(model=spec["model"].replace("pooled_pitch", "pitch_cross_attention"), conditioning="cross_attention_v1",
                     conditioning_heads=4, conditioning_width=64, conditioning_performance_bins=8, conditioning_initial_gain=0.)
+    if cyclic_head == "periodic":
+        if not getattr(codec, "cyclic_indices", ()):
+            raise ValueError("periodic outputs require declared cyclic codec fields")
+        spec["cyclic_outputs"] = "linear_modulo_one_normalized_default_bias_v1"
     return spec
 
 
@@ -37,11 +43,20 @@ def conditioning_from_spec(spec):
     return "cross_attention"
 
 
+def cyclic_head_from_spec(spec):
+    if "cyclic_outputs" not in spec:
+        return "sigmoid"
+    if spec["cyclic_outputs"] != "linear_modulo_one_normalized_default_bias_v1":
+        raise ValueError("unsupported saved cyclic output head")
+    return "periodic"
+
+
 class PilotInverse(nn.Module):
-    def __init__(self, codec=None, conditioning="concat"):
+    def __init__(self, codec=None, conditioning="concat", cyclic_head="sigmoid"):
         super().__init__()
-        spec = model_spec(codec, conditioning)
-        self.conditioning = conditioning
+        spec = model_spec(codec, conditioning, cyclic_head)
+        self.conditioning, self.cyclic_head = conditioning, cyclic_head
+        self.cyclic_indices = tuple(getattr(codec, "cyclic_indices", ()))
         self.timbre = nn.Sequential(nn.Conv2d(2, 16, 5, stride=2, padding=2), nn.GELU(),
                                     nn.Conv2d(16, 32, 3, stride=2, padding=1), nn.GELU(),
                                     nn.AdaptiveAvgPool2d((6, 4)), nn.Flatten())
@@ -58,6 +73,10 @@ class PilotInverse(nn.Module):
                     head.weight.zero_()
                     head.bias.zero_()
                     head.bias[index] = 5.
+        if cyclic_head == "periodic":
+            with torch.no_grad():
+                self.continuous.weight[list(self.cyclic_indices)] = 0
+                self.continuous.bias[list(self.cyclic_indices)] = torch.tensor(codec.default_target().continuous)[list(self.cyclic_indices)]
         if conditioning == "cross_attention":
             # Construct extras last so shared weights have exactly the baseline's seeded initialization.
             self.performance_projection = nn.Sequential(nn.Linear(440, 64), nn.GELU())
@@ -79,7 +98,12 @@ class PilotInverse(nn.Module):
             residual = self.conditioning_projection(conditioned).transpose(1, 2).flatten(1)
             timbre = timbre + self.conditioning_gain * residual
         hidden = self.fusion(torch.cat((timbre, self.pitch(features["pitch"])), dim=1))
-        return {"continuous": self.continuous(hidden).sigmoid(), "categorical": [head(hidden) for head in self.categorical],
+        raw = self.continuous(hidden)
+        continuous = raw.sigmoid()
+        if self.cyclic_head == "periodic":
+            continuous = continuous.clone()
+            continuous[:, self.cyclic_indices] = raw[:, self.cyclic_indices].remainder(1.)
+        return {"continuous": continuous, "categorical": [head(hidden) for head in self.categorical],
                 "representation": hidden}
 
 
