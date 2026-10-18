@@ -19,7 +19,7 @@ from obruxo_data.hashing import canonical_sha256, sha256_bytes
 from .audit import write_json
 from .benchmark import MemoryMonitor
 from .checkpoints import TrainingCheckpointWriter, atomic_torch_save, load_training_checkpoint
-from .codec import PilotTarget, load_codec
+from .codec import PilotCodec, PilotTarget, load_codec
 from .curve_labels import CURVE_LABEL_KEYS, SOURCE_CURVES
 from .features import tensor_digest, validate_features
 from .extended_features import features_for
@@ -49,6 +49,7 @@ class TrainConfig:
     identity_temperature: float = .1
     conditioning: str = "concat"
     cyclic_head: str = "sigmoid"
+    prediction_scope: str = "codec"
 
     def __post_init__(self):
         positive = (self.steps, self.replay_capacity, self.replay_mib, self.batch_size,
@@ -69,6 +70,8 @@ class TrainConfig:
             raise ValueError("unsupported performance conditioning")
         if self.cyclic_head not in {"sigmoid", "periodic"}:
             raise ValueError("unsupported cyclic output head")
+        if self.prediction_scope not in {"codec", "basic"}:
+            raise ValueError("unsupported prediction scope")
         if (not math.isfinite(self.identity_weight) or self.identity_weight < 0
                 or not math.isfinite(self.identity_temperature) or self.identity_temperature <= 0):
             raise ValueError("identity weight must be nonnegative and temperature positive and finite")
@@ -160,7 +163,13 @@ def replay_metrics(model, items, codec, device, config=None) -> dict:
     return {name: float(value) for name, value in terms.items()}
 
 
+def _require_prediction_scope(codec, scope):
+    if scope == "basic" and (type(codec) is not PilotCodec or codec.to_dict() != PilotCodec().to_dict()):
+        raise ValueError("basic prediction scope requires the original nine-control/two-choice pilot pool; broad presets cannot be silently projected")
+
+
 def _run_contract(pool, sampler, frontend, config, stream_config, replay_seed=None) -> dict:
+    _require_prediction_scope(pool.codec, config.prediction_scope)
     training = asdict(config)
     # Preserve the existing v1 contract for the unchanged legacy schedule.
     for name, default in (("sampling_policy", "pairs"), ("updates_per_render", 1), ("fresh_examples", None)):
@@ -176,6 +185,8 @@ def _run_contract(pool, sampler, frontend, config, stream_config, replay_seed=No
         del training["conditioning"]
     if training["cyclic_head"] == "sigmoid":
         del training["cyclic_head"]
+    if training["prediction_scope"] == "codec":
+        del training["prediction_scope"]
     contract = {"trainer": "pilot_supervised_bootstrap_v1", "pool_id": pool.pool_id,
             "contract": pool.codec.contract.to_dict(), "codec": pool.codec.to_dict(), "sampler_id": sampler.sampler_id,
             "model": model_spec(pool.codec, config.conditioning, config.cyclic_head), "frontend": frontend.describe(), "training": training,
@@ -280,6 +291,7 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
                 stop_after: int | None = None, progress=None, after_step=None, seed_replay: Path | None = None) -> dict:
     """Train with fresh renders inside the loop. after_step supports interruption testing."""
     config, stream_config = config or TrainConfig(), stream_config or StreamConfig(prefetch_clips=1)
+    _require_prediction_scope(pool.codec, config.prediction_scope)
     if resume is not None and seed_replay is not None:
         raise ValueError("resume embeds its replay seed; do not supply seed_replay again")
     if torch.device(device).type not in {"cpu", "cuda", "xpu"}:
