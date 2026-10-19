@@ -99,7 +99,9 @@ Parameter supervision can initialize the predictor and stabilize early fine-tuni
 
 Use one init oscillator, optional filter, amplitude envelope and bounded unison. Retain split manifests, the compact predictor, frozen Basic Pitch features and training-only retrieval. Keep the prediction space fixed while establishing the sound-training mechanism.
 
-#### A0. Contract, gradient correctness and resource profile — next
+#### A0. Contract, gradient correctness and resource profile
+
+The [local contract/native check](../training/reports/BASIC_SPECTRAL_CONTRACT_RESULTS.md) now passes, including 33 focused tests, 12 native requests, six exact repeats and measured target memory. The remaining handoff is the frozen A1 helper card. This establishes connectivity and resources, not useful helper gradients.
 
 Implement the spectral targets, differentiable control adapter, Gumbel-softmax selections, legal inactive defaults and separate export path. Check sound-loss gradients, fixed helper weights, hard-choice codec agreement and interrupted-run recovery. Profile real target shapes, replay bytes, optimizer memory and full rendering throughput before sizing a run. Freeze the helper qualification card described in the [basic-stage protocol](../training/STAGED_RECONSTRUCTION.md).
 
@@ -153,7 +155,7 @@ Add effects, sampler, additional oscillators or further modulation one capabilit
 
 A release can support a deliberately bounded sound vocabulary. Its model card must state that scope and how out-of-scope inputs behave. Freeze weights, preprocessing, assets and inference policy, then run the untouched final test. If test results drive further changes, treat them as development evidence and reserve new confirmation data rather than repeatedly calling the same panel an untouched test.
 
-Package trained weights, preprocessing, the exact stage decoder/defaults, required asset hashes/notices, an offline inference CLI, runtime measurements, reproducible local training instructions and listening/evaluation results. Verify a fresh-environment example and a free-Colab optimizer notebook with recovery; native Linux rendering needs its own qualification. A GUI is optional. The deployed inverse model does not need the training helper.
+Package trained weights, preprocessing, the exact stage decoder/defaults, required asset hashes/notices, an offline inference CLI, runtime measurements, reproducible local training instructions and listening/evaluation results. Verify a fresh local-environment example. Colab packaging and native Linux qualification are deferred and are not local-release prerequisites. A GUI is optional. The deployed inverse model does not need the training helper.
 
 ## Sound-quality decisions
 
@@ -189,7 +191,7 @@ When randomness is intentionally introduced in a later stage, assess sound stati
 
 ## Free-first compute and experiment limits
 
-The default is the local machine with free Colab as a fallback. No paid GPU, subscription or storage is assumed. Start with CPU float32, two learning threads, one renderer and an **8 GiB process-tree RAM budget**. Keep the existing 355,806-parameter inverse model. The initial helper ceiling is two million trainable parameters, a planning limit to profile rather than a claim of sufficient capacity.
+Run the upcoming implementation, qualification and training stages entirely on the local machine. Colab work is deferred at the user's request. No paid GPU, subscription or storage is assumed. Start with CPU float32, two learning threads, one renderer and an **8 GiB process-tree RAM budget**. Keep the existing 355,806-parameter inverse model. The initial helper ceiling is two million trainable parameters, a planning limit to profile rather than a claim of sufficient capacity.
 
 Replay is capped by **both bytes and records**: at most 512 records and 512 MiB resident features/targets, whichever fills first; optional retained feature archives are capped at 2 GiB. Full multiresolution spectra are much larger than old pooled inputs. Profile batches of 1–8 examples and reduce batch/replay size or use declared time chunks before exceeding memory. Any lossy target compression needs a fidelity check. Account for feature extraction, checkpoints, helper training and evaluation separately.
 
@@ -206,6 +208,6 @@ Second-seed training is a separate predeclared run capped like A2, after a promi
 
 The recent basic diagnosis rendered 290.73 seconds of audio in 105.28 seconds end to end; native synthesis alone took 55.53 seconds. This demonstrates faster-than-real-time operation for that workload, not promised training throughput. The earlier helper run took 18.85 minutes, mostly rendering. Profile the complete new path before increasing workers or moving learning to a GPU.
 
-Free Colab is an optional optimizer environment, used interactively with checkpoint recovery. Hardware availability and session duration are not guaranteed. [Google Colab FAQ](https://research.google.com/colaboratory/faq.html) While Linux Vital rendering remains unqualified, generate bounded feature batches locally and transfer checksummed recipes/targets; no pre-rendered WAV corpus is needed. Keep native quality checks on the qualified local renderer. Measure benefit after transfer costs. Qualify Linux plugin loading, native behavior, recovery and throughput before claiming all-in-Colab training works.
+Colab remains an optional later scaling route, after local basic reconstruction works and a measured bottleneck warrants it. Do not spend the current stages on notebooks, cloud transfer or Linux plugin qualification. If revisited, account for non-guaranteed hardware/session availability and qualify portability then. [Google Colab FAQ](https://research.google.com/colaboratory/faq.html)
 
 Keep GitHub Actions disabled and run relevant checks locally. Submit reviewable PRs for A0, A1, A2 and confirmation/release work; never merge without direct approval. This plan update does not launch experiments or promote an existing helper or predictor.

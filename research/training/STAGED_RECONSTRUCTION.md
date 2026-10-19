@@ -36,7 +36,9 @@ The bounded diagnostic is **5 cases × 2 performances × 7 methods = 70 requests
 
 These group interventions locate useful directions but can interact and are not an additive decomposition. If no group helps, inspect observations, representation limits and the metric instead of assuming a parameter loss needs more weight. A large parameter error alone is insufficient evidence to choose a training change.
 
-## A0: contract and correctness — next implementation
+## A0: contract and correctness
+
+The [local contract check](reports/BASIC_SPECTRAL_CONTRACT_RESULTS.md) now passes: unpooled spectral targets/loss, differentiable basic controls, sound-only gradient connectivity, hard export and Gumbel/optimizer recovery; 33 focused tests, 12 accepted native renders and six exact repeats. Full target replay fits only 62 four-second or 15 sixteen-second examples within 512 MiB. The remaining A0 handoff is the frozen A1 helper experiment card. No qualified helper or spectral-trained inverse model is claimed.
 
 Publish the following before launching a helper or inverse comparison:
 
@@ -117,11 +119,11 @@ Package a basic inference bundle and CLI with pinned preprocessing, weights, cod
 | Work package | Current state | Reviewable deliverable |
 |---|---|---|
 | Baseline audit and native diagnosis | Complete; listening still pending | Existing reports, checkpoints and render receipts |
-| A0 spectral/control contract | Next; not implemented by this plan | Versioned measurements/adapter, gradient/export/recovery checks, resource profile and experiment card |
+| A0 spectral/control contract | Implementation/native checks passed; A1 card next | [Versioned contract and measured resource evidence](reports/BASIC_SPECTRAL_CONTRACT_RESULTS.md); frozen helper card remains |
 | A1 helper qualification | Pending A0 | New helper, held-out and native-gradient evidence, explicit qualified/refused artifact |
 | A2 spectral inverse comparison | Pending A1 | Candidate/control checkpoints and hard-export native report |
 | A3 confirmation/basic bundle | Pending A2 | Independent confirmation, second seed, listening and reproducible basic inference bundle |
 
-Use separate reviewable PRs for these work packages and local checks with GitHub Actions disabled. Publish exact run status, resource use and failed gates; do not equate implemented code with a passed training milestone. No experiment is launched by this documentation change.
+Use separate reviewable PRs for these work packages and local checks with GitHub Actions disabled. Publish exact run status, resource use and failed gates; do not equate implemented code with a passed training milestone. All upcoming work stays local; Colab notebooks, transfers and Linux qualification are deferred.
 
 Only after basic-stage quality passes should the next PR introduce a bounded new capability. One LFO and at most two linear routes are the initial modulation limit. Optional compact mappings for the first two routes remain deferred; no 64-slot mapping output layer is part of this schedule.
