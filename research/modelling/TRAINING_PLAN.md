@@ -101,7 +101,7 @@ Use one init oscillator, optional filter, amplitude envelope and bounded unison.
 
 #### A0. Contract, gradient correctness and resource profile
 
-The [local contract/native check](../training/reports/BASIC_SPECTRAL_CONTRACT_RESULTS.md) now passes, including 33 focused tests, 12 native requests, six exact repeats and measured target memory. The remaining handoff is the frozen A1 helper card. This establishes connectivity and resources, not useful helper gradients.
+The [local contract/native check](../training/reports/BASIC_SPECTRAL_CONTRACT_RESULTS.md) now passes, including 33 focused tests, 12 native requests, six exact repeats and measured target memory. The [local A1 helper card](../training/reports/BASIC_SPECTRAL_HELPER_CARD.md) freezes its implementation, data, qualification gates and resource limits. A0 establishes connectivity and resources, not useful helper gradients.
 
 Implement the spectral targets, differentiable control adapter, Gumbel-softmax selections, legal inactive defaults and separate export path. Check sound-loss gradients, fixed helper weights, hard-choice codec agreement and interrupted-run recovery. Profile real target shapes, replay bytes, optimizer memory and full rendering throughput before sizing a run. Freeze the helper qualification card described in the [basic-stage protocol](../training/STAGED_RECONSTRUCTION.md).
 
