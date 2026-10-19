@@ -11,7 +11,9 @@ Updated 2026-10-19 for the [staged reconstruction plan](../modelling/TRAINING_PL
 | C: simple modulation | Renderer/codec can support this | Train one LFO with at most two linear routes and a small destination list; evaluate sound, not exact graph identity |
 | D: selective expansion and release | Offline narrow bundle/CLI and broad infrastructure exist | Admit useful capabilities individually, freeze supported scope, final test, fresh-environment bundle, listening/model card/runtime results |
 
-Current task: follow the [basic-stage protocol](STAGED_RECONSTRUCTION.md). The explicit `--prediction-scope basic` option rejects broad pools before creating the training frontend or renderer and records the choice in the run contract. It preserves the actual compact 14-value output layer. Older experiments retain their contracts through the default `codec` option.
+Current task: test better stereo/width and detuning evidence in the unchanged basic output space. The [five-case native diagnosis](reports/BASIC_SOUND_DIAGNOSIS.md) completed all 70 requests and 10 exact phase-fixed repeat pairs. Correcting unison/detune/pan improves every case and lowers mean sound error by 26.68%; this uses known source controls and is not a trained-model gain. Freeze the next comparison under the [basic-stage protocol](STAGED_RECONSTRUCTION.md) before training; listening and confirmation remain open.
+
+The explicit `--prediction-scope basic` option rejects broad pools before creating the training frontend or renderer and records the choice in the run contract. It preserves the actual compact 14-value output layer. Older experiments retain their contracts through the default `codec` option.
 
 Both existing basic validation panels have already influenced development. No test state is released for tuning. Full-model tiny-set fitting, eight-LFO loss tuning, all-64-slot training and mixed-corpus scaling are deferred; they do not block Stage A. Exact random-seed prediction and exhaustive parameter coverage are removed from completion criteria.
 
