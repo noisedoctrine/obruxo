@@ -162,6 +162,8 @@ def main(argv=None) -> int:
     train.add_argument("--identity-temperature", type=float, default=.1)
     train.add_argument("--conditioning", choices=("concat", "cross_attention"), default="concat")
     train.add_argument("--cyclic-head", choices=("sigmoid", "periodic"), default="sigmoid")
+    train.add_argument("--prediction-scope", choices=("codec", "basic"), default="codec",
+                       help="basic enforces the nine-control/two-choice pilot; codec preserves historical experiments")
     train.add_argument("--updates-per-render", type=int, default=1)
     train.add_argument("--fresh-examples", type=int, help="Stop adding fresh examples at this count, then continue bounded replay")
     train.add_argument("--device", default="cpu")

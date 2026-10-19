@@ -1,6 +1,14 @@
 # Training contracts, online pilot and trainer
 
-The [mixed-source small-batch check](MIXED_OVERFIT.md) now reuses verified features across rejected render attempts and fixes phase-wrap learning through an explicitly versioned model option. Its [matched fit report](reports/MIXED_OVERFIT_RESULTS.md) improves numerical fit but still misses the strict categorical gate. Full-model fitting remains the next blocker before data scaling.
+The active work follows the [staged reconstruction plan](../modelling/TRAINING_PLAN.md) and [basic-stage protocol](STAGED_RECONSTRUCTION.md): prove reliable sound reconstruction with nine continuous controls and two categorical choices before adding capabilities. Use `train --prediction-scope basic` to enforce this scope. Broad preset support remains available as infrastructure; exhaustive output coverage is not the model's completion criterion.
+
+The [completion ledger](IMPLEMENTATION_STATUS.md) separates current quality gates from implemented capabilities. Both earlier basic validation panels are development data; final-test states remain reserved.
+
+## Historical capability work
+
+The entries below describe implemented experiments in reverse chronology. Their original next-step suggestions are superseded by the active staged plan.
+
+The [mixed-source small-batch check](MIXED_OVERFIT.md) reuses verified features across rejected attempts and fixes phase-wrap learning. Its [fit report](reports/MIXED_OVERFIT_RESULTS.md) improves numerical fit but misses the strict categorical gate. Further broad-model fitting is deferred.
 
 The [mixed-source path](MIXED_SOURCES.md) now combines original corpus presets with authored coverage under unchanged frozen splits. It schedules both sources, adds corpus validation, checks program aliases and retains supervision for the sampler, effects, curves and all connection destinations. Its [bounded native/training report](reports/MIXED_SOURCE_RESULTS.md) verifies ingestion and recovery; broad model quality remains open.
 
