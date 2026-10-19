@@ -1,8 +1,8 @@
-# OBRUXO staged reconstruction plan
+# OBRUXO training plan: learn to reconstruct sound
 
-Revised 2026-10-19 following the scope correction. **Prove sound reconstruction with a small prediction space, then add capabilities when they improve audible results.** Comprehensive preset support is useful infrastructure, not a requirement to predict every field. This plan supersedes the [coverage-first snapshot](TRAINING_PLAN_COVERAGE_20261018.md), including its full-model fitting prerequisite and exhaustive coverage milestones.
+Revised 2026-10-19. **Train using perceptual spectral reconstruction loss on a small prediction space, prove improvement in real Vital audio, then add capabilities when they improve audible results.** Parameter matching is an initialization or auxiliary signal. Comprehensive preset serialization does not determine the model's output size. This revision moves sound-based learning into the first stage and supersedes the [coverage-first snapshot](TRAINING_PLAN_COVERAGE_20261018.md), including its sequence of expanding coverage before establishing useful reconstruction gradients.
 
-The [completion ledger](../training/IMPLEMENTATION_STATUS.md) tracks the active work. The [basic-stage protocol](../training/STAGED_RECONSTRUCTION.md) fixes the immediate scope and next decisions. Prior code, checkpoints, reports and split reservations remain available.
+The [completion ledger](../training/IMPLEMENTATION_STATUS.md) tracks the active work. The [basic-stage protocol](../training/STAGED_RECONSTRUCTION.md) fixes the immediate implementation and qualification steps. Prior code, checkpoints, reports and split reservations remain available. This is an updated plan, not a claim that spectral-loss training is implemented or qualified.
 
 ## Target and current evidence
 
@@ -10,7 +10,11 @@ One isolated instrument recording enters; one valid, playable `.vital` patch lea
 
 The small problem has partial evidence already: the nine-control/two-choice pilot learned from 205 and later 404 training patches. Its [original validation](../training/reports/STATE_COVERAGE_RESULTS.md) and [additional validation](../training/reports/FRESH_VALIDATION_RESULTS.md) show reconstruction gains, but persistent envelope, level and unison errors. Neither proves reliably good reconstruction or listener usefulness. Both panels (21 and 23 patches) have been used for development. They must not be relabelled as new confirmation data.
 
-The latest eight-example full-model run is an infrastructure diagnostic, not the next training prerequisite. Further work on fitting all outputs, expanding route coverage or balancing eight codebook losses is deferred. The next job is to diagnose the small model's sound errors, establish a useful baseline and close that stage's quality gate.
+The [native basic diagnosis](../training/reports/BASIC_SOUND_DIAGNOSIS.md) is complete: 70 accepted renders and 10 exact phase-fixed repeat pairs. Correcting unison voices/detune/pan reduces mean error by 26.68% across five development cases. This uses known source controls and is not a trained-model gain. Stereo and detuning must therefore remain visible to the sound objective and qualification checks.
+
+An [earlier sound-prediction helper](../training/reports/SOUND_PROXY_RESULTS.md) on the broader alpha vocabulary failed qualification: its guided updates lowered predicted loss on all 20 cases but increased real Vital error on all 20. Transfer prediction also failed. The collection/recovery code is reusable; that helper is not qualified to train the predictor. The [direct-render target experiment](../training/reports/RENDER_SELECTED_RESULTS.md) also failed to improve inverse learning, increasing held-out error by 12.56%. Neither route is an established solution merely because its plumbing exists.
+
+The latest eight-example full-model run remains an infrastructure diagnostic. Further all-output fitting, broad route coverage and eight-LFO loss tuning are deferred. The next substantial milestone is useful sound-loss gradients on the basic vocabulary, followed by a real-render improvement in the predictor.
 
 ## Separate preset support from prediction scope
 
@@ -33,22 +37,105 @@ The six-knot map limit is a proposed ceiling, not an implemented or qualified re
 
 A reduced model must actually have fewer output heads. Masking a 64-route decoder's labels does not satisfy this requirement. Record continuous values, categorical heads, categorical logits, trainable parameters and runtime for each proposed expansion. The basic model has **9 continuous outputs + 5 categorical logits = 14 output values**, with **355,806 trainable parameters**. It does not instantiate the broad model and mask most of it.
 
+| Stage A component | Predicted controls | Dense output values |
+|---|---|---:|
+| Oscillator 1 | Level, pan, unison detune | 3 |
+| Filter 1 | Cutoff, resonance | 2 |
+| Amplitude envelope | Attack, decay, sustain, release | 4 |
+| Oscillator 1 unison count | Scores for 1, 2 or 4 voices | 3 |
+| Filter 1 enable | Scores for off/on | 2 |
+| **Total** | **9 continuous controls and 2 category selections** | **14** |
+
+At export the five category scores become two integer selections: **11 predicted control values enter the existing codec**, which fills the remaining patch from its fixed template. The differentiable path retains nine scalar values and five selection-tensor entries. These are one-oscillator Stage A counts, not the eventual three-oscillator model. The helper's spectral outputs are training-only and do not enlarge the exported patch head.
+
+For future expansions, semitone transpose is one bounded continuous prediction, rounded at export. Three oscillator transposes need **3 values instead of 291 scores**, saving 288; three oscillators' level/pan/detune need **9 values**, not three. The broad codec conversion is planned, not already implemented. Other ordered numeric controls need the same deliberate review rather than automatic categorization. Nominal modes retain categorical scores. Every expansion needs a named control-by-control count; the earlier illustrative 2,348-output inventory is not an approved final architecture.
+
+Keep stack style at Normal and oscillator wave-warp mode at None in Stage A. Stack style arranges unison pitches. Wave warping includes sync, bend, pulse width, FM and ring modulation, and is separate from effects-section distortion. UI/display settings and random seeds have no prediction heads.
+
+## Sound-loss training path
+
+Native Vital does not supply derivatives for ordinary backpropagation. The proposed bridge is a small differentiable forward model, or helper: patch controls and MIDI go in, estimates of Vital's time-varying spectral measurements come out. Train and qualify it before connecting it to the predictor.
+
+```text
+On-demand helper training:
+  authored patch + training MIDI -> real Vital -> audio -> fixed spectral targets
+  authored patch + training MIDI -> helper -> fit to those spectral targets
+
+Predictor training after helper qualification:
+  target audio -> predictor -> continuous controls / Gumbel-softmax selections
+               -> frozen helper with training MIDI -> predicted spectra
+  target audio ------------------------------------> target spectra
+                             reconstruction loss -> backpropagation
+
+Deployment and real-render evaluation:
+  audio -> predictor -> rounded numeric controls / argmax categories -> codec -> Vital
+```
+
+Freeze helper weights during predictor training but retain gradients through its inputs. No `no_grad()`, detached controls, Python integer selections or JSON serialization inside this path. The full codec remains the export/native-render boundary. Known MIDI conditions the helper and evaluator, never the deployed inverse network.
+
+Use **straight-through Gumbel-softmax** for the categorical controls: a hard one-hot choice in the forward pass and a soft approximation in the backward pass. Save its RNG and temperature schedule; use unperturbed deterministic `argmax` for deployment-quality scoring. This supplies an approximate gradient through a category choice, not through native Vital. [PyTorch documentation](https://docs.pytorch.org/docs/2.14/generated/torch.nn.functional.gumbel_softmax.html)
+
+The helper route has research precedent for audio embeddings. Our performance-conditioned spectral model is a project proposal requiring its own qualification. [Combes et al., Neural Proxies for Sound Synthesizers](https://arxiv.org/abs/2509.07635)
+
+### Objective and measurement contract
+
+The primary objective is multiresolution spectral reconstruction: short windows capture attacks and longer windows capture harmonic structure. Preserve timing, absolute level and left/right information. Add envelope and stereo terms for the observed basic-model errors. Spectral distance is a practical approximation to perceived similarity; listening remains part of acceptance.
+
+```text
+training loss = spectral reconstruction
+              + weighted envelope and stereo errors
+              + optional, limited parameter-supervision anchor
+```
+
+Freeze sample rate, FFT sizes, hops, windows, magnitude/log transforms, silence floor, valid-time masks, normalization and weights in a versioned contract. The initial candidate uses the existing 44.1 kHz render path and FFT sizes 512/2048/8192 while retaining time structure. Any frequency/time reduction needed for memory must preserve real-render error ordering and sensitivity to detune, filtering, attack/release, level and pan. The old helper's coarse 24-band/eight-time-bin representation is not a qualified objective by default.
+
+Train the helper against the declared spectral/envelope/stereo measurements. Use its predictions to approximate that objective during inverse training. Report **helper-based training loss separately from loss on real Vital audio**. Low feature regression error alone cannot qualify a helper.
+
+Parameter supervision can initialize the predictor and stabilize early fine-tuning. Declare its scale and decay before comparison and inspect actual gradient contributions. Verify that sound loss alone supplies finite, nonzero gradients to active continuous and categorical heads with the parameter term disabled. Alternative settings that sound equally good must not fail acceptance solely because they differ from the source preset.
+
 ## Stages and advancement
 
-### A. Reliable basic reconstruction — active
+### A. Learn basic reconstruction from sound — active
 
-Use one init oscillator, optional filter, amplitude envelope and bounded unison. Retain the existing split manifests, compact model, frozen Basic Pitch features and training-only retrieval baseline. Keep the architecture and prediction space fixed while diagnosing its present limits.
+Use one init oscillator, optional filter, amplitude envelope and bounded unison. Retain split manifests, the compact predictor, frozen Basic Pitch features and training-only retrieval. Keep the prediction space fixed while establishing the sound-training mechanism.
 
-1. Audit existing results and choose representative good, median and poor cases before new training. Separate amplitude/envelope, spectral shape, stereo/unison and performance-transfer errors. Reuse existing checkpoints and feature caches when identities match.
-2. Confirm the small end-to-end fit and native serialization evidence. Re-run a roughly 32-example check only if the training path, features, objective or representation changes. Render its predictions; low parameter loss alone does not pass a sound-quality gate.
-3. Make one substantial, diagnosis-driven change to observation, data coverage or sound-based learning. Compare it with the unchanged basic model on the same training budget and development cases. Do not launch another seed or loss-weight sweep without a concrete unresolved question.
-4. Freeze the candidate and comparison rules, then assess new validation families and performances that were not used to choose the change. Preserve every existing test reservation. Prepare a blinded listening comparison as part of stage completion.
+#### A0. Contract, gradient correctness and resource profile — next
 
-Parameter supervision is a bootstrap and debugging signal. Exact categorical recovery may remain a tiny-set implementation check for these authored, restricted controls; it is not a perceptual score or a prerequisite to recover non-identifiable graphs and seeds.
+Implement the spectral targets, differentiable control adapter, Gumbel-softmax selections, legal inactive defaults and separate export path. Check sound-loss gradients, fixed helper weights, hard-choice codec agreement and interrupted-run recovery. Profile real target shapes, replay bytes, optimizer memory and full rendering throughput before sizing a run. Freeze the helper qualification card described in the [basic-stage protocol](../training/STAGED_RECONSTRUCTION.md).
+
+**Deliverable:** reviewed contract, focused correctness checks, measured resource profile and a frozen experiment card. **Exit:** active controls receive sound-loss gradients, hard exports remain valid and retained state fits the budget. These checks do not establish useful gradients or reconstruction quality. Existing `train` commands still use their implemented supervised loss until a separate sound-training mode exists.
+
+#### A1. Qualify a helper on the small vocabulary
+
+Reuse existing collection/recovery infrastructure, not the failed helper's qualification. Train a small temporal forward model using basic patches and known MIDI. Cover register, velocity, note duration and releases within training rather than only the old four fixed performances. Keep qualification families/performances separate. Include nearby legal control changes and hard categorical alternatives in training-only coverage.
+
+Check held-out spectral prediction, rankings of real-rendered candidates, and whether small helper-guided changes improve real Vital audio. Probe continuous and categorical changes separately, then the combined path. Compare train-only mean, nearest-neighbor and interpolation baselines. Audit stereo/detuning sensitivity explicitly.
+
+**Deliverable:** qualified helper artifact and native report. **Exit:** predeclared prediction, ranking and real-improvement gates pass on reference and transfer performances. A helper that improves its own loss while worsening real audio stays disconnected from inverse training.
+
+If qualification fails, diagnose the conflicting measurements/directions and declare one evidence-based change before another bounded attempt. A differentiable implementation of the restricted synth or bounded native optimization is a separately costed alternative, not an automatic successful fallback. Do not automatically enlarge the helper, output space or run budget.
+
+#### A2. Train the predictor on spectral loss
+
+Start a matched parameter-only control and spectral-loss candidate from the same selected basic checkpoint. Align encoder, output vocabulary, source population, performances and inverse-update budget. Freeze the qualified helper for the whole inverse run. Use Gumbel-softmax for both basic categorical decisions and differentiable bounded continuous controls.
+
+Infer one patch from a reference recording and compare its helper predictions under reference and additional training performances against real target renders of the same source patch under those performances. Reusing that one inferred patch encourages a playable sound beyond one note. No source patch labels or true MIDI enter the inverse network.
+
+Run a small end-to-end fit check because the objective changed, then the bounded matched comparison. Render hard-decoded predictions through Vital at predeclared checkpoints. Monitor category usage, sound/parameter gradient contributions, helper/native disagreement and invalid outputs. Any helper refresh needs a new qualified artifact and comparison, not simultaneous untracked changes to both models.
+
+**Deliverable:** spectral-trained candidate, matched control, recovery evidence and native report. **Exit:** real reference/transfer improvement over the matched parameter-only control and simple baselines within budget. Better helper loss cannot advance the stage. Report helper training as additional compute; matched inverse updates do not imply equal total compute.
+
+#### A3. Confirm basic quality and package the first bounded model
+
+Freeze the candidate and comparison rules, then use new independent validation families and performances. Preserve all old assignments and test reservations. Confirm hard-export performance, tail errors, transfer behavior and blinded listening. Replicate a promising learning change on a second seed; do not run seed sweeps on an unqualified mechanism.
+
+Prepare a basic inference bundle requiring neither the helper nor source MIDI at prediction time. Keep a real Vital render as the end-to-end sound check. Listening, recovery and fresh-validation gates must pass before basic reconstruction is complete.
+
+Exact categorical recovery may remain a tiny-set implementation check; it is not a perceptual score or a requirement to recover non-identifiable graphs and seeds.
 
 ### B. Add a bounded sound capability
 
-After A passes, choose the first missing capability from its failure analysis: for example a small factory waveform vocabulary, filter-envelope control, or a second oscillator. Do not activate all of them together. Freeze a new source population, stage-specific output vocabulary and model-size budget before training.
+After A passes, choose the first missing capability from its failure analysis: for example a small factory waveform vocabulary, filter-envelope control, or a second oscillator, then a third if useful. Do not activate all of them together. Freeze a new source population, named output inventory and model-size budget before training. Requalify the helper on every expanded vocabulary before using its gradients there.
 
 Compare the previous-stage model and the expanded model on the same new sounds, and retain an earlier-stage panel to detect regressions. Score the original audio; separately measure the expanded representation's ceiling. The restricted model's inability to express a sound is a measured baseline, not grounds to exclude that sound from the comparison.
 
@@ -58,17 +145,19 @@ Introduce one LFO and at most two linear source-to-destination connections. Begi
 
 For this restricted, independent graph, authored slot order can provide convenient supervised targets. Audio under multiple performances decides quality. Two different valid graphs that reconstruct equally well must not be ranked by exact source graph recovery. Do not apply unrestricted graph permutation matching to the comprehensive codec, where indexed references and order can matter.
 
-Only if simple shapes leave a demonstrated gap should this stage compare one train-fitted complex LFO head. Eight simultaneous complex curves are not the starting point. Preserve earlier simple cases throughout training and evaluation.
+Only if simple shapes leave a demonstrated gap should this stage compare one train-fitted complex LFO head. Eight simultaneous complex curves are not the starting point. Requalify the sound-training path and preserve earlier simple cases throughout training and evaluation. Keep mappings linear; the optional first-two-route/six-knot trial above remains a late experiment.
 
 ### D. Expand selectively and prepare a useful release
 
 Add effects, sampler, additional oscillators or further modulation one capability at a time, selected by observed usefulness and cost. Each addition needs the same controlled quality comparison. Route maps and custom oscillator curves remain optional late experiments. Exhaustive Vital configuration recovery is not a milestone.
 
-A release can support a deliberately bounded sound vocabulary. Its model card must state that scope and how out-of-scope inputs behave. Package trained weights, preprocessing, the exact stage decoder/defaults, required asset hashes/notices, an offline inference CLI, runtime measurements, reproducible training instructions and listening/evaluation results. A GUI is optional.
+A release can support a deliberately bounded sound vocabulary. Its model card must state that scope and how out-of-scope inputs behave. Freeze weights, preprocessing, assets and inference policy, then run the untouched final test. If test results drive further changes, treat them as development evidence and reserve new confirmation data rather than repeatedly calling the same panel an untouched test.
+
+Package trained weights, preprocessing, the exact stage decoder/defaults, required asset hashes/notices, an offline inference CLI, runtime measurements, reproducible local training instructions and listening/evaluation results. Verify a fresh-environment example and a free-Colab optimizer notebook with recovery; native Linux rendering needs its own qualification. A GUI is optional. The deployed inverse model does not need the training helper.
 
 ## Sound-quality decisions
 
-Infer a patch once from a reference recording. Compare its real Vital audio with the source under both the reference performance and reserved transfer performances. Ground-truth MIDI belongs only to the synthetic renderer/evaluator; it is never an inference input. All baselines use the same cases and performances.
+Infer a patch once from a reference recording. Compare its real Vital audio with the source under both the reference performance and reserved transfer performances. Ground-truth MIDI belongs to the training forward model and synthetic renderer/evaluator; it is never an inverse-model input. All baselines use the same cases and performances.
 
 Required comparisons are the fixed template, training-only retrieval, and the unchanged previous model. Primary reporting uses per-patch reference/transfer spectral error; report reference and transfer separately. Add amplitude-envelope and level error, stereo diagnostics, median and tail errors, and all failed/invalid/silent/clipped outputs. A lower spectral metric is evidence, not a calibrated claim of perceptual similarity.
 
@@ -88,20 +177,35 @@ Final-test states remain untouched until the release candidate and all choices a
 
 ## Data, rendering and reproducibility
 
-Audio is generated on demand in the training pipeline. Keep bounded feature replay, recipes, QA logs and recoverable checkpoints; a pre-rendered training WAV collection is not required. Reuse features only with verified audio, preprocessing and recipe identities. Render source presets faithfully for the stage and keep ancestry-aware splits immutable.
+Audio is generated on demand, measured and discarded in the training pipeline. Keep bounded feature replay, recipes, QA logs and recoverable checkpoints; a pre-rendered training WAV collection is not required. Small listening/evaluation clips are allowed. Existing inverse-feature caches may not contain the new spectral targets: reuse only with matching complete contracts, otherwise regenerate on demand under a new identity. Render source presets faithfully for the stage and keep ancestry-aware splits immutable.
 
 Start with one isolated native worker and bounded prefetch. Measure the full path (plugin startup, state loading, offline rendering, features, updates and checkpoint writes), not just synthesis time. Rendering can run faster than real time; optimize the measured bottleneck. Increase workers only after resource and state-isolation checks.
 
-For exact reproducibility diagnostics, set oscillator 1–3 random phase and sampler random phase to fixed values, preserve all other phase controls and seeds, and use a fresh process per request. Log the controlled diagnostic patch separately. Ordinary training/evaluation uses its declared stage phase/stochastic policy; diagnostic phase fixing must not silently alter the task or its targets. Exact checkpoint recovery uses retained feature tensors, not a claim that every native rerender is bit-identical.
+For exact reproducibility diagnostics, set oscillator 1–3 random phase and sampler random phase to fixed values, preserve all other phase controls and seeds, and use a fresh process per request. Log controlled copies separately. The first new spectral-training experiment also declares fixed randomness for source and predicted renders. Version this training transformation, preserve original lineage/splits, and rerender baseline and candidate under the same policy. Do not relabel historical random-phase features or scores as controlled data.
+
+Checkpoints must include helper identity, measurement/loss contract, tensor adapter, optimizer/scheduler, minibatch and Gumbel RNG, temperature schedule, replay and render cursor. Verify exact recovery on the same qualified runtime using retained tensors. CPU/GPU or cross-platform transfers require their own numerical checks; bit-identical cross-device recovery is not promised.
 
 When randomness is intentionally introduced in a later stage, assess sound statistics or a declared repeated-render score. Do not add 96 binary seed heads to make waveform identity an optimization target.
 
 ## Free-first compute and experiment limits
 
-The default is the local machine with free Colab as a fallback. No paid GPU, subscription or storage is assumed. The current local baseline uses CPU float32; the working process-tree budget is 8 GiB. The small model's historical 205-state run took about 8.8 CPU minutes including collection, and the 404-state feature replay used about 14.9 MiB. These are prior measurements, not estimates for every new run.
+The default is the local machine with free Colab as a fallback. No paid GPU, subscription or storage is assumed. Start with CPU float32, two learning threads, one renderer and an **8 GiB process-tree RAM budget**. Keep the existing 355,806-parameter inverse model. The initial helper ceiling is two million trainable parameters, a planning limit to profile rather than a claim of sufficient capacity.
 
-Use two CPU training threads initially and one renderer; account for feature extraction and evaluation separately. Keep the current 512-record replay cap unless measured data requirements justify changing it. Stop a scheduled experiment at its frozen update, fresh-render and wall-time limits and report incomplete coverage. No automatic budget extension after inspecting results.
+Replay is capped by **both bytes and records**: at most 512 records and 512 MiB resident features/targets, whichever fills first; optional retained feature archives are capped at 2 GiB. Full multiresolution spectra are much larger than old pooled inputs. Profile batches of 1–8 examples and reduce batch/replay size or use declared time chunks before exceeding memory. Any lossy target compression needs a fidelity check. Account for feature extraction, checkpoints, helper training and evaluation separately.
 
-Free Colab is optional, with CPU rendering and GPU learning only after Linux Vital loading, native output behavior, restart/checkpoint recovery and full-path throughput are qualified. GPU availability is not assumed. If rendering remains local, transferring verified feature batches is a separate recorded workflow with pinned provenance. Do not present unqualified Linux rendering as a working portable training path.
+These initial ceilings are caps, not runtime predictions or a launch instruction. A frozen experiment card is required before each run. Failed requests and recovery attempts count inside the caps. Stop at the first reached limit and report incomplete coverage. A revised budget requires a new declared experiment, never an automatic extension after inspecting results.
 
-Keep GitHub Actions disabled and run relevant checks locally. Submit reviewable PRs; never merge without direct approval. The next PRs should close basic reconstruction gaps, not add exhaustive output coverage.
+| Work package | Native requests, including audits | Optimizer updates | Wall time |
+|---|---:|---:|---:|
+| A0 correctness and resource profile | 96 | 500 debugging updates | 30 minutes |
+| A1 helper feasibility | 2,048 training + 256 qualification | 12,000 helper updates | 4 hours |
+| A2 matched inverse comparison | 1,024 total | 8,000 per arm; 16,000 total | 4 hours |
+| A3 confirmation evaluation | 960 | None during evaluation | 2 hours |
+
+Second-seed training is a separate predeclared run capped like A2, after a promising result. New stages need their own cards under the same resource policy. Choose confirmation sample size from development variability before scoring the candidate; if adequate coverage cannot fit the cap, revise the plan before collecting confirmation.
+
+The recent basic diagnosis rendered 290.73 seconds of audio in 105.28 seconds end to end; native synthesis alone took 55.53 seconds. This demonstrates faster-than-real-time operation for that workload, not promised training throughput. The earlier helper run took 18.85 minutes, mostly rendering. Profile the complete new path before increasing workers or moving learning to a GPU.
+
+Free Colab is an optional optimizer environment, used interactively with checkpoint recovery. Hardware availability and session duration are not guaranteed. [Google Colab FAQ](https://research.google.com/colaboratory/faq.html) While Linux Vital rendering remains unqualified, generate bounded feature batches locally and transfer checksummed recipes/targets; no pre-rendered WAV corpus is needed. Keep native quality checks on the qualified local renderer. Measure benefit after transfer costs. Qualify Linux plugin loading, native behavior, recovery and throughput before claiming all-in-Colab training works.
+
+Keep GitHub Actions disabled and run relevant checks locally. Submit reviewable PRs for A0, A1, A2 and confirmation/release work; never merge without direct approval. This plan update does not launch experiments or promote an existing helper or predictor.

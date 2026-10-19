@@ -1,17 +1,22 @@
 # Training-plan completion ledger
 
-Updated 2026-10-19 for the [staged reconstruction plan](../modelling/TRAINING_PLAN.md). Codec coverage and model quality are separate tracks. Free local/free Colab compute, on-demand audio, frozen test reservations and local checks with GitHub Actions disabled remain in force. PRs are reviewed, never automatically merged.
+Updated 2026-10-19 for the [spectral reconstruction plan](../modelling/TRAINING_PLAN.md). Sound-loss training moves into the first small stage; parameter matching is an initialization/auxiliary signal. Codec coverage and model quality remain separate. Free local/free Colab compute, on-demand audio, frozen test reservations and local checks with GitHub Actions disabled remain in force. PRs are reviewed, never automatically merged.
 
 ## Active training track
 
 | Stage | Evidence | Remaining acceptance work |
 |---|---|---|
-| A: basic reconstruction | Nine continuous controls, two categorical choices; trained 205/404-state models; [21-case development results](reports/STATE_COVERAGE_RESULTS.md) and [23 additional cases](reports/FRESH_VALIDATION_RESULTS.md); recovery, native serialization and audio-only exports | Diagnose sound failures, make a justified correction, confirm held-out reference/transfer quality and listening usefulness |
+| A0: spectral/control contract | Basic 14-value head, supervised 205/404-state models, recovery and codec; [native diagnosis](reports/BASIC_SOUND_DIAGNOSIS.md) complete | Implement/version spectral targets, differentiable adapter and Gumbel-softmax; verify sound-only gradients, hard export, frozen helper and recovery; profile compute |
+| A1: useful helper gradients | Collection/recovery infrastructure exists; [old alpha helper failed](reports/SOUND_PROXY_RESULTS.md) | Qualify a new basic-scope helper on held-out performances, native rankings and actual continuous/category-guided improvements |
+| A2: spectral-loss inverse learning | Not implemented/qualified by this revision | Freeze qualified helper, train matched spectral/parameter-only arms, prove hard-export native gains and log total compute |
+| A3: basic quality and bundle | [21-case](reports/STATE_COVERAGE_RESULTS.md) and [23-case](reports/FRESH_VALIDATION_RESULTS.md) development evidence; existing narrow inference exports | Confirm fresh families/performances, second seed, listening, recovery and reproducible basic bundle |
 | B: bounded sound expansion | Existing broader components can be reused | Choose one missing capability after A passes; allocate only its required heads; demonstrate gain without earlier-stage regression |
 | C: simple modulation | Renderer/codec can support this | Train one LFO with at most two linear routes and a small destination list; evaluate sound, not exact graph identity |
 | D: selective expansion and release | Offline narrow bundle/CLI and broad infrastructure exist | Admit useful capabilities individually, freeze supported scope, final test, fresh-environment bundle, listening/model card/runtime results |
 
-Current task: test better stereo/width and detuning evidence in the unchanged basic output space. The [five-case native diagnosis](reports/BASIC_SOUND_DIAGNOSIS.md) completed all 70 requests and 10 exact phase-fixed repeat pairs. Correcting unison/detune/pan improves every case and lowers mean sound error by 26.68%; this uses known source controls and is not a trained-model gain. Freeze the next comparison under the [basic-stage protocol](STAGED_RECONSTRUCTION.md) before training; listening and confirmation remain open.
+Current task: **A0, the small spectral-training contract and gradient path**, under the [basic-stage protocol](STAGED_RECONSTRUCTION.md). This plan revision launches no experiments. The five-case diagnosis completed 70 requests and 10 exact phase-fixed repeat pairs; correcting unison/detune/pan lowers mean error 26.68%, using known source controls. Those findings guide spectral/stereo sensitivity checks, not a new parameter-only feature sweep.
+
+The old helper's guided changes worsened real audio on all 20 cases despite lower predicted loss. It remains unqualified and disconnected. The new plan requires real-render gradient qualification before inverse integration. Existing supervised `train` commands do not become spectral-loss training merely because the plan changes.
 
 The explicit `--prediction-scope basic` option rejects broad pools before creating the training frontend or renderer and records the choice in the run contract. It preserves the actual compact 14-value output layer. Older experiments retain their contracts through the default `codec` option.
 

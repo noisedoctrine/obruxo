@@ -1,10 +1,12 @@
 # Training contracts, online pilot and trainer
 
-The active work follows the [staged reconstruction plan](../modelling/TRAINING_PLAN.md) and [basic-stage protocol](STAGED_RECONSTRUCTION.md): prove reliable sound reconstruction with nine continuous controls and two categorical choices before adding capabilities. Use `train --prediction-scope basic` to enforce this scope. Broad preset support remains available as infrastructure; exhaustive output coverage is not the model's completion criterion.
+The active work follows the [spectral reconstruction plan](../modelling/TRAINING_PLAN.md) and [basic-stage protocol](STAGED_RECONSTRUCTION.md): qualify a small differentiable sound helper, then train the audio-to-patch predictor on spectral loss before expanding capabilities. Stage A retains nine continuous controls and two categorical choices, totaling 14 dense outputs. Parameter matching is an initialization/auxiliary signal. Broad codec support does not determine the prediction head.
+
+**Next: A0, the versioned spectral targets and differentiable control adapter**, including sound-only gradient checks, straight-through Gumbel-softmax, deterministic hard export and recovery. The helper must pass real Vital checks before guiding inverse training. This documentation revision implements no new training mode and launches no experiments. Existing `train --prediction-scope basic` enforces the small scope but still uses its implemented parameter-supervised loss.
 
 The [completion ledger](IMPLEMENTATION_STATUS.md) separates current quality gates from implemented capabilities. Both earlier basic validation panels are development data; final-test states remain reserved.
 
-The [basic sound diagnosis](reports/BASIC_SOUND_DIAGNOSIS.md) completed 70 native requests and 10 exact phase-fixed repeats. Source-value corrections point toward unison/stereo reconstruction as the next investigation while retaining the compact prediction space; no model improvement is claimed yet.
+The [basic sound diagnosis](reports/BASIC_SOUND_DIAGNOSIS.md) completed 70 native requests and 10 exact phase-fixed repeats. Unison/stereo errors inform the new objective's sensitivity checks; no model improvement is claimed yet. The [previous helper](reports/SOUND_PROXY_RESULTS.md) improved its own predicted loss but worsened all 20 real-render cases, so useful gradients are a required gate, not an assumption.
 
 ## Historical capability work
 
