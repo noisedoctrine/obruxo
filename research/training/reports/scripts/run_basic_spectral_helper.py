@@ -18,12 +18,13 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--paired-changes", action="store_true", help="Use aligned pairs and the declared local-change objective")
+    parser.add_argument("--event-frames", action="store_true", help="Preserve note transitions and full envelopes; requires --paired-changes")
     args = parser.parse_args()
     def progress(event):
         if event["stage"] != "collect" or event["completed"] in (1, event["planned"]) or event["completed"] % 32 == 0:
             print(json.dumps(event, allow_nan=False), flush=True)
     result = run_temporal_proxy_screen(PilotPool.load(args.pool), args.output, resume=args.resume, progress=progress,
-                                      config=TemporalProxyConfig(paired_changes=args.paired_changes))
+                                      config=TemporalProxyConfig(paired_changes=args.paired_changes, event_frames=args.event_frames))
     print(json.dumps(result, allow_nan=False), flush=True)
     return 0 if result["complete"] and result["within_resource_limits"] else 2
 

@@ -40,6 +40,7 @@ class TemporalProxyConfig:
     seed: int = 0
     checkpoint_every: int = 250
     paired_changes: bool = False
+    event_frames: bool = False
 
     def __post_init__(self):
         counts = (self.training_states, self.views, self.validation_states, self.steps, self.batch_size, self.checkpoint_every)
@@ -50,6 +51,8 @@ class TemporalProxyConfig:
             raise ValueError("temporal helper exceeds its fixed experiment limits")
         if type(self.paired_changes) is not bool or self.paired_changes and (self.views != 8 or self.batch_size % 2):
             raise ValueError("paired changes require eight views and an even recording batch")
+        if type(self.event_frames) is not bool or self.event_frames and not self.paired_changes:
+            raise ValueError("event frames require paired-change training")
 
 
 def category_balanced_entries(pool, split, count):
@@ -118,9 +121,14 @@ def make_plan(pool, config):
                                                      "spectral.py", "spectral_controls.py")]
     if config.paired_changes:
         paths.extend((Path(__file__).with_name("paired_spectral.py"), Path(__file__).parents[2] / "data_generation/obruxo_data/render/vita.py"))
+    if config.event_frames:
+        from .event_frames import note_event_seconds
+        paths.append(Path(__file__).with_name("event_frames.py"))
+        for recipe in recipes:
+            note_event_seconds(Performance.from_dict(recipe["performance"]))
     plan = {"format": "local_basic_temporal_proxy_screen_v1", "pool_id": pool.pool_id, "manifest_id": pool.manifest.manifest_id,
             "codec": pool.codec.to_dict(), "contract": BasicControlAdapter(pool.codec).contract(), "config": asdict(config),
-            "model": temporal_proxy_spec(), "training_recipes": recipes, "validation_states": [entry.state_id for entry in validation],
+            "model": temporal_proxy_spec(config.event_frames), "training_recipes": recipes, "validation_states": [entry.state_id for entry in validation],
             "control_coverage": "four_original_performances_plus_paired_continuous_plus_minus_unison_and_filter_changes",
             "validation_performances": [{"reference": initial_bank()[i % 4].to_dict(), "transfer": initial_bank()[4 + i % 4].to_dict()}
                                         for i in range(config.validation_states)],
@@ -213,7 +221,12 @@ def collect_frames(pool, output, recipes, session, progress=None):
         if audio is not None:
             full = measured(torch.from_numpy(audio.copy()).T[None])
             frame_seed = recipe.get("pair_id", i)
-            values, times = sample_frames(full, torch.Generator().manual_seed(session.plan["config"]["seed"] + frame_seed))
+            generator = torch.Generator().manual_seed(session.plan["config"]["seed"] + frame_seed)
+            if session.plan["config"].get("event_frames"):
+                from .event_frames import sample_event_frames
+                values, times = sample_event_frames(full, Performance.from_dict(recipe["performance"]), generator)
+            else:
+                values, times = sample_frames(full, generator)
             record = {"measurements": values, "times": times, "target": recipe["target"],
                       "performance": performance_inputs(Performance.from_dict(recipe["performance"])), "recipe_id": row["recipe_id"]}
             if "pair_id" in recipe:

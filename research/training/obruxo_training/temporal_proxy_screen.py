@@ -268,7 +268,7 @@ def run_temporal_proxy_screen(pool, output, *, config=None, resume=False, render
         result = {**qualification_summary(cases, plan), "plan_id": plan_id, "training_records": len(cache),
                   "trainable_parameters": sum(p.numel() for p in helper.parameters()), "training_trace": training["trace"]}
         export = {"format": "basic_temporal_helper_v1", "codec": pool.codec.to_dict(), "contract": adapter.contract(),
-                  "spec": temporal_proxy_spec(), "model": helper.state_dict(), "model_sha256": tensor_digest(helper.state_dict()),
+                  "spec": temporal_proxy_spec(config.event_frames), "model": helper.state_dict(), "model_sha256": tensor_digest(helper.state_dict()),
                   "qualified_for_inverse_training": result["qualified_for_inverse_training"], "qualification": result, "plan_id": plan_id}
         atomic_torch_save(output / "helper.pt", export)
     except Exception as error:
@@ -295,7 +295,7 @@ def run_temporal_proxy_screen(pool, output, *, config=None, resume=False, render
 def load_temporal_proxy(path, *, require_qualified=True):
     saved = torch.load(Path(path), map_location="cpu", weights_only=True)
     adapter = BasicControlAdapter(load_codec(saved["codec"]))
-    if (saved.get("format") != "basic_temporal_helper_v1" or saved["spec"] != temporal_proxy_spec()
+    if (saved.get("format") != "basic_temporal_helper_v1" or saved["spec"] not in (temporal_proxy_spec(), temporal_proxy_spec(True))
             or saved["contract"] != adapter.contract() or saved["model_sha256"] != tensor_digest(saved["model"])):
         raise ValueError("incompatible or changed temporal helper")
     if require_qualified and not saved["qualified_for_inverse_training"]:
