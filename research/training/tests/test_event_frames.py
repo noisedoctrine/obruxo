@@ -12,9 +12,10 @@ from obruxo_training.pilot import PilotPool
 from obruxo_training.proxy import performance_inputs
 from obruxo_training.spectral import FFT_SIZES, SpectralTargets, spectral_loss
 from obruxo_training.spectral_controls import BasicControlAdapter
-from obruxo_training.temporal_proxy import collate_frames, full_times, temporal_proxy_spec
+from obruxo_training.features import tensor_digest
+from obruxo_training.temporal_proxy import TemporalSpectralProxy, collate_frames, full_times, temporal_proxy_spec
 from obruxo_training.temporal_proxy_data import RecordCache, TemporalProxyConfig, collect_frames, make_plan
-from obruxo_training.temporal_proxy_screen import fit_temporal_proxy
+from obruxo_training.temporal_proxy_screen import fit_temporal_proxy, load_temporal_proxy
 
 
 @pytest.fixture(autouse=True)
@@ -145,3 +146,20 @@ def test_event_batch_optimizer_resume_is_exact():
     assert torch.equal(reference["batch_rng"], resumed["batch_rng"])
     with pytest.raises(ValueError, match="contract changed"):
         fit_temporal_proxy(cache, adapter, config, {"sampling": "old_uniform"}, saved=saved)
+
+
+def test_event_artifact_remains_unqualified_and_rejects_changed_policy(tmp_path):
+    helper, adapter = TemporalSpectralProxy().freeze(), BasicControlAdapter()
+    saved = {"format": "basic_temporal_helper_v1", "codec": adapter.codec.to_dict(), "contract": adapter.contract(),
+             "spec": temporal_proxy_spec(True), "model": helper.state_dict(), "model_sha256": tensor_digest(helper.state_dict()),
+             "qualified_for_inverse_training": False}
+    path = tmp_path / "event-helper.pt"
+    torch.save(saved, path)
+    with pytest.raises(ValueError, match="qualification"):
+        load_temporal_proxy(path)
+    restored, _ = load_temporal_proxy(path, require_qualified=False)
+    assert tensor_digest(restored.state_dict()) == saved["model_sha256"]
+    saved["spec"]["frame_sampling"]["event_offsets_seconds"] = [0., .5]
+    torch.save(saved, path)
+    with pytest.raises(ValueError, match="incompatible"):
+        load_temporal_proxy(path, require_qualified=False)

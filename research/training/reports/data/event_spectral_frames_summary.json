@@ -1,0 +1,2877 @@
+{
+  "audio_archived": false,
+  "cases": [
+    {
+      "audio_sha256": [
+        "9b29025de876fcd2d4614d6b46ee99d3e6b45dd2355fc449330d1cea00fc0da5",
+        "6ab308c76df6d4d65aa65b55a232e9cce222d687318f6c22777a8bf4da6af03a",
+        "9b29025de876fcd2d4614d6b46ee99d3e6b45dd2355fc449330d1cea00fc0da5"
+      ],
+      "coverage": [
+        {
+          "full_mean_change": 8.127059845719486e-05,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.019002195447683334,
+          "peak_response_time_seconds": 0.0,
+          "resolution": "fft512",
+          "sampled_mean_change": 0.0006703876424580812
+        },
+        {
+          "full_mean_change": 0.00015576671285089105,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.01927049458026886,
+          "peak_response_time_seconds": 0.0,
+          "resolution": "fft2048",
+          "sampled_mean_change": 0.0006518189329653978
+        },
+        {
+          "full_mean_change": 0.000535554310772568,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.019153762608766556,
+          "peak_response_time_seconds": 0.0,
+          "resolution": "fft8192",
+          "sampled_mean_change": 0.0011834085453301668
+        },
+        {
+          "full_mean_change": 6.727901200065389e-05,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.0005771319265477359,
+          "peak_response_time_seconds": 0.017414966598153114,
+          "resolution": "envelope",
+          "sampled_mean_change": 6.727901200065389e-05
+        }
+      ],
+      "files": [
+        {
+          "file": "0008-0.pt",
+          "replay_bytes": 1387517,
+          "serialized_bytes": 1392377,
+          "sha256": "972dbdc6de0d55dbc72dd242a282f5cd1fb47ffd8edd198c413afcd0528a6216"
+        },
+        {
+          "file": "0008-1.pt",
+          "replay_bytes": 1387517,
+          "serialized_bytes": 1392377,
+          "sha256": "d2d548480ba8bbedc438542816541e1a07bcfeb250708c2d580e5626279bf684"
+        }
+      ],
+      "full_envelopes_exact": true,
+      "group": "attack",
+      "pair_id": 8,
+      "pair_times_exact": true,
+      "repeat_exact": true,
+      "spectral_responses_retained": true
+    },
+    {
+      "audio_sha256": [
+        "c7e731454436e0ded429897974ce1d70680ea7fd490d59a9c28ec31c99727ab0",
+        "ee4fde17d5bdf3edc3d04e78527f7111aaf0c60f152c087d9787a60106a3bc92",
+        "c7e731454436e0ded429897974ce1d70680ea7fd490d59a9c28ec31c99727ab0"
+      ],
+      "coverage": [
+        {
+          "full_mean_change": 0.002084362553432584,
+          "nearest_sample_to_peak_seconds": 0.0319274440407753,
+          "peak_response": 0.26330891251564026,
+          "peak_response_time_seconds": 0.06675736606121063,
+          "resolution": "fft512",
+          "sampled_mean_change": 0.0016765263862907887
+        },
+        {
+          "full_mean_change": 0.0022495887242257595,
+          "nearest_sample_to_peak_seconds": 0.023219957947731018,
+          "peak_response": 0.16700062155723572,
+          "peak_response_time_seconds": 0.08126983791589737,
+          "resolution": "fft2048",
+          "sampled_mean_change": 0.0016934246523305774
+        },
+        {
+          "full_mean_change": 0.0024893474765121937,
+          "nearest_sample_to_peak_seconds": 0.046439915895462036,
+          "peak_response": 0.0563688799738884,
+          "peak_response_time_seconds": 0.13931973278522491,
+          "resolution": "fft8192",
+          "sampled_mean_change": 0.003450543386861682
+        },
+        {
+          "full_mean_change": 0.013831176795065403,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 1.3676849603652954,
+          "peak_response_time_seconds": 0.07546485215425491,
+          "resolution": "envelope",
+          "sampled_mean_change": 0.013831176795065403
+        }
+      ],
+      "files": [
+        {
+          "file": "0244-0.pt",
+          "replay_bytes": 1386939,
+          "serialized_bytes": 1391865,
+          "sha256": "48a49764b21b19139c538ad3c7ee2d6c61c784525549362417f56295983c2755"
+        },
+        {
+          "file": "0244-1.pt",
+          "replay_bytes": 1386939,
+          "serialized_bytes": 1391865,
+          "sha256": "4e23bd1ab0158c6bfe4628347ff330e5032b538698859ccee292ee4c2974bf5f"
+        }
+      ],
+      "full_envelopes_exact": true,
+      "group": "attack",
+      "pair_id": 244,
+      "pair_times_exact": true,
+      "repeat_exact": true,
+      "spectral_responses_retained": true
+    },
+    {
+      "audio_sha256": [
+        "cf565c224f704918b064029573a857b8b585575f883fc4e55d708c436efb559e",
+        "54aca6e77f45c7785db5a12ef3fe62f90d98d7070d658956e525b3af78e686cd",
+        "cf565c224f704918b064029573a857b8b585575f883fc4e55d708c436efb559e"
+      ],
+      "coverage": [
+        {
+          "full_mean_change": 0.00045736675383523107,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.21033288538455963,
+          "peak_response_time_seconds": 0.0,
+          "resolution": "fft512",
+          "sampled_mean_change": 0.0065729026682674885
+        },
+        {
+          "full_mean_change": 0.0012991070980206132,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.2075020968914032,
+          "peak_response_time_seconds": 0.0,
+          "resolution": "fft2048",
+          "sampled_mean_change": 0.008242413401603699
+        },
+        {
+          "full_mean_change": 0.004443177953362465,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.20208807289600372,
+          "peak_response_time_seconds": 0.0,
+          "resolution": "fft8192",
+          "sampled_mean_change": 0.01249643787741661
+        },
+        {
+          "full_mean_change": 0.0006521062459796667,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.15920193493366241,
+          "peak_response_time_seconds": 0.0,
+          "resolution": "envelope",
+          "sampled_mean_change": 0.0006521062459796667
+        }
+      ],
+      "files": [
+        {
+          "file": "0496-0.pt",
+          "replay_bytes": 1390050,
+          "serialized_bytes": 1394937,
+          "sha256": "034fbab4ecdddad1d4502fde77b973288b13dca2c1b7429a12b41b814d32128b"
+        },
+        {
+          "file": "0496-1.pt",
+          "replay_bytes": 1390050,
+          "serialized_bytes": 1394937,
+          "sha256": "d1cb62c21a5e0c53cadf61e948fcb392cc81c029b6ab8c2272e9b61de8b4f8b8"
+        }
+      ],
+      "full_envelopes_exact": true,
+      "group": "attack",
+      "pair_id": 496,
+      "pair_times_exact": true,
+      "repeat_exact": true,
+      "spectral_responses_retained": true
+    },
+    {
+      "audio_sha256": [
+        "28b2fe7420e49ec1c07652a5d6fbd14bf5a1e4841ffda4b90d96e8bbaa1a582d",
+        "6725fa38088859f3a30437c9dc580faafa2c2351cf4fa270cbf56f9e1cc0faa0",
+        "28b2fe7420e49ec1c07652a5d6fbd14bf5a1e4841ffda4b90d96e8bbaa1a582d"
+      ],
+      "coverage": [
+        {
+          "full_mean_change": 0.0036350165028125048,
+          "nearest_sample_to_peak_seconds": 0.002902477979660034,
+          "peak_response": 0.03307749703526497,
+          "peak_response_time_seconds": 0.2641269862651825,
+          "resolution": "fft512",
+          "sampled_mean_change": 0.004382114391773939
+        },
+        {
+          "full_mean_change": 0.001476714969612658,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.013075302354991436,
+          "peak_response_time_seconds": 0.27863946557044983,
+          "resolution": "fft2048",
+          "sampled_mean_change": 0.0025020423345267773
+        },
+        {
+          "full_mean_change": 0.0006026106420904398,
+          "nearest_sample_to_peak_seconds": 0.046439915895462036,
+          "peak_response": 0.00436460180208087,
+          "peak_response_time_seconds": 0.3715192675590515,
+          "resolution": "fft8192",
+          "sampled_mean_change": 0.0007427812088280916
+        },
+        {
+          "full_mean_change": 0.027138784527778625,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.2727668285369873,
+          "peak_response_time_seconds": 0.3831292390823364,
+          "resolution": "envelope",
+          "sampled_mean_change": 0.027138784527778625
+        }
+      ],
+      "files": [
+        {
+          "file": "0012-0.pt",
+          "replay_bytes": 1386344,
+          "serialized_bytes": 1391225,
+          "sha256": "5bbbd338c82e78cfcb9afea3553fe6c9f97105a07f59a0df1282cea0fe555094"
+        },
+        {
+          "file": "0012-1.pt",
+          "replay_bytes": 1386344,
+          "serialized_bytes": 1391225,
+          "sha256": "f4e53c26a39068414f8392699a91a92135950651085b2914ac1f9cef652c83fe"
+        }
+      ],
+      "full_envelopes_exact": true,
+      "group": "decay",
+      "pair_id": 12,
+      "pair_times_exact": true,
+      "repeat_exact": true,
+      "spectral_responses_retained": true
+    },
+    {
+      "audio_sha256": [
+        "b9df0c66c5e09b666997684b51b2e3fac888ec5c80ab0755051fba24e3663019",
+        "9ca7cc58b2b21dbc4ac8344c0afddc762a0c0f8954f2f2bdb66ae70139655d07",
+        "b9df0c66c5e09b666997684b51b2e3fac888ec5c80ab0755051fba24e3663019"
+      ],
+      "coverage": [
+        {
+          "full_mean_change": 0.01050766371190548,
+          "nearest_sample_to_peak_seconds": 0.03482992947101593,
+          "peak_response": 0.11624239385128021,
+          "peak_response_time_seconds": 0.22929705679416656,
+          "resolution": "fft512",
+          "sampled_mean_change": 0.017108727246522903
+        },
+        {
+          "full_mean_change": 0.0034673886839300394,
+          "nearest_sample_to_peak_seconds": 0.1160997673869133,
+          "peak_response": 0.03800953924655914,
+          "peak_response_time_seconds": 0.2205895632505417,
+          "resolution": "fft2048",
+          "sampled_mean_change": 0.003112360369414091
+        },
+        {
+          "full_mean_change": 0.0011690271785482764,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.012644883245229721,
+          "peak_response_time_seconds": 0.3250793516635895,
+          "resolution": "fft8192",
+          "sampled_mean_change": 0.0012577322777360678
+        },
+        {
+          "full_mean_change": 0.016949523240327835,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.1995096057653427,
+          "peak_response_time_seconds": 0.26702946424484253,
+          "resolution": "envelope",
+          "sampled_mean_change": 0.016949523240327835
+        }
+      ],
+      "files": [
+        {
+          "file": "0264-0.pt",
+          "replay_bytes": 1386752,
+          "serialized_bytes": 1391673,
+          "sha256": "8a924f0648effd660c97add0da705eae13003f0e767a6c94ac2e14bfe0a6bba2"
+        },
+        {
+          "file": "0264-1.pt",
+          "replay_bytes": 1386752,
+          "serialized_bytes": 1391673,
+          "sha256": "f1747814c81591fd73bf4faa9ab782fa6cb24776139c15e55df7f429e370c1a3"
+        }
+      ],
+      "full_envelopes_exact": true,
+      "group": "decay",
+      "pair_id": 264,
+      "pair_times_exact": true,
+      "repeat_exact": true,
+      "spectral_responses_retained": true
+    },
+    {
+      "audio_sha256": [
+        "7d01ad5e28b3cb67bc7729d9a7c6b03203a5f380181547017cebfb29d5c45f90",
+        "544d4f3801f16f97871ba070204d9a4fa21ff56f02018b7c16a10b949fc9fe1a",
+        "7d01ad5e28b3cb67bc7729d9a7c6b03203a5f380181547017cebfb29d5c45f90"
+      ],
+      "coverage": [
+        {
+          "full_mean_change": 8.257012814283371e-05,
+          "nearest_sample_to_peak_seconds": 0.00290249427780509,
+          "peak_response": 0.017463942989706993,
+          "peak_response_time_seconds": 0.00290249427780509,
+          "resolution": "fft512",
+          "sampled_mean_change": 0.0007187947630882263
+        },
+        {
+          "full_mean_change": 0.00014922699483577162,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.006028658244758844,
+          "peak_response_time_seconds": 0.0,
+          "resolution": "fft2048",
+          "sampled_mean_change": 0.0006355141522362828
+        },
+        {
+          "full_mean_change": 0.0004731639928650111,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.004427496809512377,
+          "peak_response_time_seconds": 0.0,
+          "resolution": "fft8192",
+          "sampled_mean_change": 0.0008843300747685134
+        },
+        {
+          "full_mean_change": 0.0016740844585001469,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.12783105671405792,
+          "peak_response_time_seconds": 0.6849886775016785,
+          "resolution": "envelope",
+          "sampled_mean_change": 0.0016740844585001469
+        }
+      ],
+      "files": [
+        {
+          "file": "0497-0.pt",
+          "replay_bytes": 1387602,
+          "serialized_bytes": 1392441,
+          "sha256": "63860ab33b8f0791bf5ad9402049381f71a37c896cc7aa50ed9f93e5959817a6"
+        },
+        {
+          "file": "0497-1.pt",
+          "replay_bytes": 1387602,
+          "serialized_bytes": 1392441,
+          "sha256": "f3e8127ec7e99af4ab5340924d43d88e6e4c4e136f8b0c25ac660d066ab6d8bc"
+        }
+      ],
+      "full_envelopes_exact": true,
+      "group": "decay",
+      "pair_id": 497,
+      "pair_times_exact": true,
+      "repeat_exact": true,
+      "spectral_responses_retained": true
+    },
+    {
+      "audio_sha256": [
+        "2d202cd5dcfb3a68eae743f6f061db2fe5c1a1793b9d7bfbe835a5abf9edb082",
+        "750f38ef10bc2062406e7c08c4f48d026c09b0486b07d3c8aab1908f2c1fc371",
+        "2d202cd5dcfb3a68eae743f6f061db2fe5c1a1793b9d7bfbe835a5abf9edb082"
+      ],
+      "coverage": [
+        {
+          "full_mean_change": 0.002321648644283414,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.24817921221256256,
+          "peak_response_time_seconds": 1.1145578622817993,
+          "resolution": "fft512",
+          "sampled_mean_change": 0.008543869480490685
+        },
+        {
+          "full_mean_change": 0.0014320334885269403,
+          "nearest_sample_to_peak_seconds": 0.011609911918640137,
+          "peak_response": 0.09556717425584793,
+          "peak_response_time_seconds": 1.1261677742004395,
+          "resolution": "fft2048",
+          "sampled_mean_change": 0.004364392254501581
+        },
+        {
+          "full_mean_change": 0.002283704001456499,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.055320385843515396,
+          "peak_response_time_seconds": 1.1145578622817993,
+          "resolution": "fft8192",
+          "sampled_mean_change": 0.0034554714802652597
+        },
+        {
+          "full_mean_change": 0.005668085068464279,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.6486184000968933,
+          "peak_response_time_seconds": 1.1319727897644043,
+          "resolution": "envelope",
+          "sampled_mean_change": 0.005668085068464279
+        }
+      ],
+      "files": [
+        {
+          "file": "0016-0.pt",
+          "replay_bytes": 1387296,
+          "serialized_bytes": 1392185,
+          "sha256": "fc3cba58472a809fce3e2ca4461d7049724dde26454c16207928c19094e66298"
+        },
+        {
+          "file": "0016-1.pt",
+          "replay_bytes": 1387296,
+          "serialized_bytes": 1392185,
+          "sha256": "3095756885726734aefbf140adbbe6f7232d0f40c9714dca490426e35f95258b"
+        }
+      ],
+      "full_envelopes_exact": true,
+      "group": "release",
+      "pair_id": 16,
+      "pair_times_exact": true,
+      "repeat_exact": true,
+      "spectral_responses_retained": true
+    },
+    {
+      "audio_sha256": [
+        "0343ce59dc48fd4840749a1e079b36f10ec9c13da7c3093874f28219bf26ea1f",
+        "6bd06721f7626ce568f29f17357bd49dc934ac1acabd8ce59187f62b18636abc",
+        "0343ce59dc48fd4840749a1e079b36f10ec9c13da7c3093874f28219bf26ea1f"
+      ],
+      "coverage": [
+        {
+          "full_mean_change": 0.0007140449015423656,
+          "nearest_sample_to_peak_seconds": 0.002902507781982422,
+          "peak_response": 0.08649842441082001,
+          "peak_response_time_seconds": 1.1755101680755615,
+          "resolution": "fft512",
+          "sampled_mean_change": 0.0030550018418580294
+        },
+        {
+          "full_mean_change": 0.0004233327053952962,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.027363371104002,
+          "peak_response_time_seconds": 1.1842176914215088,
+          "resolution": "fft2048",
+          "sampled_mean_change": 0.0015510499943047762
+        },
+        {
+          "full_mean_change": 0.0007623350829817355,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.020570341497659683,
+          "peak_response_time_seconds": 1.160997748374939,
+          "resolution": "fft8192",
+          "sampled_mean_change": 0.0016804735641926527
+        },
+        {
+          "full_mean_change": 0.0026253778487443924,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.32371190190315247,
+          "peak_response_time_seconds": 1.1842176914215088,
+          "resolution": "envelope",
+          "sampled_mean_change": 0.0026253778487443924
+        }
+      ],
+      "files": [
+        {
+          "file": "0268-0.pt",
+          "replay_bytes": 1387432,
+          "serialized_bytes": 1392313,
+          "sha256": "35aabf20a0a7653fe01cae4ce0df3f526fc6ac3425636c21046bc5acf02cac67"
+        },
+        {
+          "file": "0268-1.pt",
+          "replay_bytes": 1387432,
+          "serialized_bytes": 1392313,
+          "sha256": "e4de00c829eb0fbc1f07723d409dd247ec2906f233692532a9ddfe024985ca16"
+        }
+      ],
+      "full_envelopes_exact": true,
+      "group": "release",
+      "pair_id": 268,
+      "pair_times_exact": true,
+      "repeat_exact": true,
+      "spectral_responses_retained": true
+    },
+    {
+      "audio_sha256": [
+        "583d11c1fa1d43dd647fa29594ef695f16e8fc9b1d65e3a0084826642dfd8132",
+        "3f5a0571deb0d8e4712f713b6b593ccee62baf61cee60da1afc3b62f81cd7738",
+        "583d11c1fa1d43dd647fa29594ef695f16e8fc9b1d65e3a0084826642dfd8132"
+      ],
+      "coverage": [
+        {
+          "full_mean_change": 0.00016218487871810794,
+          "nearest_sample_to_peak_seconds": 0.005804896354675293,
+          "peak_response": 0.013442130759358406,
+          "peak_response_time_seconds": 1.8401813507080078,
+          "resolution": "fft512",
+          "sampled_mean_change": 0.0014521414414048195
+        },
+        {
+          "full_mean_change": 0.00030777856591157615,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.010574416257441044,
+          "peak_response_time_seconds": 1.8343764543533325,
+          "resolution": "fft2048",
+          "sampled_mean_change": 0.0014778637560084462
+        },
+        {
+          "full_mean_change": 0.0007959586218930781,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.007353289518505335,
+          "peak_response_time_seconds": 0.3250793516635895,
+          "resolution": "fft8192",
+          "sampled_mean_change": 0.0014605335891246796
+        },
+        {
+          "full_mean_change": 0.0015086389612406492,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.2171153873205185,
+          "peak_response_time_seconds": 0.3482993245124817,
+          "resolution": "envelope",
+          "sampled_mean_change": 0.0015086389612406492
+        }
+      ],
+      "files": [
+        {
+          "file": "0501-0.pt",
+          "replay_bytes": 1389574,
+          "serialized_bytes": 1394489,
+          "sha256": "89986631a065530e1e9697135770a950a35778f0eae5da91f12e1581987bed1b"
+        },
+        {
+          "file": "0501-1.pt",
+          "replay_bytes": 1389574,
+          "serialized_bytes": 1394489,
+          "sha256": "f0a937716bb112dd41e9089377f8dd27bcb9eee7c8b0f881497b75ad84d51060"
+        }
+      ],
+      "full_envelopes_exact": true,
+      "group": "release",
+      "pair_id": 501,
+      "pair_times_exact": true,
+      "repeat_exact": true,
+      "spectral_responses_retained": true
+    },
+    {
+      "audio_sha256": [
+        "33e695d9c46a24ecf9760eeb762857ab897d16df124c29e7f433e61e4cffe66e",
+        "02af49a65818c93f7e5b3f7dddc83b225471dc7e1de9427ed3eed97963a48b6f",
+        "33e695d9c46a24ecf9760eeb762857ab897d16df124c29e7f433e61e4cffe66e"
+      ],
+      "coverage": [
+        {
+          "full_mean_change": 0.015333916991949081,
+          "nearest_sample_to_peak_seconds": 0.03482992202043533,
+          "peak_response": 0.08067512512207031,
+          "peak_response_time_seconds": 0.13351473212242126,
+          "resolution": "fft512",
+          "sampled_mean_change": 0.020447121933102608
+        },
+        {
+          "full_mean_change": 0.010066457092761993,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.04310479387640953,
+          "peak_response_time_seconds": 0.6153287887573242,
+          "resolution": "fft2048",
+          "sampled_mean_change": 0.01610054261982441
+        },
+        {
+          "full_mean_change": 0.005255208816379309,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.02318022958934307,
+          "peak_response_time_seconds": 0.6037188172340393,
+          "resolution": "fft8192",
+          "sampled_mean_change": 0.008806399069726467
+        },
+        {
+          "full_mean_change": 0.00836183037608862,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.04241454601287842,
+          "peak_response_time_seconds": 1.578956961631775,
+          "resolution": "envelope",
+          "sampled_mean_change": 0.00836183037608862
+        }
+      ],
+      "files": [
+        {
+          "file": "0021-0.pt",
+          "replay_bytes": 1388707,
+          "serialized_bytes": 1393529,
+          "sha256": "e230275e7c9db7c9ee250999485b60d657efbbbdd370e626e249bb10418b861e"
+        },
+        {
+          "file": "0021-1.pt",
+          "replay_bytes": 1388707,
+          "serialized_bytes": 1393529,
+          "sha256": "125532213a57d9e6d19a438e237cede396bd19856523c383ceae4f55e5383747"
+        }
+      ],
+      "full_envelopes_exact": true,
+      "group": "detune",
+      "pair_id": 21,
+      "pair_times_exact": true,
+      "repeat_exact": true,
+      "spectral_responses_retained": true
+    },
+    {
+      "audio_sha256": [
+        "caf0b90a76f9e16de9a72118ab75a636ede7aa6a5043cc1c6b05a82bcc8de990",
+        "ebd40daac07ccb21cd21b89ae0f0164bf36cd3543ea229c7a8771caa59255fc5",
+        "caf0b90a76f9e16de9a72118ab75a636ede7aa6a5043cc1c6b05a82bcc8de990"
+      ],
+      "coverage": [
+        {
+          "full_mean_change": 0.13941025733947754,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.6912277936935425,
+          "peak_response_time_seconds": 0.09868481010198593,
+          "resolution": "fft512",
+          "sampled_mean_change": 0.0832040086388588
+        },
+        {
+          "full_mean_change": 0.047512851655483246,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.2583533823490143,
+          "peak_response_time_seconds": 0.6965986490249634,
+          "resolution": "fft2048",
+          "sampled_mean_change": 0.07659413665533066
+        },
+        {
+          "full_mean_change": 0.03535982221364975,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.20230866968631744,
+          "peak_response_time_seconds": 0.6965986490249634,
+          "resolution": "fft8192",
+          "sampled_mean_change": 0.04259531944990158
+        },
+        {
+          "full_mean_change": 0.012532543390989304,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.06282027810811996,
+          "peak_response_time_seconds": 0.5746938586235046,
+          "resolution": "envelope",
+          "sampled_mean_change": 0.012532543390989304
+        }
+      ],
+      "files": [
+        {
+          "file": "0256-0.pt",
+          "replay_bytes": 1386412,
+          "serialized_bytes": 1391289,
+          "sha256": "e13d091cd41a0a71a15e73b777953b62e48da5404e70b5aa9b757bc70f603e99"
+        },
+        {
+          "file": "0256-1.pt",
+          "replay_bytes": 1386412,
+          "serialized_bytes": 1391289,
+          "sha256": "88af88a937334c7526e7b84018c13079432ecee03c4b826e68fa22e2390fdda4"
+        }
+      ],
+      "full_envelopes_exact": true,
+      "group": "detune",
+      "pair_id": 256,
+      "pair_times_exact": true,
+      "repeat_exact": true,
+      "spectral_responses_retained": true
+    },
+    {
+      "audio_sha256": [
+        "5a809f5037699411f34d8cc5480955ab6c7faa5c042ddae5394e66a71f49ba81",
+        "2715ef130674bd95464d31f429d9f75f7bbc592a972fd6cee4892e92a8e5d8e8",
+        "5a809f5037699411f34d8cc5480955ab6c7faa5c042ddae5394e66a71f49ba81"
+      ],
+      "coverage": [
+        {
+          "full_mean_change": 0.008477848954498768,
+          "nearest_sample_to_peak_seconds": 0.01160997711122036,
+          "peak_response": 0.14281682670116425,
+          "peak_response_time_seconds": 0.01160997711122036,
+          "resolution": "fft512",
+          "sampled_mean_change": 0.009397557936608791
+        },
+        {
+          "full_mean_change": 0.03676136955618858,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.22315704822540283,
+          "peak_response_time_seconds": 0.02321995422244072,
+          "resolution": "fft2048",
+          "sampled_mean_change": 0.07889889925718307
+        },
+        {
+          "full_mean_change": 0.05180749297142029,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.2035233974456787,
+          "peak_response_time_seconds": 0.8359183669090271,
+          "resolution": "fft8192",
+          "sampled_mean_change": 0.08512060344219208
+        },
+        {
+          "full_mean_change": 0.0034502355847507715,
+          "nearest_sample_to_peak_seconds": 0.0,
+          "peak_response": 0.013299624435603619,
+          "peak_response_time_seconds": 0.5630838871002197,
+          "resolution": "envelope",
+          "sampled_mean_change": 0.0034502355847507715
+        }
+      ],
+      "files": [
+        {
+          "file": "0489-0.pt",
+          "replay_bytes": 1387228,
+          "serialized_bytes": 1392121,
+          "sha256": "495ffce49e5bc1d6ca92cc10d50c95ff365a6d133f5b2e6debd1583dafb8c380"
+        },
+        {
+          "file": "0489-1.pt",
+          "replay_bytes": 1387228,
+          "serialized_bytes": 1392121,
+          "sha256": "6fe6a302fe5d043989886c84105eb800f603e4e1caeb12a28a031ff6b5379c4c"
+        }
+      ],
+      "full_envelopes_exact": true,
+      "group": "detune",
+      "pair_id": 489,
+      "pair_times_exact": true,
+      "repeat_exact": true,
+      "spectral_responses_retained": true
+    }
+  ],
+  "complete": true,
+  "conservative_replay_capacity": 386,
+  "elapsed_seconds": 68.39126205444336,
+  "exact_repeat_pairs": 12,
+  "failure": null,
+  "maximum_record_bytes": 1394937,
+  "maximum_replay_record_bytes": 1390050,
+  "native_requests": 36,
+  "optimizer_updates": 0,
+  "peak_process_tree_rss_bytes": 861667328,
+  "plan": {
+    "codec": {
+      "categorical": [
+        {
+          "name": "osc_1_unison_voices",
+          "values": [
+            1,
+            2,
+            4
+          ]
+        },
+        {
+          "name": "filter_1_on",
+          "values": [
+            0,
+            1
+          ]
+        }
+      ],
+      "codec": "authored_osc_filter_env_v2",
+      "continuous": [
+        {
+          "inactive_default": 0.25,
+          "maximum": 0.35,
+          "minimum": 0.15,
+          "name": "osc_1_level"
+        },
+        {
+          "inactive_default": 0.0,
+          "maximum": 0.7,
+          "minimum": -0.7,
+          "name": "osc_1_pan"
+        },
+        {
+          "inactive_default": 1.0,
+          "maximum": 2.5,
+          "minimum": 0.5,
+          "name": "osc_1_unison_detune"
+        },
+        {
+          "inactive_default": 96.0,
+          "maximum": 120.0,
+          "minimum": 50.0,
+          "name": "filter_1_cutoff"
+        },
+        {
+          "inactive_default": 0.25,
+          "maximum": 0.6,
+          "minimum": 0.1,
+          "name": "filter_1_resonance"
+        },
+        {
+          "inactive_default": 0.15,
+          "maximum": 0.6,
+          "minimum": 0.08,
+          "name": "env_1_attack"
+        },
+        {
+          "inactive_default": 0.7,
+          "maximum": 1.0,
+          "minimum": 0.25,
+          "name": "env_1_decay"
+        },
+        {
+          "inactive_default": 0.7,
+          "maximum": 0.9,
+          "minimum": 0.25,
+          "name": "env_1_sustain"
+        },
+        {
+          "inactive_default": 0.4,
+          "maximum": 0.65,
+          "minimum": 0.2,
+          "name": "env_1_release"
+        }
+      ],
+      "contract_id": "f1eca221ab4ba871d8f415a28d81747a42629b2f2a74be566a967758afc32f12",
+      "inactive_policy": "fixed_template_value",
+      "normalization": "linear_in_stored_units",
+      "scope": "one_init_oscillator_optional_filter1_env1_no_routes_or_effects",
+      "template_sha256": "e3761b0fed1f03b54c797c3185f8a972aabe681002db0bcb83a7a85ec4f869cf",
+      "version": 2
+    },
+    "format": "event_spectral_frame_preflight_v1",
+    "gates": {
+      "all_spectral_responses_retained": "sampled_mean_change>1e-7_when_full_mean_change>1e-7",
+      "full_envelopes_exact": true,
+      "native_all_accepted_and_historical_exact": true,
+      "projected_1024_record_archive_bytes": 2147483648,
+      "repeat_pairs": 12
+    },
+    "limits": {
+      "archive_bytes": 67108864,
+      "process_tree_bytes": 8589934592,
+      "qualification_attempts": 36,
+      "wall_seconds": 900
+    },
+    "optimizer_updates": 0,
+    "pairs": [
+      {
+        "group": "attack",
+        "pair_id": 8,
+        "recipes": [
+          {
+            "pair_id": 8,
+            "performance": {
+              "end_tick": 1560,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    400000
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    70,
+                    64
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    70,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 1440
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "26eec97515983445c8063b66afb30156f62d865d601aee278d84070097cc80b5",
+            "sequence": 16,
+            "source_state_id": "65f4559955b1e621508e1b915c6f3571f0a6e732782d000597ea7b0f85bc7aec",
+            "target": {
+              "categorical": [
+                1,
+                0
+              ],
+              "continuous": [
+                0.9241835351511489,
+                0.26216769779924887,
+                0.7680185111250954,
+                0.6571428571428571,
+                0.3,
+                0.014334728489664772,
+                0.8088283915146424,
+                0.12525106518880214,
+                0.41989153183517225
+              ]
+            },
+            "view": 0
+          },
+          {
+            "pair_id": 8,
+            "performance": {
+              "end_tick": 1560,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    400000
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    70,
+                    64
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    70,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 1440
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "26eec97515983445c8063b66afb30156f62d865d601aee278d84070097cc80b5",
+            "sequence": 20,
+            "source_state_id": "65f4559955b1e621508e1b915c6f3571f0a6e732782d000597ea7b0f85bc7aec",
+            "target": {
+              "categorical": [
+                1,
+                0
+              ],
+              "continuous": [
+                0.9241835351511489,
+                0.26216769779924887,
+                0.7680185111250954,
+                0.6571428571428571,
+                0.3,
+                0.06433472848966477,
+                0.8088283915146424,
+                0.12525106518880214,
+                0.41989153183517225
+              ]
+            },
+            "view": 4
+          }
+        ]
+      },
+      {
+        "group": "attack",
+        "pair_id": 244,
+        "recipes": [
+          {
+            "pair_id": 244,
+            "performance": {
+              "end_tick": 1320,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    400000
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    51,
+                    64
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    51,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 1200
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "523759b13a8c634f084356cf2b5aacec2c37c7564a50c113ac6619f2c35dab37",
+            "sequence": 488,
+            "source_state_id": "fae221cda5ad97224f8d66f70d185d832eb5475857d993d1d68c7dca2c5b2f35",
+            "target": {
+              "categorical": [
+                0,
+                1
+              ],
+              "continuous": [
+                0.5301415644550411,
+                0.058230073825241035,
+                0.25,
+                0.4570481576079186,
+                0.9782725079057661,
+                0.788369802881679,
+                0.12681902615839002,
+                0.15516452988973684,
+                0.025246325962565153
+              ]
+            },
+            "view": 0
+          },
+          {
+            "pair_id": 244,
+            "performance": {
+              "end_tick": 1320,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    400000
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    51,
+                    64
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    51,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 1200
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "523759b13a8c634f084356cf2b5aacec2c37c7564a50c113ac6619f2c35dab37",
+            "sequence": 492,
+            "source_state_id": "fae221cda5ad97224f8d66f70d185d832eb5475857d993d1d68c7dca2c5b2f35",
+            "target": {
+              "categorical": [
+                0,
+                1
+              ],
+              "continuous": [
+                0.5301415644550411,
+                0.058230073825241035,
+                0.25,
+                0.4570481576079186,
+                0.9782725079057661,
+                0.8383698028816791,
+                0.12681902615839002,
+                0.15516452988973684,
+                0.025246325962565153
+              ]
+            },
+            "view": 4
+          }
+        ]
+      },
+      {
+        "group": "attack",
+        "pair_id": 496,
+        "recipes": [
+          {
+            "pair_id": 496,
+            "performance": {
+              "end_tick": 1560,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    666667
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    63,
+                    96
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    63,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 1440
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "c94450f7d3d62e4a41e0e9d0f90351035ccf9ba2fc522a1282999635f64e9780",
+            "sequence": 992,
+            "source_state_id": "80bfb69e08dc621e455e4c62c80af2b92ba209f685c246ab704b25564683b3ad",
+            "target": {
+              "categorical": [
+                2,
+                0
+              ],
+              "continuous": [
+                0.3697670960311157,
+                0.10736568031092208,
+                0.5068430006329403,
+                0.6571428571428571,
+                0.3,
+                0.11254739983780027,
+                0.013873869276065931,
+                0.14315304117500738,
+                0.26258107161838173
+              ]
+            },
+            "view": 0
+          },
+          {
+            "pair_id": 496,
+            "performance": {
+              "end_tick": 1560,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    666667
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    63,
+                    96
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    63,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 1440
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "c94450f7d3d62e4a41e0e9d0f90351035ccf9ba2fc522a1282999635f64e9780",
+            "sequence": 996,
+            "source_state_id": "80bfb69e08dc621e455e4c62c80af2b92ba209f685c246ab704b25564683b3ad",
+            "target": {
+              "categorical": [
+                2,
+                0
+              ],
+              "continuous": [
+                0.3697670960311157,
+                0.10736568031092208,
+                0.5068430006329403,
+                0.6571428571428571,
+                0.3,
+                0.16254739983780025,
+                0.013873869276065931,
+                0.14315304117500738,
+                0.26258107161838173
+              ]
+            },
+            "view": 4
+          }
+        ]
+      },
+      {
+        "group": "decay",
+        "pair_id": 12,
+        "recipes": [
+          {
+            "pair_id": 12,
+            "performance": {
+              "end_tick": 1080,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    400000
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    72,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    72,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 960
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "a6fd412cb3f15743f2bf7484f5b1f02fd5f98a4687f97ec24d3232126bfbaee8",
+            "sequence": 24,
+            "source_state_id": "d8c281a9483d6122699c3d54a62530c484e2d380a595cc7da40191c4f954fd7c",
+            "target": {
+              "categorical": [
+                1,
+                1
+              ],
+              "continuous": [
+                0.7351192444681617,
+                0.11226780380357759,
+                0.011776118050863982,
+                0.50355266705857,
+                0.9524320925022358,
+                0.7207277128868679,
+                0.7039625611170371,
+                0.058331459360523086,
+                0.012685891931815685
+              ]
+            },
+            "view": 0
+          },
+          {
+            "pair_id": 12,
+            "performance": {
+              "end_tick": 1080,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    400000
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    72,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    72,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 960
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "a6fd412cb3f15743f2bf7484f5b1f02fd5f98a4687f97ec24d3232126bfbaee8",
+            "sequence": 28,
+            "source_state_id": "d8c281a9483d6122699c3d54a62530c484e2d380a595cc7da40191c4f954fd7c",
+            "target": {
+              "categorical": [
+                1,
+                1
+              ],
+              "continuous": [
+                0.7351192444681617,
+                0.11226780380357759,
+                0.011776118050863982,
+                0.50355266705857,
+                0.9524320925022358,
+                0.7207277128868679,
+                0.7539625611170372,
+                0.058331459360523086,
+                0.012685891931815685
+              ]
+            },
+            "view": 4
+          }
+        ]
+      },
+      {
+        "group": "decay",
+        "pair_id": 264,
+        "recipes": [
+          {
+            "pair_id": 264,
+            "performance": {
+              "end_tick": 1080,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    461538
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    76,
+                    112
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    76,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 960
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "a90d36cf2cfb44c8fbe16f22049d9b6bb689c7f694686d45c828fbd5d1664ca4",
+            "sequence": 528,
+            "source_state_id": "729bd96ca8af51a6a7057e760170caa99bec0a215d7d538f51e31567c0eb6704",
+            "target": {
+              "categorical": [
+                0,
+                0
+              ],
+              "continuous": [
+                0.23939628342716535,
+                0.4901591223271625,
+                0.25,
+                0.6571428571428571,
+                0.3,
+                0.29389955610360974,
+                0.663194616504613,
+                0.060674309389294856,
+                0.36267342486535536
+              ]
+            },
+            "view": 0
+          },
+          {
+            "pair_id": 264,
+            "performance": {
+              "end_tick": 1080,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    461538
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    76,
+                    112
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    76,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 960
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "a90d36cf2cfb44c8fbe16f22049d9b6bb689c7f694686d45c828fbd5d1664ca4",
+            "sequence": 532,
+            "source_state_id": "729bd96ca8af51a6a7057e760170caa99bec0a215d7d538f51e31567c0eb6704",
+            "target": {
+              "categorical": [
+                0,
+                0
+              ],
+              "continuous": [
+                0.23939628342716535,
+                0.4901591223271625,
+                0.25,
+                0.6571428571428571,
+                0.3,
+                0.29389955610360974,
+                0.713194616504613,
+                0.060674309389294856,
+                0.36267342486535536
+              ]
+            },
+            "view": 4
+          }
+        ]
+      },
+      {
+        "group": "decay",
+        "pair_id": 497,
+        "recipes": [
+          {
+            "pair_id": 497,
+            "performance": {
+              "end_tick": 1380,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    461538
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    37,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    37,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 300
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    37,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 3,
+                  "tick": 360
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    37,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 4,
+                  "tick": 540
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    37,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 5,
+                  "tick": 720
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    37,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 6,
+                  "tick": 960
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    37,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 7,
+                  "tick": 1080
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    37,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 8,
+                  "tick": 1260
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "cfc726b7d669ef65d6db848ff0f0a687c8fb937d4960363634af349054d7ea02",
+            "sequence": 993,
+            "source_state_id": "80bfb69e08dc621e455e4c62c80af2b92ba209f685c246ab704b25564683b3ad",
+            "target": {
+              "categorical": [
+                2,
+                0
+              ],
+              "continuous": [
+                0.3697670960311157,
+                0.10736568031092208,
+                0.5068430006329403,
+                0.6571428571428571,
+                0.3,
+                0.11254739983780027,
+                0.013873869276065931,
+                0.14315304117500738,
+                0.26258107161838173
+              ]
+            },
+            "view": 1
+          },
+          {
+            "pair_id": 497,
+            "performance": {
+              "end_tick": 1380,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    461538
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    37,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    37,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 300
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    37,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 3,
+                  "tick": 360
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    37,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 4,
+                  "tick": 540
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    37,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 5,
+                  "tick": 720
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    37,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 6,
+                  "tick": 960
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    37,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 7,
+                  "tick": 1080
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    37,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 8,
+                  "tick": 1260
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "cfc726b7d669ef65d6db848ff0f0a687c8fb937d4960363634af349054d7ea02",
+            "sequence": 997,
+            "source_state_id": "80bfb69e08dc621e455e4c62c80af2b92ba209f685c246ab704b25564683b3ad",
+            "target": {
+              "categorical": [
+                2,
+                0
+              ],
+              "continuous": [
+                0.3697670960311157,
+                0.10736568031092208,
+                0.5068430006329403,
+                0.6571428571428571,
+                0.3,
+                0.11254739983780027,
+                0.0,
+                0.14315304117500738,
+                0.26258107161838173
+              ]
+            },
+            "view": 5
+          }
+        ]
+      },
+      {
+        "group": "release",
+        "pair_id": 16,
+        "recipes": [
+          {
+            "pair_id": 16,
+            "performance": {
+              "end_tick": 1080,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    545455
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    64,
+                    112
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    64,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 960
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "76fc690ab068a85e38687ef7bc1051a0430b997af96f78ec542e79ccbbc31b63",
+            "sequence": 32,
+            "source_state_id": "1c2106feeaf9e6451fee95de7a81495605b63b1e214cba4957d31e8f0637db97",
+            "target": {
+              "categorical": [
+                2,
+                0
+              ],
+              "continuous": [
+                0.6200131399671953,
+                0.14729873424765783,
+                0.42294193488052767,
+                0.6571428571428571,
+                0.3,
+                0.6212220950874604,
+                0.55967102294264,
+                0.8099110771287318,
+                0.5550224030372828
+              ]
+            },
+            "view": 0
+          },
+          {
+            "pair_id": 16,
+            "performance": {
+              "end_tick": 1080,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    545455
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    64,
+                    112
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    64,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 960
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "76fc690ab068a85e38687ef7bc1051a0430b997af96f78ec542e79ccbbc31b63",
+            "sequence": 36,
+            "source_state_id": "1c2106feeaf9e6451fee95de7a81495605b63b1e214cba4957d31e8f0637db97",
+            "target": {
+              "categorical": [
+                2,
+                0
+              ],
+              "continuous": [
+                0.6200131399671953,
+                0.14729873424765783,
+                0.42294193488052767,
+                0.6571428571428571,
+                0.3,
+                0.6212220950874604,
+                0.55967102294264,
+                0.8099110771287318,
+                0.6050224030372828
+              ]
+            },
+            "view": 4
+          }
+        ]
+      },
+      {
+        "group": "release",
+        "pair_id": 268,
+        "recipes": [
+          {
+            "pair_id": 268,
+            "performance": {
+              "end_tick": 1320,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    461538
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    66,
+                    64
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    66,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 1200
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "20990acf1e74d6246c9a4b38fbfbfd6bace8b956e54b4070518482d626c031c7",
+            "sequence": 536,
+            "source_state_id": "d2fd4573bc85c814516352738c613cfdc14129f3c173bd8a9b4e7dc0dc2b048f",
+            "target": {
+              "categorical": [
+                0,
+                1
+              ],
+              "continuous": [
+                0.46356379621658417,
+                0.7342758440590695,
+                0.25,
+                0.7742333265357819,
+                0.7064820587784287,
+                0.9884695132828846,
+                0.17146395444940044,
+                0.622671770321919,
+                0.5248733995172865
+              ]
+            },
+            "view": 0
+          },
+          {
+            "pair_id": 268,
+            "performance": {
+              "end_tick": 1320,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    461538
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    66,
+                    64
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    66,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 1200
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "20990acf1e74d6246c9a4b38fbfbfd6bace8b956e54b4070518482d626c031c7",
+            "sequence": 540,
+            "source_state_id": "d2fd4573bc85c814516352738c613cfdc14129f3c173bd8a9b4e7dc0dc2b048f",
+            "target": {
+              "categorical": [
+                0,
+                1
+              ],
+              "continuous": [
+                0.46356379621658417,
+                0.7342758440590695,
+                0.25,
+                0.7742333265357819,
+                0.7064820587784287,
+                0.9884695132828846,
+                0.17146395444940044,
+                0.622671770321919,
+                0.5748733995172866
+              ]
+            },
+            "view": 4
+          }
+        ]
+      },
+      {
+        "group": "release",
+        "pair_id": 501,
+        "recipes": [
+          {
+            "pair_id": 501,
+            "performance": {
+              "end_tick": 1440,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    666667
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    71,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    71,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 240
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    71,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 3,
+                  "tick": 360
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    71,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 4,
+                  "tick": 660
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    71,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 5,
+                  "tick": 720
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    71,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 6,
+                  "tick": 1020
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    71,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 7,
+                  "tick": 1080
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    71,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 8,
+                  "tick": 1320
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "debed175b0323e1d29c23df49bf9e512d61931208e2e465c12f546dd8a934dbd",
+            "sequence": 1001,
+            "source_state_id": "27d5dadc2c0eb214dbb31a46d91d72abbafbf32aefb612fecd85b326a1c6a120",
+            "target": {
+              "categorical": [
+                2,
+                1
+              ],
+              "continuous": [
+                0.7820270559611542,
+                0.528692967377592,
+                0.1654225656503805,
+                0.11289908642485968,
+                0.46440557865258336,
+                0.8943472943980958,
+                0.5202579051832507,
+                0.6109590112927087,
+                0.27318802662634434
+              ]
+            },
+            "view": 1
+          },
+          {
+            "pair_id": 501,
+            "performance": {
+              "end_tick": 1440,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    666667
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    71,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    71,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 240
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    71,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 3,
+                  "tick": 360
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    71,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 4,
+                  "tick": 660
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    71,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 5,
+                  "tick": 720
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    71,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 6,
+                  "tick": 1020
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    71,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 7,
+                  "tick": 1080
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    71,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 8,
+                  "tick": 1320
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "debed175b0323e1d29c23df49bf9e512d61931208e2e465c12f546dd8a934dbd",
+            "sequence": 1005,
+            "source_state_id": "27d5dadc2c0eb214dbb31a46d91d72abbafbf32aefb612fecd85b326a1c6a120",
+            "target": {
+              "categorical": [
+                2,
+                1
+              ],
+              "continuous": [
+                0.7820270559611542,
+                0.528692967377592,
+                0.1654225656503805,
+                0.11289908642485968,
+                0.46440557865258336,
+                0.8943472943980958,
+                0.5202579051832507,
+                0.6109590112927087,
+                0.22318802662634435
+              ]
+            },
+            "view": 5
+          }
+        ]
+      },
+      {
+        "group": "detune",
+        "pair_id": 21,
+        "recipes": [
+          {
+            "pair_id": 21,
+            "performance": {
+              "end_tick": 1500,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    545455
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    46,
+                    64
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    46,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 240
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    46,
+                    64
+                  ],
+                  "kind": "note_on",
+                  "order": 3,
+                  "tick": 360
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    46,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 4,
+                  "tick": 540
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    46,
+                    64
+                  ],
+                  "kind": "note_on",
+                  "order": 5,
+                  "tick": 720
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    46,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 6,
+                  "tick": 1020
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    46,
+                    64
+                  ],
+                  "kind": "note_on",
+                  "order": 7,
+                  "tick": 1080
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    46,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 8,
+                  "tick": 1380
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "397edaacbb2ac2c058c0fe6c3f6935b2f307f3880ea44a9fb941bd8a63dff473",
+            "sequence": 41,
+            "source_state_id": "f20ecf11ec7a8dc5d34f2e1af27d776f391a614f04b430ef8f6841b95326f50c",
+            "target": {
+              "categorical": [
+                2,
+                1
+              ],
+              "continuous": [
+                0.9099362904466544,
+                0.6346298133297592,
+                0.6156888480999463,
+                0.3548311397112195,
+                0.48935298611666544,
+                0.7209121092207654,
+                0.7183343939766638,
+                0.05874537113837419,
+                0.5573228010986506
+              ]
+            },
+            "view": 1
+          },
+          {
+            "pair_id": 21,
+            "performance": {
+              "end_tick": 1500,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    545455
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    46,
+                    64
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    46,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 240
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    46,
+                    64
+                  ],
+                  "kind": "note_on",
+                  "order": 3,
+                  "tick": 360
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    46,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 4,
+                  "tick": 540
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    46,
+                    64
+                  ],
+                  "kind": "note_on",
+                  "order": 5,
+                  "tick": 720
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    46,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 6,
+                  "tick": 1020
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    46,
+                    64
+                  ],
+                  "kind": "note_on",
+                  "order": 7,
+                  "tick": 1080
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    46,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 8,
+                  "tick": 1380
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "397edaacbb2ac2c058c0fe6c3f6935b2f307f3880ea44a9fb941bd8a63dff473",
+            "sequence": 45,
+            "source_state_id": "f20ecf11ec7a8dc5d34f2e1af27d776f391a614f04b430ef8f6841b95326f50c",
+            "target": {
+              "categorical": [
+                2,
+                1
+              ],
+              "continuous": [
+                0.9099362904466544,
+                0.6346298133297592,
+                0.5656888480999462,
+                0.3548311397112195,
+                0.48935298611666544,
+                0.7209121092207654,
+                0.7183343939766638,
+                0.05874537113837419,
+                0.5573228010986506
+              ]
+            },
+            "view": 5
+          }
+        ]
+      },
+      {
+        "group": "detune",
+        "pair_id": 256,
+        "recipes": [
+          {
+            "pair_id": 256,
+            "performance": {
+              "end_tick": 960,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    461538
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    59,
+                    112
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    59,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 720
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "81de8980e4988f981749681e5d6d9730fdcec87dbaabdb9989c66bdaf8a0c30c",
+            "sequence": 512,
+            "source_state_id": "954988d008fc8a65e031838856db06a4cf0554811172aca4f178b636fcfca6a5",
+            "target": {
+              "categorical": [
+                2,
+                0
+              ],
+              "continuous": [
+                0.5103310486277535,
+                0.48522998344286794,
+                0.3256051091557497,
+                0.6571428571428571,
+                0.3,
+                0.1714781777133817,
+                0.7784396807895106,
+                0.9870222283896706,
+                0.6426412433729229
+              ]
+            },
+            "view": 0
+          },
+          {
+            "pair_id": 256,
+            "performance": {
+              "end_tick": 960,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    461538
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    59,
+                    112
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    59,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 720
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "81de8980e4988f981749681e5d6d9730fdcec87dbaabdb9989c66bdaf8a0c30c",
+            "sequence": 516,
+            "source_state_id": "954988d008fc8a65e031838856db06a4cf0554811172aca4f178b636fcfca6a5",
+            "target": {
+              "categorical": [
+                2,
+                0
+              ],
+              "continuous": [
+                0.5103310486277535,
+                0.48522998344286794,
+                0.3756051091557497,
+                0.6571428571428571,
+                0.3,
+                0.1714781777133817,
+                0.7784396807895106,
+                0.9870222283896706,
+                0.6426412433729229
+              ]
+            },
+            "view": 4
+          }
+        ]
+      },
+      {
+        "group": "detune",
+        "pair_id": 489,
+        "recipes": [
+          {
+            "pair_id": 489,
+            "performance": {
+              "end_tick": 1440,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    400000
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    53,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    53,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 240
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    53,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 3,
+                  "tick": 360
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    53,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 4,
+                  "tick": 660
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    53,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 5,
+                  "tick": 720
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    53,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 6,
+                  "tick": 1020
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    53,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 7,
+                  "tick": 1080
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    53,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 8,
+                  "tick": 1320
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "7c0705e66839d9274bed74c64ab1eb6ed80d3ed883abbd3046264af253e2859a",
+            "sequence": 977,
+            "source_state_id": "3e5ac94ea11dcfa090eecec8bb1bf8c6ee705e7c22bceb3d2529e9234bb1e8ef",
+            "target": {
+              "categorical": [
+                1,
+                0
+              ],
+              "continuous": [
+                0.801218083568252,
+                0.2539580076515485,
+                0.6988193239091259,
+                0.6571428571428571,
+                0.3,
+                0.4515392694776017,
+                0.41540316683004264,
+                0.1436876402061047,
+                0.5563679596491242
+              ]
+            },
+            "view": 1
+          },
+          {
+            "pair_id": 489,
+            "performance": {
+              "end_tick": 1440,
+              "events": [
+                {
+                  "channel": null,
+                  "data": [
+                    400000
+                  ],
+                  "kind": "tempo",
+                  "order": 0,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    53,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 1,
+                  "tick": 0
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    53,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 2,
+                  "tick": 240
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    53,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 3,
+                  "tick": 360
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    53,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 4,
+                  "tick": 660
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    53,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 5,
+                  "tick": 720
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    53,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 6,
+                  "tick": 1020
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    53,
+                    80
+                  ],
+                  "kind": "note_on",
+                  "order": 7,
+                  "tick": 1080
+                },
+                {
+                  "channel": 0,
+                  "data": [
+                    53,
+                    0
+                  ],
+                  "kind": "note_off",
+                  "order": 8,
+                  "tick": 1320
+                }
+              ],
+              "ticks_per_beat": 480
+            },
+            "performance_id": "7c0705e66839d9274bed74c64ab1eb6ed80d3ed883abbd3046264af253e2859a",
+            "sequence": 981,
+            "source_state_id": "3e5ac94ea11dcfa090eecec8bb1bf8c6ee705e7c22bceb3d2529e9234bb1e8ef",
+            "target": {
+              "categorical": [
+                1,
+                0
+              ],
+              "continuous": [
+                0.801218083568252,
+                0.2539580076515485,
+                0.6488193239091259,
+                0.6571428571428571,
+                0.3,
+                0.4515392694776017,
+                0.41540316683004264,
+                0.1436876402061047,
+                0.5563679596491242
+              ]
+            },
+            "view": 5
+          }
+        ]
+      }
+    ],
+    "parent_plan_id": "3ab7769e6b9c51b606005eb7b06609715f1da642844928e970915901b15a11bf",
+    "parent_records_sha256": "411a90e7f152363e1bb7178755f28652154409f291f1c4677fa47cea13ede58e",
+    "prior_evidence_sha256": "9ad8ec17a201b7809754706add5de811785a3445919107deadcc992220a839c7",
+    "qualification_changed": false,
+    "sampling": {
+      "envelope_frames": "all_valid",
+      "event_offsets_seconds": [
+        0.0,
+        0.025,
+        0.1
+      ],
+      "event_selection": "nearest_valid_center_ties_choose_earlier_deduplicate",
+      "format": "note_event_spectra_full_envelope_v1",
+      "maximum_unique_note_events": 8,
+      "pair_alignment": "same_MIDI_length_and_seed",
+      "remaining_frames": "uniform_without_replacement_at_least_eight",
+      "spectral_frames": 32,
+      "weighting": "equal_selected_frames_not_an_unbiased_full_spectral_estimate"
+    },
+    "seed": 0,
+    "source": {
+      "check_event_spectral_frames.py": "c8699e3a297e2a28546f23003da7154e4188b74b363db9083542f86b775fd6f0",
+      "check_spectral_time_coverage.py": "f73adf6a82507fa7deaae7babf380f955526b5633d6ac46861bac571ea721c14",
+      "event_frames.py": "bdc9efcbf714997bf3457c9287e6819536961b9bacfd1fc43ad57262c1ca2f07",
+      "paired_spectral.py": "243fec4e301f20eba08617900fb5376370755baaa5ba106162c66e3d833dacc9",
+      "spectral.py": "66df733a4de5398356f640ddd0c6daf954e8a5f678e0d6221f5b1125fa304eb1",
+      "temporal_proxy.py": "50b94c2c8b30f63650410362cc47cf8120f937940adb6d339c840a759eef8652",
+      "temporal_proxy_data.py": "412dedebbab97cc974c2f858649d8269aacf3b09b0684a1d73040015c04421da",
+      "vita.py": "b33546bc39674ad6307d35b69096191e3144c7769d5dc23fb5344232da7b61bf"
+    },
+    "test_split_used": false
+  },
+  "plan_id": "5e39ceda09145ab31fdd3fa0fe5db6ca9ba920947f5e939c8fdbcacad428626f",
+  "preflight_passed": true,
+  "projected_1024_record_archive_bytes": 1979904596,
+  "projection_uses_observed_maximum_not_guaranteed_future_size": true,
+  "qualified_for_inverse_training": false,
+  "renderer_identity": {
+    "backend_version": "0.8.3",
+    "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+    "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+    "settings": {
+      "buffer_size": 128,
+      "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+      "event_timing": "absolute ticks to half-even sample offsets",
+      "frame_policy": "one_guard_sample_trim_to_requested_frames_v1",
+      "plugin_name": "Vital.vst3",
+      "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+      "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+    }
+  },
+  "retained_archive_bytes": 33719438,
+  "retained_archive_bytes_before_summary": 33632311,
+  "rss_sampling_errors": 0,
+  "source_hashes": {
+    "cases.json": "aa81af46f98cf7b50eb00fe03b6431c16f73ee0e4e8872309fdbd90cc1d5c62b",
+    "plan.json": "89421fabce530f1e513f9441d5341a6791d4f447f2e83bb7d1b331ee1b71b706",
+    "renders.jsonl": "be2c57bb5279d45a7988f52c1a319eeb63f6d3558f29648f9614cedf0c76f5b7",
+    "summary.json": "f361a94a0bb79b08f3ca5192843a857a3d71315e7c9bb7f2940e3c52d5c010d3"
+  },
+  "test_split_used": false,
+  "within_resource_limits": true
+}
