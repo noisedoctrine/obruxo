@@ -107,7 +107,7 @@ Implement the spectral targets, differentiable control adapter, Gumbel-softmax s
 
 **Deliverable:** reviewed contract, focused correctness checks, measured resource profile and a frozen experiment card. **Exit:** active controls receive sound-loss gradients, hard exports remain valid and retained state fits the budget. These checks do not establish useful gradients or reconstruction quality. Existing `train` commands still use their implemented supervised loss until a separate sound-training mode exists.
 
-#### A1. Qualify a helper on the small vocabulary
+#### A1. Qualify useful sound-loss gradients on the small vocabulary
 
 The [first local helper](../training/reports/BASIC_SPECTRAL_HELPER_RESULTS.md) and [aligned-pair correction](../training/reports/PAIRED_SPECTRAL_HELPER_RESULTS.md) have completed. Both fail the useful-gradient gates; neither may guide inverse training. The paired run improves 31/48 guided cases, but saved-data diagnosis finds weak attack/decay/release response fitting even on training pairs. The next work is a targeted response investigation, not another automatic full fit or expanded output space.
 
@@ -125,9 +125,11 @@ Check held-out spectral prediction, rankings of real-rendered candidates, and wh
 
 If qualification fails, diagnose the conflicting measurements/directions and declare one evidence-based change before another bounded attempt. A differentiable implementation of the restricted synth or bounded native optimization is a separately costed alternative, not an automatic successful fallback. Do not automatically enlarge the helper, output space or run budget.
 
+The [native-gradient alternative card](../training/reports/NATIVE_GRADIENT_CARD.md) now freezes that branch: direct finite differences and categorical sound-loss tables, at most 624 native attempts, 30 minutes, 8 GiB RAM and 32 MiB output. It retains the continuous/joint real-improvement gates on reference and transfer, exact repeats and QA. Forward-helper prediction/ranking gates remain required for a learned helper, but do not apply to direct native measurements. Only a passing native direction report permits a separately costed inverse-training trial; implementation alone does not qualify it.
+
 #### A2. Train the predictor on spectral loss
 
-Start a matched parameter-only control and spectral-loss candidate from the same selected basic checkpoint. Align encoder, output vocabulary, source population, performances and inverse-update budget. Freeze the qualified helper for the whole inverse run. Use Gumbel-softmax for both basic categorical decisions and differentiable bounded continuous controls.
+Start a matched parameter-only control and spectral-loss candidate from the same selected basic checkpoint. Align encoder, output vocabulary, source population, performances and inverse-update budget. Freeze the qualified helper for the whole inverse run, or pin a qualified native-gradient estimator and count every native probe against the card. Use Gumbel-softmax for both basic categorical decisions and differentiable bounded continuous controls.
 
 Infer one patch from a reference recording and compare its helper predictions under reference and additional training performances against real target renders of the same source patch under those performances. Reusing that one inferred patch encourages a playable sound beyond one note. No source patch labels or true MIDI enter the inverse network.
 
