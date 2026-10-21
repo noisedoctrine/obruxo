@@ -33,6 +33,7 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path):
     from obruxo_training.evaluate import nearest_training_target
     from obruxo_training.features import tensor_digest
     from obruxo_training.native_fit import audit_summary, digest, make_plan, matched_step, predict_candidates
+    from obruxo_training.native_fit_report import paired_comparison, public_cases
     from obruxo_training.reproducibility import fixed_generator_phases
     from obruxo_training.spectral import SpectralTargets
     from obruxo_training.trainer import restore_model
@@ -197,6 +198,8 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path):
     return {**summary, "retained_archive_bytes": archive, "optimizer_attempts": len(charges),
             "offline_training_replay_exact": True, "cached_targets_and_inputs_rescored": True,
             "hard_audit_patches_reconstructed": True, "candidate_audit_audio_rescored": False,
+            "fit_cases": public_cases(fit_cases), "validation_cases": public_cases(validation_cases),
+            "descriptive_validation_comparison": paired_comparison(validation_cases) if validation_cases else None,
             "final_model_sha256": {name: tensor_digest(model.state_dict()) for name, model in models.items()},
             "evidence_sha256": {name: digest(source / name) for name in ("summary.json", "checkpoint.pt", "records.json", "updates.jsonl", "measurements.jsonl", "renders.jsonl")}}
 
