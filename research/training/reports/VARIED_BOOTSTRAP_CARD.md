@@ -1,0 +1,22 @@
+# Fit varied recordings before returning to sound training
+
+Declared before learning on 2026-10-22. The [native input check](VARIED_INPUT_NATIVE_RESULTS.md) passes 76 requests and exact repeats. Start from the independently verified full-bootstrap weights, give the same 404 training patches both new input views, and test whether their reconstruction improves without losing the original recordings. The model stays at **14 dense outputs and 355,806 trainable parameters**. This is initialization for A2, not completion of sound training or a release.
+
+The [frozen plan](data/varied_bootstrap_plan.json) has ID `70983e15790c468c817a8fe5813a743ed9d1cd1183bd8124195df0d96a04123f`. Verify both parent audits and their evidence hashes, pool, renderer/profile and initial inference weights before execution. The new observation contract remains separate from the patch codec. Use 808 on-demand recordings: a two-second held note and a category-balanced alternate pattern per patch, over MIDI 36–84. Keep the frozen frontend, qualified 32,768-frame lead and fixed oscillator 1–3/sampler phases. Cache only bounded features, about 29.8 MiB, and discard training waveforms.
+
+Use a fresh AdamW optimizer, seed 0, CPU with two threads, float32, batch 32 comprising 16 complete patch pairs, learning rate 0.001 and **8,000 parameter-initialization updates**. The existing active-control loss initializes the model; the paired identity-loss weight remains zero. No new prediction head or objective is introduced. Save a checkpoint after every collected observation and every 250 optimizer updates. Reuse only the final update; no intermediate checkpoint selection or automatic extension.
+
+Compare the initial and final models on two fixed panels of the same eight training patches used in the original full-bootstrap audit. One panel keeps its original input performances; the other uses each patch's new held-note input. Explicit sequence IDs keep all eight states distinct even though the new replay has adjacent pairs. Both models receive the same recording within each case, infer one patch, and render that patch under the reference and reserved transfer performance. Use the same new training-only retrieval bank for both. Keep the fixed-template and source-repeat comparisons. Any evaluator-selected file is diagnostic and cannot replace the designated final training model.
+
+Require all of the following acoustic gates, separately for reference and transfer:
+
+- Wider-input candidate error below 90% of the initial model's error.
+- Original-input candidate error at most 110% of the initial model's error.
+- Candidate error below 90% of the fixed template on both panels.
+- All source repeat comparisons exactly zero, all cases complete and every native outcome accepted.
+
+Error is the existing stereo multi-resolution spectral distance. Ratios use a `1e-12` stabilizer in both numerator and denominator, so two zero errors do not count as an improvement. Parameter accuracy remains diagnostic and cannot admit a model. These are training-state checks; they do not establish held-out perceptual quality. No validation or test source is queried, no gate is relaxed, and both earlier development panels remain reserved for their stated regression purpose.
+
+Planned native cost: **808 source requests + 192 comparison requests = 1,000**. Cap the entire run at **two hours, 4 GiB process-tree RAM and 512 MiB evidence**. The child audit wrapper charges before plugin construction without importing Torch in each native worker. Keep one fresh process/plugin per request. Explicit recovery retains the original deadline and permits at most two extra source and ten extra comparison attempts: **1,012 charged requests maximum**. Retain failed/uncommitted attempts and reconcile them with receipts; do not silently retry or discard history.
+
+Before accepting initialization, independently replay all paired updates from the verified original weights with no new rendering. Require exact model, Adam, batch RNG, global Torch RNG and metrics; verify all cached source receipts and hard patch requests from both comparison panels. Compare cached/fresh predictions at the existing `1e-6` tolerance with exact categories. That audit has a separate ten-minute / 4-GiB cap and cannot independently rescore discarded waveforms. A pass admits only later category-gradient qualification and the corrected, counterbalanced sound-training trial.
