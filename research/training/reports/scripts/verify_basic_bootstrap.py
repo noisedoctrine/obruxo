@@ -6,7 +6,7 @@ from pathlib import Path
 import random
 import subprocess
 import sys
-from time import perf_counter
+from time import perf_counter, sleep
 
 import numpy as np
 
@@ -14,7 +14,24 @@ RESEARCH = Path(__file__).resolve().parents[3]
 sys.path[:0] = [str(RESEARCH / "training"), str(RESEARCH / "data_generation")]
 
 
-def verify(root, pool_path, frozen_commit, output):
+def wait_for_native(root, seconds):
+    if type(seconds) is not int or not 0 <= seconds <= 480:
+        raise ValueError("native audit wait must be an integer in [0, 480]")
+    deadline = perf_counter() + seconds
+    while True:
+        try:
+            status = json.loads((root / "status.json").read_text())
+            summary = json.loads((root / "summary.json").read_text()) if status.get("complete") else None
+        except (FileNotFoundError, json.JSONDecodeError):
+            status, summary = {}, None
+        if summary and summary.get("complete"):
+            return summary
+        if status.get("error_type") or perf_counter() >= deadline:
+            raise RuntimeError("native audit has not completed; no training or rendering retry was made")
+        sleep(1)
+
+
+def verify(root, pool_path, frozen_commit, output, *, wait_native_seconds=0):
     import torch
     from obruxo_data.hashing import canonical_sha256, sha256_bytes
     from obruxo_data.render.base import RenderRequest
@@ -35,8 +52,7 @@ def verify(root, pool_path, frozen_commit, output):
     monitor.start()
     try:
         plan = json.loads((root / "plan.json").read_text())
-        summary = json.loads((root / "summary.json").read_text())
-        if canonical_sha256(plan) != summary["plan_id"]:
+        if canonical_sha256(plan) != json.loads((root / "run.json").read_text())["plan_id"]:
             raise ValueError("saved preflight plan identity changed")
         for name, expected in plan["source"].items():
             raw = subprocess.check_output(["git", "show", f"{frozen_commit}:research/training/obruxo_training/{name}"], cwd=RESEARCH.parent)
@@ -46,6 +62,9 @@ def verify(root, pool_path, frozen_commit, output):
         if not segments:
             raise ValueError("bootstrap has no retained training segments")
         fit_root = segments[-1]
+        fit_summary = json.loads((fit_root / "summary.json").read_text())
+        if not fit_summary["complete"]:
+            raise ValueError("training must finish before starting its replay")
         saved = load_training_checkpoint(fit_root / "checkpoint.pt")
         initial = torch.load(segments[0] / "checkpoint.initial.pt", weights_only=True)["state"]
         config = TrainConfig(**plan["config"])
@@ -65,7 +84,7 @@ def verify(root, pool_path, frozen_commit, output):
         optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate, weight_decay=0)
         generator = torch.Generator().manual_seed(config.seed)
         replay = saved["replay"]
-        assert replay_metrics(model, replay, pool.codec, "cpu", config) == summary["training"]["initial_metrics"]
+        assert replay_metrics(model, replay, pool.codec, "cpu", config) == fit_summary["initial_metrics"]
         for _step in range(config.steps):
             items = [replay[index] for index in torch.randperm(len(replay), generator=generator)[:config.batch_size].tolist()]
             model.train()
@@ -74,16 +93,19 @@ def verify(root, pool_path, frozen_commit, output):
             terms["loss"].backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 5, error_if_nonfinite=True)
             optimizer.step()
-        assert tensor_digest(model.state_dict()) == tensor_digest(saved["model"]) == summary["model_state_sha256"]
+        assert tensor_digest(model.state_dict()) == tensor_digest(saved["model"]) == fit_summary["model_state_sha256"]
         for index, state in optimizer.state_dict()["state"].items():
             assert all(torch.equal(value, saved["optimizer"]["state"][index][name]) for name, value in state.items())
         assert torch.equal(generator.get_state(), saved["batch_rng"])
         assert torch.equal(torch.get_rng_state(), saved["rng"]["torch"])
-        assert replay_metrics(model, replay, pool.codec, "cpu", config) == summary["training"]["final_metrics"]
+        assert replay_metrics(model, replay, pool.codec, "cpu", config) == fit_summary["final_metrics"]
         assert tensor_digest(frontend.basic_pitch.state_dict()) == tensor_digest(saved["basic_pitch"])
         exported = torch.load(fit_root / "model.pt", weights_only=True)
         assert tensor_digest(exported["model"]) == tensor_digest(saved["model"])
         assert all(exported[key] == value for key, value in profile_metadata(32768).items())
+        replay_seconds = perf_counter() - started
+        summary = wait_for_native(root, wait_native_seconds)
+        assert summary["plan_id"] == canonical_sha256(plan) and summary["training"] == fit_summary
         source_rows = [row for segment in segments for row in rows(segment / "renders.jsonl")]
         audit_rows = rows(root / "training-audit/renders.jsonl")
         attempts = rows(root / "attempts.jsonl")
@@ -138,6 +160,7 @@ def verify(root, pool_path, frozen_commit, output):
                   "cached_prediction_tolerance": 1e-6, "hard_categories_exact": True,
                   "all_eighty_audit_requests_reconstructed": True, "native_renders_added": 0,
                   "model_vs_template_ratio_reconstructed": ratios,
+                  "training_replay_seconds": replay_seconds, "waited_for_native_audit": bool(wait_native_seconds),
                   "elapsed_seconds": perf_counter() - started, "peak_process_tree_rss_bytes": monitor.peak_bytes,
                   "limitations": "candidate waveforms discarded; saved spectral scores not independently rescored; cached/fresh predictions are compared numerically at the reported tolerance",
                   "evidence_sha256": {path.relative_to(root).as_posix(): sha256_bytes(path.read_bytes())
@@ -157,5 +180,8 @@ if __name__ == "__main__":
     parser.add_argument("--pool", type=Path, required=True)
     parser.add_argument("--frozen-commit", required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--wait-native-seconds", type=int, default=0, help="Allow 0–480 seconds for the native audit after training replay")
     args = parser.parse_args()
-    print(json.dumps(verify(args.root, args.pool, args.frozen_commit, args.output)), flush=True)
+    if not 0 <= args.wait_native_seconds <= 480:
+        parser.error("wait-native-seconds must be in [0, 480]")
+    print(json.dumps(verify(args.root, args.pool, args.frozen_commit, args.output, wait_native_seconds=args.wait_native_seconds)), flush=True)
