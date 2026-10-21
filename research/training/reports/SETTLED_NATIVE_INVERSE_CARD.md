@@ -31,3 +31,11 @@ python research/training/reports/scripts/run_native_inverse_fit.py --pool BASIC_
 ```
 
 The first invocation only freezes the plan. Add `--execute` after recording its identity here and committing. Use `--execute --resume` only for that same attempted run and its original limits.
+
+## First interruption and bounded recovery
+
+The first attempt completed 106 matched updates, then a native worker timed out during update 107, query 10. This was an `error` receipt with no audio/QA result, not a clipping rejection. All 2,160 preceding native requests were accepted; the failed attempt remains charged. The receipt records 4,593.83 seconds elapsed for that worker call, compared with the configured 60-second timeout. Windows System events independently confirm a battery-triggered sleep spanning approximately 76 minutes during that request; see the [bounded power-event evidence](data/settled_native_inverse_host_sleep.json). No power settings were changed.
+
+The [checkpoint-prefix audit](data/settled_native_inverse_timeout_prefix.json) replays all 106 actual updates, both optimizer states and Gumbel RNG exactly and reconstructs the interrupted request. Preserve the original checkpoint, plan, summary and ledgers under `interruptions/001/` before resuming, with unchanged target records in the parent run. The prefix auditor can use `--source RUN/interruptions/001 --records-root RUN` to verify that preserved snapshot. Its distinction between timeout and audio rejection changes audit reporting only; the frozen training source remains unchanged.
+
+Resume from update 107 using the existing `--execute --resume` path. Do not reset the original four-hour deadline, any native/optimizer charges, quality gates or target hashes. Retain the timeout in the final report: the original all-attempts-accepted condition cannot be reported as passing, even if eventual numeric comparisons improve. No clean-run or model-promotion claim may be inferred from a recovered checkpoint.

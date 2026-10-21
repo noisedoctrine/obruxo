@@ -13,7 +13,7 @@ sys.path[:0] = [str(RESEARCH / "training"), str(RESEARCH / "data_generation")]
 from verify_native_inverse_fit import equal_tree  # noqa: E402
 
 
-def audit(source, pool, initial_path, retrieval_path, qualification_path):
+def audit(source, pool, initial_path, retrieval_path, qualification_path, *, records_root=None):
     import torch
     from obruxo_data.hashing import canonical_sha256, sha256_bytes
     from obruxo_data.midi import Performance
@@ -22,11 +22,14 @@ def audit(source, pool, initial_path, retrieval_path, qualification_path):
     from obruxo_training.features import tensor_digest, validate_features
     from obruxo_training.native_fit import digest, make_plan, matched_step
     from obruxo_training.native_inverse import native_reconstruction_loss
+    from obruxo_training.native_fit_report import terminal_interruption
     from obruxo_training.reproducibility import fixed_generator_phases
     from obruxo_training.spectral_controls import BasicControlAdapter, temperature_at
     from obruxo_training.trainer import restore_model
     torch.set_num_threads(2)
-    plan = make_plan(pool, initial_path, retrieval_path, qualification_path)
+    records_root = source if records_root is None else records_root
+    frozen = json.loads((source / "plan.json").read_text())
+    plan = make_plan(pool, initial_path, retrieval_path, qualification_path, preroll_frames=frozen.get("render_profile", {}).get("preroll_frames", 0))
     summary = json.loads((source / "summary.json").read_text())
     if (plan != json.loads((source / "plan.json").read_text()) or summary["plan"] != plan
             or summary["plan_id"] != canonical_sha256(plan) or summary["complete"] or not summary["failure"]):
@@ -45,9 +48,7 @@ def audit(source, pool, initial_path, retrieval_path, qualification_path):
         if (attempt["attempt"] != index or outcome["attempt"] != index or attempt["request_id"] != outcome["request_id"]
                 or outcome["renderer_identity"] != summary["renderer_identity"]):
             raise ValueError("native attempt identity changed")
-    rejected = [row for row in outcomes if row["status"] != "accepted"]
-    if len(rejected) != 1 or rejected[0] != outcomes[-1] or rejected[0]["status"] != "rejected":
-        raise ValueError("expected one terminal QA rejection")
+    interrupted = terminal_interruption(outcomes)
     if any(row["attempt"] != i for i, row in enumerate(charges)):
         raise ValueError("optimizer charge sequence changed")
     incumbent, frontend, codec = restore_model(torch.load(initial_path, map_location="cpu", weights_only=True))
@@ -55,7 +56,7 @@ def audit(source, pool, initial_path, retrieval_path, qualification_path):
     optimizers = {name: torch.optim.Adam(model.parameters(), lr=plan["optimizer"]["learning_rate"]) for name, model in models.items()}
     manifest, features = json.loads((source / "records.json").read_text()), {}
     for index, recipe in enumerate(plan["training"]):
-        row, path = manifest[str(index)], source / "records" / f"{index:03d}.pt"
+        row, path = manifest[str(index)], records_root / "records" / f"{index:03d}.pt"
         if row["recipe_id"] != canonical_sha256(recipe) or row["sha256"] != digest(path):
             raise ValueError("cached training record changed")
         record = torch.load(path, map_location="cpu", weights_only=True)
@@ -70,7 +71,8 @@ def audit(source, pool, initial_path, retrieval_path, qualification_path):
     def require_request(candidate, performance, receipt):
         raw = codec.decode(candidate)
         request = RenderRequest(preset_json=fixed_generator_phases(raw).decode(), performance=performance,
-                                renderer_id=codec.contract.renderer_id, tail_seconds=codec.contract.tail_seconds)
+                                renderer_id=codec.contract.renderer_id, tail_seconds=codec.contract.tail_seconds,
+                                preroll_frames=plan.get("render_profile", {}).get("preroll_frames", 0))
         if (request.request_id != receipt["request_id"] or sha256_bytes(raw) != receipt["source_sha256"]
                 or sha256_bytes(request.preset_json.encode()) != receipt["controlled_sha256"]):
             raise ValueError("native receipt cannot be reconstructed")
@@ -126,7 +128,7 @@ def audit(source, pool, initial_path, retrieval_path, qualification_path):
                 raise ValueError("pending accepted probe differs from the checkpoint")
             cursor += 1
             return row["loss"]
-        require_request(candidate, performance, rejected[0])
+        require_request(candidate, performance, interrupted)
         failing = candidate
         raise FoundRejection()
     try:
@@ -138,17 +140,21 @@ def audit(source, pool, initial_path, retrieval_path, qualification_path):
         raise ValueError("rejected probe was not reconstructed")
     anchor = PilotTarget(tuple(prediction["continuous"].detach()[0].tolist()), tuple(prefix[0]["candidate"]["categorical"]))
     archive = sum(path.stat().st_size for path in source.rglob("*") if path.is_file())
-    return {"format": "interrupted_native_inverse_prefix_audit_v1", "plan_id": canonical_sha256(plan),
+    probe = {"candidate": failing.to_dict(), "actual_categories": {name: options[index]
+             for (name, options), index in zip(CATEGORICAL, failing.categorical, strict=True)},
+             "receipt": interrupted, "optimizer_step": pending["step"], "state_index": update["state"], "view": update["view"]}
+    return {"format": "interrupted_native_inverse_prefix_audit_v2", "plan_id": canonical_sha256(plan),
             "initial_model_sha256": plan["initial_model_sha256"], "frozen_source": plan["source"],
             "committed_updates_per_arm": saved["step"], "optimizer_attempts": len(charges),
             "summary_reported_committed_updates_per_arm": summary["committed_updates_per_arm"],
             "offline_prefix_replay_exact": True, "both_optimizer_states_exact": True, "gumbel_rng_exact": True,
             "cached_records_hashed": True, "cached_audio_targets_independently_rescored": False,
-            "accepted_native_requests": len(outcomes) - len(rejected), "rejected_native_requests": len(rejected),
-            "total_native_attempts": len(attempts), "rejected_probe_reconstructed": True,
-            "rejected_probe": {"candidate": failing.to_dict(), "actual_categories": {name: options[index]
-                               for (name, options), index in zip(CATEGORICAL, failing.categorical, strict=True)},
-                               "receipt": rejected[0], "optimizer_step": pending["step"], "state_index": update["state"], "view": update["view"]},
+            "accepted_native_requests": len(outcomes) - 1,
+            "rejected_native_requests": int(interrupted["status"] == "rejected"),
+            "native_error_requests": int(interrupted["status"] == "error"),
+            "total_native_attempts": len(attempts), "terminal_probe_reconstructed": True, "interrupted_probe": probe,
+            "rejected_probe_reconstructed": interrupted["status"] == "rejected",
+            "rejected_probe": probe if interrupted["status"] == "rejected" else None,
             "pending_anchor": anchor.to_dict(), "model_sha256": hashes,
             "elapsed_seconds": summary["elapsed_seconds"], "peak_process_tree_rss_bytes": summary["peak_process_tree_rss_bytes"],
             "rss_sampling_errors": summary["rss_sampling_errors"], "retained_archive_bytes": archive,
@@ -163,13 +169,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("source", "pool", "initial", "retrieval", "qualification", "output"):
         parser.add_argument(f"--{name}", type=Path, required=True)
+    parser.add_argument("--records-root", type=Path)
     args = parser.parse_args()
     if args.output.exists():
         raise ValueError("refusing to replace audited evidence")
-    result = audit(args.source, PilotPool.load(args.pool), args.initial, args.retrieval, args.qualification)
+    result = audit(args.source, PilotPool.load(args.pool), args.initial, args.retrieval, args.qualification, records_root=args.records_root)
     write_json(args.output, result)
     print(json.dumps({"committed_updates_per_arm": result["committed_updates_per_arm"], "offline_prefix_replay_exact": True,
-                      "rejected_probe_reconstructed": True}))
+                      "terminal_probe_reconstructed": True, "terminal_status": result["interrupted_probe"]["receipt"]["status"]}))
 
 
 if __name__ == "__main__":
