@@ -54,6 +54,10 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path):
         if (receipt["status"] != "accepted" or receipt["request_id"] != attempts[key]["request_id"]
                 or receipt["renderer_identity"] != summary["renderer_identity"]):
             raise ValueError("native receipt acceptance or identity changed")
+
+    def require_recorded_receipt(receipt):
+        if outcomes.get((receipt["phase"], receipt["attempt"])) != receipt:
+            raise ValueError("audit receipt differs from the native outcome ledger")
     initial = torch.load(initial_path, map_location="cpu", weights_only=True)
     incumbent, frontend, codec = restore_model(initial)
     models = {name: copy.deepcopy(incumbent).train() for name in ("parameter", "spectral")}
@@ -70,6 +74,10 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path):
             audio = audit["audio"].numpy()
             if audio_float32_sha256(audio) != record["audio_sha256"][view]:
                 raise ValueError("training target does not match exact source audit repeat")
+            original = [row for row in outcomes.values() if row["phase"] == "training" and row["label"] == f"source:{index}:{view}"
+                        and row["qa"]["audio_float32_sha256"] == record["audio_sha256"][view]]
+            if not original:
+                raise ValueError("training source record has no matching native collection receipt")
             measured = SpectralTargets()(audit["audio"].T[None])
             if not equal_tree(measured, record["targets"][view]):
                 raise ValueError("cached training spectra do not match native source audio")
@@ -159,10 +167,18 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path):
             else:
                 candidates = candidates_by_state[recipe["state_id"]]
             performance = Performance.from_dict(recipe["performances"][view])
+            require_recorded_receipt(audit["source_receipt"])
             require_request(PilotTarget.from_dict(recipe["target"]), performance, audit["source_receipt"])
+            if split == "validation":
+                repeat = audit["repeat_receipt"]
+                require_recorded_receipt(repeat)
+                require_request(PilotTarget.from_dict(recipe["target"]), performance, repeat)
+                if repeat["qa"]["audio_float32_sha256"] != audit["source_receipt"]["qa"]["audio_float32_sha256"]:
+                    raise ValueError("validation repeat hash changed")
             for name, candidate in candidates.items():
                 if case["rows"][name]["candidate"] != candidate.to_dict():
                     raise ValueError("hard native audit patch differs from actual model output")
+                require_recorded_receipt(case["rows"][name]["receipt"])
                 require_request(candidate, performance, case["rows"][name]["receipt"])
     fit_result = audit_summary(fit_cases, plan, validation=False)
     validation_result = audit_summary(validation_cases, plan, validation=True) if fit_result["pass"] else None
