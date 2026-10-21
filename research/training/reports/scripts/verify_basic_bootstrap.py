@@ -1,4 +1,4 @@
-"""Replay the small bootstrap from its original weights without rendering or changing it."""
+"""Replay a frozen basic bootstrap from its original weights without new rendering."""
 
 from collections import Counter
 import json
@@ -43,11 +43,11 @@ def verify(root, pool_path, frozen_commit, output):
             if sha256_bytes(raw.replace(b"\r\n", b"\n")) != expected:
                 raise ValueError("frozen source does not match the executed plan")
         segments = sorted(root.glob("fit-*"))
-        if len(segments) != 1:
-            raise ValueError("this small audit requires the uninterrupted preflight")
-        fit_root = segments[0]
+        if not segments:
+            raise ValueError("bootstrap has no retained training segments")
+        fit_root = segments[-1]
         saved = load_training_checkpoint(fit_root / "checkpoint.pt")
-        initial = torch.load(fit_root / "checkpoint.initial.pt", weights_only=True)["state"]
+        initial = torch.load(segments[0] / "checkpoint.initial.pt", weights_only=True)["state"]
         config = TrainConfig(**plan["config"])
         pool = PilotPool.load(pool_path)
         if pool.pool_id != plan["pool_id"] or saved["step"] != config.steps:
@@ -84,13 +84,14 @@ def verify(root, pool_path, frozen_commit, output):
         exported = torch.load(fit_root / "model.pt", weights_only=True)
         assert tensor_digest(exported["model"]) == tensor_digest(saved["model"])
         assert all(exported[key] == value for key, value in profile_metadata(32768).items())
-        source_rows = rows(fit_root / "renders.jsonl")
+        source_rows = [row for segment in segments for row in rows(segment / "renders.jsonl")]
         audit_rows = rows(root / "training-audit/renders.jsonl")
         attempts = rows(root / "attempts.jsonl")
         outcomes = [*(dict(phase="training", **row) for row in source_rows), *(dict(phase="evaluation", **row) for row in audit_rows)]
         assert Counter((row["phase"], row["request_id"]) for row in attempts) == Counter(
             (row["phase"], row.get("request_id", row["provenance"]["request_id"])) for row in outcomes)
-        assert len(outcomes) == 88 and all(row["status"] == "accepted" for row in outcomes)
+        assert len(outcomes) == summary["attempts"] and all(row["status"] == "accepted" for row in outcomes)
+        assert plan["planned_requests"]["total"] <= len(outcomes) <= plan["limits"]["training_attempts"] + plan["limits"]["evaluation_attempts"]
         assert all({key: value for key, value in row["provenance"].items() if key != "request_id"} == plan["renderer_identity"] for row in outcomes)
         lookup = {(row["case"], row["method"], row["role"]): row for row in audit_rows}
         performances = {item.performance_id: item.performance() for item in pool.codec.contract.performances()}
@@ -98,10 +99,15 @@ def verify(root, pool_path, frozen_commit, output):
         sampler = training_sampler(pool, config)
         expected_requests = []
         export_differences = []
-        for index, item in enumerate(replay):
+        source_receipts = {row["provenance"]["request_id"]: row for row in source_rows}
+        for item in replay:
+            request = sampler.recipe_at(item["sequence_id"]).render_request()
+            assert item["audio_sha256"] == source_receipts[request.request_id]["qa"]["audio_float32_sha256"]
+        assert len(source_receipts) == len(replay) == len(plan["sources"])
+        for index, item in enumerate(replay[:8]):
             request = sampler.recipe_at(item["sequence_id"]).render_request()
             assert item["audio_sha256"] == lookup[index, "source", "reference"]["qa"]["audio_float32_sha256"]
-            assert source_rows[index]["provenance"]["request_id"] == request.request_id
+            assert source_receipts[request.request_id]["provenance"]["request_id"] == request.request_id
             with torch.no_grad():
                 target = predicted_targets(model.eval()(batch_features([item])), pool.codec)[0]
             exported_patch = (root / f"training-audit/prediction-{index:03d}.vital").read_bytes()
@@ -126,13 +132,14 @@ def verify(root, pool_path, frozen_commit, output):
         assert ratios == summary["model_vs_template_ratio"]
         result = {"plan_id": summary["plan_id"], "frozen_commit": frozen_commit, "replayed_updates": config.steps,
                   "model_optimizer_batch_and_global_rng_exact": True, "source_audio_hashes_match_training": 8,
+                  "training_source_receipts_verified": len(replay), "charged_native_attempts": len(outcomes), "training_segments": len(segments),
                   "native_source_repeat_pairs_exact": 16, "hard_patch_request_exports_reconstructed": 8,
                   "cached_vs_fresh_input_predictions_max_normalized_delta": max(export_differences),
                   "cached_prediction_tolerance": 1e-6, "hard_categories_exact": True,
                   "all_eighty_audit_requests_reconstructed": True, "native_renders_added": 0,
                   "model_vs_template_ratio_reconstructed": ratios,
                   "elapsed_seconds": perf_counter() - started, "peak_process_tree_rss_bytes": monitor.peak_bytes,
-                  "limitations": "candidate waveforms discarded; saved spectral scores not independently rescored; historical evaluator uses four CPU threads vs two for training, so cached/fresh predictions are compared numerically, not bytewise",
+                  "limitations": "candidate waveforms discarded; saved spectral scores not independently rescored; cached/fresh predictions are compared numerically at the reported tolerance",
                   "evidence_sha256": {path.relative_to(root).as_posix(): sha256_bytes(path.read_bytes())
                                       for path in root.rglob("*") if path.is_file()}, "qualified_for_release": False}
         if result["elapsed_seconds"] > 600 or (monitor.peak_bytes or 0) > 4 * 1024**3 or monitor.peak_bytes is None or monitor.errors:

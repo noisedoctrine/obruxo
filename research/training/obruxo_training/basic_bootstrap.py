@@ -96,6 +96,10 @@ class AuditedRenderer:
 
 def run_preflight(pool, qualification_path, output, *, execute=False, resume=False, renderer_factory=None):
     plan = make_plan(pool, qualification_path)
+    return run_frozen_plan(pool, plan, output, execute=execute, resume=resume, renderer_factory=renderer_factory)
+
+
+def run_frozen_plan(pool, plan, output, *, execute=False, resume=False, renderer_factory=None):
     output = Path(output).resolve()
     if output.exists():
         if json.loads((output / "plan.json").read_text()) != plan:
@@ -143,8 +147,8 @@ def run_preflight(pool, qualification_path, output, *, execute=False, resume=Fal
         if fit["renderer_identity"] != plan["renderer_identity"]:
             raise ValueError("bootstrap renderer differs from qualified native renderer")
         if ([item["recipe_id"] for item in saved["replay"]] != [row["recipe_id"] for row in plan["sources"]]
-                or fit["totals"]["accepted"] != 8):
-            raise ValueError("bootstrap failed its frozen eight-source coverage")
+                or fit["totals"]["accepted"] != len(plan["sources"])):
+            raise ValueError("bootstrap failed its frozen source coverage")
         evaluation_root = output / "training-audit"
         audit = evaluate_pilot(pool, fit_root / "checkpoint.pt", evaluation_root, count=8, split="train",
                                renderer_factory=AuditedFactory(str(output), "evaluation", base), progress=progress,
@@ -169,7 +173,13 @@ def run_preflight(pool, qualification_path, output, *, execute=False, resume=Fal
                    "qualified_for_release": False, "test_split_used": False}
         summary["within_resource_limits"] = (monitor.peak_bytes is not None and monitor.errors == 0
                                               and summary["archive_bytes"] < plan["limits"]["archive_bytes"])
-        summary["preflight_passed"] = (fit["tiny_overfit_gate"] and summary["all_outcomes_accepted"] and source_repeats
+        parameter_gate = plan["gates"].get("parameter_fit")
+        parameter_fit = (fit["final_metrics"]["continuous_mae"] < parameter_gate["continuous_mae_below"]
+                         and fit["final_metrics"]["categorical_accuracy"] == parameter_gate["categorical_accuracy"]
+                         and fit["final_metrics"]["loss"] < fit["initial_metrics"]["loss"] * parameter_gate["final_initial_loss_ratio_below"]
+                         if parameter_gate else fit["tiny_overfit_gate"])
+        summary["parameter_fit_passed"] = parameter_fit
+        summary["preflight_passed"] = (parameter_fit and summary["all_outcomes_accepted"] and source_repeats
                                        and summary["within_resource_limits"]
                                        and all(ratio < .9 for ratio in ratios.values()))
         write_json(output / "summary.json", summary)
