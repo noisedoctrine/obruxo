@@ -138,6 +138,8 @@ The [bounded category diagnosis](../training/reports/CATEGORY_SIGNAL_RESULTS.md)
 
 #### A2. Train the predictor on spectral loss
 
+The [64-state coverage comparison](../training/reports/BROADER_NATIVE_INVERSE_CARD.md) is implemented and frozen, with the original 32 recipes preserved, training-only additions, the same 128 updates and a separate original-subset fit gate. Its explicit cap is 3,648 native attempts; four hours, 8 GiB RAM, 2 GiB archive and all original sound thresholds remain unchanged. The archive planning bound is 1.55 GiB and 20 focused checks pass. Its actual sound outcome is pending.
+
 Start a matched parameter-only control and spectral-loss candidate from the same selected basic checkpoint. Align encoder, output vocabulary, source population, performances and inverse-update budget. Freeze the qualified helper for the whole inverse run, or pin a qualified native-gradient estimator and count every native probe against the card. Use Gumbel-softmax for both basic categorical decisions and differentiable bounded continuous controls.
 
 Infer one patch from a reference recording and compare its native or qualified-helper measurements under reference and additional training performances against real target renders of the same source patch under those performances. Reusing that one inferred patch encourages a playable sound beyond one note. No source patch labels or true MIDI enter the inverse network.
