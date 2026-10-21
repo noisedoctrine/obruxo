@@ -254,9 +254,9 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
                                           or len(validation_states) != count or any(not isinstance(state, str) for state in validation_states)
                                           or len(set(validation_states)) != count):
         raise ValueError("explicit validation states must be a unique list matching the requested count")
-    torch.set_num_threads(4)
     saved, _ = next(iter(models.values()))
     preroll_frames = saved["run_contract"]["training"].get("preroll_frames", 0)
+    torch.set_num_threads(saved["run_contract"]["training"].get("cpu_threads", 4) if preroll_frames else 4)
     if any(state["run_contract"]["training"].get("preroll_frames", 0) != preroll_frames for state, _model in models.values()):
         raise ValueError("evaluation models must share the same render profile")
     codec = pool.codec
@@ -293,6 +293,8 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
             "primary": "equal_weight_mean_of_reference_and_transfer_per_state_mrstft",
             "maximum_render_attempts": count * (8 + 2 * len(models) + (2 if lossy else 0)), "test_split_evaluated": False}
     plan.update(profile_metadata(preroll_frames))
+    if preroll_frames:
+        plan["evaluation_cpu_threads"] = torch.get_num_threads()
     if grouped_variants:
         plan.update(primary="equal_weight_mean_of_reference_and_transfer_per_lineage_mrstft",
                     case_lineages={recipe.state_id: pool.evaluation_group(recipe.state_id) if hasattr(pool, "evaluation_group") else
@@ -334,8 +336,8 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
             index = row["case"]
             path = output / f"case-{index:03d}.json"
             write_json(path, row)
-            predictions = {path.name: sha256_bytes(path.read_bytes())
-                           for path in output.glob(f"prediction-*-{index:03d}.vital")}
+            pattern = f"prediction-*-{index:03d}.vital" if curve else f"prediction-{index:03d}.vital"
+            predictions = {path.name: sha256_bytes(path.read_bytes()) for path in output.glob(pattern)}
             completed.append({"case": index, "case_sha256": sha256_bytes(path.read_bytes()), "predictions": predictions})
         write_json(output / "progress.json", {"plan_sha256": canonical_sha256(plan), "completed_cases": completed,
                                               "committed_render_count": len(renders), "renders_sha256": canonical_sha256(renders),

@@ -118,6 +118,7 @@ def test_profiled_validation_controls_every_render(trained, tmp_path):
     result = evaluate_pilot(pool, root / "full/checkpoint.pt", output, count=1, renderer_factory=ProfileRendererFactory())
     plan = json.loads((output / "plan.json").read_text())
     assert all(plan[name] == value for name, value in profile_metadata(32768).items())
+    assert plan["evaluation_cpu_threads"] == 2
     rows = [json.loads(line) for line in (output / "renders.jsonl").read_text().splitlines()]
     assert len(rows) == 10 and all(row["status"] == "accepted" for row in rows)
     assert all(row["provenance"]["settings"]["preroll_frames"] == 32768 for row in rows)
@@ -126,6 +127,9 @@ def test_profiled_validation_controls_every_render(trained, tmp_path):
     resumed = evaluate_pilot(pool, root / "full/checkpoint.pt", output, count=1,
                              renderer_factory=ProfileRendererFactory(), resume=True)
     assert resumed["renders_attempted_this_segment"] == 0 and resumed["aggregates"] == result["aggregates"]
+    (output / "prediction-000.vital").write_bytes(b"changed")
+    with pytest.raises(ValueError, match="prediction changed"):
+        evaluate_pilot(pool, root / "full/checkpoint.pt", output, count=1, resume=True)
 
 
 def test_basic_cli_defaults_to_qualified_profile_and_retains_explicit_legacy_option(tmp_path, monkeypatch):
