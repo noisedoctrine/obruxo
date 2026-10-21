@@ -23,3 +23,23 @@ The subsequent native intervention has a separate, portable runner, `../../relea
 ## Sound-helper evidence
 
 `summarize_sound_proxy.py --run /path/to/completed/screen --tests-passed N` checks the completed plan and source hashes, then publishes the sound-helper report, frozen plan, family summaries and a descriptive bootstrap over validation patches. Supply the actual completed local-test count.
+
+`summarize_basic_spectral_helper.py --source COMPLETED_RUN --output NEW_JSON` publishes the basic temporal helper's frozen qualification and resource evidence, including failures. It recomputes the admission decision and checks plan identity, accepted qualification requests and exact repeats. The paired variant additionally reports complete training pairs and descriptive agreement under both native audio objectives.
+
+`diagnose_paired_spectral_helper.py --source COMPLETED_PAIRED_RUN --output NEW_JSON` inspects all saved training pairs against a no-sound-change baseline. It verifies feature hashes and alignment, performs no renders or optimizer updates, and does not qualify an artifact. See [the paired result](../PAIRED_SPECTRAL_HELPER_RESULTS.md).
+
+`check_spectral_time_coverage.py` freezes a 12-pair, 36-render diagnostic plan, then executes it only with `--execute`. Its required `--source`, `--diagnosis` and `--output` arguments and limits are described in [the card](../SPECTRAL_TIME_COVERAGE_CARD.md). `summarize_spectral_time_coverage.py --source COMPLETED_RUN --output NEW_JSON` verifies and publishes the completed evidence. Neither script performs training or promotes the helper.
+
+`check_event_spectral_frames.py --source COMPLETED_PAIRED_RUN --prior-evidence TIME_COVERAGE_JSON --output NEW_DIRECTORY` freezes the sampling repair's native preflight; add `--execute` to run the unchanged plan once. `summarize_event_spectral_frames.py --source COMPLETED_PREFLIGHT --output NEW_JSON` verifies and publishes it without training tensors. See [the card](../EVENT_SPECTRAL_FRAMES_CARD.md). Full helper training exposes the separate opt-in flags `--paired-changes --event-frames`; the successful preflight does not start a full fit.
+
+`run_event_response_fit.py --parent COMPLETED_PAIRED_RUN --repaired COMPLETED_EVENT_PREFLIGHT --output NEW_DIRECTORY` freezes a matched short fitting check; use `--execute` to run it and `--execute --resume` only within the original limits. `summarize_event_response_fit.py --source COMPLETED_FIT --parent COMPLETED_PAIRED_RUN --repaired COMPLETED_EVENT_PREFLIGHT --output NEW_JSON` re-scores both final checkpoints and verifies update accounting before publishing. See [the result](../EVENT_RESPONSE_FIT_RESULTS.md); these are diagnostic checkpoints, not qualified helpers.
+
+`run_native_gradient_screen.py --pool EXISTING_BASIC_POOL --output NEW_DIRECTORY` freezes the separately costed direct native-gradient qualification. Add `--execute` to run the unchanged plan once; no automatic retry/resume or inverse training. See [the card](../NATIVE_GRADIENT_CARD.md).
+
+`summarize_native_gradient_screen.py --source COMPLETED_RUN --output NEW_JSON` reconstructs every recorded native request, numerical gradient and final candidate, checks receipts and recomputes all gates before publishing the [result](../NATIVE_GRADIENT_RESULTS.md). It verifies saved scalar measurements; discarded audio is not re-scored.
+
+`run_native_inverse_fit.py --pool BASIC_POOL --initial INCUMBENT_EXPORT --retrieval MATCHING_TRAINING_CHECKPOINT --qualification NATIVE_QUALIFICATION_JSON --output NEW_DIRECTORY` freezes the matched inverse-training card. Add `--execute` to train, or `--execute --resume` only for that same attempted run and original limits. See [the card](../NATIVE_INVERSE_FIT_CARD.md). It checkpoints both arms every update, logs every native probe loss and does not run validation unless the fit gate passes.
+
+`verify_native_inverse_fit.py --source COMPLETED_RUN --pool BASIC_POOL --initial INCUMBENT_EXPORT --retrieval MATCHING_TRAINING_CHECKPOINT --qualification NATIVE_QUALIFICATION_JSON --output NEW_JSON` replays both complete update sequences from the logged native losses, verifies final models/optimizers/RNG and diagnostic exports, re-scores cached training targets and input features from exact source repeats, reconstructs hard audit decisions and recomputes gates. Candidate audit audio is discarded and is not independently re-scored.
+
+`audit_native_inverse_prefix.py` takes the same paths to audit an interrupted run without new renders. It verifies the actual checkpoint/optimizer/RNG prefix and reconstructs the terminal rejected probe; see [the stopped-run result](../NATIVE_INVERSE_FIT_RESULTS.md). Reproduce from the pinned training source when auditing an older frozen contract.

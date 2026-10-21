@@ -1,0 +1,2642 @@
+{
+  "claim": "posthoc_training_fit_diagnosis_not_validation_or_qualification",
+  "elapsed_seconds": 8.477508599986322,
+  "groups": {
+    "attack": {
+      "beats_zero_response": 3,
+      "mean_change_error": 0.19847301137633622,
+      "mean_zero_response_error": 0.19043874798392477,
+      "pairs": 56
+    },
+    "cutoff": {
+      "beats_zero_response": 23,
+      "mean_change_error": 0.2592147855978945,
+      "mean_zero_response_error": 0.35043071534322656,
+      "pairs": 23
+    },
+    "decay": {
+      "beats_zero_response": 8,
+      "mean_change_error": 0.10249613524813737,
+      "mean_zero_response_error": 0.07885340298525989,
+      "pairs": 28
+    },
+    "detune": {
+      "beats_zero_response": 14,
+      "mean_change_error": 0.5194184139725708,
+      "mean_zero_response_error": 0.5234812624042943,
+      "pairs": 21
+    },
+    "filter_enable": {
+      "beats_zero_response": 124,
+      "mean_change_error": 0.5566258545844786,
+      "mean_zero_response_error": 1.1967777436779392,
+      "pairs": 124
+    },
+    "level": {
+      "beats_zero_response": 29,
+      "mean_change_error": 0.12043059938426676,
+      "mean_zero_response_error": 0.30187345013536254,
+      "pairs": 29
+    },
+    "pan": {
+      "beats_zero_response": 26,
+      "mean_change_error": 0.14549584661064477,
+      "mean_zero_response_error": 0.21397589840765657,
+      "pairs": 29
+    },
+    "release": {
+      "beats_zero_response": 0,
+      "mean_change_error": 0.04575686853890407,
+      "mean_zero_response_error": 0.03565441401272906,
+      "pairs": 28
+    },
+    "resonance": {
+      "beats_zero_response": 5,
+      "mean_change_error": 0.03387807133341474,
+      "mean_zero_response_error": 0.037947664536269646,
+      "pairs": 14
+    },
+    "sustain": {
+      "beats_zero_response": 26,
+      "mean_change_error": 0.12282945282225098,
+      "mean_zero_response_error": 0.22605495154857635,
+      "pairs": 28
+    },
+    "unison": {
+      "beats_zero_response": 109,
+      "mean_change_error": 0.8005505377659574,
+      "mean_zero_response_error": 0.8689234831253998,
+      "pairs": 128
+    }
+  },
+  "helper_sha256": "0c6ebb4768fbfbd5df61d5d8892b6fc5bf701df7ceebe780821c18213f55976b",
+  "native_requests": 0,
+  "optimizer_updates": 0,
+  "pairs": {
+    "attack": [
+      {
+        "error": 0.04127801954746246,
+        "pair_id": 8,
+        "zero_response_error": 0.016732560470700264
+      },
+      {
+        "error": 0.011660677380859852,
+        "pair_id": 9,
+        "zero_response_error": 0.00870741531252861
+      },
+      {
+        "error": 0.41126495599746704,
+        "pair_id": 24,
+        "zero_response_error": 0.39201483130455017
+      },
+      {
+        "error": 0.47131773829460144,
+        "pair_id": 25,
+        "zero_response_error": 0.45951908826828003
+      },
+      {
+        "error": 0.03683725371956825,
+        "pair_id": 28,
+        "zero_response_error": 0.03518969193100929
+      },
+      {
+        "error": 0.024926990270614624,
+        "pair_id": 41,
+        "zero_response_error": 0.014248124323785305
+      },
+      {
+        "error": 0.050401560962200165,
+        "pair_id": 45,
+        "zero_response_error": 0.049070436507463455
+      },
+      {
+        "error": 0.030323347076773643,
+        "pair_id": 64,
+        "zero_response_error": 0.02552003227174282
+      },
+      {
+        "error": 0.034170228987932205,
+        "pair_id": 80,
+        "zero_response_error": 0.028919273987412453
+      },
+      {
+        "error": 0.6494417190551758,
+        "pair_id": 81,
+        "zero_response_error": 0.6470436453819275
+      },
+      {
+        "error": 0.01937292516231537,
+        "pair_id": 96,
+        "zero_response_error": 0.004801870323717594
+      },
+      {
+        "error": 0.016893846914172173,
+        "pair_id": 97,
+        "zero_response_error": 0.010648796334862709
+      },
+      {
+        "error": 0.056044112890958786,
+        "pair_id": 100,
+        "zero_response_error": 0.04153142124414444
+      },
+      {
+        "error": 0.5848218202590942,
+        "pair_id": 113,
+        "zero_response_error": 0.5730486512184143
+      },
+      {
+        "error": 0.2172568440437317,
+        "pair_id": 117,
+        "zero_response_error": 0.21169182658195496
+      },
+      {
+        "error": 0.04292310029268265,
+        "pair_id": 136,
+        "zero_response_error": 0.039055235683918
+      },
+      {
+        "error": 0.17612189054489136,
+        "pair_id": 152,
+        "zero_response_error": 0.16854244470596313
+      },
+      {
+        "error": 0.3437507748603821,
+        "pair_id": 153,
+        "zero_response_error": 0.3398362398147583
+      },
+      {
+        "error": 0.08671604841947556,
+        "pair_id": 168,
+        "zero_response_error": 0.06104680895805359
+      },
+      {
+        "error": 0.25256699323654175,
+        "pair_id": 169,
+        "zero_response_error": 0.234217569231987
+      },
+      {
+        "error": 0.09691113233566284,
+        "pair_id": 172,
+        "zero_response_error": 0.09403437376022339
+      },
+      {
+        "error": 0.03539382666349411,
+        "pair_id": 185,
+        "zero_response_error": 0.04058598726987839
+      },
+      {
+        "error": 0.0627797544002533,
+        "pair_id": 189,
+        "zero_response_error": 0.060065124183893204
+      },
+      {
+        "error": 0.19315895438194275,
+        "pair_id": 208,
+        "zero_response_error": 0.17582771182060242
+      },
+      {
+        "error": 0.0922599732875824,
+        "pair_id": 224,
+        "zero_response_error": 0.08180300146341324
+      },
+      {
+        "error": 0.5042018294334412,
+        "pair_id": 225,
+        "zero_response_error": 0.499198317527771
+      },
+      {
+        "error": 0.14042048156261444,
+        "pair_id": 240,
+        "zero_response_error": 0.1217254176735878
+      },
+      {
+        "error": 0.6035744547843933,
+        "pair_id": 241,
+        "zero_response_error": 0.5963722467422485
+      },
+      {
+        "error": 0.20340269804000854,
+        "pair_id": 244,
+        "zero_response_error": 0.19804644584655762
+      },
+      {
+        "error": 0.025041839107871056,
+        "pair_id": 257,
+        "zero_response_error": 0.010170605964958668
+      },
+      {
+        "error": 0.08860093355178833,
+        "pair_id": 261,
+        "zero_response_error": 0.08732715249061584
+      },
+      {
+        "error": 0.14757129549980164,
+        "pair_id": 280,
+        "zero_response_error": 0.1420811116695404
+      },
+      {
+        "error": 0.11927509307861328,
+        "pair_id": 296,
+        "zero_response_error": 0.11661828309297562
+      },
+      {
+        "error": 0.6109589338302612,
+        "pair_id": 297,
+        "zero_response_error": 0.615851640701294
+      },
+      {
+        "error": 0.024991445243358612,
+        "pair_id": 312,
+        "zero_response_error": 0.0012270717415958643
+      },
+      {
+        "error": 0.06360544264316559,
+        "pair_id": 313,
+        "zero_response_error": 0.044467631727457047
+      },
+      {
+        "error": 0.03878297656774521,
+        "pair_id": 316,
+        "zero_response_error": 0.036559827625751495
+      },
+      {
+        "error": 0.13831928372383118,
+        "pair_id": 329,
+        "zero_response_error": 0.12426110357046127
+      },
+      {
+        "error": 0.007051523774862289,
+        "pair_id": 333,
+        "zero_response_error": 0.005394242238253355
+      },
+      {
+        "error": 0.041327815502882004,
+        "pair_id": 352,
+        "zero_response_error": 0.03712354972958565
+      },
+      {
+        "error": 0.010982012376189232,
+        "pair_id": 368,
+        "zero_response_error": 0.0
+      },
+      {
+        "error": 0.7195637226104736,
+        "pair_id": 369,
+        "zero_response_error": 0.7193858027458191
+      },
+      {
+        "error": 0.22371754050254822,
+        "pair_id": 384,
+        "zero_response_error": 0.21563419699668884
+      },
+      {
+        "error": 0.7778415679931641,
+        "pair_id": 385,
+        "zero_response_error": 0.7775405645370483
+      },
+      {
+        "error": 0.010248963721096516,
+        "pair_id": 388,
+        "zero_response_error": 0.0
+      },
+      {
+        "error": 0.059060703963041306,
+        "pair_id": 401,
+        "zero_response_error": 0.05162553861737251
+      },
+      {
+        "error": 0.04588000103831291,
+        "pair_id": 405,
+        "zero_response_error": 0.04483014717698097
+      },
+      {
+        "error": 0.3577069044113159,
+        "pair_id": 424,
+        "zero_response_error": 0.34390169382095337
+      },
+      {
+        "error": 0.253922700881958,
+        "pair_id": 440,
+        "zero_response_error": 0.2436230182647705
+      },
+      {
+        "error": 0.4752803146839142,
+        "pair_id": 441,
+        "zero_response_error": 0.4705660045146942
+      },
+      {
+        "error": 0.19065897166728973,
+        "pair_id": 456,
+        "zero_response_error": 0.1817999631166458
+      },
+      {
+        "error": 0.3844643533229828,
+        "pair_id": 457,
+        "zero_response_error": 0.3791181743144989
+      },
+      {
+        "error": 0.039068371057510376,
+        "pair_id": 460,
+        "zero_response_error": 0.03632872551679611
+      },
+      {
+        "error": 0.5246915221214294,
+        "pair_id": 473,
+        "zero_response_error": 0.5321000218391418
+      },
+      {
+        "error": 0.05622480809688568,
+        "pair_id": 477,
+        "zero_response_error": 0.04936007037758827
+      },
+      {
+        "error": 0.18945564329624176,
+        "pair_id": 496,
+        "zero_response_error": 0.16862915456295013
+      }
+    ],
+    "cutoff": [
+      {
+        "error": 0.2673361003398895,
+        "pair_id": 4,
+        "zero_response_error": 0.5101861953735352
+      },
+      {
+        "error": 0.3951192796230316,
+        "pair_id": 5,
+        "zero_response_error": 0.6013730764389038
+      },
+      {
+        "error": 0.27112358808517456,
+        "pair_id": 60,
+        "zero_response_error": 0.4084896445274353
+      },
+      {
+        "error": 0.3663439154624939,
+        "pair_id": 76,
+        "zero_response_error": 0.4528779089450836
+      },
+      {
+        "error": 0.4546878933906555,
+        "pair_id": 77,
+        "zero_response_error": 0.5554018020629883
+      },
+      {
+        "error": 0.08606663346290588,
+        "pair_id": 132,
+        "zero_response_error": 0.10316155105829239
+      },
+      {
+        "error": 0.2850063443183899,
+        "pair_id": 148,
+        "zero_response_error": 0.39602482318878174
+      },
+      {
+        "error": 0.21126510202884674,
+        "pair_id": 149,
+        "zero_response_error": 0.347444087266922
+      },
+      {
+        "error": 0.32023200392723083,
+        "pair_id": 204,
+        "zero_response_error": 0.4260006844997406
+      },
+      {
+        "error": 0.368814080953598,
+        "pair_id": 220,
+        "zero_response_error": 0.37038883566856384
+      },
+      {
+        "error": 0.5462590456008911,
+        "pair_id": 221,
+        "zero_response_error": 0.6340985298156738
+      },
+      {
+        "error": 0.13273026049137115,
+        "pair_id": 276,
+        "zero_response_error": 0.23989921808242798
+      },
+      {
+        "error": 0.28103938698768616,
+        "pair_id": 292,
+        "zero_response_error": 0.33165764808654785
+      },
+      {
+        "error": 0.36917373538017273,
+        "pair_id": 293,
+        "zero_response_error": 0.4147481620311737
+      },
+      {
+        "error": 0.1449706256389618,
+        "pair_id": 348,
+        "zero_response_error": 0.22651800513267517
+      },
+      {
+        "error": 0.11118581891059875,
+        "pair_id": 364,
+        "zero_response_error": 0.18054232001304626
+      },
+      {
+        "error": 0.05687235668301582,
+        "pair_id": 365,
+        "zero_response_error": 0.07115086168050766
+      },
+      {
+        "error": 0.4005943536758423,
+        "pair_id": 420,
+        "zero_response_error": 0.5667104721069336
+      },
+      {
+        "error": 0.12358982861042023,
+        "pair_id": 436,
+        "zero_response_error": 0.1326465904712677
+      },
+      {
+        "error": 0.20230111479759216,
+        "pair_id": 437,
+        "zero_response_error": 0.3445657193660736
+      },
+      {
+        "error": 0.19590763747692108,
+        "pair_id": 492,
+        "zero_response_error": 0.27950334548950195
+      },
+      {
+        "error": 0.20340897142887115,
+        "pair_id": 508,
+        "zero_response_error": 0.2680322527885437
+      },
+      {
+        "error": 0.16791199147701263,
+        "pair_id": 509,
+        "zero_response_error": 0.19848471879959106
+      }
+    ],
+    "decay": [
+      {
+        "error": 0.13249395787715912,
+        "pair_id": 12,
+        "zero_response_error": 0.14048482477664948
+      },
+      {
+        "error": 0.09892250597476959,
+        "pair_id": 29,
+        "zero_response_error": 0.16683688759803772
+      },
+      {
+        "error": 0.09886965155601501,
+        "pair_id": 48,
+        "zero_response_error": 0.14728781580924988
+      },
+      {
+        "error": 0.296782910823822,
+        "pair_id": 65,
+        "zero_response_error": 0.2851260006427765
+      },
+      {
+        "error": 0.014986604452133179,
+        "pair_id": 84,
+        "zero_response_error": 0.004025991540402174
+      },
+      {
+        "error": 0.04995950311422348,
+        "pair_id": 101,
+        "zero_response_error": 0.024154994636774063
+      },
+      {
+        "error": 0.0710543692111969,
+        "pair_id": 120,
+        "zero_response_error": 0.041325975209474564
+      },
+      {
+        "error": 0.24513046443462372,
+        "pair_id": 137,
+        "zero_response_error": 0.11021464318037033
+      },
+      {
+        "error": 0.0901670902967453,
+        "pair_id": 156,
+        "zero_response_error": 0.057006847113370895
+      },
+      {
+        "error": 0.04256879538297653,
+        "pair_id": 173,
+        "zero_response_error": 0.007877238094806671
+      },
+      {
+        "error": 0.1079811081290245,
+        "pair_id": 192,
+        "zero_response_error": 0.021134108304977417
+      },
+      {
+        "error": 0.08813146501779556,
+        "pair_id": 209,
+        "zero_response_error": 0.01179544348269701
+      },
+      {
+        "error": 0.06177349388599396,
+        "pair_id": 228,
+        "zero_response_error": 0.0045059858821332455
+      },
+      {
+        "error": 0.10215697437524796,
+        "pair_id": 245,
+        "zero_response_error": 0.0625711977481842
+      },
+      {
+        "error": 0.19347192347049713,
+        "pair_id": 264,
+        "zero_response_error": 0.1429743468761444
+      },
+      {
+        "error": 0.03974522650241852,
+        "pair_id": 281,
+        "zero_response_error": 0.0017189448699355125
+      },
+      {
+        "error": 0.15313896536827087,
+        "pair_id": 300,
+        "zero_response_error": 0.13181090354919434
+      },
+      {
+        "error": 0.01915292628109455,
+        "pair_id": 317,
+        "zero_response_error": 0.015866130590438843
+      },
+      {
+        "error": 0.06271569430828094,
+        "pair_id": 336,
+        "zero_response_error": 0.03760196268558502
+      },
+      {
+        "error": 0.06534792482852936,
+        "pair_id": 353,
+        "zero_response_error": 0.06996400654315948
+      },
+      {
+        "error": 0.07209209352731705,
+        "pair_id": 372,
+        "zero_response_error": 0.08546562492847443
+      },
+      {
+        "error": 0.15070128440856934,
+        "pair_id": 389,
+        "zero_response_error": 0.07201003283262253
+      },
+      {
+        "error": 0.20284615457057953,
+        "pair_id": 408,
+        "zero_response_error": 0.20462267100811005
+      },
+      {
+        "error": 0.15757501125335693,
+        "pair_id": 425,
+        "zero_response_error": 0.16185875236988068
+      },
+      {
+        "error": 0.023655831813812256,
+        "pair_id": 444,
+        "zero_response_error": 0.008252188563346863
+      },
+      {
+        "error": 0.09186723828315735,
+        "pair_id": 461,
+        "zero_response_error": 0.1496657431125641
+      },
+      {
+        "error": 0.0851050540804863,
+        "pair_id": 480,
+        "zero_response_error": 0.0349690280854702
+      },
+      {
+        "error": 0.05149756371974945,
+        "pair_id": 497,
+        "zero_response_error": 0.006766993552446365
+      }
+    ],
+    "detune": [
+      {
+        "error": 0.1734040081501007,
+        "pair_id": 21,
+        "zero_response_error": 0.1828070729970932
+      },
+      {
+        "error": 0.8515610694885254,
+        "pair_id": 40,
+        "zero_response_error": 0.847298800945282
+      },
+      {
+        "error": 0.4430374801158905,
+        "pair_id": 57,
+        "zero_response_error": 0.44279980659484863
+      },
+      {
+        "error": 0.020485620945692062,
+        "pair_id": 93,
+        "zero_response_error": 0.01791459321975708
+      },
+      {
+        "error": 1.016090750694275,
+        "pair_id": 112,
+        "zero_response_error": 1.0169448852539062
+      },
+      {
+        "error": 0.16688725352287292,
+        "pair_id": 129,
+        "zero_response_error": 0.17195367813110352
+      },
+      {
+        "error": 0.024132568389177322,
+        "pair_id": 165,
+        "zero_response_error": 0.02848951518535614
+      },
+      {
+        "error": 0.8343154191970825,
+        "pair_id": 184,
+        "zero_response_error": 0.8415883779525757
+      },
+      {
+        "error": 0.6543862819671631,
+        "pair_id": 201,
+        "zero_response_error": 0.6511539816856384
+      },
+      {
+        "error": 0.0501449815928936,
+        "pair_id": 237,
+        "zero_response_error": 0.051469262689352036
+      },
+      {
+        "error": 0.9452404975891113,
+        "pair_id": 256,
+        "zero_response_error": 0.9614808559417725
+      },
+      {
+        "error": 0.6081150770187378,
+        "pair_id": 273,
+        "zero_response_error": 0.6203564405441284
+      },
+      {
+        "error": 0.15400269627571106,
+        "pair_id": 309,
+        "zero_response_error": 0.14609837532043457
+      },
+      {
+        "error": 1.025160312652588,
+        "pair_id": 328,
+        "zero_response_error": 1.0639493465423584
+      },
+      {
+        "error": 0.06917601823806763,
+        "pair_id": 345,
+        "zero_response_error": 0.07462795078754425
+      },
+      {
+        "error": 0.5613754987716675,
+        "pair_id": 381,
+        "zero_response_error": 0.5431500673294067
+      },
+      {
+        "error": 1.1735159158706665,
+        "pair_id": 400,
+        "zero_response_error": 1.166343092918396
+      },
+      {
+        "error": 0.3818776309490204,
+        "pair_id": 417,
+        "zero_response_error": 0.3883224427700043
+      },
+      {
+        "error": 0.2060127705335617,
+        "pair_id": 453,
+        "zero_response_error": 0.20912517607212067
+      },
+      {
+        "error": 0.835243821144104,
+        "pair_id": 472,
+        "zero_response_error": 0.8504704833030701
+      },
+      {
+        "error": 0.7136210203170776,
+        "pair_id": 489,
+        "zero_response_error": 0.7167623043060303
+      }
+    ],
+    "filter_enable": [
+      {
+        "error": 0.7483029365539551,
+        "pair_id": 3,
+        "zero_response_error": 1.1477638483047485
+      },
+      {
+        "error": 0.7277905344963074,
+        "pair_id": 7,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6560488939285278,
+        "pair_id": 11,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.7775639295578003,
+        "pair_id": 15,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.291853129863739,
+        "pair_id": 19,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.583490252494812,
+        "pair_id": 23,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5741984844207764,
+        "pair_id": 27,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4303071200847626,
+        "pair_id": 31,
+        "zero_response_error": 1.1941074132919312
+      },
+      {
+        "error": 0.5036981701850891,
+        "pair_id": 35,
+        "zero_response_error": 1.094627857208252
+      },
+      {
+        "error": 0.6485882997512817,
+        "pair_id": 39,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4468034505844116,
+        "pair_id": 43,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4270823001861572,
+        "pair_id": 47,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4448273777961731,
+        "pair_id": 51,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.47162505984306335,
+        "pair_id": 55,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.7006093263626099,
+        "pair_id": 59,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5631584525108337,
+        "pair_id": 63,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5295936465263367,
+        "pair_id": 67,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4316585063934326,
+        "pair_id": 71,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5025239586830139,
+        "pair_id": 75,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6494002938270569,
+        "pair_id": 79,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.45520272850990295,
+        "pair_id": 83,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5490667819976807,
+        "pair_id": 87,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.39645305275917053,
+        "pair_id": 91,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5084223747253418,
+        "pair_id": 95,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.8355574011802673,
+        "pair_id": 99,
+        "zero_response_error": 1.1387851238250732
+      },
+      {
+        "error": 0.7166008353233337,
+        "pair_id": 103,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.41444364190101624,
+        "pair_id": 107,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4317186176776886,
+        "pair_id": 111,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5049954652786255,
+        "pair_id": 115,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5123425722122192,
+        "pair_id": 119,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4009779989719391,
+        "pair_id": 123,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6597040295600891,
+        "pair_id": 127,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4541587233543396,
+        "pair_id": 131,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5823351740837097,
+        "pair_id": 135,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4802272617816925,
+        "pair_id": 139,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6599476933479309,
+        "pair_id": 143,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6171517968177795,
+        "pair_id": 147,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.627733051776886,
+        "pair_id": 151,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5252535939216614,
+        "pair_id": 155,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5499851107597351,
+        "pair_id": 159,
+        "zero_response_error": 1.1817524433135986
+      },
+      {
+        "error": 0.297748863697052,
+        "pair_id": 163,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5811820030212402,
+        "pair_id": 167,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.7343088388442993,
+        "pair_id": 171,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.8121964335441589,
+        "pair_id": 175,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4083656668663025,
+        "pair_id": 179,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6515747308731079,
+        "pair_id": 183,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5204359889030457,
+        "pair_id": 187,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5337573885917664,
+        "pair_id": 195,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.2975524663925171,
+        "pair_id": 199,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6136017441749573,
+        "pair_id": 203,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6264827251434326,
+        "pair_id": 207,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4351116120815277,
+        "pair_id": 211,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.520440399646759,
+        "pair_id": 215,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4059544801712036,
+        "pair_id": 219,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5311667323112488,
+        "pair_id": 223,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4340716302394867,
+        "pair_id": 227,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.49311351776123047,
+        "pair_id": 231,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4821861684322357,
+        "pair_id": 235,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6406143307685852,
+        "pair_id": 239,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.31209856271743774,
+        "pair_id": 243,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4496086835861206,
+        "pair_id": 247,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5317071080207825,
+        "pair_id": 251,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5729647278785706,
+        "pair_id": 255,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5634903311729431,
+        "pair_id": 259,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6674970984458923,
+        "pair_id": 263,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.7261722087860107,
+        "pair_id": 267,
+        "zero_response_error": 1.1512057781219482
+      },
+      {
+        "error": 0.505742609500885,
+        "pair_id": 271,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.34218207001686096,
+        "pair_id": 275,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6383107900619507,
+        "pair_id": 279,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.7092494964599609,
+        "pair_id": 283,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.467029869556427,
+        "pair_id": 291,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6592362523078918,
+        "pair_id": 295,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5568732619285583,
+        "pair_id": 299,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6986290812492371,
+        "pair_id": 303,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.44407975673675537,
+        "pair_id": 307,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.8387799859046936,
+        "pair_id": 311,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.38662418723106384,
+        "pair_id": 315,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4062311351299286,
+        "pair_id": 319,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.7201600670814514,
+        "pair_id": 323,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6536304950714111,
+        "pair_id": 327,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5277830958366394,
+        "pair_id": 331,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6914146542549133,
+        "pair_id": 339,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6505005359649658,
+        "pair_id": 343,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.7846422791481018,
+        "pair_id": 347,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5705671906471252,
+        "pair_id": 351,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6071513295173645,
+        "pair_id": 355,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4417761266231537,
+        "pair_id": 359,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5272803902626038,
+        "pair_id": 363,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.7118879556655884,
+        "pair_id": 367,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5229302644729614,
+        "pair_id": 371,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4560219347476959,
+        "pair_id": 375,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5873446464538574,
+        "pair_id": 383,
+        "zero_response_error": 1.1889240741729736
+      },
+      {
+        "error": 0.39588069915771484,
+        "pair_id": 387,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4013451635837555,
+        "pair_id": 391,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4223093092441559,
+        "pair_id": 395,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6127803921699524,
+        "pair_id": 399,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6800106167793274,
+        "pair_id": 403,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.7991979718208313,
+        "pair_id": 407,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5395980477333069,
+        "pair_id": 411,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.42287418246269226,
+        "pair_id": 415,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5019844174385071,
+        "pair_id": 419,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.3544975519180298,
+        "pair_id": 423,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5577954053878784,
+        "pair_id": 427,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.7165924906730652,
+        "pair_id": 431,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5144132971763611,
+        "pair_id": 435,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6201996207237244,
+        "pair_id": 439,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.7330023646354675,
+        "pair_id": 443,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6358479261398315,
+        "pair_id": 447,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6866707801818848,
+        "pair_id": 451,
+        "zero_response_error": 1.1037248373031616
+      },
+      {
+        "error": 0.43365585803985596,
+        "pair_id": 455,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5159181952476501,
+        "pair_id": 459,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6431595683097839,
+        "pair_id": 463,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6084533929824829,
+        "pair_id": 467,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6236581206321716,
+        "pair_id": 471,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.3518698513507843,
+        "pair_id": 475,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6398696899414062,
+        "pair_id": 479,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5704523921012878,
+        "pair_id": 483,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.48375311493873596,
+        "pair_id": 487,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.495115727186203,
+        "pair_id": 491,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6002150177955627,
+        "pair_id": 495,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.7024821639060974,
+        "pair_id": 499,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6200335621833801,
+        "pair_id": 503,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6180943846702576,
+        "pair_id": 507,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5790087580680847,
+        "pair_id": 511,
+        "zero_response_error": 1.1995433568954468
+      }
+    ],
+    "level": [
+      {
+        "error": 0.15796080231666565,
+        "pair_id": 0,
+        "zero_response_error": 0.2245745062828064
+      },
+      {
+        "error": 0.20490708947181702,
+        "pair_id": 17,
+        "zero_response_error": 0.5644476413726807
+      },
+      {
+        "error": 0.11463948339223862,
+        "pair_id": 36,
+        "zero_response_error": 0.29991525411605835
+      },
+      {
+        "error": 0.08440940827131271,
+        "pair_id": 53,
+        "zero_response_error": 0.2650943100452423
+      },
+      {
+        "error": 0.2012006640434265,
+        "pair_id": 72,
+        "zero_response_error": 0.4519801437854767
+      },
+      {
+        "error": 0.27536267042160034,
+        "pair_id": 89,
+        "zero_response_error": 0.6081531047821045
+      },
+      {
+        "error": 0.04039216786623001,
+        "pair_id": 108,
+        "zero_response_error": 0.10540863871574402
+      },
+      {
+        "error": 0.09206641465425491,
+        "pair_id": 125,
+        "zero_response_error": 0.18776863813400269
+      },
+      {
+        "error": 0.14645348489284515,
+        "pair_id": 144,
+        "zero_response_error": 0.47175362706184387
+      },
+      {
+        "error": 0.14736735820770264,
+        "pair_id": 161,
+        "zero_response_error": 0.3040784001350403
+      },
+      {
+        "error": 0.05238974839448929,
+        "pair_id": 180,
+        "zero_response_error": 0.14528360962867737
+      },
+      {
+        "error": 0.07125501334667206,
+        "pair_id": 197,
+        "zero_response_error": 0.23152011632919312
+      },
+      {
+        "error": 0.1514752358198166,
+        "pair_id": 216,
+        "zero_response_error": 0.5786569118499756
+      },
+      {
+        "error": 0.1446043998003006,
+        "pair_id": 233,
+        "zero_response_error": 0.3914560079574585
+      },
+      {
+        "error": 0.14067082107067108,
+        "pair_id": 252,
+        "zero_response_error": 0.37359893321990967
+      },
+      {
+        "error": 0.05045013129711151,
+        "pair_id": 269,
+        "zero_response_error": 0.15371257066726685
+      },
+      {
+        "error": 0.08938571810722351,
+        "pair_id": 288,
+        "zero_response_error": 0.2691642940044403
+      },
+      {
+        "error": 0.17049144208431244,
+        "pair_id": 305,
+        "zero_response_error": 0.42240265011787415
+      },
+      {
+        "error": 0.048488158732652664,
+        "pair_id": 324,
+        "zero_response_error": 0.15993048250675201
+      },
+      {
+        "error": 0.12702924013137817,
+        "pair_id": 341,
+        "zero_response_error": 0.1548725664615631
+      },
+      {
+        "error": 0.10272400826215744,
+        "pair_id": 360,
+        "zero_response_error": 0.18719646334648132
+      },
+      {
+        "error": 0.15030287206172943,
+        "pair_id": 377,
+        "zero_response_error": 0.37479856610298157
+      },
+      {
+        "error": 0.05104295536875725,
+        "pair_id": 396,
+        "zero_response_error": 0.13093224167823792
+      },
+      {
+        "error": 0.041061725467443466,
+        "pair_id": 413,
+        "zero_response_error": 0.09486782550811768
+      },
+      {
+        "error": 0.14959007501602173,
+        "pair_id": 432,
+        "zero_response_error": 0.4421912431716919
+      },
+      {
+        "error": 0.17975769937038422,
+        "pair_id": 449,
+        "zero_response_error": 0.4250409007072449
+      },
+      {
+        "error": 0.06976214796304703,
+        "pair_id": 468,
+        "zero_response_error": 0.21414954960346222
+      },
+      {
+        "error": 0.06245105713605881,
+        "pair_id": 485,
+        "zero_response_error": 0.16767193377017975
+      },
+      {
+        "error": 0.17479538917541504,
+        "pair_id": 504,
+        "zero_response_error": 0.3537089228630066
+      }
+    ],
+    "pan": [
+      {
+        "error": 0.15337012708187103,
+        "pair_id": 1,
+        "zero_response_error": 0.2482457458972931
+      },
+      {
+        "error": 0.07096830010414124,
+        "pair_id": 20,
+        "zero_response_error": 0.09558502584695816
+      },
+      {
+        "error": 0.09366760402917862,
+        "pair_id": 37,
+        "zero_response_error": 0.12601952254772186
+      },
+      {
+        "error": 0.3818156123161316,
+        "pair_id": 56,
+        "zero_response_error": 0.47811704874038696
+      },
+      {
+        "error": 0.19677208364009857,
+        "pair_id": 73,
+        "zero_response_error": 0.3690181076526642
+      },
+      {
+        "error": 0.11629939079284668,
+        "pair_id": 92,
+        "zero_response_error": 0.145976260304451
+      },
+      {
+        "error": 0.03954017907381058,
+        "pair_id": 109,
+        "zero_response_error": 0.03600182384252548
+      },
+      {
+        "error": 0.21305111050605774,
+        "pair_id": 128,
+        "zero_response_error": 0.37407565116882324
+      },
+      {
+        "error": 0.26149606704711914,
+        "pair_id": 145,
+        "zero_response_error": 0.48489609360694885
+      },
+      {
+        "error": 0.035300884395837784,
+        "pair_id": 164,
+        "zero_response_error": 0.027524322271347046
+      },
+      {
+        "error": 0.08179586380720139,
+        "pair_id": 181,
+        "zero_response_error": 0.08728790283203125
+      },
+      {
+        "error": 0.1721329241991043,
+        "pair_id": 200,
+        "zero_response_error": 0.22904227674007416
+      },
+      {
+        "error": 0.18466635048389435,
+        "pair_id": 217,
+        "zero_response_error": 0.273404598236084
+      },
+      {
+        "error": 0.049264539033174515,
+        "pair_id": 236,
+        "zero_response_error": 0.07399307191371918
+      },
+      {
+        "error": 0.1625610888004303,
+        "pair_id": 253,
+        "zero_response_error": 0.1798037737607956
+      },
+      {
+        "error": 0.06992404162883759,
+        "pair_id": 272,
+        "zero_response_error": 0.18216435611248016
+      },
+      {
+        "error": 0.20604556798934937,
+        "pair_id": 289,
+        "zero_response_error": 0.3385644555091858
+      },
+      {
+        "error": 0.05351303517818451,
+        "pair_id": 308,
+        "zero_response_error": 0.09539157897233963
+      },
+      {
+        "error": 0.04120097681879997,
+        "pair_id": 325,
+        "zero_response_error": 0.06754708290100098
+      },
+      {
+        "error": 0.09010432660579681,
+        "pair_id": 344,
+        "zero_response_error": 0.19315458834171295
+      },
+      {
+        "error": 0.24000020325183868,
+        "pair_id": 361,
+        "zero_response_error": 0.2807396948337555
+      },
+      {
+        "error": 0.167676642537117,
+        "pair_id": 380,
+        "zero_response_error": 0.23452705144882202
+      },
+      {
+        "error": 0.1048261970281601,
+        "pair_id": 397,
+        "zero_response_error": 0.1446036845445633
+      },
+      {
+        "error": 0.11856835335493088,
+        "pair_id": 416,
+        "zero_response_error": 0.18279623985290527
+      },
+      {
+        "error": 0.2939569652080536,
+        "pair_id": 433,
+        "zero_response_error": 0.4591999053955078
+      },
+      {
+        "error": 0.11797773092985153,
+        "pair_id": 452,
+        "zero_response_error": 0.10763226449489594
+      },
+      {
+        "error": 0.044583868235349655,
+        "pair_id": 469,
+        "zero_response_error": 0.06285305321216583
+      },
+      {
+        "error": 0.18978077173233032,
+        "pair_id": 488,
+        "zero_response_error": 0.28796738386154175
+      },
+      {
+        "error": 0.26851874589920044,
+        "pair_id": 505,
+        "zero_response_error": 0.3391684889793396
+      }
+    ],
+    "release": [
+      {
+        "error": 0.1343151479959488,
+        "pair_id": 16,
+        "zero_response_error": 0.12142254412174225
+      },
+      {
+        "error": 0.0003795578086283058,
+        "pair_id": 33,
+        "zero_response_error": 0.0002572306548245251
+      },
+      {
+        "error": 0.01658683642745018,
+        "pair_id": 52,
+        "zero_response_error": 0.008125643245875835
+      },
+      {
+        "error": 0.05021915212273598,
+        "pair_id": 69,
+        "zero_response_error": 0.04216094687581062
+      },
+      {
+        "error": 0.03979361802339554,
+        "pair_id": 88,
+        "zero_response_error": 0.022544709965586662
+      },
+      {
+        "error": 0.21470652520656586,
+        "pair_id": 105,
+        "zero_response_error": 0.20400109887123108
+      },
+      {
+        "error": 0.03785204142332077,
+        "pair_id": 124,
+        "zero_response_error": 0.030713757500052452
+      },
+      {
+        "error": 0.006832609418779612,
+        "pair_id": 141,
+        "zero_response_error": 0.006249928381294012
+      },
+      {
+        "error": 0.11244726181030273,
+        "pair_id": 160,
+        "zero_response_error": 0.0953839123249054
+      },
+      {
+        "error": 0.0612962506711483,
+        "pair_id": 177,
+        "zero_response_error": 0.050009265542030334
+      },
+      {
+        "error": 0.01732415333390236,
+        "pair_id": 196,
+        "zero_response_error": 0.006033601239323616
+      },
+      {
+        "error": 0.009119084104895592,
+        "pair_id": 213,
+        "zero_response_error": 0.0059301299042999744
+      },
+      {
+        "error": 0.031913939863443375,
+        "pair_id": 232,
+        "zero_response_error": 0.013211466372013092
+      },
+      {
+        "error": 0.03745006024837494,
+        "pair_id": 249,
+        "zero_response_error": 0.02845529466867447
+      },
+      {
+        "error": 0.00965358316898346,
+        "pair_id": 268,
+        "zero_response_error": 1.9668276252104988e-07
+      },
+      {
+        "error": 0.034851014614105225,
+        "pair_id": 285,
+        "zero_response_error": 0.030913162976503372
+      },
+      {
+        "error": 0.05296296626329422,
+        "pair_id": 304,
+        "zero_response_error": 0.03854567930102348
+      },
+      {
+        "error": 0.05199626460671425,
+        "pair_id": 321,
+        "zero_response_error": 0.03852231800556183
+      },
+      {
+        "error": 0.03386490046977997,
+        "pair_id": 340,
+        "zero_response_error": 0.0263869296759367
+      },
+      {
+        "error": 0.021490976214408875,
+        "pair_id": 357,
+        "zero_response_error": 0.0073401047848165035
+      },
+      {
+        "error": 0.01764346845448017,
+        "pair_id": 376,
+        "zero_response_error": 5.274555578875916e-37
+      },
+      {
+        "error": 0.05205533280968666,
+        "pair_id": 393,
+        "zero_response_error": 0.038104500621557236
+      },
+      {
+        "error": 0.052132848650217056,
+        "pair_id": 412,
+        "zero_response_error": 0.04607938975095749
+      },
+      {
+        "error": 0.11153487861156464,
+        "pair_id": 429,
+        "zero_response_error": 0.10497793555259705
+      },
+      {
+        "error": 0.024753807112574577,
+        "pair_id": 448,
+        "zero_response_error": 0.005444865208119154
+      },
+      {
+        "error": 0.01074185874313116,
+        "pair_id": 465,
+        "zero_response_error": 0.0036402717232704163
+      },
+      {
+        "error": 0.012766475789248943,
+        "pair_id": 484,
+        "zero_response_error": 0.006806636694818735
+      },
+      {
+        "error": 0.024507705122232437,
+        "pair_id": 501,
+        "zero_response_error": 0.017062071710824966
+      }
+    ],
+    "resonance": [
+      {
+        "error": 0.02742280252277851,
+        "pair_id": 44,
+        "zero_response_error": 0.027220387011766434
+      },
+      {
+        "error": 0.04823536425828934,
+        "pair_id": 61,
+        "zero_response_error": 0.07393024861812592
+      },
+      {
+        "error": 0.03530886396765709,
+        "pair_id": 116,
+        "zero_response_error": 0.024858128279447556
+      },
+      {
+        "error": 0.007292996626347303,
+        "pair_id": 133,
+        "zero_response_error": 0.00607423996552825
+      },
+      {
+        "error": 0.031059037894010544,
+        "pair_id": 188,
+        "zero_response_error": 0.02229989692568779
+      },
+      {
+        "error": 0.0484418049454689,
+        "pair_id": 205,
+        "zero_response_error": 0.038769982755184174
+      },
+      {
+        "error": 0.036314159631729126,
+        "pair_id": 260,
+        "zero_response_error": 0.03610259294509888
+      },
+      {
+        "error": 0.04074772447347641,
+        "pair_id": 277,
+        "zero_response_error": 0.06549112498760223
+      },
+      {
+        "error": 0.04656166955828667,
+        "pair_id": 332,
+        "zero_response_error": 0.03235572576522827
+      },
+      {
+        "error": 0.043031275272369385,
+        "pair_id": 349,
+        "zero_response_error": 0.07752613723278046
+      },
+      {
+        "error": 0.03259555250406265,
+        "pair_id": 404,
+        "zero_response_error": 0.05383890122175217
+      },
+      {
+        "error": 0.029112767428159714,
+        "pair_id": 421,
+        "zero_response_error": 0.02459966391324997
+      },
+      {
+        "error": 0.011012043803930283,
+        "pair_id": 476,
+        "zero_response_error": 0.016849296167492867
+      },
+      {
+        "error": 0.03715693578124046,
+        "pair_id": 493,
+        "zero_response_error": 0.03135097771883011
+      }
+    ],
+    "sustain": [
+      {
+        "error": 0.0872952789068222,
+        "pair_id": 13,
+        "zero_response_error": 0.04100952297449112
+      },
+      {
+        "error": 0.08406198024749756,
+        "pair_id": 32,
+        "zero_response_error": 0.1903853714466095
+      },
+      {
+        "error": 0.0855165347456932,
+        "pair_id": 49,
+        "zero_response_error": 0.11028436571359634
+      },
+      {
+        "error": 0.11510759592056274,
+        "pair_id": 68,
+        "zero_response_error": 0.2970522344112396
+      },
+      {
+        "error": 0.027538612484931946,
+        "pair_id": 85,
+        "zero_response_error": 0.10816548764705658
+      },
+      {
+        "error": 0.1398663967847824,
+        "pair_id": 104,
+        "zero_response_error": 0.3961753845214844
+      },
+      {
+        "error": 0.12336371839046478,
+        "pair_id": 121,
+        "zero_response_error": 0.1294996440410614
+      },
+      {
+        "error": 0.03699242323637009,
+        "pair_id": 140,
+        "zero_response_error": 0.06576133519411087
+      },
+      {
+        "error": 0.08462375402450562,
+        "pair_id": 157,
+        "zero_response_error": 0.1361575424671173
+      },
+      {
+        "error": 0.11841659992933273,
+        "pair_id": 176,
+        "zero_response_error": 0.20882655680179596
+      },
+      {
+        "error": 0.2585541903972626,
+        "pair_id": 193,
+        "zero_response_error": 0.34094375371932983
+      },
+      {
+        "error": 0.041968997567892075,
+        "pair_id": 212,
+        "zero_response_error": 0.22077395021915436
+      },
+      {
+        "error": 0.12972940504550934,
+        "pair_id": 229,
+        "zero_response_error": 0.07880783826112747
+      },
+      {
+        "error": 0.13649015128612518,
+        "pair_id": 248,
+        "zero_response_error": 0.17163720726966858
+      },
+      {
+        "error": 0.2323584258556366,
+        "pair_id": 265,
+        "zero_response_error": 0.3642819821834564
+      },
+      {
+        "error": 0.0695626363158226,
+        "pair_id": 284,
+        "zero_response_error": 0.15729103982448578
+      },
+      {
+        "error": 0.04253710061311722,
+        "pair_id": 301,
+        "zero_response_error": 0.08262661099433899
+      },
+      {
+        "error": 0.16223253309726715,
+        "pair_id": 320,
+        "zero_response_error": 0.31055957078933716
+      },
+      {
+        "error": 0.11983326822519302,
+        "pair_id": 337,
+        "zero_response_error": 0.1842980682849884
+      },
+      {
+        "error": 0.255262553691864,
+        "pair_id": 356,
+        "zero_response_error": 0.40064752101898193
+      },
+      {
+        "error": 0.09798126667737961,
+        "pair_id": 373,
+        "zero_response_error": 0.11469122767448425
+      },
+      {
+        "error": 0.0903066024184227,
+        "pair_id": 392,
+        "zero_response_error": 0.33356598019599915
+      },
+      {
+        "error": 0.20047692954540253,
+        "pair_id": 409,
+        "zero_response_error": 0.3075089752674103
+      },
+      {
+        "error": 0.2331131547689438,
+        "pair_id": 428,
+        "zero_response_error": 0.4592369794845581
+      },
+      {
+        "error": 0.10226558148860931,
+        "pair_id": 445,
+        "zero_response_error": 0.1372201293706894
+      },
+      {
+        "error": 0.07361480593681335,
+        "pair_id": 464,
+        "zero_response_error": 0.1912994235754013
+      },
+      {
+        "error": 0.23047848045825958,
+        "pair_id": 481,
+        "zero_response_error": 0.5596683025360107
+      },
+      {
+        "error": 0.05967570096254349,
+        "pair_id": 500,
+        "zero_response_error": 0.2311626374721527
+      }
+    ],
+    "unison": [
+      {
+        "error": 0.9140781164169312,
+        "pair_id": 2,
+        "zero_response_error": 0.9207323789596558
+      },
+      {
+        "error": 0.794375479221344,
+        "pair_id": 6,
+        "zero_response_error": 0.7681019902229309
+      },
+      {
+        "error": 1.1072888374328613,
+        "pair_id": 10,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.29994997382164,
+        "pair_id": 14,
+        "zero_response_error": 0.44794559478759766
+      },
+      {
+        "error": 1.1188056468963623,
+        "pair_id": 18,
+        "zero_response_error": 1.160531997680664
+      },
+      {
+        "error": 0.4357977509498596,
+        "pair_id": 22,
+        "zero_response_error": 0.494333952665329
+      },
+      {
+        "error": 1.095554232597351,
+        "pair_id": 26,
+        "zero_response_error": 1.1076960563659668
+      },
+      {
+        "error": 0.16436134278774261,
+        "pair_id": 30,
+        "zero_response_error": 0.17725789546966553
+      },
+      {
+        "error": 1.0749223232269287,
+        "pair_id": 34,
+        "zero_response_error": 1.1929324865341187
+      },
+      {
+        "error": 1.0591424703598022,
+        "pair_id": 38,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.9849692583084106,
+        "pair_id": 42,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6797869205474854,
+        "pair_id": 46,
+        "zero_response_error": 0.7827396988868713
+      },
+      {
+        "error": 1.094139575958252,
+        "pair_id": 50,
+        "zero_response_error": 1.1083002090454102
+      },
+      {
+        "error": 0.72320556640625,
+        "pair_id": 54,
+        "zero_response_error": 0.7273272275924683
+      },
+      {
+        "error": 1.0725245475769043,
+        "pair_id": 58,
+        "zero_response_error": 1.1956872940063477
+      },
+      {
+        "error": 0.7327778339385986,
+        "pair_id": 62,
+        "zero_response_error": 0.8587668538093567
+      },
+      {
+        "error": 1.0401705503463745,
+        "pair_id": 66,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.8762078881263733,
+        "pair_id": 70,
+        "zero_response_error": 0.9706971049308777
+      },
+      {
+        "error": 1.043328881263733,
+        "pair_id": 74,
+        "zero_response_error": 1.0892579555511475
+      },
+      {
+        "error": 0.9372677803039551,
+        "pair_id": 78,
+        "zero_response_error": 0.9358157515525818
+      },
+      {
+        "error": 1.1577975749969482,
+        "pair_id": 82,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4589814841747284,
+        "pair_id": 86,
+        "zero_response_error": 0.5120071768760681
+      },
+      {
+        "error": 1.1069841384887695,
+        "pair_id": 90,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.11279526352882385,
+        "pair_id": 94,
+        "zero_response_error": 0.3395543694496155
+      },
+      {
+        "error": 1.041210412979126,
+        "pair_id": 98,
+        "zero_response_error": 1.0485949516296387
+      },
+      {
+        "error": 0.18597909808158875,
+        "pair_id": 102,
+        "zero_response_error": 0.1934661865234375
+      },
+      {
+        "error": 1.044703483581543,
+        "pair_id": 106,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.9539341926574707,
+        "pair_id": 110,
+        "zero_response_error": 0.9872949123382568
+      },
+      {
+        "error": 1.119436502456665,
+        "pair_id": 114,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 1.0830963850021362,
+        "pair_id": 118,
+        "zero_response_error": 1.144132137298584
+      },
+      {
+        "error": 1.0825635194778442,
+        "pair_id": 122,
+        "zero_response_error": 1.0754045248031616
+      },
+      {
+        "error": 0.952899694442749,
+        "pair_id": 126,
+        "zero_response_error": 0.966281533241272
+      },
+      {
+        "error": 1.083877444267273,
+        "pair_id": 130,
+        "zero_response_error": 1.1661880016326904
+      },
+      {
+        "error": 0.40319541096687317,
+        "pair_id": 134,
+        "zero_response_error": 0.3895357549190521
+      },
+      {
+        "error": 0.6806626915931702,
+        "pair_id": 138,
+        "zero_response_error": 0.8240157961845398
+      },
+      {
+        "error": 0.11193187534809113,
+        "pair_id": 142,
+        "zero_response_error": 0.2292771339416504
+      },
+      {
+        "error": 1.0916801691055298,
+        "pair_id": 146,
+        "zero_response_error": 1.108359694480896
+      },
+      {
+        "error": 0.777299702167511,
+        "pair_id": 150,
+        "zero_response_error": 0.7713051438331604
+      },
+      {
+        "error": 1.1023887395858765,
+        "pair_id": 154,
+        "zero_response_error": 1.1560817956924438
+      },
+      {
+        "error": 0.4120388329029083,
+        "pair_id": 158,
+        "zero_response_error": 0.5207070112228394
+      },
+      {
+        "error": 1.0949400663375854,
+        "pair_id": 162,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.15200136601924896,
+        "pair_id": 166,
+        "zero_response_error": 0.2991023659706116
+      },
+      {
+        "error": 1.0396392345428467,
+        "pair_id": 170,
+        "zero_response_error": 1.112187385559082
+      },
+      {
+        "error": 0.3271327316761017,
+        "pair_id": 174,
+        "zero_response_error": 0.2854793965816498
+      },
+      {
+        "error": 1.02626633644104,
+        "pair_id": 178,
+        "zero_response_error": 1.0806583166122437
+      },
+      {
+        "error": 1.2439340353012085,
+        "pair_id": 182,
+        "zero_response_error": 1.1730504035949707
+      },
+      {
+        "error": 0.9868312478065491,
+        "pair_id": 186,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4541088044643402,
+        "pair_id": 190,
+        "zero_response_error": 0.6075764298439026
+      },
+      {
+        "error": 1.1366745233535767,
+        "pair_id": 194,
+        "zero_response_error": 1.054484486579895
+      },
+      {
+        "error": 0.5074185729026794,
+        "pair_id": 198,
+        "zero_response_error": 0.5199013352394104
+      },
+      {
+        "error": 1.1230552196502686,
+        "pair_id": 202,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 1.0892531871795654,
+        "pair_id": 206,
+        "zero_response_error": 1.1944459676742554
+      },
+      {
+        "error": 1.0077837705612183,
+        "pair_id": 210,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.18679261207580566,
+        "pair_id": 214,
+        "zero_response_error": 0.2875799536705017
+      },
+      {
+        "error": 1.0893876552581787,
+        "pair_id": 218,
+        "zero_response_error": 1.102847695350647
+      },
+      {
+        "error": 0.6480675339698792,
+        "pair_id": 222,
+        "zero_response_error": 0.6600455641746521
+      },
+      {
+        "error": 1.0659164190292358,
+        "pair_id": 226,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4619700312614441,
+        "pair_id": 230,
+        "zero_response_error": 0.500764012336731
+      },
+      {
+        "error": 1.0415759086608887,
+        "pair_id": 234,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.3135893642902374,
+        "pair_id": 238,
+        "zero_response_error": 0.3574337959289551
+      },
+      {
+        "error": 1.1049507856369019,
+        "pair_id": 242,
+        "zero_response_error": 1.1108819246292114
+      },
+      {
+        "error": 0.15035325288772583,
+        "pair_id": 246,
+        "zero_response_error": 0.2001732587814331
+      },
+      {
+        "error": 1.1294794082641602,
+        "pair_id": 250,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 1.1223636865615845,
+        "pair_id": 254,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 1.1022909879684448,
+        "pair_id": 258,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.47080567479133606,
+        "pair_id": 262,
+        "zero_response_error": 0.6272143125534058
+      },
+      {
+        "error": 1.05647611618042,
+        "pair_id": 266,
+        "zero_response_error": 1.0253865718841553
+      },
+      {
+        "error": 0.8393279910087585,
+        "pair_id": 270,
+        "zero_response_error": 0.9017786383628845
+      },
+      {
+        "error": 1.0994811058044434,
+        "pair_id": 274,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.896952748298645,
+        "pair_id": 278,
+        "zero_response_error": 0.9977557063102722
+      },
+      {
+        "error": 0.7508925199508667,
+        "pair_id": 282,
+        "zero_response_error": 0.9177711009979248
+      },
+      {
+        "error": 0.32435762882232666,
+        "pair_id": 286,
+        "zero_response_error": 0.4150715172290802
+      },
+      {
+        "error": 1.0509318113327026,
+        "pair_id": 290,
+        "zero_response_error": 1.102746844291687
+      },
+      {
+        "error": 0.24137328565120697,
+        "pair_id": 294,
+        "zero_response_error": 0.2613939940929413
+      },
+      {
+        "error": 1.0967357158660889,
+        "pair_id": 298,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.1526462882757187,
+        "pair_id": 302,
+        "zero_response_error": 0.280697762966156
+      },
+      {
+        "error": 0.9669568538665771,
+        "pair_id": 306,
+        "zero_response_error": 1.1097049713134766
+      },
+      {
+        "error": 0.21100816130638123,
+        "pair_id": 310,
+        "zero_response_error": 0.32474738359451294
+      },
+      {
+        "error": 0.8559508919715881,
+        "pair_id": 314,
+        "zero_response_error": 0.9153611660003662
+      },
+      {
+        "error": 0.13496212661266327,
+        "pair_id": 318,
+        "zero_response_error": 0.17458698153495789
+      },
+      {
+        "error": 1.1183550357818604,
+        "pair_id": 322,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.14310985803604126,
+        "pair_id": 326,
+        "zero_response_error": 0.2511885464191437
+      },
+      {
+        "error": 1.0074537992477417,
+        "pair_id": 330,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 1.1134358644485474,
+        "pair_id": 334,
+        "zero_response_error": 1.1296799182891846
+      },
+      {
+        "error": 1.0281474590301514,
+        "pair_id": 338,
+        "zero_response_error": 1.0695000886917114
+      },
+      {
+        "error": 0.4068283438682556,
+        "pair_id": 342,
+        "zero_response_error": 0.40788429975509644
+      },
+      {
+        "error": 1.0010647773742676,
+        "pair_id": 346,
+        "zero_response_error": 1.15523362159729
+      },
+      {
+        "error": 1.0001583099365234,
+        "pair_id": 350,
+        "zero_response_error": 1.0670297145843506
+      },
+      {
+        "error": 1.0720646381378174,
+        "pair_id": 354,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.8622106909751892,
+        "pair_id": 358,
+        "zero_response_error": 0.9294846057891846
+      },
+      {
+        "error": 1.1226478815078735,
+        "pair_id": 362,
+        "zero_response_error": 1.106880784034729
+      },
+      {
+        "error": 0.14324939250946045,
+        "pair_id": 366,
+        "zero_response_error": 0.12068139761686325
+      },
+      {
+        "error": 1.0969855785369873,
+        "pair_id": 370,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.7153165340423584,
+        "pair_id": 374,
+        "zero_response_error": 0.6946923136711121
+      },
+      {
+        "error": 0.9916595220565796,
+        "pair_id": 378,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5756152868270874,
+        "pair_id": 382,
+        "zero_response_error": 0.8027493357658386
+      },
+      {
+        "error": 1.1340206861495972,
+        "pair_id": 386,
+        "zero_response_error": 1.1062228679656982
+      },
+      {
+        "error": 0.21129147708415985,
+        "pair_id": 390,
+        "zero_response_error": 0.2517171800136566
+      },
+      {
+        "error": 1.1057695150375366,
+        "pair_id": 394,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 1.0483546257019043,
+        "pair_id": 398,
+        "zero_response_error": 1.1253533363342285
+      },
+      {
+        "error": 1.093074083328247,
+        "pair_id": 402,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.48880526423454285,
+        "pair_id": 406,
+        "zero_response_error": 0.5361360907554626
+      },
+      {
+        "error": 1.08767831325531,
+        "pair_id": 410,
+        "zero_response_error": 1.0213286876678467
+      },
+      {
+        "error": 0.2174862027168274,
+        "pair_id": 414,
+        "zero_response_error": 0.1864984929561615
+      },
+      {
+        "error": 1.0641695261001587,
+        "pair_id": 418,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.7474159002304077,
+        "pair_id": 422,
+        "zero_response_error": 0.7792857885360718
+      },
+      {
+        "error": 1.0766392946243286,
+        "pair_id": 426,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 1.1213948726654053,
+        "pair_id": 430,
+        "zero_response_error": 1.180849552154541
+      },
+      {
+        "error": 1.1061304807662964,
+        "pair_id": 434,
+        "zero_response_error": 1.1053988933563232
+      },
+      {
+        "error": 0.3836113214492798,
+        "pair_id": 438,
+        "zero_response_error": 0.350434273481369
+      },
+      {
+        "error": 1.0915069580078125,
+        "pair_id": 442,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.5594527721405029,
+        "pair_id": 446,
+        "zero_response_error": 0.5900701284408569
+      },
+      {
+        "error": 1.1197024583816528,
+        "pair_id": 450,
+        "zero_response_error": 1.1979176998138428
+      },
+      {
+        "error": 0.40140748023986816,
+        "pair_id": 454,
+        "zero_response_error": 0.47270667552948
+      },
+      {
+        "error": 0.8076075315475464,
+        "pair_id": 458,
+        "zero_response_error": 0.8225536346435547
+      },
+      {
+        "error": 0.6074461340904236,
+        "pair_id": 462,
+        "zero_response_error": 0.6280763149261475
+      },
+      {
+        "error": 1.1370203495025635,
+        "pair_id": 466,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.4573560953140259,
+        "pair_id": 470,
+        "zero_response_error": 0.4446733593940735
+      },
+      {
+        "error": 1.1994465589523315,
+        "pair_id": 474,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.6465153098106384,
+        "pair_id": 478,
+        "zero_response_error": 0.8335745930671692
+      },
+      {
+        "error": 1.0308244228363037,
+        "pair_id": 482,
+        "zero_response_error": 1.1050347089767456
+      },
+      {
+        "error": 0.27641263604164124,
+        "pair_id": 486,
+        "zero_response_error": 0.30724477767944336
+      },
+      {
+        "error": 1.121693730354309,
+        "pair_id": 490,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.3393728733062744,
+        "pair_id": 494,
+        "zero_response_error": 0.3442024290561676
+      },
+      {
+        "error": 1.030072808265686,
+        "pair_id": 498,
+        "zero_response_error": 1.2000000476837158
+      },
+      {
+        "error": 0.2590985596179962,
+        "pair_id": 502,
+        "zero_response_error": 0.3708954155445099
+      },
+      {
+        "error": 0.9041228890419006,
+        "pair_id": 506,
+        "zero_response_error": 0.8932533264160156
+      },
+      {
+        "error": 0.23051747679710388,
+        "pair_id": 510,
+        "zero_response_error": 0.26261159777641296
+      }
+    ]
+  },
+  "plan_id": "3ab7769e6b9c51b606005eb7b06609715f1da642844928e970915901b15a11bf",
+  "records_sha256": "411a90e7f152363e1bb7178755f28652154409f291f1c4677fa47cea13ede58e",
+  "script_sha256": "f176e7ce17fcd4ca720d394d22fc3e0866746db913430a7377ab2ed37c50ab2f"
+}

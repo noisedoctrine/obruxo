@@ -1,6 +1,6 @@
 # Basic reconstruction: spectral-training protocol
 
-Revised 2026-10-19. This specifies the immediate work in the [training plan](../modelling/TRAINING_PLAN.md): establish useful spectral-loss gradients on the small vocabulary, then train and validate the predictor with them. The plan and this protocol are proposals until their implementation and qualification gates pass. Broad preset support remains infrastructure; no broad training or curve-loss tuning is scheduled.
+Revised 2026-10-21. This specifies the immediate work in the [training plan](../modelling/TRAINING_PLAN.md): establish useful spectral-loss gradients on the small vocabulary, then train and validate the predictor with them. The plan and this protocol are proposals until their implementation and qualification gates pass. Broad preset support remains infrastructure; no broad training or curve-loss tuning is scheduled.
 
 ## Prediction contract
 
@@ -74,6 +74,14 @@ A0 has no model-quality claim. Its cap is 96 native requests, 500 debugging upda
 
 The [frozen local helper card](reports/BASIC_SPECTRAL_HELPER_CARD.md) implements this protocol with 1,024 training requests and 240 planned qualification requests. Its ten renders per state/performance include isolated pan and detune checks, with 16 recovery attempts reserved inside the 256 qualification cap. Seven focused tests pass. The [completed native result](reports/BASIC_SPECTRAL_HELPER_RESULTS.md) passes forward prediction but fails useful-gradient qualification; it does not permit A2 to begin.
 
+The [aligned-pair correction](reports/PAIRED_SPECTRAL_HELPER_RESULTS.md) is also complete and fails the unchanged gates. It improves 31/48 guided trials, but continuous rankings and transfer detune/joint guidance remain inadequate. Saved-pair inspection shows poor attack/decay/release response fit even on training examples. Check temporal coverage and declare a bounded native response investigation before choosing another full fit or an alternative mechanism; do not expand the prediction vocabulary.
+
+That [bounded time-coverage investigation](reports/SPECTRAL_TIME_COVERAGE_RESULTS.md) is complete: 36 accepted native requests, 12 exact repeat pairs, exact historical audio/feature reproduction and zero optimizer updates. It exposes missed short responses in the sparse training measurements. Preserve envelope coverage and include spectral frames around note starts/ends, then verify signal retention and memory before any further fit. The existing helper also responds poorly under full-recording evaluation; the sampling finding is not a claim of solved reconstruction.
+
+The [sampling repair's native preflight](reports/EVENT_SPECTRAL_FRAMES_RESULTS.md) passes: 32 spectral frames with note-event anchors, complete envelopes, identical pair times, all tested response signals retained and bounded local storage. Twenty focused tests pass. A separately frozen short real-data response fit comes next; the preflight itself performs no learning and does not qualify an artifact.
+
+The [short matched fit](reports/EVENT_RESPONSE_FIT_RESULTS.md) subsequently fails every response-fit group despite improved absolute prediction. Retain the corrected measurements but suspend unchanged full helper fits. The plan's native-optimization alternative now needs its own fixed request budget, numerical-gradient correctness checks and real-audio update qualification before any inverse-training comparison. It must not bypass the small prediction scope or final quality gates.
+
 The [old alpha helper](reports/SOUND_PROXY_RESULTS.md) failed: useful input gradients cannot be inferred from its familiar-performance regression accuracy. Reuse collection, recovery and artifact-refusal behavior. Train a new basic-scope helper with temporal spectral targets and broader training performance coverage; the cause of the previous failure is not assumed to be settled.
 
 The card must fix training families, hard-category balance, continuous perturbations, register/velocity/duration coverage, model size, optimizer, updates and qualification recipes before collection. Use train-only records to fit any scaling statistics. Qualification and transfer recipes must not enter helper training. After a qualification panel guides revisions, label it development and use independent confirmation for the final candidate.
@@ -92,9 +100,13 @@ The cap is 2,048 training requests plus 256 qualification requests, 12,000 helpe
 
 Better helper loss with worse native error fails this stage. Keep the helper artifact marked unqualified and refuse ordinary inverse-training loading. Review the failed directions before proposing one bounded correction or a separately budgeted restricted differentiable synth/native optimization alternative. The earlier render-selected target experiment also failed to improve learning; it is not a proven fallback.
 
+The [native-gradient card](reports/NATIVE_GRADIENT_CARD.md) explicitly budgets the direct-measurement alternative: 624 requests/30 minutes/8 GiB RAM/32 MiB outputs. It tests one measured continuous and joint step on each of 24 development cases, retaining the earlier real-improvement threshold separately on reference and transfer. It does not claim a learned forward model or use its self-prediction gates. Neither this implementation nor the failed helper results qualify a sound-training path by themselves.
+
+The [completed native-gradient result](reports/NATIVE_GRADIENT_RESULTS.md) passes those gates: 24/24 continuous and 23/24 joint improvements, all 560 renders accepted and 24 exact repeats. This bounded direct-measurement path is qualified for a costed A2 trial; the learned helpers remain unqualified. Its inverse loss connection passes gradient/recovery tests, but no spectral inverse model has been trained.
+
 ## A2: spectral-loss inverse training and native comparison
 
-Only a qualified, hash-pinned helper may guide this comparison. Start the parameter-only control and spectral candidate from the same incumbent checkpoint with fresh, matched optimizer state. Keep the basic encoder/head architecture, source population, phase policy, input preprocessing, training observations and inverse-update count fixed. Report the helper's extra training data and compute separately.
+Only a qualified, hash-pinned helper or native-gradient estimator may guide this comparison. Start the parameter-only control and spectral candidate from the same incumbent checkpoint with fresh, matched optimizer state. Keep the basic encoder/head architecture, source population, phase policy, input preprocessing, training observations and inverse-update count fixed. Report helper training or native-gradient query costs separately; a direct native path must fit all probes into its declared budget.
 
 Freeze helper weights for the full inverse run while retaining derivatives through inputs. Train with the declared spectral/envelope/stereo loss and Gumbel-softmax categorical path. The parameter anchor is optional and must have a fixed scale/decay; report its gradient contribution and show sound-only categorical gradients without running a loss-weight sweep. Qualify the hard-decoded results, not a soft blend of incompatible categories.
 
@@ -103,6 +115,8 @@ Infer one patch from a reference recording; reuse that prediction to match real 
 The card must specify native audit cadence, candidate selection and stopping rules before training. At audits, export with deterministic `argmax`, render real Vital and compare against both the historical incumbent and matched continued parameter-only control on the same development cases, alongside template/retrieval. Monitor invalid outputs, category usage, helper/native disagreement and reference/transfer errors. Do not promote a model because the helper's training score improved. Stop at predeclared divergence/invalidity limits and retain the last native-checked checkpoint; an altered helper requires a new qualification/comparison.
 
 Cap A2 at 1,024 native requests including fit/audits/recovery, 8,000 inverse updates per arm and four hours total. Profile first; no automatic extension if the spectral candidate is slower. Freeze a practical native gain margin and earlier-stage/tail tolerances before scoring. The working primary improvement target is 10%; exact source-category accuracy is diagnostic, not an acceptance gate.
+
+For the qualified direct-native alternative, the [separate frozen card](reports/NATIVE_INVERSE_FIT_CARD.md) explicitly revises the request allocation to 3,328, with 128 matched updates per arm on 32 training states. The four-hour, 8-GiB RAM and 2-GiB archive limits remain. This is a predeclared replacement for the helper-based request allocation, not an extension of a completed run. Both training-performance fit gates precede the 12-state development comparison; no test states or automatic checkpoint selection are used.
 
 ## A3: fresh confirmation and first release
 
@@ -121,9 +135,9 @@ Package a basic inference bundle and CLI with pinned preprocessing, weights, cod
 | Work package | Current state | Reviewable deliverable |
 |---|---|---|
 | Baseline audit and native diagnosis | Complete; listening still pending | Existing reports, checkpoints and render receipts |
-| A0 spectral/control contract | Implementation/native checks passed; A1 card next | [Versioned contract and measured resource evidence](reports/BASIC_SPECTRAL_CONTRACT_RESULTS.md); frozen helper card remains |
-| A1 helper qualification | Pending A0 | New helper, held-out and native-gradient evidence, explicit qualified/refused artifact |
-| A2 spectral inverse comparison | Pending A1 | Candidate/control checkpoints and hard-export native report |
+| A0 spectral/control contract | Complete; both local A1 cards frozen | [Versioned contract and measured resource evidence](reports/BASIC_SPECTRAL_CONTRACT_RESULTS.md) |
+| A1 useful-gradient qualification | Direct native path qualified; learned helpers refused | [Native-gradient evidence and retained failed case](reports/NATIVE_GRADIENT_RESULTS.md) |
+| A2 spectral inverse comparison | Native objective connected/tested; costed run pending | Candidate/control checkpoints and hard-export native report |
 | A3 confirmation/basic bundle | Pending A2 | Independent confirmation, second seed, listening and reproducible basic inference bundle |
 
 Use separate reviewable PRs for these work packages and local checks with GitHub Actions disabled. Publish exact run status, resource use and failed gates; do not equate implemented code with a passed training milestone. All upcoming work stays local; Colab notebooks, transfers and Linux qualification are deferred.

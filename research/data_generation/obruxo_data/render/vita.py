@@ -34,6 +34,17 @@ _JUCE_TO_BASE64 = bytes.maketrans(_JUCE_ALPHABET, bytes(_BASE64_ALPHABET[_REVERS
 DEFAULT_PLUGIN_SHA256 = "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1"
 
 
+def _render_exact_frames(engine, frame_count: int, sample_rate: int, channels: int):
+    import numpy as np
+    # Seconds can round below the sample boundary when the backend truncates its product.
+    if not engine.render((frame_count + 1) / sample_rate):
+        raise RuntimeError("DawDreamer failed to render the Vital graph")
+    audio = np.asarray(engine.get_audio(), dtype=np.float32)
+    if audio.ndim != 2 or audio.shape[0] != channels or audio.shape[1] < frame_count:
+        raise RuntimeError(f"DawDreamer returned {audio.shape}; expected at least ({channels}, {frame_count})")
+    return np.ascontiguousarray(audio[:, :frame_count].T)
+
+
 def juce_memory_block_encode(value: bytes) -> str:
     # JUCE consumes least-significant bits first; RFC base64 consumes most-significant bits first.
     encoded = base64.b64encode(value.translate(_REVERSE_BITS)).rstrip(b"=").translate(_BASE64_TO_JUCE)
@@ -272,8 +283,6 @@ class VitalRenderer(Renderer):
             import dawdreamer as daw
         except ImportError as error:
             raise DependencyUnavailableError("DawDreamer is not installed") from error
-        import numpy as np
-
         backend_version = importlib.metadata.version("dawdreamer")
         if backend_version != "0.8.3":
             raise DependencyUnavailableError(f"DawDreamer 0.8.3 is required, found {backend_version}")
@@ -340,10 +349,7 @@ class VitalRenderer(Renderer):
                         raise ValueError("note duration rounds to zero samples")
                     synth.add_midi_note(span.pitch, span.velocity, start_sample / request.sample_rate, (end_sample - start_sample) / request.sample_rate)
             engine.load_graph([(synth, [])])
-            if not engine.render(frame_count / request.sample_rate):
-                raise RuntimeError("DawDreamer failed to render the Vital graph")
-            channel_first = np.asarray(engine.get_audio(), dtype=np.float32)
-            audio = np.ascontiguousarray(channel_first.T)
+            audio = _render_exact_frames(engine, frame_count, request.sample_rate, request.channels)
 
         qa, audio_diagnostics = analyze_audio(
             audio, sample_rate=request.sample_rate, expected_frames=frame_count,
@@ -357,6 +363,7 @@ class VitalRenderer(Renderer):
             settings={
                 "plugin_name": self.plugin_path.name,
                 "buffer_size": self.buffer_size,
+                "frame_policy": "one_guard_sample_trim_to_requested_frames_v1",
                 "schema_id": VitalSchema.load().schema_id if self.full_contract is None else "vital-1.5.5-fields-native-1.6.4",
                 **({} if self.full_contract is None else {"full_contract_sha256": canonical_sha256(self.full_contract.spec),
                                                         "full_nested_readback_verified": True,

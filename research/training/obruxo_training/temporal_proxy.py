@@ -12,13 +12,17 @@ from .spectral import ENVELOPE_HOP, ENVELOPE_WINDOW, FFT_SIZES, SAMPLE_RATE, spe
 from .spectral_controls import temperature_at
 
 
-def temporal_proxy_spec():
-    return {"model": "basic_note_conditioned_spectral_frames_v1", "note_width": 32, "hidden_width": 128,
+def temporal_proxy_spec(event_frames=False):
+    spec = {"model": "basic_note_conditioned_spectral_frames_v1", "note_width": 32, "hidden_width": 128,
             "conditioning": "canonical_controls_actual_notes_elapsed_time_and_resolution",
             "output": "nonnegative_linear_magnitudes_from_softplus_log1p_head", "log_floor": .0001,
             "log_ceiling": 16., "training_frames_per_resolution": 16, "training_envelope_frames": 16,
             "frame_sampling": "uniform_without_replacement_valid_centers_keep_absolute_times_no_frequency_pooling",
             "qualification": "full_temporal_targets", "maximum_trainable_parameters": 2_000_000}
+    if event_frames:
+        from .event_frames import event_frame_spec
+        spec.update(training_frames_per_resolution=32, training_envelope_frames="all_valid", frame_sampling=event_frame_spec())
+    return spec
 
 
 def hard_controls(adapter, targets):
@@ -58,10 +62,14 @@ def sample_frames(target, generator, count=16):
 
 def collate_frames(records):
     targets = [record["measurements"] for record in records]
-    return ({"magnitudes": tuple(torch.cat([t["magnitudes"][r] for t in targets]) for r in range(3)),
-             "masks": tuple(torch.cat([t["masks"][r] for t in targets]) for r in range(3)),
-             **{key: torch.cat([t[key] for t in targets]) for key in ("envelope", "envelope_mask", "lengths")}},
-            tuple(torch.cat([record["times"][r] for record in records]) for r in range(4)))
+    def padded(values):
+        width = max(value.shape[-1] for value in values)
+        return torch.cat([F.pad(value, (0, width - value.shape[-1])) for value in values])
+    return ({"magnitudes": tuple(padded([t["magnitudes"][r] for t in targets]) for r in range(3)),
+             "masks": tuple(padded([t["masks"][r] for t in targets]) for r in range(3)),
+             "envelope": padded([t["envelope"] for t in targets]), "envelope_mask": padded([t["envelope_mask"] for t in targets]),
+             "lengths": torch.cat([t["lengths"] for t in targets])},
+            tuple(padded([record["times"][r] for record in records]) for r in range(4)))
 
 
 class TemporalSpectralProxy(nn.Module):

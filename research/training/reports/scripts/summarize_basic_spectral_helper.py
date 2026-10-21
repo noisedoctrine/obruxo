@@ -11,6 +11,34 @@ RESEARCH = Path(__file__).resolve().parents[3]
 sys.path[:0] = [str(RESEARCH / "training"), str(RESEARCH / "data_generation")]
 
 
+def direction_diagnosis(cases):
+    """Describe saved native measurements without replacing the frozen admission gates."""
+    diagnosis = {}
+    for role in ("reference", "transfer"):
+        selected = [case for case in cases if case["role"] == role]
+        groups = {}
+        for group, methods in (("continuous", ("plus", "minus")), ("categorical", ("category",)),
+                               ("pan", ("pan",)), ("detune", ("detune",)), ("guidance", ("continuous", "joint"))):
+            counts = Counter(planned=0, native_objectives_disagree=0, helper_decreases=0)
+            for case in selected:
+                rows, start = case["rows"], case["rows"]["start"]
+                if group == "detune" and start["candidate"]["categorical"][0] == 0:
+                    continue
+                for method in methods:
+                    delta = {metric: rows[method][metric] - start[metric]
+                             for metric in ("helper_error", "native_mrstft", "native_spectral")}
+                    counts["planned"] += 1
+                    counts["helper_decreases"] += delta["helper_error"] < 0
+                    counts["native_objectives_disagree"] += delta["native_mrstft"] * delta["native_spectral"] < 0
+                    for metric in ("native_mrstft", "native_spectral"):
+                        tolerance = max(1e-7, rows["repeat"][metric])
+                        counts[metric + "_agreement"] += abs(delta[metric]) > tolerance and delta[metric] * delta["helper_error"] > 0
+                        counts[metric + "_misleading_decrease"] += delta[metric] > tolerance and delta["helper_error"] < 0
+            groups[group] = dict(counts)
+        diagnosis[role] = groups
+    return diagnosis
+
+
 def summarize(directory):
     from obruxo_data.hashing import canonical_sha256
     from obruxo_training.temporal_proxy_screen import qualification_summary
@@ -48,11 +76,19 @@ def summarize(directory):
     artifact = directory / "helper.pt"
     with artifact.open("rb") as handle:
         artifact_hash = hashlib.file_digest(handle, "sha256").hexdigest()
+    paired = {}
+    if plan["config"].get("paired_changes"):
+        accepted = {row["sequence"] for row in records if row["accepted"]}
+        complete_pairs = sum(sequence % 8 >= 4 and sequence - 4 in accepted for sequence in accepted)
+        paired = {"paired_objective": plan["paired_objective"], "control_coverage": plan["control_coverage"],
+                  "complete_training_pairs": complete_pairs, "paired_training_records": 2 * complete_pairs,
+                  "unpaired_accepted_records": len(accepted) - 2 * complete_pairs}
     return {"source_hashes": {name: hashlib.sha256(value).hexdigest() for name, value in raw.items()},
             "helper_sha256": artifact_hash, "plan_id": summary["plan_id"], "source_modules": plan["source"],
             "config": plan["config"], "limits": plan["limits"], "model": plan["model"],
             "complete": True, "qualified_for_inverse_training": result["qualified_for_inverse_training"],
             "result": result, "cases": compact, "exact_repeat_pairs": repeat_count,
+            "direction_diagnosis": direction_diagnosis(cases), **paired,
             "training_accepted": sum(row["accepted"] for row in records), "training_failures": dict(failures),
             "retained_archive_bytes": sum(path.stat().st_size for path in directory.rglob("*") if path.is_file()),
             **{key: summary[key] for key in ("render_attempts", "elapsed_seconds", "peak_process_tree_rss_bytes",

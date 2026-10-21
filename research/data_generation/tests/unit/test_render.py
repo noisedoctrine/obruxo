@@ -16,7 +16,7 @@ from obruxo_data.render import (
 )
 from obruxo_data.render.qa import AudioQualityConfig, analyze_audio, audio_float32_sha256, compare_audio
 from obruxo_data.render.vita import (
-    VitalVst3StateTemplate, juce_memory_block_decode, juce_memory_block_encode, native_preset_document,
+    VitalVst3StateTemplate, _render_exact_frames, juce_memory_block_decode, juce_memory_block_encode, native_preset_document,
     verify_loaded_controls, verify_loaded_scalars,
 )
 from obruxo_data.vital import VitalPreset
@@ -49,6 +49,37 @@ def _extract_vital_json(state: bytes) -> dict:
 def test_juce_memory_block_encoding_round_trip() -> None:
     for value in (b"", b"a", bytes(range(255)), b"Vital state \x00 payload"):
         assert juce_memory_block_decode(juce_memory_block_encode(value)) == value
+
+
+@pytest.mark.parametrize("frames", [1, 123480, 154350])
+def test_native_duration_truncation_preserves_exact_requested_sample_prefix(frames):
+    class TruncatingEngine:
+        def render(self, seconds):
+            count = int(seconds * 44100)
+            self.audio = np.stack((np.arange(count), -np.arange(count))).astype(np.float32)
+            return True
+
+        def get_audio(self):
+            return self.audio
+
+    engine = TruncatingEngine()
+    assert int((123480 / 44100) * 44100) == 123479  # The actual 150-BPM failure.
+    output = _render_exact_frames(engine, frames, 44100, 2)
+    assert output.shape == (frames, 2) and output.dtype == np.float32 and output.flags.c_contiguous
+    assert np.array_equal(output, np.stack((np.arange(frames), -np.arange(frames)), axis=1))
+
+
+@pytest.mark.parametrize("shape", [(2, 99), (1, 101), (101,)])
+def test_exact_frame_render_refuses_short_or_malformed_output(shape):
+    class BrokenEngine:
+        def render(self, seconds):
+            return True
+
+        def get_audio(self):
+            return np.zeros(shape, dtype=np.float32)
+
+    with pytest.raises(RuntimeError, match="expected at least"):
+        _render_exact_frames(BrokenEngine(), 100, 44100, 2)
 
 
 def test_vital_vst3_state_template_replaces_only_component_json() -> None:
