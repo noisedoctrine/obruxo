@@ -17,13 +17,15 @@ from .codec import PilotTarget
 from .evaluate import audio_distance
 from .native_gradient import guided_candidates, measure_native_gradient, native_gradient_spec
 from .performances import initial_bank
+from .render_profile import BASIC_PREROLL_FRAMES, basic_render_profile
 from .spectral import SpectralTargets, spectral_loss
 from .spectral_controls import BasicControlAdapter
 from .temporal_proxy import perturbed_targets
 from .temporal_proxy_data import NativeSession, category_balanced_entries
 
 
-def make_plan(pool):
+def make_plan(pool, *, preroll_frames=BASIC_PREROLL_FRAMES):
+    profile = basic_render_profile(preroll_frames)
     entries = category_balanced_entries(pool, "validation", 12)
     cases = []
     for index, entry in enumerate(entries):
@@ -39,17 +41,17 @@ def make_plan(pool):
             cases.append({"index": index, "role": role, "state_id": entry.state_id, "source": entry.target.to_dict(),
                           "start": start.to_dict(), "performance": performance.to_dict()})
     names = ("native_gradient.py", "native_gradient_screen.py", "codec.py", "spectral.py", "spectral_controls.py",
-             "temporal_proxy_data.py", "temporal_proxy.py", "evaluate.py", "reproducibility.py", "stream.py")
+             "temporal_proxy_data.py", "temporal_proxy.py", "evaluate.py", "reproducibility.py", "stream.py", "render_profile.py")
     paths = [Path(__file__).with_name(name) for name in names]
-    paths += [Path(__file__).parents[2] / "data_generation/obruxo_data/render/vita.py",
-              Path(__file__).parents[1] / "reports/scripts/run_native_gradient_screen.py"]
+    paths += [Path(__file__).parents[2] / "data_generation/obruxo_data/render" / name for name in ("vita.py", "base.py", "midi_transport.py", "qa.py")]
+    paths += [Path(__file__).parents[1] / "reports/scripts/run_native_gradient_screen.py"]
     return {"format": "basic_native_gradient_qualification_v1", "pool_id": pool.pool_id,
             "manifest_id": pool.manifest.manifest_id, "codec": pool.codec.to_dict(),
-            "contract": BasicControlAdapter(pool.codec).contract(), "estimator": native_gradient_spec(), "cases": cases,
+            "contract": BasicControlAdapter(pool.codec).contract(), "estimator": native_gradient_spec(), "cases": cases, "render_profile": profile,
             "source": {path.name: sha256_bytes(path.read_bytes().replace(b"\r\n", b"\n")) for path in paths},
             "runtime": {"python": platform.python_version(), "torch": str(torch.__version__), "numpy": np.__version__,
                         "device": "cpu", "cpu_threads": 2, "precision": "float32"},
-            "limits": {"qualification_attempts": 624, "wall_seconds": 1800, "process_tree_bytes": 8 * 1024**3,
+            "limits": {"qualification_attempts": 624, "wall_seconds": 2700 if preroll_frames else 1800, "process_tree_bytes": 8 * 1024**3,
                        "archive_bytes": 32 * 1024**2},
             "update": {"continuous_radius": .05, "continuous_scaling": "divide_by_gradient_max_absolute",
                        "category_initial_logit_margin": .1, "category_step": 1., "category_temperature": 1.,
@@ -130,9 +132,9 @@ def qualify_case(case, session):
             "category_changed": candidates["joint"].categorical != start.categorical, "renders": rows}
 
 
-def run_screen(pool, output, *, execute=False):
+def run_screen(pool, output, *, execute=False, preroll_frames=BASIC_PREROLL_FRAMES):
     torch.set_num_threads(2)
-    plan = make_plan(pool)
+    plan = make_plan(pool, preroll_frames=preroll_frames)
     plan_id = canonical_sha256(plan)
     if not execute:
         output.mkdir(parents=True, exist_ok=False)

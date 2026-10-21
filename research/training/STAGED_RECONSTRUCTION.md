@@ -104,6 +104,8 @@ The [native-gradient card](reports/NATIVE_GRADIENT_CARD.md) explicitly budgets t
 
 The [completed native-gradient result](reports/NATIVE_GRADIENT_RESULTS.md) passes those gates: 24/24 continuous and 23/24 joint improvements, all 560 renders accepted and 24 exact repeats. This bounded direct-measurement path is qualified for a costed A2 trial; the learned helpers remain unqualified. Its inverse loss connection passes gradient/recovery tests, but no spectral inverse model has been trained.
 
+That historical result uses immediate MIDI. The first inverse attempt exposed a [native startup transient](reports/NATIVE_PREROLL_RESULTS.md). The corrected 32,768-frame lead preserves every requested attack/tail and passes strict renderer checks. Its [fresh estimator qualification](reports/SETTLED_NATIVE_GRADIENT_RESULTS.md) passes the same quality gates: 22/24 continuous and 21/24 joint improvements, 560 accepted renders and 24 exact repeats. Old targets and the partial model prefix are not corrected evidence. The new runners pin profile/source identity and refuse cross-profile qualification/cache reuse. Fresh A2 starts from the same historical initial model with new optimizers and targets.
+
 ## A2: spectral-loss inverse training and native comparison
 
 Only a qualified, hash-pinned helper or native-gradient estimator may guide this comparison. Start the parameter-only control and spectral candidate from the same incumbent checkpoint with fresh, matched optimizer state. Keep the basic encoder/head architecture, source population, phase policy, input preprocessing, training observations and inverse-update count fixed. Report helper training or native-gradient query costs separately; a direct native path must fit all probes into its declared budget.
@@ -136,7 +138,7 @@ Package a basic inference bundle and CLI with pinned preprocessing, weights, cod
 |---|---|---|
 | Baseline audit and native diagnosis | Complete; listening still pending | Existing reports, checkpoints and render receipts |
 | A0 spectral/control contract | Complete; both local A1 cards frozen | [Versioned contract and measured resource evidence](reports/BASIC_SPECTRAL_CONTRACT_RESULTS.md) |
-| A1 useful-gradient qualification | Direct native path qualified; learned helpers refused | [Native-gradient evidence and retained failed case](reports/NATIVE_GRADIENT_RESULTS.md) |
+| A1 useful-gradient qualification | Native path qualified on the corrected renderer; learned helpers refused | [Settled-gradient evidence with all failures retained](reports/SETTLED_NATIVE_GRADIENT_RESULTS.md) |
 | A2 spectral inverse comparison | Native objective connected/tested; costed run pending | Candidate/control checkpoints and hard-export native report |
 | A3 confirmation/basic bundle | Pending A2 | Independent confirmation, second seed, listening and reproducible basic inference bundle |
 

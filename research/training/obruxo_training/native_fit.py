@@ -25,6 +25,7 @@ from .native_gradient import native_gradient_spec
 from .native_gradient_screen import qualification_summary
 from .native_inverse import native_reconstruction_loss
 from .performances import initial_bank
+from .render_profile import BASIC_PREROLL_FRAMES, basic_render_profile
 from .spectral import SpectralTargets, spectral_loss, target_bytes
 from .spectral_controls import BasicControlAdapter, temperature_at
 from .temporal_proxy_data import NativeSession, category_balanced_entries, training_performance
@@ -35,7 +36,7 @@ def digest(path):
     return sha256_bytes(Path(path).read_bytes())
 
 
-def require_qualification(report):
+def require_qualification(report, *, preroll_frames=0):
     plan = report["plan"]
     result = qualification_summary(report["cases"], plan)
     if (report["plan_id"] != canonical_sha256(plan) or plan["estimator"] != native_gradient_spec()
@@ -44,17 +45,28 @@ def require_qualification(report):
             or not report["within_resource_limits"] or not report["all_numerical_updates_reconstructed"]
             or not report["all_requests_reconstructed"] or report["test_split_used"]):
         raise ValueError("native estimator has not passed the required qualification")
+    if (plan.get("render_profile", {}).get("preroll_frames", 0) != preroll_frames
+            or report["renderer_identity"]["settings"].get("preroll_frames", 0) != preroll_frames):
+        raise ValueError("native estimator qualification belongs to a different render profile")
     for name in ("native_gradient.py", "spectral.py", "spectral_controls.py", "reproducibility.py"):
         current = Path(__file__).with_name(name).read_bytes().replace(b"\r\n", b"\n")
         if sha256_bytes(current) != plan["source"][name]:
             raise ValueError("qualified estimator source changed")
+    if preroll_frames:
+        render_files = {name: Path(__file__).parents[2] / "data_generation/obruxo_data/render" / name
+                        for name in ("vita.py", "base.py", "midi_transport.py", "qa.py")}
+        render_files.update({name: Path(__file__).with_name(name) for name in ("stream.py", "temporal_proxy_data.py", "render_profile.py")})
+        for name, path in render_files.items():
+            if sha256_bytes(path.read_bytes().replace(b"\r\n", b"\n")) != plan["source"].get(name):
+                raise ValueError("qualified renderer source changed or is missing")
 
 
-def make_plan(pool, initial_path, retrieval_path, qualification_path):
+def make_plan(pool, initial_path, retrieval_path, qualification_path, *, preroll_frames=BASIC_PREROLL_FRAMES):
+    profile = basic_render_profile(preroll_frames)
     if type(pool.codec) is not PilotCodec:
         raise ValueError("native inverse fitting requires the exact basic codec")
     report = json.loads(qualification_path.read_text())
-    require_qualification(report)
+    require_qualification(report, preroll_frames=preroll_frames)
     initial = torch.load(initial_path, map_location="cpu", weights_only=True)
     model, frontend, codec = restore_model(initial)
     retrieval = load_training_checkpoint(retrieval_path)
@@ -75,12 +87,12 @@ def make_plan(pool, initial_path, retrieval_path, qualification_path):
     rng = torch.Generator().manual_seed(0)
     updates = [{"state": int(index), "view": epoch % 2} for epoch in range(4) for index in torch.randperm(32, generator=rng)]
     names = ("native_fit.py", "native_gradient.py", "native_inverse.py", "spectral.py", "spectral_controls.py",
-             "model.py", "features.py", "trainer.py", "evaluate.py", "temporal_proxy_data.py", "reproducibility.py", "checkpoints.py")
+             "model.py", "features.py", "trainer.py", "evaluate.py", "temporal_proxy_data.py", "reproducibility.py", "checkpoints.py", "render_profile.py")
     paths = [Path(__file__).with_name(name) for name in names]
-    paths += [Path(__file__).parents[2] / "data_generation/obruxo_data/render/vita.py",
-              Path(__file__).parents[1] / "reports/scripts/run_native_inverse_fit.py"]
+    paths += [Path(__file__).parents[2] / "data_generation/obruxo_data/render" / name for name in ("vita.py", "base.py", "midi_transport.py", "qa.py")]
+    paths += [Path(__file__).parents[1] / "reports/scripts/run_native_inverse_fit.py"]
     return {"format": "matched_native_inverse_fit_v1", "pool_id": pool.pool_id, "manifest_id": pool.manifest.manifest_id,
-            "codec": codec.to_dict(), "adapter": BasicControlAdapter(codec).contract(), "estimator": native_gradient_spec(),
+            "codec": codec.to_dict(), "adapter": BasicControlAdapter(codec).contract(), "estimator": native_gradient_spec(), "render_profile": profile,
             "initial_file_sha256": digest(initial_path), "initial_model_sha256": tensor_digest(model.state_dict()),
             "retrieval_file_sha256": digest(retrieval_path), "retrieval_digest": retrieval_digest(retrieval["replay"]),
             "qualification_file_sha256": digest(qualification_path), "qualification_plan_id": report["plan_id"],
@@ -147,12 +159,15 @@ class FitRecords:
                 if view == 0:
                     features = self.frontend(audio)
             self.frontend.require_frozen()
-            record = {"recipe_id": canonical_sha256(recipe), "features": features, "targets": targets, "audio_sha256": hashes}
+            record = {"recipe_id": canonical_sha256(recipe), "features": features, "targets": targets, "audio_sha256": hashes,
+                      "render_profile": self.plan.get("render_profile", basic_render_profile(0))}
             atomic_torch_save(path, record)
             self.rows[str(index)] = {"file": path.name, "sha256": digest(path), "recipe_id": record["recipe_id"]}
             write_json(self.path, self.rows)
         if record["recipe_id"] != canonical_sha256(recipe):
             raise ValueError("training recipe identity changed")
+        if record.get("render_profile", basic_render_profile(0)) != self.plan.get("render_profile", basic_render_profile(0)):
+            raise ValueError("training record belongs to a different render profile")
         size = sum(target_bytes(target) for target in record["targets"]) + sum(value.numel() * value.element_size() for value in record["features"].values())
         if size > self.plan["limits"]["replay_bytes"]:
             raise RuntimeError("one training record exceeds replay budget")
@@ -347,9 +362,9 @@ def predict_candidates(models, codec, features):
     return {name: predicted_targets(model(batch_features([{"features": features}])), codec)[0] for name, model in models.items()}
 
 
-def run_fit(pool, initial_path, retrieval_path, qualification_path, output, *, execute=False, resume=False):
+def run_fit(pool, initial_path, retrieval_path, qualification_path, output, *, execute=False, resume=False, preroll_frames=BASIC_PREROLL_FRAMES):
     torch.set_num_threads(2)
-    plan = make_plan(pool, initial_path, retrieval_path, qualification_path)
+    plan = make_plan(pool, initial_path, retrieval_path, qualification_path, preroll_frames=preroll_frames)
     plan_id = canonical_sha256(plan)
     if not execute:
         output.mkdir(parents=True, exist_ok=False)
@@ -378,7 +393,11 @@ def run_fit(pool, initial_path, retrieval_path, qualification_path, output, *, e
                 saved = torch.load(output / "checkpoint.pt", map_location="cpu", weights_only=True)
             except (RuntimeError, EOFError, OSError):
                 saved = torch.load(output / "checkpoint.previous.pt", map_location="cpu", weights_only=True)
-        trace = fit_models(models, records, session, output, plan, saved)
+        if saved:
+            trace = list(saved["trace"])
+        def committed(state):
+            trace[:] = state["trace"]
+        trace = fit_models(models, records, session, output, plan, saved, after_step=committed)
         all_models = {"initial": incumbent.eval(), **{name: model.eval() for name, model in models.items()}}
         model_ids = {name: tensor_digest(model.state_dict()) for name, model in all_models.items()}
         for index, recipe in enumerate(plan["training"]):
@@ -408,7 +427,7 @@ def run_fit(pool, initial_path, retrieval_path, qualification_path, output, *, e
             validation_result = audit_summary(validation_cases, plan, validation=True)
         for name, model in models.items():
             export = inference_state(model, frontend, codec, pool.pool_id)
-            export.update(training_objective=name, training_plan_id=plan_id, qualified_for_release=False)
+            export.update(training_objective=name, training_plan_id=plan_id, qualified_for_release=False, render_profile=plan["render_profile"])
             atomic_torch_save(output / f"diagnostic-{name}.pt", export)
         frontend.require_frozen()
     except Exception as error:

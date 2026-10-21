@@ -182,7 +182,8 @@ class NativeSession:
             raise RuntimeError("helper native-attempt budget exhausted")
         source = self.codec.decode(target)
         request = RenderRequest(preset_json=fixed_generator_phases(source).decode(), performance=performance,
-                                renderer_id=self.codec.contract.renderer_id, tail_seconds=self.codec.contract.tail_seconds)
+                                renderer_id=self.codec.contract.renderer_id, tail_seconds=self.codec.contract.tail_seconds,
+                                preroll_frames=self.plan.get("render_profile", {}).get("preroll_frames", 0))
         identity = {"phase": phase, "label": label, "request_id": request.request_id, "attempt": count,
                     "source_sha256": sha256_bytes(source), "controlled_sha256": sha256_bytes(request.preset_json.encode())}
         self._append({"event": "attempt", **identity})

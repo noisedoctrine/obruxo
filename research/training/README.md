@@ -12,6 +12,8 @@ That [short matched fit](reports/EVENT_RESPONSE_FIT_RESULTS.md) is complete: 2,0
 
 The [direct native-gradient check](reports/NATIVE_GRADIENT_RESULTS.md) now passes: continuous updates improve 24/24 cases, joint updates 23/24, with 560 accepted renders and 24 exact repeats. It took 20 minutes and 0.88 GiB RAM. The inverse-model loss connection is tested; the next task is a costed matched training run. This is not yet a trained spectral candidate. Both learned helpers remain unqualified.
 
+The first matched run stopped after 34 updates on a four-voice clipping probe. The [startup investigation and correction](reports/NATIVE_PREROLL_RESULTS.md) shows that native controls were still settling at immediate note-on. New sound-training runners use an explicit 32,768-frame silent lead, preserving every requested note/tail frame and strict QA. The settled renderer passes repeat, level-response and lead-length stability checks. Old targets and qualification cannot be relabelled; recheck gradients on the corrected profile before fresh training. The investigated clipping penalty is not active.
+
 The [completion ledger](IMPLEMENTATION_STATUS.md) separates current quality gates from implemented capabilities. Both earlier basic validation panels are development data; final-test states remain reserved.
 
 The [basic sound diagnosis](reports/BASIC_SOUND_DIAGNOSIS.md) completed 70 native requests and 10 exact phase-fixed repeats. Unison/stereo errors inform the new objective's sensitivity checks; no model improvement is claimed yet. The [previous helper](reports/SOUND_PROXY_RESULTS.md) improved its own predicted loss but worsened all 20 real-render cases, so useful gradients are a required gate, not an assumption.

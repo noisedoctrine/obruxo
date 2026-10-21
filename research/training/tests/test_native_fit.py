@@ -1,6 +1,8 @@
 import copy
 import json
 from pathlib import Path
+from time import time
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -16,9 +18,18 @@ from obruxo_data.render.qa import audio_float32_sha256
 
 
 def test_qualification_is_checked_before_inverse_use():
+    from obruxo_data.hashing import canonical_sha256
     path = Path(__file__).parents[1] / "reports/data/native_gradient_summary.json"
     report = json.loads(path.read_text())
     require_qualification(report)
+    with pytest.raises(ValueError, match="render profile"):
+        require_qualification(report, preroll_frames=32768)
+    relabelled = copy.deepcopy(report)
+    relabelled["plan"]["render_profile"] = {"preroll_frames": 32768}
+    relabelled["renderer_identity"]["settings"]["preroll_frames"] = 32768
+    relabelled["plan_id"] = canonical_sha256(relabelled["plan"])
+    with pytest.raises(ValueError, match="renderer source"):
+        require_qualification(relabelled, preroll_frames=32768)
     for key in ("qualified_native_gradient_path", "all_native_accepted", "within_resource_limits", "all_requests_reconstructed"):
         changed = copy.deepcopy(report)
         changed[key] = False
@@ -116,3 +127,54 @@ def test_audit_reuses_committed_renders_and_refuses_changed_candidates(tmp_path)
     assert first == second and len(session.calls) == count == 5
     with pytest.raises(ValueError, match="predictions changed"):
         audit_case(session, tmp_path, "fixture", recipe, 0, lambda _audio: {"other": target}, {"models": "fixed"}, repeat=True)
+
+
+def test_exception_summary_retains_completed_updates(monkeypatch, tmp_path):
+    from obruxo_training import native_fit
+    initial, retrieval = tmp_path / "initial.pt", tmp_path / "retrieval.pt"
+    torch.save({}, initial)
+    torch.save({}, retrieval)
+    plan = {"initial_file_sha256": native_fit.digest(initial), "retrieval_file_sha256": native_fit.digest(retrieval),
+            "limits": {"wall_seconds": 60, "process_tree_bytes": 1024, "archive_bytes": 16 * 1024**2}}
+    output = tmp_path / "run"
+    output.mkdir()
+    (output / "plan.json").write_text(json.dumps(plan))
+    class Monitor:
+        peak_bytes, errors = 1, 0
+        def start(self):
+            pass
+        def close(self):
+            pass
+    def failed_fit(*_args, after_step=None):
+        after_step({"trace": [{"step": 1}]})
+        after_step({"trace": [{"step": 1}, {"step": 2}]})
+        raise RuntimeError("fixture render rejected")
+    codec = PilotCodec()
+    monkeypatch.setattr(native_fit, "make_plan", lambda *_args, **_kwargs: plan)
+    monkeypatch.setattr(native_fit, "restore_model", lambda *_args: (torch.nn.Linear(1, 1), object(), codec))
+    monkeypatch.setattr(native_fit, "load_training_checkpoint", lambda *_args: {"replay": []})
+    monkeypatch.setattr(native_fit, "MemoryMonitor", Monitor)
+    monkeypatch.setattr(native_fit, "NativeSession", lambda *_args: SimpleNamespace(started=time(), events=[], renderer_identity={}))
+    monkeypatch.setattr(native_fit, "FitRecords", lambda *_args: object())
+    monkeypatch.setattr(native_fit, "fit_models", failed_fit)
+    with pytest.raises(RuntimeError, match="fixture render rejected"):
+        native_fit.run_fit(SimpleNamespace(codec=codec), initial, retrieval, tmp_path / "qualification.json", output, execute=True)
+    summary = json.loads((output / "summary.json").read_text())
+    assert summary["committed_updates_per_arm"] == 2 and not summary["complete"]
+    assert summary["failure"] == "RuntimeError: fixture render rejected"
+
+
+def test_cold_target_cache_is_rejected_even_when_recipe_and_file_hash_match(tmp_path):
+    from obruxo_data.hashing import canonical_sha256
+    from obruxo_training.native_fit import FitRecords, digest
+    from obruxo_training.render_profile import basic_render_profile
+    recipe = {"state_id": "fixture", "target": PilotCodec().default_target().to_dict()}
+    directory = tmp_path / "records"
+    directory.mkdir()
+    path = directory / "000.pt"
+    torch.save({"recipe_id": canonical_sha256(recipe)}, path)  # Legacy record has no warm-profile declaration.
+    (tmp_path / "records.json").write_text(json.dumps({"0": {"file": path.name, "sha256": digest(path)}}))
+    plan = {"training": [recipe], "render_profile": basic_render_profile(), "limits": {"archive_bytes": 2 * 1024**3}}
+    records = FitRecords(tmp_path, plan, None, SimpleNamespace(check_limits=lambda: None))
+    with pytest.raises(ValueError, match="different render profile"):
+        records[0]

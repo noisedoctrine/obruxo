@@ -39,15 +39,18 @@ class RenderRequest:
     end_tick: int | None = None
     tail_seconds: float = 2.0
     renderer_id: str = DEFAULT_RENDERER_ID
+    preroll_frames: int = 0
 
     def __init__(self, *, performance: "Performance", preset: Any | None = None, preset_json: str | None = None,
                  sample_rate: int = 44_100, channels: int = 2, end_tick: int | None = None,
-                 tail_seconds: float = 2.0, renderer_id: str = DEFAULT_RENDERER_ID):
+                 tail_seconds: float = 2.0, renderer_id: str = DEFAULT_RENDERER_ID, preroll_frames: int = 0):
         if (preset is None) == (preset_json is None):
             raise ValueError("provide exactly one of preset or preset_json")
         if preset is not None:
             preset_json = preset.to_json(canonical=True)
         assert preset_json is not None
+        if type(preroll_frames) is not int or not 0 <= preroll_frames <= 44100:
+            raise ValueError("preroll_frames must be an integer in [0, 44100]")
         if renderer_id in {FULL_PRESET_RENDERER_ID, FULL_SEED_RENDERER_ID, FULL_EXPRESSION_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_CORPUS_RENDERER_ID}:
             from obruxo_data.vital.full_contract import FullPresetContract
             document, report = FullPresetContract().loads(preset_json)
@@ -62,9 +65,10 @@ class RenderRequest:
         object.__setattr__(self, "end_tick", end_tick)
         object.__setattr__(self, "tail_seconds", tail_seconds)
         object.__setattr__(self, "renderer_id", renderer_id)
+        object.__setattr__(self, "preroll_frames", preroll_frames)
 
     def identity_payload(self) -> dict[str, Any]:
-        return {
+        payload = {
             "preset_json": self.preset_json,
             "performance": self.performance.to_dict(),
             "sample_rate": self.sample_rate,
@@ -73,6 +77,9 @@ class RenderRequest:
             "tail_seconds": self.tail_seconds,
             "renderer_id": self.renderer_id,
         }
+        if self.preroll_frames:
+            payload["preroll_frames"] = self.preroll_frames
+        return payload
 
     @property
     def request_id(self) -> str:
@@ -87,6 +94,7 @@ class RenderRequest:
             sample_rate=int(value["sample_rate"]), channels=int(value["channels"]),
             end_tick=None if value.get("end_tick") is None else int(value["end_tick"]),
             tail_seconds=float(value["tail_seconds"]), renderer_id=str(value["renderer_id"]),
+            preroll_frames=value.get("preroll_frames", 0),
         )
 
     def to_dict(self) -> dict[str, Any]:
