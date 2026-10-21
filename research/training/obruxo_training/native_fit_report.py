@@ -15,6 +15,23 @@ def terminal_interruption(outcomes):
     raise ValueError("unsupported native interruption; do not classify it as an audio rejection")
 
 
+def recovered_timeouts(outcomes):
+    recovered = []
+    fields = ("phase", "label", "request_id", "source_sha256", "controlled_sha256", "renderer_identity")
+    for index, row in enumerate(outcomes):
+        if row["status"] == "accepted":
+            continue
+        if row["status"] != "error" or row.get("error_type") != "RenderTimeout" or "qa" in row:
+            raise ValueError("a native failure is not a recoverable timeout")
+        matches = [later for later in outcomes[index + 1:] if later["status"] == "accepted"
+                   and all(later.get(name) == row.get(name) and name in row for name in fields)]
+        if not matches:
+            raise ValueError("timeout has no later accepted render of the identical request")
+        recovered.append({"failed_attempt": row["attempt"], "accepted_attempt": matches[0]["attempt"],
+                          "phase": row["phase"], "request_id": row["request_id"]})
+    return recovered
+
+
 def paired_comparison(cases, *, resamples=2000):
     """Resample whole source states, retaining their paired reference/transfer observations."""
     by_state = {}

@@ -2,7 +2,7 @@ import copy
 
 import pytest
 
-from obruxo_training.native_fit_report import paired_comparison, terminal_interruption
+from obruxo_training.native_fit_report import paired_comparison, recovered_timeouts, terminal_interruption
 
 
 def cases():
@@ -22,6 +22,22 @@ def test_timeout_audit_preserves_error_and_refuses_other_or_nonterminal_failures
                  [{**timeout, "qa": {"finite": False}}]):
         with pytest.raises(ValueError):
             terminal_interruption(rows)
+
+
+def test_timeout_recovery_requires_later_identical_accepted_request_and_preserves_the_failure():
+    common = {"phase": "training", "label": "gradient:106:10", "request_id": "request", "source_sha256": "source",
+              "controlled_sha256": "controlled", "renderer_identity": {"profile": 32768}}
+    failed = {**common, "attempt": 1, "status": "error", "error_type": "RenderTimeout"}
+    accepted = {**common, "attempt": 2, "status": "accepted", "qa": {"finite": True}}
+    original = copy.deepcopy(failed)
+    assert recovered_timeouts([failed, accepted]) == [{"failed_attempt": 1, "accepted_attempt": 2,
+                                                      "phase": "training", "request_id": "request"}]
+    assert failed == original
+    assert recovered_timeouts([accepted]) == []
+    for rows in ([failed], [accepted, failed], [failed, {**accepted, "request_id": "different"}],
+                 [{**failed, "status": "rejected"}, accepted], [{**failed, "error_type": "RenderCrash"}, accepted]):
+        with pytest.raises(ValueError):
+            recovered_timeouts(rows)
 
 
 def test_paired_intervals_preserve_both_performances_and_exact_constant_difference():

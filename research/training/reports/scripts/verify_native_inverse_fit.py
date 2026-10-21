@@ -33,7 +33,7 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path):
     from obruxo_training.evaluate import nearest_training_target
     from obruxo_training.features import tensor_digest
     from obruxo_training.native_fit import audit_summary, digest, make_plan, matched_step, predict_candidates
-    from obruxo_training.native_fit_report import paired_comparison, public_cases
+    from obruxo_training.native_fit_report import paired_comparison, public_cases, recovered_timeouts
     from obruxo_training.reproducibility import fixed_generator_phases
     from obruxo_training.spectral import SpectralTargets
     from obruxo_training.trainer import restore_model
@@ -52,8 +52,9 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path):
     outcomes = {(row["phase"], row["attempt"]): row for row in events if row["event"] == "outcome"}
     if len(attempts) != sum(row["event"] == "attempt" for row in events) or attempts.keys() != outcomes.keys():
         raise ValueError("duplicate or incomplete native attempt ledger")
+    timeouts = recovered_timeouts(list(outcomes.values()))
     for key, receipt in outcomes.items():
-        if (receipt["status"] != "accepted" or receipt["request_id"] != attempts[key]["request_id"]
+        if (receipt["request_id"] != attempts[key]["request_id"]
                 or receipt["renderer_identity"] != summary["renderer_identity"]):
             raise ValueError("native receipt acceptance or identity changed")
 
@@ -106,7 +107,7 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path):
         update = plan["updates"][step]
         performance = Performance.from_dict(plan["training"][update["state"]]["performances"][update["view"]])
         receipts = [row for row in receipts_by_request[measured["request_id"]]
-                    if row["label"] == f"gradient:{step}:{measured['query']}"
+                    if row["status"] == "accepted" and row["label"] == f"gradient:{step}:{measured['query']}"
                     and row["qa"]["audio_float32_sha256"] == measured["audio_sha256"]]
         if not receipts:
             raise ValueError("a logged training loss has no matching native receipt")
@@ -193,11 +194,13 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path):
     resources = (summary["rss_sampling_errors"] == 0 and 0 < summary["peak_process_tree_rss_bytes"] <= limits["process_tree_bytes"]
                  and summary["elapsed_seconds"] <= limits["wall_seconds"] and archive <= limits["archive_bytes"]
                  and all(counts[phase] <= limits[f"{phase}_attempts"] for phase in counts))
-    passed = bool(fit_result["pass"] and validation_result and validation_result["pass"] and resources)
+    accepted = all(row["status"] == "accepted" for row in outcomes.values())
+    passed = bool(fit_result["pass"] and validation_result and validation_result["pass"] and resources and accepted)
     if (passed != summary["matched_comparison_passed"] or resources != summary["within_resource_limits"]
-            or counts != summary["render_attempts"] or not summary["all_native_accepted"] or not summary["incumbent_artifacts_unchanged"]):
+            or counts != summary["render_attempts"] or accepted != summary["all_native_accepted"] or not summary["incumbent_artifacts_unchanged"]):
         raise ValueError("final qualification/resource decision changed")
     return {**summary, "retained_archive_bytes": archive, "optimizer_attempts": len(charges),
+            "recovered_infrastructure_timeouts": timeouts,
             "offline_training_replay_exact": True, "cached_targets_and_inputs_rescored": True,
             "hard_audit_patches_reconstructed": True, "candidate_audit_audio_rescored": False,
             "fit_cases": public_cases(fit_cases), "validation_cases": public_cases(validation_cases),
