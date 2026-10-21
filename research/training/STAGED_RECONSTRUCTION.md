@@ -72,6 +72,8 @@ A0 has no model-quality claim. Its cap is 96 native requests, 500 debugging upda
 
 ## A1: qualify the forward model
 
+The [frozen local helper card](reports/BASIC_SPECTRAL_HELPER_CARD.md) implements this protocol with 1,024 training requests and 240 planned qualification requests. Its ten renders per state/performance include isolated pan and detune checks, with 16 recovery attempts reserved inside the 256 qualification cap. Seven focused tests pass. The [completed native result](reports/BASIC_SPECTRAL_HELPER_RESULTS.md) passes forward prediction but fails useful-gradient qualification; it does not permit A2 to begin.
+
 The [old alpha helper](reports/SOUND_PROXY_RESULTS.md) failed: useful input gradients cannot be inferred from its familiar-performance regression accuracy. Reuse collection, recovery and artifact-refusal behavior. Train a new basic-scope helper with temporal spectral targets and broader training performance coverage; the cause of the previous failure is not assumed to be settled.
 
 The card must fix training families, hard-category balance, continuous perturbations, register/velocity/duration coverage, model size, optimizer, updates and qualification recipes before collection. Use train-only records to fit any scaling statistics. Qualification and transfer recipes must not enter helper training. After a qualification panel guides revisions, label it development and use independent confirmation for the final candidate.
