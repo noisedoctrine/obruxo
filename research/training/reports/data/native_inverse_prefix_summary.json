@@ -1,0 +1,194 @@
+{
+  "accepted_native_requests": 742,
+  "both_optimizer_states_exact": true,
+  "cached_audio_targets_independently_rescored": false,
+  "cached_records_hashed": true,
+  "committed_updates_per_arm": 34,
+  "elapsed_seconds": 2274.715674638748,
+  "evidence_sha256": {
+    "checkpoint.pt": "6914746970d01c726a81bb80653dbc5c3079ea83777ddd53b127db5cb3b4b230",
+    "measurements.jsonl": "bda69e5672f3bfa9d1113e59d7b1b459dcbbc3fc142d7f59a8e77400ee5ec844",
+    "plan.json": "1c2703ed57307cf67116e2358b219b3f9344ddd09186a66f7b8e31386a133249",
+    "records.json": "4e913229a5ae54ce3cf38cd326ac82c079a58c8fdcd1adb6d29fe687b8c5c672",
+    "renders.jsonl": "ce77b06baad81ac1bf1fabca57073dcf63965cfe61b88df280f5d03328e2e348",
+    "summary.json": "ca508b64ec531e51192c5f04b4cb02c32ba5807d40c1722c5c01473b0717daf4",
+    "updates.jsonl": "5c21d1164688109998bb83a432af4e3aa4a396cdcbd30deaa04ab7c2c19d9341"
+  },
+  "format": "interrupted_native_inverse_prefix_audit_v1",
+  "frozen_source": {
+    "checkpoints.py": "1b65d17129dfadff08b1b07f9c48ede36aacb09133b4388adab38aa53e83088b",
+    "evaluate.py": "f193661f9c16f0f8915c068cfe7c47580b66c2a2bf71f17d27e23d314aa7829c",
+    "features.py": "895a736257041013f6b3e3ce260ed6a7bef2c94d51390f5f1a5492a78b737501",
+    "model.py": "ed009cd8a42f287de97e7348ea4cbce1f5ffcb5e028cf3d2385f835718ecaa68",
+    "native_fit.py": "36db96b738616bf0d3b5e411c001944768e5a98f2d9e75b636bb6cce0862a534",
+    "native_gradient.py": "c3bcf162416db9aa2e1d2d8e77c9f2732e1e34bc873a9f3149a45750512b2fb3",
+    "native_inverse.py": "730e131aa87f65bfb0c83ff94eaf939fd1af5e5ded8772db95edf47743807f0f",
+    "reproducibility.py": "9326793bdbc629be7c29584329b182dcb93b6fd91c270f180b24a0a6fe885729",
+    "run_native_inverse_fit.py": "68a7a761cb37dc6ba051346f605d30cf94cbd65c2896c7dd6ecd348ba6367cbc",
+    "spectral.py": "66df733a4de5398356f640ddd0c6daf954e8a5f678e0d6221f5b1125fa304eb1",
+    "spectral_controls.py": "bdf888bb7e8d9678fea7edad2bd9a445326ed9c6fde399af7004205874d3cd3d",
+    "temporal_proxy_data.py": "412dedebbab97cc974c2f858649d8269aacf3b09b0684a1d73040015c04421da",
+    "trainer.py": "672b21d256c42d2d48a80c9a71919059aeb262cedbdafbd6815b8bacc1e00e7e",
+    "vita.py": "b33546bc39674ad6307d35b69096191e3144c7769d5dc23fb5344232da7b61bf"
+  },
+  "gumbel_rng_exact": true,
+  "initial_model_sha256": "bb2dfed7dd9287217f98c17359c153f32b6afe31c292b0c3d9b8b154a2514231",
+  "matched_comparison_passed": false,
+  "model_sha256": {
+    "parameter": "23bb83f0846fb70d494ff5f122d4d9f5dbe39b7eef9b83ccab122e62e3b49e52",
+    "spectral": "02ec2a11675063606a34e707d7ebca44dbb78e3398bcbcc8c3b786a6c7a2b1e2"
+  },
+  "offline_prefix_replay_exact": true,
+  "optimizer_attempts": 35,
+  "peak_process_tree_rss_bytes": 1584209920,
+  "pending_anchor": {
+    "categorical": [
+      0,
+      0
+    ],
+    "continuous": [
+      0.9303540587425232,
+      0.21788370609283447,
+      0.0004046008689329028,
+      0.999559223651886,
+      0.0026520073879510164,
+      0.21455298364162445,
+      0.6244330406188965,
+      0.23925773799419403,
+      0.7243862748146057
+    ]
+  },
+  "plan_id": "1530130a22f4e6b7143a3ba66ab2248a231e20d77e3805b83e960d23f5734365",
+  "qualified_for_release": false,
+  "quality_evaluation_performed": false,
+  "rejected_native_requests": 1,
+  "rejected_probe": {
+    "actual_categories": {
+      "filter_1_on": 0,
+      "osc_1_unison_voices": 4
+    },
+    "candidate": {
+      "categorical": [
+        2,
+        0
+      ],
+      "continuous": [
+        0.9303540587425232,
+        0.21788370609283447,
+        0.0004046008689329028,
+        0.6571428571428571,
+        0.3,
+        0.21455298364162445,
+        0.6244330406188965,
+        0.23925773799419403,
+        0.7243862748146057
+      ]
+    },
+    "optimizer_step": 35,
+    "receipt": {
+      "attempt": 742,
+      "controlled_sha256": "b3881cc47ff57f0e98af1c747fe4c382fd4c3383533c1f3fa7761c44400b52a5",
+      "diagnostic_codes": [
+        "audio.clipping",
+        "vital.runtime.canonicalization",
+        "vital.runtime.numeric_canonicalization",
+        "vital.runtime.version_canonicalization"
+      ],
+      "event": "outcome",
+      "label": "gradient:34:14",
+      "phase": "training",
+      "provenance": {
+        "backend_version": "0.8.3",
+        "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+        "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+        "request_id": "ae74428d2a5dc579e6bbf82c0675a8a1b8ca8166c54532abe2b629734f4566c0",
+        "settings": {
+          "buffer_size": 128,
+          "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+          "event_timing": "absolute ticks to half-even sample offsets",
+          "frame_policy": "one_guard_sample_trim_to_requested_frames_v1",
+          "plugin_name": "Vital.vst3",
+          "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+          "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+        }
+      },
+      "qa": {
+        "actual_channels": 2,
+        "actual_frames": 154350,
+        "audio_float32_sha256": "986c151abf6f8126a90cecf62eece72d5c51cdd676d590acc04064e69b1a0f83",
+        "clipping_count": 1,
+        "dc_offset": [
+          4.236924981704685e-05,
+          2.1788025957354622e-05
+        ],
+        "expected_channels": 2,
+        "expected_frames": 154350,
+        "finite": true,
+        "peak": 1.0319849252700806,
+        "rms": 0.021745141139030182,
+        "silence_threshold": 1e-06,
+        "tail_frames": 11025,
+        "tail_rms": 0.0,
+        "tail_rms_warning": 0.001
+      },
+      "render_seconds": 1.4956682000192814,
+      "renderer_identity": {
+        "backend_version": "0.8.3",
+        "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+        "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+        "settings": {
+          "buffer_size": 128,
+          "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+          "event_timing": "absolute ticks to half-even sample offsets",
+          "frame_policy": "one_guard_sample_trim_to_requested_frames_v1",
+          "plugin_name": "Vital.vst3",
+          "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+          "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+        }
+      },
+      "renderer_qa": {
+        "actual_channels": 2,
+        "actual_frames": 154350,
+        "audio_float32_sha256": "986c151abf6f8126a90cecf62eece72d5c51cdd676d590acc04064e69b1a0f83",
+        "clipping_count": 1,
+        "dc_offset": [
+          4.236924981704685e-05,
+          2.1788025957354622e-05
+        ],
+        "expected_channels": 2,
+        "expected_frames": 154350,
+        "finite": true,
+        "native_state": {
+          "applied_preset_sha256": "b3881cc47ff57f0e98af1c747fe4c382fd4c3383533c1f3fa7761c44400b52a5",
+          "applied_version": "1.0.8",
+          "requested_preset_sha256": "b3881cc47ff57f0e98af1c747fe4c382fd4c3383533c1f3fa7761c44400b52a5",
+          "requested_version": "1.0.8",
+          "scalar_lfo_route_readback_verified": true,
+          "verified_loaded_scalars": 772
+        },
+        "peak": 1.0319849252700806,
+        "rms": 0.021745141139030182,
+        "silence_threshold": 1e-06,
+        "tail_frames": 11025,
+        "tail_rms": 0.0,
+        "tail_rms_warning": 0.001
+      },
+      "request_id": "ae74428d2a5dc579e6bbf82c0675a8a1b8ca8166c54532abe2b629734f4566c0",
+      "source_sha256": "92fa417c9574373cd002b12c249789d11095762bcb9d1971adc05ea519d1d79f",
+      "status": "rejected",
+      "wall_seconds": 2.6496924000093713,
+      "worker_job": 1,
+      "worker_max_jobs": 1,
+      "worker_pid": 2908
+    },
+    "state_index": 2,
+    "view": 1
+  },
+  "rejected_probe_reconstructed": true,
+  "retained_archive_bytes": 498563279,
+  "rss_sampling_errors": 0,
+  "summary_reported_committed_updates_per_arm": 0,
+  "test_split_used": false,
+  "total_native_attempts": 743,
+  "within_resource_limits": true
+}

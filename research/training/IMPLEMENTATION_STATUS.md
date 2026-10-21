@@ -18,6 +18,8 @@ Current task: **cost and run the matched inverse-training stage using the qualif
 
 The [native inverse card](reports/NATIVE_INVERSE_FIT_CARD.md) now freezes 32 training states/two performances, 128 updates per arm and a conditional 12-state comparison. Its 3,328-request allocation explicitly accounts for numerical-gradient queries within the existing four-hour/8-GiB/2-GiB limits. Six focused training/inverse tests pass; the plan is frozen before execution. Run completion and reconstruction gains remain unproven.
 
+That [run stopped on update 35](reports/NATIVE_INVERSE_FIT_RESULTS.md) when a trial four-voice configuration exceeded the audio amplitude limit. Its 34 committed updates, both optimizers and RNG replay exactly. No fit or validation quality result is available. Next, test an explicit validity penalty for clipping-only probes and correct exception progress reporting; preserve the failed run and count any continuation against its original cumulative limits.
+
 The old helper's guided changes worsened real audio on all 20 cases despite lower predicted loss. It remains unqualified and disconnected. The new plan requires real-render gradient qualification before inverse integration. Existing supervised `train` commands do not become spectral-loss training merely because the plan changes.
 
 The explicit `--prediction-scope basic` option rejects broad pools before creating the training frontend or renderer and records the choice in the run contract. It preserves the actual compact 14-value output layer. Older experiments retain their contracts through the default `codec` option.
