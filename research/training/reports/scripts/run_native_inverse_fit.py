@@ -22,11 +22,13 @@ def main():
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--preroll-frames", type=int, default=BASIC_PREROLL_FRAMES)
+    parser.add_argument("--category-calibration", type=Path)
     args = parser.parse_args()
     if args.resume and not args.execute:
         parser.error("--resume requires --execute")
     result = run_fit(PilotPool.load(args.pool), args.initial, args.retrieval, args.qualification, args.output,
-                     execute=args.execute, resume=args.resume, preroll_frames=args.preroll_frames)
+                     execute=args.execute, resume=args.resume, preroll_frames=args.preroll_frames,
+                     category_calibration_path=args.category_calibration)
     print(json.dumps(result), flush=True)
 
 

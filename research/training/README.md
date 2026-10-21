@@ -16,7 +16,7 @@ The first matched run stopped after 34 updates on a four-voice clipping probe. T
 
 The [fresh corrected trial](reports/SETTLED_NATIVE_INVERSE_RESULTS.md) is complete: 128 updates per arm, exact offline replay and both training fit gates passed. Development gains of 5.48% reference / 3.50% transfer miss the 10% target, so basic quality remains unfinished. A preserved host-sleep timeout was recovered within the original deadline and attempt caps. Inspect weak category-learning signals before another full run; wider heads remain deferred.
 
-The [completion ledger](IMPLEMENTATION_STATUS.md) separates current quality gates from implemented capabilities. Both earlier basic validation panels are development data; final-test states remain reserved.
+The [fixed-score comparison](reports/CALIBRATED_NATIVE_INVERSE_CARD.md) now integrates the checked category scales into both training losses, with raw-score hard export and calibration-bound recovery. Its fresh plan keeps the same data, initial weights, optimizer, limits and quality gates; the sound outcome is pending. Thirteen focused tests pass. The [completion ledger](IMPLEMENTATION_STATUS.md) separates current quality gates from implemented capabilities. Both earlier basic validation panels are development data; final-test states remain reserved.
 
 The [basic sound diagnosis](reports/BASIC_SOUND_DIAGNOSIS.md) completed 70 native requests and 10 exact phase-fixed repeats. Unison/stereo errors inform the new objective's sensitivity checks; no model improvement is claimed yet. The [previous helper](reports/SOUND_PROXY_RESULTS.md) improved its own predicted loss but worsened all 20 real-render cases, so useful gradients are a required gate, not an assumption.
 

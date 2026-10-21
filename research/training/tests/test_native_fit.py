@@ -71,7 +71,8 @@ class FixtureSession:
         return audio, {"qa": {"audio_float32_sha256": audio_float32_sha256(audio)}}
 
 
-def test_actual_matched_models_resume_exactly_and_optimizer_attempts_are_charged(tmp_path):
+@pytest.mark.parametrize("calibrated", [False, True])
+def test_actual_matched_models_resume_exactly_and_optimizer_attempts_are_charged(tmp_path, calibrated):
     torch.set_num_threads(2)
     torch.manual_seed(4)
     codec, base = PilotCodec(), PilotInverse()
@@ -79,6 +80,8 @@ def test_actual_matched_models_resume_exactly_and_optimizer_attempts_are_charged
     recipe = {"target": codec.default_target().to_dict(), "performances": [initial_bank()[0].performance().to_dict()] * 2}
     plan = {"training": [recipe], "updates": [{"state": 0, "view": i % 2} for i in range(4)],
             "optimizer": {"learning_rate": .0001, "seed": 0}, "limits": {"optimizer_attempts": 6}}
+    if calibrated:
+        plan["category_training"] = {"scales": [20., 21.], "diagnosis_file_sha256": "fixed-fixture"}
     audio, _ = FixtureSession(codec, plan).render(codec.default_target(), None, "training", "target")
     class Records:
         def check_limits(self):
@@ -107,7 +110,15 @@ def test_actual_matched_models_resume_exactly_and_optimizer_attempts_are_charged
     resumed = models()
     assert fit_models(resumed, Records(), FixtureSession(codec, plan), resumed_dir, plan, saved) == expected_trace
     assert all(tensor_digest(resumed[name].state_dict()) == tensor_digest(expected[name].state_dict()) for name in expected)
+    expected_state = torch.load(expected_dir / "checkpoint.pt", map_location="cpu", weights_only=True)
+    resumed_state = torch.load(resumed_dir / "checkpoint.pt", map_location="cpu", weights_only=True)
+    torch.testing.assert_close(expected_state["optimizers"], resumed_state["optimizers"], rtol=0, atol=0)
+    assert torch.equal(expected_state["rng"]["torch"], resumed_state["rng"]["torch"])
     assert len((resumed_dir / "updates.jsonl").read_text().splitlines()) == 4
+    changed = copy.deepcopy(saved)
+    changed["category_training"] = {"scales": [1., 1.]}
+    with pytest.raises(ValueError, match="contract"):
+        fit_models(models(), Records(), FixtureSession(codec, plan), resumed_dir, plan, changed)
     saved["plan_id"] = "changed"
     with pytest.raises(ValueError, match="contract"):
         fit_models(models(), Records(), FixtureSession(codec, plan), resumed_dir, plan, saved)
