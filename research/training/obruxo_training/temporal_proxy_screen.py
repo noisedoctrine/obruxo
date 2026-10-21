@@ -28,6 +28,20 @@ from .trainer import atomic_torch_save
 
 
 def fit_temporal_proxy(cache, adapter, config, contract, *, saved=None, checkpoint=None, after_step=None, check_limits=None):
+    pairs = complete_pairs(cache) if config.paired_changes else None
+    if pairs is not None and len(pairs) < .9 * config.training_states * 4:
+        raise ValueError("helper training has too few complete native pairs")
+    return fit_temporal_records(cache, adapter, config, contract, pairs=pairs, saved=saved, checkpoint=checkpoint,
+                                after_step=after_step, check_limits=check_limits)
+
+
+def fit_temporal_records(cache, adapter, config, contract, *, pairs=None, saved=None, checkpoint=None, after_step=None, check_limits=None):
+    """Shared fit loop; full screens retain their admission floor in fit_temporal_proxy."""
+    if len(cache) < 1:
+        raise ValueError("helper training needs accepted records")
+    if pairs is not None and (not pairs or config.batch_size % 2 or any(
+            len(pair) != 2 or pair[0] == pair[1] or any(type(index) is not int or not 0 <= index < len(cache) for index in pair) for pair in pairs)):
+        raise ValueError("paired fitting requires valid original/changed record indices and an even batch")
     torch.manual_seed(config.seed)
     model = TemporalSpectralProxy()
     optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
@@ -48,11 +62,6 @@ def fit_temporal_proxy(cache, adapter, config, contract, *, saved=None, checkpoi
         return {"format": "basic_temporal_helper_training_v1", "contract": contract, "step": step,
                 "model": model.state_dict(), "model_sha256": tensor_digest(model.state_dict()),
                 "optimizer": optimizer.state_dict(), "batch_rng": generator.get_state(), "torch_rng": torch.get_rng_state(), "trace": trace}
-    if len(cache) < 1:
-        raise ValueError("helper training needs accepted records")
-    pairs = complete_pairs(cache) if config.paired_changes else None
-    if pairs is not None and len(pairs) < .9 * config.training_states * 4:
-        raise ValueError("helper training has too few complete native pairs")
     while step < config.steps:
         if check_limits:
             check_limits()

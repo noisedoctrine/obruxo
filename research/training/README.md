@@ -8,6 +8,8 @@ The [paired-control correction](reports/PAIRED_SPECTRAL_HELPER_RESULTS.md) also 
 
 The [time-coverage check](reports/SPECTRAL_TIME_COVERAGE_RESULTS.md) identifies one concrete weakness: some attack/release changes exist in full audio but disappear from the 16 sampled training frames. The [event-frame repair](reports/EVENT_SPECTRAL_FRAMES_RESULTS.md) now passes its 36-render preflight: it retains all tested spectral changes and complete envelopes within local resource limits. It is opt-in through `--paired-changes --event-frames`; no full retraining or helper promotion is claimed. Next is a short response-fitting check on real measurements.
 
+That [short matched fit](reports/EVENT_RESPONSE_FIT_RESULTS.md) is complete: 2,000 total updates, 7.81 minutes and 0.93 GiB peak RAM. Corrected sampling reduces absolute error by 5.53%, but neither helper learns adequate control responses. Next is a separately budgeted check of gradients estimated from real Vital renders; another unchanged full helper fit is deferred.
+
 The [completion ledger](IMPLEMENTATION_STATUS.md) separates current quality gates from implemented capabilities. Both earlier basic validation panels are development data; final-test states remain reserved.
 
 The [basic sound diagnosis](reports/BASIC_SOUND_DIAGNOSIS.md) completed 70 native requests and 10 exact phase-fixed repeats. Unison/stereo errors inform the new objective's sensitivity checks; no model improvement is claimed yet. The [previous helper](reports/SOUND_PROXY_RESULTS.md) improved its own predicted loss but worsened all 20 real-render cases, so useful gradients are a required gate, not an assumption.

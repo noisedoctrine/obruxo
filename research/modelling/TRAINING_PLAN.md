@@ -115,6 +115,8 @@ The [completed time-coverage investigation](../training/reports/SPECTRAL_TIME_CO
 
 The [event-frame repair](../training/reports/EVENT_SPECTRAL_FRAMES_RESULTS.md) now passes its native signal-retention and resource checks. Before another full attempt, freeze a short fitting check on real measurements to establish whether the helper can learn the preserved responses. Its architecture and the 14-output inverse scope stay unchanged.
 
+The [completed matched short fit](../training/reports/EVENT_RESPONSE_FIT_RESULTS.md) does not establish learned control responses. Corrected sampling helps absolute error, but attack/decay/release/detune response gates fail even on the inspected training pairs. The next mechanism is the separately costed native-gradient alternative described below, with direct real-audio qualification before inverse integration. Do not spend another full run on this unchanged helper.
+
 Reuse existing collection/recovery infrastructure, not the failed helper's qualification. Train a small temporal forward model using basic patches and known MIDI. Cover register, velocity, note duration and releases within training rather than only the old four fixed performances. Keep qualification families/performances separate. Include nearby legal control changes and hard categorical alternatives in training-only coverage.
 
 Check held-out spectral prediction, rankings of real-rendered candidates, and whether small helper-guided changes improve real Vital audio. Probe continuous and categorical changes separately, then the combined path. Compare train-only mean, nearest-neighbor and interpolation baselines. Audit stereo/detuning sensitivity explicitly.
