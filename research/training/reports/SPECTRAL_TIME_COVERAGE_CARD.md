@@ -1,0 +1,17 @@
+# Local training-time coverage check
+
+Declared 2026-10-20 before rendering. The [paired helper diagnosis](PAIRED_SPECTRAL_HELPER_RESULTS.md) found weak attack/decay/release response fitting even on saved training pairs. This check asks whether the 16 uniformly sampled frames hide changes that are visible over the whole recording. It performs no fitting and cannot qualify or promote a helper.
+
+Select the first, middle and last accepted complete pair by ascending pair ID for each of attack, decay, release and detune: 12 pairs. Selection uses pair identity, not best/worst helper error. All come from the existing training population and use their original generated MIDI, targets and source ancestry. Do not use validation or final-test states.
+
+For each pair, render original, changed and original repeat through the phase-fixed native path. Require every audio hash to match its historical training render, the repeat to be exact, and the sampled spectra/envelopes at the saved times to match the archived tensors exactly. A rejection stops the diagnostic and remains in the durable attempt log; there are no automatic replacements or retries.
+
+Compare the frozen helper's signed-change error against predicting no change, both over the complete valid recording and at the original sampled times. Use the existing paired objective, weights and normalization floors unchanged. For each FFT resolution and envelope representation, report the mean absolute log1p sound change over full versus sampled frames, the time of the strongest full-recording change and the distance from that time to the nearest sampled frame. Exclude invalid padded times. These are descriptive measurements, not new pass thresholds or substitutes for the failed qualification gates.
+
+The runner writes a machine-readable plan before execution, pinning selected recipes, parent plan, source modules, script, helper, archived feature index and input diagnosis. Execute only that unchanged plan once. It checks feature hashes and pair alignment. Write receipts and case results after each pair, retaining no audio or new training tensors. A partial failure requires investigation and a new explicit recovery decision; the diagnostic cannot silently restart.
+
+Budget: **36 native attempts, zero optimizer updates, 15 minutes, 8 GiB process-tree RAM, 10 MiB new report/receipt files**, one native worker and two CPU threads. No cloud or Colab work. The decision is to distinguish sparse time coverage from a response problem that persists with full measurements; this small, chosen training sample cannot establish population-wide model quality or identify all causes.
+
+Prepare with `check_spectral_time_coverage.py --source COMPLETED_PAIRED_RUN --diagnosis PAIRED_DIAGNOSIS_JSON --output NEW_DIRECTORY`, then execute with the same arguments plus `--execute`. Preserve the frozen paired-run modules while reproducing this check. The completed report must include resources, all failures, full and sampled errors and the unchanged unqualified status.
+
+Frozen plan ID: `095c794443b7d3bbc20b02b7f54886a1b4ef41fa45ed3d6404ae14b58999d155`. Selected pair IDs: attack 8/244/496, decay 12/264/497, release 16/268/501, detune 21/256/489. Two synthetic checks pass: an unsampled response peak is detected while an invalid tail is excluded, and an exact signed response beats the no-change baseline. Ruff passes before native execution.

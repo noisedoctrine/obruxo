@@ -6,6 +6,8 @@ The [local spectral contract check](reports/BASIC_SPECTRAL_CONTRACT_RESULTS.md) 
 
 The [paired-control correction](reports/PAIRED_SPECTRAL_HELPER_RESULTS.md) also completed locally: 83 minutes, 1.53 GiB RAM, 508 complete training pairs and 24 exact native repeats. Guided improvements rose from 27/48 to 31/48, but direction and transfer gates still fail. Its saved training pairs expose weak attack/decay/release learning; it remains refused for inverse use. No third full fit is scheduled before that response problem is investigated.
 
+The [time-coverage check](reports/SPECTRAL_TIME_COVERAGE_RESULTS.md) identifies one concrete weakness: some attack/release changes exist in full audio but disappear from the 16 sampled training frames. All 36 renders reproduce historical audio exactly, with no training updates. Next, repair and verify time coverage before another full fit; this finding alone does not qualify a helper.
+
 The [completion ledger](IMPLEMENTATION_STATUS.md) separates current quality gates from implemented capabilities. Both earlier basic validation panels are development data; final-test states remain reserved.
 
 The [basic sound diagnosis](reports/BASIC_SOUND_DIAGNOSIS.md) completed 70 native requests and 10 exact phase-fixed repeats. Unison/stereo errors inform the new objective's sensitivity checks; no model improvement is claimed yet. The [previous helper](reports/SOUND_PROXY_RESULTS.md) improved its own predicted loss but worsened all 20 real-render cases, so useful gradients are a required gate, not an assumption.

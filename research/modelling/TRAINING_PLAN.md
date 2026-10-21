@@ -111,6 +111,8 @@ Implement the spectral targets, differentiable control adapter, Gumbel-softmax s
 
 The [first local helper](../training/reports/BASIC_SPECTRAL_HELPER_RESULTS.md) and [aligned-pair correction](../training/reports/PAIRED_SPECTRAL_HELPER_RESULTS.md) have completed. Both fail the useful-gradient gates; neither may guide inverse training. The paired run improves 31/48 guided cases, but saved-data diagnosis finds weak attack/decay/release response fitting even on training pairs. The next work is a targeted response investigation, not another automatic full fit or expanded output space.
 
+The [completed time-coverage investigation](../training/reports/SPECTRAL_TIME_COVERAGE_RESULTS.md) finds that sparse training frames miss some short attack/release changes. Repair and verify temporal supervision before another full fit. This concrete data issue does not establish that the helper architecture or all other controls are adequate; all original native gates remain required.
+
 Reuse existing collection/recovery infrastructure, not the failed helper's qualification. Train a small temporal forward model using basic patches and known MIDI. Cover register, velocity, note duration and releases within training rather than only the old four fixed performances. Keep qualification families/performances separate. Include nearby legal control changes and hard categorical alternatives in training-only coverage.
 
 Check held-out spectral prediction, rankings of real-rendered candidates, and whether small helper-guided changes improve real Vital audio. Probe continuous and categorical changes separately, then the combined path. Compare train-only mean, nearest-neighbor and interpolation baselines. Audit stereo/detuning sensitivity explicitly.
