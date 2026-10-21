@@ -2,7 +2,9 @@
 
 Declared 2026-10-21 before execution. The [calibrated 32-state trial](CALIBRATED_NATIVE_INVERSE_RESULTS.md) learns its fitted sounds but misses held-out quality. The [saved-data diagnosis](BASIC_FIT_COVERAGE_RESULTS.md) finds uneven coverage in that fine-tuning subset. This comparison tests broader training coverage while retaining the **14-output, 355,806-parameter** model. Coverage is a hypothesis, not an established cause.
 
-Frozen plan ID: `8f2a9c858d8c0d2ca7d69deebc1c2a5f2f5d45e4e040619fde7de1d1574f2f53`. No training has begun when this card is committed.
+Frozen plan ID: `8f2a9c858d8c0d2ca7d69deebc1c2a5f2f5d45e4e040619fde7de1d1574f2f53`. The initial card and implementation were committed before execution.
+
+The [completed, independently replayed outcome](BROADER_NATIVE_INVERSE_RESULTS.md) passes full/original-subset training fit, but misses held-out quality: reference improves 5.82% and transfer is 0.24% worse than the starting model. This status note does not change the frozen protocol below.
 
 ## Data and selection
 
