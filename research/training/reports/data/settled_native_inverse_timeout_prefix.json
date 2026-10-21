@@ -1,0 +1,137 @@
+{
+  "accepted_native_requests": 2160,
+  "both_optimizer_states_exact": true,
+  "cached_audio_targets_independently_rescored": false,
+  "cached_records_hashed": true,
+  "committed_updates_per_arm": 106,
+  "elapsed_seconds": 10276.08485007286,
+  "evidence_sha256": {
+    "checkpoint.pt": "d2fc2b07a14e693ea6ce9ab0263154cec65d7577c0d0f38bf8ff3bc451ab7d97",
+    "measurements.jsonl": "90bfaa0badf0b82c25a7fac06f02fe4ff3767efc67452af70e6fc39fca505668",
+    "plan.json": "61420773ade039901b8301fe962e5cc28cd502b8dfd85a124f305e060bc26134",
+    "records.json": "f9fdc14d4493455f9203609558aa70f099653698338201ad39859f0682d60738",
+    "renders.jsonl": "ab20402fcf0f5518c2803e252f7d50445fb3ab505ed7c2593214f7c6d24d8da1",
+    "summary.json": "dd4d1943929abb42fcf30ee7911078318e5490ca74b795e56e5bbdf9b676f118",
+    "updates.jsonl": "53a131f29a7f6dbc1bcd7163620fe5d559a4a3144d26a795ce1ba4278e3d23df"
+  },
+  "format": "interrupted_native_inverse_prefix_audit_v2",
+  "frozen_source": {
+    "base.py": "d8f75d18c73dd074c98669239a4dee80fc5ef98ad9dfe56e9974b4e7591a5548",
+    "checkpoints.py": "1b65d17129dfadff08b1b07f9c48ede36aacb09133b4388adab38aa53e83088b",
+    "evaluate.py": "f193661f9c16f0f8915c068cfe7c47580b66c2a2bf71f17d27e23d314aa7829c",
+    "features.py": "895a736257041013f6b3e3ce260ed6a7bef2c94d51390f5f1a5492a78b737501",
+    "midi_transport.py": "f86239b5168c918b4a0a445c67346d781f46c4fa1a96791fa7f4f9fc912f0924",
+    "model.py": "ed009cd8a42f287de97e7348ea4cbce1f5ffcb5e028cf3d2385f835718ecaa68",
+    "native_fit.py": "29e22fa9480333ef54d74924236ab6d517796f31035945b19f6f7ea7a991b89d",
+    "native_gradient.py": "c3bcf162416db9aa2e1d2d8e77c9f2732e1e34bc873a9f3149a45750512b2fb3",
+    "native_inverse.py": "730e131aa87f65bfb0c83ff94eaf939fd1af5e5ded8772db95edf47743807f0f",
+    "qa.py": "d536b111c5a7bfc104b7924d12cf3dca0958b2c75b51a22bcc0ab3adf3689c38",
+    "render_profile.py": "28d7b14c6628ba960970672563a393cec4ae958cf6648ca560c18351f05ad1ed",
+    "reproducibility.py": "9326793bdbc629be7c29584329b182dcb93b6fd91c270f180b24a0a6fe885729",
+    "run_native_inverse_fit.py": "e2569191da04bcb3151cefe1ad65e1d5511e6c3e3b7e2008b873a56fb9526b15",
+    "spectral.py": "66df733a4de5398356f640ddd0c6daf954e8a5f678e0d6221f5b1125fa304eb1",
+    "spectral_controls.py": "bdf888bb7e8d9678fea7edad2bd9a445326ed9c6fde399af7004205874d3cd3d",
+    "temporal_proxy_data.py": "076d1d06f63f6fefa6491a42a60cf9bd71743bb2012f34f33cdf010f386ce646",
+    "trainer.py": "672b21d256c42d2d48a80c9a71919059aeb262cedbdafbd6815b8bacc1e00e7e",
+    "vita.py": "169de3e8199d8d6c667c78f835e9bfbcb1c88fa49e33c857fc3052a3ffe9618a"
+  },
+  "gumbel_rng_exact": true,
+  "initial_model_sha256": "bb2dfed7dd9287217f98c17359c153f32b6afe31c292b0c3d9b8b154a2514231",
+  "interrupted_probe": {
+    "actual_categories": {
+      "filter_1_on": 1,
+      "osc_1_unison_voices": 1
+    },
+    "candidate": {
+      "categorical": [
+        0,
+        1
+      ],
+      "continuous": [
+        0.8436494469642639,
+        0.48402291536331177,
+        0.25,
+        0.26914602518081665,
+        0.11398836225271225,
+        0.7015368580818176,
+        0.0824819952249527,
+        0.8411142230033875,
+        0.0658942386507988
+      ]
+    },
+    "optimizer_step": 107,
+    "receipt": {
+      "attempt": 2160,
+      "controlled_sha256": "fb879d442b90cbf8989ae3ee1b8829e3629c210f82535dc3793a72152ce483a0",
+      "error_type": "RenderTimeout",
+      "event": "outcome",
+      "label": "gradient:106:10",
+      "phase": "training",
+      "renderer_identity": {
+        "backend_version": "0.8.3",
+        "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+        "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+        "settings": {
+          "buffer_size": 128,
+          "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+          "event_timing": "absolute ticks to half-even sample offsets",
+          "frame_policy": "one_guard_sample_trim_to_requested_frames_v1",
+          "plugin_name": "Vital.vst3",
+          "preroll_frames": 32768,
+          "preroll_policy": "shift_all_MIDI_then_trim_only_lead_v1",
+          "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+          "simple_note_time_guard": "one_eighth_sample_start_and_duration_v1",
+          "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+        }
+      },
+      "request_id": "b6b3b11c96096cd373c4fa71877a75692c98a46ae2585eec0f64168016ab0d56",
+      "source_sha256": "210857515a29dbdd34fe05c3c4e2146f5a13b727848f2754003f4668b942f0ab",
+      "status": "error",
+      "wall_seconds": 4593.831457799999,
+      "worker_job": 1,
+      "worker_max_jobs": 1,
+      "worker_pid": 14944
+    },
+    "state_index": 25,
+    "view": 1
+  },
+  "matched_comparison_passed": false,
+  "model_sha256": {
+    "parameter": "46ed6a07c43fa7b9e0353230e99c5bd114a8efabf9c5b41128e89d7c77f4d649",
+    "spectral": "a779b54abeace76696a18c2f4a1a546a490c1b630db8ece9d13b4bb99295c7bb"
+  },
+  "native_error_requests": 1,
+  "offline_prefix_replay_exact": true,
+  "optimizer_attempts": 107,
+  "peak_process_tree_rss_bytes": 1597620224,
+  "pending_anchor": {
+    "categorical": [
+      0,
+      1
+    ],
+    "continuous": [
+      0.8436494469642639,
+      0.48402291536331177,
+      0.6535268425941467,
+      0.26914602518081665,
+      0.11398836225271225,
+      0.6765368580818176,
+      0.0824819952249527,
+      0.8411142230033875,
+      0.0658942386507988
+    ]
+  },
+  "plan_id": "7fc5c19575d3869d3b82d9790b2c89d50c0e92f69ce702971d1446a69c8e5801",
+  "qualified_for_release": false,
+  "quality_evaluation_performed": false,
+  "rejected_native_requests": 0,
+  "rejected_probe": null,
+  "rejected_probe_reconstructed": false,
+  "retained_archive_bytes": 505159011,
+  "rss_sampling_errors": 0,
+  "summary_reported_committed_updates_per_arm": 106,
+  "terminal_probe_reconstructed": true,
+  "test_split_used": false,
+  "total_native_attempts": 2161,
+  "within_resource_limits": true
+}

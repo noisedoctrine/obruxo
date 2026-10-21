@@ -3,6 +3,18 @@
 import numpy as np
 
 
+def terminal_interruption(outcomes):
+    failures = [row for row in outcomes if row["status"] != "accepted"]
+    if len(failures) != 1 or failures[0] != outcomes[-1]:
+        raise ValueError("expected one terminal native interruption")
+    failure = failures[0]
+    if failure["status"] == "rejected":
+        return failure
+    if failure["status"] == "error" and failure.get("error_type") == "RenderTimeout" and "qa" not in failure:
+        return failure
+    raise ValueError("unsupported native interruption; do not classify it as an audio rejection")
+
+
 def paired_comparison(cases, *, resamples=2000):
     """Resample whole source states, retaining their paired reference/transfer observations."""
     by_state = {}

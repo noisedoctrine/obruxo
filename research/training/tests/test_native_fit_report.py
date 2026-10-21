@@ -2,7 +2,7 @@ import copy
 
 import pytest
 
-from obruxo_training.native_fit_report import paired_comparison
+from obruxo_training.native_fit_report import paired_comparison, terminal_interruption
 
 
 def cases():
@@ -10,6 +10,18 @@ def cases():
              "rows": {name: {"scores": {"mrstft": value}} for name, value in
                       (("initial", 3. + index), ("parameter", 2. + index), ("spectral", 1. + index + .1 * view))}}
             for index in range(4) for view in (0, 1)]
+
+
+def test_timeout_audit_preserves_error_and_refuses_other_or_nonterminal_failures():
+    accepted = {"status": "accepted"}
+    timeout = {"status": "error", "error_type": "RenderTimeout"}
+    rejected = {"status": "rejected", "qa": {"clipping_count": 1}}
+    assert terminal_interruption([accepted, timeout]) == timeout
+    assert terminal_interruption([accepted, rejected]) == rejected
+    for rows in ([accepted], [timeout, accepted], [timeout, timeout], [{"status": "error", "error_type": "RenderCrash"}],
+                 [{**timeout, "qa": {"finite": False}}]):
+        with pytest.raises(ValueError):
+            terminal_interruption(rows)
 
 
 def test_paired_intervals_preserve_both_performances_and_exact_constant_difference():
