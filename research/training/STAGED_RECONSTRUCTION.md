@@ -124,6 +124,8 @@ After the renderer correction and requalification, use the [fresh settled-audio 
 
 That [fresh trial is complete](reports/SETTLED_NATIVE_INVERSE_RESULTS.md): both arms take 128 updates and the sound arm passes both fit gates, but development gains of 5.48% reference / 3.50% transfer miss the 10% target. Complete offline replay succeeds, including a preserved checkpoint before a host-sleep timeout. No model is promoted. The category-score learning signal is often tiny despite strong native sound sensitivity; investigate that path before another costed comparison, preserving the small vocabulary and existing acceptance thresholds.
 
+The [fixed-scale diagnosis](reports/CATEGORY_SIGNAL_RESULTS.md) now passes its derivative gates with zero new native requests: training-only constants restore both category-head signals while preserving every checked initial hard patch and the entire historical replay. Integrate the same frozen scales into both loss arms and checkpoint their identity before a fresh matched fit. Production stays at raw-score argmax. This does not change the 14-output vocabulary or satisfy the outstanding sound-quality gates.
+
 ## A3: fresh confirmation and first release
 
 After a promising A2 result, freeze the candidate and run a second training seed with a separate card capped like A2. Choose the confirmation population size from development variability and fix the candidate comparison before new confirmation scoring. Do not multiply seeds while the sound-training mechanism remains unqualified.
