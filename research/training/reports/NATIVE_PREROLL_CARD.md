@@ -11,3 +11,9 @@ Caps: eight native requests, ten minutes, 8 GiB process-tree RAM and 64 MiB outp
 Final plan ID: `e66bbb1a7ed699297441d19305328bd2c9ed8a33eede6c8fd25037a05ae2c198`. The earlier unexecuted draft was replaced before any native request to include the guarded simple-note clock.
 
 Fifty-six focused local checks passed across rendering, expressive transport, full readback and inverse recovery, including the exception-progress regression. After tightening the simple note clock, all 22 renderer unit checks pass again. Commit the profile source before native execution.
+
+The 8,192-frame check completed eight requests with accepted warm audio, exact repeats and an unchanged legacy hash, but **failed** its settling gates: relative level-response error 0.00029038 and lead-length error 0.00240226 exceed 1e-5. The largest difference is again at frame 63, and the difference is exactly zero after requested frame 16,384, supporting a decaying startup transient rather than a later phase mismatch. Preserve that failed result.
+
+Before further execution, declare the same eight comparisons with **32,768 frames (0.743 seconds)**, checked against **40,960 frames (0.929 seconds)**. Both exceed the observed settling period and preserve buffer alignment. The request cap, ten-minute/RAM/archive limits, exact repeat requirement and **unchanged 1e-5 error thresholds** remain. No new training is authorized by a failed profile check. The longer lead is rendered offline, not a real-time sleep.
+
+Longer-profile plan ID: `533e348307985822b8ff8d1834ed02bbe183a8bd90587f14b3e994aca0294081`.

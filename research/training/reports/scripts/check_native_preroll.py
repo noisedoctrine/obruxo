@@ -25,7 +25,12 @@ def main():
     for name in ("parent", "prefix-audit", "output"):
         parser.add_argument(f"--{name}", type=Path, required=True)
     parser.add_argument("--execute", action="store_true")
+    parser.add_argument("--preroll-frames", type=int, default=32768)
+    parser.add_argument("--compare-preroll-frames", type=int, default=40960)
     args = parser.parse_args()
+    if not 0 < args.preroll_frames < args.compare_preroll_frames <= 44100 or any(
+            value % 128 for value in (args.preroll_frames, args.compare_preroll_frames)):
+        parser.error("pre-roll lengths must be increasing whole buffers within 44100 frames")
     torch.set_num_threads(2)
     prefix = json.loads(args.prefix_audit.read_text())
     parent = json.loads((args.parent / "plan.json").read_text())
@@ -41,18 +46,19 @@ def main():
     extreme[0], extreme[1], extreme[5], extreme[7] = 1., .5, 0., 1.
     extreme = codec.canonical_target(PilotTarget(tuple(extreme), (2, 0)))
     recipe = parent["training"][failed["state_index"]]
-    cases = [("cold_bad", bad, 0), ("source", PilotTarget.from_dict(recipe["target"]), 8192),
-             ("source_repeat", PilotTarget.from_dict(recipe["target"]), 8192), ("bad", bad, 8192), ("bad_repeat", bad, 8192),
-             ("lower", lower, 8192), ("long_preroll", bad, 16384), ("extreme", extreme, 8192)]
+    lead, longer = args.preroll_frames, args.compare_preroll_frames
+    cases = [("cold_bad", bad, 0), ("source", PilotTarget.from_dict(recipe["target"]), lead),
+             ("source_repeat", PilotTarget.from_dict(recipe["target"]), lead), ("bad", bad, lead), ("bad_repeat", bad, lead),
+             ("lower", lower, lead), ("long_preroll", bad, longer), ("extreme", extreme, lead)]
     paths = [Path(__file__), RESEARCH / "training/obruxo_training/temporal_proxy_data.py", RESEARCH / "training/obruxo_training/probe_capture.py"]
     paths += [RESEARCH / "data_generation/obruxo_data/render" / name for name in ("base.py", "vita.py", "midi_transport.py")]
-    plan = {"format": "native_preroll_qualification_v1", "parent_plan_id": prefix["plan_id"], "codec": codec.to_dict(),
+    plan = {"format": "native_preroll_qualification_v2", "parent_plan_id": prefix["plan_id"], "codec": codec.to_dict(),
             "prefix_audit_sha256": digest(args.prefix_audit), "performance": recipe["performances"][failed["view"]],
             "cases": [{"name": name, "target": target.to_dict(), "preroll_frames": frames} for name, target, frames in cases],
             "source": {path.name: sha256_bytes(path.read_bytes().replace(b"\r\n", b"\n")) for path in paths},
             "limits": {"qualification_attempts": 8, "wall_seconds": 600, "process_tree_bytes": 8 * 1024**3, "archive_bytes": 64 * 1024**2},
             "gates": {"legacy_hash_exact": True, "warm_all_accepted": True, "repeats_sample_exact": True,
-                      "level_relative_wave_error_max": 1e-5, "8192_vs_16384_relative_wave_error_max": 1e-5},
+                      "level_relative_wave_error_max": 1e-5, "short_vs_long_relative_wave_error_max": 1e-5},
             "no_model_quality_claim": True, "test_split_used": False}
     if not args.execute:
         args.output.mkdir(parents=True, exist_ok=False)
@@ -105,7 +111,7 @@ def main():
                  and elapsed <= plan["limits"]["wall_seconds"] and archive + 1024**2 <= plan["limits"]["archive_bytes"])
     result = {"plan_id": canonical_sha256(plan), "plan": plan, "cases": rows, "preflight_passed": quality and resources,
               "repeats_sample_exact": repeats, "level_relative_wave_error": level_error,
-              "8192_vs_16384_relative_wave_error": settling_error, "native_attempts": len(rows),
+              "short_vs_long_relative_wave_error": settling_error, "native_attempts": len(rows),
               "elapsed_seconds": elapsed, "peak_process_tree_rss_bytes": monitor.peak_bytes,
               "rss_sampling_errors": monitor.errors, "retained_archive_bytes_before_summary": archive,
               "within_resource_limits": resources, "no_model_quality_claim": True, "test_split_used": False}
