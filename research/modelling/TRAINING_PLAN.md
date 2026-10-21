@@ -113,6 +113,8 @@ The [first local helper](../training/reports/BASIC_SPECTRAL_HELPER_RESULTS.md) a
 
 The [completed time-coverage investigation](../training/reports/SPECTRAL_TIME_COVERAGE_RESULTS.md) finds that sparse training frames miss some short attack/release changes. Repair and verify temporal supervision before another full fit. This concrete data issue does not establish that the helper architecture or all other controls are adequate; all original native gates remain required.
 
+The [event-frame repair](../training/reports/EVENT_SPECTRAL_FRAMES_RESULTS.md) now passes its native signal-retention and resource checks. Before another full attempt, freeze a short fitting check on real measurements to establish whether the helper can learn the preserved responses. Its architecture and the 14-output inverse scope stay unchanged.
+
 Reuse existing collection/recovery infrastructure, not the failed helper's qualification. Train a small temporal forward model using basic patches and known MIDI. Cover register, velocity, note duration and releases within training rather than only the old four fixed performances. Keep qualification families/performances separate. Include nearby legal control changes and hard categorical alternatives in training-only coverage.
 
 Check held-out spectral prediction, rankings of real-rendered candidates, and whether small helper-guided changes improve real Vital audio. Probe continuous and categorical changes separately, then the combined path. Compare train-only mean, nearest-neighbor and interpolation baselines. Audit stereo/detuning sensitivity explicitly.
