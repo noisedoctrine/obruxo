@@ -1,0 +1,15 @@
+# Varied training performances render correctly
+
+Completed 2026-10-22. **All 76 native requests pass unchanged audio QA**, all **36 repeat pairs** have identical float32 audio hashes, and all **four historical source requests** reproduce their previously audited hashes exactly. The new input sampler is ready for a separately costed initialization comparison. No model was trained or promoted.
+
+The [card](VARIED_INPUT_NATIVE_CARD.md), [request manifest](data/varied_input_native_plan.json) and [results with case hashes](data/varied_input_native_summary.json) retain the evidence. Expanded private plan ID: `d885558107bc19b4fb74bde83fd7d49f851ddbb1d7e10e8f8305b61997e89ea5`. Executed source: `1f90bb78f4d027e01c8ac7acbbe1d66db190cb33`.
+
+Eighteen training patches cover every source-category/alternate-pattern cell, choosing the highest oscillator-level source in each cell. Each patch is played through its held and alternate sampler views twice, including chords and unison. All requests retain fixed oscillator 1–3/sampler phases and the qualified 32,768-frame lead. A separate saved-record audit reconstructs every varied source request and verifies request/receipt identities, audio QA, renderer identity, repeat and historical hashes, source hashes and resource limits. Audio was discarded after QA; the audit does not independently rescore waveforms.
+
+The complete 404-state sampler provides **808 feature observations**: 404 held notes, 137 staccato passages, 134 melodies and 133 chords. It covers all 49 MIDI pitches from 36 through 84. Alternate patterns are balanced within each source category, differing by at most one; the global totals reflect category sizes. These counts describe the full sampler, while native validation covers the declared 18-patch subset.
+
+Cost: **115.96 seconds**, **813,191,168 bytes (0.76 GiB)** peak process-tree RAM, zero sampling errors, and **13,783,428 bytes (13.14 MiB)** evidence before the final summary. There are no retries or optimizer updates. The workers generate 302.15 seconds of output audio in 68.42 seconds of native calls: **4.42 times real time**. Including fresh-worker overhead, throughput is **2.65 times real time**. Historical parity confirms that the lighter worker launch preserves the qualified audio.
+
+Three runner tests cover plan freezing, audited-parent changes, actual audio hashes, request charging, exact recovery without extra renders, failures and the original deadline. Ruff and diff checks pass. The independent receipt audit adds no native requests or training updates. The preceding sampler/initialization change has 39 distinct local checks.
+
+Next, start from the verified current weights and fit the wider paired inputs with a fresh optimizer and checkpoints. Freeze the update count and acoustic admission gates first: improve on the wider inputs while retaining the old-input comparison. Category-gradient qualification follows fixed inputs/weights. Sound training still needs both input views and a counterbalanced development panel alongside the earlier regression cases. A2 and release quality remain unproved; the prediction head stays at 14 outputs.
