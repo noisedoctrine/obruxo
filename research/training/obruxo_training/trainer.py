@@ -52,6 +52,7 @@ class TrainConfig:
     cyclic_head: str = "sigmoid"
     prediction_scope: str = "codec"
     preroll_frames: int = 0
+    input_performances: str = "initial"
 
     def __post_init__(self):
         positive = (self.steps, self.replay_capacity, self.replay_mib, self.batch_size,
@@ -60,8 +61,9 @@ class TrainConfig:
             raise ValueError("training counts must be positive integers and seed an integer")
         if self.learning_seed_override is not None and type(self.learning_seed_override) is not int:
             raise ValueError("learning_seed_override must be an integer or None")
-        if self.mode not in {"overfit", "online"} or self.replay_capacity > 512 or self.replay_mib > 256:
-            raise ValueError("pilot mode must be overfit/online with replay at most 512 examples and 256 MiB")
+        maximum_records = 1024 if self.prediction_scope == "basic" else 512
+        if self.mode not in {"overfit", "online"} or self.replay_capacity > maximum_records or self.replay_mib > 256:
+            raise ValueError(f"pilot mode must be overfit/online with replay at most {maximum_records} examples and 256 MiB")
         if self.batch_size > self.replay_capacity or self.render_budget < self.replay_capacity:
             raise ValueError("batch must fit replay and render budget must cover initial replay")
         if not math.isfinite(self.learning_rate) or self.learning_rate <= 0:
@@ -77,6 +79,10 @@ class TrainConfig:
         profile_metadata(self.preroll_frames)
         if self.preroll_frames and self.prediction_scope != "basic":
             raise ValueError("qualified bootstrap render profile requires explicit basic prediction scope")
+        if self.input_performances not in {"initial", "varied"}:
+            raise ValueError("unsupported input performance policy")
+        if self.input_performances == "varied" and (self.prediction_scope != "basic" or self.preroll_frames != 32768 or self.sampling_policy != "paired_views"):
+            raise ValueError("varied inputs require basic scope, qualified pre-roll and paired_views sampling")
         if (not math.isfinite(self.identity_weight) or self.identity_weight < 0
                 or not math.isfinite(self.identity_temperature) or self.identity_temperature <= 0):
             raise ValueError("identity weight must be nonnegative and temperature positive and finite")
@@ -176,11 +182,11 @@ def _require_prediction_scope(codec, scope):
         raise ValueError("basic prediction scope requires the original nine-control/two-choice pilot pool; broad presets cannot be silently projected")
 
 
-def _run_contract(pool, sampler, frontend, config, stream_config, replay_seed=None) -> dict:
+def _run_contract(pool, sampler, frontend, config, stream_config, replay_seed=None, *, initial_model=None) -> dict:
     _require_prediction_scope(pool.codec, config.prediction_scope)
     training = asdict(config)
     # Preserve the existing v1 contract for the unchanged legacy schedule.
-    for name, default in (("sampling_policy", "pairs"), ("updates_per_render", 1), ("fresh_examples", None), ("preroll_frames", 0)):
+    for name, default in (("sampling_policy", "pairs"), ("updates_per_render", 1), ("fresh_examples", None), ("preroll_frames", 0), ("input_performances", "initial")):
         if training[name] == default:
             del training[name]
     if training["learning_seed_override"] is None:
@@ -208,6 +214,10 @@ def _run_contract(pool, sampler, frontend, config, stream_config, replay_seed=No
         contract["identity_objective"] = {"loss": "bidirectional_paired_info_nce_v1", "representation": "decoder_fusion_128",
                                           "normalization": "l2", "negatives": "distinct_training_states_in_batch"}
     contract.update(profile_metadata(config.preroll_frames))
+    if hasattr(sampler, "observation_contract"):
+        contract["observation_contract"] = sampler.observation_contract
+    if initial_model is not None:
+        contract["initial_model"] = initial_model
     return contract
 
 
@@ -275,7 +285,7 @@ def load_replay_seed(path: Path, pool, sampler, frontend, config, stream_config)
     if source_config.preroll_frames != config.preroll_frames:
         raise ValueError("feature seed belongs to a different render profile")
     source_stream = StreamConfig.from_dict(contract["stream"])
-    expected = _run_contract(pool, sampler, frontend, source_config, source_stream, contract.get("replay_seed"))
+    expected = _run_contract(pool, sampler, frontend, source_config, source_stream, contract.get("replay_seed"), initial_model=contract.get("initial_model"))
     if contract != expected or tensor_digest(source["basic_pitch"]) != frontend.frozen_digest:
         raise ValueError("feature seed has incompatible pool, sampler or frozen frontend contracts")
     replay, cursor = source["replay"], source["cursor"]
@@ -299,9 +309,26 @@ def load_replay_seed(path: Path, pool, sampler, frontend, config, stream_config)
     return source, descriptor
 
 
+def initial_model_state(path, pool, frontend, config):
+    raw = torch.load(path, map_location="cpu", weights_only=True)
+    expected_profile = profile_metadata(config.preroll_frames)
+    if (raw.get("format") != "obruxo_pilot_inference_v1" or raw.get("training_pool_id") != pool.pool_id
+            or raw.get("codec") != pool.codec.to_dict() or raw.get("model_spec") != model_spec(pool.codec, config.conditioning, config.cyclic_head)
+            or raw.get("frontend") != frontend.describe()
+            or any(raw.get(key) != expected_profile.get(key) for key in ("render_profile", "render_phase_controls"))):
+        raise ValueError("initial model has incompatible codec, frontend, pool or render profile")
+    with torch.random.fork_rng(devices=[]):
+        restore_model(raw)  # Validate actual tensors and frozen frontend without consuming this run's RNG.
+    descriptor = {"initialization": "verified_inference_weights_fresh_optimizer_and_learning_rng_v1", "file_sha256": sha256_bytes(Path(path).read_bytes()),
+                  "model_state_sha256": tensor_digest(raw["model"]), "frontend_state_sha256": tensor_digest(raw["basic_pitch"]),
+                  "training_pool_id": pool.pool_id, **expected_profile}
+    return raw["model"], descriptor
+
+
 def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = None, device: str = "cpu",
                 stream_config: StreamConfig | None = None, renderer_factory=None, resume: Path | None = None,
-                stop_after: int | None = None, progress=None, after_step=None, seed_replay: Path | None = None) -> dict:
+                stop_after: int | None = None, progress=None, after_step=None, seed_replay: Path | None = None,
+                initial_model: Path | None = None) -> dict:
     """Train with fresh renders inside the loop. after_step supports interruption testing."""
     config, stream_config = config or TrainConfig(), stream_config or StreamConfig(prefetch_clips=1)
     _require_prediction_scope(pool.codec, config.prediction_scope)
@@ -309,6 +336,8 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
         raise ValueError("qualified basic bootstrap uses one fresh native worker per request")
     if resume is not None and seed_replay is not None:
         raise ValueError("resume embeds its replay seed; do not supply seed_replay again")
+    if resume is not None and initial_model is not None:
+        raise ValueError("resume embeds its initial model; do not supply initial_model again")
     if torch.device(device).type not in {"cpu", "cuda", "xpu"}:
         raise ValueError("pilot supports CPU, CUDA or XPU explicitly; no automatic fallback")
     learning_seed = config.seed if config.learning_seed_override is None else config.learning_seed_override
@@ -326,10 +355,15 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
     source, replay_seed = None, saved["run_contract"].get("replay_seed") if saved else None
     if seed_replay is not None:
         source, replay_seed = load_replay_seed(seed_replay, pool, sampler, frontend, config, stream_config)
-    contract = _run_contract(pool, sampler, frontend, config, stream_config, replay_seed)
+    starting_weights, initialization = None, saved["run_contract"].get("initial_model") if saved else None
+    if initial_model is not None:
+        starting_weights, initialization = initial_model_state(initial_model, pool, frontend, config)
+    contract = _run_contract(pool, sampler, frontend, config, stream_config, replay_seed, initial_model=initialization)
     if saved and (saved.get("format") != "obruxo_pilot_training_v1" or saved["run_contract"] != contract):
         raise ValueError("checkpoint training contract changed; start an explicit new run")
     model = PilotInverse(pool.codec, config.conditioning, config.cyclic_head).to(device)
+    if starting_weights is not None:
+        model.load_state_dict(starting_weights, strict=True)
     optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate, weight_decay=0)
     generator = torch.Generator().manual_seed(learning_seed)
     replay, step, initial, render_ready, renderer_identity = [], 0, None, False, None
@@ -526,6 +560,8 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
             if getattr(pool.codec, "lossy_warps", False):
                 summary["warp_curve_target_bytes"] = sum(item["warp_curve_targets"].numel() * item["warp_curve_targets"].element_size() for item in replay)
             summary["feature_bytes"] = summary["replay_bytes"] - summary["curve_target_bytes"] - summary["route_curve_target_bytes"] - summary.get("warp_curve_target_bytes", 0)
+        if initialization is not None:
+            summary["initial_model"] = initialization
         write_json(output / "summary.json", summary)
         write_json(output / "status.json", {"complete": complete, "stage": "complete" if complete else "preempted", "step": step})
         return summary
