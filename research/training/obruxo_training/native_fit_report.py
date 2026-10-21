@@ -32,6 +32,44 @@ def recovered_timeouts(outcomes):
     return recovered
 
 
+def learning_diagnostics(trace, fit_cases, categorical):
+    """Separate native category sensitivity from gradients reaching the actual logits."""
+    if not trace:
+        raise ValueError("learning diagnostics require committed updates")
+
+    def statistics(values):
+        values = np.asarray(values, dtype=np.float64)
+        if not len(values) or not np.isfinite(values).all() or (values < 0).any():
+            raise ValueError("gradient diagnostics require finite nonnegative measurements")
+        return {"min": float(values.min()), "median": float(np.median(values)), "mean": float(values.mean()),
+                "max": float(values.max()), "exact_zero_steps": int((values == 0).sum())}
+
+    groups = {}
+    for index, category in enumerate(categorical):
+        gradients = [row["gradients"]["category_l1"][index] for row in trace]
+        spans = [max(row["estimates"][0]["categorical"][index]) - min(row["estimates"][0]["categorical"][index]) for row in trace]
+        samples = [row["estimates"][0]["anchor"]["categorical"][index] for row in trace]
+        groups[category["name"]] = {"score_gradient_l1": statistics(gradients), "native_loss_span": statistics(spans),
+            "steps_with_native_response_but_exact_zero_score_gradient": sum(span > 0 and gradient == 0 for span, gradient in zip(spans, gradients, strict=True)),
+            "sampled_choices": {str(value): samples.count(choice) for choice, value in enumerate(category["values"])}}
+    selected = [case for case in fit_cases if case["view"] == 0]
+    if len({case["state_id"] for case in selected}) != len(selected):
+        raise ValueError("duplicate training states in export diagnostics")
+    exports = {}
+    for method in ("initial", "parameter", "spectral"):
+        exports[method] = {}
+        for index, category in enumerate(categorical):
+            choices = [case["rows"][method]["candidate"]["categorical"][index] for case in selected]
+            exports[method][category["name"]] = {
+                "counts": {str(value): choices.count(choice) for choice, value in enumerate(category["values"])},
+                "changed_from_initial": sum(choice != case["rows"]["initial"]["candidate"]["categorical"][index]
+                                            for choice, case in zip(choices, selected, strict=True))}
+    return {"committed_updates": len(trace), "training_states": len(selected),
+            "continuous_output_gradient_l1": statistics([row["gradients"]["continuous_l1"] for row in trace]),
+            "categorical": groups, "hard_export_category_usage": exports,
+            "claim": "learning_signal_and_category_usage_diagnostics_not_a_quality_gate"}
+
+
 def paired_comparison(cases, *, resamples=2000):
     """Resample whole source states, retaining their paired reference/transfer observations."""
     by_state = {}

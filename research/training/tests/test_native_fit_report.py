@@ -2,7 +2,7 @@ import copy
 
 import pytest
 
-from obruxo_training.native_fit_report import paired_comparison, recovered_timeouts, terminal_interruption
+from obruxo_training.native_fit_report import learning_diagnostics, paired_comparison, recovered_timeouts, terminal_interruption
 
 
 def cases():
@@ -38,6 +38,19 @@ def test_timeout_recovery_requires_later_identical_accepted_request_and_preserve
                  [{**failed, "status": "rejected"}, accepted], [{**failed, "error_type": "RenderCrash"}, accepted]):
         with pytest.raises(ValueError):
             recovered_timeouts(rows)
+
+
+def test_learning_diagnostics_distinguish_native_response_from_a_zero_network_gradient():
+    trace = [{"gradients": {"continuous_l1": .2, "category_l1": [0.]},
+              "estimates": [{"categorical": [[.1, .5]], "anchor": {"categorical": [0]}}]}]
+    fit = [{"state_id": "state", "view": 0, "rows": {name: {"candidate": {"categorical": [choice]}}
+            for name, choice in (("initial", 0), ("parameter", 1), ("spectral", 0))}}]
+    report = learning_diagnostics(trace, fit, [{"name": "filter", "values": [0, 1]}])
+    assert report["categorical"]["filter"]["steps_with_native_response_but_exact_zero_score_gradient"] == 1
+    assert report["hard_export_category_usage"]["parameter"]["filter"]["changed_from_initial"] == 1
+    assert report["hard_export_category_usage"]["spectral"]["filter"]["changed_from_initial"] == 0
+    with pytest.raises(ValueError, match="duplicate"):
+        learning_diagnostics(trace, fit + fit, [{"name": "filter", "values": [0, 1]}])
 
 
 def test_paired_intervals_preserve_both_performances_and_exact_constant_difference():
