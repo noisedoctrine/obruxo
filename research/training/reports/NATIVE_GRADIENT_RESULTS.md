@@ -1,5 +1,7 @@
 # Direct native sound-loss gradients pass the local update check
 
+Historical immediate-MIDI observation. The corrected renderer has its own [fresh qualification](SETTLED_NATIVE_GRADIENT_RESULTS.md); use that evidence for new training.
+
 Completed 2026-10-21 under the [frozen card](NATIVE_GRADIENT_CARD.md). The measured native-gradient path passes all declared direction and resource gates. Continuous updates improve **24/24** cases; combined continuous/category updates improve **23/24**, measured by both native MRSTFT and the primary spectral objective. This qualifies the bounded gradient method for a costed inverse-training trial. It does not establish a trained-model improvement.
 
 [Audited evidence](data/native_gradient_summary.json) · Frozen source commit `6d61af7` · Plan `c9f829b06e4bc3993ff59d35b8e617100a89b64de41a4997368f3c52ac6a04d5`
