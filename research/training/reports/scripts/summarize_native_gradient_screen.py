@@ -27,7 +27,7 @@ def summarize(source):
             or summary["failure"] is not None or not summary["result"]["complete"]):
         raise ValueError("incomplete or mismatched native gradient qualification")
     for name, expected in plan["source"].items():
-        path = (RESEARCH / "data_generation/obruxo_data/render/vita.py" if name == "vita.py" else
+        path = (RESEARCH / "data_generation/obruxo_data/render" / name if name in {"vita.py", "base.py", "midi_transport.py", "qa.py"} else
                 Path(__file__).with_name(name) if name == "run_native_gradient_screen.py" else
                 RESEARCH / "training/obruxo_training" / name)
         if sha256_bytes(path.read_bytes().replace(b"\r\n", b"\n")) != expected:
@@ -53,7 +53,8 @@ def summarize(source):
             candidate = PilotTarget.from_dict(row["candidate"])
             request = RenderRequest(preset_json=fixed_generator_phases(codec.decode(candidate)).decode(),
                                     performance=Performance.from_dict(planned["performance"]),
-                                    renderer_id=codec.contract.renderer_id, tail_seconds=codec.contract.tail_seconds)
+                                    renderer_id=codec.contract.renderer_id, tail_seconds=codec.contract.tail_seconds,
+                                    preroll_frames=plan.get("render_profile", {}).get("preroll_frames", 0))
             receipt = outcomes[cursor]
             if (request.request_id != row["request_id"] or sha256_bytes(codec.decode(candidate)) != receipt["source_sha256"]
                     or sha256_bytes(request.preset_json.encode()) != receipt["controlled_sha256"]):

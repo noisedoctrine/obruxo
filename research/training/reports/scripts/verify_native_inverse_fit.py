@@ -38,7 +38,8 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path):
     from obruxo_training.spectral import SpectralTargets
     from obruxo_training.trainer import restore_model
     torch.set_num_threads(2)
-    plan = make_plan(pool, initial_path, retrieval_path, qualification_path)
+    frozen = json.loads((source / "plan.json").read_text())
+    plan = make_plan(pool, initial_path, retrieval_path, qualification_path, preroll_frames=frozen.get("render_profile", {}).get("preroll_frames", 0))
     summary = json.loads((source / "summary.json").read_text())
     if (plan != json.loads((source / "plan.json").read_text()) or summary["plan"] != plan
             or summary["plan_id"] != canonical_sha256(plan) or not summary["complete"] or summary["failure"] is not None):
@@ -94,7 +95,8 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path):
     def require_request(candidate, performance, receipt):
         raw = codec.decode(candidate)
         request = RenderRequest(preset_json=fixed_generator_phases(raw).decode(), performance=performance,
-                                renderer_id=codec.contract.renderer_id, tail_seconds=codec.contract.tail_seconds)
+                                renderer_id=codec.contract.renderer_id, tail_seconds=codec.contract.tail_seconds,
+                                preroll_frames=plan.get("render_profile", {}).get("preroll_frames", 0))
         if (request.request_id != receipt["request_id"] or sha256_bytes(raw) != receipt["source_sha256"]
                 or sha256_bytes(request.preset_json.encode()) != receipt["controlled_sha256"]):
             raise ValueError("receipt does not reconstruct from the claimed patch/MIDI")

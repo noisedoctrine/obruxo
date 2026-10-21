@@ -104,6 +104,8 @@ The [native-gradient card](reports/NATIVE_GRADIENT_CARD.md) explicitly budgets t
 
 The [completed native-gradient result](reports/NATIVE_GRADIENT_RESULTS.md) passes those gates: 24/24 continuous and 23/24 joint improvements, all 560 renders accepted and 24 exact repeats. This bounded direct-measurement path is qualified for a costed A2 trial; the learned helpers remain unqualified. Its inverse loss connection passes gradient/recovery tests, but no spectral inverse model has been trained.
 
+That historical result uses immediate MIDI. The first inverse attempt exposed a [native startup transient](reports/NATIVE_PREROLL_RESULTS.md). The corrected 32,768-frame lead preserves every requested attack/tail and passes strict renderer checks. Newly qualify the estimator on this settled profile before fresh A2 training; old targets and the partial model prefix are not corrected evidence. The new runners pin profile/source identity and refuse cross-profile qualification/cache reuse. The [settled-gradient card](reports/SETTLED_NATIVE_GRADIENT_CARD.md) retains the same quality gates under a new explicit resource allocation.
+
 ## A2: spectral-loss inverse training and native comparison
 
 Only a qualified, hash-pinned helper or native-gradient estimator may guide this comparison. Start the parameter-only control and spectral candidate from the same incumbent checkpoint with fresh, matched optimizer state. Keep the basic encoder/head architecture, source population, phase policy, input preprocessing, training observations and inverse-update count fixed. Report helper training or native-gradient query costs separately; a direct native path must fit all probes into its declared budget.
