@@ -1,0 +1,156 @@
+{
+  "config": {
+    "batch_size": 8,
+    "checkpoint_every": 50,
+    "conditioning": "concat",
+    "cpu_threads": 2,
+    "cyclic_head": "sigmoid",
+    "fresh_examples": null,
+    "identity_temperature": 0.1,
+    "identity_weight": 0.0,
+    "learning_rate": 0.001,
+    "learning_seed_override": null,
+    "mode": "overfit",
+    "prediction_scope": "basic",
+    "preroll_frames": 32768,
+    "render_budget": 8,
+    "replay_capacity": 8,
+    "replay_mib": 8,
+    "sampling_policy": "state_round_robin",
+    "seed": 0,
+    "steps": 800,
+    "updates_per_render": 1
+  },
+  "experiment": "settled_basic_bootstrap_preflight_v1",
+  "gates": {
+    "all_outcomes_accepted": true,
+    "all_source_repeats_exact": true,
+    "model_vs_template_mrstft_ratio_both_roles": 0.9,
+    "trainer_tiny_overfit": true
+  },
+  "limits": {
+    "archive_bytes": 268435456,
+    "evaluation_attempts": 90,
+    "optimizer_updates": 800,
+    "process_tree_bytes": 4294967296,
+    "training_attempts": 10,
+    "wall_seconds": 1800
+  },
+  "manifest_id": "c6f567ad416d90594e675fd34be3b28b4c1916be2e8110e5593e9d66a2677920",
+  "planned_requests": {
+    "evaluation": 80,
+    "total": 88,
+    "training": 8
+  },
+  "pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+  "qualification_sha256": "25d217636533c264ffe1b52f8024ad3cb4487fb80bc91a23276af544ce92dae1",
+  "quality_claim": "training_fit_preflight_only_not_a_released_or_sound_trained_model",
+  "recovery": "explicit_resume_original_deadline_up_to_two_source_and_ten_evaluation_extra_attempts",
+  "render_phase_controls": {
+    "osc_1_random_phase": 0.0,
+    "osc_2_random_phase": 0.0,
+    "osc_3_random_phase": 0.0,
+    "sample_random_phase": 0.0
+  },
+  "render_profile": {
+    "midi_timing": "exact_sample_shift",
+    "preroll_frames": 32768,
+    "startup": "settled_controls_before_MIDI",
+    "trim": "added_lead_only"
+  },
+  "renderer_identity": {
+    "backend_version": "0.8.3",
+    "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+    "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+    "settings": {
+      "buffer_size": 128,
+      "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+      "event_timing": "absolute ticks to half-even sample offsets",
+      "frame_policy": "one_guard_sample_trim_to_requested_frames_v1",
+      "plugin_name": "Vital.vst3",
+      "preroll_frames": 32768,
+      "preroll_policy": "shift_all_MIDI_then_trim_only_lead_v1",
+      "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+      "simple_note_time_guard": "one_eighth_sample_start_and_duration_v1",
+      "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+    }
+  },
+  "runtime": {
+    "cpu_threads": 2,
+    "device": "cpu",
+    "native_workers": 1,
+    "numpy": "2.4.6",
+    "precision": "float32",
+    "python": "3.12.13",
+    "torch": "2.12.1+xpu"
+  },
+  "selection": "final_only_no_held_out_states",
+  "source": {
+    "basic_bootstrap.py": "b8825fe767f099ce5daa3fd1073162cefbf2f06ebf709dcf60481a3933b17a6d",
+    "checkpoints.py": "1b65d17129dfadff08b1b07f9c48ede36aacb09133b4388adab38aa53e83088b",
+    "evaluate.py": "09c73dca6bdbd031149ed2bee96fae237117fd462084797e2e1508866c9f400a",
+    "features.py": "895a736257041013f6b3e3ce260ed6a7bef2c94d51390f5f1a5492a78b737501",
+    "model.py": "ed009cd8a42f287de97e7348ea4cbce1f5ffcb5e028cf3d2385f835718ecaa68",
+    "profiled_sampler.py": "1940c87f81d83ec2e38f6bb5ed1483fe19ed4d3223e3d3939ce32d04af30ea64",
+    "trainer.py": "c77777be6971713f82c8613c379985abd2b95f2a287ea3ebb1d1d383a961e951"
+  },
+  "sources": [
+    {
+      "performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "recipe_id": "173df615aa9bd85eb461414fd6222b0128b1f377d58ae99f9416b87a4c2e5215",
+      "request_id": "640b56bdc27dfb8674b090aa4b805f24222698beaf33fc61952974474990378e",
+      "sequence_id": 0,
+      "state_id": "5a900dbe774aedc7ed3aa3874bed32ecc71bdab1b8b208bb6f5af5936695eccc"
+    },
+    {
+      "performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "recipe_id": "6005a916f29cca2c4997f7bacb913de630292d7c027c546705d6f5e3e141e9e9",
+      "request_id": "5696c102e09a84cb704ddb608eb3d399b5e45e72025f49266244090312f2f6af",
+      "sequence_id": 1,
+      "state_id": "1c2106feeaf9e6451fee95de7a81495605b63b1e214cba4957d31e8f0637db97"
+    },
+    {
+      "performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "recipe_id": "df02b108a7d04fcf167020adeb9180216856f2f73a18b68802db5edd2f1e374f",
+      "request_id": "14d6f251bc39b0880fc12adc1026932632945f6b48d09697500b73131341102f",
+      "sequence_id": 2,
+      "state_id": "1d881e15b2e32782d4cd37b7d6adb8c14256c568e39afdc274dee03c0d9addb3"
+    },
+    {
+      "performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "recipe_id": "49b7ce2ca8f9cd99d5edb82317b6d3f3c3944137826ace3ef37c88a7b66daa7a",
+      "request_id": "579a7d647cd65ec6789f9deaabe6eda99d95be2f3e5851788d74407fcaf36c01",
+      "sequence_id": 3,
+      "state_id": "de8d3759e0d29978fe8166cf82a955f1fba8c1f89ef014a60033bc6ab3d0a7c0"
+    },
+    {
+      "performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "recipe_id": "91d3fbc681080346f3d7bed468df2d23356731e5e038c0ecb2c7f5e09e23f794",
+      "request_id": "53ea70f2bc8219aff7a129137a2ae33fa185e03fe11f30d367a947fa0abae204",
+      "sequence_id": 4,
+      "state_id": "80a22e98a4d96341d25c649ebba037c85e9b0ed3bb1a19648493218b163bfb91"
+    },
+    {
+      "performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+      "recipe_id": "d440a64652cde264986fb3cf959f51931c6737e29d861a8799a4add869283bf0",
+      "request_id": "c3f59d8142912e9654a531aeefba1cdd40ba09a9fc7c6aa290355fe20a8c3f96",
+      "sequence_id": 5,
+      "state_id": "109cc4d6e5c826b85a0e0449748397c4cae5210d4f9ef287e54d56e2bbc3d46e"
+    },
+    {
+      "performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+      "recipe_id": "d6d92a6ddc52e3e381443de295b1e30844c1a0c9392ccaa7f426429181209af4",
+      "request_id": "e33ef3ce7108b213cf5a7fd73ac6ee81030978387c65e6467e2e8a74cb787e2b",
+      "sequence_id": 6,
+      "state_id": "85d6a8aa4057767f7018300e1da536010a8fdf96e47f5a92bd9bb2375f8d6612"
+    },
+    {
+      "performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+      "recipe_id": "c6da185bb93e57bd253ade79b12935cad29c4e4c442b8e0e9ae927f80bef0198",
+      "request_id": "edc0e1078b30f0c10d177b5e945944413c4fb2804fad8506afcb201077829ab0",
+      "sequence_id": 7,
+      "state_id": "954988d008fc8a65e031838856db06a4cf0554811172aca4f178b636fcfca6a5"
+    }
+  ],
+  "test_split_used": false
+}

@@ -32,6 +32,8 @@ The explicit `--prediction-scope basic` option rejects broad pools before creati
 
 Both existing basic validation panels have already influenced development. No test state is released for tuning. Full-model tiny-set fitting, eight-LFO loss tuning, all-64-slot training and mixed-corpus scaling are deferred; they do not block Stage A. Exact random-seed prediction and exhaustive parameter coverage are removed from completion criteria.
 
+The [corrected-render bootstrap preflight](reports/SETTLED_BOOTSTRAP_CARD.md) now has explicit profile/phase-aware source, cache, checkpoint and evaluation contracts. New `train --prediction-scope basic` commands default to the qualified render setup; historical commands remain reproducible with explicit zero lead. The frozen eight-training-patch plan checks basic fitting before refreshing initialization at larger scale. It uses 800 updates and 88 planned native requests, with battery-safe checkpoint boundaries and the original deadline retained across recovery. A bootstrap pass alone cannot advance A2 or qualify a release.
+
 ## Retained infrastructure and experiments
 
 The following remain useful engineering evidence, not evidence that Stage A or release quality is complete:

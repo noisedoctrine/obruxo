@@ -164,6 +164,8 @@ def main(argv=None) -> int:
     train.add_argument("--cyclic-head", choices=("sigmoid", "periodic"), default="sigmoid")
     train.add_argument("--prediction-scope", choices=("codec", "basic"), default="codec",
                        help="basic enforces the nine-control/two-choice pilot; codec preserves historical experiments")
+    train.add_argument("--preroll-frames", type=int, choices=(0, 32768),
+                       help="Basic defaults to the qualified lead with fixed random phase; explicit zero preserves legacy rendering")
     train.add_argument("--updates-per-render", type=int, default=1)
     train.add_argument("--fresh-examples", type=int, help="Stop adding fresh examples at this count, then continue bounded replay")
     train.add_argument("--device", default="cpu")
@@ -488,6 +490,8 @@ def main(argv=None) -> int:
                 return 0 if result["renders_accepted"] == result["renders_attempted"] else 2
             if args.command == "train":
                 from .trainer import TrainConfig, train_pilot
+                if args.preroll_frames is None:
+                    args.preroll_frames = 32768 if args.prediction_scope == "basic" else 0
                 config = TrainConfig(**{key: getattr(args, key) for key in TrainConfig.__dataclass_fields__})
                 result = train_pilot(pool, args.output, config=config, device=args.device,
                                      stream_config=StreamConfig(prefetch_clips=1, timeout_seconds=args.timeout, worker_jobs=args.worker_jobs),

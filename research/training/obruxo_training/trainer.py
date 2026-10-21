@@ -26,6 +26,7 @@ from .extended_features import features_for
 from .model import PilotInverse, batch_features, conditioning_from_spec, cyclic_head_from_spec, loss_terms, model_spec, predicted_targets
 from .paired import complete_pairs, identity_terms, paired_batch_indices
 from .pilot import PilotPool, PilotSampler
+from .profiled_sampler import profile_metadata, training_sampler
 from .stream import OnlineRenderStream, StreamConfig
 
 
@@ -50,6 +51,7 @@ class TrainConfig:
     conditioning: str = "concat"
     cyclic_head: str = "sigmoid"
     prediction_scope: str = "codec"
+    preroll_frames: int = 0
 
     def __post_init__(self):
         positive = (self.steps, self.replay_capacity, self.replay_mib, self.batch_size,
@@ -72,6 +74,9 @@ class TrainConfig:
             raise ValueError("unsupported cyclic output head")
         if self.prediction_scope not in {"codec", "basic"}:
             raise ValueError("unsupported prediction scope")
+        profile_metadata(self.preroll_frames)
+        if self.preroll_frames and self.prediction_scope != "basic":
+            raise ValueError("qualified bootstrap render profile requires explicit basic prediction scope")
         if (not math.isfinite(self.identity_weight) or self.identity_weight < 0
                 or not math.isfinite(self.identity_temperature) or self.identity_temperature <= 0):
             raise ValueError("identity weight must be nonnegative and temperature positive and finite")
@@ -124,6 +129,9 @@ def validate_replay(items: list[dict], sampler: PilotSampler, cursor: dict, conf
         raise ValueError("saved replay and acknowledged cursor disagree")
     targets = {entry.state_id: entry.target.to_dict() for entry in sampler.pool.entries}
     for item in items:
+        expected_profile = profile_metadata(config.preroll_frames)
+        if any(item.get(key) != expected_profile.get(key) for key in ("render_profile", "render_phase_controls")):
+            raise ValueError("saved replay render profile or phase policy changed")
         recipe = sampler.recipe_at(item["sequence_id"])
         if recipe.split != "train" or recipe.performance_role != "reference":
             raise ValueError("replay contains held-out data")
@@ -172,7 +180,7 @@ def _run_contract(pool, sampler, frontend, config, stream_config, replay_seed=No
     _require_prediction_scope(pool.codec, config.prediction_scope)
     training = asdict(config)
     # Preserve the existing v1 contract for the unchanged legacy schedule.
-    for name, default in (("sampling_policy", "pairs"), ("updates_per_render", 1), ("fresh_examples", None)):
+    for name, default in (("sampling_policy", "pairs"), ("updates_per_render", 1), ("fresh_examples", None), ("preroll_frames", 0)):
         if training[name] == default:
             del training[name]
     if training["learning_seed_override"] is None:
@@ -199,6 +207,7 @@ def _run_contract(pool, sampler, frontend, config, stream_config, replay_seed=No
     if config.identity_weight:
         contract["identity_objective"] = {"loss": "bidirectional_paired_info_nce_v1", "representation": "decoder_fusion_128",
                                           "normalization": "l2", "negatives": "distinct_training_states_in_batch"}
+    contract.update(profile_metadata(config.preroll_frames))
     return contract
 
 
@@ -243,6 +252,8 @@ def load_replay_seed(path: Path, pool, sampler, frontend, config, stream_config)
     raw = path.read_bytes()
     source = load_training_checkpoint(path)
     if source.get("format") == "obruxo_paired_features_v1":
+        if config.preroll_frames:
+            raise ValueError("legacy paired feature cache lacks the corrected render profile")
         from .paired_features import validate_cache
         if config.sampling_policy != "paired_views":
             raise ValueError("paired feature cache requires the paired_views sampler")
@@ -261,6 +272,8 @@ def load_replay_seed(path: Path, pool, sampler, frontend, config, stream_config)
         raise ValueError("feature seeding needs a collected pilot checkpoint")
     contract = source["run_contract"]
     source_config = TrainConfig(**contract["training"])
+    if source_config.preroll_frames != config.preroll_frames:
+        raise ValueError("feature seed belongs to a different render profile")
     source_stream = StreamConfig.from_dict(contract["stream"])
     expected = _run_contract(pool, sampler, frontend, source_config, source_stream, contract.get("replay_seed"))
     if contract != expected or tensor_digest(source["basic_pitch"]) != frontend.frozen_digest:
@@ -292,6 +305,8 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
     """Train with fresh renders inside the loop. after_step supports interruption testing."""
     config, stream_config = config or TrainConfig(), stream_config or StreamConfig(prefetch_clips=1)
     _require_prediction_scope(pool.codec, config.prediction_scope)
+    if config.preroll_frames and stream_config.worker_jobs != 1:
+        raise ValueError("qualified basic bootstrap uses one fresh native worker per request")
     if resume is not None and seed_replay is not None:
         raise ValueError("resume embeds its replay seed; do not supply seed_replay again")
     if torch.device(device).type not in {"cpu", "cuda", "xpu"}:
@@ -304,7 +319,7 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
     torch.manual_seed(learning_seed)
     saved = load_training_checkpoint(resume) if resume else None
     frontend = features_for(pool.codec, saved["basic_pitch"] if saved else None)
-    sampler = PilotSampler(pool, seed=config.seed, policy=config.sampling_policy)
+    sampler = training_sampler(pool, config)
     paired = config.sampling_policy == "paired_views"
     if paired and len({entry.state_id for entry in pool.entries if pool.manifest.by_state[entry.state_id].split == "train"}) < config.batch_size // 2:
         raise ValueError("paired training needs enough distinct training states for its batch")
@@ -382,6 +397,8 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
                     totals[{"accepted": "accepted", "rejected": "rejected", "error": "errors"}[status]] += 1
                     if outcome.audio is not None:
                         identity = {key: value for key, value in outcome.metadata["provenance"].items() if key != "request_id"}
+                        if config.preroll_frames and identity.get("settings", {}).get("preroll_frames") != config.preroll_frames:
+                            raise ValueError("accepted bootstrap audio lacks its declared render profile")
                         if renderer_identity is not None and identity != renderer_identity:
                             raise ValueError("renderer provenance changed during training or recovery")
                         renderer_identity = identity
@@ -393,6 +410,7 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
                         item = {"features": features, "target": target.to_dict(), "sequence_id": recipe.sequence_id,
                                 "state_id": recipe.state_id, "recipe_id": recipe.recipe_id,
                                 "audio_sha256": outcome.metadata["qa"]["audio_float32_sha256"], "uses": 0}
+                        item.update(profile_metadata(config.preroll_frames))
                         if paired or config.sampling_policy in {"performance_round_robin", "attack_compatible", "source_balanced"}:
                             item["performance_id"] = recipe.performance_id
                         for flag, key, method, *_ in SOURCE_CURVES:
@@ -480,7 +498,7 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
         frontend.require_frozen()
         complete = step == config.steps
         if complete:
-            export_model(output / "model.pt", model, frontend, pool.codec, pool.pool_id)
+            export_model(output / "model.pt", model, frontend, pool.codec, pool.pool_id, preroll_frames=config.preroll_frames)
         summary = {"run_id": canonical_sha256(contract), "mode": config.mode, "complete": complete, "step": step,
                    "device": device, "torch": str(torch.__version__), "config": asdict(config), "totals": totals,
                    "replay_examples": len(replay), "replay_bytes": replay_bytes(replay), "initial_metrics": initial,
@@ -518,15 +536,16 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
         monitor.close()
 
 
-def export_model(path: Path, model, frontend, codec, pool_id: str) -> None:
-    atomic_torch_save(path, inference_state(model, frontend, codec, pool_id))
+def export_model(path: Path, model, frontend, codec, pool_id: str, *, preroll_frames=0) -> None:
+    atomic_torch_save(path, inference_state(model, frontend, codec, pool_id, preroll_frames=preroll_frames))
 
 
-def inference_state(model, frontend, codec, pool_id: str) -> dict:
+def inference_state(model, frontend, codec, pool_id: str, *, preroll_frames=0) -> dict:
     frontend.require_frozen()
     return {"format": "obruxo_pilot_inference_v1", "model_spec": model_spec(codec, model.conditioning, model.cyclic_head), "model": model.state_dict(),
             "basic_pitch": frontend.basic_pitch.state_dict(), "frontend": frontend.describe(), "contract": codec.contract.to_dict(),
-            "codec": codec.to_dict(), "training_pool_id": pool_id, "input": "audio_only"}
+            "codec": codec.to_dict(), "training_pool_id": pool_id, "input": "audio_only", **profile_metadata(preroll_frames),
+            **({"qualified_for_release": False} if preroll_frames else {})}
 
 
 def load_model(path: Path, device: str = "cpu") -> tuple:

@@ -65,7 +65,8 @@ def restore_evaluation_checkpoint(saved, pool):
     config = TrainConfig(**contract["training"])
     stream_config = StreamConfig.from_dict(contract["stream"])
     frontend = features_for(pool.codec, saved["basic_pitch"])
-    sampler = PilotSampler(pool, seed=config.seed, policy=config.sampling_policy)
+    from .profiled_sampler import training_sampler
+    sampler = training_sampler(pool, config)
     if contract != _run_contract(pool, sampler, frontend, config, stream_config, contract.get("replay_seed")):
         raise ValueError("evaluation checkpoint belongs to incompatible contracts or a different pool")
     OnlineRenderStream(sampler, 1, config=stream_config, resume=saved["cursor"])
@@ -78,10 +79,10 @@ def restore_evaluation_checkpoint(saved, pool):
 
 
 def evaluate_pilot(pool, checkpoint: Path, output: Path, *, count: int = 4, split: str = "validation",
-                   renderer_factory=None, timeout: float = 60, progress=None, validation_states=None) -> dict:
+                   renderer_factory=None, timeout: float = 60, progress=None, validation_states=None, resume=False) -> dict:
     saved, model, frontend, sampler = load_evaluation_checkpoint(checkpoint, pool)
     return _evaluate_models(pool, {"model": (saved, model)}, frontend, sampler, output, count=count, split=split,
-                            renderer_factory=renderer_factory, timeout=timeout, progress=progress, validation_states=validation_states)
+                            renderer_factory=renderer_factory, timeout=timeout, progress=progress, validation_states=validation_states, resume=resume)
 
 
 def retrieval_digest(replay: list[dict]) -> str:
@@ -146,6 +147,7 @@ def evaluate_comparison(pool, checkpoints: dict[str, Path], retrieval_checkpoint
         expansion = training_pool.expansion_from(pool) if training_pool.pool_id != pool.pool_id else None
         saved, model, _, _ = load_evaluation_checkpoint(path, training_pool)
         if (any(saved["run_contract"][key] != reference["run_contract"][key] for key in common_keys)
+                or saved["run_contract"]["training"].get("preroll_frames", 0) != reference["run_contract"]["training"].get("preroll_frames", 0)
                 or saved["renderer_identity"] != reference["renderer_identity"]):
             raise ValueError("comparison checkpoints must share inference contracts and renderer with the retrieval source")
         models[name] = (saved, model)
@@ -254,12 +256,17 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
         raise ValueError("explicit validation states must be a unique list matching the requested count")
     torch.set_num_threads(4)
     saved, _ = next(iter(models.values()))
+    preroll_frames = saved["run_contract"]["training"].get("preroll_frames", 0)
+    if any(state["run_contract"]["training"].get("preroll_frames", 0) != preroll_frames for state, _model in models.values()):
+        raise ValueError("evaluation models must share the same render profile")
     codec = pool.codec
     grouped_variants = getattr(codec, "multiple_variants_per_root", False) or hasattr(pool, "evaluation_group")
     lossy = getattr(codec, "lossy_curves", False)
     source_targets = {entry.state_id: entry.target for entry in pool.entries} if lossy else {}
     replay = saved["replay"] if retrieval is None else retrieval["replay"]
-    sampler = training_sampler if split == "train" else PilotSampler(pool, split="validation")
+    from .profiled_sampler import ProfiledSampler, profile_metadata
+    sampler = training_sampler if split == "train" else (ProfiledSampler(pool, split="validation", preroll_frames=preroll_frames)
+                                                        if preroll_frames else PilotSampler(pool, split="validation"))
     if split == "train":
         recipes = [sampler.recipe_at(item["sequence_id"]) for item in replay[:count]]
     else:
@@ -285,6 +292,7 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
             "retrieval_sha256": retrieval_digest(replay),
             "primary": "equal_weight_mean_of_reference_and_transfer_per_state_mrstft",
             "maximum_render_attempts": count * (8 + 2 * len(models) + (2 if lossy else 0)), "test_split_evaluated": False}
+    plan.update(profile_metadata(preroll_frames))
     if grouped_variants:
         plan.update(primary="equal_weight_mean_of_reference_and_transfer_per_lineage_mrstft",
                     case_lineages={recipe.state_id: pool.evaluation_group(recipe.state_id) if hasattr(pool, "evaluation_group") else
@@ -340,8 +348,12 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
     def render(raw, performance, case_index, method, role):
         if render_attempt_limit is not None and len(renders) >= render_attempt_limit:
             raise RuntimeError("frozen evaluation native-render attempt budget exhausted")
+        if preroll_frames:
+            from .reproducibility import fixed_generator_phases
+            raw = fixed_generator_phases(raw)
         request = RenderRequest(preset_json=raw.decode(), performance=performance, sample_rate=codec.contract.sample_rate,
-                                channels=2, tail_seconds=codec.contract.tail_seconds, renderer_id=codec.contract.renderer_id)
+                                channels=2, tail_seconds=codec.contract.tail_seconds, renderer_id=codec.contract.renderer_id,
+                                preroll_frames=preroll_frames)
         audio, metadata = render_isolated(request, renderer_factory=renderer_factory, timeout=timeout)
         identity = {key: value for key, value in metadata.get("provenance", {}).items() if key != "request_id"}
         if audio is not None and identity != saved["renderer_identity"]:
@@ -458,7 +470,8 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
             selected = statistics["selected"]
             if selected is not None:
                 selected_state, selected_model = models[selected]
-                export_model(output / "selected-model.pt", selected_model, frontend, codec, selected_state["run_contract"]["pool_id"])
+                export_model(output / "selected-model.pt", selected_model, frontend, codec, selected_state["run_contract"]["pool_id"],
+                             preroll_frames=preroll_frames)
         else:
             summary.update(model_state_sha256=model_info["model"]["model_state_sha256"], step=saved["step"])
         write_json(output / "summary.json", summary)
