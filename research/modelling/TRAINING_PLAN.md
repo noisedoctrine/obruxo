@@ -1,6 +1,6 @@
 # OBRUXO training plan: learn to reconstruct sound
 
-Revised 2026-10-19. **Train using perceptual spectral reconstruction loss on a small prediction space, prove improvement in real Vital audio, then add capabilities when they improve audible results.** Parameter matching is an initialization or auxiliary signal. Comprehensive preset serialization does not determine the model's output size. This revision moves sound-based learning into the first stage and supersedes the [coverage-first snapshot](TRAINING_PLAN_COVERAGE_20261018.md), including its sequence of expanding coverage before establishing useful reconstruction gradients.
+Revised 2026-10-21. **Train using perceptual spectral reconstruction loss on a small prediction space, prove improvement in real Vital audio, then add capabilities when they improve audible results.** Parameter matching is an initialization or auxiliary signal. Comprehensive preset serialization does not determine the model's output size. This revision moves sound-based learning into the first stage and supersedes the [coverage-first snapshot](TRAINING_PLAN_COVERAGE_20261018.md), including its sequence of expanding coverage before establishing useful reconstruction gradients.
 
 The [completion ledger](../training/IMPLEMENTATION_STATUS.md) tracks the active work. The [basic-stage protocol](../training/STAGED_RECONSTRUCTION.md) fixes the immediate implementation and qualification steps. Prior code, checkpoints, reports and split reservations remain available. This is an updated plan, not a claim that spectral-loss training is implemented or qualified.
 
@@ -54,24 +54,21 @@ Keep stack style at Normal and oscillator wave-warp mode at None in Stage A. Sta
 
 ## Sound-loss training path
 
-Native Vital does not supply derivatives for ordinary backpropagation. The proposed bridge is a small differentiable forward model, or helper: patch controls and MIDI go in, estimates of Vital's time-varying spectral measurements come out. Train and qualify it before connecting it to the predictor.
+Native Vital does not supply derivatives for ordinary backpropagation. The active basic path now estimates local sound-loss gradients from legal native renders. The [bounded qualification](../training/reports/NATIVE_GRADIENT_RESULTS.md) passes: continuous changes improve 24/24 cases and joint changes 23/24. The inverse loss connection is tested, but matched inverse training remains pending. A learned forward helper remains an alternative requiring its own qualification; both current helpers failed.
 
 ```text
-On-demand helper training:
-  authored patch + training MIDI -> real Vital -> audio -> fixed spectral targets
-  authored patch + training MIDI -> helper -> fit to those spectral targets
-
-Predictor training after helper qualification:
+Predictor training with the qualified native estimator:
   target audio -> predictor -> continuous controls / Gumbel-softmax selections
-               -> frozen helper with training MIDI -> predicted spectra
-  target audio ------------------------------------> target spectra
-                             reconstruction loss -> backpropagation
+               -> codec/native render boundary -> real Vital with training MIDI
+  target audio ---------------------------------> target spectra
+  legal control probes -> real spectral losses -> local gradient estimates
+                           measured tensor loss -> backpropagation
 
 Deployment and real-render evaluation:
   audio -> predictor -> rounded numeric controls / argmax categories -> codec -> Vital
 ```
 
-Freeze helper weights during predictor training but retain gradients through its inputs. No `no_grad()`, detached controls, Python integer selections or JSON serialization inside this path. The full codec remains the export/native-render boundary. Known MIDI conditions the helper and evaluator, never the deployed inverse network.
+At the explicit native boundary, serialize hard legal patches and measure their sound losses. Reconnect those measurements to the original raw continuous tensors and straight-through choices using the pinned numerical estimator. Its forward value is the measured native loss; its backward is a local estimate, not an exact plugin derivative. A learned-helper implementation instead keeps its weights frozen and retains derivatives through its inputs. Known MIDI conditions only the evaluator or helper, never the deployed inverse network.
 
 Use **straight-through Gumbel-softmax** for the categorical controls: a hard one-hot choice in the forward pass and a soft approximation in the backward pass. Save its RNG and temperature schedule; use unperturbed deterministic `argmax` for deployment-quality scoring. This supplies an approximate gradient through a category choice, not through native Vital. [PyTorch documentation](https://docs.pytorch.org/docs/2.14/generated/torch.nn.functional.gumbel_softmax.html)
 
@@ -127,11 +124,13 @@ If qualification fails, diagnose the conflicting measurements/directions and dec
 
 The [native-gradient alternative card](../training/reports/NATIVE_GRADIENT_CARD.md) now freezes that branch: direct finite differences and categorical sound-loss tables, at most 624 native attempts, 30 minutes, 8 GiB RAM and 32 MiB output. It retains the continuous/joint real-improvement gates on reference and transfer, exact repeats and QA. Forward-helper prediction/ranking gates remain required for a learned helper, but do not apply to direct native measurements. Only a passing native direction report permits a separately costed inverse-training trial; implementation alone does not qualify it.
 
+The [completed native result](../training/reports/NATIVE_GRADIENT_RESULTS.md) passes all those gates with 560 accepted renders, 24 exact repeats, 20 minutes and 0.88 GiB RAM. This qualifies the bounded estimator for a costed A2 trial. It does not qualify either learned helper or establish inverse-model quality. Each training example can require 22 native probes, so the next card must freeze a practical fit/update/audit allocation before execution; any revision to the A2 request budget must be explicit.
+
 #### A2. Train the predictor on spectral loss
 
 Start a matched parameter-only control and spectral-loss candidate from the same selected basic checkpoint. Align encoder, output vocabulary, source population, performances and inverse-update budget. Freeze the qualified helper for the whole inverse run, or pin a qualified native-gradient estimator and count every native probe against the card. Use Gumbel-softmax for both basic categorical decisions and differentiable bounded continuous controls.
 
-Infer one patch from a reference recording and compare its helper predictions under reference and additional training performances against real target renders of the same source patch under those performances. Reusing that one inferred patch encourages a playable sound beyond one note. No source patch labels or true MIDI enter the inverse network.
+Infer one patch from a reference recording and compare its native or qualified-helper measurements under reference and additional training performances against real target renders of the same source patch under those performances. Reusing that one inferred patch encourages a playable sound beyond one note. No source patch labels or true MIDI enter the inverse network.
 
 Run a small end-to-end fit check because the objective changed, then the bounded matched comparison. Render hard-decoded predictions through Vital at predeclared checkpoints. Monitor category usage, sound/parameter gradient contributions, helper/native disagreement and invalid outputs. Any helper refresh needs a new qualified artifact and comparison, not simultaneous untracked changes to both models.
 
