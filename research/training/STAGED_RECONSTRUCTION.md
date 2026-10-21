@@ -1,6 +1,6 @@
 # Basic reconstruction: spectral-training protocol
 
-Revised 2026-10-19. This specifies the immediate work in the [training plan](../modelling/TRAINING_PLAN.md): establish useful spectral-loss gradients on the small vocabulary, then train and validate the predictor with them. The plan and this protocol are proposals until their implementation and qualification gates pass. Broad preset support remains infrastructure; no broad training or curve-loss tuning is scheduled.
+Revised 2026-10-21. This specifies the immediate work in the [training plan](../modelling/TRAINING_PLAN.md): establish useful spectral-loss gradients on the small vocabulary, then train and validate the predictor with them. The plan and this protocol are proposals until their implementation and qualification gates pass. Broad preset support remains infrastructure; no broad training or curve-loss tuning is scheduled.
 
 ## Prediction contract
 
@@ -100,9 +100,13 @@ The cap is 2,048 training requests plus 256 qualification requests, 12,000 helpe
 
 Better helper loss with worse native error fails this stage. Keep the helper artifact marked unqualified and refuse ordinary inverse-training loading. Review the failed directions before proposing one bounded correction or a separately budgeted restricted differentiable synth/native optimization alternative. The earlier render-selected target experiment also failed to improve learning; it is not a proven fallback.
 
+The [native-gradient card](reports/NATIVE_GRADIENT_CARD.md) explicitly budgets the direct-measurement alternative: 624 requests/30 minutes/8 GiB RAM/32 MiB outputs. It tests one measured continuous and joint step on each of 24 development cases, retaining the earlier real-improvement threshold separately on reference and transfer. It does not claim a learned forward model or use its self-prediction gates. Neither this implementation nor the failed helper results qualify a sound-training path by themselves.
+
+The [completed native-gradient result](reports/NATIVE_GRADIENT_RESULTS.md) passes those gates: 24/24 continuous and 23/24 joint improvements, all 560 renders accepted and 24 exact repeats. This bounded direct-measurement path is qualified for a costed A2 trial; the learned helpers remain unqualified. Its inverse loss connection passes gradient/recovery tests, but no spectral inverse model has been trained.
+
 ## A2: spectral-loss inverse training and native comparison
 
-Only a qualified, hash-pinned helper may guide this comparison. Start the parameter-only control and spectral candidate from the same incumbent checkpoint with fresh, matched optimizer state. Keep the basic encoder/head architecture, source population, phase policy, input preprocessing, training observations and inverse-update count fixed. Report the helper's extra training data and compute separately.
+Only a qualified, hash-pinned helper or native-gradient estimator may guide this comparison. Start the parameter-only control and spectral candidate from the same incumbent checkpoint with fresh, matched optimizer state. Keep the basic encoder/head architecture, source population, phase policy, input preprocessing, training observations and inverse-update count fixed. Report helper training or native-gradient query costs separately; a direct native path must fit all probes into its declared budget.
 
 Freeze helper weights for the full inverse run while retaining derivatives through inputs. Train with the declared spectral/envelope/stereo loss and Gumbel-softmax categorical path. The parameter anchor is optional and must have a fixed scale/decay; report its gradient contribution and show sound-only categorical gradients without running a loss-weight sweep. Qualify the hard-decoded results, not a soft blend of incompatible categories.
 
@@ -130,8 +134,8 @@ Package a basic inference bundle and CLI with pinned preprocessing, weights, cod
 |---|---|---|
 | Baseline audit and native diagnosis | Complete; listening still pending | Existing reports, checkpoints and render receipts |
 | A0 spectral/control contract | Complete; both local A1 cards frozen | [Versioned contract and measured resource evidence](reports/BASIC_SPECTRAL_CONTRACT_RESULTS.md) |
-| A1 helper qualification | Two bounded runs complete, neither qualified | [Paired result and training-fit diagnosis](reports/PAIRED_SPECTRAL_HELPER_RESULTS.md); both artifacts explicitly refused |
-| A2 spectral inverse comparison | Pending A1 | Candidate/control checkpoints and hard-export native report |
+| A1 useful-gradient qualification | Direct native path qualified; learned helpers refused | [Native-gradient evidence and retained failed case](reports/NATIVE_GRADIENT_RESULTS.md) |
+| A2 spectral inverse comparison | Native objective connected/tested; costed run pending | Candidate/control checkpoints and hard-export native report |
 | A3 confirmation/basic bundle | Pending A2 | Independent confirmation, second seed, listening and reproducible basic inference bundle |
 
 Use separate reviewable PRs for these work packages and local checks with GitHub Actions disabled. Publish exact run status, resource use and failed gates; do not equate implemented code with a passed training milestone. All upcoming work stays local; Colab notebooks, transfers and Linux qualification are deferred.
