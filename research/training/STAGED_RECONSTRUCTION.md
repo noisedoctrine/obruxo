@@ -116,6 +116,8 @@ The card must specify native audit cadence, candidate selection and stopping rul
 
 Cap A2 at 1,024 native requests including fit/audits/recovery, 8,000 inverse updates per arm and four hours total. Profile first; no automatic extension if the spectral candidate is slower. Freeze a practical native gain margin and earlier-stage/tail tolerances before scoring. The working primary improvement target is 10%; exact source-category accuracy is diagnostic, not an acceptance gate.
 
+For the qualified direct-native alternative, the [separate frozen card](reports/NATIVE_INVERSE_FIT_CARD.md) explicitly revises the request allocation to 3,328, with 128 matched updates per arm on 32 training states. The four-hour, 8-GiB RAM and 2-GiB archive limits remain. This is a predeclared replacement for the helper-based request allocation, not an extension of a completed run. Both training-performance fit gates precede the 12-state development comparison; no test states or automatic checkpoint selection are used.
+
 ## A3: fresh confirmation and first release
 
 After a promising A2 result, freeze the candidate and run a second training seed with a separate card capped like A2. Choose the confirmation population size from development variability and fix the candidate comparison before new confirmation scoring. Do not multiply seeds while the sound-training mechanism remains unqualified.

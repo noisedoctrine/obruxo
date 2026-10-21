@@ -126,6 +126,8 @@ The [native-gradient alternative card](../training/reports/NATIVE_GRADIENT_CARD.
 
 The [completed native result](../training/reports/NATIVE_GRADIENT_RESULTS.md) passes all those gates with 560 accepted renders, 24 exact repeats, 20 minutes and 0.88 GiB RAM. This qualifies the bounded estimator for a costed A2 trial. It does not qualify either learned helper or establish inverse-model quality. Each training example can require 22 native probes, so the next card must freeze a practical fit/update/audit allocation before execution; any revision to the A2 request budget must be explicit.
 
+The [matched native inverse card](../training/reports/NATIVE_INVERSE_FIT_CARD.md) freezes that next trial: 32 training states, two performances, 128 updates per arm and a conditional 12-state reference/transfer comparison. Its native request allocation explicitly replaces the helper-based A2 cap with 3,328 charged attempts (3,304 worst-case planned), while retaining four hours, 8 GiB RAM and 2 GiB archive. The spectral arm has no parameter anchor; the same incumbent weights, features, data order and optimizer settings start both arms. The fit gate must pass before validation begins.
+
 #### A2. Train the predictor on spectral loss
 
 Start a matched parameter-only control and spectral-loss candidate from the same selected basic checkpoint. Align encoder, output vocabulary, source population, performances and inverse-update budget. Freeze the qualified helper for the whole inverse run, or pin a qualified native-gradient estimator and count every native probe against the card. Use Gumbel-softmax for both basic categorical decisions and differentiable bounded continuous controls.
@@ -211,6 +213,7 @@ These initial ceilings are caps, not runtime predictions or a launch instruction
 | A0 correctness and resource profile | 96 | 500 debugging updates | 30 minutes |
 | A1 helper feasibility | 2,048 training + 256 qualification | 12,000 helper updates | 4 hours |
 | A2 matched inverse comparison | 1,024 total | 8,000 per arm; 16,000 total | 4 hours |
+| A2 qualified native-estimator trial | 3,328 total, per the explicit native card | 128 per arm; 256 total | 4 hours |
 | A3 confirmation evaluation | 960 | None during evaluation | 2 hours |
 
 Second-seed training is a separate predeclared run capped like A2, after a promising result. New stages need their own cards under the same resource policy. Choose confirmation sample size from development variability before scoring the candidate; if adequate coverage cannot fit the cap, revise the plan before collecting confirmation.

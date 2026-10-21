@@ -16,6 +16,8 @@ Updated 2026-10-21 for the [spectral reconstruction plan](../modelling/TRAINING_
 
 Current task: **cost and run the matched inverse-training stage using the qualified native-gradient path**. The [short helper fit](reports/EVENT_RESPONSE_FIT_RESULTS.md) failed; the [direct native alternative](reports/NATIVE_GRADIENT_RESULTS.md) subsequently passed its separately frozen gates in 20 minutes and 0.88 GiB RAM. Budget the small fit and comparison explicitly before execution: each example can need 22 gradient queries. Preserve the 14-output scope and existing checkpoint as the shared starting point. Both learned helpers remain unqualified; no new inverse model has been promoted.
 
+The [native inverse card](reports/NATIVE_INVERSE_FIT_CARD.md) now freezes 32 training states/two performances, 128 updates per arm and a conditional 12-state comparison. Its 3,328-request allocation explicitly accounts for numerical-gradient queries within the existing four-hour/8-GiB/2-GiB limits. Six focused training/inverse tests pass; the plan is frozen before execution. Run completion and reconstruction gains remain unproven.
+
 The old helper's guided changes worsened real audio on all 20 cases despite lower predicted loss. It remains unqualified and disconnected. The new plan requires real-render gradient qualification before inverse integration. Existing supervised `train` commands do not become spectral-loss training merely because the plan changes.
 
 The explicit `--prediction-scope basic` option rejects broad pools before creating the training frontend or renderer and records the choice in the run contract. It preserves the actual compact 14-value output layer. Older experiments retain their contracts through the default `codec` option.
