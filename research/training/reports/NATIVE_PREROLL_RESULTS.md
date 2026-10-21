@@ -32,4 +32,4 @@ Renderer, expressive transport, full-readback and recovery checks passed locally
 
 ## Next training gate
 
-Recheck the numerical-gradient method on newly rendered settled audio under its [new card](SETTLED_NATIVE_GRADIENT_CARD.md). Historical qualification applies to the old observation profile. Do not reuse the old source cache or partially sound-trained models. After that gate passes, freeze a fresh matched inverse trial from the same historical starting model, with new optimizers and fresh target renders. Basic reconstruction, fresh confirmation, listening and release remain unfinished.
+The numerical-gradient method has now passed its [fresh settled-audio qualification](SETTLED_NATIVE_GRADIENT_RESULTS.md) under the original quality gates. Historical qualification still applies only to the old observation profile. Do not reuse the old source cache or partially sound-trained models. Freeze a fresh matched inverse trial from the same historical starting model, with new optimizers and fresh target renders. Basic reconstruction, fresh confirmation, listening and release remain unfinished.
