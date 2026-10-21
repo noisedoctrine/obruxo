@@ -18,6 +18,7 @@ from .codec import PilotTarget, load_codec
 from .evaluate import audio_distance
 from .features import tensor_digest
 from .proxy import performance_inputs
+from .paired_spectral import complete_pairs, paired_change_loss, require_aligned_pairs
 from .spectral import SpectralTargets, require_spectral_contract, spectral_loss
 from .spectral_controls import BasicControlAdapter
 from .temporal_proxy import (TemporalSpectralProxy, collate_frames, full_times, guide_patch, hard_controls,
@@ -49,17 +50,31 @@ def fit_temporal_proxy(cache, adapter, config, contract, *, saved=None, checkpoi
                 "optimizer": optimizer.state_dict(), "batch_rng": generator.get_state(), "torch_rng": torch.get_rng_state(), "trace": trace}
     if len(cache) < 1:
         raise ValueError("helper training needs accepted records")
+    pairs = complete_pairs(cache) if config.paired_changes else None
+    if pairs is not None and len(pairs) < .9 * config.training_states * 4:
+        raise ValueError("helper training has too few complete native pairs")
     while step < config.steps:
         if check_limits:
             check_limits()
-        indices = torch.randint(len(cache), (config.batch_size,), generator=generator).tolist()
+        if pairs is None:
+            indices = torch.randint(len(cache), (config.batch_size,), generator=generator).tolist()
+        else:
+            selected = torch.randint(len(pairs), (config.batch_size // 2,), generator=generator).tolist()
+            indices = [position for index in selected for position in pairs[index]]
         records = [cache[index] for index in indices]
+        if pairs is not None:
+            require_aligned_pairs(records)
         target, times = collate_frames(records)
         controls = hard_controls(adapter, [PilotTarget.from_dict(record["target"]) for record in records])
         played = torch.stack([record["performance"] for record in records])
         optimizer.zero_grad(set_to_none=True)
-        terms = spectral_loss(model(controls, played, times), target)
+        prediction = model(controls, played, times)
+        terms = spectral_loss(prediction, target)
         loss = terms["loss"].mean()
+        if pairs is not None:
+            terms["paired_change"] = paired_change_loss(prediction, target)
+            loss = loss + .25 * terms["paired_change"].mean()
+            terms["total_objective"] = loss[None]
         if not torch.isfinite(loss):
             raise ValueError("nonfinite helper training objective")
         loss.backward()

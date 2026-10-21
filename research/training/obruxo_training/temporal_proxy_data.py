@@ -39,6 +39,7 @@ class TemporalProxyConfig:
     learning_rate: float = .001
     seed: int = 0
     checkpoint_every: int = 250
+    paired_changes: bool = False
 
     def __post_init__(self):
         counts = (self.training_states, self.views, self.validation_states, self.steps, self.batch_size, self.checkpoint_every)
@@ -47,6 +48,8 @@ class TemporalProxyConfig:
         if (self.views > 8 or self.training_states * self.views > 2048 or self.validation_states * 20 > 256 or self.steps > 12000
                 or type(self.seed) is not int or not 0 < self.learning_rate <= .01):
             raise ValueError("temporal helper exceeds its fixed experiment limits")
+        if type(self.paired_changes) is not bool or self.paired_changes and (self.views != 8 or self.batch_size % 2):
+            raise ValueError("paired changes require eight views and an even recording batch")
 
 
 def category_balanced_entries(pool, split, count):
@@ -96,15 +99,25 @@ def make_plan(pool, config):
                 raise ValueError("generated training performance matches a reserved recipe")
             values, choices = list(entry.target.continuous), list(entry.target.categorical)
             if view in (4, 5):
-                values = [min(1., max(0., value + (.05 if view == 4 else -.05))) for value in values]
+                if config.paired_changes:
+                    active = pool.codec.continuous_mask(entry.target)
+                    position = next((index * 2 + view - 4 + offset) % 9 for offset in range(9)
+                                    if active[(index * 2 + view - 4 + offset) % 9])
+                    values[position] = min(1., max(0., values[position] + (.05 if view == 4 else -.05)))
+                else:
+                    values = [min(1., max(0., value + (.05 if view == 4 else -.05))) for value in values]
             if view in (6, 7):
                 category = view - 6
                 choices[category] = (choices[category] + 1) % (3 if category == 0 else 2)
             target = pool.codec.canonical_target(PilotTarget(tuple(values), tuple(choices)))
             recipes.append({"sequence": len(recipes), "source_state_id": entry.state_id, "view": view,
                             "target": target.to_dict(), "performance": performance.to_dict(), "performance_id": identity})
+            if config.paired_changes:
+                recipes[-1]["pair_id"] = index * 4 + view % 4
     paths = [Path(__file__).parent / name for name in ("temporal_proxy.py", "temporal_proxy_data.py", "temporal_proxy_screen.py",
                                                      "spectral.py", "spectral_controls.py")]
+    if config.paired_changes:
+        paths.extend((Path(__file__).with_name("paired_spectral.py"), Path(__file__).parents[2] / "data_generation/obruxo_data/render/vita.py"))
     plan = {"format": "local_basic_temporal_proxy_screen_v1", "pool_id": pool.pool_id, "manifest_id": pool.manifest.manifest_id,
             "codec": pool.codec.to_dict(), "contract": BasicControlAdapter(pool.codec).contract(), "config": asdict(config),
             "model": temporal_proxy_spec(), "training_recipes": recipes, "validation_states": [entry.state_id for entry in validation],
@@ -124,6 +137,10 @@ def make_plan(pool, config):
             "baselines": ["training_mean", "nearest_training_record", "five_neighbor_interpolation"],
             "gradient_probe": {"steps": 16, "learning_rate": .03, "continuous_radius": .15, "joint_categories": True},
             "test_split_used": False, "helper_refresh_during_inverse_training": False}
+    if config.paired_changes:
+        from .paired_spectral import pair_spec
+        plan.update(format="local_basic_paired_temporal_proxy_v1", paired_objective=pair_spec(),
+                    control_coverage="four_original_performances_plus_two_isolated_active_controls_unison_and_filter_pairs")
     return plan, recipes, validation
 
 
@@ -195,9 +212,12 @@ def collect_frames(pool, output, recipes, session, progress=None):
         row = {"recipe_id": canonical_sha256(recipe), "sequence": i, "accepted": audio is not None, "receipt": receipt}
         if audio is not None:
             full = measured(torch.from_numpy(audio.copy()).T[None])
-            values, times = sample_frames(full, torch.Generator().manual_seed(session.plan["config"]["seed"] + i))
+            frame_seed = recipe.get("pair_id", i)
+            values, times = sample_frames(full, torch.Generator().manual_seed(session.plan["config"]["seed"] + frame_seed))
             record = {"measurements": values, "times": times, "target": recipe["target"],
                       "performance": performance_inputs(Performance.from_dict(recipe["performance"])), "recipe_id": row["recipe_id"]}
+            if "pair_id" in recipe:
+                record.update(pair_id=recipe["pair_id"], source_state_id=recipe["source_state_id"])
             path = records / f"{i:05d}.pt"
             atomic_torch_save(path, record)
             size = path.stat().st_size

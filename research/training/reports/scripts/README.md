@@ -23,3 +23,7 @@ The subsequent native intervention has a separate, portable runner, `../../relea
 ## Sound-helper evidence
 
 `summarize_sound_proxy.py --run /path/to/completed/screen --tests-passed N` checks the completed plan and source hashes, then publishes the sound-helper report, frozen plan, family summaries and a descriptive bootstrap over validation patches. Supply the actual completed local-test count.
+
+`summarize_basic_spectral_helper.py --source COMPLETED_RUN --output NEW_JSON` publishes the basic temporal helper's frozen qualification and resource evidence, including failures. It recomputes the admission decision and checks plan identity, accepted qualification requests and exact repeats. The paired variant additionally reports complete training pairs and descriptive agreement under both native audio objectives.
+
+`diagnose_paired_spectral_helper.py --source COMPLETED_PAIRED_RUN --output NEW_JSON` inspects all saved training pairs against a no-sound-change baseline. It verifies feature hashes and alignment, performs no renders or optimizer updates, and does not qualify an artifact. See [the paired result](../PAIRED_SPECTRAL_HELPER_RESULTS.md).

@@ -74,6 +74,8 @@ A0 has no model-quality claim. Its cap is 96 native requests, 500 debugging upda
 
 The [frozen local helper card](reports/BASIC_SPECTRAL_HELPER_CARD.md) implements this protocol with 1,024 training requests and 240 planned qualification requests. Its ten renders per state/performance include isolated pan and detune checks, with 16 recovery attempts reserved inside the 256 qualification cap. Seven focused tests pass. The [completed native result](reports/BASIC_SPECTRAL_HELPER_RESULTS.md) passes forward prediction but fails useful-gradient qualification; it does not permit A2 to begin.
 
+The [aligned-pair correction](reports/PAIRED_SPECTRAL_HELPER_RESULTS.md) is also complete and fails the unchanged gates. It improves 31/48 guided trials, but continuous rankings and transfer detune/joint guidance remain inadequate. Saved-pair inspection shows poor attack/decay/release response fit even on training examples. Check temporal coverage and declare a bounded native response investigation before choosing another full fit or an alternative mechanism; do not expand the prediction vocabulary.
+
 The [old alpha helper](reports/SOUND_PROXY_RESULTS.md) failed: useful input gradients cannot be inferred from its familiar-performance regression accuracy. Reuse collection, recovery and artifact-refusal behavior. Train a new basic-scope helper with temporal spectral targets and broader training performance coverage; the cause of the previous failure is not assumed to be settled.
 
 The card must fix training families, hard-category balance, continuous perturbations, register/velocity/duration coverage, model size, optimizer, updates and qualification recipes before collection. Use train-only records to fit any scaling statistics. Qualification and transfer recipes must not enter helper training. After a qualification panel guides revisions, label it development and use independent confirmation for the final candidate.
@@ -121,8 +123,8 @@ Package a basic inference bundle and CLI with pinned preprocessing, weights, cod
 | Work package | Current state | Reviewable deliverable |
 |---|---|---|
 | Baseline audit and native diagnosis | Complete; listening still pending | Existing reports, checkpoints and render receipts |
-| A0 spectral/control contract | Implementation/native checks passed; A1 card next | [Versioned contract and measured resource evidence](reports/BASIC_SPECTRAL_CONTRACT_RESULTS.md); frozen helper card remains |
-| A1 helper qualification | Pending A0 | New helper, held-out and native-gradient evidence, explicit qualified/refused artifact |
+| A0 spectral/control contract | Complete; both local A1 cards frozen | [Versioned contract and measured resource evidence](reports/BASIC_SPECTRAL_CONTRACT_RESULTS.md) |
+| A1 helper qualification | Two bounded runs complete, neither qualified | [Paired result and training-fit diagnosis](reports/PAIRED_SPECTRAL_HELPER_RESULTS.md); both artifacts explicitly refused |
 | A2 spectral inverse comparison | Pending A1 | Candidate/control checkpoints and hard-export native report |
 | A3 confirmation/basic bundle | Pending A2 | Independent confirmation, second seed, listening and reproducible basic inference bundle |
 
