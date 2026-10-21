@@ -4,6 +4,8 @@ Declared 2026-10-21 before execution. The [previous matched trial](SETTLED_NATIV
 
 Frozen plan ID: `b93183419006684feaa0dd593842a1b27511528bda2f9c6c21a4dd18dddb891b`. Compared with the previous settled plan, only the format, pinned implementation sources and explicit category-training metadata change. All other fields, including source states, MIDI, updates, initial weights, retrieval, renderer, optimizer, limits and gates, are identical.
 
+Execution is [complete and independently replayed](CALIBRATED_NATIVE_INVERSE_RESULTS.md): training fit passes, but held-out gains of 7.23% reference / 4.24% transfer miss the unchanged target. This status note does not revise the frozen protocol below.
+
 ## Training change
 
 Divide the unison logits by **20.31771924164867** and filter logits by **20.337628037582693** before both arms' training losses. The constants come from the initial model's 32 training-reference observations: float64 RMS after removing each row's class mean, floored at one. Labels and validation measurements do not enter calibration. Bind the completed diagnosis, pool, initial weights, qualification and Gumbel implementation by hash; recompute the constants from the saved training outputs before admission.
