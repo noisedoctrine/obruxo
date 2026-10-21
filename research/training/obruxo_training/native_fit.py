@@ -378,7 +378,11 @@ def run_fit(pool, initial_path, retrieval_path, qualification_path, output, *, e
                 saved = torch.load(output / "checkpoint.pt", map_location="cpu", weights_only=True)
             except (RuntimeError, EOFError, OSError):
                 saved = torch.load(output / "checkpoint.previous.pt", map_location="cpu", weights_only=True)
-        trace = fit_models(models, records, session, output, plan, saved)
+        if saved:
+            trace = list(saved["trace"])
+        def committed(state):
+            trace[:] = state["trace"]
+        trace = fit_models(models, records, session, output, plan, saved, after_step=committed)
         all_models = {"initial": incumbent.eval(), **{name: model.eval() for name, model in models.items()}}
         model_ids = {name: tensor_digest(model.state_dict()) for name, model in all_models.items()}
         for index, recipe in enumerate(plan["training"]):

@@ -1,6 +1,8 @@
 import copy
 import json
 from pathlib import Path
+from time import time
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -116,3 +118,38 @@ def test_audit_reuses_committed_renders_and_refuses_changed_candidates(tmp_path)
     assert first == second and len(session.calls) == count == 5
     with pytest.raises(ValueError, match="predictions changed"):
         audit_case(session, tmp_path, "fixture", recipe, 0, lambda _audio: {"other": target}, {"models": "fixed"}, repeat=True)
+
+
+def test_exception_summary_retains_completed_updates(monkeypatch, tmp_path):
+    from obruxo_training import native_fit
+    initial, retrieval = tmp_path / "initial.pt", tmp_path / "retrieval.pt"
+    torch.save({}, initial)
+    torch.save({}, retrieval)
+    plan = {"initial_file_sha256": native_fit.digest(initial), "retrieval_file_sha256": native_fit.digest(retrieval),
+            "limits": {"wall_seconds": 60, "process_tree_bytes": 1024, "archive_bytes": 16 * 1024**2}}
+    output = tmp_path / "run"
+    output.mkdir()
+    (output / "plan.json").write_text(json.dumps(plan))
+    class Monitor:
+        peak_bytes, errors = 1, 0
+        def start(self):
+            pass
+        def close(self):
+            pass
+    def failed_fit(*_args, after_step=None):
+        after_step({"trace": [{"step": 1}]})
+        after_step({"trace": [{"step": 1}, {"step": 2}]})
+        raise RuntimeError("fixture render rejected")
+    codec = PilotCodec()
+    monkeypatch.setattr(native_fit, "make_plan", lambda *_args: plan)
+    monkeypatch.setattr(native_fit, "restore_model", lambda *_args: (torch.nn.Linear(1, 1), object(), codec))
+    monkeypatch.setattr(native_fit, "load_training_checkpoint", lambda *_args: {"replay": []})
+    monkeypatch.setattr(native_fit, "MemoryMonitor", Monitor)
+    monkeypatch.setattr(native_fit, "NativeSession", lambda *_args: SimpleNamespace(started=time(), events=[], renderer_identity={}))
+    monkeypatch.setattr(native_fit, "FitRecords", lambda *_args: object())
+    monkeypatch.setattr(native_fit, "fit_models", failed_fit)
+    with pytest.raises(RuntimeError, match="fixture render rejected"):
+        native_fit.run_fit(SimpleNamespace(codec=codec), initial, retrieval, tmp_path / "qualification.json", output, execute=True)
+    summary = json.loads((output / "summary.json").read_text())
+    assert summary["committed_updates_per_arm"] == 2 and not summary["complete"]
+    assert summary["failure"] == "RuntimeError: fixture render rejected"

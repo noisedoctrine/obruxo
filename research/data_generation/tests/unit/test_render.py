@@ -16,7 +16,7 @@ from obruxo_data.render import (
 )
 from obruxo_data.render.qa import AudioQualityConfig, analyze_audio, audio_float32_sha256, compare_audio
 from obruxo_data.render.vita import (
-    VitalVst3StateTemplate, _render_exact_frames, juce_memory_block_decode, juce_memory_block_encode, native_preset_document,
+    VitalVst3StateTemplate, _add_note_events, _render_after_preroll, _render_exact_frames, juce_memory_block_decode, juce_memory_block_encode, native_preset_document,
     verify_loaded_controls, verify_loaded_scalars,
 )
 from obruxo_data.vital import VitalPreset
@@ -151,6 +151,67 @@ def test_render_request_accepts_preset_and_has_stable_identity() -> None:
     assert RenderRequest.from_dict(first.to_dict()).request_id == first.request_id
     preset.set_raw("osc_1_level", 0.25)
     assert RenderRequest(preset=preset, performance=performance).request_id != first.request_id
+
+
+def test_preroll_is_hashed_and_legacy_request_identity_stays_unchanged():
+    preset, performance = VitalPreset.init(), Performance()
+    performance.add_note(pitch=60, velocity=90, start_tick=0, duration_ticks=480)
+    legacy = RenderRequest(preset=preset, performance=performance)
+    assert "preroll_frames" not in legacy.identity_payload()
+    warm = RenderRequest(preset=preset, performance=performance, preroll_frames=8192)
+    assert warm.request_id != legacy.request_id
+    assert RenderRequest.from_dict(warm.to_dict()).request_id == warm.request_id
+    for invalid in (-1, True, .5, 44101):
+        with pytest.raises(ValueError, match="preroll_frames"):
+            RenderRequest(preset=preset, performance=performance, preroll_frames=invalid)
+
+
+def test_preroll_shifts_notes_without_changing_duration_and_keeps_first_attack_frame():
+    from obruxo_data.midi import TempoMap
+    preset, performance = VitalPreset.init(), Performance(bpm=110)
+    performance.add_note(pitch=60, velocity=90, start_tick=0, duration_ticks=480)
+    performance.add_note(pitch=67, velocity=80, start_tick=720, duration_ticks=240)
+    request = RenderRequest(preset=preset, performance=performance, preroll_frames=8192)
+    calls = []
+    class Synth:
+        def add_midi_note(self, *values):
+            calls.append(values)
+    timing = TempoMap.from_performance(performance)
+    _add_note_events(Synth(), request, timing)
+    for call, note in zip(calls, performance.note_spans(), strict=True):
+        start, end = timing.tick_to_sample(note.start_tick, 44100), timing.tick_to_sample(note.end_tick, 44100)
+        assert call == (note.pitch, note.velocity, (start + 8192 + .125) / 44100, (end - start + .125) / 44100)
+        for quantize in (int, round):
+            assert quantize(call[2] * 44100) == start + 8192
+            assert quantize(call[3] * 44100) == end - start
+            assert quantize((call[2] + call[3]) * 44100) == end + 8192
+    class Engine:
+        def render(self, seconds):
+            self.audio = np.zeros((2, round(seconds * 44100)), dtype=np.float32)
+            self.audio[:, 8192] = (.25, -.5)
+            self.audio[:, 8192 + 99] = (.1, .2)
+            return True
+        def get_audio(self):
+            return self.audio
+    body = _render_after_preroll(Engine(), 100, 44100, 2, 8192)
+    assert body.shape == (100, 2) and body.flags.c_contiguous
+    np.testing.assert_array_equal(body[0], np.array([.25, -.5], dtype=np.float32))
+    np.testing.assert_array_equal(body[-1], np.array([.1, .2], dtype=np.float32))
+
+
+def test_preroll_moves_all_expressive_midi_by_the_same_exact_sample_offset(tmp_path):
+    from obruxo_data.midi import EventKind, MidiEvent
+    from obruxo_data.render.midi_transport import write_sample_midi
+    performance = Performance(bpm=110)
+    performance.add_note(pitch=60, velocity=90, start_tick=0, duration_ticks=480, release_velocity=37)
+    performance.events.append(MidiEvent(240, 4, EventKind.PITCH_BEND, 0, (4096,)))
+    performance.events.append(MidiEvent(300, 5, EventKind.CONTROL_CHANGE, 0, (74, 101)))
+    cold = write_sample_midi(performance, tmp_path / "cold.mid", 44100)
+    warm = write_sample_midi(performance, tmp_path / "warm.mid", 44100, preroll_frames=8192)
+    assert cold["file_sha256"] != warm["file_sha256"]
+    for first, second in zip(cold["events"], warm["events"], strict=True):
+        assert second == {**first, "sample": first["sample"] + 8192}
+    assert warm["note_off_velocity"] == "preserved" and warm["all_events"]
 
 
 def test_plugin_scalar_readback_detects_rejection_and_accepts_float32_rounding():

@@ -45,6 +45,25 @@ def _render_exact_frames(engine, frame_count: int, sample_rate: int, channels: i
     return np.ascontiguousarray(audio[:, :frame_count].T)
 
 
+def _render_after_preroll(engine, frame_count, sample_rate, channels, preroll_frames):
+    import numpy as np
+    audio = _render_exact_frames(engine, frame_count + preroll_frames, sample_rate, channels)
+    return np.ascontiguousarray(audio[preroll_frames:])
+
+
+def _add_note_events(synth, request, timing):
+    guard = .125 if request.preroll_frames else 0.
+    for span in request.performance.note_spans():
+        start_sample = timing.tick_to_sample(span.start_tick, request.sample_rate) + request.preroll_frames
+        end_sample = timing.tick_to_sample(span.end_tick, request.sample_rate) + request.preroll_frames
+        if end_sample <= start_sample:
+            raise ValueError("note duration rounds to zero samples")
+        # The host may floor either the duration or absolute note-off time. Both
+        # guards stay below half a sample, preserving floor and nearest rounding.
+        synth.add_midi_note(span.pitch, span.velocity, (start_sample + guard) / request.sample_rate,
+                            (end_sample - start_sample + guard) / request.sample_rate)
+
+
 def juce_memory_block_encode(value: bytes) -> str:
     # JUCE consumes least-significant bits first; RFC base64 consumes most-significant bits first.
     encoded = base64.b64encode(value.translate(_REVERSE_BITS)).rstrip(b"=").translate(_BASE64_TO_JUCE)
@@ -338,18 +357,13 @@ class VitalRenderer(Renderer):
             if self.renderer_id in {FULL_EXPRESSION_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_CORPUS_RENDERER_ID}:
                 from .midi_transport import write_sample_midi
                 midi_path = root / "performance.mid"
-                midi_transport = write_sample_midi(performance, midi_path, request.sample_rate)
+                midi_transport = write_sample_midi(performance, midi_path, request.sample_rate, preroll_frames=request.preroll_frames)
                 if not synth.load_midi(str(midi_path), clear_previous=True, beats=False, all_events=True):
                     raise RuntimeError("DawDreamer failed to load the expressive MIDI file")
             else:
-                for span in performance.note_spans():
-                    start_sample = timing.tick_to_sample(span.start_tick, request.sample_rate)
-                    end_sample = timing.tick_to_sample(span.end_tick, request.sample_rate)
-                    if end_sample <= start_sample:
-                        raise ValueError("note duration rounds to zero samples")
-                    synth.add_midi_note(span.pitch, span.velocity, start_sample / request.sample_rate, (end_sample - start_sample) / request.sample_rate)
+                _add_note_events(synth, request, timing)
             engine.load_graph([(synth, [])])
-            audio = _render_exact_frames(engine, frame_count, request.sample_rate, request.channels)
+            audio = _render_after_preroll(engine, frame_count, request.sample_rate, request.channels, request.preroll_frames)
 
         qa, audio_diagnostics = analyze_audio(
             audio, sample_rate=request.sample_rate, expected_frames=frame_count,
@@ -376,6 +390,10 @@ class VitalRenderer(Renderer):
                                   "version_bridge_and_scalar_lfo_route_readback_v2" if self.legacy_training
                                   else "version_bridge_and_scalar_lfo_route_readback_v3"),
                 "event_timing": "absolute ticks to half-even sample offsets",
+                **({"preroll_frames": request.preroll_frames, "preroll_policy": "shift_all_MIDI_then_trim_only_lead_v1"}
+                   if request.preroll_frames else {}),
+                **({"simple_note_time_guard": "one_eighth_sample_start_and_duration_v1"}
+                   if request.preroll_frames and midi_transport is None else {}),
                 **({"midi_transport": midi_transport["transport"], "control_response": "native_control_rate_processing_not_sample_exact"} if midi_transport else {}),
                 "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
             },
@@ -407,6 +425,8 @@ class VitalRenderer(Renderer):
             raise ValueError("sample_rate must be a positive integer")
         if request.channels != 2:
             raise ValueError("Vital renderer currently supports stereo output only")
+        if request.preroll_frames and request.preroll_frames % self.buffer_size:
+            raise ValueError("preroll_frames must contain whole audio buffers")
         if not isinstance(request.tail_seconds, (int, float)) or not math.isfinite(request.tail_seconds) or request.tail_seconds < 0:
             raise ValueError("tail_seconds must be a finite non-negative number")
         end_tick = request.performance.end_tick if request.end_tick is None else request.end_tick
