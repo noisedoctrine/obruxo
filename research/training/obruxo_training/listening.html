@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sound reconstruction listening check</title>
+<style>
+body { font: 16px/1.5 system-ui, sans-serif; max-width: 900px; margin: 32px auto; padding: 0 20px; color: #202831; background: #f6f7f9; }
+h1 { font-size: 1.6rem; } section { background: white; border: 1px solid #d5dbe2; border-radius: 8px; padding: 20px; margin: 24px 0; }
+h2 { font-size: 1.1rem; margin-top: 0; } .clips { display: flex; gap: 16px; flex-wrap: wrap; } audio { width: 250px; max-width: 100%; }
+label { display: block; margin: 16px 0; } select, button { font: inherit; padding: 8px 12px; border: 1px solid #9aa6b4; border-radius: 4px; }
+button { background: #174e80; color: white; cursor: pointer; } :focus-visible { outline: 3px solid #da9f17; outline-offset: 3px; }
+#status { min-height: 1.5em; } small { color: #566270; }
+</style>
+<h1>Sound reconstruction listening check</h1>
+<p>Listen to the reference, then A and B. Compare tone, loudness, stereo width and how the sound changes over time. Replay as needed. Keep playback volume the same for all three clips.</p>
+<p>Choose the closer sound and whether either reconstruction is close enough to be useful. Ties and poor matches are valid answers. Model names are hidden.</p>
+<form id="form"><div id="trials"></div><button type="submit">Save judgments</button></form>
+<p id="status" role="status"></p>
+<small>Share the saved JSON with the evaluator. This page uses only the bundled audio and saves answers as a local file. Reloading clears unsaved answers.</small>
+<script>
+const packet = __PACKET__;
+const trials = document.getElementById('trials');
+const select = (name, question, choices) => {
+  const label = document.createElement('label');
+  label.append(document.createTextNode(question + ' '));
+  const input = document.createElement('select');
+  input.name = name; input.required = true;
+  for (const [value, text] of [['', 'Choose…'], ...choices]) {
+    const option = document.createElement('option'); option.value = value; option.textContent = text; input.append(option);
+  }
+  label.append(input); return label;
+};
+for (const [index, trial] of packet.trials.entries()) {
+  const section = document.createElement('section');
+  const heading = document.createElement('h2'); heading.textContent = `Comparison ${index + 1} of ${packet.trials.length}`;
+  section.append(heading);
+  const clips = document.createElement('div'); clips.className = 'clips';
+  for (const [slot, title] of [['reference', 'Reference'], ['a', 'A'], ['b', 'B']]) {
+    const container = document.createElement('div');
+    const caption = document.createElement('div'); caption.textContent = title;
+    const audio = document.createElement('audio'); audio.controls = true; audio.preload = 'none'; audio.src = trial.audio[slot].file;
+    audio.setAttribute('aria-label', `Comparison ${index + 1}, ${title}`);
+    audio.addEventListener('play', () => document.querySelectorAll('audio').forEach(other => { if (other !== audio) other.pause(); }));
+    container.append(caption, audio); clips.append(container);
+  }
+  section.append(clips);
+  section.append(select(`${trial.trial_id}-preferred`, 'Which matches the reference more closely?', [['a', 'A'], ['b', 'B'], ['tie', 'About the same'], ['neither', 'Neither is close']]));
+  section.append(select(`${trial.trial_id}-usable`, 'Which is close enough to be useful?', [['a', 'A'], ['b', 'B'], ['both', 'Both'], ['neither', 'Neither']]));
+  trials.append(section);
+}
+document.getElementById('form').addEventListener('submit', event => {
+  event.preventDefault();
+  const data = new FormData(event.target);
+  const judgments = packet.trials.map(trial => ({trial_id: trial.trial_id, preferred: data.get(`${trial.trial_id}-preferred`), usable: data.get(`${trial.trial_id}-usable`)}));
+  const result = {format: 'blind_pairwise_listening_responses_v1', packet_id: packet.packet_id, judgments};
+  const url = URL.createObjectURL(new Blob([JSON.stringify(result, null, 2) + '\n'], {type: 'application/json'}));
+  const link = document.createElement('a'); link.href = url; link.download = `listening-${packet.packet_id.slice(0, 12)}.json`; link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  document.getElementById('status').textContent = 'Judgments saved. Share the downloaded JSON with the evaluator.';
+});
+</script>
+</html>

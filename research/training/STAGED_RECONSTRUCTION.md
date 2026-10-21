@@ -132,6 +132,8 @@ Use template, training-only retrieval and unchanged model controls. Report refer
 
 Also retain the matched parameter-only control. The confirmation evaluation ceiling is 960 native requests and two hours, with no optimizer updates during evaluation. If adequate statistical coverage cannot fit that cap, revise the plan before collecting confirmation rather than stop when results happen to look favorable. Prepare randomized/blinded listening clips and record actual judgments; automatic spectral scores do not substitute for listening.
 
+The [local listening tool](LISTENING.md) prepares anonymous, counterbalanced reference/A/B packets and audits returned judgments without revealing model labels to the listener. It preserves sample values and counts every planned trial, including ties and neither. Preparing this tool is separate from collecting listening evidence; the listening population, audio budget and acceptance rules still need a frozen card after a promising candidate. No synthetic response can satisfy the listening gate.
+
 Package a basic inference bundle and CLI with pinned preprocessing, weights, codec/defaults, assets/notices and an audio-only example. Neither helper weights nor true MIDI are inference dependencies. Verify a fresh-environment load, export/native round trip, latency/memory and recovery. Record the model's bounded scope and remaining failures. Final-test use belongs to the frozen release candidate; it is not part of the development comparisons above.
 
 ## Work order and status
