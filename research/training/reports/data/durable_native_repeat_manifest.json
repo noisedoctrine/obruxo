@@ -1,0 +1,110 @@
+{
+  "automatic_repeats": 0,
+  "deadline_unix": 1792680191.3023922,
+  "frozen_commit": "e92d0bd1aa3667ef1c4dcca8ea5213c8f5ab04b0",
+  "limitation": "Launch/input paths and command stay in the bound private manifest. This manifest contains no model-quality result.",
+  "limits": {
+    "aggregate_archive_bytes": 5368709120,
+    "native_attempts": 7803,
+    "optimizer_attempts_per_arm": 290,
+    "process_tree_bytes": 8589934592,
+    "wall_seconds": 21600
+  },
+  "prior_run": {
+    "archive_bytes": 808373733,
+    "charged_optimizer_attempts": 30,
+    "committed_updates_per_arm": 29,
+    "evidence_sha256": {
+      "checkpoint.previous.pt": "cef49f3761eb60ee522b67788bf08572a8b2b78e2dc05bb49066facf36655fdf",
+      "checkpoint.pt": "e14fdcf06c554b662fcff7b84d2ab5a8076bb42768ebffd09fe21fc15076eac8",
+      "external-interruptions/001/checkpoint.previous.pt": "cef49f3761eb60ee522b67788bf08572a8b2b78e2dc05bb49066facf36655fdf",
+      "external-interruptions/001/checkpoint.pt": "e14fdcf06c554b662fcff7b84d2ab5a8076bb42768ebffd09fe21fc15076eac8",
+      "external-interruptions/001/measurements.jsonl": "ee6b798b0104c6c40062a76f5d47b50eed1a3919b8f59739304b3592e2d69f1a",
+      "external-interruptions/001/observation.json": "d0d3ed32d56407c62f20ad93111a33c5871d7c3c61d67958aaea06e6064a04ff",
+      "external-interruptions/001/records.json": "68f4e05757ed671ec439358a04b640da9a62a7df0eafaca7802b63f62ba2c652",
+      "external-interruptions/001/renders.jsonl": "39c7aa654b0cdafc0bdb6f739ea9e3c0ba59034c9bb82c74992eac6001868906",
+      "external-interruptions/001/run.json": "d9470d4bab8a211b67d35627440f29abe198a3a18b1014ec278f3a3cc2c96c03",
+      "external-interruptions/001/updates.jsonl": "5d1d3bf55d3f81cf215bd3794591d504f07825ea856e145e15b02efb44b825e6",
+      "measurements.jsonl": "ee6b798b0104c6c40062a76f5d47b50eed1a3919b8f59739304b3592e2d69f1a",
+      "plan.json": "5b7ad1b3423c2d8bd7200025ea844038a6b43227e246da1052975d8636452f36",
+      "records.json": "68f4e05757ed671ec439358a04b640da9a62a7df0eafaca7802b63f62ba2c652",
+      "records/002.pt": "79cdba381fe5bf0dbd18a3734c53f202080d57f31aac5e115cf8085378bc7770",
+      "records/003.pt": "7e0f4fe2914bd42b1cfcb3a1ad6ccf1889e7fdf2f3719253a046fd865b4182dd",
+      "records/004.pt": "f228d23cdd2be5daf0d64d5d32f167437ef3169a1d75404d9e6fcd314b28c320",
+      "records/006.pt": "fb915ab128c639ed31bd3acdfaa1ff7c52b5147178eac4ed9a5a133931246ac0",
+      "records/008.pt": "b563832fb39f7aa7827efc8ec714abca08316da9a7e507192e56387fa855c49d",
+      "records/011.pt": "caab796030742fe6ee83225cd9f221929680acdc7e39129e20e2553b159ec962",
+      "records/013.pt": "83d701615abdcf3a1a8a53945c69d2f9c0d03016f8b98335f690c8871cb96178",
+      "records/014.pt": "c5d557240293ee1fe3c86a4a19fd6576354cb98b094ca27f9bdab22330ccedb7",
+      "records/015.pt": "c8402e358bc15dcc0a3804addbcd5fae2da4388fbfabdc38103fa089fe52afde",
+      "records/016.pt": "e8d5794e39706b670692b4b5c2afe550d3f1d15c54d6619319a07dfef9109209",
+      "records/017.pt": "18f97ac5dcc0b8db17adcb8fee3459a664bb3eaf0653a8183ff8718739a061e1",
+      "records/019.pt": "a25c28f4b039f1a825d1dd9a57ade105e5abed1d7e68adb3536245095be50cb4",
+      "records/021.pt": "e5c0d8d3ccfb849dd1628c5da4295ea608c46f21fa79ed1ef1d7eabda31fab97",
+      "records/022.pt": "c28b50ffb1fe836b5aba58ffb89c51096a34f66a022e0a489dee15a7fac1481a",
+      "records/028.pt": "34499adba05693e7dd9602686d034bef2446fbbcf6f16d078d941a1d46c58e4f",
+      "records/033.pt": "8d1ce4bd8c6efca804026fa75d336c82ff993bca30fbde7b3b586bfad6c32842",
+      "records/035.pt": "efb9e953c9f3ad1ecbf005fd57a93d70ea445b741c958a2230e56784acd67c56",
+      "records/040.pt": "7a86b6af733702d03809d248a5bbbf448ebcd3e760226ddefaccc7c5878e75d7",
+      "records/042.pt": "c2737503165ad3f377a896eeb97edda9f454ae4cf72e265e1bd786cb5b3b9d92",
+      "records/044.pt": "30618f3bfd5b2c0b5ff68f72cf4c75cbd7c6d11b25e124b75a9e1319b42a6cc8",
+      "records/045.pt": "0525e6e80ced86915619b8953c4ff34d0ab8297002471f64209cd4b633afc7b0",
+      "records/046.pt": "7d22318253898517138cd01ff40d91933071a5b6b70f722d62511f7c5d459a42",
+      "records/047.pt": "decf910c6d916860022c2c43cea46b9b5ba010a77ab1eb406ea09ec0b4840d9d",
+      "records/048.pt": "12164a8e4ef65a208caeb8ddf54a1e7f825f2a9300ecb50fdbe8d1a51060bcd8",
+      "records/052.pt": "459999f261a215d0c0cca04e2184a45f574a6bd8802099cd53db0de3f10d016e",
+      "records/054.pt": "f3fc6e28cff9e6157908cb39be72df0a935077cfeb0074cba2d59e610ea97155",
+      "records/055.pt": "2c38a430c19b4aa26e3ea647bd9fbd975e5007fa0b470632c09083da4c948072",
+      "records/060.pt": "a75d5890ba6fc889aaeaea23c5c441a5607e6bf5ad71eecf6550644408f7cafe",
+      "records/061.pt": "43bf3ea6b73ab009842b9ba55c7cb13649793da61e28bdf34d1f4073dd58dfe9",
+      "records/063.pt": "90b66a5b3f19392a755ce0ecf33a3f293ec192b20951f5cdbf9ed18465f1c76b",
+      "renders.jsonl": "39c7aa654b0cdafc0bdb6f739ea9e3c0ba59034c9bb82c74992eac6001868906",
+      "run.json": "d9470d4bab8a211b67d35627440f29abe198a3a18b1014ec278f3a3cc2c96c03",
+      "updates.jsonl": "5d1d3bf55d3f81cf215bd3794591d504f07825ea856e145e15b02efb44b825e6"
+    },
+    "native_attempts": 683,
+    "native_outcomes": 682,
+    "outcome_statuses": {
+      "accepted": 682
+    },
+    "qualified_for_release": false,
+    "unobserved_attempts": [
+      {
+        "attempt": 682,
+        "controlled_sha256": "a709eb9018b74f7bc2cf73df04c24681174e652fb5c8af30896598a18ee1afa2",
+        "event": "attempt",
+        "label": "gradient:29:16",
+        "phase": "training",
+        "request_id": "73cd24d0cd0d563ded8794aebb7fa065c82a6c4496b00540379a44aea6e0c718",
+        "source_sha256": "a5848f7f965c6079dc246e2afcfce6080e14d080aa296dfc412937a13aef84b9"
+      }
+    ]
+  },
+  "private_manifest_file_sha256": "41db80067c3c98571297a54a803ea47968200a2b83d012d5075ffd0a9a8ec71e",
+  "repeat_plan_id": "0e0a11000832b5b004e7b2d9e5ba235c11545e2fada6dc834028d0ff51f453ec",
+  "retained_prelaunches": [
+    {
+      "archive_bytes": 570747,
+      "evidence_sha256": {
+        "native.stderr.log": "06cce91ed1109100e57b553dba7f09bb99362d919496781101903523efae4e21",
+        "native.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "plan.json": "5b7ad1b3423c2d8bd7200025ea844038a6b43227e246da1052975d8636452f36",
+        "repeat-plan.json": "67b3171f2a205837a7cfd28ea908b190660dc773616579b65687d9ffdcc3ec1d",
+        "supervisor-run.json": "42ddaf169897d8068bfbb9b21e05fa43564da11046bb1947f017deb1197b7efa",
+        "supervisor-summary.json": "8ec8291eff5fa6eea58dcf406a49421fc443fc4a9f720fb2959f2d3f71391258",
+        "supervisor.traceback.log": "ecb9fe7af426ed122db23de894203cc1662fb4f6541e63257be92400d4710fb9"
+      }
+    }
+  ],
+  "scope": "Unchanged training plan, model, observations, optimizer, seed and quality gates; one clean repeat after external process loss.",
+  "source_sha256_lf": {
+    "benchmark.py": "1941574c1f9295dd9d136a131ea58f514b53db9298d133e8f988a514668d9ad0",
+    "native_repeat.py": "82828f52970e7425692582da0a830780e392d1dd8a15f09036cf53c149df7c17",
+    "start_native_repeat.ps1": "a2e25b0d6be26894381434985669a5d481cb2ba1db746c3899a1cfce20214511",
+    "supervise_native_repeat.py": "95d1c71e90074b5ba5f746c7a3ec61e96f34d9a9802fb0337185e3360367cc2c"
+  },
+  "started_unix": 1792658591.3023922,
+  "test_split_used": false,
+  "training_plan_file_sha256": "5b7ad1b3423c2d8bd7200025ea844038a6b43227e246da1052975d8636452f36",
+  "training_plan_id": "15084f99418c108999eb58f8e9f0afbf6d4241fdeee3950290b47b1a3db17a51"
+}
