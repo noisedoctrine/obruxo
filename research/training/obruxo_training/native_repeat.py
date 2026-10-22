@@ -45,11 +45,10 @@ def interrupted_history(source):
             "committed_updates_per_arm": saved["step"],
             "charged_optimizer_attempts": len((source / "updates.jsonl").read_text().splitlines()),
             "archive_bytes": archive_bytes(source), "qualified_for_release": False,
-            "evidence_sha256": {name: digest(source / name) for name in
-                ("plan.json", "run.json", "checkpoint.pt", "renders.jsonl", "updates.jsonl", "measurements.jsonl")}}
+            "evidence_sha256": {path.relative_to(source).as_posix(): digest(path) for path in source.rglob("*") if path.is_file()}}
 
 
-def prepare_repeat(source, output, command, *, working_directory, pythonpath):
+def prepare_repeat(source, output, command, *, working_directory, pythonpath, prelaunches=()):
     source, output = Path(source).resolve(), Path(output).resolve()
     if output.exists() or output == source or source in output.parents or output in source.parents:
         raise ValueError("repeat evidence needs a distinct new directory")
@@ -73,15 +72,29 @@ def prepare_repeat(source, output, command, *, working_directory, pythonpath):
             or len(history["unobserved_attempts"]) != 1 or history["archive_bytes"] > 1024**3):
         raise ValueError("this repeat requires one externally interrupted run with otherwise accepted observations")
     new_attempts = sum(training["limits"][name] for name in ("training_attempts", "qualification_attempts"))
+    retained = []
+    for value in prelaunches:
+        path = Path(value).resolve()
+        prior = json.loads((path / "supervisor-summary.json").read_text())
+        if (path in (source, output) or (path / "run.json").exists() or (path / "renders.jsonl").exists()
+                or digest(path / "plan.json") != digest(source / "plan.json") or prior["failure"] is None
+                or prior["native_attempts_including_interrupted_run"] != history["native_attempts"]
+                or prior["optimizer_attempts_per_arm_including_interrupted_run"] != history["charged_optimizer_attempts"]):
+            raise ValueError("a retained prelaunch directory contains new training or rendering work")
+        retained.append({"root": str(path), "archive_bytes": archive_bytes(path),
+                         "evidence_sha256": {item.relative_to(path).as_posix(): digest(item) for item in path.rglob("*") if item.is_file()}})
+    roots = [source, output, *(Path(item["root"]) for item in retained)]
+    if any(left == right or left in right.parents or right in left.parents for index, left in enumerate(roots) for right in roots[index + 1:]):
+        raise ValueError("repeat evidence roots must be distinct and disjoint")
     reserve = 64 * 1024**2
-    if history["archive_bytes"] + training["storage_bound"]["estimated_archive_upper_bound_bytes"] + reserve > 5 * 1024**3:
+    if history["archive_bytes"] + sum(item["archive_bytes"] for item in retained) + training["storage_bound"]["estimated_archive_upper_bound_bytes"] + reserve > 5 * 1024**3:
         raise ValueError("retained and repeated evidence exceeds the aggregate archive cap")
     wrapper = Path(__file__).parents[1] / "reports/scripts/supervise_native_repeat.py"
     windows = wrapper.with_name("start_native_repeat.ps1")
     files = [Path(__file__), Path(__file__).with_name("benchmark.py"), wrapper, windows]
     plan = {"format": "externally_interrupted_native_repeat_v1", "source": str(source), "output": str(output),
             "training_plan_id": canonical_sha256(training), "training_plan_file_sha256": digest(source / "plan.json"),
-            "prior_run": history, "command": list(command), "working_directory": str(Path(working_directory).resolve()),
+            "prior_run": history, "prelaunches": retained, "command": list(command), "working_directory": str(Path(working_directory).resolve()),
             "pythonpath": str(pythonpath), "started_unix": json.loads((source / "run.json").read_text())["started_unix"],
             "limits": {"native_attempts": history["native_attempts"] + new_attempts,
                        "optimizer_attempts_per_arm": history["charged_optimizer_attempts"] + training["limits"]["optimizer_attempts"],
@@ -115,11 +128,12 @@ class AttemptCounter:
 
 
 def resource_usage(plan, monitor, native, optimizer):
+    retained = sum(archive_bytes(item["root"]) for item in plan.get("prelaunches", ()))
     return {"native_attempts_including_interrupted_run": plan["prior_run"]["native_attempts"] + native.poll(),
             "optimizer_attempts_per_arm_including_interrupted_run": plan["prior_run"]["charged_optimizer_attempts"] + optimizer.poll(),
             "elapsed_seconds_including_interrupted_run": time() - plan["started_unix"],
             "peak_process_tree_rss_bytes": monitor.peak_bytes, "rss_sampling_errors": monitor.errors,
-            "aggregate_archive_bytes": archive_bytes(plan["source"]) + archive_bytes(plan["output"])}
+            "aggregate_archive_bytes": archive_bytes(plan["source"]) + archive_bytes(plan["output"]) + retained}
 
 
 def require_budget(usage, limits):
@@ -143,6 +157,10 @@ def supervise_repeat(path):
     for name, expected in plan["prior_run"]["evidence_sha256"].items():
         if digest(source / name) != expected:
             raise ValueError("interrupted evidence changed")
+    for retained in plan.get("prelaunches", ()):
+        for name, expected in retained["evidence_sha256"].items():
+            if digest(Path(retained["root"]) / name) != expected:
+                raise ValueError("retained prelaunch evidence changed")
     directory = Path(__file__).parent
     for name, expected in plan["source_sha256_lf"].items():
         current = directory / name if (directory / name).exists() else directory.parent / "reports/scripts" / name

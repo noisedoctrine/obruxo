@@ -4,7 +4,7 @@ $repeatDriver = Join-Path $PSScriptRoot 'supervise_native_repeat.py'
 foreach ($repeatPath in @($Python, $Plan, $repeatDriver)) {
     if (!(Test-Path -LiteralPath $repeatPath -PathType Leaf) -or $repeatPath.Contains('"')) { throw 'Repeat launch requires existing unambiguous file paths.' }
 }
-$repeatEnvironment = foreach ($repeatName in @('PATH','SystemRoot','WINDIR','COMSPEC','TEMP','TMP','USERPROFILE','APPDATA','LOCALAPPDATA','HOMEDRIVE','HOMEPATH')) {
+$repeatEnvironment = foreach ($repeatName in @('PATH','SystemRoot','WINDIR','COMSPEC','TEMP','TMP','USERPROFILE','USERNAME','USERDOMAIN','LOGNAME','USER','LNAME','APPDATA','LOCALAPPDATA','HOMEDRIVE','HOMEPATH')) {
     $repeatValue = [Environment]::GetEnvironmentVariable($repeatName, 'Process')
     if ($null -ne $repeatValue) { $repeatName+'='+$repeatValue }
 }
