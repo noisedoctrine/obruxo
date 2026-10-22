@@ -105,7 +105,7 @@ def acoustic_gates(plan, audits):
     return {"candidate_baseline_ratios": ratios, "candidate_template_ratios": templates, "acoustic_gates_passed": passed}
 
 
-def run(pool, plan, initial_root, output, *, execute=False, resume=False, renderer_factory=None):
+def run(pool, plan, initial_root, output, *, execute=False, resume=False, renderer_factory=None, feature_cache=None):
     output = Path(output).resolve()
     if output.exists():
         if json.loads((output / "plan.json").read_text()) != plan:
@@ -115,6 +115,10 @@ def run(pool, plan, initial_root, output, *, execute=False, resume=False, render
         write_json(output / "plan.json", plan)
     if not execute:
         return {"plan_id": canonical_sha256(plan), "executed": False}
+    if (feature_cache is None) != ("feature_cache" not in plan):
+        raise ValueError("cached initialization requires its frozen feature cache")
+    if feature_cache is not None and sha256_bytes(feature_cache.read_bytes()) != plan["feature_cache"]["file_sha256"]:
+        raise ValueError("initialization feature cache changed")
     if (output / "run.json").exists() != resume:
         raise ValueError("existing run needs explicit resume; a new run cannot resume")
     model_path = initial_root / "fit-000/model.pt"
@@ -154,6 +158,7 @@ def run(pool, plan, initial_root, output, *, execute=False, resume=False, render
             fit_root = output / f"fit-{len(segments):03d}"
             fit = train_pilot(pool, fit_root, config=TrainConfig(**plan["config"]), stream_config=StreamConfig(prefetch_clips=1),
                               renderer_factory=AuditedFactory(str(output), "training", base),
+                              seed_replay=feature_cache if previous is None else None,
                               initial_model=model_path if previous is None else None,
                               resume=previous / "checkpoint.pt" if previous else None, after_step=check, progress=progress)
         saved = load_training_checkpoint(fit_root / "checkpoint.pt")

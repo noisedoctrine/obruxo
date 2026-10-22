@@ -63,6 +63,9 @@ class ProfiledSampler:
 
 def training_sampler(pool, config):
     kwargs = {"seed": config.seed, "policy": config.sampling_policy}
+    if config.input_performances == "mixed":
+        from .mixed_input_performances import MixedSampler
+        return MixedSampler(pool, preroll_frames=config.preroll_frames, **kwargs)
     if config.input_performances == "varied":
         from .input_performances import VariedSampler
         return VariedSampler(pool, preroll_frames=config.preroll_frames, **kwargs)

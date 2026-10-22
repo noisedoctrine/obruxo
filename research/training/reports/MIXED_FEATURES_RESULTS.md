@@ -1,0 +1,11 @@
+# Original and wider training inputs are combined
+
+Completed 2026-10-22 with **zero native requests and zero optimizer updates**. All 404 original and 808 wider observations are retained: **1,212 distinct inputs**, arranged as 1,616 weighted records. Every patch has original/held and original/alternate pairs. All 404 repeated-original feature objects remain shared after serialization, avoiding unnecessary memory growth.
+
+The [card](MIXED_FEATURES_CARD.md), [input/source manifest](data/mixed_feature_preparation_manifest.json) and [measured results](data/mixed_features_summary.json) retain the evidence. Private preparation plan ID: `9c34ab98ce90a68125cd6074fd01fa017328010ba47c34716a35643f44271416`. Executed source: `9da670cf9b66eaf42a0fe96780254f2cae666e2c`. The public manifest omits local parent paths and retains their labels and exact file hashes.
+
+Preparation rechecks both completed independent audits, their file hashes, both source checkpoints, complete source coverage, source recipe identities, pool, frozen frontend, renderer/profile and remapped feature tensors. The wider run's source observations are valid despite its rejected model. Its model weights are not reused. Reloading the serialized cache through the next fit planner repeats these checks successfully; a separate read confirms 1,212 unique feature objects and all 404 shared original aliases.
+
+Cost: **203.19 seconds**, **719,532,032 bytes (0.67 GiB)** peak process-tree RAM, zero sampling errors and **48,611,200 bytes (46.36 MiB)** cache storage. Conservative weighted replay accounting is **62,474,560 bytes (59.58 MiB)**, within 64 MiB. All preparation limits pass. Cache SHA-256: `9404a8b326c15825b22a6b282a9f3773369c21a2bdd3deb0b4711d5d1bc1ede6`.
+
+The combined-data checks cover exact parent request equality, paired sampling with 50% original inputs, altered feature/origin/frontend rejection, unchanged learning RNG, basic-only replay limits, zero-render fitting and exact checkpoint recovery. Legacy/varied training and the comparison driver still pass. This qualifies the input cache, not a model. The [next frozen fit](MIXED_BOOTSTRAP_CARD.md) must pass the unchanged original/wider acoustic gates before its weights are admitted. The prediction head remains 14 outputs.
