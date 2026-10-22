@@ -1,0 +1,42 @@
+{
+  "limits": {
+    "archive_bytes": 134217728,
+    "process_tree_bytes": 4294967296,
+    "wall_seconds": 300
+  },
+  "native_requests": 0,
+  "operation": "obruxo_mixed_features_v1",
+  "optimizer_updates": 0,
+  "origins": {
+    "original": {
+      "audit_sha256": "5b77ebac0aecea8d2f19a778130ab879732b27127090f68e5074f3d659b1204a",
+      "checkpoint": "fit-000/checkpoint.pt",
+      "checkpoint_sha256": "765657bb618d7fc2ab465693ff94be10be52bb8c99126ec45ffe7a7468358c4b",
+      "parent_label": "settled-basic-full-bootstrap-20261022"
+    },
+    "wide": {
+      "audit_sha256": "7a352b6a5edf7040be482acf4c4b3f1294a6b2bbf960df0e542c7d229bbb1696",
+      "checkpoint": "fit-000/checkpoint.pt",
+      "checkpoint_sha256": "5ffdd1d5e49a6b10b91ef3734931d5ca561ad67cea70dbdd1984ca1ac1e3a56d",
+      "parent_label": "varied-basic-bootstrap-20261022"
+    }
+  },
+  "pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+  "schedule": [
+    "original",
+    "wide_held",
+    "original",
+    "wide_alternate"
+  ],
+  "source": {
+    "features.py": "895a736257041013f6b3e3ce260ed6a7bef2c94d51390f5f1a5492a78b737501",
+    "mixed_features.py": "ee562d3f67b465a831394f95c8c9b1eef48655f1a5ad02c11749a0475706ba3b",
+    "mixed_input_performances.py": "076aff59f7bbe6eabdf3c05e54d4f18e5efd218b23fb65f94996c3d0d7f1ef44",
+    "paired.py": "1c5d8c69d92151b40418e8bc949630a306686740025a22a31eea2147f4a89025",
+    "profiled_sampler.py": "42f1eefb044b812aac964ca7f6adffad9b6d66855a8f22ae18503958704964d5",
+    "trainer.py": "6fda802fe96d763295c8cc6305efec7d63965517b049c3b06e55a1ecf1e32d2d"
+  },
+  "execution_plan_id": "9c34ab98ce90a68125cd6074fd01fa017328010ba47c34716a35643f44271416",
+  "execution_plan_file_sha256": "c6ffe13a49cf3944ae7199a7d3fcbcdc373c885b264e5c0571e159049cdfb38a",
+  "local_paths_omitted": true
+}

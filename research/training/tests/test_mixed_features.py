@@ -12,7 +12,7 @@ from obruxo_training.model import PilotInverse
 from obruxo_training.pilot import PilotPool
 from obruxo_training.profiled_sampler import profile_metadata
 from obruxo_training.stream import OnlineRenderStream, StreamConfig
-from obruxo_training.trainer import TrainConfig, export_model, train_pilot
+from obruxo_training.trainer import TrainConfig, export_model, load_replay_seed, train_pilot
 
 
 def synthetic_cache(pool, sampler, frontend, stream):
@@ -66,6 +66,15 @@ def test_mixed_feature_training_has_no_renders_and_exact_recovery(tmp_path, monk
     path, initial_path = tmp_path / "features.pt", tmp_path / "initial.pt"
     atomic_torch_save(path, saved)
     export_model(initial_path, PilotInverse(pool.codec), frontend, pool.codec, pool.pool_id, preroll_frames=32768)
+
+    def validator_with_random_imports(*_args):
+        torch.rand(7)
+        return parents, native
+
+    monkeypatch.setattr(cache, "load_origins", validator_with_random_imports)
+    rng = torch.get_rng_state().clone()
+    load_replay_seed(path, pool, sampler, frontend, config, stream)
+    assert torch.equal(rng, torch.get_rng_state())
 
     def forbid_render():
         raise AssertionError("cached training must not render")

@@ -1,0 +1,32 @@
+{
+  "aliases_verified_after_serialization": 404,
+  "cache_file_bytes": 48611200,
+  "cache_file_sha256": "9404a8b326c15825b22a6b282a9f3773369c21a2bdd3deb0b4711d5d1bc1ede6",
+  "complete": true,
+  "counted_replay_bytes": 62474560,
+  "distinct_parent_observations": 1212,
+  "elapsed_seconds": 203.18579390004743,
+  "executed_source_commit": "9da670cf9b66eaf42a0fe96780254f2cae666e2c",
+  "features_sha256": "da5024f905e574e71f2409f61f0e173f16689bdde799491d306b87f72b4d7433",
+  "format": "obruxo_mixed_features_v1",
+  "new_native_requests": 0,
+  "optimizer_updates": 0,
+  "peak_process_tree_rss_bytes": 719532032,
+  "plan_id": "9c34ab98ce90a68125cd6074fd01fa017328010ba47c34716a35643f44271416",
+  "pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+  "rss_sampling_errors": 0,
+  "source_banks": {
+    "original": {
+      "audit_sha256": "5b77ebac0aecea8d2f19a778130ab879732b27127090f68e5074f3d659b1204a",
+      "checkpoint": "fit-000/checkpoint.pt",
+      "checkpoint_sha256": "765657bb618d7fc2ab465693ff94be10be52bb8c99126ec45ffe7a7468358c4b"
+    },
+    "wide": {
+      "audit_sha256": "7a352b6a5edf7040be482acf4c4b3f1294a6b2bbf960df0e542c7d229bbb1696",
+      "checkpoint": "fit-000/checkpoint.pt",
+      "checkpoint_sha256": "5ffdd1d5e49a6b10b91ef3734931d5ca561ad67cea70dbdd1984ca1ac1e3a56d"
+    }
+  },
+  "unique_feature_objects": 1212,
+  "weighted_records": 1616
+}

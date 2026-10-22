@@ -266,7 +266,8 @@ def load_replay_seed(path: Path, pool, sampler, frontend, config, stream_config)
     source = load_training_checkpoint(path)
     if source.get("format") == "obruxo_mixed_features_v1":
         from .mixed_features import validate_cache
-        validate_cache(source, pool, sampler, frontend, config, stream_config)
+        with torch.random.fork_rng(devices=[]):
+            validate_cache(source, pool, sampler, frontend, config, stream_config)
         return source, {"policy": "verified_original_and_wide_features_fresh_learning_state_v1", "checkpoint_sha256": sha256_bytes(raw),
                         "source_run_id": canonical_sha256(source["origins"]), "examples": len(source["replay"]),
                         "distinct_parent_observations": source["distinct_parent_observations"],

@@ -33,7 +33,7 @@ from verify_basic_bootstrap import wait_for_native  # noqa: E402
 
 
 def json_rows(path):
-    return [json.loads(line) for line in path.read_text().splitlines()]
+    return [json.loads(line) for line in path.read_text().splitlines()] if path.is_file() else []
 
 
 def replay_fit(saved, initial, initial_model, pool, config, fit_summary):
@@ -72,7 +72,7 @@ def replay_fit(saved, initial, initial_model, pool, config, fit_summary):
     return model.eval()
 
 
-def verify(root, pool_path, initial_root, frozen_commit, output, *, wait_native_seconds=0):
+def verify(root, pool_path, initial_root, frozen_commit, output, *, wait_native_seconds=0, feature_cache=None):
     started, monitor = perf_counter(), MemoryMonitor()
     monitor.start()
     try:
@@ -107,10 +107,24 @@ def verify(root, pool_path, initial_root, frozen_commit, output, *, wait_native_
         samplers = {"original": training_sampler(pool, TrainConfig(**plan["original_sampler_config"])), "wide": training_sampler(pool, config)}
         memories = {"original": old_saved["replay"], "wide": saved["replay"]}
         source_rows = [row for segment in segments for row in json_rows(segment / "renders.jsonl")]
-        sources = {row["provenance"]["request_id"]: row for row in source_rows}
-        assert len(sources) == len(saved["replay"]) == len(plan["sources"]) == 808
-        for item, spec in zip(saved["replay"], plan["sources"], strict=True):
-            assert item["recipe_id"] == spec["recipe_id"] and item["audio_sha256"] == sources[spec["request_id"]]["qa"]["audio_float32_sha256"]
+        if "feature_cache" in plan:
+            from obruxo_training.mixed_features import validate_cache
+            from obruxo_training.stream import StreamConfig
+            assert feature_cache is not None and sha256_bytes(feature_cache.read_bytes()) == plan["feature_cache"]["file_sha256"]
+            cached = torch.load(feature_cache, map_location="cpu", weights_only=True)
+            validate_cache(cached, pool, training_sampler(pool, config), features_for(pool.codec, saved["basic_pitch"]), config, StreamConfig(prefetch_clips=1))
+            assert not source_rows and summary["training"]["totals"]["render_attempts"] == 0
+            assert len(saved["replay"]) == len(cached["replay"]) == len(plan["sources"]) == 1616
+            for item, parent, spec in zip(saved["replay"], cached["replay"], plan["sources"], strict=True):
+                assert item["recipe_id"] == parent["recipe_id"] == spec["recipe_id"] and item["origin"] == parent["origin"] == spec["origin"]
+                assert item["audio_sha256"] == parent["audio_sha256"] and tensor_digest(item["features"]) == tensor_digest(parent["features"])
+            distinct_observations = cached["distinct_parent_observations"]
+        else:
+            sources = {row["provenance"]["request_id"]: row for row in source_rows}
+            assert len(sources) == len(saved["replay"]) == len(plan["sources"]) == 808
+            for item, spec in zip(saved["replay"], plan["sources"], strict=True):
+                assert item["recipe_id"] == spec["recipe_id"] and item["audio_sha256"] == sources[spec["request_id"]]["qa"]["audio_float32_sha256"]
+            distinct_observations = len(saved["replay"])
         all_outcomes = [{"phase": "training", **row} for row in source_rows]
         differences, pairs, reconstructed, observed, ratios, template_ratios = [], 0, 0, 0, {}, {}
         performances = {item.performance_id: item.performance() for item in pool.codec.contract.performances()}
@@ -163,9 +177,13 @@ def verify(root, pool_path, initial_root, frozen_commit, output, *, wait_native_
         assert Counter((row["phase"], row["request_id"]) for row in attempts) == Counter(
             (row["phase"], row.get("request_id", row["provenance"]["request_id"])) for row in all_outcomes)
         assert all(row["status"] == "accepted" for row in all_outcomes)
-        assert len(attempts) == summary["attempts"] and 1000 <= len(attempts) <= 1012 and reconstructed == 192 and pairs == 32
+        assert (len(attempts) == summary["attempts"] and plan["planned_requests"]["total"] <= len(attempts)
+                <= plan["limits"]["training_attempts"] + plan["limits"]["evaluation_attempts"] and reconstructed == 192 and pairs == 32)
         result = {"plan_id": summary["plan_id"], "frozen_commit": frozen_commit, "replayed_updates": config.steps,
-                  "model_optimizer_batch_and_global_rng_exact": True, "training_source_receipts_verified": 808,
+                  "model_optimizer_batch_and_global_rng_exact": True, "training_observations_verified": len(saved["replay"]),
+                  "distinct_parent_observations_verified": distinct_observations, "training_source_receipts_verified": len(source_rows),
+                  "cached_feature_source_verified": "feature_cache" in plan,
+                  "feature_cache_sha256": plan.get("feature_cache", {}).get("file_sha256"),
                   "all_native_audit_requests_reconstructed": observed, "planned_native_audit_requests_reconstructed": reconstructed,
                   "hard_patch_request_exports_reconstructed": len(differences),
                   "native_source_repeat_pairs_exact": pairs, "cached_prediction_tolerance": 1e-6,
@@ -177,7 +195,9 @@ def verify(root, pool_path, initial_root, frozen_commit, output, *, wait_native_
                   "limitations": "waveforms discarded; spectral scores reconstructed from saved cases, not independently rescored",
                   "evidence_sha256": {path.relative_to(root).as_posix(): sha256_bytes(path.read_bytes()) for path in root.rglob("*") if path.is_file()},
                   "qualified_for_release": False}
-        assert result["elapsed_seconds"] < 600 and monitor.peak_bytes is not None and monitor.peak_bytes < 4 * 1024**3 and monitor.errors == 0
+        audit_limit = 900 if "feature_cache" in plan else 600
+        result["audit_resource_limit_seconds"] = audit_limit
+        assert result["elapsed_seconds"] < audit_limit and monitor.peak_bytes is not None and monitor.peak_bytes < 4 * 1024**3 and monitor.errors == 0
         output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
         return {key: value for key, value in result.items() if key != "evidence_sha256"}
     finally:
@@ -190,5 +210,7 @@ if __name__ == "__main__":
         parser.add_argument("--" + name, type=Path, required=True)
     parser.add_argument("--frozen-commit", required=True)
     parser.add_argument("--wait-native-seconds", type=int, choices=range(481), default=0, metavar="0..480")
+    parser.add_argument("--feature-cache", type=Path)
     args = parser.parse_args()
-    print(json.dumps(verify(args.root, args.pool, args.initial_root, args.frozen_commit, args.output, wait_native_seconds=args.wait_native_seconds)), flush=True)
+    print(json.dumps(verify(args.root, args.pool, args.initial_root, args.frozen_commit, args.output,
+                            wait_native_seconds=args.wait_native_seconds, feature_cache=args.feature_cache)), flush=True)
