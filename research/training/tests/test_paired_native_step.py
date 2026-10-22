@@ -9,6 +9,7 @@ from obruxo_training.codec import PilotCodec  # noqa: E402
 from obruxo_training.features import PITCH_SIZE, TIMBRE_SHAPE, tensor_digest  # noqa: E402
 from obruxo_training.model import PilotInverse, batch_features, loss_terms  # noqa: E402
 from obruxo_training.paired_native_step import matched_pair_step, reciprocal_updates  # noqa: E402
+from obruxo_training.production_controls import ProductionControlAdapter  # noqa: E402
 
 
 def setup_pair():
@@ -47,6 +48,12 @@ def test_both_observations_are_independently_measured_and_control_cross_entropy_
     codec, models, optimizers, features, targets = setup_pair()
     before = {name: tensor_digest(model.state_dict()) for name, model in models.items()}
     expected_control = float(loss_terms(models["parameter"](batch_features([{"features": row} for row in features])), targets, codec)["loss"].detach())
+    adapter = ProductionControlAdapter(codec, scales=(32., 29.))
+    production = []
+    with torch.no_grad():
+        for row in features:
+            prediction = models["spectral"](batch_features([{"features": row}]))
+            production.append(adapter.export(prediction["continuous"], prediction["categorical"])[0].to_dict())
     calls = []
 
     def evaluate(index, patch):
@@ -55,6 +62,7 @@ def test_both_observations_are_independently_measured_and_control_cross_entropy_
 
     result = matched_pair_step(models, optimizers, features, targets, codec, evaluate, 0, 128, scales=(32., 29.))
     assert result["losses"]["parameter"] == expected_control and expected_control > 100
+    assert result["production_patches"] == production
     assert len(calls) == result["gradient_queries"] <= 44
     assert Counter(index for index, _patch in calls) == {index: row["queries"] for index, row in enumerate(result["estimates"])}
     assert result["losses"]["spectral"] == pytest.approx(sum(row["value"] for row in result["estimates"]) / 2)

@@ -7,6 +7,7 @@ import torch
 from obruxo_data.hashing import canonical_sha256
 from obruxo_data.midi import Performance
 
+from .audit import write_json
 from .checkpoints import atomic_torch_save
 from .codec import PilotTarget
 from .native_fit import append_durable, record_features
@@ -101,6 +102,7 @@ def fit_pairs(models, records, session, output, plan, saved=None, *, after_step=
                  "optimizers": {name: optimizer.state_dict() for name, optimizer in optimizers.items()},
                  "rng": capture_rng("cpu"), "trace": trace, "production_training": policy}
         atomic_torch_save(output / "checkpoint.pt", state)
+        write_json(output / "progress.json", {"committed_updates": step + 1, "planned_updates": len(plan["updates"]), "losses": result["losses"]})
         if after_step:
             after_step(state)
         if (step + 1) % 8 == 0:

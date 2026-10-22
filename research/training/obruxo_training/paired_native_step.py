@@ -18,6 +18,13 @@ def reciprocal_updates(count, *, seed=0):
                           {"state": pairs[index][0], "input_view": pairs[index][1], "view": 0}]} for index in order]
 
 
+def pair_prediction(model, features):
+    # Match production's singleton forward exactly; average independent observations in the loss.
+    rows = [model(batch_features([{"features": value}])) for value in features]
+    return {"continuous": torch.cat([row["continuous"] for row in rows]),
+            "categorical": [torch.cat([row["categorical"][head] for row in rows]) for head in (0, 1)]}
+
+
 def matched_pair_step(models, optimizers, features, targets, codec, evaluate, step, steps, *, scales):
     if type(codec) is not PilotCodec or len(features) != 2 or len(targets) != 2 or targets[0] != targets[1]:
         raise ValueError("paired native update requires two observations of the same basic patch")
@@ -25,10 +32,9 @@ def matched_pair_step(models, optimizers, features, targets, codec, evaluate, st
         codec.validate_target(target)
     adapter = ProductionControlAdapter(codec, scales=scales)
     temperature = temperature_at(step, steps)
-    batch = batch_features([{"features": value} for value in features])
     for optimizer in optimizers.values():
         optimizer.zero_grad(set_to_none=True)
-    predictions = {name: models[name](batch) for name in ("parameter", "spectral")}
+    predictions = {name: pair_prediction(models[name], features) for name in ("parameter", "spectral")}
     # The matched control always receives raw logits. Scales belong only to the adapter's backward path.
     parameter = loss_terms(predictions["parameter"], targets, codec)
     spectral = predictions["spectral"]
