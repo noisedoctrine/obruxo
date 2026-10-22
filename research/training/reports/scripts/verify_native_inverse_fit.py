@@ -23,7 +23,7 @@ def equal_tree(first, second):
     return first == second
 
 
-def verify(source, pool, initial_path, retrieval_path, qualification_path, *, observe_step=None):
+def verify(source, pool, initial_path, retrieval_path, qualification_path, *, observe_step=None, calibration_path=None):
     import torch
     from obruxo_data.hashing import canonical_sha256, sha256_bytes
     from obruxo_data.midi import Performance
@@ -40,12 +40,15 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path, *, ob
     from obruxo_training.trainer import restore_model
     torch.set_num_threads(2)
     frozen = json.loads((source / "plan.json").read_text())
-    plan = make_plan(pool, initial_path, retrieval_path, qualification_path, preroll_frames=frozen.get("render_profile", {}).get("preroll_frames", 0))
+    plan = make_plan(pool, initial_path, retrieval_path, qualification_path,
+                     preroll_frames=frozen.get("render_profile", {}).get("preroll_frames", 0), category_calibration_path=calibration_path)
     summary = json.loads((source / "summary.json").read_text())
     if (plan != json.loads((source / "plan.json").read_text()) or summary["plan"] != plan
             or summary["plan_id"] != canonical_sha256(plan) or not summary["complete"] or summary["failure"] is not None):
         raise ValueError("run is incomplete or its frozen contracts changed")
     saved = torch.load(source / "checkpoint.pt", map_location="cpu", weights_only=True)
+    if saved.get("category_training") != plan.get("category_training"):
+        raise ValueError("checkpoint category calibration differs from the frozen plan")
     interruptions = []
     for path in sorted((source / "interruptions").glob("*/checkpoint.pt")):
         snapshot = torch.load(path, map_location="cpu", weights_only=True)
@@ -149,7 +152,7 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path, *, ob
 
         with observe_step(step, models, records, committed) if observe_step else nullcontext():
             result = matched_step(models, optimizers, records[update["state"]], PilotTarget.from_dict(plan["training"][update["state"]]["target"]),
-                                  codec, evaluate, step, len(plan["updates"]))
+                                  codec, evaluate, step, len(plan["updates"]), category_training=plan.get("category_training"))
         if cursor != len(point) or any(result[key] != committed[key] for key in result):
             raise ValueError("offline numerical update differs from training")
         for _path, snapshot, _history in interruptions:
@@ -165,7 +168,8 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path, *, ob
         exported = torch.load(source / f"diagnostic-{name}.pt", map_location="cpu", weights_only=True)
         if (not equal_tree(exported["model"], model.state_dict()) or exported["training_plan_id"] != canonical_sha256(plan)
                 or exported["qualified_for_release"] or exported["codec"] != codec.to_dict()
-                or exported.get("render_profile", {}) != plan.get("render_profile", {})):
+                or exported.get("render_profile", {}) != plan.get("render_profile", {})
+                or exported.get("category_training") != plan.get("category_training")):
             raise ValueError("diagnostic inference export differs from its actual trained model")
     if not torch.equal(torch.get_rng_state(), saved["rng"]["torch"]):
         raise ValueError("replayed Gumbel RNG differs from the committed checkpoint")
@@ -246,10 +250,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("source", "pool", "initial", "retrieval", "qualification", "output"):
         parser.add_argument(f"--{name}", type=Path, required=True)
+    parser.add_argument("--category-calibration", type=Path)
     args = parser.parse_args()
     if args.output.exists():
         raise ValueError("refusing to replace verified evidence")
-    result = verify(args.source, PilotPool.load(args.pool), args.initial, args.retrieval, args.qualification)
+    result = verify(args.source, PilotPool.load(args.pool), args.initial, args.retrieval, args.qualification, calibration_path=args.category_calibration)
     write_json(args.output, result)
     print(json.dumps({"offline_training_replay_exact": True, "matched_comparison_passed": result["matched_comparison_passed"]}))
 

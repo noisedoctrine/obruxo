@@ -13,12 +13,13 @@ sys.path[:0] = [str(RESEARCH / "training"), str(RESEARCH / "data_generation")]
 from verify_native_inverse_fit import equal_tree  # noqa: E402
 
 
-def audit(source, pool, initial_path, retrieval_path, qualification_path, *, records_root=None):
+def audit(source, pool, initial_path, retrieval_path, qualification_path, *, records_root=None, calibration_path=None):
     import torch
     from obruxo_data.hashing import canonical_sha256, sha256_bytes
     from obruxo_data.midi import Performance
     from obruxo_data.render.base import RenderRequest
     from obruxo_training.codec import CATEGORICAL, PilotTarget
+    from obruxo_training.category_signal import scaled_logits
     from obruxo_training.features import tensor_digest, validate_features
     from obruxo_training.native_fit import digest, make_plan, matched_step
     from obruxo_training.native_inverse import native_reconstruction_loss
@@ -29,13 +30,15 @@ def audit(source, pool, initial_path, retrieval_path, qualification_path, *, rec
     torch.set_num_threads(2)
     records_root = source if records_root is None else records_root
     frozen = json.loads((source / "plan.json").read_text())
-    plan = make_plan(pool, initial_path, retrieval_path, qualification_path, preroll_frames=frozen.get("render_profile", {}).get("preroll_frames", 0))
+    plan = make_plan(pool, initial_path, retrieval_path, qualification_path,
+                     preroll_frames=frozen.get("render_profile", {}).get("preroll_frames", 0), category_calibration_path=calibration_path)
     summary = json.loads((source / "summary.json").read_text())
     if (plan != json.loads((source / "plan.json").read_text()) or summary["plan"] != plan
             or summary["plan_id"] != canonical_sha256(plan) or summary["complete"] or not summary["failure"]):
         raise ValueError("expected an unchanged, terminal interrupted run")
     saved = torch.load(source / "checkpoint.pt", map_location="cpu", weights_only=True)
-    if saved["plan_id"] != canonical_sha256(plan) or saved["step"] != len(saved["trace"]):
+    if (saved["plan_id"] != canonical_sha256(plan) or saved["step"] != len(saved["trace"])
+            or saved.get("category_training") != plan.get("category_training")):
         raise ValueError("committed checkpoint contract changed")
     charges = [json.loads(line) for line in (source / "updates.jsonl").read_text().splitlines()]
     measured = [json.loads(line) for line in (source / "measurements.jsonl").read_text().splitlines()]
@@ -102,7 +105,7 @@ def audit(source, pool, initial_path, retrieval_path, qualification_path, *, rec
             cursor += 1
             return row["loss"]
         result = matched_step(models, optimizers, features[update["state"]], PilotTarget.from_dict(plan["training"][update["state"]]["target"]),
-                              codec, evaluate, step, len(plan["updates"]))
+                              codec, evaluate, step, len(plan["updates"]), category_training=plan.get("category_training"))
         if cursor != len(point) or any(result[key] != trace[key] for key in result):
             raise ValueError("native optimizer prefix cannot be replayed exactly")
     if not torch.equal(torch.get_rng_state(), saved["rng"]["torch"]):
@@ -117,6 +120,8 @@ def audit(source, pool, initial_path, retrieval_path, qualification_path, *, rec
     update = plan["updates"][saved["step"]]
     performance = Performance.from_dict(plan["training"][update["state"]]["performances"][update["view"]])
     prediction = models["spectral"]( {"timbre": features[update["state"]]["timbre"][None], "pitch": features[update["state"]]["pitch"][None]} )
+    if plan.get("category_training"):
+        prediction = {**prediction, "categorical": scaled_logits(prediction["categorical"], plan["category_training"]["scales"])}
     prefix, cursor, failing = by_attempt[pending["attempt"]], 0, None
     class FoundRejection(Exception):
         pass
@@ -170,10 +175,12 @@ def main():
     for name in ("source", "pool", "initial", "retrieval", "qualification", "output"):
         parser.add_argument(f"--{name}", type=Path, required=True)
     parser.add_argument("--records-root", type=Path)
+    parser.add_argument("--category-calibration", type=Path)
     args = parser.parse_args()
     if args.output.exists():
         raise ValueError("refusing to replace audited evidence")
-    result = audit(args.source, PilotPool.load(args.pool), args.initial, args.retrieval, args.qualification, records_root=args.records_root)
+    result = audit(args.source, PilotPool.load(args.pool), args.initial, args.retrieval, args.qualification,
+                   records_root=args.records_root, calibration_path=args.category_calibration)
     write_json(args.output, result)
     print(json.dumps({"committed_updates_per_arm": result["committed_updates_per_arm"], "offline_prefix_replay_exact": True,
                       "terminal_probe_reconstructed": True, "terminal_status": result["interrupted_probe"]["receipt"]["status"]}))

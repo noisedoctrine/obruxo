@@ -16,6 +16,8 @@ from obruxo_data.midi import Performance
 
 from .audit import write_json
 from .benchmark import MemoryMonitor
+from .category_calibration import load_calibration
+from .category_signal import scaled_logits
 from .checkpoints import atomic_torch_save, load_training_checkpoint
 from .codec import PilotCodec, PilotTarget
 from .evaluate import audio_distance, nearest_training_target, restore_evaluation_checkpoint, retrieval_digest
@@ -61,12 +63,13 @@ def require_qualification(report, *, preroll_frames=0):
                 raise ValueError("qualified renderer source changed or is missing")
 
 
-def make_plan(pool, initial_path, retrieval_path, qualification_path, *, preroll_frames=BASIC_PREROLL_FRAMES):
+def make_plan(pool, initial_path, retrieval_path, qualification_path, *, preroll_frames=BASIC_PREROLL_FRAMES, category_calibration_path=None):
     profile = basic_render_profile(preroll_frames)
     if type(pool.codec) is not PilotCodec:
         raise ValueError("native inverse fitting requires the exact basic codec")
     report = json.loads(qualification_path.read_text())
     require_qualification(report, preroll_frames=preroll_frames)
+    calibration = load_calibration(category_calibration_path, pool, initial_path, qualification_path) if category_calibration_path else None
     initial = torch.load(initial_path, map_location="cpu", weights_only=True)
     model, frontend, codec = restore_model(initial)
     retrieval = load_training_checkpoint(retrieval_path)
@@ -89,9 +92,12 @@ def make_plan(pool, initial_path, retrieval_path, qualification_path, *, preroll
     names = ("native_fit.py", "native_gradient.py", "native_inverse.py", "spectral.py", "spectral_controls.py",
              "model.py", "features.py", "trainer.py", "evaluate.py", "temporal_proxy_data.py", "reproducibility.py", "checkpoints.py", "render_profile.py")
     paths = [Path(__file__).with_name(name) for name in names]
+    if calibration:
+        paths += [Path(__file__).with_name(name) for name in ("category_calibration.py", "category_signal.py")]
     paths += [Path(__file__).parents[2] / "data_generation/obruxo_data/render" / name for name in ("vita.py", "base.py", "midi_transport.py", "qa.py")]
     paths += [Path(__file__).parents[1] / "reports/scripts/run_native_inverse_fit.py"]
-    return {"format": "matched_native_inverse_fit_v1", "pool_id": pool.pool_id, "manifest_id": pool.manifest.manifest_id,
+    return {"format": "matched_native_inverse_fit_v2" if calibration else "matched_native_inverse_fit_v1",
+            "pool_id": pool.pool_id, "manifest_id": pool.manifest.manifest_id,
             "codec": codec.to_dict(), "adapter": BasicControlAdapter(codec).contract(), "estimator": native_gradient_spec(), "render_profile": profile,
             "initial_file_sha256": digest(initial_path), "initial_model_sha256": tensor_digest(model.state_dict()),
             "retrieval_file_sha256": digest(retrieval_path), "retrieval_digest": retrieval_digest(retrieval["replay"]),
@@ -112,7 +118,8 @@ def make_plan(pool, initial_path, retrieval_path, qualification_path, *, preroll
             "source": {path.name: sha256_bytes(path.read_bytes().replace(b"\r\n", b"\n")) for path in paths},
             "runtime": {"python": platform.python_version(), "torch": str(torch.__version__), "numpy": np.__version__,
                         "device": "cpu", "cpu_threads": 2, "precision": "float32", "native_workers": 1},
-            "test_split_used": False, "checkpoint_selection": "final_only", "inference_input": "primary_audio_only"}
+            "test_split_used": False, "checkpoint_selection": "final_only", "inference_input": "primary_audio_only",
+            **({"category_training": calibration} if calibration else {})}
 
 
 def append_durable(path, value):
@@ -179,7 +186,7 @@ class FitRecords:
         return record
 
 
-def matched_step(models, optimizers, features, target, codec, evaluate, step, steps):
+def matched_step(models, optimizers, features, target, codec, evaluate, step, steps, *, category_training=None):
     """One shared observation, one update per arm; the spectral arm receives no labels."""
     losses, gradients = {}, {}
     adapter = BasicControlAdapter(codec)
@@ -187,12 +194,15 @@ def matched_step(models, optimizers, features, target, codec, evaluate, step, st
         model, optimizer = models[name], optimizers[name]
         optimizer.zero_grad(set_to_none=True)
         prediction = model(batch_features([{"features": features}]))
+        raw_logits = prediction["categorical"]
+        if category_training:
+            prediction = {**prediction, "categorical": scaled_logits(raw_logits, category_training["scales"])}
         if name == "parameter":
             loss = loss_terms(prediction, [target], codec)["loss"]
             estimates = []
         else:
             prediction["continuous"].retain_grad()
-            for scores in prediction["categorical"]:
+            for scores in (*raw_logits, *prediction["categorical"]):
                 scores.retain_grad()
             loss, estimates = native_reconstruction_loss(prediction, adapter, evaluate, temperature=temperature_at(step, steps))
         if not torch.isfinite(loss):
@@ -203,7 +213,9 @@ def matched_step(models, optimizers, features, target, codec, evaluate, step, st
             raise ValueError("nonfinite inverse gradients")
         if name == "spectral":
             gradients = {"continuous_l1": float(prediction["continuous"].grad.abs().sum()),
-                         "category_l1": [float(scores.grad.abs().sum()) for scores in prediction["categorical"]]}
+                         "category_l1": [float(scores.grad.abs().sum()) for scores in raw_logits]}
+            if category_training:
+                gradients["category_scaled_l1"] = [float(scores.grad.abs().sum()) for scores in prediction["categorical"]]
         optimizer.step()
         losses[name] = float(loss.detach())
     return {"losses": losses, "gradients": gradients, "gradient_queries": sum(row.queries for row in estimates),
@@ -217,7 +229,7 @@ def fit_models(models, records, session, output, plan, saved=None, *, after_step
     trace = []
     if saved:
         if (saved["plan_id"] != canonical_sha256(plan) or saved["format"] != "matched_native_inverse_checkpoint_v1"
-                or saved["step"] != len(saved["trace"])):
+                or saved["step"] != len(saved["trace"]) or saved.get("category_training") != plan.get("category_training")):
             raise ValueError("training checkpoint contract changed")
         for name, model in models.items():
             model.load_state_dict(saved["models"][name])
@@ -252,7 +264,9 @@ def fit_models(models, records, session, output, plan, saved=None, *, after_step
             audio, receipt = session.render(candidate, performance, "training", f"gradient:{step}:{query}")
             query += 1
             if audio is None:
-                raise RuntimeError("native gradient training render rejected")
+                status = receipt.get("status", "rejected")
+                detail = f": {receipt['error_type']}" if receipt.get("error_type") else ""
+                raise RuntimeError(f"native gradient training render {status}{detail}")
             value = float(spectral_loss(SpectralTargets()(torch.from_numpy(audio.copy()).T[None]), record["targets"][view])["loss"].item())
             append_durable(output / "measurements.jsonl", {"optimizer_attempt": charge["attempt"], "step": step + 1,
                            "query": query - 1, "candidate": candidate.to_dict(), "loss": value,
@@ -260,12 +274,14 @@ def fit_models(models, records, session, output, plan, saved=None, *, after_step
             return value
 
         result = matched_step(models, optimizers, record["features"], PilotTarget.from_dict(recipe["target"]), session.codec,
-                              evaluate, step, len(plan["updates"]))
+                              evaluate, step, len(plan["updates"]), category_training=plan.get("category_training"))
         trace.append({**charge, **result})
         state = {"format": "matched_native_inverse_checkpoint_v1", "plan_id": canonical_sha256(plan), "step": step + 1,
                  "models": {name: model.state_dict() for name, model in models.items()},
                  "optimizers": {name: optimizer.state_dict() for name, optimizer in optimizers.items()},
                  "rng": capture_rng("cpu"), "trace": trace}
+        if plan.get("category_training"):
+            state["category_training"] = plan["category_training"]
         atomic_torch_save(output / "checkpoint.pt", state)
         if after_step:
             after_step(state)
@@ -362,9 +378,11 @@ def predict_candidates(models, codec, features):
     return {name: predicted_targets(model(batch_features([{"features": features}])), codec)[0] for name, model in models.items()}
 
 
-def run_fit(pool, initial_path, retrieval_path, qualification_path, output, *, execute=False, resume=False, preroll_frames=BASIC_PREROLL_FRAMES):
+def run_fit(pool, initial_path, retrieval_path, qualification_path, output, *, execute=False, resume=False,
+            preroll_frames=BASIC_PREROLL_FRAMES, category_calibration_path=None):
     torch.set_num_threads(2)
-    plan = make_plan(pool, initial_path, retrieval_path, qualification_path, preroll_frames=preroll_frames)
+    plan = make_plan(pool, initial_path, retrieval_path, qualification_path,
+                     preroll_frames=preroll_frames, category_calibration_path=category_calibration_path)
     plan_id = canonical_sha256(plan)
     if not execute:
         output.mkdir(parents=True, exist_ok=False)
@@ -428,6 +446,8 @@ def run_fit(pool, initial_path, retrieval_path, qualification_path, output, *, e
         for name, model in models.items():
             export = inference_state(model, frontend, codec, pool.pool_id)
             export.update(training_objective=name, training_plan_id=plan_id, qualified_for_release=False, render_profile=plan["render_profile"])
+            if plan.get("category_training"):
+                export["category_training"] = plan["category_training"]
             atomic_torch_save(output / f"diagnostic-{name}.pt", export)
         frontend.require_frozen()
     except Exception as error:
