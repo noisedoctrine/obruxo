@@ -1,0 +1,4337 @@
+{
+  "plan_id": "70983e15790c468c817a8fe5813a743ed9d1cd1183bd8124195df0d96a04123f",
+  "executed_source_commit": "559ca4dd07316e07ed5ca5f60e81509df6505d8f",
+  "complete": true,
+  "passed": false,
+  "acoustic_gates_passed": false,
+  "model_state_sha256": "a8574c784f7b47f8df54981a4a0dcb2229dee51da0121ea043a8adab15c7b36d",
+  "candidate_baseline_ratios": {
+    "original": {
+      "reference": 3.0846385410589416,
+      "transfer": 3.097506876895261
+    },
+    "wide": {
+      "reference": 0.5329344785510489,
+      "transfer": 0.5489976989012002
+    }
+  },
+  "candidate_template_ratios": {
+    "original": {
+      "reference": 0.34884210095611345,
+      "transfer": 0.2304859418827245
+    },
+    "wide": {
+      "reference": 0.2623186389213587,
+      "transfer": 0.15241753335889074
+    }
+  },
+  "attempts": 1000,
+  "receipts": 1000,
+  "attempts_by_phase": {
+    "evaluation": 192,
+    "training": 808
+  },
+  "all_outcomes_accepted": true,
+  "attempt_outcome_counts_match": true,
+  "elapsed_seconds": 2590.442295074463,
+  "peak_process_tree_rss_bytes": 1311752192,
+  "rss_sampling_errors": 0,
+  "archive_bytes_before_summary": 90470781,
+  "training": {
+    "audio_files_written": 0,
+    "checkpoint_seconds_this_segment": 351.8198865003651,
+    "checkpoint_storage": {
+      "collection_writes": 809,
+      "full_writes": 33,
+      "initial_writes": 1,
+      "serialized_bytes": 14194292899
+    },
+    "complete": true,
+    "config": {
+      "batch_size": 32,
+      "checkpoint_every": 250,
+      "conditioning": "concat",
+      "cpu_threads": 2,
+      "cyclic_head": "sigmoid",
+      "fresh_examples": null,
+      "identity_temperature": 0.1,
+      "identity_weight": 0.0,
+      "input_performances": "varied",
+      "learning_rate": 0.001,
+      "learning_seed_override": null,
+      "mode": "overfit",
+      "prediction_scope": "basic",
+      "preroll_frames": 32768,
+      "render_budget": 808,
+      "replay_capacity": 808,
+      "replay_mib": 32,
+      "sampling_policy": "paired_views",
+      "seed": 0,
+      "steps": 8000,
+      "updates_per_render": 1
+    },
+    "cursor": {
+      "audio_replay": "regenerate_unacknowledged_not_bit_exact",
+      "next_sequence_id": 808,
+      "stream_id": "cfc264bf8fc9de2a0a201dd7d247860c6ada0ed9cbc01c9bccd5ed59078cb21c",
+      "version": 1
+    },
+    "device": "cpu",
+    "elapsed_seconds_this_segment": 2066.0235417000367,
+    "feature_seconds_this_segment": 220.63569330063183,
+    "final_metrics": {
+      "categorical_accuracy": 0.9993811845779419,
+      "categorical_ce": 0.00436513964086771,
+      "continuous_mae": 0.09785988181829453,
+      "continuous_mse": 0.01704687625169754,
+      "identity_accuracy": 0.12871287763118744,
+      "identity_loss": 4.9398016929626465,
+      "identity_negative_cosine": 0.3157954514026642,
+      "identity_positive_cosine": 0.614357590675354,
+      "loss": 0.021412014961242676
+    },
+    "fresh_accepted_this_segment": 808,
+    "fresh_example_target_reached": true,
+    "frontend": {
+      "basic_pitch_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+      "device": "cpu",
+      "fft": 2048,
+      "frontend": "stereo_mel_and_frozen_basic_pitch_v1",
+      "hop": 441,
+      "input": "audio_only",
+      "log_scale": 10,
+      "maximum_audio_seconds": 16,
+      "normalization": "fixed_scaling_no_fitted_statistics",
+      "pitch_size": 3521,
+      "pitch_time_bins": 8,
+      "precision": "float32",
+      "sample_rate": 44100,
+      "timbre_shape": [
+        2,
+        96,
+        32
+      ]
+    },
+    "frozen_weights_and_buffers_unchanged": true,
+    "initial_metrics": {
+      "categorical_accuracy": 0.6584158539772034,
+      "categorical_ce": 27.22829246520996,
+      "continuous_mae": 0.30999577045440674,
+      "continuous_mse": 0.15796728432178497,
+      "identity_accuracy": 0.06064356490969658,
+      "identity_loss": 6.497909069061279,
+      "identity_negative_cosine": 0.3508182168006897,
+      "identity_positive_cosine": 0.5667091608047485,
+      "loss": 27.386259078979492
+    },
+    "initial_model": {
+      "file_sha256": "a4d008aa547ef93602287cfd09e041d18bddcea4bac40d36e4b1ec3a84364407",
+      "frontend_state_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+      "initialization": "verified_inference_weights_fresh_optimizer_and_learning_rng_v1",
+      "model_state_sha256": "35cd356e97b5574df5d1a3cfaf19e79bd5b86f53df5e9ee6f56573a3da282c7b",
+      "render_phase_controls": {
+        "osc_1_random_phase": 0.0,
+        "osc_2_random_phase": 0.0,
+        "osc_3_random_phase": 0.0,
+        "sample_random_phase": 0.0
+      },
+      "render_profile": {
+        "midi_timing": "exact_sample_shift",
+        "preroll_frames": 32768,
+        "startup": "settled_controls_before_MIDI",
+        "trim": "added_lead_only"
+      },
+      "training_pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86"
+    },
+    "mode": "overfit",
+    "model_state_sha256": "a8574c784f7b47f8df54981a4a0dcb2229dee51da0121ea043a8adab15c7b36d",
+    "peak_process_tree_rss_bytes": 997818368,
+    "pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+    "quality_claim": "supervised_bootstrap_only_real_render_validation_required",
+    "renderer_identity": {
+      "backend_version": "0.8.3",
+      "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+      "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+      "settings": {
+        "buffer_size": 128,
+        "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+        "event_timing": "absolute ticks to half-even sample offsets",
+        "frame_policy": "one_guard_sample_trim_to_requested_frames_v1",
+        "plugin_name": "Vital.vst3",
+        "preroll_frames": 32768,
+        "preroll_policy": "shift_all_MIDI_then_trim_only_lead_v1",
+        "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+        "simple_note_time_guard": "one_eighth_sample_start_and_duration_v1",
+        "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+      }
+    },
+    "replay_bytes": 31237280,
+    "replay_distinct_audio_buffers": 808,
+    "replay_distinct_states": 404,
+    "replay_examples": 808,
+    "replay_seed": null,
+    "rss_sampling_errors": 0,
+    "run_id": "2882f9e9c3bc1f4b0cda9238a68a24474d4867f2d289c9fa682c58615d807463",
+    "seeded_feature_examples": 0,
+    "step": 8000,
+    "tiny_overfit_gate": false,
+    "torch": "2.12.1+xpu",
+    "totals": {
+      "accepted": 808,
+      "errors": 0,
+      "feature_seconds": 220.63569330063183,
+      "maximum_gradient_norm": 78.67169189453125,
+      "optimizer_seconds": 155.5574446026585,
+      "rejected": 0,
+      "render_attempts": 808,
+      "reused_feature_draws": 255192,
+      "sampled_examples": 256000
+    },
+    "trainable_parameters": 355806
+  },
+  "audits": {
+    "original": {
+      "aggregates": {
+        "baseline": {
+          "reference": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 0.30616439265819884,
+            "mean_rms_relative": 0.0760491443797946,
+            "planned": 8,
+            "scored": 8
+          },
+          "transfer": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 0.3381705901119858,
+            "mean_rms_relative": 0.10055124142672867,
+            "planned": 8,
+            "scored": 8
+          }
+        },
+        "fixed_template": {
+          "reference": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 2.7072606285413108,
+            "mean_rms_relative": 1.2943193959072232,
+            "planned": 8,
+            "scored": 8
+          },
+          "transfer": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 4.544683809702596,
+            "mean_rms_relative": 3.1925804533530027,
+            "planned": 8,
+            "scored": 8
+          }
+        },
+        "source_repeat": {
+          "reference": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 0.0,
+            "mean_rms_relative": 0.0,
+            "planned": 8,
+            "scored": 8
+          },
+          "transfer": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 0.0,
+            "mean_rms_relative": 0.0,
+            "planned": 8,
+            "scored": 8
+          }
+        },
+        "train_retrieval": {
+          "reference": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 1.6857053947945437,
+            "mean_rms_relative": 0.518823891878128,
+            "planned": 8,
+            "scored": 8
+          },
+          "transfer": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 1.7065718723461032,
+            "mean_rms_relative": 0.6169741079211235,
+            "planned": 8,
+            "scored": 8
+          }
+        },
+        "varied": {
+          "reference": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 0.944406485495468,
+            "mean_rms_relative": 0.2717572799883783,
+            "planned": 8,
+            "scored": 8
+          },
+          "transfer": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 1.047485728437702,
+            "mean_rms_relative": 0.38262052461504936,
+            "planned": 8,
+            "scored": 8
+          }
+        }
+      },
+      "audio_files_written": 0,
+      "candidate_order": [
+        "baseline",
+        "varied"
+      ],
+      "cases": [
+        {
+          "case": 0,
+          "methods": {
+            "baseline": {
+              "reference": {
+                "mrstft": 0.19917802760998407,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.1819271445274353,
+                    "spectral_convergence": 0.07946953177452087
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.08793572336435318,
+                    "spectral_convergence": 0.07805684208869934
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.09472755342721939,
+                    "spectral_convergence": 0.07541728764772415
+                  }
+                ],
+                "rms_relative": 0.0314532071352005
+              },
+              "transfer": {
+                "mrstft": 0.28609668960173923,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.09322626143693924,
+                    "spectral_convergence": 0.12898781895637512
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.1768377274274826,
+                    "spectral_convergence": 0.16425210237503052
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.13427728414535522,
+                    "spectral_convergence": 0.16070887446403503
+                  }
+                ],
+                "rms_relative": 0.03291502222418785
+              }
+            },
+            "fixed_template": {
+              "reference": {
+                "mrstft": 3.2777666648228965,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 2.3182740211486816,
+                    "spectral_convergence": 1.2550219297409058
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 1.8086154460906982,
+                    "spectral_convergence": 1.2475916147232056
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.9541149139404297,
+                    "spectral_convergence": 1.249682068824768
+                  }
+                ],
+                "rms_relative": 0.926224410533905
+              },
+              "transfer": {
+                "mrstft": 3.029086391131083,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 1.660872459411621,
+                    "spectral_convergence": 1.0276724100112915
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 2.47320556640625,
+                    "spectral_convergence": 1.0413715839385986
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.8401910066604614,
+                    "spectral_convergence": 1.0439461469650269
+                  }
+                ],
+                "rms_relative": 0.7710586190223694
+              }
+            },
+            "source_repeat": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "train_retrieval": {
+              "reference": {
+                "mrstft": 1.2099040945370991,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.6813626289367676,
+                    "spectral_convergence": 0.6401020288467407
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.4688531756401062,
+                    "spectral_convergence": 0.6182098388671875
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.6633721590042114,
+                    "spectral_convergence": 0.5578124523162842
+                  }
+                ],
+                "rms_relative": 0.28087636828422546
+              },
+              "transfer": {
+                "mrstft": 1.0547463198502858,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.40216347575187683,
+                    "spectral_convergence": 0.5569062232971191
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.6574439406394958,
+                    "spectral_convergence": 0.5451290011405945
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.4781302809715271,
+                    "spectral_convergence": 0.5244660377502441
+                  }
+                ],
+                "rms_relative": 0.40972793102264404
+              }
+            },
+            "varied": {
+              "reference": {
+                "mrstft": 0.7892791330814362,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.332388311624527,
+                    "spectral_convergence": 0.5197060704231262
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.2529244124889374,
+                    "spectral_convergence": 0.5078232884407043
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.31967034935951233,
+                    "spectral_convergence": 0.4353249669075012
+                  }
+                ],
+                "rms_relative": 0.05437194183468819
+              },
+              "transfer": {
+                "mrstft": 0.7193122257788976,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.18997283279895782,
+                    "spectral_convergence": 0.458455890417099
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.28240740299224854,
+                    "spectral_convergence": 0.47130662202835083
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.3068617880344391,
+                    "spectral_convergence": 0.44893214106559753
+                  }
+                ],
+                "rms_relative": 0.2739099860191345
+              }
+            }
+          },
+          "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+          "state_id": "5a900dbe774aedc7ed3aa3874bed32ecc71bdab1b8b208bb6f5af5936695eccc",
+          "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+        },
+        {
+          "case": 1,
+          "methods": {
+            "baseline": {
+              "reference": {
+                "mrstft": 0.514024535814921,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.3001909554004669,
+                    "spectral_convergence": 0.25103166699409485
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.26420825719833374,
+                    "spectral_convergence": 0.22954055666923523
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.3111128509044647,
+                    "spectral_convergence": 0.18598932027816772
+                  }
+                ],
+                "rms_relative": 0.026397688314318657
+              },
+              "transfer": {
+                "mrstft": 0.46142007907231647,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.14669708907604218,
+                    "spectral_convergence": 0.32853373885154724
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.16719844937324524,
+                    "spectral_convergence": 0.28353676199913025
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.24019642174243927,
+                    "spectral_convergence": 0.2180977761745453
+                  }
+                ],
+                "rms_relative": 0.01506147813051939
+              }
+            },
+            "fixed_template": {
+              "reference": {
+                "mrstft": 1.0621692538261414,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.3616705536842346,
+                    "spectral_convergence": 0.5646880865097046
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.5355050563812256,
+                    "spectral_convergence": 0.5557988882064819
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.6290735602378845,
+                    "spectral_convergence": 0.5397716164588928
+                  }
+                ],
+                "rms_relative": 0.35047775506973267
+              },
+              "transfer": {
+                "mrstft": 0.9716329077879587,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.2388100028038025,
+                    "spectral_convergence": 0.5819369554519653
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.3735734522342682,
+                    "spectral_convergence": 0.5653973817825317
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.6024556756019592,
+                    "spectral_convergence": 0.5527252554893494
+                  }
+                ],
+                "rms_relative": 0.22023126482963562
+              }
+            },
+            "source_repeat": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "train_retrieval": {
+              "reference": {
+                "mrstft": 2.4509467482566833,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 1.7831730842590332,
+                    "spectral_convergence": 0.8381320834159851
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 1.623721957206726,
+                    "spectral_convergence": 0.8346771001815796
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.4434545040130615,
+                    "spectral_convergence": 0.8296815156936646
+                  }
+                ],
+                "rms_relative": 0.7575117349624634
+              },
+              "transfer": {
+                "mrstft": 1.5217962861061096,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.7351254820823669,
+                    "spectral_convergence": 0.8097058534622192
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.570630669593811,
+                    "spectral_convergence": 0.8020786046981812
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.8513359427452087,
+                    "spectral_convergence": 0.7965123057365417
+                  }
+                ],
+                "rms_relative": 0.6847325563430786
+              }
+            },
+            "varied": {
+              "reference": {
+                "mrstft": 0.9336537917455038,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.4726744592189789,
+                    "spectral_convergence": 0.4160880148410797
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.5047699809074402,
+                    "spectral_convergence": 0.3985796272754669
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.6439340114593506,
+                    "spectral_convergence": 0.36491528153419495
+                  }
+                ],
+                "rms_relative": 0.07111398130655289
+              },
+              "transfer": {
+                "mrstft": 0.9646682739257812,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.30444595217704773,
+                    "spectral_convergence": 0.5185424089431763
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.39956367015838623,
+                    "spectral_convergence": 0.4864853024482727
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.7411360144615173,
+                    "spectral_convergence": 0.4438314735889435
+                  }
+                ],
+                "rms_relative": 0.08938224613666534
+              }
+            }
+          },
+          "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+          "state_id": "1c2106feeaf9e6451fee95de7a81495605b63b1e214cba4957d31e8f0637db97",
+          "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+        },
+        {
+          "case": 2,
+          "methods": {
+            "baseline": {
+              "reference": {
+                "mrstft": 0.19763063515226045,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.02888687327504158,
+                    "spectral_convergence": 0.1725272387266159
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0365850031375885,
+                    "spectral_convergence": 0.15403586626052856
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0784093365073204,
+                    "spectral_convergence": 0.12244758754968643
+                  }
+                ],
+                "rms_relative": 0.048380572348833084
+              },
+              "transfer": {
+                "mrstft": 0.2265785187482834,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.13228008151054382,
+                    "spectral_convergence": 0.12239497900009155
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.10082761198282242,
+                    "spectral_convergence": 0.11964806169271469
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0915006622672081,
+                    "spectral_convergence": 0.11308415979146957
+                  }
+                ],
+                "rms_relative": 0.07368389517068863
+              }
+            },
+            "fixed_template": {
+              "reference": {
+                "mrstft": 2.114709715048472,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.6573959589004517,
+                    "spectral_convergence": 1.2433267831802368
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.6933886408805847,
+                    "spectral_convergence": 1.2397911548614502
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.3266044855117798,
+                    "spectral_convergence": 1.183622121810913
+                  }
+                ],
+                "rms_relative": 0.7929418087005615
+              },
+              "transfer": {
+                "mrstft": 2.735576589902242,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 2.1981492042541504,
+                    "spectral_convergence": 0.8017573952674866
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 1.89100980758667,
+                    "spectral_convergence": 0.8068004846572876
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.7137295007705688,
+                    "spectral_convergence": 0.7952833771705627
+                  }
+                ],
+                "rms_relative": 0.4177861511707306
+              }
+            },
+            "source_repeat": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "train_retrieval": {
+              "reference": {
+                "mrstft": 0.9253941774368286,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.27129867672920227,
+                    "spectral_convergence": 0.5971636176109314
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.2847370505332947,
+                    "spectral_convergence": 0.5979713797569275
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.409345418214798,
+                    "spectral_convergence": 0.615666389465332
+                  }
+                ],
+                "rms_relative": 0.4343801736831665
+              },
+              "transfer": {
+                "mrstft": 1.6199826995531719,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 1.0180363655090332,
+                    "spectral_convergence": 0.5998327732086182
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 1.0719300508499146,
+                    "spectral_convergence": 0.5918949842453003
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.9425039291381836,
+                    "spectral_convergence": 0.6357499957084656
+                  }
+                ],
+                "rms_relative": 0.35449761152267456
+              }
+            },
+            "varied": {
+              "reference": {
+                "mrstft": 0.7918057988087336,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.22861447930335999,
+                    "spectral_convergence": 0.5564326643943787
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.20279242098331451,
+                    "spectral_convergence": 0.5422680377960205
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.3438940644264221,
+                    "spectral_convergence": 0.5014157295227051
+                  }
+                ],
+                "rms_relative": 0.4312082827091217
+              },
+              "transfer": {
+                "mrstft": 1.3725567857424419,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.9528326988220215,
+                    "spectral_convergence": 0.6656534671783447
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.6622074246406555,
+                    "spectral_convergence": 0.6652157306671143
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.5124861001968384,
+                    "spectral_convergence": 0.6592749357223511
+                  }
+                ],
+                "rms_relative": 0.6104817986488342
+              }
+            }
+          },
+          "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+          "state_id": "1d881e15b2e32782d4cd37b7d6adb8c14256c568e39afdc274dee03c0d9addb3",
+          "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+        },
+        {
+          "case": 3,
+          "methods": {
+            "baseline": {
+              "reference": {
+                "mrstft": 0.3400910769899686,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.11378490179777145,
+                    "spectral_convergence": 0.19667203724384308
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.15381936728954315,
+                    "spectral_convergence": 0.18705685436725616
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.20954984426498413,
+                    "spectral_convergence": 0.15939022600650787
+                  }
+                ],
+                "rms_relative": 0.04922979697585106
+              },
+              "transfer": {
+                "mrstft": 0.3809546132882436,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.11594846844673157,
+                    "spectral_convergence": 0.22973453998565674
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.11856716871261597,
+                    "spectral_convergence": 0.22516317665576935
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.23775199055671692,
+                    "spectral_convergence": 0.2156984955072403
+                  }
+                ],
+                "rms_relative": 0.13923297822475433
+              }
+            },
+            "fixed_template": {
+              "reference": {
+                "mrstft": 1.1094723840554555,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.5005298852920532,
+                    "spectral_convergence": 0.48018601536750793
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.6243847012519836,
+                    "spectral_convergence": 0.4711960554122925
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.8569031357765198,
+                    "spectral_convergence": 0.3952173590660095
+                  }
+                ],
+                "rms_relative": 0.08945468813180923
+              },
+              "transfer": {
+                "mrstft": 0.7152181516091028,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.19770540297031403,
+                    "spectral_convergence": 0.36320412158966064
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.24828022718429565,
+                    "spectral_convergence": 0.36210671067237854
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.6286419034004211,
+                    "spectral_convergence": 0.34571608901023865
+                  }
+                ],
+                "rms_relative": 0.015112722292542458
+              }
+            },
+            "source_repeat": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "train_retrieval": {
+              "reference": {
+                "mrstft": 2.293181002140045,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 1.9569233655929565,
+                    "spectral_convergence": 0.7672016620635986
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 1.5007892847061157,
+                    "spectral_convergence": 0.7564430832862854
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.1757171154022217,
+                    "spectral_convergence": 0.7224684953689575
+                  }
+                ],
+                "rms_relative": 0.6600632071495056
+              },
+              "transfer": {
+                "mrstft": 2.381523291269938,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 1.7290828227996826,
+                    "spectral_convergence": 0.7164499759674072
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 1.7327277660369873,
+                    "spectral_convergence": 0.7103179693222046
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.5636005401611328,
+                    "spectral_convergence": 0.6923907995223999
+                  }
+                ],
+                "rms_relative": 0.6540541648864746
+              }
+            },
+            "varied": {
+              "reference": {
+                "mrstft": 1.3322918514410655,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.5923511981964111,
+                    "spectral_convergence": 0.4671610891819
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.8675724864006042,
+                    "spectral_convergence": 0.49548274278640747
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.9747069478034973,
+                    "spectral_convergence": 0.5996010899543762
+                  }
+                ],
+                "rms_relative": 0.26405033469200134
+              },
+              "transfer": {
+                "mrstft": 1.2173803647359211,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.3218209743499756,
+                    "spectral_convergence": 0.5752397775650024
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.4677136540412903,
+                    "spectral_convergence": 0.4767155647277832
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.182041883468628,
+                    "spectral_convergence": 0.6286092400550842
+                  }
+                ],
+                "rms_relative": 0.3348858058452606
+              }
+            }
+          },
+          "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+          "state_id": "de8d3759e0d29978fe8166cf82a955f1fba8c1f89ef014a60033bc6ab3d0a7c0",
+          "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+        },
+        {
+          "case": 4,
+          "methods": {
+            "baseline": {
+              "reference": {
+                "mrstft": 0.23880348292489847,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.03415530547499657,
+                    "spectral_convergence": 0.21542499959468842
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.030972639098763466,
+                    "spectral_convergence": 0.20936523377895355
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.05187520384788513,
+                    "spectral_convergence": 0.17461706697940826
+                  }
+                ],
+                "rms_relative": 0.02024751342833042
+              },
+              "transfer": {
+                "mrstft": 0.2601781754444043,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.018128199502825737,
+                    "spectral_convergence": 0.24204440414905548
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.024220570921897888,
+                    "spectral_convergence": 0.24056360125541687
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.02189154177904129,
+                    "spectral_convergence": 0.23368620872497559
+                  }
+                ],
+                "rms_relative": 0.2060372680425644
+              }
+            },
+            "fixed_template": {
+              "reference": {
+                "mrstft": 3.6155967315038047,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 2.560163736343384,
+                    "spectral_convergence": 1.3421330451965332
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 2.022977352142334,
+                    "spectral_convergence": 1.3450871706008911
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 2.2470054626464844,
+                    "spectral_convergence": 1.329423427581787
+                  }
+                ],
+                "rms_relative": 0.8167507648468018
+              },
+              "transfer": {
+                "mrstft": 3.0049487948417664,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 1.8442575931549072,
+                    "spectral_convergence": 0.7290655374526978
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 2.8028061389923096,
+                    "spectral_convergence": 0.7225401997566223
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 2.180694818496704,
+                    "spectral_convergence": 0.7354820966720581
+                  }
+                ],
+                "rms_relative": 0.4561394155025482
+              }
+            },
+            "source_repeat": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "train_retrieval": {
+              "reference": {
+                "mrstft": 1.5491357843081157,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.8684750199317932,
+                    "spectral_convergence": 0.7851036190986633
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.6112399101257324,
+                    "spectral_convergence": 0.7729151844978333
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.8807730674743652,
+                    "spectral_convergence": 0.7289005517959595
+                  }
+                ],
+                "rms_relative": 0.32174649834632874
+              },
+              "transfer": {
+                "mrstft": 1.3360531330108643,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.5707287788391113,
+                    "spectral_convergence": 0.608071506023407
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.9757807850837708,
+                    "spectral_convergence": 0.6029936671257019
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.6572083234786987,
+                    "spectral_convergence": 0.5933763384819031
+                  }
+                ],
+                "rms_relative": 0.514686644077301
+              }
+            },
+            "varied": {
+              "reference": {
+                "mrstft": 0.6108741040031115,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.07399793714284897,
+                    "spectral_convergence": 0.5456918478012085
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0668536126613617,
+                    "spectral_convergence": 0.538124144077301
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.11502307653427124,
+                    "spectral_convergence": 0.49293169379234314
+                  }
+                ],
+                "rms_relative": 0.292026549577713
+              },
+              "transfer": {
+                "mrstft": 0.5355903853972753,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.03454941138625145,
+                    "spectral_convergence": 0.5003347396850586
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.04119505733251572,
+                    "spectral_convergence": 0.4995880424976349
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.03716656193137169,
+                    "spectral_convergence": 0.49393734335899353
+                  }
+                ],
+                "rms_relative": 0.45040109753608704
+              }
+            }
+          },
+          "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+          "state_id": "80a22e98a4d96341d25c649ebba037c85e9b0ed3bb1a19648493218b163bfb91",
+          "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+        },
+        {
+          "case": 5,
+          "methods": {
+            "baseline": {
+              "reference": {
+                "mrstft": 0.39177044853568077,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.07373436540365219,
+                    "spectral_convergence": 0.33474859595298767
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.05207916721701622,
+                    "spectral_convergence": 0.3273491859436035
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.06188309192657471,
+                    "spectral_convergence": 0.325516939163208
+                  }
+                ],
+                "rms_relative": 0.31540510058403015
+              },
+              "transfer": {
+                "mrstft": 0.33444931358098984,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.03366268798708916,
+                    "spectral_convergence": 0.25605344772338867
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.04863656684756279,
+                    "spectral_convergence": 0.2531791627407074
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.15564392507076263,
+                    "spectral_convergence": 0.25617215037345886
+                  }
+                ],
+                "rms_relative": 0.20878438651561737
+              }
+            },
+            "fixed_template": {
+              "reference": {
+                "mrstft": 8.381271839141846,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 2.5415916442871094,
+                    "spectral_convergence": 6.571544170379639
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 1.867294430732727,
+                    "spectral_convergence": 6.433602809906006
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.2384833097457886,
+                    "spectral_convergence": 6.491299152374268
+                  }
+                ],
+                "rms_relative": 6.453924655914307
+              },
+              "transfer": {
+                "mrstft": 23.536448578039806,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.9916599988937378,
+                    "spectral_convergence": 22.418882369995117
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.8010024428367615,
+                    "spectral_convergence": 22.201671600341797
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.655022144317627,
+                    "spectral_convergence": 22.541107177734375
+                  }
+                ],
+                "rms_relative": 22.820228576660156
+              }
+            },
+            "source_repeat": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "train_retrieval": {
+              "reference": {
+                "mrstft": 0.9608727196852366,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.23518939316272736,
+                    "spectral_convergence": 0.7862491011619568
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.16297072172164917,
+                    "spectral_convergence": 0.7905372977256775
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.13666202127933502,
+                    "spectral_convergence": 0.771009624004364
+                  }
+                ],
+                "rms_relative": 0.5013947486877441
+              },
+              "transfer": {
+                "mrstft": 1.1572865769267082,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.10298751294612885,
+                    "spectral_convergence": 0.9752395153045654
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.12032248824834824,
+                    "spectral_convergence": 0.9733110070228577
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.33223649859428406,
+                    "spectral_convergence": 0.9677627086639404
+                  }
+                ],
+                "rms_relative": 0.9277703762054443
+              }
+            },
+            "varied": {
+              "reference": {
+                "mrstft": 1.0320414354403813,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.1382017284631729,
+                    "spectral_convergence": 0.95894455909729
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.1021011620759964,
+                    "spectral_convergence": 0.9383764863014221
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.10891251266002655,
+                    "spectral_convergence": 0.8495878577232361
+                  }
+                ],
+                "rms_relative": 0.18323378264904022
+              },
+              "transfer": {
+                "mrstft": 1.1057206839323044,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.08448049426078796,
+                    "spectral_convergence": 1.0066121816635132
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.12112630903720856,
+                    "spectral_convergence": 0.9805360436439514
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.2990413010120392,
+                    "spectral_convergence": 0.8253657221794128
+                  }
+                ],
+                "rms_relative": 0.23901264369487762
+              }
+            }
+          },
+          "reference_performance_id": "542a647d5e45aef0c77b39e6ebc515c5e6ec645b24d37ad5a563e90ed8456d86",
+          "state_id": "109cc4d6e5c826b85a0e0449748397c4cae5210d4f9ef287e54d56e2bbc3d46e",
+          "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+        },
+        {
+          "case": 6,
+          "methods": {
+            "baseline": {
+              "reference": {
+                "mrstft": 0.20023151859641075,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.059875208884477615,
+                    "spectral_convergence": 0.14074212312698364
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.06131329387426376,
+                    "spectral_convergence": 0.13114085793495178
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0977475494146347,
+                    "spectral_convergence": 0.10987552255392075
+                  }
+                ],
+                "rms_relative": 0.04021637886762619
+              },
+              "transfer": {
+                "mrstft": 0.3105529397726059,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.258425772190094,
+                    "spectral_convergence": 0.12600305676460266
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.1596156805753708,
+                    "spectral_convergence": 0.11994918435811996
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.1668875366449356,
+                    "spectral_convergence": 0.10077758878469467
+                  }
+                ],
+                "rms_relative": 0.04158681258559227
+              }
+            },
+            "fixed_template": {
+              "reference": {
+                "mrstft": 1.2103058397769928,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.3119768798351288,
+                    "spectral_convergence": 0.7677464485168457
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.35822778940200806,
+                    "spectral_convergence": 0.7627646923065186
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.7216305136680603,
+                    "spectral_convergence": 0.708571195602417
+                  }
+                ],
+                "rms_relative": 0.4818175435066223
+              },
+              "transfer": {
+                "mrstft": 1.401279906431834,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.5086579918861389,
+                    "spectral_convergence": 0.712893009185791
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.6331513524055481,
+                    "spectral_convergence": 0.7136260867118835
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.941070556640625,
+                    "spectral_convergence": 0.6944407224655151
+                  }
+                ],
+                "rms_relative": 0.4088720977306366
+              }
+            },
+            "source_repeat": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "train_retrieval": {
+              "reference": {
+                "mrstft": 1.4295984506607056,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.4615302085876465,
+                    "spectral_convergence": 0.8478083610534668
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.46741199493408203,
+                    "spectral_convergence": 0.84282386302948
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.8794471025466919,
+                    "spectral_convergence": 0.7897738218307495
+                  }
+                ],
+                "rms_relative": 0.4025786519050598
+              },
+              "transfer": {
+                "mrstft": 1.7633458773295085,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.9207471609115601,
+                    "spectral_convergence": 0.835196316242218
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.8863350749015808,
+                    "spectral_convergence": 0.834351658821106
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.0010697841644287,
+                    "spectral_convergence": 0.8123376369476318
+                  }
+                ],
+                "rms_relative": 0.5841630101203918
+              }
+            },
+            "varied": {
+              "reference": {
+                "mrstft": 1.2329470316569011,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.5100467801094055,
+                    "spectral_convergence": 0.7911326289176941
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.42567628622055054,
+                    "spectral_convergence": 0.765264093875885
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.5546644926071167,
+                    "spectral_convergence": 0.6520568132400513
+                  }
+                ],
+                "rms_relative": 0.48934322595596313
+              },
+              "transfer": {
+                "mrstft": 1.535954217116038,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.6262885928153992,
+                    "spectral_convergence": 0.8071005940437317
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.7531468868255615,
+                    "spectral_convergence": 0.798629879951477
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.8609718680381775,
+                    "spectral_convergence": 0.7617248296737671
+                  }
+                ],
+                "rms_relative": 0.6199406385421753
+              }
+            }
+          },
+          "reference_performance_id": "b0c78828dc6d8061c275b4b566d3ebbb76fbe2ae2d13dcfaa59d2a8b6f32ffdd",
+          "state_id": "85d6a8aa4057767f7018300e1da536010a8fdf96e47f5a92bd9bb2375f8d6612",
+          "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+        },
+        {
+          "case": 7,
+          "methods": {
+            "baseline": {
+              "reference": {
+                "mrstft": 0.3675854156414668,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.25932055711746216,
+                    "spectral_convergence": 0.15382294356822968
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.19393345713615417,
+                    "spectral_convergence": 0.1452752947807312
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.21996957063674927,
+                    "spectral_convergence": 0.13043442368507385
+                  }
+                ],
+                "rms_relative": 0.07706289738416672
+              },
+              "transfer": {
+                "mrstft": 0.44513439138730365,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.26109960675239563,
+                    "spectral_convergence": 0.227570578455925
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.20544685423374176,
+                    "spectral_convergence": 0.2346869856119156
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.20176072418689728,
+                    "spectral_convergence": 0.20483842492103577
+                  }
+                ],
+                "rms_relative": 0.08710809051990509
+              }
+            },
+            "fixed_template": {
+              "reference": {
+                "mrstft": 0.8867926001548767,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.39233341813087463,
+                    "spectral_convergence": 0.48265963792800903
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.4478789269924164,
+                    "spectral_convergence": 0.48182523250579834
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.36993831396102905,
+                    "spectral_convergence": 0.4857422709465027
+                  }
+                ],
+                "rms_relative": 0.44296354055404663
+              },
+              "transfer": {
+                "mrstft": 0.9632791578769684,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.29899144172668457,
+                    "spectral_convergence": 0.5112625360488892
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.32585522532463074,
+                    "spectral_convergence": 0.5081762671470642
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.7352401614189148,
+                    "spectral_convergence": 0.5103118419647217
+                  }
+                ],
+                "rms_relative": 0.4312147796154022
+              }
+            },
+            "source_repeat": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "train_retrieval": {
+              "reference": {
+                "mrstft": 2.6666101813316345,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 2.0039103031158447,
+                    "spectral_convergence": 0.8423845171928406
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 1.8104846477508545,
+                    "spectral_convergence": 0.8385273218154907
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.6785309314727783,
+                    "spectral_convergence": 0.8259928226470947
+                  }
+                ],
+                "rms_relative": 0.7920397520065308
+              },
+              "transfer": {
+                "mrstft": 2.817840794722239,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 1.856643557548523,
+                    "spectral_convergence": 0.8434197306632996
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 1.9402152299880981,
+                    "spectral_convergence": 0.8418639302253723
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 2.137087821960449,
+                    "spectral_convergence": 0.8342921137809753
+                  }
+                ],
+                "rms_relative": 0.806160569190979
+              }
+            },
+            "varied": {
+              "reference": {
+                "mrstft": 0.832358737786611,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.4031244218349457,
+                    "spectral_convergence": 0.43444156646728516
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.38756322860717773,
+                    "spectral_convergence": 0.43140652775764465
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.4147689938545227,
+                    "spectral_convergence": 0.42577147483825684
+                  }
+                ],
+                "rms_relative": 0.3887101411819458
+              },
+              "transfer": {
+                "mrstft": 0.9287028908729553,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.3983984887599945,
+                    "spectral_convergence": 0.5144584774971008
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.3745739161968231,
+                    "spectral_convergence": 0.5176618099212646
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.4726661443710327,
+                    "spectral_convergence": 0.5083498358726501
+                  }
+                ],
+                "rms_relative": 0.44294998049736023
+              }
+            }
+          },
+          "reference_performance_id": "4348b7240dbb7ead63474d6a3eba4d50aa8380823e1d4e24947bd85d90386842",
+          "state_id": "954988d008fc8a65e031838856db06a4cf0554811172aca4f178b636fcfca6a5",
+          "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+        }
+      ],
+      "comparison": {
+        "bootstrap": {
+          "interval": "percentile_95",
+          "limit": "descriptive_validation_only_not_adjusted_for_checkpoint_selection",
+          "resamples": 2000,
+          "seed": 0,
+          "unit": "state"
+        },
+        "checkpoints": {
+          "baseline": {
+            "against_train_retrieval": {
+              "ci95": [
+                -1.7338671645731665,
+                -1.0467184171235815
+              ],
+              "mean_delta": -1.373971142185231,
+              "paired": 8,
+              "planned": 8,
+              "ties": 0,
+              "wins": 8
+            },
+            "mean_reference_transfer_mrstft": 0.3221674913850923,
+            "paired_roles_scored": 8,
+            "planned": 8,
+            "selection_eligible": true
+          },
+          "varied": {
+            "against_train_retrieval": {
+              "ci95": [
+                -1.1196444017967828,
+                -0.323286018020008
+              ],
+              "mean_delta": -0.7001925266037383,
+              "paired": 8,
+              "planned": 8,
+              "ties": 0,
+              "wins": 7
+            },
+            "mean_reference_transfer_mrstft": 0.9959461069665849,
+            "paired_roles_scored": 8,
+            "planned": 8,
+            "selection_eligible": true
+          }
+        },
+        "primary": "equal_weight_mean_of_reference_and_transfer_per_state_mrstft",
+        "selected": "baseline",
+        "selection_policy": "lowest_complete_validation_mean_input_order_breaks_ties"
+      },
+      "completed_cases_reused": 0,
+      "elapsed_includes_uncommitted_interrupted_work": true,
+      "elapsed_seconds": 203.7528323000297,
+      "evaluation": "pilot_real_render_comparison_v2",
+      "metric": "mean_over_512_2048_8192_of_spectral_convergence_plus_log_magnitude_mae_stereo",
+      "metric_limit": "diagnostic_spectral_distance_not_a_calibrated_perceptual_score",
+      "models": {
+        "baseline": {
+          "file_sha256": "765657bb618d7fc2ab465693ff94be10be52bb8c99126ec45ffe7a7468358c4b",
+          "model_state_sha256": "35cd356e97b5574df5d1a3cfaf19e79bd5b86f53df5e9ee6f56573a3da282c7b",
+          "step": 16000
+        },
+        "varied": {
+          "file_sha256": "5ffdd1d5e49a6b10b91ef3734931d5ca561ad67cea70dbdd1984ca1ac1e3a56d",
+          "model_state_sha256": "a8574c784f7b47f8df54981a4a0dcb2229dee51da0121ea043a8adab15c7b36d",
+          "step": 8000
+        }
+      },
+      "planned_uninterrupted_render_attempts": 96,
+      "pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+      "recovery": "reuse_committed_cases_rerender_entire_unfinished_case_with_all_checkpoints",
+      "render_wall_seconds": 195.84698740014574,
+      "renderer_identity": {
+        "backend_version": "0.8.3",
+        "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+        "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+        "settings": {
+          "buffer_size": 128,
+          "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+          "event_timing": "absolute ticks to half-even sample offsets",
+          "frame_policy": "one_guard_sample_trim_to_requested_frames_v1",
+          "plugin_name": "Vital.vst3",
+          "preroll_frames": 32768,
+          "preroll_policy": "shift_all_MIDI_then_trim_only_lead_v1",
+          "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+          "simple_note_time_guard": "one_eighth_sample_start_and_duration_v1",
+          "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+        }
+      },
+      "renders_accepted": 96,
+      "renders_attempted": 96,
+      "renders_attempted_this_segment": 96,
+      "retrieval_distinct_train_states": 404,
+      "retrieval_examples": 808,
+      "retrieval_policy": "equal_branch_mean_squared_feature_distance_train_replay_only",
+      "retrieval_sha256": "5dec0d6d4427a699ea853f5371e3ac68262e9a74f585ab43c0457d654a8d2a2d",
+      "retrieval_source": {
+        "checkpoint_sha256": "5ffdd1d5e49a6b10b91ef3734931d5ca561ad67cea70dbdd1984ca1ac1e3a56d"
+      },
+      "selection": "explicit_unique_training_state_sequences_diagnostic_only",
+      "split": "train",
+      "test_split_evaluated": false,
+      "transfer": "same_patch_predicted_from_reference_audio_rendered_on_reserved_performance"
+    },
+    "wide": {
+      "aggregates": {
+        "baseline": {
+          "reference": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 1.3884782747675977,
+            "mean_rms_relative": 0.5836838521063328,
+            "planned": 8,
+            "scored": 8
+          },
+          "transfer": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 1.2617347897030413,
+            "mean_rms_relative": 0.5426690950989723,
+            "planned": 8,
+            "scored": 8
+          }
+        },
+        "fixed_template": {
+          "reference": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 2.820874446382125,
+            "mean_rms_relative": 1.2202664092183113,
+            "planned": 8,
+            "scored": 8
+          },
+          "transfer": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 4.544683809702596,
+            "mean_rms_relative": 3.1925804533530027,
+            "planned": 8,
+            "scored": 8
+          }
+        },
+        "source_repeat": {
+          "reference": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 0.0,
+            "mean_rms_relative": 0.0,
+            "planned": 8,
+            "scored": 8
+          },
+          "transfer": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 0.0,
+            "mean_rms_relative": 0.0,
+            "planned": 8,
+            "scored": 8
+          }
+        },
+        "train_retrieval": {
+          "reference": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 0.0,
+            "mean_rms_relative": 0.0,
+            "planned": 8,
+            "scored": 8
+          },
+          "transfer": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 0.0,
+            "mean_rms_relative": 0.0,
+            "planned": 8,
+            "scored": 8
+          }
+        },
+        "varied": {
+          "reference": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 0.7399679453422626,
+            "mean_rms_relative": 0.26585798617452383,
+            "planned": 8,
+            "scored": 8
+          },
+          "transfer": {
+            "failed_or_unscorable": 0,
+            "mean_mrstft": 0.6926894961701086,
+            "mean_rms_relative": 0.2551942244172096,
+            "planned": 8,
+            "scored": 8
+          }
+        }
+      },
+      "audio_files_written": 0,
+      "candidate_order": [
+        "baseline",
+        "varied"
+      ],
+      "cases": [
+        {
+          "case": 0,
+          "methods": {
+            "baseline": {
+              "reference": {
+                "mrstft": 1.2333448827266693,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.5085470080375671,
+                    "spectral_convergence": 0.7804120779037476
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.4153454005718231,
+                    "spectral_convergence": 0.798018753528595
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.2606586217880249,
+                    "spectral_convergence": 0.9370527863502502
+                  }
+                ],
+                "rms_relative": 0.3991704285144806
+              },
+              "transfer": {
+                "mrstft": 1.3752633929252625,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.5727466940879822,
+                    "spectral_convergence": 0.8018446564674377
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.5385715961456299,
+                    "spectral_convergence": 0.7367501854896545
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.7308234572410583,
+                    "spectral_convergence": 0.7450535893440247
+                  }
+                ],
+                "rms_relative": 0.6918894648551941
+              }
+            },
+            "fixed_template": {
+              "reference": {
+                "mrstft": 3.526496112346649,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 2.246570348739624,
+                    "spectral_convergence": 2.0748131275177
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 1.3378105163574219,
+                    "spectral_convergence": 2.0757508277893066
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.7693997025489807,
+                    "spectral_convergence": 2.075143814086914
+                  }
+                ],
+                "rms_relative": 1.6452864408493042
+              },
+              "transfer": {
+                "mrstft": 3.029086391131083,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 1.660872459411621,
+                    "spectral_convergence": 1.0276724100112915
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 2.47320556640625,
+                    "spectral_convergence": 1.0413715839385986
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.8401910066604614,
+                    "spectral_convergence": 1.0439461469650269
+                  }
+                ],
+                "rms_relative": 0.7710586190223694
+              }
+            },
+            "source_repeat": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "train_retrieval": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "varied": {
+              "reference": {
+                "mrstft": 0.840302457412084,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.18032456934452057,
+                    "spectral_convergence": 0.7236958146095276
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.1098998561501503,
+                    "spectral_convergence": 0.7177935838699341
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.10726610571146011,
+                    "spectral_convergence": 0.6819274425506592
+                  }
+                ],
+                "rms_relative": 0.24452164769172668
+              },
+              "transfer": {
+                "mrstft": 0.647800991932551,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.15953609347343445,
+                    "spectral_convergence": 0.3933357298374176
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.21416285634040833,
+                    "spectral_convergence": 0.4130275249481201
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.3611792027950287,
+                    "spectral_convergence": 0.402161568403244
+                  }
+                ],
+                "rms_relative": 0.06247088313102722
+              }
+            }
+          },
+          "reference_performance_id": "073b4be1ee23999845cc5137d6fe9a0d0f603d39d2873dbffaab60e92e0c475b",
+          "state_id": "5a900dbe774aedc7ed3aa3874bed32ecc71bdab1b8b208bb6f5af5936695eccc",
+          "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+        },
+        {
+          "case": 1,
+          "methods": {
+            "baseline": {
+              "reference": {
+                "mrstft": 1.5652982791264851,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.8429197669029236,
+                    "spectral_convergence": 0.595560610294342
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.7889436483383179,
+                    "spectral_convergence": 0.5976894497871399
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.2764668464660645,
+                    "spectral_convergence": 0.5943145155906677
+                  }
+                ],
+                "rms_relative": 0.5199492573738098
+              },
+              "transfer": {
+                "mrstft": 1.249342679977417,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.5689238905906677,
+                    "spectral_convergence": 0.6504831910133362
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.5301621556282043,
+                    "spectral_convergence": 0.6359230875968933
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.7480515837669373,
+                    "spectral_convergence": 0.6144841313362122
+                  }
+                ],
+                "rms_relative": 0.5246203541755676
+              }
+            },
+            "fixed_template": {
+              "reference": {
+                "mrstft": 1.2442725896835327,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.5856584906578064,
+                    "spectral_convergence": 0.5809324979782104
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.4530142545700073,
+                    "spectral_convergence": 0.550233006477356
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.0186913013458252,
+                    "spectral_convergence": 0.5442882180213928
+                  }
+                ],
+                "rms_relative": 0.34888213872909546
+              },
+              "transfer": {
+                "mrstft": 0.9716329077879587,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.2388100028038025,
+                    "spectral_convergence": 0.5819369554519653
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.3735734522342682,
+                    "spectral_convergence": 0.5653973817825317
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.6024556756019592,
+                    "spectral_convergence": 0.5527252554893494
+                  }
+                ],
+                "rms_relative": 0.22023126482963562
+              }
+            },
+            "source_repeat": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "train_retrieval": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "varied": {
+              "reference": {
+                "mrstft": 0.6603498856226603,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.23214280605316162,
+                    "spectral_convergence": 0.3760156035423279
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.24589529633522034,
+                    "spectral_convergence": 0.40255504846572876
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.3375494182109833,
+                    "spectral_convergence": 0.3868914842605591
+                  }
+                ],
+                "rms_relative": 0.32969245314598083
+              },
+              "transfer": {
+                "mrstft": 0.4418387363354365,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.10997945070266724,
+                    "spectral_convergence": 0.32144132256507874
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.13024091720581055,
+                    "spectral_convergence": 0.28961074352264404
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.2216968983411789,
+                    "spectral_convergence": 0.25254687666893005
+                  }
+                ],
+                "rms_relative": 0.19260729849338531
+              }
+            }
+          },
+          "reference_performance_id": "107ce414f4f209f5420df6dc05528b86e09ac6cc45cd3d25e3bec588d4fae1db",
+          "state_id": "1c2106feeaf9e6451fee95de7a81495605b63b1e214cba4957d31e8f0637db97",
+          "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+        },
+        {
+          "case": 2,
+          "methods": {
+            "baseline": {
+              "reference": {
+                "mrstft": 0.9899837871392568,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.7589298486709595,
+                    "spectral_convergence": 0.39875802397727966
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.6301171779632568,
+                    "spectral_convergence": 0.39712586998939514
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.3941321074962616,
+                    "spectral_convergence": 0.3908883333206177
+                  }
+                ],
+                "rms_relative": 0.3364435136318207
+              },
+              "transfer": {
+                "mrstft": 1.1481159726778667,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.8924795389175415,
+                    "spectral_convergence": 0.4694569408893585
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.6258856654167175,
+                    "spectral_convergence": 0.46936124563217163
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.5276774764060974,
+                    "spectral_convergence": 0.45948705077171326
+                  }
+                ],
+                "rms_relative": 0.3877308666706085
+              }
+            },
+            "fixed_template": {
+              "reference": {
+                "mrstft": 2.405206839243571,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 1.8626188039779663,
+                    "spectral_convergence": 0.7422213554382324
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 1.752945065498352,
+                    "spectral_convergence": 0.7489476203918457
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.3549591302871704,
+                    "spectral_convergence": 0.753928542137146
+                  }
+                ],
+                "rms_relative": 0.39653217792510986
+              },
+              "transfer": {
+                "mrstft": 2.735576589902242,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 2.1981492042541504,
+                    "spectral_convergence": 0.8017573952674866
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 1.89100980758667,
+                    "spectral_convergence": 0.8068004846572876
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.7137295007705688,
+                    "spectral_convergence": 0.7952833771705627
+                  }
+                ],
+                "rms_relative": 0.4177861511707306
+              }
+            },
+            "source_repeat": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "train_retrieval": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "varied": {
+              "reference": {
+                "mrstft": 0.29545306662718457,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.13754713535308838,
+                    "spectral_convergence": 0.18664894998073578
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.11659114807844162,
+                    "spectral_convergence": 0.1840718686580658
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0839182510972023,
+                    "spectral_convergence": 0.17758184671401978
+                  }
+                ],
+                "rms_relative": 0.15532223880290985
+              },
+              "transfer": {
+                "mrstft": 0.34224068621794385,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.16885066032409668,
+                    "spectral_convergence": 0.20489805936813354
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.1305423229932785,
+                    "spectral_convergence": 0.203508660197258
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.13348856568336487,
+                    "spectral_convergence": 0.1854337900876999
+                  }
+                ],
+                "rms_relative": 0.1486615389585495
+              }
+            }
+          },
+          "reference_performance_id": "37471d0879c29c93b10be3bff0a72617dcee1eff4fc3af8c9a8de633697bf4b3",
+          "state_id": "1d881e15b2e32782d4cd37b7d6adb8c14256c568e39afdc274dee03c0d9addb3",
+          "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+        },
+        {
+          "case": 3,
+          "methods": {
+            "baseline": {
+              "reference": {
+                "mrstft": 1.1183395485083263,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.41551417112350464,
+                    "spectral_convergence": 0.5087628364562988
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.5807634592056274,
+                    "spectral_convergence": 0.4871324300765991
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.8849267959594727,
+                    "spectral_convergence": 0.47791895270347595
+                  }
+                ],
+                "rms_relative": 0.30593642592430115
+              },
+              "transfer": {
+                "mrstft": 0.9997790058453878,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.3509250283241272,
+                    "spectral_convergence": 0.516193151473999
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.3552127480506897,
+                    "spectral_convergence": 0.510388195514679
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.7638288736343384,
+                    "spectral_convergence": 0.5027890205383301
+                  }
+                ],
+                "rms_relative": 0.3150204122066498
+              }
+            },
+            "fixed_template": {
+              "reference": {
+                "mrstft": 0.7440166076024374,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.2326410710811615,
+                    "spectral_convergence": 0.34231436252593994
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.3931661546230316,
+                    "spectral_convergence": 0.3084038197994232
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.6695407032966614,
+                    "spectral_convergence": 0.28598371148109436
+                  }
+                ],
+                "rms_relative": 0.04721294343471527
+              },
+              "transfer": {
+                "mrstft": 0.7152181516091028,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.19770540297031403,
+                    "spectral_convergence": 0.36320412158966064
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.24828022718429565,
+                    "spectral_convergence": 0.36210671067237854
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.6286419034004211,
+                    "spectral_convergence": 0.34571608901023865
+                  }
+                ],
+                "rms_relative": 0.015112722292542458
+              }
+            },
+            "source_repeat": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "train_retrieval": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "varied": {
+              "reference": {
+                "mrstft": 1.5285364389419556,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.49309617280960083,
+                    "spectral_convergence": 0.5874726176261902
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 1.0132877826690674,
+                    "spectral_convergence": 0.49349096417427063
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.4985408782958984,
+                    "spectral_convergence": 0.49972090125083923
+                  }
+                ],
+                "rms_relative": 0.35934701561927795
+              },
+              "transfer": {
+                "mrstft": 1.2407726446787517,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.3549462556838989,
+                    "spectral_convergence": 0.5713008642196655
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.4794183373451233,
+                    "spectral_convergence": 0.5360547304153442
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.21235191822052,
+                    "spectral_convergence": 0.5682458281517029
+                  }
+                ],
+                "rms_relative": 0.3408259153366089
+              }
+            }
+          },
+          "reference_performance_id": "c81fa74e2e362b43b420e84618d50dd47535021a9572cbe2907b7ab072d32c0a",
+          "state_id": "de8d3759e0d29978fe8166cf82a955f1fba8c1f89ef014a60033bc6ab3d0a7c0",
+          "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+        },
+        {
+          "case": 4,
+          "methods": {
+            "baseline": {
+              "reference": {
+                "mrstft": 1.507451335589091,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.4021793603897095,
+                    "spectral_convergence": 1.0753988027572632
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.5327515602111816,
+                    "spectral_convergence": 1.0866549015045166
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.33460986614227295,
+                    "spectral_convergence": 1.090759515762329
+                  }
+                ],
+                "rms_relative": 0.9737327098846436
+              },
+              "transfer": {
+                "mrstft": 1.4271125892798107,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.29342377185821533,
+                    "spectral_convergence": 1.0483566522598267
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.48815518617630005,
+                    "spectral_convergence": 1.0632798671722412
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.3215216100215912,
+                    "spectral_convergence": 1.0666006803512573
+                  }
+                ],
+                "rms_relative": 0.9658595323562622
+              }
+            },
+            "fixed_template": {
+              "reference": {
+                "mrstft": 3.4209568897883096,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 2.624494791030884,
+                    "spectral_convergence": 0.7373436689376831
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 3.101506233215332,
+                    "spectral_convergence": 0.7261630296707153
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 2.333427667617798,
+                    "spectral_convergence": 0.7399352788925171
+                  }
+                ],
+                "rms_relative": 0.4378468990325928
+              },
+              "transfer": {
+                "mrstft": 3.0049487948417664,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 1.8442575931549072,
+                    "spectral_convergence": 0.7290655374526978
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 2.8028061389923096,
+                    "spectral_convergence": 0.7225401997566223
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 2.180694818496704,
+                    "spectral_convergence": 0.7354820966720581
+                  }
+                ],
+                "rms_relative": 0.4561394155025482
+              }
+            },
+            "source_repeat": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "train_retrieval": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "varied": {
+              "reference": {
+                "mrstft": 0.4316621944308281,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.031654518097639084,
+                    "spectral_convergence": 0.39844951033592224
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.042049892246723175,
+                    "spectral_convergence": 0.39505645632743835
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.03347938135266304,
+                    "spectral_convergence": 0.3942968249320984
+                  }
+                ],
+                "rms_relative": 0.3548016846179962
+              },
+              "transfer": {
+                "mrstft": 0.4317118680725495,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.025937015190720558,
+                    "spectral_convergence": 0.4027324616909027
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.038456134498119354,
+                    "spectral_convergence": 0.3989727199077606
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.031211763620376587,
+                    "spectral_convergence": 0.3978255093097687
+                  }
+                ],
+                "rms_relative": 0.3587312400341034
+              }
+            }
+          },
+          "reference_performance_id": "364af0ba43eced1a78819cace96ca7ffe8be5bf09cbac230f9c126a0f90fcaaa",
+          "state_id": "80a22e98a4d96341d25c649ebba037c85e9b0ed3bb1a19648493218b163bfb91",
+          "transfer_performance_id": "77ce10a4677eb839ddcfd9c665b8a225e04d1c7c4788904d201dfdbe15c7c541"
+        },
+        {
+          "case": 5,
+          "methods": {
+            "baseline": {
+              "reference": {
+                "mrstft": 1.47703322271506,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.15332281589508057,
+                    "spectral_convergence": 1.276236653327942
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.16552986204624176,
+                    "spectral_convergence": 1.2758922576904297
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.17430174350738525,
+                    "spectral_convergence": 1.3858163356781006
+                  }
+                ],
+                "rms_relative": 0.8534187078475952
+              },
+              "transfer": {
+                "mrstft": 0.71987026805679,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0574161671102047,
+                    "spectral_convergence": 0.622568666934967
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.06569935381412506,
+                    "spectral_convergence": 0.606187641620636
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.14667631685733795,
+                    "spectral_convergence": 0.6610626578330994
+                  }
+                ],
+                "rms_relative": 0.29002514481544495
+              }
+            },
+            "fixed_template": {
+              "reference": {
+                "mrstft": 8.890232682228088,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 3.276353120803833,
+                    "spectral_convergence": 6.468331336975098
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 2.5348525047302246,
+                    "spectral_convergence": 6.351576328277588
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.6360045671463013,
+                    "spectral_convergence": 6.403580188751221
+                  }
+                ],
+                "rms_relative": 6.331409931182861
+              },
+              "transfer": {
+                "mrstft": 23.536448578039806,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.9916599988937378,
+                    "spectral_convergence": 22.418882369995117
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.8010024428367615,
+                    "spectral_convergence": 22.201671600341797
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.655022144317627,
+                    "spectral_convergence": 22.541107177734375
+                  }
+                ],
+                "rms_relative": 22.820228576660156
+              }
+            },
+            "source_repeat": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "train_retrieval": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "varied": {
+              "reference": {
+                "mrstft": 0.3707594946026802,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.10056227445602417,
+                    "spectral_convergence": 0.2810705304145813
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.07104621827602386,
+                    "spectral_convergence": 0.27570831775665283
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0677107647061348,
+                    "spectral_convergence": 0.31618037819862366
+                  }
+                ],
+                "rms_relative": 0.029845409095287323
+              },
+              "transfer": {
+                "mrstft": 0.6238352134823799,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.04737715795636177,
+                    "spectral_convergence": 0.5801731944084167
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.04589460417628288,
+                    "spectral_convergence": 0.5402927398681641
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.1154506728053093,
+                    "spectral_convergence": 0.542317271232605
+                  }
+                ],
+                "rms_relative": 0.3176809549331665
+              }
+            }
+          },
+          "reference_performance_id": "7783b10242da401bb6e79031305483e5b5d5834d8e0056f948dd5c165d078f49",
+          "state_id": "109cc4d6e5c826b85a0e0449748397c4cae5210d4f9ef287e54d56e2bbc3d46e",
+          "transfer_performance_id": "17d05cedb2fc1d20b3de98a72afdc7ef33affac573e890d026361c03b9495ce8"
+        },
+        {
+          "case": 6,
+          "methods": {
+            "baseline": {
+              "reference": {
+                "mrstft": 1.7138876418272655,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.4795520603656769,
+                    "spectral_convergence": 0.821080207824707
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.9646863341331482,
+                    "spectral_convergence": 0.8216752409934998
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.2429298162460327,
+                    "spectral_convergence": 0.8117392659187317
+                  }
+                ],
+                "rms_relative": 0.6590150594711304
+              },
+              "transfer": {
+                "mrstft": 1.8328471183776855,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.6653082966804504,
+                    "spectral_convergence": 0.8146666884422302
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.9904740452766418,
+                    "spectral_convergence": 0.8153055906295776
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 1.4082187414169312,
+                    "spectral_convergence": 0.8045679926872253
+                  }
+                ],
+                "rms_relative": 0.6992458701133728
+              }
+            },
+            "fixed_template": {
+              "reference": {
+                "mrstft": 1.4624756971995037,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.5914661288261414,
+                    "spectral_convergence": 0.8471767902374268
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.5835527181625366,
+                    "spectral_convergence": 0.8477864861488342
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.6825225353240967,
+                    "spectral_convergence": 0.8349224328994751
+                  }
+                ],
+                "rms_relative": 0.17629440128803253
+              },
+              "transfer": {
+                "mrstft": 1.401279906431834,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.5086579918861389,
+                    "spectral_convergence": 0.712893009185791
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.6331513524055481,
+                    "spectral_convergence": 0.7136260867118835
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.941070556640625,
+                    "spectral_convergence": 0.6944407224655151
+                  }
+                ],
+                "rms_relative": 0.4088720977306366
+              }
+            },
+            "source_repeat": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "train_retrieval": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "varied": {
+              "reference": {
+                "mrstft": 0.7559120953083038,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.42278867959976196,
+                    "spectral_convergence": 0.28991296887397766
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.4760358929634094,
+                    "spectral_convergence": 0.2890039086341858
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.5006004571914673,
+                    "spectral_convergence": 0.2893943786621094
+                  }
+                ],
+                "rms_relative": 0.1563539355993271
+              },
+              "transfer": {
+                "mrstft": 0.8701558510462443,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.5284436941146851,
+                    "spectral_convergence": 0.2900441288948059
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.5769718289375305,
+                    "spectral_convergence": 0.28815221786499023
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.6380270719528198,
+                    "spectral_convergence": 0.28882861137390137
+                  }
+                ],
+                "rms_relative": 0.14354878664016724
+              }
+            }
+          },
+          "reference_performance_id": "bd5dece6b4707ae9b1b70dc228bd4bf84a69941e63daebaab62f069a24460077",
+          "state_id": "85d6a8aa4057767f7018300e1da536010a8fdf96e47f5a92bd9bb2375f8d6612",
+          "transfer_performance_id": "81c861df5da8757ee7599fd415530bb70239233d85905d07164c2e06fca72d3b"
+        },
+        {
+          "case": 7,
+          "methods": {
+            "baseline": {
+              "reference": {
+                "mrstft": 1.5024875005086262,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.4309394955635071,
+                    "spectral_convergence": 1.0129826068878174
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.4716033339500427,
+                    "spectral_convergence": 1.0119407176971436
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.5594195127487183,
+                    "spectral_convergence": 1.02057683467865
+                  }
+                ],
+                "rms_relative": 0.6218047142028809
+              },
+              "transfer": {
+                "mrstft": 1.3415472904841106,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.39630383253097534,
+                    "spectral_convergence": 0.8404831886291504
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.37770897150039673,
+                    "spectral_convergence": 0.8628809452056885
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.691184401512146,
+                    "spectral_convergence": 0.8560805320739746
+                  }
+                ],
+                "rms_relative": 0.4669611155986786
+              }
+            },
+            "fixed_template": {
+              "reference": {
+                "mrstft": 0.8733381529649099,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.3765782117843628,
+                    "spectral_convergence": 0.5072178840637207
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.4060499966144562,
+                    "spectral_convergence": 0.5066515207290649
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.3002796173095703,
+                    "spectral_convergence": 0.5232372283935547
+                  }
+                ],
+                "rms_relative": 0.37866634130477905
+              },
+              "transfer": {
+                "mrstft": 0.9632791578769684,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.29899144172668457,
+                    "spectral_convergence": 0.5112625360488892
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.32585522532463074,
+                    "spectral_convergence": 0.5081762671470642
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.7352401614189148,
+                    "spectral_convergence": 0.5103118419647217
+                  }
+                ],
+                "rms_relative": 0.4312147796154022
+              }
+            },
+            "source_repeat": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "train_retrieval": {
+              "reference": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              },
+              "transfer": {
+                "mrstft": 0.0,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.0,
+                    "spectral_convergence": 0.0
+                  }
+                ],
+                "rms_relative": 0.0
+              }
+            },
+            "varied": {
+              "reference": {
+                "mrstft": 1.0367679297924042,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.47031474113464355,
+                    "spectral_convergence": 0.6523631811141968
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.43724438548088074,
+                    "spectral_convergence": 0.6462054252624512
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.2803012728691101,
+                    "spectral_convergence": 0.6238747835159302
+                  }
+                ],
+                "rms_relative": 0.4969795048236847
+              },
+              "transfer": {
+                "mrstft": 0.9431599775950114,
+                "resolutions": [
+                  {
+                    "fft": 512,
+                    "log_magnitude_mae": 0.4119364619255066,
+                    "spectral_convergence": 0.5286625623703003
+                  },
+                  {
+                    "fft": 2048,
+                    "log_magnitude_mae": 0.3866083323955536,
+                    "spectral_convergence": 0.5308412909507751
+                  },
+                  {
+                    "fft": 8192,
+                    "log_magnitude_mae": 0.45178332924842834,
+                    "spectral_convergence": 0.5196479558944702
+                  }
+                ],
+                "rms_relative": 0.47702717781066895
+              }
+            }
+          },
+          "reference_performance_id": "a4d6433781bc3bd384527991e52e2f12dfdb037df295fc94685114a1d3e55a0f",
+          "state_id": "954988d008fc8a65e031838856db06a4cf0554811172aca4f178b636fcfca6a5",
+          "transfer_performance_id": "7de08237462f8384fbc3d48e013bb284b352c383ed8d828983625e6fe163aa1b"
+        }
+      ],
+      "comparison": {
+        "bootstrap": {
+          "interval": "percentile_95",
+          "limit": "descriptive_validation_only_not_adjusted_for_checkpoint_selection",
+          "resamples": 2000,
+          "seed": 0,
+          "unit": "state"
+        },
+        "checkpoints": {
+          "baseline": {
+            "against_train_retrieval": {
+              "ci95": [
+                1.173453247479241,
+                1.4861342441445835
+              ],
+              "mean_delta": 1.3251065322353193,
+              "paired": 8,
+              "planned": 8,
+              "ties": 0,
+              "wins": 0
+            },
+            "mean_reference_transfer_mrstft": 1.3251065322353193,
+            "paired_roles_scored": 8,
+            "planned": 8,
+            "selection_eligible": true
+          },
+          "varied": {
+            "against_train_retrieval": {
+              "ci95": [
+                0.5047754090977832,
+                0.9470130261140487
+              ],
+              "mean_delta": 0.7163287207561856,
+              "paired": 8,
+              "planned": 8,
+              "ties": 0,
+              "wins": 0
+            },
+            "mean_reference_transfer_mrstft": 0.7163287207561856,
+            "paired_roles_scored": 8,
+            "planned": 8,
+            "selection_eligible": true
+          }
+        },
+        "primary": "equal_weight_mean_of_reference_and_transfer_per_state_mrstft",
+        "selected": "varied",
+        "selection_policy": "lowest_complete_validation_mean_input_order_breaks_ties"
+      },
+      "completed_cases_reused": 0,
+      "elapsed_includes_uncommitted_interrupted_work": true,
+      "elapsed_seconds": 277.9661237000255,
+      "evaluation": "pilot_real_render_comparison_v2",
+      "metric": "mean_over_512_2048_8192_of_spectral_convergence_plus_log_magnitude_mae_stereo",
+      "metric_limit": "diagnostic_spectral_distance_not_a_calibrated_perceptual_score",
+      "models": {
+        "baseline": {
+          "file_sha256": "765657bb618d7fc2ab465693ff94be10be52bb8c99126ec45ffe7a7468358c4b",
+          "model_state_sha256": "35cd356e97b5574df5d1a3cfaf19e79bd5b86f53df5e9ee6f56573a3da282c7b",
+          "step": 16000
+        },
+        "varied": {
+          "file_sha256": "5ffdd1d5e49a6b10b91ef3734931d5ca561ad67cea70dbdd1984ca1ac1e3a56d",
+          "model_state_sha256": "a8574c784f7b47f8df54981a4a0dcb2229dee51da0121ea043a8adab15c7b36d",
+          "step": 8000
+        }
+      },
+      "planned_uninterrupted_render_attempts": 96,
+      "pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+      "recovery": "reuse_committed_cases_rerender_entire_unfinished_case_with_all_checkpoints",
+      "render_wall_seconds": 265.85524910024833,
+      "renderer_identity": {
+        "backend_version": "0.8.3",
+        "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+        "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+        "settings": {
+          "buffer_size": 128,
+          "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+          "event_timing": "absolute ticks to half-even sample offsets",
+          "frame_policy": "one_guard_sample_trim_to_requested_frames_v1",
+          "plugin_name": "Vital.vst3",
+          "preroll_frames": 32768,
+          "preroll_policy": "shift_all_MIDI_then_trim_only_lead_v1",
+          "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+          "simple_note_time_guard": "one_eighth_sample_start_and_duration_v1",
+          "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+        }
+      },
+      "renders_accepted": 96,
+      "renders_attempted": 96,
+      "renders_attempted_this_segment": 96,
+      "retrieval_distinct_train_states": 404,
+      "retrieval_examples": 808,
+      "retrieval_policy": "equal_branch_mean_squared_feature_distance_train_replay_only",
+      "retrieval_sha256": "5dec0d6d4427a699ea853f5371e3ac68262e9a74f585ab43c0457d654a8d2a2d",
+      "retrieval_source": {
+        "checkpoint_sha256": "5ffdd1d5e49a6b10b91ef3734931d5ca561ad67cea70dbdd1984ca1ac1e3a56d"
+      },
+      "selection": "explicit_unique_training_state_sequences_diagnostic_only",
+      "split": "train",
+      "test_split_evaluated": false,
+      "transfer": "same_patch_predicted_from_reference_audio_rendered_on_reserved_performance"
+    }
+  },
+  "replay_audit": {
+    "all_native_audit_requests_reconstructed": 192,
+    "cached_prediction_tolerance": 1E-06,
+    "cached_vs_fresh_input_predictions_max_normalized_delta": 1.1102230246251565E-16,
+    "candidate_baseline_ratios_reconstructed": {
+      "original": {
+        "reference": 3.0846385410589416,
+        "transfer": 3.097506876895261
+      },
+      "wide": {
+        "reference": 0.5329344785510489,
+        "transfer": 0.5489976989012002
+      }
+    },
+    "charged_native_attempts": 1000,
+    "elapsed_seconds": 270.6190896999906,
+    "evidence_sha256": {
+      "attempts.jsonl": "4c82d70efa126a004e247780d0938465091390ddc615ca6918b30714bbe5cf5c",
+      "audit-original/case-000.json": "4e64ffe06b0aa9dd75f5b974320cdbe522764fdde254b4c98a9f8c6ac5d1a7d4",
+      "audit-original/case-001.json": "66f71d7c48230e01d065a12c43224abcc4730a6ac2fdcb23afd9fdd8b92bea1c",
+      "audit-original/case-002.json": "92c355f706b103d0091108f8426e33bf8f20bc6c3c55b8eb32f6478c106125ab",
+      "audit-original/case-003.json": "d126269af17c6013b779d1a467c9dea06c56e68e34e66edff4fe484db082ca0d",
+      "audit-original/case-004.json": "335d46fadea19913846e15ecdca20f41c24826f5bfac060e6cba32059ade6180",
+      "audit-original/case-005.json": "9fdabc03eaa4479a8957e0921d3a6e1d6d82ea3e6e9043d4c7d5da44a6719788",
+      "audit-original/case-006.json": "ed6ee8c0465ab953e4afb2b643982425058414c49ed4dead345c9d4c5311c42b",
+      "audit-original/case-007.json": "b547057b0e6c38de00d04193afb948dce8fe92922a9caa6419a4f0c2b3e45fe7",
+      "audit-original/plan.json": "cb132316bd813ea4cd165a1a0a84c95c1a94fe5fa09425b3ad01e6135995a41f",
+      "audit-original/prediction-baseline-000.vital": "3b619c0e4143d07372592014f6f6beeb8e47e109f995f2300c24d0294de28992",
+      "audit-original/prediction-baseline-001.vital": "eeac67d95cc287db8f7232b1cf7eefdcf6a5cd48bbd9dc0e29271fb3e2049a9a",
+      "audit-original/prediction-baseline-002.vital": "0325c3a687540d122321362e6da3c1948712382fb4ae604b0d3cf9ea5b6eb751",
+      "audit-original/prediction-baseline-003.vital": "e37d3d5170bcd66bb0dfb5e1255483570941e4587ace310d6205a6b9a08ce310",
+      "audit-original/prediction-baseline-004.vital": "adfe8c4625c81775ded6cb2dc775815b51bba0afa74e221073845de3ab0a3f1a",
+      "audit-original/prediction-baseline-005.vital": "96668d94b909ac913ddf6a72514c8b32510818f537e87f3b08683cf8bc42c1e4",
+      "audit-original/prediction-baseline-006.vital": "9e1813d9eb06b3e73e2116307ef1f6f06f684090aa73e194877b216fbafb122f",
+      "audit-original/prediction-baseline-007.vital": "dd1bb29120ed9b993cb8679faf3b7a3e86520de47dbfb6598598f9a0e378ee81",
+      "audit-original/prediction-varied-000.vital": "ae2dbbad8fc37517ce86c61415a41a350eb47bd387d6a7cd2310632b5e5fbe30",
+      "audit-original/prediction-varied-001.vital": "46455204f964842f8697d47c9f81717a80e854ec3641945382a06fb2d8288ab4",
+      "audit-original/prediction-varied-002.vital": "5e4d8fd7c6836a4739fe324c21ba59bc7fa437faeb458c4ef0ff95da2a977ff5",
+      "audit-original/prediction-varied-003.vital": "148b2dbc9f589973f5af9636974c0149e99b6c43fc808ff356851320047d18fa",
+      "audit-original/prediction-varied-004.vital": "be29c69713809ae3be546ca6d84b432396e533cc3f1098e0e72e94fdbe3ee994",
+      "audit-original/prediction-varied-005.vital": "b5d41da27ab89b8def305325b796f208ec5a96b4cac51d2b491ab7c8cd7e6572",
+      "audit-original/prediction-varied-006.vital": "d9f693b891fcf8adb342eb1c9f988a00ae9df6a2ded9aaca6fa183f7aff6b786",
+      "audit-original/prediction-varied-007.vital": "0c460a3dec8a9a2f8dbe622b66288db5621e0962212127d4f42a35c9465ca5c8",
+      "audit-original/progress.json": "b2360b7da65d741e4599fb7a065efc6fa74837df18fd183483cd63d861cb83ec",
+      "audit-original/renders.jsonl": "840a84bce09feb3616b0170db3a52e7b72c544b95184f8ca20ff56216c80ebdb",
+      "audit-original/selected-model.pt": "a4d008aa547ef93602287cfd09e041d18bddcea4bac40d36e4b1ec3a84364407",
+      "audit-original/status.json": "def929db62816e2a951179bfb9ba9feabe973bf3c1cc8d45c62f0465d1aa52f7",
+      "audit-original/summary.json": "182a335c185128761c8c03454360276e877aef4a0e5f25fcbe91d936d2c8057d",
+      "audit-wide/case-000.json": "b0aea0c10e072871a5668244ae4c0bcf8324ce758f0a389d8d9c2a1f7cc630ed",
+      "audit-wide/case-001.json": "7ef6a49d07d19d3cf713918e324f35af08e1ae81abe29d8dca5cf261cc3d0525",
+      "audit-wide/case-002.json": "d78ea00a1380c2e603d3f1dd1e887a7244f1bc7416fe36e63446f3fd90ac3dc1",
+      "audit-wide/case-003.json": "0c62fccf802dd8891d29a5f926851eef8fc1106460fca85876fdfc9b85b4de89",
+      "audit-wide/case-004.json": "68ca7a485f5f1ad9e45eab7a64af353bb5083acae17204635696ad61c988e7fe",
+      "audit-wide/case-005.json": "71ee6334871005833bb907965ea9bd532a3e12a420265d9a72e456dd64a4cd88",
+      "audit-wide/case-006.json": "514a135cd835c20e66ad1f0d1a107c6ae1528b16c1df6b3f74394bd606068830",
+      "audit-wide/case-007.json": "58d650296bf0a94ec56ffa58a5f1f5e671f36d96d8ee5cf65703828452f74cc4",
+      "audit-wide/plan.json": "5da35581125efc8b761de88bac058c28a4657c0600f1872ce7de3451ad42a696",
+      "audit-wide/prediction-baseline-000.vital": "d6211f71cf1bd1da7ada2c57a0479d30c086552f68f6c27c24fb7eded592f8f6",
+      "audit-wide/prediction-baseline-001.vital": "bcb4786a6021c88dd8f61c7653be9c434d37dee0f20267e1029d0bc246b5f9a2",
+      "audit-wide/prediction-baseline-002.vital": "1849bc8bffdfbed7d4b281f75db7d87f9497ddf40100041bd552ccc0fa5212c4",
+      "audit-wide/prediction-baseline-003.vital": "65615a34b0a1c0a1cfa02e0682f292b0a80692d476d701743662ff4dff234586",
+      "audit-wide/prediction-baseline-004.vital": "2a389492567ad61da081ee2a4d6312f2afafdafe7acd9bfcbcf62d0511a9022b",
+      "audit-wide/prediction-baseline-005.vital": "508e61aaf0692b75e953a2bb6cf93082f7a2c2bdfbff52fe0975649beb4b8b96",
+      "audit-wide/prediction-baseline-006.vital": "6a6244e96320aa485c150c2423ed57e90ffeb6c73de770f17c6d0f3dd0fe04a7",
+      "audit-wide/prediction-baseline-007.vital": "3b7eb9b347ea195831c8b942ad83fd655d83bf27b9693f4adc0e44b3b424f93f",
+      "audit-wide/prediction-varied-000.vital": "d2050bf77f3602c3ef299183baf73d3764efc0e02c403b1ad854b4a42a03be95",
+      "audit-wide/prediction-varied-001.vital": "66d38e00f2b7a6f68b831db69d17ebfa3cdeebbdf1e41bebd739ec14bb36d891",
+      "audit-wide/prediction-varied-002.vital": "21f3c180cf2ec0b51245f3bd78b040bfb7117eafc567619a755625251c5a2b46",
+      "audit-wide/prediction-varied-003.vital": "f884af991f3e4e5eabc412077772469dc6aedf38ae9dcfbed1a5e0d6390d807e",
+      "audit-wide/prediction-varied-004.vital": "1f7fa3f2d448286bfa8e11e109b365d1e9ab238a21124bf7d70274d0676c81b3",
+      "audit-wide/prediction-varied-005.vital": "95f047ae0cf20fd9648ec4f5f505527c17891c39755b1587ddf5f2cd9ccf7353",
+      "audit-wide/prediction-varied-006.vital": "635bd1ebc1e54ed617f4c8c9d159dc5bab1f61e5a0bef82380f20eb57860ce0f",
+      "audit-wide/prediction-varied-007.vital": "832ad51853c287cc35dc4d43d8eb0d2f322fee6f51c7ab6b5bb1b7367b27a497",
+      "audit-wide/progress.json": "87ba750c943178a749a6f8a3cdc1163073165275427301e28fbe86e03fdb618f",
+      "audit-wide/renders.jsonl": "c43e50ec2ebf4a5c5a1f5c141dc91b52eb3977295e47758afea9366dc187911c",
+      "audit-wide/selected-model.pt": "9e2ef5796989268ac903de1025232396e16b82806323c7e72c788b6d4b2a47e7",
+      "audit-wide/status.json": "def929db62816e2a951179bfb9ba9feabe973bf3c1cc8d45c62f0465d1aa52f7",
+      "audit-wide/summary.json": "bf5d288e9877da6b7c326b1244a8e59f1cba6bdd0e790c747c2b97b0739fa309",
+      "fit-000/checkpoint.initial.pt": "52b3bdfacc9c4430a27db2549fba7af47c0082bea546dece9bd59de95519d87f",
+      "fit-000/checkpoint.previous.pt": "1551f855cc0714f8379401c88feff8f05ea46ef625eefc78986a6b3c53abd6c1",
+      "fit-000/checkpoint.pt": "5ffdd1d5e49a6b10b91ef3734931d5ca561ad67cea70dbdd1984ca1ac1e3a56d",
+      "fit-000/model.pt": "9e2ef5796989268ac903de1025232396e16b82806323c7e72c788b6d4b2a47e7",
+      "fit-000/renders.jsonl": "1e02de35a088919f0d755610ce2e230aaaab9dc436b14161806e4c165b178fbc",
+      "fit-000/status.json": "70d412a5478b3f8008b761976e0e66f4f46b38e2bd779c01bf2830f8a8ad37b5",
+      "fit-000/summary.json": "0113c1f40ab125bc7bca274a5c8a82a6028560617a451c10494d7485568f5a3b",
+      "plan.json": "379435adf0b6ff5053e4f9884b02ff292bb3e3d2f1dedbe795d5677ac4aad9e9",
+      "progress.jsonl": "e43e78706a19b866cffd00cb0b758c9f899d65d0c7572b7007b6c1aed3e245db",
+      "run.json": "e87ee1e0adb10943a91aeda0d591d67db7ac55f1656c89bc3d050f5943ed1dfd",
+      "status.json": "30119d0c1567c6fe25c8c9c8216d13c1bab809a4f142f1be7ac862ff2af55bef",
+      "summary.json": "cfbb05257f80396ba15af40cadb622524b96bc43fb44f55d79c45b4743e2ea8c"
+    },
+    "frozen_commit": "559ca4dd07316e07ed5ca5f60e81509df6505d8f",
+    "hard_categories_exact": true,
+    "hard_patch_request_exports_reconstructed": 32,
+    "limitations": "waveforms discarded; spectral scores reconstructed from saved cases, not independently rescored",
+    "model_optimizer_batch_and_global_rng_exact": true,
+    "native_renders_added": 0,
+    "native_source_repeat_pairs_exact": 32,
+    "peak_process_tree_rss_bytes": 929267712,
+    "plan_id": "70983e15790c468c817a8fe5813a743ed9d1cd1183bd8124195df0d96a04123f",
+    "planned_native_audit_requests_reconstructed": 192,
+    "qualified_for_release": false,
+    "replayed_updates": 8000,
+    "training_replay_seconds": 239.96846390003338,
+    "training_source_receipts_verified": 808,
+    "verifier_sha256_lf": "7c518922b2a464124fae4187d399c810346a03d703ccdd66ea21f6b98ef25105",
+    "waited_for_native_audit": true
+  },
+  "replay_audit_file_sha256": "7a352b6a5edf7040be482acf4c4b3f1294a6b2bbf960df0e542c7d229bbb1696",
+  "qualified_for_release": false,
+  "test_split_used": false
+}

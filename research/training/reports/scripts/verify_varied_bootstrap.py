@@ -29,6 +29,7 @@ from obruxo_training.pilot import PilotPool  # noqa: E402
 from obruxo_training.profiled_sampler import profile_metadata, training_sampler  # noqa: E402
 from obruxo_training.reproducibility import fixed_generator_phases  # noqa: E402
 from obruxo_training.trainer import TrainConfig, replay_metrics, restore_model, validate_replay  # noqa: E402
+from verify_basic_bootstrap import wait_for_native  # noqa: E402
 
 
 def json_rows(path):
@@ -71,12 +72,12 @@ def replay_fit(saved, initial, initial_model, pool, config, fit_summary):
     return model.eval()
 
 
-def verify(root, pool_path, initial_root, frozen_commit, output):
+def verify(root, pool_path, initial_root, frozen_commit, output, *, wait_native_seconds=0):
     started, monitor = perf_counter(), MemoryMonitor()
     monitor.start()
     try:
-        plan, summary = [json.loads((root / name).read_text()) for name in ("plan.json", "summary.json")]
-        assert summary["complete"] and summary["plan_id"] == canonical_sha256(plan) == json.loads((root / "run.json").read_text())["plan_id"]
+        plan = json.loads((root / "plan.json").read_text())
+        assert canonical_sha256(plan) == json.loads((root / "run.json").read_text())["plan_id"]
         for name, expected in plan["source"].items():
             raw = subprocess.check_output(["git", "show", f"{frozen_commit}:research/training/obruxo_training/{name}"], cwd=RESEARCH.parent)
             assert sha256_bytes(raw.replace(b"\r\n", b"\n")) == expected
@@ -84,6 +85,8 @@ def verify(root, pool_path, initial_root, frozen_commit, output):
         assert pool.pool_id == plan["pool_id"]
         segments = sorted(root.glob("fit-*"))
         fit_root = segments[-1]
+        fit_summary = json.loads((fit_root / "summary.json").read_text())
+        assert fit_summary["complete"]
         saved = load_training_checkpoint(fit_root / "checkpoint.pt")
         initial = torch.load(segments[0] / "checkpoint.initial.pt", weights_only=True)["state"]
         initial_path = initial_root / "fit-000/model.pt"
@@ -91,8 +94,10 @@ def verify(root, pool_path, initial_root, frozen_commit, output):
         initial_model = torch.load(initial_path, weights_only=True)
         assert tensor_digest(initial_model["model"]) == plan["initial_model"]["model_state_sha256"]
         validate_replay(saved["replay"], training_sampler(pool, config), saved["cursor"], config)
-        model = replay_fit(saved, initial, initial_model, pool, config, summary["training"])
+        model = replay_fit(saved, initial, initial_model, pool, config, fit_summary)
         replay_seconds = perf_counter() - started
+        summary = wait_for_native(root, wait_native_seconds)
+        assert summary["complete"] and summary["plan_id"] == canonical_sha256(plan) and summary["training"] == fit_summary
         exported = torch.load(fit_root / "model.pt", weights_only=True)
         assert tensor_digest(exported["model"]) == tensor_digest(saved["model"])
         assert all(exported[key] == value for key, value in profile_metadata(32768).items())
@@ -167,6 +172,7 @@ def verify(root, pool_path, initial_root, frozen_commit, output):
                   "cached_vs_fresh_input_predictions_max_normalized_delta": max(differences), "hard_categories_exact": True,
                   "candidate_baseline_ratios_reconstructed": ratios, "charged_native_attempts": len(attempts),
                   "native_renders_added": 0, "training_replay_seconds": replay_seconds, "elapsed_seconds": perf_counter() - started,
+                  "waited_for_native_audit": bool(wait_native_seconds), "verifier_sha256_lf": sha256_bytes(Path(__file__).read_bytes().replace(b"\r\n", b"\n")),
                   "peak_process_tree_rss_bytes": monitor.peak_bytes,
                   "limitations": "waveforms discarded; spectral scores reconstructed from saved cases, not independently rescored",
                   "evidence_sha256": {path.relative_to(root).as_posix(): sha256_bytes(path.read_bytes()) for path in root.rglob("*") if path.is_file()},
@@ -183,5 +189,6 @@ if __name__ == "__main__":
     for name in ("root", "pool", "initial-root", "output"):
         parser.add_argument("--" + name, type=Path, required=True)
     parser.add_argument("--frozen-commit", required=True)
+    parser.add_argument("--wait-native-seconds", type=int, choices=range(481), default=0, metavar="0..480")
     args = parser.parse_args()
-    print(json.dumps(verify(args.root, args.pool, args.initial_root, args.frozen_commit, args.output)), flush=True)
+    print(json.dumps(verify(args.root, args.pool, args.initial_root, args.frozen_commit, args.output, wait_native_seconds=args.wait_native_seconds)), flush=True)
