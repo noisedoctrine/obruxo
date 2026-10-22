@@ -1,5 +1,7 @@
 # Check category feedback for refreshed initial weights
 
+Status: the [completed zero-render result](REFRESHED_CATEGORY_RESULTS.md) passes. The native sound fit remains a separate experiment under its own plan and gates.
+
 Protocol prepared 2026-10-22 before the new mathematical check. Use the retained accepted initializer with 404 patches and 16,000 updates, tensor hash `35cd356e97b5574df5d1a3cfaf19e79bd5b86f53df5e9ee6f56573a3da282c7b`. Neither the wider-only nor joint-replay model passed admission. Their verified source recordings remain usable independently of their rejected weights. Freeze the inference/checkpoint/cache hashes and machine-readable plan before execution. The historical category report is bound to other weights and cannot be relabelled.
 
 Fit the same two fixed constants from 32 category-balanced **training-only** patches in the verified combined feature cache: per-head `max(1, RMS(scores - row mean))`, float64 accumulation. Use all four weighted records per patch: original, wider held note, original again, wider alternate. These are 128 weighted observations / 96 distinct recordings, matching the forthcoming sound-fit input proportions exactly. Category labels select representative states but do not enter the constant calculation. Require byte-identical fixed-phase production exports before/after scaling, unchanged continuous outputs and frozen model/frontend weights. In production use raw-score argmax.

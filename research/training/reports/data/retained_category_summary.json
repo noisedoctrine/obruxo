@@ -1,0 +1,102 @@
+{
+  "all_derivatives_finite": true,
+  "complete_report_bytes": 6672820,
+  "complete_report_sha256": "76faee4213097fad31ea7287764d6e1b8d5d337474693465147b9cb64772c54d",
+  "derivative_gates": {
+    "fraction_above_floor": 0.99,
+    "healthy_median_gain": 0.5,
+    "matrix_norm_floor": 1e-08,
+    "median_norm_floor": 1e-05,
+    "weak_median_gain": 10.0,
+    "weak_raw_median_threshold": 1e-05
+  },
+  "derivative_heads": [
+    {
+      "head": 0,
+      "pass": true,
+      "temperatures": [
+        {
+          "exact_zero_points": 0,
+          "fraction_above_connectivity_floor": 1.0,
+          "median_gain": 58960.28392391366,
+          "original_median_norm": 1.948754555613176e-07,
+          "pass": true,
+          "points": 2048,
+          "scaled_median_norm": 0.011489912189697304,
+          "temperature": 1.0
+        },
+        {
+          "exact_zero_points": 0,
+          "fraction_above_connectivity_floor": 0.99658203125,
+          "median_gain": 417221749023.274,
+          "original_median_norm": 2.4901699256301505e-14,
+          "pass": true,
+          "points": 2048,
+          "scaled_median_norm": 0.010389530517365676,
+          "temperature": 0.5
+        }
+      ]
+    },
+    {
+      "head": 1,
+      "pass": true,
+      "temperatures": [
+        {
+          "exact_zero_points": 0,
+          "fraction_above_connectivity_floor": 1.0,
+          "median_gain": 2.373221407569815e+17,
+          "original_median_norm": 3.369111825843522e-20,
+          "pass": true,
+          "points": 2048,
+          "scaled_median_norm": 0.007995648309588472,
+          "temperature": 1.0
+        },
+        {
+          "exact_zero_points": 0,
+          "fraction_above_connectivity_floor": 0.998046875,
+          "median_gain": 2.4817210260904615e+36,
+          "original_median_norm": 1.2899294034931593e-39,
+          "pass": true,
+          "points": 2048,
+          "scaled_median_norm": 0.0032012449228213,
+          "temperature": 0.5
+        }
+      ]
+    }
+  ],
+  "distinct_recordings": 96,
+  "elapsed_seconds": 178.83475030004047,
+  "evidence_bytes_upper_bound": 13416179,
+  "failure": null,
+  "fixed_scales": [
+    32.73040780087214,
+    29.015704035654633
+  ],
+  "frozen_commit": "0b4ae2c30723d425cdf3bda71f860a09ee5a839b",
+  "inference": {
+    "categorical_sizes": [
+      3,
+      2
+    ],
+    "continuous_heads": 9,
+    "dense_outputs": 14,
+    "frontend_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+    "model_sha256": "35cd356e97b5574df5d1a3cfaf19e79bd5b86f53df5e9ee6f56573a3da282c7b",
+    "trainable_parameters": 355806
+  },
+  "input_cache_sha256": "9404a8b326c15825b22a6b282a9f3773369c21a2bdd3deb0b4711d5d1bc1ede6",
+  "limitation": "Mathematical derivative connectivity only; no new native sensitivity or sound-quality measurement. Full sampled matrices remain in the local report.",
+  "model_frontend_and_rng_unchanged": true,
+  "native_requests": 0,
+  "optimizer_updates": 0,
+  "passed": true,
+  "peak_process_tree_rss_bytes": 825331712,
+  "plan_id": "bc1ffa3a6d7882288ce43aab67bb134c9f18073583a5f3c36074183e02a779d6",
+  "qualified_for_release": false,
+  "rss_sampling_errors": 0,
+  "sampled_points": 4096,
+  "selected_states": 32,
+  "test_split_used": false,
+  "weighted_observations": 128,
+  "within_resource_limits": true
+}
