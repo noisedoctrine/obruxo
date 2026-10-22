@@ -1,5 +1,7 @@
 # One supervised repeat after process loss
 
+The [repeat now completes and passes exact offline replay](BALANCED_NATIVE_FIT_RESULTS.md). Its reconstruction gate fails, so no model is admitted. Supervision counts the interrupted work within the unchanged aggregate limits; this card retains the predeclared operational protocol.
+
 Prepared before another native render. The comparison remains training plan `15084f99418c108999eb58f8e9f0afbf6d4241fdeee3950290b47b1a3db17a51`: the same accepted initial model, 14 outputs, input recordings, 256 updates per arm, optimizer/RNG settings and sound-quality gates. No numerical training source changes are needed.
 
 Frozen operational manifest: [`0e0a11000832b5b004e7b2d9e5ba235c11545e2fada6dc834028d0ff51f453ec`](data/durable_native_repeat_manifest.json). Its public copy retains the cumulative limits and all interrupted/prelaunch evidence hashes while omitting local launch paths. The complete private manifest is hash-bound; preparation and launch use frozen source `e92d0bd1aa3667ef1c4dcca8ea5213c8f5ab04b0`.

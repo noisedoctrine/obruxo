@@ -1,0 +1,384 @@
+{
+  "evidence_sha256": {
+    "diagnosis_output": "b24a523dd99207e3c597c03c0d586a60bbed079ee8b8147d01b24e8ec2ed77bb",
+    "diagnosis_script": "63611b9fa8b64882281b70d16baba9f8525b54ea671775581fcf1dad499b8cb6",
+    "feature_cache": "9404a8b326c15825b22a6b282a9f3773369c21a2bdd3deb0b4711d5d1bc1ede6",
+    "final_checkpoint": "c0f0cef3446b7c0fd6b11ce1127bd19c841adb2a63137a1c6dbf89d31f2d1762",
+    "fit_cases": "50bcef2aebd5850a26376638162dca9824f480581fdb116bdc167db2793ac034",
+    "initial_model": "a4d008aa547ef93602287cfd09e041d18bddcea4bac40d36e4b1ec3a84364407",
+    "interrupted_checkpoint": "e14fdcf06c554b662fcff7b84d2ab5a8076bb42768ebffd09fe21fc15076eac8"
+  },
+  "format": "balanced_native_controls_diagnosis_v1",
+  "limitation": "Parameter diagnostics describe drift; real-render sound comparisons remain the quality gate. Phase ordering is observed, not isolated as a cause.",
+  "metrics": {
+    "initial": {
+      "all_view_category_agreement": {
+        "filter_1_on": 0.796875,
+        "osc_1_unison_voices": 0.1875
+      },
+      "mean_cross_view_source_active_control_spread": 0.3161861313269795,
+      "views": {
+        "original_input": {
+          "categorical_accuracy": {
+            "filter_1_on": 1.0,
+            "osc_1_unison_voices": 1.0
+          },
+          "continuous_mae": {
+            "env_1_attack": 0.04571319404414191,
+            "env_1_decay": 0.04774090041101903,
+            "env_1_release": 0.06818251486944825,
+            "env_1_sustain": 0.052133912885724124,
+            "filter_1_cutoff": 0.023576018924187005,
+            "filter_1_resonance": 0.03308891282839519,
+            "osc_1_level": 0.03811386165856776,
+            "osc_1_pan": 0.033195922020603126,
+            "osc_1_unison_detune": 0.04134184921414189
+          },
+          "source_active_normalized_mae": 0.04447913277552012
+        },
+        "wide_alternate_input": {
+          "categorical_accuracy": {
+            "filter_1_on": 0.890625,
+            "osc_1_unison_voices": 0.390625
+          },
+          "continuous_mae": {
+            "env_1_attack": 0.3901620947314852,
+            "env_1_decay": 0.3442781793781317,
+            "env_1_release": 0.3523822508597926,
+            "env_1_sustain": 0.28387644929020395,
+            "filter_1_cutoff": 0.13853760319315506,
+            "filter_1_resonance": 0.428959406360678,
+            "osc_1_level": 0.35168434085923717,
+            "osc_1_pan": 0.16935231747029716,
+            "osc_1_unison_detune": 0.38056752215266654
+          },
+          "source_active_normalized_mae": 0.3167649402486533
+        },
+        "wide_held_input": {
+          "categorical_accuracy": {
+            "filter_1_on": 0.875,
+            "osc_1_unison_voices": 0.5
+          },
+          "continuous_mae": {
+            "env_1_attack": 0.39083639785833296,
+            "env_1_decay": 0.2956376393765211,
+            "env_1_release": 0.3452825450532688,
+            "env_1_sustain": 0.2550449626752628,
+            "filter_1_cutoff": 0.13985668551872352,
+            "filter_1_resonance": 0.27429538269488224,
+            "osc_1_level": 0.3537691201512144,
+            "osc_1_pan": 0.18286943370415296,
+            "osc_1_unison_detune": 0.40838555063949983
+          },
+          "source_active_normalized_mae": 0.30021474619202976
+        }
+      }
+    },
+    "parameter_final": {
+      "all_view_category_agreement": {
+        "filter_1_on": 0.890625,
+        "osc_1_unison_voices": 0.234375
+      },
+      "mean_cross_view_source_active_control_spread": 0.3043876917066068,
+      "views": {
+        "original_input": {
+          "categorical_accuracy": {
+            "filter_1_on": 1.0,
+            "osc_1_unison_voices": 0.984375
+          },
+          "continuous_mae": {
+            "env_1_attack": 0.1393555361718377,
+            "env_1_decay": 0.13466860951887755,
+            "env_1_release": 0.12282976197603274,
+            "env_1_sustain": 0.1059772607374107,
+            "filter_1_cutoff": 0.04504311168843911,
+            "filter_1_resonance": 0.10315327202980665,
+            "osc_1_level": 0.13440966757633982,
+            "osc_1_pan": 0.06585830940380784,
+            "osc_1_unison_detune": 0.10997721939357478
+          },
+          "source_active_normalized_mae": 0.1109381077512441
+        },
+        "wide_alternate_input": {
+          "categorical_accuracy": {
+            "filter_1_on": 0.953125,
+            "osc_1_unison_voices": 0.421875
+          },
+          "continuous_mae": {
+            "env_1_attack": 0.3686168701541389,
+            "env_1_decay": 0.3251505896409378,
+            "env_1_release": 0.3319058067417584,
+            "env_1_sustain": 0.25187571510951895,
+            "filter_1_cutoff": 0.11259456119632161,
+            "filter_1_resonance": 0.38439529594006544,
+            "osc_1_level": 0.3270834703366661,
+            "osc_1_pan": 0.1444898824109849,
+            "osc_1_unison_detune": 0.3709952267827619
+          },
+          "source_active_normalized_mae": 0.2927128660295035
+        },
+        "wide_held_input": {
+          "categorical_accuracy": {
+            "filter_1_on": 0.90625,
+            "osc_1_unison_voices": 0.53125
+          },
+          "continuous_mae": {
+            "env_1_attack": 0.375599494377952,
+            "env_1_decay": 0.2649808384558248,
+            "env_1_release": 0.3427928435949124,
+            "env_1_sustain": 0.21627962928506553,
+            "filter_1_cutoff": 0.13488387650820888,
+            "filter_1_resonance": 0.2720758335184323,
+            "osc_1_level": 0.33111265300716486,
+            "osc_1_pan": 0.16510069573198702,
+            "osc_1_unison_detune": 0.39359367628114467
+          },
+          "source_active_normalized_mae": 0.2818144469584625
+        }
+      }
+    },
+    "parameter_step29": {
+      "all_view_category_agreement": {
+        "filter_1_on": 0.8125,
+        "osc_1_unison_voices": 0.15625
+      },
+      "mean_cross_view_source_active_control_spread": 0.31550753684136434,
+      "views": {
+        "original_input": {
+          "categorical_accuracy": {
+            "filter_1_on": 1.0,
+            "osc_1_unison_voices": 1.0
+          },
+          "continuous_mae": {
+            "env_1_attack": 0.060741460198389496,
+            "env_1_decay": 0.05892172034802611,
+            "env_1_release": 0.06976091851477363,
+            "env_1_sustain": 0.05585119235908392,
+            "filter_1_cutoff": 0.022366644435234253,
+            "filter_1_resonance": 0.04736748096882087,
+            "osc_1_level": 0.04765464369612127,
+            "osc_1_pan": 0.03430057853631174,
+            "osc_1_unison_detune": 0.05352750329707127
+          },
+          "source_active_normalized_mae": 0.0518824490309795
+        },
+        "wide_alternate_input": {
+          "categorical_accuracy": {
+            "filter_1_on": 0.90625,
+            "osc_1_unison_voices": 0.34375
+          },
+          "continuous_mae": {
+            "env_1_attack": 0.39109829672583846,
+            "env_1_decay": 0.3493345660096114,
+            "env_1_release": 0.3671426290024731,
+            "env_1_sustain": 0.283471643737955,
+            "filter_1_cutoff": 0.13092498766377875,
+            "filter_1_resonance": 0.41172740005108033,
+            "osc_1_level": 0.3603594381667047,
+            "osc_1_pan": 0.17085232163995384,
+            "osc_1_unison_detune": 0.3863867264743209
+          },
+          "source_active_normalized_mae": 0.3196279351364884
+        },
+        "wide_held_input": {
+          "categorical_accuracy": {
+            "filter_1_on": 0.875,
+            "osc_1_unison_voices": 0.515625
+          },
+          "continuous_mae": {
+            "env_1_attack": 0.3969653008892456,
+            "env_1_decay": 0.3003992631416693,
+            "env_1_release": 0.3543216753274156,
+            "env_1_sustain": 0.253835384809597,
+            "filter_1_cutoff": 0.13842278518308043,
+            "filter_1_resonance": 0.27816688014687846,
+            "osc_1_level": 0.3583863180041789,
+            "osc_1_pan": 0.1871749016064699,
+            "osc_1_unison_detune": 0.4040576251987289
+          },
+          "source_active_normalized_mae": 0.3036134521443555
+        }
+      }
+    },
+    "spectral_final": {
+      "all_view_category_agreement": {
+        "filter_1_on": 0.78125,
+        "osc_1_unison_voices": 0.171875
+      },
+      "mean_cross_view_source_active_control_spread": 0.2824761207035007,
+      "views": {
+        "original_input": {
+          "categorical_accuracy": {
+            "filter_1_on": 1.0,
+            "osc_1_unison_voices": 1.0
+          },
+          "continuous_mae": {
+            "env_1_attack": 0.15526053361895137,
+            "env_1_decay": 0.10595996518011033,
+            "env_1_release": 0.11600910956836073,
+            "env_1_sustain": 0.0889495590046863,
+            "filter_1_cutoff": 0.03236697555246622,
+            "filter_1_resonance": 0.13999296673403755,
+            "osc_1_level": 0.19944579133684442,
+            "osc_1_pan": 0.04257740481360617,
+            "osc_1_unison_detune": 0.09394150621669875
+          },
+          "source_active_normalized_mae": 0.11180818914227197
+        },
+        "wide_alternate_input": {
+          "categorical_accuracy": {
+            "filter_1_on": 0.890625,
+            "osc_1_unison_voices": 0.359375
+          },
+          "continuous_mae": {
+            "env_1_attack": 0.35942690943847466,
+            "env_1_decay": 0.362416368102256,
+            "env_1_release": 0.3511811013492772,
+            "env_1_sustain": 0.2737833667750711,
+            "filter_1_cutoff": 0.11535380026458103,
+            "filter_1_resonance": 0.4231405585591328,
+            "osc_1_level": 0.3564285196924952,
+            "osc_1_pan": 0.16162208941709044,
+            "osc_1_unison_detune": 0.38153630852876286
+          },
+          "source_active_normalized_mae": 0.3114434268288682
+        },
+        "wide_held_input": {
+          "categorical_accuracy": {
+            "filter_1_on": 0.859375,
+            "osc_1_unison_voices": 0.5
+          },
+          "continuous_mae": {
+            "env_1_attack": 0.3856699975902383,
+            "env_1_decay": 0.3026908315141167,
+            "env_1_release": 0.34099007012531746,
+            "env_1_sustain": 0.2020665140280531,
+            "filter_1_cutoff": 0.12825516852968694,
+            "filter_1_resonance": 0.27402197053321087,
+            "osc_1_level": 0.37184049971433997,
+            "osc_1_pan": 0.17531767774759413,
+            "osc_1_unison_detune": 0.4103209646642394
+          },
+          "source_active_normalized_mae": 0.29374527912646736
+        }
+      }
+    },
+    "spectral_step29": {
+      "all_view_category_agreement": {
+        "filter_1_on": 0.8125,
+        "osc_1_unison_voices": 0.1875
+      },
+      "mean_cross_view_source_active_control_spread": 0.31294779786206867,
+      "views": {
+        "original_input": {
+          "categorical_accuracy": {
+            "filter_1_on": 1.0,
+            "osc_1_unison_voices": 1.0
+          },
+          "continuous_mae": {
+            "env_1_attack": 0.05911671929581522,
+            "env_1_decay": 0.0581321700608457,
+            "env_1_release": 0.06564460604439239,
+            "env_1_sustain": 0.07212580238206669,
+            "filter_1_cutoff": 0.030472417566332368,
+            "filter_1_resonance": 0.04727198171843822,
+            "osc_1_level": 0.06200627889610071,
+            "osc_1_pan": 0.035796510858436506,
+            "osc_1_unison_detune": 0.0826845416541381
+          },
+          "source_active_normalized_mae": 0.058247316589788815
+        },
+        "wide_alternate_input": {
+          "categorical_accuracy": {
+            "filter_1_on": 0.90625,
+            "osc_1_unison_voices": 0.390625
+          },
+          "continuous_mae": {
+            "env_1_attack": 0.38297109384180644,
+            "env_1_decay": 0.3400604520044231,
+            "env_1_release": 0.3540972309247695,
+            "env_1_sustain": 0.28780899319732567,
+            "filter_1_cutoff": 0.1319068544532948,
+            "filter_1_resonance": 0.42733956846327026,
+            "osc_1_level": 0.34591561542221666,
+            "osc_1_pan": 0.17427692605579465,
+            "osc_1_unison_detune": 0.3984208834558278
+          },
+          "source_active_normalized_mae": 0.3168936787164089
+        },
+        "wide_held_input": {
+          "categorical_accuracy": {
+            "filter_1_on": 0.875,
+            "osc_1_unison_voices": 0.5
+          },
+          "continuous_mae": {
+            "env_1_attack": 0.3887996141807707,
+            "env_1_decay": 0.2962884896128568,
+            "env_1_release": 0.3520168059853431,
+            "env_1_sustain": 0.261326315480935,
+            "filter_1_cutoff": 0.14104729112927286,
+            "filter_1_resonance": 0.2766112369526219,
+            "osc_1_level": 0.3497877790647022,
+            "osc_1_pan": 0.18356273148468355,
+            "osc_1_unison_detune": 0.4228666105470363
+          },
+          "source_active_normalized_mae": 0.302774493129369
+        }
+      }
+    }
+  },
+  "native_category_signal": {
+    "filter_1_on": {
+      "responding_updates_with_exact_zero_gradient": 0,
+      "updates_with_native_response": 256
+    },
+    "osc_1_unison_voices": {
+      "responding_updates_with_exact_zero_gradient": 0,
+      "updates_with_native_response": 256
+    }
+  },
+  "native_requests_added": 0,
+  "optimizer_updates_added": 0,
+  "ordered_training_phases": [
+    {
+      "input_view": 0,
+      "sampled_choice_source_agreement": {
+        "filter_1_on": 0.828125,
+        "osc_1_unison_voices": 0.40625
+      },
+      "target_view": 1,
+      "updates": 64
+    },
+    {
+      "input_view": 1,
+      "sampled_choice_source_agreement": {
+        "filter_1_on": 0.859375,
+        "osc_1_unison_voices": 0.46875
+      },
+      "target_view": 0,
+      "updates": 64
+    },
+    {
+      "input_view": 0,
+      "sampled_choice_source_agreement": {
+        "filter_1_on": 0.765625,
+        "osc_1_unison_voices": 0.4375
+      },
+      "target_view": 2,
+      "updates": 64
+    },
+    {
+      "input_view": 2,
+      "sampled_choice_source_agreement": {
+        "filter_1_on": 0.78125,
+        "osc_1_unison_voices": 0.3125
+      },
+      "target_view": 0,
+      "updates": 64
+    }
+  ],
+  "saved_hard_exports_checked": 576,
+  "test_split_used": false,
+  "training_plan_id": "15084f99418c108999eb58f8e9f0afbf6d4241fdeee3950290b47b1a3db17a51",
+  "training_states": 64
+}
