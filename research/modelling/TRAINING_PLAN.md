@@ -54,11 +54,11 @@ Keep stack style at Normal and oscillator wave-warp mode at None in Stage A. Sta
 
 ## Sound-loss training path
 
-Native Vital does not supply derivatives for ordinary backpropagation. The active basic path now estimates local sound-loss gradients from legal native renders. The [bounded qualification](../training/reports/NATIVE_GRADIENT_RESULTS.md) passes: continuous changes improve 24/24 cases and joint changes 23/24. The inverse loss connection is tested, but matched inverse training remains pending. A learned forward helper remains an alternative requiring its own qualification; both current helpers failed.
+Native Vital does not supply derivatives for ordinary backpropagation. The active basic path estimates local sound-loss gradients from legal native renders. The [settled-renderer qualification](../training/reports/SETTLED_NATIVE_GRADIENT_RESULTS.md) passes: continuous changes improve 22/24 cases and joint changes 21/24. Matched inverse fits have run, but their reconstruction gates still fail. A learned forward helper remains an alternative requiring its own qualification; both current helpers failed.
 
 ```text
 Predictor training with the qualified native estimator:
-  target audio -> predictor -> continuous controls / Gumbel-softmax selections
+  target audio -> predictor -> continuous controls / hard straight-through selections
                -> codec/native render boundary -> real Vital with training MIDI
   target audio ---------------------------------> target spectra
   legal control probes -> real spectral losses -> local gradient estimates
@@ -70,7 +70,7 @@ Deployment and real-render evaluation:
 
 At the explicit native boundary, serialize hard legal patches and measure their sound losses. Reconnect those measurements to the original raw continuous tensors and straight-through choices using the pinned numerical estimator. Its forward value is the measured native loss; its backward is a local estimate, not an exact plugin derivative. A learned-helper implementation instead keeps its weights frozen and retains derivatives through its inputs. Known MIDI conditions only the evaluator or helper, never the deployed inverse network.
 
-Use **straight-through Gumbel-softmax** for the categorical controls: a hard one-hot choice in the forward pass and a soft approximation in the backward pass. Save its RNG and temperature schedule; use unperturbed deterministic `argmax` for deployment-quality scoring. This supplies an approximate gradient through a category choice, not through native Vital. [PyTorch documentation](https://docs.pytorch.org/docs/2.14/generated/torch.nn.functional.gumbel_softmax.html)
+Category heads use a hard legal choice in the forward pass and an approximate derivative in the backward pass. Historical fits use straight-through Gumbel-softmax and preserve its RNG/temperature schedule. The [new production-choice contract](../training/reports/PRODUCTION_CHOICE_RESULTS.md) instead renders raw, unperturbed `argmax` during training and export, with fixed scales applied only to the backward softmax derivative. Its derivative/export check passes on the retained model and audited inputs. It still needs a bounded native-direction/end-to-end check before another full fit. The matched parameter control must receive raw, unscaled logits. Neither construction supplies an exact Vital derivative. [Historical Gumbel implementation](https://docs.pytorch.org/docs/2.14/generated/torch.nn.functional.gumbel_softmax.html)
 
 The helper route has research precedent for audio embeddings. Our performance-conditioned spectral model is a project proposal requiring its own qualification. [Combes et al., Neural Proxies for Sound Synthesizers](https://arxiv.org/abs/2509.07635)
 
