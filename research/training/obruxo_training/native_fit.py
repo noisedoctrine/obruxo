@@ -177,18 +177,23 @@ class FitRecords:
                 raise ValueError("training record changed")
             record = torch.load(path, map_location="cpu", weights_only=True)
         else:
-            targets, hashes, features = [], [], None
+            targets, hashes, views = [], [], []
             for view, value in enumerate(recipe["performances"]):
                 audio, receipt = self.session.render(PilotTarget.from_dict(recipe["target"]), Performance.from_dict(value),
                                                      "training", f"source:{index}:{view}")
                 if audio is None:
                     raise RuntimeError("training source render rejected")
+                if recipe.get("source_audio_sha256") and receipt["qa"]["audio_float32_sha256"] != recipe["source_audio_sha256"][view]:
+                    raise ValueError("sound-training source differs from its audited input recording")
                 targets.append(SpectralTargets()(torch.from_numpy(audio.copy()).T[None]))
                 hashes.append(receipt["qa"]["audio_float32_sha256"])
-                if view == 0:
-                    features = self.frontend(audio)
+                if view == 0 or self.plan.get("training_view_roles"):
+                    views.append(self.frontend(audio))
+                    if recipe.get("source_feature_sha256") and tensor_digest(views[-1]) != recipe["source_feature_sha256"][view]:
+                        raise ValueError("sound-training features differ from their audited input recording")
             self.frontend.require_frozen()
-            record = {"recipe_id": canonical_sha256(recipe), "features": features, "targets": targets, "audio_sha256": hashes,
+            record = {"recipe_id": canonical_sha256(recipe), "features": views if self.plan.get("training_view_roles") else views[0],
+                      "targets": targets, "audio_sha256": hashes,
                       "render_profile": self.plan.get("render_profile", basic_render_profile(0))}
             atomic_torch_save(path, record)
             self.rows[str(index)] = {"file": path.name, "sha256": digest(path), "recipe_id": record["recipe_id"]}
@@ -197,7 +202,10 @@ class FitRecords:
             raise ValueError("training recipe identity changed")
         if record.get("render_profile", basic_render_profile(0)) != self.plan.get("render_profile", basic_render_profile(0)):
             raise ValueError("training record belongs to a different render profile")
-        size = sum(target_bytes(target) for target in record["targets"]) + sum(value.numel() * value.element_size() for value in record["features"].values())
+        views = record["features"] if isinstance(record["features"], list) else [record["features"]]
+        if len(views) != (len(recipe["performances"]) if self.plan.get("training_view_roles") else 1):
+            raise ValueError("training record input views changed")
+        size = sum(target_bytes(target) for target in record["targets"]) + sum(value.numel() * value.element_size() for features in views for value in features.values())
         if size > self.plan["limits"]["replay_bytes"]:
             raise RuntimeError("one training record exceeds replay budget")
         while self.cache and (self.bytes + size > self.plan["limits"]["replay_bytes"] or len(self.cache) >= self.plan["limits"]["replay_records"]):
@@ -244,6 +252,10 @@ def matched_step(models, optimizers, features, target, codec, evaluate, step, st
             "estimates": [row.to_dict() for row in estimates]}
 
 
+def record_features(record, view=0):
+    return record["features"][view] if isinstance(record["features"], list) else record["features"]
+
+
 def fit_models(models, records, session, output, plan, saved=None, *, after_step=None):
     optimizers = {name: torch.optim.Adam(model.parameters(), lr=plan["optimizer"]["learning_rate"]) for name, model in models.items()}
     for model in models.values():
@@ -265,7 +277,7 @@ def fit_models(models, records, session, output, plan, saved=None, *, after_step
     if any(row["attempt"] != i for i, row in enumerate(charges)):
         raise ValueError("optimizer attempt ledger changed")
     for step, row in enumerate(trace):
-        charge = {key: row[key] for key in ("attempt", "step", "state", "view")}
+        charge = {key: row[key] for key in ("attempt", "step", "state", "view", "input_view") if key in row}
         if row["step"] != step + 1 or row["attempt"] >= len(charges) or charges[row["attempt"]] != charge:
             raise ValueError("checkpoint trace differs from charged optimizer attempts")
     for step in range(len(trace), len(plan["updates"])):
@@ -276,6 +288,8 @@ def fit_models(models, records, session, output, plan, saved=None, *, after_step
         index, view = update["state"], update["view"]
         record, recipe = records[index], plan["training"][index]
         charge = {"attempt": len(charges), "step": step + 1, "state": index, "view": view}
+        if "input_view" in update:
+            charge["input_view"] = update["input_view"]
         append_durable(charge_path, charge)
         charges.append(charge)
         performance = Performance.from_dict(recipe["performances"][view])
@@ -295,7 +309,7 @@ def fit_models(models, records, session, output, plan, saved=None, *, after_step
                            "request_id": receipt.get("request_id"), "audio_sha256": receipt["qa"]["audio_float32_sha256"]})
             return value
 
-        result = matched_step(models, optimizers, record["features"], PilotTarget.from_dict(recipe["target"]), session.codec,
+        result = matched_step(models, optimizers, record_features(record, update.get("input_view", 0)), PilotTarget.from_dict(recipe["target"]), session.codec,
                               evaluate, step, len(plan["updates"]), category_training=plan.get("category_training"))
         trace.append({**charge, **result})
         state = {"format": "matched_native_inverse_checkpoint_v1", "plan_id": canonical_sha256(plan), "step": step + 1,
@@ -361,17 +375,20 @@ def audit_case(session, output, label, recipe, view, candidate_provider, identit
                   "tail_error": float(np.mean(np.abs(candidate_rms - reference_rms) / np.maximum(reference_rms, .001)))}
         saved["rows"][name] = {"scores": scores, "candidate": candidate.to_dict(), "receipt": receipt}
         atomic_torch_save(path, saved)
-    return {"label": label, "state_id": recipe["state_id"], "view": view, "repeat_exact": saved["repeat_exact"],
+    return {"label": label, "state_id": recipe["state_id"], **({"case_id": recipe["case_id"]} if "case_id" in recipe else {}),
+            "view": view, "repeat_exact": saved["repeat_exact"],
             "source_receipt": saved["source_receipt"], "rows": saved["rows"]}, candidates
 
 
 def audit_summary(cases, plan, *, validation):
-    count = len(plan["validation" if validation else "training"])
-    expected = {(entry["state_id"], view) for entry in plan["validation" if validation else "training"] for view in (0, 1)}
-    actual = [(row["state_id"], row["view"]) for row in cases]
+    recipes = plan["validation" if validation else "training"]
+    count = len(recipes)
+    roles = ("reference", "transfer") if validation else plan.get("training_view_roles", ("reference", "additional_training_MIDI"))
+    expected = {(entry.get("case_id", entry["state_id"]), view) for entry in recipes for view in range(len(roles))}
+    actual = [(row.get("case_id", row["state_id"]), row["view"]) for row in cases]
     complete = len(actual) == len(expected) and set(actual) == expected and all(row["repeat_exact"] for row in cases)
     groups = {}
-    for view, role in ((0, "reference"), (1, "transfer" if validation else "additional_training_MIDI")):
+    for view, role in enumerate(roles):
         selected = [row for row in cases if row["view"] == view]
         names = ("initial", "parameter", "spectral", "template", "retrieval") if validation else ("initial", "parameter", "spectral")
         means = {name: {metric: float(np.mean([row["rows"][name]["scores"][metric] for row in selected])) if selected else None
@@ -393,6 +410,17 @@ def audit_summary(cases, plan, *, validation):
                           and means["spectral"]["mrstft"] < means["initial"]["mrstft"])
         groups[role] = {"planned": count, "completed": len(selected), "means": means, "tail_p90": tail, "pass": bool(passed)}
     result = {"complete": complete, "groups": groups, "pass": complete and all(row["pass"] for row in groups.values())}
+    if validation and plan.get("validation_panels"):
+        panels = plan["validation_panels"]
+        all_ids = [value for ids in panels.values() for value in ids]
+        if len(set(all_ids)) != len(all_ids) or set(all_ids) != {entry.get("case_id", entry["state_id"]) for entry in recipes}:
+            raise ValueError("validation panel membership changed")
+        result["panels"] = {}
+        for name, ids in panels.items():
+            subset = {**plan, "validation": [entry for entry in recipes if entry.get("case_id", entry["state_id"]) in ids]}
+            subset.pop("validation_panels")
+            result["panels"][name] = audit_summary([row for row in cases if row.get("case_id", row["state_id"]) in ids], subset, validation=True)
+        result["pass"] = result["pass"] and all(row["pass"] for row in result["panels"].values())
     if validation or not plan.get("training_population"):
         return result
     original_ids = plan["training_population"]["original_state_ids"]
@@ -416,6 +444,12 @@ def run_fit(pool, initial_path, retrieval_path, qualification_path, output, *, e
     torch.set_num_threads(2)
     plan = make_plan(pool, initial_path, retrieval_path, qualification_path,
                      preroll_frames=preroll_frames, category_calibration_path=category_calibration_path, training_states=training_states)
+    return run_plan(pool, initial_path, retrieval_path, output, plan, execute=execute, resume=resume)
+
+
+def run_plan(pool, initial_path, retrieval_path, output, plan, *, execute=False, resume=False):
+    """Execute an already validated plan from a protocol-specific plan builder."""
+    torch.set_num_threads(2)
     plan_id = canonical_sha256(plan)
     if not execute:
         output.mkdir(parents=True, exist_ok=False)
@@ -454,8 +488,8 @@ def run_fit(pool, initial_path, retrieval_path, qualification_path, output, *, e
         model_ids = {name: tensor_digest(model.state_dict()) for name, model in all_models.items()}
         for index, recipe in enumerate(plan["training"]):
             record = records[index]
-            candidates = predict_candidates(all_models, codec, record["features"])
-            for view in (0, 1):
+            for view in range(len(recipe["performances"])):
+                candidates = predict_candidates(all_models, codec, record_features(record, view if plan.get("training_view_roles") else 0))
                 case, _ = audit_case(session, output, f"fit-{index:03d}-{view}", recipe, view, lambda _audio: candidates,
                                      model_ids, expected_audio=record["audio_sha256"][view])
                 fit_cases.append(case)
@@ -475,7 +509,7 @@ def run_fit(pool, initial_path, retrieval_path, qualification_path, output, *, e
                 validation_cases.extend((reference, transfer))
                 write_json(output / "validation_cases.json", validation_cases)
                 records.check_limits()
-                print(json.dumps({"stage": "validation", "completed": index + 1, "planned": 12}), flush=True)
+                print(json.dumps({"stage": "validation", "completed": index + 1, "planned": len(plan["validation"])}), flush=True)
             validation_result = audit_summary(validation_cases, plan, validation=True)
         for name, model in models.items():
             export = inference_state(model, frontend, codec, pool.pool_id, preroll_frames=plan["render_profile"]["preroll_frames"])
@@ -498,7 +532,7 @@ def run_fit(pool, initial_path, retrieval_path, qualification_path, output, *, e
         resources = (monitor.errors == 0 and monitor.peak_bytes is not None and monitor.peak_bytes <= plan["limits"]["process_tree_bytes"]
                      and elapsed <= plan["limits"]["wall_seconds"] and archive + 1024**2 <= plan["limits"]["archive_bytes"])
         unchanged = digest(initial_path) == plan["initial_file_sha256"] and digest(retrieval_path) == plan["retrieval_file_sha256"]
-        complete = failure is None and len(trace) == 128 and fit_result is not None
+        complete = failure is None and len(trace) == len(plan["updates"]) and fit_result is not None
         passed = bool(complete and fit_result["pass"] and validation_result and validation_result["pass"] and accepted and resources and unchanged)
         summary = {"plan_id": plan_id, "plan": plan, "complete": complete, "failure": failure,
                    "fit_result": fit_result, "validation_result": validation_result, "matched_comparison_passed": passed,

@@ -23,7 +23,7 @@ def equal_tree(first, second):
     return first == second
 
 
-def verify(source, pool, initial_path, retrieval_path, qualification_path, *, observe_step=None, calibration_path=None):
+def verify(source, pool, initial_path, retrieval_path, qualification_path, *, observe_step=None, calibration_path=None, input_cache_path=None):
     import torch
     from obruxo_data.hashing import canonical_sha256, sha256_bytes
     from obruxo_data.midi import Performance
@@ -33,16 +33,22 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path, *, ob
     from obruxo_training.codec import PilotTarget
     from obruxo_training.evaluate import nearest_training_target
     from obruxo_training.features import tensor_digest
-    from obruxo_training.native_fit import audit_summary, digest, make_plan, matched_step, predict_candidates
-    from obruxo_training.native_fit_report import learning_diagnostics, paired_comparison, public_cases, recovered_timeouts
+    from obruxo_training.native_fit import audit_summary, digest, make_plan, matched_step, predict_candidates, record_features
+    from obruxo_training.native_fit_report import development_comparison, learning_diagnostics, public_cases, recovered_timeouts
     from obruxo_training.reproducibility import fixed_generator_phases
     from obruxo_training.spectral import SpectralTargets
     from obruxo_training.trainer import restore_model
     torch.set_num_threads(2)
     frozen = json.loads((source / "plan.json").read_text())
-    plan = make_plan(pool, initial_path, retrieval_path, qualification_path,
-                     preroll_frames=frozen.get("render_profile", {}).get("preroll_frames", 0), category_calibration_path=calibration_path,
-                     training_states=len(frozen["training"]))
+    if frozen["format"] == "matched_native_inverse_fit_v4":
+        from obruxo_training.balanced_native_fit import make_plan as balanced_plan
+        if input_cache_path is None or calibration_path is None:
+            raise ValueError("balanced fit audit requires its input cache and category qualification")
+        plan = balanced_plan(pool, initial_path, retrieval_path, qualification_path, input_cache_path, calibration_path)
+    else:
+        plan = make_plan(pool, initial_path, retrieval_path, qualification_path,
+                         preroll_frames=frozen.get("render_profile", {}).get("preroll_frames", 0), category_calibration_path=calibration_path,
+                         training_states=len(frozen["training"]))
     summary = json.loads((source / "summary.json").read_text())
     if (plan != json.loads((source / "plan.json").read_text()) or summary["plan"] != plan
             or summary["plan_id"] != canonical_sha256(plan) or not summary["complete"] or summary["failure"] is not None):
@@ -89,7 +95,7 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path, *, ob
         if digest(path) != row["sha256"] or row["recipe_id"] != canonical_sha256(recipe):
             raise ValueError("training feature/target record changed")
         record = torch.load(path, map_location="cpu", weights_only=True)
-        for view in (0, 1):
+        for view in range(len(recipe["performances"])):
             audit = torch.load(source / "audits" / f"fit-{index:03d}-{view}.pt", map_location="cpu", weights_only=True)
             audio = audit["audio"].numpy()
             if audio_float32_sha256(audio) != record["audio_sha256"][view]:
@@ -101,8 +107,12 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path, *, ob
             measured = SpectralTargets()(audit["audio"].T[None])
             if not equal_tree(measured, record["targets"][view]):
                 raise ValueError("cached training spectra do not match native source audio")
-            if view == 0 and not equal_tree(frontend(audio), record["features"]):
+            if (view == 0 or plan.get("training_view_roles")) and not equal_tree(frontend(audio), record_features(record, view)):
                 raise ValueError("cached inverse input features do not match native source audio")
+            if recipe.get("source_audio_sha256") and record["audio_sha256"][view] != recipe["source_audio_sha256"][view]:
+                raise ValueError("sound-fit source does not match its audited input bank")
+            if recipe.get("source_feature_sha256") and tensor_digest(record_features(record, view)) != recipe["source_feature_sha256"][view]:
+                raise ValueError("sound-fit input features do not match their audited bank")
         # Keep small input features; full targets are verified, then released.
         records[index] = record["features"]
     by_attempt = defaultdict(list)
@@ -130,15 +140,16 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path, *, ob
             raise ValueError("a logged training loss has no matching native receipt")
         require_request(PilotTarget.from_dict(measured["candidate"]), performance, receipts[0])
         by_attempt[measured["optimizer_attempt"]].append(measured)
-    if (saved["plan_id"] != canonical_sha256(plan) or saved["step"] != 128 or len(saved["trace"]) != 128
+    if (saved["plan_id"] != canonical_sha256(plan) or saved["step"] != len(plan["updates"]) or len(saved["trace"]) != len(plan["updates"])
             or len(charges) > plan["limits"]["optimizer_attempts"] or any(row["attempt"] != i for i, row in enumerate(charges))):
         raise ValueError("optimizer checkpoint or attempt count changed")
     torch.manual_seed(plan["optimizer"]["seed"])
     for step, committed in enumerate(saved["trace"]):
         update = plan["updates"][step]
-        charge = {key: committed[key] for key in ("attempt", "step", "state", "view")}
+        charge = {key: committed[key] for key in ("attempt", "step", "state", "view", "input_view") if key in committed}
         if (charges[committed["attempt"]] != charge or charge["step"] != step + 1
-                or charge["state"] != update["state"] or charge["view"] != update["view"]):
+                or charge["state"] != update["state"] or charge["view"] != update["view"]
+                or charge.get("input_view") != update.get("input_view")):
             raise ValueError("committed update does not match the frozen selection or charge")
         point = by_attempt[committed["attempt"]]
         cursor = 0
@@ -152,7 +163,8 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path, *, ob
             return measured["loss"]
 
         with observe_step(step, models, records, committed) if observe_step else nullcontext():
-            result = matched_step(models, optimizers, records[update["state"]], PilotTarget.from_dict(plan["training"][update["state"]]["target"]),
+            features = record_features({"features": records[update["state"]]}, update.get("input_view", 0))
+            result = matched_step(models, optimizers, features, PilotTarget.from_dict(plan["training"][update["state"]]["target"]),
                                   codec, evaluate, step, len(plan["updates"]), category_training=plan.get("category_training"))
         if cursor != len(point) or any(result[key] != committed[key] for key in result):
             raise ValueError("offline numerical update differs from training")
@@ -172,6 +184,9 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path, *, ob
                 or exported.get("render_profile", {}) != plan.get("render_profile", {})
                 or exported.get("category_training") != plan.get("category_training")):
             raise ValueError("diagnostic inference export differs from its actual trained model")
+        if plan["format"] == "matched_native_inverse_fit_v4":
+            from obruxo_training.inference_profile import artifact_rendering
+            artifact_rendering(exported)
     if not torch.equal(torch.get_rng_state(), saved["rng"]["torch"]):
         raise ValueError("replayed Gumbel RNG differs from the committed checkpoint")
     all_models = {"initial": incumbent.eval(), **{name: model.eval() for name, model in models.items()}}
@@ -181,7 +196,8 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path, *, ob
     for split, cases in (("training", fit_cases), ("validation", validation_cases)):
         candidates_by_state = {}
         for case in cases:
-            recipe = next(row for row in plan[split] if row["state_id"] == case["state_id"])
+            case_id = case.get("case_id", case["state_id"])
+            recipe = next(row for row in plan[split] if row.get("case_id", row["state_id"]) == case_id)
             index, view = plan[split].index(recipe), case["view"]
             audit = torch.load(source / "audits" / f"{case['label']}.pt", map_location="cpu", weights_only=True)
             if audit["rows"] != case["rows"] or audit["source_receipt"] != case["source_receipt"] or not audit["repeat_exact"]:
@@ -189,14 +205,15 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path, *, ob
             if audio_float32_sha256(audit["audio"].numpy()) != audit["source_receipt"]["qa"]["audio_float32_sha256"]:
                 raise ValueError("saved native audit source audio changed")
             if split == "training":
-                candidates = predict_candidates(all_models, codec, records[index])
+                features = record_features({"features": records[index]}, view if plan.get("training_view_roles") else 0)
+                candidates = predict_candidates(all_models, codec, features)
             elif view == 0:
                 features = frontend(audit["audio"].numpy())
                 candidates = {**predict_candidates(all_models, codec, features), "template": codec.default_target(),
                               "retrieval": nearest_training_target(features, retrieval)}
-                candidates_by_state[recipe["state_id"]] = candidates
+                candidates_by_state[case_id] = candidates
             else:
-                candidates = candidates_by_state[recipe["state_id"]]
+                candidates = candidates_by_state[case_id]
             performance = Performance.from_dict(recipe["performances"][view])
             require_recorded_receipt(audit["source_receipt"])
             require_request(PilotTarget.from_dict(recipe["target"]), performance, audit["source_receipt"])
@@ -240,7 +257,7 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path, *, ob
             "hard_audit_patches_reconstructed": True, "candidate_audit_audio_rescored": False,
             "fit_cases": public_cases(fit_cases), "validation_cases": public_cases(validation_cases),
             "learning_diagnostics": learning_diagnostics(saved["trace"], fit_cases, plan["codec"]["categorical"]),
-            "descriptive_validation_comparison": paired_comparison(validation_cases) if validation_cases else None,
+            "descriptive_validation_comparison": development_comparison(validation_cases, plan.get("validation_panels")) if validation_cases else None,
             "final_model_sha256": {name: tensor_digest(model.state_dict()) for name, model in models.items()},
             "evidence_sha256": {name: digest(source / name) for name in ("summary.json", "checkpoint.pt", "records.json", "updates.jsonl", "measurements.jsonl", "renders.jsonl")}}
 
@@ -252,10 +269,12 @@ def main():
     for name in ("source", "pool", "initial", "retrieval", "qualification", "output"):
         parser.add_argument(f"--{name}", type=Path, required=True)
     parser.add_argument("--category-calibration", type=Path)
+    parser.add_argument("--input-cache", type=Path)
     args = parser.parse_args()
     if args.output.exists():
         raise ValueError("refusing to replace verified evidence")
-    result = verify(args.source, PilotPool.load(args.pool), args.initial, args.retrieval, args.qualification, calibration_path=args.category_calibration)
+    result = verify(args.source, PilotPool.load(args.pool), args.initial, args.retrieval, args.qualification,
+                    calibration_path=args.category_calibration, input_cache_path=args.input_cache)
     write_json(args.output, result)
     print(json.dumps({"offline_training_replay_exact": True, "matched_comparison_passed": result["matched_comparison_passed"]}))
 

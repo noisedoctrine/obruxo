@@ -230,6 +230,7 @@ These initial ceilings are caps, not runtime predictions or a launch instruction
 | A1 helper feasibility | 2,048 training + 256 qualification | 12,000 helper updates | 4 hours |
 | A2 matched inverse comparison | 1,024 total | 8,000 per arm; 16,000 total | 4 hours |
 | A2 qualified native-estimator trial | 3,328 total, per the explicit native card | 128 per arm; 256 total | 4 hours |
+| A2 original/wider native fit | 7,120 total, per the [new card](../training/reports/BALANCED_NATIVE_FIT_CARD.md) | 256 per arm; 512 total | 6 hours |
 | A3 confirmation evaluation | 960 | None during evaluation | 2 hours |
 
 Second-seed training is a separate predeclared run capped like A2, after a promising result. New stages need their own cards under the same resource policy. Choose confirmation sample size from development variability before scoring the candidate; if adequate coverage cannot fit the cap, revise the plan before collecting confirmation.

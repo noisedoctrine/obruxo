@@ -25,7 +25,8 @@ def storage_bound(training, validation, tail_seconds):
         return result
     train_frames = [count for recipe in training for count in frames(recipe)]
     audit_frames = train_frames + [count for recipe in validation for count in frames(recipe)]
-    records = sum(target_tensor_bytes(count) for count in train_frames) + len(training) * 4 * (prod(TIMBRE_SHAPE) + PITCH_SIZE)
+    input_views = sum(len(recipe["performances"]) if recipe.get("input_views") == "all" else 1 for recipe in training)
+    records = sum(target_tensor_bytes(count) for count in train_frames) + input_views * 4 * (prod(TIMBRE_SHAPE) + PITCH_SIZE)
     audit_audio = sum(audit_frames) * 2 * 4 * 2  # Stereo float32, current and previous atomic-save copies.
     serialization = len(training) * 128 * 1024 + len(audit_frames) * 256 * 1024
     reserve = 256 * 1024**2
