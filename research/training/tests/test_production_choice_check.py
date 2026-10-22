@@ -61,8 +61,12 @@ def test_validator_recomputes_derivatives_exports_and_scales(report):
     output, _plan = report
     result = check.validate_check(output / "summary.json", None, None, None, None, None)
     assert result["scales"] and not result["native_direction_qualified"]
+    status = output / "status.json"
+    status.write_text('{"earlier_failure": "preserved"}')
+    before = {path.name: path.read_bytes() for path in output.iterdir()}
     with pytest.raises(ValueError, match="already started"):
         check.run_check(None, None, None, None, None, output, execute=True)
+    assert before == {path.name: path.read_bytes() for path in output.iterdir()}
 
 
 def test_verification_resources_and_overwrite_guard(report):

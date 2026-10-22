@@ -113,6 +113,7 @@ def make_plan(pool, bootstrap_root, bootstrap_audit_path, qualification_path, in
 
 def run_check(pool, bootstrap_root, bootstrap_audit_path, qualification_path, input_cache_path, output, *, execute=False):
     started, monitor = perf_counter(), MemoryMonitor()
+    started_here = False
     monitor.start()
     try:
         with refresh.cpu_settings():
@@ -138,6 +139,7 @@ def run_check(pool, bootstrap_root, bootstrap_audit_path, qualification_path, in
             if (output / "run.json").exists():
                 raise ValueError("production-choice check already started; preserve evidence")
             write_json(output / "run.json", {"plan_id": canonical_sha256(plan)})
+            started_here = True
             evidence = mathematical_evidence(*bundle)
         result = {"plan": plan, "plan_id": canonical_sha256(plan), "bootstrap_audit": audit, **evidence,
                   "elapsed_seconds": perf_counter() - started, "peak_process_tree_rss_bytes": monitor.peak_bytes,
@@ -151,7 +153,7 @@ def run_check(pool, bootstrap_root, bootstrap_audit_path, qualification_path, in
         write_json(output / "summary.json", result)
         return {key: value for key, value in result.items() if key not in {"plan", "bootstrap_audit", "derivatives", "initial_training_inputs"}}
     except BaseException as error:
-        if (output / "run.json").exists():
+        if started_here:
             write_json(output / "status.json", {"complete": False, "error_type": type(error).__name__})
         raise
     finally:
