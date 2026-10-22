@@ -89,7 +89,8 @@ class FixtureSession:
 
 
 @pytest.mark.parametrize("calibrated", [False, True])
-def test_actual_matched_models_resume_exactly_and_optimizer_attempts_are_charged(tmp_path, calibrated):
+@pytest.mark.parametrize("multiview", [False, True])
+def test_actual_matched_models_resume_exactly_and_optimizer_attempts_are_charged(tmp_path, calibrated, multiview):
     torch.set_num_threads(2)
     torch.manual_seed(4)
     codec, base = PilotCodec(), PilotInverse()
@@ -97,6 +98,10 @@ def test_actual_matched_models_resume_exactly_and_optimizer_attempts_are_charged
     recipe = {"target": codec.default_target().to_dict(), "performances": [initial_bank()[0].performance().to_dict()] * 2}
     plan = {"training": [recipe], "updates": [{"state": 0, "view": i % 2} for i in range(4)],
             "optimizer": {"learning_rate": .0001, "seed": 0}, "limits": {"optimizer_attempts": 6}}
+    if multiview:
+        from obruxo_training.balanced_sound_data import cross_view_updates
+        plan["updates"] = cross_view_updates(1)
+        recipe["performances"].append(initial_bank()[2].performance().to_dict())
     if calibrated:
         plan["category_training"] = {"scales": [20., 21.], "diagnosis_file_sha256": "fixed-fixture"}
     audio, _ = FixtureSession(codec, plan).render(codec.default_target(), None, "training", "target")
@@ -106,7 +111,8 @@ def test_actual_matched_models_resume_exactly_and_optimizer_attempts_are_charged
 
         def __getitem__(self, index):
             measured = SpectralTargets()(torch.from_numpy(audio).T[None])
-            return {"features": features, "targets": [measured, measured]}
+            views = [{name: value * scale for name, value in features.items()} for scale in (1., .5, .25)] if multiview else features
+            return {"features": views, "targets": [measured] * len(recipe["performances"])}
 
     def models():
         return {name: copy.deepcopy(base) for name in ("parameter", "spectral")}

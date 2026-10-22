@@ -75,21 +75,23 @@ def paired_comparison(cases, *, resamples=2000):
     by_state = {}
     for case in cases:
         views = by_state.setdefault(case["state_id"], {})
-        if case["view"] in views or case["view"] not in (0, 1):
+        key = case.get("case_id", case["state_id"])
+        observations = views.setdefault(case["view"], {})
+        if key in observations or case["view"] not in (0, 1):
             raise ValueError("duplicate or unsupported comparison view")
-        views[case["view"]] = case
-    if not by_state or any(set(views) != {0, 1} for views in by_state.values()):
+        observations[key] = case
+    if not by_state or any(set(views) != {0, 1} or set(views[0]) != set(views[1]) for views in by_state.values()):
         raise ValueError("paired comparison requires both views for every source state")
     states = sorted(by_state)
     rng = np.random.default_rng(0)
     selections = rng.integers(0, len(states), size=(resamples, len(states)))
     groups = {}
     for view, role in ((0, "reference"), (1, "transfer")):
-        selected = [by_state[state][view] for state in states]
+        selected = [list(by_state[state][view].values()) for state in states]
         comparisons = {}
         for baseline in ("initial", "parameter"):
-            candidate = np.array([row["rows"]["spectral"]["scores"]["mrstft"] for row in selected])
-            control = np.array([row["rows"][baseline]["scores"]["mrstft"] for row in selected])
+            candidate = np.array([np.mean([row["rows"]["spectral"]["scores"]["mrstft"] for row in rows]) for rows in selected])
+            control = np.array([np.mean([row["rows"][baseline]["scores"]["mrstft"] for row in rows]) for rows in selected])
             delta = candidate - control
             if not np.isfinite(candidate).all() or not np.isfinite(control).all() or (candidate < 0).any() or (control < 0).any():
                 raise ValueError("comparison scores must be finite and nonnegative")
@@ -104,8 +106,16 @@ def paired_comparison(cases, *, resamples=2000):
             "bootstrap_seed": 0, "unit": "whole_source_state_with_both_views", "descriptive_not_an_additional_pass_gate": True}
 
 
+def development_comparison(cases, panels=None):
+    if not panels:
+        return paired_comparison(cases)
+    return {"panels": {name: paired_comparison([row for row in cases if row.get("case_id", row["state_id"]) in ids])
+                       for name, ids in panels.items()}, "panels_share_source_states": True}
+
+
 def public_cases(cases):
-    return [{"state_id": case["state_id"], "view": case["view"], "repeat_exact": case["repeat_exact"],
+    return [{"state_id": case["state_id"], **({"case_id": case["case_id"]} if "case_id" in case else {}),
+             "view": case["view"], "repeat_exact": case["repeat_exact"],
              "source_audio_sha256": case["source_receipt"]["qa"]["audio_float32_sha256"],
              "methods": {name: {"scores": row["scores"], "candidate": row["candidate"],
                                  "request_id": row["receipt"]["request_id"],

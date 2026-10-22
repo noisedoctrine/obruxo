@@ -15,9 +15,14 @@ def file_digest(path):
     return sha256_bytes(Path(path).read_bytes())
 
 
-def load_calibration(path, pool, initial_path, qualification_path):
+def load_calibration(path, pool, initial_path, qualification_path, *, retrieval_path=None, input_cache_path=None):
     report = json.loads(path.read_text())
     plan = report["plan"]
+    if plan.get("format") == "basic_category_jacobian_check_v2":
+        if retrieval_path is None or input_cache_path is None:
+            raise ValueError("refreshed category calibration needs its checkpoint and audited input cache")
+        from .category_scale_refresh import validate_refresh
+        return validate_refresh(path, pool, initial_path, retrieval_path, qualification_path, input_cache_path)
     required = ("passed", "historical_replay_unchanged", "within_resource_limits", "all_saved_derivatives_reconstructed", "actual_training_points_verified")
     if (plan["format"] != "basic_category_signal_check_v1" or report["plan_id"] != canonical_sha256(plan)
             or not all(report[name] for name in required) or report["failure"] is not None
