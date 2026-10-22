@@ -1,0 +1,1099 @@
+{
+  "bootstrap_audit_sha256": "5b77ebac0aecea8d2f19a778130ab879732b27127090f68e5074f3d659b1204a",
+  "bootstrap_plan_id": "4738aea656807b39269ad75a3d3eddfe6c963daf39f85b83d619119e79f46a56",
+  "experiment": "varied_basic_input_native_check_v1",
+  "full_sampler_census": {
+    "distinct_pitches": [
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84
+    ],
+    "patterns": {
+      "chord": 133,
+      "held": 404,
+      "melody": 134,
+      "staccato": 137
+    },
+    "records": 808
+  },
+  "gates": {
+    "all_historical_hashes_exact": true,
+    "all_outcomes_accepted": true,
+    "all_repeat_hashes_exact": true
+  },
+  "limits": {
+    "archive_bytes": 67108864,
+    "native_attempts": 76,
+    "process_tree_bytes": 4294967296,
+    "wall_seconds": 600
+  },
+  "manifest_id": "c6f567ad416d90594e675fd34be3b28b4c1916be2e8110e5593e9d66a2677920",
+  "observation_contract": {
+    "contract_id": "bb3c8ccf2c9c3a11ca4418162b9f9ee479556c75a66ea9cd7072365597a60fb3",
+    "observations": "basic_varied_observations_v1",
+    "patch_contract_id": "f1eca221ab4ba871d8f415a28d81747a42629b2f2a74be566a967758afc32f12",
+    "performance_policy": {
+      "alternate_patterns": [
+        "staccato",
+        "melody",
+        "chord"
+      ],
+      "held_seconds": 2.0,
+      "pattern_assignment": "balanced_within_each_source_category_independent_shuffled_state_order",
+      "pitch_range": [
+        36,
+        84
+      ],
+      "policy": "basic_varied_inputs_v1",
+      "seed_function_sha256": "86abb959bf49da1a823fd98db9dd078e8b5dd3059ff0e854b4e08e4a2fe2eec1",
+      "source_sha256_lf": "af8c29dff480b098725a83bebfc744ceab40a2d44fdce8855a96113809e812df",
+      "views": [
+        "informative_held_note",
+        "balanced_alternate_pattern"
+      ]
+    },
+    "role": "reference",
+    "split": "train"
+  },
+  "optimizer_updates": 0,
+  "planned_native_requests": 76,
+  "pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+  "qualification_sha256": "25d217636533c264ffe1b52f8024ad3cb4487fb80bc91a23276af544ce92dae1",
+  "qualified_for_release": false,
+  "renderer_identity": {
+    "backend_version": "0.8.3",
+    "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+    "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+    "settings": {
+      "buffer_size": 128,
+      "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+      "event_timing": "absolute ticks to half-even sample offsets",
+      "frame_policy": "one_guard_sample_trim_to_requested_frames_v1",
+      "plugin_name": "Vital.vst3",
+      "preroll_frames": 32768,
+      "preroll_policy": "shift_all_MIDI_then_trim_only_lead_v1",
+      "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+      "simple_note_time_guard": "one_eighth_sample_start_and_duration_v1",
+      "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+    }
+  },
+  "requests": [
+    {
+      "category": [
+        0,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "a4f6fea860c9fe271971f1530c6952d46a218b054ff5a105a80236c2669dada4",
+      "repeat": 0,
+      "request_id": "e759224b80da8288fb62ff397328d231dbebb37dcd0e56e4a113e4d56d9b1b06",
+      "sequence_id": 192,
+      "state_id": "e6dcb46bf4ae53975c3d3340f5bdeea611a3df8b088dea57454d11a7d95f15f0"
+    },
+    {
+      "category": [
+        0,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "a4f6fea860c9fe271971f1530c6952d46a218b054ff5a105a80236c2669dada4",
+      "repeat": 1,
+      "request_id": "e759224b80da8288fb62ff397328d231dbebb37dcd0e56e4a113e4d56d9b1b06",
+      "sequence_id": 192,
+      "state_id": "e6dcb46bf4ae53975c3d3340f5bdeea611a3df8b088dea57454d11a7d95f15f0"
+    },
+    {
+      "category": [
+        0,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "chord",
+      "recipe_id": "13ee36facd0fdfaf76eae9875596afaf430f8c9c7e478e01da75df9a22c59de3",
+      "repeat": 0,
+      "request_id": "5e1e5d4e523b7e9b53d1630d3e375de32d55cfaef5a199477b539c2ec0c32dc5",
+      "sequence_id": 193,
+      "state_id": "e6dcb46bf4ae53975c3d3340f5bdeea611a3df8b088dea57454d11a7d95f15f0"
+    },
+    {
+      "category": [
+        0,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "chord",
+      "recipe_id": "13ee36facd0fdfaf76eae9875596afaf430f8c9c7e478e01da75df9a22c59de3",
+      "repeat": 1,
+      "request_id": "5e1e5d4e523b7e9b53d1630d3e375de32d55cfaef5a199477b539c2ec0c32dc5",
+      "sequence_id": 193,
+      "state_id": "e6dcb46bf4ae53975c3d3340f5bdeea611a3df8b088dea57454d11a7d95f15f0"
+    },
+    {
+      "category": [
+        0,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "3686206691298fcc043d1676ae4708c5c19b14a1e8dbb39f993b4eec2b56847a",
+      "repeat": 0,
+      "request_id": "9ff5a62e677cd111349a1a29c597c0a02843e58bd1c480e75b758a75258a0968",
+      "sequence_id": 562,
+      "state_id": "103e4a7f21446d3c400abbaddb48f33bd0c1649a6f2c7e04c78c84221ff878cb"
+    },
+    {
+      "category": [
+        0,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "3686206691298fcc043d1676ae4708c5c19b14a1e8dbb39f993b4eec2b56847a",
+      "repeat": 1,
+      "request_id": "9ff5a62e677cd111349a1a29c597c0a02843e58bd1c480e75b758a75258a0968",
+      "sequence_id": 562,
+      "state_id": "103e4a7f21446d3c400abbaddb48f33bd0c1649a6f2c7e04c78c84221ff878cb"
+    },
+    {
+      "category": [
+        0,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "melody",
+      "recipe_id": "c143c68cb4f2cbf5318b07c20f6cde41bff9bcf9ca6f76a48f694fd5439efa14",
+      "repeat": 0,
+      "request_id": "02bca28de1cf347b1a2e63d3a124d0189f31c25d3a807e474b74c89bccd7984d",
+      "sequence_id": 563,
+      "state_id": "103e4a7f21446d3c400abbaddb48f33bd0c1649a6f2c7e04c78c84221ff878cb"
+    },
+    {
+      "category": [
+        0,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "melody",
+      "recipe_id": "c143c68cb4f2cbf5318b07c20f6cde41bff9bcf9ca6f76a48f694fd5439efa14",
+      "repeat": 1,
+      "request_id": "02bca28de1cf347b1a2e63d3a124d0189f31c25d3a807e474b74c89bccd7984d",
+      "sequence_id": 563,
+      "state_id": "103e4a7f21446d3c400abbaddb48f33bd0c1649a6f2c7e04c78c84221ff878cb"
+    },
+    {
+      "category": [
+        0,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "01d31fe4f2508fa2477ae3887fae99829c8c7c75471c7f164f4915fa6f6f2adc",
+      "repeat": 0,
+      "request_id": "5bb7b908560babaf13943cfdcd9ec649ea2598d673ea2c3aab5876d06ed30131",
+      "sequence_id": 792,
+      "state_id": "3dffafcd0fb4bfd2db59c3454e36dc9e31f9452507b7ba80b8835ae42ba315a0"
+    },
+    {
+      "category": [
+        0,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "01d31fe4f2508fa2477ae3887fae99829c8c7c75471c7f164f4915fa6f6f2adc",
+      "repeat": 1,
+      "request_id": "5bb7b908560babaf13943cfdcd9ec649ea2598d673ea2c3aab5876d06ed30131",
+      "sequence_id": 792,
+      "state_id": "3dffafcd0fb4bfd2db59c3454e36dc9e31f9452507b7ba80b8835ae42ba315a0"
+    },
+    {
+      "category": [
+        0,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "staccato",
+      "recipe_id": "530fcdb69cc3b56925a3a701d7cd62922935faf2eab3f2191603489e8c03af67",
+      "repeat": 0,
+      "request_id": "eba88c2073059b751ecf1ee7134a4d01f6f498ad46836199e1324d44728fd642",
+      "sequence_id": 793,
+      "state_id": "3dffafcd0fb4bfd2db59c3454e36dc9e31f9452507b7ba80b8835ae42ba315a0"
+    },
+    {
+      "category": [
+        0,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "staccato",
+      "recipe_id": "530fcdb69cc3b56925a3a701d7cd62922935faf2eab3f2191603489e8c03af67",
+      "repeat": 1,
+      "request_id": "eba88c2073059b751ecf1ee7134a4d01f6f498ad46836199e1324d44728fd642",
+      "sequence_id": 793,
+      "state_id": "3dffafcd0fb4bfd2db59c3454e36dc9e31f9452507b7ba80b8835ae42ba315a0"
+    },
+    {
+      "category": [
+        0,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "d44fdc30a0e2e02e6b0934a54c8b15a2a743a45ebd855afeb2a8581f21d75449",
+      "repeat": 0,
+      "request_id": "a301d436ba763ba7caf40785e1753f3c05a952c25bb256cec6ab7e65d8002159",
+      "sequence_id": 770,
+      "state_id": "5fa5de5f60f25a924bd42e4bd8f8b6eb2d27590f31d334865375522142cfe18e"
+    },
+    {
+      "category": [
+        0,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "d44fdc30a0e2e02e6b0934a54c8b15a2a743a45ebd855afeb2a8581f21d75449",
+      "repeat": 1,
+      "request_id": "a301d436ba763ba7caf40785e1753f3c05a952c25bb256cec6ab7e65d8002159",
+      "sequence_id": 770,
+      "state_id": "5fa5de5f60f25a924bd42e4bd8f8b6eb2d27590f31d334865375522142cfe18e"
+    },
+    {
+      "category": [
+        0,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "chord",
+      "recipe_id": "81b22b9e91b6a1b9d2ce7fb12147460983d18f5917d4028d31b1187a97ffe68f",
+      "repeat": 0,
+      "request_id": "20696e20b27e98d4af49d9b2efb4a4eeb8941eeeeb85fca9553527adbbb89122",
+      "sequence_id": 771,
+      "state_id": "5fa5de5f60f25a924bd42e4bd8f8b6eb2d27590f31d334865375522142cfe18e"
+    },
+    {
+      "category": [
+        0,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "chord",
+      "recipe_id": "81b22b9e91b6a1b9d2ce7fb12147460983d18f5917d4028d31b1187a97ffe68f",
+      "repeat": 1,
+      "request_id": "20696e20b27e98d4af49d9b2efb4a4eeb8941eeeeb85fca9553527adbbb89122",
+      "sequence_id": 771,
+      "state_id": "5fa5de5f60f25a924bd42e4bd8f8b6eb2d27590f31d334865375522142cfe18e"
+    },
+    {
+      "category": [
+        0,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "ec04b19adef56422fd100c89ac30f5eba5ca299db61b125244a79a9c46355148",
+      "repeat": 0,
+      "request_id": "70f185b2600cd937971364af64519f9eeef9f80e938a7aa8f225c0288d890606",
+      "sequence_id": 664,
+      "state_id": "344964f8217d932ac1fdd95002b5a5147316dc2cef0e5cba4fc1810ba02d3aaa"
+    },
+    {
+      "category": [
+        0,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "ec04b19adef56422fd100c89ac30f5eba5ca299db61b125244a79a9c46355148",
+      "repeat": 1,
+      "request_id": "70f185b2600cd937971364af64519f9eeef9f80e938a7aa8f225c0288d890606",
+      "sequence_id": 664,
+      "state_id": "344964f8217d932ac1fdd95002b5a5147316dc2cef0e5cba4fc1810ba02d3aaa"
+    },
+    {
+      "category": [
+        0,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "melody",
+      "recipe_id": "931482bac2ac42e8edb23da1f956a83351499c86eb350060413c202833ce17a3",
+      "repeat": 0,
+      "request_id": "0e8a8a39b1ad14ee5d8259aff6c02f34156fd287541ce70f611022340bc8c268",
+      "sequence_id": 665,
+      "state_id": "344964f8217d932ac1fdd95002b5a5147316dc2cef0e5cba4fc1810ba02d3aaa"
+    },
+    {
+      "category": [
+        0,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "melody",
+      "recipe_id": "931482bac2ac42e8edb23da1f956a83351499c86eb350060413c202833ce17a3",
+      "repeat": 1,
+      "request_id": "0e8a8a39b1ad14ee5d8259aff6c02f34156fd287541ce70f611022340bc8c268",
+      "sequence_id": 665,
+      "state_id": "344964f8217d932ac1fdd95002b5a5147316dc2cef0e5cba4fc1810ba02d3aaa"
+    },
+    {
+      "category": [
+        0,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "e2fd346c8399fb276925e0e705c4a897300f775620bad86668af352f569af2c1",
+      "repeat": 0,
+      "request_id": "c5c4d2547385f64632697a1548c4b68b567516dc1975e69bfd7b83a04071dfeb",
+      "sequence_id": 232,
+      "state_id": "52371ca4bd542e34896207007e2dc77aaab8cc11ac339777158793ae48f58c57"
+    },
+    {
+      "category": [
+        0,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "e2fd346c8399fb276925e0e705c4a897300f775620bad86668af352f569af2c1",
+      "repeat": 1,
+      "request_id": "c5c4d2547385f64632697a1548c4b68b567516dc1975e69bfd7b83a04071dfeb",
+      "sequence_id": 232,
+      "state_id": "52371ca4bd542e34896207007e2dc77aaab8cc11ac339777158793ae48f58c57"
+    },
+    {
+      "category": [
+        0,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "staccato",
+      "recipe_id": "b57a1d54c93f41e68397cbe420119b4f95c3a9efe5cc07b138fc66c669e9c69b",
+      "repeat": 0,
+      "request_id": "e37ea0c7996b9e02416bb6f3b149bba6b0fe625276b71611c317207d2742b166",
+      "sequence_id": 233,
+      "state_id": "52371ca4bd542e34896207007e2dc77aaab8cc11ac339777158793ae48f58c57"
+    },
+    {
+      "category": [
+        0,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "staccato",
+      "recipe_id": "b57a1d54c93f41e68397cbe420119b4f95c3a9efe5cc07b138fc66c669e9c69b",
+      "repeat": 1,
+      "request_id": "e37ea0c7996b9e02416bb6f3b149bba6b0fe625276b71611c317207d2742b166",
+      "sequence_id": 233,
+      "state_id": "52371ca4bd542e34896207007e2dc77aaab8cc11ac339777158793ae48f58c57"
+    },
+    {
+      "category": [
+        1,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "8fd6653947709674de07944b793322694462e90fd84e2e4e1efd53757739282a",
+      "repeat": 0,
+      "request_id": "2ea153ad640d31c5bea2ba7be61b75baa8df4f7ba8d37736fcdea3566f18e4e6",
+      "sequence_id": 470,
+      "state_id": "e9920f3a44875729781c9aa2161008fe0abf1c3267c05fad045308994e18da1f"
+    },
+    {
+      "category": [
+        1,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "8fd6653947709674de07944b793322694462e90fd84e2e4e1efd53757739282a",
+      "repeat": 1,
+      "request_id": "2ea153ad640d31c5bea2ba7be61b75baa8df4f7ba8d37736fcdea3566f18e4e6",
+      "sequence_id": 470,
+      "state_id": "e9920f3a44875729781c9aa2161008fe0abf1c3267c05fad045308994e18da1f"
+    },
+    {
+      "category": [
+        1,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "chord",
+      "recipe_id": "eaa6876b1a3eca319c5b4d002c673b0478fd68923d7e68bfc78d90a94d71552c",
+      "repeat": 0,
+      "request_id": "30316b364136a6e95c3f0833d029421a1698b0ea58a9ddae529eaf3ad8ee67e1",
+      "sequence_id": 471,
+      "state_id": "e9920f3a44875729781c9aa2161008fe0abf1c3267c05fad045308994e18da1f"
+    },
+    {
+      "category": [
+        1,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "chord",
+      "recipe_id": "eaa6876b1a3eca319c5b4d002c673b0478fd68923d7e68bfc78d90a94d71552c",
+      "repeat": 1,
+      "request_id": "30316b364136a6e95c3f0833d029421a1698b0ea58a9ddae529eaf3ad8ee67e1",
+      "sequence_id": 471,
+      "state_id": "e9920f3a44875729781c9aa2161008fe0abf1c3267c05fad045308994e18da1f"
+    },
+    {
+      "category": [
+        1,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "73d0ba650c64a1922d5c27e79dae098f868a31eb13f32ddb3d316379b52ee4a5",
+      "repeat": 0,
+      "request_id": "56bb61dc0356a968a651704a34fc47206ba4dc5470448da6d7d7463d7a5ed380",
+      "sequence_id": 720,
+      "state_id": "f253c895d0850f8b9bbe47a2832274be45b975f3e03966100aa821e9fa539331"
+    },
+    {
+      "category": [
+        1,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "73d0ba650c64a1922d5c27e79dae098f868a31eb13f32ddb3d316379b52ee4a5",
+      "repeat": 1,
+      "request_id": "56bb61dc0356a968a651704a34fc47206ba4dc5470448da6d7d7463d7a5ed380",
+      "sequence_id": 720,
+      "state_id": "f253c895d0850f8b9bbe47a2832274be45b975f3e03966100aa821e9fa539331"
+    },
+    {
+      "category": [
+        1,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "melody",
+      "recipe_id": "82ccd60e34a972b9820ab86b2fcea41bdf64d2ede105e7355679be5afc7b85d0",
+      "repeat": 0,
+      "request_id": "2d2fe1cc87c6927dec1b6084010df705aecfeac9e1a8fe2c3dadb35a370ebfd9",
+      "sequence_id": 721,
+      "state_id": "f253c895d0850f8b9bbe47a2832274be45b975f3e03966100aa821e9fa539331"
+    },
+    {
+      "category": [
+        1,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "melody",
+      "recipe_id": "82ccd60e34a972b9820ab86b2fcea41bdf64d2ede105e7355679be5afc7b85d0",
+      "repeat": 1,
+      "request_id": "2d2fe1cc87c6927dec1b6084010df705aecfeac9e1a8fe2c3dadb35a370ebfd9",
+      "sequence_id": 721,
+      "state_id": "f253c895d0850f8b9bbe47a2832274be45b975f3e03966100aa821e9fa539331"
+    },
+    {
+      "category": [
+        1,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "b4abc0918b1745565e64be3048ffe4b7e00f3a2df3d94bb66cc73c1f629958b8",
+      "repeat": 0,
+      "request_id": "cfab776101de908fd2693f8a4e110eee23feb285c80e4ab777098dc4d25d242d",
+      "sequence_id": 416,
+      "state_id": "65f4559955b1e621508e1b915c6f3571f0a6e732782d000597ea7b0f85bc7aec"
+    },
+    {
+      "category": [
+        1,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "b4abc0918b1745565e64be3048ffe4b7e00f3a2df3d94bb66cc73c1f629958b8",
+      "repeat": 1,
+      "request_id": "cfab776101de908fd2693f8a4e110eee23feb285c80e4ab777098dc4d25d242d",
+      "sequence_id": 416,
+      "state_id": "65f4559955b1e621508e1b915c6f3571f0a6e732782d000597ea7b0f85bc7aec"
+    },
+    {
+      "category": [
+        1,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "staccato",
+      "recipe_id": "75a3f545f61efece95a334b846050ecfa6391dd94a1a600ec74bf139783924e0",
+      "repeat": 0,
+      "request_id": "8968ea4bb19557d4d8f94644081fefcfb302db260821ad04524196addc4a1ebb",
+      "sequence_id": 417,
+      "state_id": "65f4559955b1e621508e1b915c6f3571f0a6e732782d000597ea7b0f85bc7aec"
+    },
+    {
+      "category": [
+        1,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "staccato",
+      "recipe_id": "75a3f545f61efece95a334b846050ecfa6391dd94a1a600ec74bf139783924e0",
+      "repeat": 1,
+      "request_id": "8968ea4bb19557d4d8f94644081fefcfb302db260821ad04524196addc4a1ebb",
+      "sequence_id": 417,
+      "state_id": "65f4559955b1e621508e1b915c6f3571f0a6e732782d000597ea7b0f85bc7aec"
+    },
+    {
+      "category": [
+        1,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "763c617b5a948e5116b418d51a3601ece951c659b5cd8884d992e421a035eb0f",
+      "repeat": 0,
+      "request_id": "d7f64e73ea0fffec06a908340285469951612ff04ac0435c95a49d1c2292ad2b",
+      "sequence_id": 628,
+      "state_id": "188169ef000f6c1ecfd78cf4f99c12696722d6a6bc0673d127ab6454f997499b"
+    },
+    {
+      "category": [
+        1,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "763c617b5a948e5116b418d51a3601ece951c659b5cd8884d992e421a035eb0f",
+      "repeat": 1,
+      "request_id": "d7f64e73ea0fffec06a908340285469951612ff04ac0435c95a49d1c2292ad2b",
+      "sequence_id": 628,
+      "state_id": "188169ef000f6c1ecfd78cf4f99c12696722d6a6bc0673d127ab6454f997499b"
+    },
+    {
+      "category": [
+        1,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "chord",
+      "recipe_id": "60f82ae550042a86a5b1867d882258f054ef2adc3ae1d7645517b5ec496cb528",
+      "repeat": 0,
+      "request_id": "198945347140ed3c9ef8b594b994e5690ebd96e130247e8fce60c4111bf87dc7",
+      "sequence_id": 629,
+      "state_id": "188169ef000f6c1ecfd78cf4f99c12696722d6a6bc0673d127ab6454f997499b"
+    },
+    {
+      "category": [
+        1,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "chord",
+      "recipe_id": "60f82ae550042a86a5b1867d882258f054ef2adc3ae1d7645517b5ec496cb528",
+      "repeat": 1,
+      "request_id": "198945347140ed3c9ef8b594b994e5690ebd96e130247e8fce60c4111bf87dc7",
+      "sequence_id": 629,
+      "state_id": "188169ef000f6c1ecfd78cf4f99c12696722d6a6bc0673d127ab6454f997499b"
+    },
+    {
+      "category": [
+        1,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "bec9d771c119a8b406ee8632ccc65c35e9853fa676ddf98c35fa0e56be6022ac",
+      "repeat": 0,
+      "request_id": "d6e11862e739302cf71045df8aaa24e2317110d8c31ade30ca6255438b55b37c",
+      "sequence_id": 442,
+      "state_id": "019ac998726b92fb9a2136be9e3130b7cf5f9d8dc38f853fcde6bb466b3eaf4b"
+    },
+    {
+      "category": [
+        1,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "bec9d771c119a8b406ee8632ccc65c35e9853fa676ddf98c35fa0e56be6022ac",
+      "repeat": 1,
+      "request_id": "d6e11862e739302cf71045df8aaa24e2317110d8c31ade30ca6255438b55b37c",
+      "sequence_id": 442,
+      "state_id": "019ac998726b92fb9a2136be9e3130b7cf5f9d8dc38f853fcde6bb466b3eaf4b"
+    },
+    {
+      "category": [
+        1,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "melody",
+      "recipe_id": "8368bd514b6f1c7c255567d79672c61bf13469fdaa2f2beade83e1398c69a61a",
+      "repeat": 0,
+      "request_id": "7a7ab59341237e43c306d19f2cadf6816ef468c2b0408ae117c5024c0f69cfb5",
+      "sequence_id": 443,
+      "state_id": "019ac998726b92fb9a2136be9e3130b7cf5f9d8dc38f853fcde6bb466b3eaf4b"
+    },
+    {
+      "category": [
+        1,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "melody",
+      "recipe_id": "8368bd514b6f1c7c255567d79672c61bf13469fdaa2f2beade83e1398c69a61a",
+      "repeat": 1,
+      "request_id": "7a7ab59341237e43c306d19f2cadf6816ef468c2b0408ae117c5024c0f69cfb5",
+      "sequence_id": 443,
+      "state_id": "019ac998726b92fb9a2136be9e3130b7cf5f9d8dc38f853fcde6bb466b3eaf4b"
+    },
+    {
+      "category": [
+        1,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "ef4610026f8c4456fbc087c994fd592f754a1f3f13084e9d9a861de9a38d723d",
+      "repeat": 0,
+      "request_id": "9a8ea6411b6b3301b5c06cdd5762256a66d3e772ff6c842bb55f081211819713",
+      "sequence_id": 694,
+      "state_id": "228de670ba3a0bbdb8b8730d6d720949e4864589ae3cd6d5ade43a30dea8b555"
+    },
+    {
+      "category": [
+        1,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "ef4610026f8c4456fbc087c994fd592f754a1f3f13084e9d9a861de9a38d723d",
+      "repeat": 1,
+      "request_id": "9a8ea6411b6b3301b5c06cdd5762256a66d3e772ff6c842bb55f081211819713",
+      "sequence_id": 694,
+      "state_id": "228de670ba3a0bbdb8b8730d6d720949e4864589ae3cd6d5ade43a30dea8b555"
+    },
+    {
+      "category": [
+        1,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "staccato",
+      "recipe_id": "5b5e17971ce9e527bd1fffb141c0da38d4f6244177a05b73c09fe063e9d38758",
+      "repeat": 0,
+      "request_id": "4243d78616cd7fd62b71de90436f99ac34d6c8a79ec7690508bd14964ca08c6d",
+      "sequence_id": 695,
+      "state_id": "228de670ba3a0bbdb8b8730d6d720949e4864589ae3cd6d5ade43a30dea8b555"
+    },
+    {
+      "category": [
+        1,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "staccato",
+      "recipe_id": "5b5e17971ce9e527bd1fffb141c0da38d4f6244177a05b73c09fe063e9d38758",
+      "repeat": 1,
+      "request_id": "4243d78616cd7fd62b71de90436f99ac34d6c8a79ec7690508bd14964ca08c6d",
+      "sequence_id": 695,
+      "state_id": "228de670ba3a0bbdb8b8730d6d720949e4864589ae3cd6d5ade43a30dea8b555"
+    },
+    {
+      "category": [
+        2,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "dd43a33d32ae679534979bee54b95442b99ef88572530f8040baa164018141ef",
+      "repeat": 0,
+      "request_id": "59fc26add94cee7e28cc5c82aa632fa0fba48f4f558d4e9a3fc8d1c95d8cbd25",
+      "sequence_id": 82,
+      "state_id": "97bdeb124bef1769044700ef9249ed05f6b20e5aea57c4c0566e64862ba1ace9"
+    },
+    {
+      "category": [
+        2,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "dd43a33d32ae679534979bee54b95442b99ef88572530f8040baa164018141ef",
+      "repeat": 1,
+      "request_id": "59fc26add94cee7e28cc5c82aa632fa0fba48f4f558d4e9a3fc8d1c95d8cbd25",
+      "sequence_id": 82,
+      "state_id": "97bdeb124bef1769044700ef9249ed05f6b20e5aea57c4c0566e64862ba1ace9"
+    },
+    {
+      "category": [
+        2,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "chord",
+      "recipe_id": "5af8744c8618e67cf61426a6a1cf7566fb5dc352282d91d72851d9b836d89991",
+      "repeat": 0,
+      "request_id": "d479735e4e7cb3e1c973bdad2cc734f1301ad318907567c53238ea66fedd510a",
+      "sequence_id": 83,
+      "state_id": "97bdeb124bef1769044700ef9249ed05f6b20e5aea57c4c0566e64862ba1ace9"
+    },
+    {
+      "category": [
+        2,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "chord",
+      "recipe_id": "5af8744c8618e67cf61426a6a1cf7566fb5dc352282d91d72851d9b836d89991",
+      "repeat": 1,
+      "request_id": "d479735e4e7cb3e1c973bdad2cc734f1301ad318907567c53238ea66fedd510a",
+      "sequence_id": 83,
+      "state_id": "97bdeb124bef1769044700ef9249ed05f6b20e5aea57c4c0566e64862ba1ace9"
+    },
+    {
+      "category": [
+        2,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "84f0584e3d0075c1a23015fa595e9e3454cae3727459ec79bda8a7c8ba0b82bc",
+      "repeat": 0,
+      "request_id": "25e5f526b44f8d514ba1b4d00e0b25856006c1ec48a852f8ad9e07643979bad8",
+      "sequence_id": 710,
+      "state_id": "b1b3c6f54274163893a2876f124ebb497f852acbd6f5fd5a3a4fcf8c250efe22"
+    },
+    {
+      "category": [
+        2,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "84f0584e3d0075c1a23015fa595e9e3454cae3727459ec79bda8a7c8ba0b82bc",
+      "repeat": 1,
+      "request_id": "25e5f526b44f8d514ba1b4d00e0b25856006c1ec48a852f8ad9e07643979bad8",
+      "sequence_id": 710,
+      "state_id": "b1b3c6f54274163893a2876f124ebb497f852acbd6f5fd5a3a4fcf8c250efe22"
+    },
+    {
+      "category": [
+        2,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "melody",
+      "recipe_id": "a83d0d98371941773bff291554ee8cd9fc0af67754748c4f9ada1f1679904a4d",
+      "repeat": 0,
+      "request_id": "d8ffa026d113798d045d9d8abd35f12c34501f8d15e6baf9d3c104048e357f3a",
+      "sequence_id": 711,
+      "state_id": "b1b3c6f54274163893a2876f124ebb497f852acbd6f5fd5a3a4fcf8c250efe22"
+    },
+    {
+      "category": [
+        2,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "melody",
+      "recipe_id": "a83d0d98371941773bff291554ee8cd9fc0af67754748c4f9ada1f1679904a4d",
+      "repeat": 1,
+      "request_id": "d8ffa026d113798d045d9d8abd35f12c34501f8d15e6baf9d3c104048e357f3a",
+      "sequence_id": 711,
+      "state_id": "b1b3c6f54274163893a2876f124ebb497f852acbd6f5fd5a3a4fcf8c250efe22"
+    },
+    {
+      "category": [
+        2,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "c3525796c01b9656f18261c117b7bd219000f9aad091d1adfdf888d2fc7b8631",
+      "repeat": 0,
+      "request_id": "88a42317e894d53370ab18758533d2c5bd61de1cde267aaf73c381d09b11575c",
+      "sequence_id": 618,
+      "state_id": "842d67962477044b280e7bba020d76de11700c821a86a5f1fcd6a444274bf24a"
+    },
+    {
+      "category": [
+        2,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "c3525796c01b9656f18261c117b7bd219000f9aad091d1adfdf888d2fc7b8631",
+      "repeat": 1,
+      "request_id": "88a42317e894d53370ab18758533d2c5bd61de1cde267aaf73c381d09b11575c",
+      "sequence_id": 618,
+      "state_id": "842d67962477044b280e7bba020d76de11700c821a86a5f1fcd6a444274bf24a"
+    },
+    {
+      "category": [
+        2,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "staccato",
+      "recipe_id": "22a47e3dba4088de94ff99a262addf6541c822b03e4df973a8f8babda77d07cc",
+      "repeat": 0,
+      "request_id": "4e58bb3fd285f8957e69380042526b6acebb42655260a0593b210862eb5f398d",
+      "sequence_id": 619,
+      "state_id": "842d67962477044b280e7bba020d76de11700c821a86a5f1fcd6a444274bf24a"
+    },
+    {
+      "category": [
+        2,
+        0
+      ],
+      "kind": "varied",
+      "pattern": "staccato",
+      "recipe_id": "22a47e3dba4088de94ff99a262addf6541c822b03e4df973a8f8babda77d07cc",
+      "repeat": 1,
+      "request_id": "4e58bb3fd285f8957e69380042526b6acebb42655260a0593b210862eb5f398d",
+      "sequence_id": 619,
+      "state_id": "842d67962477044b280e7bba020d76de11700c821a86a5f1fcd6a444274bf24a"
+    },
+    {
+      "category": [
+        2,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "0764b5463489eb89c265149a7c5b3c15a869be548660a68aba4f6db793cd70e4",
+      "repeat": 0,
+      "request_id": "3d37e4f8741d3f563d181b91c25174dc35aa33b0a49bd109f5f0b74cc415d987",
+      "sequence_id": 100,
+      "state_id": "df51ac4813b4b99e62ba60244dd4479ac293150784e43172c68df1722be62a18"
+    },
+    {
+      "category": [
+        2,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "0764b5463489eb89c265149a7c5b3c15a869be548660a68aba4f6db793cd70e4",
+      "repeat": 1,
+      "request_id": "3d37e4f8741d3f563d181b91c25174dc35aa33b0a49bd109f5f0b74cc415d987",
+      "sequence_id": 100,
+      "state_id": "df51ac4813b4b99e62ba60244dd4479ac293150784e43172c68df1722be62a18"
+    },
+    {
+      "category": [
+        2,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "chord",
+      "recipe_id": "6a8eec289b175286562dc36a4fe01de70c3a2ad54c47b1a54df8a7b3ab71e21e",
+      "repeat": 0,
+      "request_id": "7574b0904163d29f97146dde18b3b85ab825ddab5ed3fd40181bea9c83cf5d73",
+      "sequence_id": 101,
+      "state_id": "df51ac4813b4b99e62ba60244dd4479ac293150784e43172c68df1722be62a18"
+    },
+    {
+      "category": [
+        2,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "chord",
+      "recipe_id": "6a8eec289b175286562dc36a4fe01de70c3a2ad54c47b1a54df8a7b3ab71e21e",
+      "repeat": 1,
+      "request_id": "7574b0904163d29f97146dde18b3b85ab825ddab5ed3fd40181bea9c83cf5d73",
+      "sequence_id": 101,
+      "state_id": "df51ac4813b4b99e62ba60244dd4479ac293150784e43172c68df1722be62a18"
+    },
+    {
+      "category": [
+        2,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "0b36301d91d10852f97d9011eb333d7efeab510c2b4a5fb3974f3ef914be0304",
+      "repeat": 0,
+      "request_id": "76c47705df02fc7d31e031c28b0d0f81c9fdb843160ec154d3ec70ac15c09eaa",
+      "sequence_id": 748,
+      "state_id": "5d677d72268c6bf4e8e3910efdfde5e1d818a227866c0442f496140155349b8c"
+    },
+    {
+      "category": [
+        2,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "0b36301d91d10852f97d9011eb333d7efeab510c2b4a5fb3974f3ef914be0304",
+      "repeat": 1,
+      "request_id": "76c47705df02fc7d31e031c28b0d0f81c9fdb843160ec154d3ec70ac15c09eaa",
+      "sequence_id": 748,
+      "state_id": "5d677d72268c6bf4e8e3910efdfde5e1d818a227866c0442f496140155349b8c"
+    },
+    {
+      "category": [
+        2,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "melody",
+      "recipe_id": "fb894c124d7ad1107f3f7d9350dce5aaf0c853a965616455315294f6afeb63b1",
+      "repeat": 0,
+      "request_id": "31f39a558d43c6aeef229fa09dfd0c4b6e6febebbf176cf7f6d39e1d62d89b4e",
+      "sequence_id": 749,
+      "state_id": "5d677d72268c6bf4e8e3910efdfde5e1d818a227866c0442f496140155349b8c"
+    },
+    {
+      "category": [
+        2,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "melody",
+      "recipe_id": "fb894c124d7ad1107f3f7d9350dce5aaf0c853a965616455315294f6afeb63b1",
+      "repeat": 1,
+      "request_id": "31f39a558d43c6aeef229fa09dfd0c4b6e6febebbf176cf7f6d39e1d62d89b4e",
+      "sequence_id": 749,
+      "state_id": "5d677d72268c6bf4e8e3910efdfde5e1d818a227866c0442f496140155349b8c"
+    },
+    {
+      "category": [
+        2,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "99ec407358e4a1bff6001a32c1294ffc90c6db0c4ab585134bbf0db91caa5117",
+      "repeat": 0,
+      "request_id": "9bbbd03a37386c0426b6174b4b6bd1180d4959d0897106a9efeec928d7abd5ec",
+      "sequence_id": 554,
+      "state_id": "3277b8f2dbc4ec122a5b4cbc42907ccbd92e7d04c552df27caba4b1393abedc4"
+    },
+    {
+      "category": [
+        2,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "held",
+      "recipe_id": "99ec407358e4a1bff6001a32c1294ffc90c6db0c4ab585134bbf0db91caa5117",
+      "repeat": 1,
+      "request_id": "9bbbd03a37386c0426b6174b4b6bd1180d4959d0897106a9efeec928d7abd5ec",
+      "sequence_id": 554,
+      "state_id": "3277b8f2dbc4ec122a5b4cbc42907ccbd92e7d04c552df27caba4b1393abedc4"
+    },
+    {
+      "category": [
+        2,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "staccato",
+      "recipe_id": "16591fed04a4b0b2b0bf7cc44d2a59424803e76a63bac97818f3b90a7dad266f",
+      "repeat": 0,
+      "request_id": "ab54a78329f2d40096c48fa8d63b7a778063ae4088b9599e6467262a918352b5",
+      "sequence_id": 555,
+      "state_id": "3277b8f2dbc4ec122a5b4cbc42907ccbd92e7d04c552df27caba4b1393abedc4"
+    },
+    {
+      "category": [
+        2,
+        1
+      ],
+      "kind": "varied",
+      "pattern": "staccato",
+      "recipe_id": "16591fed04a4b0b2b0bf7cc44d2a59424803e76a63bac97818f3b90a7dad266f",
+      "repeat": 1,
+      "request_id": "ab54a78329f2d40096c48fa8d63b7a778063ae4088b9599e6467262a918352b5",
+      "sequence_id": 555,
+      "state_id": "3277b8f2dbc4ec122a5b4cbc42907ccbd92e7d04c552df27caba4b1393abedc4"
+    },
+    {
+      "expected_audio_sha256": "09fd012e3de5b0adafaf06ad7d1138ed8a713190c2e4e3b9f07cd3ab67756908",
+      "kind": "historical_parity",
+      "request_id": "640b56bdc27dfb8674b090aa4b805f24222698beaf33fc61952974474990378e",
+      "sequence_id": 0
+    },
+    {
+      "expected_audio_sha256": "bc91ed572399d26e96d40e987519f80d2ca5874a1d16dbe3b5cb7b46e0c18c4c",
+      "kind": "historical_parity",
+      "request_id": "5696c102e09a84cb704ddb608eb3d399b5e45e72025f49266244090312f2f6af",
+      "sequence_id": 1
+    },
+    {
+      "expected_audio_sha256": "3cb22b5af566f3d041d141dca50ea675585194cd5e7f88fdcf98018236909041",
+      "kind": "historical_parity",
+      "request_id": "14d6f251bc39b0880fc12adc1026932632945f6b48d09697500b73131341102f",
+      "sequence_id": 2
+    },
+    {
+      "expected_audio_sha256": "367e0078c6a4ce7c114ef0c06909a208f78eba5e44a8d34f6c1b830bf3803124",
+      "kind": "historical_parity",
+      "request_id": "579a7d647cd65ec6789f9deaabe6eda99d95be2f3e5851788d74407fcaf36c01",
+      "sequence_id": 3
+    }
+  ],
+  "selection": "highest_source_level_per_category_and_alternate_pattern_both_views_twice_plus_four_historical_requests",
+  "source": {
+    "input_performances.py": "af8c29dff480b098725a83bebfc744ceab40a2d44fdce8855a96113809e812df",
+    "profiled_sampler.py": "f4cc02bd7d14ab382f931aef146b1d3a78f2291ef9e4902bccf8fcb1e24ac4b1",
+    "stream.py": "008d5aed58f6dc81bba7e51754a728f2232ee7774bc206abc95cc74cd22ef753",
+    "varied_input_check.py": "ea8a99aea1207dbc28b61bc7bfb6401075ac1c023da7741f5a23fca502ba033d"
+  },
+  "test_split_used": false,
+  "execution_plan_id": "d885558107bc19b4fb74bde83fd7d49f851ddbb1d7e10e8f8305b61997e89ea5",
+  "execution_plan_file_sha256": "cf50ee51340139f1b95bb49d0b9b14e4e10157f8a6bdc95317c1969df8c618e8",
+  "request_payloads_omitted": true
+}
