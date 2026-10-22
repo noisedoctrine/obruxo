@@ -210,6 +210,8 @@ Start with one isolated native worker and bounded prefetch. Measure the full pat
 
 For exact reproducibility diagnostics, set oscillator 1–3 random phase and sampler random phase to fixed values, preserve all other phase controls and seeds, and use a fresh process per request. Log controlled copies separately. The first new spectral-training experiment also declares fixed randomness for source and predicted renders. Version this training transformation, preserve original lineage/splits, and rerender baseline and candidate under the same policy. Do not relabel historical random-phase features or scores as controlled data.
 
+The [phase-export repair](../training/reports/PHASE_EXPORT.md) preserves this declared policy when restoring a model and writing a predicted preset. The constants are applied after codec decoding; they add no prediction heads. Missing or changed profile metadata is rejected rather than inferred from historical scores.
+
 Checkpoints must include helper identity, measurement/loss contract, tensor adapter, optimizer/scheduler, minibatch and Gumbel RNG, temperature schedule, replay and render cursor. Verify exact recovery on the same qualified runtime using retained tensors. CPU/GPU or cross-platform transfers require their own numerical checks; bit-identical cross-device recovery is not promised.
 
 When randomness is intentionally introduced in a later stage, assess sound statistics or a declared repeated-render score. Do not add 96 binary seed heads to make waveform identity an optimization target.

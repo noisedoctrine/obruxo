@@ -585,16 +585,18 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
         monitor.close()
 
 
-def export_model(path: Path, model, frontend, codec, pool_id: str, *, preroll_frames=0) -> None:
+def export_model(path: Path, model, frontend, codec, pool_id: str, *, preroll_frames=None) -> None:
     atomic_torch_save(path, inference_state(model, frontend, codec, pool_id, preroll_frames=preroll_frames))
 
 
-def inference_state(model, frontend, codec, pool_id: str, *, preroll_frames=0) -> dict:
+def inference_state(model, frontend, codec, pool_id: str, *, preroll_frames=None) -> dict:
+    from .inference_profile import model_rendering
     frontend.require_frozen()
+    rendering = model_rendering(model) if preroll_frames is None else profile_metadata(preroll_frames)
     return {"format": "obruxo_pilot_inference_v1", "model_spec": model_spec(codec, model.conditioning, model.cyclic_head), "model": model.state_dict(),
             "basic_pitch": frontend.basic_pitch.state_dict(), "frontend": frontend.describe(), "contract": codec.contract.to_dict(),
-            "codec": codec.to_dict(), "training_pool_id": pool_id, "input": "audio_only", **profile_metadata(preroll_frames),
-            **({"qualified_for_release": False} if preroll_frames else {})}
+            "codec": codec.to_dict(), "training_pool_id": pool_id, "input": "audio_only", **rendering,
+            **({"qualified_for_release": False} if rendering else {})}
 
 
 def load_model(path: Path, device: str = "cpu") -> tuple:
@@ -603,6 +605,8 @@ def load_model(path: Path, device: str = "cpu") -> tuple:
 
 
 def restore_model(saved, device: str = "cpu") -> tuple:
+    from .inference_profile import artifact_rendering, bind_rendering
+    artifact_rendering(saved)
     codec = load_codec(saved["codec"])
     conditioning = conditioning_from_spec(saved["model_spec"])
     cyclic_head = cyclic_head_from_spec(saved["model_spec"])
@@ -616,6 +620,7 @@ def restore_model(saved, device: str = "cpu") -> tuple:
         raise ValueError("inference frontend or frozen weights changed")
     model = PilotInverse(codec, conditioning, cyclic_head).to(device).eval()
     model.load_state_dict(saved["model"], strict=True)
+    bind_rendering(model, saved)
     return model, frontend, codec
 
 

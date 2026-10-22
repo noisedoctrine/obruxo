@@ -80,6 +80,13 @@ def test_profiled_recovery_is_exact_and_export_declares_source_rendering(trained
     exported = torch.load(root / "full/model.pt", weights_only=True)
     assert all(exported[name] == value for name, value in profile_metadata(32768).items())
     assert exported["qualified_for_release"] is False
+    from obruxo_training.evaluate import load_evaluation_checkpoint
+    from obruxo_training.inference_profile import model_rendering
+    from obruxo_training.trainer import inference_state
+    _, pool, _, _, _ = trained
+    _, restored, frontend, _ = load_evaluation_checkpoint(root / "full/checkpoint.pt", pool)
+    assert model_rendering(restored) == profile_metadata(32768)
+    assert all(inference_state(restored, frontend, pool.codec, pool.pool_id)[name] == value for name, value in profile_metadata(32768).items())
 
 
 def test_profile_refuses_mixed_seed_resume_and_tampered_replay(trained, tmp_path):

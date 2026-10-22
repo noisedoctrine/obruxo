@@ -29,6 +29,7 @@ from .native_inverse import native_reconstruction_loss
 from .native_fit_storage import storage_bound
 from .performances import initial_bank
 from .render_profile import BASIC_PREROLL_FRAMES, basic_render_profile
+from .reproducibility import FULL_PHASE_CONTROL
 from .spectral import SpectralTargets, spectral_loss, target_bytes
 from .spectral_controls import BasicControlAdapter, temperature_at
 from .temporal_proxy_data import NativeSession, category_balanced_entries, training_performance
@@ -105,7 +106,8 @@ def make_plan(pool, initial_path, retrieval_path, qualification_path, *, preroll
     updates = [{"state": int(index), "view": epoch % 2} for epoch in range(128 // training_states)
                for index in torch.randperm(training_states, generator=rng)]
     names = ("native_fit.py", "native_gradient.py", "native_inverse.py", "spectral.py", "spectral_controls.py",
-             "model.py", "features.py", "trainer.py", "evaluate.py", "temporal_proxy_data.py", "reproducibility.py", "checkpoints.py", "render_profile.py")
+             "model.py", "features.py", "trainer.py", "evaluate.py", "temporal_proxy_data.py", "reproducibility.py", "checkpoints.py", "render_profile.py",
+             "inference_profile.py")
     paths = [Path(__file__).with_name(name) for name in names]
     if calibration:
         paths += [Path(__file__).with_name(name) for name in ("category_calibration.py", "category_signal.py")]
@@ -476,8 +478,9 @@ def run_fit(pool, initial_path, retrieval_path, qualification_path, output, *, e
                 print(json.dumps({"stage": "validation", "completed": index + 1, "planned": 12}), flush=True)
             validation_result = audit_summary(validation_cases, plan, validation=True)
         for name, model in models.items():
-            export = inference_state(model, frontend, codec, pool.pool_id)
-            export.update(training_objective=name, training_plan_id=plan_id, qualified_for_release=False, render_profile=plan["render_profile"])
+            export = inference_state(model, frontend, codec, pool.pool_id, preroll_frames=plan["render_profile"]["preroll_frames"])
+            export.update(training_objective=name, training_plan_id=plan_id, qualified_for_release=False,
+                          render_profile=plan["render_profile"], render_phase_controls=dict(FULL_PHASE_CONTROL))
             if plan.get("category_training"):
                 export["category_training"] = plan["category_training"]
             atomic_torch_save(output / f"diagnostic-{name}.pt", export)

@@ -364,8 +364,9 @@ def main(argv=None) -> int:
             target, result = rank_audio(model, frontend, codec, bank, audio, sample_rate=sample_rate,
                                         renderer_factory=NativeRendererFactory(args.plugin_path), timeout=args.timeout, expected_renderer=renderer)
             args.output.parent.mkdir(parents=True, exist_ok=True)
+            from .inference_profile import prediction_preset
             with args.output.open("xb") as handle:
-                handle.write(codec.decode(target))
+                handle.write(prediction_preset(model, codec, target))
             report.parent.mkdir(parents=True, exist_ok=True)
             write_json(report, result)
             print(json.dumps({"output": str(args.output), "report": str(report), "ranked": result["ranked"], "selected": result["selected"]}))
@@ -401,6 +402,7 @@ def main(argv=None) -> int:
             return 0 if result["qualified_for_inverse_training"] else 2
         if args.command == "infer":
             import torch
+            from .inference_profile import prediction_preset
             from .trainer import load_model, predict_audio
             if args.asset_references:
                 raise ValueError("inference uses the bundle's embedded asset catalog")
@@ -410,7 +412,7 @@ def main(argv=None) -> int:
             target = predict_audio(model, frontend, codec, audio, sample_rate)
             args.output.parent.mkdir(parents=True, exist_ok=True)
             with args.output.open("xb") as handle:
-                handle.write(codec.decode(target))
+                handle.write(prediction_preset(model, codec, target))
             print(json.dumps({"output": str(args.output), "scope": codec.to_dict()["scope"], "target": target.to_dict()}))
             return 0
         if args.command in {"pilot", "alpha-pool", "full-scalar-pool", "factory-pool", "lfo-pool", "routing-pool", "nested-pool", "expression-pool", "combined-pool", "curve-pool", "graph-pool", "expand-pilot", "benchmark", "codec-check", "train", "evaluate", "evaluate-curve", "compare"}:
