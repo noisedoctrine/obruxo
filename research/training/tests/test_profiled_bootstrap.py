@@ -1,4 +1,4 @@
-from dataclasses import dataclass, replace
+from dataclasses import replace
 import json
 
 import pytest
@@ -10,25 +10,10 @@ from obruxo_training.cli import main  # noqa: E402
 from obruxo_training.evaluate import evaluate_pilot  # noqa: E402
 from obruxo_training.pilot import PilotPool, PilotSampler  # noqa: E402
 from obruxo_training.profiled_sampler import ProfiledSampler, profile_metadata, training_sampler  # noqa: E402
-from obruxo_training.reproducibility import FULL_PHASE_CONTROL, fixed_generator_phases  # noqa: E402
+from obruxo_training.reproducibility import fixed_generator_phases  # noqa: E402
 from obruxo_training.stream import OnlineRenderStream, StreamConfig  # noqa: E402
 from obruxo_training.trainer import TrainConfig, train_pilot  # noqa: E402
-from test_stream import FakeRenderer  # noqa: E402
-
-
-class ProfileRenderer(FakeRenderer):
-    def render(self, request):
-        assert request.preroll_frames == 32768
-        assert all(json.loads(request.preset_json)["settings"][name] == value for name, value in FULL_PHASE_CONTROL.items())
-        result = super().render(request)
-        result.provenance = replace(result.provenance, settings={"preroll_frames": request.preroll_frames})
-        return result
-
-
-@dataclass(frozen=True)
-class ProfileRendererFactory:
-    def __call__(self):
-        return ProfileRenderer("valid")
+from profile_renderer import ProfileRendererFactory  # noqa: E402
 
 
 @pytest.fixture(scope="module")

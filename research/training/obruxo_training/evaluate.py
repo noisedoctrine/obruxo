@@ -242,14 +242,29 @@ def curve_statistics(rows: list[dict], model_names: list[str], baseline_name: st
                           "limit": "descriptive_validation_only_not_adjusted_for_checkpoint_selection"}}
 
 
+def training_recipes(sampler, replay, count, sequence_ids=None):
+    if sequence_ids is None:
+        return [sampler.recipe_at(item["sequence_id"]) for item in replay[:count]]
+    if (not isinstance(sequence_ids, list) or len(sequence_ids) != count or len(set(sequence_ids)) != count
+            or any(type(index) is not int or not 0 <= index < sampler.epoch_size for index in sequence_ids)):
+        raise ValueError("explicit training sequences must be unique first-epoch integers matching count")
+    recipes = [sampler.recipe_at(index) for index in sequence_ids]
+    if (len({recipe.state_id for recipe in recipes}) != count
+            or any(recipe.split != "train" or recipe.performance_role != "reference" for recipe in recipes)):
+        raise ValueError("explicit training cases require distinct training states and reference observations")
+    return recipes
+
+
 def _evaluate_models(pool, models, frontend, training_sampler, output, *, count, split, curve=False, artifacts=None,
                      renderer_factory=None, timeout=60, progress=None, resume=False, comparison=False, retrieval=None,
                      validation_extension=None, identity_diagnostics=False, validation_states=None, render_attempt_limit=None,
-                     architecture_comparison=False):
+                     architecture_comparison=False, training_sequence_ids=None):
     if split not in {"train", "validation"} or type(count) is not int or count <= 0:
         raise ValueError("pilot diagnostics use a positive count from train or validation; final test stays reserved")
     if render_attempt_limit is not None and (type(render_attempt_limit) is not int or render_attempt_limit <= 0):
         raise ValueError("native render-attempt limit must be a positive integer")
+    if training_sequence_ids is not None and split != "train":
+        raise ValueError("explicit training sequences cannot select validation or test data")
     if validation_states is not None and (split != "validation" or not isinstance(validation_states, list)
                                           or len(validation_states) != count or any(not isinstance(state, str) for state in validation_states)
                                           or len(set(validation_states)) != count):
@@ -268,7 +283,7 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
     sampler = training_sampler if split == "train" else (ProfiledSampler(pool, split="validation", preroll_frames=preroll_frames)
                                                         if preroll_frames else PilotSampler(pool, split="validation"))
     if split == "train":
-        recipes = [sampler.recipe_at(item["sequence_id"]) for item in replay[:count]]
+        recipes = training_recipes(sampler, replay, count, training_sequence_ids)
     else:
         recipes, seen = [], set(validation_extension["excluded_state_ids"] if validation_extension else ())
         wanted = set(validation_states) if validation_states is not None else None
@@ -314,6 +329,8 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
         plan["identity_diagnostics"] = "heldout_state_reference_to_reserved_transfer_retrieval_v1"
     if validation_states is not None:
         plan["validation_states"] = validation_states
+    if training_sequence_ids is not None:
+        plan["training_sequence_ids"] = training_sequence_ids
     transfers = [entry for entry in pool.codec.contract.performances() if entry.role == "transfer"]
     if comparison:
         plan.update(evaluation="pilot_real_render_comparison_v2", candidate_order=list(models),
@@ -457,6 +474,8 @@ def _evaluate_models(pool, models, frontend, training_sampler, output, *, count,
         if identity_diagnostics:
             from .paired import representation_statistics
             summary["identity_diagnostics"] = representation_statistics(rows, list(models))
+        if training_sequence_ids is not None:
+            summary["selection"] = "explicit_unique_training_state_sequences_diagnostic_only"
         if curve:
             summary["retrieval_sha256"] = retrieval_digest(replay)
             statistics = curve_statistics(rows, list(models))
