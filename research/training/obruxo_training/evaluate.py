@@ -67,7 +67,7 @@ def restore_evaluation_checkpoint(saved, pool):
     frontend = features_for(pool.codec, saved["basic_pitch"])
     from .profiled_sampler import training_sampler
     sampler = training_sampler(pool, config)
-    if contract != _run_contract(pool, sampler, frontend, config, stream_config, contract.get("replay_seed")):
+    if contract != _run_contract(pool, sampler, frontend, config, stream_config, contract.get("replay_seed"), initial_model=contract.get("initial_model")):
         raise ValueError("evaluation checkpoint belongs to incompatible contracts or a different pool")
     OnlineRenderStream(sampler, 1, config=stream_config, resume=saved["cursor"])
     validate_replay(saved["replay"], sampler, saved["cursor"], config)

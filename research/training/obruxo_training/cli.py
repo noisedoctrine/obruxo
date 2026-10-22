@@ -166,6 +166,9 @@ def main(argv=None) -> int:
                        help="basic enforces the nine-control/two-choice pilot; codec preserves historical experiments")
     train.add_argument("--preroll-frames", type=int, choices=(0, 32768),
                        help="Basic defaults to the qualified lead with fixed random phase; explicit zero preserves legacy rendering")
+    train.add_argument("--input-performances", choices=("initial", "varied"), default="initial",
+                       help="varied gives basic patches paired broad-pitch observations with category-independent pattern assignment")
+    train.add_argument("--initial-model", type=Path, help="Verified same-pool inference weights; start a fresh optimizer and learning RNG")
     train.add_argument("--updates-per-render", type=int, default=1)
     train.add_argument("--fresh-examples", type=int, help="Stop adding fresh examples at this count, then continue bounded replay")
     train.add_argument("--device", default="cpu")
@@ -497,6 +500,7 @@ def main(argv=None) -> int:
                                      stream_config=StreamConfig(prefetch_clips=1, timeout_seconds=args.timeout, worker_jobs=args.worker_jobs),
                                      renderer_factory=factory, resume=args.resume,
                                      seed_replay=args.seed_replay,
+                                     initial_model=args.initial_model,
                                      stop_after=args.stop_after, progress=lambda value: print(json.dumps(value), flush=True))
                 print(json.dumps(result, indent=2))
                 return 2 if result["complete"] and config.mode == "overfit" and not result["tiny_overfit_gate"] else 0
