@@ -1,0 +1,12 @@
+{
+  "checkpoint_file": "prefix-checkpoint.pt",
+  "checkpoint_file_sha256": "f2f0f8850521de503aab1d83b0d9bca273dfb62f69b639557bbc4dcc6de78e17",
+  "elapsed_seconds": 3.2352723000003607,
+  "native_requests_added": 0,
+  "offline_training_replay_exact": true,
+  "optimizer_updates_added": 0,
+  "plan_id": "c2d8a42e179494705cb925406d8cbea41a147668fcb0a2db7abb7b6001300cb1",
+  "qualified_for_release": false,
+  "replayed_updates": 4,
+  "training_state_sha256": "3a46864bdaafb3ac7a2b3988d939e95ba32f4cde6b65da42b3f7bf24cc3a2665"
+}
