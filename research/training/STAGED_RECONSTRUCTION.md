@@ -147,7 +147,7 @@ Package a basic inference bundle and CLI with pinned preprocessing, weights, cod
 | Baseline audit and native diagnosis | Complete; listening still pending | Existing reports, checkpoints and render receipts |
 | A0 spectral/control contract | Complete; both local A1 cards frozen | [Versioned contract and measured resource evidence](reports/BASIC_SPECTRAL_CONTRACT_RESULTS.md) |
 | A1 useful-gradient qualification | Native path qualified on the corrected renderer; learned helpers refused | [Settled-gradient evidence with all failures retained](reports/SETTLED_NATIVE_GRADIENT_RESULTS.md) |
-| A2 spectral inverse comparison | Fixed-score trial complete and exactly replayed; fit passes, held-out gains 7.23% / 4.24% miss 10% | [Actual result](reports/CALIBRATED_NATIVE_INVERSE_RESULTS.md); inspect coverage and remaining sound errors before another run |
+| A2 spectral inverse comparison | Fixed-score trial misses held-out 10%; saved-data coverage/error diagnosis complete | [Actual result](reports/CALIBRATED_NATIVE_INVERSE_RESULTS.md) and [64-state comparison rationale](reports/BASIC_FIT_COVERAGE_RESULTS.md); freeze selection/cost before execution |
 | A3 confirmation/basic bundle | Pending A2 | Independent confirmation, second seed, listening and reproducible basic inference bundle |
 
 Use separate reviewable PRs for these work packages and local checks with GitHub Actions disabled. Publish exact run status, resource use and failed gates; do not equate implemented code with a passed training milestone. All upcoming work stays local; Colab notebooks, transfers and Linux qualification are deferred.
