@@ -1,0 +1,6706 @@
+{
+  "actual_replayed_optimizer_updates": 256,
+  "actual_training_points_verified": true,
+  "all_saved_derivatives_reconstructed": true,
+  "claim": "fixed_point_derivative_diagnosis_not_new_sound_quality",
+  "elapsed_seconds": 37.596062660217285,
+  "estimated_archive_bytes_with_margin": 184519,
+  "evidence_sha256": {
+    "plan.json": "35e35c4e0fc497382f4cc668b1fa767bba2d9f86ec9a2565e45cdf066a0bfde5",
+    "run.json": "f68d73ff88f6502c172668f1d82a9637e9276ed85421686d7af37c8c44c36759",
+    "summary.json": "a0836929fac1442115d149f0870ba0b5db46d1c6671976a88c7ea87f34def8e5"
+  },
+  "failure": null,
+  "fixed_scales": [
+    20.31771924164867,
+    20.337628037582693
+  ],
+  "heads": [
+    {
+      "all_finite": true,
+      "better_native_alternative_steps": 88,
+      "calibrated_gradient_median": 0.0009089710365515202,
+      "calibrated_responsive_zero_steps": 0,
+      "fixed_scale": 20.31771924164867,
+      "median_gain": 1065.6034958069836,
+      "name": "osc_1_unison_voices",
+      "original_gradient_median": 8.5301056174103e-07,
+      "original_responsive_zero_steps": 1,
+      "pass": true,
+      "points": 128,
+      "raw_margin_median": 9.915993690490723
+    },
+    {
+      "all_finite": true,
+      "better_native_alternative_steps": 25,
+      "calibrated_gradient_median": 0.0020577122922986746,
+      "calibrated_responsive_zero_steps": 0,
+      "fixed_scale": 20.337628037582693,
+      "median_gain": 18561910026838.82,
+      "name": "filter_1_on",
+      "original_gradient_median": 1.1085671083004989e-16,
+      "original_responsive_zero_steps": 8,
+      "pass": true,
+      "points": 128,
+      "raw_margin_median": 26.938663482666016
+    }
+  ],
+  "historical_replay_unchanged": true,
+  "initial_training_inputs": [
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          -10.488041877746582,
+          -7.469060897827148,
+          1.7853666543960571
+        ],
+        [
+          9.788591384887695,
+          -10.774166107177734
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          8.213240623474121,
+          14.827407836914062,
+          -71.96611022949219
+        ],
+        [
+          -22.443073272705078,
+          18.064970016479492
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          11.719472885131836,
+          5.419157981872559,
+          -58.122764587402344
+        ],
+        [
+          9.500775337219238,
+          -15.318502426147461
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          -23.58066749572754,
+          -30.070484161376953,
+          35.42837142944336
+        ],
+        [
+          -33.66335678100586,
+          35.160247802734375
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          -7.929224014282227,
+          2.961540937423706,
+          -6.662480354309082
+        ],
+        [
+          12.863778114318848,
+          -14.223511695861816
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          -7.967838764190674,
+          16.59624671936035,
+          -32.3677978515625
+        ],
+        [
+          -15.231559753417969,
+          15.105117797851562
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          -4.7276997566223145,
+          -3.5679879188537598,
+          1.1866310834884644
+        ],
+        [
+          8.677248001098633,
+          -10.60793685913086
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          6.815779685974121,
+          8.696524620056152,
+          -47.776878356933594
+        ],
+        [
+          -13.410513877868652,
+          12.68876838684082
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          3.8577494621276855,
+          -6.674505710601807,
+          -8.507792472839355
+        ],
+        [
+          9.002426147460938,
+          -8.618395805358887
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          -1.6133315563201904,
+          -12.743819236755371,
+          1.9593111276626587
+        ],
+        [
+          -14.761911392211914,
+          13.610204696655273
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          5.004467010498047,
+          -5.287513256072998,
+          -29.735977172851562
+        ],
+        [
+          -11.036195755004883,
+          4.753103733062744
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          4.510931968688965,
+          5.063065052032471,
+          -28.257179260253906
+        ],
+        [
+          -11.656431198120117,
+          10.822356224060059
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          -2.3220458030700684,
+          2.7523033618927,
+          -24.31796646118164
+        ],
+        [
+          25.533296585083008,
+          -26.936237335205078
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          -1.3704605102539062,
+          -11.771294593811035,
+          -2.6589150428771973
+        ],
+        [
+          -9.513284683227539,
+          8.320775032043457
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          11.515983581542969,
+          -14.383877754211426,
+          -12.478504180908203
+        ],
+        [
+          6.031571865081787,
+          -6.548381328582764
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          -12.510566711425781,
+          -1.1454960107803345,
+          9.23513126373291
+        ],
+        [
+          -30.62491226196289,
+          25.322664260864258
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          -14.574295043945312,
+          -13.093526840209961,
+          14.106796264648438
+        ],
+        [
+          31.543289184570312,
+          -32.65253448486328
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          7.645899295806885,
+          3.57425856590271,
+          -36.85955047607422
+        ],
+        [
+          -14.908005714416504,
+          11.519577026367188
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          6.022111415863037,
+          -0.16614818572998047,
+          -23.474939346313477
+        ],
+        [
+          -1.8740696907043457,
+          0.15284527838230133
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          -15.93713665008545,
+          5.63492488861084,
+          1.511106014251709
+        ],
+        [
+          -16.237834930419922,
+          10.985589981079102
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          -12.977349281311035,
+          -4.31450080871582,
+          9.258756637573242
+        ],
+        [
+          36.81254196166992,
+          -37.36994171142578
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          20.607770919799805,
+          -7.446268558502197,
+          -45.87554168701172
+        ],
+        [
+          -32.19559860229492,
+          29.73993492126465
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          25.070226669311523,
+          -12.301894187927246,
+          -48.215206146240234
+        ],
+        [
+          -7.679887771606445,
+          1.7639495134353638
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          7.855853080749512,
+          11.195040702819824,
+          -57.73536682128906
+        ],
+        [
+          -16.9539794921875,
+          16.60500144958496
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          -16.331300735473633,
+          -13.733762741088867,
+          16.214975357055664
+        ],
+        [
+          39.04678726196289,
+          -39.97492599487305
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          3.6973299980163574,
+          1.6181318759918213,
+          -17.22347640991211
+        ],
+        [
+          -17.85213851928711,
+          16.4100399017334
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          41.72469711303711,
+          -15.789446830749512,
+          -95.99724578857422
+        ],
+        [
+          -10.523552894592285,
+          0.8379769921302795
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          -14.838655471801758,
+          9.310823440551758,
+          -7.329654216766357
+        ],
+        [
+          -36.77797317504883,
+          37.05278015136719
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          1.8044334650039673,
+          -3.5300052165985107,
+          -13.93089485168457
+        ],
+        [
+          1.2626123428344727,
+          -2.51861572265625
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          -11.337920188903809,
+          10.167238235473633,
+          -12.332630157470703
+        ],
+        [
+          -16.358076095581055,
+          15.13003921508789
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          -9.365893363952637,
+          -4.20729398727417,
+          7.611644744873047
+        ],
+        [
+          24.253515243530273,
+          -25.548307418823242
+        ]
+      ]
+    },
+    {
+      "hard_patch_unchanged": true,
+      "raw_logits": [
+        [
+          -28.53456687927246,
+          0.4972423315048218,
+          19.633563995361328
+        ],
+        [
+          -24.484710693359375,
+          20.085981369018555
+        ]
+      ]
+    }
+  ],
+  "model_promoted": false,
+  "passed": true,
+  "peak_process_tree_rss_bytes": 809132032,
+  "plan": {
+    "calibration": {
+      "accumulation": "float64",
+      "formula": "max(1,RMS(scores-per_row_class_mean))",
+      "heads": [
+        3,
+        2
+      ],
+      "rows": 32,
+      "source": "32_training_reference_features_and_initial_weights_only"
+    },
+    "cpu_threads": 2,
+    "device": "cpu",
+    "diagnostic": {
+      "baseline_gradient_atol": 1e-30,
+      "baseline_gradient_rtol": 1e-05,
+      "better_alternative_tolerance": 1e-07,
+      "forward_patch": "held_at_recorded_anchor",
+      "minimum_median_gradient_gain": 10.0,
+      "noise": "same_actual_Gumbel_draws",
+      "points": 128
+    },
+    "format": "basic_category_signal_check_v1",
+    "gumbel_implementation_sha256": "442c1bb83466841677f9c0954aff3ee6430ab7c1199f7a1efe7e5a8c46b494e7",
+    "initial_sha256": "5517db59dec68f0daca30789d08e75f41183e5577ba5a2082a4dc9488da15d4f",
+    "limits": {
+      "archive_bytes": 33554432,
+      "process_tree_bytes": 8589934592,
+      "wall_seconds": 300
+    },
+    "native_requests": 0,
+    "new_evaluation_data": false,
+    "new_fitting_updates": 0,
+    "parent_audit_sha256": "277839da7e3818088fd86c5f8e6c689c9d65a28d344485575d912716af8a9070",
+    "parent_evidence_sha256": {
+      "checkpoint.pt": "d56fe9b256044e38ad5d7d0a2ae5787fa69e7bf08f1b664d83637388a114c356",
+      "measurements.jsonl": "2dc48e941b0e4db36194eb53d2f925713a0cd50f687eb9f2e093f94f2df7b6cb",
+      "records.json": "f9fdc14d4493455f9203609558aa70f099653698338201ad39859f0682d60738",
+      "renders.jsonl": "659c5e500ef31697f616fb5225f10600c8c273ba0bb6784cb9c493c8326e9a7a",
+      "summary.json": "e666a495249f001b8f0b044c608c83e31f547a62cd2efdc809d8cc20932f84da",
+      "updates.jsonl": "4e85ca37cb7e973900486925ab573dc4f2a1fe2948e368f11cdd4df74cd7cb88"
+    },
+    "parent_plan_id": "7fc5c19575d3869d3b82d9790b2c89d50c0e92f69ce702971d1446a69c8e5801",
+    "pool_sha256": "ed05cf3db0dd1862671a525a2c6fac2f7d9497633848246b330a2b544ae02e87",
+    "precision": "float32",
+    "qualification_sha256": "25d217636533c264ffe1b52f8024ad3cb4487fb80bc91a23276af544ce92dae1",
+    "replayed_optimizer_updates": 256,
+    "retrieval_sha256": "8231920789f8ef8c5bb7359613aa6c51b84cc193d24475ae5293a8cbeb17dece",
+    "source": {
+      "category_signal.py": "139c63fd271e0792e69be8e1006a7f2b593f3c79d4f54e7e4568dccca03ed6e0",
+      "check_category_signal.py": "30c4a983404994211cae32849d33b783ba4577d29d080bbaee2c05a78871086d",
+      "verify_native_inverse_fit.py": "4dea04f3be4bf0322ea23c5b04072eb8de973566b2abf39106a5ed23bac86c05"
+    }
+  },
+  "plan_id": "39f32dd27c91794b566a6cf8658ca38e0515760660e747c1d1e94fb679f5f199",
+  "points": [
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0006136382580734789,
+          "conditional_losses": [
+            0.3487107455730438,
+            0.39899390935897827,
+            0.3936734199523926
+          ],
+          "head": 0,
+          "noise": [
+            -1.2551391124725342,
+            -0.20732688903808594,
+            0.4860612750053406
+          ],
+          "original_gradient_l1": 0.00021964336337987334,
+          "raw_logits": [
+            -2.3220458030700684,
+            2.7523033618927,
+            -24.31796646118164
+          ],
+          "raw_top_two_margin": 5.074349403381348,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0020408406853675842,
+          "conditional_losses": [
+            0.39899390935897827,
+            0.5562321543693542
+          ],
+          "head": 1,
+          "noise": [
+            -0.9302403926849365,
+            -0.03508278727531433
+          ],
+          "original_gradient_l1": 6.281908830845253e-24,
+          "raw_logits": [
+            25.533296585083008,
+            -26.936237335205078
+          ],
+          "raw_top_two_margin": 52.46953582763672,
+          "selected": 0
+        }
+      ],
+      "step": 1
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.000721210497431457,
+          "conditional_losses": [
+            0.3828115463256836,
+            0.6262884736061096,
+            0.6023112535476685
+          ],
+          "head": 0,
+          "noise": [
+            -0.4486068785190582,
+            1.6258082389831543,
+            0.8381997346878052
+          ],
+          "original_gradient_l1": 2.511574281882645e-10,
+          "raw_logits": [
+            -28.538162231445312,
+            0.5247278213500977,
+            19.61821746826172
+          ],
+          "raw_top_two_margin": 19.093490600585938,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0023695994168519974,
+          "conditional_losses": [
+            1.2079212665557861,
+            0.6023112535476685
+          ],
+          "head": 1,
+          "noise": [
+            0.138459712266922,
+            1.0787839889526367
+          ],
+          "original_gradient_l1": 8.81895298119786e-21,
+          "raw_logits": [
+            -24.477519989013672,
+            20.082124710083008
+          ],
+          "raw_top_two_margin": 44.55964660644531,
+          "selected": 1
+        }
+      ],
+      "step": 2
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0019106268882751465,
+          "conditional_losses": [
+            0.1522410362958908,
+            0.24893274903297424,
+            0.32479655742645264
+          ],
+          "head": 0,
+          "noise": [
+            0.5057274103164673,
+            1.637037754058838,
+            0.8234412670135498
+          ],
+          "original_gradient_l1": 0.03806190937757492,
+          "raw_logits": [
+            3.7080042362213135,
+            1.569968581199646,
+            -17.085927963256836
+          ],
+          "raw_top_two_margin": 2.138035774230957,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.005840875208377838,
+          "conditional_losses": [
+            0.7496084570884705,
+            0.1522410362958908
+          ],
+          "head": 1,
+          "noise": [
+            0.027771612629294395,
+            0.4193297028541565
+          ],
+          "original_gradient_l1": 5.170874092169447e-16,
+          "raw_logits": [
+            -17.734378814697266,
+            16.29190444946289
+          ],
+          "raw_top_two_margin": 34.026283264160156,
+          "selected": 1
+        }
+      ],
+      "step": 3
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.002172318985685706,
+          "conditional_losses": [
+            0.7847229838371277,
+            0.9272353649139404,
+            0.849073588848114
+          ],
+          "head": 0,
+          "noise": [
+            0.5425760746002197,
+            0.6481053233146667,
+            1.4698281288146973
+          ],
+          "original_gradient_l1": 0.001266374485567212,
+          "raw_logits": [
+            1.8830029964447021,
+            -3.5778985023498535,
+            -13.872710227966309
+          ],
+          "raw_top_two_margin": 5.460901260375977,
+          "selected": 0
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.008409639820456505,
+          "conditional_losses": [
+            0.7847229838371277,
+            0.4223344624042511
+          ],
+          "head": 1,
+          "noise": [
+            -0.08960180729627609,
+            -0.42952725291252136
+          ],
+          "original_gradient_l1": 0.011301332153379917,
+          "raw_logits": [
+            1.253138542175293,
+            -2.4992871284484863
+          ],
+          "raw_top_two_margin": 3.7524256706237793,
+          "selected": 0
+        }
+      ],
+      "step": 4
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0037836937699466944,
+          "conditional_losses": [
+            0.36853671073913574,
+            0.6375275254249573,
+            0.6591987013816833
+          ],
+          "head": 0,
+          "noise": [
+            1.4431341886520386,
+            -0.12159406393766403,
+            2.1521291732788086
+          ],
+          "original_gradient_l1": 0.004665864631533623,
+          "raw_logits": [
+            -15.780735969543457,
+            5.5894293785095215,
+            1.359022855758667
+          ],
+          "raw_top_two_margin": 4.230406761169434,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0038496172055602074,
+          "conditional_losses": [
+            1.1618887186050415,
+            0.6375275254249573
+          ],
+          "head": 1,
+          "noise": [
+            0.29865309596061707,
+            1.3617596626281738
+          ],
+          "original_gradient_l1": 1.6151793444385554e-13,
+          "raw_logits": [
+            -16.278379440307617,
+            11.029044151306152
+          ],
+          "raw_top_two_margin": 27.307422637939453,
+          "selected": 1
+        }
+      ],
+      "step": 5
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0030368920415639877,
+          "conditional_losses": [
+            0.7105663418769836,
+            0.7446663975715637,
+            0.9659579396247864
+          ],
+          "head": 0,
+          "noise": [
+            0.20212168991565704,
+            0.12150197476148605,
+            -0.135870099067688
+          ],
+          "original_gradient_l1": 4.133392239591416e-11,
+          "raw_logits": [
+            -11.214816093444824,
+            9.989893913269043,
+            -12.183394432067871
+          ],
+          "raw_top_two_margin": 21.204710006713867,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0017333345022052526,
+          "conditional_losses": [
+            1.2310324907302856,
+            0.7446663975715637
+          ],
+          "head": 1,
+          "noise": [
+            -0.3133263885974884,
+            1.353537678718567
+          ],
+          "original_gradient_l1": 1.4490041221539994e-15,
+          "raw_logits": [
+            -16.177509307861328,
+            14.963813781738281
+          ],
+          "raw_top_two_margin": 31.14132308959961,
+          "selected": 1
+        }
+      ],
+      "step": 6
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0009085131459869444,
+          "conditional_losses": [
+            0.44983747601509094,
+            0.38536396622657776,
+            0.48151570558547974
+          ],
+          "head": 0,
+          "noise": [
+            -0.5069166421890259,
+            0.004159626085311174,
+            1.52318274974823
+          ],
+          "original_gradient_l1": 0.00025402801111340523,
+          "raw_logits": [
+            -1.5570632219314575,
+            -12.631227493286133,
+            1.8173508644104004
+          ],
+          "raw_top_two_margin": 3.3744139671325684,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.007197828032076359,
+          "conditional_losses": [
+            0.767385721206665,
+            0.48151570558547974
+          ],
+          "head": 1,
+          "noise": [
+            1.797386646270752,
+            0.4203333854675293
+          ],
+          "original_gradient_l1": 3.2021306721648213e-13,
+          "raw_logits": [
+            -14.716832160949707,
+            13.55111312866211
+          ],
+          "raw_top_two_margin": 28.2679443359375,
+          "selected": 1
+        }
+      ],
+      "step": 7
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.002179640345275402,
+          "conditional_losses": [
+            0.4389631152153015,
+            0.522762656211853,
+            0.6021029353141785
+          ],
+          "head": 0,
+          "noise": [
+            -0.9142997860908508,
+            0.16402024030685425,
+            0.42232224345207214
+          ],
+          "original_gradient_l1": 1.567549588799011e-05,
+          "raw_logits": [
+            4.935511589050293,
+            -5.192254543304443,
+            -29.81432342529297
+          ],
+          "raw_top_two_margin": 10.127765655517578,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00141313043422997,
+          "conditional_losses": [
+            0.580471932888031,
+            0.4389631152153015
+          ],
+          "head": 1,
+          "noise": [
+            -0.46368539333343506,
+            0.7791000604629517
+          ],
+          "original_gradient_l1": 3.367435885692771e-09,
+          "raw_logits": [
+            -11.039061546325684,
+            4.815286636352539
+          ],
+          "raw_top_two_margin": 15.854348182678223,
+          "selected": 1
+        }
+      ],
+      "step": 8
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0024129594676196575,
+          "conditional_losses": [
+            0.7580268979072571,
+            1.0049879550933838,
+            0.9258153438568115
+          ],
+          "head": 0,
+          "noise": [
+            1.1466269493103027,
+            3.1624345779418945,
+            -0.3228521943092346
+          ],
+          "original_gradient_l1": 0.031497687101364136,
+          "raw_logits": [
+            -4.7877044677734375,
+            -3.3965861797332764,
+            1.13106369972229
+          ],
+          "raw_top_two_margin": 4.527649879455566,
+          "selected": 2
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0063644228503108025,
+          "conditional_losses": [
+            0.9258153438568115,
+            0.4767957627773285
+          ],
+          "head": 1,
+          "noise": [
+            0.8718448281288147,
+            0.25789347290992737
+          ],
+          "original_gradient_l1": 6.945646280342999e-10,
+          "raw_logits": [
+            8.58211612701416,
+            -10.483012199401855
+          ],
+          "raw_top_two_margin": 19.065128326416016,
+          "selected": 0
+        }
+      ],
+      "step": 9
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0015542239416390657,
+          "conditional_losses": [
+            0.22482730448246002,
+            0.20866286754608154,
+            0.4308188855648041
+          ],
+          "head": 0,
+          "noise": [
+            0.46514514088630676,
+            -0.688803493976593,
+            3.171846389770508
+          ],
+          "original_gradient_l1": 1.0543847110966453e-06,
+          "raw_logits": [
+            -14.672149658203125,
+            9.158817291259766,
+            -7.225500106811523
+          ],
+          "raw_top_two_margin": 16.38431739807129,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0005579846911132336,
+          "conditional_losses": [
+            0.8853177428245544,
+            0.20866286754608154
+          ],
+          "head": 1,
+          "noise": [
+            -1.7749416828155518,
+            -0.7502211928367615
+          ],
+          "original_gradient_l1": 2.309095414595963e-34,
+          "raw_logits": [
+            -36.50767135620117,
+            36.83236312866211
+          ],
+          "raw_top_two_margin": 73.34003448486328,
+          "selected": 1
+        }
+      ],
+      "step": 10
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0007563503459095955,
+          "conditional_losses": [
+            0.5567847490310669,
+            0.623598039150238,
+            0.5986893177032471
+          ],
+          "head": 0,
+          "noise": [
+            -0.36442309617996216,
+            1.2188174724578857,
+            1.5595184564590454
+          ],
+          "original_gradient_l1": 2.6445193270774325e-06,
+          "raw_logits": [
+            -8.30551815032959,
+            3.220698595046997,
+            -6.6614789962768555
+          ],
+          "raw_top_two_margin": 9.882177352905273,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0014917843509465456,
+          "conditional_losses": [
+            0.623598039150238,
+            0.6829248666763306
+          ],
+          "head": 1,
+          "noise": [
+            -1.4823832511901855,
+            -0.4136447012424469
+          ],
+          "original_gradient_l1": 1.2533248364924449e-13,
+          "raw_logits": [
+            12.788763046264648,
+            -14.143282890319824
+          ],
+          "raw_top_two_margin": 26.932044982910156,
+          "selected": 0
+        }
+      ],
+      "step": 11
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0007140675443224609,
+          "conditional_losses": [
+            0.5563609600067139,
+            0.5226030945777893,
+            0.48049673438072205
+          ],
+          "head": 0,
+          "noise": [
+            0.8002249598503113,
+            0.1811010241508484,
+            -0.30136194825172424
+          ],
+          "original_gradient_l1": 3.688462311401963e-05,
+          "raw_logits": [
+            11.856953620910645,
+            5.248273849487305,
+            -57.88115692138672
+          ],
+          "raw_top_two_margin": 6.60867977142334,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 8.744514161662664e-06,
+          "conditional_losses": [
+            0.5563609600067139,
+            0.6302222013473511
+          ],
+          "head": 1,
+          "noise": [
+            5.409710884094238,
+            0.13225211203098297
+          ],
+          "original_gradient_l1": 2.9513884724022017e-15,
+          "raw_logits": [
+            9.271215438842773,
+            -15.008552551269531
+          ],
+          "raw_top_two_margin": 24.279767990112305,
+          "selected": 0
+        }
+      ],
+      "step": 12
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00044221142889000475,
+          "conditional_losses": [
+            0.5725236535072327,
+            0.5829402208328247,
+            0.5430887341499329
+          ],
+          "head": 0,
+          "noise": [
+            0.17042836546897888,
+            3.0059845447540283,
+            1.726327657699585
+          ],
+          "original_gradient_l1": 1.4366226155749692e-29,
+          "raw_logits": [
+            -23.34027671813965,
+            -29.932199478149414,
+            35.0906867980957
+          ],
+          "raw_top_two_margin": 58.43096160888672,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 9.23149345908314e-05,
+          "conditional_losses": [
+            0.7819193005561829,
+            0.5430887341499329
+          ],
+          "head": 1,
+          "noise": [
+            -1.8917335271835327,
+            0.08560192584991455
+          ],
+          "original_gradient_l1": 3.5036431972303855e-33,
+          "raw_logits": [
+            -33.19369125366211,
+            34.71161651611328
+          ],
+          "raw_top_two_margin": 67.90530395507812,
+          "selected": 1
+        }
+      ],
+      "step": 13
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0008528660982847214,
+          "conditional_losses": [
+            0.4722757041454315,
+            0.4663618803024292,
+            0.5431448221206665
+          ],
+          "head": 0,
+          "noise": [
+            1.8232046365737915,
+            0.6909471154212952,
+            -0.6884987950325012
+          ],
+          "original_gradient_l1": 6.39937752566766e-07,
+          "raw_logits": [
+            -12.86685562133789,
+            -4.175710201263428,
+            8.990852355957031
+          ],
+          "raw_top_two_margin": 13.166563034057617,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 1.4929841199773364e-05,
+          "conditional_losses": [
+            0.5431448221206665,
+            0.645957887172699
+          ],
+          "head": 1,
+          "noise": [
+            2.1383564472198486,
+            -0.5057564377784729
+          ],
+          "original_gradient_l1": 2.6890443106785158e-36,
+          "raw_logits": [
+            36.210445404052734,
+            -36.74882507324219
+          ],
+          "raw_top_two_margin": 72.95927429199219,
+          "selected": 0
+        }
+      ],
+      "step": 14
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0002999360440298915,
+          "conditional_losses": [
+            0.36330023407936096,
+            0.38532960414886475,
+            0.3455168902873993
+          ],
+          "head": 0,
+          "noise": [
+            -0.44200724363327026,
+            -0.46861398220062256,
+            0.6499369740486145
+          ],
+          "original_gradient_l1": 3.5717981781350876e-16,
+          "raw_logits": [
+            -16.68577003479004,
+            -13.254437446594238,
+            16.253952026367188
+          ],
+          "raw_top_two_margin": 29.50838851928711,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.002490011975169182,
+          "conditional_losses": [
+            0.3455168902873993,
+            0.45918911695480347
+          ],
+          "head": 1,
+          "noise": [
+            -0.25152310729026794,
+            4.4324822425842285
+          ],
+          "original_gradient_l1": 7.625882565180167e-36,
+          "raw_logits": [
+            39.09931945800781,
+            -39.988258361816406
+          ],
+          "raw_top_two_margin": 79.08757781982422,
+          "selected": 0
+        }
+      ],
+      "step": 15
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0001494558819103986,
+          "conditional_losses": [
+            0.6558545827865601,
+            0.653840184211731,
+            0.608021080493927
+          ],
+          "head": 0,
+          "noise": [
+            1.2156734466552734,
+            1.5651339292526245,
+            1.7292863130569458
+          ],
+          "original_gradient_l1": 2.1127039412262487e-20,
+          "raw_logits": [
+            24.981534957885742,
+            -12.212666511535645,
+            -48.200660705566406
+          ],
+          "raw_top_two_margin": 37.1942024230957,
+          "selected": 0
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0018898217240348458,
+          "conditional_losses": [
+            0.48677176237106323,
+            0.6558545827865601
+          ],
+          "head": 1,
+          "noise": [
+            0.3806001543998718,
+            1.785813570022583
+          ],
+          "original_gradient_l1": 4.370023816591129e-06,
+          "raw_logits": [
+            -7.511030197143555,
+            1.7193974256515503
+          ],
+          "raw_top_two_margin": 9.230427742004395,
+          "selected": 1
+        }
+      ],
+      "step": 16
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0011578828562051058,
+          "conditional_losses": [
+            0.333437979221344,
+            0.32017841935157776,
+            0.4363228678703308
+          ],
+          "head": 0,
+          "noise": [
+            1.344129204750061,
+            0.6374263763427734,
+            0.7581418752670288
+          ],
+          "original_gradient_l1": 5.414421623724242e-13,
+          "raw_logits": [
+            11.433164596557617,
+            -14.265713691711426,
+            -12.390517234802246
+          ],
+          "raw_top_two_margin": 23.823680877685547,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0012866156175732613,
+          "conditional_losses": [
+            0.333437979221344,
+            0.4233444631099701
+          ],
+          "head": 1,
+          "noise": [
+            1.599514126777649,
+            0.6724877953529358
+          ],
+          "original_gradient_l1": 1.3166803114472714e-07,
+          "raw_logits": [
+            5.937606334686279,
+            -6.402467727661133
+          ],
+          "raw_top_two_margin": 12.34007453918457,
+          "selected": 0
+        }
+      ],
+      "step": 17
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0016625950811430812,
+          "conditional_losses": [
+            0.45632806420326233,
+            0.46896037459373474,
+            0.5232231616973877
+          ],
+          "head": 0,
+          "noise": [
+            0.31588488817214966,
+            0.05468535050749779,
+            0.7041004300117493
+          ],
+          "original_gradient_l1": 0.028380922973155975,
+          "raw_logits": [
+            -1.3673089742660522,
+            -11.678773880004883,
+            -2.6749796867370605
+          ],
+          "raw_top_two_margin": 1.3076707124710083,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00363166444003582,
+          "conditional_losses": [
+            0.860854983329773,
+            0.45632806420326233
+          ],
+          "head": 1,
+          "noise": [
+            0.2573409974575043,
+            1.507731556892395
+          ],
+          "original_gradient_l1": 7.608268459691203e-10,
+          "raw_logits": [
+            -9.366751670837402,
+            8.194361686706543
+          ],
+          "raw_top_two_margin": 17.561113357543945,
+          "selected": 1
+        }
+      ],
+      "step": 18
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0018418091349303722,
+          "conditional_losses": [
+            0.7578782439231873,
+            0.8010197877883911,
+            0.8476884365081787
+          ],
+          "head": 0,
+          "noise": [
+            0.5784783959388733,
+            -0.6632437705993652,
+            -0.9366126656532288
+          ],
+          "original_gradient_l1": 1.3016574484936427e-06,
+          "raw_logits": [
+            -12.47523307800293,
+            -1.3025398254394531,
+            9.508926391601562
+          ],
+          "raw_top_two_margin": 10.811466217041016,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.027417264878749847,
+          "conditional_losses": [
+            2.039102077484131,
+            0.8476884365081787
+          ],
+          "head": 1,
+          "noise": [
+            3.248138666152954,
+            -0.19581063091754913
+          ],
+          "original_gradient_l1": 4.532165151789954e-25,
+          "raw_logits": [
+            -30.46730613708496,
+            25.288799285888672
+          ],
+          "raw_top_two_margin": 55.756103515625,
+          "selected": 1
+        }
+      ],
+      "step": 19
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 4.934602475259453e-05,
+          "conditional_losses": [
+            0.30101850628852844,
+            0.2905886471271515,
+            0.487898051738739
+          ],
+          "head": 0,
+          "noise": [
+            1.6425881385803223,
+            1.6265453100204468,
+            1.6155946254730225
+          ],
+          "original_gradient_l1": 2.904874718441299e-29,
+          "raw_logits": [
+            41.276023864746094,
+            -15.351484298706055,
+            -95.76785278320312
+          ],
+          "raw_top_two_margin": 56.62751007080078,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0021938441786915064,
+          "conditional_losses": [
+            0.39576199650764465,
+            0.30101850628852844
+          ],
+          "head": 1,
+          "noise": [
+            -0.10090850293636322,
+            0.042888954281806946
+          ],
+          "original_gradient_l1": 9.688001227914356e-07,
+          "raw_logits": [
+            -10.36185073852539,
+            0.8363288640975952
+          ],
+          "raw_top_two_margin": 11.198179244995117,
+          "selected": 1
+        }
+      ],
+      "step": 20
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00026436493499204516,
+          "conditional_losses": [
+            0.36324626207351685,
+            0.4285975992679596,
+            0.3965928256511688
+          ],
+          "head": 0,
+          "noise": [
+            1.691457748413086,
+            -1.3199220895767212,
+            -0.12327855825424194
+          ],
+          "original_gradient_l1": 5.0935414037667215e-06,
+          "raw_logits": [
+            6.025489807128906,
+            -0.39507099986076355,
+            -22.75672149658203
+          ],
+          "raw_top_two_margin": 6.420560836791992,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0009929656516760588,
+          "conditional_losses": [
+            0.4026361405849457,
+            0.36324626207351685
+          ],
+          "head": 1,
+          "noise": [
+            0.19133424758911133,
+            0.5253166556358337
+          ],
+          "original_gradient_l1": 0.004857214167714119,
+          "raw_logits": [
+            -1.9161205291748047,
+            0.277362585067749
+          ],
+          "raw_top_two_margin": 2.1934831142425537,
+          "selected": 1
+        }
+      ],
+      "step": 21
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.002110611880198121,
+          "conditional_losses": [
+            0.37300795316696167,
+            0.3813534379005432,
+            0.2967877686023712
+          ],
+          "head": 0,
+          "noise": [
+            -1.2567708492279053,
+            0.36113378405570984,
+            -1.2730674743652344
+          ],
+          "original_gradient_l1": 1.1401265402697508e-13,
+          "raw_logits": [
+            -14.60790729522705,
+            -12.757743835449219,
+            14.046771049499512
+          ],
+          "raw_top_two_margin": 26.804515838623047,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0033620602916926146,
+          "conditional_losses": [
+            0.2967877686023712,
+            0.4704776108264923
+          ],
+          "head": 1,
+          "noise": [
+            -0.7175174355506897,
+            1.341981053352356
+          ],
+          "original_gradient_l1": 1.1754284290990934e-30,
+          "raw_logits": [
+            31.34637451171875,
+            -32.4046745300293
+          ],
+          "raw_top_two_margin": 63.75104904174805,
+          "selected": 0
+        }
+      ],
+      "step": 22
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.000909428927116096,
+          "conditional_losses": [
+            1.2152230739593506,
+            1.2388622760772705,
+            1.8291335105895996
+          ],
+          "head": 0,
+          "noise": [
+            -0.22113433480262756,
+            0.5298475623130798,
+            0.27098676562309265
+          ],
+          "original_gradient_l1": 0.0014976661186665297,
+          "raw_logits": [
+            8.12443733215332,
+            10.554044723510742,
+            -56.63410949707031
+          ],
+          "raw_top_two_margin": 2.429607391357422,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.03580724447965622,
+          "conditional_losses": [
+            2.5944151878356934,
+            1.2388622760772705
+          ],
+          "head": 1,
+          "noise": [
+            1.8106263875961304,
+            -0.07022930681705475
+          ],
+          "original_gradient_l1": 2.009480847033605e-15,
+          "raw_logits": [
+            -16.7293643951416,
+            16.421897888183594
+          ],
+          "raw_top_two_margin": 33.15126037597656,
+          "selected": 1
+        }
+      ],
+      "step": 23
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 5.161364242667332e-05,
+          "conditional_losses": [
+            0.31286975741386414,
+            0.30652254819869995,
+            0.36415109038352966
+          ],
+          "head": 0,
+          "noise": [
+            3.106898069381714,
+            0.3683732748031616,
+            0.5240358114242554
+          ],
+          "original_gradient_l1": 0.0004766263300552964,
+          "raw_logits": [
+            4.888079643249512,
+            4.620891094207764,
+            -27.95505714416504
+          ],
+          "raw_top_two_margin": 0.26718854904174805,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0019249441102147102,
+          "conditional_losses": [
+            0.6474316120147705,
+            0.31286975741386414
+          ],
+          "head": 1,
+          "noise": [
+            -0.45740005373954773,
+            1.0122196674346924
+          ],
+          "original_gradient_l1": 1.785455572451966e-12,
+          "raw_logits": [
+            -11.495047569274902,
+            10.727684020996094
+          ],
+          "raw_top_two_margin": 22.222732543945312,
+          "selected": 1
+        }
+      ],
+      "step": 24
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.007413243409246206,
+          "conditional_losses": [
+            1.2992098331451416,
+            1.3146708011627197,
+            1.807300329208374
+          ],
+          "head": 0,
+          "noise": [
+            0.9498642683029175,
+            -0.21991023421287537,
+            2.794834613800049
+          ],
+          "original_gradient_l1": 1.2238718174384302e-16,
+          "raw_logits": [
+            20.823715209960938,
+            -7.498269081115723,
+            -46.1072998046875
+          ],
+          "raw_top_two_margin": 28.321983337402344,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 9.027027408592403e-05,
+          "conditional_losses": [
+            2.61977219581604,
+            1.2992098331451416
+          ],
+          "head": 1,
+          "noise": [
+            -0.7997156381607056,
+            2.869835615158081
+          ],
+          "original_gradient_l1": 1.2787906818019259e-31,
+          "raw_logits": [
+            -31.754243850708008,
+            29.330747604370117
+          ],
+          "raw_top_two_margin": 61.084991455078125,
+          "selected": 1
+        }
+      ],
+      "step": 25
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 1.081191840057727e-05,
+          "conditional_losses": [
+            0.36953726410865784,
+            0.37147483229637146,
+            0.369912326335907
+          ],
+          "head": 0,
+          "noise": [
+            -0.8054989576339722,
+            1.000488042831421,
+            0.018747933208942413
+          ],
+          "original_gradient_l1": 1.3544721747459857e-15,
+          "raw_logits": [
+            -7.565845012664795,
+            15.955798149108887,
+            -31.50395965576172
+          ],
+          "raw_top_two_margin": 23.521642684936523,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.006916858721524477,
+          "conditional_losses": [
+            0.6566849946975708,
+            0.37147483229637146
+          ],
+          "head": 1,
+          "noise": [
+            3.322883129119873,
+            2.4981632232666016
+          ],
+          "original_gradient_l1": 5.123447341024139e-15,
+          "raw_logits": [
+            -14.767351150512695,
+            14.686003684997559
+          ],
+          "raw_top_two_margin": 29.453353881835938,
+          "selected": 1
+        }
+      ],
+      "step": 26
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0016266547609120607,
+          "conditional_losses": [
+            0.2817331552505493,
+            0.20915310084819794,
+            0.300956130027771
+          ],
+          "head": 0,
+          "noise": [
+            -0.1734449416399002,
+            2.072283983230591,
+            0.5117243528366089
+          ],
+          "original_gradient_l1": 1.9473496649879962e-05,
+          "raw_logits": [
+            3.7829272747039795,
+            -6.563526153564453,
+            -8.137372970581055
+          ],
+          "raw_top_two_margin": 10.346453666687012,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0018288666615262628,
+          "conditional_losses": [
+            0.2817331552505493,
+            0.37234264612197876
+          ],
+          "head": 1,
+          "noise": [
+            -0.7602590322494507,
+            1.0791842937469482
+          ],
+          "original_gradient_l1": 6.3674110428735275e-09,
+          "raw_logits": [
+            8.557883262634277,
+            -8.163376808166504
+          ],
+          "raw_top_two_margin": 16.72126007080078,
+          "selected": 0
+        }
+      ],
+      "step": 27
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.00011163594899699092,
+          "conditional_losses": [
+            0.4026758074760437,
+            0.39843547344207764,
+            0.3232327401638031
+          ],
+          "head": 0,
+          "noise": [
+            2.174739122390747,
+            1.4021837711334229,
+            -0.3418872654438019
+          ],
+          "original_gradient_l1": 2.1591495169559494e-05,
+          "raw_logits": [
+            8.278548240661621,
+            14.4844331741333,
+            -71.11952209472656
+          ],
+          "raw_top_two_margin": 6.20588493347168,
+          "selected": 1
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0004148904699832201,
+          "conditional_losses": [
+            0.3609951436519623,
+            0.39843547344207764
+          ],
+          "head": 1,
+          "noise": [
+            0.34492549300193787,
+            0.2390740066766739
+          ],
+          "original_gradient_l1": 3.036748453640873e-21,
+          "raw_logits": [
+            -21.847618103027344,
+            17.644411087036133
+          ],
+          "raw_top_two_margin": 39.492027282714844,
+          "selected": 1
+        }
+      ],
+      "step": 28
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.00012715873890556395,
+          "conditional_losses": [
+            0.4015620946884155,
+            0.38574814796447754,
+            0.3546721339225769
+          ],
+          "head": 0,
+          "noise": [
+            1.992777705192566,
+            -0.3753403127193451,
+            -0.05230944976210594
+          ],
+          "original_gradient_l1": 2.704312646528706e-05,
+          "raw_logits": [
+            7.550333499908447,
+            3.530271053314209,
+            -36.182613372802734
+          ],
+          "raw_top_two_margin": 4.020062446594238,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 4.5778251660522074e-05,
+          "conditional_losses": [
+            0.4303320050239563,
+            0.4015620946884155
+          ],
+          "head": 1,
+          "noise": [
+            -0.07323503494262695,
+            2.4173882007598877
+          ],
+          "original_gradient_l1": 6.62993281304471e-16,
+          "raw_logits": [
+            -14.380739212036133,
+            11.172337532043457
+          ],
+          "raw_top_two_margin": 25.553077697753906,
+          "selected": 1
+        }
+      ],
+      "step": 29
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0015442022122442722,
+          "conditional_losses": [
+            0.47839081287384033,
+            0.5255504846572876,
+            0.6057278513908386
+          ],
+          "head": 0,
+          "noise": [
+            0.18668125569820404,
+            1.179516315460205,
+            2.2462456226348877
+          ],
+          "original_gradient_l1": 2.416820734651992e-06,
+          "raw_logits": [
+            -10.139203071594238,
+            -7.305121898651123,
+            1.591101884841919
+          ],
+          "raw_top_two_margin": 8.896224021911621,
+          "selected": 2
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.005390502512454987,
+          "conditional_losses": [
+            0.6057278513908386,
+            0.38349831104278564
+          ],
+          "head": 1,
+          "noise": [
+            -0.37376850843429565,
+            -0.01778312958776951
+          ],
+          "original_gradient_l1": 2.94081252405487e-11,
+          "raw_logits": [
+            9.838327407836914,
+            -10.773804664611816
+          ],
+          "raw_top_two_margin": 20.612133026123047,
+          "selected": 0
+        }
+      ],
+      "step": 30
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 8.359244384337217e-05,
+          "conditional_losses": [
+            0.4973606467247009,
+            0.5149193406105042,
+            0.7864581346511841
+          ],
+          "head": 0,
+          "noise": [
+            2.621293306350708,
+            -0.9373690485954285,
+            -0.43149393796920776
+          ],
+          "original_gradient_l1": 0.0025223875418305397,
+          "raw_logits": [
+            6.988508701324463,
+            8.238012313842773,
+            -46.948974609375
+          ],
+          "raw_top_two_margin": 1.2495036125183105,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.01419820636510849,
+          "conditional_losses": [
+            1.4344271421432495,
+            0.4973606467247009
+          ],
+          "head": 1,
+          "noise": [
+            -0.09221182018518448,
+            0.1330205649137497
+          ],
+          "original_gradient_l1": 4.649246482593683e-13,
+          "raw_logits": [
+            -12.780240058898926,
+            12.090984344482422
+          ],
+          "raw_top_two_margin": 24.87122344970703,
+          "selected": 1
+        }
+      ],
+      "step": 31
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.002812339924275875,
+          "conditional_losses": [
+            0.31826767325401306,
+            0.6174845695495605,
+            0.5565826892852783
+          ],
+          "head": 0,
+          "noise": [
+            -0.2437346875667572,
+            0.7071723937988281,
+            0.31404727697372437
+          ],
+          "original_gradient_l1": 4.093497238955024e-07,
+          "raw_logits": [
+            -8.770071983337402,
+            -4.2157673835754395,
+            7.358953952789307
+          ],
+          "raw_top_two_margin": 11.574721336364746,
+          "selected": 2
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.00036421851837076247,
+          "conditional_losses": [
+            0.5565826892852783,
+            0.5313787460327148
+          ],
+          "head": 1,
+          "noise": [
+            -0.8852341175079346,
+            -0.059500448405742645
+          ],
+          "original_gradient_l1": 2.441864697924408e-25,
+          "raw_logits": [
+            23.137645721435547,
+            -24.32605743408203
+          ],
+          "raw_top_two_margin": 47.46370315551758,
+          "selected": 0
+        }
+      ],
+      "step": 32
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0014904066920280457,
+          "conditional_losses": [
+            0.5632297396659851,
+            0.5615242123603821,
+            0.6194858551025391
+          ],
+          "head": 0,
+          "noise": [
+            0.8997899293899536,
+            -0.6595121026039124,
+            -0.38468509912490845
+          ],
+          "original_gradient_l1": 1.3510149443618502e-08,
+          "raw_logits": [
+            -12.126501083374023,
+            -4.369544506072998,
+            8.82186508178711
+          ],
+          "raw_top_two_margin": 13.191410064697266,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 3.944158379454166e-05,
+          "conditional_losses": [
+            0.6194858551025391,
+            0.7308626770973206
+          ],
+          "head": 1,
+          "noise": [
+            0.8385696411132812,
+            -0.7057591676712036
+          ],
+          "original_gradient_l1": 1.3006906155723982e-37,
+          "raw_logits": [
+            35.188140869140625,
+            -35.699466705322266
+          ],
+          "raw_top_two_margin": 70.88760375976562,
+          "selected": 0
+        }
+      ],
+      "step": 33
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.00026600476121529937,
+          "conditional_losses": [
+            0.49380454421043396,
+            0.4117248058319092,
+            0.47451820969581604
+          ],
+          "head": 0,
+          "noise": [
+            -0.14493608474731445,
+            -1.536887526512146,
+            1.3168989419937134
+          ],
+          "original_gradient_l1": 0.00024147435033228248,
+          "raw_logits": [
+            -1.1728013753890991,
+            -12.414073944091797,
+            1.8911919593811035
+          ],
+          "raw_top_two_margin": 3.063993453979492,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.002657019766047597,
+          "conditional_losses": [
+            0.8061511516571045,
+            0.47451820969581604
+          ],
+          "head": 1,
+          "noise": [
+            3.8686089515686035,
+            0.3735038936138153
+          ],
+          "original_gradient_l1": 6.470492544541351e-13,
+          "raw_logits": [
+            -14.087922096252441,
+            12.987881660461426
+          ],
+          "raw_top_two_margin": 27.075803756713867,
+          "selected": 1
+        }
+      ],
+      "step": 34
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.000343060411978513,
+          "conditional_losses": [
+            0.809241533279419,
+            0.7818930745124817,
+            0.818115234375
+          ],
+          "head": 0,
+          "noise": [
+            2.446366548538208,
+            1.0955719947814941,
+            0.10685329139232635
+          ],
+          "original_gradient_l1": 6.6641105149756186e-06,
+          "raw_logits": [
+            11.904383659362793,
+            5.332070350646973,
+            -58.083309173583984
+          ],
+          "raw_top_two_margin": 6.57231330871582,
+          "selected": 0
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.002781154587864876,
+          "conditional_losses": [
+            0.809241533279419,
+            0.710069477558136
+          ],
+          "head": 1,
+          "noise": [
+            -0.9923703670501709,
+            0.38707977533340454
+          ],
+          "original_gradient_l1": 4.233635740157754e-13,
+          "raw_logits": [
+            9.222086906433105,
+            -14.95711898803711
+          ],
+          "raw_top_two_margin": 24.17920684814453,
+          "selected": 0
+        }
+      ],
+      "step": 35
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0027009283658117056,
+          "conditional_losses": [
+            0.7563899755477905,
+            0.8567993640899658,
+            0.7457133531570435
+          ],
+          "head": 0,
+          "noise": [
+            0.09356043487787247,
+            1.1121995449066162,
+            -0.2147543728351593
+          ],
+          "original_gradient_l1": 0.0005719584878534079,
+          "raw_logits": [
+            2.3780786991119385,
+            -3.8176016807556152,
+            -13.45419979095459
+          ],
+          "raw_top_two_margin": 6.195680618286133,
+          "selected": 0
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.004313369281589985,
+          "conditional_losses": [
+            0.7563899755477905,
+            0.5063925385475159
+          ],
+          "head": 1,
+          "noise": [
+            -0.023296691477298737,
+            1.4661229848861694
+          ],
+          "original_gradient_l1": 0.018915735185146332,
+          "raw_logits": [
+            1.6635572910308838,
+            -2.7178568840026855
+          ],
+          "raw_top_two_margin": 4.381414413452148,
+          "selected": 0
+        }
+      ],
+      "step": 36
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0011456016218289733,
+          "conditional_losses": [
+            0.6098690032958984,
+            0.6657178997993469,
+            0.6575707793235779
+          ],
+          "head": 0,
+          "noise": [
+            1.056645393371582,
+            -0.438330739736557,
+            1.7187079191207886
+          ],
+          "original_gradient_l1": 3.030109149704252e-11,
+          "raw_logits": [
+            -10.586787223815918,
+            9.408941268920898,
+            -11.86999797821045
+          ],
+          "raw_top_two_margin": 19.9957275390625,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.008868974633514881,
+          "conditional_losses": [
+            1.1373934745788574,
+            0.6657178997993469
+          ],
+          "head": 1,
+          "noise": [
+            1.47505521774292,
+            1.1549017429351807
+          ],
+          "original_gradient_l1": 5.496864251040921e-16,
+          "raw_logits": [
+            -15.55907917022705,
+            14.40440559387207
+          ],
+          "raw_top_two_margin": 29.963485717773438,
+          "selected": 1
+        }
+      ],
+      "step": 37
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0024878312833607197,
+          "conditional_losses": [
+            0.5261013507843018,
+            0.8025298714637756,
+            0.7117931246757507
+          ],
+          "head": 0,
+          "noise": [
+            0.6643304228782654,
+            -1.315984845161438,
+            1.9257946014404297
+          ],
+          "original_gradient_l1": 4.312959936214611e-05,
+          "raw_logits": [
+            -4.936709880828857,
+            -3.2129039764404297,
+            1.6765358448028564
+          ],
+          "raw_top_two_margin": 4.889439582824707,
+          "selected": 2
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0012853082735091448,
+          "conditional_losses": [
+            0.7117931246757507,
+            0.42820262908935547
+          ],
+          "head": 1,
+          "noise": [
+            1.07188081741333,
+            -0.6883058547973633
+          ],
+          "original_gradient_l1": 9.875902179379281e-12,
+          "raw_logits": [
+            8.603522300720215,
+            -10.343674659729004
+          ],
+          "raw_top_two_margin": 18.94719696044922,
+          "selected": 0
+        }
+      ],
+      "step": 38
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.002994225360453129,
+          "conditional_losses": [
+            0.4280770421028137,
+            0.43385621905326843,
+            0.5391791462898254
+          ],
+          "head": 0,
+          "noise": [
+            0.2062709778547287,
+            -0.35568055510520935,
+            0.9403514266014099
+          ],
+          "original_gradient_l1": 0.034456655383110046,
+          "raw_logits": [
+            -0.7635089755058289,
+            -11.374601364135742,
+            -2.931384325027466
+          ],
+          "raw_top_two_margin": 2.167875289916992,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00547382514923811,
+          "conditional_losses": [
+            0.8709231615066528,
+            0.4280770421028137
+          ],
+          "head": 1,
+          "noise": [
+            2.5563762187957764,
+            0.08733535557985306
+          ],
+          "original_gradient_l1": 9.672361755974634e-08,
+          "raw_logits": [
+            -8.59317684173584,
+            7.438672065734863
+          ],
+          "raw_top_two_margin": 16.031848907470703,
+          "selected": 1
+        }
+      ],
+      "step": 39
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.002802882343530655,
+          "conditional_losses": [
+            0.3372303545475006,
+            0.47119981050491333,
+            0.4701763987541199
+          ],
+          "head": 0,
+          "noise": [
+            0.48532843589782715,
+            -0.31270843744277954,
+            -0.9368894100189209
+          ],
+          "original_gradient_l1": 8.594332030043006e-05,
+          "raw_logits": [
+            5.940551280975342,
+            -0.2117694914340973,
+            -22.455965042114258
+          ],
+          "raw_top_two_margin": 6.152320861816406,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0034987879917025566,
+          "conditional_losses": [
+            0.47181418538093567,
+            0.3372303545475006
+          ],
+          "head": 1,
+          "noise": [
+            -0.6184971332550049,
+            -0.14496269822120667
+          ],
+          "original_gradient_l1": 0.016442514955997467,
+          "raw_logits": [
+            -1.784259557723999,
+            0.1543179452419281
+          ],
+          "raw_top_two_margin": 1.9385775327682495,
+          "selected": 1
+        }
+      ],
+      "step": 40
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0024676804896444082,
+          "conditional_losses": [
+            0.394714891910553,
+            0.40729933977127075,
+            0.3016844093799591
+          ],
+          "head": 0,
+          "noise": [
+            0.2029167115688324,
+            2.1355907917022705,
+            -0.009901338256895542
+          ],
+          "original_gradient_l1": 1.8681866458274046e-15,
+          "raw_logits": [
+            -15.268684387207031,
+            -13.379295349121094,
+            15.597585678100586
+          ],
+          "raw_top_two_margin": 28.97688102722168,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0006089027738198638,
+          "conditional_losses": [
+            0.3016844093799591,
+            0.4840066134929657
+          ],
+          "head": 1,
+          "noise": [
+            -0.5665581226348877,
+            0.2472226917743683
+          ],
+          "original_gradient_l1": 2.302431467778177e-40,
+          "raw_logits": [
+            37.88428497314453,
+            -38.53621292114258
+          ],
+          "raw_top_two_margin": 76.42050170898438,
+          "selected": 0
+        }
+      ],
+      "step": 41
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0007914886227808893,
+          "conditional_losses": [
+            0.6080591678619385,
+            0.6536327600479126,
+            0.6247785091400146
+          ],
+          "head": 0,
+          "noise": [
+            -0.26173222064971924,
+            0.6834903359413147,
+            1.6729683876037598
+          ],
+          "original_gradient_l1": 1.5832747521926649e-06,
+          "raw_logits": [
+            -8.334442138671875,
+            3.438016414642334,
+            -6.51179313659668
+          ],
+          "raw_top_two_margin": 9.949810028076172,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0028351489454507828,
+          "conditional_losses": [
+            0.6536327600479126,
+            0.755251407623291
+          ],
+          "head": 1,
+          "noise": [
+            -0.8985199928283691,
+            0.7286360263824463
+          ],
+          "original_gradient_l1": 5.450787797468479e-14,
+          "raw_logits": [
+            12.075346946716309,
+            -13.392669677734375
+          ],
+          "raw_top_two_margin": 25.468017578125,
+          "selected": 0
+        }
+      ],
+      "step": 42
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0019436164293438196,
+          "conditional_losses": [
+            0.2395520806312561,
+            0.38162359595298767,
+            0.41719961166381836
+          ],
+          "head": 0,
+          "noise": [
+            1.4229412078857422,
+            1.4721357822418213,
+            -1.4219753742218018
+          ],
+          "original_gradient_l1": 3.066825959852082e-10,
+          "raw_logits": [
+            -28.573827743530273,
+            1.0573365688323975,
+            19.600948333740234
+          ],
+          "raw_top_two_margin": 18.543611526489258,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0022132734302431345,
+          "conditional_losses": [
+            0.6839026212692261,
+            0.41719961166381836
+          ],
+          "head": 1,
+          "noise": [
+            1.0954269170761108,
+            1.0581730604171753
+          ],
+          "original_gradient_l1": 1.2510186953049056e-23,
+          "raw_logits": [
+            -23.656312942504883,
+            19.444175720214844
+          ],
+          "raw_top_two_margin": 43.100486755371094,
+          "selected": 1
+        }
+      ],
+      "step": 43
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0005615301197394729,
+          "conditional_losses": [
+            0.3159383237361908,
+            0.3355995714664459,
+            0.48282212018966675
+          ],
+          "head": 0,
+          "noise": [
+            1.750229835510254,
+            0.687734842300415,
+            0.9000730514526367
+          ],
+          "original_gradient_l1": 0.011817347258329391,
+          "raw_logits": [
+            7.230917453765869,
+            8.231021881103516,
+            -47.69077682495117
+          ],
+          "raw_top_two_margin": 1.0001044273376465,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.015598124824464321,
+          "conditional_losses": [
+            0.87953782081604,
+            0.3159383237361908
+          ],
+          "head": 1,
+          "noise": [
+            -0.7261806130409241,
+            -1.4728295803070068
+          ],
+          "original_gradient_l1": 4.823386698729615e-13,
+          "raw_logits": [
+            -12.344802856445312,
+            11.638589859008789
+          ],
+          "raw_top_two_margin": 23.9833927154541,
+          "selected": 1
+        }
+      ],
+      "step": 44
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0005753759760409594,
+          "conditional_losses": [
+            1.096459984779358,
+            1.104111671447754,
+            1.5566682815551758
+          ],
+          "head": 0,
+          "noise": [
+            1.7825212478637695,
+            1.5657628774642944,
+            1.4233492612838745
+          ],
+          "original_gradient_l1": 5.5466691100513714e-18,
+          "raw_logits": [
+            21.137882232666016,
+            -7.624312400817871,
+            -46.44472885131836
+          ],
+          "raw_top_two_margin": 28.762195587158203,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0012889804784208536,
+          "conditional_losses": [
+            2.2814552783966064,
+            1.096459984779358
+          ],
+          "head": 1,
+          "noise": [
+            0.6720240712165833,
+            1.6024785041809082
+          ],
+          "original_gradient_l1": 2.0271770360650857e-32,
+          "raw_logits": [
+            -31.070913314819336,
+            28.630796432495117
+          ],
+          "raw_top_two_margin": 59.70170974731445,
+          "selected": 1
+        }
+      ],
+      "step": 45
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0025689173489809036,
+          "conditional_losses": [
+            0.23247526586055756,
+            0.21495729684829712,
+            0.38630950450897217
+          ],
+          "head": 0,
+          "noise": [
+            0.9630585312843323,
+            -1.3161371946334839,
+            0.8077579140663147
+          ],
+          "original_gradient_l1": 6.638568546876028e-14,
+          "raw_logits": [
+            11.19778060913086,
+            -13.9702787399292,
+            -12.23550033569336
+          ],
+          "raw_top_two_margin": 23.43328094482422,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0005230277311056852,
+          "conditional_losses": [
+            0.23247526586055756,
+            0.327521413564682
+          ],
+          "head": 1,
+          "noise": [
+            1.4186384677886963,
+            -0.4533095061779022
+          ],
+          "original_gradient_l1": 2.530017262358797e-08,
+          "raw_logits": [
+            5.665544033050537,
+            -6.115058898925781
+          ],
+          "raw_top_two_margin": 11.780603408813477,
+          "selected": 0
+        }
+      ],
+      "step": 46
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.006386604160070419,
+          "conditional_losses": [
+            0.20042964816093445,
+            0.3286798596382141,
+            0.45119577646255493
+          ],
+          "head": 0,
+          "noise": [
+            2.586918354034424,
+            -0.6867403388023376,
+            1.134252905845642
+          ],
+          "original_gradient_l1": 0.0048369113355875015,
+          "raw_logits": [
+            -15.768805503845215,
+            5.985772609710693,
+            0.8140413165092468
+          ],
+          "raw_top_two_margin": 5.171731472015381,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.008763538673520088,
+          "conditional_losses": [
+            0.626901388168335,
+            0.3286798596382141
+          ],
+          "head": 1,
+          "noise": [
+            0.20490862429141998,
+            -0.8284990191459656
+          ],
+          "original_gradient_l1": 2.3637172677070523e-14,
+          "raw_logits": [
+            -15.371638298034668,
+            10.528278350830078
+          ],
+          "raw_top_two_margin": 25.899917602539062,
+          "selected": 1
+        }
+      ],
+      "step": 47
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.004213341977447271,
+          "conditional_losses": [
+            0.3951108753681183,
+            0.43097859621047974,
+            0.5676287412643433
+          ],
+          "head": 0,
+          "noise": [
+            -0.343520849943161,
+            1.0304644107818604,
+            0.6636971831321716
+          ],
+          "original_gradient_l1": 1.7509889858047245e-06,
+          "raw_logits": [
+            -12.187347412109375,
+            -1.0889629125595093,
+            9.191978454589844
+          ],
+          "raw_top_two_margin": 10.280941009521484,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0066782948561012745,
+          "conditional_losses": [
+            1.4827115535736084,
+            0.5676287412643433
+          ],
+          "head": 1,
+          "noise": [
+            0.13227884471416473,
+            -0.28181737661361694
+          ],
+          "original_gradient_l1": 1.5302495632428226e-28,
+          "raw_logits": [
+            -28.87645721435547,
+            23.827817916870117
+          ],
+          "raw_top_two_margin": 52.70427703857422,
+          "selected": 1
+        }
+      ],
+      "step": 48
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.00026062753750011325,
+          "conditional_losses": [
+            0.43403124809265137,
+            0.4392503499984741,
+            0.5021951794624329
+          ],
+          "head": 0,
+          "noise": [
+            1.6403372287750244,
+            -0.20016855001449585,
+            0.10812272131443024
+          ],
+          "original_gradient_l1": 3.308366696374264e-14,
+          "raw_logits": [
+            -7.235586643218994,
+            15.686476707458496,
+            -31.624988555908203
+          ],
+          "raw_top_two_margin": 22.92206382751465,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00131876184605062,
+          "conditional_losses": [
+            0.8623723983764648,
+            0.4392503499984741
+          ],
+          "head": 1,
+          "noise": [
+            0.43805792927742004,
+            1.9828041791915894
+          ],
+          "original_gradient_l1": 7.068522370317148e-17,
+          "raw_logits": [
+            -14.098225593566895,
+            13.9899320602417
+          ],
+          "raw_top_two_margin": 28.088157653808594,
+          "selected": 1
+        }
+      ],
+      "step": 49
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.002248411998152733,
+          "conditional_losses": [
+            0.4050888419151306,
+            0.4126105308532715,
+            0.33074358105659485
+          ],
+          "head": 0,
+          "noise": [
+            1.9691420793533325,
+            -1.4024358987808228,
+            0.8169341087341309
+          ],
+          "original_gradient_l1": 1.312939184726792e-15,
+          "raw_logits": [
+            -13.460803985595703,
+            -12.769037246704102,
+            13.454270362854004
+          ],
+          "raw_top_two_margin": 26.223308563232422,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0006638893974013627,
+          "conditional_losses": [
+            0.33074358105659485,
+            0.5071902871131897
+          ],
+          "head": 1,
+          "noise": [
+            -0.043770864605903625,
+            0.2549630403518677
+          ],
+          "original_gradient_l1": 1.2227908940817252e-34,
+          "raw_logits": [
+            30.54998207092285,
+            -31.544422149658203
+          ],
+          "raw_top_two_margin": 62.09440612792969,
+          "selected": 0
+        }
+      ],
+      "step": 50
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 1.4098557585384697e-05,
+          "conditional_losses": [
+            0.46973201632499695,
+            0.5003859400749207,
+            0.7717543244361877
+          ],
+          "head": 0,
+          "noise": [
+            1.0515674352645874,
+            5.37141227722168,
+            0.7175393104553223
+          ],
+          "original_gradient_l1": 6.169672815303784e-06,
+          "raw_logits": [
+            7.732964515686035,
+            10.989598274230957,
+            -57.427833557128906
+          ],
+          "raw_top_two_margin": 3.256633758544922,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.022253595292568207,
+          "conditional_losses": [
+            1.234762191772461,
+            0.5003859400749207
+          ],
+          "head": 1,
+          "noise": [
+            1.1864367723464966,
+            -0.532916784286499
+          ],
+          "original_gradient_l1": 5.75977970444841e-17,
+          "raw_logits": [
+            -16.015796661376953,
+            15.663866996765137
+          ],
+          "raw_top_two_margin": 31.679664611816406,
+          "selected": 1
+        }
+      ],
+      "step": 51
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0005583863239735365,
+          "conditional_losses": [
+            0.8919017910957336,
+            0.864662766456604,
+            0.8311730027198792
+          ],
+          "head": 0,
+          "noise": [
+            -0.6373424530029297,
+            -0.7925081253051758,
+            4.958883285522461
+          ],
+          "original_gradient_l1": 1.487818677844223e-22,
+          "raw_logits": [
+            25.05497932434082,
+            -12.257405281066895,
+            -48.651248931884766
+          ],
+          "raw_top_two_margin": 37.31238555908203,
+          "selected": 0
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0023907313589006662,
+          "conditional_losses": [
+            0.6836537718772888,
+            0.8919017910957336
+          ],
+          "head": 1,
+          "noise": [
+            3.062056541442871,
+            0.9598890542984009
+          ],
+          "original_gradient_l1": 0.00043034966802224517,
+          "raw_logits": [
+            -6.715082168579102,
+            1.059622049331665
+          ],
+          "raw_top_two_margin": 7.7747039794921875,
+          "selected": 1
+        }
+      ],
+      "step": 52
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0038472407031804323,
+          "conditional_losses": [
+            0.5175142288208008,
+            0.676971971988678,
+            0.6820924878120422
+          ],
+          "head": 0,
+          "noise": [
+            1.4062855243682861,
+            0.6652166247367859,
+            -0.042865727096796036
+          ],
+          "original_gradient_l1": 0.0017720735631883144,
+          "raw_logits": [
+            4.577001571655273,
+            1.0132642984390259,
+            -17.06490707397461
+          ],
+          "raw_top_two_margin": 3.563737392425537,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.09550029039382935,
+          "conditional_losses": [
+            3.6145360469818115,
+            0.5175142288208008
+          ],
+          "head": 1,
+          "noise": [
+            -0.11968888342380524,
+            -1.5078613758087158
+          ],
+          "original_gradient_l1": 1.1099043284787521e-15,
+          "raw_logits": [
+            -15.602760314941406,
+            14.251513481140137
+          ],
+          "raw_top_two_margin": 29.85427474975586,
+          "selected": 1
+        }
+      ],
+      "step": 53
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 4.9530375690665096e-05,
+          "conditional_losses": [
+            0.37230196595191956,
+            0.37100347876548767,
+            0.29106608033180237
+          ],
+          "head": 0,
+          "noise": [
+            -1.6064479351043701,
+            -1.4084434509277344,
+            -1.236314058303833
+          ],
+          "original_gradient_l1": 7.252256750689412e-07,
+          "raw_logits": [
+            8.1255464553833,
+            14.619170188903809,
+            -71.22502899169922
+          ],
+          "raw_top_two_margin": 6.493623733520508,
+          "selected": 1
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 3.732859477167949e-05,
+          "conditional_losses": [
+            0.347413569688797,
+            0.37100347876548767
+          ],
+          "head": 1,
+          "noise": [
+            -1.369005799293518,
+            0.18257030844688416
+          ],
+          "original_gradient_l1": 4.257337549501693e-24,
+          "raw_logits": [
+            -21.20067596435547,
+            17.052467346191406
+          ],
+          "raw_top_two_margin": 38.253143310546875,
+          "selected": 1
+        }
+      ],
+      "step": 54
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 9.510586824035272e-05,
+          "conditional_losses": [
+            0.2871648669242859,
+            0.27602025866508484,
+            0.36007159948349
+          ],
+          "head": 0,
+          "noise": [
+            -0.8789466023445129,
+            2.44922137260437,
+            0.22628530859947205
+          ],
+          "original_gradient_l1": 0.0006550205871462822,
+          "raw_logits": [
+            5.019577503204346,
+            4.619138717651367,
+            -28.541479110717773
+          ],
+          "raw_top_two_margin": 0.4004387855529785,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.007060650736093521,
+          "conditional_losses": [
+            0.5080813765525818,
+            0.27602025866508484
+          ],
+          "head": 1,
+          "noise": [
+            1.048317790031433,
+            0.29532182216644287
+          ],
+          "original_gradient_l1": 3.901717057080978e-12,
+          "raw_logits": [
+            -10.626404762268066,
+            9.849321365356445
+          ],
+          "raw_top_two_margin": 20.475727081298828,
+          "selected": 1
+        }
+      ],
+      "step": 55
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 4.812944825971499e-05,
+          "conditional_losses": [
+            0.4399351179599762,
+            0.46074607968330383,
+            0.4373592436313629
+          ],
+          "head": 0,
+          "noise": [
+            1.472520112991333,
+            -1.0435978174209595,
+            -0.3758717179298401
+          ],
+          "original_gradient_l1": 3.29206828464379e-10,
+          "raw_logits": [
+            6.286154270172119,
+            -5.461552143096924,
+            -31.56410789489746
+          ],
+          "raw_top_two_margin": 11.747706413269043,
+          "selected": 0
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0023597246035933495,
+          "conditional_losses": [
+            0.34033411741256714,
+            0.4399351179599762
+          ],
+          "head": 1,
+          "noise": [
+            1.7647470235824585,
+            0.24798986315727234
+          ],
+          "original_gradient_l1": 1.0306440856311383e-07,
+          "raw_logits": [
+            -9.78310489654541,
+            3.7718887329101562
+          ],
+          "raw_top_two_margin": 13.554993629455566,
+          "selected": 1
+        }
+      ],
+      "step": 56
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.00027068608324043453,
+          "conditional_losses": [
+            0.3089577555656433,
+            0.2525400221347809,
+            0.2942688465118408
+          ],
+          "head": 0,
+          "noise": [
+            2.193394899368286,
+            -0.011629996821284294,
+            0.634652316570282
+          ],
+          "original_gradient_l1": 3.625701516796198e-09,
+          "raw_logits": [
+            4.3310933113098145,
+            -6.59462833404541,
+            -8.787444114685059
+          ],
+          "raw_top_two_margin": 10.925722122192383,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.002074583899229765,
+          "conditional_losses": [
+            0.3089577555656433,
+            0.4057764708995819
+          ],
+          "head": 1,
+          "noise": [
+            2.1584484577178955,
+            1.9369783401489258
+          ],
+          "original_gradient_l1": 1.3823285571756827e-10,
+          "raw_logits": [
+            8.105790138244629,
+            -7.7436628341674805
+          ],
+          "raw_top_two_margin": 15.84945297241211,
+          "selected": 0
+        }
+      ],
+      "step": 57
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 1.9603521650424227e-05,
+          "conditional_losses": [
+            0.39651647210121155,
+            0.36896711587905884,
+            0.4058774709701538
+          ],
+          "head": 0,
+          "noise": [
+            0.6964065432548523,
+            -0.4347105622291565,
+            -0.19224317371845245
+          ],
+          "original_gradient_l1": 1.394884472382995e-35,
+          "raw_logits": [
+            42.573204040527344,
+            -15.954116821289062,
+            -98.22449493408203
+          ],
+          "raw_top_two_margin": 58.527320861816406,
+          "selected": 0
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0034660878591239452,
+          "conditional_losses": [
+            0.2744077444076538,
+            0.39651647210121155
+          ],
+          "head": 1,
+          "noise": [
+            -0.06910087168216705,
+            -0.02064233087003231
+          ],
+          "original_gradient_l1": 1.2048924418195384e-06,
+          "raw_logits": [
+            -9.542613983154297,
+            0.05043719708919525
+          ],
+          "raw_top_two_margin": 9.593050956726074,
+          "selected": 1
+        }
+      ],
+      "step": 58
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.002064833650365472,
+          "conditional_losses": [
+            0.22222734987735748,
+            0.48384398221969604,
+            0.4992397427558899
+          ],
+          "head": 0,
+          "noise": [
+            -0.6806727647781372,
+            0.7660718560218811,
+            -0.17766308784484863
+          ],
+          "original_gradient_l1": 9.364602426842339e-09,
+          "raw_logits": [
+            -8.99433422088623,
+            -4.262820243835449,
+            7.929974555969238
+          ],
+          "raw_top_two_margin": 12.192794799804688,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0016800460871309042,
+          "conditional_losses": [
+            0.4992397427558899,
+            0.5528440475463867
+          ],
+          "head": 1,
+          "noise": [
+            -0.5025990009307861,
+            1.609397292137146
+          ],
+          "original_gradient_l1": 3.892183469206096e-27,
+          "raw_logits": [
+            22.94145393371582,
+            -24.037506103515625
+          ],
+          "raw_top_two_margin": 46.97895812988281,
+          "selected": 0
+        }
+      ],
+      "step": 59
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00039018888492137194,
+          "conditional_losses": [
+            0.4729856848716736,
+            0.47818031907081604,
+            0.450350284576416
+          ],
+          "head": 0,
+          "noise": [
+            0.6676018834114075,
+            0.7195753455162048,
+            -0.37978595495224
+          ],
+          "original_gradient_l1": 3.3353458343132354e-34,
+          "raw_logits": [
+            -22.99370765686035,
+            -29.44110107421875,
+            34.52668380737305
+          ],
+          "raw_top_two_margin": 57.52039337158203,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0007525978144258261,
+          "conditional_losses": [
+            0.6432453393936157,
+            0.450350284576416
+          ],
+          "head": 1,
+          "noise": [
+            0.25539684295654297,
+            -0.44318827986717224
+          ],
+          "original_gradient_l1": 3.054371026331803e-39,
+          "raw_logits": [
+            -33.10305404663086,
+            34.61946487426758
+          ],
+          "raw_top_two_margin": 67.72251892089844,
+          "selected": 1
+        }
+      ],
+      "step": 60
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0005928591708652675,
+          "conditional_losses": [
+            0.4334283769130707,
+            0.4037749171257019,
+            0.39252185821533203
+          ],
+          "head": 0,
+          "noise": [
+            0.01756216399371624,
+            1.2507978677749634,
+            1.1078031063079834
+          ],
+          "original_gradient_l1": 0.005448564887046814,
+          "raw_logits": [
+            7.1584367752075195,
+            4.016586780548096,
+            -36.18380355834961
+          ],
+          "raw_top_two_margin": 3.141849994659424,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 8.508650353178382e-05,
+          "conditional_losses": [
+            0.4496033191680908,
+            0.4334283769130707
+          ],
+          "head": 1,
+          "noise": [
+            2.297191858291626,
+            3.4943535327911377
+          ],
+          "original_gradient_l1": 1.037569104446664e-16,
+          "raw_logits": [
+            -13.530475616455078,
+            10.438642501831055
+          ],
+          "raw_top_two_margin": 23.969118118286133,
+          "selected": 1
+        }
+      ],
+      "step": 61
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.00843519251793623,
+          "conditional_losses": [
+            0.9250301718711853,
+            0.9555734395980835,
+            1.2095648050308228
+          ],
+          "head": 0,
+          "noise": [
+            0.04513376206159592,
+            0.8977731466293335,
+            0.6110816597938538
+          ],
+          "original_gradient_l1": 1.1358896699675824e-05,
+          "raw_logits": [
+            -9.47755241394043,
+            -7.357827186584473,
+            1.28669273853302
+          ],
+          "raw_top_two_margin": 8.644519805908203,
+          "selected": 2
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0002231835969723761,
+          "conditional_losses": [
+            1.2095648050308228,
+            0.6471791863441467
+          ],
+          "head": 1,
+          "noise": [
+            4.0503315925598145,
+            0.6605717539787292
+          ],
+          "original_gradient_l1": 1.8746521330170914e-14,
+          "raw_logits": [
+            9.749290466308594,
+            -10.649222373962402
+          ],
+          "raw_top_two_margin": 20.398513793945312,
+          "selected": 0
+        }
+      ],
+      "step": 62
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 9.403456351719797e-05,
+          "conditional_losses": [
+            0.3186165690422058,
+            0.34481731057167053,
+            0.2709362506866455
+          ],
+          "head": 0,
+          "noise": [
+            1.8215034008026123,
+            -1.075766682624817,
+            -0.6805506944656372
+          ],
+          "original_gradient_l1": 0.006765314377844334,
+          "raw_logits": [
+            -1.4822663068771362,
+            2.9984633922576904,
+            -24.67371940612793
+          ],
+          "raw_top_two_margin": 4.480729579925537,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0020761978812515736,
+          "conditional_losses": [
+            0.34481731057167053,
+            0.5458813905715942
+          ],
+          "head": 1,
+          "noise": [
+            0.3463415801525116,
+            0.828274667263031
+          ],
+          "original_gradient_l1": 1.9905287162098948e-27,
+          "raw_logits": [
+            22.27466583251953,
+            -23.68035125732422
+          ],
+          "raw_top_two_margin": 45.95501708984375,
+          "selected": 0
+        }
+      ],
+      "step": 63
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0011142228031530976,
+          "conditional_losses": [
+            0.2101564258337021,
+            0.19477173686027527,
+            0.2915428876876831
+          ],
+          "head": 0,
+          "noise": [
+            0.33191823959350586,
+            1.1788337230682373,
+            0.3917869031429291
+          ],
+          "original_gradient_l1": 3.546798705428289e-12,
+          "raw_logits": [
+            -14.20766544342041,
+            9.163938522338867,
+            -8.332894325256348
+          ],
+          "raw_top_two_margin": 17.49683380126953,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.005187133327126503,
+          "conditional_losses": [
+            0.5210937857627869,
+            0.19477173686027527
+          ],
+          "head": 1,
+          "noise": [
+            0.6432151198387146,
+            -1.4624264240264893
+          ],
+          "original_gradient_l1": 1.6000866644739356e-40,
+          "raw_logits": [
+            -34.98283767700195,
+            35.40044021606445
+          ],
+          "raw_top_two_margin": 70.3832778930664,
+          "selected": 1
+        }
+      ],
+      "step": 64
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0006364743458107114,
+          "conditional_losses": [
+            0.28798067569732666,
+            0.2763979136943817,
+            0.3681204915046692
+          ],
+          "head": 0,
+          "noise": [
+            0.0015601161867380142,
+            1.1269420385360718,
+            0.6503012180328369
+          ],
+          "original_gradient_l1": 0.006316788494586945,
+          "raw_logits": [
+            5.082120418548584,
+            4.643077373504639,
+            -28.81978988647461
+          ],
+          "raw_top_two_margin": 0.4390430450439453,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.009771110489964485,
+          "conditional_losses": [
+            0.6202895641326904,
+            0.2763979136943817
+          ],
+          "head": 1,
+          "noise": [
+            -0.11410091072320938,
+            -0.532724916934967
+          ],
+          "original_gradient_l1": 1.3812123103237872e-12,
+          "raw_logits": [
+            -10.540285110473633,
+            9.724319458007812
+          ],
+          "raw_top_two_margin": 20.264604568481445,
+          "selected": 1
+        }
+      ],
+      "step": 65
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0011541969142854214,
+          "conditional_losses": [
+            0.33530393242836,
+            0.3948407471179962,
+            0.3515319228172302
+          ],
+          "head": 0,
+          "noise": [
+            1.642820954322815,
+            0.8061906695365906,
+            -0.023906312882900238
+          ],
+          "original_gradient_l1": 1.758815415087156e-05,
+          "raw_logits": [
+            5.955086708068848,
+            0.007434535771608353,
+            -22.944026947021484
+          ],
+          "raw_top_two_margin": 5.947652339935303,
+          "selected": 0
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.00021622359054163098,
+          "conditional_losses": [
+            0.28472253680229187,
+            0.33530393242836
+          ],
+          "head": 1,
+          "noise": [
+            -0.03937460482120514,
+            2.3565468788146973
+          ],
+          "original_gradient_l1": 0.0002933755749836564,
+          "raw_logits": [
+            -1.9163004159927368,
+            0.25219056010246277
+          ],
+          "raw_top_two_margin": 2.1684908866882324,
+          "selected": 1
+        }
+      ],
+      "step": 66
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.003811278846114874,
+          "conditional_losses": [
+            0.1960025429725647,
+            0.1787789911031723,
+            0.3237135708332062
+          ],
+          "head": 0,
+          "noise": [
+            -1.7695528268814087,
+            -1.0416346788406372,
+            0.5921608805656433
+          ],
+          "original_gradient_l1": 9.727046251795102e-11,
+          "raw_logits": [
+            -14.241162300109863,
+            9.17603874206543,
+            -8.314111709594727
+          ],
+          "raw_top_two_margin": 17.490150451660156,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.002000670414417982,
+          "conditional_losses": [
+            0.7030006647109985,
+            0.1787789911031723
+          ],
+          "head": 1,
+          "noise": [
+            0.5133688449859619,
+            -0.3796442449092865
+          ],
+          "original_gradient_l1": 7.815041535539505e-42,
+          "raw_logits": [
+            -35.141685485839844,
+            35.553768157958984
+          ],
+          "raw_top_two_margin": 70.69544982910156,
+          "selected": 1
+        }
+      ],
+      "step": 67
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00039021074189804494,
+          "conditional_losses": [
+            0.3947434425354004,
+            0.3996560275554657,
+            0.44589588046073914
+          ],
+          "head": 0,
+          "noise": [
+            1.9658070802688599,
+            1.0413212776184082,
+            0.17154055833816528
+          ],
+          "original_gradient_l1": 0.00012773674097843468,
+          "raw_logits": [
+            -0.23293353617191315,
+            -11.393802642822266,
+            -3.5848422050476074
+          ],
+          "raw_top_two_margin": 3.3519086837768555,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.009763574227690697,
+          "conditional_losses": [
+            0.6902618408203125,
+            0.3947434425354004
+          ],
+          "head": 1,
+          "noise": [
+            0.6585357189178467,
+            -0.2957807779312134
+          ],
+          "original_gradient_l1": 3.503830281470499e-10,
+          "raw_logits": [
+            -8.736663818359375,
+            7.574620723724365
+          ],
+          "raw_top_two_margin": 16.3112850189209,
+          "selected": 1
+        }
+      ],
+      "step": 68
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 7.517905032727867e-05,
+          "conditional_losses": [
+            0.3273386061191559,
+            0.32518142461776733,
+            0.2474544495344162
+          ],
+          "head": 0,
+          "noise": [
+            0.3477114737033844,
+            0.17746607959270477,
+            -0.42942485213279724
+          ],
+          "original_gradient_l1": 9.807954484131187e-07,
+          "raw_logits": [
+            8.137075424194336,
+            14.675305366516113,
+            -71.38162994384766
+          ],
+          "raw_top_two_margin": 6.538229942321777,
+          "selected": 1
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 3.4314593904127833e-06,
+          "conditional_losses": [
+            0.3250752389431,
+            0.32518142461776733
+          ],
+          "head": 1,
+          "noise": [
+            0.7859576940536499,
+            -1.3902039527893066
+          ],
+          "original_gradient_l1": 4.666650282171549e-26,
+          "raw_logits": [
+            -21.330326080322266,
+            17.085107803344727
+          ],
+          "raw_top_two_margin": 38.415435791015625,
+          "selected": 1
+        }
+      ],
+      "step": 69
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.002864515408873558,
+          "conditional_losses": [
+            0.22529025375843048,
+            0.5504521131515503,
+            0.49227192997932434
+          ],
+          "head": 0,
+          "noise": [
+            0.06888890266418457,
+            0.1575726717710495,
+            0.8525899052619934
+          ],
+          "original_gradient_l1": 1.2411807137624464e-09,
+          "raw_logits": [
+            -9.039101600646973,
+            -4.301734924316406,
+            8.103312492370605
+          ],
+          "raw_top_two_margin": 12.405047416687012,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00011216809798497707,
+          "conditional_losses": [
+            0.49227192997932434,
+            0.5282027721405029
+          ],
+          "head": 1,
+          "noise": [
+            -0.5008057355880737,
+            -0.924003005027771
+          ],
+          "original_gradient_l1": 5.297169877799758e-30,
+          "raw_logits": [
+            22.70184898376465,
+            -23.781339645385742
+          ],
+          "raw_top_two_margin": 46.48318862915039,
+          "selected": 0
+        }
+      ],
+      "step": 70
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.001914749387651682,
+          "conditional_losses": [
+            0.5172361135482788,
+            0.5918666124343872,
+            0.5611180663108826
+          ],
+          "head": 0,
+          "noise": [
+            1.989245891571045,
+            0.6002978682518005,
+            0.47162455320358276
+          ],
+          "original_gradient_l1": 2.0782941589914117e-07,
+          "raw_logits": [
+            -8.123984336853027,
+            3.357285737991333,
+            -6.6863532066345215
+          ],
+          "raw_top_two_margin": 10.043639183044434,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.001380512840114534,
+          "conditional_losses": [
+            0.5918666124343872,
+            0.6458162665367126
+          ],
+          "head": 1,
+          "noise": [
+            0.32488858699798584,
+            2.343602418899536
+          ],
+          "original_gradient_l1": 1.1968635895800756e-15,
+          "raw_logits": [
+            11.849044799804688,
+            -13.178193092346191
+          ],
+          "raw_top_two_margin": 25.027236938476562,
+          "selected": 0
+        }
+      ],
+      "step": 71
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.004518967121839523,
+          "conditional_losses": [
+            0.1880241185426712,
+            0.4104820191860199,
+            0.4897002577781677
+          ],
+          "head": 0,
+          "noise": [
+            0.3900720477104187,
+            0.3183777332305908,
+            -0.8625448942184448
+          ],
+          "original_gradient_l1": 7.539771559095243e-06,
+          "raw_logits": [
+            -16.13355255126953,
+            6.495395660400391,
+            0.2704673707485199
+          ],
+          "raw_top_two_margin": 6.224928379058838,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.010755114257335663,
+          "conditional_losses": [
+            0.7638677358627319,
+            0.4104820191860199
+          ],
+          "head": 1,
+          "noise": [
+            1.5010870695114136,
+            -0.23834551870822906
+          ],
+          "original_gradient_l1": 2.7990489615638053e-15,
+          "raw_logits": [
+            -15.121506690979004,
+            10.247369766235352
+          ],
+          "raw_top_two_margin": 25.368877410888672,
+          "selected": 1
+        }
+      ],
+      "step": 72
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.000724629033356905,
+          "conditional_losses": [
+            0.5464234948158264,
+            0.5568128228187561,
+            0.511730432510376
+          ],
+          "head": 0,
+          "noise": [
+            1.2736631631851196,
+            0.8098307251930237,
+            -0.22621005773544312
+          ],
+          "original_gradient_l1": 3.652933714760686e-36,
+          "raw_logits": [
+            -23.123960494995117,
+            -29.374021530151367,
+            34.673927307128906
+          ],
+          "raw_top_two_margin": 57.797889709472656,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 8.07552642072551e-05,
+          "conditional_losses": [
+            0.752129316329956,
+            0.511730432510376
+          ],
+          "head": 1,
+          "noise": [
+            -0.3399195969104767,
+            0.6048829555511475
+          ],
+          "original_gradient_l1": 3.44719422223905e-43,
+          "raw_logits": [
+            -33.40790557861328,
+            34.925148010253906
+          ],
+          "raw_top_two_margin": 68.33305358886719,
+          "selected": 1
+        }
+      ],
+      "step": 73
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0026259960141032934,
+          "conditional_losses": [
+            0.46154847741127014,
+            0.5176267623901367,
+            0.5944678783416748
+          ],
+          "head": 0,
+          "noise": [
+            1.3878151178359985,
+            2.3008553981781006,
+            1.4784419536590576
+          ],
+          "original_gradient_l1": 3.297234343335731e-06,
+          "raw_logits": [
+            -9.440556526184082,
+            -7.394250869750977,
+            1.359386920928955
+          ],
+          "raw_top_two_margin": 8.753637313842773,
+          "selected": 2
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.007187688257545233,
+          "conditional_losses": [
+            0.5944678783416748,
+            0.37913939356803894
+          ],
+          "head": 1,
+          "noise": [
+            0.41618338227272034,
+            1.672236680984497
+          ],
+          "original_gradient_l1": 7.864650770905701e-13,
+          "raw_logits": [
+            9.679555892944336,
+            -10.584686279296875
+          ],
+          "raw_top_two_margin": 20.26424217224121,
+          "selected": 0
+        }
+      ],
+      "step": 74
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0010343017056584358,
+          "conditional_losses": [
+            0.2602693736553192,
+            0.29327085614204407,
+            0.24813300371170044
+          ],
+          "head": 0,
+          "noise": [
+            -0.5587770938873291,
+            1.6713814735412598,
+            -0.7620872855186462
+          ],
+          "original_gradient_l1": 3.4673268880436408e-18,
+          "raw_logits": [
+            -14.482854843139648,
+            -13.737854957580566,
+            15.237480163574219
+          ],
+          "raw_top_two_margin": 28.97533416748047,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00014319369802251458,
+          "conditional_losses": [
+            0.24813300371170044,
+            0.37684503197669983
+          ],
+          "head": 1,
+          "noise": [
+            -0.056907255202531815,
+            0.19304700195789337
+          ],
+          "original_gradient_l1": 0.0,
+          "raw_logits": [
+            36.9305534362793,
+            -37.47655487060547
+          ],
+          "raw_top_two_margin": 74.4071044921875,
+          "selected": 0
+        }
+      ],
+      "step": 75
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 1.941533264471218e-05,
+          "conditional_losses": [
+            0.9686083197593689,
+            0.9660469889640808,
+            1.4476028680801392
+          ],
+          "head": 0,
+          "noise": [
+            -0.4254004657268524,
+            4.626572608947754,
+            0.7611424922943115
+          ],
+          "original_gradient_l1": 5.549376058605951e-18,
+          "raw_logits": [
+            21.479991912841797,
+            -7.6140522956848145,
+            -47.226097106933594
+          ],
+          "raw_top_two_margin": 29.094043731689453,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0032811376731842756,
+          "conditional_losses": [
+            2.038365125656128,
+            0.9686083197593689
+          ],
+          "head": 1,
+          "noise": [
+            1.1634601354599,
+            0.8944791555404663
+          ],
+          "original_gradient_l1": 4.553752760095711e-37,
+          "raw_logits": [
+            -31.025880813598633,
+            28.50836181640625
+          ],
+          "raw_top_two_margin": 59.53424072265625,
+          "selected": 1
+        }
+      ],
+      "step": 76
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0032436316832900047,
+          "conditional_losses": [
+            0.4016171395778656,
+            0.39616525173187256,
+            0.49582439661026
+          ],
+          "head": 0,
+          "noise": [
+            0.04390428587794304,
+            0.692604660987854,
+            0.54835444688797
+          ],
+          "original_gradient_l1": 1.1167770042064262e-09,
+          "raw_logits": [
+            -12.051151275634766,
+            -4.341545104980469,
+            8.881063461303711
+          ],
+          "raw_top_two_margin": 13.22260856628418,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 1.8953925291498308e-06,
+          "conditional_losses": [
+            0.49582439661026,
+            0.6004575490951538
+          ],
+          "head": 1,
+          "noise": [
+            1.9042799472808838,
+            -0.9837766885757446
+          ],
+          "original_gradient_l1": 0.0,
+          "raw_logits": [
+            34.22475051879883,
+            -34.65673828125
+          ],
+          "raw_top_two_margin": 68.88148498535156,
+          "selected": 0
+        }
+      ],
+      "step": 77
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0004838877357542515,
+          "conditional_losses": [
+            0.27262842655181885,
+            0.2889728248119354,
+            0.27087172865867615
+          ],
+          "head": 0,
+          "noise": [
+            0.9838939905166626,
+            1.540961503982544,
+            0.4223436117172241
+          ],
+          "original_gradient_l1": 0.004662567283958197,
+          "raw_logits": [
+            7.637970447540283,
+            8.524262428283691,
+            -49.75897216796875
+          ],
+          "raw_top_two_margin": 0.8862919807434082,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.009057620540261269,
+          "conditional_losses": [
+            0.6896758675575256,
+            0.2889728248119354
+          ],
+          "head": 1,
+          "noise": [
+            -1.4195928573608398,
+            -1.6124343872070312
+          ],
+          "original_gradient_l1": 1.612376237130383e-15,
+          "raw_logits": [
+            -12.144147872924805,
+            11.398560523986816
+          ],
+          "raw_top_two_margin": 23.542709350585938,
+          "selected": 1
+        }
+      ],
+      "step": 78
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.000498252164106816,
+          "conditional_losses": [
+            0.37090426683425903,
+            0.35727185010910034,
+            0.32241737842559814
+          ],
+          "head": 0,
+          "noise": [
+            0.557018518447876,
+            0.6136447787284851,
+            -0.4298083186149597
+          ],
+          "original_gradient_l1": 0.000559713807888329,
+          "raw_logits": [
+            7.072502136230469,
+            4.089221954345703,
+            -35.91937255859375
+          ],
+          "raw_top_two_margin": 2.9832801818847656,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 2.360514918109402e-05,
+          "conditional_losses": [
+            0.38843563199043274,
+            0.37090426683425903
+          ],
+          "head": 1,
+          "noise": [
+            -0.5735805630683899,
+            1.4565625190734863
+          ],
+          "original_gradient_l1": 1.0927053823873964e-18,
+          "raw_logits": [
+            -13.615854263305664,
+            10.463645935058594
+          ],
+          "raw_top_two_margin": 24.079500198364258,
+          "selected": 1
+        }
+      ],
+      "step": 79
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0004786669451277703,
+          "conditional_losses": [
+            0.5896746516227722,
+            0.570762574672699,
+            0.5053303241729736
+          ],
+          "head": 0,
+          "noise": [
+            -1.7383544445037842,
+            -0.4616682529449463,
+            0.26494646072387695
+          ],
+          "original_gradient_l1": 1.0994865078828298e-05,
+          "raw_logits": [
+            12.315583229064941,
+            5.17799711227417,
+            -59.13046646118164
+          ],
+          "raw_top_two_margin": 7.1375861167907715,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0018514114199206233,
+          "conditional_losses": [
+            0.5896746516227722,
+            0.667237401008606
+          ],
+          "head": 1,
+          "noise": [
+            0.5426451563835144,
+            0.8215543031692505
+          ],
+          "original_gradient_l1": 1.1795651121543338e-16,
+          "raw_logits": [
+            9.12366771697998,
+            -14.919480323791504
+          ],
+          "raw_top_two_margin": 24.043148040771484,
+          "selected": 0
+        }
+      ],
+      "step": 80
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00046801488497294486,
+          "conditional_losses": [
+            0.17022868990898132,
+            0.24385514855384827,
+            0.30111077427864075
+          ],
+          "head": 0,
+          "noise": [
+            -0.41318967938423157,
+            1.564182162284851,
+            4.471149444580078
+          ],
+          "original_gradient_l1": 0.013115697540342808,
+          "raw_logits": [
+            4.835026741027832,
+            1.0343459844589233,
+            -17.558046340942383
+          ],
+          "raw_top_two_margin": 3.800680637359619,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0017007472924888134,
+          "conditional_losses": [
+            0.672349750995636,
+            0.17022868990898132
+          ],
+          "head": 1,
+          "noise": [
+            -1.3339593410491943,
+            -0.22040992975234985
+          ],
+          "original_gradient_l1": 7.177397061273751e-20,
+          "raw_logits": [
+            -15.138410568237305,
+            13.732300758361816
+          ],
+          "raw_top_two_margin": 28.870712280273438,
+          "selected": 1
+        }
+      ],
+      "step": 81
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 1.8715169062488712e-05,
+          "conditional_losses": [
+            0.5566933751106262,
+            0.5580226182937622,
+            0.45986732840538025
+          ],
+          "head": 0,
+          "noise": [
+            2.016904830932617,
+            2.4406800270080566,
+            -0.07581137120723724
+          ],
+          "original_gradient_l1": 2.521376060862254e-27,
+          "raw_logits": [
+            25.567970275878906,
+            -12.320443153381348,
+            -49.60729217529297
+          ],
+          "raw_top_two_margin": 37.88841247558594,
+          "selected": 0
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.005417125299572945,
+          "conditional_losses": [
+            0.3875662088394165,
+            0.5566933751106262
+          ],
+          "head": 1,
+          "noise": [
+            0.595727801322937,
+            -0.2886940538883209
+          ],
+          "original_gradient_l1": 9.095758287003264e-06,
+          "raw_logits": [
+            -7.125922679901123,
+            1.1881924867630005
+          ],
+          "raw_top_two_margin": 8.314115524291992,
+          "selected": 1
+        }
+      ],
+      "step": 82
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0009551149560138583,
+          "conditional_losses": [
+            0.41308316588401794,
+            0.5272652506828308,
+            0.47423386573791504
+          ],
+          "head": 0,
+          "noise": [
+            -1.178654670715332,
+            1.6569688320159912,
+            0.6210963129997253
+          ],
+          "original_gradient_l1": 0.0014532963978126645,
+          "raw_logits": [
+            2.7054760456085205,
+            -3.8127729892730713,
+            -13.679449081420898
+          ],
+          "raw_top_two_margin": 6.518249034881592,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.002361247083172202,
+          "conditional_losses": [
+            0.41308316588401794,
+            0.4785568118095398
+          ],
+          "head": 1,
+          "noise": [
+            -1.3069490194320679,
+            -1.020058274269104
+          ],
+          "original_gradient_l1": 0.001465685199946165,
+          "raw_logits": [
+            1.2549831867218018,
+            -2.3276262283325195
+          ],
+          "raw_top_two_margin": 3.5826094150543213,
+          "selected": 0
+        }
+      ],
+      "step": 83
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0006180525524541736,
+          "conditional_losses": [
+            0.36235401034355164,
+            0.40091660618782043,
+            0.47133854031562805
+          ],
+          "head": 0,
+          "noise": [
+            0.26537024974823,
+            0.668073296546936,
+            -0.04912520945072174
+          ],
+          "original_gradient_l1": 8.74172221697507e-15,
+          "raw_logits": [
+            -10.157657623291016,
+            9.333841323852539,
+            -12.409271240234375
+          ],
+          "raw_top_two_margin": 19.491498947143555,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.005331465043127537,
+          "conditional_losses": [
+            0.6725608110427856,
+            0.40091660618782043
+          ],
+          "head": 1,
+          "noise": [
+            0.33254534006118774,
+            -0.042036350816488266
+          ],
+          "original_gradient_l1": 1.9193961941578676e-20,
+          "raw_logits": [
+            -15.755632400512695,
+            14.572290420532227
+          ],
+          "raw_top_two_margin": 30.327922821044922,
+          "selected": 1
+        }
+      ],
+      "step": 84
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.008349149487912655,
+          "conditional_losses": [
+            0.6141343712806702,
+            0.8735825419425964,
+            0.7766367793083191
+          ],
+          "head": 0,
+          "noise": [
+            1.1270848512649536,
+            1.3589774370193481,
+            -0.30589771270751953
+          ],
+          "original_gradient_l1": 0.003926061559468508,
+          "raw_logits": [
+            -5.088749408721924,
+            -2.901653289794922,
+            1.623638391494751
+          ],
+          "raw_top_two_margin": 4.525291442871094,
+          "selected": 2
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.008013039827346802,
+          "conditional_losses": [
+            0.7766367793083191,
+            0.43104657530784607
+          ],
+          "head": 1,
+          "noise": [
+            -0.2713852524757385,
+            1.5924264192581177
+          ],
+          "original_gradient_l1": 5.922822562259844e-12,
+          "raw_logits": [
+            8.506422996520996,
+            -10.217668533325195
+          ],
+          "raw_top_two_margin": 18.724090576171875,
+          "selected": 0
+        }
+      ],
+      "step": 85
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0004916973412036896,
+          "conditional_losses": [
+            0.4375650882720947,
+            0.45474526286125183,
+            0.7425228357315063
+          ],
+          "head": 0,
+          "noise": [
+            1.8511613607406616,
+            0.9866279363632202,
+            -0.30655452609062195
+          ],
+          "original_gradient_l1": 0.0015211454592645168,
+          "raw_logits": [
+            7.896552085876465,
+            11.065316200256348,
+            -58.15976333618164
+          ],
+          "raw_top_two_margin": 3.168764114379883,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.015730123966932297,
+          "conditional_losses": [
+            1.311042308807373,
+            0.45474526286125183
+          ],
+          "head": 1,
+          "noise": [
+            2.7138831615448,
+            -0.021785475313663483
+          ],
+          "original_gradient_l1": 1.6601809577032487e-19,
+          "raw_logits": [
+            -16.039403915405273,
+            15.635510444641113
+          ],
+          "raw_top_two_margin": 31.674915313720703,
+          "selected": 1
+        }
+      ],
+      "step": 86
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.003208079608157277,
+          "conditional_losses": [
+            0.3226928412914276,
+            0.4957691729068756,
+            0.4780559837818146
+          ],
+          "head": 0,
+          "noise": [
+            0.5906625390052795,
+            -0.5052332282066345,
+            -1.0192029476165771
+          ],
+          "original_gradient_l1": 1.9274847966625416e-14,
+          "raw_logits": [
+            -29.19085121154785,
+            1.22645902633667,
+            20.233591079711914
+          ],
+          "raw_top_two_margin": 19.007131576538086,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0004532307502813637,
+          "conditional_losses": [
+            0.6828506588935852,
+            0.4780559837818146
+          ],
+          "head": 1,
+          "noise": [
+            -0.129068061709404,
+            0.5210291147232056
+          ],
+          "original_gradient_l1": 7.118313810726445e-30,
+          "raw_logits": [
+            -23.569904327392578,
+            19.395511627197266
+          ],
+          "raw_top_two_margin": 42.965415954589844,
+          "selected": 1
+        }
+      ],
+      "step": 87
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 3.7027589883109613e-07,
+          "conditional_losses": [
+            0.34810400009155273,
+            0.3508734405040741,
+            0.2745199501514435
+          ],
+          "head": 0,
+          "noise": [
+            0.2690604031085968,
+            7.357268333435059,
+            -0.7575052380561829
+          ],
+          "original_gradient_l1": 8.829390804642248e-14,
+          "raw_logits": [
+            -12.974535942077637,
+            -13.045501708984375,
+            13.416316986083984
+          ],
+          "raw_top_two_margin": 26.390853881835938,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 4.38481401943136e-06,
+          "conditional_losses": [
+            0.2745199501514435,
+            0.4402517080307007
+          ],
+          "head": 1,
+          "noise": [
+            2.699930191040039,
+            0.014272009022533894
+          ],
+          "original_gradient_l1": 2.4943112664981744e-43,
+          "raw_logits": [
+            29.977291107177734,
+            -30.930484771728516
+          ],
+          "raw_top_two_margin": 60.90777587890625,
+          "selected": 0
+        }
+      ],
+      "step": 88
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0031837993301451206,
+          "conditional_losses": [
+            0.42538323998451233,
+            0.356367826461792,
+            0.46857813000679016
+          ],
+          "head": 0,
+          "noise": [
+            0.6805359125137329,
+            2.3685994148254395,
+            0.9067530632019043
+          ],
+          "original_gradient_l1": 0.0016674019861966372,
+          "raw_logits": [
+            -0.8940300345420837,
+            -12.200716018676758,
+            1.7208539247512817
+          ],
+          "raw_top_two_margin": 2.6148838996887207,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0028321389108896255,
+          "conditional_losses": [
+            0.5582693219184875,
+            0.46857813000679016
+          ],
+          "head": 1,
+          "noise": [
+            1.3772138357162476,
+            0.6072262525558472
+          ],
+          "original_gradient_l1": 5.53851910627104e-19,
+          "raw_logits": [
+            -14.023143768310547,
+            12.922137260437012
+          ],
+          "raw_top_two_margin": 26.945281982421875,
+          "selected": 1
+        }
+      ],
+      "step": 89
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 6.054686309653334e-06,
+          "conditional_losses": [
+            0.34940651059150696,
+            0.3509097397327423,
+            0.37575456500053406
+          ],
+          "head": 0,
+          "noise": [
+            -0.3781209886074066,
+            2.942767381668091,
+            1.0861830711364746
+          ],
+          "original_gradient_l1": 8.898008506420628e-21,
+          "raw_logits": [
+            -7.1607184410095215,
+            15.567416191101074,
+            -31.54974937438965
+          ],
+          "raw_top_two_margin": 22.728134155273438,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0027409973554313183,
+          "conditional_losses": [
+            0.6691032648086548,
+            0.3509097397327423
+          ],
+          "head": 1,
+          "noise": [
+            0.5021519064903259,
+            0.899498462677002
+          ],
+          "original_gradient_l1": 4.1044540436167844e-20,
+          "raw_logits": [
+            -14.138814926147461,
+            13.998394012451172
+          ],
+          "raw_top_two_margin": 28.137208938598633,
+          "selected": 1
+        }
+      ],
+      "step": 90
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0020464735571295023,
+          "conditional_losses": [
+            0.40402987599372864,
+            0.37157726287841797,
+            0.4606326222419739
+          ],
+          "head": 0,
+          "noise": [
+            0.8520629405975342,
+            -0.018777934834361076,
+            -0.5144003629684448
+          ],
+          "original_gradient_l1": 3.4179794283772935e-07,
+          "raw_logits": [
+            -12.089941024780273,
+            -0.7696952819824219,
+            8.561854362487793
+          ],
+          "raw_top_two_margin": 9.331549644470215,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00045596991549246013,
+          "conditional_losses": [
+            1.2639646530151367,
+            0.4606326222419739
+          ],
+          "head": 1,
+          "noise": [
+            -0.8160572648048401,
+            0.22238878905773163
+          ],
+          "original_gradient_l1": 1.881926528749598e-36,
+          "raw_logits": [
+            -28.67548179626465,
+            23.540386199951172
+          ],
+          "raw_top_two_margin": 52.21586608886719,
+          "selected": 1
+        }
+      ],
+      "step": 91
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 4.202442869427614e-05,
+          "conditional_losses": [
+            0.36042240262031555,
+            0.39867979288101196,
+            0.5744441747665405
+          ],
+          "head": 0,
+          "noise": [
+            3.085378885269165,
+            -0.03612653911113739,
+            0.3269011080265045
+          ],
+          "original_gradient_l1": 1.1713990021033904e-11,
+          "raw_logits": [
+            6.175137519836426,
+            -5.046331405639648,
+            -32.36869430541992
+          ],
+          "raw_top_two_margin": 11.221468925476074,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.007958509027957916,
+          "conditional_losses": [
+            0.5685945153236389,
+            0.36042240262031555
+          ],
+          "head": 1,
+          "noise": [
+            0.38897523283958435,
+            -0.3644281327724457
+          ],
+          "original_gradient_l1": 2.8754332248581704e-10,
+          "raw_logits": [
+            -10.215339660644531,
+            3.914228916168213
+          ],
+          "raw_top_two_margin": 14.129568099975586,
+          "selected": 1
+        }
+      ],
+      "step": 92
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0046007526107132435,
+          "conditional_losses": [
+            0.22060570120811462,
+            0.17968033254146576,
+            0.371164470911026
+          ],
+          "head": 0,
+          "noise": [
+            -1.1023331880569458,
+            0.997161328792572,
+            0.2011801302433014
+          ],
+          "original_gradient_l1": 3.4114868696531666e-16,
+          "raw_logits": [
+            10.972756385803223,
+            -13.612361907958984,
+            -12.186039924621582
+          ],
+          "raw_top_two_margin": 23.158796310424805,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00018964499759022146,
+          "conditional_losses": [
+            0.22060570120811462,
+            0.3013405203819275
+          ],
+          "head": 1,
+          "noise": [
+            0.3139990568161011,
+            3.5177130699157715
+          ],
+          "original_gradient_l1": 7.941026751723257e-07,
+          "raw_logits": [
+            5.383052825927734,
+            -5.903228759765625
+          ],
+          "raw_top_two_margin": 11.28628158569336,
+          "selected": 0
+        }
+      ],
+      "step": 93
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.00040582477231509984,
+          "conditional_losses": [
+            0.359199196100235,
+            0.3487299084663391,
+            0.6075141429901123
+          ],
+          "head": 0,
+          "noise": [
+            -1.132816195487976,
+            1.8220717906951904,
+            0.22141404449939728
+          ],
+          "original_gradient_l1": 2.1981468360631243e-40,
+          "raw_logits": [
+            42.54182052612305,
+            -15.693373680114746,
+            -99.28022766113281
+          ],
+          "raw_top_two_margin": 58.23519515991211,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00402224063873291,
+          "conditional_losses": [
+            0.4669601023197174,
+            0.359199196100235
+          ],
+          "head": 1,
+          "noise": [
+            -0.07400330156087875,
+            -0.8136935234069824
+          ],
+          "original_gradient_l1": 1.2683545946856611e-07,
+          "raw_logits": [
+            -10.020997047424316,
+            -0.044975195080041885
+          ],
+          "raw_top_two_margin": 9.976021766662598,
+          "selected": 1
+        }
+      ],
+      "step": 94
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.004133959766477346,
+          "conditional_losses": [
+            0.22471942007541656,
+            0.1483122706413269,
+            0.26328831911087036
+          ],
+          "head": 0,
+          "noise": [
+            -0.8067503571510315,
+            0.6354449391365051,
+            0.5845463275909424
+          ],
+          "original_gradient_l1": 7.295382431493636e-08,
+          "raw_logits": [
+            4.361997127532959,
+            -6.354663848876953,
+            -8.965154647827148
+          ],
+          "raw_top_two_margin": 10.71666145324707,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0005924452561885118,
+          "conditional_losses": [
+            0.22471942007541656,
+            0.31788966059684753
+          ],
+          "head": 1,
+          "noise": [
+            1.452085256576538,
+            0.2265346795320511
+          ],
+          "original_gradient_l1": 1.0148476026553e-12,
+          "raw_logits": [
+            7.618154048919678,
+            -7.348495006561279
+          ],
+          "raw_top_two_margin": 14.966649055480957,
+          "selected": 0
+        }
+      ],
+      "step": 95
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.002061501843854785,
+          "conditional_losses": [
+            0.19606874883174896,
+            0.23609498143196106,
+            0.27146732807159424
+          ],
+          "head": 0,
+          "noise": [
+            0.17945130169391632,
+            -0.2687428891658783,
+            0.6930809020996094
+          ],
+          "original_gradient_l1": 0.00029185955645516515,
+          "raw_logits": [
+            -1.3371332883834839,
+            2.9157583713531494,
+            -24.392566680908203
+          ],
+          "raw_top_two_margin": 4.252891540527344,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.002325054258108139,
+          "conditional_losses": [
+            0.23609498143196106,
+            0.4466959238052368
+          ],
+          "head": 1,
+          "noise": [
+            0.2730843424797058,
+            0.9121030569076538
+          ],
+          "original_gradient_l1": 7.907683916590346e-32,
+          "raw_logits": [
+            21.695127487182617,
+            -23.091760635375977
+          ],
+          "raw_top_two_margin": 44.786888122558594,
+          "selected": 0
+        }
+      ],
+      "step": 96
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.005961630493402481,
+          "conditional_losses": [
+            0.4487050175666809,
+            0.6250821352005005,
+            0.6271512508392334
+          ],
+          "head": 0,
+          "noise": [
+            1.8815994262695312,
+            -0.027336932718753815,
+            3.7859630584716797
+          ],
+          "original_gradient_l1": 1.92662673725863e-06,
+          "raw_logits": [
+            5.892201900482178,
+            -0.028689999133348465,
+            -22.425968170166016
+          ],
+          "raw_top_two_margin": 5.920891761779785,
+          "selected": 0
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 5.117705768498126e-06,
+          "conditional_losses": [
+            0.4487050175666809,
+            0.3388245403766632
+          ],
+          "head": 1,
+          "noise": [
+            4.409335613250732,
+            -0.7536994218826294
+          ],
+          "original_gradient_l1": 0.0027636021841317415,
+          "raw_logits": [
+            -1.9217768907546997,
+            0.2337092161178589
+          ],
+          "raw_top_two_margin": 2.1554861068725586,
+          "selected": 0
+        }
+      ],
+      "step": 97
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 3.0872124625602737e-06,
+          "conditional_losses": [
+            0.659342348575592,
+            0.6632333993911743,
+            0.5486294627189636
+          ],
+          "head": 0,
+          "noise": [
+            1.3257087469100952,
+            -1.5475529432296753,
+            -0.32747653126716614
+          ],
+          "original_gradient_l1": 1.0933705538919199e-31,
+          "raw_logits": [
+            25.595848083496094,
+            -12.463932037353516,
+            -49.434547424316406
+          ],
+          "raw_top_two_margin": 38.05978012084961,
+          "selected": 0
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.003994459751993418,
+          "conditional_losses": [
+            0.4414462149143219,
+            0.659342348575592
+          ],
+          "head": 1,
+          "noise": [
+            3.1130871772766113,
+            3.888446092605591
+          ],
+          "original_gradient_l1": 7.128123797883745e-07,
+          "raw_logits": [
+            -6.890396595001221,
+            0.920028805732727
+          ],
+          "raw_top_two_margin": 7.810425281524658,
+          "selected": 1
+        }
+      ],
+      "step": 98
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0018970741657540202,
+          "conditional_losses": [
+            0.5951730012893677,
+            0.6780127286911011,
+            0.6284654140472412
+          ],
+          "head": 0,
+          "noise": [
+            -0.6012073755264282,
+            -0.7831386923789978,
+            0.178327277302742
+          ],
+          "original_gradient_l1": 4.310440999688581e-06,
+          "raw_logits": [
+            2.715090274810791,
+            -3.880315065383911,
+            -13.52879524230957
+          ],
+          "raw_top_two_margin": 6.595405578613281,
+          "selected": 0
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0015603986103087664,
+          "conditional_losses": [
+            0.5951730012893677,
+            0.4993014633655548
+          ],
+          "head": 1,
+          "noise": [
+            -1.5246758460998535,
+            -0.06576839089393616
+          ],
+          "original_gradient_l1": 0.0037403726018965244,
+          "raw_logits": [
+            1.5562787055969238,
+            -2.6050121784210205
+          ],
+          "raw_top_two_margin": 4.161291122436523,
+          "selected": 0
+        }
+      ],
+      "step": 99
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.006865780334919691,
+          "conditional_losses": [
+            0.14385034143924713,
+            0.27370500564575195,
+            0.39110201597213745
+          ],
+          "head": 0,
+          "noise": [
+            0.8605591058731079,
+            -0.3255159258842468,
+            -0.21154192090034485
+          ],
+          "original_gradient_l1": 1.4072998965275474e-05,
+          "raw_logits": [
+            -16.32683753967285,
+            6.632833957672119,
+            0.2850232720375061
+          ],
+          "raw_top_two_margin": 6.347810745239258,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 4.558882210403681e-06,
+          "conditional_losses": [
+            0.6442081332206726,
+            0.27370500564575195
+          ],
+          "head": 1,
+          "noise": [
+            -0.32884883880615234,
+            4.2363996505737305
+          ],
+          "original_gradient_l1": 7.625945886239895e-22,
+          "raw_logits": [
+            -14.84408187866211,
+            9.959099769592285
+          ],
+          "raw_top_two_margin": 24.803180694580078,
+          "selected": 1
+        }
+      ],
+      "step": 100
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0029727034270763397,
+          "conditional_losses": [
+            0.31832069158554077,
+            0.3371148109436035,
+            0.5338403582572937
+          ],
+          "head": 0,
+          "noise": [
+            -0.07566969841718674,
+            -1.3096952438354492,
+            1.8956897258758545
+          ],
+          "original_gradient_l1": 0.0024040681309998035,
+          "raw_logits": [
+            7.849987983703613,
+            11.004410743713379,
+            -58.037940979003906
+          ],
+          "raw_top_two_margin": 3.1544227600097656,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00017164401651825756,
+          "conditional_losses": [
+            0.9814969301223755,
+            0.3371148109436035
+          ],
+          "head": 1,
+          "noise": [
+            1.3997160196304321,
+            3.7477922439575195
+          ],
+          "original_gradient_l1": 8.891510600768615e-25,
+          "raw_logits": [
+            -15.83028507232666,
+            15.435139656066895
+          ],
+          "raw_top_two_margin": 31.265424728393555,
+          "selected": 1
+        }
+      ],
+      "step": 101
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 5.772206714027561e-05,
+          "conditional_losses": [
+            0.26473134756088257,
+            0.38600045442581177,
+            0.42691490054130554
+          ],
+          "head": 0,
+          "noise": [
+            -0.12272029370069504,
+            3.5474884510040283,
+            -0.23494601249694824
+          ],
+          "original_gradient_l1": 8.549625851034248e-13,
+          "raw_logits": [
+            -29.418794631958008,
+            1.4653611183166504,
+            20.3660888671875
+          ],
+          "raw_top_two_margin": 18.900728225708008,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.002228362485766411,
+          "conditional_losses": [
+            0.6094603538513184,
+            0.42691490054130554
+          ],
+          "head": 1,
+          "noise": [
+            0.48454809188842773,
+            -0.14568665623664856
+          ],
+          "original_gradient_l1": 1.9457812227861823e-31,
+          "raw_logits": [
+            -23.328157424926758,
+            19.178668975830078
+          ],
+          "raw_top_two_margin": 42.50682830810547,
+          "selected": 1
+        }
+      ],
+      "step": 102
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 4.210615770716686e-06,
+          "conditional_losses": [
+            0.384898841381073,
+            0.36013486981391907,
+            0.602366030216217
+          ],
+          "head": 0,
+          "noise": [
+            1.1220707893371582,
+            -0.12731437385082245,
+            -0.2406095415353775
+          ],
+          "original_gradient_l1": 2.802596928649634e-45,
+          "raw_logits": [
+            42.369449615478516,
+            -15.80688762664795,
+            -98.79633331298828
+          ],
+          "raw_top_two_margin": 58.17633819580078,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0033848534803837538,
+          "conditional_losses": [
+            0.49100086092948914,
+            0.384898841381073
+          ],
+          "head": 1,
+          "noise": [
+            -0.1681041419506073,
+            -0.03038722462952137
+          ],
+          "original_gradient_l1": 6.265448604381163e-08,
+          "raw_logits": [
+            -9.852788925170898,
+            -0.15253369510173798
+          ],
+          "raw_top_two_margin": 9.700255393981934,
+          "selected": 1
+        }
+      ],
+      "step": 103
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.00033503968734294176,
+          "conditional_losses": [
+            0.18159189820289612,
+            0.21877646446228027,
+            0.15562690794467926
+          ],
+          "head": 0,
+          "noise": [
+            1.7320126295089722,
+            -0.14069059491157532,
+            -0.4688693881034851
+          ],
+          "original_gradient_l1": 0.0019316616235300899,
+          "raw_logits": [
+            -1.3855421543121338,
+            2.9477970600128174,
+            -24.27777862548828
+          ],
+          "raw_top_two_margin": 4.333339214324951,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.003936511930078268,
+          "conditional_losses": [
+            0.21877646446228027,
+            0.46058666706085205
+          ],
+          "head": 1,
+          "noise": [
+            -1.0623302459716797,
+            -0.11080102622509003
+          ],
+          "original_gradient_l1": 5.753407141589776e-33,
+          "raw_logits": [
+            21.583866119384766,
+            -22.965030670166016
+          ],
+          "raw_top_two_margin": 44.54889678955078,
+          "selected": 0
+        }
+      ],
+      "step": 104
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.005565515719354153,
+          "conditional_losses": [
+            0.407467782497406,
+            0.697429358959198,
+            0.6075912714004517
+          ],
+          "head": 0,
+          "noise": [
+            0.5063759088516235,
+            -1.244101643562317,
+            -0.9355637431144714
+          ],
+          "original_gradient_l1": 5.530642738449387e-05,
+          "raw_logits": [
+            -5.198176860809326,
+            -2.853672504425049,
+            1.9241418838500977
+          ],
+          "raw_top_two_margin": 4.7778143882751465,
+          "selected": 2
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0027507622726261616,
+          "conditional_losses": [
+            0.6075912714004517,
+            0.42629122734069824
+          ],
+          "head": 1,
+          "noise": [
+            -0.38452184200286865,
+            1.841517448425293
+          ],
+          "original_gradient_l1": 1.2637646192113078e-13,
+          "raw_logits": [
+            8.718884468078613,
+            -10.34885311126709
+          ],
+          "raw_top_two_margin": 19.067737579345703,
+          "selected": 0
+        }
+      ],
+      "step": 105
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 1.5953422916936688e-05,
+          "conditional_losses": [
+            0.254617840051651,
+            0.2541380226612091,
+            0.2032090425491333
+          ],
+          "head": 0,
+          "noise": [
+            1.2610688209533691,
+            0.2523176074028015,
+            0.41220831871032715
+          ],
+          "original_gradient_l1": 1.6588307971687755e-07,
+          "raw_logits": [
+            8.16043758392334,
+            14.371673583984375,
+            -70.52008056640625
+          ],
+          "raw_top_two_margin": 6.211236000061035,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0004592380137182772,
+          "conditional_losses": [
+            0.2984040379524231,
+            0.2541380226612091
+          ],
+          "head": 1,
+          "noise": [
+            1.09293794631958,
+            0.7725348472595215
+          ],
+          "original_gradient_l1": 8.431570080934029e-30,
+          "raw_logits": [
+            -21.186899185180664,
+            16.888824462890625
+          ],
+          "raw_top_two_margin": 38.075721740722656,
+          "selected": 1
+        }
+      ],
+      "step": 106
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.005964844487607479,
+          "conditional_losses": [
+            0.2397131621837616,
+            0.38523346185684204,
+            0.45952749252319336
+          ],
+          "head": 0,
+          "noise": [
+            -0.45559945702552795,
+            -0.09575572609901428,
+            0.918030858039856
+          ],
+          "original_gradient_l1": 0.0009195171296596527,
+          "raw_logits": [
+            4.886092662811279,
+            0.8589981198310852,
+            -17.29670524597168
+          ],
+          "raw_top_two_margin": 4.02709436416626,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.04989686980843544,
+          "conditional_losses": [
+            3.5890984535217285,
+            0.2397131621837616
+          ],
+          "head": 1,
+          "noise": [
+            0.27777132391929626,
+            0.1754247546195984
+          ],
+          "original_gradient_l1": 4.6077276111795956e-21,
+          "raw_logits": [
+            -14.900555610656738,
+            13.505598068237305
+          ],
+          "raw_top_two_margin": 28.40615463256836,
+          "selected": 1
+        }
+      ],
+      "step": 107
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.002990890759974718,
+          "conditional_losses": [
+            0.3806411921977997,
+            0.3822164833545685,
+            0.45130905508995056
+          ],
+          "head": 0,
+          "noise": [
+            -1.1708028316497803,
+            -1.4080300331115723,
+            -0.8926263451576233
+          ],
+          "original_gradient_l1": 0.0029042139649391174,
+          "raw_logits": [
+            -0.449078768491745,
+            -11.267733573913574,
+            -3.2781543731689453
+          ],
+          "raw_top_two_margin": 2.829075574874878,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.01302371732890606,
+          "conditional_losses": [
+            0.6998844742774963,
+            0.3806411921977997
+          ],
+          "head": 1,
+          "noise": [
+            1.6918058395385742,
+            1.167559027671814
+          ],
+          "original_gradient_l1": 3.7049616846696054e-12,
+          "raw_logits": [
+            -8.2877779006958,
+            7.125397205352783
+          ],
+          "raw_top_two_margin": 15.413175582885742,
+          "selected": 1
+        }
+      ],
+      "step": 108
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0017982376739382744,
+          "conditional_losses": [
+            0.524817705154419,
+            0.4533100724220276,
+            0.49827632308006287
+          ],
+          "head": 0,
+          "noise": [
+            0.2636203169822693,
+            0.4879857301712036,
+            0.0784352570772171
+          ],
+          "original_gradient_l1": 0.0009075601701624691,
+          "raw_logits": [
+            -1.0088253021240234,
+            -12.118880271911621,
+            1.821969985961914
+          ],
+          "raw_top_two_margin": 2.8307952880859375,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00335035752505064,
+          "conditional_losses": [
+            0.7147486209869385,
+            0.49827632308006287
+          ],
+          "head": 1,
+          "noise": [
+            -0.29428592324256897,
+            -0.33705413341522217
+          ],
+          "original_gradient_l1": 3.988994897402797e-21,
+          "raw_logits": [
+            -13.776846885681152,
+            12.703522682189941
+          ],
+          "raw_top_two_margin": 26.480369567871094,
+          "selected": 1
+        }
+      ],
+      "step": 109
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0005864418344572186,
+          "conditional_losses": [
+            0.2594907581806183,
+            0.275211364030838,
+            0.22897502779960632
+          ],
+          "head": 0,
+          "noise": [
+            0.21613532304763794,
+            0.6847740411758423,
+            0.6269511580467224
+          ],
+          "original_gradient_l1": 0.007481719367206097,
+          "raw_logits": [
+            7.694601058959961,
+            8.163596153259277,
+            -48.977699279785156
+          ],
+          "raw_top_two_margin": 0.4689950942993164,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0005678307497873902,
+          "conditional_losses": [
+            0.5221207737922668,
+            0.275211364030838
+          ],
+          "head": 1,
+          "noise": [
+            2.4194300174713135,
+            -1.169499397277832
+          ],
+          "original_gradient_l1": 5.252838823497285e-16,
+          "raw_logits": [
+            -11.96516227722168,
+            11.229856491088867
+          ],
+          "raw_top_two_margin": 23.195018768310547,
+          "selected": 1
+        }
+      ],
+      "step": 110
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 6.806103192502633e-05,
+          "conditional_losses": [
+            0.47140181064605713,
+            0.47674238681793213,
+            0.4489709138870239
+          ],
+          "head": 0,
+          "noise": [
+            -0.023201070725917816,
+            1.7918224334716797,
+            1.0757477283477783
+          ],
+          "original_gradient_l1": 0.0,
+          "raw_logits": [
+            -23.194047927856445,
+            -29.169633865356445,
+            34.73751449584961
+          ],
+          "raw_top_two_margin": 57.93156433105469,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 2.3885670543677406e-06,
+          "conditional_losses": [
+            0.6415050625801086,
+            0.4489709138870239
+          ],
+          "head": 1,
+          "noise": [
+            -0.6850706934928894,
+            1.3784645795822144
+          ],
+          "original_gradient_l1": 0.0,
+          "raw_logits": [
+            -33.27029800415039,
+            34.818546295166016
+          ],
+          "raw_top_two_margin": 68.0888442993164,
+          "selected": 1
+        }
+      ],
+      "step": 111
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.012330740690231323,
+          "conditional_losses": [
+            0.1979590207338333,
+            0.4702201783657074,
+            0.4818195700645447
+          ],
+          "head": 0,
+          "noise": [
+            1.9390450716018677,
+            0.5100129842758179,
+            1.0405957698822021
+          ],
+          "original_gradient_l1": 1.4127275738129441e-12,
+          "raw_logits": [
+            -9.299649238586426,
+            -4.190977573394775,
+            8.47388744354248
+          ],
+          "raw_top_two_margin": 12.664865493774414,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00020887186110485345,
+          "conditional_losses": [
+            0.4818195700645447,
+            0.5504038333892822
+          ],
+          "head": 1,
+          "noise": [
+            0.34496986865997314,
+            0.3790038824081421
+          ],
+          "original_gradient_l1": 1.3465192410690628e-37,
+          "raw_logits": [
+            22.799331665039062,
+            -23.84646987915039
+          ],
+          "raw_top_two_margin": 46.64580154418945,
+          "selected": 0
+        }
+      ],
+      "step": 112
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.001725191017612815,
+          "conditional_losses": [
+            0.4963914155960083,
+            0.49080049991607666,
+            0.5641156435012817
+          ],
+          "head": 0,
+          "noise": [
+            0.8208634853363037,
+            0.9184948801994324,
+            1.3512450456619263
+          ],
+          "original_gradient_l1": 1.445630399242448e-12,
+          "raw_logits": [
+            -12.42940616607666,
+            -4.31795597076416,
+            9.354809761047363
+          ],
+          "raw_top_two_margin": 13.672765731811523,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 2.2396809072233737e-05,
+          "conditional_losses": [
+            0.5641156435012817,
+            0.6933382153511047
+          ],
+          "head": 1,
+          "noise": [
+            0.6163842678070068,
+            0.16378767788410187
+          ],
+          "original_gradient_l1": 0.0,
+          "raw_logits": [
+            34.53251266479492,
+            -34.947391510009766
+          ],
+          "raw_top_two_margin": 69.47990417480469,
+          "selected": 0
+        }
+      ],
+      "step": 113
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0003938488953281194,
+          "conditional_losses": [
+            0.30000734329223633,
+            0.2882757782936096,
+            0.3443337678909302
+          ],
+          "head": 0,
+          "noise": [
+            -1.2421269416809082,
+            -0.32048195600509644,
+            -0.982460618019104
+          ],
+          "original_gradient_l1": 0.010076867416501045,
+          "raw_logits": [
+            5.117500305175781,
+            4.4387030601501465,
+            -28.353620529174805
+          ],
+          "raw_top_two_margin": 0.6787972450256348,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 3.511625254759565e-05,
+          "conditional_losses": [
+            0.5319503545761108,
+            0.2882757782936096
+          ],
+          "head": 1,
+          "noise": [
+            0.006269157398492098,
+            2.95841646194458
+          ],
+          "original_gradient_l1": 3.038853999884861e-19,
+          "raw_logits": [
+            -10.554258346557617,
+            9.705462455749512
+          ],
+          "raw_top_two_margin": 20.259719848632812,
+          "selected": 1
+        }
+      ],
+      "step": 114
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0039000597316771746,
+          "conditional_losses": [
+            0.36508846282958984,
+            0.37134605646133423,
+            0.27467191219329834
+          ],
+          "head": 0,
+          "noise": [
+            -0.22789868712425232,
+            -0.4674191474914551,
+            -0.9947792291641235
+          ],
+          "original_gradient_l1": 9.52999307366318e-22,
+          "raw_logits": [
+            -13.25163459777832,
+            -12.903417587280273,
+            13.657047271728516
+          ],
+          "raw_top_two_margin": 26.56046485900879,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 6.767921149730682e-05,
+          "conditional_losses": [
+            0.27467191219329834,
+            0.4651598632335663
+          ],
+          "head": 1,
+          "noise": [
+            -1.0828611850738525,
+            -1.4914880990982056
+          ],
+          "original_gradient_l1": 0.0,
+          "raw_logits": [
+            30.21558380126953,
+            -31.141822814941406
+          ],
+          "raw_top_two_margin": 61.35740661621094,
+          "selected": 0
+        }
+      ],
+      "step": 115
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0003053228138014674,
+          "conditional_losses": [
+            0.4247959554195404,
+            0.4527970850467682,
+            0.4431172311306
+          ],
+          "head": 0,
+          "noise": [
+            0.48655322194099426,
+            -0.015257550403475761,
+            1.8028991222381592
+          ],
+          "original_gradient_l1": 4.970036624675042e-17,
+          "raw_logits": [
+            -10.287407875061035,
+            9.203834533691406,
+            -12.093029022216797
+          ],
+          "raw_top_two_margin": 19.491241455078125,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0054592858068645,
+          "conditional_losses": [
+            0.7029575109481812,
+            0.4527970850467682
+          ],
+          "head": 1,
+          "noise": [
+            1.4145216941833496,
+            0.9180423021316528
+          ],
+          "original_gradient_l1": 1.2977763744235275e-24,
+          "raw_logits": [
+            -15.661966323852539,
+            14.505319595336914
+          ],
+          "raw_top_two_margin": 30.167285919189453,
+          "selected": 1
+        }
+      ],
+      "step": 116
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 8.21317189547699e-06,
+          "conditional_losses": [
+            0.7064829468727112,
+            0.6814462542533875,
+            0.7083418965339661
+          ],
+          "head": 0,
+          "noise": [
+            1.8025184869766235,
+            -1.2422007322311401,
+            -0.07629416882991791
+          ],
+          "original_gradient_l1": 9.999905070667836e-11,
+          "raw_logits": [
+            12.478907585144043,
+            4.685451030731201,
+            -58.04750442504883
+          ],
+          "raw_top_two_margin": 7.793456554412842,
+          "selected": 0
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0022015259601175785,
+          "conditional_losses": [
+            0.7064829468727112,
+            0.6526359915733337
+          ],
+          "head": 1,
+          "noise": [
+            -0.03476724773645401,
+            0.8190142512321472
+          ],
+          "original_gradient_l1": 1.3314313679937738e-20,
+          "raw_logits": [
+            9.337057113647461,
+            -15.1255464553833
+          ],
+          "raw_top_two_margin": 24.462604522705078,
+          "selected": 0
+        }
+      ],
+      "step": 117
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.00036645482759922743,
+          "conditional_losses": [
+            0.9346978664398193,
+            0.9242420196533203,
+            1.417829990386963
+          ],
+          "head": 0,
+          "noise": [
+            -0.1103895902633667,
+            1.9502067565917969,
+            -0.3730165660381317
+          ],
+          "original_gradient_l1": 2.7076114265098312e-24,
+          "raw_logits": [
+            21.47955894470215,
+            -7.7236151695251465,
+            -47.209686279296875
+          ],
+          "raw_top_two_margin": 29.203174591064453,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00016035772569011897,
+          "conditional_losses": [
+            1.9513362646102905,
+            0.9346978664398193
+          ],
+          "head": 1,
+          "noise": [
+            2.3746676445007324,
+            3.275362491607666
+          ],
+          "original_gradient_l1": 0.0,
+          "raw_logits": [
+            -30.76105499267578,
+            28.26605224609375
+          ],
+          "raw_top_two_margin": 59.02710723876953,
+          "selected": 1
+        }
+      ],
+      "step": 118
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.0024968041107058525,
+          "conditional_losses": [
+            0.2256816029548645,
+            0.1685687005519867,
+            0.2592094838619232
+          ],
+          "head": 0,
+          "noise": [
+            1.1036407947540283,
+            1.3333418369293213,
+            0.518807053565979
+          ],
+          "original_gradient_l1": 3.7657410523195267e-10,
+          "raw_logits": [
+            4.272641658782959,
+            -6.378485679626465,
+            -8.697139739990234
+          ],
+          "raw_top_two_margin": 10.651126861572266,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0008789618732407689,
+          "conditional_losses": [
+            0.2256816029548645,
+            0.32217639684677124
+          ],
+          "head": 1,
+          "noise": [
+            1.1605780124664307,
+            0.34879493713378906
+          ],
+          "original_gradient_l1": 2.549672848068188e-14,
+          "raw_logits": [
+            7.632594108581543,
+            -7.397286891937256
+          ],
+          "raw_top_two_margin": 15.02988052368164,
+          "selected": 0
+        }
+      ],
+      "step": 119
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.006406692322343588,
+          "conditional_losses": [
+            0.22329081594944,
+            0.209538534283638,
+            0.3509884476661682
+          ],
+          "head": 0,
+          "noise": [
+            -0.5611507892608643,
+            -0.3649885654449463,
+            -0.7878447771072388
+          ],
+          "original_gradient_l1": 5.75338754416066e-09,
+          "raw_logits": [
+            -12.173148155212402,
+            -0.9076600074768066,
+            8.895956039428711
+          ],
+          "raw_top_two_margin": 9.80361557006836,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 7.736049155937508e-06,
+          "conditional_losses": [
+            1.0993057489395142,
+            0.3509884476661682
+          ],
+          "head": 1,
+          "noise": [
+            -0.038069069385528564,
+            2.6063601970672607
+          ],
+          "original_gradient_l1": 2.802596928649634e-45,
+          "raw_logits": [
+            -28.551307678222656,
+            23.515851974487305
+          ],
+          "raw_top_two_margin": 52.067161560058594,
+          "selected": 1
+        }
+      ],
+      "step": 120
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.004513462074100971,
+          "conditional_losses": [
+            0.9122505187988281,
+            0.9573687314987183,
+            1.2069196701049805
+          ],
+          "head": 0,
+          "noise": [
+            -0.18667012453079224,
+            -0.2397281378507614,
+            0.827643871307373
+          ],
+          "original_gradient_l1": 3.0320579380571644e-09,
+          "raw_logits": [
+            -9.517248153686523,
+            -7.397027969360352,
+            1.5004637241363525
+          ],
+          "raw_top_two_margin": 8.897491455078125,
+          "selected": 2
+        },
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.004860947839915752,
+          "conditional_losses": [
+            1.2069196701049805,
+            0.642451286315918
+          ],
+          "head": 1,
+          "noise": [
+            0.5168826580047607,
+            -0.03970908746123314
+          ],
+          "original_gradient_l1": 4.07956172329262e-18,
+          "raw_logits": [
+            9.85713005065918,
+            -10.745702743530273
+          ],
+          "raw_top_two_margin": 20.602832794189453,
+          "selected": 0
+        }
+      ],
+      "step": 121
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0062061576172709465,
+          "conditional_losses": [
+            0.2833693027496338,
+            0.27381372451782227,
+            0.4147089123725891
+          ],
+          "head": 0,
+          "noise": [
+            1.3922491073608398,
+            0.0004423642822075635,
+            1.154413104057312
+          ],
+          "original_gradient_l1": 4.75568172895232e-14,
+          "raw_logits": [
+            -14.438041687011719,
+            8.9415864944458,
+            -7.588073253631592
+          ],
+          "raw_top_two_margin": 16.529659271240234,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 2.2369375074049458e-05,
+          "conditional_losses": [
+            0.5654706358909607,
+            0.27381372451782227
+          ],
+          "head": 1,
+          "noise": [
+            -0.24723652005195618,
+            0.3215589225292206
+          ],
+          "original_gradient_l1": 0.0,
+          "raw_logits": [
+            -35.54049301147461,
+            35.98133850097656
+          ],
+          "raw_top_two_margin": 71.52183532714844,
+          "selected": 1
+        }
+      ],
+      "step": 122
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 2.399558616161812e-05,
+          "conditional_losses": [
+            0.41076621413230896,
+            0.38521620631217957,
+            0.3857457935810089
+          ],
+          "head": 0,
+          "noise": [
+            -1.115820288658142,
+            1.7906572818756104,
+            0.1666366457939148
+          ],
+          "original_gradient_l1": 0.02372433990240097,
+          "raw_logits": [
+            7.042856693267822,
+            3.9399070739746094,
+            -35.44470977783203
+          ],
+          "raw_top_two_margin": 3.102949619293213,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.0005444406997412443,
+          "conditional_losses": [
+            0.4520919919013977,
+            0.41076621413230896
+          ],
+          "head": 1,
+          "noise": [
+            1.0965784788131714,
+            1.225221037864685
+          ],
+          "original_gradient_l1": 6.70169928406966e-22,
+          "raw_logits": [
+            -13.499346733093262,
+            10.393295288085938
+          ],
+          "raw_top_two_margin": 23.892642974853516,
+          "selected": 1
+        }
+      ],
+      "step": 123
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.00026672950480133295,
+          "conditional_losses": [
+            0.36155033111572266,
+            0.3766498565673828,
+            0.35410118103027344
+          ],
+          "head": 0,
+          "noise": [
+            1.1724956035614014,
+            0.5977253913879395,
+            -1.6142380237579346
+          ],
+          "original_gradient_l1": 5.474781218650637e-12,
+          "raw_logits": [
+            5.781828880310059,
+            -5.196112155914307,
+            -31.711584091186523
+          ],
+          "raw_top_two_margin": 10.977941513061523,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.000809619203209877,
+          "conditional_losses": [
+            0.3919818103313446,
+            0.36155033111572266
+          ],
+          "head": 1,
+          "noise": [
+            0.1371127814054489,
+            0.30554506182670593
+          ],
+          "original_gradient_l1": 2.2865907843387656e-13,
+          "raw_logits": [
+            -9.782161712646484,
+            3.6014089584350586
+          ],
+          "raw_top_two_margin": 13.383570671081543,
+          "selected": 1
+        }
+      ],
+      "step": 124
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 2.3084146960172802e-05,
+          "conditional_losses": [
+            0.4302208423614502,
+            0.433441162109375,
+            0.501894474029541
+          ],
+          "head": 0,
+          "noise": [
+            -0.12192800641059875,
+            0.5424436330795288,
+            -0.3831562101840973
+          ],
+          "original_gradient_l1": 1.0162741056313596e-22,
+          "raw_logits": [
+            -7.184122562408447,
+            15.475887298583984,
+            -31.372716903686523
+          ],
+          "raw_top_two_margin": 22.660009384155273,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.01715455949306488,
+          "conditional_losses": [
+            0.8598838448524475,
+            0.433441162109375
+          ],
+          "head": 1,
+          "noise": [
+            1.9363694190979004,
+            0.9907792806625366
+          ],
+          "original_gradient_l1": 7.146038504907475e-24,
+          "raw_logits": [
+            -14.149446487426758,
+            13.979966163635254
+          ],
+          "raw_top_two_margin": 28.129413604736328,
+          "selected": 1
+        }
+      ],
+      "step": 125
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 4.368358986539533e-06,
+          "conditional_losses": [
+            0.5623978972434998,
+            0.6177144646644592,
+            0.5809752345085144
+          ],
+          "head": 0,
+          "noise": [
+            1.0413581132888794,
+            -0.5488172769546509,
+            4.344749927520752
+          ],
+          "original_gradient_l1": 1.3715964087168686e-05,
+          "raw_logits": [
+            -8.366846084594727,
+            3.3700342178344727,
+            -6.233137607574463
+          ],
+          "raw_top_two_margin": 9.603172302246094,
+          "selected": 1
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 4.9752925406210124e-05,
+          "conditional_losses": [
+            0.6177144646644592,
+            0.7114435434341431
+          ],
+          "head": 1,
+          "noise": [
+            2.247605562210083,
+            0.4840129315853119
+          ],
+          "original_gradient_l1": 2.3521745656596262e-24,
+          "raw_logits": [
+            11.852250099182129,
+            -13.157689094543457
+          ],
+          "raw_top_two_margin": 25.009939193725586,
+          "selected": 0
+        }
+      ],
+      "step": 126
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.00039056732202880085,
+          "conditional_losses": [
+            0.17194581031799316,
+            0.20429068803787231,
+            0.15681062638759613
+          ],
+          "head": 0,
+          "noise": [
+            1.1193870306015015,
+            0.6243342757225037,
+            0.9817354083061218
+          ],
+          "original_gradient_l1": 4.312863576586622e-27,
+          "raw_logits": [
+            -14.632684707641602,
+            -13.592034339904785,
+            15.504963874816895
+          ],
+          "raw_top_two_margin": 29.09699821472168,
+          "selected": 2
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 4.836061862079077e-07,
+          "conditional_losses": [
+            0.15681062638759613,
+            0.30185213685035706
+          ],
+          "head": 1,
+          "noise": [
+            3.0043842792510986,
+            1.1339898109436035
+          ],
+          "original_gradient_l1": 0.0,
+          "raw_logits": [
+            37.02002716064453,
+            -37.4254035949707
+          ],
+          "raw_top_two_margin": 74.4454345703125,
+          "selected": 0
+        }
+      ],
+      "step": 127
+    },
+    {
+      "heads": [
+        {
+          "better_alternative": true,
+          "calibrated_gradient_l1": 0.009418860077857971,
+          "conditional_losses": [
+            0.2000972032546997,
+            0.1322370171546936,
+            0.3771994709968567
+          ],
+          "head": 0,
+          "noise": [
+            0.3624382019042969,
+            1.1459100246429443,
+            1.8576375246047974
+          ],
+          "original_gradient_l1": 1.077964390561545e-19,
+          "raw_logits": [
+            10.715370178222656,
+            -13.340861320495605,
+            -12.101767539978027
+          ],
+          "raw_top_two_margin": 22.817138671875,
+          "selected": 0
+        },
+        {
+          "better_alternative": false,
+          "calibrated_gradient_l1": 0.003021653275936842,
+          "conditional_losses": [
+            0.2000972032546997,
+            0.26451829075813293
+          ],
+          "head": 1,
+          "noise": [
+            -0.17119351029396057,
+            0.15518072247505188
+          ],
+          "original_gradient_l1": 5.97956614778461e-11,
+          "raw_logits": [
+            5.26489782333374,
+            -5.8069376945495605
+          ],
+          "raw_top_two_margin": 11.0718355178833,
+          "selected": 0
+        }
+      ],
+      "step": 128
+    }
+  ],
+  "retained_archive_bytes": 183545,
+  "rss_sampling_errors": 0,
+  "within_resource_limits": true
+}

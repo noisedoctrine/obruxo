@@ -2,6 +2,7 @@
 
 import argparse
 from collections import defaultdict
+from contextlib import nullcontext
 import copy
 import json
 from pathlib import Path
@@ -22,7 +23,7 @@ def equal_tree(first, second):
     return first == second
 
 
-def verify(source, pool, initial_path, retrieval_path, qualification_path):
+def verify(source, pool, initial_path, retrieval_path, qualification_path, *, observe_step=None):
     import torch
     from obruxo_data.hashing import canonical_sha256, sha256_bytes
     from obruxo_data.midi import Performance
@@ -146,8 +147,9 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path):
             cursor += 1
             return measured["loss"]
 
-        result = matched_step(models, optimizers, records[update["state"]], PilotTarget.from_dict(plan["training"][update["state"]]["target"]),
-                              codec, evaluate, step, len(plan["updates"]))
+        with observe_step(step, models, records, committed) if observe_step else nullcontext():
+            result = matched_step(models, optimizers, records[update["state"]], PilotTarget.from_dict(plan["training"][update["state"]]["target"]),
+                                  codec, evaluate, step, len(plan["updates"]))
         if cursor != len(point) or any(result[key] != committed[key] for key in result):
             raise ValueError("offline numerical update differs from training")
         for _path, snapshot, _history in interruptions:

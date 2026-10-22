@@ -134,6 +134,8 @@ The [settled renderer profile](../training/reports/NATIVE_PREROLL_RESULTS.md) no
 
 The [fresh matched A2 trial](../training/reports/SETTLED_NATIVE_INVERSE_RESULTS.md) now completes 128 updates per arm with exact model/optimizer/Gumbel replay. Sound training passes both training fit gates, but held-out development MRSTFT gains of 5.48% reference / 3.50% transfer miss the frozen 10% target. A host-sleep timeout is preserved and recovered within the same original limits. No model is promoted. Diagnose the weak category-learning signal before another full run; retain the 14-output scope and final confirmation/listening requirements.
 
+The [bounded category diagnosis](../training/reports/CATEGORY_SIGNAL_RESULTS.md) passes: one fixed training-only scale per existing categorical head restores measured derivatives while preserving initial decoded patches and the historical replay. It collects no new audio and establishes no model-quality improvement. The next A2 comparison must apply the same fixed scales to both loss arms, retain raw-score production choices, freeze recovery identity and preserve the original quality thresholds before execution.
+
 #### A2. Train the predictor on spectral loss
 
 Start a matched parameter-only control and spectral-loss candidate from the same selected basic checkpoint. Align encoder, output vocabulary, source population, performances and inverse-update budget. Freeze the qualified helper for the whole inverse run, or pin a qualified native-gradient estimator and count every native probe against the card. Use Gumbel-softmax for both basic categorical decisions and differentiable bounded continuous controls.
