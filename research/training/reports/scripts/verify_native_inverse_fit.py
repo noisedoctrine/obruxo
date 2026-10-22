@@ -41,7 +41,8 @@ def verify(source, pool, initial_path, retrieval_path, qualification_path, *, ob
     torch.set_num_threads(2)
     frozen = json.loads((source / "plan.json").read_text())
     plan = make_plan(pool, initial_path, retrieval_path, qualification_path,
-                     preroll_frames=frozen.get("render_profile", {}).get("preroll_frames", 0), category_calibration_path=calibration_path)
+                     preroll_frames=frozen.get("render_profile", {}).get("preroll_frames", 0), category_calibration_path=calibration_path,
+                     training_states=len(frozen["training"]))
     summary = json.loads((source / "summary.json").read_text())
     if (plan != json.loads((source / "plan.json").read_text()) or summary["plan"] != plan
             or summary["plan_id"] != canonical_sha256(plan) or not summary["complete"] or summary["failure"] is not None):

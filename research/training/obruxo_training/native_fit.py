@@ -26,12 +26,14 @@ from .model import batch_features, loss_terms, predicted_targets
 from .native_gradient import native_gradient_spec
 from .native_gradient_screen import qualification_summary
 from .native_inverse import native_reconstruction_loss
+from .native_fit_storage import storage_bound
 from .performances import initial_bank
 from .render_profile import BASIC_PREROLL_FRAMES, basic_render_profile
 from .spectral import SpectralTargets, spectral_loss, target_bytes
 from .spectral_controls import BasicControlAdapter, temperature_at
 from .temporal_proxy_data import NativeSession, category_balanced_entries, training_performance
 from .trainer import capture_rng, inference_state, restore_model, restore_rng
+from .training_coverage import expand_training
 
 
 def digest(path):
@@ -63,7 +65,12 @@ def require_qualification(report, *, preroll_frames=0):
                 raise ValueError("qualified renderer source changed or is missing")
 
 
-def make_plan(pool, initial_path, retrieval_path, qualification_path, *, preroll_frames=BASIC_PREROLL_FRAMES, category_calibration_path=None):
+def make_plan(pool, initial_path, retrieval_path, qualification_path, *, preroll_frames=BASIC_PREROLL_FRAMES,
+              category_calibration_path=None, training_states=32):
+    if type(training_states) is not int or training_states not in (32, 64):
+        raise ValueError("native comparison supports only 32 or 64 training states")
+    if training_states == 64 and not category_calibration_path:
+        raise ValueError("broader comparison requires the checked fixed category scales")
     profile = basic_render_profile(preroll_frames)
     if type(pool.codec) is not PilotCodec:
         raise ValueError("native inverse fitting requires the exact basic codec")
@@ -79,7 +86,11 @@ def make_plan(pool, initial_path, retrieval_path, qualification_path, *, preroll
         raise ValueError("initial model and train-only retrieval checkpoint must match this pool")
     training = []
     reserved = {row.performance_id for row in initial_bank()}
-    for index, entry in enumerate(category_balanced_entries(pool, "train", 32)):
+    entries = category_balanced_entries(pool, "train", 32)
+    population = None
+    if training_states == 64:
+        entries, population = expand_training(pool, entries)
+    for index, entry in enumerate(entries):
         performances = [training_performance(0, index, (index + offset) % 4).to_dict() for offset in (0, 1)]
         if any(canonical_sha256(row) in reserved for row in performances):
             raise ValueError("training MIDI matches a reserved evaluation recipe")
@@ -87,16 +98,22 @@ def make_plan(pool, initial_path, retrieval_path, qualification_path, *, preroll
     validation = [{"state_id": entry.state_id, "target": entry.target.to_dict(),
                    "performances": [initial_bank()[offset + index % 4].performance().to_dict() for offset in (0, 4)]}
                   for index, entry in enumerate(category_balanced_entries(pool, "validation", 12))]
+    storage = storage_bound(training, validation, codec.contract.tail_seconds) if population else None
+    if storage and storage["estimated_archive_upper_bound_bytes"] + 32 * 1024**2 > 2 * 1024**3:
+        raise ValueError("planned broader-fit evidence exceeds the unchanged archive cap")
     rng = torch.Generator().manual_seed(0)
-    updates = [{"state": int(index), "view": epoch % 2} for epoch in range(4) for index in torch.randperm(32, generator=rng)]
+    updates = [{"state": int(index), "view": epoch % 2} for epoch in range(128 // training_states)
+               for index in torch.randperm(training_states, generator=rng)]
     names = ("native_fit.py", "native_gradient.py", "native_inverse.py", "spectral.py", "spectral_controls.py",
              "model.py", "features.py", "trainer.py", "evaluate.py", "temporal_proxy_data.py", "reproducibility.py", "checkpoints.py", "render_profile.py")
     paths = [Path(__file__).with_name(name) for name in names]
     if calibration:
         paths += [Path(__file__).with_name(name) for name in ("category_calibration.py", "category_signal.py")]
+    if population:
+        paths += [Path(__file__).with_name(name) for name in ("training_coverage.py", "native_fit_storage.py")]
     paths += [Path(__file__).parents[2] / "data_generation/obruxo_data/render" / name for name in ("vita.py", "base.py", "midi_transport.py", "qa.py")]
     paths += [Path(__file__).parents[1] / "reports/scripts/run_native_inverse_fit.py"]
-    return {"format": "matched_native_inverse_fit_v2" if calibration else "matched_native_inverse_fit_v1",
+    return {"format": "matched_native_inverse_fit_v3" if population else "matched_native_inverse_fit_v2" if calibration else "matched_native_inverse_fit_v1",
             "pool_id": pool.pool_id, "manifest_id": pool.manifest.manifest_id,
             "codec": codec.to_dict(), "adapter": BasicControlAdapter(codec).contract(), "estimator": native_gradient_spec(), "render_profile": profile,
             "initial_file_sha256": digest(initial_path), "initial_model_sha256": tensor_digest(model.state_dict()),
@@ -106,20 +123,23 @@ def make_plan(pool, initial_path, retrieval_path, qualification_path, *, preroll
             "optimizer": {"name": "Adam", "learning_rate": .0001, "gradient_norm_cap": 5., "seed": 0,
                           "updates_per_arm": 128, "batch_size": 1, "checkpoint_every": 1,
                           "spectral_parameter_anchor_weight": 0., "temperature_start": 1., "temperature_end": .5},
-            "limits": {"training_attempts": 2896, "qualification_attempts": 432, "optimizer_attempts": 132,
+            "limits": {"training_attempts": 2 * training_states + 2816 + 16,
+                       "qualification_attempts": 8 * training_states + 168 + 8, "optimizer_attempts": 132,
                        "wall_seconds": 14400, "process_tree_bytes": 8 * 1024**3, "archive_bytes": 2 * 1024**3,
                        "replay_bytes": 512 * 1024**2, "replay_records": 512},
-            "planned_maximum_requests": {"training_targets": 64, "gradient_probes": 2816, "fit_audit": 256,
-                                         "validation_audit": 168, "total": 3304},
+            "planned_maximum_requests": {"training_targets": 2 * training_states, "gradient_probes": 2816, "fit_audit": 8 * training_states,
+                                         "validation_audit": 168, "total": 10 * training_states + 2984},
             "gates": {"fit_spectral_vs_initial_ratio": .9, "fit_spectral_vs_parameter_ratio": 1.,
                       "validation_mrstft_vs_parameter_ratio": .9, "validation_mrstft_vs_initial_ratio": .9,
                       "validation_vs_template_and_retrieval": "strictly_lower_mean_mrstft",
-                      "validation_tail_p90_vs_initial_ratio": 1.1, "all_renders_accepted": True, "all_repeats_exact": True},
+                      "validation_tail_p90_vs_initial_ratio": 1.1, "all_renders_accepted": True, "all_repeats_exact": True,
+                      **({"retained_original_fit_required": True} if population else {})},
             "source": {path.name: sha256_bytes(path.read_bytes().replace(b"\r\n", b"\n")) for path in paths},
             "runtime": {"python": platform.python_version(), "torch": str(torch.__version__), "numpy": np.__version__,
                         "device": "cpu", "cpu_threads": 2, "precision": "float32", "native_workers": 1},
             "test_split_used": False, "checkpoint_selection": "final_only", "inference_input": "primary_audio_only",
-            **({"category_training": calibration} if calibration else {})}
+            **({"category_training": calibration} if calibration else {}),
+            **({"training_population": population, "storage_bound": storage} if population else {})}
 
 
 def append_durable(path, value):
@@ -370,7 +390,18 @@ def audit_summary(cases, plan, *, validation):
                           and means["spectral"]["spectral"] <= means["parameter"]["spectral"]
                           and means["spectral"]["mrstft"] < means["initial"]["mrstft"])
         groups[role] = {"planned": count, "completed": len(selected), "means": means, "tail_p90": tail, "pass": bool(passed)}
-    return {"complete": complete, "groups": groups, "pass": complete and all(row["pass"] for row in groups.values())}
+    result = {"complete": complete, "groups": groups, "pass": complete and all(row["pass"] for row in groups.values())}
+    if validation or not plan.get("training_population"):
+        return result
+    original_ids = plan["training_population"]["original_state_ids"]
+    original = [entry for entry in plan["training"] if entry["state_id"] in original_ids]
+    if not original_ids or len(set(original_ids)) != len(original_ids) or len(original) != len(original_ids) or len(original) >= count:
+        raise ValueError("original training subset membership changed")
+    original_plan = {key: value for key, value in plan.items() if key != "training_population"}
+    original_plan["training"] = original
+    result["retained_original"] = audit_summary([row for row in cases if row["state_id"] in original_ids], original_plan, validation=False)
+    result["pass"] = result["pass"] and result["retained_original"]["pass"]
+    return result
 
 
 @torch.no_grad()
@@ -379,15 +410,16 @@ def predict_candidates(models, codec, features):
 
 
 def run_fit(pool, initial_path, retrieval_path, qualification_path, output, *, execute=False, resume=False,
-            preroll_frames=BASIC_PREROLL_FRAMES, category_calibration_path=None):
+            preroll_frames=BASIC_PREROLL_FRAMES, category_calibration_path=None, training_states=32):
     torch.set_num_threads(2)
     plan = make_plan(pool, initial_path, retrieval_path, qualification_path,
-                     preroll_frames=preroll_frames, category_calibration_path=category_calibration_path)
+                     preroll_frames=preroll_frames, category_calibration_path=category_calibration_path, training_states=training_states)
     plan_id = canonical_sha256(plan)
     if not execute:
         output.mkdir(parents=True, exist_ok=False)
         write_json(output / "plan.json", plan)
-        return {"plan_id": plan_id, "updates_per_arm": 128, "maximum_native_requests": 3328}
+        return {"plan_id": plan_id, "updates_per_arm": len(plan["updates"]),
+                "maximum_native_requests": plan["limits"]["training_attempts"] + plan["limits"]["qualification_attempts"]}
     if json.loads((output / "plan.json").read_text()) != plan:
         raise ValueError("frozen inverse plan changed")
     if (output / "run.json").exists() != resume:
@@ -427,7 +459,7 @@ def run_fit(pool, initial_path, retrieval_path, qualification_path, output, *, e
                 fit_cases.append(case)
                 write_json(output / "fit_cases.json", fit_cases)
                 records.check_limits()
-            print(json.dumps({"stage": "fit_audit", "completed": index + 1, "planned": 32}), flush=True)
+            print(json.dumps({"stage": "fit_audit", "completed": index + 1, "planned": len(plan["training"])}), flush=True)
         fit_result = audit_summary(fit_cases, plan, validation=False)
         write_json(output / "fit_result.json", fit_result)
         if fit_result["pass"]:

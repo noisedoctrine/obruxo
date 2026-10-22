@@ -60,6 +60,23 @@ def test_fit_and_validation_gates_use_both_performances_and_complete_denominator
     assert not audit_summary(cases, plan, validation=False)["pass"]
 
 
+def test_broader_fit_cannot_hide_failure_on_retained_original_states():
+    recipes = [{"state_id": str(index)} for index in range(4)]
+    plan = {"training": recipes, "training_population": {"original_state_ids": ["0", "1"]}}
+    cases = []
+    for index, recipe in enumerate(recipes):
+        for view in (0, 1):
+            rows = {name: {"scores": {"spectral": value, "mrstft": value, "tail_error": .01}}
+                    for name, value in (("initial", 1.), ("parameter", 1.), ("spectral", .95 if index < 2 else .1))}
+            cases.append({"state_id": recipe["state_id"], "view": view, "repeat_exact": True, "rows": rows})
+    result = audit_summary(cases, plan, validation=False)
+    assert all(group["pass"] for group in result["groups"].values())
+    assert not result["retained_original"]["pass"] and not result["pass"]
+    plan["training_population"]["original_state_ids"].append("missing")
+    with pytest.raises(ValueError, match="original training subset"):
+        audit_summary(cases, plan, validation=False)
+
+
 class FixtureSession:
     def __init__(self, codec, plan):
         self.codec, self.plan, self.calls = codec, plan, []
