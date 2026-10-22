@@ -14,6 +14,7 @@ UPDATE = {"continuous_radius": .01, "continuous_scaling": "divide_by_gradient_ma
 GATES = {"roles": ["original_input", "wider_input"], "cases_per_role": 12, "methods": ["continuous", "joint"],
          "minimum_improved_fraction": .6, "mean_mrstft_delta_below": 0., "mean_spectral_delta_below": 0.,
          "repeat_exact": True, "all_native_accepted": True, "nonzero_model_gradient": True,
+         "nonzero_continuous_gradient_when_native_gradient_exceeds": 1e-7,
          "nonzero_category_gradient_when_native_loss_span_exceeds": 1e-7}
 
 
@@ -43,6 +44,7 @@ def guided_prediction(model, features, adapter, evaluate):
     gradients = {"continuous": continuous.grad[0].tolist(), "categorical": [scores.grad[0].tolist() for scores in logits],
                  "model_gradient_sha256": tensor_digest(parameters),
                  "model_parameter_gradient_l1": sum(float(value.double().abs().sum()) for value in parameters.values()),
+                 "continuous_parameter_gradient_l1": (model.continuous.weight.grad.double().abs().sum(-1) + model.continuous.bias.grad.double().abs()).tolist(),
                  "category_parameter_gradient_l1": [sum(float(value.grad.double().abs().sum()) for value in head.parameters() if value.grad is not None)
                                                      for head in model.categorical]}
     with torch.no_grad():
@@ -60,16 +62,21 @@ def guided_prediction(model, features, adapter, evaluate):
 def direction_summary(cases, plan):
     result = qualification_summary(cases, plan)
     connected = bool(cases) and all(row["direction"]["gradients"]["model_parameter_gradient_l1"] > 0 for row in cases)
-    category_checks = []
+    continuous_checks, category_checks = [], []
     for row in cases:
         estimate, gradients = row["direction"]["estimate"], row["direction"]["gradients"]
+        for output, value in enumerate(gradients["continuous"]):
+            if abs(value) > GATES["nonzero_continuous_gradient_when_native_gradient_exceeds"]:
+                continuous_checks.append(gradients["continuous_parameter_gradient_l1"][output] > 0)
         for head, costs in enumerate(estimate["categorical"]):
             if max(costs) - min(costs) <= GATES["nonzero_category_gradient_when_native_loss_span_exceeds"]:
                 continue
             output_norm = sum(abs(value) for value in gradients["categorical"][head])
             category_checks.append(output_norm > 0 and gradients["category_parameter_gradient_l1"][head] > 0)
     unchanged = bool(cases) and all(row["direction"]["weights_and_rng_unchanged"] for row in cases)
-    passed = result["direction_gates_passed"] and connected and bool(category_checks) and all(category_checks) and unchanged
+    continuous_connected = bool(continuous_checks) and all(continuous_checks)
+    passed = result["direction_gates_passed"] and connected and continuous_connected and bool(category_checks) and all(category_checks) and unchanged
     return {**result, "native_loss_reaches_model_weights": connected, "responding_category_checks": len(category_checks),
+            "responding_continuous_checks": len(continuous_checks), "responding_continuous_gradients_connected": continuous_connected,
             "responding_category_gradients_connected": bool(category_checks) and all(category_checks),
             "weights_and_rng_unchanged": unchanged, "direction_gates_passed": bool(passed)}
