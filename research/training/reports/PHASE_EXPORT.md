@@ -1,0 +1,11 @@
+# Preserve evaluated phase settings in exported presets
+
+Qualified basic training and evaluation use zero random phase for all three oscillators and the sampler. The ordinary inference command previously wrote the codec's default oscillator random phases instead. Candidate bundles also lost the declared rendering setup during export, and candidate ranking omitted its declared startup lead.
+
+The inference loader now validates and retains both the render profile and all four phase constants. Preset export applies these constants after decoding the predicted controls. Both inference commands use this boundary. Candidate bundles bind the rendering metadata into their identity; ranking uses the declared lead and phase settings. Restoring or exporting a model again preserves its rendering setup, including models restored from ordinary training checkpoints. New native-fit diagnostics include complete phase metadata, and their frozen source manifest includes the export helper. The older render-selected learning experiment remains outside the qualified fixed-phase training path.
+
+The codec and its **14 dense outputs / 355,806 trainable parameters** remain unchanged. Fixed phase is an explicit rendering policy outside the predicted controls. Legacy artifacts without rendering metadata retain their previous preset bytes and zero lead. Incomplete, altered or unsupported metadata is rejected; historical artifacts are not silently repaired. Old native-fit diagnostics that declare a profile without its phase controls need a new explicit export before inference.
+
+Fifteen focused local checks pass for actual CLI preset bytes, model reload/re-export, candidate identity corruption, request phases/lead, checkpoint restoration and exact training recovery. Seventeen related audio-ranking/native-fit regressions also pass. They use fixtures, not new native training or audio-quality measurements. GitHub Actions stays disabled. This repair closes an export mismatch; it does not establish better sound quality, advance A2 or admit either rejected initializer.
+
+Next retain the accepted earlier initializer, qualify category feedback against verified input recordings, then run the matched sound-loss comparison with both input views and unchanged original-input/development gates. Additional parameter-only initializer retries are deferred.

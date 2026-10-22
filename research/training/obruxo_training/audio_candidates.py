@@ -14,6 +14,7 @@ from .candidates import PROPOSAL_SPEC, propose_candidates
 from .codec import PilotTarget
 from .evaluate import audio_distance, load_evaluation_checkpoint, retrieval_digest
 from .features import tensor_digest, validate_features
+from .inference_profile import PROFILE_KEYS, model_rendering, prediction_preset
 from .model import batch_features
 from .performances import CAPABILITIES
 from .stream import NativeRendererFactory, render_isolated
@@ -48,7 +49,7 @@ def export_candidate_model(pool, checkpoint, output, *, qualification=None):
     bank = candidate_bank(source)
     identity = {"model_sha256": tensor_digest(model.state_dict()), "bank_sha256": retrieval_digest(bank),
                 "frontend": frontend.describe(), "pool_id": pool.pool_id, "ranking_spec": RANKING_SPEC,
-                "renderer_identity": source["renderer_identity"]}
+                "renderer_identity": source["renderer_identity"], **model_rendering(model)}
     qualified = qualification is not None and qualification.get("qualified") is True and qualification.get("identity") == identity
     if qualification is not None and not qualified:
         raise ValueError("candidate ranking qualification does not match this model and bank")
@@ -73,6 +74,9 @@ def load_candidate_model(path, *, allow_unqualified=False):
             or saved["identity"]["pool_id"] != saved["base"]["training_pool_id"]
             or saved["identity"]["renderer_identity"] != saved["renderer_identity"]):
         raise ValueError("candidate bundle model, bank or frozen frontend changed")
+    rendering = model_rendering(model)
+    if any(saved["identity"].get(key) != rendering.get(key) for key in PROFILE_KEYS):
+        raise ValueError("candidate bundle rendering metadata changed")
     qualification = saved["qualification"]
     if saved["qualified"] and (not qualification or not qualification.get("qualified") or qualification.get("identity") != saved["identity"]):
         raise ValueError("candidate bundle qualification changed")
@@ -132,8 +136,10 @@ def rank_audio(model, frontend, codec, bank, audio, *, sample_rate=44100, render
     result["estimated_performance"] = performance.to_dict()
     result["estimated_performance_id"] = canonical_sha256(performance.to_dict())
     for name, target in candidates.items():
-        request = RenderRequest(preset_json=codec.decode(target).decode(), performance=performance, sample_rate=sample_rate,
-                                channels=2, tail_seconds=codec.contract.tail_seconds, renderer_id=codec.contract.renderer_id)
+        rendering = model_rendering(model)
+        request = RenderRequest(preset_json=prediction_preset(model, codec, target).decode(), performance=performance, sample_rate=sample_rate,
+                                channels=2, tail_seconds=codec.contract.tail_seconds, renderer_id=codec.contract.renderer_id,
+                                preroll_frames=rendering.get("render_profile", {}).get("preroll_frames", 0))
         rendered, metadata = render_isolated(request, renderer_factory=renderer_factory or NativeRendererFactory(), timeout=timeout)
         event = {"method": name, "request_id": request.request_id, **metadata}
         result["renders"].append(event)

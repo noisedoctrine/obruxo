@@ -75,6 +75,8 @@ def restore_evaluation_checkpoint(saved, pool):
         raise ValueError("training-only retrieval memory is empty")
     model = PilotInverse(pool.codec, config.conditioning, config.cyclic_head).eval()
     model.load_state_dict(saved["model"], strict=True)
+    from .inference_profile import bind_rendering
+    bind_rendering(model, contract)
     return saved, model, frontend, sampler
 
 

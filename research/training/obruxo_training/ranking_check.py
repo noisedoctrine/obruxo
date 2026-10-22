@@ -17,6 +17,7 @@ from .benchmark import MemoryMonitor
 from .codec import PilotTarget
 from .contracts import RenderRecipe
 from .evaluate import _restore_evaluation, audio_distance, curve_statistics
+from .inference_profile import model_rendering, prediction_preset
 from .performances import initial_bank
 from .proxy_screen import balanced_entries, source_identity
 from .splits import SplitLedger
@@ -88,8 +89,9 @@ def check_audio_ranking(pool, checkpoint, output, *, count=10, renderer_factory=
 
     def render(target, performance, index, method, role):
         budget()
-        request = RenderRequest(preset_json=codec.decode(target).decode(), performance=performance, sample_rate=44100, channels=2,
-                                tail_seconds=codec.contract.tail_seconds, renderer_id=codec.contract.renderer_id)
+        request = RenderRequest(preset_json=prediction_preset(model, codec, target).decode(), performance=performance, sample_rate=44100, channels=2,
+                                tail_seconds=codec.contract.tail_seconds, renderer_id=codec.contract.renderer_id,
+                                preroll_frames=model_rendering(model).get("render_profile", {}).get("preroll_frames", 0))
         audio, metadata = render_isolated(request, renderer_factory=factory, timeout=timeout)
         record({"method": method, "request_id": request.request_id, **metadata}, index, role)
         return audio
