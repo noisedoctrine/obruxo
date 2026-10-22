@@ -1,6 +1,6 @@
 # Original and wider inputs in matched sound-loss training
 
-Prepared 2026-10-22 before the next native fit. This implements the next A2 comparison; no quality result is available yet. Keep the accepted 404-state / 16,000-update initializer. Both rejected expanded-input initializers stay rejected. The model remains **14 dense outputs / 355,806 parameters**.
+Prepared 2026-10-22 before the native fit. The [completed and independently audited result](BALANCED_NATIVE_FIT_RESULTS.md) fails original-input reconstruction despite wider-input gains; neither new model is admitted. The protocol below remains the frozen historical allocation. Keep the accepted 404-state / 16,000-update initializer. Both rejected expanded-input initializers stay rejected. The model remains **14 dense outputs / 355,806 parameters**.
 
 Frozen plan: [`15084f99418c108999eb58f8e9f0afbf6d4241fdeee3950290b47b1a3db17a51`](data/balanced_native_fit_plan.json). The production loader reconstructs the passed category check and validates the actual input cache. The conservative archive estimate is **2,724,438,911 bytes / 2.54 GiB**, within the declared 4-GiB cap. Planning/qualification validation precedes the native-fit timer; report it separately from execution. The frozen plan itself performs no native rendering or optimizer updates.
 
