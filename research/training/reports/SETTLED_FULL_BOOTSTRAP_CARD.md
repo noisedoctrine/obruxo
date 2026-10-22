@@ -1,0 +1,17 @@
+# Refresh basic initialization on corrected audio
+
+Frozen 2026-10-22 after the [eight-patch preflight](SETTLED_BOOTSTRAP_RESULTS.md) and its zero-render replay audit passed. The [machine-readable plan](data/settled_full_bootstrap_plan.json) has ID `4738aea656807b39269ad75a3d3eddfe6c963daf39f85b83d619119e79f46a56`. This is the next initialization step, not another sound-loss comparison or a release.
+
+Use all **404 existing training states**, preserving the old state/reference schedule and split assignments. Start a fresh seed-zero model; collect corrected, phase-fixed inputs through the training loop. No old features or model weights enter training. Keep the same 14 outputs, 355,806 parameters and frozen frontend.
+
+Match the historical initialization's 16,000 updates, batch size 32 and AdamW learning rate 0.001. Use float32 CPU with two threads; this is a refreshed initialization, not a causal comparison isolating rendering alone. Retain the bounded 404-example feature replay (32 MiB cap) and no waveform archive. Checkpoint after every collected source and every 250 optimizer updates; retain the previous atomic checkpoint. Use final weights only.
+
+Audit the first eight training states on reference and transfer performances using source, source repeat, model, template and retrieval, as in the small preflight. This verifies that broader initialization preserves that small reconstruction check. It is explicitly an eight-state training audit; it does not measure held-out quality or all 404 states' native reconstruction.
+
+Planned native cost: **404 source inputs + 80 audit requests = 484**. Original limits: **two hours wall time, 4 GiB process-tree RAM, 512 MiB archive, 16,000 committed updates**. Recovery allowances: at most 406 source attempts and 90 audit attempts (**496 total**). Charge requests before renderer startup; keep prior receipts and the original deadline. No automatic retries, tuning extensions or source replacements. Enforce cooperative limits at update/render boundaries and archive checks at progress boundaries. One fresh worker per request, 60-second request timeout. Running on battery with checkpoints remains authorized.
+
+All 404 frozen training states must be present exactly once in the collected feature replay, with accepted outcomes and unchanged renderer/profile identity. For this larger initialization, require final source-active normalized MAE below **0.06**, categorical accuracy **1.0**, and final label loss below **5%** of initial loss. This differs from the eight-example MAE threshold (0.05) because it is a larger initialization check; neither threshold is a perceptual release criterion. The historical 404-state initialization had MAE 0.05253. Require exact native repeats and model/template mean MRSTFT ratio below 0.9 on both performances in the eight-state audit, plus resource limits and complete attempt/outcome matching.
+
+Independently replay the actual 16,000 updates without new renders, verifying final model, Adam state and random states, source receipts and hard exports. Publish the original evidence and limitations. No held-out or test source is used for fitting, selection or this admission gate.
+
+A pass permits training-only category-scale qualification tied to these new initial weights, followed by the matched sound-loss experiment with unchanged real-sound quality gates. The historical category calibration cannot be reused by changing its model hash. Keep the bootstrap model explicitly unqualified for release.
