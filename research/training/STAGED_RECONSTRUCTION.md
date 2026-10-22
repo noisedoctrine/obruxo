@@ -120,6 +120,10 @@ Cap A2 at 1,024 native requests including fit/audits/recovery, 8,000 inverse upd
 
 For the qualified direct-native alternative, the [separate frozen card](reports/NATIVE_INVERSE_FIT_CARD.md) explicitly revises the request allocation to 3,328, with 128 matched updates per arm on 32 training states. The four-hour, 8-GiB RAM and 2-GiB archive limits remain. This is a predeclared replacement for the helper-based request allocation, not an extension of a completed run. Both training-performance fit gates precede the 12-state development comparison; no test states or automatic checkpoint selection are used.
 
+After the renderer correction and requalification, use the [fresh settled-audio card](reports/SETTLED_NATIVE_INVERSE_CARD.md). It preserves the original initial weights, matched design and thresholds, with new target measurements and optimizers. The stopped cold-renderer model prefix is not its initialization.
+
+That [fresh trial is complete](reports/SETTLED_NATIVE_INVERSE_RESULTS.md): both arms take 128 updates and the sound arm passes both fit gates, but development gains of 5.48% reference / 3.50% transfer miss the 10% target. Complete offline replay succeeds, including a preserved checkpoint before a host-sleep timeout. No model is promoted. The category-score learning signal is often tiny despite strong native sound sensitivity; investigate that path before another costed comparison, preserving the small vocabulary and existing acceptance thresholds.
+
 ## A3: fresh confirmation and first release
 
 After a promising A2 result, freeze the candidate and run a second training seed with a separate card capped like A2. Choose the confirmation population size from development variability and fix the candidate comparison before new confirmation scoring. Do not multiply seeds while the sound-training mechanism remains unqualified.
@@ -139,7 +143,7 @@ Package a basic inference bundle and CLI with pinned preprocessing, weights, cod
 | Baseline audit and native diagnosis | Complete; listening still pending | Existing reports, checkpoints and render receipts |
 | A0 spectral/control contract | Complete; both local A1 cards frozen | [Versioned contract and measured resource evidence](reports/BASIC_SPECTRAL_CONTRACT_RESULTS.md) |
 | A1 useful-gradient qualification | Native path qualified on the corrected renderer; learned helpers refused | [Settled-gradient evidence with all failures retained](reports/SETTLED_NATIVE_GRADIENT_RESULTS.md) |
-| A2 spectral inverse comparison | Native objective connected/tested; costed run pending | Candidate/control checkpoints and hard-export native report |
+| A2 spectral inverse comparison | Matched run complete and replayed; fit passes, development target fails | [Actual candidate/control sound results and recovery evidence](reports/SETTLED_NATIVE_INVERSE_RESULTS.md); category-learning diagnosis next |
 | A3 confirmation/basic bundle | Pending A2 | Independent confirmation, second seed, listening and reproducible basic inference bundle |
 
 Use separate reviewable PRs for these work packages and local checks with GitHub Actions disabled. Publish exact run status, resource use and failed gates; do not equate implemented code with a passed training milestone. All upcoming work stays local; Colab notebooks, transfers and Linux qualification are deferred.

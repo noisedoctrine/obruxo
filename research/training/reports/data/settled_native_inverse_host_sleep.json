@@ -1,0 +1,34 @@
+{
+  "query_local_interval": [
+    "2026-10-21T16:22:00+08:00",
+    "2026-10-21T19:19:00+08:00"
+  ],
+  "configured_timeout_seconds": 60,
+  "worker_elapsed_seconds": 4593.831457799999,
+  "source": "Windows System event log",
+  "events": [
+    {
+      "event_id": 1,
+      "created_utc": "2026-10-21T11:13:36.3150334Z",
+      "provider": "Microsoft-Windows-Power-Troubleshooter",
+      "message": "The system has returned from a low power state.\r\n\r\nSleep Time: ‎2026‎-‎10‎-‎21T09:56:54.775765300Z\r\nWake Time: ‎2026‎-‎10‎-‎21T11:13:35.258176700Z\r\n\r\nWake Source: Unknown",
+      "record_id": 61860,
+      "times": {
+        "WakeTime": "2026-10-21T11:13:35.2581767Z",
+        "SleepTime": "2026-10-21T09:56:54.7757653Z"
+      }
+    },
+    {
+      "event_id": 42,
+      "created_utc": "2026-10-21T09:57:02.5801128Z",
+      "provider": "Microsoft-Windows-Kernel-Power",
+      "message": "The system is entering sleep.\r\n\r\nSleep Reason: Battery",
+      "record_id": 61833,
+      "times": {}
+    }
+  ],
+  "native_request_id": "b6b3b11c96096cd373c4fa71877a75692c98a46ae2585eec0f64168016ab0d56",
+  "format": "local_host_sleep_evidence_v1",
+  "power_settings_changed": false,
+  "native_error": "RenderTimeout"
+}
