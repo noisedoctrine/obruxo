@@ -128,3 +128,20 @@ def test_supervisor_records_clean_completion_and_rejects_incomplete_children(tmp
     saved = json.loads((output / "supervisor-summary.json").read_text())
     assert (saved["failure"] is None) is complete
     assert saved["native_attempts_including_interrupted_run"] == 2 and saved["qualified_for_release"] is False
+
+
+@pytest.mark.parametrize("new_work", (False, True))
+def test_prelaunch_failures_are_retained_but_cannot_hide_native_work(tmp_path, new_work):
+    source, output, _, command = interrupted(tmp_path)
+    prior = tmp_path / "prelaunch"
+    prior.mkdir()
+    (prior / "plan.json").write_bytes((source / "plan.json").read_bytes())
+    (prior / "supervisor-summary.json").write_text(json.dumps({"failure": "environment setup failed",
+        "native_attempts_including_interrupted_run": 2, "optimizer_attempts_per_arm_including_interrupted_run": 2}))
+    if new_work:
+        (prior / "run.json").write_text('{}')
+        with pytest.raises(ValueError, match="new training or rendering"):
+            prepare_repeat(source, output, command, working_directory=tmp_path, pythonpath="fixture", prelaunches=[prior])
+    else:
+        plan = prepare_repeat(source, output, command, working_directory=tmp_path, pythonpath="fixture", prelaunches=[prior])
+        assert len(plan["prelaunches"]) == 1 and plan["prelaunches"][0]["archive_bytes"] > 0

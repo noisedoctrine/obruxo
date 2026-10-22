@@ -25,7 +25,7 @@ if __name__ == "__main__":
             supervise_repeat(args.plan)
         else:
             plan = prepare_repeat(request["source"], request["output"], request["command"],
-                                  working_directory=request["working_directory"], pythonpath=request["pythonpath"])
+                                  working_directory=request["working_directory"], pythonpath=request["pythonpath"], prelaunches=request.get("prelaunches", ()))
             print(json.dumps({"limits": plan["limits"], "training_plan_id": plan["training_plan_id"]}))
     except BaseException:
         if args.plan:
