@@ -61,7 +61,7 @@ class TrainConfig:
             raise ValueError("training counts must be positive integers and seed an integer")
         if self.learning_seed_override is not None and type(self.learning_seed_override) is not int:
             raise ValueError("learning_seed_override must be an integer or None")
-        maximum_records = 1024 if self.prediction_scope == "basic" else 512
+        maximum_records = 2048 if self.prediction_scope == "basic" else 512
         if self.mode not in {"overfit", "online"} or self.replay_capacity > maximum_records or self.replay_mib > 256:
             raise ValueError(f"pilot mode must be overfit/online with replay at most {maximum_records} examples and 256 MiB")
         if self.batch_size > self.replay_capacity or self.render_budget < self.replay_capacity:
@@ -79,10 +79,13 @@ class TrainConfig:
         profile_metadata(self.preroll_frames)
         if self.preroll_frames and self.prediction_scope != "basic":
             raise ValueError("qualified bootstrap render profile requires explicit basic prediction scope")
-        if self.input_performances not in {"initial", "varied"}:
+        if self.input_performances not in {"initial", "varied", "mixed"}:
             raise ValueError("unsupported input performance policy")
         if self.input_performances == "varied" and (self.prediction_scope != "basic" or self.preroll_frames != 32768 or self.sampling_policy != "paired_views"):
             raise ValueError("varied inputs require basic scope, qualified pre-roll and paired_views sampling")
+        if self.input_performances == "mixed" and (self.prediction_scope != "basic" or self.preroll_frames != 32768
+                                                   or self.sampling_policy != "paired_views" or self.mode != "overfit"):
+            raise ValueError("mixed inputs require basic scope, qualified pre-roll, paired_views and fixed cached replay")
         if (not math.isfinite(self.identity_weight) or self.identity_weight < 0
                 or not math.isfinite(self.identity_temperature) or self.identity_temperature <= 0):
             raise ValueError("identity weight must be nonnegative and temperature positive and finite")
@@ -261,6 +264,13 @@ def _rejected_prefix_history(path, source, sampler):
 def load_replay_seed(path: Path, pool, sampler, frontend, config, stream_config) -> tuple:
     raw = path.read_bytes()
     source = load_training_checkpoint(path)
+    if source.get("format") == "obruxo_mixed_features_v1":
+        from .mixed_features import validate_cache
+        validate_cache(source, pool, sampler, frontend, config, stream_config)
+        return source, {"policy": "verified_original_and_wide_features_fresh_learning_state_v1", "checkpoint_sha256": sha256_bytes(raw),
+                        "source_run_id": canonical_sha256(source["origins"]), "examples": len(source["replay"]),
+                        "distinct_parent_observations": source["distinct_parent_observations"],
+                        "acknowledged_recipes": source["cursor"]["next_sequence_id"]}
     if source.get("format") == "obruxo_paired_features_v1":
         if config.preroll_frames:
             raise ValueError("legacy paired feature cache lacks the corrected render profile")
@@ -338,6 +348,8 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
         raise ValueError("resume embeds its replay seed; do not supply seed_replay again")
     if resume is not None and initial_model is not None:
         raise ValueError("resume embeds its initial model; do not supply initial_model again")
+    if config.input_performances == "mixed" and resume is None and seed_replay is None:
+        raise ValueError("mixed inputs require their verified feature cache")
     if torch.device(device).type not in {"cpu", "cuda", "xpu"}:
         raise ValueError("pilot supports CPU, CUDA or XPU explicitly; no automatic fallback")
     learning_seed = config.seed if config.learning_seed_override is None else config.learning_seed_override

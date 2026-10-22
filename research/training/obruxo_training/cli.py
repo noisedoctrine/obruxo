@@ -166,7 +166,7 @@ def main(argv=None) -> int:
                        help="basic enforces the nine-control/two-choice pilot; codec preserves historical experiments")
     train.add_argument("--preroll-frames", type=int, choices=(0, 32768),
                        help="Basic defaults to the qualified lead with fixed random phase; explicit zero preserves legacy rendering")
-    train.add_argument("--input-performances", choices=("initial", "varied"), default="initial",
+    train.add_argument("--input-performances", choices=("initial", "varied", "mixed"), default="initial",
                        help="varied gives basic patches paired broad-pitch observations with category-independent pattern assignment")
     train.add_argument("--initial-model", type=Path, help="Verified same-pool inference weights; start a fresh optimizer and learning RNG")
     train.add_argument("--updates-per-render", type=int, default=1)
