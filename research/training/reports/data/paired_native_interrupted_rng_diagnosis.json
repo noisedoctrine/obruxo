@@ -1,0 +1,22 @@
+{
+  "plan_id": "c2d8a42e179494705cb925406d8cbea41a147668fcb0a2db7abb7b6001300cb1",
+  "checkpoint_step": 49,
+  "native_requests_added": 0,
+  "optimizer_updates_added": 0,
+  "model_equal": {
+    "parameter": true,
+    "spectral": true
+  },
+  "optimizer_equal": {
+    "parameter": true,
+    "spectral": true
+  },
+  "rng_equal": {
+    "python": false,
+    "numpy": false,
+    "torch": true,
+    "device": true,
+    "accelerator": true
+  },
+  "failure": "paired final models, Adam or RNG do not reproduce exactly"
+}
