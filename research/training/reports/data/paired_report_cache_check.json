@@ -1,0 +1,17 @@
+{
+  "cached_comparisons_reused": 119,
+  "elapsed_seconds": 9.347778299998026,
+  "evidence_sha256": {
+    "checkpoint.pt": "29d5ccab94c7c8abfacc67bcf3b29112514bb9b946861e421f2fe66dbf5c79d1",
+    "measurements.jsonl": "076a6dd520a94768dfb8220ec1dcc8d1b08d02c4d410a8a7f5fa8f6d6096c8c1",
+    "renders.jsonl": "2f518977fd3fb09a32da3631410df720951e7758ad8f3b0629b670e7b444e339",
+    "updates.jsonl": "d76d270852f05647482fd4553975905fb250473fdfe815be0880a023f44a5b26"
+  },
+  "final_trained_updates": 128,
+  "new_native_requests": 0,
+  "new_optimizer_updates": 0,
+  "peak_process_tree_rss_bytes": 1734660096,
+  "qualified_for_release": false,
+  "rss_sampling_errors": 0,
+  "training_evidence_unchanged": true
+}
