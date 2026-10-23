@@ -15,6 +15,7 @@ from obruxo_training.features import PITCH_SIZE, TIMBRE_SHAPE, tensor_digest  # 
 from obruxo_training.model import PilotInverse  # noqa: E402
 from obruxo_training.paired_native_step import reciprocal_updates  # noqa: E402
 from obruxo_training.paired_native_training import fit_pairs  # noqa: E402
+from obruxo_training.paired_performance_objective import INPUT_TRANSFER, evaluation_views  # noqa: E402
 from obruxo_training.spectral import SpectralTargets  # noqa: E402
 
 
@@ -25,8 +26,8 @@ def sound(candidate, performance):
     return np.stack((wave * (1.1 - candidate.continuous[1]), wave * (.1 + candidate.continuous[1])), -1).astype(np.float32)
 
 
-@pytest.fixture
-def inputs():
+@pytest.fixture(params=[False, True], ids=["transfer", "input-and-transfer"])
+def inputs(request):
     torch.set_num_threads(2)
     torch.manual_seed(5)
     codec, initial = PilotCodec(), PilotInverse()
@@ -46,6 +47,8 @@ def inputs():
     plan = {"training": [{"target": codec.default_target().to_dict(), "performances": performances}], "updates": reciprocal_updates(1),
             "production_training": {"forward": "unperturbed_argmax", "parameter_logits": "raw", "scales": [32., 29.]},
             "optimizer": {"learning_rate": .0001, "seed": 0}, "limits": {"optimizer_attempts": 4}}
+    if request.param:
+        plan.update(reconstruction_objective=INPUT_TRANSFER, rng_initialization="python_numpy_and_torch_from_optimizer_seed")
     def fresh():
         return {name: copy.deepcopy(initial) for name in ("parameter", "spectral")}
     return plan, records, session, fresh, calls
@@ -80,7 +83,18 @@ def test_checkpoint_resume_reproduces_both_models_adam_and_individual_measuremen
     assert len(measured) == sum(row["gradient_queries"] for row in expected)
     for row in measured:
         example = plan["updates"][row["step"] - 1]["examples"][row["example"]]
-        assert all(row[key] == example[key] for key in ("state", "input_view", "view"))
+        views = evaluation_views(plan, example)
+        assert all(row[key] == example[key] for key in ("state", "input_view"))
+        assert row["view"] == views[row["query"] % len(views)]
+    for update in expected:
+        for index, estimate in enumerate(update["estimates"]):
+            rows = [row for row in measured if row["step"] == update["step"] and row["example"] == index]
+            views = evaluation_views(plan, update["examples"][index])
+            assert sum(row["loss"] for row in rows[:len(views)]) / len(views) == estimate["value"]
+            for start in range(0, len(rows), len(views)):
+                components = rows[start:start + len(views)]
+                assert tuple(row["view"] for row in components) == views
+                assert all(row["candidate"] == components[0]["candidate"] for row in components)
 
 
 def test_budget_rejection_does_not_charge_or_render(tmp_path, inputs):
@@ -107,3 +121,22 @@ def test_attempt_ledger_cannot_skip_the_first_pair(tmp_path, inputs):
     with pytest.raises(ValueError, match="attempt ledger"):
         fit_pairs(fresh(), records, session, tmp_path, plan)
     assert calls == []
+
+
+@pytest.mark.parametrize("inputs", [True], indirect=True)
+def test_failed_second_performance_does_not_advance_either_model(tmp_path, inputs):
+    plan, records, session, fresh, _calls = inputs
+    models = fresh()
+    before = {name: tensor_digest(model.state_dict()) for name, model in models.items()}
+    original = session.render
+    def fail_second(candidate, performance, phase, label):
+        if label == "gradient:0:0:1":
+            return None, {}
+        return original(candidate, performance, phase, label)
+    session.render = fail_second
+    with pytest.raises(RuntimeError, match="not accepted"):
+        fit_pairs(models, records, session, tmp_path, plan)
+    assert {name: tensor_digest(model.state_dict()) for name, model in models.items()} == before
+    assert not (tmp_path / "checkpoint.pt").exists()
+    assert len((tmp_path / "updates.jsonl").read_text().splitlines()) == 1
+    assert len((tmp_path / "measurements.jsonl").read_text().splitlines()) == 1

@@ -25,6 +25,7 @@ from .paired_native_evidence import native_ledger, rescore_waveform
 from .paired_native_fit import make_plan
 from .paired_native_step import matched_pair_step
 from .paired_native_training import CHECKPOINT_FORMAT
+from .paired_performance_objective import evaluation_views, seed_external_streams
 from .reproducibility import fixed_generator_phases
 from .spectral import SpectralTargets
 from .trainer import capture_rng, restore_model, restore_rng
@@ -61,7 +62,9 @@ def training_signature(models, optimizers):
 
 def verify(source, pool, bootstrap_root, bootstrap_audit_path, qualification_path, cache_path, choice_path, direction_source, *, prefix_plan=None):
     prefix = prefix_plan is not None
-    plan = prefix_plan if prefix else make_plan(pool, bootstrap_root, bootstrap_audit_path, qualification_path, cache_path, choice_path, direction_source)
+    stored_plan = json.loads((source / "plan.json").read_text())
+    options = {"input_and_transfer": True} if stored_plan.get("reconstruction_objective") is not None else {}
+    plan = prefix_plan if prefix else make_plan(pool, bootstrap_root, bootstrap_audit_path, qualification_path, cache_path, choice_path, direction_source, **options)
     summary = ({"elapsed_seconds": time() - json.loads((source / "run.json").read_text())["started_unix"]} if prefix else
                json.loads((source / "summary.json").read_text()))
     if (json.loads((source / "plan.json").read_text()) != plan or (not prefix and (summary["plan"] != plan
@@ -96,6 +99,7 @@ def verify(source, pool, bootstrap_root, bootstrap_audit_path, qualification_pat
     incumbent, frontend, codec = restore_model(initial)
     models = {name: copy.deepcopy(incumbent).train() for name in ("parameter", "spectral")}
     optimizers = {name: torch.optim.Adam(model.parameters(), lr=plan["optimizer"]["learning_rate"]) for name, model in models.items()}
+    seed_external_streams(plan)
     torch.manual_seed(plan["optimizer"]["seed"])
     rows = json.loads((source / "records.json").read_text())
     records = {}
@@ -175,26 +179,30 @@ def verify(source, pool, bootstrap_root, bootstrap_audit_path, qualification_pat
         cursor, before_rng = 0, capture_rng("cpu")
         def evaluate(example, candidate):
             nonlocal cursor
-            if cursor >= len(measurements):
-                raise IncompleteMeasurement()
-            observed = measurements[cursor]
             row = examples[example]
-            if (observed["query"] != cursor or observed["step"] != step + 1 or observed["example"] != example
-                    or any(observed[key] != row[key] for key in ("state", "input_view", "view")) or observed["candidate"] != candidate.to_dict()):
-                raise ValueError("paired native gradient query differs from its replayed model")
-            matching = [receipt for receipt in outcomes.values() if receipt["status"] == "accepted" and receipt["phase"] == "training"
-                        and receipt["label"] == f"gradient:{step}:{example}:{cursor}" and receipt["request_id"] == observed["request_id"]
-                        and receipt["qa"]["audio_float32_sha256"] == observed["audio_sha256"]]
-            if not matching:
-                raise ValueError("paired loss measurement has no accepted native receipt")
-            for receipt in matching:
-                require_request(candidate, Performance.from_dict(plan["training"][row["state"]]["performances"][row["view"]]), receipt)
-            cursor += 1
-            return observed["loss"]
+            losses = []
+            for view in evaluation_views(plan, row):
+                if cursor >= len(measurements):
+                    raise IncompleteMeasurement()
+                observed = measurements[cursor]
+                if (observed["query"] != cursor or observed["step"] != step + 1 or observed["example"] != example or observed["view"] != view
+                        or any(observed[key] != row[key] for key in ("state", "input_view")) or observed["candidate"] != candidate.to_dict()):
+                    raise ValueError("paired native gradient query differs from its replayed model")
+                matching = [receipt for receipt in outcomes.values() if receipt["status"] == "accepted" and receipt["phase"] == "training"
+                            and receipt["label"] == f"gradient:{step}:{example}:{cursor}" and receipt["request_id"] == observed["request_id"]
+                            and receipt["qa"]["audio_float32_sha256"] == observed["audio_sha256"]]
+                if not matching:
+                    raise ValueError("paired loss measurement has no accepted native receipt")
+                for receipt in matching:
+                    require_request(candidate, Performance.from_dict(plan["training"][row["state"]]["performances"][view]), receipt)
+                cursor += 1
+                losses.append(observed["loss"])
+            return sum(losses) / len(losses)
         features = [record_features(records[row["state"]], row["input_view"]) for row in examples]
         targets = [PilotTarget.from_dict(plan["training"][row["state"]]["target"]) for row in examples]
         try:
             result = matched_pair_step(trial, trial_opts, features, targets, codec, evaluate, step, len(plan["updates"]), scales=plan["production_training"]["scales"])
+            result["gradient_queries"] = cursor
         except IncompleteMeasurement:
             if ordinal in committed:
                 raise ValueError("committed paired update has incomplete native measurements") from None
