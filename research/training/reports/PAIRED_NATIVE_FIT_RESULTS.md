@@ -1,0 +1,19 @@
+# Paired sound training still loses original-note quality
+
+The final 128-update comparison finishes, but **neither trained model is admitted**. Sound training improves reconstruction of the wider recordings while worsening the original recordings. The same failure occurs on the retained original 32 patches. The conditional development comparison does not run. Keep the accepted initializer, the 14-output scope and every existing quality gate.
+
+The [independent audit](data/paired_native_fit_verification.json) passes: both models, Adam and RNG replay exactly through all 128 updates, both interrupted attempts and the 49/87/128-update interruption checkpoints. All 576 candidate comparison waveforms are rescored, all hard requests reconstructed, and source inputs/targets checked. The [identity proof](data/paired_native_identity_verification.json) binds all 192 original comparison caches and confirms they remain unchanged. The complete audit takes **950.02 seconds / 2.40 GiB**, adding zero native requests or real optimizer updates.
+
+The [frozen numerical card](PAIRED_NATIVE_FIT_CARD.md) uses 64 training patches, three input recordings per patch, and the same starting weights for parameter and sound training. Each update combines two separately inferred patches: original input scored under a wider performance, and wider input scored under the original performance. There are 128 updates and 256 observations per arm. Hard category choices match production; only their backward derivative uses the fixed scales.
+
+| Input recordings, all 64 patches | Initial spectral error | Parameter training | Sound training | Change from initial | Fit gate |
+|---|---:|---:|---:|---:|---|
+| Original notes | 0.313734 | 0.483039 | 0.386193 | +23.1% | Fail |
+| Wider held notes | 1.477426 | 1.379246 | 1.271080 | -14.0% | Pass |
+| Wider alternate pattern | 1.955185 | 1.944166 | 1.651413 | -15.5% | Pass |
+
+Values are mean multiresolution spectral distance, where lower is better. The unchanged fit decision also checks the combined sound objective against initialization and the matched control. On the retained 32 patches, original-note spectral error rises from 0.323321 to 0.424609 (+31.3%); the two wider groups pass. This is a training-fit failure, before held-out generalization or listening can establish quality.
+
+Two battery sleeps and a Windows report-write interruption are retained in the [continuation](PAIRED_NATIVE_CONTINUATION_CARD.md) and [report-recovery](PAIRED_REPORT_RECOVERY_CARD.md) evidence. All 128 updates are saved before report-only recovery; all 119 completed comparison caches are checked and reused without further training. The final count is **5,985 native attempts: 5,983 accepted plus two observed timeouts whose identical requests later succeed**, with 130 charged optimizer attempts. Strict all-attempt acceptance remains false. The native window spans **13 hours 10 minutes**, including sleep and interruptions; it meets the separately declared 24-hour/5-GiB continuation limits. The original six-hour failure remains recorded. The [terminal service reports](data/paired_report_recovery_completion.json) confirm recovery and verification exit successfully and release their scoped active-work requests. Reproducing the run's arithmetic does not reverse the sound-quality failure.
+
+The next objective must implement the plan's existing requirement: **one inferred patch is scored against both its input performance and an additional performance**. Reciprocal inputs alone do not supply the first term: each prediction in this completed fit is scored only under the other performance. Correct that gap before another full fit, with an explicit render budget and a small end-to-end check. The observed regression does not establish this gap as its sole cause. Do not expand the output vocabulary, retry parameter-only initialization, loosen preservation gates or promote either diagnostic model.
