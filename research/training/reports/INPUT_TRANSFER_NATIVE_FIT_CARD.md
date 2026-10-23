@@ -2,6 +2,8 @@
 
 Frozen [plan](data/input_transfer_native_fit_plan.json): `4b29e0f4cbcef2c38316a82989e3f16a4b5389fa3ed7d92851bbae1023d74d93`, source `d328186`, file SHA-256 `6ff8a63236a4ba86396d6767e748ccfbf6c46ef0c79f01e8d17ba251896833ae`. [Actual input/proof validation](data/input_transfer_preparation.json) passes in **424.06 seconds / 0.83 GiB**, with zero renders/updates and no sampling errors. The conservative evidence bound is **4,356,828,663 bytes / 4.06 GiB**, below the 5-GiB cap. Native execution and reconstruction gains remain unproven.
 
+Native execution starts locally on 2026-10-23 after a separate **415.56-second / 0.82-GiB** [input revalidation](data/input_transfer_execution_start.json), with zero new renders/updates. The first **four real paired updates** pass [exact independent model/Adam/Python/NumPy/Torch replay](data/input_transfer_prefix_verification.json) in **5.23 seconds**, adding zero native requests or optimizer updates. The immutable early checkpoint is retained and training continues. The final 128-update comparison remains pending; this proves recovery correctness, not reconstruction quality.
+
 Prepared before native work on 2026-10-23. **Fifty local checks pass**, covering both historical transfer-only and new input/transfer execution, exact model/Adam/RNG recovery, independent waveform rescoring, changed performance rejection and failure in the second component before either model advances. Ruff passes. Freeze the implemented input/compute plan before execution. This is a new run, not another continuation of the failed paired fit.
 
 The [paired result](PAIRED_NATIVE_FIT_RESULTS.md) loses original-input reconstruction despite wider-input gains. It also leaves a gap against the training plan: an original-input prediction is scored only under the wider performance, and a wider-input prediction only under the original performance. Correct that objective before further changes to model capacity or training data. The regression does not establish this gap as its sole cause.
@@ -17,7 +19,7 @@ Save both models and Adam after every update. The first four real updates are th
 | Native work | Worst-case planned requests |
 |---|---:|
 | Three source recordings for each of 64 patches | 192 |
-| 128 updates Ã— two predictions Ã— two performances Ã— 22 control probes | 11,264 |
+| 128 updates Ãƒâ€” two predictions Ãƒâ€” two performances Ãƒâ€” 22 control probes | 11,264 |
 | Final fit comparisons | 768 |
 | Conditional existing development panels | 504 |
 | **Planned total** | **12,728** |
