@@ -4,6 +4,8 @@ Frozen [plan](data/input_transfer_native_fit_plan.json): `4b29e0f4cbcef2c38316a8
 
 Native execution starts locally on 2026-10-23 after a separate **415.56-second / 0.82-GiB** [input revalidation](data/input_transfer_execution_start.json), with zero new renders/updates. The first **four real paired updates** pass [exact independent model/Adam/Python/NumPy/Torch replay](data/input_transfer_prefix_verification.json) in **5.23 seconds**, adding zero native requests or optimizer updates. The immutable early checkpoint is retained and training continues. The final 128-update comparison remains pending; this proves recovery correctness, not reconstruction quality.
 
+A [declared one-shot final-audit controller](data/input_transfer_final_audit_declaration.json) is live and waiting for this exact process/creation time and frozen plan. It requires a successful terminal service and complete saved comparison before invoking only offline verification; failed/incomplete training stops it, and changed inputs or an existing proof are rejected. It cannot resume training or raise a budget. [Five isolated guard checks](data/input_transfer_final_audit_guard_check.json) pass without real renders, updates or audit launches. The final audit remains pending and uses the already declared twenty-minute/4-GiB allowance.
+
 Prepared before native work on 2026-10-23. **Fifty local checks pass**, covering both historical transfer-only and new input/transfer execution, exact model/Adam/RNG recovery, independent waveform rescoring, changed performance rejection and failure in the second component before either model advances. Ruff passes. Freeze the implemented input/compute plan before execution. This is a new run, not another continuation of the failed paired fit.
 
 The [paired result](PAIRED_NATIVE_FIT_RESULTS.md) loses original-input reconstruction despite wider-input gains. It also leaves a gap against the training plan: an original-input prediction is scored only under the wider performance, and a wider-input prediction only under the original performance. Correct that objective before further changes to model capacity or training data. The regression does not establish this gap as its sole cause.
@@ -19,7 +21,7 @@ Save both models and Adam after every update. The first four real updates are th
 | Native work | Worst-case planned requests |
 |---|---:|
 | Three source recordings for each of 64 patches | 192 |
-| 128 updates Ãƒâ€” two predictions Ãƒâ€” two performances Ãƒâ€” 22 control probes | 11,264 |
+| 128 updates × two predictions × two performances × 22 control probes | 11,264 |
 | Final fit comparisons | 768 |
 | Conditional existing development panels | 504 |
 | **Planned total** | **12,728** |

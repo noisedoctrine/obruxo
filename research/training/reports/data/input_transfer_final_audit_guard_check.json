@@ -1,0 +1,13 @@
+{
+  "cases_passed": [
+    "failed training prevents audit",
+    "incomplete comparisons prevent audit",
+    "existing proof is preserved",
+    "changed plan is rejected",
+    "complete fit invokes verification only and preserves quality failure"
+  ],
+  "controller_sha256": "58579443c998dba1da69c0a34fefc34ee779b87235c2de93aec542e81569478c",
+  "real_audit_launches": 0,
+  "real_native_requests": 0,
+  "real_optimizer_updates": 0
+}
