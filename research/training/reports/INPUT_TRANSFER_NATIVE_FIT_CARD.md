@@ -1,5 +1,7 @@
 # Match both performances with each predicted patch
 
+Frozen [plan](data/input_transfer_native_fit_plan.json): `4b29e0f4cbcef2c38316a82989e3f16a4b5389fa3ed7d92851bbae1023d74d93`, source `d328186`, file SHA-256 `6ff8a63236a4ba86396d6767e748ccfbf6c46ef0c79f01e8d17ba251896833ae`. [Actual input/proof validation](data/input_transfer_preparation.json) passes in **424.06 seconds / 0.83 GiB**, with zero renders/updates and no sampling errors. The conservative evidence bound is **4,356,828,663 bytes / 4.06 GiB**, below the 5-GiB cap. Native execution and reconstruction gains remain unproven.
+
 Prepared before native work on 2026-10-23. **Fifty local checks pass**, covering both historical transfer-only and new input/transfer execution, exact model/Adam/RNG recovery, independent waveform rescoring, changed performance rejection and failure in the second component before either model advances. Ruff passes. Freeze the implemented input/compute plan before execution. This is a new run, not another continuation of the failed paired fit.
 
 The [paired result](PAIRED_NATIVE_FIT_RESULTS.md) loses original-input reconstruction despite wider-input gains. It also leaves a gap against the training plan: an original-input prediction is scored only under the wider performance, and a wider-input prediction only under the original performance. Correct that objective before further changes to model capacity or training data. The regression does not establish this gap as its sole cause.
@@ -15,14 +17,14 @@ Save both models and Adam after every update. The first four real updates are th
 | Native work | Worst-case planned requests |
 |---|---:|
 | Three source recordings for each of 64 patches | 192 |
-| 128 updates × two predictions × two performances × 22 control probes | 11,264 |
+| 128 updates Ã— two predictions Ã— two performances Ã— 22 control probes | 11,264 |
 | Final fit comparisons | 768 |
 | Conditional existing development panels | 504 |
 | **Planned total** | **12,728** |
 
 Cap cumulative requests at **13,120**: 11,840 training and 1,280 qualification attempts, including failed or interrupted work. Cap charged update attempts at 132 per arm. Four complete extra paired attempts plus source requests require at most 11,808 training requests; the phase cap leaves 32 additional attempts. This explicitly replaces the previous single-performance request allocation. No intermediate quality sweep or automatic budget extension is permitted.
 
-Use a new **ten-hour** deadline from the original start of this new run, **8 GiB** process-tree RAM, **512 MiB** replay and **5 GiB** evidence. These are ceilings, not promises of runtime. The completed prior run's last 500 accepted calls average 1.418 seconds wall time for 3.975 seconds of audio; across all accepted calls the mean is 2.183 seconds. At that latter rate the request ceiling alone costs about eight hours. Preparation retains a separately measured ten-minute allowance. The independent no-render audit retains twenty minutes / 4 GiB. Recompute the conservative storage bound with an additional 256-MiB allowance for the doubled ledgers and reject any estimate above the evidence ceiling before execution.
+Use a new **ten-hour** deadline from the original start of this new run, **8 GiB** process-tree RAM, **512 MiB** replay and **5 GiB** evidence. These are ceilings, not promises of runtime. The [measured prior throughput](data/input_transfer_compute_profile.json) binds its source ledger: the last 500 accepted calls (qualification only) average 1.418 seconds wall time for 3.975 seconds of audio; across all 5,983 accepted calls the mean is 2.183 seconds. At that latter rate the request ceiling alone costs about eight hours. Preparation retains a separately measured ten-minute allowance. The independent no-render audit retains twenty minutes / 4 GiB. Recompute the conservative storage bound with an additional 256-MiB allowance for the doubled ledgers and reject any estimate above the evidence ceiling before execution.
 
 Render sources and probes on demand; discard intermediate probe audio under the existing contract, retaining component losses and provenance for exact optimizer replay. Keep every final comparison waveform for independent rescoring. A scoped active-work request may prevent automatic idle sleep without changing persistent power settings. Any interruption keeps the original deadline, failed attempt, checkpoint and ledger prefix. No extra launch is inferred from remaining optimizer attempts.
 
