@@ -1,0 +1,41 @@
+{
+  "report_only": {
+    "active_computation_request": {
+      "display_required": false,
+      "persistent_settings_changed": false,
+      "released": true,
+      "requested": true
+    },
+    "charged_optimizer_attempts": 130,
+    "complete": true,
+    "continuation_budget_met": true,
+    "failure": null,
+    "matched_comparison_passed_under_continuation": false,
+    "numerical_plan_id": "c2d8a42e179494705cb925406d8cbea41a147668fcb0a2db7abb7b6001300cb1",
+    "original_budget_met": false,
+    "qualified_for_release": false,
+    "sound_quality_gates_passed": false
+  },
+  "report_service": {
+    "active_computation_request": {
+      "display_required": false,
+      "persistent_settings_changed": false,
+      "released": true,
+      "requested": true
+    },
+    "elapsed_seconds_including_validation": 952.6494987010956,
+    "exit_code": 0,
+    "failure": null
+  },
+  "verification_service": {
+    "active_computation_request": {
+      "display_required": false,
+      "persistent_settings_changed": false,
+      "released": true,
+      "requested": true
+    },
+    "elapsed_seconds_including_validation": 957.4483091831207,
+    "exit_code": 0,
+    "failure": null
+  }
+}

@@ -1,5 +1,7 @@
 # Learn from original and wider recordings in every update
 
+The [final audited result](PAIRED_NATIVE_FIT_RESULTS.md) completes all 128 updates with exact replay and 576 independently rescored comparison sounds, but fails original-input reconstruction. The continuation resource verdict passes under its separately declared limits; the original six-hour failure remains. Neither model is admitted. The pre-execution numerical contract below is retained.
+
 The original execution stops after 49 saved updates when battery sleep causes a timeout and exceeds the six-hour deadline. Its [interruption and exact saved-state replay](PAIRED_NATIVE_CONTINUATION_CARD.md) are preserved. The separate continuation declaration keeps the numerical plan and all quality gates; it does not relabel the original budget failure. Use that continuation entry point for resumption and final verification of this run.
 
 Declared before the next local fit on 2026-10-23. The [production-choice native path](PRODUCTION_NATIVE_RESULTS.md) passes its real-audio prerequisite. The last long fit still regresses on original recordings, so retain the earlier accepted initializer and keep all reconstruction gates. The model remains **14 dense outputs / 355,806 trainable parameters**. No parameter-only initializer retry or extra prediction head is introduced.
