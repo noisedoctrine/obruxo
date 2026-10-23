@@ -1,0 +1,41 @@
+{
+  "auditor_source_sha256": "80a377cc5798391d474143a424a6b5d23ba9011bcf14f643d52f74872396f343",
+  "charged_optimizer_attempts_before_continuation": 50,
+  "committed_updates_before_continuation": 49,
+  "deadline_unix": 1792797741.5647514,
+  "declared_unix": 1792745485.37032,
+  "execution_helper_sha256": "c620f13f1bd79a9c675cc6ea9639f5ec14fed36cd7d005faa02b0fd9c7fc4b07",
+  "format": "paired_native_operational_continuation_v1",
+  "limits": {
+    "archive_bytes": 5368709120,
+    "optimizer_attempts": 132,
+    "process_tree_bytes": 8589934592,
+    "qualification_attempts": 1280,
+    "replay_bytes": 536870912,
+    "replay_records": 512,
+    "training_attempts": 5840,
+    "wall_seconds": 86400
+  },
+  "maximum_explicit_launches": 3,
+  "native_attempts_before_continuation": 2042,
+  "numerical_plan_file_sha256": "61f85381569bf85642a13499c233e8528b57fa9c85b910de8af6e915ee3cbcc9",
+  "numerical_plan_id": "c2d8a42e179494705cb925406d8cbea41a147668fcb0a2db7abb7b6001300cb1",
+  "operational_archive_reserve_bytes": 1048576,
+  "operational_source_sha256": "bb110cf341643c058349bb923b71f263c5b6d39f435c6a37466e9a472733e76c",
+  "original_deadline_failed": true,
+  "original_evidence_sha256": {
+    "checkpoint.pt": "f9da2e5a333a257e7a46b154add421cc0078415a1490809d4d8a9cbb9a825078",
+    "measurements.jsonl": "7b3d0194edebaf60e3aad94e6264153ab1be54d65ed59e6db62e4de1176e66c1",
+    "plan.json": "61f85381569bf85642a13499c233e8528b57fa9c85b910de8af6e915ee3cbcc9",
+    "prefix-checkpoint.pt": "f2f0f8850521de503aab1d83b0d9bca273dfb62f69b639557bbc4dcc6de78e17",
+    "prefix-verification.json": "7b7e37b0e29ac266959d87d3f0d3c6469a851ff9d3d85933a1d3847ccd74af0a",
+    "records.json": "59254a8de20bf9de983489d61974a75bc2df04f2e9d8a246de54c8714d85f7da",
+    "renders.jsonl": "201469302d52380e363256d5a6e421883c398e01f22fb74eca914d0ba0384c17",
+    "run.json": "600187e65500098addd4edd20d93eba465755f6114f9d2c07e1e928db47d0110",
+    "summary.json": "162cac526b76ce525b0dd86976289d39a5f4629754be628666fd699d97729c9b",
+    "updates.jsonl": "7079efd702132de83626688b67a3e166ee53c169d9ca12a7722b314e054b8995"
+  },
+  "original_started_unix": 1792711341.5647514,
+  "prefix_audit_sha256": "2014675a691cd4d5eb1976153b91f325a983d8621a77ae714bfce0f8b82080bc",
+  "qualified_for_release": false
+}

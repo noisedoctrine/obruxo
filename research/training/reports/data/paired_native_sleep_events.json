@@ -1,0 +1,42 @@
+[
+  {
+    "time_utc": "2026-10-23T06:18:29.6651422Z",
+    "id": 506,
+    "message": "The system is entering Modern Standby \r\n\r\nReason: Idle Timeout."
+  },
+  {
+    "time_utc": "2026-10-23T06:17:58.3158025Z",
+    "id": 507,
+    "message": "The system is exiting Modern Standby \r\n\r\nReason: Power Button."
+  },
+  {
+    "time_utc": "2026-10-23T06:17:56.7307710Z",
+    "id": 506,
+    "message": "The system is entering Modern Standby \r\n\r\nReason: Sleep, Hibernate, or Shutdown."
+  },
+  {
+    "time_utc": "2026-10-23T01:00:58.8626512Z",
+    "id": 107,
+    "message": "The system has resumed from sleep."
+  },
+  {
+    "time_utc": "2026-10-23T01:00:56.6313728Z",
+    "id": 42,
+    "message": "The system is entering sleep.\r\n\r\nSleep Reason: Battery"
+  },
+  {
+    "time_utc": "2026-10-23T01:00:51.3084508Z",
+    "id": 507,
+    "message": "The system is exiting Modern Standby \r\n\r\nReason: Sleep, Hibernate, or Shutdown."
+  },
+  {
+    "time_utc": "2026-10-23T00:55:13.5026846Z",
+    "id": 506,
+    "message": "The system is entering Modern Standby \r\n\r\nReason: 53."
+  },
+  {
+    "time_utc": "2026-10-23T00:55:13.5011768Z",
+    "id": 507,
+    "message": "The system is exiting Modern Standby \r\n\r\nReason: 53."
+  }
+]

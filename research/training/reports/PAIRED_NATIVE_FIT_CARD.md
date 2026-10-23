@@ -1,5 +1,7 @@
 # Learn from original and wider recordings in every update
 
+The original execution stops after 49 saved updates when battery sleep causes a timeout and exceeds the six-hour deadline. Its [interruption and exact saved-state replay](PAIRED_NATIVE_CONTINUATION_CARD.md) are preserved. The separate continuation declaration keeps the numerical plan and all quality gates; it does not relabel the original budget failure. Use that continuation entry point for resumption and final verification of this run.
+
 Declared before the next local fit on 2026-10-23. The [production-choice native path](PRODUCTION_NATIVE_RESULTS.md) passes its real-audio prerequisite. The last long fit still regresses on original recordings, so retain the earlier accepted initializer and keep all reconstruction gates. The model remains **14 dense outputs / 355,806 trainable parameters**. No parameter-only initializer retry or extra prediction head is introduced.
 
 Frozen [plan](data/paired_native_fit_plan.json): `c2d8a42e179494705cb925406d8cbea41a147668fcb0a2db7abb7b6001300cb1`, source `5650298`. Twenty-seven focused local checks pass, covering the complete simulated runner/auditor, early replay, model/Adam/RNG recovery, counted timeout recovery and altered evidence rejection. This includes the conditional development branch without inventing a passing sound result. Actual input/proof validation takes **203.94 seconds / 0.81 GiB**, with zero new renders/updates and no sampling errors. Full training and the final independent sound comparison remain incomplete.

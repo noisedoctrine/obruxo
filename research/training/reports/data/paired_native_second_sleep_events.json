@@ -1,0 +1,27 @@
+[
+  {
+    "time_utc": "2026-10-23T10:19:04.9733460Z",
+    "id": 506,
+    "message": "The system is entering Modern Standby \r\n\r\nReason: Idle Timeout."
+  },
+  {
+    "time_utc": "2026-10-23T10:17:49.8215061Z",
+    "id": 507,
+    "message": "The system is exiting Modern Standby \r\n\r\nReason: Power Button."
+  },
+  {
+    "time_utc": "2026-10-23T10:17:48.2485196Z",
+    "id": 506,
+    "message": "The system is entering Modern Standby \r\n\r\nReason: Sleep, Hibernate, or Shutdown."
+  },
+  {
+    "time_utc": "2026-10-23T10:13:51.7248169Z",
+    "id": 107,
+    "message": "The system has resumed from sleep."
+  },
+  {
+    "time_utc": "2026-10-23T10:13:48.6985477Z",
+    "id": 42,
+    "message": "The system is entering sleep.\r\n\r\nSleep Reason: Battery"
+  }
+]
