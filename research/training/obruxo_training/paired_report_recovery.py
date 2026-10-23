@@ -69,10 +69,15 @@ def freeze_report_recovery(source, declaration):
     if summary["render_attempts"]["qualification"] + remaining > manifest["limits"]["qualification_attempts"]:
         raise ValueError("remaining comparisons do not fit the unchanged qualification cap")
     backup = source / "report_recovery"
-    backup.mkdir(exist_ok=False)
+    backup.mkdir(exist_ok=True)
     partial = source / "fit_cases.json.partial"
-    shutil.copy2(partial, backup / partial.name)
-    write_json(backup / "partial-evidence.json", {partial.name: digest(partial)})
+    preserved = backup / partial.name
+    if preserved.exists():
+        if digest(preserved) != digest(partial):
+            raise ValueError("the preserved interrupted report changed")
+    else:
+        shutil.copy2(partial, preserved)
+        write_json(backup / "partial-evidence.json", {partial.name: digest(partial)})
     report = {"format": "paired_final_report_recovery_v1", "operational_manifest_sha256": digest(declaration / "manifest.json"),
               "numerical_plan_id": canonical_sha256(plan), "operational_audit_id": canonical_sha256(scoped_plan(plan, manifest)),
               "checkpoint_sha256": digest(source / "checkpoint.pt"), "trained_updates": saved["step"],
@@ -154,7 +159,7 @@ def check_cached_fit(source, declaration, bootstrap_root):
                     records[index] = torch.load(source / "records" / f"{index:03d}.pt", map_location="cpu", weights_only=True)
                 record, recipe = records[index], plan["training"][index]
                 def provider(_audio):
-                    return predict_candidates(models, record_features(record, view), codec)
+                    return predict_candidates(models=models, codec=codec, features=record_features(record, view))
                 audit_case(session, source, path.stem, recipe, view, provider, identities, expected_audio=record["audio_sha256"][view])
     finally:
         monitor.close()
