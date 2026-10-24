@@ -3,6 +3,7 @@
 import torch
 
 from .codec import PilotCodec
+from .conditioned_fit_policy import gradient_groups, require_frozen
 from .model import batch_features, loss_terms
 from .native_inverse import native_reconstruction_loss
 from .production_controls import ProductionControlAdapter
@@ -54,9 +55,12 @@ def matched_pair_step(models, optimizers, features, targets, codec, evaluate, st
             raise ValueError("nonfinite paired inverse gradient")
     gradients = {"continuous_l1": spectral["continuous"].grad.abs().sum(-1).tolist(),
                  "category_l1": [scores.grad.abs().sum(-1).tolist() for scores in spectral["categorical"]]}
+    correction = {name: gradient_groups(model) for name, model in models.items() if hasattr(model, "conditioning_training_policy")}
     # Do not advance either optimizer if a native callback or either backward pass fails.
     for name in ("parameter", "spectral"):
         optimizers[name].step()
+        require_frozen(models[name])
     return {"losses": {name: float(value.detach()) for name, value in losses.items()}, "gradients": gradients,
+            **({"correction_gradients": correction} if correction else {}),
             "gradient_queries": sum(row.queries for row in estimates), "estimates": [row.to_dict() for row in estimates],
             "production_patches": [target.to_dict() for target in production], "temperature": temperature}

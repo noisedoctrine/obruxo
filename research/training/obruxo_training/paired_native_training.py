@@ -10,6 +10,7 @@ from obruxo_data.midi import Performance
 from .audit import write_json
 from .checkpoints import atomic_torch_save
 from .codec import PilotTarget
+from .conditioned_fit_policy import require_frozen
 from .native_fit import append_durable, record_features
 from .paired_native_step import matched_pair_step
 from .paired_performance_objective import evaluation_views, seed_external_streams
@@ -52,6 +53,8 @@ def fit_pairs(models, records, session, output, plan, saved=None, *, after_step=
     else:
         seed_external_streams(plan)
         torch.manual_seed(plan["optimizer"]["seed"])
+    for model in models.values():
+        require_frozen(model)
     charges_path = output / "updates.jsonl"
     charges = [json.loads(line) for line in charges_path.read_text().splitlines()] if charges_path.exists() else []
     for index, charge in enumerate(charges):
