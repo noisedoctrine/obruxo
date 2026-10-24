@@ -1,0 +1,11 @@
+{
+  "continuous_auxiliary_weight": 1.0,
+  "declared_at_utc": "2026-10-24T19:10:57.103532+00:00",
+  "expected_parameter_model_sha256": "b0a18a318e8a29adf8c0c6f77eec29df9898c0c77b65b3747e3b888a06b78d09",
+  "experimental_training_updates": 0,
+  "implementation_commit": "cd63b7e",
+  "native_executions_started": 0,
+  "plan_file_sha256": "43b4e324b773753a276eb429e655679637e0fbe0c9eb52e005cd19d7e81ee9e5",
+  "plan_id": "e17e3f018828a226040a62fa1cc6a37d79b104cd0b5a170c3f7e6cd9fba3137f",
+  "qualified_for_release": false
+}
