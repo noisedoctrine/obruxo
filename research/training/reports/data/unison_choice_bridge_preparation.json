@@ -1,0 +1,12 @@
+{
+  "experimental_training_updates": 0,
+  "new_native_requests": 0,
+  "plan_id": "e598c1b72414faf7d639fde3bf5c80c9d4d4015c4487f46ebde367aff0955a2a",
+  "qualified_for_release": false,
+  "resources": {
+    "elapsed_seconds": 0.5506025000067893,
+    "peak_process_tree_rss_bytes": 506638336,
+    "rss_sampling_errors": 0
+  },
+  "simulated_optimizer_step_applications": 0
+}
