@@ -1,0 +1,42 @@
+{
+  "all_native_accepted": false,
+  "archive_bytes_before_summary": 1062859970,
+  "committed_updates_per_arm": 49,
+  "complete": false,
+  "elapsed_seconds": 24934.593321084976,
+  "failure": "RuntimeError: paired native sound render was not accepted",
+  "fit_result": null,
+  "incumbent_artifacts_unchanged": true,
+  "matched_comparison_passed": false,
+  "native_receipts_resolved": false,
+  "peak_process_tree_rss_bytes": 2952491008,
+  "plan_id": "c2d8a42e179494705cb925406d8cbea41a147668fcb0a2db7abb7b6001300cb1",
+  "qualified_for_release": false,
+  "raw_summary_sha256": "162cac526b76ce525b0dd86976289d39a5f4629754be628666fd699d97729c9b",
+  "recovered_timeouts": [],
+  "render_attempts": {
+    "qualification": 0,
+    "training": 2042
+  },
+  "renderer_identity": {
+    "backend_version": "0.8.3",
+    "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+    "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+    "settings": {
+      "buffer_size": 128,
+      "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+      "event_timing": "absolute ticks to half-even sample offsets",
+      "frame_policy": "one_guard_sample_trim_to_requested_frames_v1",
+      "plugin_name": "Vital.vst3",
+      "preroll_frames": 32768,
+      "preroll_policy": "shift_all_MIDI_then_trim_only_lead_v1",
+      "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+      "simple_note_time_guard": "one_eighth_sample_start_and_duration_v1",
+      "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+    }
+  },
+  "rss_sampling_errors": 0,
+  "test_split_used": false,
+  "validation_result": null,
+  "within_resource_limits": false
+}

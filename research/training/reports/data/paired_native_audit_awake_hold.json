@@ -1,0 +1,9 @@
+{
+  "audit_pid": 7644,
+  "elapsed_seconds": 76.04700000000594,
+  "audit_still_running": false,
+  "requested": true,
+  "released": true,
+  "display_required": false,
+  "persistent_settings_changed": false
+}
