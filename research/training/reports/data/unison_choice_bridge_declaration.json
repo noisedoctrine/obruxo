@@ -1,0 +1,9 @@
+{
+  "implementation_commit": "8083e9a",
+  "plan_file_sha256": "28b526d4750aef35890a28dda6f08f8803be05375dc0c77b97d0405f1770b9b4",
+  "operator_sha256": "6713cc2ed16fd194d7342d303f11f6b719dce56bbc9ef16182d20399f2ae5460",
+  "local_checks_passed": 12,
+  "new_native_requests": 0,
+  "experimental_training_updates": 0,
+  "planned_simulated_optimizer_step_applications": 3
+}
