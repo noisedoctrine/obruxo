@@ -1,5 +1,7 @@
 # Qualify a small correction while preserving the starting predictor
 
+Outcome: the [completed checked bridge](CONDITIONED_BASIC_BRIDGE_RESULTS.md) preserves all 1,616 scheduled predictions/presets after cold reload and connects all 188 responding continuous / 48 categorical checks at 24 cached native points to the correction. It takes 53.84 seconds / 0.71 GiB with zero new renders or optimizer updates and unchanged parent evidence. All 14 outputs and the frozen earlier predictor are retained. Useful correction learning and reconstruction quality remain unproven; the declaration and stopped prelaunch check below are preserved.
+
 Declared before execution on 2026-10-24. The [saved-data diagnosis](PAIRED_LEARNING_DIAGNOSIS_RESULTS.md) points to performance sensitivity in the sound-feature path. Test the existing note-conditioned feature correction with the accepted predictor retained and frozen. Keep the same **14 outputs**, codec, assets, audio-only frontend, fixed generator phases and settled 32,768-frame lead.
 
 Six focused local checks pass for prediction/preset/RNG identity, gradient access, an optimizer step that leaves all shared weights fixed, stale-gradient/altered-policy rejection, cold export with restored freeze/phase policy, held-out/duplicate-cache rejection, and repeated recordings under distinct scheduling IDs. Ruff and diff checks pass. This does not establish useful correction learning or reconstruction quality.
