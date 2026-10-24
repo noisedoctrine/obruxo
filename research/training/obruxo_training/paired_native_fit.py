@@ -22,6 +22,7 @@ from .native_fit import FitRecords, audit_case, audit_summary, digest, make_plan
 from .paired_native_evidence import RetainedAuditSession, native_ledger
 from .paired_native_step import reciprocal_updates
 from .paired_native_training import fit_pairs
+from .paired_performance_objective import include_input_performance
 from .production_controls import ProductionControlAdapter
 from .production_native_audit import verify_screen
 from .reproducibility import FULL_PHASE_CONTROL
@@ -64,7 +65,7 @@ def compose_paired_plan(pool, base, cache, scales):
             "comparison_audio": "content_addressed_float32_all_fit_and_development_candidates"}
 
 
-def make_plan(pool, bootstrap_root, bootstrap_audit_path, qualification_path, cache_path, choice_path, direction_source):
+def make_plan(pool, bootstrap_root, bootstrap_audit_path, qualification_path, cache_path, choice_path, direction_source, *, input_and_transfer=False):
     direction = verify_screen(direction_source, pool, bootstrap_root, bootstrap_audit_path, qualification_path, cache_path, choice_path)
     if (not direction["qualified_production_direction"] or direction["candidate_audio_rescored"] != 72
             or not direction["all_model_gradients_and_local_steps_reconstructed"] or not direction["all_requests_reconstructed"]):
@@ -77,8 +78,10 @@ def make_plan(pool, bootstrap_root, bootstrap_audit_path, qualification_path, ca
         raise ValueError("paired fit differs from its qualified model or input recordings")
     cache = torch.load(cache_path, map_location="cpu", weights_only=True)
     plan = compose_paired_plan(pool, base, cache, direction["plan"]["adapter"]["fixed_scales"])
+    if input_and_transfer:
+        plan = include_input_performance(plan)
     names = ("paired_native_fit.py", "paired_native_step.py", "paired_native_training.py", "paired_native_evidence.py", "paired_native_audit.py",
-             "balanced_native_fit.py", "balanced_sound_data.py", "native_fit_storage.py", "training_coverage.py", "native_fit_report.py")
+             "paired_performance_objective.py", "balanced_native_fit.py", "balanced_sound_data.py", "native_fit_storage.py", "training_coverage.py", "native_fit_report.py")
     paths = {name: Path(__file__).with_name(name) for name in names}
     paths["reports/scripts/run_paired_native_fit.py"] = Path(__file__).parents[1] / "reports/scripts/run_paired_native_fit.py"
     plan["source"] = {**plan["source"], **direction["plan"]["source"],
@@ -211,12 +214,12 @@ def run_plan(pool, initial_path, retrieval_path, output, plan, *, execute=False,
     return {"complete": complete, "matched_comparison_passed": passed, "committed_updates_per_arm": len(trace)}
 
 
-def run_fit(pool, bootstrap_root, bootstrap_audit_path, qualification_path, cache_path, choice_path, direction_source, output, *, execute=False, resume=False):
+def run_fit(pool, bootstrap_root, bootstrap_audit_path, qualification_path, cache_path, choice_path, direction_source, output, *, execute=False, resume=False, input_and_transfer=False):
     started, monitor = perf_counter(), MemoryMonitor()
     monitor.start()
     with refresh.cpu_settings():
         try:
-            plan = make_plan(pool, bootstrap_root, bootstrap_audit_path, qualification_path, cache_path, choice_path, direction_source)
+            plan = make_plan(pool, bootstrap_root, bootstrap_audit_path, qualification_path, cache_path, choice_path, direction_source, input_and_transfer=input_and_transfer)
         finally:
             monitor.close()
         validation = {"elapsed_seconds": perf_counter() - started, "peak_process_tree_rss_bytes": monitor.peak_bytes,

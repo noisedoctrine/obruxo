@@ -1,0 +1,14 @@
+{
+  "controller_sha256": "58579443c998dba1da69c0a34fefc34ee779b87235c2de93aec542e81569478c",
+  "maximum_audit_executions": 1,
+  "new_native_requests_allowed": 0,
+  "new_optimizer_updates_allowed": 0,
+  "operator_sha256": "5db207c00b88a53988e68ea5444640a9cb465a08dfc3c0e589f363dee735a9d7",
+  "plan_sha256": "6ff8a63236a4ba86396d6767e748ccfbf6c46ef0c79f01e8d17ba251896833ae",
+  "requires_complete_native_comparison": true,
+  "resume_or_budget_extension_allowed": false,
+  "training_created_unix": 1792761120.704782,
+  "training_pid": 16416,
+  "verification_process_tree_bytes": 4294967296,
+  "verification_wall_seconds": 1200
+}

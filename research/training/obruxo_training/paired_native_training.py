@@ -12,6 +12,7 @@ from .checkpoints import atomic_torch_save
 from .codec import PilotTarget
 from .native_fit import append_durable, record_features
 from .paired_native_step import matched_pair_step
+from .paired_performance_objective import evaluation_views, seed_external_streams
 from .spectral import SpectralTargets, spectral_loss
 from .trainer import capture_rng, restore_rng
 
@@ -49,6 +50,7 @@ def fit_pairs(models, records, session, output, plan, saved=None, *, after_step=
         trace = list(saved["trace"])
         restore_rng(saved["rng"], "cpu")
     else:
+        seed_external_streams(plan)
         torch.manual_seed(plan["optimizer"]["seed"])
     charges_path = output / "updates.jsonl"
     charges = [json.loads(line) for line in charges_path.read_text().splitlines()] if charges_path.exists() else []
@@ -80,22 +82,26 @@ def fit_pairs(models, records, session, output, plan, saved=None, *, after_step=
                 raise ValueError("paired native callback index changed")
             row = examples[index]
             recipe = plan["training"][row["state"]]
-            performance = Performance.from_dict(recipe["performances"][row["view"]])
-            audio, receipt = session.render(candidate, performance, "training", f"gradient:{step}:{index}:{query}")
-            current = query
-            query += 1
-            if audio is None:
-                raise RuntimeError("paired native sound render was not accepted")
-            loss = float(spectral_loss(measure(torch.from_numpy(audio.copy()).T[None]), selected[index]["targets"][row["view"]])["loss"])
-            append_durable(output / "measurements.jsonl", {"optimizer_attempt": charge["attempt"], "step": step + 1,
-                "query": current, "example": index, "state": row["state"], "input_view": row["input_view"], "view": row["view"],
-                "candidate": candidate.to_dict(), "loss": loss, "request_id": receipt["request_id"],
-                "audio_sha256": receipt["qa"]["audio_float32_sha256"]})
-            return loss
+            losses = []
+            for view in evaluation_views(plan, row):
+                performance = Performance.from_dict(recipe["performances"][view])
+                audio, receipt = session.render(candidate, performance, "training", f"gradient:{step}:{index}:{query}")
+                current = query
+                query += 1
+                if audio is None:
+                    raise RuntimeError("paired native sound render was not accepted")
+                loss = float(spectral_loss(measure(torch.from_numpy(audio.copy()).T[None]), selected[index]["targets"][view])["loss"])
+                append_durable(output / "measurements.jsonl", {"optimizer_attempt": charge["attempt"], "step": step + 1,
+                    "query": current, "example": index, "state": row["state"], "input_view": row["input_view"], "view": view,
+                    "candidate": candidate.to_dict(), "loss": loss, "request_id": receipt["request_id"],
+                    "audio_sha256": receipt["qa"]["audio_float32_sha256"]})
+                losses.append(loss)
+            return sum(losses) / len(losses)
 
         features = [record_features(record, row["input_view"]) for row, record in zip(examples, selected, strict=True)]
         targets = [PilotTarget.from_dict(plan["training"][row["state"]]["target"]) for row in examples]
         result = matched_pair_step(models, optimizers, features, targets, session.codec, evaluate, step, len(plan["updates"]), scales=policy["scales"])
+        result["gradient_queries"] = query
         trace.append({**charge, **result})
         state = {"format": CHECKPOINT_FORMAT, "plan_id": canonical_sha256(plan), "step": step + 1,
                  "models": {name: model.state_dict() for name, model in models.items()},
