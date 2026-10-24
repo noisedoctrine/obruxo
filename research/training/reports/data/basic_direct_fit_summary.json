@@ -1,0 +1,188 @@
+{
+  "committed_updates_per_arm": 48,
+  "complete": true,
+  "elapsed_seconds": 10566.642081975937,
+  "failure": null,
+  "matched_comparison_passed": false,
+  "native_receipts_resolved": true,
+  "peak_process_tree_rss_bytes": 1608310784,
+  "plan_id": "6cb54820c938cf145e7139b08314ec1b69116f6dfeca363a5d501b42413acd0f",
+  "qualified_for_release": false,
+  "recovered_timeouts": [],
+  "render_attempts": {
+    "qualification": 208,
+    "training": 5451
+  },
+  "result": {
+    "clamping": {
+      "parameter": {
+        "above_one": 16,
+        "below_zero": 109,
+        "controls": 1728
+      },
+      "spectral": {
+        "above_one": 36,
+        "below_zero": 48,
+        "controls": 1728
+      }
+    },
+    "later_gradient_access": {
+      "parameter": {
+        "continuous": true,
+        "filter": true,
+        "hidden": true,
+        "unison": true
+      },
+      "spectral": {
+        "continuous": true,
+        "filter": true,
+        "hidden": true,
+        "unison": true
+      }
+    },
+    "original_regression": {
+      "means": {
+        "initial": {
+          "mrstft": 0.3233209263999015,
+          "spectral": 0.12160713784396648
+        },
+        "parameter": {
+          "mrstft": 0.3904463787233302,
+          "spectral": 0.155089445062913
+        },
+        "spectral": {
+          "mrstft": 0.2933346913584197,
+          "spectral": 0.11001279985066503
+        }
+      },
+      "mrstft_p90": {
+        "initial": 0.5437791543702285,
+        "parameter": 0.6900997892022134,
+        "spectral": 0.4269788354635239
+      },
+      "pass": true,
+      "states": 32
+    },
+    "pass": false,
+    "six_groups": {
+      "original_input_own": {
+        "cases": 12,
+        "means": {
+          "initial": {
+            "mrstft": 0.3456624509352777,
+            "spectral": 0.12773960859825215
+          },
+          "parameter": {
+            "mrstft": 0.5337007497954701,
+            "spectral": 0.21026451016465822
+          },
+          "spectral": {
+            "mrstft": 0.308435026763214,
+            "spectral": 0.11382453454037507
+          }
+        },
+        "pass": true,
+        "states": 12
+      },
+      "original_input_transfer": {
+        "cases": 24,
+        "means": {
+          "initial": {
+            "mrstft": 0.3498325636610389,
+            "spectral": 0.1347153865111371
+          },
+          "parameter": {
+            "mrstft": 0.5323333436519735,
+            "spectral": 0.21391542969892421
+          },
+          "spectral": {
+            "mrstft": 0.31161122258830193,
+            "spectral": 0.11879277586316069
+          }
+        },
+        "pass": true,
+        "states": 12
+      },
+      "wide_alternate_input_own": {
+        "cases": 12,
+        "means": {
+          "initial": {
+            "mrstft": 1.8346869374314947,
+            "spectral": 0.760532021522522
+          },
+          "parameter": {
+            "mrstft": 1.7313307805193794,
+            "spectral": 0.7439758802453676
+          },
+          "spectral": {
+            "mrstft": 1.5660989458362262,
+            "spectral": 0.6140091742078463
+          }
+        },
+        "pass": true,
+        "states": 12
+      },
+      "wide_alternate_input_transfer": {
+        "cases": 12,
+        "means": {
+          "initial": {
+            "mrstft": 1.5877961114876797,
+            "spectral": 0.6432420412699381
+          },
+          "parameter": {
+            "mrstft": 1.40440466047989,
+            "spectral": 0.5874858126044273
+          },
+          "spectral": {
+            "mrstft": 1.4195627081725333,
+            "spectral": 0.5492067734400431
+          }
+        },
+        "pass": true,
+        "states": 12
+      },
+      "wide_held_input_own": {
+        "cases": 12,
+        "means": {
+          "initial": {
+            "mrstft": 1.5356349274516103,
+            "spectral": 0.6047952224810919
+          },
+          "parameter": {
+            "mrstft": 1.2259273479382196,
+            "spectral": 0.47946372752388317
+          },
+          "spectral": {
+            "mrstft": 1.2492341328826215,
+            "spectral": 0.4985146125157674
+          }
+        },
+        "pass": false,
+        "states": 12
+      },
+      "wide_held_input_transfer": {
+        "cases": 12,
+        "means": {
+          "initial": {
+            "mrstft": 1.6107762137220965,
+            "spectral": 0.6258450796206793
+          },
+          "parameter": {
+            "mrstft": 1.277666337374184,
+            "spectral": 0.4859052275617917
+          },
+          "spectral": {
+            "mrstft": 1.3327470330728424,
+            "spectral": 0.515342985590299
+          }
+        },
+        "pass": false,
+        "states": 12
+      }
+    }
+  },
+  "retained_archive_bytes_before_summary": 583759832,
+  "rss_sampling_errors": 0,
+  "test_split_used": false,
+  "within_resource_limits": true
+}
