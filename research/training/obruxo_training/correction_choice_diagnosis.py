@@ -52,10 +52,10 @@ def source_contract(source, initial):
     for arm in ("parameter", "spectral"):
         files[f"diagnostic-{arm}.pt"] = digest(source / f"diagnostic-{arm}.pt")
     files["verification.json"] = digest(source / "verification.json")
-    training = Path(__file__).parents[1]
-    code = {name: sha256_bytes((training / (name if "/" in name else f"obruxo_training/{name}")).read_bytes().replace(b"\r\n", b"\n"))
-            for name in proof["plan"]["source"]}
-    if code != proof["plan"]["source"]:
+    names = ("model.py", "features.py", "codec.py", "trainer.py", "conditioned_basic.py", "conditioned_fit_policy.py", "inference_profile.py",
+             "reproducibility.py", "native_fit.py", "native_gradient.py", "paired_native_step.py", "paired_native_audit.py", "spectral_controls.py")
+    code = {name: sha256_bytes(Path(__file__).with_name(name).read_bytes().replace(b"\r\n", b"\n")) for name in names}
+    if any(value != proof["plan"]["source"][name] for name, value in code.items()):
         raise ValueError("choice diagnosis changed the verified prediction or measurement implementation")
     return {"format": "saved_correction_choice_diagnosis_v1", "parent_plan_id": proof["plan_id"], "parent_files": files,
             "initial_file_sha256": digest(initial), "numerical_source": code,
