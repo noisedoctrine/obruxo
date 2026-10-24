@@ -1,0 +1,255 @@
+{
+  "committed_updates_per_arm": 192,
+  "comparison_waveforms_rescored": 480,
+  "complete": true,
+  "elapsed_seconds": 773.519463300705,
+  "evidence_sha256": {
+    "checkpoint.pt": "0dd06fbf3d4509cbb01739211d039b8f34dba53ee8055b0685fb93ae84c37995",
+    "costs.jsonl": "36bdb6e38a776158cfb1475e8dc1621c44ea56c9cc145a7f63da812a537afe6b",
+    "diagnostic-parameter.pt": "3ddf89b621d661111fbd723ce762713ece217a8f5dd4b9b223f7a1f447d71502",
+    "diagnostic-spectral.pt": "1f64116e3d0d8fdbea7d3f788234a5c28aedeccb009bd022a9b81b10840b1bd6",
+    "executions.jsonl": "8d29c31a2311504795a476da626cd6cd2e9d3ee206ed14f95b8fd427f33f72b1",
+    "finals.jsonl": "2d06cfecf5dcf2e6c82c1468309b0578d79806f9fa02c6dfeeccf340b3972c8f",
+    "plan.json": "3ceebc4b5a300c1a062633db8c4acfb53e6e11b9669f4842577bcff0a17ed636",
+    "prefix-checkpoint.pt": "1c33b91cb51d3f6af33e81e662f7fa6c51e75a73d46dd7b83777810ca10f84d2",
+    "prefix-verification.json": "cc8e9664d32aa891ea83ebe809627c8691f9eada2aae29d112f2457d13f644bd",
+    "renders.jsonl": "68a28d65372a66c6f450b7fec59e20e6b33784cc5e2425a5b4bd41c84fdbe703",
+    "summary.json": "35ad0bea0c76f88889f1bd899949830bd32748b1a15edb23d307aeaf402a8728",
+    "updates.jsonl": "a9864ceea0771cebc82644d7c6cb008062cf17c6525652f6ad46283dadabf12d"
+  },
+  "experimental_training_updates_added": 0,
+  "failure": null,
+  "final_model_sha256": {
+    "parameter": "3b676d5032a76ae45c3109bf504a83379021cf9931297da5f8637823ce696726",
+    "spectral": "7ed837b5c0e981a7f1ce8dd1448ce22624091cd020e989f744cb0a698ae117da"
+  },
+  "matched_comparison_passed": false,
+  "native_receipts_resolved": true,
+  "native_requests_added": 0,
+  "offline_training_replay_exact": true,
+  "peak_process_tree_rss_bytes": 1073582080,
+  "plan_id": "9847596ab6e0be68ff352d78186126a9593b9dd91cd0e7ef2b0b6ac143f6b744",
+  "private_verification_sha256": "f3c5769a635f77d7a713efb27d9c6954463f2e2eeb9319cb2c6dd77b73ea5944",
+  "qualified_for_release": false,
+  "recovered_timeouts": [],
+  "render_attempts": {
+    "qualification": 208,
+    "training": 168
+  },
+  "result": {
+    "original_regression": {
+      "means": {
+        "initial": {
+          "mrstft": 0.3233209263999015,
+          "spectral": 0.12160713784396648
+        },
+        "parameter": {
+          "mrstft": 0.43752498224300024,
+          "spectral": 0.16698511969298124
+        },
+        "spectral": {
+          "mrstft": 0.40010504742773867,
+          "spectral": 0.15596846002154052
+        }
+      },
+      "mrstft_p90": {
+        "initial": 0.5437791543702285,
+        "parameter": 0.8444854664305848,
+        "spectral": 0.7508707702159882
+      },
+      "pass": false,
+      "states": 32
+    },
+    "pass": false,
+    "six_groups": {
+      "original_input_own": {
+        "cases": 12,
+        "means": {
+          "initial": {
+            "mrstft": 0.3456624509352777,
+            "spectral": 0.12773960859825215
+          },
+          "parameter": {
+            "mrstft": 0.3456624509352777,
+            "spectral": 0.12773960859825215
+          },
+          "spectral": {
+            "mrstft": 0.3528430700923006,
+            "spectral": 0.13448257589091858
+          }
+        },
+        "pass": false,
+        "states": 12
+      },
+      "original_input_transfer": {
+        "cases": 24,
+        "means": {
+          "initial": {
+            "mrstft": 0.3498325636610389,
+            "spectral": 0.1347153865111371
+          },
+          "parameter": {
+            "mrstft": 0.3498325636610389,
+            "spectral": 0.1347153865111371
+          },
+          "spectral": {
+            "mrstft": 0.36320856079045266,
+            "spectral": 0.14452445646747947
+          }
+        },
+        "pass": false,
+        "states": 12
+      },
+      "wide_alternate_input_own": {
+        "cases": 12,
+        "means": {
+          "initial": {
+            "mrstft": 1.8346869374314947,
+            "spectral": 0.760532021522522
+          },
+          "parameter": {
+            "mrstft": 1.8249053830901782,
+            "spectral": 0.7596247618397077
+          },
+          "spectral": {
+            "mrstft": 1.6658915128144953,
+            "spectral": 0.7007636750737826
+          }
+        },
+        "pass": true,
+        "states": 12
+      },
+      "wide_alternate_input_transfer": {
+        "cases": 12,
+        "means": {
+          "initial": {
+            "mrstft": 1.5877961114876797,
+            "spectral": 0.6432420412699381
+          },
+          "parameter": {
+            "mrstft": 1.5850991735027893,
+            "spectral": 0.6437960565090179
+          },
+          "spectral": {
+            "mrstft": 1.5041876112421353,
+            "spectral": 0.6147572075327238
+          }
+        },
+        "pass": true,
+        "states": 12
+      },
+      "wide_held_input_own": {
+        "cases": 12,
+        "means": {
+          "initial": {
+            "mrstft": 1.5356349274516103,
+            "spectral": 0.6047952224810919
+          },
+          "parameter": {
+            "mrstft": 1.5457855446471107,
+            "spectral": 0.6163425594568253
+          },
+          "spectral": {
+            "mrstft": 1.4363048093186483,
+            "spectral": 0.5791203156113625
+          }
+        },
+        "pass": true,
+        "states": 12
+      },
+      "wide_held_input_transfer": {
+        "cases": 12,
+        "means": {
+          "initial": {
+            "mrstft": 1.6107762137220965,
+            "spectral": 0.6258450796206793
+          },
+          "parameter": {
+            "mrstft": 1.6430509090423584,
+            "spectral": 0.6438685854276022
+          },
+          "spectral": {
+            "mrstft": 1.553901287002696,
+            "spectral": 0.6130050296584765
+          }
+        },
+        "pass": true,
+        "states": 12
+      }
+    },
+    "wider_oracle_recovery": {
+      "1": {
+        "means": {
+          "initial": {
+            "mrstft": 1.5732055705868533,
+            "spectral": 0.6153201510508856
+          },
+          "parameter": {
+            "mrstft": 1.5944182268447344,
+            "spectral": 0.6301055724422137
+          },
+          "spectral": {
+            "mrstft": 1.4951030481606722,
+            "spectral": 0.5960626726349195
+          }
+        },
+        "oracle": {
+          "available_gain": 0.03387118627627694,
+          "initial_mean": 0.6153201510508856,
+          "oracle_mean": 0.5814489647746086
+        },
+        "pass": true,
+        "required_sound_loss_at_most": 0.5983845579127471
+      },
+      "2": {
+        "means": {
+          "initial": {
+            "mrstft": 1.711241524459587,
+            "spectral": 0.7018870313962301
+          },
+          "parameter": {
+            "mrstft": 1.705002278296484,
+            "spectral": 0.7017104091743628
+          },
+          "spectral": {
+            "mrstft": 1.5850395620283153,
+            "spectral": 0.6577604413032532
+          }
+        },
+        "oracle": {
+          "available_gain": 0.058213986456394196,
+          "initial_mean": 0.7018870313962301,
+          "oracle_mean": 0.6436730449398359
+        },
+        "pass": true,
+        "required_sound_loss_at_most": 0.672780038168033
+      }
+    }
+  },
+  "retained_archive_bytes_before_summary": 503817141,
+  "rss_sampling_errors": 0,
+  "signal": {
+    "groups": {
+      "1": {
+        "available_gain": 0.03387118627627694,
+        "initial_mean": 0.6153201510508856,
+        "oracle_mean": 0.5814489647746086
+      },
+      "2": {
+        "available_gain": 0.058213986456394196,
+        "initial_mean": 0.7018870313962301,
+        "oracle_mean": 0.6436730449398359
+      }
+    },
+    "pass": true
+  },
+  "test_split_used": false,
+  "verification_resources": {
+    "elapsed_seconds": 120.84055400002399,
+    "peak_process_tree_rss_bytes": 765276160,
+    "rss_sampling_errors": 0,
+    "within_resource_limits": true
+  },
+  "verified": true,
+  "within_resource_limits": true
+}
