@@ -1,0 +1,28 @@
+# Small native fit of the existing basic outputs with sound rehearsal
+
+Prepared 2026-10-24 after the [direct bridge passes](BASIC_DIRECT_BRIDGE_RESULTS.md). Implementation, exact source/storage bounds and numerical plan must be frozen before execution. This is a small fitting prerequisite; it does not admit a model or replace full A2/A3 quality and confirmation gates.
+
+Initialize both arms from the untrained qualified `model.pt` (SHA-256 `0e1b88f7916a31cf4afd4af20aacda14a69086ea6c61ecc303ba249391dca735`). Keep the same nine continuous outputs and two choices: **14 values / 11 codec selections**, with 355,806 earlier weights frozen and 27,118 direct-correction weights trainable. Never initialize from rejected trained heads or simulator files. Monitor out-of-range correction proposals/clamping explicitly; a legal bounded value alone is not evidence of learning.
+
+Retain the same 12 fitting patches, three recordings each and 104 final input/playback cases, including the original-32 preservation panel. Add the bridge's **32 original training recordings as explicit rehearsal data**. This panel was already training data; using it for rehearsal is not fresh confirmation. Infer from audio features only. Reuse source waveforms/features and initial comparison audio only after exact recipe, performance, profile, renderer, hash and accepted-initial prediction checks. Generate new candidates on demand.
+
+Run **48 updates per arm**: two passes over the 24 reciprocal original/wider pairs, with shuffle seeds zero and one. At each update append two original reference recordings in the bridge's round-robin order, giving each of 32 references three visits. Use singleton forwards, fresh Adam at `1e-3`, seed zero, float32 CPU, norm cap five, and the existing 1.0-to-0.5 backward temperature schedule. Production categories remain unperturbed argmax. The parameter control receives the new model's raw corrected scores, with no extra scaling applied to its label loss.
+
+The candidate weights the original prediction's input/reciprocal mean sound loss by 0.25 and the wider prediction's corresponding mean by 0.5. Each reference uses its own performance and contributes 0.125 times `current_sound_loss + relu(current_sound_loss - accepted_initial_sound_loss)`. Thus original/reference observations retain half the base weight, with additional pressure only when reference sound error regresses. The candidate receives no parameter-label anchor. The parameter control uses the same observations, weights and update budget with its existing masked control/category label losses.
+
+Use the qualified native estimator, at most 22 legal probes per prediction/performance, and record every raw candidate, measured loss, receipt and attempted update. **Recompute gradients at changed controls**; do not reuse the previous three-choice cost table. Do not advance either optimizer if any render or backward pass fails. Check absent old-predictor gradients and unchanged old weights at every update. Save both models, Adam and all RNG every update; require exact replay of the first four real updates before continuing. Score only the final update 48, with no intermediate selection.
+
+Freshly render both final models in all 104 cases, retaining every candidate waveform. Keep six original/held/alternate own/transfer groups separate, averaging multiple original transfers within patch first. Each requires at least 10% lower combined sound loss than initialization, no worse combined loss than the parameter control, and strictly lower MRSTFT than initialization. The original-32 panel requires no worse mean combined loss/MRSTFT and p90 MRSTFT at most 1.1 times initialization. This small preservation panel does not replace the full trial's separate original-32/original/wider improvement gates. No development/test scoring or model admission occurs here.
+
+| Planned new native work | Maximum requests |
+|---|---:|
+| 48 updates × two paired predictions × two performances × 22 probes | 4,224 |
+| 48 updates × two reference predictions × one performance × 22 probes | 2,112 |
+| Two final models × 104 unique audit cases | 208 |
+| **Total** | **6,544** |
+
+The four-observation rehearsal adds measured reference work, so this card explicitly allocates **four hours / 4 GiB RAM / 2 GiB evidence / 512 MiB replay**, replacing the preceding category-only experiment's smaller allowance. Cap new native attempts at **6,720**: 6,480 training and 240 qualification. Allow at most **49 charged update attempts per arm and two explicit native executions**, preserving the original start/deadline and all attempts on a terminal known identical timeout recovery. No automatic cap increase or extra training launch is allowed.
+
+Calculate actual source-target tensors, waveforms, caches, checkpoints, interrupted prefixes, scalar ledgers and publication bounds before execution; reject an over-budget plan. Preparation has ten minutes / 4 GiB. Independent final replay/rescoring has twenty minutes / 4 GiB, with no new native requests or experimental updates; distinguish replayed scalar probe costs from independently rescored retained final waveforms. Preserve failures and all charged work.
+
+Use two Torch threads and one native worker, fixed generator phases and the qualified 32,768-frame lead. Keep the scoped active-work request and already authorized checkpointed battery operation. Local only; Actions disabled and Colab deferred. A failed fit/preservation gate stops advancement and does not permit more epochs, parameter-only initialization, weaker final gates or output expansion.
