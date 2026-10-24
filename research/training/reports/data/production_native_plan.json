@@ -1,0 +1,3944 @@
+{
+  "adapter": {
+    "backward_probability": "softmax(raw_logits / fixed_scale / temperature)",
+    "canonicalization": "continuous_default_blend_with_hard_one_hot_activity",
+    "codec": {
+      "categorical": [
+        {
+          "name": "osc_1_unison_voices",
+          "values": [
+            1,
+            2,
+            4
+          ]
+        },
+        {
+          "name": "filter_1_on",
+          "values": [
+            0,
+            1
+          ]
+        }
+      ],
+      "codec": "authored_osc_filter_env_v2",
+      "continuous": [
+        {
+          "inactive_default": 0.25,
+          "maximum": 0.35,
+          "minimum": 0.15,
+          "name": "osc_1_level"
+        },
+        {
+          "inactive_default": 0.0,
+          "maximum": 0.7,
+          "minimum": -0.7,
+          "name": "osc_1_pan"
+        },
+        {
+          "inactive_default": 1.0,
+          "maximum": 2.5,
+          "minimum": 0.5,
+          "name": "osc_1_unison_detune"
+        },
+        {
+          "inactive_default": 96.0,
+          "maximum": 120.0,
+          "minimum": 50.0,
+          "name": "filter_1_cutoff"
+        },
+        {
+          "inactive_default": 0.25,
+          "maximum": 0.6,
+          "minimum": 0.1,
+          "name": "filter_1_resonance"
+        },
+        {
+          "inactive_default": 0.15,
+          "maximum": 0.6,
+          "minimum": 0.08,
+          "name": "env_1_attack"
+        },
+        {
+          "inactive_default": 0.7,
+          "maximum": 1.0,
+          "minimum": 0.25,
+          "name": "env_1_decay"
+        },
+        {
+          "inactive_default": 0.7,
+          "maximum": 0.9,
+          "minimum": 0.25,
+          "name": "env_1_sustain"
+        },
+        {
+          "inactive_default": 0.4,
+          "maximum": 0.65,
+          "minimum": 0.2,
+          "name": "env_1_release"
+        }
+      ],
+      "contract_id": "f1eca221ab4ba871d8f415a28d81747a42629b2f2a74be566a967758afc32f12",
+      "inactive_policy": "fixed_template_value",
+      "normalization": "linear_in_stored_units",
+      "scope": "one_init_oscillator_optional_filter1_env1_no_routes_or_effects",
+      "template_sha256": "e3761b0fed1f03b54c797c3185f8a972aabe681002db0bcb83a7a85ec4f869cf",
+      "version": 2
+    },
+    "export_choice": "unperturbed_argmax",
+    "features": {
+      "center": true,
+      "channels": [
+        "left",
+        "right"
+      ],
+      "dtype": "float32",
+      "envelope": {
+        "center": true,
+        "channels": [
+          "left",
+          "right",
+          "(left-right)/2"
+        ],
+        "hop": 256,
+        "rms_floor": 1e-07,
+        "window": 1024
+      },
+      "fft_sizes": [
+        512,
+        2048,
+        8192
+      ],
+      "format": "basic_temporal_spectra_v1",
+      "hop": "fft/4",
+      "magnitude": "abs_stft/sqrt_fft",
+      "maximum_samples": 705600,
+      "objective": {
+        "convergence_rms_floor": 0.001,
+        "envelope_weight": 0.1,
+        "gain_normalization": null,
+        "log_floor": 0.0001,
+        "side_weight": 0.1,
+        "spectral": "mean_resolution(0.5*(convergence+mean_log1p_l1))"
+      },
+      "padding": "constant_zero",
+      "pooling": null,
+      "sample_rate": 44100,
+      "valid_frame": "center_sample_less_than_length",
+      "window": "periodic_hann"
+    },
+    "fixed_scales": [
+      32.73040780087214,
+      29.015704035654633
+    ],
+    "format": "basic_production_controls_v1",
+    "input_size": 14,
+    "parameter_control_logits": "raw_unscaled",
+    "phase_application": "separate_hashed_render_copy",
+    "phase_policy": {
+      "osc_1_random_phase": 0.0,
+      "osc_2_random_phase": 0.0,
+      "osc_3_random_phase": 0.0,
+      "sample_random_phase": 0.0
+    },
+    "random_draws": 0,
+    "temperature": {
+      "end": 0.5,
+      "schedule": "linear_by_committed_update",
+      "start": 1.0
+    },
+    "training_choice": "unperturbed_argmax_with_scaled_softmax_backward"
+  },
+  "archive_estimate_bytes": 312525312,
+  "cases": [
+    {
+      "index": 0,
+      "input_audio_sha256": "e78a549c0d3244d9ebcaedcb289cd8fe8b37d7c2bc502a850c6b5213544f3d1c",
+      "input_features_sha256": "71b43da919a57d84b75a6d6a126940ad9a76ad1c3265ba4cde110fe01cc58297",
+      "input_recipe_id": "6e8a21fd103ebf071f2249e150a3aff9b7f737dfd62a1622a37338313f54b130",
+      "input_view": 0,
+      "performance": {
+        "end_tick": 1880,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              545455
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              64
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1760
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          0,
+          0
+        ],
+        "continuous": [
+          0.2516261637210846,
+          0.47051453590393066,
+          0.25,
+          0.6571428571428571,
+          0.3,
+          0.6837239861488342,
+          0.11384286731481552,
+          0.05816902965307236,
+          0.5608294606208801
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            8.226086616516113,
+            -1.1189566850662231,
+            -19.892227172851562
+          ],
+          [
+            7.521975517272949,
+            -9.10924243927002
+          ]
+        ],
+        "continuous": [
+          0.2516261637210846,
+          0.47051453590393066,
+          0.41061463952064514,
+          0.8507012128829956,
+          0.6849183440208435,
+          0.6837239861488342,
+          0.11384286731481552,
+          0.05816902965307236,
+          0.5608294606208801
+        ]
+      },
+      "role": "original_input",
+      "source": {
+        "categorical": [
+          0,
+          0
+        ],
+        "continuous": [
+          0.24524406793041686,
+          0.4742578303693218,
+          0.25,
+          0.6571428571428571,
+          0.3,
+          0.6434717277386703,
+          0.07551514382426239,
+          0.07107287505003179,
+          0.9043052209921186
+        ]
+      },
+      "source_samples": 182414,
+      "state_id": "feea6ed56567153f27b56dd4c4231d010c6eaa42a8c2b5024f82bbc9a4122262",
+      "target_audio_sha256": "3ea82a4ea954165a411e19bebc2362cfbf232289d90d415852f21285eafd6429",
+      "target_recipe_id": "6f1117e88b683c90a5d02743d87ed7ef14f047361c571fddbe659402f4c9007c",
+      "target_view": 1
+    },
+    {
+      "index": 0,
+      "input_audio_sha256": "3ea82a4ea954165a411e19bebc2362cfbf232289d90d415852f21285eafd6429",
+      "input_features_sha256": "a5462463be7aa08e06ab9efc6d8e0f6a42b697378f893847efc95a45a6675d95",
+      "input_recipe_id": "6f1117e88b683c90a5d02743d87ed7ef14f047361c571fddbe659402f4c9007c",
+      "input_view": 1,
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              96
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          0,
+          1
+        ],
+        "continuous": [
+          0.5415104031562805,
+          0.8230394124984741,
+          0.25,
+          0.939437747001648,
+          0.45115381479263306,
+          0.7625793218612671,
+          0.07041755318641663,
+          0.0645151138305664,
+          0.6725714206695557
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            2.761991500854492,
+            -2.5162651538848877,
+            -13.278470993041992
+          ],
+          [
+            -2.784802198410034,
+            1.2906410694122314
+          ]
+        ],
+        "continuous": [
+          0.5415104031562805,
+          0.8230394124984741,
+          0.0026480641681700945,
+          0.939437747001648,
+          0.45115381479263306,
+          0.7625793218612671,
+          0.07041755318641663,
+          0.0645151138305664,
+          0.6725714206695557
+        ]
+      },
+      "role": "wider_input",
+      "source": {
+        "categorical": [
+          0,
+          0
+        ],
+        "continuous": [
+          0.24524406793041686,
+          0.4742578303693218,
+          0.25,
+          0.6571428571428571,
+          0.3,
+          0.6434717277386703,
+          0.07551514382426239,
+          0.07107287505003179,
+          0.9043052209921186
+        ]
+      },
+      "source_samples": 176400,
+      "state_id": "feea6ed56567153f27b56dd4c4231d010c6eaa42a8c2b5024f82bbc9a4122262",
+      "target_audio_sha256": "e78a549c0d3244d9ebcaedcb289cd8fe8b37d7c2bc502a850c6b5213544f3d1c",
+      "target_recipe_id": "6e8a21fd103ebf071f2249e150a3aff9b7f737dfd62a1622a37338313f54b130",
+      "target_view": 0
+    },
+    {
+      "index": 1,
+      "input_audio_sha256": "171cb54ed67f154f08a6ba4dbe43fc8d54badce5c1e52493f80dbb72036a5e3b",
+      "input_features_sha256": "21f4cf895f15eb53c16bae31f24d80be34f2b9279bb0eb94f2fa5b8b812561b2",
+      "input_recipe_id": "eb2c0b4ea787fb46add8c23635b089b591c1fe25960844f15fec529cb8c8dd82",
+      "input_view": 0,
+      "performance": {
+        "end_tick": 2520,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              400000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              77,
+              112
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              77,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 2400
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          0,
+          1
+        ],
+        "continuous": [
+          0.5505052804946899,
+          0.09819799661636353,
+          0.25,
+          0.8130702972412109,
+          0.21719849109649658,
+          0.6225727200508118,
+          0.5294367074966431,
+          0.8122925162315369,
+          0.05412633717060089
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            14.109068870544434,
+            -10.812314987182617,
+            -16.54131507873535
+          ],
+          [
+            -25.437170028686523,
+            19.74151039123535
+          ]
+        ],
+        "continuous": [
+          0.5505052804946899,
+          0.09819799661636353,
+          0.002542987698689103,
+          0.8130702972412109,
+          0.21719849109649658,
+          0.6225727200508118,
+          0.5294367074966431,
+          0.8122925162315369,
+          0.05412633717060089
+        ]
+      },
+      "role": "original_input",
+      "source": {
+        "categorical": [
+          0,
+          1
+        ],
+        "continuous": [
+          0.5448964123607368,
+          0.08565563097588469,
+          0.25,
+          0.7994839571936008,
+          0.21781068011829985,
+          0.6373498332897914,
+          0.5711254693968092,
+          0.712772489080186,
+          0.0974324090514831
+        ]
+      },
+      "source_samples": 180810,
+      "state_id": "9822599a6cb97be24884206b6dacf6146a46be99484d9322fd646e4d4ff555f4",
+      "target_audio_sha256": "f7d8f27b77749471be04fa9b2cbc3e5ceed09d5f765118ae340e27a51aa6d3db",
+      "target_recipe_id": "71b5f6c0c178e2ce64984091d2285d03cda36132dc0a7c2126378c4fb5d0ae7d",
+      "target_view": 1
+    },
+    {
+      "index": 1,
+      "input_audio_sha256": "f7d8f27b77749471be04fa9b2cbc3e5ceed09d5f765118ae340e27a51aa6d3db",
+      "input_features_sha256": "3672b8bd4e5f22d77d41e0aa5a0bea503f9682c5d2378638f23ede4746da820e",
+      "input_recipe_id": "71b5f6c0c178e2ce64984091d2285d03cda36132dc0a7c2126378c4fb5d0ae7d",
+      "input_view": 1,
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              96
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 360
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              96
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 840
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              96
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 960
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1320
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              96
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 1800
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          1,
+          1
+        ],
+        "continuous": [
+          0.98479163646698,
+          0.835831344127655,
+          0.990611732006073,
+          0.8376145362854004,
+          0.9987727999687195,
+          0.9988352656364441,
+          0.9946946501731873,
+          0.07202478498220444,
+          0.9990447163581848
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            -0.39443439245224,
+            13.158285140991211,
+            -56.179447174072266
+          ],
+          [
+            -64.17156219482422,
+            58.56819534301758
+          ]
+        ],
+        "continuous": [
+          0.98479163646698,
+          0.835831344127655,
+          0.990611732006073,
+          0.8376145362854004,
+          0.9987727999687195,
+          0.9988352656364441,
+          0.9946946501731873,
+          0.07202478498220444,
+          0.9990447163581848
+        ]
+      },
+      "role": "wider_input",
+      "source": {
+        "categorical": [
+          0,
+          1
+        ],
+        "continuous": [
+          0.5448964123607368,
+          0.08565563097588469,
+          0.25,
+          0.7994839571936008,
+          0.21781068011829985,
+          0.6373498332897914,
+          0.5711254693968092,
+          0.712772489080186,
+          0.0974324090514831
+        ]
+      },
+      "source_samples": 176400,
+      "state_id": "9822599a6cb97be24884206b6dacf6146a46be99484d9322fd646e4d4ff555f4",
+      "target_audio_sha256": "171cb54ed67f154f08a6ba4dbe43fc8d54badce5c1e52493f80dbb72036a5e3b",
+      "target_recipe_id": "eb2c0b4ea787fb46add8c23635b089b591c1fe25960844f15fec529cb8c8dd82",
+      "target_view": 0
+    },
+    {
+      "index": 2,
+      "input_audio_sha256": "fdb8b4e8f92a3c710c6784da762a02c424cd6bf7724846e5f6570c5259711b00",
+      "input_features_sha256": "fe87066ff215ae9fa7c2c3bab1d3406c608c07f86dae802985b80bc42cd9f5ce",
+      "input_recipe_id": "446182f8648f653ff6602738d59095176172566c1b10d881b2482ed510581096",
+      "input_view": 0,
+      "performance": {
+        "end_tick": 1880,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              545455
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              48,
+              112
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              48,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1760
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          1,
+          0
+        ],
+        "continuous": [
+          0.936021625995636,
+          0.2252354770898819,
+          0.5302228927612305,
+          0.6571428571428571,
+          0.3,
+          0.13398553431034088,
+          0.7870882153511047,
+          0.1656947135925293,
+          0.6228744983673096
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            -2.2346298694610596,
+            6.096500396728516,
+            -9.051566123962402
+          ],
+          [
+            7.898490905761719,
+            -10.785117149353027
+          ]
+        ],
+        "continuous": [
+          0.936021625995636,
+          0.2252354770898819,
+          0.5302228927612305,
+          0.8365222215652466,
+          0.044797398149967194,
+          0.13398553431034088,
+          0.7870882153511047,
+          0.1656947135925293,
+          0.6228744983673096
+        ]
+      },
+      "role": "original_input",
+      "source": {
+        "categorical": [
+          1,
+          0
+        ],
+        "continuous": [
+          0.9241835351511489,
+          0.26216769779924887,
+          0.7680185111250954,
+          0.6571428571428571,
+          0.3,
+          0.014334728489664772,
+          0.8088283915146424,
+          0.12525106518880214,
+          0.41989153183517225
+        ]
+      },
+      "source_samples": 182414,
+      "state_id": "65f4559955b1e621508e1b915c6f3571f0a6e732782d000597ea7b0f85bc7aec",
+      "target_audio_sha256": "6eee5861d621edc66101ed354a8d4a25debc191e96d9cd147d500086dfd0f7e7",
+      "target_recipe_id": "cf8d199830f3cd963c99e5bfa2e66d29de6b70e70ef0a144eda68801b7f3a49e",
+      "target_view": 1
+    },
+    {
+      "index": 2,
+      "input_audio_sha256": "6eee5861d621edc66101ed354a8d4a25debc191e96d9cd147d500086dfd0f7e7",
+      "input_features_sha256": "2006ed1dd30bebdc30810b0efe18160c8064053a01d51ffb48c39e6695d5b3b4",
+      "input_recipe_id": "cf8d199830f3cd963c99e5bfa2e66d29de6b70e70ef0a144eda68801b7f3a49e",
+      "input_view": 1,
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 120
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 600
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 960
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1080
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 1560
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          2,
+          0
+        ],
+        "continuous": [
+          0.1640060544013977,
+          0.2276887744665146,
+          0.01974259503185749,
+          0.6571428571428571,
+          0.3,
+          0.16838720440864563,
+          0.8851456642150879,
+          0.9775811433792114,
+          0.6445997953414917
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            -10.534671783447266,
+            -85.90525817871094,
+            94.95167541503906
+          ],
+          [
+            42.010650634765625,
+            -47.23303985595703
+          ]
+        ],
+        "continuous": [
+          0.1640060544013977,
+          0.2276887744665146,
+          0.01974259503185749,
+          0.65468829870224,
+          0.015260905958712101,
+          0.16838720440864563,
+          0.8851456642150879,
+          0.9775811433792114,
+          0.6445997953414917
+        ]
+      },
+      "role": "wider_input",
+      "source": {
+        "categorical": [
+          1,
+          0
+        ],
+        "continuous": [
+          0.9241835351511489,
+          0.26216769779924887,
+          0.7680185111250954,
+          0.6571428571428571,
+          0.3,
+          0.014334728489664772,
+          0.8088283915146424,
+          0.12525106518880214,
+          0.41989153183517225
+        ]
+      },
+      "source_samples": 176400,
+      "state_id": "65f4559955b1e621508e1b915c6f3571f0a6e732782d000597ea7b0f85bc7aec",
+      "target_audio_sha256": "fdb8b4e8f92a3c710c6784da762a02c424cd6bf7724846e5f6570c5259711b00",
+      "target_recipe_id": "446182f8648f653ff6602738d59095176172566c1b10d881b2482ed510581096",
+      "target_view": 0
+    },
+    {
+      "index": 3,
+      "input_audio_sha256": "0a6a6f518bb8bb28b7c4aa2de503a2044a74f6a548d987f9a62193f7285ec87e",
+      "input_features_sha256": "62a9256ce1ea8a7c62f92a5ee22c208c1eb349211b045277316015d653941247",
+      "input_recipe_id": "69d4103e1c72924cf4115b1359c448f165827bff5d0bb3057cae5e56c5acac6e",
+      "input_view": 0,
+      "performance": {
+        "end_tick": 2200,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              461538
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              79,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              79,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 2080
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          1,
+          1
+        ],
+        "continuous": [
+          0.7549347281455994,
+          0.11619319021701813,
+          0.010204833932220936,
+          0.5423689484596252,
+          0.9479582905769348,
+          0.7333648204803467,
+          0.9932505488395691,
+          0.009384368546307087,
+          0.014987663365900517
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            -4.985569477081299,
+            24.424394607543945,
+            -35.849632263183594
+          ],
+          [
+            -27.787940979003906,
+            20.122251510620117
+          ]
+        ],
+        "continuous": [
+          0.7549347281455994,
+          0.11619319021701813,
+          0.010204833932220936,
+          0.5423689484596252,
+          0.9479582905769348,
+          0.7333648204803467,
+          0.9932505488395691,
+          0.009384368546307087,
+          0.014987663365900517
+        ]
+      },
+      "role": "original_input",
+      "source": {
+        "categorical": [
+          1,
+          1
+        ],
+        "continuous": [
+          0.7351192444681617,
+          0.11226780380357759,
+          0.011776118050863982,
+          0.50355266705857,
+          0.9524320925022358,
+          0.7207277128868679,
+          0.7039625611170371,
+          0.058331459360523086,
+          0.012685891931815685
+        ]
+      },
+      "source_samples": 181488,
+      "state_id": "d8c281a9483d6122699c3d54a62530c484e2d380a595cc7da40191c4f954fd7c",
+      "target_audio_sha256": "1c53ccac79e09d166a3896c3776ce6f745bf38a1eca6c5ad118ce97f0f0fccb5",
+      "target_recipe_id": "a3a9534c4c1fdd6beb063807573ce7d39d5e3a19f182a49ac22bdf11ede9b441",
+      "target_view": 1
+    },
+    {
+      "index": 3,
+      "input_audio_sha256": "1c53ccac79e09d166a3896c3776ce6f745bf38a1eca6c5ad118ce97f0f0fccb5",
+      "input_features_sha256": "317158473ac37ce61e5182cbe65497fc19ca2d7329bec45b7f62c3f1ee231944",
+      "input_recipe_id": "a3a9534c4c1fdd6beb063807573ce7d39d5e3a19f182a49ac22bdf11ede9b441",
+      "input_view": 1,
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              80
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              80
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          1,
+          1
+        ],
+        "continuous": [
+          0.4638267755508423,
+          0.41952285170555115,
+          0.9999449253082275,
+          0.789993405342102,
+          0.9999778270721436,
+          0.9814109206199646,
+          0.9992772936820984,
+          0.028496524319052696,
+          0.9999769926071167
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            -2.582510471343994,
+            5.2548394203186035,
+            -20.89023208618164
+          ],
+          [
+            -40.81401443481445,
+            40.49216079711914
+          ]
+        ],
+        "continuous": [
+          0.4638267755508423,
+          0.41952285170555115,
+          0.9999449253082275,
+          0.789993405342102,
+          0.9999778270721436,
+          0.9814109206199646,
+          0.9992772936820984,
+          0.028496524319052696,
+          0.9999769926071167
+        ]
+      },
+      "role": "wider_input",
+      "source": {
+        "categorical": [
+          1,
+          1
+        ],
+        "continuous": [
+          0.7351192444681617,
+          0.11226780380357759,
+          0.011776118050863982,
+          0.50355266705857,
+          0.9524320925022358,
+          0.7207277128868679,
+          0.7039625611170371,
+          0.058331459360523086,
+          0.012685891931815685
+        ]
+      },
+      "source_samples": 176400,
+      "state_id": "d8c281a9483d6122699c3d54a62530c484e2d380a595cc7da40191c4f954fd7c",
+      "target_audio_sha256": "0a6a6f518bb8bb28b7c4aa2de503a2044a74f6a548d987f9a62193f7285ec87e",
+      "target_recipe_id": "69d4103e1c72924cf4115b1359c448f165827bff5d0bb3057cae5e56c5acac6e",
+      "target_view": 0
+    },
+    {
+      "index": 4,
+      "input_audio_sha256": "bc91ed572399d26e96d40e987519f80d2ca5874a1d16dbe3b5cb7b46e0c18c4c",
+      "input_features_sha256": "e1a637c3b852830f1fda6b87eee3eba9e76994da3724241ea69daafff5d859de",
+      "input_recipe_id": "1df22ffe8700eb5c384170b2498550e1590bed430a94a20313b6369fcea2c8f2",
+      "input_view": 0,
+      "performance": {
+        "end_tick": 2200,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              461538
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              40,
+              64
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              40,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 2080
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          2,
+          0
+        ],
+        "continuous": [
+          0.5900208950042725,
+          0.17604489624500275,
+          0.3635402321815491,
+          0.6571428571428571,
+          0.3,
+          0.6930250525474548,
+          0.5437702536582947,
+          0.8686679005622864,
+          0.4487377405166626
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            -16.855300903320312,
+            -47.67619705200195,
+            56.61292266845703
+          ],
+          [
+            35.719398498535156,
+            -41.653404235839844
+          ]
+        ],
+        "continuous": [
+          0.5900208950042725,
+          0.17604489624500275,
+          0.3635402321815491,
+          0.9974933862686157,
+          0.8490059971809387,
+          0.6930250525474548,
+          0.5437702536582947,
+          0.8686679005622864,
+          0.4487377405166626
+        ]
+      },
+      "role": "original_input",
+      "source": {
+        "categorical": [
+          2,
+          0
+        ],
+        "continuous": [
+          0.6200131399671953,
+          0.14729873424765783,
+          0.42294193488052767,
+          0.6571428571428571,
+          0.3,
+          0.6212220950874604,
+          0.55967102294264,
+          0.8099110771287318,
+          0.5550224030372828
+        ]
+      },
+      "source_samples": 181488,
+      "state_id": "1c2106feeaf9e6451fee95de7a81495605b63b1e214cba4957d31e8f0637db97",
+      "target_audio_sha256": "8041344132418adba5ecae6bd2b5e5b9cd595131153dfaa9719bed4fa122306c",
+      "target_recipe_id": "b270e65d5e7abeda18674d999cda5ad2d703a146c9b2fcba55d3c7fbd2cba8a9",
+      "target_view": 1
+    },
+    {
+      "index": 4,
+      "input_audio_sha256": "8041344132418adba5ecae6bd2b5e5b9cd595131153dfaa9719bed4fa122306c",
+      "input_features_sha256": "5aa33274c95a3de55a8e6812b23782787ca9ea8e710d078db111daeed509d9dd",
+      "input_recipe_id": "b270e65d5e7abeda18674d999cda5ad2d703a146c9b2fcba55d3c7fbd2cba8a9",
+      "input_view": 1,
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              96
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 360
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              96
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 840
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              96
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 960
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1320
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              96
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 1800
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          2,
+          0
+        ],
+        "continuous": [
+          9.967169717128854e-06,
+          0.00012357544619590044,
+          0.1795845478773117,
+          0.6571428571428571,
+          0.3,
+          0.23754560947418213,
+          0.9362609386444092,
+          0.9998898506164551,
+          0.9953073859214783
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            -46.96262741088867,
+            -133.71096801757812,
+            164.27650451660156
+          ],
+          [
+            35.463157653808594,
+            -43.55417251586914
+          ]
+        ],
+        "continuous": [
+          9.967169717128854e-06,
+          0.00012357544619590044,
+          0.1795845478773117,
+          0.9999998807907104,
+          1.087128342902588e-08,
+          0.23754560947418213,
+          0.9362609386444092,
+          0.9998898506164551,
+          0.9953073859214783
+        ]
+      },
+      "role": "wider_input",
+      "source": {
+        "categorical": [
+          2,
+          0
+        ],
+        "continuous": [
+          0.6200131399671953,
+          0.14729873424765783,
+          0.42294193488052767,
+          0.6571428571428571,
+          0.3,
+          0.6212220950874604,
+          0.55967102294264,
+          0.8099110771287318,
+          0.5550224030372828
+        ]
+      },
+      "source_samples": 176400,
+      "state_id": "1c2106feeaf9e6451fee95de7a81495605b63b1e214cba4957d31e8f0637db97",
+      "target_audio_sha256": "bc91ed572399d26e96d40e987519f80d2ca5874a1d16dbe3b5cb7b46e0c18c4c",
+      "target_recipe_id": "1df22ffe8700eb5c384170b2498550e1590bed430a94a20313b6369fcea2c8f2",
+      "target_view": 0
+    },
+    {
+      "index": 5,
+      "input_audio_sha256": "80cfbc56d2697e717f00f43dc326f6eabbb88446426308478982812f2b67cd48",
+      "input_features_sha256": "bb3fa01967ce20abb5d66488f1a1fa84721285cad9c297f10dd54adaa84c2308",
+      "input_recipe_id": "298d6c96630450056b13dae451ada6918a9c2871defe0b69ac218ab95f41e38a",
+      "input_view": 0,
+      "performance": {
+        "end_tick": 1880,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              545455
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              65,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              65,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1760
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          2,
+          1
+        ],
+        "continuous": [
+          0.8682094812393188,
+          0.6808081269264221,
+          0.6446006298065186,
+          0.3284854590892792,
+          0.5890137553215027,
+          0.7361698746681213,
+          0.5857692956924438,
+          0.14721974730491638,
+          0.6170597076416016
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            -8.517705917358398,
+            -6.372981071472168,
+            16.161724090576172
+          ],
+          [
+            -22.366291046142578,
+            20.755048751831055
+          ]
+        ],
+        "continuous": [
+          0.8682094812393188,
+          0.6808081269264221,
+          0.6446006298065186,
+          0.3284854590892792,
+          0.5890137553215027,
+          0.7361698746681213,
+          0.5857692956924438,
+          0.14721974730491638,
+          0.6170597076416016
+        ]
+      },
+      "role": "original_input",
+      "source": {
+        "categorical": [
+          2,
+          1
+        ],
+        "continuous": [
+          0.9099362904466544,
+          0.6346298133297592,
+          0.6156888480999463,
+          0.3548311397112195,
+          0.48935298611666544,
+          0.7209121092207654,
+          0.7183343939766638,
+          0.05874537113837419,
+          0.5573228010986506
+        ]
+      },
+      "source_samples": 182414,
+      "state_id": "f20ecf11ec7a8dc5d34f2e1af27d776f391a614f04b430ef8f6841b95326f50c",
+      "target_audio_sha256": "30ac5abaeebadfb5cfd6554e5b95dec8aea1984a0c862cbf1e017fec2b2b3ec6",
+      "target_recipe_id": "5e3dee6e18384a23e27caee9330424a9332ba4655109e351e212bf10c496e466",
+      "target_view": 1
+    },
+    {
+      "index": 5,
+      "input_audio_sha256": "30ac5abaeebadfb5cfd6554e5b95dec8aea1984a0c862cbf1e017fec2b2b3ec6",
+      "input_features_sha256": "0ca7fa92439ce1aec2fb1b627efe0fef69121ee93f8823e3fa3e2174b4af6c1e",
+      "input_recipe_id": "5e3dee6e18384a23e27caee9330424a9332ba4655109e351e212bf10c496e466",
+      "input_view": 1,
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 120
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 600
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 960
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1080
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 1560
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          2,
+          1
+        ],
+        "continuous": [
+          0.8002333641052246,
+          0.47198307514190674,
+          0.7850116491317749,
+          0.3840947449207306,
+          0.7398752570152283,
+          0.26478803157806396,
+          0.8894504308700562,
+          0.04354920610785484,
+          0.46543294191360474
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            -23.355899810791016,
+            -1.9658581018447876,
+            24.293071746826172
+          ],
+          [
+            -53.217227935791016,
+            53.47949981689453
+          ]
+        ],
+        "continuous": [
+          0.8002333641052246,
+          0.47198307514190674,
+          0.7850116491317749,
+          0.3840947449207306,
+          0.7398752570152283,
+          0.26478803157806396,
+          0.8894504308700562,
+          0.04354920610785484,
+          0.46543294191360474
+        ]
+      },
+      "role": "wider_input",
+      "source": {
+        "categorical": [
+          2,
+          1
+        ],
+        "continuous": [
+          0.9099362904466544,
+          0.6346298133297592,
+          0.6156888480999463,
+          0.3548311397112195,
+          0.48935298611666544,
+          0.7209121092207654,
+          0.7183343939766638,
+          0.05874537113837419,
+          0.5573228010986506
+        ]
+      },
+      "source_samples": 176400,
+      "state_id": "f20ecf11ec7a8dc5d34f2e1af27d776f391a614f04b430ef8f6841b95326f50c",
+      "target_audio_sha256": "80cfbc56d2697e717f00f43dc326f6eabbb88446426308478982812f2b67cd48",
+      "target_recipe_id": "298d6c96630450056b13dae451ada6918a9c2871defe0b69ac218ab95f41e38a",
+      "target_view": 0
+    },
+    {
+      "index": 6,
+      "input_audio_sha256": "967cc71f479460b334428a3eab562dbba48389229b537b90e55cdb9ad55f93ce",
+      "input_features_sha256": "a7d675b5ec1df6b9577b06cfcbc57ab03990aaeff778d5e1c5c60e01dac07d97",
+      "input_recipe_id": "09eea81c25ab4f65be340af21b69b495fb5c126144c416a4e9552e4557d32587",
+      "input_view": 0,
+      "performance": {
+        "end_tick": 1560,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              666667
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              41,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              45,
+              80
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              48,
+              80
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              41,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              45,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              48,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          0,
+          0
+        ],
+        "continuous": [
+          0.20587663352489471,
+          0.07656199485063553,
+          0.25,
+          0.6571428571428571,
+          0.3,
+          0.9958539009094238,
+          0.902351975440979,
+          0.9505862593650818,
+          0.16556203365325928
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            11.243856430053711,
+            -8.086158752441406,
+            -30.19236946105957
+          ],
+          [
+            19.221288681030273,
+            -26.368301391601562
+          ]
+        ],
+        "continuous": [
+          0.20587663352489471,
+          0.07656199485063553,
+          0.011436643078923225,
+          0.482822984457016,
+          0.7126880884170532,
+          0.9958539009094238,
+          0.902351975440979,
+          0.9505862593650818,
+          0.16556203365325928
+        ]
+      },
+      "role": "original_input",
+      "source": {
+        "categorical": [
+          0,
+          0
+        ],
+        "continuous": [
+          0.19043607650762795,
+          0.04382567385025238,
+          0.25,
+          0.6571428571428571,
+          0.3,
+          0.7531786907924797,
+          0.91571999082407,
+          0.9759400680103439,
+          0.2696343769256273
+        ]
+      },
+      "source_samples": 183750,
+      "state_id": "ce50a6bb09f2ead9b821eb936d6d3a52bb07df246e8a9f6564da57318fe3e0c0",
+      "target_audio_sha256": "41674c67c76e26716304a7bfd51ab8773cba77c5b00833a5e25a016f9672c8ba",
+      "target_recipe_id": "cbe276ab6b3938e158a5408edbb79d785be40d0aa2a2208b402623df3d88e84d",
+      "target_view": 2
+    },
+    {
+      "index": 6,
+      "input_audio_sha256": "41674c67c76e26716304a7bfd51ab8773cba77c5b00833a5e25a016f9672c8ba",
+      "input_features_sha256": "8a4294002893941f734cb4b424677d2860430b7f9ebafb1b85813f97c6166310",
+      "input_recipe_id": "cbe276ab6b3938e158a5408edbb79d785be40d0aa2a2208b402623df3d88e84d",
+      "input_view": 2,
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              96
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 360
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              96
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 840
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              96
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 960
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1320
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              96
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 1800
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          0,
+          0
+        ],
+        "continuous": [
+          6.027869314806367e-09,
+          0.003922687377780676,
+          0.25,
+          0.6571428571428571,
+          0.3,
+          8.502029800183664e-07,
+          7.615089998580515e-05,
+          0.9999998807907104,
+          0.999993085861206
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            8.640020370483398,
+            -71.84886169433594,
+            0.7922468185424805
+          ],
+          [
+            -1.8319969177246094,
+            -12.346942901611328
+          ]
+        ],
+        "continuous": [
+          6.027869314806367e-09,
+          0.003922687377780676,
+          2.5731210939738958e-08,
+          0.9999382495880127,
+          1.34407139285031e-06,
+          8.502029800183664e-07,
+          7.615089998580515e-05,
+          0.9999998807907104,
+          0.999993085861206
+        ]
+      },
+      "role": "wider_input",
+      "source": {
+        "categorical": [
+          0,
+          0
+        ],
+        "continuous": [
+          0.19043607650762795,
+          0.04382567385025238,
+          0.25,
+          0.6571428571428571,
+          0.3,
+          0.7531786907924797,
+          0.91571999082407,
+          0.9759400680103439,
+          0.2696343769256273
+        ]
+      },
+      "source_samples": 176400,
+      "state_id": "ce50a6bb09f2ead9b821eb936d6d3a52bb07df246e8a9f6564da57318fe3e0c0",
+      "target_audio_sha256": "967cc71f479460b334428a3eab562dbba48389229b537b90e55cdb9ad55f93ce",
+      "target_recipe_id": "09eea81c25ab4f65be340af21b69b495fb5c126144c416a4e9552e4557d32587",
+      "target_view": 0
+    },
+    {
+      "index": 7,
+      "input_audio_sha256": "c3dfc2c9754f02845836162d50062aeb52b17f1f016b63b00636fc4e7bc6661e",
+      "input_features_sha256": "bec82686db23b640384a47f96dcd0d4b97871d5a9bdca60ef34ac2f4e0e6fe4b",
+      "input_recipe_id": "f03a6e9e22cdbabf838aa8d056d036ee67adbccde241dbe06eed9c79d72b896d",
+      "input_view": 0,
+      "performance": {
+        "end_tick": 1560,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              666667
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              68,
+              96
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              72,
+              96
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              75,
+              96
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              68,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              72,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              75,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          0,
+          1
+        ],
+        "continuous": [
+          0.7196815609931946,
+          0.5858269333839417,
+          0.25,
+          0.21104605495929718,
+          0.26244908571243286,
+          0.33122193813323975,
+          0.7206901907920837,
+          0.5125836730003357,
+          0.5920045971870422
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            14.080625534057617,
+            -16.045333862304688,
+            0.9812681674957275
+          ],
+          [
+            -27.101106643676758,
+            28.00503921508789
+          ]
+        ],
+        "continuous": [
+          0.7196815609931946,
+          0.5858269333839417,
+          0.750138521194458,
+          0.21104605495929718,
+          0.26244908571243286,
+          0.33122193813323975,
+          0.7206901907920837,
+          0.5125836730003357,
+          0.5920045971870422
+        ]
+      },
+      "role": "original_input",
+      "source": {
+        "categorical": [
+          0,
+          1
+        ],
+        "continuous": [
+          0.7263921904207715,
+          0.5133088637547233,
+          0.25,
+          0.17396107843408182,
+          0.2598883509439006,
+          0.28228279886897956,
+          0.7201267963382735,
+          0.3929062056970334,
+          0.5598899915900628
+        ]
+      },
+      "source_samples": 183750,
+      "state_id": "eb50cec0c5d4b7ac0b5cf6ceb3a4f06cdf1b29d49fd24872ac0453043c1e3519",
+      "target_audio_sha256": "2ab37d7bed167938bdaf8fd0a779efe7355f2d9f64cf9655e1c72b9b6752cdaf",
+      "target_recipe_id": "9c7d74d7dc16807751c99bedf86e53f8118480cf4ac1fe9cf00f73d70c5aab3f",
+      "target_view": 2
+    },
+    {
+      "index": 7,
+      "input_audio_sha256": "2ab37d7bed167938bdaf8fd0a779efe7355f2d9f64cf9655e1c72b9b6752cdaf",
+      "input_features_sha256": "34f659e5b3e15ac23bdb36e016ba043f7af2a716941a2fb901af5c965fc0b54e",
+      "input_recipe_id": "9c7d74d7dc16807751c99bedf86e53f8118480cf4ac1fe9cf00f73d70c5aab3f",
+      "input_view": 2,
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 120
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 600
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 960
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1080
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 1560
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          1,
+          1
+        ],
+        "continuous": [
+          0.05957840383052826,
+          0.7796067595481873,
+          0.8522248864173889,
+          0.451157808303833,
+          0.9650833606719971,
+          0.07881586253643036,
+          0.983190655708313,
+          0.8438912630081177,
+          0.9906349778175354
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            -27.452648162841797,
+            11.353065490722656,
+            10.355560302734375
+          ],
+          [
+            -48.72071838378906,
+            50.25752258300781
+          ]
+        ],
+        "continuous": [
+          0.05957840383052826,
+          0.7796067595481873,
+          0.8522248864173889,
+          0.451157808303833,
+          0.9650833606719971,
+          0.07881586253643036,
+          0.983190655708313,
+          0.8438912630081177,
+          0.9906349778175354
+        ]
+      },
+      "role": "wider_input",
+      "source": {
+        "categorical": [
+          0,
+          1
+        ],
+        "continuous": [
+          0.7263921904207715,
+          0.5133088637547233,
+          0.25,
+          0.17396107843408182,
+          0.2598883509439006,
+          0.28228279886897956,
+          0.7201267963382735,
+          0.3929062056970334,
+          0.5598899915900628
+        ]
+      },
+      "source_samples": 176400,
+      "state_id": "eb50cec0c5d4b7ac0b5cf6ceb3a4f06cdf1b29d49fd24872ac0453043c1e3519",
+      "target_audio_sha256": "c3dfc2c9754f02845836162d50062aeb52b17f1f016b63b00636fc4e7bc6661e",
+      "target_recipe_id": "f03a6e9e22cdbabf838aa8d056d036ee67adbccde241dbe06eed9c79d72b896d",
+      "target_view": 0
+    },
+    {
+      "index": 8,
+      "input_audio_sha256": "56203d8ad57b29789e1c465a11bff6683d07495152111ca072961cead7031075",
+      "input_features_sha256": "a80185cee838d99f703dda86be34cb5a73e1fa9787625df4f1186cbd97c53c97",
+      "input_recipe_id": "40197d57f0d35b9b81d63a341da22739a092d7f962b05b24e40e492a19d98086",
+      "input_view": 0,
+      "performance": {
+        "end_tick": 2520,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              400000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              46,
+              64
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              50,
+              64
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              53,
+              64
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              46,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 2400
+          },
+          {
+            "channel": 0,
+            "data": [
+              50,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 2400
+          },
+          {
+            "channel": 0,
+            "data": [
+              53,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 2400
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          1,
+          0
+        ],
+        "continuous": [
+          0.3255062401294708,
+          0.9082685112953186,
+          0.31737634539604187,
+          0.6571428571428571,
+          0.3,
+          0.4728880226612091,
+          0.9094078540802002,
+          0.8168567419052124,
+          0.068697988986969
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            -6.967528343200684,
+            8.680765151977539,
+            -13.484297752380371
+          ],
+          [
+            9.297219276428223,
+            -11.763279914855957
+          ]
+        ],
+        "continuous": [
+          0.3255062401294708,
+          0.9082685112953186,
+          0.31737634539604187,
+          0.9841763973236084,
+          0.31780171394348145,
+          0.4728880226612091,
+          0.9094078540802002,
+          0.8168567419052124,
+          0.068697988986969
+        ]
+      },
+      "role": "original_input",
+      "source": {
+        "categorical": [
+          1,
+          0
+        ],
+        "continuous": [
+          0.3294077250035399,
+          0.9446393096904058,
+          0.35498596379415115,
+          0.6571428571428571,
+          0.3,
+          0.46897734731498897,
+          0.9102295599384178,
+          0.8380827344080626,
+          0.00034587017235865325
+        ]
+      },
+      "source_samples": 180810,
+      "state_id": "b909a9cad73075e54f07d87253bb6d941599de2804e838d0bfcd68d1c5fb5271",
+      "target_audio_sha256": "5d30f2e56a7d48904763f614fb796bec875e634789a7fdd5e4c1cd4e2fc670e6",
+      "target_recipe_id": "8cb7563b06fbff3898365e1ff217354dd9678f5d9e4a5d5d935e1dcab3fda8c1",
+      "target_view": 2
+    },
+    {
+      "index": 8,
+      "input_audio_sha256": "5d30f2e56a7d48904763f614fb796bec875e634789a7fdd5e4c1cd4e2fc670e6",
+      "input_features_sha256": "64512d81f22b964daeb0dec1e5ebad9395e3c35b614fe9ced3ead9d757e85a79",
+      "input_recipe_id": "8cb7563b06fbff3898365e1ff217354dd9678f5d9e4a5d5d935e1dcab3fda8c1",
+      "input_view": 2,
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              80
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              80
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          2,
+          0
+        ],
+        "continuous": [
+          0.06188971921801567,
+          0.9952672719955444,
+          0.030853040516376495,
+          0.6571428571428571,
+          0.3,
+          0.6518206000328064,
+          0.9882398843765259,
+          0.9999966621398926,
+          0.9141362905502319
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            -7.697146892547607,
+            -31.525320053100586,
+            5.696427345275879
+          ],
+          [
+            25.80060577392578,
+            -34.897972106933594
+          ]
+        ],
+        "continuous": [
+          0.06188971921801567,
+          0.9952672719955444,
+          0.030853040516376495,
+          0.9908127188682556,
+          1.9878325474564917e-06,
+          0.6518206000328064,
+          0.9882398843765259,
+          0.9999966621398926,
+          0.9141362905502319
+        ]
+      },
+      "role": "wider_input",
+      "source": {
+        "categorical": [
+          1,
+          0
+        ],
+        "continuous": [
+          0.3294077250035399,
+          0.9446393096904058,
+          0.35498596379415115,
+          0.6571428571428571,
+          0.3,
+          0.46897734731498897,
+          0.9102295599384178,
+          0.8380827344080626,
+          0.00034587017235865325
+        ]
+      },
+      "source_samples": 176400,
+      "state_id": "b909a9cad73075e54f07d87253bb6d941599de2804e838d0bfcd68d1c5fb5271",
+      "target_audio_sha256": "56203d8ad57b29789e1c465a11bff6683d07495152111ca072961cead7031075",
+      "target_recipe_id": "40197d57f0d35b9b81d63a341da22739a092d7f962b05b24e40e492a19d98086",
+      "target_view": 0
+    },
+    {
+      "index": 9,
+      "input_audio_sha256": "d6665ca77572d33bc665aeeff17934828773591eaf8701c98cf6e557048dfcb3",
+      "input_features_sha256": "580f7f60dab3c019dc655b3860092bff0ff305da95ddc116229346f61a06b45e",
+      "input_recipe_id": "f1a23ad2517bf5b587fc0d31745eddf58c8e4987ce3b0374136aeacf425c14a7",
+      "input_view": 0,
+      "performance": {
+        "end_tick": 1380,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              545455
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              64
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 300
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              64
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 360
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 660
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              64
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 720
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 960
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              64
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1080
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 1260
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          1,
+          1
+        ],
+        "continuous": [
+          0.3112685978412628,
+          0.5116539597511292,
+          0.5801786184310913,
+          0.8880038857460022,
+          0.8407809734344482,
+          0.7938442826271057,
+          0.2937815487384796,
+          0.9837446212768555,
+          0.40277519822120667
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            -22.210098266601562,
+            17.13153648376465,
+            -15.16728401184082
+          ],
+          [
+            -35.217342376708984,
+            30.98513412475586
+          ]
+        ],
+        "continuous": [
+          0.3112685978412628,
+          0.5116539597511292,
+          0.5801786184310913,
+          0.8880038857460022,
+          0.8407809734344482,
+          0.7938442826271057,
+          0.2937815487384796,
+          0.9837446212768555,
+          0.40277519822120667
+        ]
+      },
+      "role": "original_input",
+      "source": {
+        "categorical": [
+          1,
+          1
+        ],
+        "continuous": [
+          0.2943424383365699,
+          0.5164104520251672,
+          0.525955480181237,
+          0.8743061668568245,
+          0.8341755947453849,
+          0.7431870653720193,
+          0.3236677510111087,
+          0.8908393290470998,
+          0.54413732532567
+        ]
+      },
+      "source_samples": 157357,
+      "state_id": "4b7912655066936f25664c8ef8a73dbc209bfd787e99dff438ed413e8e18d5fe",
+      "target_audio_sha256": "c222d675c932eddcb317a5c6f06a206266415782d7d81094062991567627b106",
+      "target_recipe_id": "227ddee17da70332f329f24b166be6dd3f584def7994856cb3a793b3d1edcbac",
+      "target_view": 2
+    },
+    {
+      "index": 9,
+      "input_audio_sha256": "c222d675c932eddcb317a5c6f06a206266415782d7d81094062991567627b106",
+      "input_features_sha256": "09c5dbeeb628e1f64b7668ee82734c2c1f5e141ea448b27b366817cae391a164",
+      "input_recipe_id": "227ddee17da70332f329f24b166be6dd3f584def7994856cb3a793b3d1edcbac",
+      "input_view": 2,
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              80
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              80
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          1,
+          1
+        ],
+        "continuous": [
+          0.30051183700561523,
+          0.23463435471057892,
+          0.2703474164009094,
+          0.8535974621772766,
+          0.7865233421325684,
+          0.8025983572006226,
+          0.6770209074020386,
+          0.9071876406669617,
+          0.952261745929718
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            7.219050884246826,
+            7.850993633270264,
+            -45.565940856933594
+          ],
+          [
+            -15.867774963378906,
+            11.470602989196777
+          ]
+        ],
+        "continuous": [
+          0.30051183700561523,
+          0.23463435471057892,
+          0.2703474164009094,
+          0.8535974621772766,
+          0.7865233421325684,
+          0.8025983572006226,
+          0.6770209074020386,
+          0.9071876406669617,
+          0.952261745929718
+        ]
+      },
+      "role": "wider_input",
+      "source": {
+        "categorical": [
+          1,
+          1
+        ],
+        "continuous": [
+          0.2943424383365699,
+          0.5164104520251672,
+          0.525955480181237,
+          0.8743061668568245,
+          0.8341755947453849,
+          0.7431870653720193,
+          0.3236677510111087,
+          0.8908393290470998,
+          0.54413732532567
+        ]
+      },
+      "source_samples": 176400,
+      "state_id": "4b7912655066936f25664c8ef8a73dbc209bfd787e99dff438ed413e8e18d5fe",
+      "target_audio_sha256": "d6665ca77572d33bc665aeeff17934828773591eaf8701c98cf6e557048dfcb3",
+      "target_recipe_id": "f1a23ad2517bf5b587fc0d31745eddf58c8e4987ce3b0374136aeacf425c14a7",
+      "target_view": 0
+    },
+    {
+      "index": 10,
+      "input_audio_sha256": "5c6efbcbfefa6be119d39caf2f24228121f7e889fb6a60f599fa083eb3aa71fe",
+      "input_features_sha256": "7af98d2a701b5adbd8af45ca8ec46ed6dab2bc44e47f11b9208fc4812c895630",
+      "input_recipe_id": "6e26e7680f62a63878fc2d368916410bb55f36f05262c143e00b15c69f2c4e4d",
+      "input_view": 0,
+      "performance": {
+        "end_tick": 1560,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              666667
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              56,
+              112
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              112
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              63,
+              112
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              56,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              63,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1440
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          2,
+          0
+        ],
+        "continuous": [
+          0.31505003571510315,
+          0.24758602678775787,
+          0.32779422402381897,
+          0.6571428571428571,
+          0.3,
+          0.06121920421719551,
+          0.5896245837211609,
+          0.8321571350097656,
+          0.3515516221523285
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            5.399409770965576,
+            -25.972341537475586,
+            20.29169273376465
+          ],
+          [
+            31.173734664916992,
+            -34.127811431884766
+          ]
+        ],
+        "continuous": [
+          0.31505003571510315,
+          0.24758602678775787,
+          0.32779422402381897,
+          0.903718113899231,
+          0.9714280962944031,
+          0.06121920421719551,
+          0.5896245837211609,
+          0.8321571350097656,
+          0.3515516221523285
+        ]
+      },
+      "role": "original_input",
+      "source": {
+        "categorical": [
+          2,
+          0
+        ],
+        "continuous": [
+          0.307067073003613,
+          0.21351653810910998,
+          0.3257597746943399,
+          0.6571428571428571,
+          0.3,
+          0.0445304786248758,
+          0.5140013810817341,
+          0.7429171364952503,
+          0.4213389914112934
+        ]
+      },
+      "source_samples": 183750,
+      "state_id": "b26374dbca2bd47224fcc1ecdaf4dc123c6566fa924f1f87bbd9888366b18637",
+      "target_audio_sha256": "b40210fd328f23af2dd0474558bf2ce399dd3e9d8c79ade55a4c64cad2c1996c",
+      "target_recipe_id": "5c4e1a69d891f4896794e9b7574453c03427f0ac746b1fb9e4594f0c8281a8cc",
+      "target_view": 2
+    },
+    {
+      "index": 10,
+      "input_audio_sha256": "b40210fd328f23af2dd0474558bf2ce399dd3e9d8c79ade55a4c64cad2c1996c",
+      "input_features_sha256": "65e24186dadbc1673c00e728b9c4e10801506767b7ac9d75e11d6c6edd849552",
+      "input_recipe_id": "5c4e1a69d891f4896794e9b7574453c03427f0ac746b1fb9e4594f0c8281a8cc",
+      "input_view": 2,
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 120
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 600
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 960
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1080
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 1560
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          2,
+          0
+        ],
+        "continuous": [
+          0.03545641154050827,
+          0.029544701799750328,
+          0.007642445154488087,
+          0.6571428571428571,
+          0.3,
+          0.21922099590301514,
+          0.09306357800960541,
+          0.9969052672386169,
+          0.32701075077056885
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            -27.790958404541016,
+            -94.90489196777344,
+            121.70409393310547
+          ],
+          [
+            54.513240814208984,
+            -61.305843353271484
+          ]
+        ],
+        "continuous": [
+          0.03545641154050827,
+          0.029544701799750328,
+          0.007642445154488087,
+          0.9995076656341553,
+          0.9353565573692322,
+          0.21922099590301514,
+          0.09306357800960541,
+          0.9969052672386169,
+          0.32701075077056885
+        ]
+      },
+      "role": "wider_input",
+      "source": {
+        "categorical": [
+          2,
+          0
+        ],
+        "continuous": [
+          0.307067073003613,
+          0.21351653810910998,
+          0.3257597746943399,
+          0.6571428571428571,
+          0.3,
+          0.0445304786248758,
+          0.5140013810817341,
+          0.7429171364952503,
+          0.4213389914112934
+        ]
+      },
+      "source_samples": 176400,
+      "state_id": "b26374dbca2bd47224fcc1ecdaf4dc123c6566fa924f1f87bbd9888366b18637",
+      "target_audio_sha256": "5c6efbcbfefa6be119d39caf2f24228121f7e889fb6a60f599fa083eb3aa71fe",
+      "target_recipe_id": "6e26e7680f62a63878fc2d368916410bb55f36f05262c143e00b15c69f2c4e4d",
+      "target_view": 0
+    },
+    {
+      "index": 11,
+      "input_audio_sha256": "13d8a02331b26b2e267ace49da02f8cf8a2f912c9b79eb5865d0e9ecba8505f7",
+      "input_features_sha256": "7791332c81fc03ce7e4518a308bc2f49a5cf12f01888a5fc50201a08eb780a88",
+      "input_recipe_id": "1604364df3c6bfb39207bff9e6cdc6453a8da24c3ff27662e0c38d58d3a58d09",
+      "input_view": 0,
+      "performance": {
+        "end_tick": 1500,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              545455
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              76,
+              64
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              76,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 300
+          },
+          {
+            "channel": 0,
+            "data": [
+              80,
+              64
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 360
+          },
+          {
+            "channel": 0,
+            "data": [
+              80,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 660
+          },
+          {
+            "channel": 0,
+            "data": [
+              83,
+              64
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 720
+          },
+          {
+            "channel": 0,
+            "data": [
+              83,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1020
+          },
+          {
+            "channel": 0,
+            "data": [
+              78,
+              64
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1080
+          },
+          {
+            "channel": 0,
+            "data": [
+              78,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 1380
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          2,
+          1
+        ],
+        "continuous": [
+          0.6299576759338379,
+          0.7441357970237732,
+          0.6122838854789734,
+          0.490721195936203,
+          0.4426151514053345,
+          0.581558883190155,
+          0.4046294689178467,
+          0.6996699571609497,
+          0.031522706151008606
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            -2.2041842937469482,
+            -13.468816757202148,
+            17.424816131591797
+          ],
+          [
+            -12.938117027282715,
+            11.157245635986328
+          ]
+        ],
+        "continuous": [
+          0.6299576759338379,
+          0.7441357970237732,
+          0.6122838854789734,
+          0.490721195936203,
+          0.4426151514053345,
+          0.581558883190155,
+          0.4046294689178467,
+          0.6996699571609497,
+          0.031522706151008606
+        ]
+      },
+      "role": "original_input",
+      "source": {
+        "categorical": [
+          2,
+          1
+        ],
+        "continuous": [
+          0.668424890014044,
+          0.6902014906444304,
+          0.6438945205150218,
+          0.48627108572584976,
+          0.4643273864805735,
+          0.6028334521970976,
+          0.3555993189245197,
+          0.8523229452879879,
+          0.13448692131483098
+        ]
+      },
+      "source_samples": 163371,
+      "state_id": "5f10fa7bcf873a8c863c61963ddc8425e06988d82336e6315ef64eca05392950",
+      "target_audio_sha256": "600e0aac92c4d55e029d17bc73ff7e8b7b73125dcb9855932778cf2f8afea7ef",
+      "target_recipe_id": "a1b5e930b51f8ad7a7f50b1b6f32e25384ba622bb2466ae8c4f055055b3de481",
+      "target_view": 2
+    },
+    {
+      "index": 11,
+      "input_audio_sha256": "600e0aac92c4d55e029d17bc73ff7e8b7b73125dcb9855932778cf2f8afea7ef",
+      "input_features_sha256": "831bfb3d9133584ee153e1114f849989da256a8222f359a7332d8088eba29ccd",
+      "input_recipe_id": "a1b5e930b51f8ad7a7f50b1b6f32e25384ba622bb2466ae8c4f055055b3de481",
+      "input_view": 2,
+      "performance": {
+        "end_tick": 1920,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              500000
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 120
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 480
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 600
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 960
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1080
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              80
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1440
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 1560
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "production_patch": {
+        "categorical": [
+          1,
+          1
+        ],
+        "continuous": [
+          0.5402664542198181,
+          0.6468855738639832,
+          0.9998904466629028,
+          0.6575413942337036,
+          0.9998974800109863,
+          0.7694131135940552,
+          0.9854497909545898,
+          0.34514525532722473,
+          0.9999555349349976
+        ]
+      },
+      "raw_prediction": {
+        "categorical": [
+          [
+            2.97865629196167,
+            7.3320488929748535,
+            -40.9556999206543
+          ],
+          [
+            -45.81368637084961,
+            45.47431564331055
+          ]
+        ],
+        "continuous": [
+          0.5402664542198181,
+          0.6468855738639832,
+          0.9998904466629028,
+          0.6575413942337036,
+          0.9998974800109863,
+          0.7694131135940552,
+          0.9854497909545898,
+          0.34514525532722473,
+          0.9999555349349976
+        ]
+      },
+      "role": "wider_input",
+      "source": {
+        "categorical": [
+          2,
+          1
+        ],
+        "continuous": [
+          0.668424890014044,
+          0.6902014906444304,
+          0.6438945205150218,
+          0.48627108572584976,
+          0.4643273864805735,
+          0.6028334521970976,
+          0.3555993189245197,
+          0.8523229452879879,
+          0.13448692131483098
+        ]
+      },
+      "source_samples": 176400,
+      "state_id": "5f10fa7bcf873a8c863c61963ddc8425e06988d82336e6315ef64eca05392950",
+      "target_audio_sha256": "13d8a02331b26b2e267ace49da02f8cf8a2f912c9b79eb5865d0e9ecba8505f7",
+      "target_recipe_id": "1604364df3c6bfb39207bff9e6cdc6453a8da24c3ff27662e0c38d58d3a58d09",
+      "target_view": 0
+    }
+  ],
+  "choice_proof": {
+    "adapter": {
+      "backward_probability": "softmax(raw_logits / fixed_scale / temperature)",
+      "canonicalization": "continuous_default_blend_with_hard_one_hot_activity",
+      "codec": {
+        "categorical": [
+          {
+            "name": "osc_1_unison_voices",
+            "values": [
+              1,
+              2,
+              4
+            ]
+          },
+          {
+            "name": "filter_1_on",
+            "values": [
+              0,
+              1
+            ]
+          }
+        ],
+        "codec": "authored_osc_filter_env_v2",
+        "continuous": [
+          {
+            "inactive_default": 0.25,
+            "maximum": 0.35,
+            "minimum": 0.15,
+            "name": "osc_1_level"
+          },
+          {
+            "inactive_default": 0.0,
+            "maximum": 0.7,
+            "minimum": -0.7,
+            "name": "osc_1_pan"
+          },
+          {
+            "inactive_default": 1.0,
+            "maximum": 2.5,
+            "minimum": 0.5,
+            "name": "osc_1_unison_detune"
+          },
+          {
+            "inactive_default": 96.0,
+            "maximum": 120.0,
+            "minimum": 50.0,
+            "name": "filter_1_cutoff"
+          },
+          {
+            "inactive_default": 0.25,
+            "maximum": 0.6,
+            "minimum": 0.1,
+            "name": "filter_1_resonance"
+          },
+          {
+            "inactive_default": 0.15,
+            "maximum": 0.6,
+            "minimum": 0.08,
+            "name": "env_1_attack"
+          },
+          {
+            "inactive_default": 0.7,
+            "maximum": 1.0,
+            "minimum": 0.25,
+            "name": "env_1_decay"
+          },
+          {
+            "inactive_default": 0.7,
+            "maximum": 0.9,
+            "minimum": 0.25,
+            "name": "env_1_sustain"
+          },
+          {
+            "inactive_default": 0.4,
+            "maximum": 0.65,
+            "minimum": 0.2,
+            "name": "env_1_release"
+          }
+        ],
+        "contract_id": "f1eca221ab4ba871d8f415a28d81747a42629b2f2a74be566a967758afc32f12",
+        "inactive_policy": "fixed_template_value",
+        "normalization": "linear_in_stored_units",
+        "scope": "one_init_oscillator_optional_filter1_env1_no_routes_or_effects",
+        "template_sha256": "e3761b0fed1f03b54c797c3185f8a972aabe681002db0bcb83a7a85ec4f869cf",
+        "version": 2
+      },
+      "export_choice": "unperturbed_argmax",
+      "features": {
+        "center": true,
+        "channels": [
+          "left",
+          "right"
+        ],
+        "dtype": "float32",
+        "envelope": {
+          "center": true,
+          "channels": [
+            "left",
+            "right",
+            "(left-right)/2"
+          ],
+          "hop": 256,
+          "rms_floor": 1e-07,
+          "window": 1024
+        },
+        "fft_sizes": [
+          512,
+          2048,
+          8192
+        ],
+        "format": "basic_temporal_spectra_v1",
+        "hop": "fft/4",
+        "magnitude": "abs_stft/sqrt_fft",
+        "maximum_samples": 705600,
+        "objective": {
+          "convergence_rms_floor": 0.001,
+          "envelope_weight": 0.1,
+          "gain_normalization": null,
+          "log_floor": 0.0001,
+          "side_weight": 0.1,
+          "spectral": "mean_resolution(0.5*(convergence+mean_log1p_l1))"
+        },
+        "padding": "constant_zero",
+        "pooling": null,
+        "sample_rate": 44100,
+        "valid_frame": "center_sample_less_than_length",
+        "window": "periodic_hann"
+      },
+      "fixed_scales": [
+        32.73040780087214,
+        29.015704035654633
+      ],
+      "format": "basic_production_controls_v1",
+      "input_size": 14,
+      "parameter_control_logits": "raw_unscaled",
+      "phase_application": "separate_hashed_render_copy",
+      "phase_policy": {
+        "osc_1_random_phase": 0.0,
+        "osc_2_random_phase": 0.0,
+        "osc_3_random_phase": 0.0,
+        "sample_random_phase": 0.0
+      },
+      "random_draws": 0,
+      "temperature": {
+        "end": 0.5,
+        "schedule": "linear_by_committed_update",
+        "start": 1.0
+      },
+      "training_choice": "unperturbed_argmax_with_scaled_softmax_backward"
+    },
+    "format": "basic_production_choice_check_v1",
+    "native_direction_qualified": false,
+    "plan_id": "bb8d2e5af90a9dfd140e1209f803f3385ee74387c2f47da4537347c7398c9476",
+    "report_sha256": "cfde36330600336a3cea53e9427a61c597ba361b74e1fb7422c861fc2e375a76",
+    "scales": [
+      32.73040780087214,
+      29.015704035654633
+    ]
+  },
+  "codec": {
+    "categorical": [
+      {
+        "name": "osc_1_unison_voices",
+        "values": [
+          1,
+          2,
+          4
+        ]
+      },
+      {
+        "name": "filter_1_on",
+        "values": [
+          0,
+          1
+        ]
+      }
+    ],
+    "codec": "authored_osc_filter_env_v2",
+    "continuous": [
+      {
+        "inactive_default": 0.25,
+        "maximum": 0.35,
+        "minimum": 0.15,
+        "name": "osc_1_level"
+      },
+      {
+        "inactive_default": 0.0,
+        "maximum": 0.7,
+        "minimum": -0.7,
+        "name": "osc_1_pan"
+      },
+      {
+        "inactive_default": 1.0,
+        "maximum": 2.5,
+        "minimum": 0.5,
+        "name": "osc_1_unison_detune"
+      },
+      {
+        "inactive_default": 96.0,
+        "maximum": 120.0,
+        "minimum": 50.0,
+        "name": "filter_1_cutoff"
+      },
+      {
+        "inactive_default": 0.25,
+        "maximum": 0.6,
+        "minimum": 0.1,
+        "name": "filter_1_resonance"
+      },
+      {
+        "inactive_default": 0.15,
+        "maximum": 0.6,
+        "minimum": 0.08,
+        "name": "env_1_attack"
+      },
+      {
+        "inactive_default": 0.7,
+        "maximum": 1.0,
+        "minimum": 0.25,
+        "name": "env_1_decay"
+      },
+      {
+        "inactive_default": 0.7,
+        "maximum": 0.9,
+        "minimum": 0.25,
+        "name": "env_1_sustain"
+      },
+      {
+        "inactive_default": 0.4,
+        "maximum": 0.65,
+        "minimum": 0.2,
+        "name": "env_1_release"
+      }
+    ],
+    "contract_id": "f1eca221ab4ba871d8f415a28d81747a42629b2f2a74be566a967758afc32f12",
+    "inactive_policy": "fixed_template_value",
+    "normalization": "linear_in_stored_units",
+    "scope": "one_init_oscillator_optional_filter1_env1_no_routes_or_effects",
+    "template_sha256": "e3761b0fed1f03b54c797c3185f8a972aabe681002db0bcb83a7a85ec4f869cf",
+    "version": 2
+  },
+  "development_split_used": false,
+  "expected_renderer_identity": {
+    "backend_version": "0.8.3",
+    "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+    "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+    "settings": {
+      "buffer_size": 128,
+      "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+      "event_timing": "absolute ticks to half-even sample offsets",
+      "frame_policy": "one_guard_sample_trim_to_requested_frames_v1",
+      "plugin_name": "Vital.vst3",
+      "preroll_frames": 32768,
+      "preroll_policy": "shift_all_MIDI_then_trim_only_lead_v1",
+      "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+      "simple_note_time_guard": "one_eighth_sample_start_and_duration_v1",
+      "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+    }
+  },
+  "format": "basic_production_native_direction_v1",
+  "gates": {
+    "all_native_accepted": true,
+    "cases_per_role": 12,
+    "mean_mrstft_delta_below": 0.0,
+    "mean_spectral_delta_below": 0.0,
+    "methods": [
+      "continuous",
+      "joint"
+    ],
+    "minimum_improved_fraction": 0.6,
+    "nonzero_category_gradient_when_native_loss_span_exceeds": 1e-07,
+    "nonzero_continuous_gradient_when_native_gradient_exceeds": 1e-07,
+    "nonzero_model_gradient": true,
+    "repeat_exact": true,
+    "roles": [
+      "original_input",
+      "wider_input"
+    ]
+  },
+  "inference": {
+    "categorical_sizes": [
+      3,
+      2
+    ],
+    "continuous_heads": 9,
+    "dense_outputs": 14,
+    "frontend_sha256": "8b4ffbbd0b01fb3b07913c424c086637abbff891e87b3b9070a1758b50893f4f",
+    "model_sha256": "35cd356e97b5574df5d1a3cfaf19e79bd5b86f53df5e9ee6f56573a3da282c7b",
+    "trainable_parameters": 355806
+  },
+  "initial_sha256": "a4d008aa547ef93602287cfd09e041d18bddcea4bac40d36e4b1ec3a84364407",
+  "input_cache_sha256": "9404a8b326c15825b22a6b282a9f3773369c21a2bdd3deb0b4711d5d1bc1ede6",
+  "limits": {
+    "archive_bytes": 536870912,
+    "optimizer_updates": 0,
+    "planning_wall_seconds": 600,
+    "process_tree_bytes": 8589934592,
+    "qualification_attempts": 624,
+    "wall_seconds": 2700
+  },
+  "manifest_id": "c6f567ad416d90594e675fd34be3b28b4c1916be2e8110e5593e9d66a2677920",
+  "physical_qualification_sha256": "25d217636533c264ffe1b52f8024ad3cb4487fb80bc91a23276af544ce92dae1",
+  "pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+  "render_phase_controls": {
+    "osc_1_random_phase": 0.0,
+    "osc_2_random_phase": 0.0,
+    "osc_3_random_phase": 0.0,
+    "sample_random_phase": 0.0
+  },
+  "render_profile": {
+    "midi_timing": "exact_sample_shift",
+    "preroll_frames": 32768,
+    "startup": "settled_controls_before_MIDI",
+    "trim": "added_lead_only"
+  },
+  "runtime": {
+    "cpu_threads": 2,
+    "gumbel_sha256": "442c1bb83466841677f9c0954aff3ee6430ab7c1199f7a1efe7e5a8c46b494e7",
+    "numpy": "2.4.6",
+    "python": "3.12.13",
+    "torch": "2.12.1+xpu"
+  },
+  "selection": "two_train_states_per_category_original_and_category_balanced_held_or_alternate_reciprocal_inputs",
+  "source": {
+    "balanced_sound_data.py": "c07c78d01264019f4e717baf574e85210221339e13ed02684678fd7e7a35bda0",
+    "benchmark.py": "1941574c1f9295dd9d136a131ea58f514b53db9298d133e8f988a514668d9ad0",
+    "category_calibration.py": "9bb2e51ce8f0d32dc850b1d027a964789ba30611fb679a51f722bf0d15783104",
+    "category_jacobian.py": "dbb9385418a4cfa83cc5d4ebd5ff5e8788d9749e34d4adf174a8842d4b9fdc1b",
+    "category_scale_refresh.py": "cf4a2e0e677e78184581c043fcd5e991da1a982096bb673a4084a03560ecf545",
+    "category_signal.py": "139c63fd271e0792e69be8e1006a7f2b593f3c79d4f54e7e4568dccca03ed6e0",
+    "codec.py": "62e915fd0aae9d7e77644771deb4fc216ac2f614f930628f7aaa9fa63e23edb8",
+    "evaluate.py": "181b5e123217c849db21fd46e3a77dd2a4003474f8d956ddfb141aba81d7084b",
+    "features.py": "895a736257041013f6b3e3ce260ed6a7bef2c94d51390f5f1a5492a78b737501",
+    "inference_profile.py": "8b9e5b7c146c454c987fb61f1c744e22adac60bbff4f29bf9a74f31885a6faea",
+    "input_performances.py": "af8c29dff480b098725a83bebfc744ceab40a2d44fdce8855a96113809e812df",
+    "mixed_features.py": "ee562d3f67b465a831394f95c8c9b1eef48655f1a5ad02c11749a0475706ba3b",
+    "mixed_input_performances.py": "076aff59f7bbe6eabdf3c05e54d4f18e5efd218b23fb65f94996c3d0d7f1ef44",
+    "model.py": "ed009cd8a42f287de97e7348ea4cbce1f5ffcb5e028cf3d2385f835718ecaa68",
+    "native_fit.py": "70a1c990e705df405e9439cefbfd4441b9fd7a0210bcdc58ebe9eb915b0fc7a2",
+    "native_gradient.py": "c3bcf162416db9aa2e1d2d8e77c9f2732e1e34bc873a9f3149a45750512b2fb3",
+    "native_inverse.py": "730e131aa87f65bfb0c83ff94eaf939fd1af5e5ded8772db95edf47743807f0f",
+    "paired.py": "1c5d8c69d92151b40418e8bc949630a306686740025a22a31eea2147f4a89025",
+    "production_choice_check.py": "0d79024ee51e60aab3d29fea495148ec7ef482860e60ed9e953622eabf424bca",
+    "production_controls.py": "00a649a10217c299370e376908bdc5f2b3ee58123d8e8dfd342cd24bbd52e059",
+    "production_direction.py": "1d6f7d4597bdafe9dde8c59716232575cd9774f7f7b472f487f79efe4eb8cf7f",
+    "production_native_audit.py": "6a26d37d4ade6cfb5b8aefed584fcd2ad7c2e6975bc518f285bdf6869a781ce4",
+    "production_native_screen.py": "32ee5e560ef5c6718144d3d8eee99b10b4678802e752e73b2fa0fc5c0cba306a",
+    "profiled_sampler.py": "42f1eefb044b812aac964ca7f6adffad9b6d66855a8f22ae18503958704964d5",
+    "reports/scripts/check_production_choices.py": "417193abaa4c9bea3ce321d0793163bcd84a4b967eb287fa2f4c47f9f0d1835a",
+    "reports/scripts/run_production_native_screen.py": "0d8a6d015a2c7b739e559bff2a8ddd2a70caa89959865c0b3a02ead1d4c506e9",
+    "reproducibility.py": "9326793bdbc629be7c29584329b182dcb93b6fd91c270f180b24a0a6fe885729",
+    "spectral_controls.py": "bdf888bb7e8d9678fea7edad2bd9a445326ed9c6fde399af7004205874d3cd3d",
+    "trainer.py": "92cae41f88618e34f02f624aa3086bf9b1c7c5a9334b19409bbc8fe633d24f3f"
+  },
+  "test_split_used": false,
+  "update": {
+    "backtracking": false,
+    "category_scaling": "each_head_divide_by_gradient_max_absolute",
+    "category_step_in_fixed_scale_units": 1.0,
+    "claim": "local_output_direction_and_model_gradient_connection_not_inverse_training",
+    "continuous_radius": 0.01,
+    "continuous_scaling": "divide_by_gradient_max_absolute",
+    "optimizer_updates": 0,
+    "steps": 1,
+    "temperature": 1.0
+  }
+}
