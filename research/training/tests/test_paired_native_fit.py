@@ -20,6 +20,7 @@ from obruxo_training.model import PilotInverse  # noqa: E402
 from obruxo_training.native_fit import audit_summary as actual_summary  # noqa: E402
 from obruxo_training.paired_native_evidence import native_ledger  # noqa: E402
 from obruxo_training.paired_native_step import reciprocal_updates  # noqa: E402
+from obruxo_training.paired_performance_objective import INPUT_TRANSFER  # noqa: E402
 from obruxo_training.profiled_sampler import profile_metadata  # noqa: E402
 from obruxo_training.reproducibility import fixed_generator_phases  # noqa: E402
 
@@ -65,8 +66,8 @@ class FakeSession(fit.PairedSession):
         return audio, receipt
 
 
-@pytest.fixture
-def completed(tmp_path, monkeypatch):
+@pytest.fixture(params=[False, True], ids=["transfer", "input-and-transfer"])
+def completed(tmp_path, monkeypatch, request):
     torch.set_num_threads(2)
     torch.manual_seed(12)
     codec, model, frontend = PilotCodec(), PilotInverse(), Frontend()
@@ -90,6 +91,9 @@ def completed(tmp_path, monkeypatch):
                 "qualification_attempts": 40, "wall_seconds": 600, "process_tree_bytes": 4 * 1024**3, "archive_bytes": 256 * 1024**2,
                 "replay_bytes": 32 * 1024**2, "replay_records": 8}, "expected_renderer_identity": {"fixture": True},
             "initial_file_sha256": fit.digest(initial), "retrieval_file_sha256": fit.digest(retrieval), **profile_metadata(32768)}
+    if request.param:
+        plan.update(reconstruction_objective=INPUT_TRANSFER, rng_initialization="python_numpy_and_torch_from_optimizer_seed")
+        plan["limits"]["training_attempts"] = 256
     pool = SimpleNamespace(codec=codec, pool_id="fixture")
     def restore(saved):
         restored, front = PilotInverse(), Frontend(saved["basic_pitch"])
@@ -108,7 +112,7 @@ def completed(tmp_path, monkeypatch):
     monkeypatch.setattr(fit, "MemoryMonitor", lambda: SimpleNamespace(peak_bytes=1024**2, errors=0, start=lambda: None, close=lambda: None))
     monkeypatch.setattr(fit, "audit_summary", coverage_summary)
     monkeypatch.setattr(audit, "audit_summary", coverage_summary)
-    monkeypatch.setattr(audit, "make_plan", lambda *_args: copy.deepcopy(plan))
+    monkeypatch.setattr(audit, "make_plan", lambda *_args, **_kwargs: copy.deepcopy(plan))
     output = tmp_path / "fit"
     fit.run_plan(pool, initial, retrieval, output, plan)
     result = fit.run_plan(pool, initial, retrieval, output, plan, execute=True)
@@ -129,9 +133,14 @@ def test_complete_simulated_runner_replays_both_models_and_rescores_all_audio(co
     assert len(list((output / "comparison_audio").glob("*.pt"))) <= 19
 
 
-@pytest.mark.parametrize("change", ("model", "optimizer", "loss", "waveform", "score", "export", "receipt", "prefix", "decision"))
+@pytest.mark.parametrize("change", ("model", "optimizer", "loss", "waveform", "score", "export", "receipt", "prefix", "decision", "performance"))
 def test_paired_auditor_rejects_changed_model_measurement_and_audio_evidence(completed, change):
     output, pool, bootstrap = completed
+    if change == "performance":
+        path = output / "measurements.jsonl"
+        rows = [json.loads(line) for line in path.read_text().splitlines()]
+        rows[0]["view"] = (rows[0]["view"] + 1) % 3
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows))
     if change in ("model", "optimizer"):
         path = output / "checkpoint.pt"
         saved = torch.load(path, map_location="cpu", weights_only=True)
@@ -169,7 +178,7 @@ def test_paired_auditor_rejects_changed_model_measurement_and_audio_evidence(com
         saved = json.loads(path.read_text())
         saved["training_state_sha256"] = "changed"
         write_json(path, saved)
-    else:
+    elif change == "decision":
         path = output / "summary.json"
         saved = json.loads(path.read_text())
         saved["matched_comparison_passed"] = True

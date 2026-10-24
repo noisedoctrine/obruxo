@@ -1,0 +1,9 @@
+{
+  "elapsed_seconds": 424.06236520000675,
+  "native_requests": 0,
+  "optimizer_updates": 0,
+  "peak_process_tree_rss_bytes": 887672832,
+  "plan_file_sha256": "6ff8a63236a4ba86396d6767e748ccfbf6c46ef0c79f01e8d17ba251896833ae",
+  "rss_sampling_errors": 0,
+  "source_commit": "d328186"
+}

@@ -1,0 +1,16 @@
+{
+  "accepted_outcomes": 5983,
+  "all_accepted_mean_wall_seconds": 2.1825447380243435,
+  "new_native_requests": 0,
+  "new_optimizer_updates": 0,
+  "recent_mean_audio_seconds": 3.974654693877551,
+  "recent_mean_native_render_seconds": 0.7882086196001619,
+  "recent_mean_wall_seconds": 1.4175866707998794,
+  "recent_outcomes": 500,
+  "recent_phase_counts": {
+    "qualification": 500,
+    "training": 0
+  },
+  "source_numerical_plan_id": "c2d8a42e179494705cb925406d8cbea41a147668fcb0a2db7abb7b6001300cb1",
+  "source_renders_sha256": "a2ea1da42b8c050c9591af226af4eded1c6336eb1cd19f5a1756e4f862248071"
+}
