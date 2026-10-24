@@ -17,6 +17,7 @@ from .audit import write_json
 from .benchmark import MemoryMonitor
 from .checkpoints import load_training_checkpoint
 from .codec import PilotTarget
+from .conditioned_fit_policy import restore_policy
 from .evaluate import nearest_training_target
 from .features import tensor_digest
 from .native_fit import audit_summary, digest, predict_candidates, record_features
@@ -60,11 +61,13 @@ def training_signature(models, optimizers):
         "optimizers": {name: optimizer.state_dict() for name, optimizer in optimizers.items()}, "rng": capture_rng("cpu")}))
 
 
-def verify(source, pool, bootstrap_root, bootstrap_audit_path, qualification_path, cache_path, choice_path, direction_source, *, prefix_plan=None):
+def verify(source, pool, bootstrap_root, bootstrap_audit_path, qualification_path, cache_path, choice_path, direction_source, *, prefix_plan=None, expected_plan=None):
     prefix = prefix_plan is not None
     stored_plan = json.loads((source / "plan.json").read_text())
     options = {"input_and_transfer": True} if stored_plan.get("reconstruction_objective") is not None else {}
-    plan = prefix_plan if prefix else make_plan(pool, bootstrap_root, bootstrap_audit_path, qualification_path, cache_path, choice_path, direction_source, **options)
+    plan = prefix_plan if prefix else expected_plan
+    if plan is None:
+        plan = make_plan(pool, bootstrap_root, bootstrap_audit_path, qualification_path, cache_path, choice_path, direction_source, **options)
     summary = ({"elapsed_seconds": time() - json.loads((source / "run.json").read_text())["started_unix"]} if prefix else
                json.loads((source / "summary.json").read_text()))
     if (json.loads((source / "plan.json").read_text()) != plan or (not prefix and (summary["plan"] != plan
@@ -97,6 +100,7 @@ def verify(source, pool, bootstrap_root, bootstrap_audit_path, qualification_pat
                 used.add(key)
     initial = torch.load(bootstrap_root / "fit-000/model.pt", map_location="cpu", weights_only=True)
     incumbent, frontend, codec = restore_model(initial)
+    restore_policy(incumbent, initial)
     models = {name: copy.deepcopy(incumbent).train() for name in ("parameter", "spectral")}
     optimizers = {name: torch.optim.Adam(model.parameters(), lr=plan["optimizer"]["learning_rate"]) for name, model in models.items()}
     seed_external_streams(plan)
@@ -237,12 +241,18 @@ def verify(source, pool, bootstrap_root, bootstrap_audit_path, qualification_pat
     if plan.get("prefix_check_updates") and prefix_evidence is None:
         raise ValueError("paired early end-to-end replay evidence is missing")
     all_models = {"initial": incumbent.eval(), **{name: model.eval() for name, model in models.items()}}
-    retrieval = load_training_checkpoint(bootstrap_root / "fit-000/checkpoint.pt")["replay"]
+    retrieval = [] if plan.get("fit_audit_cells") else load_training_checkpoint(bootstrap_root / "fit-000/checkpoint.pt")["replay"]
     fit_cases = json.loads((source / "fit_cases.json").read_text())
     validation_cases = json.loads((source / "validation_cases.json").read_text()) if (source / "validation_cases.json").exists() else []
     compared, references = 0, {}
     model_ids = {name: tensor_digest(model.state_dict()) for name, model in all_models.items()}
-    for split, cases in (("training", fit_cases), ("validation", validation_cases)):
+    if plan.get("fit_audit_cells"):
+        from .conditioned_short_audit import verify_comparisons
+        compared = verify_comparisons(source, plan, all_models, codec, frontend, records, cache_path, fit_cases,
+                                      model_ids, require_receipt, require_request)
+        if validation_cases:
+            raise ValueError("short fitting check must not contain held-out comparisons")
+    for split, cases in (() if plan.get("fit_audit_cells") else (("training", fit_cases), ("validation", validation_cases))):
         for case in cases:
             identity = case.get("case_id", case["state_id"])
             recipe = next(row for row in plan[split] if row.get("case_id", row["state_id"]) == identity)
@@ -289,26 +299,33 @@ def verify(source, pool, bootstrap_root, bootstrap_audit_path, qualification_pat
                 if rescore_waveform(source, row["receipt"], reference, codec.contract.tail_seconds) != row["scores"]:
                     raise ValueError("paired sound score differs from its retained waveform")
                 compared += 1
-    fit_result = audit_summary(fit_cases, plan, validation=False)
-    validation_result = audit_summary(validation_cases, plan, validation=True) if fit_result["pass"] else None
+    if plan.get("fit_audit_cells"):
+        from .conditioned_short_audit import short_summary
+        fit_result, validation_result = short_summary(fit_cases, plan, saved["trace"]), None
+    else:
+        fit_result = audit_summary(fit_cases, plan, validation=False)
+        validation_result = audit_summary(validation_cases, plan, validation=True) if fit_result["pass"] else None
     if (not fit_result["complete"] or (validation_result is not None and not validation_result["complete"])
             or used != {key for key, row in outcomes.items() if row["status"] == "accepted"}):
         raise ValueError("paired comparison or native receipt coverage is incomplete")
     for name in models:
         exported = torch.load(source / f"diagnostic-{name}.pt", map_location="cpu", weights_only=True)
         restored, exported_frontend, exported_codec = restore_model(exported)
+        restore_policy(restored, exported)
         if (tensor_digest(restored.state_dict()) != model_ids[name] or exported_codec.to_dict() != codec.to_dict()
                 or tensor_digest(exported_frontend.basic_pitch.state_dict()) != tensor_digest(frontend.basic_pitch.state_dict())
                 or exported["training_plan_id"] != canonical_sha256(plan) or exported["training_objective"] != name
                 or exported["production_training"] != plan["production_training"] or exported["render_profile"] != plan["render_profile"]
                 or exported["render_phase_controls"] != plan["render_phase_controls"] or exported["qualified_for_release"]):
             raise ValueError("paired diagnostic export differs from its recovered model/profile")
+        if getattr(restored, "conditioning_training_policy", None) != getattr(incumbent, "conditioning_training_policy", None):
+            raise ValueError("paired diagnostic export changed its frozen training policy")
     archive = sum(path.stat().st_size for path in source.rglob("*") if path.is_file())
     counts = {phase: sum(key[0] == phase for key in attempts) for phase in ("training", "qualification")}
     resources = (summary["rss_sampling_errors"] == 0 and 0 < summary["peak_process_tree_rss_bytes"] <= plan["limits"]["process_tree_bytes"]
                  and summary["elapsed_seconds"] <= plan["limits"]["wall_seconds"] and archive + 1024**2 <= plan["limits"]["archive_bytes"]
                  and len(charges) <= plan["limits"]["optimizer_attempts"] and all(counts[phase] <= plan["limits"][f"{phase}_attempts"] for phase in counts))
-    passed = bool(fit_result["pass"] and validation_result and validation_result["pass"] and resources)
+    passed = bool(fit_result["pass"] and (bool(plan.get("fit_audit_cells")) or validation_result and validation_result["pass"]) and resources)
     if (fit_result != summary["fit_result"] or validation_result != summary["validation_result"] or passed != summary["matched_comparison_passed"]
             or resources != summary["within_resource_limits"] or counts != summary["render_attempts"] or recovered != summary["recovered_timeouts"]
             or summary["all_native_accepted"] != all(row["status"] == "accepted" for row in outcomes.values())

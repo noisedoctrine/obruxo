@@ -16,6 +16,7 @@ from .audit import write_json
 from .balanced_native_fit import compose_plan
 from .benchmark import MemoryMonitor
 from .checkpoints import atomic_torch_save, load_training_checkpoint
+from .conditioned_fit_policy import restore_policy
 from .evaluate import nearest_training_target
 from .features import tensor_digest
 from .native_fit import FitRecords, audit_case, audit_summary, digest, make_plan as legacy_plan, predict_candidates, record_features
@@ -115,7 +116,7 @@ def archive_interruption(output, plan):
     write_json(target / "evidence.json", {name: digest(target / name) for name in names if (target / name).exists()})
 
 
-def run_plan(pool, initial_path, retrieval_path, output, plan, *, execute=False, resume=False, input_validation=None):
+def run_plan(pool, initial_path, retrieval_path, output, plan, *, execute=False, resume=False, input_validation=None, input_cache_path=None):
     plan_id = canonical_sha256(plan)
     if not execute:
         output.mkdir(parents=True, exist_ok=False)
@@ -127,7 +128,9 @@ def run_plan(pool, initial_path, retrieval_path, output, plan, *, execute=False,
         archive_interruption(output, plan)
     else:
         write_json(output / "run.json", {"plan_id": plan_id, "started_unix": time(), "input_validation": input_validation})
-    incumbent, frontend, codec = restore_model(torch.load(initial_path, map_location="cpu", weights_only=True))
+    initial = torch.load(initial_path, map_location="cpu", weights_only=True)
+    incumbent, frontend, codec = restore_model(initial)
+    restore_policy(incumbent, initial)
     models = {name: copy.deepcopy(incumbent).train() for name in ("parameter", "spectral")}
     retrieval = load_training_checkpoint(retrieval_path)["replay"]
     monitor = MemoryMonitor()
@@ -154,7 +157,10 @@ def run_plan(pool, initial_path, retrieval_path, output, plan, *, execute=False,
         trace = fit_pairs(models, records, session, output, plan, saved, after_step=committed)
         all_models = {"initial": incumbent.eval(), **{name: model.eval() for name, model in models.items()}}
         identities = {name: tensor_digest(model.state_dict()) for name, model in all_models.items()}
-        for index, recipe in enumerate(plan["training"]):
+        if plan.get("fit_audit_cells"):
+            from .conditioned_short_audit import collect_comparisons
+            fit_cases = collect_comparisons(retained, output, plan, all_models, codec, records, input_cache_path, identities)
+        for index, recipe in enumerate([] if plan.get("fit_audit_cells") else plan["training"]):
             record = records[index]
             for view in range(3):
                 candidates = predict_candidates(all_models, codec, record_features(record, view))
@@ -163,9 +169,13 @@ def run_plan(pool, initial_path, retrieval_path, output, plan, *, execute=False,
                 fit_cases.append(case)
                 write_json(output / "fit_cases.json", fit_cases)
                 records.check_limits()
-        fit_result = audit_summary(fit_cases, plan, validation=False)
+        if plan.get("fit_audit_cells"):
+            from .conditioned_short_audit import short_summary
+            fit_result = short_summary(fit_cases, plan, trace)
+        else:
+            fit_result = audit_summary(fit_cases, plan, validation=False)
         write_json(output / "fit_result.json", fit_result)
-        if fit_result["pass"]:
+        if fit_result["pass"] and not plan.get("fit_audit_cells"):
             for index, recipe in enumerate(plan["validation"]):
                 def provider(audio):
                     features = frontend(audio)
@@ -181,6 +191,8 @@ def run_plan(pool, initial_path, retrieval_path, output, plan, *, execute=False,
             export = inference_state(model, frontend, codec, pool.pool_id, preroll_frames=plan["render_profile"]["preroll_frames"])
             export.update(training_objective=name, training_plan_id=plan_id, qualified_for_release=False,
                           render_profile=plan["render_profile"], render_phase_controls=dict(FULL_PHASE_CONTROL), production_training=plan["production_training"])
+            if hasattr(model, "conditioning_training_policy"):
+                export["conditioning_training_policy"] = copy.deepcopy(model.conditioning_training_policy)
             atomic_torch_save(output / f"diagnostic-{name}.pt", export)
         frontend.require_frozen()
     except BaseException as error:
@@ -202,7 +214,8 @@ def run_plan(pool, initial_path, retrieval_path, output, plan, *, execute=False,
                      and elapsed <= plan["limits"]["wall_seconds"] and archive + 1024**2 <= plan["limits"]["archive_bytes"])
         unchanged = digest(initial_path) == plan["initial_file_sha256"] and digest(retrieval_path) == plan["retrieval_file_sha256"]
         complete = failure is None and len(trace) == len(plan["updates"]) and fit_result is not None
-        passed = bool(complete and fit_result["pass"] and validation_result and validation_result["pass"] and resolved and resources and unchanged)
+        quality = fit_result and fit_result["pass"] and (bool(plan.get("fit_audit_cells")) or validation_result and validation_result["pass"])
+        passed = bool(complete and quality and resolved and resources and unchanged)
         summary = {"plan_id": plan_id, "plan": plan, "complete": complete, "failure": failure, "fit_result": fit_result, "validation_result": validation_result,
                    "matched_comparison_passed": passed, "committed_updates_per_arm": len(trace), "elapsed_seconds": elapsed,
                    "peak_process_tree_rss_bytes": monitor.peak_bytes, "rss_sampling_errors": monitor.errors, "archive_bytes_before_summary": archive,
