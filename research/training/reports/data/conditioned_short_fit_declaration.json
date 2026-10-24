@@ -1,0 +1,21 @@
+{
+  "implementation_commit": "74bf143",
+  "plan_sha256": "da10f83aaa6a89c1882eaec776697fd1edf24ac27e4c6362393acc045090600f",
+  "operator_sha256": "159fc9c767310e50617ab772f0f37d06f0abc14ebacbfc6382ee17c4a1f942f0",
+  "software_checks": {
+    "paired_compatibility": 38,
+    "conditioned_checks": 10,
+    "ruff": "passed",
+    "diff_check": "passed"
+  },
+  "native_requests_before_launch": 0,
+  "optimizer_updates_before_launch": 0,
+  "earlier_preparation": {
+    "status": "superseded_preparation_only",
+    "reason": "Added explicit two-execution and known-timeout recovery enforcement before execution; original preparation remains unchanged.",
+    "prior_plan_sha256": "cc2cf05f4c2452193961a83e53198da0504424d5760375c30b24c8979b971b29",
+    "new_plan_sha256": "da10f83aaa6a89c1882eaec776697fd1edf24ac27e4c6362393acc045090600f",
+    "native_requests": 0,
+    "optimizer_updates": 0
+  }
+}
