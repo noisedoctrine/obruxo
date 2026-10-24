@@ -1,0 +1,203 @@
+{
+  "all_hard_requests_reconstructed": true,
+  "all_native_accepted": true,
+  "archive_bytes_before_summary": 3077064231,
+  "cached_targets_and_inputs_rescored": true,
+  "committed_updates_per_arm": 128,
+  "comparison_waveforms_rescored": 576,
+  "complete": true,
+  "elapsed_seconds": 17714.439425945282,
+  "evidence_sha256": {
+    "checkpoint.pt": "76bac6bb923586f939b08a781774a7fc63054e4121a20922e6898e74c4194490",
+    "measurements.jsonl": "207f3c1531f0ea58ab9900a2e28c3b8a35558228c43ad9c2d6c307094a5606b1",
+    "plan.json": "6ff8a63236a4ba86396d6767e748ccfbf6c46ef0c79f01e8d17ba251896833ae",
+    "records.json": "66e065f02abca4465aa618d4b0aa078bdc3c34d45255e13c5da57cd419e6dd3e",
+    "renders.jsonl": "7a8c1c61c8e0f93b08792bf70716d30f016c60e2c33d0d4a2675d67e126cf161",
+    "summary.json": "2ceb46ce65b3b0bd35d59515e77c8f076cab9d41f970055fba18cb172284e399",
+    "updates.jsonl": "33091e54e57a12a7f0f52f39a6fa09b9724df395a65dd47cbb7a31f097363dfa"
+  },
+  "failure": null,
+  "final_model_sha256": {
+    "parameter": "50f91b3027fc85f28811c6bcb901709997bb903b9dd94a8c512234a757cef9f9",
+    "spectral": "1a64abc6525cf5696b9821b67a9b9d3c6f96966a62f08903914d0e5c07efe36f"
+  },
+  "fit_result": {
+    "complete": true,
+    "groups": {
+      "original_input": {
+        "completed": 64,
+        "means": {
+          "initial": {
+            "mrstft": 0.31373384377123636,
+            "spectral": 0.117642768076621,
+            "tail_error": 0.00024425831830502244
+          },
+          "parameter": {
+            "mrstft": 0.4830390813876875,
+            "spectral": 0.18751863506622612,
+            "tail_error": 0.00020375774324349425
+          },
+          "spectral": {
+            "mrstft": 0.3687903224296557,
+            "spectral": 0.14083705632947385,
+            "tail_error": 0.00022919700209886914
+          }
+        },
+        "pass": false,
+        "planned": 64,
+        "tail_p90": null
+      },
+      "wide_alternate_input": {
+        "completed": 64,
+        "means": {
+          "initial": {
+            "mrstft": 1.95518523765107,
+            "spectral": 0.8060254477895796,
+            "tail_error": 0.001295905645396397
+          },
+          "parameter": {
+            "mrstft": 1.9441664384212347,
+            "spectral": 0.821042018593289,
+            "tail_error": 0.0016195708878215523
+          },
+          "spectral": {
+            "mrstft": 1.580945983257455,
+            "spectral": 0.6330358553677797,
+            "tail_error": 0.0011028108697156383
+          }
+        },
+        "pass": true,
+        "planned": 64,
+        "tail_p90": null
+      },
+      "wide_held_input": {
+        "completed": 64,
+        "means": {
+          "initial": {
+            "mrstft": 1.4774256277208526,
+            "spectral": 0.5354118645482231,
+            "tail_error": 0.0013905976217204788
+          },
+          "parameter": {
+            "mrstft": 1.3792464450525586,
+            "spectral": 0.5050383855123073,
+            "tail_error": 0.0014091490822048468
+          },
+          "spectral": {
+            "mrstft": 1.2823277937811022,
+            "spectral": 0.4459179598779883,
+            "tail_error": 0.0012742404364200234
+          }
+        },
+        "pass": true,
+        "planned": 64,
+        "tail_p90": null
+      }
+    },
+    "pass": false,
+    "retained_original": {
+      "complete": true,
+      "groups": {
+        "original_input": {
+          "completed": 32,
+          "means": {
+            "initial": {
+              "mrstft": 0.3233209263999015,
+              "spectral": 0.12160713784396648,
+              "tail_error": 0.0001340337872224626
+            },
+            "parameter": {
+              "mrstft": 0.5136386095934237,
+              "spectral": 0.20381230511702597,
+              "tail_error": 3.342509136297683e-05
+            },
+            "spectral": {
+              "mrstft": 0.4055561269245421,
+              "spectral": 0.15750754030887038,
+              "tail_error": 0.00013403378722162126
+            }
+          },
+          "pass": false,
+          "planned": 32,
+          "tail_p90": null
+        },
+        "wide_alternate_input": {
+          "completed": 32,
+          "means": {
+            "initial": {
+              "mrstft": 1.9952972860385971,
+              "spectral": 0.8545500189065933,
+              "tail_error": 0.0017992703483205926
+            },
+            "parameter": {
+              "mrstft": 2.113473193331932,
+              "spectral": 0.9379049697890878,
+              "tail_error": 0.002358493269245378
+            },
+            "spectral": {
+              "mrstft": 1.6218350484656792,
+              "spectral": 0.6707588415592909,
+              "tail_error": 0.0015613693265438748
+            }
+          },
+          "pass": true,
+          "planned": 32,
+          "tail_p90": null
+        },
+        "wide_held_input": {
+          "completed": 32,
+          "means": {
+            "initial": {
+              "mrstft": 1.3733983144629747,
+              "spectral": 0.5110768453450873,
+              "tail_error": 0.001329189949089161
+            },
+            "parameter": {
+              "mrstft": 1.3330122454208322,
+              "spectral": 0.5259461551322602,
+              "tail_error": 0.0010755282923491781
+            },
+            "spectral": {
+              "mrstft": 1.236666874649624,
+              "spectral": 0.4536941286060028,
+              "tail_error": 0.0011979017598613207
+            }
+          },
+          "pass": true,
+          "planned": 32,
+          "tail_p90": null
+        }
+      },
+      "pass": false
+    }
+  },
+  "incumbent_artifacts_unchanged": true,
+  "interrupted_optimizer_attempts_replayed": [],
+  "interruption_checkpoints_replayed": [],
+  "matched_comparison_passed": false,
+  "native_receipts_resolved": true,
+  "native_requests_added": 0,
+  "offline_training_replay_exact": true,
+  "optimizer_updates_added": 0,
+  "peak_process_tree_rss_bytes": 2590748672,
+  "plan_id": "4b29e0f4cbcef2c38316a82989e3f16a4b5389fa3ed7d92851bbae1023d74d93",
+  "qualified_for_release": false,
+  "raw_verification_sha256": "1bb78c1db5c4b9c293b59ae396912c5d629a81d8626d9abfe5628b091c6e9463",
+  "recovered_timeouts": [],
+  "render_attempts": {
+    "qualification": 768,
+    "training": 10184
+  },
+  "retained_archive_bytes": 3077691081,
+  "rss_sampling_errors": 0,
+  "test_split_used": false,
+  "validation_result": null,
+  "verification_resources": {
+    "elapsed_seconds": 1069.9884665999998,
+    "peak_process_tree_rss_bytes": 2656350208,
+    "rss_sampling_errors": 0,
+    "within_resource_limits": true
+  },
+  "verified": true,
+  "within_resource_limits": true
+}

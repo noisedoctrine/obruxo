@@ -154,6 +154,8 @@ The [completed paired fit](../training/reports/PAIRED_NATIVE_FIT_RESULTS.md) fin
 
 Run a small end-to-end fit check because the objective changed, then the bounded matched comparison. Render hard-decoded predictions through Vital at predeclared checkpoints. Monitor category usage, sound/parameter gradient contributions, helper/native disagreement and invalid outputs. Any helper refresh needs a new qualified artifact and comparison, not simultaneous untracked changes to both models.
 
+The [completed input/transfer correction](../training/reports/INPUT_TRANSFER_NATIVE_FIT_RESULTS.md) now scores both performances for every prediction. All 128 updates replay exactly, all 10,952 native requests are accepted, and all 576 comparison waveforms are independently rescored within the frozen limits. Original-input spectral error still rises 17.5%; wider held/alternate error falls 13.2%/19.1%, and the retained original 32 patches also fail. No development scoring or model admission follows. Diagnose saved input-branch sensitivity and opposing paired gradients before choosing a structural next change. Do not repeat parameter-only initialization, weaken gates or expand outputs to address this failure.
+
 **Deliverable:** spectral-trained candidate, matched control, recovery evidence and native report. **Exit:** real reference/transfer improvement over the matched parameter-only control and simple baselines within budget. Better helper loss cannot advance the stage. Report helper training as additional compute; matched inverse updates do not imply equal total compute.
 
 #### A3. Confirm basic quality and package the first bounded model
