@@ -168,6 +168,8 @@ The [three-choice fit now completes](../training/reports/UNISON_CHOICE_FIT_RESUL
 
 The [direct-output bridge now passes](../training/reports/BASIC_DIRECT_BRIDGE_RESULTS.md): all 1,616 initial presets and calibrated choices match, all responding native components connect, 32 reference recordings are verified, and software recovery is exact. No native rendering or experimental training occurs in this qualification. The [next native fit](../training/reports/BASIC_DIRECT_FIT_CARD.md) keeps 14 outputs, adds explicit sound rehearsal, and measures fresh gradients after controls change. Its 48 updates per arm are a fitting prerequisite, not model admission; full A2/A3 and preservation requirements remain in force.
 
+That direct/rehearsal fit is now implemented and frozen under plan `6cb54820c938cf145e7139b08314ec1b69116f6dfeca363a5d501b42413acd0f`, with 24 passing local checks and verified real inputs. It plans at most 6,544 native requests under a 6,720-attempt / four-hour cap, with 4-GiB RAM, 2-GiB evidence and 512-MiB replay ceilings. Calculated evidence is 0.883 GiB and resident replay 41.46 MiB. Execute and independently verify before drawing any sound-quality conclusion; training probe scalar replay is distinct from independent rescoring of the 312 retained initial/final comparisons.
+
 **Deliverable:** spectral-trained candidate, matched control, recovery evidence and native report. **Exit:** real reference/transfer improvement over the matched parameter-only control and simple baselines within budget. Better helper loss cannot advance the stage. Report helper training as additional compute; matched inverse updates do not imply equal total compute.
 
 #### A3. Confirm basic quality and package the first bounded model
