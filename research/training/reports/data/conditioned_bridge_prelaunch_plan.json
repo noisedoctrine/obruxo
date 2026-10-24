@@ -1,0 +1,61 @@
+{
+  "direction_plan_id": "b1aabfef73a4e32e108f54eedec98c63225659b5ec85302d512a352958356d94",
+  "format": "basic_conditioned_identity_bridge_v1",
+  "initialization": "zero_output_projection_gain_one_v1",
+  "input_files": {
+    "direction/cases.json": "34bfdec08b0c129ee01be5b561d7caf7b33fafcb41306229a9b3c7f5634da986",
+    "direction/plan.json": "7d4a4d9146ea1dfa194540d17f3577616ec0903e4e0fd77aa7f4880810297f8b",
+    "direction/renders.jsonl": "860a4f8a2c474954d8fb2867f7c97ae5f4079cad8ddc01a552c427744894f297",
+    "direction/run.json": "294f8df88106185f239244df5534783fd7cf274f4cdc4699b4b6b712ba6537e4",
+    "direction/summary.json": "19a104972848d77ebf784c8811ba3c4bc0cf9c510c4f5ff825da23222d9ded87",
+    "direction/verification.json": "b46d2de111f5a20075d36b844ab7f7a5e98064759f1df43d838e11e71175658e",
+    "features": "9404a8b326c15825b22a6b282a9f3773369c21a2bdd3deb0b4711d5d1bc1ede6",
+    "initial": "a4d008aa547ef93602287cfd09e041d18bddcea4bac40d36e4b1ec3a84364407",
+    "parent/checkpoint.pt": "76bac6bb923586f939b08a781774a7fc63054e4121a20922e6898e74c4194490",
+    "parent/measurements.jsonl": "207f3c1531f0ea58ab9900a2e28c3b8a35558228c43ad9c2d6c307094a5606b1",
+    "parent/plan.json": "6ff8a63236a4ba86396d6767e748ccfbf6c46ef0c79f01e8d17ba251896833ae",
+    "parent/records.json": "66e065f02abca4465aa618d4b0aa078bdc3c34d45255e13c5da57cd419e6dd3e",
+    "parent/renders.jsonl": "7a8c1c61c8e0f93b08792bf70716d30f016c60e2c33d0d4a2675d67e126cf161",
+    "parent/summary.json": "2ceb46ce65b3b0bd35d59515e77c8f076cab9d41f970055fba18cb172284e399",
+    "parent/updates.jsonl": "33091e54e57a12a7f0f52f39a6fa09b9724df395a65dd47cbb7a31f097363dfa",
+    "parent/verification.json": "1bb78c1db5c4b9c293b59ae396912c5d629a81d8626d9abfe5628b091c6e9463",
+    "pool": "ed05cf3db0dd1862671a525a2c6fac2f7d9497633848246b330a2b544ae02e87"
+  },
+  "limits": {
+    "archive_bytes": 67108864,
+    "process_tree_bytes": 4294967296,
+    "wall_seconds": 300
+  },
+  "model_budget": {
+    "dense_outputs": 14,
+    "frozen_parameters": 355806,
+    "total_parameters": 426271,
+    "trainable_parameters": 70465
+  },
+  "new_native_requests": 0,
+  "new_optimizer_updates": 0,
+  "parent_plan_id": "4b29e0f4cbcef2c38316a82989e3f16a4b5389fa3ed7d92851bbae1023d74d93",
+  "runtime": {
+    "device": "cpu",
+    "precision": "float32",
+    "threads": 2,
+    "torch": "2.12.1+xpu"
+  },
+  "seed": 0,
+  "source": {
+    "audit.py": "58a5c1630b8f1db153f27297177f9af827749ae97e1a0eda64604483fb240925",
+    "benchmark.py": "1941574c1f9295dd9d136a131ea58f514b53db9298d133e8f988a514668d9ad0",
+    "checkpoints.py": "1b65d17129dfadff08b1b07f9c48ede36aacb09133b4388adab38aa53e83088b",
+    "codec.py": "62e915fd0aae9d7e77644771deb4fc216ac2f614f930628f7aaa9fa63e23edb8",
+    "conditioned_basic.py": "d9c0f602c1e26e4c0a49623058de71e9bbb23e64742aad5c8623374216d5e8de",
+    "conditioned_bridge.py": "f5d37a7791dbec51d7667e1829a28dc0a1037d3130a000671429690a17c37def",
+    "features.py": "895a736257041013f6b3e3ce260ed6a7bef2c94d51390f5f1a5492a78b737501",
+    "inference_profile.py": "8b9e5b7c146c454c987fb61f1c744e22adac60bbff4f29bf9a74f31885a6faea",
+    "model.py": "ed009cd8a42f287de97e7348ea4cbce1f5ffcb5e028cf3d2385f835718ecaa68",
+    "native_gradient.py": "c3bcf162416db9aa2e1d2d8e77c9f2732e1e34bc873a9f3149a45750512b2fb3",
+    "production_controls.py": "00a649a10217c299370e376908bdc5f2b3ee58123d8e8dfd342cd24bbd52e059",
+    "reproducibility.py": "9326793bdbc629be7c29584329b182dcb93b6fd91c270f180b24a0a6fe885729",
+    "spectral_controls.py": "bdf888bb7e8d9678fea7edad2bd9a445326ed9c6fde399af7004205874d3cd3d",
+    "trainer.py": "92cae41f88618e34f02f624aa3086bf9b1c7c5a9334b19409bbc8fe633d24f3f"
+  }
+}
