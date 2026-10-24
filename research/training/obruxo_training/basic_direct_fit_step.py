@@ -3,6 +3,7 @@
 import torch
 
 from .basic_direct import REHEARSAL, reference_loss
+from .continuous_auxiliary import SPEC as AUXILIARY_SPEC, paired_continuous_loss
 from .model import batch_features, loss_terms
 from .native_inverse import native_reconstruction_loss
 from .production_controls import ProductionControlAdapter
@@ -36,7 +37,9 @@ def predict(model, features):
     return result, bounds
 
 
-def matched_step(models, optimizers, codec, observations, evaluate, step, steps, *, norm_cap=5.):
+def matched_step(models, optimizers, codec, observations, evaluate, step, steps, *, norm_cap=5., continuous_auxiliary=None):
+    if continuous_auxiliary is not None and continuous_auxiliary != AUXILIARY_SPEC:
+        raise ValueError("continuous auxiliary differs from its fixed paired contract")
     if len(observations) != 4 or [len(row["cells"]) for row in observations] != [2, 2, 1, 1]:
         raise ValueError("direct fitting needs a reciprocal pair and two singleton references")
     if observations[0]["target"] != observations[1]["target"]:
@@ -66,6 +69,11 @@ def matched_step(models, optimizers, codec, observations, evaluate, step, steps,
     penalized = sound[:2] + [reference_loss(sound[i], observations[i]["baseline"]) for i in (2, 3)]
     losses = {"parameter": sum(w * value for w, value in zip(weights, parameter, strict=True)),
               "spectral": sum(w * value for w, value in zip(weights, penalized, strict=True))}
+    native_sound = losses["spectral"]
+    auxiliary = None
+    if continuous_auxiliary is not None:
+        auxiliary = paired_continuous_loss(predictions["spectral"][:2], [row["target"] for row in observations[:2]], codec)
+        losses["spectral"] = native_sound + AUXILIARY_SPEC["weight"] * auxiliary
     norms, access = {}, {}
     for arm, loss in losses.items():
         if not torch.isfinite(loss):
@@ -79,8 +87,11 @@ def matched_step(models, optimizers, codec, observations, evaluate, step, steps,
     for arm in ("parameter", "spectral"):
         optimizers[arm].step()
         models[arm].require_frozen()
-    return {"temperature": temperature, "losses": {arm: float(value.detach()) for arm, value in losses.items()},
+    result = {"temperature": temperature, "losses": {arm: float(value.detach()) for arm, value in losses.items()},
             "observation_sound_losses": [float(value.detach()) for value in sound],
             "reference_penalized_losses": [float(value.detach()) for value in penalized[2:]],
             "gradient_norms": norms, "correction_gradients": access, "clamping": clamping,
             "estimates": estimates, "production_patches": patches, "gradient_queries": sum(row["queries"] for row in estimates)}
+    if auxiliary is not None:
+        result.update(native_sound_loss=float(native_sound.detach()), continuous_auxiliary_loss=float(auxiliary.detach()), continuous_auxiliary_weight=AUXILIARY_SPEC["weight"])
+    return result

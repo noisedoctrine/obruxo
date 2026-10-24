@@ -52,8 +52,15 @@ def decisions(inputs, store, trace):
     reached = len(trace) > 1 and all(all(groups.values()) for groups in access.values())
     clamping = {arm: {bound: sum(row["clamping"][arm][obs][bound] for row in trace for obs in range(4))
                       for bound in ("below_zero", "above_one", "controls")} for arm in ("parameter", "spectral")}
-    return {"six_groups": groups, "original_regression": regression, "later_gradient_access": access, "clamping": clamping,
-            "pass": bool(all(row["pass"] for row in groups.values()) and regression["pass"] and reached)}
+    result = {"six_groups": groups, "original_regression": regression, "later_gradient_access": access, "clamping": clamping,
+              "pass": bool(all(row["pass"] for row in groups.values()) and regression["pass"] and reached)}
+    earlier = inputs.plan.get("earlier_sound_reference")
+    if earlier:
+        current = {"means": means["spectral"], "mrstft_p90": p90["spectral"]}
+        preserved = all(current["means"][metric] <= earlier["means"][metric] for metric in ("spectral", "mrstft")) and current["mrstft_p90"] <= earlier["mrstft_p90"]
+        result["earlier_sound_preservation"] = {"current": current, "earlier": earlier, "pass": bool(preserved)}
+        result["pass"] = bool(result["pass"] and preserved)
+    return result
 
 
 def verify(inputs, output):
@@ -101,6 +108,12 @@ def verify(inputs, output):
         raise ValueError("direct final checkpoint or prefix evidence changed")
     replay_training(inputs, SoundStore(output, inputs), snapshot)
     models, _optimizers = replay_training(inputs, store, saved, prefix)
+    expected = plan.get("expected_parameter_model_sha256")
+    if expected and tensor_digest(models["parameter"].state_dict()) != expected:
+        raise ValueError("auxiliary comparison changed the matched parameter-control identity")
+    expected_prefix = plan.get("expected_parameter_prefix_model_sha256")
+    if expected_prefix and tensor_digest(snapshot["models"]["parameter"]) != expected_prefix:
+        raise ValueError("auxiliary comparison changed the matched parameter-control prefix")
     if store.used_probes != set(store.probes):
         raise ValueError("direct probe ledger contains unused measurements")
     for row in store.probes.values():

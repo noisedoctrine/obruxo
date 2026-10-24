@@ -21,6 +21,7 @@ from .benchmark import MemoryMonitor
 from .checkpoints import atomic_torch_save
 from .codec import PilotTarget
 from .conditioned_bridge import read
+from .features import tensor_digest
 from .native_fit import append_durable, digest
 from .paired_native_audit import equal_tree, training_signature
 from .paired_native_evidence import RetainedAuditSession, native_ledger
@@ -122,7 +123,7 @@ def step(models, optimizers, inputs, store, index):
         return sum(costs) / len(costs)
 
     return matched_step(models, optimizers, inputs.codec, observations, evaluate, index, len(inputs.plan["updates"]),
-                        norm_cap=inputs.plan["optimizer"]["gradient_norm_cap"])
+                        norm_cap=inputs.plan["optimizer"]["gradient_norm_cap"], continuous_auxiliary=inputs.plan.get("continuous_auxiliary"))
 
 
 def replay_training(inputs, store, saved, prefix=None):
@@ -191,6 +192,9 @@ def train(inputs, store, output, saved=None):
             before = capture_rng("cpu")
             try:
                 replay_models, replay_opts = replay_training(inputs, SoundStore(output, inputs), torch.load(output / "checkpoint.pt", map_location="cpu", weights_only=True))
+                expected = inputs.plan.get("expected_parameter_prefix_model_sha256")
+                if expected and tensor_digest(replay_models["parameter"].state_dict()) != expected:
+                    raise ValueError("auxiliary fit changed the matched parameter-control prefix")
                 shutil.copyfile(output / "checkpoint.pt", output / "prefix-checkpoint.pt")
                 write_json(output / "prefix-verification.json", {"plan_id": canonical_sha256(inputs.plan), "replayed_updates": index + 1,
                     "training_state_sha256": training_signature(replay_models, replay_opts), "offline_training_replay_exact": True,
@@ -234,6 +238,9 @@ def execute(inputs, output, *, resume=False):
     try:
         saved = torch.load(output / "checkpoint.pt", map_location="cpu", weights_only=True) if (output / "checkpoint.pt").exists() else None
         models, trace = train(inputs, store, output, saved)
+        expected = inputs.plan.get("expected_parameter_model_sha256")
+        if expected and tensor_digest(models["parameter"].state_dict()) != expected:
+            raise ValueError("auxiliary fit changed the matched parameter-control model")
         collect_finals(inputs, store, models)
         result = decisions(inputs, store, trace)
         for arm, model in models.items():
