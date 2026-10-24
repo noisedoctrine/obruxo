@@ -1,0 +1,11 @@
+{
+  "native_requests": 0,
+  "optimizer_updates": 0,
+  "plan_id": "42d39182defcf2ebcdd5d40121fa7defd40f299f19d8a0625aceebf96fe41f45",
+  "qualified_for_release": false,
+  "resources": {
+    "elapsed_seconds": 0.6199274999962654,
+    "peak_process_tree_rss_bytes": 482484224,
+    "rss_sampling_errors": 0
+  }
+}
