@@ -5,7 +5,7 @@ import pytest
 import torch
 
 from obruxo_training.conditioned_basic import COUNTS, apply_policy, bridge_state, gradient_access, make_conditioned, restore_conditioned
-from obruxo_training.conditioned_bridge import training_bank
+from obruxo_training.conditioned_bridge import identical_predictions, training_bank
 from obruxo_training.codec import PilotCodec
 from obruxo_training.features import AudioFeatures, BasicPitchICASSP2022, PITCH_SIZE, TIMBRE_SHAPE, tensor_digest
 from obruxo_training.inference_profile import bind_rendering, prediction_preset
@@ -40,6 +40,8 @@ def test_bridge_preserves_predictions_presets_rng_and_named_parameter_budget(dat
     adapter = ProductionControlAdapter(codec)
     target = adapter.export(first["continuous"], first["categorical"])[0]
     assert prediction_preset(base, codec, target) == prediction_preset(model, codec, target)
+    rows = identical_predictions(base, model, model, codec, {"fixture": {"features": features, "state_id": "training", "audio_sha256": "same-audio"}}, adapter)
+    assert rows[0]["audio_sha256"] == "same-audio" and rows[0]["state_id"] == "training"
 
 
 def measured_direction(base, codec, features):
@@ -112,3 +114,15 @@ def test_held_out_inputs_and_inconsistent_duplicate_recipes_are_refused(data):
         training_bank({"replay": [row, changed]}, pool)
     with pytest.raises(ValueError, match="404-state"):
         training_bank({"replay": [row]}, pool)
+
+
+def test_distinct_schedule_ids_retain_repeated_recordings_and_require_identical_features(data):
+    _base, _codec, features = data
+    states = [f"train-{index}" for index in range(404)]
+    pool = SimpleNamespace(manifest=SimpleNamespace(by_state={state: SimpleNamespace(split="train") for state in states}))
+    rows = [{"state_id": state, "recipe_id": f"{state}/slot-{slot}", "features": features, "audio_sha256": f"{state}/audio-{view}"}
+            for state in states for slot, view in enumerate((0, 1, 0, 2))]
+    assert len(training_bank({"replay": rows}, pool)) == 1616
+    rows[2] = {**rows[2], "features": {**features, "pitch": features["pitch"] + .01}}
+    with pytest.raises(ValueError, match="duplicate recording"):
+        training_bank({"replay": rows}, pool)
