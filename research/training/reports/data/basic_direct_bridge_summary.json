@@ -1,0 +1,769 @@
+{
+  "distinct_recordings": 1212,
+  "experimental_training_updates": 0,
+  "identity_file": "basic_direct_bridge_identity.jsonl",
+  "identity_file_sha256": "f664ca09c0264bad8517777fbb8a3068ce3e40cb58d73f1ff0d44b3588f53230",
+  "initialization_cases": 1616,
+  "initialization_gradient_reference_recovery_passed": true,
+  "model_budget": {
+    "dense_outputs": 14,
+    "frozen_parameters": 355806,
+    "total_parameters": 382924,
+    "trainable_parameters": 27118
+  },
+  "model_file_sha256": "0e1b88f7916a31cf4afd4af20aacda14a69086ea6c61ecc303ba249391dca735",
+  "model_sha256": "adc4a6fb7ebc783c8782bc39692129b141a75bdb5f63172bc78fa81bc9574702",
+  "native_gradient_cases": 24,
+  "native_rows": [
+    {
+      "category_bias_gradient_l1": [
+        0.07980912551283836,
+        0.06657964363694191
+      ],
+      "continuous_bias_gradient_l1": [
+        0.05616679787635803,
+        0.01119166612625122,
+        null,
+        null,
+        null,
+        1.1892365217208862,
+        0.20573198795318604,
+        0.24640023708343506,
+        0.009897053241729736
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 3.9203494845105524,
+        "filter": 0.15187465791314025,
+        "hidden": 0.0,
+        "unison": 0.18205239610324497
+      },
+      "index": 0,
+      "role": "original_input",
+      "state_id": "feea6ed56567153f27b56dd4c4231d010c6eaa42a8c2b5024f82bbc9a4122262",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.030844344291836023,
+        0.06465810537338257
+      ],
+      "continuous_bias_gradient_l1": [
+        0.24726510047912598,
+        0.31090259552001953,
+        null,
+        0.09162187576293945,
+        0.08822500705718994,
+        0.6912028789520264,
+        0.07838666439056396,
+        0.19747614860534668,
+        0.005882382392883301
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 3.849680480787356,
+        "filter": 0.14548128550814,
+        "hidden": 0.0,
+        "unison": 0.06940003652016458
+      },
+      "index": 0,
+      "role": "wider_input",
+      "state_id": "feea6ed56567153f27b56dd4c4231d010c6eaa42a8c2b5024f82bbc9a4122262",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.05616679205559194,
+        0.11452838778495789
+      ],
+      "continuous_bias_gradient_l1": [
+        1.0744481086730957,
+        0.0527191162109375,
+        null,
+        0.29803380370140076,
+        0.3455531597137451,
+        0.02575114369392395,
+        0.03081485629081726,
+        1.1475377082824707,
+        0.0055821239948272705
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 14.579597230029322,
+        "filter": 0.5602453869068995,
+        "hidden": 0.0,
+        "unison": 0.2747544671747164
+      },
+      "index": 1,
+      "role": "original_input",
+      "state_id": "9822599a6cb97be24884206b6dacf6146a46be99484d9322fd646e4d4ff555f4",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.0389093226112891,
+        0.020701395347714424
+      ],
+      "continuous_bias_gradient_l1": [
+        0.5894295573234558,
+        0.3758585453033447,
+        0.0871478021144867,
+        0.10822534561157227,
+        0.097993403673172,
+        0.33969637751579285,
+        0.4686359763145447,
+        0.16860246658325195,
+        0.1835380494594574
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 8.514975867117755,
+        "filter": 0.0728658907028148,
+        "hidden": 0.0,
+        "unison": 0.13695513745324206
+      },
+      "index": 1,
+      "role": "wider_input",
+      "state_id": "9822599a6cb97be24884206b6dacf6146a46be99484d9322fd646e4d4ff555f4",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.0683776845689863,
+        0.02454069722443819
+      ],
+      "continuous_bias_gradient_l1": [
+        0.2802655100822449,
+        0.0943484902381897,
+        0.34054070711135864,
+        null,
+        null,
+        0.0019806623458862305,
+        0.07041066884994507,
+        0.7505321502685547,
+        0.02323150634765625
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 12.111125669617195,
+        "filter": 0.19036291615702794,
+        "hidden": 0.0,
+        "unison": 0.5304077297356571
+      },
+      "index": 2,
+      "role": "original_input",
+      "state_id": "65f4559955b1e621508e1b915c6f3571f0a6e732782d000597ea7b0f85bc7aec",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.00616053695557639,
+        0.008150696754455566
+      ],
+      "continuous_bias_gradient_l1": [
+        0.5645722150802612,
+        0.003851652145385742,
+        0.04907839372754097,
+        null,
+        null,
+        0.008563399314880371,
+        0.02391815185546875,
+        0.045701347291469574,
+        0.12449145317077637
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 5.89068832843077,
+        "filter": 0.058540092073599226,
+        "hidden": 0.0,
+        "unison": 0.04424632798509265
+      },
+      "index": 2,
+      "role": "wider_input",
+      "state_id": "65f4559955b1e621508e1b915c6f3571f0a6e732782d000597ea7b0f85bc7aec",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.04060149472206831,
+        0.14876360446214676
+      ],
+      "continuous_bias_gradient_l1": [
+        0.6662547588348389,
+        0.015016794204711914,
+        0.17620065808296204,
+        2.369046688079834,
+        0.04526495933532715,
+        0.41578471660614014,
+        1.1366379261016846,
+        0.2352784276008606,
+        0.0002966245810966939
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 24.36024234987849,
+        "filter": 0.7162201378960162,
+        "hidden": 0.0,
+        "unison": 0.19547528793555102
+      },
+      "index": 3,
+      "role": "original_input",
+      "state_id": "d8c281a9483d6122699c3d54a62530c484e2d380a595cc7da40191c4f954fd7c",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.003252041118685156,
+        0.046142835170030594
+      ],
+      "continuous_bias_gradient_l1": [
+        0.3728044033050537,
+        0.13204216957092285,
+        0.06609898805618286,
+        0.1739048957824707,
+        0.018230006098747253,
+        0.5302340984344482,
+        0.4332723021507263,
+        0.14235496520996094,
+        0.02425345964729786
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 4.535494786003255,
+        "filter": 0.11054358211913495,
+        "hidden": 0.0,
+        "unison": 0.007790857927716388
+      },
+      "index": 3,
+      "role": "wider_input",
+      "state_id": "d8c281a9483d6122699c3d54a62530c484e2d380a595cc7da40191c4f954fd7c",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.039043974597007036,
+        0.03176146745681763
+      ],
+      "continuous_bias_gradient_l1": [
+        0.46533286571502686,
+        0.16129225492477417,
+        1.6150643825531006,
+        null,
+        null,
+        0.13225913047790527,
+        0.010408163070678711,
+        0.5201539397239685,
+        0.016213953495025635
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 21.56192475399439,
+        "filter": 0.23447549401316792,
+        "hidden": 0.0,
+        "unison": 0.2882377943897154
+      },
+      "index": 4,
+      "role": "original_input",
+      "state_id": "1c2106feeaf9e6451fee95de7a81495605b63b1e214cba4957d31e8f0637db97",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.00017140838190243812,
+        0.0087139499373734
+      ],
+      "continuous_bias_gradient_l1": [
+        0.6912146210670471,
+        0.15416236221790314,
+        0.03629565238952637,
+        null,
+        null,
+        0.08347034454345703,
+        0.0446927547454834,
+        0.11696778237819672,
+        0.15898525714874268
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 21.176143660908565,
+        "filter": 0.14351335003448185,
+        "hidden": 0.0,
+        "unison": 0.0028229897413893923
+      },
+      "index": 4,
+      "role": "wider_input",
+      "state_id": "1c2106feeaf9e6451fee95de7a81495605b63b1e214cba4957d31e8f0637db97",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.04168802872300148,
+        0.11950572207570076
+      ],
+      "continuous_bias_gradient_l1": [
+        0.0793379545211792,
+        0.0737917423248291,
+        1.448291540145874,
+        0.2291780710220337,
+        0.004135072231292725,
+        0.08215785026550293,
+        0.48627346754074097,
+        0.4111194610595703,
+        0.011503100395202637
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 14.498498188237136,
+        "filter": 0.6131575860490557,
+        "hidden": 0.0,
+        "unison": 0.21389210869529052
+      },
+      "index": 5,
+      "role": "original_input",
+      "state_id": "f20ecf11ec7a8dc5d34f2e1af27d776f391a614f04b430ef8f6841b95326f50c",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.007290313602425158,
+        0.017120763659477234
+      ],
+      "continuous_bias_gradient_l1": [
+        0.07075726985931396,
+        0.18053114414215088,
+        0.09423375129699707,
+        0.265619158744812,
+        0.033759474754333496,
+        0.16105711460113525,
+        0.13680756092071533,
+        0.04331052303314209,
+        0.04879772663116455
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 2.9903911366855027,
+        "filter": 0.04947249012911925,
+        "hidden": 0.0,
+        "unison": 0.021066231154691195
+      },
+      "index": 5,
+      "role": "wider_input",
+      "state_id": "f20ecf11ec7a8dc5d34f2e1af27d776f391a614f04b430ef8f6841b95326f50c",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.05309437330288347,
+        0.15650202333927155
+      ],
+      "continuous_bias_gradient_l1": [
+        0.07311239838600159,
+        0.5484417080879211,
+        null,
+        null,
+        null,
+        0.3494117558002472,
+        0.02173006534576416,
+        0.042602717876434326,
+        0.004709511995315552
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 5.1358222543676675,
+        "filter": 0.7728464161918964,
+        "hidden": 0.0,
+        "unison": 0.2621933907676066
+      },
+      "index": 6,
+      "role": "original_input",
+      "state_id": "ce50a6bb09f2ead9b821eb936d6d3a52bb07df246e8a9f6564da57318fe3e0c0",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.028618564479984343,
+        0.039801253005862236
+      ],
+      "continuous_bias_gradient_l1": [
+        0.8182690739631653,
+        0.0967506617307663,
+        null,
+        null,
+        null,
+        0.0012158934259787202,
+        0.015403795056045055,
+        0.4603411555290222,
+        0.17324425280094147
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 30.926269400922138,
+        "filter": 0.7864073282980826,
+        "hidden": 0.0,
+        "unison": 0.5654557856842075
+      },
+      "index": 6,
+      "role": "wider_input",
+      "state_id": "ce50a6bb09f2ead9b821eb936d6d3a52bb07df246e8a9f6564da57318fe3e0c0",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.08315429277718067,
+        0.5346027612686157
+      ],
+      "continuous_bias_gradient_l1": [
+        1.2276983261108398,
+        0.5656194686889648,
+        null,
+        6.813709259033203,
+        0.12443482875823975,
+        0.03521263599395752,
+        0.39164841175079346,
+        1.661151647567749,
+        0.011713504791259766
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 46.70732076922286,
+        "filter": 2.305366906686686,
+        "hidden": 0.0,
+        "unison": 0.3585861698811641
+      },
+      "index": 7,
+      "role": "original_input",
+      "state_id": "eb50cec0c5d4b7ac0b5cf6ceb3a4f06cdf1b29d49fd24872ac0453043c1e3519",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.018844741338398308,
+        0.002517048502340913
+      ],
+      "continuous_bias_gradient_l1": [
+        0.12276172637939453,
+        0.06371796131134033,
+        0.010736584663391113,
+        0.11306405067443848,
+        0.06570696830749512,
+        0.0001150369644165039,
+        0.0026687788777053356,
+        0.0025129318237304688,
+        0.15588083863258362
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 1.4553834877356024,
+        "filter": 0.0068196394541928385,
+        "hidden": 0.0,
+        "unison": 0.051057555318131165
+      },
+      "index": 7,
+      "role": "wider_input",
+      "state_id": "eb50cec0c5d4b7ac0b5cf6ceb3a4f06cdf1b29d49fd24872ac0453043c1e3519",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.14280028082430363,
+        0.13268376886844635
+      ],
+      "continuous_bias_gradient_l1": [
+        0.4005369544029236,
+        0.5631298422813416,
+        0.9135708212852478,
+        null,
+        null,
+        0.001201033592224121,
+        0.0586545467376709,
+        0.34209370613098145,
+        0.002898275852203369
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 16.308339991362345,
+        "filter": 0.9481907249282813,
+        "hidden": 0.0,
+        "unison": 1.02048580392875
+      },
+      "index": 8,
+      "role": "original_input",
+      "state_id": "b909a9cad73075e54f07d87253bb6d941599de2804e838d0bfcd68d1c5fb5271",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.00655190326506272,
+        0.014877102803438902
+      ],
+      "continuous_bias_gradient_l1": [
+        0.522303581237793,
+        0.1491442769765854,
+        0.37852704524993896,
+        null,
+        null,
+        0.08755147457122803,
+        0.02884557470679283,
+        0.2129783034324646,
+        0.07085978984832764
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 14.554869704996236,
+        "filter": 0.14931236559641548,
+        "hidden": 0.0,
+        "unison": 0.06575743854273242
+      },
+      "index": 8,
+      "role": "wider_input",
+      "state_id": "b909a9cad73075e54f07d87253bb6d941599de2804e838d0bfcd68d1c5fb5271",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.09264571033418179,
+        0.11111509054899216
+      ],
+      "continuous_bias_gradient_l1": [
+        0.8856273889541626,
+        0.017090439796447754,
+        0.24586230516433716,
+        0.2512788772583008,
+        0.16705304384231567,
+        0.5476583242416382,
+        0.0574648380279541,
+        0.706496000289917,
+        0.07025152444839478
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 17.69900673146185,
+        "filter": 0.666928326478228,
+        "hidden": 0.0,
+        "unison": 0.5560725204559276
+      },
+      "index": 9,
+      "role": "original_input",
+      "state_id": "4b7912655066936f25664c8ef8a73dbc209bfd787e99dff438ed413e8e18d5fe",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.04776705987751484,
+        0.22491595149040222
+      ],
+      "continuous_bias_gradient_l1": [
+        0.4408460855484009,
+        0.5005264282226562,
+        0.25689423084259033,
+        0.12768864631652832,
+        0.08335530757904053,
+        0.07756829261779785,
+        0.0367128849029541,
+        0.3059661388397217,
+        0.07742583751678467
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 6.3374859974309175,
+        "filter": 0.7474639558749914,
+        "hidden": 0.0,
+        "unison": 0.15874443511188474
+      },
+      "index": 9,
+      "role": "wider_input",
+      "state_id": "4b7912655066936f25664c8ef8a73dbc209bfd787e99dff438ed413e8e18d5fe",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.13422575406730175,
+        0.05274574086070061
+      ],
+      "continuous_bias_gradient_l1": [
+        1.4123269319534302,
+        0.23473381996154785,
+        0.5479943752288818,
+        null,
+        null,
+        0.001767575740814209,
+        0.12099742889404297,
+        1.136574387550354,
+        0.010249614715576172
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 18.447472539181035,
+        "filter": 0.28084431591560133,
+        "hidden": 0.0,
+        "unison": 0.7146840612404048
+      },
+      "index": 10,
+      "role": "original_input",
+      "state_id": "b26374dbca2bd47224fcc1ecdaf4dc123c6566fa924f1f87bbd9888366b18637",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.001984581300348509,
+        0.006714139599353075
+      ],
+      "continuous_bias_gradient_l1": [
+        0.7271629571914673,
+        0.22206544876098633,
+        0.0049794637598097324,
+        null,
+        null,
+        0.022316575050354004,
+        0.0338977575302124,
+        0.3675442636013031,
+        0.03479182720184326
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 14.886496957831696,
+        "filter": 0.07074813739109231,
+        "hidden": 0.0,
+        "unison": 0.02091190231658402
+      },
+      "index": 10,
+      "role": "wider_input",
+      "state_id": "b26374dbca2bd47224fcc1ecdaf4dc123c6566fa924f1f87bbd9888366b18637",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.058313824236392975,
+        0.1306319683790207
+      ],
+      "continuous_bias_gradient_l1": [
+        0.47596633434295654,
+        0.13836532831192017,
+        0.9820279479026794,
+        0.07637292146682739,
+        0.04965662956237793,
+        0.1568925380706787,
+        0.1064920425415039,
+        0.5636027455329895,
+        0.012620091438293457
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 12.617943994919187,
+        "filter": 0.6433680966729298,
+        "hidden": 0.0,
+        "unison": 0.28719810779148247
+      },
+      "index": 11,
+      "role": "original_input",
+      "state_id": "5f10fa7bcf873a8c863c61963ddc8425e06988d82336e6315ef64eca05392950",
+      "weights_and_rng_unchanged": true
+    },
+    {
+      "category_bias_gradient_l1": [
+        0.011186589254066348,
+        0.011290623806416988
+      ],
+      "continuous_bias_gradient_l1": [
+        0.0150984525680542,
+        0.022570490837097168,
+        0.022422758862376213,
+        0.11289238929748535,
+        0.08874502032995224,
+        0.4490017890930176,
+        0.03170332312583923,
+        0.01379549503326416,
+        0.26721397042274475
+      ],
+      "frozen_gradients_absent": true,
+      "gradient_groups": {
+        "continuous": 2.8540755355256806,
+        "filter": 0.03148614190240551,
+        "hidden": 0.0,
+        "unison": 0.03119602089242335
+      },
+      "index": 11,
+      "role": "wider_input",
+      "state_id": "5f10fa7bcf873a8c863c61963ddc8425e06988d82336e6315ef64eca05392950",
+      "weights_and_rng_unchanged": true
+    }
+  ],
+  "new_native_requests": 0,
+  "parent_artifacts_unchanged": true,
+  "plan_id": "954f36e517ae405500c2cc3f80b16f2c4fcd0e668f1065c664623fbd3d8c31cb",
+  "private_summary_sha256": "49806904f5aaf0665f7afee7f0332d73d0dc79e5d42eb9c02b7b85b2390210dd",
+  "qualified_for_release": false,
+  "reference_check": {
+    "accepted_baselines_verified": true,
+    "reference_records": 32,
+    "schedule_check_updates": 48,
+    "visits_per_reference": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+    ]
+  },
+  "resources": {
+    "elapsed_seconds": 86.05230650000158,
+    "peak_process_tree_rss_bytes": 780034048,
+    "rss_sampling_errors": 0
+  },
+  "retained_archive_bytes": 7251613,
+  "simulated_cold_cases": 1616,
+  "simulated_optimizer_step_applications": 3,
+  "software_recovery": {
+    "experimental_training_updates": 0,
+    "first": {
+      "gradient_groups": {
+        "continuous": 10.331264780278616,
+        "filter": 0.3089932330767624,
+        "hidden": 0.0,
+        "unison": 0.1707697183592245
+      },
+      "loss": 1.3905287981033325
+    },
+    "model_adam_rng_recovery_exact": true,
+    "native_requests": 0,
+    "second": {
+      "gradient_groups": {
+        "continuous": 10.246332826171965,
+        "filter": 0.3047093338682316,
+        "hidden": 5.36247164468021,
+        "unison": 0.17090802890015766
+      },
+      "loss": 1.3802400827407837
+    },
+    "simulated_optimizer_step_applications": 3,
+    "software_cost_evaluations": 224
+  },
+  "training_states": 404
+}
