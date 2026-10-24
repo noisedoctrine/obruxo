@@ -1,5 +1,7 @@
 # Separate recording sensitivity from opposing learning signals
 
+Outcome: the [completed diagnosis](PAIRED_LEARNING_DIAGNOSIS_RESULTS.md) replays every update and final state exactly, retains all 1,344 feature cases and leaves parent evidence unchanged. It takes 14.33 seconds / 0.74 GiB with zero new renders or added training updates. The wider-recording failure follows the sound-feature branch more strongly than the separate note vector; the next hypothesis is a qualified conditional correction, with 14 outputs retained. The declaration below remains unchanged.
+
 Declared before inspecting new measurements on 2026-10-24. The [completed input/transfer fit](INPUT_TRANSFER_NATIVE_FIT_RESULTS.md) loses original-note quality despite accepted audio, exact replay and sound loss under both performances. Keep its failure, the accepted initializer, 14 outputs and every quality gate. Do not start another long fit until this saved-data diagnosis informs a structural next choice.
 
 Twelve focused local checks pass, including unchanged update traces/model/Adam/RNG after gradient observation, changed performance/missing component/final-weight rejection, refusal of an unverified parent and restoration of the original native-loss callback. Ruff and diff checks pass. These are correctness checks, not a diagnosis result or model qualification.
