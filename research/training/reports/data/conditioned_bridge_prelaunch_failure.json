@@ -1,0 +1,17 @@
+{
+  "actual_distinct_state_audio_recordings": 1212,
+  "actual_scheduled_recipe_ids": 1616,
+  "actual_training_states": 404,
+  "failed_execution_elapsed_seconds": null,
+  "failed_execution_peak_rss_bytes": null,
+  "failure": "ValueError: conditioning bridge requires the full accepted 404-state/three-view cache",
+  "failure_resource_measurement_recorded": false,
+  "frozen_plan_sha256": "2fe5b5ae76c20afe18e5efee3f09ee72d8c55e67001b662ad93840531451a223",
+  "incorrect_assumption": "1212 unique scheduling recipe IDs",
+  "model_artifact_created": false,
+  "new_native_requests": 0,
+  "new_optimizer_updates": 0,
+  "source_commit": "74e4a89",
+  "source_file_sha256": "f5d37a7791dbec51d7667e1829a28dc0a1037d3130a000671429690a17c37def",
+  "stage": "training_bank_before_model_creation"
+}

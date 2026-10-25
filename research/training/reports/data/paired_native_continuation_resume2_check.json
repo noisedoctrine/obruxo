@@ -1,0 +1,33 @@
+{
+  "charged_optimizer_attempts": 89,
+  "checkpoint_file_sha256": "c78562ca44c2768d7ace7d4ea77a061b2513f7a5cbc8ac829d5a5f6ea257235d",
+  "checkpoint_readable_and_finite": true,
+  "checkpoint_step": 87,
+  "external_rng_witness_matches": true,
+  "full_87_update_replay_performed": false,
+  "maximum_recorded_native_rss_bytes": 2952491008,
+  "native_attempts": 3606,
+  "native_requests_added": 0,
+  "observed_timeouts": 2,
+  "observed_unix": 1792751097.0065641,
+  "optimizer_updates_added": 0,
+  "original_evidence_preserved": {
+    "checkpoint.pt": true,
+    "measurements.jsonl": true,
+    "plan.json": true,
+    "prefix-checkpoint.pt": true,
+    "prefix-verification.json": true,
+    "records.json": true,
+    "renders.jsonl": true,
+    "run.json": true,
+    "summary.json": true,
+    "updates.jsonl": true
+  },
+  "qualified_for_release": false,
+  "raw_validation_report_sha256": "ef6d092d5fbd5029d9391e0b8c0e7325174320f95d3ca905cee18967c9bed352",
+  "remaining_committed_updates": 41,
+  "scope": "checkpoint_integrity_and_remaining_declared_budget_only",
+  "training_state_sha256": "ba5473a0c82ea837346c878c8ec4faf927fd29fdf716b83d976ae1fd2fe6bf94",
+  "unresolved_timeout_attempt": 3605,
+  "worst_case_training_attempts_at_completion": 5428
+}

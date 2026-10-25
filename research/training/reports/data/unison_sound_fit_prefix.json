@@ -1,0 +1,9 @@
+{
+  "checkpoint_file_sha256": "1c33b91cb51d3f6af33e81e662f7fa6c51e75a73d46dd7b83777810ca10f84d2",
+  "native_requests_added": 0,
+  "offline_training_replay_exact": true,
+  "optimizer_updates_added": 0,
+  "plan_id": "9847596ab6e0be68ff352d78186126a9593b9dd91cd0e7ef2b0b6ac143f6b744",
+  "replayed_updates": 4,
+  "training_state_sha256": "20e971153821855f25b92d3ed3c6852cff31fdcb100548a68bf5cbcbbd3e5f1b"
+}

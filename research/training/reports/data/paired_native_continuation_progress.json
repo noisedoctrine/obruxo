@@ -1,0 +1,36 @@
+{
+  "accepted_native_outcomes_observed": 2190,
+  "completed_native_attempts_observed": 2191,
+  "in_flight_attempts_not_admitted": 1,
+  "manifest_sha256": "a1c5ac35f58203f70bf548fa9f2ef298e867c0f11f4d57ba664ff74017960b2f",
+  "numerical_plan_id": "c2d8a42e179494705cb925406d8cbea41a147668fcb0a2db7abb7b6001300cb1",
+  "observed_unix": 1792746288.9707782,
+  "original_clock_unchanged": true,
+  "original_evidence_preserved": {
+    "checkpoint.pt": true,
+    "measurements.jsonl": true,
+    "plan.json": true,
+    "prefix-checkpoint.pt": true,
+    "prefix-verification.json": true,
+    "records.json": true,
+    "renders.jsonl": true,
+    "run.json": true,
+    "summary.json": true,
+    "updates.jsonl": true
+  },
+  "original_ledger_prefixes_unchanged": true,
+  "partial_tail_bytes_not_admitted": 0,
+  "qualified_for_release": false,
+  "recovered_timeouts": [
+    {
+      "accepted_attempt": 2064,
+      "failed_attempt": 2041,
+      "phase": "training",
+      "request_id": "82ceca9837fd577d0aedc9b0800393f19952b384474430fafccf60211b0d40c0"
+    }
+  ],
+  "saved_updates_observed": 52,
+  "scope": "live_checkpoint_progress_and_completed_native_receipts_only",
+  "sound_quality_compared": false,
+  "verified_live_process_id": 23632
+}

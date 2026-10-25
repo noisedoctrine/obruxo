@@ -1,0 +1,28 @@
+{
+  "cached_comparisons": 119,
+  "charged_optimizer_attempts": 130,
+  "checkpoint_sha256": "29d5ccab94c7c8abfacc67bcf3b29112514bb9b946861e421f2fe66dbf5c79d1",
+  "format": "paired_final_report_recovery_v1",
+  "immutable_training_evidence": {
+    "checkpoint.pt": "29d5ccab94c7c8abfacc67bcf3b29112514bb9b946861e421f2fe66dbf5c79d1",
+    "measurements.jsonl": "076a6dd520a94768dfb8220ec1dcc8d1b08d02c4d410a8a7f5fa8f6d6096c8c1",
+    "plan.json": "61f85381569bf85642a13499c233e8528b57fa9c85b910de8af6e915ee3cbcc9",
+    "run.json": "600187e65500098addd4edd20d93eba465755f6114f9d2c07e1e928db47d0110",
+    "updates.jsonl": "d76d270852f05647482fd4553975905fb250473fdfe815be0880a023f44a5b26"
+  },
+  "maximum_additional_qualification_attempts": 796,
+  "new_training_updates_allowed": 0,
+  "numeric_plan_and_quality_gates_unchanged": true,
+  "numerical_plan_id": "c2d8a42e179494705cb925406d8cbea41a147668fcb0a2db7abb7b6001300cb1",
+  "operational_audit_id": "c630414d1882ca3eef1cc39db6f3048585890271def82360be45109803ce128f",
+  "operational_manifest_sha256": "a1c5ac35f58203f70bf548fa9f2ef298e867c0f11f4d57ba664ff74017960b2f",
+  "preserved_partial_sha256": "2ec181701a423137a946cb12b56965212638dc03b5d1b887391d0554972d1c12",
+  "qualification_attempts_spent": 476,
+  "source_sha256": {
+    "atomic_io.py": "087fdc993b6570217d267d1586688c43446f8ac64392e3c5ed384e4f3b48387c",
+    "audit.py": "58a5c1630b8f1db153f27297177f9af827749ae97e1a0eda64604483fb240925",
+    "paired_report_recovery.py": "342382dfb57bf6a3e31698475d6d30a7161d6cb95e4c24068a31346e0610cf65",
+    "reports/scripts/run_paired_report_recovery.py": "b55c22fdcd6b5bf90e89fcfbb782996d288a9146e7c0205bdc2502eeca846d63"
+  },
+  "trained_updates": 128
+}

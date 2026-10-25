@@ -10,6 +10,7 @@ from obruxo_data.hashing import canonical_sha256
 from obruxo_data.vital import VitalSchema
 
 from .assets import AssetCatalog, AssetReference
+from .atomic_io import replace_file
 from .contracts import TrainingContract
 from .eligibility import inspect_preset
 from .identity import PresetIdentity
@@ -24,7 +25,7 @@ def write_json(path: Path, value) -> None:
         stream.write("\n")
         stream.flush()
         os.fsync(stream.fileno())
-    os.replace(temporary, path)
+    replace_file(temporary, path)
 
 
 def _discover(root: Path) -> tuple[list[Path], list[str]]:

@@ -1,0 +1,11 @@
+{
+  "input_validation": {
+    "elapsed_seconds": 415.5643858000112,
+    "native_requests": 0,
+    "optimizer_updates": 0,
+    "peak_process_tree_rss_bytes": 881565696,
+    "rss_sampling_errors": 0
+  },
+  "plan_id": "4b29e0f4cbcef2c38316a82989e3f16a4b5389fa3ed7d92851bbae1023d74d93",
+  "started_unix": 1792761545.4940872
+}

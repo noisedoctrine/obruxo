@@ -1,0 +1,26 @@
+{
+  "declared_at_utc": "2026-10-24T15:30:36.566929+00:00",
+  "experimental_optimizer_updates": 0,
+  "format": "basic_direct_fit_declaration_v1",
+  "implementation_commit": "aeb2de0",
+  "limits": {
+    "archive_bytes": 2147483648,
+    "native_executions": 2,
+    "optimizer_attempts": 49,
+    "process_tree_bytes": 4294967296,
+    "qualification_attempts": 240,
+    "replay_bytes": 536870912,
+    "training_attempts": 6480,
+    "wall_seconds": 14400
+  },
+  "native_executions_started": 0,
+  "plan_file_sha256": "a49236419d946870cc11e101d35421afbc2636b4b8ee2b48f3c2b43687c9be1b",
+  "plan_id": "6cb54820c938cf145e7139b08314ec1b69116f6dfeca363a5d501b42413acd0f",
+  "planned_native_requests": {
+    "paired_gradients": 4224,
+    "qualification": 208,
+    "reference_gradients": 2112,
+    "total": 6544
+  },
+  "qualified_for_release": false
+}

@@ -1,0 +1,53 @@
+{
+  "diagnosis_source_sha256": "63c33cfb6e913e58e2f264a02b3a0c552efe815338ed9451fe667cfe4b17ac9a",
+  "format": "saved_correction_choice_diagnosis_v1",
+  "initial_file_sha256": "aa685cf562a294dc734d74337b746aab702504424345e6d259bf999f0edbb65e",
+  "limits": {
+    "process_tree_bytes": 4294967296,
+    "report_bytes": 33554432,
+    "wall_seconds": 300
+  },
+  "native_requests": 0,
+  "numerical_source": {
+    "codec.py": "62e915fd0aae9d7e77644771deb4fc216ac2f614f930628f7aaa9fa63e23edb8",
+    "conditioned_basic.py": "d9c0f602c1e26e4c0a49623058de71e9bbb23e64742aad5c8623374216d5e8de",
+    "conditioned_fit_policy.py": "371f3468b8d6018d515142a18bb15582e99cab7653014a6cbfac91040823e53d",
+    "features.py": "895a736257041013f6b3e3ce260ed6a7bef2c94d51390f5f1a5492a78b737501",
+    "inference_profile.py": "8b9e5b7c146c454c987fb61f1c744e22adac60bbff4f29bf9a74f31885a6faea",
+    "model.py": "ed009cd8a42f287de97e7348ea4cbce1f5ffcb5e028cf3d2385f835718ecaa68",
+    "native_fit.py": "70a1c990e705df405e9439cefbfd4441b9fd7a0210bcdc58ebe9eb915b0fc7a2",
+    "native_gradient.py": "c3bcf162416db9aa2e1d2d8e77c9f2732e1e34bc873a9f3149a45750512b2fb3",
+    "paired_native_audit.py": "cc2ab68e6874ba28584c82460799e75214639bd87cec89c7cb442994e05528cd",
+    "paired_native_step.py": "800b791aaa2c88ca013d6cf7856050405542411b9dd1bcfd843a5c39028e89d2",
+    "reproducibility.py": "9326793bdbc629be7c29584329b182dcb93b6fd91c270f180b24a0a6fe885729",
+    "spectral_controls.py": "bdf888bb7e8d9678fea7edad2bd9a445326ed9c6fde399af7004205874d3cd3d",
+    "trainer.py": "92cae41f88618e34f02f624aa3086bf9b1c7c5a9334b19409bbc8fe633d24f3f"
+  },
+  "optimizer_updates": 0,
+  "parent_files": {
+    "checkpoint.pt": "c507e5fa2a438c7ddb41d1fc3aeb72b8b03c9a45eb2ea51d4b45f21d12d8c713",
+    "diagnostic-parameter.pt": "7f1dd978654f307d93692b53e5624076d59e15e48d32e250b2670cdd8d44eb39",
+    "diagnostic-spectral.pt": "bfe3c63d83741b4b27a01ed7f8f1d4c0c47e30602e41d8df367bd836ac1de185",
+    "measurements.jsonl": "d6fa2b12bef4240acb6860abb3b3f28c9c3414053d0059839f976f3ef21fcad0",
+    "plan.json": "da10f83aaa6a89c1882eaec776697fd1edf24ac27e4c6362393acc045090600f",
+    "records.json": "0781f4df88b7625bb2e3788606438537393e9a338cee13c9f4732c75748f16e2",
+    "records/000.pt": "2a152e4282f508f0cbd27fa2f31d6104825ed3ede9605cee5a99eafc2700bca0",
+    "records/001.pt": "fdd21571ad23f7e3ebd5097dce9c8701b0fb926238bfef0f78b00d7d255ac1f7",
+    "records/002.pt": "5a52b8118ccb98116e9136a4a632e63e350c080c4830993e0288e17d9a18d235",
+    "records/003.pt": "028d7ed4ccef37c11591cad3b93316167528fa2117235793b12f693385c5f4db",
+    "records/004.pt": "0420077c49410440af2085e4f880521614e996012c06be18717b5d7ca23b9a76",
+    "records/005.pt": "76e50e18fd235482cc743fe91fe9e76cbd348639920281f9643b6aae9bea04e8",
+    "records/006.pt": "1b899b4de7c2057d065064d488814d25a4060fe331d4d6cd71c7740fffb64ebe",
+    "records/007.pt": "cc8e2848536a9ccaca0b6e077698ef9581a5c59a3bf90a9ab136cb440f233e6f",
+    "records/008.pt": "7354ee14d3b265b893b2fd1fb1d36d9a8fe22d175515ae93de28f134a2ddd4a4",
+    "records/009.pt": "f0f559a4843e7c1a851c13c969224f81024d5f0a2f8802de21c39f2ce9e2ef8b",
+    "records/010.pt": "83522c32892937d4c9a12bda5820c51274611b9f17d3a5ffe08b053b2f8a06bc",
+    "records/011.pt": "b7709bbe2fb55ad7a5dc33216d90b4c9495c25d8dfe83143e8cd73f8199b0d4a",
+    "renders.jsonl": "54c4fe00d7fde1a941b7191b6ca352894a20fbc6d577d39dc9ed6480d7fd4b64",
+    "summary.json": "b6c97837ac414d2546963bcc0ba648b270ccf6b829dd4b08e6cc0fd4c22987bf",
+    "updates.jsonl": "4dcc1b00582da9f3e6f1229e01e62d36ad7c0924da8e894db25260358d502713",
+    "verification.json": "2b41355b4dcf7692563136a0edbcb96519ac9503302a8d990195c7a06f467e29"
+  },
+  "parent_plan_id": "95869556df2179579993f905113c54bcfa715bd9086ac53d7ec2d077062fd799",
+  "repeated_observations_are_not_independent_cases": true
+}
