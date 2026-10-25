@@ -1,9 +1,10 @@
 import pytest
 import torch
 
-from obruxo_training.protected_update_check import inspect_proposals
+from obruxo_training.basic_direct_fit import initialize
 from obruxo_training.codec import PilotCodec
-from obruxo_training.protected_updates import project_direction, select_proposal
+from obruxo_training.protected_update_check import inspect_proposals, sound_losses
+from obruxo_training.protected_updates import loss_gradients, project_direction, select_proposal
 from test_basic_direct_fit import completed  # noqa: F401
 
 
@@ -61,6 +62,19 @@ def test_output_guard_backtracks_for_unsampled_inputs_and_restores_on_failure():
 
 def test_temporary_proposals_leave_full_historical_fit_exact(completed):  # noqa: F811
     inputs, source = completed
+    saved = torch.load(source / "checkpoint.pt", map_location="cpu", weights_only=True)
+    models, _ = initialize(inputs)
+    first = saved["trace"][0]
+    losses = sound_losses(models["spectral"], inputs, inputs.observations(first["update"]), first["estimates"], first["temperature"])
+    gradients = loss_gradients(losses, models["spectral"])
+    for gradient in gradients:
+        parameters = tuple(models["spectral"].correction.parameters())
+        pieces = gradient.split([p.numel() for p in parameters])
+        assert torch.count_nonzero(pieces[-2].reshape_as(parameters[-2])[9:]) == 0
+        assert torch.count_nonzero(pieces[-1][9:]) == 0
+    assert any(torch.count_nonzero(gradient) for gradient in gradients)
+    full = loss_gradients(sound_losses(models["spectral"], inputs, inputs.observations(first["update"]), first["estimates"], first["temperature"], fixed_choices=False), models["spectral"])
+    assert any(torch.count_nonzero(gradient[-5:]) for gradient in full)
     result = inspect_proposals(inputs, source)
     assert result["model_adam_rng_replay_exact"] and result["replayed_updates_per_arm"] == 4
     assert result["temporary_protected_proposals"] == 4 and result["scalar_probes_reused"] > 0

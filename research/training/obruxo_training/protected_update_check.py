@@ -24,13 +24,16 @@ from .trainer import capture_rng
 from .update_diagnosis import LIMITS, make_plan as diagnosis_plan
 
 
-def sound_losses(model, inputs, observations, estimates, temperature):
+def sound_losses(model, inputs, observations, estimates, temperature, *, fixed_choices=True):
     result = []
     for cells, data in zip(observations, estimates, strict=True):
         prediction = inputs.predict(model, inputs.plan["fit_audit_cells"][cells[0]])
         encoded = inputs.adapter(prediction["continuous"], prediction["categorical"], temperature=temperature)
         estimate = NativeGradient(PilotTarget.from_dict(data["anchor"]), data["value"], tuple(data["continuous"]), tuple(map(tuple, data["categorical"])), data["queries"])
-        result.append(measured_loss(prediction["continuous"], (encoded[:, 9:12], encoded[:, 12:]), estimate))
+        # A fixed hard selection has zero category derivative inside its region.
+        # The original Adam proposal still receives its full straight-through gradient.
+        choices = (encoded[:, 9:12], encoded[:, 12:])
+        result.append(measured_loss(prediction["continuous"], tuple(choice.detach() if fixed_choices else choice for choice in choices), estimate))
     return result
 
 
@@ -47,6 +50,7 @@ def inspect_proposals(inputs, source):
         rng = capture_rng("cpu")
         losses = sound_losses(model, inputs, observations, recorded["estimates"], recorded["temperature"])
         gradients = loss_gradients(losses, model)
+        full_gradients = loss_gradients(sound_losses(model, inputs, observations, recorded["estimates"], recorded["temperature"], fixed_choices=False), model)
         result = step(models, optimizers, inputs, store, index)
         if {"step": index + 1, "update": inputs.plan["updates"][index], **result} != {key: value for key, value in recorded.items() if key != "attempt"}:
             raise ValueError("protected inspection changed historical updates")
@@ -61,7 +65,7 @@ def inspect_proposals(inputs, source):
         for observation in (2, 3):
             baseline = inputs.cases[observations[observation][0]]["rows"]["initial"]["scores"]["spectral"]
             weights[observation] *= 2 if float(losses[observation].detach()) > float(torch.tensor(baseline)) else 1
-        original = float(sum(weight * torch.dot(gradient.double(), proposal.double()) for weight, gradient in zip(weights, gradients, strict=True)))
+        original = float(sum(weight * torch.dot(gradient.double(), proposal.double()) for weight, gradient in zip(weights, full_gradients, strict=True)))
         protected["weighted_output_estimated_change"] = sum(weight * row["estimated_sound_change"] for weight, row in zip(weights, protected["changes"], strict=True))
         rows.append({"step": index + 1, "original_weight_linear_change": original, **protected})
     if (not all(equal_tree(model.state_dict(), saved["models"][arm]) and equal_tree(optimizers[arm].state_dict(), saved["optimizers"][arm]) for arm, model in models.items())

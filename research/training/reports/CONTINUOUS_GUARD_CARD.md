@@ -1,0 +1,9 @@
+# Align protection with actual hard selections
+
+Prepared 2026-10-25 after the first [protection screen fails](PROTECTED_UPDATE_RESULTS.md). Keep its failed evidence and all thresholds. This is a derivative correction, not an auxiliary-weight or gate sweep.
+
+The original Adam proposal still uses the full native continuous and straight-through category gradients. For the protection constraints only, detach the hard category tensors: a fixed hard selection has zero category derivative inside its current selection region. Construct the four sound-gradient halfspaces through the continuous outputs. Hard-selection changes remain subject to the existing conditional native-cost output guard. Keep all projection, step-cap, backtracking and nonzero-progress rules unchanged.
+
+Freeze implementation and a separate numerical plan, then screen all 48 unchanged original sound-only states. Require at least 36 accepted proposals and at least 25% of the original positive estimated weight-linear gain. Preserve the first screen's full-gradient denominator exactly; only the protection derivative changes. The ratio remains a local screening approximation, not native audio or a new trajectory. All four local estimates must be non-increasing within 1e-8, and every panel input's normalized control change must stay within 0.025. Zero updates do not count as accepted proposals.
+
+Require exact original model/Adam/RNG/trace/probe replay, unchanged source evidence, seven focused tests and five-minute / 4-GiB / 64-MiB limits. Count 96 replayed optimizer applications and 48 temporary proposals, with zero new renders or experimental updates. A pass permits preparation of native after-update acceptance checks, not training promotion. No model admission, extra epochs, output expansion, relaxed quality gates, development/test scoring, Actions or Colab work.

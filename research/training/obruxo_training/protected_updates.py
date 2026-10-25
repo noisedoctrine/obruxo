@@ -7,7 +7,9 @@ from torch.nn.utils import parameters_to_vector, vector_to_parameters
 
 from .update_diagnosis import movement, predict_bank
 
-SPEC = {"format": "sampled_sound_protected_adam_v1", "constraints": "four_individual_raw_sound_gradients_dot_displacement_nonpositive",
+SPEC = {"format": "sampled_sound_protected_adam_v2", "constraints": "four_continuous_sound_gradients_at_fixed_hard_choices_dot_displacement_nonpositive",
+        "adam_proposal": "unchanged_full_native_continuous_and_straight_through_category_gradient",
+        "hard_choice_change_guard": "conditional_native_cost_difference_in_output_guard",
         "projection": "closest_euclidean_parameter_displacement", "continuous_bank_change_cap": .025,
         "backtracking_factors": [2.**-i for i in range(9)], "estimated_change_tolerance": 1e-8,
         "native_sound_acceptance_qualified": False, "auxiliary_labels": False}
