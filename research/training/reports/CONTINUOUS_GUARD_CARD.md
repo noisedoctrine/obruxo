@@ -1,5 +1,7 @@
 # Align protection with actual hard selections
 
+**Completed:** [result](CONTINUOUS_GUARD_RESULTS.md) accepts 45/48 proposals and retains 32.89% of the original estimated gain in 26.55 seconds / 0.73 GiB. Both unchanged screening gates pass. No new native audio, training trajectory or model admission is claimed.
+
 Prepared 2026-10-25 after the first [protection screen fails](PROTECTED_UPDATE_RESULTS.md). Keep its failed evidence and all thresholds. This is a derivative correction, not an auxiliary-weight or gate sweep.
 
 The original Adam proposal still uses the full native continuous and straight-through category gradients. For the protection constraints only, detach the hard category tensors: a fixed hard selection has zero category derivative inside its current selection region. Construct the four sound-gradient halfspaces through the continuous outputs. Hard-selection changes remain subject to the existing conditional native-cost output guard. Keep all projection, step-cap, backtracking and nonzero-progress rules unchanged.
