@@ -1,0 +1,33 @@
+{
+  "accepted_results_reused": 63,
+  "additional_planned_native_requests": 11,
+  "aggregate_native_attempt_cap": 76,
+  "declared_at_utc": "2026-10-25T14:25:02.858150+00:00",
+  "implementation_commit": "1ccbc82ea3f9ce21b586c5fa406da2f350332d70",
+  "new_aggregate_wall_seconds_cap": 1800,
+  "operator_sha256": "6d9b2131f28f7135dcb55f9ad60f84bf3b7716f80d2821319032dc30125d5851",
+  "optimizer_applications": 0,
+  "original_15_minute_budget_passed": false,
+  "original_missing_runtime": {
+    "failed_archive_bytes": 627219,
+    "failed_audio_results": 0,
+    "failed_evidence_sha256": {
+      "declaration.json": "6bd5ff582acd61dad53cd095fa22095d964d8dc7794c7a61eb6273d99f582c7c",
+      "plan.json": "35cb355e95b077865aa75c691dc882966d3b0d71e1a68dfeb8d489092ef267e0",
+      "renders.jsonl": "a6c1385c911932ea1e3210175ca03f7316c63dfadfd65fd85126e49eb5f4de12",
+      "run.json": "b42cfd949f8be9d1314c82839df954405ce28271800feb0a53d4bb62695a5afb",
+      "service_execute.json": "2051f95cfc3f71a3bcc4cd23db8970aab0eb70c01795488246158c10c6b14ab7",
+      "service_prepare.json": "b332b0c6ad825717f2cfc3bc650fde8047a1d7aa3ef22daff2bdd76f45f8c633",
+      "summary.json": "5043d3418f47b3247f2adf09e0c221d0ae61ed0401c7bdf07de9f56e81e5a120"
+    },
+    "failed_native_attempts": 1,
+    "failed_plan_id": "ae31bd6b1afeda395c79ada47918473c3b7b22e200b6ba71e2e8c4197088513e",
+    "original_started_unix": 1792936833.1221833
+  },
+  "plan_file_sha256": "6c64f9412cc27ab7de8f0c926793155e83b601430053fa293e01dc1d6d3d80d8",
+  "plan_id": "384f1ec41ca4228494d0c3d11b8c239e88c0faee94e37b9bcbd9668c2fc006c3",
+  "runtime": {
+    "vita_entry_sha256": "443f7b027be7649dc877940797198f935669cf3e5fe4916c508e25176b77a352",
+    "vita_version": "0.1.0"
+  }
+}
