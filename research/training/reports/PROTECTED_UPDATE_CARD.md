@@ -1,5 +1,7 @@
 # Protect sampled sounds without stalling learning
 
+**Completed and rejected:** [result](PROTECTED_UPDATE_RESULTS.md) accepts only 24/48 proposals against the frozen 36/48 gate. No native fit follows this version. Reproduce it from implementation `76f1e5b`; later protection rules have separate declarations.
+
 Prepared 2026-10-25 after the [saved-update inspection](BASIC_UPDATE_DIAGNOSIS_RESULTS.md) confirms competing sound objectives. Before any native fit, check a concrete proposal policy at all 48 original sound-only training states. This check performs zero new native requests or experimental training updates and produces no new trained model.
 
 For each historical Adam proposal, calculate the four individual raw sound-loss weight gradients from that state's exact native measurements. Project the proposal onto their common non-increasing halfspaces using the closest Euclidean displacement. Enumerate the at most sixteen active sets, including rank-deficient cases; zero is feasible. Then halve the projected displacement at most eight times, checking actual predicted outputs against the same local native estimates. Accept only if none of the four estimates increases beyond 1e-8 and at least one decreases by more than 1e-8. Bound every existing panel input's normalized-control change to 0.025; this is a chosen conservative cap, not a certified linearity radius. A rejected proposal returns the unchanged weights.
