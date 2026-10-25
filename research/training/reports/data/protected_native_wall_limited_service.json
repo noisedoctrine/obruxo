@@ -1,0 +1,19 @@
+{
+  "aggregate_wall_seconds_from_original_start": 900.5063621997833,
+  "awake": {
+    "display_required": false,
+    "persistent_settings_changed": false,
+    "released": true,
+    "requested": true
+  },
+  "elapsed_seconds": 310.4853885000339,
+  "failure": {
+    "message": "native protection check incomplete: {'type': 'RuntimeError', 'message': 'helper wall-time budget exhausted'}",
+    "type": "RuntimeError"
+  },
+  "finished_at_utc": "2026-10-25T14:15:33.628545+00:00",
+  "mode": "execute",
+  "operator_sha256": "c028d8eff6f427453c00f449e06c515cae414a4252026e0fc98f89f1e46d5c1e",
+  "peak_process_tree_rss_bytes": 1378115584,
+  "rss_sampling_errors": 0
+}

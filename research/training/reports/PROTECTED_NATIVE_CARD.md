@@ -1,5 +1,7 @@
 # Check protected proposals with actual Vital audio
 
+**Completed and rejected:** [full native result](PROTECTED_NATIVE_RESULTS.md) accepts all 74 renders and independently re-scores them; only 7/12 points pass the frozen 9/12 protection gate. No model is trained or admitted. The original 15-minute miss stays recorded.
+
 Prepared 2026-10-25 after the [corrected local screen](CONTINUOUS_GUARD_RESULTS.md) passes. Use every fourth saved original sound-only state: updates 4, 8, 12, ..., 48. Keep all four sampled observations per state, including both playback performances for each paired input. This uniform historical panel is a training diagnostic, not fresh-family generalization or a new model trajectory.
 
 Reconstruct the exact screened raw outputs from each audited anchor and saved displacement. Verify the complete movement record and retrieve the exact matching before costs/receipts from the audited native probes. The source model, optimizer and cached before sounds are not retrained or rerendered. Render all 72 actual proposed patch/performance combinations and repeat the first and last exactly: **74 planned native requests**, with one additional charged request allowed only for an identical observed RenderTimeout without QA. Retain all after audio and independently re-score every result; before training-probe audio was transient and is not independently re-scored here.

@@ -1,0 +1,20 @@
+{
+  "complete": false,
+  "experimental_training_updates": 0,
+  "failure": {
+    "message": "helper wall-time budget exhausted",
+    "type": "RuntimeError"
+  },
+  "native_attempts": 63,
+  "optimizer_applications": 0,
+  "plan_id": "ae31bd6b1afeda395c79ada47918473c3b7b22e200b6ba71e2e8c4197088513e",
+  "qualified_for_release": false,
+  "resources": {
+    "elapsed_seconds": 306.2399321999983,
+    "peak_process_tree_rss_bytes": 1377067008,
+    "rss_sampling_errors": 0
+  },
+  "result": null,
+  "test_split_used": false,
+  "within_resource_limits": true
+}
