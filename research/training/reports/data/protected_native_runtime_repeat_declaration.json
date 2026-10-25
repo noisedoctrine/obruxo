@@ -1,0 +1,34 @@
+{
+  "aggregate_native_attempt_cap": 76,
+  "aggregate_wall_seconds_cap": 900,
+  "clock_policy": "original_run_start_without_reset",
+  "declared_at_utc": "2026-10-25T14:09:40.046890+00:00",
+  "failed_runtime": {
+    "failed_archive_bytes": 627219,
+    "failed_audio_results": 0,
+    "failed_evidence_sha256": {
+      "declaration.json": "6bd5ff582acd61dad53cd095fa22095d964d8dc7794c7a61eb6273d99f582c7c",
+      "plan.json": "35cb355e95b077865aa75c691dc882966d3b0d71e1a68dfeb8d489092ef267e0",
+      "renders.jsonl": "a6c1385c911932ea1e3210175ca03f7316c63dfadfd65fd85126e49eb5f4de12",
+      "run.json": "b42cfd949f8be9d1314c82839df954405ce28271800feb0a53d4bb62695a5afb",
+      "service_execute.json": "2051f95cfc3f71a3bcc4cd23db8970aab0eb70c01795488246158c10c6b14ab7",
+      "service_prepare.json": "b332b0c6ad825717f2cfc3bc650fde8047a1d7aa3ef22daff2bdd76f45f8c633",
+      "summary.json": "5043d3418f47b3247f2adf09e0c221d0ae61ed0401c7bdf07de9f56e81e5a120"
+    },
+    "failed_native_attempts": 1,
+    "failed_plan_id": "ae31bd6b1afeda395c79ada47918473c3b7b22e200b6ba71e2e8c4197088513e",
+    "original_started_unix": 1792936833.1221833
+  },
+  "implementation_commit": "07180a96b62ee73988c29a6c90e05b015ca30b56",
+  "maximum_new_native_attempts": 75,
+  "numerical_panel_unchanged": true,
+  "operator_sha256": "c028d8eff6f427453c00f449e06c515cae414a4252026e0fc98f89f1e46d5c1e",
+  "plan_file_sha256": "35cb355e95b077865aa75c691dc882966d3b0d71e1a68dfeb8d489092ef267e0",
+  "plan_id": "ae31bd6b1afeda395c79ada47918473c3b7b22e200b6ba71e2e8c4197088513e",
+  "runtime": {
+    "dependency_path": "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\data_generation\\outputs\\smoke-deps",
+    "vita_entry_sha256": "443f7b027be7649dc877940797198f935669cf3e5fe4916c508e25176b77a352",
+    "vita_path": "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\data_generation\\outputs\\smoke-deps\\vita\\__init__.py",
+    "vita_version": "0.1.0"
+  }
+}
