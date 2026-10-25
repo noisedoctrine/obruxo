@@ -1,0 +1,19 @@
+"""Check individual protected proposals at saved sound-training states."""
+
+import argparse
+import json
+from pathlib import Path
+import sys
+
+RESEARCH = Path(__file__).resolve().parents[3]
+sys.path[:0] = [str(RESEARCH / "training"), str(RESEARCH / "data_generation")]
+
+if __name__ == "__main__":
+    from obruxo_training.protected_update_check import run
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--sources", nargs=2, type=Path, required=True)
+    for name in ("parent", "bridge", "features", "diagnosis", "output"):
+        parser.add_argument("--" + name, type=Path, required=True)
+    parser.add_argument("--execute", action="store_true")
+    args = parser.parse_args()
+    print(json.dumps(run(args.sources, args.parent, args.bridge, args.features, args.diagnosis, args.output, execute=args.execute)), flush=True)
