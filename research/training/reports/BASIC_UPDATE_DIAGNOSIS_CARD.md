@@ -1,5 +1,7 @@
 # Inspect saved basic-model updates
 
+**Completed:** [result](BASIC_UPDATE_DIAGNOSIS_RESULTS.md) replays both trajectories exactly in 21.52 seconds / 0.73 GiB, with zero new renders or experimental training. Competing objectives occur at small as well as larger control changes; next check a protected update for useful progress.
+
 Prepared 2026-10-25 after the sound-only and continuous-auxiliary fits complete but fail their full quality gates. Compare both complete 48-update trajectories using saved native measurements. No new renders, experimental updates, model promotion or changed gates.
 
 Measure all nine continuous-control changes and categorical selections before and after each update, on every unique input in the existing 104-case panel. For the four sampled observations, report the continuous gradient dotted with the actual displacement plus conditional category-cost changes. Report reference losses separately and apply the original weights and float32 hinge derivative when estimating the combined sound objective. These are local approximations; simultaneous category/control changes and curvature are not measured. The finite-difference spacing of 0.025 is a measurement scale, **not a certified linearity radius**.
