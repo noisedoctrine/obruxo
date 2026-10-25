@@ -1,0 +1,30 @@
+# Continuous auxiliary helps wider sounds but loses earlier gains
+
+Completed 2026-10-25 under scientific plan `e17e3f018828a226040a62fa1cc6a37d79b104cd0b5a170c3f7e6cd9fba3137f` and the [separate operational continuation](AUXILIARY_CONTINUATION_CARD.md), plan `5ab835eae61d22305e53cb73ee20dbd4380ce92525d9c1b382de2ec0a40a7949`. All **48 updates per arm** complete, with **49 charged attempts per arm**, including the interrupted ninth attempt. Native work totals **5,654 attempts: 5,653 accepted and one retained timeout**, resolved by the identical request at attempt 954. There are no new failures during continuation, extra epochs, changed observations or relaxed sound gates.
+
+The [independent audit](data/auxiliary_continuation_verification.json) verifies the preserved original files, eight-update recovery boundary, native/update ledger prefixes, model/Adam/RNG replay through all 48 updates and **312 independently rescored initial/final waveforms**. It replays 5,445 scalar training probes; their transient waveforms are not independently rescored. The parameter-control model remains exactly `b0a18a318e8a29adf8c0c6f77eec29df9898c0c77b65b3747e3b888a06b78d09`, making the matched comparison unchanged.
+
+**Reject this candidate.** Three of six groups pass. The auxiliary improves the wider groups further and narrows the held-input control gaps, but original-input transfer misses the 10% improvement gate, both held-input groups still trail the parameter control, and the candidate fails retention of the preceding sound model's original-32 gains. Local gradient alignment was useful diagnostic evidence, not a guarantee of a better fit. The fixed auxiliary proposal is not promoted or retried at another weight on this result.
+
+| Input and playback | Combined sound error vs initialization | MRSTFT vs initialization | Combined error vs parameter control | Group passes |
+|---|---:|---:|---:|---|
+| Original input, own performance | -10.17% | -6.51% | -45.43% | Yes |
+| Original input, transferred performance | -4.56% | -1.16% | -39.90% | No |
+| Wider held input, own performance | -19.55% | -20.87% | +1.48% | No |
+| Wider held input, transferred performance | -21.79% | -21.70% | +0.74% | No |
+| Wider alternate input, own performance | -22.75% | -17.94% | -21.03% | Yes |
+| Wider alternate input, transferred performance | -20.27% | -16.72% | -12.71% | Yes |
+
+Negative changes mean lower error. Original transfers are averaged within patch before group averaging. The [104 input/playback cases](data/continuous_auxiliary_fit_cases.json) and [summary](data/auxiliary_continuation_summary.json) retain exact scores and predictions. All source recordings are training data; these comparisons do not establish fresh-family generalization.
+
+On the original 32 recordings, mean combined error is `0.114066`, MRSTFT `0.308984` and MRSTFT p90 `0.482265`. Those improve **6.20% / 4.43% / 11.31%** against initialization, so the original nonregression gate passes. They are **3.68% / 5.33% / 12.95% worse** than the preceding sound-only model (`0.110013 / 0.293335 / 0.426979`), so the additional prior-gain gate fails. Keep that earlier sound model as the stronger research reference; neither model is admitted for release.
+
+The model still emits **14 values / 11 codec selections**, with 355,806 earlier weights frozen and 27,118 correction weights trainable. The candidate adds only the declared paired source-active continuous MSE; category labels remain excluded and reference sound/excess losses stay unchanged. Sound-arm proposals cross below zero 43 times and above one 42 times out of 1,728 observed controls (4.92%); bounded export does not prove adequate step size or preservation.
+
+The original four-hour wall budget is **missed**, following the long interruption; this is preserved rather than reclassified as a pass. Continuation finishes within its separately declared **24-hour total window from the original start**: aggregate wall time is **63,800.61 seconds (17 h 43 min)**, including the interruption. The [continuation service](data/auxiliary_continuation_service_001.json), including input validation, takes **7,804.46 seconds (2 h 10 min)** and peaks at **1.06 GiB**, with zero sampling errors and its scoped active-work request released. Aggregate retained original/continued evidence is about **0.600 GiB**, below the unchanged 2-GiB total cap. Native executions total two; no third launch is permitted.
+
+Final [verification](data/auxiliary_continuation_verification.json) takes **210.40 seconds / 0.89 GiB**; its [external service](data/auxiliary_continuation_service_002.json), including the boundary check, exits successfully in 236.03 seconds. Counting the original early check, real recovery preparation, final boundary check, early-prefix replay and full replay, 72 updates per arm are replayed in software; they add no experimental training or native queries. Seven recovery checks, 21 fit checks, Ruff and diff checks pass. The original and continuation implementations/plans were committed before their native executions.
+
+The candidate's final tensor SHA-256 is `599009801266869dc69444d5c8deff1749eddbc968cea785c82a51b69947a27d`; its artifact remains explicitly unqualified for release. Restore it only for diagnosis through `restore_direct`. All full A2/A3 quality, fresh-family, second-seed, listening and bundle requirements remain open.
+
+Next, inspect actual before/after prediction changes and reference-error directions in the saved trajectories. In particular, determine whether neural weight steps produce control movements much larger than the finite-difference measurement scale, and whether individual updates trade earlier-sound error for wider-sound gains. The measurement spacing is not a certified linearity radius; a diagnosis must not claim that bounding a step guarantees audible improvement. Use saved costs and exact replay before choosing an update-policy change. Do not add epochs, sweep auxiliary weights, weaken gates or expand outputs. Local only; Actions stays disabled and Colab deferred.

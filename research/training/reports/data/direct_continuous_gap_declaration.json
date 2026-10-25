@@ -1,0 +1,10 @@
+{
+  "continuous_auxiliary_weight": 1.0,
+  "declared_at_utc": "2026-10-24T18:55:55.584458+00:00",
+  "experimental_training_updates": 0,
+  "implementation_commit": "3c2f8e9",
+  "native_requests": 0,
+  "plan_file_sha256": "0c470070a2c3b550ee4cbec086926051a2e2a1ae07597f0773b05fe1ccfb59bf",
+  "plan_id": "fafdb38ef4b8365e968b411ad90a84a837226ba8784322ed494f96165c406833",
+  "replayed_optimizer_applications": 96
+}

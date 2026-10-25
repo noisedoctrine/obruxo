@@ -1,0 +1,9 @@
+{
+  "declared_at_utc": "2026-10-25T13:25:44.436163+00:00",
+  "experimental_training_updates": 0,
+  "implementation_commit": "7e397c4c84652342ef3b89774543ddb541f3fa02",
+  "native_requests": 0,
+  "plan_file_sha256": "b6e8b4789536b5901b752c6d9e8ea87cdf42eda70ceaa2caeedf0d99f065b1ff",
+  "plan_id": "72d3b784f8d71f4ebf6299a280019f59adb7385085b1930df062efccb9632805",
+  "replayed_optimizer_applications": 192
+}

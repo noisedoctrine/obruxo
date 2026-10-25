@@ -1,0 +1,21 @@
+{
+  "committed_updates_per_arm": 8,
+  "complete": false,
+  "elapsed_seconds": 54379.57184290886,
+  "failure": "RuntimeError: direct sound probe was not accepted",
+  "matched_comparison_passed": false,
+  "native_receipts_resolved": false,
+  "peak_process_tree_rss_bytes": 1118097408,
+  "plan_id": "e17e3f018828a226040a62fa1cc6a37d79b104cd0b5a170c3f7e6cd9fba3137f",
+  "qualified_for_release": false,
+  "recovered_timeouts": [],
+  "render_attempts": {
+    "qualification": 0,
+    "training": 954
+  },
+  "result": null,
+  "retained_archive_bytes_before_summary": 56654532,
+  "rss_sampling_errors": 0,
+  "test_split_used": false,
+  "within_resource_limits": false
+}

@@ -1,0 +1,16 @@
+{
+  "charged_update_attempts_per_arm": 9,
+  "committed_updates_per_arm": 8,
+  "declared_at_utc": "2026-10-25T10:43:14.692641+00:00",
+  "implementation_commit": "58524e4",
+  "native_attempts_used": 954,
+  "native_executions_total_cap": 2,
+  "native_executions_used": 1,
+  "new_epochs": 0,
+  "objective_or_schedule_changed": false,
+  "original_budget_passed": false,
+  "original_plan_id": "e17e3f018828a226040a62fa1cc6a37d79b104cd0b5a170c3f7e6cd9fba3137f",
+  "plan_file_sha256": "ef674cffe6bef05a663bc115057866bc55fe3a191fda0ff21d3d413e8425c61d",
+  "plan_id": "5ab835eae61d22305e53cb73ee20dbd4380ce92525d9c1b382de2ec0a40a7949",
+  "total_wall_seconds_from_original_start": 86400
+}
