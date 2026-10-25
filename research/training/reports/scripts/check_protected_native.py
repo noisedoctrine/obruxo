@@ -16,6 +16,7 @@ if __name__ == "__main__":
     for name in ("parent", "bridge", "features", "diagnosis", "screen", "output"):
         parser.add_argument("--" + name, type=Path, required=True)
     parser.add_argument("--mode", choices=("prepare", "execute", "verify"), default="prepare")
+    parser.add_argument("--continue-from", type=Path)
     args = parser.parse_args()
     with active_computation():
-        print(json.dumps(run(args.sources, args.parent, args.bridge, args.features, args.diagnosis, args.screen, args.output, mode=args.mode)), flush=True)
+        print(json.dumps(run(args.sources, args.parent, args.bridge, args.features, args.diagnosis, args.screen, args.output, mode=args.mode, continue_from=args.continue_from)), flush=True)
