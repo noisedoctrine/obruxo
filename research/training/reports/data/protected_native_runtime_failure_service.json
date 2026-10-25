@@ -1,0 +1,18 @@
+{
+  "awake": {
+    "display_required": false,
+    "persistent_settings_changed": false,
+    "released": true,
+    "requested": true
+  },
+  "elapsed_seconds": 8.441963899997063,
+  "failure": {
+    "message": "native protection check incomplete: {'type': 'RuntimeError', 'message': 'native protected proposal was not accepted'}",
+    "type": "RuntimeError"
+  },
+  "finished_at_utc": "2026-10-25T14:00:36.634887+00:00",
+  "mode": "execute",
+  "operator_sha256": "7ae5ad9dd932db897475dd29256d395886ab0c339f58df299f1fc03304545a3b",
+  "peak_process_tree_rss_bytes": 1060761600,
+  "rss_sampling_errors": 0
+}

@@ -1,0 +1,13 @@
+# Finish the eleven remaining native comparisons
+
+**Completed and rejected:** [full native result](PROTECTED_NATIVE_RESULTS.md) accepts all 74 renders and independently re-scores them; only 7/12 points pass the frozen 9/12 protection gate. No model is trained or admitted. The original 15-minute miss stays recorded.
+
+The runtime-repaired check preserves **63 accepted results** and stops before charging its next request when the original 15-minute wall window expires. All 63 request/outcome pairs and retained scores are complete; there are no native errors in that prefix. Keep the original wall miss recorded as false, separately from any completed comparison or later budget.
+
+Declare a **30-minute aggregate window from the original start**, not a reset clock. Keep the same 74 jobs, source patches, sound gates, phase controls, preroll and native-attempt allowance. The aggregate request cap remains 76 including the original missing-runtime failure and optional single timeout allowance; the accepted prefix is already charged. Only **11 additional planned renders** remain. The combined three-directory archive must stay below 512 MiB and process-tree RAM below 4 GiB.
+
+Before continuing, independently re-score every retained prefix waveform and reconstruct its receipts. Freeze the complete immutable source manifest and compatible recovery-adapter source differences. Copy the native ledger and content-addressed audio to a new directory; re-use those exact measurement rows without rendering them again. Require the original ledger bytes and measurement prefix to survive unchanged. Refuse duplicate migration/execution, altered source audio, unknown outcomes, non-clock failures or changes to numerical jobs/gates/rendering. The saved run timestamp stays at the original start and NativeSession enforces the new 30-minute aggregate window against real time.
+
+Three focused native tests pass, including a software-only six-result prefix completed with exactly two new renders, original-clock preservation, exact rescoring, source-tamper refusal and timeout accounting. Source and numerical continuation plan are frozen before the remaining renders. The new launcher keeps heavy imports inside its main guard so isolated render workers do not repeat unrelated Torch imports; the Vita entry point and engine/profile remain pinned.
+
+Complete and independently audit all 74 requested results before reporting native-screen decisions. The original 15-minute miss cannot be relabeled as passed. This work applies zero optimizer updates, produces no model and changes no final A2/A3 acceptance criteria. Local only; Actions disabled and Colab deferred.

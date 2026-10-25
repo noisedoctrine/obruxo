@@ -1,0 +1,6074 @@
+{
+  "accepted_proposals": 24,
+  "estimated_gain_fraction": 0.33618442177878544,
+  "experimental_training_updates": 0,
+  "model_adam_rng_replay_exact": true,
+  "native_requests": 0,
+  "native_sound_acceptance_qualified": false,
+  "new_trajectory_qualified": false,
+  "original_weight_linear_gain": 0.3701789855017769,
+  "plan_id": "55a64e73e8a289756edc79901f3736f732b6eb144a95894f84e7490d01c18e1e",
+  "protected_output_estimated_gain": 0.12444840819557226,
+  "qualified_for_release": false,
+  "replayed_updates_per_arm": 48,
+  "resources": {
+    "elapsed_seconds": 28.947959999961313,
+    "peak_process_tree_rss_bytes": 781328384,
+    "rss_sampling_errors": 0
+  },
+  "rows": [
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0008694231510162354,
+            0.0035071969032287598,
+            0.0030043721199035645,
+            -0.003735661506652832,
+            -0.0012227296829223633,
+            -0.0017266273498535156,
+            -0.001785874366760254,
+            0.00033360719680786133,
+            0.0035980939865112305
+          ],
+          "estimated_sound_change": -0.004068482525733958,
+          "linear_continuous_change": -0.004068482525733958,
+          "maximum_control_change": 0.003735661506652832,
+          "maximum_previously_active_change": 0.003735661506652832
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.001656174659729004,
+            0.002102792263031006,
+            0.0017249584197998047,
+            -0.0017737150192260742,
+            0.0009937882423400879,
+            -0.0016311407089233398,
+            -0.00193023681640625,
+            -0.0012492537498474121,
+            0.0020214319229125977
+          ],
+          "estimated_sound_change": -0.003939454339325208,
+          "linear_continuous_change": -0.003939454339325208,
+          "maximum_control_change": 0.002102792263031006,
+          "maximum_previously_active_change": 0.002102792263031006
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.005049586296081543,
+            0.0027112364768981934,
+            0.004896283149719238,
+            -0.003478407859802246,
+            -0.0007005144143477082,
+            -0.005234718322753906,
+            -0.0048413872718811035,
+            -0.0037191808223724365,
+            0.0035325288772583008
+          ],
+          "estimated_sound_change": -0.017716902962039413,
+          "linear_continuous_change": -0.017716902962039413,
+          "maximum_control_change": 0.005234718322753906,
+          "maximum_previously_active_change": 0.005234718322753906
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0008694231510162354,
+            0.0035071969032287598,
+            0.0030043721199035645,
+            -0.003735661506652832,
+            -0.0012227296829223633,
+            -0.0017266273498535156,
+            -0.001785874366760254,
+            0.00033360719680786133,
+            0.0035980939865112305
+          ],
+          "estimated_sound_change": -0.004012559757553153,
+          "linear_continuous_change": -0.004012559757553153,
+          "maximum_control_change": 0.003735661506652832,
+          "maximum_previously_active_change": 0.003735661506652832
+        }
+      ],
+      "maximum_bank_control_change": 0.021606385707855225,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.0063534085508451885,
+      "projected_norm": 0.021493961170801847,
+      "projection_distance": 0.0,
+      "proposal_norm": 0.021493961170801847,
+      "scale": 1.0,
+      "step": 1,
+      "weighted_output_estimated_change": -0.005703030641045164
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.012804564624420114,
+      "projected_norm": 0.11767577675746844,
+      "projection_distance": 0.0,
+      "proposal_norm": 0.11767577675746844,
+      "scale": 0.0,
+      "step": 2,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0026755332946777344,
+            0.002319619059562683,
+            0.0030286163091659546,
+            -0.0029762685298919678,
+            -0.0014777779579162598,
+            -0.0034714341163635254,
+            -0.0010954737663269043,
+            0.0006633400917053223,
+            0.0009531974792480469
+          ],
+          "estimated_sound_change": -0.0006083339089891752,
+          "linear_continuous_change": -0.0006083339089891752,
+          "maximum_control_change": 0.0034714341163635254,
+          "maximum_previously_active_change": 0.0034714341163635254
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.010294515639543533,
+            0.008326686918735504,
+            -0.01083916425704956,
+            0.0,
+            0.0,
+            0.0,
+            0.006607472896575928,
+            0.0
+          ],
+          "estimated_sound_change": -0.005500421833875106,
+          "linear_continuous_change": -0.005500421833875106,
+          "maximum_control_change": 0.01083916425704956,
+          "maximum_previously_active_change": 0.010294515639543533
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.001463174819946289,
+            0.001221299171447754,
+            0.001485973596572876,
+            -0.0017031803727149963,
+            -0.0006684660911560059,
+            -0.0014029443264007568,
+            -0.00044035911560058594,
+            -0.0001061856746673584,
+            0.0005511641502380371
+          ],
+          "estimated_sound_change": -0.001364904812615198,
+          "linear_continuous_change": -0.001364904812615198,
+          "maximum_control_change": 0.0017031803727149963,
+          "maximum_previously_active_change": 0.0017031803727149963
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0019069164991378784,
+            0.0012895464897155762,
+            0.0017837509512901306,
+            -0.0018820762634277344,
+            -0.0007268786430358887,
+            -0.0019727349281311035,
+            -0.0007623732089996338,
+            -0.00016874074935913086,
+            0.0006489753723144531
+          ],
+          "estimated_sound_change": -0.00310616117276008,
+          "linear_continuous_change": -0.00310616117276008,
+          "maximum_control_change": 0.0019727349281311035,
+          "maximum_previously_active_change": 0.0019727349281311035
+        }
+      ],
+      "maximum_bank_control_change": 0.015533924102783203,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.007072044211788937,
+      "projected_norm": 0.10297296333143299,
+      "projection_distance": 0.0,
+      "proposal_norm": 0.10297296333143299,
+      "scale": 0.5,
+      "step": 3,
+      "weighted_output_estimated_change": -0.0034611776423567565
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0023653358221054077,
+            0.0008808672428131104,
+            8.291751146316528e-05,
+            -0.001333773136138916,
+            0.0007562339305877686,
+            -0.0019666552543640137,
+            -0.0008522570133209229,
+            -0.001046299934387207,
+            0.001011490821838379
+          ],
+          "estimated_sound_change": -0.004817652609305777,
+          "linear_continuous_change": -0.004817652609305777,
+          "maximum_control_change": 0.0023653358221054077,
+          "maximum_previously_active_change": 0.0023653358221054077
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.002830609679222107,
+            0.0010456442832946777,
+            -0.0001314925029873848,
+            -0.0016541481018066406,
+            0.0009249448776245117,
+            -0.0024521946907043457,
+            -0.0009790658950805664,
+            -0.0009912848472595215,
+            0.0012189149856567383
+          ],
+          "estimated_sound_change": -0.005533917139444548,
+          "linear_continuous_change": -0.005533917139444548,
+          "maximum_control_change": 0.002830609679222107,
+          "maximum_previously_active_change": 0.002830609679222107
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.005484640598297119,
+            -0.004699796438217163,
+            -0.011373817920684814,
+            -0.0015617012977600098,
+            0.0,
+            -0.003522425889968872,
+            -0.00128936767578125,
+            0.0009022355079650879,
+            0.0
+          ],
+          "estimated_sound_change": -0.015995031074544905,
+          "linear_continuous_change": -0.015995031074544905,
+          "maximum_control_change": 0.011373817920684814,
+          "maximum_previously_active_change": 0.011373817920684814
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0028328001499176025,
+            -6.520748138427734e-05,
+            -0.0016729235649108887,
+            -0.0012669563293457031,
+            0.001461327075958252,
+            -0.002266526222229004,
+            -0.0008129775524139404,
+            -0.0009323954582214355,
+            0.0007441937923431396
+          ],
+          "estimated_sound_change": -0.005304707895868073,
+          "linear_continuous_change": -0.005304707895868073,
+          "maximum_control_change": 0.0028328001499176025,
+          "maximum_previously_active_change": 0.0028328001499176025
+        }
+      ],
+      "maximum_bank_control_change": 0.01280800998210907,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.014006410909729972,
+      "projected_norm": 0.10017945163788837,
+      "projection_distance": 0.0,
+      "proposal_norm": 0.10017945163788837,
+      "scale": 0.5,
+      "step": 4,
+      "weighted_output_estimated_change": -0.00663383909335034
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.0026853322289636244,
+      "projected_norm": 0.08947235066598416,
+      "projection_distance": 0.002148146145903204,
+      "proposal_norm": 0.08949813442503123,
+      "scale": 0.0,
+      "step": 5,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.0021360167575634748,
+      "projected_norm": 0.07895473852380126,
+      "projection_distance": 0.0010417535720603191,
+      "proposal_norm": 0.07896161083632165,
+      "scale": 0.0,
+      "step": 6,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.00823749716474342,
+      "projected_norm": 0.08759608043325537,
+      "projection_distance": 0.0027011568519117223,
+      "proposal_norm": 0.08763771765403254,
+      "scale": 0.0,
+      "step": 7,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.02425034821374207,
+      "projected_norm": 0.08633276132777769,
+      "projection_distance": 0.002721289152823258,
+      "proposal_norm": 0.08637563946583691,
+      "scale": 0.0,
+      "step": 8,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.024592145295938603,
+      "projected_norm": 0.08312891785980546,
+      "projection_distance": 0.007504847303934696,
+      "proposal_norm": 0.08346699777515432,
+      "scale": 0.0,
+      "step": 9,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0011371374130249023,
+            -0.0012163817882537842,
+            0.0013641119003295898,
+            -0.002545654773712158,
+            0.002176344394683838,
+            -0.0025893449783325195,
+            -0.0003082752227783203,
+            0.0031549930572509766,
+            -0.005293905735015869
+          ],
+          "estimated_sound_change": -0.00043058183788691185,
+          "linear_continuous_change": -0.00043058183788691185,
+          "maximum_control_change": 0.005293905735015869,
+          "maximum_previously_active_change": 0.005293905735015869
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.002438277006149292,
+            -0.0010071098804473877,
+            0.0015257596969604492,
+            -0.001573801040649414,
+            0.001764833927154541,
+            -0.004443347454071045,
+            -0.0016176104545593262,
+            0.0013230741024017334,
+            -0.0038927793502807617
+          ],
+          "estimated_sound_change": -0.0030208482568472275,
+          "linear_continuous_change": -0.0030208482568472275,
+          "maximum_control_change": 0.004443347454071045,
+          "maximum_previously_active_change": 0.004443347454071045
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0024283528327941895,
+            -0.0016106367111206055,
+            0.001903235912322998,
+            -0.002620100975036621,
+            0.0024373531341552734,
+            -0.0053261518478393555,
+            -0.0017870962619781494,
+            0.003093421459197998,
+            -0.005921058356761932
+          ],
+          "estimated_sound_change": -0.0006646909589824713,
+          "linear_continuous_change": -0.0006646909589824713,
+          "maximum_control_change": 0.005921058356761932,
+          "maximum_previously_active_change": 0.005921058356761932
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0011371374130249023,
+            -0.0012163817882537842,
+            0.0013641119003295898,
+            -0.002545654773712158,
+            0.002176344394683838,
+            -0.0025893449783325195,
+            -0.0003082752227783203,
+            0.0031549930572509766,
+            -0.005293905735015869
+          ],
+          "estimated_sound_change": -0.0018537575098065402,
+          "linear_continuous_change": -0.0018537575098065402,
+          "maximum_control_change": 0.005293905735015869,
+          "maximum_previously_active_change": 0.005293905735015869
+        }
+      ],
+      "maximum_bank_control_change": 0.020314574241638184,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": 0.0038659144768024827,
+      "projected_norm": 0.064113123379112,
+      "projection_distance": 0.003161615952968755,
+      "proposal_norm": 0.06419103056392915,
+      "scale": 1.0,
+      "step": 10,
+      "weighted_output_estimated_change": -0.0021645953352197856
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0005526840686798096,
+            -0.0012133866548538208,
+            -0.0023632049560546875,
+            -0.00027507543563842773,
+            0.00236588716506958,
+            -0.0006416440010070801,
+            0.0031054019927978516,
+            0.0019617080688476562,
+            -0.0028794407844543457
+          ],
+          "estimated_sound_change": -0.00031362487797004213,
+          "linear_continuous_change": -0.00031362487797004213,
+          "maximum_control_change": 0.0031054019927978516,
+          "maximum_previously_active_change": 0.0031054019927978516
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0004898905754089355,
+            -0.0009778738021850586,
+            -0.0023418664932250977,
+            0.00026530027389526367,
+            0.0017155120149254799,
+            0.0,
+            0.0024596452713012695,
+            0.0012472793459892273,
+            -0.002002894878387451
+          ],
+          "estimated_sound_change": -0.00198236626778506,
+          "linear_continuous_change": -0.00198236626778506,
+          "maximum_control_change": 0.0024596452713012695,
+          "maximum_previously_active_change": 0.0024596452713012695
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0020019710063934326,
+            -0.0010385513305664062,
+            -0.0019618868827819824,
+            0.0009174346923828125,
+            0.0015487074851989746,
+            0.0018248260021209717,
+            0.002917051315307617,
+            0.0016262531280517578,
+            -0.0015919804573059082
+          ],
+          "estimated_sound_change": -0.0033299212743465017,
+          "linear_continuous_change": -0.0033299212743465017,
+          "maximum_control_change": 0.002917051315307617,
+          "maximum_previously_active_change": 0.002917051315307617
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.001249760389328003,
+            -0.00040459632873535156,
+            -0.002035796642303467,
+            -0.0005776286125183105,
+            0.0,
+            -0.0018488168716430664,
+            0.0012619756162166595,
+            0.0002270340919494629,
+            -0.0018583834171295166
+          ],
+          "estimated_sound_change": -0.004574551762800412,
+          "linear_continuous_change": -0.004574551762800412,
+          "maximum_control_change": 0.002035796642303467,
+          "maximum_previously_active_change": 0.002035796642303467
+        }
+      ],
+      "maximum_bank_control_change": 0.011581182479858398,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.003037670912018877,
+      "projected_norm": 0.05691707833372507,
+      "projection_distance": 0.0,
+      "proposal_norm": 0.05691707833372507,
+      "scale": 1.0,
+      "step": 11,
+      "weighted_output_estimated_change": -0.0030457076126717687
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0007363557815551758,
+            -0.0008947104215621948,
+            -0.0024098753929138184,
+            -0.00045359134674072266,
+            0.0007042884826660156,
+            -0.0007042586803436279,
+            0.0027134716510772705,
+            0.001596301794052124,
+            -0.0029517412185668945
+          ],
+          "estimated_sound_change": -0.002536450889306649,
+          "linear_continuous_change": -0.002536450889306649,
+          "maximum_control_change": 0.0029517412185668945,
+          "maximum_previously_active_change": 0.0029517412185668945
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0006873011589050293,
+            -0.0014410614967346191,
+            -0.0019396543502807617,
+            0.0005077719688415527,
+            0.0,
+            -0.001877129077911377,
+            0.00044614076614379883,
+            0.0006757676601409912,
+            -0.0026702284812927246
+          ],
+          "estimated_sound_change": -0.0010174055346147083,
+          "linear_continuous_change": -0.0010174055346147083,
+          "maximum_control_change": 0.0026702284812927246,
+          "maximum_previously_active_change": 0.0026702284812927246
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0019480586051940918,
+            -0.0015172958374023438,
+            -0.002323552966117859,
+            0.0011044144630432129,
+            0.0008158981800079346,
+            0.000970304012298584,
+            0.002542734146118164,
+            0.0018429160118103027,
+            -0.002549588680267334
+          ],
+          "estimated_sound_change": -0.004206072615082764,
+          "linear_continuous_change": -0.004206072615082764,
+          "maximum_control_change": 0.002549588680267334,
+          "maximum_previously_active_change": 0.002549588680267334
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0011797845363616943,
+            -0.0017688572406768799,
+            -0.002985091879963875,
+            0.0005548000335693359,
+            0.0011818408966064453,
+            -0.0005148053169250488,
+            0.00286942720413208,
+            0.002117753028869629,
+            -0.0036858469247817993
+          ],
+          "estimated_sound_change": -0.0018664420329983496,
+          "linear_continuous_change": -0.0018664420329983496,
+          "maximum_control_change": 0.0036858469247817993,
+          "maximum_previously_active_change": 0.0036858469247817993
+        }
+      ],
+      "maximum_bank_control_change": 0.011664867401123047,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.002530780355848184,
+      "projected_norm": 0.057307109626703365,
+      "projection_distance": 0.0,
+      "proposal_norm": 0.057307109626703365,
+      "scale": 1.0,
+      "step": 12,
+      "weighted_output_estimated_change": -0.002427638897529501
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.01337367296218872,
+            0.006584793329238892,
+            0.006944775581359863,
+            0.002849876880645752,
+            0.0,
+            0.007178992033004761,
+            0.007589399814605713,
+            0.010042548179626465,
+            0.011918783187866211
+          ],
+          "estimated_sound_change": -0.021803639046749073,
+          "linear_continuous_change": -0.021803639046749073,
+          "maximum_control_change": 0.01337367296218872,
+          "maximum_previously_active_change": 0.01337367296218872
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0031592845916748047,
+            0.010889753699302673,
+            0.005382319912314415,
+            -0.004779219627380371,
+            0.0,
+            -0.011606097221374512,
+            0.0021418333053588867,
+            0.005086839199066162,
+            0.008128166198730469
+          ],
+          "estimated_sound_change": -0.008421442295891333,
+          "linear_continuous_change": -0.008421442295891333,
+          "maximum_control_change": 0.011606097221374512,
+          "maximum_previously_active_change": 0.011606097221374512
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.003711700439453125,
+            0.001130521297454834,
+            0.0013065934181213379,
+            0.0021768808364868164,
+            0.0004794320557266474,
+            0.00141105055809021,
+            0.0014507174491882324,
+            0.0034003853797912598,
+            0.0032700300216674805
+          ],
+          "estimated_sound_change": -0.006090351679062239,
+          "linear_continuous_change": -0.006090351679062239,
+          "maximum_control_change": 0.003711700439453125,
+          "maximum_previously_active_change": 0.003711700439453125
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.00016260147094726562,
+            0.0018337219953536987,
+            0.0003872821107506752,
+            8.01384449005127e-05,
+            0.0006317496299743652,
+            -0.0022215843200683594,
+            0.00019186735153198242,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": -1.1271192070793546e-05,
+          "linear_continuous_change": -1.1271192070793546e-05,
+          "maximum_control_change": 0.0022215843200683594,
+          "maximum_previously_active_change": 0.0022215843200683594
+        }
+      ],
+      "maximum_bank_control_change": 0.015371367335319519,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.011943616430195932,
+      "projected_norm": 0.05751299550957959,
+      "projection_distance": 0.0007556109976902756,
+      "proposal_norm": 0.05751795893861964,
+      "scale": 1.0,
+      "step": 13,
+      "weighted_output_estimated_change": -0.011185627728407343
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.002507507801055908,
+            0.00038820505142211914,
+            0.00150221586227417,
+            0.0009946823120117188,
+            0.00017255544662475586,
+            0.0011974573135375977,
+            0.0015204548835754395,
+            0.0019178986549377441,
+            0.0014171004295349121
+          ],
+          "estimated_sound_change": -0.003558626144188889,
+          "linear_continuous_change": -0.003558626144188889,
+          "maximum_control_change": 0.002507507801055908,
+          "maximum_previously_active_change": 0.002507507801055908
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.001549065113067627,
+            0.002386525273323059,
+            0.0005248785018920898,
+            0.0,
+            0.0006573200225830078,
+            0.002857506275177002,
+            0.002571284770965576,
+            0.0017892122268676758
+          ],
+          "estimated_sound_change": -0.0008332614340416572,
+          "linear_continuous_change": -0.0008332614340416572,
+          "maximum_control_change": 0.002857506275177002,
+          "maximum_previously_active_change": 0.002857506275177002
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0025990307331085205,
+            0.00019812583923339844,
+            0.0014508552849292755,
+            0.0011266469955444336,
+            0.00011172890663146973,
+            0.0013782680034637451,
+            0.0014066696166992188,
+            0.0018856525421142578,
+            0.0014071464538574219
+          ],
+          "estimated_sound_change": -0.004106627134836668,
+          "linear_continuous_change": -0.004106627134836668,
+          "maximum_control_change": 0.0025990307331085205,
+          "maximum_previously_active_change": 0.0025990307331085205
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0002486705780029297,
+            0.00038892030715942383,
+            0.00037366151809692383,
+            -6.583333015441895e-05,
+            0.00022041797637939453,
+            -0.0005158483982086182,
+            0.0007992982864379883,
+            0.0007012486457824707,
+            0.00019443035125732422
+          ],
+          "estimated_sound_change": -1.516349246166655e-06,
+          "linear_continuous_change": -1.516349246166655e-06,
+          "maximum_control_change": 0.0007992982864379883,
+          "maximum_previously_active_change": 0.0007992982864379883
+        }
+      ],
+      "maximum_bank_control_change": 0.006533145904541016,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.009669430023663717,
+      "projected_norm": 0.06031317556684673,
+      "projection_distance": 0.00018647753702309854,
+      "proposal_norm": 0.06031346384373126,
+      "scale": 0.25,
+      "step": 14,
+      "weighted_output_estimated_change": -0.002333133580432989
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.006781637668609619,
+            0.0004678070545196533,
+            0.0019900016486644745,
+            0.0031857192516326904,
+            -0.0004024505615234375,
+            0.006229221820831299,
+            0.0036319494247436523,
+            0.004081785678863525,
+            0.0018102377653121948
+          ],
+          "estimated_sound_change": -0.008931073554569728,
+          "linear_continuous_change": -0.008931073554569728,
+          "maximum_control_change": 0.006781637668609619,
+          "maximum_previously_active_change": 0.006781637668609619
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.005694344639778137,
+            0.007786570116877556,
+            0.005572795867919922,
+            0.0,
+            0.0,
+            0.0,
+            0.012916147708892822,
+            0.003919661045074463
+          ],
+          "estimated_sound_change": -0.006328715011028266,
+          "linear_continuous_change": -0.006328715011028266,
+          "maximum_control_change": 0.012916147708892822,
+          "maximum_previously_active_change": 0.012916147708892822
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.002718508243560791,
+            0.0004425644874572754,
+            0.0010172724723815918,
+            0.0017753839492797852,
+            0.00031697750091552734,
+            0.0019377470016479492,
+            0.0024068355560302734,
+            0.00267888605594635,
+            0.0007129311561584473
+          ],
+          "estimated_sound_change": -0.004939702908632878,
+          "linear_continuous_change": -0.004939702908632878,
+          "maximum_control_change": 0.002718508243560791,
+          "maximum_previously_active_change": 0.002718508243560791
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0030401945114135742,
+            1.2218952178955078e-06,
+            0.0009942054748535156,
+            0.0019488334655761719,
+            0.0001592007465660572,
+            0.0022916942834854126,
+            0.0019951462745666504,
+            0.0024710670113563538,
+            0.0006086826324462891
+          ],
+          "estimated_sound_change": -0.00626658650014322,
+          "linear_continuous_change": -0.00626658650014322,
+          "maximum_control_change": 0.0030401945114135742,
+          "maximum_previously_active_change": 0.0030401945114135742
+        }
+      ],
+      "maximum_bank_control_change": 0.01585441827774048,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.019466400710802474,
+      "projected_norm": 0.06694555280469336,
+      "projection_distance": 0.0,
+      "proposal_norm": 0.06694555280469336,
+      "scale": 0.5,
+      "step": 15,
+      "weighted_output_estimated_change": -0.00819869824635059
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.007657009061538262,
+      "projected_norm": 0.06781387644182124,
+      "projection_distance": 0.000424722079458008,
+      "proposal_norm": 0.06781520645778025,
+      "scale": 0.0,
+      "step": 16,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": 0.001368342693192283,
+      "projected_norm": 0.060047252171141485,
+      "projection_distance": 0.002391754514850231,
+      "proposal_norm": 0.06009486652754916,
+      "scale": 0.0,
+      "step": 17,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.009730815887451172,
+            -0.002388089895248413,
+            0.003684692084789276,
+            0.005478382110595703,
+            -0.001902163028717041,
+            0.008490979671478271,
+            -0.0002770423889160156,
+            0.003967106342315674,
+            0.0030821412801742554
+          ],
+          "estimated_sound_change": -0.005329782729959206,
+          "linear_continuous_change": -0.005329782729959206,
+          "maximum_control_change": 0.009730815887451172,
+          "maximum_previously_active_change": 0.009730815887451172
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.010313808917999268,
+            -0.0010980814695358276,
+            0.004734821617603302,
+            0.004292607307434082,
+            -0.0021416842937469482,
+            0.0074242353439331055,
+            0.0003261566162109375,
+            0.005745649337768555,
+            0.003583550453186035
+          ],
+          "estimated_sound_change": -0.008840162770971098,
+          "linear_continuous_change": -0.008840162770971098,
+          "maximum_control_change": 0.010313808917999268,
+          "maximum_previously_active_change": 0.010313808917999268
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.004387080669403076,
+            -0.0010603591799736023,
+            0.0017033219337463379,
+            0.0030587315559387207,
+            -0.0007315278053283691,
+            0.003548651933670044,
+            0.0010921359062194824,
+            0.0030847489833831787,
+            0.0016026496887207031
+          ],
+          "estimated_sound_change": -0.003912146497613285,
+          "linear_continuous_change": -0.003912146497613285,
+          "maximum_control_change": 0.004387080669403076,
+          "maximum_previously_active_change": 0.004387080669403076
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.00954669713973999,
+            -0.0013593286275863647,
+            0.00530928373336792,
+            0.005097448825836182,
+            -0.0016739368438720703,
+            0.0063266754150390625,
+            0.0002550482749938965,
+            0.005993247032165527,
+            0.0035446584224700928
+          ],
+          "estimated_sound_change": -0.011076475242277607,
+          "linear_continuous_change": -0.011076475242277607,
+          "maximum_control_change": 0.00954669713973999,
+          "maximum_previously_active_change": 0.00954669713973999
+        }
+      ],
+      "maximum_bank_control_change": 0.019549548625946045,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.009475829768106177,
+      "projected_norm": 0.06037606997598184,
+      "projection_distance": 0.0,
+      "proposal_norm": 0.06037606997598184,
+      "scale": 1.0,
+      "step": 18,
+      "weighted_output_estimated_change": -0.008115123097663372
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.004355490207672119,
+            -0.0032630562782287598,
+            0.0025197267532348633,
+            0.0023114681243896484,
+            -0.0009563565254211426,
+            0.006812453269958496,
+            -0.001056373119354248,
+            0.0007124841213226318,
+            0.002198934555053711
+          ],
+          "estimated_sound_change": -0.005202237466355171,
+          "linear_continuous_change": -0.005202237466355171,
+          "maximum_control_change": 0.006812453269958496,
+          "maximum_previously_active_change": 0.006812453269958496
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0007476955652236938,
+            -0.0036759376525878906,
+            0.0019713640213012695,
+            0.0011461377143859863,
+            -7.969141006469727e-05,
+            0.003402113914489746,
+            0.0006641745567321777,
+            0.00012701749801635742,
+            0.0012860894203186035
+          ],
+          "estimated_sound_change": -0.002202907488153547,
+          "linear_continuous_change": -0.002202907488153547,
+          "maximum_control_change": 0.0036759376525878906,
+          "maximum_previously_active_change": 0.0036759376525878906
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0004138052463531494,
+            -0.003455430269241333,
+            0.0009930282831192017,
+            0.0017091035842895508,
+            0.0004450678825378418,
+            0.0026726126670837402,
+            0.0009651780128479004,
+            -0.0007276535034179688,
+            0.0006979703903198242
+          ],
+          "estimated_sound_change": -0.0060318343680920705,
+          "linear_continuous_change": -0.0060318343680920705,
+          "maximum_control_change": 0.003455430269241333,
+          "maximum_previously_active_change": 0.003455430269241333
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.00033880770206451416,
+            -0.004030883312225342,
+            0.0013631358742713928,
+            0.001702725887298584,
+            0.0001850426197052002,
+            0.0038475096225738525,
+            0.0010161995887756348,
+            -0.000561833381652832,
+            0.0011003613471984863
+          ],
+          "estimated_sound_change": -0.00024713971555401205,
+          "linear_continuous_change": -0.00024713971555401205,
+          "maximum_control_change": 0.004030883312225342,
+          "maximum_previously_active_change": 0.004030883312225342
+        }
+      ],
+      "maximum_bank_control_change": 0.015968292951583862,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.0067913704153002375,
+      "projected_norm": 0.06570697573054389,
+      "projection_distance": 0.00371440319179122,
+      "proposal_norm": 0.06581187925234676,
+      "scale": 1.0,
+      "step": 19,
+      "weighted_output_estimated_change": -0.003940864167132835
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0013812482357025146,
+            -0.0034650564193725586,
+            -0.0019552111625671387,
+            0.0033814311027526855,
+            0.00037384033203125,
+            0.004596531391143799,
+            -0.0007598996162414551,
+            -0.0012611150741577148,
+            0.00039327144622802734
+          ],
+          "estimated_sound_change": -0.0007886084426950113,
+          "linear_continuous_change": -0.0007886084426950113,
+          "maximum_control_change": 0.004596531391143799,
+          "maximum_previously_active_change": 0.004596531391143799
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.00027638673782348633,
+            -0.00366896390914917,
+            -0.0005742907524108887,
+            0.0027629733085632324,
+            0.000614464282989502,
+            0.0009772181510925293,
+            -0.00010192394256591797,
+            0.0005699098110198975,
+            0.00016570091247558594
+          ],
+          "estimated_sound_change": -0.0006798699431108389,
+          "linear_continuous_change": -0.0006798699431108389,
+          "maximum_control_change": 0.00366896390914917,
+          "maximum_previously_active_change": 0.00366896390914917
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0006099939346313477,
+            -0.010024726390838623,
+            -0.0070188045501708984,
+            0.006127595901489258,
+            0.0,
+            0.009567171335220337,
+            -0.0045888423919677734,
+            -0.006529450416564941,
+            -0.0023865103721618652
+          ],
+          "estimated_sound_change": -0.012970451617577525,
+          "linear_continuous_change": -0.012970451617577525,
+          "maximum_control_change": 0.010024726390838623,
+          "maximum_previously_active_change": 0.010024726390838623
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0013812482357025146,
+            -0.0034650564193725586,
+            -0.0019552111625671387,
+            0.0033814311027526855,
+            0.00037384033203125,
+            0.004596531391143799,
+            -0.0007598996162414551,
+            -0.0012611150741577148,
+            0.00039327144622802734
+          ],
+          "estimated_sound_change": -0.0004954942406901303,
+          "linear_continuous_change": -0.0004954942406901303,
+          "maximum_control_change": 0.004596531391143799,
+          "maximum_previously_active_change": 0.004596531391143799
+        }
+      ],
+      "maximum_bank_control_change": 0.012855872511863708,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.0008754078747337298,
+      "projected_norm": 0.05341059247751962,
+      "projection_distance": 0.001397256764896193,
+      "proposal_norm": 0.053428865936558205,
+      "scale": 1.0,
+      "step": 20,
+      "weighted_output_estimated_change": -0.0038416367667098196
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": 0.0007693133090389709,
+      "projected_norm": 0.04305773413064888,
+      "projection_distance": 0.0011909770543226611,
+      "proposal_norm": 0.0430742021958569,
+      "scale": 0.0,
+      "step": 21,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.0028585035296694386,
+      "projected_norm": 0.041067674919099253,
+      "projection_distance": 0.0013426370971598707,
+      "proposal_norm": 0.041089616664499076,
+      "scale": 0.0,
+      "step": 22,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.001868268976927343,
+      "projected_norm": 0.04301752629256786,
+      "projection_distance": 0.00014271489753533192,
+      "proposal_norm": 0.04301776302730938,
+      "scale": 0.0,
+      "step": 23,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.002701654058122238,
+      "projected_norm": 0.043493517791931495,
+      "projection_distance": 2.1847440641031132e-05,
+      "proposal_norm": 0.04349352327907824,
+      "scale": 0.0,
+      "step": 24,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.00484152028994673,
+      "projected_norm": 0.047984137348978446,
+      "projection_distance": 0.0009295342208088086,
+      "proposal_norm": 0.047993139832618464,
+      "scale": 0.0,
+      "step": 25,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0009351372718811035,
+            -0.0016990229487419128,
+            -0.0004947837442159653,
+            0.0005491673946380615,
+            0.0007163882255554199,
+            -0.0003673434257507324,
+            -0.0009605884552001953,
+            -0.0003731846809387207,
+            -0.0008855462074279785
+          ],
+          "estimated_sound_change": -0.00024241226307897246,
+          "linear_continuous_change": -0.00024241226307897246,
+          "maximum_control_change": 0.0016990229487419128,
+          "maximum_previously_active_change": 0.0016990229487419128
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0013988018035888672,
+            -0.002526611089706421,
+            -0.0003428459167480469,
+            0.0010728240013122559,
+            0.0,
+            -0.0013409256935119629,
+            -0.0017507076263427734,
+            -0.0004347562789916992,
+            -0.0013568997383117676
+          ],
+          "estimated_sound_change": -0.0019640087996108937,
+          "linear_continuous_change": -0.0019640087996108937,
+          "maximum_control_change": 0.002526611089706421,
+          "maximum_previously_active_change": 0.002526611089706421
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0007258951663970947,
+            -0.001466900110244751,
+            -0.0006481409072875977,
+            0.00029081106185913086,
+            0.0005384683609008789,
+            -3.4809112548828125e-05,
+            -0.0010117590427398682,
+            -0.0004229545593261719,
+            -0.0008791536092758179
+          ],
+          "estimated_sound_change": -0.0009177084331390964,
+          "linear_continuous_change": -0.0009177084331390964,
+          "maximum_control_change": 0.001466900110244751,
+          "maximum_previously_active_change": 0.001466900110244751
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.00036093592643737793,
+            -0.000733107328414917,
+            -0.0012730658054351807,
+            0.00019997358322143555,
+            -0.0001679062843322754,
+            0.0010074973106384277,
+            -0.0009329319000244141,
+            -0.0006534457206726074,
+            -0.000614464282989502
+          ],
+          "estimated_sound_change": -2.408149264443531e-06,
+          "linear_continuous_change": -2.408149264443531e-06,
+          "maximum_control_change": 0.0012730658054351807,
+          "maximum_previously_active_change": 0.0010074973106384277
+        }
+      ],
+      "maximum_bank_control_change": 0.003724031150341034,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.0026663253704834675,
+      "projected_norm": 0.046941401754412415,
+      "projection_distance": 0.0005133720706088383,
+      "proposal_norm": 0.04694420890325056,
+      "scale": 0.5,
+      "step": 26,
+      "weighted_output_estimated_change": -0.0011579230570336878
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.002689659595489502,
+            -0.0018173009157180786,
+            0.0034942030906677246,
+            -0.0012186765670776367,
+            0.001797795295715332,
+            -0.004915177822113037,
+            -0.0014050006866455078,
+            0.0006586909294128418,
+            -0.0025796890258789062
+          ],
+          "estimated_sound_change": -0.00912516401096352,
+          "linear_continuous_change": -0.00912516401096352,
+          "maximum_control_change": 0.004915177822113037,
+          "maximum_previously_active_change": 0.004915177822113037
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.000981256365776062,
+            0.004564732313156128,
+            -0.0038983821868896484,
+            0.002920413389801979,
+            -0.0046957433223724365,
+            0.002256929874420166,
+            0.0,
+            -0.0038014650344848633
+          ],
+          "estimated_sound_change": -0.0008159525141238073,
+          "linear_continuous_change": -0.0008159525141238073,
+          "maximum_control_change": 0.0046957433223724365,
+          "maximum_previously_active_change": 0.0046957433223724365
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -9.238719940185547e-07,
+            6.198883056640625e-05,
+            0.0003593862056732178,
+            -0.0007377266883850098,
+            -0.00044733285903930664,
+            -0.00025850534439086914,
+            -0.000788569450378418,
+            -0.00012665987014770508,
+            -0.0014182180166244507
+          ],
+          "estimated_sound_change": -9.76160312760043e-05,
+          "linear_continuous_change": -9.76160312760043e-05,
+          "maximum_control_change": 0.0014182180166244507,
+          "maximum_previously_active_change": 0.0014182180166244507
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0014029890298843384,
+            -0.001819312572479248,
+            -0.0015853047370910645,
+            0.0004488825798034668,
+            0.0,
+            -0.0008938908576965332,
+            -0.0007049068808555603,
+            -0.00040343403816223145,
+            -0.0015790760517120361
+          ],
+          "estimated_sound_change": -0.004554774658187539,
+          "linear_continuous_change": -0.004554774658187539,
+          "maximum_control_change": 0.001819312572479248,
+          "maximum_previously_active_change": 0.001819312572479248
+        }
+      ],
+      "maximum_bank_control_change": 0.009917430579662323,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.003843116466230837,
+      "projected_norm": 0.04582052709015131,
+      "projection_distance": 0.0,
+      "proposal_norm": 0.04582052709015131,
+      "scale": 1.0,
+      "step": 27,
+      "weighted_output_estimated_change": -0.0038523649321686696
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.002040947917958134,
+      "projected_norm": 0.04356094287615751,
+      "projection_distance": 0.0006077378165543194,
+      "proposal_norm": 0.043565182078278114,
+      "scale": 0.0,
+      "step": 28,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.0012145841342591727,
+      "projected_norm": 0.041702814935082926,
+      "projection_distance": 0.0016140452974374307,
+      "proposal_norm": 0.04173403785559162,
+      "scale": 0.0,
+      "step": 29,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.002710261643776282,
+      "projected_norm": 0.04382433711211346,
+      "projection_distance": 0.0007359982389619556,
+      "proposal_norm": 0.043830516957069056,
+      "scale": 0.0,
+      "step": 30,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.011784682437543928,
+      "projected_norm": 0.050943571685559734,
+      "projection_distance": 0.0016532780142685857,
+      "proposal_norm": 0.05097039164332779,
+      "scale": 0.0,
+      "step": 31,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.009824161755064587,
+      "projected_norm": 0.057684176703099284,
+      "projection_distance": 0.00134901913232724,
+      "proposal_norm": 0.05769994882609301,
+      "scale": 0.0,
+      "step": 32,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.023728505347665643,
+      "projected_norm": 0.05708940968584686,
+      "projection_distance": 0.0014882367804369794,
+      "proposal_norm": 0.05710880446124833,
+      "scale": 0.0,
+      "step": 33,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.00491892183692547,
+      "projected_norm": 0.057933429601568116,
+      "projection_distance": 0.00279246288673361,
+      "proposal_norm": 0.05800069063704003,
+      "scale": 0.0,
+      "step": 34,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.0015516255753201204,
+      "projected_norm": 0.05429450254211224,
+      "projection_distance": 0.0015688274819132596,
+      "proposal_norm": 0.05431716327242634,
+      "scale": 0.0,
+      "step": 35,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.005468964254338487,
+      "projected_norm": 0.051871847084299684,
+      "projection_distance": 0.0,
+      "proposal_norm": 0.051871847084299684,
+      "scale": 0.0,
+      "step": 36,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.0018320692158625776,
+      "projected_norm": 0.04978700300376191,
+      "projection_distance": 0.0,
+      "proposal_norm": 0.04978700300376191,
+      "scale": 0.0,
+      "step": 37,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0005789995193481445,
+            0.0032579898834228516,
+            -0.0016641020774841309,
+            -0.0029953718185424805,
+            6.854534149169922e-05,
+            0.0024222135543823242,
+            0.0031746327877044678,
+            0.0004844069480895996,
+            -0.001587510108947754
+          ],
+          "estimated_sound_change": -0.0025731080982871446,
+          "linear_continuous_change": -0.0025731080982871446,
+          "maximum_control_change": 0.0032579898834228516,
+          "maximum_previously_active_change": 0.0032579898834228516
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.002350151538848877,
+            0.000644296407699585,
+            -0.0009927153587341309,
+            -0.0011334419250488281,
+            0.0014960765838623047,
+            -0.0009628534317016602,
+            0.0004680156707763672,
+            -0.00015106797218322754,
+            -0.001802980899810791
+          ],
+          "estimated_sound_change": -0.0006562735100512637,
+          "linear_continuous_change": -0.0006562735100512637,
+          "maximum_control_change": 0.002350151538848877,
+          "maximum_previously_active_change": 0.002350151538848877
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0006959140300750732,
+            0.0011779367923736572,
+            -0.0008249878883361816,
+            -0.0006827116012573242,
+            0.0007182955741882324,
+            0.0004868507385253906,
+            0.0014895051717758179,
+            0.00018733739852905273,
+            -0.0007350146770477295
+          ],
+          "estimated_sound_change": -0.00013859882066702406,
+          "linear_continuous_change": -0.00013859882066702406,
+          "maximum_control_change": 0.0014895051717758179,
+          "maximum_previously_active_change": 0.0014895051717758179
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0012641549110412598,
+            0.0030870437622070312,
+            -0.001687765121459961,
+            -0.0019519329071044922,
+            0.0012691915035247803,
+            0.0013691186904907227,
+            0.0036644339561462402,
+            0.0005756616592407227,
+            0.0
+          ],
+          "estimated_sound_change": -0.0010682690270336073,
+          "linear_continuous_change": -0.0010682690270336073,
+          "maximum_control_change": 0.0036644339561462402,
+          "maximum_previously_active_change": 0.0036644339561462402
+        }
+      ],
+      "maximum_bank_control_change": 0.019070640206336975,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.003137799530763082,
+      "projected_norm": 0.05049119189878951,
+      "projection_distance": 0.0,
+      "proposal_norm": 0.05049119189878951,
+      "scale": 0.5,
+      "step": 38,
+      "weighted_output_estimated_change": -0.0012558058889391979
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0014830827713012695,
+            -0.003363698720932007,
+            -0.00019345118198543787,
+            0.008470088243484497,
+            0.0037595778703689575,
+            0.002487361431121826,
+            -0.00019061565399169922,
+            -0.0008886456489562988,
+            -0.0025027990341186523
+          ],
+          "estimated_sound_change": -0.023303008502266746,
+          "linear_continuous_change": -0.023303008502266746,
+          "maximum_control_change": 0.008470088243484497,
+          "maximum_previously_active_change": 0.008470088243484497
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.005739420652389526,
+            -0.008728384971618652,
+            0.0,
+            0.011489272117614746,
+            0.0,
+            0.0,
+            -0.005114436149597168,
+            -0.0036103129386901855,
+            -0.005329787731170654
+          ],
+          "estimated_sound_change": -0.012198950565827659,
+          "linear_continuous_change": -0.012198950565827659,
+          "maximum_control_change": 0.011489272117614746,
+          "maximum_previously_active_change": 0.011489272117614746
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.000561833381652832,
+            0.0035856664180755615,
+            -0.003966629505157471,
+            0.002146780490875244,
+            0.0009935647249221802,
+            0.005827464163303375,
+            0.005904972553253174,
+            -3.446638584136963e-05,
+            -0.0037807226181030273
+          ],
+          "estimated_sound_change": -0.0010897653461117143,
+          "linear_continuous_change": -0.0010897653461117143,
+          "maximum_control_change": 0.005904972553253174,
+          "maximum_previously_active_change": 0.005904972553253174
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0014830827713012695,
+            -0.003363698720932007,
+            -0.00019345118198543787,
+            0.008470088243484497,
+            0.0037595778703689575,
+            0.002487361431121826,
+            -0.00019061565399169922,
+            -0.0008886456489562988,
+            -0.0025027990341186523
+          ],
+          "estimated_sound_change": -0.018253631486082614,
+          "linear_continuous_change": -0.018253631486082614,
+          "maximum_control_change": 0.008470088243484497,
+          "maximum_previously_active_change": 0.008470088243484497
+        }
+      ],
+      "maximum_bank_control_change": 0.02088332176208496,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.017815727945129693,
+      "projected_norm": 0.055003594406815896,
+      "projection_distance": 0.0,
+      "proposal_norm": 0.055003594406815896,
+      "scale": 1.0,
+      "step": 39,
+      "weighted_output_estimated_change": -0.016624855948265134
+    },
+    {
+      "accepted": false,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "estimated_sound_change": 0.0,
+          "linear_continuous_change": 0.0,
+          "maximum_control_change": 0.0,
+          "maximum_previously_active_change": 0.0
+        }
+      ],
+      "maximum_bank_control_change": 0.0,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.002916451764959379,
+      "projected_norm": 0.05231450752282561,
+      "projection_distance": 0.0011689075737592253,
+      "proposal_norm": 0.05232756484179016,
+      "scale": 0.0,
+      "step": 40,
+      "weighted_output_estimated_change": 0.0
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            5.08427619934082e-05,
+            -0.0006759166717529297,
+            -0.0008628368377685547,
+            0.0026171207427978516,
+            9.447336196899414e-05,
+            0.0007402300834655762,
+            0.002092510461807251,
+            0.0002327263355255127,
+            -0.000878453254699707
+          ],
+          "estimated_sound_change": -0.00023694192435197399,
+          "linear_continuous_change": -0.00023694192435197399,
+          "maximum_control_change": 0.0026171207427978516,
+          "maximum_previously_active_change": 0.0026171207427978516
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0021170377731323242,
+            -0.0024643540382385254,
+            -0.0005020499229431152,
+            0.0027529001235961914,
+            0.0,
+            -0.001837015151977539,
+            -0.001377403736114502,
+            -0.0007845759391784668,
+            -0.0023682117462158203
+          ],
+          "estimated_sound_change": -0.0018468548624639407,
+          "linear_continuous_change": -0.0018468548624639407,
+          "maximum_control_change": 0.0027529001235961914,
+          "maximum_previously_active_change": 0.0027529001235961914
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0003268718719482422,
+            -0.0007335543632507324,
+            -0.001033782958984375,
+            0.002853572368621826,
+            -0.00019419193267822266,
+            0.0010388270020484924,
+            0.002494722604751587,
+            0.0002442598342895508,
+            -0.0007376372814178467
+          ],
+          "estimated_sound_change": -0.0014096318939729846,
+          "linear_continuous_change": -0.0014096318939729846,
+          "maximum_control_change": 0.002853572368621826,
+          "maximum_previously_active_change": 0.002853572368621826
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0008383691310882568,
+            -0.00023362040519714355,
+            -0.0012740790843963623,
+            0.0026319026947021484,
+            0.0,
+            0.0,
+            0.0030086636543273926,
+            0.00030535459518432617,
+            -0.0003896653652191162
+          ],
+          "estimated_sound_change": -8.222250889033917e-06,
+          "linear_continuous_change": -8.222250889033917e-06,
+          "maximum_control_change": 0.0030086636543273926,
+          "maximum_previously_active_change": 0.0030086636543273926
+        }
+      ],
+      "maximum_bank_control_change": 0.009662747383117676,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.0029644952255681875,
+      "projected_norm": 0.04763164809844337,
+      "projection_distance": 0.0005530764959171836,
+      "proposal_norm": 0.04763485902345334,
+      "scale": 0.5,
+      "step": 41,
+      "weighted_output_estimated_change": -0.0013360986671743392
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0023140013217926025,
+            -0.004301693290472031,
+            -0.0005103982985019684,
+            0.0038622915744781494,
+            -0.0017005205154418945,
+            0.0009971857070922852,
+            -0.0015156269073486328,
+            -0.0003158450126647949,
+            -0.0011675283312797546
+          ],
+          "estimated_sound_change": -0.0016133472194235232,
+          "linear_continuous_change": -0.0016133472194235232,
+          "maximum_control_change": 0.004301693290472031,
+          "maximum_previously_active_change": 0.004301693290472031
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            -0.013657093048095703,
+            -0.003360830247402191,
+            0.007860243320465088,
+            -0.007043972611427307,
+            0.0,
+            -0.002388283610343933,
+            0.0,
+            -0.0038736462593078613
+          ],
+          "estimated_sound_change": -0.006791357725788314,
+          "linear_continuous_change": -0.006791357725788314,
+          "maximum_control_change": 0.013657093048095703,
+          "maximum_previously_active_change": 0.013657093048095703
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0035328269004821777,
+            -0.00411301851272583,
+            -0.0007067322731018066,
+            0.00352632999420166,
+            -0.0024091601371765137,
+            0.0024064481258392334,
+            -0.0011867880821228027,
+            -0.0002995729446411133,
+            -0.0004989057779312134
+          ],
+          "estimated_sound_change": -0.004496869145094171,
+          "linear_continuous_change": -0.004496869145094171,
+          "maximum_control_change": 0.00411301851272583,
+          "maximum_previously_active_change": 0.00411301851272583
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0041030049324035645,
+            -0.003141641616821289,
+            -0.0007828772068023682,
+            0.0021079182624816895,
+            -0.0021820068359375,
+            0.003711402416229248,
+            0.0005240440368652344,
+            0.000336378812789917,
+            0.00014960765838623047
+          ],
+          "estimated_sound_change": -0.005616697959025524,
+          "linear_continuous_change": -0.005616697959025524,
+          "maximum_control_change": 0.0041030049324035645,
+          "maximum_previously_active_change": 0.0041030049324035645
+        }
+      ],
+      "maximum_bank_control_change": 0.020574092864990234,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.015426493453538737,
+      "projected_norm": 0.05073977468571719,
+      "projection_distance": 0.0,
+      "proposal_norm": 0.05073977468571719,
+      "scale": 0.5,
+      "step": 42,
+      "weighted_output_estimated_change": -0.00576529880064319
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.008688032627105713,
+            -3.740191459655762e-05,
+            -0.000546623021364212,
+            -0.0014123320579528809,
+            -0.004389345645904541,
+            0.008833646774291992,
+            0.003924846649169922,
+            0.002562284469604492,
+            0.0005377084016799927
+          ],
+          "estimated_sound_change": -0.005710830549197627,
+          "linear_continuous_change": -0.005710830549197627,
+          "maximum_control_change": 0.008833646774291992,
+          "maximum_previously_active_change": 0.008833646774291992
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.009089469909667969,
+            0.0004190504550933838,
+            -0.0013525709509849548,
+            -0.0013730525970458984,
+            -0.005275160074234009,
+            0.009227991104125977,
+            0.0033757388591766357,
+            0.002477675676345825,
+            0.00018101930618286133
+          ],
+          "estimated_sound_change": -0.005879351336321998,
+          "linear_continuous_change": -0.005879351336321998,
+          "maximum_control_change": 0.009227991104125977,
+          "maximum_previously_active_change": 0.009227991104125977
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0068156421184539795,
+            0.0014187097549438477,
+            0.0003579258918762207,
+            -0.00174635648727417,
+            -0.002753734588623047,
+            0.006828725337982178,
+            0.0047983527183532715,
+            0.002736330032348633,
+            0.0011766254901885986
+          ],
+          "estimated_sound_change": -0.00690739827160502,
+          "linear_continuous_change": -0.00690739827160502,
+          "maximum_control_change": 0.006828725337982178,
+          "maximum_previously_active_change": 0.006828725337982178
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0016632527112960815,
+            -0.0007128119468688965,
+            -0.0003071427345275879,
+            0.0013439059257507324,
+            0.0,
+            0.0007928311824798584,
+            0.000859525054693222,
+            0.0008004307746887207,
+            -0.0003165602684020996
+          ],
+          "estimated_sound_change": -0.002498644945445604,
+          "linear_continuous_change": -0.002498644945445604,
+          "maximum_control_change": 0.0016632527112960815,
+          "maximum_previously_active_change": 0.0016632527112960815
+        }
+      ],
+      "maximum_bank_control_change": 0.01835000514984131,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.017074409871649977,
+      "projected_norm": 0.05961450448645064,
+      "projection_distance": 0.0,
+      "proposal_norm": 0.05961450448645064,
+      "scale": 0.5,
+      "step": 43,
+      "weighted_output_estimated_change": -0.006406563491542361
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.008275747299194336,
+            0.0007345378398895264,
+            -4.172325134277344e-07,
+            -0.0015192031860351562,
+            -0.003936886787414551,
+            0.008157670497894287,
+            0.0039997398853302,
+            0.0027235448360443115,
+            0.0019125938415527344
+          ],
+          "estimated_sound_change": -0.0056179043951032305,
+          "linear_continuous_change": -0.0056179043951032305,
+          "maximum_control_change": 0.008275747299194336,
+          "maximum_previously_active_change": 0.008275747299194336
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.002843603491783142,
+            -0.0011512041091918945,
+            -0.00038421154022216797,
+            0.0013415217399597168,
+            0.0,
+            0.001007378101348877,
+            0.0007471442222595215,
+            0.001044929027557373,
+            -5.4776668548583984e-05
+          ],
+          "estimated_sound_change": -0.0018894651572698427,
+          "linear_continuous_change": -0.0018894651572698427,
+          "maximum_control_change": 0.002843603491783142,
+          "maximum_previously_active_change": 0.002843603491783142
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0052450597286224365,
+            0.0009725689888000488,
+            4.953145980834961e-05,
+            -0.000697791576385498,
+            -0.0022885948419570923,
+            0.004771441221237183,
+            0.0028694868087768555,
+            0.0018976330757141113,
+            0.0013282299041748047
+          ],
+          "estimated_sound_change": -0.0065329722601159485,
+          "linear_continuous_change": -0.0065329722601159485,
+          "maximum_control_change": 0.0052450597286224365,
+          "maximum_previously_active_change": 0.0052450597286224365
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.005713939666748047,
+            -0.001056276261806488,
+            -0.0005073584616184235,
+            0.0008628368377685547,
+            -0.0030270814895629883,
+            0.0038352608680725098,
+            0.001059889793395996,
+            0.0014662742614746094,
+            0.0007405132055282593
+          ],
+          "estimated_sound_change": -0.0036251909064288794,
+          "linear_continuous_change": -0.0036251909064288794,
+          "maximum_control_change": 0.005713939666748047,
+          "maximum_previously_active_change": 0.005713939666748047
+        }
+      ],
+      "maximum_bank_control_change": 0.023039281368255615,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.010674205063359952,
+      "projected_norm": 0.0672264330273882,
+      "projection_distance": 0.0,
+      "proposal_norm": 0.0672264330273882,
+      "scale": 0.5,
+      "step": 44,
+      "weighted_output_estimated_change": -0.004435600605743326
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.00011837482452392578,
+            9.66191291809082e-05,
+            -0.0002126842737197876,
+            0.00042694807052612305,
+            -0.00048065185546875,
+            -9.34600830078125e-05,
+            -0.001197315752506256,
+            0.0005505084991455078,
+            -0.00021636486053466797
+          ],
+          "estimated_sound_change": -0.000152623424508613,
+          "linear_continuous_change": -0.000152623424508613,
+          "maximum_control_change": 0.001197315752506256,
+          "maximum_previously_active_change": 0.001197315752506256
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            6.61015510559082e-05,
+            2.6598572731018066e-05,
+            0.0,
+            0.0006451010704040527,
+            -0.00048604607582092285,
+            0.0003439188003540039,
+            -0.0010954290628433228,
+            0.0,
+            -0.00028020143508911133
+          ],
+          "estimated_sound_change": -3.022360106388467e-05,
+          "linear_continuous_change": -3.022360106388467e-05,
+          "maximum_control_change": 0.0010954290628433228,
+          "maximum_previously_active_change": 0.0010954290628433228
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.005350232124328613,
+            0.0026250481605529785,
+            -2.199411392211914e-05,
+            -0.0028272271156311035,
+            0.0,
+            0.006673187017440796,
+            0.002848207950592041,
+            0.0022912025451660156,
+            0.0013520121574401855
+          ],
+          "estimated_sound_change": -0.004511172494023881,
+          "linear_continuous_change": -0.004511172494023881,
+          "maximum_control_change": 0.006673187017440796,
+          "maximum_previously_active_change": 0.006673187017440796
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            1
+          ],
+          "before_choices": [
+            1,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0016087889671325684,
+            -9.134411811828613e-05,
+            0.0,
+            -0.0001875758171081543,
+            -0.0016568303108215332,
+            0.0016764998435974121,
+            -0.0015903115272521973,
+            0.0005000652745366096,
+            0.0
+          ],
+          "estimated_sound_change": -0.0002934850757428891,
+          "linear_continuous_change": -0.0002934850757428891,
+          "maximum_control_change": 0.0016764998435974121,
+          "maximum_previously_active_change": 0.0016764998435974121
+        }
+      ],
+      "maximum_bank_control_change": 0.019910216331481934,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.00022554443508112092,
+      "projected_norm": 0.05848485673212806,
+      "projection_distance": 0.00403811709499297,
+      "proposal_norm": 0.058624097917583384,
+      "scale": 0.5,
+      "step": 45,
+      "weighted_output_estimated_change": -0.001217746414632927
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.009511053562164307,
+            -0.007117509841918945,
+            0.01013481616973877,
+            -0.002393484115600586,
+            0.0,
+            -0.012545228004455566,
+            -0.004112184047698975,
+            0.0019128918647766113,
+            0.002783834934234619
+          ],
+          "estimated_sound_change": -0.018324530322049157,
+          "linear_continuous_change": -0.018324530322049157,
+          "maximum_control_change": 0.012545228004455566,
+          "maximum_previously_active_change": 0.012545228004455566
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.012790560722351074,
+            -0.004516541957855225,
+            0.011156931519508362,
+            -0.00029265880584716797,
+            0.008023295551538467,
+            -0.018211662769317627,
+            0.0,
+            0.0,
+            -0.000326693058013916
+          ],
+          "estimated_sound_change": -0.013029283044195556,
+          "linear_continuous_change": -0.013029283044195556,
+          "maximum_control_change": 0.018211662769317627,
+          "maximum_previously_active_change": 0.018211662769317627
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0004363059997558594,
+            0.0016481578350067139,
+            0.0038989409804344177,
+            -0.002205073833465576,
+            0.000626005232334137,
+            -0.001260310411453247,
+            0.0021347999572753906,
+            0.002947688102722168,
+            0.002475917339324951
+          ],
+          "estimated_sound_change": -0.002666328251166303,
+          "linear_continuous_change": -0.002666328251166303,
+          "maximum_control_change": 0.0038989409804344177,
+          "maximum_previously_active_change": 0.002947688102722168
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0012072324752807617,
+            -0.0005807280540466309,
+            0.0010815858840942383,
+            0.0006147921085357666,
+            0.0007766783237457275,
+            -0.0021322667598724365,
+            -0.0002772808074951172,
+            0.0008146762847900391,
+            9.781122207641602e-05
+          ],
+          "estimated_sound_change": -0.0005785746883324442,
+          "linear_continuous_change": -0.0005785746883324442,
+          "maximum_control_change": 0.0021322667598724365,
+          "maximum_previously_active_change": 0.0021322667598724365
+        }
+      ],
+      "maximum_bank_control_change": 0.018211662769317627,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.024561780257232057,
+      "projected_norm": 0.051131399465964525,
+      "projection_distance": 0.0,
+      "proposal_norm": 0.051131399465964525,
+      "scale": 0.5,
+      "step": 46,
+      "weighted_output_estimated_change": -0.011906999837484755
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0011674761772155762,
+            0.0006728619337081909,
+            0.005136549472808838,
+            -0.0017216205596923828,
+            0.0021100640296936035,
+            -0.004188120365142822,
+            0.003831028938293457,
+            0.003646373748779297,
+            0.001811683177947998
+          ],
+          "estimated_sound_change": -0.006325148259089802,
+          "linear_continuous_change": -0.006325148259089802,
+          "maximum_control_change": 0.005136549472808838,
+          "maximum_previously_active_change": 0.005136549472808838
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0008581876754760742,
+            0.0013802051544189453,
+            0.002357661724090576,
+            -0.0015212297439575195,
+            0.00038196705281734467,
+            -0.0003285631537437439,
+            0.003579854965209961,
+            0.0020948275923728943,
+            0.001843482255935669
+          ],
+          "estimated_sound_change": -0.001621860477304158,
+          "linear_continuous_change": -0.001621860477304158,
+          "maximum_control_change": 0.003579854965209961,
+          "maximum_previously_active_change": 0.003579854965209961
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            1
+          ],
+          "before_choices": [
+            2,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.0009211897850036621,
+            -0.0001786351203918457,
+            0.0014722347259521484,
+            0.0004563331604003906,
+            0.0010238885879516602,
+            -0.002184748649597168,
+            0.0016894936561584473,
+            0.001524612307548523,
+            0.0003947019577026367
+          ],
+          "estimated_sound_change": -2.510868065019904e-05,
+          "linear_continuous_change": -2.510868065019904e-05,
+          "maximum_control_change": 0.002184748649597168,
+          "maximum_previously_active_change": 0.002184748649597168
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0011643171310424805,
+            0.0011562108993530273,
+            0.00131148099899292,
+            -0.0005844831466674805,
+            0.00021724216639995575,
+            0.00012417137622833252,
+            0.0029238462448120117,
+            0.0017603784799575806,
+            0.001300036907196045
+          ],
+          "estimated_sound_change": -0.003622138772212401,
+          "linear_continuous_change": -0.003622138772212401,
+          "maximum_control_change": 0.0029238462448120117,
+          "maximum_previously_active_change": 0.0029238462448120117
+        }
+      ],
+      "maximum_bank_control_change": 0.020676428452134132,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.006293983152664126,
+      "projected_norm": 0.053197021643793856,
+      "projection_distance": 0.0005022150976441477,
+      "proposal_norm": 0.053199392212454455,
+      "scale": 0.5,
+      "step": 47,
+      "weighted_output_estimated_change": -0.0033008905815589047
+    },
+    {
+      "accepted": true,
+      "changes": [
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            1,
+            0
+          ],
+          "before_choices": [
+            1,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            -0.01551353931427002,
+            -0.006694972515106201,
+            0.0022453665733337402,
+            0.0015017390251159668,
+            0.0,
+            -0.02002739906311035,
+            -0.005171358585357666,
+            -0.004677295684814453,
+            0.0053824782371521
+          ],
+          "estimated_sound_change": -0.023993319800662848,
+          "linear_continuous_change": -0.023993319800662848,
+          "maximum_control_change": 0.02002739906311035,
+          "maximum_previously_active_change": 0.02002739906311035
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            2,
+            0
+          ],
+          "before_choices": [
+            2,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0,
+            -0.0007519721984863281,
+            0.00047347694635391235,
+            0.0015625953674316406,
+            0.006498705595731735,
+            0.0,
+            0.0014097988605499268,
+            0.0,
+            0.0045656561851501465
+          ],
+          "estimated_sound_change": -9.97580474226802e-06,
+          "linear_continuous_change": -9.97580474226802e-06,
+          "maximum_control_change": 0.006498705595731735,
+          "maximum_previously_active_change": 0.0045656561851501465
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            1
+          ],
+          "before_choices": [
+            0,
+            1
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.0001252889633178711,
+            0.00041232630610466003,
+            0.00038026273250579834,
+            0.00033217668533325195,
+            0.0006086230278015137,
+            -0.0007429122924804688,
+            0.0014805495738983154,
+            0.0006694793701171875,
+            0.0009600520133972168
+          ],
+          "estimated_sound_change": -2.4086858496363994e-05,
+          "linear_continuous_change": -2.4086858496363994e-05,
+          "maximum_control_change": 0.0014805495738983154,
+          "maximum_previously_active_change": 0.0014805495738983154
+        },
+        {
+          "above_measurement_spacing": false,
+          "after_choices": [
+            0,
+            0
+          ],
+          "before_choices": [
+            0,
+            0
+          ],
+          "category_heads_changed": 0,
+          "conditional_category_change": 0.0,
+          "continuous_delta": [
+            0.00047466158866882324,
+            0.0002008378505706787,
+            -0.00018614530563354492,
+            0.0006667971611022949,
+            0.00016498565673828125,
+            -0.0001519322395324707,
+            0.0009496733546257019,
+            0.0008561834692955017,
+            -0.00010132789611816406
+          ],
+          "estimated_sound_change": -0.001046867613332947,
+          "linear_continuous_change": -0.001046867613332947,
+          "maximum_control_change": 0.0009496733546257019,
+          "maximum_previously_active_change": 0.0009496733546257019
+        }
+      ],
+      "maximum_bank_control_change": 0.02232956886291504,
+      "nonzero_sound_gradients": 4,
+      "original_weight_linear_change": -0.011648698481793134,
+      "projected_norm": 0.04775135204639216,
+      "projection_distance": 0.00218947023959745,
+      "proposal_norm": 0.047801520919198356,
+      "scale": 0.5,
+      "step": 48,
+      "weighted_output_estimated_change": -0.00613718716151551
+    }
+  ],
+  "scalar_probes_reused": 5451,
+  "temporary_protected_proposals": 48,
+  "test_split_used": false,
+  "useful_local_proposals": false,
+  "within_resource_limits": true
+}

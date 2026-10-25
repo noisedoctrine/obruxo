@@ -1,0 +1,9 @@
+# Reject the first sound-protection screen
+
+The frozen first policy produces useful nonzero proposals at **24/48** saved sound-only states, below the declared **36/48** gate. It retains an estimated 33.62% of the original positive weight-linear gain, exceeding that separate 25% screen, but the joint result **fails**. Do not start a native fit with this policy or lower its thresholds.
+
+The complete check takes **28.95 seconds / 0.73 GiB RAM** with zero new renders or experimental training. All 48 historical updates per arm, model/Adam/RNG state and 5,451 scalar probes replay exactly. Seven focused projection/guard/recovery tests pass. The [plan](data/protected_update_plan.json), [declaration](data/protected_update_declaration.json) and [full result](data/protected_update_summary.json) preserve the failed screen; implementation is `76f1e5b` and numerical-plan commit is `490dce3`.
+
+The rejected proposals are not simply projected to zero: their median retained parameter-displacement norm is 99.97%. Instead, they fail the subsequent output-based protection guard. The projection uses the full straight-through category gradient even when the hard category remains unchanged. Its weight-space condition can therefore credit a hypothetical category improvement while the actual continuous-control change worsens a sound. This identifies a mismatch in the proposed protection rule; it does not invalidate the original declared native estimator or prove the later corrected rule will succeed.
+
+A separately frozen correction will keep the full native gradient for the original Adam proposal, while constructing protection constraints from continuous controls with fixed hard selections. Actual hard-selection changes must still pass the conditional native-cost output guard. Preserve the same usefulness thresholds, control cap, input panel, model scope and quality requirements. Neither screen produces a new trained model or establishes native acceptance.

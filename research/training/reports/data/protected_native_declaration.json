@@ -1,0 +1,9 @@
+{
+  "declared_at_utc": "2026-10-25T13:59:44.574746+00:00",
+  "implementation_commit": "71fe812ba0d50a4fa96b83879337301ccf4588f7",
+  "operator_sha256": "7ae5ad9dd932db897475dd29256d395886ab0c339f58df299f1fc03304545a3b",
+  "optimizer_applications": 0,
+  "plan_file_sha256": "35cb355e95b077865aa75c691dc882966d3b0d71e1a68dfeb8d489092ef267e0",
+  "plan_id": "ae31bd6b1afeda395c79ada47918473c3b7b22e200b6ba71e2e8c4197088513e",
+  "planned_native_requests": 74
+}

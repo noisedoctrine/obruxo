@@ -1,0 +1,16 @@
+{
+  "aggregate_wall_seconds_from_original_start": 1469.715791940689,
+  "awake": {
+    "display_required": false,
+    "persistent_settings_changed": false,
+    "released": true,
+    "requested": true
+  },
+  "elapsed_seconds": 23.442129499977455,
+  "failure": null,
+  "finished_at_utc": "2026-10-25T14:25:02.837975+00:00",
+  "mode": "prepare",
+  "operator_sha256": "6d9b2131f28f7135dcb55f9ad60f84bf3b7716f80d2821319032dc30125d5851",
+  "peak_process_tree_rss_bytes": 655036416,
+  "rss_sampling_errors": 0
+}

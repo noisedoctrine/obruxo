@@ -1,0 +1,15 @@
+{
+  "awake": {
+    "display_required": false,
+    "persistent_settings_changed": false,
+    "released": true,
+    "requested": true
+  },
+  "elapsed_seconds": 4.872118400002364,
+  "failure": null,
+  "finished_at_utc": "2026-10-25T13:59:44.570695+00:00",
+  "mode": "prepare",
+  "operator_sha256": "7ae5ad9dd932db897475dd29256d395886ab0c339f58df299f1fc03304545a3b",
+  "peak_process_tree_rss_bytes": 648929280,
+  "rss_sampling_errors": 0
+}
