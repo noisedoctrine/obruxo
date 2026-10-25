@@ -1,0 +1,10 @@
+{
+  "elapsed_seconds": 15.663671999995131,
+  "experimental_training_updates": 0,
+  "native_requests": 0,
+  "numerical_state_unchanged": true,
+  "original_committed_prefix_replay_exact": true,
+  "peak_process_tree_rss_bytes": 746721280,
+  "replayed_updates_per_arm": 8,
+  "rss_sampling_errors": 0
+}
