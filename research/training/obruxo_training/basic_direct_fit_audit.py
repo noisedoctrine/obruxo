@@ -60,6 +60,11 @@ def decisions(inputs, store, trace):
         preserved = all(current["means"][metric] <= earlier["means"][metric] for metric in ("spectral", "mrstft")) and current["mrstft_p90"] <= earlier["mrstft_p90"]
         result["earlier_sound_preservation"] = {"current": current, "earlier": earlier, "pass": bool(preserved)}
         result["pass"] = bool(result["pass"] and preserved)
+    if inputs.plan.get("native_acceptance") is not None:
+        accepted = sum(row["native_acceptance"]["accepted"] for row in trace)
+        enough = accepted >= inputs.plan["gates"]["minimum_native_accepted_updates"]
+        result["native_acceptance"] = {"accepted_updates": accepted, "scheduled_updates": len(trace), "pass": bool(enough)}
+        result["pass"] = bool(result["pass"] and enough)
     return result
 
 

@@ -1,0 +1,11 @@
+{
+  "elapsed_seconds": 25.690027499978896,
+  "experimental_training_updates": 0,
+  "native_requests": 0,
+  "peak_process_tree_rss_bytes": 787505152,
+  "prior_model_adam_rng_replay_exact": true,
+  "replayed_optimizer_applications": 96,
+  "replayed_updates_per_arm": 48,
+  "rss_sampling_errors": 0,
+  "scalar_probes_reused": 5451
+}
