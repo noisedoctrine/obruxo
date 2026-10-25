@@ -23,6 +23,7 @@ from .codec import PilotTarget
 from .conditioned_bridge import read
 from .features import tensor_digest
 from .native_fit import append_durable, digest
+from .native_acceptance import SPEC as ACCEPTANCE_SPEC, accept_update, capture
 from .paired_native_audit import equal_tree, training_signature
 from .paired_native_evidence import RetainedAuditSession, native_ledger
 from .paired_native_fit import PairedSession
@@ -109,6 +110,9 @@ def initialize(inputs):
 
 
 def step(models, optimizers, inputs, store, index):
+    policy = inputs.plan.get("native_acceptance")
+    if policy is not None and (policy != ACCEPTANCE_SPEC or inputs.plan.get("continuous_auxiliary") is not None):
+        raise ValueError("native acceptance requires its fixed sound-only contract")
     update = inputs.plan["updates"][index]
     cell_lists = inputs.observations(update)
     observations = []
@@ -122,8 +126,12 @@ def step(models, optimizers, inputs, store, index):
         costs = [store.probe(index + 1, observation, cell, candidate) for cell in cell_lists[observation]]
         return sum(costs) / len(costs)
 
-    return matched_step(models, optimizers, inputs.codec, observations, evaluate, index, len(inputs.plan["updates"]),
-                        norm_cap=inputs.plan["optimizer"]["gradient_norm_cap"], continuous_auxiliary=inputs.plan.get("continuous_auxiliary"))
+    before = capture(inputs, models["spectral"]) if policy is not None else None
+    result = matched_step(models, optimizers, inputs.codec, observations, evaluate, index, len(inputs.plan["updates"]),
+                          norm_cap=inputs.plan["optimizer"]["gradient_norm_cap"], continuous_auxiliary=inputs.plan.get("continuous_auxiliary"))
+    if before is not None:
+        result["native_acceptance"] = accept_update(inputs, models["spectral"], before, cell_lists, observations, result, evaluate)
+    return result
 
 
 def replay_training(inputs, store, saved, prefix=None):
@@ -201,8 +209,14 @@ def train(inputs, store, output, saved=None):
                     "checkpoint_file_sha256": digest(output / "prefix-checkpoint.pt"), "native_requests_added": 0, "experimental_optimizer_updates_added": 0})
             finally:
                 restore_rng(before, "cpu")
-        write_json(output / "progress.json", {"phase": "fit", "updates": index + 1, "planned_updates": len(inputs.plan["updates"]),
-                   "probes": len(store.probes), "losses": result["losses"], "clamping": result["clamping"]["spectral"]})
+        progress = {"phase": "fit", "updates": index + 1, "planned_updates": len(inputs.plan["updates"]),
+                    "probes": len(store.probes), "losses": result["losses"], "clamping": result["clamping"]["spectral"]}
+        if "native_acceptance" in result:
+            accepted = result["native_acceptance"]
+            progress["native_acceptance"] = {"accepted_updates": sum(row["native_acceptance"]["accepted"] for row in trace),
+                                             "last_scale": accepted["scale"], "before_objective": accepted["before_objective"],
+                                             "committed_objective": accepted["committed_objective"], "trials": len(accepted["trials"])}
+        write_json(output / "progress.json", progress)
     return models, trace
 
 
