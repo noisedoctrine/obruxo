@@ -1,0 +1,22 @@
+{
+  "basic_pitch_revision": "9991303bba609a3b93089d13ec80d1d495083596",
+  "files": {
+    "basic-pitch-LICENSE.txt": {
+      "bytes": 11384,
+      "sha256": "929c910bae2152fa87199a5d0660e09263419b7eee6d4b301d05ee2aaf211c37",
+      "source_url": "https://raw.githubusercontent.com/spotify/basic-pitch/9991303bba609a3b93089d13ec80d1d495083596/LICENSE"
+    },
+    "basic-pitch-NOTICE.txt": {
+      "bytes": 1034,
+      "sha256": "b810e55c0e3b520fabb45fc2ccc74880187bf84e309971968541cc812dcde905",
+      "source_url": "https://raw.githubusercontent.com/spotify/basic-pitch/9991303bba609a3b93089d13ec80d1d495083596/NOTICE"
+    },
+    "nnAudio-LICENSE.txt": {
+      "bytes": 1068,
+      "sha256": "00c8e713d9ec6de0aa2cf7c382746423cb5746a0d6a81f91dc67221490b5ba46",
+      "source_url": "https://raw.githubusercontent.com/KinWaiCheuk/nnAudio/3c11520139a6f944f4257664c29b2359843f5d07/LICENSE"
+    }
+  },
+  "format": "obruxo_frontend_attributions_v1",
+  "nnAudio_license_source_revision": "3c11520139a6f944f4257664c29b2359843f5d07"
+}
