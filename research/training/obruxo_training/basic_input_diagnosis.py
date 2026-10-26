@@ -70,9 +70,11 @@ def select_examples(cells, rows):
     return selected
 
 
-def prepare(fit, output, *, implementation_commit):
+def prepare(fit, output, *, implementation_commit, ffmpeg=None):
     if output.exists():
         raise FileExistsError(output)
+    from .listening_loudness import resolve_ffmpeg
+    ffmpeg = resolve_ffmpeg(ffmpeg)
     plan = json.loads((fit / "plan.json").read_bytes())
     verified = json.loads((fit / "verification.json").read_bytes())
     if not verified["verified"] or verified["plan_id"] != canonical_sha256(plan) or not verified["complete"]:
@@ -121,7 +123,7 @@ def prepare(fit, output, *, implementation_commit):
             case[role] = {"path": destination.relative_to(output).as_posix(), "sha256": digest(destination)}
         manifest["cases"].append(case)
     write_json(output / "inputs.json", manifest)
-    packet = prepare_listening(output / "inputs.json", output / "packet")
+    packet = prepare_listening(output / "inputs.json", output / "packet", ffmpeg=ffmpeg)
     write_json(output / "control_diagnosis.json", {"groups": controls, "claim": "source_parameter_errors_are_diagnostic_not_reconstruction_acceptance"})
     return {"fit_plan_id": verified["plan_id"], "packet_id": packet["packet_id"], "trials": packet["trials"],
             "independent_families": len({row["family_id"] for row in selected}), "listener_page": packet["listener_page"],

@@ -16,16 +16,24 @@ button { background: #174e80; color: white; cursor: pointer; } :focus-visible { 
 .pill input:checked + span { background: #174e80; color: white; border-color: #174e80; }
 .pill input:focus-visible + span { outline: 3px solid #da9f17; outline-offset: 3px; }
 #status { min-height: 1.5em; } small { color: #566270; }
+#condition-note { padding: 12px 16px; border-left: 3px solid #174e80; background: #e9f0f7; }
 </style>
 <h1>Sound reconstruction listening check</h1>
-<p>Listen to the reference, then A and B. Every play button restarts its clip immediately. Compare tone, loudness, stereo width and how the sound changes over time. Keep playback volume the same for all three clips.</p>
-<p>Choose the closer sound and whether either reconstruction is close enough to be useful. Ties and poor matches are valid answers. Model names are hidden.</p>
+<p>Listen to the reference, then A and B. Every play button restarts its clip immediately. Keep playback volume the same for all three clips.</p>
+<p id="condition-note"></p>
+<p>Ties and poor matches are valid answers. Model names are hidden.</p>
 <form id="form"><div id="trials"></div><button type="submit">Save judgments</button></form>
 <p id="status" role="status"></p>
 <small>Choices are saved in this browser as you go. Use Save judgments when finished, then share the downloaded JSON with the evaluator. This page uses only the bundled audio.</small>
 <script>
 const packet = __PACKET__;
 const initialAnswers = __INITIAL_ANSWERS__;
+const matched = packet.condition?.purpose === 'timbre';
+const levelTest = packet.condition?.purpose === 'level_accuracy';
+document.getElementById('condition-note').textContent = matched
+  ? 'Volume matched using integrated LUFS. Compare tone, stereo width and how the sound changes over time. Original level errors are measured separately.'
+  : levelTest ? 'Original volumes. For this test, judge how closely each clip matches the reference level.'
+  : 'Original volumes. This earlier packet did not control loudness and is unsuitable for ranking tone.';
 const trials = document.getElementById('trials');
 const draftKey = `listening-draft-${packet.packet_id}`;
 let savedAnswers = initialAnswers;
@@ -51,7 +59,8 @@ for (const [index, trial] of packet.trials.entries()) {
   const clips = document.createElement('div'); clips.className = 'clips';
   for (const [slot, title] of [['reference', 'Reference'], ['a', 'A'], ['b', 'B']]) {
     const container = document.createElement('div');
-    const audio = document.createElement('audio'); audio.preload = 'auto'; audio.src = trial.audio[slot].file;
+    const asset = trial.audio[slot];
+    const audio = document.createElement('audio'); audio.preload = 'auto'; audio.src = `${asset.file}?sha256=${asset.sha256}`;
     audio.setAttribute('aria-label', `Comparison ${index + 1}, ${title}`);
     players.push(audio);
     const play = document.createElement('button'); play.type = 'button'; play.className = 'play'; play.textContent = `▶ ${title}`;
@@ -64,8 +73,8 @@ for (const [index, trial] of packet.trials.entries()) {
     container.append(play, audio); clips.append(container);
   }
   section.append(clips);
-  section.append(pills(`${trial.trial_id}-preferred`, 'Which matches the reference more closely?', [['a', 'A'], ['b', 'B'], ['tie', 'About the same'], ['neither', 'Neither is close']]));
-  section.append(pills(`${trial.trial_id}-usable`, 'Which is close enough to be useful?', [['a', 'A'], ['b', 'B'], ['both', 'Both'], ['neither', 'Neither']]));
+  section.append(pills(`${trial.trial_id}-preferred`, levelTest ? 'Which matches the reference level more closely?' : 'Which sound matches the reference more closely?', [['a', 'A'], ['b', 'B'], ['tie', 'About the same'], ['neither', 'Neither is close']]));
+  section.append(pills(`${trial.trial_id}-usable`, levelTest ? 'Which matches the reference level acceptably?' : 'Which is close enough to be useful after level matching?', [['a', 'A'], ['b', 'B'], ['both', 'Both'], ['neither', 'Neither']]));
   trials.append(section);
 }
 document.getElementById('form').addEventListener('change', event => {

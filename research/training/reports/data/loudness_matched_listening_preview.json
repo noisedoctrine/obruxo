@@ -1,0 +1,14 @@
+{
+  "packet_id": "39f30583088381eed55167ae14458f43adbd9e90177e81b7e76958dec95d4079",
+  "condition": {
+    "absolute_level": "assessed_separately",
+    "envelopes": "preserved_without_dynamic_processing",
+    "loudness": "integrated_bs1770_constant_gain",
+    "maximum_spread_lu": 0.1,
+    "purpose": "timbre",
+    "target_lufs": -23.0,
+    "true_peak_ceiling_dbtp": -1.0
+  },
+  "verified_served_wavs": 36,
+  "hash_cache_keys": true
+}

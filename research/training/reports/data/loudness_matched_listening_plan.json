@@ -1,0 +1,18 @@
+{
+  "implementation_commit": "52b81412d050a94869c4c573e1681a63b8ccabb6",
+  "independent_meter": "pyloudnorm_0.2.0_DeMan_BS1770",
+  "input_manifest_sha256": "5c217210b87726b085abc0c91b539c561625ff93897520cf6ca90f24eef9f82b",
+  "limits": {
+    "archive_bytes": 134217728,
+    "process_tree_bytes": 4294967296,
+    "wall_seconds": 600
+  },
+  "new_native_requests": 0,
+  "optimizer_applications": 0,
+  "original_packet_id": "4556b43d7c4c98f243c625fee90b8466ef2696c62d8a9904548315e46962b0d2",
+  "purpose": "loudness_matched_timbre_diagnostic",
+  "tolerances": {
+    "meter_agreement_lu": 0.2,
+    "within_trial_lu": 0.1
+  }
+}

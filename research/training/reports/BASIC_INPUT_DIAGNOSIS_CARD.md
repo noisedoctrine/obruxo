@@ -1,5 +1,7 @@
 # Inspect saved input failures and prepare blind listening
 
+**Historical original-level listening protocol.** The listener found severe loudness confounds in five comparisons. Tone-listening preparation is superseded by the [loudness-matched condition](LOUDNESS_MATCHED_LISTENING_CARD.md); retain the original audio and submitted responses as diagnostic history.
+
 Use only the completed trainable-input fit's verified final predictions and retained native audio. Require its complete independent audit and unchanged plan/final-file identities. Add no renders, optimizer updates, model changes or confirmation scores. The 192 new validation roots stay reserved.
 
 Describe unison/filter selections and source-active normalized control errors separately for original, held-note and alternate input recordings. Count each patch/input once across playback performances; reject different inferred patches for the same recording. Parameter errors are explanatory diagnostics, not reconstruction acceptance rules or proof that exact parameter recovery is necessary.

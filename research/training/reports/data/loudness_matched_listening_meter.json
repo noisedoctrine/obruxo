@@ -1,0 +1,340 @@
+{
+  "cases": [
+    {
+      "clips": {
+        "a": {
+          "ffmpeg_lufs": -23.0,
+          "frames": 182414,
+          "independent_lufs": -22.995469380400657,
+          "meter_difference_lu": 0.004530619599343311,
+          "static_gain_roundtrip_exact": true
+        },
+        "b": {
+          "ffmpeg_lufs": -23.0,
+          "frames": 182414,
+          "independent_lufs": -22.994859561801643,
+          "meter_difference_lu": 0.005140438198356634,
+          "static_gain_roundtrip_exact": true
+        },
+        "reference": {
+          "ffmpeg_lufs": -22.999,
+          "frames": 182414,
+          "independent_lufs": -22.994334153210477,
+          "meter_difference_lu": 0.004665846789521311,
+          "static_gain_roundtrip_exact": true
+        }
+      },
+      "independent_spread_lu": 0.0011352271901792221,
+      "trial_id": "trial-001"
+    },
+    {
+      "clips": {
+        "a": {
+          "ffmpeg_lufs": -22.999,
+          "frames": 180810,
+          "independent_lufs": -22.99552560801388,
+          "meter_difference_lu": 0.003474391986117098,
+          "static_gain_roundtrip_exact": true
+        },
+        "b": {
+          "ffmpeg_lufs": -22.998,
+          "frames": 180810,
+          "independent_lufs": -22.99375090332118,
+          "meter_difference_lu": 0.004249096678819342,
+          "static_gain_roundtrip_exact": true
+        },
+        "reference": {
+          "ffmpeg_lufs": -23.0,
+          "frames": 180810,
+          "independent_lufs": -22.99572303186119,
+          "meter_difference_lu": 0.004276968138810844,
+          "static_gain_roundtrip_exact": true
+        }
+      },
+      "independent_spread_lu": 0.0019721285400073896,
+      "trial_id": "trial-002"
+    },
+    {
+      "clips": {
+        "a": {
+          "ffmpeg_lufs": -24.684,
+          "frames": 176400,
+          "independent_lufs": -24.682903243118215,
+          "meter_difference_lu": 0.0010967568817861206,
+          "static_gain_roundtrip_exact": true
+        },
+        "b": {
+          "ffmpeg_lufs": -24.686,
+          "frames": 176400,
+          "independent_lufs": -24.68151329845981,
+          "meter_difference_lu": 0.0044867015401912624,
+          "static_gain_roundtrip_exact": true
+        },
+        "reference": {
+          "ffmpeg_lufs": -24.685,
+          "frames": 176400,
+          "independent_lufs": -24.677628573570775,
+          "meter_difference_lu": 0.007371426429223504,
+          "static_gain_roundtrip_exact": true
+        }
+      },
+      "independent_spread_lu": 0.005274669547439714,
+      "trial_id": "trial-003"
+    },
+    {
+      "clips": {
+        "a": {
+          "ffmpeg_lufs": -22.999,
+          "frames": 176400,
+          "independent_lufs": -22.99417553894864,
+          "meter_difference_lu": 0.004824461051359918,
+          "static_gain_roundtrip_exact": true
+        },
+        "b": {
+          "ffmpeg_lufs": -23.002,
+          "frames": 176400,
+          "independent_lufs": -22.996046079401008,
+          "meter_difference_lu": 0.005953920598990692,
+          "static_gain_roundtrip_exact": true
+        },
+        "reference": {
+          "ffmpeg_lufs": -22.999,
+          "frames": 176400,
+          "independent_lufs": -22.994359137396124,
+          "meter_difference_lu": 0.004640862603874751,
+          "static_gain_roundtrip_exact": true
+        }
+      },
+      "independent_spread_lu": 0.0018705404523693403,
+      "trial_id": "trial-004"
+    },
+    {
+      "clips": {
+        "a": {
+          "ffmpeg_lufs": -22.999,
+          "frames": 176400,
+          "independent_lufs": -22.996186067142933,
+          "meter_difference_lu": 0.0028139328570659927,
+          "static_gain_roundtrip_exact": true
+        },
+        "b": {
+          "ffmpeg_lufs": -22.999,
+          "frames": 176400,
+          "independent_lufs": -22.99538135926644,
+          "meter_difference_lu": 0.003618640733559886,
+          "static_gain_roundtrip_exact": true
+        },
+        "reference": {
+          "ffmpeg_lufs": -23.001,
+          "frames": 176400,
+          "independent_lufs": -22.994676015627245,
+          "meter_difference_lu": 0.006323984372755831,
+          "static_gain_roundtrip_exact": true
+        }
+      },
+      "independent_spread_lu": 0.001510051515687394,
+      "trial_id": "trial-005"
+    },
+    {
+      "clips": {
+        "a": {
+          "ffmpeg_lufs": -23.0,
+          "frames": 176400,
+          "independent_lufs": -22.99357868419702,
+          "meter_difference_lu": 0.006421315802981553,
+          "static_gain_roundtrip_exact": true
+        },
+        "b": {
+          "ffmpeg_lufs": -22.999,
+          "frames": 176400,
+          "independent_lufs": -22.99480911086069,
+          "meter_difference_lu": 0.004190889139309206,
+          "static_gain_roundtrip_exact": true
+        },
+        "reference": {
+          "ffmpeg_lufs": -22.999,
+          "frames": 176400,
+          "independent_lufs": -22.99464995310952,
+          "meter_difference_lu": 0.004350046890479575,
+          "static_gain_roundtrip_exact": true
+        }
+      },
+      "independent_spread_lu": 0.0012304266636711247,
+      "trial_id": "trial-006"
+    },
+    {
+      "clips": {
+        "a": {
+          "ffmpeg_lufs": -22.996,
+          "frames": 180810,
+          "independent_lufs": -22.992632313512313,
+          "meter_difference_lu": 0.003367686487685262,
+          "static_gain_roundtrip_exact": true
+        },
+        "b": {
+          "ffmpeg_lufs": -23.0,
+          "frames": 180810,
+          "independent_lufs": -22.994680966159684,
+          "meter_difference_lu": 0.005319033840315512,
+          "static_gain_roundtrip_exact": true
+        },
+        "reference": {
+          "ffmpeg_lufs": -23.0,
+          "frames": 180810,
+          "independent_lufs": -22.994287361150263,
+          "meter_difference_lu": 0.0057126388497366065,
+          "static_gain_roundtrip_exact": true
+        }
+      },
+      "independent_spread_lu": 0.0020486526473710853,
+      "trial_id": "trial-007"
+    },
+    {
+      "clips": {
+        "a": {
+          "ffmpeg_lufs": -23.0,
+          "frames": 176400,
+          "independent_lufs": -22.99472691038002,
+          "meter_difference_lu": 0.005273089619979743,
+          "static_gain_roundtrip_exact": true
+        },
+        "b": {
+          "ffmpeg_lufs": -22.999,
+          "frames": 176400,
+          "independent_lufs": -22.995253512188356,
+          "meter_difference_lu": 0.0037464878116431066,
+          "static_gain_roundtrip_exact": true
+        },
+        "reference": {
+          "ffmpeg_lufs": -23.0,
+          "frames": 176400,
+          "independent_lufs": -22.99530686336977,
+          "meter_difference_lu": 0.004693136630230299,
+          "static_gain_roundtrip_exact": true
+        }
+      },
+      "independent_spread_lu": 0.0005799529897494438,
+      "trial_id": "trial-008"
+    },
+    {
+      "clips": {
+        "a": {
+          "ffmpeg_lufs": -23.001,
+          "frames": 183750,
+          "independent_lufs": -22.996231656182406,
+          "meter_difference_lu": 0.0047683438175951665,
+          "static_gain_roundtrip_exact": true
+        },
+        "b": {
+          "ffmpeg_lufs": -23.002,
+          "frames": 183750,
+          "independent_lufs": -22.994851534394584,
+          "meter_difference_lu": 0.0071484656054146,
+          "static_gain_roundtrip_exact": true
+        },
+        "reference": {
+          "ffmpeg_lufs": -22.998,
+          "frames": 183750,
+          "independent_lufs": -22.994328938191682,
+          "meter_difference_lu": 0.0036710618083191093,
+          "static_gain_roundtrip_exact": true
+        }
+      },
+      "independent_spread_lu": 0.0019027179907240566,
+      "trial_id": "trial-009"
+    },
+    {
+      "clips": {
+        "a": {
+          "ffmpeg_lufs": -22.999,
+          "frames": 182414,
+          "independent_lufs": -22.993933237453625,
+          "meter_difference_lu": 0.0050667625463738375,
+          "static_gain_roundtrip_exact": true
+        },
+        "b": {
+          "ffmpeg_lufs": -23.0,
+          "frames": 182414,
+          "independent_lufs": -22.994590831096243,
+          "meter_difference_lu": 0.005409168903756978,
+          "static_gain_roundtrip_exact": true
+        },
+        "reference": {
+          "ffmpeg_lufs": -22.999,
+          "frames": 182414,
+          "independent_lufs": -22.994748932139515,
+          "meter_difference_lu": 0.0042510678604834595,
+          "static_gain_roundtrip_exact": true
+        }
+      },
+      "independent_spread_lu": 0.000815694685890378,
+      "trial_id": "trial-010"
+    },
+    {
+      "clips": {
+        "a": {
+          "ffmpeg_lufs": -22.999,
+          "frames": 183750,
+          "independent_lufs": -22.9930632267138,
+          "meter_difference_lu": 0.005936773286197905,
+          "static_gain_roundtrip_exact": true
+        },
+        "b": {
+          "ffmpeg_lufs": -23.002,
+          "frames": 183750,
+          "independent_lufs": -22.995291012688465,
+          "meter_difference_lu": 0.006708987311533576,
+          "static_gain_roundtrip_exact": true
+        },
+        "reference": {
+          "ffmpeg_lufs": -23.001,
+          "frames": 183750,
+          "independent_lufs": -22.995984864717553,
+          "meter_difference_lu": 0.005015135282448568,
+          "static_gain_roundtrip_exact": true
+        }
+      },
+      "independent_spread_lu": 0.002921638003751781,
+      "trial_id": "trial-011"
+    },
+    {
+      "clips": {
+        "a": {
+          "ffmpeg_lufs": -22.999,
+          "frames": 176400,
+          "independent_lufs": -22.99563383958551,
+          "meter_difference_lu": 0.003366160414490338,
+          "static_gain_roundtrip_exact": true
+        },
+        "b": {
+          "ffmpeg_lufs": -23.004,
+          "frames": 176400,
+          "independent_lufs": -22.996625891054745,
+          "meter_difference_lu": 0.007374108945256808,
+          "static_gain_roundtrip_exact": true
+        },
+        "reference": {
+          "ffmpeg_lufs": -23.001,
+          "frames": 176400,
+          "independent_lufs": -22.99488989345878,
+          "meter_difference_lu": 0.006110106541221683,
+          "static_gain_roundtrip_exact": true
+        }
+      },
+      "independent_spread_lu": 0.0017359975959649887,
+      "trial_id": "trial-012"
+    }
+  ],
+  "filter": "DeMan",
+  "implementation_commit": "3570dd95b3432204810edbb411fbfe01deb40252",
+  "maximum_independent_spread_lu": 0.005274669547439714,
+  "maximum_lufs_vs_peak_relative_gain_difference_db": 10.388011295404336,
+  "maximum_lufs_vs_rms_relative_gain_difference_db": 1.9740711215929387,
+  "maximum_meter_difference_lu": 0.007374108945256808,
+  "maximum_original_loudness_error_lu": 9.744999999999997,
+  "originals_unchanged": true,
+  "packet_id": "39f30583088381eed55167ae14458f43adbd9e90177e81b7e76958dec95d4079",
+  "pyloudnorm_version": "0.2.0",
+  "qualified_for_release": false,
+  "verified": true
+}
