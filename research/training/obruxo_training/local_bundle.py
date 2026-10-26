@@ -7,10 +7,11 @@ from pathlib import Path
 import platform
 import shutil
 
-from .bundle_runner import FORMAT, identity, verify_bundle
+from .bundle_runner import FORMAT, bundle_file, identity, verify_bundle
 from .codec import PilotCodec
 from .inference_profile import model_rendering
 from .prediction import load_predictor
+from .runtime_notices import verify as verify_notice_inventory
 
 SOURCE_DIRS = ("research/training/obruxo_training", "research/data_generation/obruxo_data", "research/modelling/basic_pitch/obruxo_basic_pitch")
 DEPENDENCIES = ("torch", "numpy", "scipy", "PyYAML", "mido", "psutil")
@@ -20,18 +21,30 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def create_bundle(model_path, output, *, repository=None):
+def create_bundle(model_path, output, *, repository=None, notice_archive=None):
     repository = Path(repository) if repository else Path(__file__).resolve().parents[3]
     sources = [repository / name for name in SOURCE_DIRS]
     if any(not source.is_dir() for source in sources):
         raise ValueError("bundle source package is missing")
     if any(output.resolve().is_relative_to(source.resolve()) for source in sources):
         raise ValueError("bundle output must be outside the runtime source directories")
+    upstream = repository / "research/training/notices/upstream"
+    attribution = json.loads((upstream / "manifest.json").read_bytes())
+    if attribution["format"] != "obruxo_frontend_attributions_v1" or len(attribution["files"]) != 3:
+        raise ValueError("frontend attribution manifest is incomplete")
+    for name, row in attribution["files"].items():
+        if digest(bundle_file(upstream, name)) != row["sha256"]:
+            raise ValueError("frontend license or notice bytes changed")
+    inventory = verify_notice_inventory(notice_archive) if notice_archive is not None else None
     model, frontend, codec, settings = load_predictor(model_path)
     if type(codec) is not PilotCodec:
         raise ValueError("local basic bundles require the 14-output basic codec")
     frontend.require_frozen()
     runtime = {"python": platform.python_version(), "dependencies": {name: importlib.metadata.version(name) for name in DEPENDENCIES}}
+    if inventory:
+        from .runtime_notices import canonical_name
+        if any(inventory["packages"].get(canonical_name(name), {}).get("version") != version for name, version in runtime["dependencies"].items()):
+            raise ValueError("notice inventory differs from the bundle's direct runtime versions")
     model_sha = digest(model_path)
     output.mkdir(parents=True, exist_ok=False)
     for source in sources:
@@ -53,6 +66,17 @@ def create_bundle(model_path, output, *, repository=None):
             target.parent.mkdir(exist_ok=True)
             shutil.copyfile(source, target)
             notices[name] = target.relative_to(output).as_posix()
+    for name in (*attribution["files"], "manifest.json"):
+        target = output / "notices/upstream" / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(bundle_file(upstream, name), target)
+    notices["frontend_attributions"] = "notices/upstream/manifest.json"
+    if inventory:
+        for name in (*inventory["files"], "inventory.json"):
+            target = output / "notices/runtime" / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(bundle_file(notice_archive, name), target)
+        notices["runtime_inventory"] = "notices/runtime/inventory.json"
     lock = "\n".join(f"{name}=={version}" for name, version in runtime["dependencies"].items()) + "\n"
     (output / "requirements.lock").write_text(lock, encoding="utf-8", newline="\n")
     (output / "README.md").write_text(
@@ -70,7 +94,8 @@ def create_bundle(model_path, output, *, repository=None):
     manifest = {"format": FORMAT, "qualified_for_release": False, "source_model_qualified_for_release": settings["qualified_for_release"],
                 "model_format": settings["format"], "model_file_sha256": model_sha, "dense_outputs": 14, "codec_values": 11,
                 "input": "audio_only", "frontend": frontend.describe(), "rendering": model_rendering(model),
-                "runtime": runtime, "files": files, "notices": notices, "release_notices_complete": False}
+                "runtime": runtime, "files": files, "notices": notices, "release_notices_complete": False,
+                "runtime_notice_inventory_id": inventory["inventory_id"] if inventory else None}
     manifest["bundle_id"] = identity(manifest)
     (output / "bundle.json").write_text(json.dumps(manifest, sort_keys=True, indent=2, allow_nan=False), encoding="utf-8", newline="\n")
     verify_bundle(output)
