@@ -11,3 +11,5 @@ The check takes **28.76 seconds / 0.90 GiB**, retains 10.94 MiB and adds **zero 
 The snapshots keep release qualification false and preserve the source models' status. The available project/Basic Pitch readmes are copied into the notice inventory; complete release notices and a clean dependency-install check remain open, alongside reconstruction admission, fresh confirmation and listening. No model is promoted.
 
 [Commands and runtime requirements](../LOCAL_BUNDLE.md). The local sound fit continues under its frozen plan.
+
+The later [fresh-runtime check](CLEAN_BASIC_RUNTIME_RESULTS.md) installs dependencies without sharing site-packages and confirms six exact presets after correcting Windows library resolution. It preserves the shared-package check above as separate historical evidence.
