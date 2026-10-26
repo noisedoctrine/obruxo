@@ -1,0 +1,101 @@
+{
+  "claim": "source_parameter_errors_are_diagnostic_not_reconstruction_acceptance",
+  "groups": {
+    "alternate:parameter": {
+      "correct_filter": 12,
+      "correct_unison": 6,
+      "independent_patches": 12,
+      "source_active_normalized_control_mae": {
+        "env_1_attack": 0.3056478096747779,
+        "env_1_decay": 0.42335359003672784,
+        "env_1_release": 0.21133272937369446,
+        "env_1_sustain": 0.24676835395346575,
+        "filter_1_cutoff": 0.08422454252882529,
+        "filter_1_resonance": 0.29031110121803605,
+        "osc_1_level": 0.24334460586512552,
+        "osc_1_pan": 0.26794031275341756,
+        "osc_1_unison_detune": 0.35713716730828815
+      }
+    },
+    "alternate:spectral": {
+      "correct_filter": 11,
+      "correct_unison": 5,
+      "independent_patches": 12,
+      "source_active_normalized_control_mae": {
+        "env_1_attack": 0.37323665609595963,
+        "env_1_decay": 0.43466230884268287,
+        "env_1_release": 0.26305530956741824,
+        "env_1_sustain": 0.204260738215062,
+        "filter_1_cutoff": 0.10462530138660303,
+        "filter_1_resonance": 0.29856644292969864,
+        "osc_1_level": 0.30205466157997013,
+        "osc_1_pan": 0.1948553846083826,
+        "osc_1_unison_detune": 0.41553688649441534
+      }
+    },
+    "held_note:parameter": {
+      "correct_filter": 11,
+      "correct_unison": 6,
+      "independent_patches": 12,
+      "source_active_normalized_control_mae": {
+        "env_1_attack": 0.2620904540174055,
+        "env_1_decay": 0.30779792500048603,
+        "env_1_release": 0.2834939728181428,
+        "env_1_sustain": 0.2950926641306723,
+        "filter_1_cutoff": 0.08577726341672803,
+        "filter_1_resonance": 0.15905259603187005,
+        "osc_1_level": 0.3099767014645541,
+        "osc_1_pan": 0.23410756896111995,
+        "osc_1_unison_detune": 0.21082999947699343
+      }
+    },
+    "held_note:spectral": {
+      "correct_filter": 11,
+      "correct_unison": 5,
+      "independent_patches": 12,
+      "source_active_normalized_control_mae": {
+        "env_1_attack": 0.368497808292791,
+        "env_1_decay": 0.28356674876373295,
+        "env_1_release": 0.32433394789704345,
+        "env_1_sustain": 0.3247567944077621,
+        "filter_1_cutoff": 0.10892279600423743,
+        "filter_1_resonance": 0.20363425896567977,
+        "osc_1_level": 0.35674883828614923,
+        "osc_1_pan": 0.26080842628817447,
+        "osc_1_unison_detune": 0.29710751836236493
+      }
+    },
+    "original:parameter": {
+      "correct_filter": 12,
+      "correct_unison": 12,
+      "independent_patches": 12,
+      "source_active_normalized_control_mae": {
+        "env_1_attack": 0.08284325293899147,
+        "env_1_decay": 0.09648963360781679,
+        "env_1_release": 0.22943199692091235,
+        "env_1_sustain": 0.055300137655199984,
+        "filter_1_cutoff": 0.03492380027649631,
+        "filter_1_resonance": 0.08592553143250407,
+        "osc_1_level": 0.05545872088486184,
+        "osc_1_pan": 0.08047856526629169,
+        "osc_1_unison_detune": 0.06635338645702982
+      }
+    },
+    "original:spectral": {
+      "correct_filter": 12,
+      "correct_unison": 12,
+      "independent_patches": 12,
+      "source_active_normalized_control_mae": {
+        "env_1_attack": 0.05741369116493095,
+        "env_1_decay": 0.054565559227121446,
+        "env_1_release": 0.09836925105058979,
+        "env_1_sustain": 0.06732170173303291,
+        "filter_1_cutoff": 0.017945205364182815,
+        "filter_1_resonance": 0.03598676163329902,
+        "osc_1_level": 0.05155284246337663,
+        "osc_1_pan": 0.03452521963405986,
+        "osc_1_unison_detune": 0.036105019519385745
+      }
+    }
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "examples": [
+    {
+      "family_id": "00101a37d15caf237c74987523d33c24160043cc2383d0e8a5be6964b1f2c19c",
+      "family_mean_combined_loss_gap": -0.06813520193099976,
+      "group": "alternate:own",
+      "index": 61,
+      "selection": "median_gap"
+    },
+    {
+      "family_id": "4bc9d45d1381cc9ff83834c83a9f1b2068b754289a96f987ecc8c0cff283c315",
+      "family_mean_combined_loss_gap": 0.13723230361938477,
+      "group": "alternate:own",
+      "index": 40,
+      "selection": "largest_remaining_gap"
+    },
+    {
+      "family_id": "3c1f5425fffdc07eedc9986724e4c86a53519634ca507a689cbb6cddf932dc07",
+      "family_mean_combined_loss_gap": -0.010122716426849365,
+      "group": "alternate:transfer",
+      "index": 48,
+      "selection": "median_gap"
+    },
+    {
+      "family_id": "4bc9d45d1381cc9ff83834c83a9f1b2068b754289a96f987ecc8c0cff283c315",
+      "family_mean_combined_loss_gap": 0.10621321201324463,
+      "group": "alternate:transfer",
+      "index": 41,
+      "selection": "largest_remaining_gap"
+    },
+    {
+      "family_id": "9822599a6cb97be24884206b6dacf6146a46be99484d9322fd646e4d4ff555f4",
+      "family_mean_combined_loss_gap": 0.07532137632369995,
+      "group": "held_note:own",
+      "index": 24,
+      "selection": "median_gap"
+    },
+    {
+      "family_id": "7d7fd40e46a0dbb4945b4cb821097626f84f7f184fb4f373c8c16579aa78035c",
+      "family_mean_combined_loss_gap": 0.23723062872886658,
+      "group": "held_note:own",
+      "index": 17,
+      "selection": "largest_remaining_gap"
+    },
+    {
+      "family_id": "9822599a6cb97be24884206b6dacf6146a46be99484d9322fd646e4d4ff555f4",
+      "family_mean_combined_loss_gap": 0.06305384635925293,
+      "group": "held_note:transfer",
+      "index": 25,
+      "selection": "median_gap"
+    },
+    {
+      "family_id": "7d7fd40e46a0dbb4945b4cb821097626f84f7f184fb4f373c8c16579aa78035c",
+      "family_mean_combined_loss_gap": 0.2903074622154236,
+      "group": "held_note:transfer",
+      "index": 18,
+      "selection": "largest_remaining_gap"
+    },
+    {
+      "family_id": "0b6d3f3fee1292298f1e1e1b23641314c746a37c09ab306949f5e7762f7caeaa",
+      "family_mean_combined_loss_gap": -0.05363239347934723,
+      "group": "original:own",
+      "index": 77,
+      "selection": "median_gap"
+    },
+    {
+      "family_id": "b5067e1d4bee9d92e59b618526187302c80d4efe5c39cff10a120c6a16f3a9a1",
+      "family_mean_combined_loss_gap": -0.011819977313280106,
+      "group": "original:own",
+      "index": 0,
+      "selection": "largest_remaining_gap"
+    },
+    {
+      "family_id": "00101a37d15caf237c74987523d33c24160043cc2383d0e8a5be6964b1f2c19c",
+      "family_mean_combined_loss_gap": -0.051500171422958374,
+      "group": "original:transfer",
+      "index": 57,
+      "selection": "median_gap"
+    },
+    {
+      "family_id": "ce50a6bb09f2ead9b821eb936d6d3a52bb07df246e8a9f6564da57318fe3e0c0",
+      "family_mean_combined_loss_gap": 0.018878117203712463,
+      "group": "original:transfer",
+      "index": 8,
+      "selection": "largest_remaining_gap"
+    }
+  ],
+  "fit_plan_id": "efb0885f7e0763d72fd82202798edba0fd312bdec7e5367cfa28969abcb2d5f0",
+  "implementation_commit": "0c0c4fef80369bcb485cc5e2640f65277af4316a",
+  "limits": {
+    "archive_bytes": 134217728,
+    "process_tree_bytes": 4294967296,
+    "wall_seconds": 300
+  },
+  "new_native_requests": 0,
+  "optimizer_applications": 0,
+  "selection_rule": "per_group_family_mean_gap_median_and_largest_remaining_gap_first_playback_v1",
+  "verification_sha256": "49648702738292dc1434a342339ebba1f726075a49a4ee102b47d884295e4d45"
+}
