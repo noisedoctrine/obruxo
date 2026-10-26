@@ -209,7 +209,7 @@ def main(argv=None) -> int:
     compare.add_argument("--identity-diagnostics", action="store_true", help="Measure representations across reference and reserved transfer audio")
     compare.add_argument("--validation-states", type=Path, help="JSON list of explicit validation state IDs in evaluation order")
     compare.add_argument("--allow-architecture-comparison", action="store_true", help="Explicitly compare supported conditioning variants")
-    infer = commands.add_parser("infer", help="Export a pilot .vital prediction from a 44.1 kHz stereo WAV")
+    infer = commands.add_parser("infer", help="Export a .vital prediction from an audio-only inference model and 44.1 kHz WAV")
     infer.add_argument("--model", type=Path, required=True)
     infer.add_argument("--audio", type=Path, required=True)
     infer.add_argument("--output", type=Path, required=True)
@@ -403,17 +403,21 @@ def main(argv=None) -> int:
         if args.command == "infer":
             import torch
             from .inference_profile import prediction_preset
-            from .trainer import load_model, predict_audio
+            from .prediction import load_predictor
+            from .trainer import predict_audio
             if args.asset_references:
                 raise ValueError("inference uses the bundle's embedded asset catalog")
-            torch.set_num_threads(4)
             sample_rate, audio = _read_inference_audio(args.audio)
-            model, frontend, codec = load_model(args.model, args.device)
+            model, frontend, codec, settings = load_predictor(args.model, args.device)
+            torch.set_num_threads(settings["cpu_threads"])
             target = predict_audio(model, frontend, codec, audio, sample_rate)
             args.output.parent.mkdir(parents=True, exist_ok=True)
             with args.output.open("xb") as handle:
                 handle.write(prediction_preset(model, codec, target))
-            print(json.dumps({"output": str(args.output), "scope": codec.to_dict()["scope"], "target": target.to_dict()}))
+            report = {"output": str(args.output), "scope": codec.to_dict()["scope"], "target": target.to_dict()}
+            if settings["qualified_for_release"] is not None:
+                report["qualified_for_release"] = settings["qualified_for_release"]
+            print(json.dumps(report))
             return 0
         if args.command in {"pilot", "alpha-pool", "full-scalar-pool", "factory-pool", "lfo-pool", "routing-pool", "nested-pool", "expression-pool", "combined-pool", "curve-pool", "graph-pool", "expand-pilot", "benchmark", "codec-check", "train", "evaluate", "evaluate-curve", "compare"}:
             from .pilot import PilotPool
