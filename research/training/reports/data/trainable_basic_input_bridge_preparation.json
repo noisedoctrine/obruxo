@@ -1,0 +1,12 @@
+{
+  "experimental_training_updates": 0,
+  "model_admission_allowed": false,
+  "new_native_requests": 0,
+  "plan_id": "34716c6aefca3faa930e8e18d2fd2a4b3de9d9564f22f9b765a814988747e062",
+  "qualified_for_release": false,
+  "resources": {
+    "elapsed_seconds": 2.3095441999612376,
+    "peak_process_tree_rss_bytes": 504451072,
+    "rss_sampling_errors": 0
+  }
+}

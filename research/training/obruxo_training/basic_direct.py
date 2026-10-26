@@ -77,6 +77,9 @@ def rehearsal_indices(step, records=32):
 
 
 def export_direct(model, frontend, codec, pool_id):
+    if type(model) is not BasicDirect:
+        from .trainable_basic import export_trainable
+        return export_trainable(model, frontend, codec, pool_id)
     if type(codec) is not PilotCodec:
         raise ValueError("direct correction requires the basic codec")
     model.require_frozen()
@@ -86,6 +89,9 @@ def export_direct(model, frontend, codec, pool_id):
 
 
 def restore_direct(saved):
+    if saved["format"] == "trainable_basic_inputs_v1":
+        from .trainable_basic import restore_trainable
+        return restore_trainable(saved)
     if saved["format"] != FORMAT or saved["spec"] != SPEC or saved["qualified_for_release"]:
         raise ValueError("direct correction export contract changed")
     base, frontend, codec = restore_model(saved["base"])

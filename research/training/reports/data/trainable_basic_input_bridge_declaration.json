@@ -1,0 +1,8 @@
+{
+  "experimental_training_updates": 0,
+  "implementation_commit": "fa00aa3b7d5fc2c985a939142fa8bd887caeb490",
+  "new_native_requests": 0,
+  "operator_sha256": "4aa56b49a5f4400e28c09e5a8137c2cc5f73d397d0a62d5225c6cd79e06eb8ad",
+  "plan_file_sha256": "ed1e0a8f655cbb46e5f1534017961ba1d8c5fa8bf88eaafe7d98d152dcceb214",
+  "preparation_sha256": "41ba8ddaf91c5efce4e5af75358be01288736f2a7eb37afb0216dd89c707e3fd"
+}
