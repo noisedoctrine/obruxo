@@ -6,7 +6,7 @@ const path = require('node:path');
 const test = require('node:test');
 const vm = require('node:vm');
 
-function page({storage = new Map(), initialAnswers = {}} = {}) {
+function page({storage = new Map(), initialAnswers = {}, condition} = {}) {
   const nodes = [], downloads = [], blobs = [];
   class Element {
     constructor(tag) { this.tag = tag; this.children = []; this.attributes = {}; this.listeners = {}; this.paused = true; this.currentTime = 0; this.controls = false; this.playCount = 0; nodes.push(this); }
@@ -17,8 +17,8 @@ function page({storage = new Map(), initialAnswers = {}} = {}) {
     play() { this.paused = false; this.playCount++; return Promise.resolve(); }
     click() { if (this.listeners.click) return this.listeners.click(); downloads.push({name: this.download, url: this.href}); }
   }
-  const roots = {trials: new Element('div'), form: new Element('form'), status: new Element('p')};
-  const packet = {packet_id: 'anonymous-packet', trials: Array.from({length: 4}, (_, index) => {
+  const roots = {trials: new Element('div'), form: new Element('form'), status: new Element('p'), 'condition-note': new Element('p')};
+  const packet = {packet_id: 'anonymous-packet', condition, trials: Array.from({length: 4}, (_, index) => {
     const trial_id = `trial-${index + 1}`;
     return {trial_id, audio: Object.fromEntries(['reference', 'a', 'b'].map(slot => [slot, {file: `${trial_id}-${slot}.wav`}]))};
   })};
@@ -101,4 +101,10 @@ test('existing choices survive the page upgrade and later browser reloads', () =
   const reloaded = page({storage: first.storage, initialAnswers});
   assert.equal(reloaded.nodes.find(node => node.name === 'trial-1-preferred' && node.checked).value, 'tie');
   assert.equal(reloaded.nodes.find(node => node.name === 'trial-1-usable' && node.checked).value, 'neither');
+});
+
+test('tone and original-level tasks are labeled as separate listening conditions', () => {
+  assert.match(page({condition: {purpose: 'timbre'}}).roots['condition-note'].textContent, /Volume matched/);
+  assert.match(page({condition: {purpose: 'level_accuracy'}}).roots['condition-note'].textContent, /judge.*reference level/);
+  assert.match(page().roots['condition-note'].textContent, /unsuitable for ranking tone/);
 });

@@ -39,11 +39,19 @@ def render_page(packet, answers=None):
     return template.replace("__PACKET__", json.dumps(packet)).replace("__INITIAL_ANSWERS__", json.dumps(answers or {}))
 
 
+def private_payload(key):
+    names = ("seed", "trials", "input_manifest_sha256", "inputs")
+    result = {name: key[name] for name in names}
+    if "processing" in key:
+        result["processing"] = key["processing"]
+    return result
+
+
 def refresh_page(key_path, answers):
     key_path = Path(key_path)
     key = json.loads(key_path.read_bytes())
     public, packet = key_path.parent / "listen", key["packet"]
-    private = {name: key[name] for name in ("seed", "trials", "input_manifest_sha256", "inputs")}
+    private = private_payload(key)
     if identity({name: value for name, value in packet.items() if name != "packet_id"}) != packet["packet_id"] or identity(private) != packet["assignment_sha256"]:
         raise ValueError("listening packet or assignment changed")
     for name, expected in key["files_sha256"].items():
@@ -66,13 +74,19 @@ def refresh_page(key_path, answers):
             "restored_answers": len(answers), "audio_and_assignment_unchanged": True}
 
 
-def prepare(manifest_path, output, *, seed=None):
+def prepare(manifest_path, output, *, seed=None, purpose="timbre", ffmpeg=None):
     from scipy.io import wavfile
     manifest_path, output = Path(manifest_path), Path(output)
     manifest_bytes = manifest_path.read_bytes()
     manifest = json.loads(manifest_bytes)
     if manifest["format"] != "blind_pairwise_listening_inputs_v1" or not manifest["cases"]:
         raise ValueError("expected nonempty blind pairwise listening inputs")
+    if purpose not in {"timbre", "level_accuracy"}:
+        raise ValueError("listening purpose must be timbre or level_accuracy")
+    meter = None
+    if purpose == "timbre":
+        from .listening_loudness import LoudnessMeter
+        meter = LoudnessMeter(ffmpeg)
     seed = secrets.randbits(128) if seed is None else seed
     if type(seed) is not int:
         raise ValueError("listening seed must be an integer")
@@ -85,8 +99,11 @@ def prepare(manifest_path, output, *, seed=None):
         audio = {name: checked_audio(row[name], manifest_path.parent) for name in ("reference", "candidate", "control")}
         if len({value.shape for value in audio.values()}) != 1:
             raise ValueError("paired clips must preserve the same complete observation length")
-        cases.append(row)
-        del audio
+        matching = None
+        if meter:
+            from .listening_loudness import match_triplet
+            audio, matching = match_triplet(audio, meter)
+        cases.append((row, audio, matching))
     # Validate every source before creating an output directory. Re-encoding
     # removes identifying WAV metadata, preserving all float32 sample values.
     output.mkdir(parents=True, exist_ok=False)
@@ -96,9 +113,8 @@ def prepare(manifest_path, output, *, seed=None):
     rng.shuffle(cases)
     assignments = [["candidate", "control"] if index % 2 else ["control", "candidate"] for index in range(len(cases))]
     rng.shuffle(assignments)
-    trials, key = [], []
-    for index, row in enumerate(cases):
-        audio = {name: checked_audio(row[name], manifest_path.parent) for name in ("reference", "candidate", "control")}
+    trials, key, processing = [], [], []
+    for index, (row, audio, matching) in enumerate(cases):
         trial_id = f"trial-{index + 1:03d}"
         methods = assignments[index]
         files = {}
@@ -109,9 +125,17 @@ def prepare(manifest_path, output, *, seed=None):
         trials.append({"trial_id": trial_id, "audio": files})
         key.append({"trial_id": trial_id, "family_id": row["family_id"], "role": row["role"],
                     "a": methods[0], "b": methods[1]})
+        if matching:
+            processing.append({"trial_id": trial_id, "family_id": row["family_id"], "role": row["role"], **matching})
         del audio
     private = {"seed": seed, "trials": key, "input_manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(), "inputs": manifest}
-    packet = {"format": "blind_pairwise_listening_packet_v1", "trials": trials, "assignment_sha256": identity(private)}
+    if meter:
+        private["processing"] = {"meter": meter.identity, "cases": processing}
+        from .listening_loudness import POLICY
+        condition = POLICY
+    else:
+        condition = {"purpose": "level_accuracy", "loudness": "original_levels", "tone_preferences_valid": False}
+    packet = {"format": "blind_pairwise_listening_packet_v1", "trials": trials, "condition": condition, "assignment_sha256": identity(private)}
     packet["packet_id"] = identity(packet)
     write_json(public / "packet.json", packet)
     (public / "index.html").write_text(render_page(packet), encoding="utf-8")
@@ -126,7 +150,7 @@ def summarize(key_path, responses_path):
     responses = json.loads(responses_path.read_text(encoding="utf-8"))
     packet = key["packet"]
     payload = {name: value for name, value in packet.items() if name != "packet_id"}
-    private = {name: key[name] for name in ("seed", "trials", "input_manifest_sha256", "inputs")}
+    private = private_payload(key)
     if (key["format"] != "blind_pairwise_listening_key_v1" or identity(payload) != packet["packet_id"]
             or identity(private) != packet["assignment_sha256"]
             or responses.get("format") != "blind_pairwise_listening_responses_v1"
@@ -164,6 +188,7 @@ def summarize(key_path, responses_path):
                       "control_usable_fraction": mean("control" in row["usable"] for row in values)}
                      for family, values in sorted(families.items())]
     return {"format": "blind_pairwise_listening_summary_v1", "packet_id": packet["packet_id"],
+            "condition": packet.get("condition", {"purpose": "legacy_unmatched", "tone_preferences_valid": False}),
             "responses_sha256": digest(responses_path), "answer_key_sha256": digest(key_path),
             "planned_trials": len(expected), "completed_trials": len(rows), "families": family_scores,
             "counts": {name: counts[name] for name in ("candidate", "control", "tie", "neither")},

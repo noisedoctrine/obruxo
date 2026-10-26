@@ -17,12 +17,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--fit", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--ffmpeg", type=Path)
     args = parser.parse_args()
     implementation = subprocess.check_output(["git", "-C", str(REPOSITORY), "rev-parse", "HEAD"], text=True).strip()
     monitor, started = MemoryMonitor(), perf_counter()
     monitor.start()
     try:
-        result = prepare(args.fit, args.output, implementation_commit=implementation)
+        result = prepare(args.fit, args.output, implementation_commit=implementation, ffmpeg=args.ffmpeg)
     finally:
         monitor.close()
     elapsed = perf_counter() - started

@@ -15,13 +15,15 @@ def main():
     packet.add_argument("--manifest", type=Path, required=True)
     packet.add_argument("--output", type=Path, required=True)
     packet.add_argument("--seed", type=int)
+    packet.add_argument("--purpose", choices=("timbre", "level_accuracy"), default="timbre")
+    packet.add_argument("--ffmpeg", type=Path)
     score = commands.add_parser("summarize")
     score.add_argument("--key", type=Path, required=True)
     score.add_argument("--responses", type=Path, required=True)
     score.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "prepare":
-        print(prepare(args.manifest, args.output, seed=args.seed))
+        print(prepare(args.manifest, args.output, seed=args.seed, purpose=args.purpose, ffmpeg=args.ffmpeg))
         return
     if args.output.exists():
         raise ValueError("refusing to replace listening results")
