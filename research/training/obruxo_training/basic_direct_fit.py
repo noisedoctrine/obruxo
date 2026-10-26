@@ -204,9 +204,13 @@ def train(inputs, store, output, saved=None):
                 if expected and tensor_digest(replay_models["parameter"].state_dict()) != expected:
                     raise ValueError("auxiliary fit changed the matched parameter-control prefix")
                 shutil.copyfile(output / "checkpoint.pt", output / "prefix-checkpoint.pt")
-                write_json(output / "prefix-verification.json", {"plan_id": canonical_sha256(inputs.plan), "replayed_updates": index + 1,
+                proof = {"plan_id": canonical_sha256(inputs.plan), "replayed_updates": index + 1,
                     "training_state_sha256": training_signature(replay_models, replay_opts), "offline_training_replay_exact": True,
-                    "checkpoint_file_sha256": digest(output / "prefix-checkpoint.pt"), "native_requests_added": 0, "experimental_optimizer_updates_added": 0})
+                    "checkpoint_file_sha256": digest(output / "prefix-checkpoint.pt"), "native_requests_added": 0, "experimental_optimizer_updates_added": 0}
+                if inputs.plan.get("require_trainable_input_updates"):
+                    from .trainable_basic_fit import check_input_learning
+                    proof["input_branch_updates"] = check_input_learning(inputs, replay_models, replay_opts, prefix=True)
+                write_json(output / "prefix-verification.json", proof)
             finally:
                 restore_rng(before, "cpu")
         progress = {"phase": "fit", "updates": index + 1, "planned_updates": len(inputs.plan["updates"]),

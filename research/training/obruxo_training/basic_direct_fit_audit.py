@@ -118,8 +118,16 @@ def verify(inputs, output):
             or prefix["replayed_updates"] != plan["prefix_check_updates"] or snapshot["step"] != prefix["replayed_updates"]
             or digest(output / "prefix-checkpoint.pt") != prefix["checkpoint_file_sha256"] or snapshot["trace"] != saved["trace"][:snapshot["step"]]):
         raise ValueError("direct final checkpoint or prefix evidence changed")
-    replay_training(inputs, SoundStore(output, inputs), snapshot)
+    prefix_models, prefix_optimizers = replay_training(inputs, SoundStore(output, inputs), snapshot)
+    input_updates = None
+    if plan.get("require_trainable_input_updates"):
+        from .trainable_basic_fit import check_input_learning
+        if prefix["input_branch_updates"] != check_input_learning(inputs, prefix_models, prefix_optimizers, prefix=True):
+            raise ValueError("trainable input prefix updates changed")
+    del prefix_models, prefix_optimizers
     models, _optimizers = replay_training(inputs, store, saved, prefix)
+    if plan.get("require_trainable_input_updates"):
+        input_updates = check_input_learning(inputs, models, _optimizers)
     expected = plan.get("expected_parameter_model_sha256")
     if expected and tensor_digest(models["parameter"].state_dict()) != expected:
         raise ValueError("auxiliary comparison changed the matched parameter-control identity")
@@ -182,6 +190,11 @@ def verify(inputs, output):
     roots = ("plan.json", "run.json", "executions.jsonl", "summary.json", "checkpoint.pt", "prefix-checkpoint.pt",
              "prefix-verification.json", "renders.jsonl", "updates.jsonl", "probes.jsonl", "finals.jsonl", "diagnostic-parameter.pt", "diagnostic-spectral.pt")
     evidence = {name: digest(output / name) for name in roots}
+    if plan.get("parameter_control_rehearsal_sha256"):
+        value = digest(output / "parameter-control-rehearsal.json")
+        if value != plan["parameter_control_rehearsal_sha256"]:
+            raise ValueError("frozen parameter-control rehearsal changed")
+        evidence["parameter-control-rehearsal.json"] = value
     if completion:
         evidence["process-loss-observation.json"] = digest(output / "process-loss-observation.json")
     for folder in ("source_audio", "comparison_audio", "interruption"):
@@ -192,6 +205,7 @@ def verify(inputs, output):
             "result": result, "matched_comparison_passed": result["pass"],
             **({"original_budget_passed": False, "original_peak_process_tree_rss_bytes": None,
                 "final_only_completion": True, "experimental_training_updates_added": 0} if completion else {}),
+            **({"input_branch_updates": input_updates} if input_updates else {}),
             "final_model_sha256": identities, "evidence_sha256": evidence, "test_split_used": False, "qualified_for_release": False}
 
 
