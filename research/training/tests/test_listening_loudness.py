@@ -7,7 +7,7 @@ import pytest
 from scipy.io import wavfile
 
 from obruxo_training.listening import digest, prepare, summarize, write_json
-from obruxo_training.listening_loudness import POLICY, LoudnessMeter, match_triplet
+from obruxo_training.listening_loudness import POLICY, LoudnessMeter, match_triplet, verify_packet
 
 
 @pytest.fixture(scope="module")
@@ -73,6 +73,9 @@ def test_timbre_packet_matches_levels_by_default_and_binds_processing_to_identit
     write_json(response, {"format": "blind_pairwise_listening_responses_v1", "packet_id": result["packet_id"],
                           "judgments": [{"trial_id": "trial-001", "preferred": "tie", "usable": "both"}]})
     assert summarize(output / "answer-key.json", response)["condition"]["purpose"] == "timbre"
+    proof = verify_packet(output / "answer-key.json", manifest)
+    assert proof["verified"] and proof["maximum_independent_spread_lu"] <= .1
+    assert proof["maximum_meter_difference_lu"] <= .2
     key["processing"]["cases"][0]["common_gain_db"] -= 1
     write_json(output / "answer-key.json", key)
     with pytest.raises(ValueError, match="packet"):

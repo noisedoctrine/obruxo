@@ -74,3 +74,65 @@ def match_triplet(audio, meter):
         raise ValueError("exported listening clips miss the frozen loudness/headroom tolerance")
     return matched, {"before": before, "after": after, "individual_gain_db": gains, "common_gain_db": attenuation,
                      "maximum_spread_lu": max(levels) - min(levels), "policy": POLICY}
+
+
+def verify_packet(key_path, manifest_path):
+    """Check exported files with a second BS.1770 implementation and original samples."""
+    import json
+    import importlib.metadata
+    import pyloudnorm
+    from scipy.io import wavfile
+    from .listening import digest, identity, private_payload
+    key_path, manifest_path = Path(key_path), Path(manifest_path)
+    key = json.loads(key_path.read_bytes())
+    packet = key["packet"]
+    if (packet.get("condition") != POLICY or identity(private_payload(key)) != packet["assignment_sha256"]
+            or identity({name: value for name, value in packet.items() if name != "packet_id"}) != packet["packet_id"]
+            or digest(manifest_path) != key["input_manifest_sha256"]):
+        raise ValueError("matched packet, processing or original input manifest changed")
+    for name, expected in key["files_sha256"].items():
+        if digest(key_path.parent / "listen" / name) != expected:
+            raise ValueError("matched page or packet changed")
+    originals = {(row["family_id"], row["role"]): row for row in key["inputs"]["cases"]}
+    assignments = {row["trial_id"]: row for row in key["trials"]}
+    processing = {row["trial_id"]: row for row in key["processing"]["cases"]}
+    meter, cases, rms_difference, peak_difference, level_errors = pyloudnorm.Meter(44100, filter_class="DeMan"), [], [], [], []
+    for trial in packet["trials"]:
+        assignment, record = assignments[trial["trial_id"]], processing[trial["trial_id"]]
+        original = originals[assignment["family_id"], assignment["role"]]
+        measurements = {}
+        for slot, asset in trial["audio"].items():
+            path = key_path.parent / "listen" / asset["file"]
+            if digest(path) != asset["sha256"]:
+                raise ValueError("matched waveform changed")
+            rate, audio = wavfile.read(path)
+            method = "reference" if slot == "reference" else assignment[slot]
+            source_path = manifest_path.parent / original[method]["path"]
+            if digest(source_path) != original[method]["sha256"]:
+                raise ValueError("original waveform changed")
+            source_rate, source = wavfile.read(source_path)
+            gain = 10**((record["individual_gain_db"][method] + record["common_gain_db"]) / 20)
+            expected = (source.astype(np.float64) * gain).astype(np.float32)
+            if rate != 44100 or source_rate != 44100 or not np.array_equal(audio, expected):
+                raise ValueError("export changed something beyond the recorded constant gain")
+            loudness = float(meter.integrated_loudness(audio.astype(np.float64)))
+            primary = record["after"][method]["integrated_lufs"]
+            if not math.isfinite(loudness) or abs(loudness - primary) > .2 or record["after"][method]["true_peak_upper_dbtp"] > -1:
+                raise ValueError("independent meter or peak verification failed")
+            measurements[slot] = {"independent_lufs": loudness, "ffmpeg_lufs": primary, "meter_difference_lu": abs(loudness - primary),
+                                  "frames": len(audio), "static_gain_roundtrip_exact": True}
+            if method != "reference":
+                reference, value = record["before"]["reference"], record["before"][method]
+                lufs_gain = reference["integrated_lufs"] - value["integrated_lufs"]
+                rms_difference.append(abs(lufs_gain - (reference["rms_dbfs"] - value["rms_dbfs"])))
+                peak_difference.append(abs(lufs_gain - (reference["sample_peak_dbfs"] - value["sample_peak_dbfs"])))
+                level_errors.append(abs(lufs_gain))
+        levels = [row["independent_lufs"] for row in measurements.values()]
+        if max(levels) - min(levels) > .1:
+            raise ValueError("independent loudness spread exceeds 0.1 LU")
+        cases.append({"trial_id": trial["trial_id"], "clips": measurements, "independent_spread_lu": max(levels) - min(levels)})
+    return {"verified": True, "packet_id": packet["packet_id"], "cases": cases, "pyloudnorm_version": importlib.metadata.version("pyloudnorm"),
+            "filter": "DeMan", "originals_unchanged": True, "maximum_independent_spread_lu": max(row["independent_spread_lu"] for row in cases),
+            "maximum_meter_difference_lu": max(clip["meter_difference_lu"] for row in cases for clip in row["clips"].values()),
+            "maximum_original_loudness_error_lu": max(level_errors), "maximum_lufs_vs_rms_relative_gain_difference_db": max(rms_difference),
+            "maximum_lufs_vs_peak_relative_gain_difference_db": max(peak_difference), "qualified_for_release": False}

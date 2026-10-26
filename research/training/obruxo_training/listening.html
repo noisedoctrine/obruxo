@@ -31,7 +31,7 @@ const initialAnswers = __INITIAL_ANSWERS__;
 const matched = packet.condition?.purpose === 'timbre';
 const levelTest = packet.condition?.purpose === 'level_accuracy';
 document.getElementById('condition-note').textContent = matched
-  ? 'Volume matched. Compare tone, stereo width and how the sound changes over time. Original level errors are measured separately.'
+  ? 'Volume matched using integrated LUFS. Compare tone, stereo width and how the sound changes over time. Original level errors are measured separately.'
   : levelTest ? 'Original volumes. For this test, judge how closely each clip matches the reference level.'
   : 'Original volumes. This earlier packet did not control loudness and is unsuitable for ranking tone.';
 const trials = document.getElementById('trials');
