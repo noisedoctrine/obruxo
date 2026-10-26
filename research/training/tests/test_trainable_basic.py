@@ -84,7 +84,7 @@ def trained(completed, tmp_path_factory):  # noqa: F811
     ctx.initial_path = bridge / "model.pt"
     torch.save(export_direct(ctx.model, ctx.frontend, ctx.codec, "simulation"), ctx.initial_path)
     ctx.plan = {**copy.deepcopy(original.plan), "native_acceptance": copy.deepcopy(ACCEPTANCE),
-                "gates": {**original.plan["gates"], "minimum_native_accepted_updates": 3}}
+                "gates": {**original.plan["gates"], "minimum_native_accepted_updates": 3}, "require_trainable_input_updates": True}
     write_json(output / "plan.json", ctx.plan)
     with pytest.MonkeyPatch.context() as patch:
         patch.setattr(fit, "PairedSession", FakeSession)
@@ -97,6 +97,7 @@ def test_existing_sound_fit_and_audit_include_encoder_and_adam_state(trained):
     ctx, output, _source = trained
     proof = verify(ctx, output)
     assert proof["offline_training_replay_exact"] and proof["comparison_waveforms_rescored"] == 24
+    assert all(value > 0 for groups in proof["input_branch_updates"].values() for value in groups.values())
     saved = torch.load(output / "checkpoint.pt", map_location="cpu", weights_only=True)
     for arm in ("parameter", "spectral"):
         assert equal_tree(saved["models"][arm]["base.timbre.0.weight"], ctx.model.base.timbre[0].weight)
