@@ -1,0 +1,17 @@
+{
+  "cases": 6,
+  "clean_dependency_install": false,
+  "environment": "new_venv_with_shared_installed_packages",
+  "implementation_commit": "1cb25628b0c9410ae82065a8f20c910d6e9fc02e",
+  "limits": {
+    "archive_bytes": 134217728,
+    "process_tree_bytes": 4294967296,
+    "wall_seconds": 300
+  },
+  "model_sha256": {
+    "direct": "36df1dd37f70d5be3b77cd61601875bac8acf987aa8b8d4cae703104b08f0432",
+    "trainable_inputs": "426edb24d09d55e423b1e2fb5fc5b677f2d62f0332c7b25c7a5d136dc8bfb136"
+  },
+  "new_native_requests": 0,
+  "optimizer_applications": 0
+}

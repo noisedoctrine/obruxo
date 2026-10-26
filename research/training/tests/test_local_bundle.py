@@ -24,7 +24,8 @@ def snapshots(artifacts, tmp_path_factory):  # noqa: F811
 @pytest.mark.parametrize("name", ["legacy", "direct", "inputs"])
 def test_packaged_model_runs_in_isolated_process_outside_checkout(snapshots, tmp_path, name):
     source, root = snapshots
-    bundle = root / name
+    bundle = tmp_path / "relocated bundle"
+    shutil.copytree(root / name, bundle)
     expected = tmp_path / "expected.vital"
     assert main(["infer", "--model", str(source / f"{name}.pt"), "--audio", str(source / "input.wav"), "--output", str(expected)]) == 0
     process = subprocess.run([sys.executable, "-I", str(bundle / "run.py"), "--audio", str(source / "input.wav"),

@@ -1,0 +1,12 @@
+{
+  "base_prefix": "C:\\Users\\angert\\miniforge3\\envs\\py312",
+  "isolated": 1,
+  "prefix": "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\tmp\\local-basic-bundle-env-20261026",
+  "system_site_packages": [
+    "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\tmp\\local-basic-bundle-env-20261026",
+    "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\tmp\\local-basic-bundle-env-20261026\\Lib\\site-packages",
+    "C:\\Users\\angert\\miniforge3\\envs\\py312",
+    "C:\\Users\\angert\\miniforge3\\envs\\py312\\Lib\\site-packages"
+  ],
+  "user_site_enabled": false
+}
