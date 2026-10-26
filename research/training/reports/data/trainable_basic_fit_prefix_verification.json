@@ -1,0 +1,19 @@
+{
+  "checkpoint_file_sha256": "d1d4c215689e8884a40540c6898511c925f7b75e934599efb329acf35f31f5e9",
+  "experimental_optimizer_updates_added": 0,
+  "input_branch_updates": {
+    "parameter": {
+      "pitch": 7.969043008954159,
+      "timbre": 6.567482993355952
+    },
+    "spectral": {
+      "pitch": 4.603148410756219,
+      "timbre": 4.712809955497505
+    }
+  },
+  "native_requests_added": 0,
+  "offline_training_replay_exact": true,
+  "plan_id": "efb0885f7e0763d72fd82202798edba0fd312bdec7e5367cfa28969abcb2d5f0",
+  "replayed_updates": 4,
+  "training_state_sha256": "d4343c6e359bed42c3e8cc22bd582d595c7ef2beb34f558be6473fe0ed39b899"
+}
