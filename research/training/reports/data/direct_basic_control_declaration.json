@@ -1,0 +1,11 @@
+{
+  "charged_update_attempts_per_case_cap": 33,
+  "implementation_commit": "30a15a9764b90e9e313c9396d62adbceb7156aa3",
+  "maximum_native_executions": 2,
+  "maximum_native_requests": 4608,
+  "maximum_updates_per_case": 32,
+  "operator_sha256": "fb42ad9f78f1dde328ebd5ca722acaa0229ec57eb219457906433ba8395289f9",
+  "plan_file_sha256": "ad6cd08ad02898dc1c64a41caff467dd90ad230606dfcfc356ce357c4441d186",
+  "plan_id": "642b1d087a02752b9ec38d6038a328da8bf3f7dd77349bd0833f0ac5d23f5a1a",
+  "preparation_sha256": "ac91d6c2dbad30bef0a71b7218b42a1633acdfe8403ee0583cce69f402f444fc"
+}

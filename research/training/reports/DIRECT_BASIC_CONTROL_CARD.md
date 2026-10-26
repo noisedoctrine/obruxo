@@ -1,8 +1,8 @@
-# Proposed component check: fit three known sounds by adjusting controls directly
+# Component check: fit three known sounds by adjusting controls directly
 
 Before another inverse-model change, test whether the existing sound objective and a bounded native optimizer can reconstruct three individual training patches. Adjust the same nine continuous controls and two legal category choices directly. Do not train a network, add prediction heads or supervise source parameter values. This separates a component-fitting question from the shared audio-to-patch mapping; neither outcome proves a unique cause of the network failure.
 
-**Preparation only until implemented and qualified.** Complete local software tests, exact interruption/replay checks, source/runtime pins and a concrete immutable plan before launch. Incorporate the listener's actual diagnostic feedback when deciding to execute. This card does not start native work or admit a model.
+The [implementation and execution record](DIRECT_BASIC_CONTROL_EXECUTION.md) records seventeen passing software tests, exact interruption/replay checks, source/runtime pins and the immutable native plan. The first listening pass identifies a loudness confound and supplies no tone ranking. This check keeps original-level sound loss, tests individual component convergence and makes no inverse-model admission claim. The replacement LUFS-matched listening condition remains separate.
 
 Select the existing held-note inputs nearest the low, middle and high registers: training indices **2, 8 and 11**, at MIDI **36, 61 and 83**. They are already used training/development sounds, with source categories (one voice/filter on), (four voices/filter off) and (four voices/filter on). For each, optimize one patch against both its held-note and original performances with equal weight. Known MIDI drives only the diagnostic renderer. Start from the qualified, untrained trainable-input initializer's prediction, not the rejected fitted model or source controls.
 
@@ -23,6 +23,8 @@ Use one isolated native worker, CPU float32 and two Torch threads. Preserve the 
 | Hard cap | **4,608** |
 
 Declare **four hours / 4 GiB process-tree RAM / 2 GiB evidence / 512 MiB resident data**, at most two native executions and 33 charged direct-update attempts per patch including recovery. Keep the original start/deadline across recovery. Checkpoint direct controls, categories, Adam, measurement/acceptance cursors and all receipts after every completed update; preserve incomplete requests without inventing outcomes. Retain initial/final comparison audio and exact-repeat evidence. No automatic budget extension or additional epochs.
+
+Only a known `RenderTimeout` may use the second execution, retrying the identical request under the original deadline. Trial silence, clipping or tail rejection may refuse that trial; nonfinite/wrong-shape/native-state failures stop the check. All category/gradient/anchor renders must succeed. The recovery reserve can serve either native phase, while the combined hard cap stays 4,608. Float32 proposals are moved toward their anchors by one representable value when rounding would exceed the 0.025 continuous move cap.
 
 Freeze these diagnostic success rules before execution: every patch is valid, its joint combined sound loss is at least 25% below initialization and no worse than its matched parameter-control prediction, each performance's combined loss improves at least 10% from initialization, and MRSTFT improves on both performances. Independently rescore retained initial/final audio, reproduce the direct update trajectory and verify final fixed-phase repeats. Record all misses. If a patch reaches eight consecutive refused continuous updates, stop that patch and report its actual status; any accepted category or continuous change resets this count. Do not silently add steps.
 

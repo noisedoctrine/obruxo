@@ -1,0 +1,28 @@
+{
+  "observed_unix": 1793042307.878169,
+  "process_id": 28984,
+  "process_created_unix": 1793041816.9006407,
+  "confirmed_live": true,
+  "plan_sha256": "ad6cd08ad02898dc1c64a41caff467dd90ad230606dfcfc356ce357c4441d186",
+  "progress": {
+    "accepted_continuous_updates": 7,
+    "case": 0,
+    "completed_updates": 7,
+    "consecutive_refusals": 0,
+    "joint_loss": 0.3948497623205185,
+    "native_measurements": 232,
+    "training_index": 2
+  },
+  "resource_heartbeat": {
+    "elapsed_seconds": 481.55992817878723,
+    "observed_unix": 1793042299.1442797,
+    "peak_process_tree_rss_bytes": 1030504448,
+    "rss_sampling_errors": 0
+  },
+  "native_attempts": 253,
+  "accepted_outcomes": 252,
+  "failed_outcomes": 0,
+  "complete": false,
+  "qualified_for_release": false,
+  "inverse_training_updates": 0
+}
