@@ -78,7 +78,14 @@ def verify(inputs, output):
     if not 1 <= len(executions) <= plan["limits"]["native_executions"] or any(row["ordinal"] != index + 1
             or row["resume"] != (index > 0) or row["plan_id"] != plan_id for index, row in enumerate(executions)):
         raise ValueError("direct native execution history changed")
-    attempts, outcomes, recovered = native_ledger(lines(output / "renders.jsonl"), plan["expected_renderer_identity"])
+    completion = plan.get("final_only_completion")
+    if completion:
+        from .final_fit_completion import verify_origin
+        verify_origin(plan, output)
+    attempts, outcomes, recovery = native_ledger(lines(output / "renders.jsonl"), plan["expected_renderer_identity"],
+                                                known_process_losses=completion["known_process_losses"] if completion else ())
+    recovered = [row for row in recovery if row.get("kind") != "process_loss"]
+    process_losses = [row for row in recovery if row.get("kind") == "process_loss"]
     for phase in ("training", "qualification"):
         if sum(key[0] == phase for key in attempts) > plan["limits"][f"{phase}_attempts"]:
             raise ValueError("direct native attempt budget exceeded")
@@ -165,17 +172,26 @@ def verify(inputs, output):
         raise ValueError("direct native ledger has an unexplained accepted request")
     result = decisions(inputs, store, saved["trace"])
     archive = sum(path.stat().st_size for path in output.rglob("*") if path.is_file())
-    if (result != summary["result"] or recovered != summary["recovered_timeouts"] or not summary["native_receipts_resolved"]
+    if completion:
+        archive += completion["observation"]["source_archive_bytes"]
+        if summary["original_budget_passed"] is not False or summary["original_peak_process_tree_rss_bytes"] is not None:
+            raise ValueError("lost original resource record cannot become a passed budget")
+    if (result != summary["result"] or recovered != summary["recovered_timeouts"] or process_losses != summary.get("resolved_process_losses", []) or not summary["native_receipts_resolved"]
             or summary["matched_comparison_passed"] != result["pass"] or archive + 1024**2 > plan["limits"]["archive_bytes"]):
         raise ValueError("direct final decision, recovery or archive changed")
     roots = ("plan.json", "run.json", "executions.jsonl", "summary.json", "checkpoint.pt", "prefix-checkpoint.pt",
              "prefix-verification.json", "renders.jsonl", "updates.jsonl", "probes.jsonl", "finals.jsonl", "diagnostic-parameter.pt", "diagnostic-spectral.pt")
     evidence = {name: digest(output / name) for name in roots}
+    if completion:
+        evidence["process-loss-observation.json"] = digest(output / "process-loss-observation.json")
     for folder in ("source_audio", "comparison_audio", "interruption"):
         evidence.update({path.relative_to(output).as_posix(): digest(path) for path in (output / folder).rglob("*") if path.is_file()})
     return {"plan_id": plan_id, "complete": True, "offline_training_replay_exact": True, "committed_updates_per_arm": saved["step"],
             "comparison_waveforms_rescored": compared, "training_scalar_probes_replayed": len(store.probes), "training_probe_audio_independently_rescored": False,
-            "native_receipts_resolved": True, "recovered_timeouts": recovered, "result": result, "matched_comparison_passed": result["pass"],
+            "native_receipts_resolved": True, "recovered_timeouts": recovered, "resolved_process_losses": process_losses,
+            "result": result, "matched_comparison_passed": result["pass"],
+            **({"original_budget_passed": False, "original_peak_process_tree_rss_bytes": None,
+                "final_only_completion": True, "experimental_training_updates_added": 0} if completion else {}),
             "final_model_sha256": identities, "evidence_sha256": evidence, "test_split_used": False, "qualified_for_release": False}
 
 

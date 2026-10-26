@@ -11,7 +11,7 @@ from .evaluate import audio_distance
 from .spectral import SpectralTargets, spectral_loss
 
 
-def native_ledger(events, renderer_identity):
+def native_ledger(events, renderer_identity, *, known_process_losses=()):
     attempts, outcomes = {}, {}
     for row in events:
         key = row["phase"], row["attempt"]
@@ -22,7 +22,10 @@ def native_ledger(events, renderer_identity):
     if attempts.keys() != outcomes.keys():
         raise ValueError("native ledger has an unobserved result; preserve the interruption")
     fields = ("phase", "label", "request_id", "source_sha256", "controlled_sha256")
-    recovered = []
+    losses = {(row["phase"], row["attempt"]): row for row in known_process_losses}
+    if len(losses) != len(known_process_losses):
+        raise ValueError("duplicate declared process loss")
+    recovered, used_losses = [], set()
     for phase in {key[0] for key in attempts}:
         if sorted(key[1] for key in attempts if key[0] == phase) != list(range(sum(key[0] == phase for key in attempts))):
             raise ValueError("native attempt counters changed")
@@ -33,6 +36,20 @@ def native_ledger(events, renderer_identity):
             if receipt["renderer_identity"] != renderer_identity:
                 raise ValueError("native renderer identity changed")
             continue
+        if key in losses:
+            declared = losses[key]
+            if (key[0] != "qualification" or receipt["status"] != "unobserved" or receipt.get("error_type") != "ProcessLostBeforeReceipt"
+                    or "qa" in receipt or receipt.get("observation_evidence_sha256") != declared["observation_evidence_sha256"]
+                    or any(receipt.get(name) != declared.get(name) for name in fields)):
+                raise ValueError("process loss differs from its frozen observation evidence")
+            matches = [later for later in outcomes.values() if later["status"] == "accepted" and later["phase"] == key[0]
+                       and later["attempt"] > key[1] and all(later.get(name) == receipt.get(name) for name in fields)]
+            if not matches:
+                raise ValueError("unobserved process-loss request has no later accepted identical request")
+            recovered.append({"kind": "process_loss", "phase": key[0], "unobserved_attempt": key[1],
+                              "accepted_attempt": matches[0]["attempt"], "request_id": receipt["request_id"]})
+            used_losses.add(key)
+            continue
         if receipt["status"] != "error" or receipt.get("error_type") != "RenderTimeout" or "qa" in receipt:
             raise ValueError("native audio rejection or unsupported failure cannot be recovered")
         matches = [later for later in outcomes.values() if later["status"] == "accepted" and later["phase"] == key[0]
@@ -40,6 +57,8 @@ def native_ledger(events, renderer_identity):
         if not matches:
             raise ValueError("native timeout has no later accepted identical request")
         recovered.append({"phase": key[0], "failed_attempt": key[1], "accepted_attempt": matches[0]["attempt"], "request_id": receipt["request_id"]})
+    if used_losses != set(losses):
+        raise ValueError("declared process loss is absent from the native ledger")
     return attempts, outcomes, recovered
 
 

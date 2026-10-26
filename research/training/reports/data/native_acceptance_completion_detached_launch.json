@@ -1,0 +1,9 @@
+{
+  "process_id": 23720,
+  "creation_date_utc": "2026-10-26T11:34:01.5662770Z",
+  "command_line": "\"C:\\Users\\angert\\miniforge3\\envs\\py312\\python.exe\" \"C:\\Users\\angert\\Documents\\projects\\OBRUXO\\tmp\\finalize_native_acceptance_fit.py\" finalize --plan-sha256 f8c38b385e6caf332f07d863c8f25d52133fcd34c00a06e448b787b5a8f5265b",
+  "return_value": 0,
+  "plan_file_sha256": "f8c38b385e6caf332f07d863c8f25d52133fcd34c00a06e448b787b5a8f5265b",
+  "detached": true,
+  "hidden": true
+}

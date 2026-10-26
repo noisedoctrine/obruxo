@@ -1,0 +1,17 @@
+# Finish the saved basic fit without training again
+
+The original measured-acceptance driver is confirmed absent. It saved all 48 updates per arm and 201/208 final comparisons, then stopped before recording a result or terminal resource report. Its final ledger entry charges `final:100:spectral` but has no observed outcome. The cause of process loss is unknown. Preserve the entire original directory and its six-hour budget result as unconfirmed/failed; original peak RAM is unknown.
+
+The completion uses the original remaining native execution. Before launching, freeze a separate operational plan and process-loss observation, including every original file hash and the exact pending request. Replay all 48 updates using retained scalar probes and check the model, Adam, RNG, parameter control and early checkpoint. Independently rescore the 201 retained comparisons. Numerical training code, data, initializer, quality gates, final checkpoint selection and the 14-output vocabulary stay fixed.
+
+Allocate **20 minutes, 4 GiB process-tree RAM and 2 GiB aggregate evidence across both directories** for the completion. Retain the original 7,344 training / 240 qualification request caps, 49 charged-update cap and two-execution cap. Add **zero experimental optimizer updates and at most seven native requests**. Reuse all existing comparisons. The first new render repeats the exact request whose receipt was lost, followed by the six remaining comparisons. All use the same fixed phases and 32,768-frame preroll.
+
+Copy original ledgers byte for byte into a new directory; preserve original root files under `interruption/`. Rebind only checkpoint plan identifiers, leaving model/Adam/RNG/trace unchanged. Annotate the absent outcome explicitly as `unobserved` / `ProcessLostBeforeReceipt`, bound to the frozen observation. This annotation supplies no audio or QA claim. It can be resolved only by a later accepted, identical request. Ordinary audits continue to reject undeclared losses; training-phase losses and audio rejections are unsupported.
+
+Launch a detached hidden local driver with durable start identity, resource heartbeat and completion report. Use a scoped awake request and existing battery/checkpoint authorization. Independently replay the completed trajectory and rescore all 312 source/initial/final comparisons. Report the new completion resources separately from the missing original resource record. A passed completion budget cannot establish the original peak RAM or repair its missing terminal report.
+
+Publish the actual six-group reconstruction, earlier-32 preservation and accepted-update decisions, including failures. Neither finishing this small fit nor a successful audit grants A2/A3 admission or release qualification. Broader fitting, fresh families/performances, a second seed, listening and deployment remain open. GitHub Actions stays disabled; no Colab work.
+
+Implementation: [completion runner](../obruxo_training/final_fit_completion.py), [CLI](scripts/complete_native_acceptance_fit.py), [recovery tests](../tests/test_final_fit_completion.py).
+
+Completed under plan `e9227ca1f35112e2e591a283d0e55685836b1ea91bd328c9bd92dbbe78aebbd6`, implementation `b0aae9c`: seven additional native requests, zero experimental updates, exact replay and 312 independently rescored comparisons. [Final result](NATIVE_ACCEPTANCE_FIT_RESULTS.md).
