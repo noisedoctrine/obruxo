@@ -1,0 +1,3640 @@
+{
+  "archive_overhead_reserve_bytes": 536870912,
+  "audio_bytes_upper_bound": 6435072000,
+  "before_evaluation": [
+    "independently_verified_A2_fit_and_unchanged_quality_preservation_gates",
+    "freeze_candidate_control_weights_complete_runtime_and_scoring_plan",
+    "qualify_training_only_retrieval_and_complete_no_render_recovery_preflight"
+  ],
+  "cases": [
+    {
+      "bank_index": 5,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "d9c4664e797b58c251e8a1a884c8316c1181ea0cab9cc385ba9c7405c836bfbc",
+      "split": "validation",
+      "state_id": "d9c4664e797b58c251e8a1a884c8316c1181ea0cab9cc385ba9c7405c836bfbc"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "e3d1a67b0657795dd8c066244651b7dcd1c3151160d81987bcb8795a19715ef9",
+      "split": "validation",
+      "state_id": "e3d1a67b0657795dd8c066244651b7dcd1c3151160d81987bcb8795a19715ef9"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "2ef9e061273804f7b8e09b4f03ce00e91d1d5a4203259647fd5b42a992fed19c",
+      "split": "validation",
+      "state_id": "2ef9e061273804f7b8e09b4f03ce00e91d1d5a4203259647fd5b42a992fed19c"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "5dedb6e17047f20421f002724037fed8f1e54bfa0c6b415cc5873f6989b1aff6",
+      "split": "validation",
+      "state_id": "5dedb6e17047f20421f002724037fed8f1e54bfa0c6b415cc5873f6989b1aff6"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "cb907926c65475ed3ab7770d4a88e199fe3c1e47a6ce141aca678abc218b4ae4",
+      "split": "validation",
+      "state_id": "cb907926c65475ed3ab7770d4a88e199fe3c1e47a6ce141aca678abc218b4ae4"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "a75255f7f33cd8a6592745074b63560f1b6358ba24db64f9f2ff77f9d85f93ec",
+      "split": "validation",
+      "state_id": "a75255f7f33cd8a6592745074b63560f1b6358ba24db64f9f2ff77f9d85f93ec"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "71725c8eb58c8188eef5426ddec19cc751e08e06df2eb587363f03774bdca075",
+      "split": "validation",
+      "state_id": "71725c8eb58c8188eef5426ddec19cc751e08e06df2eb587363f03774bdca075"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "66bc7afc4f74f1acb1f4608ea58a9ad043fd4660ec3115f5d6e4572ff9d8c3f3",
+      "split": "validation",
+      "state_id": "66bc7afc4f74f1acb1f4608ea58a9ad043fd4660ec3115f5d6e4572ff9d8c3f3"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "e941c1229e77d469876e519c4dba80078b8e8567d29cff6fef2ff342d03d5506",
+      "split": "validation",
+      "state_id": "e941c1229e77d469876e519c4dba80078b8e8567d29cff6fef2ff342d03d5506"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "278c5fba91239fab0c0eedd60778ee3b775f5ce36b04baec6efee33b809770fc",
+      "split": "validation",
+      "state_id": "278c5fba91239fab0c0eedd60778ee3b775f5ce36b04baec6efee33b809770fc"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "e3b286824185eee2c55724aab52a99f1f7762e39b86b828c7fee17fc80a4ab31",
+      "split": "validation",
+      "state_id": "e3b286824185eee2c55724aab52a99f1f7762e39b86b828c7fee17fc80a4ab31"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "2e0c2d0ead92893682ec9d86f07a593b786b8f93a9930de26ce1000e6d6730ca",
+      "split": "validation",
+      "state_id": "2e0c2d0ead92893682ec9d86f07a593b786b8f93a9930de26ce1000e6d6730ca"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "00c71c2f014de59d15f701a2bb53365535b9edf0fe8ebcb7f3927d27f3b28273",
+      "split": "validation",
+      "state_id": "00c71c2f014de59d15f701a2bb53365535b9edf0fe8ebcb7f3927d27f3b28273"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "af276240500bab77c580e0014afaf5a80b93fc7530ebd829aa922b6e69fb1a48",
+      "split": "validation",
+      "state_id": "af276240500bab77c580e0014afaf5a80b93fc7530ebd829aa922b6e69fb1a48"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "270ba73f9089f63df93c5d89f48c609ec8b5377a577bf70bf7d9f4280b4e0f7d",
+      "split": "validation",
+      "state_id": "270ba73f9089f63df93c5d89f48c609ec8b5377a577bf70bf7d9f4280b4e0f7d"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "b7d288de2d4abad37e51960505d534c30d0e8a8983e2297dbe8b9526f481e427",
+      "split": "validation",
+      "state_id": "b7d288de2d4abad37e51960505d534c30d0e8a8983e2297dbe8b9526f481e427"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "46438fb24170caebe4631ff2f25468f6f18491c0593191a24c421ec77f2b27cb",
+      "split": "validation",
+      "state_id": "46438fb24170caebe4631ff2f25468f6f18491c0593191a24c421ec77f2b27cb"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "64d529c749ed65873707bfec84b00a36f302e66e188e250581c385faf3b21535",
+      "split": "validation",
+      "state_id": "64d529c749ed65873707bfec84b00a36f302e66e188e250581c385faf3b21535"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "30747606ffbd239970c1ab8f0d69d6d570c13c1841f19247ca3766653823a7f1",
+      "split": "validation",
+      "state_id": "30747606ffbd239970c1ab8f0d69d6d570c13c1841f19247ca3766653823a7f1"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "6a87c1ee010d71a4855cf9ae7e3ff3ef67a00c048d15175040750d04356a5abe",
+      "split": "validation",
+      "state_id": "6a87c1ee010d71a4855cf9ae7e3ff3ef67a00c048d15175040750d04356a5abe"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "b0c52e7c5a007e4b0438fa833db321ce6989e47abd328cc9638a718d623500bc",
+      "split": "validation",
+      "state_id": "b0c52e7c5a007e4b0438fa833db321ce6989e47abd328cc9638a718d623500bc"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "729a519b0de45823304fe8c4515bb73b4dce6e734b9eb5f3121fc0a44242c58b",
+      "split": "validation",
+      "state_id": "729a519b0de45823304fe8c4515bb73b4dce6e734b9eb5f3121fc0a44242c58b"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "35b4e652d03c136f12402819d9c1d8a1b3bc04fbf0bd02ba2cc40ad1cbd37d14",
+      "split": "validation",
+      "state_id": "35b4e652d03c136f12402819d9c1d8a1b3bc04fbf0bd02ba2cc40ad1cbd37d14"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "7e68163021bd931bea7cbcfeacb90716145d9ab2821bbf6a63e00e68d6d9fd24",
+      "split": "validation",
+      "state_id": "7e68163021bd931bea7cbcfeacb90716145d9ab2821bbf6a63e00e68d6d9fd24"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "83fab55f03846d668fdf51dff6b768edc9903de8dc8bca27fc86908e165f83c7",
+      "split": "validation",
+      "state_id": "83fab55f03846d668fdf51dff6b768edc9903de8dc8bca27fc86908e165f83c7"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "1b618c3891c09034323f26bd93a05fae3c1b879112cadaa25d3171df14311717",
+      "split": "validation",
+      "state_id": "1b618c3891c09034323f26bd93a05fae3c1b879112cadaa25d3171df14311717"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "fefc2edfe0df0022e76c27d319b262cd3018daece1bfdcffaf90554de1c113a7",
+      "split": "validation",
+      "state_id": "fefc2edfe0df0022e76c27d319b262cd3018daece1bfdcffaf90554de1c113a7"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "1b2cf09b7ce970c292f0bf9064402d3d47407036d79d7b11d9fd9312a92ac660",
+      "split": "validation",
+      "state_id": "1b2cf09b7ce970c292f0bf9064402d3d47407036d79d7b11d9fd9312a92ac660"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "3ead44458e5363982d786360b51d9b00e1f929a0e18e27f666cd9c5a8bbadfee",
+      "split": "validation",
+      "state_id": "3ead44458e5363982d786360b51d9b00e1f929a0e18e27f666cd9c5a8bbadfee"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "00397d7d00651800349043ce52f78d2b914ce4f7bba410e43ab1883879803d67",
+      "split": "validation",
+      "state_id": "00397d7d00651800349043ce52f78d2b914ce4f7bba410e43ab1883879803d67"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "4a5fa9b0bbe2d60bc25dce720d5695c0364467c3cecf2329f6c6380112ff7e8e",
+      "split": "validation",
+      "state_id": "4a5fa9b0bbe2d60bc25dce720d5695c0364467c3cecf2329f6c6380112ff7e8e"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "0982cd745f4ca0524ceee27130367fe5d6f9b7c8da4ff9a81e9b327f35eb6621",
+      "split": "validation",
+      "state_id": "0982cd745f4ca0524ceee27130367fe5d6f9b7c8da4ff9a81e9b327f35eb6621"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "85cc2aef5b566d85670978e060bc114f7ac6ad613578eaa003511a4fd1d3b674",
+      "split": "validation",
+      "state_id": "85cc2aef5b566d85670978e060bc114f7ac6ad613578eaa003511a4fd1d3b674"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "e6d59a30e25a54127ff3c474a51c79fadda41eaed931b9322084f6b50d8079d9",
+      "split": "validation",
+      "state_id": "e6d59a30e25a54127ff3c474a51c79fadda41eaed931b9322084f6b50d8079d9"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "9075c79ece5ae98901dd7a8173e5722351bbef6d92f1a068d4c7180a943f8dd0",
+      "split": "validation",
+      "state_id": "9075c79ece5ae98901dd7a8173e5722351bbef6d92f1a068d4c7180a943f8dd0"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "46aceb8da9ec2572ec19634de4e2ea7c093f89af5f869335ccc8d9a45c576fe6",
+      "split": "validation",
+      "state_id": "46aceb8da9ec2572ec19634de4e2ea7c093f89af5f869335ccc8d9a45c576fe6"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "735f6775ce6dff9e752d691c38a7d68df7c1e1c2110a3fb597589f4b76811c03",
+      "split": "validation",
+      "state_id": "735f6775ce6dff9e752d691c38a7d68df7c1e1c2110a3fb597589f4b76811c03"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "f50499d33970c79ea3c2779fb3f32d0931d0bc989e85074953bd326005cfa429",
+      "split": "validation",
+      "state_id": "f50499d33970c79ea3c2779fb3f32d0931d0bc989e85074953bd326005cfa429"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "6fa841711f4321609092a52b04071bd3930c3245434c4c7cc037876e1409ca3c",
+      "split": "validation",
+      "state_id": "6fa841711f4321609092a52b04071bd3930c3245434c4c7cc037876e1409ca3c"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "9de04ce6f6e0362ffb5369678c79f537cd9320117bd1266865279f0b2ce2dfda",
+      "split": "validation",
+      "state_id": "9de04ce6f6e0362ffb5369678c79f537cd9320117bd1266865279f0b2ce2dfda"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "4c8ec1f3e16e5d8e3c56a446012f623ba599f38147e7144fdcaf7f9c9bb7293a",
+      "split": "validation",
+      "state_id": "4c8ec1f3e16e5d8e3c56a446012f623ba599f38147e7144fdcaf7f9c9bb7293a"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "af83690ee10e1c248ea4e2f3680557aaab2aa0cbbfcc14ed676d7c5bb504cc12",
+      "split": "validation",
+      "state_id": "af83690ee10e1c248ea4e2f3680557aaab2aa0cbbfcc14ed676d7c5bb504cc12"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "624b913c093761550e57f2f3010abbc11debb061cb3828ae09f031655b485533",
+      "split": "validation",
+      "state_id": "624b913c093761550e57f2f3010abbc11debb061cb3828ae09f031655b485533"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "ab59efdadfa1990c097bd2b6d1056d61fb31aaf2d264a93cfadcac20e6dbc6b0",
+      "split": "validation",
+      "state_id": "ab59efdadfa1990c097bd2b6d1056d61fb31aaf2d264a93cfadcac20e6dbc6b0"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "e05e13a5d735aa7ce4c393848cbab2b25c9974d9e267fb474e5db976d4669825",
+      "split": "validation",
+      "state_id": "e05e13a5d735aa7ce4c393848cbab2b25c9974d9e267fb474e5db976d4669825"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "b2cc6b45dfce2cad6319b316508dea761599c3043eb8f5f64fa524a17710d5f5",
+      "split": "validation",
+      "state_id": "b2cc6b45dfce2cad6319b316508dea761599c3043eb8f5f64fa524a17710d5f5"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "9b54dc26f893a85f003702db851323fe383df6d079161140e2c9e3f84d99e566",
+      "split": "validation",
+      "state_id": "9b54dc26f893a85f003702db851323fe383df6d079161140e2c9e3f84d99e566"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "3330618e046adf535d89bbea450ef72cded03d472d281133e40c126ed4907604",
+      "split": "validation",
+      "state_id": "3330618e046adf535d89bbea450ef72cded03d472d281133e40c126ed4907604"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "2f50fadbb46704f6a90bc676d27cea1eed2c830d990ebd897ccb26f76703eefd",
+      "split": "validation",
+      "state_id": "2f50fadbb46704f6a90bc676d27cea1eed2c830d990ebd897ccb26f76703eefd"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "a2dfb38c4021ee9ca3a35c9c03f035fd37b25310c629c292d44ceb4d944d721e",
+      "split": "validation",
+      "state_id": "a2dfb38c4021ee9ca3a35c9c03f035fd37b25310c629c292d44ceb4d944d721e"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "2e9a9d91008eaaf2669dc8cd56e46209e207ff346002cc6ea5de3940ec272265",
+      "split": "validation",
+      "state_id": "2e9a9d91008eaaf2669dc8cd56e46209e207ff346002cc6ea5de3940ec272265"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "b5814c8e0b0bb143ea49b0835e9c77fe8d82d9207e77521d3b4ced409a8f23ef",
+      "split": "validation",
+      "state_id": "b5814c8e0b0bb143ea49b0835e9c77fe8d82d9207e77521d3b4ced409a8f23ef"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "6e31fe1885a6e4583aa662b12d80e50bf239545ee6c5b20f7847176a00e35972",
+      "split": "validation",
+      "state_id": "6e31fe1885a6e4583aa662b12d80e50bf239545ee6c5b20f7847176a00e35972"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "567950e4be8a2227fd168d3ec8898f0c5b7a305c80dcf280c1f2a8e791483192",
+      "split": "validation",
+      "state_id": "567950e4be8a2227fd168d3ec8898f0c5b7a305c80dcf280c1f2a8e791483192"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "427ee70296fe32d93ad4d11a0417c9132a03108101356ffe374807440d15e57a",
+      "split": "validation",
+      "state_id": "427ee70296fe32d93ad4d11a0417c9132a03108101356ffe374807440d15e57a"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "bad45a5c4a937c9c597cd7b08c20218380eb84604afa8607c4016638b3bfc4d9",
+      "split": "validation",
+      "state_id": "bad45a5c4a937c9c597cd7b08c20218380eb84604afa8607c4016638b3bfc4d9"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "516602c81667d8d4095a36b8b186a7dafb7458768a716e02c7c95eb57fcfbff1",
+      "split": "validation",
+      "state_id": "516602c81667d8d4095a36b8b186a7dafb7458768a716e02c7c95eb57fcfbff1"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "3610700f8386e46b63b4c2af168a21d0d82588678b13fd948889d976d13d03b7",
+      "split": "validation",
+      "state_id": "3610700f8386e46b63b4c2af168a21d0d82588678b13fd948889d976d13d03b7"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "88ef5009abd2b0ffdc7c62b0b387eea5a5d7d323bab4a9fde8741f884c71bae3",
+      "split": "validation",
+      "state_id": "88ef5009abd2b0ffdc7c62b0b387eea5a5d7d323bab4a9fde8741f884c71bae3"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "5c4ff55aafb9b2bdb34c3056577afc450ff110f6aba6c17393df67f34fc3231f",
+      "split": "validation",
+      "state_id": "5c4ff55aafb9b2bdb34c3056577afc450ff110f6aba6c17393df67f34fc3231f"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "467ec55e291971e8f351c4dfab3927bbd80de834fa90335ad14475521c040913",
+      "split": "validation",
+      "state_id": "467ec55e291971e8f351c4dfab3927bbd80de834fa90335ad14475521c040913"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "63a594fb8dd9e6873c23241b314644046c2d7dbb04b975c10f9082cfeee14774",
+      "split": "validation",
+      "state_id": "63a594fb8dd9e6873c23241b314644046c2d7dbb04b975c10f9082cfeee14774"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "30c3da07b494c6792268c6f32b33c86df12b2658cbb70fe82c3180ae73f7e5af",
+      "split": "validation",
+      "state_id": "30c3da07b494c6792268c6f32b33c86df12b2658cbb70fe82c3180ae73f7e5af"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "6add33c9c8be6a600f390a0a1ffd5c5b9a70d31a9e4b64121e1a272cb2921a55",
+      "split": "validation",
+      "state_id": "6add33c9c8be6a600f390a0a1ffd5c5b9a70d31a9e4b64121e1a272cb2921a55"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "5d6ba863457c98d5cdacf83eafdf655a5d8dbabee232b9c4914fd542e722e500",
+      "split": "validation",
+      "state_id": "5d6ba863457c98d5cdacf83eafdf655a5d8dbabee232b9c4914fd542e722e500"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "93c584633702398e6275c05b0d1960463f2d1b43f465458a0933bde320c3804a",
+      "split": "validation",
+      "state_id": "93c584633702398e6275c05b0d1960463f2d1b43f465458a0933bde320c3804a"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "f534478763244e6b4f6fcecd60d20be6b5fa12ebf4bb54be6cd8102c07a1a0c9",
+      "split": "validation",
+      "state_id": "f534478763244e6b4f6fcecd60d20be6b5fa12ebf4bb54be6cd8102c07a1a0c9"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "9bb16e65e33353961941997136f4d6367a29a0a2c575295b5d93853577d24dff",
+      "split": "validation",
+      "state_id": "9bb16e65e33353961941997136f4d6367a29a0a2c575295b5d93853577d24dff"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "3a15e289b418441271239c92513b9bdb9c2849e10b1da0dde7acca1a65186042",
+      "split": "validation",
+      "state_id": "3a15e289b418441271239c92513b9bdb9c2849e10b1da0dde7acca1a65186042"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "b1b9f438052140c26550fc6f9084a51c256132a01ef8cf723162d26ac562dd76",
+      "split": "validation",
+      "state_id": "b1b9f438052140c26550fc6f9084a51c256132a01ef8cf723162d26ac562dd76"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "5a1508050332cd3145a469314c2150e2556eadbad3273bb5416d3b63c3e6bdcd",
+      "split": "validation",
+      "state_id": "5a1508050332cd3145a469314c2150e2556eadbad3273bb5416d3b63c3e6bdcd"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "897dd6f7d1e6424f043152bf0fcc78d2a2469263f1e76f9a9c537bbf1aa0a80f",
+      "split": "validation",
+      "state_id": "897dd6f7d1e6424f043152bf0fcc78d2a2469263f1e76f9a9c537bbf1aa0a80f"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "a180bd80437a59a26bbe3149fd6069b36fae93c730556abd14d12e127de75a4f",
+      "split": "validation",
+      "state_id": "a180bd80437a59a26bbe3149fd6069b36fae93c730556abd14d12e127de75a4f"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "8cde951cfa9c96c9904e96e8125733dd718e9b643143316100cdb39e943a9491",
+      "split": "validation",
+      "state_id": "8cde951cfa9c96c9904e96e8125733dd718e9b643143316100cdb39e943a9491"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "01da0f22267c606e2d057df32ce60ee12cb30db7eb3638ec3598d696010cdc4e",
+      "split": "validation",
+      "state_id": "01da0f22267c606e2d057df32ce60ee12cb30db7eb3638ec3598d696010cdc4e"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "a7e568b6faf9f221c081d42fe67adf0ee3c8347f90ede9141cae71eb62cd3119",
+      "split": "validation",
+      "state_id": "a7e568b6faf9f221c081d42fe67adf0ee3c8347f90ede9141cae71eb62cd3119"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "4f47b7691e78e284205c86a8d221f4f0d3a4dc5eb4b3e33a29c9acdde9e8e6c6",
+      "split": "validation",
+      "state_id": "4f47b7691e78e284205c86a8d221f4f0d3a4dc5eb4b3e33a29c9acdde9e8e6c6"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "2dade5f0bae0fc03a6dd7e4d1a6c865420f8282310ecdcb6ca783a70c9ee987f",
+      "split": "validation",
+      "state_id": "2dade5f0bae0fc03a6dd7e4d1a6c865420f8282310ecdcb6ca783a70c9ee987f"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "afd5f12bd2fb28084f01f407e461aa191c89f63f34d387a6f485e187f31fc61d",
+      "split": "validation",
+      "state_id": "afd5f12bd2fb28084f01f407e461aa191c89f63f34d387a6f485e187f31fc61d"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "8effc6e7a0d9b51487610e437b6fd2a468eb369b0b2f1e951d17ce49ea9152a3",
+      "split": "validation",
+      "state_id": "8effc6e7a0d9b51487610e437b6fd2a468eb369b0b2f1e951d17ce49ea9152a3"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "3efed2d6369dc93b68ec49a8dec4f4a559feed275906f5c377ce581496ba93e4",
+      "split": "validation",
+      "state_id": "3efed2d6369dc93b68ec49a8dec4f4a559feed275906f5c377ce581496ba93e4"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "7e5de327b1f480a85a44a73aa991b924d8df7d31c20940993b6417946236362d",
+      "split": "validation",
+      "state_id": "7e5de327b1f480a85a44a73aa991b924d8df7d31c20940993b6417946236362d"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "56c19114d6464b9eeb2fb2375dc9ec3df351429a27b993f13ee79e8d9921d7b4",
+      "split": "validation",
+      "state_id": "56c19114d6464b9eeb2fb2375dc9ec3df351429a27b993f13ee79e8d9921d7b4"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "e6499d818f873c34b0073af4a9fb6ba49b5881e41327504f2750daab184baff5",
+      "split": "validation",
+      "state_id": "e6499d818f873c34b0073af4a9fb6ba49b5881e41327504f2750daab184baff5"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "7eb72c1149f5bab531b4c5f0e34ce119a1f90af61f7a0bb0afd78c172205da46",
+      "split": "validation",
+      "state_id": "7eb72c1149f5bab531b4c5f0e34ce119a1f90af61f7a0bb0afd78c172205da46"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "b5d0311c49ebe658d8d4d4265cb1edd0fab09983e2e18e71286ff125293c5e8f",
+      "split": "validation",
+      "state_id": "b5d0311c49ebe658d8d4d4265cb1edd0fab09983e2e18e71286ff125293c5e8f"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "f333e55e9e975fb3bd0467370c57fed3e4babf293ff8bc81e1f2d4a75aa3b43a",
+      "split": "validation",
+      "state_id": "f333e55e9e975fb3bd0467370c57fed3e4babf293ff8bc81e1f2d4a75aa3b43a"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "c7be76e616df9eb420376cbf3d022d47b89821d474a6865c041bdc010e456651",
+      "split": "validation",
+      "state_id": "c7be76e616df9eb420376cbf3d022d47b89821d474a6865c041bdc010e456651"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "b547b4558dd8621de481f61cf42679e3f2a17eefd6b3f811c8bb3885707bf583",
+      "split": "validation",
+      "state_id": "b547b4558dd8621de481f61cf42679e3f2a17eefd6b3f811c8bb3885707bf583"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "445cb914834101194319fa35f3258d01ee437ab21ebc80be8af20af712db2c24",
+      "split": "validation",
+      "state_id": "445cb914834101194319fa35f3258d01ee437ab21ebc80be8af20af712db2c24"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "c59ac4f8b0d9418ed490699f14cff6cc8905418e84edfdaa670c3b33750162af",
+      "split": "validation",
+      "state_id": "c59ac4f8b0d9418ed490699f14cff6cc8905418e84edfdaa670c3b33750162af"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "69d8edb3c723abbc433fdc4534d2230608f6f8739383daacd02c191afa480769",
+      "split": "validation",
+      "state_id": "69d8edb3c723abbc433fdc4534d2230608f6f8739383daacd02c191afa480769"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "d088599870cea0565bcd6c3c736ec305da9cee86c4bf3b9b1f9e60d625bd2fb4",
+      "split": "validation",
+      "state_id": "d088599870cea0565bcd6c3c736ec305da9cee86c4bf3b9b1f9e60d625bd2fb4"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "d6c2c9d3b6ff8e7292ab09c031c352450a38955599ad0d59ea72888a1dad3bd7",
+      "split": "validation",
+      "state_id": "d6c2c9d3b6ff8e7292ab09c031c352450a38955599ad0d59ea72888a1dad3bd7"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "4fca40c4e6a12194c4a48a0d7d16596b21316b0b73ab5a25552162c4c25f4616",
+      "split": "validation",
+      "state_id": "4fca40c4e6a12194c4a48a0d7d16596b21316b0b73ab5a25552162c4c25f4616"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "279896939ae13bd79c053ff0cf6141707b4dba43726b631dc40fb36f7ea13b45",
+      "split": "validation",
+      "state_id": "279896939ae13bd79c053ff0cf6141707b4dba43726b631dc40fb36f7ea13b45"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "634515250b88df028eb3da5498aef2a6b0225c03001b72e640a68b08d37f7536",
+      "split": "validation",
+      "state_id": "634515250b88df028eb3da5498aef2a6b0225c03001b72e640a68b08d37f7536"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "71f56ca6de57234e2a820fc629ee19f4977c1a2799eb5b9bddb9321bf700ef92",
+      "split": "validation",
+      "state_id": "71f56ca6de57234e2a820fc629ee19f4977c1a2799eb5b9bddb9321bf700ef92"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "886702e5b59fe270c37ecd70403b757f395d33ede7e5b3610bc08d4f95db6d1e",
+      "split": "validation",
+      "state_id": "886702e5b59fe270c37ecd70403b757f395d33ede7e5b3610bc08d4f95db6d1e"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "03f0d0d8a40212a321227dbe5601ebcef4485d65b73e80166ae0a02a11f9cf95",
+      "split": "validation",
+      "state_id": "03f0d0d8a40212a321227dbe5601ebcef4485d65b73e80166ae0a02a11f9cf95"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "f9d6d19085e48507c68621c194c6d1c298537ffe5b8abbd39b5cf6e1204b31fb",
+      "split": "validation",
+      "state_id": "f9d6d19085e48507c68621c194c6d1c298537ffe5b8abbd39b5cf6e1204b31fb"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "375d2017c0708f37d0f89615edb87cdfb939da3f2f77de69c1de79c331dc42f9",
+      "split": "validation",
+      "state_id": "375d2017c0708f37d0f89615edb87cdfb939da3f2f77de69c1de79c331dc42f9"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "0e053d7ead055e3688511c82158e7886d1c8e7dc987cb1b6e64c33e6387cb987",
+      "split": "validation",
+      "state_id": "0e053d7ead055e3688511c82158e7886d1c8e7dc987cb1b6e64c33e6387cb987"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "9eb2c358d849fb9a98e333cf230417ebf8cfc75ce7e07601b6d824b39cf09580",
+      "split": "validation",
+      "state_id": "9eb2c358d849fb9a98e333cf230417ebf8cfc75ce7e07601b6d824b39cf09580"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "bd4c64a0a791feba66a6e06b7feef1fada872eefc259e352452ebfa355778e03",
+      "split": "validation",
+      "state_id": "bd4c64a0a791feba66a6e06b7feef1fada872eefc259e352452ebfa355778e03"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "559ce6a7d643f0cdd69e14811c54d8fe8ea02bbdb89e8c5a260c9f55b0e0e48a",
+      "split": "validation",
+      "state_id": "559ce6a7d643f0cdd69e14811c54d8fe8ea02bbdb89e8c5a260c9f55b0e0e48a"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "0d7c82b59cfbfd619ac06f4d0bf880b064106a85555fb0fc6baba3b30b397cc6",
+      "split": "validation",
+      "state_id": "0d7c82b59cfbfd619ac06f4d0bf880b064106a85555fb0fc6baba3b30b397cc6"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "4b23c3aa81039a89a08ba5f78e0588d87af0b6eb06c13d6da205621e4a1ada8b",
+      "split": "validation",
+      "state_id": "4b23c3aa81039a89a08ba5f78e0588d87af0b6eb06c13d6da205621e4a1ada8b"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "a5c1c25da95925d5ed6b137b0de4651e2e845aab05a1b1901fda31c04c2ce8b4",
+      "split": "validation",
+      "state_id": "a5c1c25da95925d5ed6b137b0de4651e2e845aab05a1b1901fda31c04c2ce8b4"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "9887e5040e465bb78c756629cf06ccda00192f7e806228be95f6ad72fba55e5f",
+      "split": "validation",
+      "state_id": "9887e5040e465bb78c756629cf06ccda00192f7e806228be95f6ad72fba55e5f"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "494399dd38413f7f0b1aaeadef39c93c31eb4de81b293961e44b96c71b5b24cb",
+      "split": "validation",
+      "state_id": "494399dd38413f7f0b1aaeadef39c93c31eb4de81b293961e44b96c71b5b24cb"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "703142ba0e74b5ee8ad9ff4b21a046d1059294d1bdec1b2e90a0b634f3fa3723",
+      "split": "validation",
+      "state_id": "703142ba0e74b5ee8ad9ff4b21a046d1059294d1bdec1b2e90a0b634f3fa3723"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "7f80a29b1c8029097d7512eb08892eb25131c73c335ec450aab7c4adac152d0c",
+      "split": "validation",
+      "state_id": "7f80a29b1c8029097d7512eb08892eb25131c73c335ec450aab7c4adac152d0c"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "517c812903bd07bf62ab17755ee8e3d538b6be7ea2eae7b14d30c3dac37eefce",
+      "split": "validation",
+      "state_id": "517c812903bd07bf62ab17755ee8e3d538b6be7ea2eae7b14d30c3dac37eefce"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "5468708f5e6f21500a4aa707d26491166073a2e9dca1184ca0fe122e143fc55b",
+      "split": "validation",
+      "state_id": "5468708f5e6f21500a4aa707d26491166073a2e9dca1184ca0fe122e143fc55b"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "b6e9f28011c2f9853126ae0650125ead6f7495efc86c130a1144b63abaf730c7",
+      "split": "validation",
+      "state_id": "b6e9f28011c2f9853126ae0650125ead6f7495efc86c130a1144b63abaf730c7"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "46b71bc9e40d81aeb6076055cf38a6bbcaba3dc558067815256de4d2c43350db",
+      "split": "validation",
+      "state_id": "46b71bc9e40d81aeb6076055cf38a6bbcaba3dc558067815256de4d2c43350db"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "558fbd50c44f5f7eb1db58c41971527f97a394ce49d1de4436cb6853f0fcf1e3",
+      "split": "validation",
+      "state_id": "558fbd50c44f5f7eb1db58c41971527f97a394ce49d1de4436cb6853f0fcf1e3"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "1231e4f2cbb74bbf0710bec5795c734c6ec95c2ac3e1c233c4af87c2b955815f",
+      "split": "validation",
+      "state_id": "1231e4f2cbb74bbf0710bec5795c734c6ec95c2ac3e1c233c4af87c2b955815f"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "bb4df22b3b5eae1d49a905e5ed04998e19aa58d4874e50ed7fa31c055f074a20",
+      "split": "validation",
+      "state_id": "bb4df22b3b5eae1d49a905e5ed04998e19aa58d4874e50ed7fa31c055f074a20"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "3f5b5475304669557a6d981117016740e5fe036abb045de8a1880750fbd8aaf3",
+      "split": "validation",
+      "state_id": "3f5b5475304669557a6d981117016740e5fe036abb045de8a1880750fbd8aaf3"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "8cbd01ab5a181801c08c42f2e8870602670c1d941c299616b38a26616948c28c",
+      "split": "validation",
+      "state_id": "8cbd01ab5a181801c08c42f2e8870602670c1d941c299616b38a26616948c28c"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "98b19beacd076f03de837454eda2f8b3775c4b6f85cc282e2ea295bcfe785479",
+      "split": "validation",
+      "state_id": "98b19beacd076f03de837454eda2f8b3775c4b6f85cc282e2ea295bcfe785479"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "9b2bc103395be4ae94009abf25409db24583350d9152c7ffaf02a71ef97c6e77",
+      "split": "validation",
+      "state_id": "9b2bc103395be4ae94009abf25409db24583350d9152c7ffaf02a71ef97c6e77"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "76d38be36a88c2d537e7d9a743103f47e15eef294064f1ae68ee671f8e72a5bd",
+      "split": "validation",
+      "state_id": "76d38be36a88c2d537e7d9a743103f47e15eef294064f1ae68ee671f8e72a5bd"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "5e08ae2c8e65a8f34786deb995aec0af4909a7272d201587ecb2545e0f38bf08",
+      "split": "validation",
+      "state_id": "5e08ae2c8e65a8f34786deb995aec0af4909a7272d201587ecb2545e0f38bf08"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "beee9e396653c6524f53bd493dbe346be9027f67416d67ceb6e2a6e9df1b20a8",
+      "split": "validation",
+      "state_id": "beee9e396653c6524f53bd493dbe346be9027f67416d67ceb6e2a6e9df1b20a8"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "8762d96641aa7f054ce80ebbd15720851d2b1f74b5de5896495f75085662c2ef",
+      "split": "validation",
+      "state_id": "8762d96641aa7f054ce80ebbd15720851d2b1f74b5de5896495f75085662c2ef"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "ef322531515649e5362989775aba410ccd437a590f34e687780013827b336714",
+      "split": "validation",
+      "state_id": "ef322531515649e5362989775aba410ccd437a590f34e687780013827b336714"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "1023de2eff526931860c8f166b3494ea04c46d2aa22051825a7c43b82d972c78",
+      "split": "validation",
+      "state_id": "1023de2eff526931860c8f166b3494ea04c46d2aa22051825a7c43b82d972c78"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "e76540ce55eb02db23ae32b920a4eccf73bea94b3c2dbdfe9a7960b2b1e938a7",
+      "split": "validation",
+      "state_id": "e76540ce55eb02db23ae32b920a4eccf73bea94b3c2dbdfe9a7960b2b1e938a7"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "5ac98c9fbd6db67362f675cf8a2b9ac799f2f397ff80dd4a3c874a70141494c5",
+      "split": "validation",
+      "state_id": "5ac98c9fbd6db67362f675cf8a2b9ac799f2f397ff80dd4a3c874a70141494c5"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "0a4f6bcb896bf37c18a1ef29b93ad1cfaecaadf4e567d4f99c8a28c4fe1d6406",
+      "split": "validation",
+      "state_id": "0a4f6bcb896bf37c18a1ef29b93ad1cfaecaadf4e567d4f99c8a28c4fe1d6406"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "454da6b95187808a6c9332ee2d4baf24f4123172f260c39dc3adfc8f2bf0138d",
+      "split": "validation",
+      "state_id": "454da6b95187808a6c9332ee2d4baf24f4123172f260c39dc3adfc8f2bf0138d"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "6e42aa6d8c9266ac3eadb8b22903349eb3bed378cf72206a6d9cdb9e0f0db7f0",
+      "split": "validation",
+      "state_id": "6e42aa6d8c9266ac3eadb8b22903349eb3bed378cf72206a6d9cdb9e0f0db7f0"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "d399d8e2ced6ecaf301fad5df367b47faba2e94589b0eff4c42ba42376f77422",
+      "split": "validation",
+      "state_id": "d399d8e2ced6ecaf301fad5df367b47faba2e94589b0eff4c42ba42376f77422"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "14fb4530ee43512ba4bf5d9a1a34ea813cc8dd92137077a9f884042dec8fa5c0",
+      "split": "validation",
+      "state_id": "14fb4530ee43512ba4bf5d9a1a34ea813cc8dd92137077a9f884042dec8fa5c0"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "6233b217e390e0d30accef8369efa8932b554302e781674bce13ddf417c81303",
+      "split": "validation",
+      "state_id": "6233b217e390e0d30accef8369efa8932b554302e781674bce13ddf417c81303"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "3e0a663bb12eb395dcd287a731312de8c2bd71ca9868a938d6b9f75a43078c6a",
+      "split": "validation",
+      "state_id": "3e0a663bb12eb395dcd287a731312de8c2bd71ca9868a938d6b9f75a43078c6a"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "b388af9243dda7d4074f83d6f78655fe1e7992f840e10c599894bcd2107758b5",
+      "split": "validation",
+      "state_id": "b388af9243dda7d4074f83d6f78655fe1e7992f840e10c599894bcd2107758b5"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "4590c22ecc54a29152f8c3b942ac8cef87c9945a79fcfb4bac09fcdad94fcf94",
+      "split": "validation",
+      "state_id": "4590c22ecc54a29152f8c3b942ac8cef87c9945a79fcfb4bac09fcdad94fcf94"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "b6be9c7b85673026af0ded8589de4d4d40f43e5ba933ce70de0a7bf7db66afec",
+      "split": "validation",
+      "state_id": "b6be9c7b85673026af0ded8589de4d4d40f43e5ba933ce70de0a7bf7db66afec"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "c5526ffc63e8ed2169159018a44112d71dc4fd1555ceb03c80cc5df01b130c6e",
+      "split": "validation",
+      "state_id": "c5526ffc63e8ed2169159018a44112d71dc4fd1555ceb03c80cc5df01b130c6e"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "10eadc733d68cbe1e8b51ca8d300fb6a49706a71fd4c1ae517613d2e5191b027",
+      "split": "validation",
+      "state_id": "10eadc733d68cbe1e8b51ca8d300fb6a49706a71fd4c1ae517613d2e5191b027"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "56aa9eda4685083a230b75f7c07c2de5e9581be9c297d237be9c178cde757dce",
+      "split": "validation",
+      "state_id": "56aa9eda4685083a230b75f7c07c2de5e9581be9c297d237be9c178cde757dce"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "b1e886572c80da0a05adb631647347f57b4f3a30d7a2937e7dafd4b730da5635",
+      "split": "validation",
+      "state_id": "b1e886572c80da0a05adb631647347f57b4f3a30d7a2937e7dafd4b730da5635"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "875eb96c12f121338c1fabd93d3da903239e4083a74951147e87f9530b7f5e6b",
+      "split": "validation",
+      "state_id": "875eb96c12f121338c1fabd93d3da903239e4083a74951147e87f9530b7f5e6b"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "4c2b1eabff3b33e10c5cd29b7c4c0b0695b9ee5caf4df025f6af0082aa619bd7",
+      "split": "validation",
+      "state_id": "4c2b1eabff3b33e10c5cd29b7c4c0b0695b9ee5caf4df025f6af0082aa619bd7"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "99f1e2eabde43831e1e0693a1099ffe7bbac21fbc1a2b800065eb58ef865f9aa",
+      "split": "validation",
+      "state_id": "99f1e2eabde43831e1e0693a1099ffe7bbac21fbc1a2b800065eb58ef865f9aa"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "5a7470a934fa66fb5c649268ee73af194d670f5ad805ae1b57168c203094cb47",
+      "split": "validation",
+      "state_id": "5a7470a934fa66fb5c649268ee73af194d670f5ad805ae1b57168c203094cb47"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "6fca22396d915c0842bb012c6e9196b9faa9c23473e283b221e9a27eb7f56fb4",
+      "split": "validation",
+      "state_id": "6fca22396d915c0842bb012c6e9196b9faa9c23473e283b221e9a27eb7f56fb4"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "afc2595f6db3c324c527cc375ad39149347f833c4884b636e3115e2ef4ea5d6e",
+      "split": "validation",
+      "state_id": "afc2595f6db3c324c527cc375ad39149347f833c4884b636e3115e2ef4ea5d6e"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "e21ea41830a9ffb6603ee58e5d4761391fc04b919d06e13b07e5fd8478cc39ca",
+      "split": "validation",
+      "state_id": "e21ea41830a9ffb6603ee58e5d4761391fc04b919d06e13b07e5fd8478cc39ca"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "d17cc9e589ad58a95cf44044bbcd494a6223b574ebe09f6dd23677f851363d49",
+      "split": "validation",
+      "state_id": "d17cc9e589ad58a95cf44044bbcd494a6223b574ebe09f6dd23677f851363d49"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "733c78aaa72e71239ce9453461d8aed0769053623e86a01dce4e096cbb6cfcd3",
+      "split": "validation",
+      "state_id": "733c78aaa72e71239ce9453461d8aed0769053623e86a01dce4e096cbb6cfcd3"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "ae7893d466b3f9d7b8294f546f14b57c3444237f2833629841d914fcf777c63e",
+      "split": "validation",
+      "state_id": "ae7893d466b3f9d7b8294f546f14b57c3444237f2833629841d914fcf777c63e"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "6aadd891ed88b2079d9e7969e346a9851d537481174ee4bd5ec3c1c087178e2c",
+      "split": "validation",
+      "state_id": "6aadd891ed88b2079d9e7969e346a9851d537481174ee4bd5ec3c1c087178e2c"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "29c7300b4902fd95a83caae6d6e6d49ba1f732d6102b3c846e5d7be7ef795090",
+      "split": "validation",
+      "state_id": "29c7300b4902fd95a83caae6d6e6d49ba1f732d6102b3c846e5d7be7ef795090"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "af46001b4e569e9f455f9cb4f23afa2f38223db89a70b66545be30ab0a2c7b16",
+      "split": "validation",
+      "state_id": "af46001b4e569e9f455f9cb4f23afa2f38223db89a70b66545be30ab0a2c7b16"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "f2938f44ad6be64538d42c8eb322e843e83403b1526b767d8352a05cda041c13",
+      "split": "validation",
+      "state_id": "f2938f44ad6be64538d42c8eb322e843e83403b1526b767d8352a05cda041c13"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "586bb23761a019df0f33c8b3e4319b53a102278b2c6a1f43cb0085d8b362e8d7",
+      "split": "validation",
+      "state_id": "586bb23761a019df0f33c8b3e4319b53a102278b2c6a1f43cb0085d8b362e8d7"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "1ec5e136be8f2df7542e6871de2cc6a7b81ecf298a23d8b41d4dca492d5173d7",
+      "split": "validation",
+      "state_id": "1ec5e136be8f2df7542e6871de2cc6a7b81ecf298a23d8b41d4dca492d5173d7"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "5a0d9d22f1767e813063e4ed83950cd7c092f25f98df96b7c8967e4960deaf2d",
+      "split": "validation",
+      "state_id": "5a0d9d22f1767e813063e4ed83950cd7c092f25f98df96b7c8967e4960deaf2d"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "f16d78a950d96a06cc88032cdfb3889e93bd3f2cf4772639343e4064bb8893c0",
+      "split": "validation",
+      "state_id": "f16d78a950d96a06cc88032cdfb3889e93bd3f2cf4772639343e4064bb8893c0"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "7fe89c37cda5c89376af432cd5a4d5641bc31c030189adaa2fda8d24565b8d68",
+      "split": "validation",
+      "state_id": "7fe89c37cda5c89376af432cd5a4d5641bc31c030189adaa2fda8d24565b8d68"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "10984c2f66441d88ee45c5f2249306f0e805eb5200d546ad75699695d06347ba",
+      "split": "validation",
+      "state_id": "10984c2f66441d88ee45c5f2249306f0e805eb5200d546ad75699695d06347ba"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "16227661ca3da7575c1762a44f54050de986a10a8dd21f73c22487df65c0ee5e",
+      "split": "validation",
+      "state_id": "16227661ca3da7575c1762a44f54050de986a10a8dd21f73c22487df65c0ee5e"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "512b585cde0307048b9bdf196581b20ede51bbb18d26bb272524e3ccf4c9dea7",
+      "split": "validation",
+      "state_id": "512b585cde0307048b9bdf196581b20ede51bbb18d26bb272524e3ccf4c9dea7"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "e0254390104dcfddf647fec514ca9efeffd5e7146d5889ca6d4074418ed8a2a8",
+      "split": "validation",
+      "state_id": "e0254390104dcfddf647fec514ca9efeffd5e7146d5889ca6d4074418ed8a2a8"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "e2bef3ab69bf57e3bf8ac908bad2dd3b10afca3dea7799750a57069341f8deb3",
+      "split": "validation",
+      "state_id": "e2bef3ab69bf57e3bf8ac908bad2dd3b10afca3dea7799750a57069341f8deb3"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "6eeb1d8f21da697ef26eb9a70e0f310ef43f394431e47a00068f9228a70f94b4",
+      "split": "validation",
+      "state_id": "6eeb1d8f21da697ef26eb9a70e0f310ef43f394431e47a00068f9228a70f94b4"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "2ef5eadddb9ae648466ae8adb6c64b803412de54aa133e978b4ddccc7dd9b1b4",
+      "split": "validation",
+      "state_id": "2ef5eadddb9ae648466ae8adb6c64b803412de54aa133e978b4ddccc7dd9b1b4"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "c67c1c377664f6edf18d932513b6e052460aa13931fc2551b8181e074923ac41",
+      "split": "validation",
+      "state_id": "c67c1c377664f6edf18d932513b6e052460aa13931fc2551b8181e074923ac41"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "998d151c7d7e4e7269dc845857e0f77a5f53912b00d1d17239a720f6c6f14b36",
+      "split": "validation",
+      "state_id": "998d151c7d7e4e7269dc845857e0f77a5f53912b00d1d17239a720f6c6f14b36"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "a80f040246ef2b24e12be3fda6fdefe1cd94f9b63229a8a1b1cfcb50a51f621d",
+      "split": "validation",
+      "state_id": "a80f040246ef2b24e12be3fda6fdefe1cd94f9b63229a8a1b1cfcb50a51f621d"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "5ef5c3cc7c2b88c1ede24af102ff274659ae7d0a2c6576b644db9485c7593d12",
+      "split": "validation",
+      "state_id": "5ef5c3cc7c2b88c1ede24af102ff274659ae7d0a2c6576b644db9485c7593d12"
+    },
+    {
+      "bank_index": 1,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "63055b06ff95703a3201fb2ac7cf2a97250172c008e72e44df70e799311f6c38",
+      "split": "validation",
+      "state_id": "63055b06ff95703a3201fb2ac7cf2a97250172c008e72e44df70e799311f6c38"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "25ac1297ac4a3169e8f31294c233cac095dfa356dffb1724a0cd22769a1bc10a",
+      "split": "validation",
+      "state_id": "25ac1297ac4a3169e8f31294c233cac095dfa356dffb1724a0cd22769a1bc10a"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "17972740d86b4e4a9efc3dffd41ed876c46b826d72dd977716840b75b6c7187f",
+      "split": "validation",
+      "state_id": "17972740d86b4e4a9efc3dffd41ed876c46b826d72dd977716840b75b6c7187f"
+    },
+    {
+      "bank_index": 6,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "81507f8ec72744d4153efab4b784490a17e25a58ceb73b8adbe0ee334da2d3ba",
+      "split": "validation",
+      "state_id": "81507f8ec72744d4153efab4b784490a17e25a58ceb73b8adbe0ee334da2d3ba"
+    },
+    {
+      "bank_index": 0,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "5ce5b7b2ff1f6f70f05865b4db45e8276e0b534d1057f22d1be1f0ee6466795c",
+      "split": "validation",
+      "state_id": "5ce5b7b2ff1f6f70f05865b4db45e8276e0b534d1057f22d1be1f0ee6466795c"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        2,
+        0
+      ],
+      "lineage_id": "33d911a0ff3085e5c8c5958d0d76996c9ec4c3bb36f3ee32579aff388411c3e0",
+      "split": "validation",
+      "state_id": "33d911a0ff3085e5c8c5958d0d76996c9ec4c3bb36f3ee32579aff388411c3e0"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "af7d1297bdd3f6b7cb8fdbfa2f55552f614d0d04e8e2e9620be1fdac3452a2e9",
+      "split": "validation",
+      "state_id": "af7d1297bdd3f6b7cb8fdbfa2f55552f614d0d04e8e2e9620be1fdac3452a2e9"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "a0792df483fbcb9fac6034ed15eee612cad2a99cf9f4751550e200055cc8f452",
+      "split": "validation",
+      "state_id": "a0792df483fbcb9fac6034ed15eee612cad2a99cf9f4751550e200055cc8f452"
+    },
+    {
+      "bank_index": 5,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "3d275ddbb86e95614b80aff9b918394c64d38c3c890db9b8c8be93a568587893",
+      "split": "validation",
+      "state_id": "3d275ddbb86e95614b80aff9b918394c64d38c3c890db9b8c8be93a568587893"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "7202a5af18084aa4ecda6b94e2fd00b75234de03e36879836f29ac565cae401f",
+      "split": "validation",
+      "state_id": "7202a5af18084aa4ecda6b94e2fd00b75234de03e36879836f29ac565cae401f"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "1d565629a06d1511f65b7458a2483b7add41c7deaa2c18ac06d70bb7d0e9bfc7",
+      "split": "validation",
+      "state_id": "1d565629a06d1511f65b7458a2483b7add41c7deaa2c18ac06d70bb7d0e9bfc7"
+    },
+    {
+      "bank_index": 2,
+      "category": [
+        1,
+        0
+      ],
+      "lineage_id": "317b0daa842e674ff08ef481a37e49c372c4b74d8fa92951fbe17a77a11e934d",
+      "split": "validation",
+      "state_id": "317b0daa842e674ff08ef481a37e49c372c4b74d8fa92951fbe17a77a11e934d"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        0,
+        1
+      ],
+      "lineage_id": "1df7c1e106dec18c7dad45b7752544bbee9fd02bf0500e969cc33288e34f5641",
+      "split": "validation",
+      "state_id": "1df7c1e106dec18c7dad45b7752544bbee9fd02bf0500e969cc33288e34f5641"
+    },
+    {
+      "bank_index": 4,
+      "category": [
+        2,
+        1
+      ],
+      "lineage_id": "566afbe3c4bfc805c263cc34420350368263a40f6c874b21a0a3d935171dccb5",
+      "split": "validation",
+      "state_id": "566afbe3c4bfc805c263cc34420350368263a40f6c874b21a0a3d935171dccb5"
+    },
+    {
+      "bank_index": 7,
+      "category": [
+        1,
+        1
+      ],
+      "lineage_id": "8d1c510cc37ed18177cf93e659a0aa01fb96b87ad1b93c3325c52bbaeea00e9c",
+      "split": "validation",
+      "state_id": "8d1c510cc37ed18177cf93e659a0aa01fb96b87ad1b93c3325c52bbaeea00e9c"
+    },
+    {
+      "bank_index": 3,
+      "category": [
+        0,
+        0
+      ],
+      "lineage_id": "df335f471f33720ce7b281aa649bad806cfb54aaf0916dc46f058aea863169ce",
+      "split": "validation",
+      "state_id": "df335f471f33720ce7b281aa649bad806cfb54aaf0916dc46f058aea863169ce"
+    }
+  ],
+  "expansion": {
+    "added_states": 3584,
+    "added_states_by_split": {
+      "test": 373,
+      "train": 2855,
+      "validation": 356
+    },
+    "evaluation_policy": "fixed_parent_validation_recipes_and_parent_training_retrieval",
+    "expanded_manifest_id": "49972c9c19f54b1aac0f9742239e3b2b9a0108ef5f1744a16dc2ac2dbbde5c4b",
+    "expanded_pool_id": "243927fbc32fa8a65e3c40d195dd3c2eb5a7459146ec400d3baf887141751b1f",
+    "feature_reuse": "cross_pool_seed_and_resume_forbidden_start_fresh",
+    "parent_manifest_id": "c6f567ad416d90594e675fd34be3b28b4c1916be2e8110e5593e9d66a2677920",
+    "parent_pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+    "policy": "independent_authored_prefix_expansion_v1",
+    "preserved_states": 512,
+    "preserved_states_by_split": {
+      "test": 64,
+      "train": 404,
+      "validation": 44
+    }
+  },
+  "format": "basic_confirmation_reservation_v1",
+  "implementation_commit": "b5296cc8c1eeae165a293c483895db73144707d5",
+  "inference_policy": "one_prediction_from_reference_audio_only_then_reuse_under_all_three_performances",
+  "limits": {
+    "archive_bytes": 8589934592,
+    "native_requests": 3840,
+    "optimizer_updates": 0,
+    "planned_native_requests": 3648,
+    "process_tree_bytes": 8589934592,
+    "wall_seconds": 14400
+  },
+  "methods": [
+    "candidate",
+    "matched_parameter_control",
+    "previous_model",
+    "fixed_template",
+    "training_retrieval"
+  ],
+  "new_native_requests": 0,
+  "optimizer_applications": 0,
+  "pending_fit_plan_id": "efb0885f7e0763d72fd82202798edba0fd312bdec7e5367cfa28969abcb2d5f0",
+  "pending_fit_plan_sha256": "9dcf994241e61d3980ddcf64c8b30abb49085800f63eb0eedf99369f976b6ada",
+  "performances": [
+    {
+      "bank_index": 0,
+      "performance": {
+        "end_tick": 1673,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              594059
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              50,
+              72
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              50,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1656
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "27672c874b467ec7c782572effc84bd95fbd9ea8825de846512bcf72433ca215",
+      "render_frames": 179511,
+      "role": "reference"
+    },
+    {
+      "bank_index": 0,
+      "performance": {
+        "end_tick": 2201,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              472441
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              36,
+              64
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              36,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 2184
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "4bf6eab4504ce5b18be9db36ed6e6f4cc22bfca858415bdef6e01d702f018d49",
+      "render_frames": 183736,
+      "role": "transfer_held"
+    },
+    {
+      "bank_index": 0,
+      "performance": {
+        "end_tick": 2257,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              392157
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              48,
+              72
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              48,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 294
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              96
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 428
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 942
+          },
+          {
+            "channel": 0,
+            "data": [
+              55,
+              112
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 979
+          },
+          {
+            "channel": 0,
+            "data": [
+              55,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1358
+          },
+          {
+            "channel": 0,
+            "data": [
+              72,
+              64
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1652
+          },
+          {
+            "channel": 0,
+            "data": [
+              72,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 2240
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "9bd3c34a8508fc7be64b807c10d2c2a24f8255e7a553fd617b907f0c707eded8",
+      "render_frames": 169518,
+      "role": "transfer_pattern"
+    },
+    {
+      "bank_index": 1,
+      "performance": {
+        "end_tick": 1706,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              582524
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              52,
+              88
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              55,
+              88
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              59,
+              88
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              52,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1689
+          },
+          {
+            "channel": 0,
+            "data": [
+              55,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1689
+          },
+          {
+            "channel": 0,
+            "data": [
+              59,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1689
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "5808212b2d7858f6c8f3f9f53a19af289f1b9b134ca0399647a98965c86c20c1",
+      "render_frames": 179504,
+      "role": "reference"
+    },
+    {
+      "bank_index": 1,
+      "performance": {
+        "end_tick": 2236,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              465116
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              78,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              78,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 2219
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "640072edd7491ad955d53c5c7ddf5acc77c69a9c96f55b6b5cf4fff73b7852c9",
+      "render_frames": 183750,
+      "role": "transfer_held"
+    },
+    {
+      "bank_index": 1,
+      "performance": {
+        "end_tick": 2286,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              387097
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              49,
+              72
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              49,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 298
+          },
+          {
+            "channel": 0,
+            "data": [
+              66,
+              96
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 434
+          },
+          {
+            "channel": 0,
+            "data": [
+              66,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 955
+          },
+          {
+            "channel": 0,
+            "data": [
+              56,
+              112
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 992
+          },
+          {
+            "channel": 0,
+            "data": [
+              56,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1376
+          },
+          {
+            "channel": 0,
+            "data": [
+              71,
+              64
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1674
+          },
+          {
+            "channel": 0,
+            "data": [
+              71,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 2269
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "9ef71402f3d54c2a74243a9a820b98e09527d2f674df810fb400c1b0bbf05338",
+      "render_frames": 169501,
+      "role": "transfer_pattern"
+    },
+    {
+      "bank_index": 2,
+      "performance": {
+        "end_tick": 1739,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              571429
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              54,
+              104
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              54,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1722
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "caefb117994a5d1f1de0078fe6af6c5bcb7c7e7178c72fc1e5b7e427a51f214e",
+      "render_frames": 179498,
+      "role": "reference"
+    },
+    {
+      "bank_index": 2,
+      "performance": {
+        "end_tick": 2270,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              458015
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              38,
+              96
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              38,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 2253
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "b2e694bf2975d1369d3ba13d00fb33401e64597d07d440a02f89072050864df7",
+      "render_frames": 183722,
+      "role": "transfer_held"
+    },
+    {
+      "bank_index": 2,
+      "performance": {
+        "end_tick": 2316,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              382166
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              50,
+              72
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              50,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 301
+          },
+          {
+            "channel": 0,
+            "data": [
+              65,
+              96
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 440
+          },
+          {
+            "channel": 0,
+            "data": [
+              65,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 968
+          },
+          {
+            "channel": 0,
+            "data": [
+              57,
+              112
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 1005
+          },
+          {
+            "channel": 0,
+            "data": [
+              57,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1394
+          },
+          {
+            "channel": 0,
+            "data": [
+              70,
+              64
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1696
+          },
+          {
+            "channel": 0,
+            "data": [
+              70,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 2299
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "f6bee5e1d8c8b3ed1c410c3618b566149803d834bfde80c4501107a7b843f7d1",
+      "render_frames": 169518,
+      "role": "transfer_pattern"
+    },
+    {
+      "bank_index": 3,
+      "performance": {
+        "end_tick": 1772,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              560748
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              56,
+              112
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              59,
+              112
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              63,
+              112
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              56,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1755
+          },
+          {
+            "channel": 0,
+            "data": [
+              59,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1755
+          },
+          {
+            "channel": 0,
+            "data": [
+              63,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1755
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "4d7e0efdd3fea71ef1725a1f2186d321742e67cc1ff6fb3eb9208dee76459af5",
+      "render_frames": 179491,
+      "role": "reference"
+    },
+    {
+      "bank_index": 3,
+      "performance": {
+        "end_tick": 2305,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              451128
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              80,
+              112
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              80,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 2288
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "daeebaf09ce68e5dd441b5e0689589918a4acd4445a5b4b1cd9939eb809ef271",
+      "render_frames": 183736,
+      "role": "transfer_held"
+    },
+    {
+      "bank_index": 3,
+      "performance": {
+        "end_tick": 2345,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              377358
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              51,
+              72
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              51,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 305
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              96
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 445
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 979
+          },
+          {
+            "channel": 0,
+            "data": [
+              58,
+              112
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 1018
+          },
+          {
+            "channel": 0,
+            "data": [
+              58,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1412
+          },
+          {
+            "channel": 0,
+            "data": [
+              69,
+              64
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1717
+          },
+          {
+            "channel": 0,
+            "data": [
+              69,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 2328
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "e22d22b77697bda23c8370bcfc3817c243e2afc3af1b40328529c32e83dc876f",
+      "render_frames": 169501,
+      "role": "transfer_pattern"
+    },
+    {
+      "bank_index": 4,
+      "performance": {
+        "end_tick": 1805,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              550459
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              58,
+              72
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              58,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1788
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "abac61db2510027921d795198e880e180b2500a4b07882915bc2df763fefde69",
+      "render_frames": 179485,
+      "role": "reference"
+    },
+    {
+      "bank_index": 4,
+      "performance": {
+        "end_tick": 2339,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              444444
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              40,
+              64
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              40,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 2322
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "5c80d1a151fc736085ccb71d120a0dd7726f429df7c7f8cba06473f9cf0ad4ec",
+      "render_frames": 183709,
+      "role": "transfer_held"
+    },
+    {
+      "bank_index": 4,
+      "performance": {
+        "end_tick": 2374,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              372671
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              52,
+              72
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              52,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 309
+          },
+          {
+            "channel": 0,
+            "data": [
+              63,
+              96
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 451
+          },
+          {
+            "channel": 0,
+            "data": [
+              63,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 992
+          },
+          {
+            "channel": 0,
+            "data": [
+              59,
+              112
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 1030
+          },
+          {
+            "channel": 0,
+            "data": [
+              59,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1429
+          },
+          {
+            "channel": 0,
+            "data": [
+              68,
+              64
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1739
+          },
+          {
+            "channel": 0,
+            "data": [
+              68,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 2357
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "5ef4f6df686a723090f60453eb962eb2d69f470125ab30a77d25e748ee6c7379",
+      "render_frames": 169484,
+      "role": "transfer_pattern"
+    },
+    {
+      "bank_index": 5,
+      "performance": {
+        "end_tick": 1837,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              540541
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              88
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              63,
+              88
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              88
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1820
+          },
+          {
+            "channel": 0,
+            "data": [
+              63,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1820
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1820
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "bed24ace4232de51a05572a182ac148b68c509264c8fef9b273347895b971a25",
+      "render_frames": 179429,
+      "role": "reference"
+    },
+    {
+      "bank_index": 5,
+      "performance": {
+        "end_tick": 2373,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              437956
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              82,
+              80
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              82,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 2356
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "db83779c91ddb203e19ae25bf3f15e5905ab4ea44874b49d2b79bba068a83d18",
+      "render_frames": 183683,
+      "role": "transfer_held"
+    },
+    {
+      "bank_index": 5,
+      "performance": {
+        "end_tick": 2403,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              368098
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              53,
+              72
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              53,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 313
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              96
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 456
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1004
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              112
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 1043
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1447
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              64
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1760
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 2386
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "bad7a4f4f38f79be64b9f7e013a02328e824061dad47285fa76cb584406aa6ba",
+      "render_frames": 169467,
+      "role": "transfer_pattern"
+    },
+    {
+      "bank_index": 6,
+      "performance": {
+        "end_tick": 1870,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              530973
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              104
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1853
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "73c8f18020983a6bd9e3aa08e66589f7b7ed4e3451b1eb395affdcb66457e2a5",
+      "render_frames": 179424,
+      "role": "reference"
+    },
+    {
+      "bank_index": 6,
+      "performance": {
+        "end_tick": 2408,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              431655
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              42,
+              96
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              42,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 2391
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "f00b3b64c2d10c6825eb52399c656f3fb0c88e1329d49c8a094d732634ce3f49",
+      "render_frames": 183697,
+      "role": "transfer_held"
+    },
+    {
+      "bank_index": 6,
+      "performance": {
+        "end_tick": 2433,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              363636
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              54,
+              72
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              54,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 317
+          },
+          {
+            "channel": 0,
+            "data": [
+              61,
+              96
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 462
+          },
+          {
+            "channel": 0,
+            "data": [
+              61,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1016
+          },
+          {
+            "channel": 0,
+            "data": [
+              61,
+              112
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 1056
+          },
+          {
+            "channel": 0,
+            "data": [
+              61,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1465
+          },
+          {
+            "channel": 0,
+            "data": [
+              66,
+              64
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1782
+          },
+          {
+            "channel": 0,
+            "data": [
+              66,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 2416
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "1ef90c767702d2a4a14bb10f256d098a6a76814a39facf0a893e85627b2aa24b",
+      "render_frames": 169484,
+      "role": "transfer_pattern"
+    },
+    {
+      "bank_index": 7,
+      "performance": {
+        "end_tick": 1903,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              521739
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              112
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              112
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              71,
+              112
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              64,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 1886
+          },
+          {
+            "channel": 0,
+            "data": [
+              67,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1886
+          },
+          {
+            "channel": 0,
+            "data": [
+              71,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1886
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "653712b7010e31b49f0596c134b3d892ca525bb4e5b9c39404ac28a549b5a827",
+      "render_frames": 179420,
+      "role": "reference"
+    },
+    {
+      "bank_index": 7,
+      "performance": {
+        "end_tick": 2442,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              425532
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              112
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              84,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 2425
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "d26ef6816d2e9ea26e3a87c8d96d52a551b7d969dc98bc1d5c9cdd80c06c87bf",
+      "render_frames": 183672,
+      "role": "transfer_held"
+    },
+    {
+      "bank_index": 7,
+      "performance": {
+        "end_tick": 2462,
+        "events": [
+          {
+            "channel": null,
+            "data": [
+              359281
+            ],
+            "kind": "tempo",
+            "order": 0,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              55,
+              72
+            ],
+            "kind": "note_on",
+            "order": 1,
+            "tick": 0
+          },
+          {
+            "channel": 0,
+            "data": [
+              55,
+              0
+            ],
+            "kind": "note_off",
+            "order": 2,
+            "tick": 321
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              96
+            ],
+            "kind": "note_on",
+            "order": 3,
+            "tick": 468
+          },
+          {
+            "channel": 0,
+            "data": [
+              60,
+              0
+            ],
+            "kind": "note_off",
+            "order": 4,
+            "tick": 1029
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              112
+            ],
+            "kind": "note_on",
+            "order": 5,
+            "tick": 1069
+          },
+          {
+            "channel": 0,
+            "data": [
+              62,
+              0
+            ],
+            "kind": "note_off",
+            "order": 6,
+            "tick": 1483
+          },
+          {
+            "channel": 0,
+            "data": [
+              65,
+              64
+            ],
+            "kind": "note_on",
+            "order": 7,
+            "tick": 1804
+          },
+          {
+            "channel": 0,
+            "data": [
+              65,
+              0
+            ],
+            "kind": "note_off",
+            "order": 8,
+            "tick": 2445
+          }
+        ],
+        "ticks_per_beat": 480
+      },
+      "performance_id": "01e75b545540c95ecd28e3812d5e1c7ce99a0009a8b370216ef00542b5883896",
+      "render_frames": 169468,
+      "role": "transfer_pattern"
+    }
+  ],
+  "precision_planning": {
+    "limitation": "rough_development_variability_estimate_not_guaranteed_fresh_panel_precision_or_power",
+    "method": "normal_95_interval_half_width_divided_by_development_control_mean",
+    "roles": {
+      "reference": {
+        "estimated_95ci_half_width_at_48": 0.14541768934402038,
+        "estimated_families_for_10pct_ci_half_width": 102,
+        "independent_families": 32,
+        "relative_paired_sd": 0.5140220944145115
+      },
+      "transfer": {
+        "estimated_95ci_half_width_at_48": 0.17800355352325542,
+        "estimated_families_for_10pct_ci_half_width": 153,
+        "independent_families": 12,
+        "relative_paired_sd": 0.6292065278164988
+      }
+    },
+    "source_plan_id": "6cb54820c938cf145e7139b08314ec1b69116f6dfeca363a5d501b42413acd0f",
+    "verification_sha256": "639a96d39da9a1b4799200b8c3d2af27f3a97ac463ee23c8b076864f61742cd8"
+  },
+  "previous_model_file_sha256": "36df1dd37f70d5be3b77cd61601875bac8acf987aa8b8d4cae703104b08f0432",
+  "purpose": "reserve_only_no_audio_or_candidate_scoring",
+  "qualified_for_release": false,
+  "rendering": {
+    "channels": 2,
+    "dtype": "float32",
+    "phase": "fixed_oscillator_1_2_3_and_sampler_random_phase",
+    "preroll_frames": 32768,
+    "sample_rate": 44100,
+    "tail_seconds": 2.0
+  },
+  "requests_per_family": {
+    "exact_reference_repeat": 1,
+    "five_methods_three_performances": 15,
+    "three_sources": 3
+  },
+  "reservation_id": "ad79b987d567ee7d9e05f20c0393a91d34cbfd5b317955998e5288aebe5aa019",
+  "source_pool_file_sha256": "ed05cf3db0dd1862671a525a2c6fac2f7d9497633848246b330a2b544ae02e87",
+  "test_states_evaluated": 0,
+  "training_only_feature_cache_sha256": "9404a8b326c15825b22a6b282a9f3773369c21a2bdd3deb0b4711d5d1bc1ede6"
+}
