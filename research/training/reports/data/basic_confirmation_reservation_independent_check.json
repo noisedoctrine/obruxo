@@ -1,0 +1,183 @@
+{
+  "candidate_scored": false,
+  "excluded_unit_test_fixture_directories": [
+    "pytest-contracts-01",
+    "pytest-contracts-02",
+    "pytest-contracts-03",
+    "pytest-contracts-final",
+    "pytest-coverage-first-20261009",
+    "pytest-evaluation-resume-20261010-elevated",
+    "pytest-feature-seed-20261010",
+    "pytest-foundation-static",
+    "pytest-full-pilot-20261009",
+    "pytest-full-pilot-20261010",
+    "pytest-learning-curve-20261009",
+    "pytest-learning-seed-all-20261014",
+    "pytest-learning-seed-proof-20261014",
+    "pytest-named-comparison-20261010",
+    "pytest-native-state-v2",
+    "pytest-online-01",
+    "pytest-online-final",
+    "pytest-pilot-01",
+    "pytest-pool-expansion-20261013",
+    "pytest-pool-expansion-cli-20261013",
+    "pytest-pool-expansion-contracts-20261013",
+    "pytest-replay-branches-20261014",
+    "pytest-seed-override-20261014",
+    "pytest-seed-override-all-20261014",
+    "pytest-seed-override-final-20261014",
+    "pytest-seed-override-final2-20261014",
+    "pytest-seed-override-final3-20261014",
+    "pytest-seed-override-focused-20261014",
+    "pytest-trainer-all",
+    "pytest-trainer-final",
+    "pytest-trainer-first",
+    "pytest-two-view-final-20261011"
+  ],
+  "historical_state_or_lineage_overlap": [],
+  "history": [
+    {
+      "pool": "authored-pilot-v2-20261005/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "7ec6258b6aa7c2f3832ab7950aef962abf7d9f5283914854fb4d97fc2493623f"
+    },
+    {
+      "pool": "authored-alpha-20261015/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "21fe657d89c4cc6856d19c89bec8fe15c3e2788f56a7c299bd859bd5d15b9125"
+    },
+    {
+      "pool": "authored-pilot-20261005/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "12f60011b88048479e8b4dbbc489599b10dcdb37d3ffa1ae81cda31faf64f797"
+    },
+    {
+      "pool": "authored-expanded-20261013/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "ed05cf3db0dd1862671a525a2c6fac2f7d9497633848246b330a2b544ae02e87"
+    },
+    {
+      "pool": "authored-alpha-v1-20261015/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "9a823e2f7338d9a6ed70244cbb80238ac94b5f7347059efbd160448453cae185"
+    },
+    {
+      "pool": "authored-alpha-final-20261015/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "d8962b4f8ca37fe71b0eae30d755d44be2ed9a33b1f3e199af0a9b6a50a8bc08"
+    },
+    {
+      "pool": "combined-curriculum-pool-20261017/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "c270493d4f29bd4bacb66955952f1ec15f9fa6c417d52e234e09f5c6bb3ea837"
+    },
+    {
+      "pool": "combined-curriculum-headroom-pool-20261017/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "1eb95c5f96f4191c563dd550bec8f5406274e7422c25d29d06b0ca28d691c932"
+    },
+    {
+      "pool": "factory-asset-integration-20261016/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "732fbead15c89314c95d26829044addc68026f0b9c08c7cb08c8e9fbccf0b147"
+    },
+    {
+      "pool": "long-tail-observation-pool-20261018/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "ea2f1f900f2f4c0d7c31ddcaae97f9235e570d32bc75faed19dc56d6b41a922a"
+    },
+    {
+      "pool": "long-observation-pool-20261018/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "ec45a931ba4aabdcf95b8b35e3cdcf8c7ec7df30bd4cfbcdb38f61595c026458"
+    },
+    {
+      "pool": "curve-input-active-pool-20261017/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "24b030677639a26796c263477e49a80e63fa95bd9e2625ab44071fee8f884256"
+    },
+    {
+      "pool": "expression-coverage-pool-20261017/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "a36e297cf652af513018bf374a2886d91b91f4b0c55dd53bebd3d6288e52f873"
+    },
+    {
+      "pool": "curve-input-pool-20261017/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "d0633dca8278a85a11665319e4788bb17a809c24015d48488c82f0fa89587a21"
+    },
+    {
+      "pool": "graph-integration-pool-20261017/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "b3b741e8d4bac67b51aacafddee677b6ee15d94c54f0a02c950eec5700eb217a"
+    },
+    {
+      "pool": "graph-coverage-balanced-pool-20261017/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "4e750678c00129711f3251c863170ff0d284d9f113d82202130a3bfddccc68aa"
+    },
+    {
+      "pool": "expression-pipeline-integration-20261017/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "5ee05e70eabe6e4dd978fb76d0361f5f8fefab1001ca6e3d8e2aa226af209729"
+    },
+    {
+      "pool": "full-scalar-native-grid-final-20261016/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "4166374f26d66df22949655046a6edcdec341c406c81f30ee4153866dc5acb05"
+    },
+    {
+      "pool": "full-scalar-integration-20261016/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "9ab62dbc96d61a0573186db27c51bc979d70c7a9f616e182f4f4b2698ea69a6a"
+    },
+    {
+      "pool": "lfo-training-periodic-final-20261016/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "ef0a0e51acc9aac182615db655139c7ff726625c2357f467c989306ed05afa56"
+    },
+    {
+      "pool": "lfo-training-integration-20261016/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "5a0ceffea75684955278cf6d2fcfe529054c20a67ba55a053883ae030598a4fc"
+    },
+    {
+      "pool": "lfo-training-original-source-20261016/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "f842d2d6066a2f0b9b5e905d8e26f200ec4c63bc3c8525a02c8d241b26624035"
+    },
+    {
+      "pool": "routing-training-integration-20261016/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "99a31132f1db513ad01feacf5760eca36dae09ad43cde1fbb59ebd65c6a179e0"
+    },
+    {
+      "pool": "mixed-source-verified-cache-pool-20261018/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "1bd0c01dde8dc9eba423113ea7dbda69337c6eede1ba2d9aecf35666d03d8c08"
+    },
+    {
+      "pool": "nested-training-integration-20261017/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "edcf7f7b78ea58d1e0b19111ec440b2a364696731a2b88c0a7310792b73c4f84"
+    },
+    {
+      "pool": "original-corpus-pool-20261018/pool.json",
+      "selected_id_overlap": 0,
+      "sha256": "930cc2fe0b59297f8b1d0551b34cca34756cb2c758ccc4064f812d1ec1518b8f"
+    }
+  ],
+  "history_scope": "experiment_pool_manifests_in_training_outputs_excluding_unit_test_fixture_directories",
+  "new_native_requests": 0,
+  "old_test_assignments_preserved": 64,
+  "optimizer_applications": 0,
+  "parent_assignments_preserved": 512,
+  "parent_pool_file_unchanged": true,
+  "prior_pool_manifests_checked": 26,
+  "qualified_for_release": false,
+  "reservation_file_sha256": "6f9ae7a221d903d3a66ed319f986052e771d2b54e28b85b36f911cdc8861b337",
+  "reservation_id": "ad79b987d567ee7d9e05f20c0393a91d34cbfd5b317955998e5288aebe5aa019",
+  "running_fit_sources_unchanged": 42,
+  "selected_new_validation_roots": 192,
+  "verified": true
+}

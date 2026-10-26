@@ -1,0 +1,25 @@
+{
+  "candidate_scored": false,
+  "elapsed_seconds": 84.92763920000289,
+  "expanded_population": {
+    "audio_qa": "not_run",
+    "codec_id": "842fb3b3757e016c33efe296aa6ed355ac3a392e4c754035b4e3b41803a439bc",
+    "pool_id": "243927fbc32fa8a65e3c40d195dd3c2eb5a7459146ec400d3baf887141751b1f",
+    "states": 4096,
+    "states_by_split": {
+      "test": 437,
+      "train": 3259,
+      "validation": 400
+    }
+  },
+  "families": 192,
+  "new_native_requests": 0,
+  "optimizer_applications": 0,
+  "parent_assignments_preserved": 512,
+  "peak_process_tree_rss_bytes": 121405440,
+  "performance_bank_entries": 24,
+  "qualified_for_release": false,
+  "reservation_id": "ad79b987d567ee7d9e05f20c0393a91d34cbfd5b317955998e5288aebe5aa019",
+  "rss_sampling_errors": 0,
+  "within_resource_limits": true
+}

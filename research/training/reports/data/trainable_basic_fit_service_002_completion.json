@@ -1,0 +1,13 @@
+{
+  "active_computation_request": {
+    "display_required": false,
+    "persistent_settings_changed": false,
+    "released": true,
+    "requested": true
+  },
+  "elapsed_seconds_including_validation": 317.2769498825073,
+  "exit_code": 0,
+  "failure": null,
+  "peak_process_tree_rss_bytes": 963538944,
+  "rss_sampling_errors": 0
+}
