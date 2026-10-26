@@ -59,7 +59,8 @@ for (const [index, trial] of packet.trials.entries()) {
   const clips = document.createElement('div'); clips.className = 'clips';
   for (const [slot, title] of [['reference', 'Reference'], ['a', 'A'], ['b', 'B']]) {
     const container = document.createElement('div');
-    const audio = document.createElement('audio'); audio.preload = 'auto'; audio.src = trial.audio[slot].file;
+    const asset = trial.audio[slot];
+    const audio = document.createElement('audio'); audio.preload = 'auto'; audio.src = `${asset.file}?sha256=${asset.sha256}`;
     audio.setAttribute('aria-label', `Comparison ${index + 1}, ${title}`);
     players.push(audio);
     const play = document.createElement('button'); play.type = 'button'; play.className = 'play'; play.textContent = `▶ ${title}`;

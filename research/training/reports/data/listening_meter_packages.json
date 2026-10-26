@@ -1,0 +1,21 @@
+[
+  {
+    "name": "imageio-ffmpeg",
+    "version": "0.6.0",
+    "wheel": "imageio_ffmpeg-0.6.0-py3-none-win_amd64.whl",
+    "sha256": "02fa47c83703c37df6bfe4896aab339013f62bf02c5ebf2dce6da56af04ffc0a",
+    "url": "https://files.pythonhosted.org/packages/2c/c6/fa760e12a2483469e2bf5058c5faff664acf66cadb4df2ad6205b016a73d/imageio_ffmpeg-0.6.0-py3-none-win_amd64.whl",
+    "requires": null
+  },
+  {
+    "name": "pyloudnorm",
+    "version": "0.2.0",
+    "wheel": "pyloudnorm-0.2.0-py3-none-any.whl",
+    "sha256": "9bb69afb904f59d007a7f9ba3d75d16fb8aeef35c44d6df822a9f192d69cf13f",
+    "url": "https://files.pythonhosted.org/packages/aa/b6/65a49a05614b2548edbba3aab118f2ebe7441dfd778accdcdce9f6567f20/pyloudnorm-0.2.0-py3-none-any.whl",
+    "requires": [
+      "scipy>=1.0.1",
+      "numpy>=1.14.2"
+    ]
+  }
+]

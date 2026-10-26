@@ -20,7 +20,7 @@ function page({storage = new Map(), initialAnswers = {}, condition} = {}) {
   const roots = {trials: new Element('div'), form: new Element('form'), status: new Element('p'), 'condition-note': new Element('p')};
   const packet = {packet_id: 'anonymous-packet', condition, trials: Array.from({length: 4}, (_, index) => {
     const trial_id = `trial-${index + 1}`;
-    return {trial_id, audio: Object.fromEntries(['reference', 'a', 'b'].map(slot => [slot, {file: `${trial_id}-${slot}.wav`}]))};
+    return {trial_id, audio: Object.fromEntries(['reference', 'a', 'b'].map(slot => [slot, {file: `${trial_id}-${slot}.wav`, sha256: 'fixture-sha'}]))};
   })};
   const document = {
     getElementById: id => roots[id], createElement: tag => new Element(tag), createTextNode: text => ({textContent: text}),
@@ -48,7 +48,7 @@ test('every comparison preloads its clips and exposes all answers as required ra
     assert.equal(node.controls, false);
     assert.equal(node.preload, 'auto');
     assert.match(node.attributes['aria-label'], /^Comparison [1-4], (Reference|A|B)$/);
-    assert.match(node.src, /^trial-[1-4]-(reference|a|b)\.wav$/);
+    assert.match(node.src, /^trial-[1-4]-(reference|a|b)\.wav\?sha256=fixture-sha$/);
   }
   assert.equal(nodes.filter(node => node.tag === 'select').length, 0);
   const answers = nodes.filter(node => node.tag === 'input');

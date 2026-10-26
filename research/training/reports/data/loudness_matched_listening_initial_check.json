@@ -1,0 +1,22 @@
+{
+  "archive_bytes": 51727063,
+  "complete": false,
+  "elapsed_seconds": 15.361493000003975,
+  "failure": "FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\angert\\\\Documents\\\\projects\\\\OBRUXO\\\\research\\\\training\\\\outputs\\\\basic-input-listening-20261027\\\\packet\\\\packet.json'",
+  "inverse_inference_calls": 0,
+  "listener_responses_received": false,
+  "maximum_independent_spread_lu": 0.005274669547439714,
+  "maximum_meter_difference_lu": 0.007374108945256808,
+  "new_native_requests": 0,
+  "optimizer_applications": 0,
+  "packet": {
+    "listener_page": "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\basic-input-listening-matched-20261027\\packet\\listen\\index.html",
+    "packet_id": "39f30583088381eed55167ae14458f43adbd9e90177e81b7e76958dec95d4079",
+    "trials": 12
+  },
+  "peak_process_tree_rss_bytes": 147910656,
+  "qualified_for_release": false,
+  "rss_sampling_errors": 0,
+  "trials_verified": 12,
+  "within_resource_limits": true
+}
