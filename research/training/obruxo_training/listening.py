@@ -34,6 +34,38 @@ def checked_audio(asset, root):
     return audio
 
 
+def render_page(packet, answers=None):
+    template = Path(__file__).with_name("listening.html").read_text(encoding="utf-8")
+    return template.replace("__PACKET__", json.dumps(packet)).replace("__INITIAL_ANSWERS__", json.dumps(answers or {}))
+
+
+def refresh_page(key_path, answers):
+    key_path = Path(key_path)
+    key = json.loads(key_path.read_bytes())
+    public, packet = key_path.parent / "listen", key["packet"]
+    private = {name: key[name] for name in ("seed", "trials", "input_manifest_sha256", "inputs")}
+    if identity({name: value for name, value in packet.items() if name != "packet_id"}) != packet["packet_id"] or identity(private) != packet["assignment_sha256"]:
+        raise ValueError("listening packet or assignment changed")
+    for name, expected in key["files_sha256"].items():
+        if digest(public / name) != expected:
+            raise ValueError("listening page or packet changed before refresh")
+    allowed = {f"{trial['trial_id']}-{field}": choices for trial in packet["trials"]
+               for field, choices in (("preferred", {"a", "b", "tie", "neither"}), ("usable", {"a", "b", "both", "neither"}))}
+    if any(name not in allowed or value not in allowed[name] for name, value in answers.items()):
+        raise ValueError("restored choices do not belong to this listening packet")
+    page = public / "index.html"
+    before = digest(page)
+    archive = key_path.parent / "page-revisions"
+    archive.mkdir(exist_ok=True)
+    (archive / f"{before}.html").write_bytes(page.read_bytes())
+    (archive / f"{digest(key_path)}.json").write_bytes(key_path.read_bytes())
+    page.write_text(render_page(packet, answers), encoding="utf-8")
+    key["files_sha256"]["index.html"] = digest(page)
+    write_json(key_path, key)
+    return {"packet_id": packet["packet_id"], "previous_page_sha256": before, "page_sha256": digest(page),
+            "restored_answers": len(answers), "audio_and_assignment_unchanged": True}
+
+
 def prepare(manifest_path, output, *, seed=None):
     from scipy.io import wavfile
     manifest_path, output = Path(manifest_path), Path(output)
@@ -82,8 +114,7 @@ def prepare(manifest_path, output, *, seed=None):
     packet = {"format": "blind_pairwise_listening_packet_v1", "trials": trials, "assignment_sha256": identity(private)}
     packet["packet_id"] = identity(packet)
     write_json(public / "packet.json", packet)
-    template = Path(__file__).with_name("listening.html").read_text(encoding="utf-8")
-    (public / "index.html").write_text(template.replace("__PACKET__", json.dumps(packet)), encoding="utf-8")
+    (public / "index.html").write_text(render_page(packet), encoding="utf-8")
     write_json(output / "answer-key.json", {"format": "blind_pairwise_listening_key_v1", "packet": packet, **private,
                "files_sha256": {name: digest(public / name) for name in ("index.html", "packet.json")}})
     return {"packet_id": packet["packet_id"], "trials": len(trials), "listener_page": str(public / "index.html")}

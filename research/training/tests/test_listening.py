@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from scipy.io import wavfile
 
-from obruxo_training.listening import digest, prepare, summarize, write_json
+from obruxo_training.listening import digest, prepare, refresh_page, summarize, write_json
 
 
 def fixture_inputs(tmp_path):
@@ -64,6 +64,27 @@ def test_bad_audio_or_hash_fails_before_packet_is_created(tmp_path):
     with pytest.raises(ValueError, match="finite"):
         prepare(path, output, seed=0)
     assert not output.exists()
+
+
+def test_page_refresh_preserves_choices_packet_assignment_audio_and_valid_judgments(tmp_path):
+    manifest_path, _ = fixture_inputs(tmp_path)
+    packet = tmp_path / "packet"
+    prepare(manifest_path, packet, seed=17)
+    key_path = packet / "answer-key.json"
+    before = json.loads(key_path.read_bytes())
+    audio = {path.name: digest(path) for path in (packet / "listen").glob("*.wav")}
+    answers = {"trial-001-preferred": "b", "trial-001-usable": "neither"}
+    receipt = refresh_page(key_path, answers)
+    after = json.loads(key_path.read_bytes())
+    assert after["packet"] == before["packet"] and after["trials"] == before["trials"]
+    assert {path.name: digest(path) for path in (packet / "listen").glob("*.wav")} == audio
+    assert receipt["restored_answers"] == 2 and receipt["audio_and_assignment_unchanged"]
+    assert '"trial-001-preferred": "b"' in (packet / "listen/index.html").read_text(encoding="utf-8")
+    responses, _ = make_responses(packet, tmp_path)
+    assert summarize(key_path, responses)["completed_trials"] == 3
+    assert list((packet / "page-revisions").glob("*.html"))
+    with pytest.raises(ValueError, match="restored choices"):
+        refresh_page(key_path, {"foreign-preferred": "a"})
 
 
 def make_responses(packet, tmp_path):
