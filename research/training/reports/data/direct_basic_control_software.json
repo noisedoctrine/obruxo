@@ -1,0 +1,22 @@
+{
+  "elapsed_seconds": 20.85844070004532,
+  "exit_code": 0,
+  "experimental_updates": 0,
+  "native_requests": 0,
+  "passed": true,
+  "peak_process_tree_rss_bytes": 653819904,
+  "rss_sampling_errors": 0,
+  "scope": "synthetic_software_and_interruption_replay_only",
+  "source_sha256": {
+    "direct_basic_audit.py": "1b804dc4eaa808a5eccfa8c5974561fc74c79493739090ba8cfb6584c1d534c8",
+    "direct_basic_control.py": "ea55ae04df467de5f65d56fbcd3d598f81dcbf6ac5a80a3d613dcb025e35efa9",
+    "direct_basic_fit.py": "def532a9e3a5292092ff5726b80c0938ccbdcbbd0b7ed16af81ad49cb0d77b4f",
+    "direct_basic_plan.py": "e4a71b191dd0d98ce3083d7f518393168359cdb566b178b39f66d475c00c3e57",
+    "direct_basic_store.py": "bd7d0556aee766a494f7dafb57200920e3739eaefd10ae6b9a45403f11531c00"
+  },
+  "test_source_sha256": {
+    "test_direct_basic_control.py": "403382f7d18bfb66871f53bf5621106f3daab6c3dd8130adfac2387c0b6272b9",
+    "test_direct_basic_recovery.py": "6434957ddaa2cc0b46d94b2d90de9afb19b17dc99e0afa2e820af62416924c35"
+  },
+  "tests": 17
+}
