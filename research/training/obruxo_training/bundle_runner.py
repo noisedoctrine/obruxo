@@ -73,6 +73,7 @@ def windows_runtime_libraries():
     import os
     torch_lib = Path(importlib.metadata.distribution("torch").locate_file("torch/lib"))
     handles = [os.add_dll_directory(str(path)) for path in (native, torch_lib) if path.is_dir()]
+    os.environ["PATH"] = os.pathsep.join((str(native), str(torch_lib), os.environ.get("PATH", "")))
     # Torch adds both base and venv directories. Windows does not order those
     # directories, so pin the installed venv copies before Torch loads them.
     handles.extend(ctypes.WinDLL(str(path)) for path in sorted(native.glob("mkl_sycl_*.dll")))
