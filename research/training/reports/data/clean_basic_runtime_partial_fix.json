@@ -1,0 +1,42 @@
+{
+  "archive_bytes": 4917103,
+  "bundles": {
+    "direct": {
+      "bundle_id": "461e495b13cd3543297eb915a65579bf756d3a0a1751ae843fc7a48ec0d2c6b0",
+      "files": 210,
+      "model_file_sha256": "36df1dd37f70d5be3b77cd61601875bac8acf987aa8b8d4cae703104b08f0432",
+      "output": "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\clean-basic-runtime-fixed-20261026\\snapshot direct",
+      "qualified_for_release": false,
+      "source_model_qualified_for_release": false
+    }
+  },
+  "cases": [
+    {
+      "exact_preset_match": true,
+      "expected_preset_sha256": "745a74d3cae3eaac799411d05ef5ae792b827ea33c2f4754e95f25c0aa54b240",
+      "external_dependency_modules": {},
+      "external_model_native_libraries": [
+        "C:\\Users\\angert\\miniforge3\\envs\\py312\\Library\\bin\\mkl_core.2.dll",
+        "C:\\Users\\angert\\miniforge3\\envs\\py312\\Library\\bin\\sycl8.dll",
+        "C:\\Users\\angert\\miniforge3\\envs\\py312\\Library\\bin\\umf.dll",
+        "C:\\Users\\angert\\miniforge3\\envs\\py312\\Library\\bin\\ur_loader.dll"
+      ],
+      "input_view": 0,
+      "model": "direct",
+      "preset_sha256": "745a74d3cae3eaac799411d05ef5ae792b827ea33c2f4754e95f25c0aa54b240",
+      "runtime_report_sha256": "243873886b47dbc23b068664fa8633764ef031a5868608d23cd44795851be975",
+      "source_origin_report_sha256": "2d12f943d829d0e80624eac885860a35725e5a1b04429d0bb34f65bf97a1f582"
+    }
+  ],
+  "clean_dependency_install": true,
+  "elapsed_seconds": 7.322705400001723,
+  "failure": "ValueError: clean inference differs from its audited preset or uses dependencies outside the new environment",
+  "new_native_requests": 0,
+  "optimizer_applications": 0,
+  "passed": false,
+  "peak_process_tree_rss_bytes": 998076416,
+  "qualified_for_release": false,
+  "rss_sampling_errors": 0,
+  "shared_site_packages": false,
+  "within_resource_limits": true
+}

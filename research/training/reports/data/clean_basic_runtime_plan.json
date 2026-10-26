@@ -1,0 +1,24 @@
+{
+  "cases": 6,
+  "clean_dependency_install": true,
+  "criterion": "exact_audited_preset_bytes_and_no_shared_python_or_model_native_libraries",
+  "frozen_fit_sources_unchanged": 42,
+  "implementation_commit": "44a814dd4761aa05638e6a1163db82ed69639f84",
+  "install_summary_sha256": "115db20e2a8a024a16518f6ca992b2744df2b76d31c19d867e63e03f4ca13c9e",
+  "limits": {
+    "archive_bytes": 134217728,
+    "process_tree_bytes": 4294967296,
+    "wall_seconds": 300
+  },
+  "model_sha256": {
+    "direct": "36df1dd37f70d5be3b77cd61601875bac8acf987aa8b8d4cae703104b08f0432",
+    "trainable_inputs": "426edb24d09d55e423b1e2fb5fc5b677f2d62f0332c7b25c7a5d136dc8bfb136"
+  },
+  "new_native_requests": 0,
+  "optimizer_applications": 0,
+  "previous_failed_check_sha256": [
+    "ff1e3aa231dde5168b47929b0b481ca564e8f85f3b0d40b5c9fe27ba92b56956",
+    "450cda8e9a4e2f0c3d5acdf1c9a573b3e4e1a6e300c248d2e6b97e3bb6f4dbd5"
+  ],
+  "requirements_sha256": "d52aa981c7c64029a083ed85f143d0b641ab37c63a0b04d1f80f2fd4300ec343"
+}
