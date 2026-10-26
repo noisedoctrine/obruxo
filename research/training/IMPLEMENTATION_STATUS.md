@@ -22,6 +22,8 @@ The [saved-mechanism audit](reports/BASIC_FIT_MECHANISM_RESULTS.md) finds correc
 
 The [phase-export repair](reports/PHASE_EXPORT.md) makes declared fixed phases survive model restoration, preset export and candidate ranking. Legacy unprofiled artifacts keep their previous behavior. This boundary correction preserves the 14-output model and does not constitute a sound-quality result.
 
+The [inference notice inventory](reports/INFERENCE_NOTICES_RESULTS.md) now preserves the pinned frontend license/attribution texts and 68 original notices for all 36 locked runtime packages. A real notice-bearing snapshot reproduces its previously audited preset in the isolated environment. Project-wide licensing and copied preset/schema terms remain unresolved; `release_notices_complete` and model release qualification stay false.
+
 The [original/wider sound-fit protocol](reports/BALANCED_NATIVE_FIT_CARD.md) uses the retained accepted weights with all three input recordings and 256 updates per arm. Its conditional development panels retain the original cases plus 24 counterbalanced cases. The [category prerequisite](reports/REFRESHED_CATEGORY_CARD.md) validates the accepted weights and audited input cache separately; the loader reconstructs its evidence rather than accepting a success flag.
 
 The [zero-render category check](reports/REFRESHED_CATEGORY_RESULTS.md) now passes on the retained weights and 128 weighted original/wider observations. All 4,096 sampled points match the independent derivative formula, hard exports remain unchanged, and the complete check takes 178.83 seconds / 0.77 GiB with zero renders or updates. It permits preparation of the next matched sound fit; it does not advance A2 or qualify a model for release.

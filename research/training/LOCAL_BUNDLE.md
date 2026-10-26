@@ -23,6 +23,13 @@ runtime-env/Scripts/python.exe -I research/training/reports/scripts/check_local_
 
 `runtime-wheels` must contain the locked wheels. The tested environment occupies 4.70 GiB; reserve 8 GiB for environment and wheelhouse together. The checker requires a fresh environment without shared packages, compares exact preset bytes and records dependency-module/native-library origins. Its output directory must be new. A Windows venv uses its own oneMKL libraries even when its base interpreter comes from Conda. The XPU distribution is retained for reproducibility; inference runs on CPU.
 
-The builder copies the available project and Basic Pitch readmes into its notice inventory. Complete release notices and model-quality/listening qualification remain required. The original isolated-source check shares installed packages; the separate fresh-install result above closes dependency isolation only for its recorded platform/runtime.
+The builder includes the original pinned Spotify Basic Pitch LICENSE/NOTICE and nnAudio MIT text, with source URLs and byte hashes. [Attribution provenance and remaining terms](notices/README.md) describe the local conversion and the unresolved project/preset-data terms. For an installed locked runtime, preserve its original dependency notices before packaging:
+
+```powershell
+python -I research/training/reports/scripts/collect_runtime_notices.py --lock research/training/runtime/windows-cp312-xpu.lock --environment runtime-env --site-packages runtime-env/Lib/site-packages --output runtime-notices
+python research/training/run.py bundle-basic --model model.pt --runtime-notices runtime-notices --output local-basic-model
+```
+
+Every collected text must match its installed distribution RECORD; missing/changed license files or locked package versions fail. The snapshot binds the archive into its file hashes and rejects direct dependency version mismatches. The [real notice-bearing snapshot check](reports/INFERENCE_NOTICES_RESULTS.md) preserves 68 files for all 36 locked packages and reproduces an already audited prediction in the isolated runtime. `release_notices_complete` and model release qualification remain false. The original isolated-source check shares installed packages; the separate fresh-install result above closes dependency isolation only for its recorded platform/runtime.
 
 The implementation leaves the running sound fit's frozen numerical files unchanged. [Audio-to-preset usage](BASIC_INFERENCE.md) also works directly from the source checkout.

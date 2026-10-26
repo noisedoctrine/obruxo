@@ -1,0 +1,34 @@
+{
+  "active_computation_request": {
+    "display_required": false,
+    "persistent_settings_changed": false,
+    "released": true,
+    "requested": true
+  },
+  "complete": true,
+  "failure": null,
+  "inference_cases": 1,
+  "new_native_requests": 0,
+  "optimizer_applications": 0,
+  "passed": true,
+  "qualified_for_release": false,
+  "release_notices_complete": false,
+  "resources": {
+    "elapsed_seconds": 21.174910600006115,
+    "peak_process_tree_rss_bytes": 1002147840,
+    "rss_sampling_errors": 0
+  },
+  "result": {
+    "archive_bytes": 7209119,
+    "bundle_id": "2e04ff825c6cc85538ff3695c436c5e7367ebb23ed4f2a326555268ff0ac97c2",
+    "external_dependency_modules": {},
+    "external_model_native_libraries": [],
+    "frontend_notice_files": 3,
+    "inventory_id": "6bccf88bee13bf726bc95464d46faa2d2682008c909fe25f650d95b4f02250c6",
+    "original_runtime_notice_files": 68,
+    "preset_matches_prior_audit": true,
+    "preset_sha256": "960d959f782ae1724ae8cbb854fc66114c84d446e395b9b0acd390c01de19e46",
+    "runtime_packages": 36,
+    "source_isolation_verified": true
+  }
+}

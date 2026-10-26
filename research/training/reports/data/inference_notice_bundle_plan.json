@@ -1,0 +1,19 @@
+{
+  "expected_preset_sha256": "960d959f782ae1724ae8cbb854fc66114c84d446e395b9b0acd390c01de19e46",
+  "frozen_direct_check_sources_unchanged": 48,
+  "implementation_commit": "65f69a4f784fe642b283124788cf6f65e1b5d03f",
+  "input_audio_sha256": "2185ffbdacbf8acafcef22dae2884000744eef1541408ad360b35c370f47278c",
+  "inventory_id": "6bccf88bee13bf726bc95464d46faa2d2682008c909fe25f650d95b4f02250c6",
+  "inventory_sha256": "bf3075a97536cf27b3e8d6a727c02032f617b45c48644bef293f660b5596ada7",
+  "limits": {
+    "archive_bytes": 134217728,
+    "process_tree_bytes": 4294967296,
+    "wall_seconds": 300
+  },
+  "locked_runtime_packages": 36,
+  "model_sha256": "426edb24d09d55e423b1e2fb5fc5b677f2d62f0332c7b25c7a5d136dc8bfb136",
+  "new_native_requests": 0,
+  "optimizer_applications": 0,
+  "original_runtime_notice_files": 68,
+  "scope": "notice_packaging_of_already_audited_inference_case"
+}
