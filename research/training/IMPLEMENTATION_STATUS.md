@@ -1,6 +1,6 @@
 # Training-plan completion ledger
 
-Updated 2026-10-26 for the [spectral reconstruction plan](../modelling/TRAINING_PLAN.md). Sound-loss training moves into the first small stage; parameter matching is an initialization/auxiliary signal. Codec coverage and model quality remain separate. Upcoming work is local only; Colab work is deferred. On-demand audio, frozen test reservations and local checks with GitHub Actions disabled remain in force. PRs are reviewed, never automatically merged.
+Updated 2026-10-27 for the [spectral reconstruction plan](../modelling/TRAINING_PLAN.md). Sound-loss training moves into the first small stage; parameter matching is an initialization/auxiliary signal. Codec coverage and model quality remain separate. Upcoming work is local only; Colab work is deferred. On-demand audio, frozen test reservations and local checks with GitHub Actions disabled remain in force. PRs are reviewed, never automatically merged.
 
 ## Active training track
 
@@ -17,6 +17,8 @@ Updated 2026-10-26 for the [spectral reconstruction plan](../modelling/TRAINING_
 The [next confirmation panel](reports/BASIC_CONFIRMATION_RESERVATION_CARD.md) reserves 192 new authored validation roots and 24 fresh balanced performances without audio generation, feature extraction, model scoring or training. It preserves all 512 original assignments and test reservations. Existing development variability motivates a separately declared 3,840-request / four-hour design; A2 must pass and the complete evaluation plan must be frozen before collecting any confirmation audio. This is preparation, not a quality result.
 
 The [saved-input diagnosis and listening page](reports/BASIC_INPUT_DIAGNOSIS_RESULTS.md) now cover all six failed-fit groups without new renders. Held-note predictions have broad control errors alongside weak unison selection. Twelve blind comparisons across eight patches are ready; the listener has begun, with complete judgments pending. The page supports instant replay, response pills and preserved drafts. No new architecture or training repeat is selected from label error alone.
+
+The [saved-mechanism audit](reports/BASIC_FIT_MECHANISM_RESULTS.md) finds correct held-note identities on 12/12 inputs and only two primary updates per wider recording. Even the best previously probed/final sound patches remain 5.16% worse than the parameter control on the held pair objective; alternate inputs have useful retained alternatives. A [three-sound direct-control check](reports/DIRECT_BASIC_CONTROL_CARD.md) is proposed to test component convergence before another network change. It requires software qualification, a frozen execution plan and the actual listening feedback before launch; no native work is started.
 
 The [phase-export repair](reports/PHASE_EXPORT.md) makes declared fixed phases survive model restoration, preset export and candidate ranking. Legacy unprofiled artifacts keep their previous behavior. This boundary correction preserves the 14-output model and does not constitute a sound-quality result.
 
