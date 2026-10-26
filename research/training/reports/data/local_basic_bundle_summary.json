@@ -1,0 +1,99 @@
+{
+  "active_computation_request": {
+    "display_required": false,
+    "persistent_settings_changed": false,
+    "released": true,
+    "requested": true
+  },
+  "archive_bytes": 11466660,
+  "bundles": {
+    "direct": {
+      "bundle_id": "0d7bced821edf8843fa4e2ba75a2325ca1fd7e85b04866f06afc761264b0bc28",
+      "files": 210,
+      "model_file_sha256": "36df1dd37f70d5be3b77cd61601875bac8acf987aa8b8d4cae703104b08f0432",
+      "output": "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\local-basic-bundle-check-20261026\\snapshot direct",
+      "qualified_for_release": false,
+      "source_model_qualified_for_release": false
+    },
+    "trainable_inputs": {
+      "bundle_id": "3c3779016da6e5aab518ef5cd36d315d0627d7f286f4d7e8371ab9761214dca7",
+      "files": 210,
+      "model_file_sha256": "426edb24d09d55e423b1e2fb5fc5b677f2d62f0332c7b25c7a5d136dc8bfb136",
+      "output": "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\local-basic-bundle-check-20261026\\snapshot trainable_inputs",
+      "qualified_for_release": false,
+      "source_model_qualified_for_release": false
+    }
+  },
+  "cases": [
+    {
+      "bundle_id": "0d7bced821edf8843fa4e2ba75a2325ca1fd7e85b04866f06afc761264b0bc28",
+      "expected_preset_sha256": "745a74d3cae3eaac799411d05ef5ae792b827ea33c2f4754e95f25c0aa54b240",
+      "input_view": 0,
+      "model": "direct",
+      "origin_report_sha256": "ef4974d4dc3a90bb2dd5cae73d253ba154f332b4158d5c4fd4cf7995bf74cdc6",
+      "preset_sha256": "745a74d3cae3eaac799411d05ef5ae792b827ea33c2f4754e95f25c0aa54b240",
+      "runtime_module_count": 57,
+      "source_isolated": true
+    },
+    {
+      "bundle_id": "0d7bced821edf8843fa4e2ba75a2325ca1fd7e85b04866f06afc761264b0bc28",
+      "expected_preset_sha256": "806c30dcaba3cedb1bc51c8aff5c4f53f590b7680079b50ff096d9da29705dc9",
+      "input_view": 1,
+      "model": "direct",
+      "origin_report_sha256": "0ec220bcd9b5c0f58f8bed2ff9e47c9d029e9caff43aba3dfaf003752cd3f938",
+      "preset_sha256": "806c30dcaba3cedb1bc51c8aff5c4f53f590b7680079b50ff096d9da29705dc9",
+      "runtime_module_count": 57,
+      "source_isolated": true
+    },
+    {
+      "bundle_id": "0d7bced821edf8843fa4e2ba75a2325ca1fd7e85b04866f06afc761264b0bc28",
+      "expected_preset_sha256": "c5602202da37b26c41c8172369c46e83d4f1acbde456e621451ac0731a60b287",
+      "input_view": 2,
+      "model": "direct",
+      "origin_report_sha256": "de59318281216e4d18f07e442349ceede2e3a37491947c5722cf418218f7598f",
+      "preset_sha256": "c5602202da37b26c41c8172369c46e83d4f1acbde456e621451ac0731a60b287",
+      "runtime_module_count": 57,
+      "source_isolated": true
+    },
+    {
+      "bundle_id": "3c3779016da6e5aab518ef5cd36d315d0627d7f286f4d7e8371ab9761214dca7",
+      "expected_preset_sha256": "0823890877542b008f2be64ceb7d4154ed81d97d473c5d5035ac52c685d680c2",
+      "input_view": 0,
+      "model": "trainable_inputs",
+      "origin_report_sha256": "44f17989342e6f5ff2b5b0417aba3da1b7e6593882b3f259bd4ba3e5a2f86cd5",
+      "preset_sha256": "0823890877542b008f2be64ceb7d4154ed81d97d473c5d5035ac52c685d680c2",
+      "runtime_module_count": 57,
+      "source_isolated": true
+    },
+    {
+      "bundle_id": "3c3779016da6e5aab518ef5cd36d315d0627d7f286f4d7e8371ab9761214dca7",
+      "expected_preset_sha256": "960d959f782ae1724ae8cbb854fc66114c84d446e395b9b0acd390c01de19e46",
+      "input_view": 1,
+      "model": "trainable_inputs",
+      "origin_report_sha256": "f9c2739e35589d25d5d447419ccfc84fbc4a2e1d28374599fd465cb6f8b22d1d",
+      "preset_sha256": "960d959f782ae1724ae8cbb854fc66114c84d446e395b9b0acd390c01de19e46",
+      "runtime_module_count": 57,
+      "source_isolated": true
+    },
+    {
+      "bundle_id": "3c3779016da6e5aab518ef5cd36d315d0627d7f286f4d7e8371ab9761214dca7",
+      "expected_preset_sha256": "85384c59cce59aa568147ca2d71bf9a3a765a5ade871774273d25b138ef54eaa",
+      "input_view": 2,
+      "model": "trainable_inputs",
+      "origin_report_sha256": "9d6d26721b1c9bc19a1f19c1ed4f49520ce87d79d665c2cab96f24cf3d801bae",
+      "preset_sha256": "85384c59cce59aa568147ca2d71bf9a3a765a5ade871774273d25b138ef54eaa",
+      "runtime_module_count": 57,
+      "source_isolated": true
+    }
+  ],
+  "clean_dependency_install": false,
+  "elapsed_seconds": 28.762491900008172,
+  "new_environment_with_shared_packages": true,
+  "new_native_requests": 0,
+  "optimizer_applications": 0,
+  "passed": true,
+  "peak_process_tree_rss_bytes": 967737344,
+  "qualified_for_release": false,
+  "rss_sampling_errors": 0,
+  "source_isolation_verified": true
+}

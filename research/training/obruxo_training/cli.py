@@ -209,6 +209,9 @@ def main(argv=None) -> int:
     compare.add_argument("--identity-diagnostics", action="store_true", help="Measure representations across reference and reserved transfer audio")
     compare.add_argument("--validation-states", type=Path, help="JSON list of explicit validation state IDs in evaluation order")
     compare.add_argument("--allow-architecture-comparison", action="store_true", help="Explicitly compare supported conditioning variants")
+    bundle = commands.add_parser("bundle-basic", help="Package a basic model and project runtime for local audio-only inference")
+    bundle.add_argument("--model", type=Path, required=True)
+    bundle.add_argument("--output", type=Path, required=True)
     infer = commands.add_parser("infer", help="Export a .vital prediction from an audio-only inference model and 44.1 kHz WAV")
     infer.add_argument("--model", type=Path, required=True)
     infer.add_argument("--audio", type=Path, required=True)
@@ -400,6 +403,12 @@ def main(argv=None) -> int:
                                       renderer_factory=NativeRendererFactory(args.plugin_path), resume=args.resume, progress=proxy_progress)
             print(json.dumps(result, indent=2))
             return 0 if result["qualified_for_inverse_training"] else 2
+        if args.command == "bundle-basic":
+            from .local_bundle import create_bundle
+            if args.asset_references:
+                raise ValueError("basic bundles use the model's embedded codec and assets")
+            print(json.dumps(create_bundle(args.model, args.output)))
+            return 0
         if args.command == "infer":
             import torch
             from .inference_profile import prediction_preset
