@@ -1,0 +1,9 @@
+{
+  "process_id": 3260,
+  "creation_date_utc": "2026-10-26T12:17:19.1416470Z",
+  "command_line": "\"C:\\Users\\angert\\miniforge3\\envs\\py312\\python.exe\" \"C:\\Users\\angert\\Documents\\projects\\OBRUXO\\tmp\\run_trainable_basic_fit.py\" execute --plan-sha256 9dcf994241e61d3980ddcf64c8b30abb49085800f63eb0eedf99369f976b6ada",
+  "return_value": 0,
+  "plan_file_sha256": "9dcf994241e61d3980ddcf64c8b30abb49085800f63eb0eedf99369f976b6ada",
+  "detached": true,
+  "hidden": true
+}

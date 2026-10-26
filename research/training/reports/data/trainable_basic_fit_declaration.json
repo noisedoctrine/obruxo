@@ -1,0 +1,13 @@
+{
+  "charged_updates_per_arm_cap": 49,
+  "implementation_commit": "bed700b2faba8f6738de635dffe88c5fef054d9b",
+  "maximum_native_executions": 2,
+  "maximum_native_requests": 7584,
+  "operator_sha256": "56a12b087353dbb31336cc790f7109f9be18d4aed4f4699ad82aa8924f1459ea",
+  "optimizer_updates_per_arm": 48,
+  "plan_file_sha256": "9dcf994241e61d3980ddcf64c8b30abb49085800f63eb0eedf99369f976b6ada",
+  "plan_id": "efb0885f7e0763d72fd82202798edba0fd312bdec7e5367cfa28969abcb2d5f0",
+  "preparation_sha256": "915225413a00d386d966ce94801b9863e3502479e4ca37e5d095caa590af5e4e",
+  "vita_entry_sha256": "443f7b027be7649dc877940797198f935669cf3e5fe4916c508e25176b77a352",
+  "vita_version": "0.1.0"
+}
