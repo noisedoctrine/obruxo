@@ -13,3 +13,5 @@ Launch a detached hidden local driver with durable start identity, resource hear
 Publish the actual six-group reconstruction, earlier-32 preservation and accepted-update decisions, including failures. Neither finishing this small fit nor a successful audit grants A2/A3 admission or release qualification. Broader fitting, fresh families/performances, a second seed, listening and deployment remain open. GitHub Actions stays disabled; no Colab work.
 
 Implementation: [completion runner](../obruxo_training/final_fit_completion.py), [CLI](scripts/complete_native_acceptance_fit.py), [recovery tests](../tests/test_final_fit_completion.py).
+
+Completed under plan `e9227ca1f35112e2e591a283d0e55685836b1ea91bd328c9bd92dbbe78aebbd6`, implementation `b0aae9c`: seven additional native requests, zero experimental updates, exact replay and 312 independently rescored comparisons. [Final result](NATIVE_ACCEPTANCE_FIT_RESULTS.md).

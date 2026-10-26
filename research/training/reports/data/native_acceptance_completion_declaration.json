@@ -1,0 +1,11 @@
+{
+  "experimental_training_updates": 0,
+  "implementation_commit": "b0aae9ce9ffc1b02b44c2539940a73a0ccd4acdc",
+  "maximum_additional_native_requests": 7,
+  "operator_sha256": "1827923203031a152ef16c6a4f6261f15dca5012771f46a8de6e0d404f4059b9",
+  "plan_file_sha256": "f8c38b385e6caf332f07d863c8f25d52133fcd34c00a06e448b787b5a8f5265b",
+  "plan_id": "e9227ca1f35112e2e591a283d0e55685836b1ea91bd328c9bd92dbbe78aebbd6",
+  "preparation_sha256": "037d649aa02506017b8f3ee6161ac579af09f59a13cbf49b415d1b398353b989",
+  "vita_entry_sha256": "443f7b027be7649dc877940797198f935669cf3e5fe4916c508e25176b77a352",
+  "vita_version": "0.1.0"
+}

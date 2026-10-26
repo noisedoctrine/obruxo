@@ -1,0 +1,225 @@
+{
+  "aggregate_archive_bytes": 1213399048,
+  "committed_updates_per_arm": 48,
+  "complete": true,
+  "current_confirmation_seconds": 46.933411599951796,
+  "elapsed_seconds": 82.46876692771912,
+  "failure": null,
+  "matched_comparison_passed": false,
+  "native_receipts_resolved": true,
+  "original_budget_passed": false,
+  "original_peak_process_tree_rss_bytes": null,
+  "peak_process_tree_rss_bytes": 1223798784,
+  "plan_id": "e9227ca1f35112e2e591a283d0e55685836b1ea91bd328c9bd92dbbe78aebbd6",
+  "qualified_for_release": false,
+  "recovered_timeouts": [],
+  "render_attempts": {
+    "qualification": 209,
+    "training": 5801
+  },
+  "resolved_process_losses": [
+    {
+      "accepted_attempt": 202,
+      "kind": "process_loss",
+      "phase": "qualification",
+      "request_id": "094701d6f6ad1c5b14be11ae7abbe4482d6b59bd174a179a11e488c0f3216192",
+      "unobserved_attempt": 201
+    }
+  ],
+  "result": {
+    "clamping": {
+      "parameter": {
+        "above_one": 16,
+        "below_zero": 109,
+        "controls": 1728
+      },
+      "spectral": {
+        "above_one": 35,
+        "below_zero": 45,
+        "controls": 1728
+      }
+    },
+    "earlier_sound_preservation": {
+      "current": {
+        "means": {
+          "mrstft": 0.2843695073388517,
+          "spectral": 0.10810623446013778
+        },
+        "mrstft_p90": 0.42881242583195367
+      },
+      "earlier": {
+        "means": {
+          "mrstft": 0.2933346913584197,
+          "spectral": 0.11001279985066503
+        },
+        "model_sha256": "06dc8d184b5878c01f7a5cfd31960e6ff52c2319bacb1a7ac408dc9d248f4dd7",
+        "mrstft_p90": 0.4269788354635239,
+        "plan_id": "6cb54820c938cf145e7139b08314ec1b69116f6dfeca363a5d501b42413acd0f"
+      },
+      "pass": false
+    },
+    "later_gradient_access": {
+      "parameter": {
+        "continuous": true,
+        "filter": true,
+        "hidden": true,
+        "unison": true
+      },
+      "spectral": {
+        "continuous": true,
+        "filter": true,
+        "hidden": true,
+        "unison": true
+      }
+    },
+    "native_acceptance": {
+      "accepted_updates": 44,
+      "pass": true,
+      "scheduled_updates": 48
+    },
+    "original_regression": {
+      "means": {
+        "initial": {
+          "mrstft": 0.3233209263999015,
+          "spectral": 0.12160713784396648
+        },
+        "parameter": {
+          "mrstft": 0.3904463787233302,
+          "spectral": 0.155089445062913
+        },
+        "spectral": {
+          "mrstft": 0.2843695073388517,
+          "spectral": 0.10810623446013778
+        }
+      },
+      "mrstft_p90": {
+        "initial": 0.5437791543702285,
+        "parameter": 0.6900997892022134,
+        "spectral": 0.42881242583195367
+      },
+      "pass": true,
+      "states": 32
+    },
+    "pass": false,
+    "six_groups": {
+      "original_input_own": {
+        "cases": 12,
+        "means": {
+          "initial": {
+            "mrstft": 0.3456624509352777,
+            "spectral": 0.12773960859825215
+          },
+          "parameter": {
+            "mrstft": 0.5337007497954701,
+            "spectral": 0.21026451016465822
+          },
+          "spectral": {
+            "mrstft": 0.30533994454890495,
+            "spectral": 0.11332453849414985
+          }
+        },
+        "pass": true,
+        "states": 12
+      },
+      "original_input_transfer": {
+        "cases": 24,
+        "means": {
+          "initial": {
+            "mrstft": 0.3498325636610389,
+            "spectral": 0.1347153865111371
+          },
+          "parameter": {
+            "mrstft": 0.5323333436519735,
+            "spectral": 0.21391542969892421
+          },
+          "spectral": {
+            "mrstft": 0.3086617771639592,
+            "spectral": 0.120557544597735
+          }
+        },
+        "pass": true,
+        "states": 12
+      },
+      "wide_alternate_input_own": {
+        "cases": 12,
+        "means": {
+          "initial": {
+            "mrstft": 1.8346869374314947,
+            "spectral": 0.760532021522522
+          },
+          "parameter": {
+            "mrstft": 1.7313307805193794,
+            "spectral": 0.7439758802453676
+          },
+          "spectral": {
+            "mrstft": 1.5897152134113843,
+            "spectral": 0.6307377914587656
+          }
+        },
+        "pass": true,
+        "states": 12
+      },
+      "wide_alternate_input_transfer": {
+        "cases": 12,
+        "means": {
+          "initial": {
+            "mrstft": 1.5877961114876797,
+            "spectral": 0.6432420412699381
+          },
+          "parameter": {
+            "mrstft": 1.40440466047989,
+            "spectral": 0.5874858126044273
+          },
+          "spectral": {
+            "mrstft": 1.4383073498805363,
+            "spectral": 0.5591336240371069
+          }
+        },
+        "pass": true,
+        "states": 12
+      },
+      "wide_held_input_own": {
+        "cases": 12,
+        "means": {
+          "initial": {
+            "mrstft": 1.5356349274516103,
+            "spectral": 0.6047952224810919
+          },
+          "parameter": {
+            "mrstft": 1.2259273479382196,
+            "spectral": 0.47946372752388317
+          },
+          "spectral": {
+            "mrstft": 1.3167056842810578,
+            "spectral": 0.5221634718279043
+          }
+        },
+        "pass": false,
+        "states": 12
+      },
+      "wide_held_input_transfer": {
+        "cases": 12,
+        "means": {
+          "initial": {
+            "mrstft": 1.6107762137220965,
+            "spectral": 0.6258450796206793
+          },
+          "parameter": {
+            "mrstft": 1.277666337374184,
+            "spectral": 0.4859052275617917
+          },
+          "spectral": {
+            "mrstft": 1.3934231466717188,
+            "spectral": 0.5398700709144274
+          }
+        },
+        "pass": false,
+        "states": 12
+      }
+    }
+  },
+  "retained_archive_bytes_before_summary": 644281534,
+  "rss_sampling_errors": 0,
+  "test_split_used": false,
+  "within_resource_limits": true
+}

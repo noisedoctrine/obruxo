@@ -2,7 +2,7 @@
 
 Revised 2026-10-21. **Train using perceptual spectral reconstruction loss on a small prediction space, prove improvement in real Vital audio, then add capabilities when they improve audible results.** Parameter matching is an initialization or auxiliary signal. Comprehensive preset serialization does not determine the model's output size. This revision moves sound-based learning into the first stage and supersedes the [coverage-first snapshot](TRAINING_PLAN_COVERAGE_20261018.md), including its sequence of expanding coverage before establishing useful reconstruction gradients.
 
-The [completion ledger](../training/IMPLEMENTATION_STATUS.md) tracks the active work. The [basic-stage protocol](../training/STAGED_RECONSTRUCTION.md) fixes the immediate implementation and qualification steps. Prior code, checkpoints, reports and split reservations remain available. This is an updated plan, not a claim that spectral-loss training is implemented or qualified.
+The [completion ledger](../training/IMPLEMENTATION_STATUS.md) tracks the active work. The [basic-stage protocol](../training/STAGED_RECONSTRUCTION.md) fixes the immediate implementation and qualification steps. Prior code, checkpoints, reports and split reservations remain available. Sound-loss training now runs locally; model-quality admission remains open. The [latest completed basic fit](../training/reports/NATIVE_ACCEPTANCE_FIT_RESULTS.md) passes four of six reconstruction groups but still trails the parameter-trained control on held recordings. Keep Stage A2 active and the prediction space at 14 values until reconstruction and preservation pass.
 
 ## Target and current evidence
 
