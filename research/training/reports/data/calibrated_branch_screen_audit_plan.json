@@ -1,0 +1,28 @@
+{
+  "evidence_sha256": {
+    "calibration.json": "a798774b9c3fcdd892b0beb364a4285f71d0c96e7565c22885632d028429560d",
+    "checkpoint.previous.pt": "b3f05e61cb71f703ec13ace52e24db01419621f081f1ea4132a2b57faddbbe85",
+    "checkpoint.pt": "9d5668a0e8c0972f252bd7cc7c84cfaf9f1dfb3072127c54179ee0e816c18169",
+    "encoder.pt": "fe20d6b7e9f51257fb48ca433401a95f1aabdf266df56ecefd185f4369d81a54",
+    "gradient_diagnostics.json": "0f2d0c44a4fc49654cb43c711c0e01e8dd676ad5ca610def78a16c30a431f78b",
+    "plan.json": "42201a47198a6ddb003e1d4c77864ff65a1608c88f0b4abf34f9179355cfb6a7",
+    "progress.json": "9ce4e46a306039ce22d2a12ed985df72d106231aeb5d10c02c1d4f4fad744ae5",
+    "summary.json": "26ea6e882397a57ed4ff2f3e2d4538020c9333734334561595f213d27457c080"
+  },
+  "new_experimental_arms": 0,
+  "new_native_requests": 0,
+  "rng_restoration": {
+    "checkpoint_sha256": "9d5668a0e8c0972f252bd7cc7c84cfaf9f1dfb3072127c54179ee0e816c18169",
+    "full_global_rng_restored": [
+      "python",
+      "numpy",
+      "torch"
+    ],
+    "wrapper_sha256_lf": "908e62115a20b328490919452aeedb01b02854b40f7678eff05fb4fa232b6e4a"
+  },
+  "screen_plan_id": "70e037cdba963fa097844fd956f24e89075eb239ffaf1d88a91ae2edc5fc9917",
+  "source_sha256_lf": {
+    "obruxo_training/branch_calibration.py": "6d898156a52ec92d4d59433ad04d475d6b142c84575eceed8919200d9590d717",
+    "reports/scripts/run_calibrated_branch_screen.py": "8b54e339ffbd0a66d60a6e353e8cb7b3f6b8dbad8eba1b3e3f49fdb99ef13fb2"
+  }
+}

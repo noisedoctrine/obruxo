@@ -1,0 +1,56 @@
+{
+  "coefficient": 25.223667687164678,
+  "median_scaled_note_to_identity_norm_ratio": 1.0,
+  "optimizer_updates_during_measurement": 0,
+  "training_batches": [
+    {
+      "gradient_cosine": -0.7786020577574877,
+      "identity_norm": 1.69635193419803,
+      "unscaled_note_to_identity_norm_ratio": 0.039456261323696215,
+      "unscaled_reversed_note_norm": 0.066931705212675
+    },
+    {
+      "gradient_cosine": -0.8493453260224112,
+      "identity_norm": 3.587381093388997,
+      "unscaled_note_to_identity_norm_ratio": 0.01827898840623875,
+      "unscaled_reversed_note_norm": 0.06557369741481757
+    },
+    {
+      "gradient_cosine": 0.868118043359593,
+      "identity_norm": 1.6613227296737911,
+      "unscaled_note_to_identity_norm_ratio": 0.03983434878126171,
+      "unscaled_reversed_note_norm": 0.06617770905206355
+    },
+    {
+      "gradient_cosine": 0.3342304142815378,
+      "identity_norm": 1.4124375675368994,
+      "unscaled_note_to_identity_norm_ratio": 0.011557161662788171,
+      "unscaled_reversed_note_norm": 0.016323769306619232
+    },
+    {
+      "gradient_cosine": 0.40926402820883273,
+      "identity_norm": 0.6561277059317105,
+      "unscaled_note_to_identity_norm_ratio": 0.1418402324102137,
+      "unscaled_reversed_note_norm": 0.09306530630013418
+    },
+    {
+      "gradient_cosine": 0.8025018884428324,
+      "identity_norm": 2.5078958067839325,
+      "unscaled_note_to_identity_norm_ratio": 0.04278500130411926,
+      "unscaled_reversed_note_norm": 0.10730032536384577
+    },
+    {
+      "gradient_cosine": 0.1654675872930354,
+      "identity_norm": 1.8504091802849374,
+      "unscaled_note_to_identity_norm_ratio": 0.013978967006992712,
+      "unscaled_reversed_note_norm": 0.02586680888063957
+    },
+    {
+      "gradient_cosine": 0.8657031820729416,
+      "identity_norm": 1.2710623967828987,
+      "unscaled_note_to_identity_norm_ratio": 0.04584170629773804,
+      "unscaled_reversed_note_norm": 0.05826766907942061
+    }
+  ],
+  "validation_used": false
+}

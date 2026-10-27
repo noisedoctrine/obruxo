@@ -1,0 +1,26 @@
+{
+  "calibration_encoder_head_adam_rng_exact": true,
+  "candidate_and_control_fresh_probes_exact": true,
+  "new_experimental_arms": 0,
+  "new_native_requests": 0,
+  "promising_for_sound_trial": false,
+  "qualified_for_release": false,
+  "resources": {
+    "elapsed_seconds": 42.104532600031234,
+    "peak_process_tree_rss_bytes": 793993216,
+    "rss_sampling_errors": 0
+  },
+  "rng_restoration": {
+    "checkpoint_sha256": "9d5668a0e8c0972f252bd7cc7c84cfaf9f1dfb3072127c54179ee0e816c18169",
+    "full_global_rng_restored": [
+      "python",
+      "numpy",
+      "torch"
+    ],
+    "wrapper_sha256_lf": "908e62115a20b328490919452aeedb01b02854b40f7678eff05fb4fa232b6e4a"
+  },
+  "screen_plan_id": "70e037cdba963fa097844fd956f24e89075eb239ffaf1d88a91ae2edc5fc9917",
+  "software_replay_encoder_updates": 500,
+  "software_replay_head_warmup_updates": 100,
+  "verified": true
+}

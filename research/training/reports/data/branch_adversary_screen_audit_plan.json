@@ -1,0 +1,20 @@
+{
+  "evidence_sha256": {
+    "checkpoint.previous.pt": "f786725d4451460a0a594ce281c03d5fef1f7ad561417ff0c0793e91f184451e",
+    "checkpoint.pt": "208ae1eafbbaf5972fa5d35e339748790dcb27503edb5a93b6e11e2f46dacad3",
+    "observations.json": "5981dc2d3e3ab1c3345078f45488b785a36401f7e8d16ad3315c4d865b7f62c1",
+    "paired_adversarial-encoder.pt": "d941439e7fa791c27fa3f576f58158d759b087af71ae7d3dfdc3a6508b602eb3",
+    "paired_only-encoder.pt": "5fed96b588f7695fa5e309a2bdde5c6e0e426fe05c75a2bf389264a1d08991a0",
+    "plan.json": "c6982ac1d7df44144936ec779992cb60fc194f6c2c9112bf5daaaf5e5ea34d50",
+    "progress.json": "c1801053d8fd55433398573b3824bc435990bc998b428c732e97af563e5adc41",
+    "recovery-prefix.pt": "132c1e632327d67d1e386632b3ac71c86ebea84259a6da53e8d1e9c0e12fa959",
+    "summary.json": "b14f9c07b91194abe6e54afa9d34a76671d1a76ef7c170a92c4f5aada4555e7c"
+  },
+  "limits": {
+    "process_tree_bytes": 4294967296,
+    "wall_seconds": 600
+  },
+  "new_native_requests": 0,
+  "screen_plan_id": "0773be97f01a7ba550660d34c3bb919103807e01fe9904ee1538a59e93d753a7",
+  "verifier_sha256_lf": "0c52b52d17753fb071dad2b42f8c799924aa3fdbd9683182016e1348ac65830b"
+}
