@@ -24,10 +24,14 @@ def main():
     plan = json.loads((args.run / "plan.json").read_bytes())
     first = json.loads((args.run / "verification.json").read_bytes())
     differences = [name for name, sha in first["evidence_sha256"].items() if digest(args.run / name) != sha]
-    operational = json.loads((args.run / "automatic-verification.json").read_bytes())
+    operational_bytes = (args.run / "automatic-verification.json").read_bytes()
+    operational = json.loads(operational_bytes)
     pending = {key: operational[key] for key in ("supervisor_pid", "supervisor_created_unix", "observed_pid", "observed_created_unix", "started_unix", "native_requests_allowed")}
     pending["complete"] = False
-    pending_sha = hashlib.sha256(json.dumps(pending, indent=2).encode()).hexdigest()
+    pending_bytes = json.dumps(pending, indent=2).encode()
+    if b"\r\n" in operational_bytes:
+        pending_bytes = pending_bytes.replace(b"\n", b"\r\n")
+    pending_sha = hashlib.sha256(pending_bytes).hexdigest()
     current, compatible = source_code(plan)
     if (differences != ["automatic-verification.json"] or pending_sha != first["evidence_sha256"]["automatic-verification.json"]
             or not operational["complete"] or not operational["verified"] or operational["exit_code"] != 0
