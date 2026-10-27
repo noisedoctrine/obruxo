@@ -1,4 +1,5 @@
 import json
+import importlib.metadata
 from pathlib import Path
 import shutil
 import subprocess
@@ -9,6 +10,7 @@ import pytest
 from obruxo_training.bundle_runner import bundle_file, identity, verify_bundle
 from obruxo_training.cli import main
 from obruxo_training.local_bundle import create_bundle
+from obruxo_training.runtime_notices import collect as collect_notices
 from test_prediction import artifacts  # noqa: F401
 
 
@@ -88,3 +90,31 @@ def test_packaged_verify_command_uses_only_manifest_and_runtime(snapshots, tmp_p
                              capture_output=True, text=True, timeout=30)
     assert process.returncode == 0, process.stderr
     assert json.loads(process.stdout)["qualified_for_release"] is False
+
+
+def test_bundle_preserves_frontend_license_and_upstream_notice_bytes(snapshots):
+    _source, root = snapshots
+    manifest = verify_bundle(root / "direct")
+    notice = root / "direct" / manifest["notices"]["frontend_attributions"]
+    record = json.loads(notice.read_bytes())
+    assert len(record["files"]) == 3 and not manifest["release_notices_complete"]
+    for filename, row in record["files"].items():
+        import hashlib
+        assert hashlib.sha256((notice.parent / filename).read_bytes()).hexdigest() == row["sha256"]
+
+
+def test_optional_runtime_inventory_is_bound_to_bundle_and_actual_versions(snapshots, tmp_path):
+    from obruxo_training.local_bundle import DEPENDENCIES
+    from test_runtime_notices import installed
+    source, _root = snapshots
+    versions = [(name, importlib.metadata.version(name)) for name in DEPENDENCIES]
+    env, site, lock = installed(tmp_path, versions)
+    archive = tmp_path / "notices"
+    inventory = collect_notices(lock, env, site, archive)
+    output = tmp_path / "bundle"
+    create_bundle(source / "direct.pt", output, notice_archive=archive)
+    manifest = verify_bundle(output)
+    assert manifest["runtime_notice_inventory_id"] == inventory["inventory_id"]
+    assert manifest["notices"]["runtime_inventory"] == "notices/runtime/inventory.json"
+    assert (output / "notices/runtime/requirements.lock").read_bytes() == lock.read_bytes()
+    assert not manifest["release_notices_complete"] and not manifest["qualified_for_release"]

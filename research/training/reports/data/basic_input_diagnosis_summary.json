@@ -1,0 +1,16 @@
+{
+  "archive_bytes": 103366820,
+  "elapsed_seconds": 7.861711299978197,
+  "fit_plan_id": "efb0885f7e0763d72fd82202798edba0fd312bdec7e5367cfa28969abcb2d5f0",
+  "independent_families": 8,
+  "listener_page": "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\basic-input-listening-20261027\\packet\\listen\\index.html",
+  "new_native_requests": 0,
+  "optimizer_applications": 0,
+  "packet_id": "4556b43d7c4c98f243c625fee90b8466ef2696c62d8a9904548315e46962b0d2",
+  "peak_process_tree_rss_bytes": 421826560,
+  "qualified_for_release": false,
+  "responses_received": false,
+  "rss_sampling_errors": 0,
+  "trials": 12,
+  "within_resource_limits": true
+}

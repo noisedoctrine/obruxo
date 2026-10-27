@@ -62,6 +62,24 @@ def runtime_origins(root):
     return result
 
 
+def windows_runtime_libraries():
+    """Keep a venv's oneMKL libraries ahead of its Conda base interpreter."""
+    if sys.platform != "win32" or sys.prefix == sys.base_prefix:
+        return []
+    native = Path(sys.prefix) / "Library/bin"
+    if not native.is_dir():
+        return []
+    import ctypes
+    import os
+    torch_lib = Path(importlib.metadata.distribution("torch").locate_file("torch/lib"))
+    handles = [os.add_dll_directory(str(path)) for path in (native, torch_lib) if path.is_dir()]
+    os.environ["PATH"] = os.pathsep.join((str(native), str(torch_lib), os.environ.get("PATH", "")))
+    # Torch adds both base and venv directories. Windows does not order those
+    # directories, so pin the installed venv copies before Torch loads them.
+    handles.extend(ctypes.WinDLL(str(path)) for path in sorted(native.glob("mkl_sycl_*.dll")))
+    return handles
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Run a local basic model using only its packaged project source and data.")
     parser.add_argument("--audio", type=Path)
@@ -81,6 +99,7 @@ def main(argv=None):
         if args.report and args.report.exists():
             raise FileExistsError(f"report already exists: {args.report}")
         sys.path[:0] = [str(root / "research/training"), str(root / "research/data_generation"), str(root / "research/modelling/basic_pitch")]
+        _runtime_libraries = windows_runtime_libraries()
         import torch
         from obruxo_training.cli import _read_inference_audio
         from obruxo_training.inference_profile import prediction_preset

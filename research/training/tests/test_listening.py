@@ -5,7 +5,11 @@ import numpy as np
 import pytest
 from scipy.io import wavfile
 
-from obruxo_training.listening import digest, prepare, summarize, write_json
+from obruxo_training.listening import digest, prepare as prepare_listening, refresh_page, summarize, write_json
+
+
+def original_level_packet(*args, **kwargs):
+    return prepare_listening(*args, purpose="level_accuracy", **kwargs)
 
 
 def fixture_inputs(tmp_path):
@@ -26,11 +30,11 @@ def fixture_inputs(tmp_path):
 def test_packet_hides_labels_preserves_samples_and_repeats_assignment(tmp_path):
     manifest_path, manifest = fixture_inputs(tmp_path)
     first, second = tmp_path / "first", tmp_path / "second"
-    result = prepare(manifest_path, first, seed=17)
+    result = original_level_packet(manifest_path, first, seed=17)
     assert result["trials"] == 3
-    assert prepare(manifest_path, second, seed=17)["packet_id"] == result["packet_id"]
+    assert original_level_packet(manifest_path, second, seed=17)["packet_id"] == result["packet_id"]
     randomized = tmp_path / "randomized"
-    prepare(manifest_path, randomized)
+    original_level_packet(manifest_path, randomized)
     assert type(json.loads((randomized / "answer-key.json").read_text())["seed"]) is int
     key = json.loads((first / "answer-key.json").read_text())
     assert {trial["a"] for trial in key["trials"]} == {"candidate", "control"}
@@ -44,7 +48,7 @@ def test_packet_hides_labels_preserves_samples_and_repeats_assignment(tmp_path):
             _, anonymous = wavfile.read(public / f"{trial['trial_id']}-{slot}.wav")
             assert np.array_equal(original, anonymous)
     with pytest.raises(FileExistsError):
-        prepare(manifest_path, first, seed=17)
+        original_level_packet(manifest_path, first, seed=17)
 
 
 def test_bad_audio_or_hash_fails_before_packet_is_created(tmp_path):
@@ -53,7 +57,7 @@ def test_bad_audio_or_hash_fails_before_packet_is_created(tmp_path):
     write_json(path, manifest)
     output = tmp_path / "packet"
     with pytest.raises(ValueError, match="hash"):
-        prepare(path, output, seed=0)
+        original_level_packet(path, output, seed=0)
     assert not output.exists()
     _, manifest = fixture_inputs(tmp_path)
     asset = tmp_path / manifest["cases"][0]["candidate"]["path"]
@@ -62,8 +66,29 @@ def test_bad_audio_or_hash_fails_before_packet_is_created(tmp_path):
         row["candidate"]["sha256"] = digest(asset)
     write_json(path, manifest)
     with pytest.raises(ValueError, match="finite"):
-        prepare(path, output, seed=0)
+        original_level_packet(path, output, seed=0)
     assert not output.exists()
+
+
+def test_page_refresh_preserves_choices_packet_assignment_audio_and_valid_judgments(tmp_path):
+    manifest_path, _ = fixture_inputs(tmp_path)
+    packet = tmp_path / "packet"
+    original_level_packet(manifest_path, packet, seed=17)
+    key_path = packet / "answer-key.json"
+    before = json.loads(key_path.read_bytes())
+    audio = {path.name: digest(path) for path in (packet / "listen").glob("*.wav")}
+    answers = {"trial-001-preferred": "b", "trial-001-usable": "neither"}
+    receipt = refresh_page(key_path, answers)
+    after = json.loads(key_path.read_bytes())
+    assert after["packet"] == before["packet"] and after["trials"] == before["trials"]
+    assert {path.name: digest(path) for path in (packet / "listen").glob("*.wav")} == audio
+    assert receipt["restored_answers"] == 2 and receipt["audio_and_assignment_unchanged"]
+    assert '"trial-001-preferred": "b"' in (packet / "listen/index.html").read_text(encoding="utf-8")
+    responses, _ = make_responses(packet, tmp_path)
+    assert summarize(key_path, responses)["completed_trials"] == 3
+    assert list((packet / "page-revisions").glob("*.html"))
+    with pytest.raises(ValueError, match="restored choices"):
+        refresh_page(key_path, {"foreign-preferred": "a"})
 
 
 def make_responses(packet, tmp_path):
@@ -82,7 +107,7 @@ def make_responses(packet, tmp_path):
 def test_judgments_decode_both_assignments_and_weight_independent_families(tmp_path):
     manifest_path, _ = fixture_inputs(tmp_path)
     packet = tmp_path / "packet"
-    prepare(manifest_path, packet, seed=17)
+    original_level_packet(manifest_path, packet, seed=17)
     responses_path, _ = make_responses(packet, tmp_path)
     report = summarize(packet / "answer-key.json", responses_path)
     assert report["completed_trials"] == report["planned_trials"] == 3
@@ -102,7 +127,7 @@ def test_judgments_decode_both_assignments_and_weight_independent_families(tmp_p
 def test_missing_duplicate_foreign_and_invalid_judgments_never_drop_trials(tmp_path):
     manifest_path, _ = fixture_inputs(tmp_path)
     packet = tmp_path / "packet"
-    prepare(manifest_path, packet, seed=17)
+    original_level_packet(manifest_path, packet, seed=17)
     path, responses = make_responses(packet, tmp_path)
     for mutation in ("missing", "duplicate", "foreign", "choice", "packet"):
         changed = copy.deepcopy(responses)
@@ -124,7 +149,7 @@ def test_missing_duplicate_foreign_and_invalid_judgments_never_drop_trials(tmp_p
 def test_packet_audio_and_private_assignment_tampering_are_detected(tmp_path):
     manifest_path, _ = fixture_inputs(tmp_path)
     packet = tmp_path / "packet"
-    prepare(manifest_path, packet, seed=17)
+    original_level_packet(manifest_path, packet, seed=17)
     path, _ = make_responses(packet, tmp_path)
     key_path = packet / "answer-key.json"
     original = json.loads(key_path.read_text())

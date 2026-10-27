@@ -1,0 +1,17 @@
+{
+  "evidence_sha256": {
+    "finals.jsonl": "cf1c9dd785ff9d54ac856ff29a17ef41505f69ab172b89975b3f730e0f4e02ef",
+    "plan.json": "9dcf994241e61d3980ddcf64c8b30abb49085800f63eb0eedf99369f976b6ada",
+    "probes.jsonl": "b01f17dcca2d9a9c306f97d593298979cb896c7165ccb11a552081cb6dea3546"
+  },
+  "feature_cache_sha256": "9404a8b326c15825b22a6b282a9f3773369c21a2bdd3deb0b4711d5d1bc1ede6",
+  "fit_plan_id": "efb0885f7e0763d72fd82202798edba0fd312bdec7e5367cfa28969abcb2d5f0",
+  "implementation_commit": "ae6d389340fc401de441e14fe3153a868fe27e38",
+  "limits": {
+    "archive_bytes": 8388608,
+    "process_tree_bytes": 4294967296,
+    "wall_seconds": 300
+  },
+  "new_native_requests": 0,
+  "optimizer_applications": 0
+}

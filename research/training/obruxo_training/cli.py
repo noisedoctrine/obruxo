@@ -210,6 +210,7 @@ def main(argv=None) -> int:
     compare.add_argument("--validation-states", type=Path, help="JSON list of explicit validation state IDs in evaluation order")
     compare.add_argument("--allow-architecture-comparison", action="store_true", help="Explicitly compare supported conditioning variants")
     bundle = commands.add_parser("bundle-basic", help="Package a basic model and project runtime for local audio-only inference")
+    bundle.add_argument("--runtime-notices", type=Path, help="Include a verified license/notice inventory for the recorded runtime")
     bundle.add_argument("--model", type=Path, required=True)
     bundle.add_argument("--output", type=Path, required=True)
     infer = commands.add_parser("infer", help="Export a .vital prediction from an audio-only inference model and 44.1 kHz WAV")
@@ -407,7 +408,7 @@ def main(argv=None) -> int:
             from .local_bundle import create_bundle
             if args.asset_references:
                 raise ValueError("basic bundles use the model's embedded codec and assets")
-            print(json.dumps(create_bundle(args.model, args.output)))
+            print(json.dumps(create_bundle(args.model, args.output, notice_archive=args.runtime_notices)))
             return 0
         if args.command == "infer":
             import torch

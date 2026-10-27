@@ -1,0 +1,100 @@
+{
+  "archive_bytes": 11502834,
+  "bundles": {
+    "direct": {
+      "bundle_id": "cf69a03524caa04e78fb33d9cad0300a9ccb8896f4264a9bf79d39c7e2a46a6d",
+      "files": 210,
+      "model_file_sha256": "36df1dd37f70d5be3b77cd61601875bac8acf987aa8b8d4cae703104b08f0432",
+      "output": "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\clean-basic-runtime-isolated-20261026\\snapshot direct",
+      "qualified_for_release": false,
+      "source_model_qualified_for_release": false
+    },
+    "trainable_inputs": {
+      "bundle_id": "925f06945fcace0b259d88f19db2bfc3bb3ab556de14e51bfcfb943658e4d7b4",
+      "files": 210,
+      "model_file_sha256": "426edb24d09d55e423b1e2fb5fc5b677f2d62f0332c7b25c7a5d136dc8bfb136",
+      "output": "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\clean-basic-runtime-isolated-20261026\\snapshot trainable_inputs",
+      "qualified_for_release": false,
+      "source_model_qualified_for_release": false
+    }
+  },
+  "cases": [
+    {
+      "clean_runtime_passed": true,
+      "expected_preset_sha256": "745a74d3cae3eaac799411d05ef5ae792b827ea33c2f4754e95f25c0aa54b240",
+      "external_dependency_modules": {},
+      "external_model_native_libraries": [],
+      "input_view": 0,
+      "model": "direct",
+      "preset_sha256": "745a74d3cae3eaac799411d05ef5ae792b827ea33c2f4754e95f25c0aa54b240",
+      "runtime_report_sha256": "6b88ed398e5be5c3c017a6e71d27beafb7c908e4509d0f92756702ff4e2be676",
+      "source_origin_report_sha256": "127c01d98ebb4305db41a9ad364e5605eb4f277dbb149b2b1923cb7076690709"
+    },
+    {
+      "clean_runtime_passed": true,
+      "expected_preset_sha256": "806c30dcaba3cedb1bc51c8aff5c4f53f590b7680079b50ff096d9da29705dc9",
+      "external_dependency_modules": {},
+      "external_model_native_libraries": [],
+      "input_view": 1,
+      "model": "direct",
+      "preset_sha256": "806c30dcaba3cedb1bc51c8aff5c4f53f590b7680079b50ff096d9da29705dc9",
+      "runtime_report_sha256": "1c50e0197c6317e012b7e975fc97da74ee74a2c9f79990cbe689ef92f80d5fad",
+      "source_origin_report_sha256": "3361384af386f754a94977ad90220c3ba35c8dc733eb0ad43dc5ee3f9df5b64d"
+    },
+    {
+      "clean_runtime_passed": true,
+      "expected_preset_sha256": "c5602202da37b26c41c8172369c46e83d4f1acbde456e621451ac0731a60b287",
+      "external_dependency_modules": {},
+      "external_model_native_libraries": [],
+      "input_view": 2,
+      "model": "direct",
+      "preset_sha256": "c5602202da37b26c41c8172369c46e83d4f1acbde456e621451ac0731a60b287",
+      "runtime_report_sha256": "85b9c023ccc9858ac39538eb6e8cd5c70a04d65f6affa2cd24cdd6e4f01b6f79",
+      "source_origin_report_sha256": "7743ff79d19be654ee435931c1b4ab88f27d727f7abb79399e0373fb75efc7bb"
+    },
+    {
+      "clean_runtime_passed": true,
+      "expected_preset_sha256": "0823890877542b008f2be64ceb7d4154ed81d97d473c5d5035ac52c685d680c2",
+      "external_dependency_modules": {},
+      "external_model_native_libraries": [],
+      "input_view": 0,
+      "model": "trainable_inputs",
+      "preset_sha256": "0823890877542b008f2be64ceb7d4154ed81d97d473c5d5035ac52c685d680c2",
+      "runtime_report_sha256": "fd9e25ed8b497153ed4a875f5c8e4cebc0f402902f1c6eaa2350e50f8e4987fc",
+      "source_origin_report_sha256": "f6a89748d5955afba0266f5ef5647cda94f6548caf64712b56fb68ad8d3bce32"
+    },
+    {
+      "clean_runtime_passed": true,
+      "expected_preset_sha256": "960d959f782ae1724ae8cbb854fc66114c84d446e395b9b0acd390c01de19e46",
+      "external_dependency_modules": {},
+      "external_model_native_libraries": [],
+      "input_view": 1,
+      "model": "trainable_inputs",
+      "preset_sha256": "960d959f782ae1724ae8cbb854fc66114c84d446e395b9b0acd390c01de19e46",
+      "runtime_report_sha256": "ee13b54551860c700bf22acee5ae571dc52790617b373298e11db5cd89904ce4",
+      "source_origin_report_sha256": "71abe422dfabd47c1f264d7c2df272771a1e2cfadb4d084173d6060c3df706b3"
+    },
+    {
+      "clean_runtime_passed": true,
+      "expected_preset_sha256": "85384c59cce59aa568147ca2d71bf9a3a765a5ade871774273d25b138ef54eaa",
+      "external_dependency_modules": {},
+      "external_model_native_libraries": [],
+      "input_view": 2,
+      "model": "trainable_inputs",
+      "preset_sha256": "85384c59cce59aa568147ca2d71bf9a3a765a5ade871774273d25b138ef54eaa",
+      "runtime_report_sha256": "b1bcd96a22ea08bafca53e364813cf51e674305f1d04e33956e48dffdce8e856",
+      "source_origin_report_sha256": "812e4de5ba470c9180168edc2728c8f677bb6be3d48a62e073270bf7e740599a"
+    }
+  ],
+  "clean_dependency_install": true,
+  "elapsed_seconds": 30.47727670002496,
+  "failure": null,
+  "new_native_requests": 0,
+  "optimizer_applications": 0,
+  "passed": true,
+  "peak_process_tree_rss_bytes": 1004658688,
+  "qualified_for_release": false,
+  "rss_sampling_errors": 0,
+  "shared_site_packages": false,
+  "within_resource_limits": true
+}

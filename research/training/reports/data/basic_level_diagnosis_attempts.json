@@ -1,0 +1,26 @@
+{
+  "aggregate_execution_seconds": 498.7055385999847,
+  "final_directory": "basic-level-diagnosis-complete-20261027",
+  "preserved_attempts": [
+    {
+      "cases": 97,
+      "complete_processing": false,
+      "directory": "basic-level-diagnosis-20261027",
+      "elapsed_seconds": 189.37998739996692,
+      "reason": "stopped at the unchanged processing gate; 97 cases; not a complete result",
+      "summary_sha256": "e03eae51539e43baa8fe33859d3bef24d16988d76c929358b07a6888a73b68e9"
+    },
+    {
+      "cases": 104,
+      "complete_processing": true,
+      "directory": "basic-level-diagnosis-refined-20261027",
+      "elapsed_seconds": 160.42209890001686,
+      "reason": "processing complete; earlier reference group omits its 12 training overlaps; superseded summary",
+      "summary_sha256": "6e6ff2e14c801a8a3e6ff78c6592f69c710fd735c0146f6b7f24a824cc0dfc89"
+    }
+  ],
+  "unchanged_processing_tolerances": {
+    "meter_difference_lu": 0.2,
+    "spread_lu": 0.1
+  }
+}

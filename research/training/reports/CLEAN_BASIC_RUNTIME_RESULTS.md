@@ -1,0 +1,13 @@
+# Basic snapshots reproduce in a fresh local runtime
+
+The fresh Windows x64 environment installs **36 hash-pinned distributions without sharing site-packages**. All six audio-to-preset cases then reproduce their previously audited preset bytes, with every checked dependency module and math library loaded from the new environment. The models retain 14 dense outputs / 11 codec selections and remain unqualified for release.
+
+The [first check](data/clean_basic_runtime_first_check.json) fails because Torch loads three oneMKL libraries from the Conda base environment. An initial preload fixes those files but [still leaks four dependent libraries](data/clean_basic_runtime_partial_fix.json). Both failures remain recorded. The final launcher prefers the venv's library path for dynamic dependencies and loads its oneMKL entry libraries before Torch; it changes only that inference process.
+
+Implementation `44a814d` precedes the [frozen final check](data/clean_basic_runtime_plan.json). The [six-case result](data/clean_basic_runtime_summary.json) covers the earlier trained direct model and the untrained trainable-input bridge, each with three recording types. The [origin reports](data/clean_basic_runtime_origins.json) record six dependency modules per case, isolated Python, disabled user-site imports and no external math libraries. These are packaging checks against saved predictions, not new reconstruction-quality evidence.
+
+The [offline hash-checked installation](data/clean_basic_runtime_install.json) takes **167.49 seconds / 0.23 GiB RAM**. The environment occupies 4.70 GiB and its local wheelhouse 1.71 GiB, within the declared combined 8 GiB allocation. The six final predictions take **30.48 seconds / 0.94 GiB RAM**, retaining 10.97 MiB within their 300-second / 4-GiB / 128-MiB limits. Thirteen snapshot tests pass; Ruff and diff checks pass. No native renders or optimizer updates are added. All 42 source files pinned by the ongoing sound fit remain unchanged.
+
+This qualifies dependency isolation for the recorded Windows/Python/runtime combination. The [complete wheel-hash lock](../runtime/windows-cp312-xpu.lock) and [repeatable checker](scripts/check_local_runtime.py) are retained. The tested install uses the existing local wheelhouse; fetching the entire wheel set on a different machine and other platforms are not covered. The XPU Torch distribution matches training, but these predictions run on CPU.
+
+Model-quality admission, fresh confirmation, second-seed replication, human listening and complete release notices remain open. The current native fit and its queued final audit continue under their original plan.

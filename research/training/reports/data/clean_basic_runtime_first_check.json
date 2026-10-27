@@ -1,0 +1,30 @@
+{
+  "cases": [
+    {
+      "exact_preset_match": true,
+      "expected_preset_sha256": "745a74d3cae3eaac799411d05ef5ae792b827ea33c2f4754e95f25c0aa54b240",
+      "external_dependency_modules": {},
+      "external_model_native_libraries": [
+        "C:\\Users\\angert\\miniforge3\\envs\\py312\\Library\\bin\\mkl_sycl_blas.5.dll",
+        "C:\\Users\\angert\\miniforge3\\envs\\py312\\Library\\bin\\mkl_sycl_dft.5.dll",
+        "C:\\Users\\angert\\miniforge3\\envs\\py312\\Library\\bin\\mkl_sycl_lapack.5.dll"
+      ],
+      "input_view": 0,
+      "model": "direct",
+      "preset_sha256": "745a74d3cae3eaac799411d05ef5ae792b827ea33c2f4754e95f25c0aa54b240",
+      "runtime_report_sha256": "1b6f9f90f8455b3005ebc336b59631a9e63582cd5a4b0e9ebcee2b6117d7c31a",
+      "source_origin_report_sha256": "5a80d35e3c6e8db5cff9c89b55b40a6d83f00dfacd4d2621179ac186a3fe940a"
+    }
+  ],
+  "clean_dependency_install": true,
+  "elapsed_seconds": 13.922872499970254,
+  "failure": "ValueError: clean inference differs from its audited preset or uses dependencies outside the new environment",
+  "new_native_requests": 0,
+  "optimizer_applications": 0,
+  "passed": false,
+  "peak_process_tree_rss_bytes": 561967104,
+  "qualified_for_release": false,
+  "rss_sampling_errors": 0,
+  "shared_site_packages": false,
+  "within_resource_limits": true
+}
