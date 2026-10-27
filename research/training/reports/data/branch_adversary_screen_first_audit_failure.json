@@ -1,0 +1,9 @@
+{
+  "verified": false,
+  "stage": "prefix_rng_check",
+  "matching_training_trace_updates_per_arm": 250,
+  "new_native_requests": 0,
+  "new_experimental_arms": 0,
+  "reason": "Standalone verifier compared a new process global RNG without first restoring the checkpoint global RNG. All first 250 training-trace results matched before this check.",
+  "fix": "Restore archived global RNG before replay, retain the explicit paired generator seed, and verify both prefix and final RNG states. Preserve this failed audit and run corrected verification separately."
+}

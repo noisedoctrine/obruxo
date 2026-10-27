@@ -8,6 +8,8 @@ Before another shared-model fit, complete the [frozen representation checks](../
 
 ## Target and current evidence
 
+The [first cheap branch-specific note-removal experiment](../training/reports/BRANCH_ADVERSARY_SCREEN_RESULTS.md) now completes. It trains only the timbre encoder, comparing paired identity learning with and without a reversed note-prediction gradient. It preserves the fourteen-output inverse model and makes no native requests. Fresh readouts show essentially unchanged leakage; the auxiliary encoder-gradient norm is only about 4–6% of the paired-learning gradient at saved checkpoints. Do not reject separation as a goal or run an expensive sound fit with this unhelpful setting. Qualify a meaningful training signal before the next changed objective; the three-case shared-learning prerequisite and all reconstruction gates remain open. Spectral sound loss remains primary for inverse training.
+
 One isolated instrument recording enters; one valid, playable `.vital` patch leaves. Inference receives audio only. The useful result is a similar sound, including its response to new notes, durations and velocities. Recovering the exact source settings or routing graph is not the product goal.
 
 The small problem has partial evidence already: the nine-control/two-choice pilot learned from 205 and later 404 training patches. Its [original validation](../training/reports/STATE_COVERAGE_RESULTS.md) and [additional validation](../training/reports/FRESH_VALIDATION_RESULTS.md) show reconstruction gains, but persistent envelope, level and unison errors. Neither proves reliably good reconstruction or listener usefulness. Both panels (21 and 23 patches) have been used for development. They must not be relabelled as new confirmation data.

@@ -1,0 +1,130 @@
+[
+  {
+    "batch": 0,
+    "checkpoint": "prefix250",
+    "gradient_cosine": -0.5218046326964066,
+    "identity_norm": 0.6161836774065117,
+    "reversed_note_norm": 0.05910934369622928,
+    "reversed_note_to_identity_norm_ratio": 0.09592812316129136
+  },
+  {
+    "batch": 1,
+    "checkpoint": "prefix250",
+    "gradient_cosine": -0.5824351893103555,
+    "identity_norm": 1.6577720367300681,
+    "reversed_note_norm": 0.03929451926129266,
+    "reversed_note_to_identity_norm_ratio": 0.023703210327277895
+  },
+  {
+    "batch": 2,
+    "checkpoint": "prefix250",
+    "gradient_cosine": -0.3381078323371687,
+    "identity_norm": 0.5489544774582081,
+    "reversed_note_norm": 0.039928245661414515,
+    "reversed_note_to_identity_norm_ratio": 0.0727350760418094
+  },
+  {
+    "batch": 3,
+    "checkpoint": "prefix250",
+    "gradient_cosine": -0.5275801133543435,
+    "identity_norm": 0.9631006916328794,
+    "reversed_note_norm": 0.05382530653154641,
+    "reversed_note_to_identity_norm_ratio": 0.05588751726497967
+  },
+  {
+    "batch": 4,
+    "checkpoint": "prefix250",
+    "gradient_cosine": 0.5714601233475238,
+    "identity_norm": 1.0672346643473312,
+    "reversed_note_norm": 0.019423545209776835,
+    "reversed_note_to_identity_norm_ratio": 0.01819988223644828
+  },
+  {
+    "batch": 5,
+    "checkpoint": "prefix250",
+    "gradient_cosine": 0.5228158610745781,
+    "identity_norm": 0.6010751319511174,
+    "reversed_note_norm": 0.026071403280823593,
+    "reversed_note_to_identity_norm_ratio": 0.04337461640809299
+  },
+  {
+    "batch": 6,
+    "checkpoint": "prefix250",
+    "gradient_cosine": -0.6577833406718382,
+    "identity_norm": 0.7639229991618101,
+    "reversed_note_norm": 0.042215412307499624,
+    "reversed_note_to_identity_norm_ratio": 0.05526134486567249
+  },
+  {
+    "batch": 7,
+    "checkpoint": "prefix250",
+    "gradient_cosine": -0.08401085243439413,
+    "identity_norm": 0.5142091863165913,
+    "reversed_note_norm": 0.04459226648525754,
+    "reversed_note_to_identity_norm_ratio": 0.08672008916192858
+  },
+  {
+    "batch": 0,
+    "checkpoint": "final500",
+    "gradient_cosine": 0.596629700614265,
+    "identity_norm": 0.5384212312140841,
+    "reversed_note_norm": 0.03696488909364826,
+    "reversed_note_to_identity_norm_ratio": 0.06865421894730313
+  },
+  {
+    "batch": 1,
+    "checkpoint": "final500",
+    "gradient_cosine": 0.03262658942020636,
+    "identity_norm": 0.8430182928802294,
+    "reversed_note_norm": 0.028641443378484063,
+    "reversed_note_to_identity_norm_ratio": 0.03397487767510788
+  },
+  {
+    "batch": 2,
+    "checkpoint": "final500",
+    "gradient_cosine": -0.920049675595705,
+    "identity_norm": 0.8534872220609333,
+    "reversed_note_norm": 0.029800320500447494,
+    "reversed_note_to_identity_norm_ratio": 0.03491595390085401
+  },
+  {
+    "batch": 3,
+    "checkpoint": "final500",
+    "gradient_cosine": -0.10979486623244766,
+    "identity_norm": 0.6293934438203128,
+    "reversed_note_norm": 0.016547412206398972,
+    "reversed_note_to_identity_norm_ratio": 0.02629104635402452
+  },
+  {
+    "batch": 4,
+    "checkpoint": "final500",
+    "gradient_cosine": -0.06056214062626938,
+    "identity_norm": 1.5050766822296637,
+    "reversed_note_norm": 0.048126969009091025,
+    "reversed_note_to_identity_norm_ratio": 0.0319764232462856
+  },
+  {
+    "batch": 5,
+    "checkpoint": "final500",
+    "gradient_cosine": -0.8450627583795148,
+    "identity_norm": 0.9015266736261897,
+    "reversed_note_norm": 0.0597198486066713,
+    "reversed_note_to_identity_norm_ratio": 0.06624301904064751
+  },
+  {
+    "batch": 6,
+    "checkpoint": "final500",
+    "gradient_cosine": -0.4508644430159594,
+    "identity_norm": 0.5861172095407112,
+    "reversed_note_norm": 0.015357515228891692,
+    "reversed_note_to_identity_norm_ratio": 0.026202123020625915
+  },
+  {
+    "batch": 7,
+    "checkpoint": "final500",
+    "gradient_cosine": -0.608891992866597,
+    "identity_norm": 1.1541914096074628,
+    "reversed_note_norm": 0.02751544603526505,
+    "reversed_note_to_identity_norm_ratio": 0.0238395865765653
+  }
+]
