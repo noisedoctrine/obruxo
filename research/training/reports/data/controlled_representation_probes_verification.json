@@ -1,0 +1,36 @@
+{
+  "all_evidence_unchanged": true,
+  "feature_extractions_reproduced_exactly": 288,
+  "inverse_model_optimizer_updates": 0,
+  "maximum_independent_spread_lu": 0.00613779483865784,
+  "native_waveforms_verified": 144,
+  "new_native_requests": 0,
+  "plan_id": "33280c8921663424b629b98d9d3539044475ccdc06280d0bd6809118829840ca",
+  "qualified_for_release": false,
+  "repeat_limit": "Twelve repeat waveforms were compared sample-for-sample live; duplicate audio was not retained for a second offline sample comparison.",
+  "resources": {
+    "elapsed_seconds": 38.69538679998368,
+    "peak_process_tree_rss_bytes": 613470208,
+    "rss_sampling_errors": 0
+  },
+  "source_factor_contrasts": {
+    "duration_ticks": {
+      "identical_waveform_pairs": 0,
+      "pairs": 72,
+      "rendered_waveform_changes": true
+    },
+    "pitch": {
+      "identical_waveform_pairs": 0,
+      "pairs": 144,
+      "rendered_waveform_changes": true
+    },
+    "velocity": {
+      "identical_waveform_pairs": 72,
+      "pairs": 72,
+      "rendered_waveform_changes": false
+    }
+  },
+  "velocity_isolation_test_informative": false,
+  "velocity_track_template_value": 0.0,
+  "verified": true
+}

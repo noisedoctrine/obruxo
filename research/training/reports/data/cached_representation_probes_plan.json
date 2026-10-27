@@ -1,0 +1,44 @@
+{
+  "duplicate_original_rows_removed": 404,
+  "fold_unit": "whole_patch_stratified_by_source_categories",
+  "folds": 3,
+  "format": "cached_frozen_basic_probes_v1",
+  "inputs_sha256": {
+    "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\authored-expanded-20261013\\pool.json": "ed05cf3db0dd1862671a525a2c6fac2f7d9497633848246b330a2b544ae02e87",
+    "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\mixed-basic-features-20261022\\features.pt": "9404a8b326c15825b22a6b282a9f3773369c21a2bdd3deb0b4711d5d1bc1ede6",
+    "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\trainable-basic-input-bridge-20261026\\model.pt": "426edb24d09d55e423b1e2fb5fc5b677f2d62f0332c7b25c7a5d136dc8bfb136",
+    "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\trainable-basic-sound-fit-20261026\\diagnostic-parameter.pt": "157d28836677536c2688d627a3f082d44eb4906cd411eeaebb8342f3654eec64",
+    "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\trainable-basic-sound-fit-20261026\\diagnostic-spectral.pt": "a21b90dcfb0cc69cfb15679fea345874b49681de46d9ad260b39ab2f89bf058e",
+    "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\trainable-basic-sound-fit-20261026\\verification.json": "49648702738292dc1434a342339ebba1f726075a49a4ee102b47d884295e4d45"
+  },
+  "inverse_model_optimizer_updates": 0,
+  "limitations": [
+    "All patches were previously seen by the inverse encoder; held-out means new to the linear probe only.",
+    "Cached performances change pitch, timing and velocity together; this is not an independent-factor causal test.",
+    "Linear readability does not prove decoder reliance; low readability does not prove absence of information."
+  ],
+  "limits": {
+    "archive_bytes": 16777216,
+    "process_tree_bytes": 4294967296,
+    "wall_seconds": 600
+  },
+  "new_native_requests": 0,
+  "null_seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "observations": 1212,
+  "ridge": 0.1,
+  "source_sha256_lf": {
+    "obruxo_training/features.py": "895a736257041013f6b3e3ce260ed6a7bef2c94d51390f5f1a5492a78b737501",
+    "obruxo_training/mixed_input_performances.py": "076aff59f7bbe6eabdf3c05e54d4f18e5efd218b23fb65f94996c3d0d7f1ef44",
+    "obruxo_training/model.py": "ed009cd8a42f287de97e7348ea4cbce1f5ffcb5e028cf3d2385f835718ecaa68",
+    "obruxo_training/representation_probes.py": "55f4aaeb6bbfd0052d4de5113b108ab4943efa0b145d0b4e93362354bcdc4b9c",
+    "obruxo_training/trainable_basic.py": "90ef874f8fea3ade333ca801534a2c9588c655a73712ec7e7affbc0d6174fcb0",
+    "reports/scripts/probe_frozen_basic.py": "e52c6743c54154ab21cb60dd51bdeb1c17d103e0ace76a2efff68ab081905185"
+  },
+  "training_patches": 404
+}

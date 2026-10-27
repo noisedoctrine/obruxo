@@ -1,0 +1,8 @@
+{
+  "complete": false,
+  "stage": "first_render_receipt_write",
+  "native_render_calls_returned": 1,
+  "retained_recordings": 0,
+  "reason": "Missing attempts subdirectory caused FileNotFoundError before the first receipt was saved.",
+  "fix": "Create recordings, attempts and repeats directories before native execution. Preserve this run and execute the corrected script into a fresh directory."
+}
