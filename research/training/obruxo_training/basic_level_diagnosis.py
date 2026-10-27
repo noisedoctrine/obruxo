@@ -65,7 +65,11 @@ def matched_scores(audio):
 def summarize(rows):
     groups = defaultdict(lambda: defaultdict(list))
     for row in rows:
-        groups[row["group"]][row["state_id"]].append(row)
+        memberships = {row["group"]}
+        if row.get("reference_panel_member"):
+            memberships.add("earlier_32")
+        for group in memberships:
+            groups[group][row["state_id"]].append(row)
     result = {}
     for group, families in groups.items():
         arms = {}

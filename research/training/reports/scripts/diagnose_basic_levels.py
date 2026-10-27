@@ -43,6 +43,12 @@ def main():
     lookup = {(row["index"], row["arm"]): row for row in finals}
     if len(lookup) != 208:
         raise ValueError("duplicate saved fit comparison")
+    reference_states = set(fit["regression_state_ids"])
+    reference_cells = [cell for cell in fit["fit_audit_cells"] if cell["input_view"] == cell["playback_view"] == 0
+                       and cell["recipe"]["state_id"] in reference_states]
+    if len(reference_cells) != 32 or {cell["recipe"]["state_id"] for cell in reference_cells} != reference_states:
+        raise ValueError("the full earlier-32 reference panel must remain present, including training overlap")
+    expected_groups = {"earlier_32": 32, **{role + suffix: 12 for role in fit["training_view_roles"] for suffix in ("_own", "_transfer")}}
     meter = LoudnessMeter(args.ffmpeg)
     independent = pyloudnorm.Meter(44100, filter_class="DeMan")
     cache, files = {}, {}
@@ -76,6 +82,7 @@ def main():
                                           "constant_gain_solver_maximum_passes": 4,
                                           "independent_meter": "pyloudnorm_" + importlib.metadata.version("pyloudnorm") + "_DeMan",
                                           "grouping": "same_six_training_groups_plus_earlier_32; equal_weight_per_independent_patch",
+                                          "expected_independent_patches_per_group": expected_groups,
                                           "original_scores": "reused_from_independently_rescored_verified_fit; not_modified",
                                           "limits": {"wall_seconds": 600, "process_tree_bytes": 4 * 1024**3, "archive_bytes": 64 * 1024**2},
                                           "native_requests": 0, "inverse_inference_calls": 0, "optimizer_applications": 0,
@@ -97,6 +104,7 @@ def main():
                 matched, matching = match_recordings(audio, CachedMeter(), independent.integrated_loudness)
                 group = "earlier_32" if cell["training_index"] is None else fit["training_view_roles"][cell["input_view"]] + ("_own" if cell["input_view"] == view else "_transfer")
                 row = {"index": index, "group": group, "state_id": recipe["state_id"], "training_index": cell["training_index"],
+                       "reference_panel_member": cell["input_view"] == view == 0 and recipe["state_id"] in reference_states,
                        "input_view": cell["input_view"], "playback_view": view, "raw": {arm: arms[arm]["scores"] for arm in ARMS},
                        "matched": matched_scores(matched), "matching": matching}
                 rows.append(row)
@@ -105,6 +113,8 @@ def main():
                 if elapsed > 600 or (monitor.peak_bytes or 0) > 4 * 1024**3:
                     raise RuntimeError("level diagnosis exceeded its fixed time or memory allocation")
                 write_json(args.output / "progress.json", {"completed_cases": len(rows), "planned_cases": 104, "elapsed_seconds": elapsed})
+            if {group: row["independent_patches"] for group, row in summarize(rows).items()} != expected_groups:
+                raise ValueError("level diagnosis lost a predeclared group or independent patch")
             if any(digest(args.fit / name) != sha for name, sha in files.items()) or any(digest(REPOSITORY / "research/training" / name) != sha for name, sha in source.items()):
                 raise ValueError("level diagnosis source or evidence changed during analysis")
     except BaseException as error:

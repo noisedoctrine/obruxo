@@ -85,3 +85,15 @@ def test_level_matched_numeric_reversal_does_not_replace_original_scores():
     ratio = summarize([row])["held_note_own"]["sound_vs_parameter_ratios"]
     assert ratio["raw_spectral"] == 2. and ratio["matched_spectral"] == .5
     assert row["raw"]["spectral"]["spectral"] == 2.
+
+
+def test_reference_panel_retains_training_overlap_without_duplicating_its_group():
+    overlap, reference = observation("a", 2.), observation("b", 4.)
+    overlap["group"] = "original_input_own"
+    overlap["reference_panel_member"] = True
+    reference["group"] = "earlier_32"
+    reference["reference_panel_member"] = True
+    groups = summarize([overlap, reference])
+    assert groups["original_input_own"]["independent_patches"] == 1
+    assert groups["earlier_32"]["independent_patches"] == groups["earlier_32"]["observations"] == 2
+    assert groups["earlier_32"]["means"]["spectral"]["raw_spectral"] == 3.
