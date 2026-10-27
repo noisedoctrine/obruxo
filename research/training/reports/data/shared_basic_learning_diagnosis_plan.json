@@ -1,0 +1,14 @@
+{
+  "checkpoint_sha256": "d9d9dddafa50589871997db8d65e3286f5e08ba79237882c9a9a6b28bf29efea",
+  "diagnostic_script_sha256": "acf98945f2ad5c00ca72e7000372488ae5ab3a260fc6c1e1a7cecbceeb4d4cf9",
+  "experimental_optimizer_updates": 0,
+  "fit_plan_id": "efb0885f7e0763d72fd82202798edba0fd312bdec7e5367cfa28969abcb2d5f0",
+  "fit_verification_sha256": "49648702738292dc1434a342339ebba1f726075a49a4ee102b47d884295e4d45",
+  "limits": {
+    "archive_bytes": 16777216,
+    "process_tree_bytes": 4294967296,
+    "wall_seconds": 600
+  },
+  "new_native_requests": 0,
+  "software_replay_updates_per_arm": 48
+}

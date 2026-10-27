@@ -1,0 +1,55 @@
+{
+  "archive_bytes_before_summary": 9953418,
+  "experimental_optimizer_updates": 0,
+  "initialization_cases": 1616,
+  "later_input_gradient_l1": {
+    "hidden": 5.855311838025815,
+    "pitch": 0.04295907098449063,
+    "timbre": 0.20065981981704084
+  },
+  "model_budget": {
+    "dense_outputs": 14,
+    "frozen_parameters": 355806,
+    "total_parameters": 613788,
+    "trainable_parameters": 257982
+  },
+  "model_file_sha256": "28f76d358ec739387b7f03555e59065934fcad3998327256c5f974e45a16404f",
+  "model_sha256": "8ce131675f9216521ee716bce334f449b4524d6c154b1745193488d44c9a3c93",
+  "new_native_requests": 0,
+  "plan_id": "5dd19d57fbdadb0a055b8528beb2188e72d99c6e672bf70e5d1930ed032f7f28",
+  "qualified_for_release": false,
+  "qualified_gradient_policy": true,
+  "resources": {
+    "elapsed_seconds": 39.60013009997783,
+    "peak_process_tree_rss_bytes": 738553856,
+    "rss_sampling_errors": 0
+  },
+  "restored_inward_native_directions": 33,
+  "saved_active_native_components": 1470,
+  "simulated_cold_cases": 1616,
+  "software_recovery": {
+    "experimental_training_updates": 0,
+    "first": {
+      "gradient_groups": {
+        "continuous": 10.068775135907345,
+        "filter": 0.31911462130665313,
+        "hidden": 0.0,
+        "unison": 0.07383489121184539
+      },
+      "loss": 0.9548376202583313
+    },
+    "model_adam_rng_recovery_exact": true,
+    "native_requests": 0,
+    "second": {
+      "gradient_groups": {
+        "continuous": 9.887487573549151,
+        "filter": 0.3169926366972504,
+        "hidden": 6.098930728827347,
+        "unison": 0.07343754304383765
+      },
+      "loss": 0.9448341131210327
+    },
+    "simulated_optimizer_step_applications": 3,
+    "software_cost_evaluations": 212
+  }
+}

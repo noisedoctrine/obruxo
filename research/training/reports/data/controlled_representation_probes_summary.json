@@ -1,0 +1,6736 @@
+{
+  "complete": true,
+  "continuous_control_order": [
+    "osc_1_level",
+    "osc_1_pan",
+    "osc_1_unison_detune",
+    "filter_1_cutoff",
+    "filter_1_resonance",
+    "env_1_attack",
+    "env_1_decay",
+    "env_1_sustain",
+    "env_1_release"
+  ],
+  "exact_repeats": 12,
+  "features_sha256": "72c9c094b0d22a5f038b8309a76d02fc30e14d2fe3026dc7e304ea659d1bb849",
+  "features_tensor_sha256": {
+    "matched": "f2bb5ae334794ff9dc415408e0a91c4c30b69b2464a78bc850eaecea625b3941",
+    "original": "0e6d8b97189127c28b66c5b529cb656cdae57a997ddd0df9f6d7f5e2c064cc76"
+  },
+  "input_artifacts_unchanged": true,
+  "inverse_model_optimizer_updates": 0,
+  "limitations": [
+    "Twelve patches were already used in inverse training; this is a diagnostic, not final validation.",
+    "Velocity and oscillator level can both change gain; LUFS matching removes that dimension intentionally.",
+    "A readable factor is present but the decoder may not use it; fixed outputs alone could reflect collapse."
+  ],
+  "native_requests": 156,
+  "new_validation_or_test_used": false,
+  "plan_id": "33280c8921663424b629b98d9d3539044475ccdc06280d0bd6809118829840ca",
+  "qualified_for_release": false,
+  "recordings": 144,
+  "resources": {
+    "archive_bytes_before_summary": 228733818,
+    "elapsed_seconds": 320.7741443000268,
+    "peak_process_tree_rss_bytes": 889802752,
+    "rss_sampling_errors": 0
+  },
+  "results": {
+    "initial/matched": {
+      "branches": {
+        "mixed_hidden": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 1.0,
+              "balanced_accuracy": 1.0,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  0,
+                  72
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.3333333333333333,
+                0.6111111111111112,
+                0.5,
+                0.3888888888888889,
+                0.5138888888888888
+              ],
+              "shuffled_training_mean_accuracy": 0.46944444444444444,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.9027777777777778,
+              "balanced_accuracy": 0.9027777711550394,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  42,
+                  6,
+                  0
+                ],
+                [
+                  4,
+                  40,
+                  4
+                ],
+                [
+                  0,
+                  0,
+                  48
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.25,
+                0.4305555555555556,
+                0.2777777777777778,
+                0.4027777777777778,
+                0.375
+              ],
+              "shuffled_training_mean_accuracy": 0.3472222222222222,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.4999999925494194,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  60,
+                  12
+                ],
+                [
+                  60,
+                  12
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 0.16133729315873496,
+          "patch_readout": {
+            "accuracy": 0.20833333333333334,
+            "balanced_accuracy": 0.20833333333333334,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                2,
+                0,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                4,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                2,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2,
+                0
+              ],
+              [
+                0,
+                4,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                2,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2,
+                0
+              ],
+              [
+                0,
+                4,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.041666666666666664,
+              0.10416666666666667,
+              0.14583333333333334,
+              0.10416666666666667,
+              0.08333333333333333
+            ],
+            "shuffled_training_mean_accuracy": 0.09583333333333334,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        },
+        "performance": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 1.0,
+              "balanced_accuracy": 1.0,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  0,
+                  72
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.3611111111111111,
+                0.6111111111111112,
+                0.5694444444444444,
+                0.375,
+                0.4444444444444444
+              ],
+              "shuffled_training_mean_accuracy": 0.4722222222222222,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.9861111111111112,
+              "balanced_accuracy": 0.9861111044883728,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  48,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  46,
+                  2
+                ],
+                [
+                  0,
+                  0,
+                  48
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.20833333333333334,
+                0.4027777777777778,
+                0.3611111111111111,
+                0.5,
+                0.20833333333333334
+              ],
+              "shuffled_training_mean_accuracy": 0.33611111111111114,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.49999999068677425,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  69,
+                  3
+                ],
+                [
+                  69,
+                  3
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 0.0002822135810199421,
+          "patch_readout": {
+            "accuracy": 0.125,
+            "balanced_accuracy": 0.125,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                2,
+                2,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2,
+                4,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                4,
+                2,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                2,
+                2,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                2,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                2,
+                0,
+                2
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                0,
+                2
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.08333333333333333,
+              0.10416666666666667,
+              0.10416666666666667,
+              0.08333333333333333,
+              0.0625
+            ],
+            "shuffled_training_mean_accuracy": 0.0875,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        },
+        "raw_basic_pitch": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 1.0,
+              "balanced_accuracy": 1.0,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  0,
+                  72
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2777777777777778,
+                0.5416666666666666,
+                0.5833333333333334,
+                0.4583333333333333,
+                0.2361111111111111
+              ],
+              "shuffled_training_mean_accuracy": 0.41944444444444445,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 1.0,
+              "balanced_accuracy": 1.0,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  48,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  48,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  48
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.3333333333333333,
+                0.3888888888888889,
+                0.4444444444444444,
+                0.5972222222222222,
+                0.25
+              ],
+              "shuffled_training_mean_accuracy": 0.4027777777777778,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  38,
+                  34
+                ],
+                [
+                  38,
+                  34
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 0.00034148183426246616,
+          "patch_readout": {
+            "accuracy": 0.125,
+            "balanced_accuracy": 0.125,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                4,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                4,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.0625,
+              0.08333333333333333,
+              0.125,
+              0.10416666666666667,
+              0.10416666666666667
+            ],
+            "shuffled_training_mean_accuracy": 0.09583333333333334,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        },
+        "raw_mel": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 0.9444444444444444,
+              "balanced_accuracy": 0.9444444477558136,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  8,
+                  64
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.3055555555555556,
+                0.5833333333333334,
+                0.6527777777777778,
+                0.4861111111111111,
+                0.3055555555555556
+              ],
+              "shuffled_training_mean_accuracy": 0.4666666666666667,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.9861111111111112,
+              "balanced_accuracy": 0.9861111044883728,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  48,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  48,
+                  0
+                ],
+                [
+                  0,
+                  2,
+                  46
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.20833333333333334,
+                0.5138888888888888,
+                0.4166666666666667,
+                0.4722222222222222,
+                0.2222222222222222
+              ],
+              "shuffled_training_mean_accuracy": 0.36666666666666664,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5000000149011612,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  33,
+                  39
+                ],
+                [
+                  33,
+                  39
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 0.006968014510967728,
+          "patch_readout": {
+            "accuracy": 0.5,
+            "balanced_accuracy": 0.5,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                6,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                4,
+                0,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                4,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                6,
+                0,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                4,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                4
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.041666666666666664,
+              0.125,
+              0.2708333333333333,
+              0.125,
+              0.08333333333333333
+            ],
+            "shuffled_training_mean_accuracy": 0.12916666666666665,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        },
+        "timbre": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 0.9583333333333334,
+              "balanced_accuracy": 0.9583333432674408,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  6,
+                  66
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2916666666666667,
+                0.5833333333333334,
+                0.5277777777777778,
+                0.4444444444444444,
+                0.4166666666666667
+              ],
+              "shuffled_training_mean_accuracy": 0.4527777777777778,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.9305555555555556,
+              "balanced_accuracy": 0.930555542310079,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  42,
+                  4,
+                  2
+                ],
+                [
+                  0,
+                  46,
+                  2
+                ],
+                [
+                  0,
+                  2,
+                  46
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.3055555555555556,
+                0.4583333333333333,
+                0.3472222222222222,
+                0.4583333333333333,
+                0.3194444444444444
+              ],
+              "shuffled_training_mean_accuracy": 0.37777777777777777,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  27,
+                  45
+                ],
+                [
+                  27,
+                  45
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 1.0332820366817663,
+          "patch_readout": {
+            "accuracy": 0.7083333333333334,
+            "balanced_accuracy": 0.7083333333333334,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                8,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                8,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                4,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                8,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                8,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                8,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                6,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                6
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.0,
+              0.20833333333333334,
+              0.3541666666666667,
+              0.08333333333333333,
+              0.10416666666666667
+            ],
+            "shuffled_training_mean_accuracy": 0.15,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        }
+      },
+      "prediction_stability": {
+        "duration_ticks": {
+          "category_flip_fraction": [
+            0.25,
+            0.08333333333333333
+          ],
+          "normalized_control_maximum_absolute_change": [
+            0.9580134153366089,
+            0.8538073301315308,
+            0.9986079335212708,
+            0.9413499236106873,
+            0.9999340176582336,
+            0.9923098087310791,
+            0.6661969423294067,
+            0.9986365437507629,
+            0.9972236156463623
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.5786100559764438,
+            0.17862619602722893,
+            0.18158936328516498,
+            0.1777606507142385,
+            0.36646913711188567,
+            0.35856565746750374,
+            0.0645990894538247,
+            0.6154788175804747,
+            0.5224739097078176
+          ],
+          "pairs": 72
+        },
+        "pitch": {
+          "category_flip_fraction": [
+            0.7361111111111112,
+            0.1388888888888889
+          ],
+          "normalized_control_maximum_absolute_change": [
+            0.9810523390769958,
+            0.9265819787979126,
+            1.0,
+            0.8658775091171265,
+            0.9999231100082397,
+            0.9903292655944824,
+            0.999986469745636,
+            0.9223088026046753,
+            0.9984046220779419
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.4185267858491797,
+            0.2059094735769678,
+            0.6073918687003849,
+            0.11754334014323023,
+            0.49757407284859156,
+            0.3866164990096068,
+            0.30728217711051303,
+            0.29114560454561594,
+            0.416394678245221
+          ],
+          "pairs": 144
+        },
+        "velocity": {
+          "category_flip_fraction": [
+            0.0,
+            0.0
+          ],
+          "normalized_control_maximum_absolute_change": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "pairs": 72
+        }
+      }
+    },
+    "initial/original": {
+      "branches": {
+        "mixed_hidden": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 0.9861111111111112,
+              "balanced_accuracy": 0.9861111044883728,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  2,
+                  70
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2361111111111111,
+                0.5833333333333334,
+                0.5833333333333334,
+                0.5694444444444444,
+                0.3055555555555556
+              ],
+              "shuffled_training_mean_accuracy": 0.45555555555555555,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.8472222222222222,
+              "balanced_accuracy": 0.8472222089767456,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  40,
+                  8,
+                  0
+                ],
+                [
+                  6,
+                  34,
+                  8
+                ],
+                [
+                  0,
+                  0,
+                  48
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.3333333333333333,
+                0.3333333333333333,
+                0.2361111111111111,
+                0.3472222222222222,
+                0.4027777777777778
+              ],
+              "shuffled_training_mean_accuracy": 0.33055555555555555,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  52,
+                  20
+                ],
+                [
+                  52,
+                  20
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 0.019240916194378545,
+          "patch_readout": {
+            "accuracy": 0.5,
+            "balanced_accuracy": 0.5,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                4,
+                0,
+                0,
+                2,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                8,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                4,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                8,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                8,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                2,
+                0,
+                2,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                2,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                4
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.0625,
+              0.0,
+              0.2708333333333333,
+              0.10416666666666667,
+              0.041666666666666664
+            ],
+            "shuffled_training_mean_accuracy": 0.09583333333333333,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        },
+        "performance": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 0.9583333333333334,
+              "balanced_accuracy": 0.9583333432674408,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  6,
+                  66
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.3611111111111111,
+                0.5833333333333334,
+                0.6666666666666666,
+                0.5138888888888888,
+                0.3055555555555556
+              ],
+              "shuffled_training_mean_accuracy": 0.4861111111111111,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.9722222222222222,
+              "balanced_accuracy": 0.9722222089767456,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  48,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  46,
+                  0
+                ],
+                [
+                  0,
+                  2,
+                  46
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.25,
+                0.4305555555555556,
+                0.3888888888888889,
+                0.4027777777777778,
+                0.3888888888888889
+              ],
+              "shuffled_training_mean_accuracy": 0.37222222222222223,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5000000149011612,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  67,
+                  5
+                ],
+                [
+                  67,
+                  5
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 0.0005555500109756602,
+          "patch_readout": {
+            "accuracy": 0.14583333333333334,
+            "balanced_accuracy": 0.14583333333333334,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                0,
+                0,
+                2,
+                0,
+                2,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                0,
+                4,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                2,
+                4,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                0,
+                4,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                2,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                0,
+                6,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                2,
+                4,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                2,
+                4,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                2,
+                0,
+                0,
+                0,
+                2,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                2,
+                0,
+                0,
+                0,
+                2,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                2,
+                0,
+                0,
+                0,
+                2,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                2,
+                4,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.10416666666666667,
+              0.08333333333333333,
+              0.08333333333333333,
+              0.10416666666666667,
+              0.0625
+            ],
+            "shuffled_training_mean_accuracy": 0.0875,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        },
+        "raw_basic_pitch": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 1.0,
+              "balanced_accuracy": 1.0,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  0,
+                  72
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.3055555555555556,
+                0.6666666666666666,
+                0.5277777777777778,
+                0.4305555555555556,
+                0.3194444444444444
+              ],
+              "shuffled_training_mean_accuracy": 0.45,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 1.0,
+              "balanced_accuracy": 1.0,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  48,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  48,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  48
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2916666666666667,
+                0.4027777777777778,
+                0.4444444444444444,
+                0.6388888888888888,
+                0.2222222222222222
+              ],
+              "shuffled_training_mean_accuracy": 0.39999999999999997,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  35,
+                  37
+                ],
+                [
+                  35,
+                  37
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 0.00036935178935357623,
+          "patch_readout": {
+            "accuracy": 0.14583333333333334,
+            "balanced_accuracy": 0.14583333333333334,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                4,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                4,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                4,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.041666666666666664,
+              0.08333333333333333,
+              0.14583333333333334,
+              0.08333333333333333,
+              0.08333333333333333
+            ],
+            "shuffled_training_mean_accuracy": 0.0875,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        },
+        "raw_mel": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 0.875,
+              "balanced_accuracy": 0.875,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  18,
+                  54
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2361111111111111,
+                0.6805555555555556,
+                0.6111111111111112,
+                0.3888888888888889,
+                0.3333333333333333
+              ],
+              "shuffled_training_mean_accuracy": 0.45,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 1.0,
+              "balanced_accuracy": 1.0,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  48,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  48,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  48
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.3333333333333333,
+                0.2361111111111111,
+                0.4583333333333333,
+                0.3611111111111111,
+                0.3055555555555556
+              ],
+              "shuffled_training_mean_accuracy": 0.3388888888888889,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  35,
+                  37
+                ],
+                [
+                  35,
+                  37
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 0.0010275668300378453,
+          "patch_readout": {
+            "accuracy": 0.5208333333333334,
+            "balanced_accuracy": 0.5208333333333334,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                6,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                4,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                4,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.041666666666666664,
+              0.125,
+              0.2708333333333333,
+              0.125,
+              0.08333333333333333
+            ],
+            "shuffled_training_mean_accuracy": 0.12916666666666665,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        },
+        "timbre": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 0.9583333333333334,
+              "balanced_accuracy": 0.9583333432674408,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  6,
+                  66
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2361111111111111,
+                0.6111111111111112,
+                0.6388888888888888,
+                0.5138888888888888,
+                0.3888888888888889
+              ],
+              "shuffled_training_mean_accuracy": 0.47777777777777775,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.8194444444444444,
+              "balanced_accuracy": 0.819444457689921,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  38,
+                  10,
+                  0
+                ],
+                [
+                  16,
+                  32,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  48
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2777777777777778,
+                0.3888888888888889,
+                0.2777777777777778,
+                0.3888888888888889,
+                0.2916666666666667
+              ],
+              "shuffled_training_mean_accuracy": 0.325,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5000000074505806,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  15,
+                  57
+                ],
+                [
+                  15,
+                  57
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 0.16007737971665645,
+          "patch_readout": {
+            "accuracy": 0.5625,
+            "balanced_accuracy": 0.5625,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                6,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                6,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                6,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                4,
+                2,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                8,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                4,
+                0,
+                0,
+                0,
+                2,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                4
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.041666666666666664,
+              0.08333333333333333,
+              0.3541666666666667,
+              0.10416666666666667,
+              0.08333333333333333
+            ],
+            "shuffled_training_mean_accuracy": 0.13333333333333333,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        }
+      },
+      "prediction_stability": {
+        "duration_ticks": {
+          "category_flip_fraction": [
+            0.5277777777777778,
+            0.5555555555555556
+          ],
+          "normalized_control_maximum_absolute_change": [
+            0.7406737804412842,
+            0.633360743522644,
+            0.9890066385269165,
+            0.589288055896759,
+            0.7419667840003967,
+            0.6303199529647827,
+            0.7801569104194641,
+            0.9946056604385376,
+            0.9816319346427917
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.30952404791282284,
+            0.15459865543784368,
+            0.16219201350789567,
+            0.28712400711245006,
+            0.20615773068534005,
+            0.22198328913913834,
+            0.2570544332265854,
+            0.5467589944601059,
+            0.3821626727779706
+          ],
+          "pairs": 72
+        },
+        "pitch": {
+          "category_flip_fraction": [
+            0.6527777777777778,
+            0.2222222222222222
+          ],
+          "normalized_control_maximum_absolute_change": [
+            0.8137018084526062,
+            0.4535755217075348,
+            0.9999895095825195,
+            0.5327467918395996,
+            0.7164753079414368,
+            0.9244863986968994,
+            0.961543619632721,
+            0.8729374408721924,
+            0.9792225360870361
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.2677331129088998,
+            0.12314997269358072,
+            0.6026932524825194,
+            0.1760777168803745,
+            0.14151373422808117,
+            0.30301723153226906,
+            0.3332094949566656,
+            0.24731206004313813,
+            0.2866113708458013
+          ],
+          "pairs": 144
+        },
+        "velocity": {
+          "category_flip_fraction": [
+            0.0,
+            0.0
+          ],
+          "normalized_control_maximum_absolute_change": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "pairs": 72
+        }
+      }
+    },
+    "parameter/matched": {
+      "branches": {
+        "mixed_hidden": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 0.9722222222222222,
+              "balanced_accuracy": 0.9722222089767456,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  4,
+                  68
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.20833333333333334,
+                0.625,
+                0.5138888888888888,
+                0.5,
+                0.5833333333333334
+              ],
+              "shuffled_training_mean_accuracy": 0.4861111111111111,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.9166666666666666,
+              "balanced_accuracy": 0.9166666666666666,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  44,
+                  4,
+                  0
+                ],
+                [
+                  6,
+                  40,
+                  2
+                ],
+                [
+                  0,
+                  0,
+                  48
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.18055555555555555,
+                0.5416666666666666,
+                0.3333333333333333,
+                0.4444444444444444,
+                0.3194444444444444
+              ],
+              "shuffled_training_mean_accuracy": 0.3638888888888889,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.4999999850988388,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  50,
+                  22
+                ],
+                [
+                  50,
+                  22
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 1.6717457120293795,
+          "patch_readout": {
+            "accuracy": 0.25,
+            "balanced_accuracy": 0.25,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                4,
+                2,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                0,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                4,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                2,
+                2,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                4,
+                0,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                4,
+                0,
+                2,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                2,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.0625,
+              0.08333333333333333,
+              0.1875,
+              0.041666666666666664,
+              0.0625
+            ],
+            "shuffled_training_mean_accuracy": 0.0875,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        },
+        "performance": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 1.0,
+              "balanced_accuracy": 1.0,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  0,
+                  72
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2916666666666667,
+                0.6388888888888888,
+                0.5972222222222222,
+                0.3472222222222222,
+                0.4166666666666667
+              ],
+              "shuffled_training_mean_accuracy": 0.4583333333333333,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.9444444444444444,
+              "balanced_accuracy": 0.9444444378217062,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  46,
+                  2,
+                  0
+                ],
+                [
+                  0,
+                  48,
+                  0
+                ],
+                [
+                  0,
+                  6,
+                  42
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.3333333333333333,
+                0.4444444444444444,
+                0.4027777777777778,
+                0.4166666666666667,
+                0.19444444444444445
+              ],
+              "shuffled_training_mean_accuracy": 0.35833333333333334,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  63,
+                  9
+                ],
+                [
+                  63,
+                  9
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 3.2255892653608266e-05,
+          "patch_readout": {
+            "accuracy": 0.125,
+            "balanced_accuracy": 0.125,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                0,
+                0,
+                0,
+                2,
+                0,
+                2,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                0,
+                2,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                0,
+                2,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                0,
+                2,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                2,
+                0,
+                0,
+                0,
+                4,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                2,
+                0,
+                2,
+                2,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                2,
+                0,
+                2,
+                0,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4
+              ],
+              [
+                0,
+                2,
+                0,
+                2,
+                0,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.08333333333333333,
+              0.08333333333333333,
+              0.10416666666666667,
+              0.08333333333333333,
+              0.0625
+            ],
+            "shuffled_training_mean_accuracy": 0.08333333333333333,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        },
+        "timbre": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 0.9583333333333334,
+              "balanced_accuracy": 0.9583333432674408,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  6,
+                  66
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2916666666666667,
+                0.6388888888888888,
+                0.5,
+                0.4027777777777778,
+                0.375
+              ],
+              "shuffled_training_mean_accuracy": 0.44166666666666665,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.9305555555555556,
+              "balanced_accuracy": 0.930555542310079,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  42,
+                  4,
+                  2
+                ],
+                [
+                  0,
+                  46,
+                  2
+                ],
+                [
+                  0,
+                  2,
+                  46
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2361111111111111,
+                0.4583333333333333,
+                0.3194444444444444,
+                0.4583333333333333,
+                0.3472222222222222
+              ],
+              "shuffled_training_mean_accuracy": 0.3638888888888889,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  43,
+                  29
+                ],
+                [
+                  43,
+                  29
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 1.2040892995302006,
+          "patch_readout": {
+            "accuracy": 0.7083333333333334,
+            "balanced_accuracy": 0.7083333333333334,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                8,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                6,
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                8,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                8,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                0,
+                2,
+                2,
+                0,
+                0,
+                2,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                8,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                8,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                6,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                4
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.0,
+              0.1875,
+              0.3333333333333333,
+              0.10416666666666667,
+              0.10416666666666667
+            ],
+            "shuffled_training_mean_accuracy": 0.14583333333333334,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        }
+      },
+      "prediction_stability": {
+        "duration_ticks": {
+          "category_flip_fraction": [
+            0.3055555555555556,
+            0.08333333333333333
+          ],
+          "normalized_control_maximum_absolute_change": [
+            0.9976251721382141,
+            0.7611855864524841,
+            0.9353907108306885,
+            0.7136902809143066,
+            0.8922827243804932,
+            0.9362413287162781,
+            0.5940504670143127,
+            0.8789418339729309,
+            0.9922297596931458
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.5466208524174161,
+            0.18059156772991022,
+            0.2600335041061044,
+            0.24396259089310965,
+            0.3228175619410144,
+            0.30336593655455446,
+            0.11060789330965942,
+            0.5304626168476211,
+            0.39771395549178123
+          ],
+          "pairs": 72
+        },
+        "pitch": {
+          "category_flip_fraction": [
+            0.6666666666666666,
+            0.2777777777777778
+          ],
+          "normalized_control_maximum_absolute_change": [
+            1.0,
+            1.0,
+            0.9425827860832214,
+            0.8387471437454224,
+            0.9111815690994263,
+            1.0,
+            0.8937528133392334,
+            0.9822341203689575,
+            0.9006279706954956
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.3920496509850232,
+            0.3175603455682803,
+            0.5261754617094994,
+            0.1835973673603601,
+            0.39573123430212337,
+            0.43985379782194894,
+            0.28223782074120307,
+            0.32423682409959537,
+            0.2905660383403301
+          ],
+          "pairs": 144
+        },
+        "velocity": {
+          "category_flip_fraction": [
+            0.0,
+            0.0
+          ],
+          "normalized_control_maximum_absolute_change": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "pairs": 72
+        }
+      }
+    },
+    "parameter/original": {
+      "branches": {
+        "mixed_hidden": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 0.9861111111111112,
+              "balanced_accuracy": 0.9861111044883728,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  2,
+                  70
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2361111111111111,
+                0.5,
+                0.6388888888888888,
+                0.625,
+                0.2638888888888889
+              ],
+              "shuffled_training_mean_accuracy": 0.4527777777777778,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.7916666666666666,
+              "balanced_accuracy": 0.7916666666666666,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  42,
+                  6,
+                  0
+                ],
+                [
+                  10,
+                  24,
+                  14
+                ],
+                [
+                  0,
+                  0,
+                  48
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.20833333333333334,
+                0.4861111111111111,
+                0.25,
+                0.3472222222222222,
+                0.3333333333333333
+              ],
+              "shuffled_training_mean_accuracy": 0.325,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5000000074505806,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  65,
+                  7
+                ],
+                [
+                  65,
+                  7
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 0.2809668617572377,
+          "patch_readout": {
+            "accuracy": 0.3125,
+            "balanced_accuracy": 0.3125,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                2,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                2,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                4,
+                0,
+                2,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                2,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                2,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                2,
+                0,
+                0,
+                0,
+                2
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.0625,
+              0.08333333333333333,
+              0.14583333333333334,
+              0.08333333333333333,
+              0.08333333333333333
+            ],
+            "shuffled_training_mean_accuracy": 0.09166666666666666,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        },
+        "performance": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 0.9722222222222222,
+              "balanced_accuracy": 0.9722222089767456,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  4,
+                  68
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2222222222222222,
+                0.5277777777777778,
+                0.6111111111111112,
+                0.4583333333333333,
+                0.4027777777777778
+              ],
+              "shuffled_training_mean_accuracy": 0.4444444444444445,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.9722222222222222,
+              "balanced_accuracy": 0.9722222288449606,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  48,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  44,
+                  2
+                ],
+                [
+                  0,
+                  0,
+                  48
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2222222222222222,
+                0.4444444444444444,
+                0.2916666666666667,
+                0.3472222222222222,
+                0.3472222222222222
+              ],
+              "shuffled_training_mean_accuracy": 0.33055555555555555,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5000000074505806,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  65,
+                  7
+                ],
+                [
+                  65,
+                  7
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 3.1319763460127694e-05,
+          "patch_readout": {
+            "accuracy": 0.1875,
+            "balanced_accuracy": 0.1875,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                0,
+                0,
+                2,
+                2,
+                0,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                2,
+                0,
+                0,
+                0,
+                4,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2,
+                4,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2,
+                2,
+                0,
+                0,
+                2,
+                0,
+                0,
+                2,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                2,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2,
+                2,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                0,
+                2,
+                2,
+                2,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                2,
+                0,
+                0,
+                2,
+                0,
+                2,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                4,
+                2,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                2,
+                2,
+                2,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                2,
+                2,
+                2,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                2,
+                2,
+                2,
+                0,
+                0
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.08333333333333333,
+              0.08333333333333333,
+              0.14583333333333334,
+              0.0625,
+              0.0625
+            ],
+            "shuffled_training_mean_accuracy": 0.0875,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        },
+        "timbre": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 0.9583333333333334,
+              "balanced_accuracy": 0.9583333432674408,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  6,
+                  66
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2638888888888889,
+                0.5972222222222222,
+                0.6388888888888888,
+                0.5138888888888888,
+                0.3611111111111111
+              ],
+              "shuffled_training_mean_accuracy": 0.475,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.8055555555555556,
+              "balanced_accuracy": 0.805555542310079,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  40,
+                  8,
+                  0
+                ],
+                [
+                  20,
+                  28,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  48
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2638888888888889,
+                0.3888888888888889,
+                0.2777777777777778,
+                0.375,
+                0.2777777777777778
+              ],
+              "shuffled_training_mean_accuracy": 0.31666666666666665,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  45,
+                  27
+                ],
+                [
+                  45,
+                  27
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 0.18742637610446766,
+          "patch_readout": {
+            "accuracy": 0.5208333333333334,
+            "balanced_accuracy": 0.5208333333333334,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                4,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                8,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                4,
+                0,
+                0,
+                0,
+                2,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                4
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.041666666666666664,
+              0.10416666666666667,
+              0.3125,
+              0.125,
+              0.08333333333333333
+            ],
+            "shuffled_training_mean_accuracy": 0.13333333333333333,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        }
+      },
+      "prediction_stability": {
+        "duration_ticks": {
+          "category_flip_fraction": [
+            0.5555555555555556,
+            0.4722222222222222
+          ],
+          "normalized_control_maximum_absolute_change": [
+            0.7562457919120789,
+            0.6247653961181641,
+            1.0,
+            0.5258433818817139,
+            0.7539722919464111,
+            0.6433959603309631,
+            0.7822197079658508,
+            0.9471582174301147,
+            1.0
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.3252360735916429,
+            0.14835381161214578,
+            0.19071025168523192,
+            0.2743443548679352,
+            0.2211185230149163,
+            0.19854851605163681,
+            0.2720814579062992,
+            0.5352729640694128,
+            0.42315711826086044
+          ],
+          "pairs": 72
+        },
+        "pitch": {
+          "category_flip_fraction": [
+            0.6666666666666666,
+            0.2222222222222222
+          ],
+          "normalized_control_maximum_absolute_change": [
+            0.7277984619140625,
+            0.4049195647239685,
+            0.9681555032730103,
+            0.5375270843505859,
+            0.668952226638794,
+            0.837141215801239,
+            0.9240042567253113,
+            0.789763331413269,
+            0.9898982048034668
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.2462098465508057,
+            0.12958020476313928,
+            0.5582920850817269,
+            0.1787798230846723,
+            0.13758737511105007,
+            0.2873794022533629,
+            0.3165031938503186,
+            0.23597554362560105,
+            0.272312029161387
+          ],
+          "pairs": 144
+        },
+        "velocity": {
+          "category_flip_fraction": [
+            0.0,
+            0.0
+          ],
+          "normalized_control_maximum_absolute_change": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "pairs": 72
+        }
+      }
+    },
+    "spectral/matched": {
+      "branches": {
+        "mixed_hidden": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 0.9722222222222222,
+              "balanced_accuracy": 0.9722222089767456,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  4,
+                  68
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.3333333333333333,
+                0.6111111111111112,
+                0.5694444444444444,
+                0.4583333333333333,
+                0.3472222222222222
+              ],
+              "shuffled_training_mean_accuracy": 0.4638888888888889,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.9583333333333334,
+              "balanced_accuracy": 0.9583333333333334,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  46,
+                  2,
+                  0
+                ],
+                [
+                  4,
+                  44,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  48
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2916666666666667,
+                0.4027777777777778,
+                0.3055555555555556,
+                0.4583333333333333,
+                0.4027777777777778
+              ],
+              "shuffled_training_mean_accuracy": 0.37222222222222223,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5000000149011612,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  58,
+                  14
+                ],
+                [
+                  58,
+                  14
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 0.37490301353171185,
+          "patch_readout": {
+            "accuracy": 0.16666666666666666,
+            "balanced_accuracy": 0.16666666666666666,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                0,
+                2,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                2,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.08333333333333333,
+              0.0625,
+              0.10416666666666667,
+              0.10416666666666667,
+              0.0625
+            ],
+            "shuffled_training_mean_accuracy": 0.08333333333333333,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        },
+        "performance": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 1.0,
+              "balanced_accuracy": 1.0,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  0,
+                  72
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2916666666666667,
+                0.6111111111111112,
+                0.6111111111111112,
+                0.4861111111111111,
+                0.3055555555555556
+              ],
+              "shuffled_training_mean_accuracy": 0.46111111111111114,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 1.0,
+              "balanced_accuracy": 1.0,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  48,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  48,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  48
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.1527777777777778,
+                0.2638888888888889,
+                0.4166666666666667,
+                0.5,
+                0.3611111111111111
+              ],
+              "shuffled_training_mean_accuracy": 0.3388888888888889,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.49999998696148396,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  68,
+                  4
+                ],
+                [
+                  68,
+                  4
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 0.003625249908869924,
+          "patch_readout": {
+            "accuracy": 0.125,
+            "balanced_accuracy": 0.125,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                2,
+                0,
+                0,
+                2,
+                0,
+                0,
+                2,
+                0,
+                0,
+                2,
+                0,
+                0
+              ],
+              [
+                0,
+                2,
+                0,
+                0,
+                0,
+                2,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0
+              ],
+              [
+                4,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                2,
+                0,
+                0,
+                2,
+                0,
+                0,
+                2,
+                0,
+                0
+              ],
+              [
+                0,
+                2,
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                0,
+                2,
+                0,
+                0
+              ],
+              [
+                2,
+                2,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                2
+              ],
+              [
+                2,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2
+              ],
+              [
+                2,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2
+              ],
+              [
+                0,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.041666666666666664,
+              0.0625,
+              0.10416666666666667,
+              0.0625,
+              0.0625
+            ],
+            "shuffled_training_mean_accuracy": 0.06666666666666667,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        },
+        "timbre": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 0.9583333333333334,
+              "balanced_accuracy": 0.9583333432674408,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  6,
+                  66
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2777777777777778,
+                0.5833333333333334,
+                0.5138888888888888,
+                0.4444444444444444,
+                0.375
+              ],
+              "shuffled_training_mean_accuracy": 0.4388888888888889,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.9166666666666666,
+              "balanced_accuracy": 0.9166666666666666,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  42,
+                  4,
+                  2
+                ],
+                [
+                  0,
+                  44,
+                  4
+                ],
+                [
+                  0,
+                  2,
+                  46
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.3055555555555556,
+                0.4166666666666667,
+                0.3611111111111111,
+                0.4444444444444444,
+                0.3333333333333333
+              ],
+              "shuffled_training_mean_accuracy": 0.37222222222222223,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5000000149011612,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  33,
+                  39
+                ],
+                [
+                  33,
+                  39
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 1.0946392087820636,
+          "patch_readout": {
+            "accuracy": 0.7083333333333334,
+            "balanced_accuracy": 0.7083333333333334,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                8,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                8,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                8,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                0,
+                2,
+                2,
+                2,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                8,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                8,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                6,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                4
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.0,
+              0.1875,
+              0.3541666666666667,
+              0.125,
+              0.10416666666666667
+            ],
+            "shuffled_training_mean_accuracy": 0.15416666666666667,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        }
+      },
+      "prediction_stability": {
+        "duration_ticks": {
+          "category_flip_fraction": [
+            0.25,
+            0.027777777777777776
+          ],
+          "normalized_control_maximum_absolute_change": [
+            0.9425379633903503,
+            0.8227248191833496,
+            1.0,
+            0.7428915500640869,
+            0.9255003929138184,
+            0.9859421253204346,
+            0.6093389987945557,
+            0.9797623753547668,
+            0.9851561784744263
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.5728796886073219,
+            0.17462643194529745,
+            0.19048299407586455,
+            0.19542135132683647,
+            0.3445221591326926,
+            0.3501171295841535,
+            0.07189393416047096,
+            0.6162750327752696,
+            0.5053273165960692
+          ],
+          "pairs": 72
+        },
+        "pitch": {
+          "category_flip_fraction": [
+            0.75,
+            0.19444444444444445
+          ],
+          "normalized_control_maximum_absolute_change": [
+            0.9873325824737549,
+            1.0,
+            0.9895164370536804,
+            0.8646020293235779,
+            0.9869944453239441,
+            0.9793125987052917,
+            0.9465033411979675,
+            0.8752142190933228,
+            0.9466536641120911
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.4236130659571952,
+            0.24361102189868689,
+            0.5957620366487362,
+            0.18273557308647367,
+            0.4749125734799438,
+            0.3894832631469601,
+            0.2684401832520962,
+            0.2678685801802203,
+            0.3908382020114611
+          ],
+          "pairs": 144
+        },
+        "velocity": {
+          "category_flip_fraction": [
+            0.0,
+            0.0
+          ],
+          "normalized_control_maximum_absolute_change": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "pairs": 72
+        }
+      }
+    },
+    "spectral/original": {
+      "branches": {
+        "mixed_hidden": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 0.9444444444444444,
+              "balanced_accuracy": 0.9444444477558136,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  70,
+                  2
+                ],
+                [
+                  6,
+                  66
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2916666666666667,
+                0.5694444444444444,
+                0.5833333333333334,
+                0.5694444444444444,
+                0.4027777777777778
+              ],
+              "shuffled_training_mean_accuracy": 0.48333333333333334,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.8055555555555556,
+              "balanced_accuracy": 0.8055555621782938,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  42,
+                  6,
+                  0
+                ],
+                [
+                  18,
+                  26,
+                  4
+                ],
+                [
+                  0,
+                  0,
+                  48
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.3333333333333333,
+                0.3888888888888889,
+                0.3333333333333333,
+                0.3472222222222222,
+                0.3333333333333333
+              ],
+              "shuffled_training_mean_accuracy": 0.3472222222222222,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  55,
+                  17
+                ],
+                [
+                  55,
+                  17
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 0.062228856984087234,
+          "patch_readout": {
+            "accuracy": 0.3333333333333333,
+            "balanced_accuracy": 0.3333333333333333,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                4,
+                0,
+                0,
+                2,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                4,
+                0,
+                0,
+                2,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                4,
+                0,
+                0,
+                2,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                2,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                4
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.041666666666666664,
+              0.0625,
+              0.16666666666666666,
+              0.08333333333333333,
+              0.08333333333333333
+            ],
+            "shuffled_training_mean_accuracy": 0.0875,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        },
+        "performance": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 0.9722222222222222,
+              "balanced_accuracy": 0.9722222089767456,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  4,
+                  68
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2638888888888889,
+                0.6666666666666666,
+                0.5972222222222222,
+                0.5138888888888888,
+                0.3472222222222222
+              ],
+              "shuffled_training_mean_accuracy": 0.47777777777777775,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.9305555555555556,
+              "balanced_accuracy": 0.9305555621782938,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  42,
+                  6,
+                  0
+                ],
+                [
+                  4,
+                  44,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  48
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2777777777777778,
+                0.4305555555555556,
+                0.3055555555555556,
+                0.4722222222222222,
+                0.3611111111111111
+              ],
+              "shuffled_training_mean_accuracy": 0.36944444444444446,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5000000111758709,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  66,
+                  6
+                ],
+                [
+                  66,
+                  6
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 0.004426193136398408,
+          "patch_readout": {
+            "accuracy": 0.125,
+            "balanced_accuracy": 0.125,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                4,
+                0,
+                0,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                2,
+                0,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                2,
+                0,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                2,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                4,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                2,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                2,
+                0
+              ],
+              [
+                2,
+                0,
+                0,
+                0,
+                0,
+                2,
+                2,
+                0,
+                2,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                4,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2,
+                0
+              ],
+              [
+                2,
+                0,
+                4,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0,
+                2,
+                0
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.041666666666666664,
+              0.10416666666666667,
+              0.10416666666666667,
+              0.0625,
+              0.10416666666666667
+            ],
+            "shuffled_training_mean_accuracy": 0.08333333333333334,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        },
+        "timbre": {
+          "factor_readouts": {
+            "duration_ticks": {
+              "accuracy": 0.9583333333333334,
+              "balanced_accuracy": 0.9583333432674408,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  72,
+                  0
+                ],
+                [
+                  6,
+                  66
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2361111111111111,
+                0.6111111111111112,
+                0.625,
+                0.5416666666666666,
+                0.3611111111111111
+              ],
+              "shuffled_training_mean_accuracy": 0.475,
+              "uniform_class_chance": 0.5
+            },
+            "pitch": {
+              "accuracy": 0.8333333333333334,
+              "balanced_accuracy": 0.8333333333333334,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  40,
+                  8,
+                  0
+                ],
+                [
+                  16,
+                  32,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  48
+                ]
+              ],
+              "largest_class_fraction": 0.3333333432674408,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.2638888888888889,
+                0.4166666666666667,
+                0.2916666666666667,
+                0.375,
+                0.2916666666666667
+              ],
+              "shuffled_training_mean_accuracy": 0.3277777777777778,
+              "uniform_class_chance": 0.3333333333333333
+            },
+            "velocity": {
+              "accuracy": 0.5,
+              "balanced_accuracy": 0.5,
+              "confusion_actual_rows_predicted_columns": [
+                [
+                  27,
+                  45
+                ],
+                [
+                  27,
+                  45
+                ]
+              ],
+              "largest_class_fraction": 0.5,
+              "observations": 144,
+              "shuffled_training_accuracies": [
+                0.5,
+                0.5,
+                0.5,
+                0.5,
+                0.5
+              ],
+              "shuffled_training_mean_accuracy": 0.5,
+              "uniform_class_chance": 0.5
+            }
+          },
+          "mean_feature_variance": 0.1700645665641749,
+          "patch_readout": {
+            "accuracy": 0.5208333333333334,
+            "balanced_accuracy": 0.5208333333333334,
+            "confusion_actual_rows_predicted_columns": [
+              [
+                4,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                6,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                4,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                8,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                4,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                4,
+                0,
+                0,
+                0,
+                0,
+                4
+              ]
+            ],
+            "largest_class_fraction": 0.0833333358168602,
+            "observations": 96,
+            "shuffled_training_accuracies": [
+              0.041666666666666664,
+              0.0625,
+              0.3541666666666667,
+              0.125,
+              0.08333333333333333
+            ],
+            "shuffled_training_mean_accuracy": 0.13333333333333333,
+            "split": "same_patches_unseen_pitch_performances",
+            "test_pitches": [
+              48,
+              72
+            ],
+            "training_observations": 48,
+            "training_pitch": 60,
+            "uniform_class_chance": 0.08333333333333333
+          }
+        }
+      },
+      "prediction_stability": {
+        "duration_ticks": {
+          "category_flip_fraction": [
+            0.5833333333333334,
+            0.5555555555555556
+          ],
+          "normalized_control_maximum_absolute_change": [
+            0.7308387756347656,
+            0.6461198925971985,
+            0.9923869371414185,
+            0.5330600738525391,
+            0.7222342491149902,
+            0.6347816586494446,
+            0.7482563257217407,
+            0.997957706451416,
+            0.9810054302215576
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.3028954569664266,
+            0.15656405873596668,
+            0.16181703789819343,
+            0.27235088497400284,
+            0.1869898041089376,
+            0.22106177690956327,
+            0.24335324184762108,
+            0.5524007646987835,
+            0.3867671001288626
+          ],
+          "pairs": 72
+        },
+        "pitch": {
+          "category_flip_fraction": [
+            0.6805555555555556,
+            0.2222222222222222
+          ],
+          "normalized_control_maximum_absolute_change": [
+            0.7803216576576233,
+            0.41725954413414,
+            0.9913136959075928,
+            0.5524621605873108,
+            0.714813232421875,
+            0.9047022461891174,
+            0.9076693654060364,
+            0.8546229004859924,
+            0.9592689871788025
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.26487173709190553,
+            0.11962909406671922,
+            0.5960855855664704,
+            0.18396804647313225,
+            0.13114689456091988,
+            0.2997096071226729,
+            0.2978064014265935,
+            0.25039306475405787,
+            0.2831620349445277
+          ],
+          "pairs": 144
+        },
+        "velocity": {
+          "category_flip_fraction": [
+            0.0,
+            0.0
+          ],
+          "normalized_control_maximum_absolute_change": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "normalized_control_mean_absolute_change": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "pairs": 72
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "diagnosis_sha256": {
+    "measurements.json": "9bc507d8450ae8f6fe97e9af70e347406ba7174cd1a25f4e8eee69b71e047629",
+    "plan.json": "158e0ee69f493a73233e688bb5b1a2cae0e449497404de8a72b1377cbc7d0824",
+    "summary.json": "f74cf99d45ac239c9e82f0ef058675b937692306619463588a26fb05cad53fde"
+  },
+  "direct_verification_sha256": "67b7222b8ec16d63ea1d558c217b35bd96a8447564bfa89b9cfe59a0007dd700",
+  "experimental_optimizer_updates": 0,
+  "feature_cache_sha256": "9404a8b326c15825b22a6b282a9f3773369c21a2bdd3deb0b4711d5d1bc1ede6",
+  "format": "inward_basic_software_qualification_v1",
+  "gradient_policy": {
+    "above_one_backward": "pass_positive_gradient_only",
+    "additional_parameters": 0,
+    "below_zero_backward": "pass_negative_gradient_only",
+    "dense_outputs": 14,
+    "format": "inward_basic_output_gradient_v1",
+    "forward": "unchanged_clamp_to_zero_one",
+    "inside_and_boundary_backward": "identity",
+    "native_derivative": "unchanged_bounded_finite_difference",
+    "production_format": "trainable_basic_inputs_v1"
+  },
+  "initializer_sha256": "426edb24d09d55e423b1e2fb5fc5b677f2d62f0332c7b25c7a5d136dc8bfb136",
+  "limits": {
+    "archive_bytes": 67108864,
+    "process_tree_bytes": 4294967296,
+    "wall_seconds": 600
+  },
+  "model_budget": {
+    "dense_outputs": 14,
+    "frozen_parameters": 355806,
+    "total_parameters": 613788,
+    "trainable_parameters": 257982
+  },
+  "new_native_requests": 0,
+  "source": {
+    "obruxo_training/inward_basic.py": "a09e912a2c5c756b31cd21183254add8cc0bd598178dc0c2bff098ccd6d83056",
+    "reports/scripts/diagnose_shared_basic_learning.py": "acf98945f2ad5c00ca72e7000372488ae5ab3a260fc6c1e1a7cecbceeb4d4cf9",
+    "reports/scripts/qualify_inward_basic.py": "a2f875dad99feb9d27802bdcb2a46ba48d1b20dd783ef1edb0fea8334085e91d"
+  }
+}

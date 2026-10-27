@@ -1,0 +1,27 @@
+{
+  "active_control_observations": 1470,
+  "by_input_view": {
+    "0": {
+      "active": 1100,
+      "blocked_inward": 6
+    },
+    "1": {
+      "active": 185,
+      "blocked_inward": 13
+    },
+    "2": {
+      "active": 185,
+      "blocked_inward": 14
+    }
+  },
+  "clipped_with_inward_native_gradient": 33,
+  "elapsed_seconds": 12.315376600017771,
+  "experimental_optimizer_updates": 0,
+  "model_Adam_RNG_replay_exact": true,
+  "new_native_requests": 0,
+  "peak_process_tree_rss_bytes": 792313856,
+  "qualified_for_release": false,
+  "replayed_updates_per_arm": 48,
+  "rss_sampling_errors": 0,
+  "strictly_clipped": 54
+}
