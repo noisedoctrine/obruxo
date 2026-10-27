@@ -1,0 +1,16 @@
+{
+  "archive_bytes_before_summary": 38665877,
+  "committed_updates": 96,
+  "complete": true,
+  "direct_quality_passed_before_independent_verification": true,
+  "elapsed_seconds": 6253.300656557083,
+  "failure": null,
+  "inverse_training_updates": 0,
+  "native_attempts": 2598,
+  "peak_process_tree_rss_bytes": 1069289472,
+  "plan_id": "642b1d087a02752b9ec38d6038a328da8bf3f7dd77349bd0833f0ac5d23f5a1a",
+  "qualified_for_release": false,
+  "rss_sampling_errors": 0,
+  "test_split_used": false,
+  "within_resource_limits": true
+}

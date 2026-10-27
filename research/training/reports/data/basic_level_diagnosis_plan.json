@@ -1,0 +1,52 @@
+{
+  "cases": 104,
+  "constant_gain_solver_maximum_passes": 4,
+  "expected_independent_patches_per_group": {
+    "earlier_32": 32,
+    "original_input_own": 12,
+    "original_input_transfer": 12,
+    "wide_alternate_input_own": 12,
+    "wide_alternate_input_transfer": 12,
+    "wide_held_input_own": 12,
+    "wide_held_input_transfer": 12
+  },
+  "fit_plan_id": "efb0885f7e0763d72fd82202798edba0fd312bdec7e5367cfa28969abcb2d5f0",
+  "fit_verification_sha256": "49648702738292dc1434a342339ebba1f726075a49a4ee102b47d884295e4d45",
+  "grouping": "same_six_training_groups_plus_earlier_32; equal_weight_per_independent_patch",
+  "implementation_commit": "7f4e166fd2decfe97a458cf5cc749815cb6739e4",
+  "independent_meter": "pyloudnorm_0.2.0_DeMan",
+  "inverse_inference_calls": 0,
+  "limits": {
+    "archive_bytes": 67108864,
+    "process_tree_bytes": 4294967296,
+    "wall_seconds": 600
+  },
+  "matching": {
+    "absolute_level": "assessed_separately",
+    "envelopes": "preserved_without_dynamic_processing",
+    "loudness": "integrated_bs1770_constant_gain",
+    "maximum_spread_lu": 0.1,
+    "purpose": "timbre",
+    "target_lufs": -23.0,
+    "true_peak_ceiling_dbtp": -1.0
+  },
+  "meter": {
+    "backend": "ffmpeg_ebur128_true_peak",
+    "executable_sha256": "2ce797a0f88d7f067180338fb227f7b1928ea727bd9a4d7a1d022f7c52af71a3",
+    "version": "ffmpeg version 7.1-essentials_build-www.gyan.dev Copyright (c) 2000-2024 the FFmpeg developers"
+  },
+  "model_admission_allowed": false,
+  "native_requests": 0,
+  "optimizer_applications": 0,
+  "original_scores": "reused_from_independently_rescored_verified_fit; not_modified",
+  "parent_cases_sha256": "e42ba878d0289c190e5f6c3e096077609c6bf7b24a54512ff9ec463d864a5ae6",
+  "prediction_waveforms": 312,
+  "source": {
+    "obruxo_training/basic_level_diagnosis.py": "48dc59e50c8008200a3cefb6818196362c7062ce34e1dc1ba0be5e20cc2e3434",
+    "obruxo_training/evaluate.py": "181b5e123217c849db21fd46e3a77dd2a4003474f8d956ddfb141aba81d7084b",
+    "obruxo_training/listening_loudness.py": "38fb0d0367cb36ebd87a87876b4b39d176d27a9c4a9b9cf7fb2003bda78a71fd",
+    "obruxo_training/spectral.py": "66df733a4de5398356f640ddd0c6daf954e8a5f678e0d6221f5b1125fa304eb1",
+    "reports/scripts/diagnose_basic_levels.py": "01dd4c37a8ded5f567f84b3f327ee32b2e97a330d4a28339c89ccbe9d1880a4d"
+  },
+  "test_split_used": false
+}

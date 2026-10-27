@@ -1,0 +1,13 @@
+{
+  "completed_operational_record_sha256": "f3165ab64edcea9b4f2360d54a5f4c394e130155a8d0753a633670527e1e98a9",
+  "exact_original_pending_record_reconstructed_sha256": "5c2b6e291b1fa160cd87df65821d57ffa1e040b806b891cd8d0ef2cc2aaf5b17",
+  "frozen_source_files_unchanged": 48,
+  "new_native_requests": 0,
+  "only_changed_record": "automatic-verification.json",
+  "operational_transition": "pending_to_completed_after_verifier_return; original_verification_unchanged",
+  "optimizer_applications": 0,
+  "original_verification_sha256": "7adb38de0114dfbd2a4162756fa7df7c43db5522cb90f3de8e7eea4dcb05d64d",
+  "publication_script_sha256": "d919ccdf269befba0747b8e545fa196de371321191b44fcf38a3bfe132e16c25",
+  "purpose": "independent_replay_on_terminal_static_publication_snapshot",
+  "unchanged_scientific_evidence_files": 32
+}

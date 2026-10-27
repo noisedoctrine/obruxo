@@ -223,3 +223,5 @@ research/training/reports/scripts/diagnose_basic_sound.py text eol=lf
 research/training/reports/scripts/summarize_basic_diagnosis.py text eol=lf
 research/training/tests/test_basic_diagnosis.py text eol=lf
 research/training/notices/upstream/* -text
+research/training/notices/upstream/manifest.json text eol=lf
+research/training/reports/data/basic_level_diagnosis_cases.jsonl -text
