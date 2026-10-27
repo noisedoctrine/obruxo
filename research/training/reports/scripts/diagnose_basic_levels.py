@@ -73,6 +73,7 @@ def main():
                                           "fit_plan_id": proof["plan_id"], "fit_verification_sha256": digest(args.fit / "verification.json"),
                                           "parent_cases_sha256": digest(args.parent / "fit_cases.json"), "source": source, "cases": 104,
                                           "prediction_waveforms": 312, "matching": POLICY, "meter": meter.identity,
+                                          "constant_gain_solver_maximum_passes": 4,
                                           "independent_meter": "pyloudnorm_" + importlib.metadata.version("pyloudnorm") + "_DeMan",
                                           "grouping": "same_six_training_groups_plus_earlier_32; equal_weight_per_independent_patch",
                                           "original_scores": "reused_from_independently_rescored_verified_fit; not_modified",
@@ -116,6 +117,7 @@ def main():
                   "cases": len(rows), "source_and_prediction_files_sha256": files, "unique_metered_recordings": len(cache), "resources": resources,
                   "maximum_independent_spread_lu": max((row["matching"]["independent_spread_lu"] for row in rows), default=None),
                   "maximum_meter_disagreement_lu": max((row["matching"]["meter_disagreement_lu"] for row in rows), default=None),
+                  "maximum_gain_solver_passes": max((len(row["matching"]["rounds"]) for row in rows), default=None),
                   "native_requests": 0, "inverse_inference_calls": 0, "optimizer_applications": 0, "qualified_for_release": False, "test_split_used": False}
         archive = sum(path.stat().st_size for path in args.output.rglob("*") if path.is_file())
         report["within_resource_limits"] = bool(resources["elapsed_seconds"] <= 600 and monitor.peak_bytes and monitor.peak_bytes <= 4 * 1024**3 and not monitor.errors and archive + 1024**2 < 64 * 1024**2)

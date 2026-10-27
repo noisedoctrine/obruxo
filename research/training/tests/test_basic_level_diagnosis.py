@@ -49,6 +49,21 @@ def test_independent_meter_disagreement_and_incomplete_comparison_are_rejected()
         match_recordings(audio, meter, lambda _: 0.)
 
 
+def test_gain_solver_corrects_absolute_gate_changes_without_dynamic_processing():
+    class GatedMeter(EnergyMeter):
+        def measure(self, audio):
+            result = super().measure(audio)
+            result["integrated_lufs"] += 1. if np.abs(audio).max() < .05 else 0.
+            return result
+
+    audio, meter = recordings(), GatedMeter()
+    matched, proof = match_recordings(audio, meter, lambda value: meter.measure(value)["integrated_lufs"])
+    assert 1 < len(proof["rounds"]) <= 4 and proof["independent_spread_lu"] < .00001
+    for arm, original in audio.items():
+        gain = 10 ** ((proof["individual_gain_db"][arm] + proof["common_gain_db"]) / 20)
+        assert np.array_equal(matched[arm], (original.astype(np.float64) * gain).astype(np.float32))
+
+
 def observation(state, level):
     costs = {arm: {"spectral": level, "mrstft": level} for arm in ARMS}
     return {"group": "held_note_own", "state_id": state, "raw": copy.deepcopy(costs), "matched": copy.deepcopy(costs),
