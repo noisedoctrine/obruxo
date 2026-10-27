@@ -1,0 +1,18 @@
+{
+  "changes_to_screen_rules": false,
+  "encoder_optimizer_updates": 0,
+  "format": "posthoc_branch_normalization_inspection_v1",
+  "inputs_sha256": {
+    "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\branch-note-removal-screen-20261028\\checkpoint.pt": "208ae1eafbbaf5972fa5d35e339748790dcb27503edb5a93b6e11e2f46dacad3",
+    "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\branch-note-removal-screen-20261028\\observations.json": "5981dc2d3e3ab1c3345078f45488b785a36401f7e8d16ad3315c4d865b7f62c1",
+    "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\branch-note-removal-screen-20261028\\paired_only-encoder.pt": "5fed96b588f7695fa5e309a2bdde5c6e0e426fe05c75a2bf389264a1d08991a0",
+    "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\calibrated-note-removal-screen-20261028\\checkpoint.pt": "9d5668a0e8c0972f252bd7cc7c84cfaf9f1dfb3072127c54179ee0e816c18169",
+    "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\calibrated-note-removal-screen-20261028\\encoder.pt": "fe20d6b7e9f51257fb48ca433401a95f1aabdf266df56ecefd185f4369d81a54",
+    "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\calibrated-note-removal-screen-20261028\\plan.json": "42201a47198a6ddb003e1d4c77864ff65a1608c88f0b4abf34f9179355cfb6a7",
+    "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\calibrated-note-removal-screen-20261028\\summary.json": "26ea6e882397a57ed4ff2f3e2d4538020c9333734334561595f213d27457c080",
+    "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\mixed-basic-features-20261022\\features.pt": "9404a8b326c15825b22a6b282a9f3773369c21a2bdd3deb0b4711d5d1bc1ede6",
+    "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\trainable-basic-input-bridge-20261026\\model.pt": "426edb24d09d55e423b1e2fb5fc5b677f2d62f0332c7b25c7a5d136dc8bfb136"
+  },
+  "new_native_requests": 0,
+  "source_sha256_lf": "2c03de1c7882c788aca1fbc4d02a3a36e3750566e7f65298b53d449d7f47a027"
+}

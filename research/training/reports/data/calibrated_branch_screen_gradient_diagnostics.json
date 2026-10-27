@@ -1,0 +1,110 @@
+[
+  {
+    "batches": [
+      {
+        "gradient_cosine": -0.5767934407618817,
+        "identity_norm": 0.6889070154725018,
+        "unscaled_note_to_identity_norm_ratio": 0.07671249637671892,
+        "unscaled_reversed_note_norm": 0.05284777692833054
+      },
+      {
+        "gradient_cosine": -0.6275457717352909,
+        "identity_norm": 1.7456252623326187,
+        "unscaled_note_to_identity_norm_ratio": 0.0201527040177444,
+        "unscaled_reversed_note_norm": 0.03517906923768669
+      },
+      {
+        "gradient_cosine": -0.26489840391958697,
+        "identity_norm": 0.6482959665102789,
+        "unscaled_note_to_identity_norm_ratio": 0.053494502415822015,
+        "unscaled_reversed_note_norm": 0.03468027014665178
+      },
+      {
+        "gradient_cosine": -0.495732001183432,
+        "identity_norm": 1.0119121747686484,
+        "unscaled_note_to_identity_norm_ratio": 0.046836765047731495,
+        "unscaled_reversed_note_norm": 0.04739469277857819
+      },
+      {
+        "gradient_cosine": 0.31792316219298883,
+        "identity_norm": 1.0409883145885352,
+        "unscaled_note_to_identity_norm_ratio": 0.01969011843822563,
+        "unscaled_reversed_note_norm": 0.02049718320705714
+      },
+      {
+        "gradient_cosine": 0.6656076421892412,
+        "identity_norm": 0.7577601153336148,
+        "unscaled_note_to_identity_norm_ratio": 0.034931223685142634,
+        "unscaled_reversed_note_norm": 0.026469488088397976
+      },
+      {
+        "gradient_cosine": -0.688062697721183,
+        "identity_norm": 0.8884872576664973,
+        "unscaled_note_to_identity_norm_ratio": 0.0429193263799968,
+        "unscaled_reversed_note_norm": 0.03813327459625671
+      },
+      {
+        "gradient_cosine": -0.17640116043890874,
+        "identity_norm": 0.448335739569279,
+        "unscaled_note_to_identity_norm_ratio": 0.08799638593011586,
+        "unscaled_reversed_note_norm": 0.03945192476540219
+      }
+    ],
+    "mean_scaled_note_to_identity_norm_ratio": 1.2067428973773466,
+    "update": 250
+  },
+  {
+    "batches": [
+      {
+        "gradient_cosine": 0.3248873921475588,
+        "identity_norm": 0.4412849194544442,
+        "unscaled_note_to_identity_norm_ratio": 0.0819981789496406,
+        "unscaled_reversed_note_norm": 0.03618455979320325
+      },
+      {
+        "gradient_cosine": 0.004643889281678953,
+        "identity_norm": 0.8087885783590305,
+        "unscaled_note_to_identity_norm_ratio": 0.02461015018246067,
+        "unscaled_reversed_note_norm": 0.0199044083792746
+      },
+      {
+        "gradient_cosine": -0.9138249533384234,
+        "identity_norm": 0.8725959734284258,
+        "unscaled_note_to_identity_norm_ratio": 0.031192661348858595,
+        "unscaled_reversed_note_norm": 0.027218590693530498
+      },
+      {
+        "gradient_cosine": -0.19001860393652703,
+        "identity_norm": 0.6993867413309893,
+        "unscaled_note_to_identity_norm_ratio": 0.027222421953756994,
+        "unscaled_reversed_note_norm": 0.019039000981375287
+      },
+      {
+        "gradient_cosine": -0.1901686093063037,
+        "identity_norm": 1.4214997132833063,
+        "unscaled_note_to_identity_norm_ratio": 0.027765810368762214,
+        "unscaled_reversed_note_norm": 0.03946909147827414
+      },
+      {
+        "gradient_cosine": -0.8955984831357907,
+        "identity_norm": 0.9384337939838036,
+        "unscaled_note_to_identity_norm_ratio": 0.05227411996387889,
+        "unscaled_reversed_note_norm": 0.04905580072486735
+      },
+      {
+        "gradient_cosine": -0.5140504586377493,
+        "identity_norm": 0.5077299364230998,
+        "unscaled_note_to_identity_norm_ratio": 0.025070243498542664,
+        "unscaled_reversed_note_norm": 0.012728913137626698
+      },
+      {
+        "gradient_cosine": -0.6524505740063261,
+        "identity_norm": 1.2386234944431995,
+        "unscaled_note_to_identity_norm_ratio": 0.024769847093935926,
+        "unscaled_reversed_note_norm": 0.03068051456431465
+      }
+    ],
+    "mean_scaled_note_to_identity_norm_ratio": 0.9298182753590538,
+    "update": 500
+  }
+]

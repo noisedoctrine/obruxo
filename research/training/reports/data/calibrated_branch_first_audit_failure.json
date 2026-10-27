@@ -1,0 +1,9 @@
+{
+  "verified": false,
+  "matching_trace_updates": 500,
+  "new_native_requests": 0,
+  "new_experimental_arms": 0,
+  "stage": "final_full_rng_comparison",
+  "reason": "The standalone process seeded Torch but did not restore the archived Python/NumPy global RNG state before the complete RNG comparison. All 500 candidate training-trace entries matched.",
+  "fix": "Use a separate verifier initializer that restores all three global RNG states before invoking unchanged replay code. Preserve this failed audit."
+}

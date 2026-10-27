@@ -1,5 +1,7 @@
 # First branch-specific note-removal setting shows no useful separation gain
 
+The [single training-calibrated follow-up](CALIBRATED_BRANCH_SCREEN_RESULTS.md) now tests meaningful auxiliary pressure with the same data and readouts. It gives a small 2.6–4.8% cached-probe MSE increase, still below every 10% leakage gate. The first result and settings below remain unchanged.
+
 The cheap [predeclared screen](BRANCH_ADVERSARY_SCREEN_CARD.md) completes both matched encoder arms. Adding the reversed note-prediction gradient produces essentially the same independent pitch/timing readouts as paired-view training alone. **None of the four leakage-reduction conditions passes.** Source-control information and representation spread remain similar between arms. This setting does not qualify for an expensive sound-training trial; it does not settle whether a stronger or differently designed separation objective would help.
 
 This is an encoder-only experiment. Spectral reconstruction remains primary in the inverse-model training plan, but no inverse sound-loss fit or native audio comparison is performed here. Neither research encoder is a deployable patch model, and no A2/A3 gate advances.

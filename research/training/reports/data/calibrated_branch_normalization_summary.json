@@ -1,0 +1,142 @@
+{
+  "changes_to_screen_rules": false,
+  "elapsed_seconds": 5.851063299982343,
+  "encoder_optimizer_updates": 0,
+  "limit": "Information in mean/scale exposes an adversary coverage gap; it does not establish the cause of the screen outcome or a successful repair.",
+  "new_native_requests": 0,
+  "posthoc": true,
+  "results": {
+    "calibrated": {
+      "actual_training_head": {
+        "scaled_mean_midi": {
+          "mae": 0.05732112453244198,
+          "mean_baseline_rmse": 0.24035147821355343,
+          "mse_vs_mean_baseline": 0.09860668157294984,
+          "observations": 435,
+          "rmse": 0.0754744521563771
+        },
+        "scaled_mean_note_seconds": {
+          "mae": 0.0999979606647601,
+          "mean_baseline_rmse": 0.26525447282716685,
+          "mse_vs_mean_baseline": 0.2557959008663944,
+          "observations": 435,
+          "rmse": 0.13415581630696075
+        }
+      },
+      "head_layer_normalized": {
+        "scaled_mean_midi": {
+          "mae": 0.05869304013203624,
+          "mean_baseline_rmse": 0.24035147821355343,
+          "mse_vs_mean_baseline": 0.1009305297122756,
+          "observations": 435,
+          "rmse": 0.07635862049282932
+        },
+        "scaled_mean_note_seconds": {
+          "mae": 0.11731337641696343,
+          "mean_baseline_rmse": 0.26525447282716685,
+          "mse_vs_mean_baseline": 0.32337119020234284,
+          "observations": 435,
+          "rmse": 0.15083890757443008
+        }
+      },
+      "raw": {
+        "scaled_mean_midi": {
+          "mae": 0.06311765485694984,
+          "mean_baseline_rmse": 0.24035147821355343,
+          "mse_vs_mean_baseline": 0.12208795733658062,
+          "observations": 435,
+          "rmse": 0.08398141954257947
+        },
+        "scaled_mean_note_seconds": {
+          "mae": 0.12957273823231144,
+          "mean_baseline_rmse": 0.26525447282716685,
+          "mse_vs_mean_baseline": 0.37013263048071304,
+          "observations": 435,
+          "rmse": 0.1613769127023187
+        }
+      },
+      "raw_mean_and_scale": {
+        "scaled_mean_midi": {
+          "mae": 0.16565462506709214,
+          "mean_baseline_rmse": 0.24035147821355343,
+          "mse_vs_mean_baseline": 0.8131245859368027,
+          "observations": 435,
+          "rmse": 0.21673315038953345
+        },
+        "scaled_mean_note_seconds": {
+          "mae": 0.24410943203147445,
+          "mean_baseline_rmse": 0.26525447282716685,
+          "mse_vs_mean_baseline": 0.9783145704785867,
+          "observations": 435,
+          "rmse": 0.2623626306003774
+        }
+      }
+    },
+    "paired_only": {
+      "actual_training_head": {
+        "scaled_mean_midi": {
+          "mae": 0.05753810578721693,
+          "mean_baseline_rmse": 0.24035147821355343,
+          "mse_vs_mean_baseline": 0.09796115190486357,
+          "observations": 435,
+          "rmse": 0.07522699935968305
+        },
+        "scaled_mean_note_seconds": {
+          "mae": 0.09673854545957741,
+          "mean_baseline_rmse": 0.26525447282716685,
+          "mse_vs_mean_baseline": 0.23933638728422713,
+          "observations": 435,
+          "rmse": 0.12976784169189975
+        }
+      },
+      "head_layer_normalized": {
+        "scaled_mean_midi": {
+          "mae": 0.060523363919884644,
+          "mean_baseline_rmse": 0.24035147821355343,
+          "mse_vs_mean_baseline": 0.10546308175008139,
+          "observations": 435,
+          "rmse": 0.07805433470130799
+        },
+        "scaled_mean_note_seconds": {
+          "mae": 0.11389646829337903,
+          "mean_baseline_rmse": 0.26525447282716685,
+          "mse_vs_mean_baseline": 0.30309677593322126,
+          "observations": 435,
+          "rmse": 0.1460337959546189
+        }
+      },
+      "raw": {
+        "scaled_mean_midi": {
+          "mae": 0.06267046010688596,
+          "mean_baseline_rmse": 0.24035147821355343,
+          "mse_vs_mean_baseline": 0.11901891259727071,
+          "observations": 435,
+          "rmse": 0.0829191394982378
+        },
+        "scaled_mean_note_seconds": {
+          "mae": 0.12741176552260036,
+          "mean_baseline_rmse": 0.26525447282716685,
+          "mse_vs_mean_baseline": 0.3555630491050195,
+          "observations": 435,
+          "rmse": 0.15816887541356303
+        }
+      },
+      "raw_mean_and_scale": {
+        "scaled_mean_midi": {
+          "mae": 0.16577107114182613,
+          "mean_baseline_rmse": 0.24035147821355343,
+          "mse_vs_mean_baseline": 0.8094707263349192,
+          "observations": 435,
+          "rmse": 0.21624564567254345
+        },
+        "scaled_mean_note_seconds": {
+          "mae": 0.24487585085260385,
+          "mean_baseline_rmse": 0.26525447282716685,
+          "mse_vs_mean_baseline": 0.9800849962160009,
+          "observations": 435,
+          "rmse": 0.26259991808068994
+        }
+      }
+    }
+  }
+}
