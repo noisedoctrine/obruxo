@@ -1,0 +1,1053 @@
+{
+  "auxiliary_training_patches": 259,
+  "comparison_spec": {
+    "acceptance": "unchanged_actual_sound_decrease_only",
+    "additional_inference_outputs": 0,
+    "auxiliary_batch_patches": 32,
+    "auxiliary_batch_seed": 101,
+    "calibration_update": 2,
+    "coefficient_limits": [
+      0.001,
+      1000.0
+    ],
+    "epochs": 8,
+    "format": "shared_basic_sound_note_auxiliary_v1",
+    "gradient_norm_cap": 5.0,
+    "head_refit": "before_each_update_on_training_patches_only",
+    "learning_rate": 0.001,
+    "note_to_sound_encoder_gradient_ratio": 1.0,
+    "primary": "unchanged_native_sound_and_reference_rehearsal",
+    "ramp_updates": 8,
+    "seed": 0,
+    "training_indices": [
+      2,
+      8,
+      11
+    ],
+    "updates_per_arm": 48
+  },
+  "diagnostic_patches_excluded_for_sound_exposure": 20,
+  "diagnostic_patches_without_sound_exposure": 125,
+  "expected_renderer_identity": {
+    "backend_version": "0.8.3",
+    "engine_fingerprint": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+    "renderer_id": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+    "settings": {
+      "buffer_size": 128,
+      "determinism": "numeric tolerance; the Vital engine is not claimed bit-deterministic",
+      "event_timing": "absolute ticks to half-even sample offsets",
+      "frame_policy": "one_guard_sample_trim_to_requested_frames_v1",
+      "plugin_name": "Vital.vst3",
+      "preroll_frames": 32768,
+      "preroll_policy": "shift_all_MIDI_then_trim_only_lead_v1",
+      "schema_id": "vital-1.0.8-vita-0.1.0-026ce213403d",
+      "simple_note_time_guard": "one_eighth_sample_start_and_duration_v1",
+      "state_loading": "version_bridge_and_scalar_lfo_route_readback_v2"
+    }
+  },
+  "format": "shared_basic_auxiliary_execution_declaration_v1",
+  "full_local_plan": "C:\\Users\\angert\\Documents\\projects\\OBRUXO\\research\\training\\outputs\\shared-basic-auxiliary-20261031\\plan.json",
+  "full_plan_file_sha256": "5a062f264e4910add0d985052be7bdc0674ffc749b1df8d9f60351222a0d1322",
+  "limits": {
+    "archive_bytes": 2147483648,
+    "native_executions": 2,
+    "optimizer_attempts": 49,
+    "process_tree_bytes": 4294967296,
+    "qualification_attempts": 360,
+    "replay_bytes": 536870912,
+    "training_attempts": 15000,
+    "wall_seconds": 36000
+  },
+  "maximum_native_requests": 15360,
+  "model_budget": {
+    "dense_outputs": 14,
+    "frozen_parameters": 355806,
+    "total_parameters": 613788,
+    "trainable_parameters": 257982
+  },
+  "native_completion_verified": false,
+  "native_execution_started": true,
+  "plan_id": "83bcfff742c12f2f33b799676beb2168300b8810333c37e81d289533fe70a387",
+  "planned_maximum_native_requests": 14620,
+  "qualified_for_release": false,
+  "quality_result_available": false,
+  "render_phase_controls": {
+    "osc_1_random_phase": 0.0,
+    "osc_2_random_phase": 0.0,
+    "osc_3_random_phase": 0.0,
+    "sample_random_phase": 0.0
+  },
+  "render_profile": {
+    "midi_timing": "exact_sample_shift",
+    "preroll_frames": 32768,
+    "startup": "settled_controls_before_MIDI",
+    "trim": "added_lead_only"
+  },
+  "repeat_comparisons": [
+    17,
+    18,
+    59,
+    60,
+    80,
+    81
+  ],
+  "selected_comparisons": [
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83
+  ],
+  "source_sha256_lf": {
+    "audit.py": "58a5c1630b8f1db153f27297177f9af827749ae97e1a0eda64604483fb240925",
+    "basic_direct.py": "7e970127f2a689ee28b58db861ce32e867540d20ba414251e66b601b84f904cf",
+    "basic_direct_bridge.py": "ed1ec9deda232e496f08958f5435362b149b85afe90f6e5baf3bb8169f91e722",
+    "basic_direct_fit.py": "aaebc0b3995bea6488f7813f3d010862ac33c3183f2621361215d0b1ca021ed9",
+    "basic_direct_fit_audit.py": "3b785699dcf5a171fff4a68d76c87297c61f178243346555e799a08e16cd96a7",
+    "basic_direct_fit_data.py": "f1842433a76604e8ac55512bad189483d6e6ab1b6eb06b68de788c6ad3da16ff",
+    "basic_direct_fit_step.py": "1f4b104ffd404a710f840be5c59294a617d9563ced008423bcd01a45a7c0ef20",
+    "benchmark.py": "1941574c1f9295dd9d136a131ea58f514b53db9298d133e8f988a514668d9ad0",
+    "branch_adversary.py": "d992744104a4b66f2233cf6c5bd5123a3cc2b26f5817148af8efa4b1fbc18b16",
+    "checkpoints.py": "1b65d17129dfadff08b1b07f9c48ede36aacb09133b4388adab38aa53e83088b",
+    "codec.py": "62e915fd0aae9d7e77644771deb4fc216ac2f614f930628f7aaa9fa63e23edb8",
+    "conditioned_basic.py": "d9c0f602c1e26e4c0a49623058de71e9bbb23e64742aad5c8623374216d5e8de",
+    "conditioned_bridge.py": "f56bd7fe1bbf430ab4bebc88a4139052421774831a50d2a2987b870fb4392d31",
+    "conditioned_short_audit.py": "c92b0965fe35931596d40098b896e742a1734755bd2efd2a5ef0f38dc230f09f",
+    "features.py": "895a736257041013f6b3e3ce260ed6a7bef2c94d51390f5f1a5492a78b737501",
+    "final_fit_completion.py": "ad252ef8c48a6da247ab80ac4f96460445bf7cb57538fd2be46e6d2fd5559045",
+    "fitted_note_head.py": "c586aadb7eef88f1da7642ce00bb5eca15af52ac1b613a924e19be86105c1751",
+    "inference_profile.py": "8b9e5b7c146c454c987fb61f1c744e22adac60bbff4f29bf9a74f31885a6faea",
+    "inward_basic.py": "a09e912a2c5c756b31cd21183254add8cc0bd598178dc0c2bff098ccd6d83056",
+    "local_execution.py": "c620f13f1bd79a9c675cc6ea9639f5ec14fed36cd7d005faa02b0fd9c7fc4b07",
+    "model.py": "ed009cd8a42f287de97e7348ea4cbce1f5ffcb5e028cf3d2385f835718ecaa68",
+    "native_acceptance.py": "31e877a92e323edb3e3081747ef95faaf50e72ce80994fcdf14e905f28a88744",
+    "native_acceptance_fit.py": "bec96e2b65bf59f6adaf3787a914ae55e691d5066548cf37748ab3a5513b0b6c",
+    "native_fit_storage.py": "e8166182f38a3a1f407f59214adc2fb8cfbecb7ad408d4beddf345df7ad2cd6b",
+    "native_gradient.py": "c3bcf162416db9aa2e1d2d8e77c9f2732e1e34bc873a9f3149a45750512b2fb3",
+    "native_inverse.py": "730e131aa87f65bfb0c83ff94eaf939fd1af5e5ded8772db95edf47743807f0f",
+    "paired_native_audit.py": "cc2ab68e6874ba28584c82460799e75214639bd87cec89c7cb442994e05528cd",
+    "paired_native_evidence.py": "904370af51a36d13a923fcfc70b4cdd07975fe53f34be29b24de41b83610f427",
+    "paired_native_fit.py": "8f64de587c32b43c04ee342e45e0caef9bb073417ba667fa6fcc470f3097f7fe",
+    "production_controls.py": "00a649a10217c299370e376908bdc5f2b3ee58123d8e8dfd342cd24bbd52e059",
+    "reports/SHARED_BASIC_AUXILIARY_CARD.md": "9a642d0bf06b1a8e3021d7a325fec7d991e44bb6afd21824c15f010b546b744d",
+    "reports/scripts/check_basic_direct_bridge.py": "19b204f4d1fdffd90ff3f4e4c4b768cc150b312598f2c1f3e62448950bf37695",
+    "reports/scripts/check_trainable_basic_bridge.py": "2f1e585bcdbb07a99c09edd9383820a7d6c84681bf6b314545f62d929085eb6b",
+    "reports/scripts/complete_native_acceptance_fit.py": "4606e54181b4873b4abc43c008960027d0ac06fbd4debbee5c5160848af99551",
+    "reports/scripts/run_basic_direct_fit.py": "5b319f30339798a8e0a484c582c7007ba52dc02cd13f6cc241ce7bb5302533c7",
+    "reports/scripts/run_native_acceptance_fit.py": "fb5b6957684bb561b962fcba36c16971fbad6ca13451a6ccdee8b45355b19d71",
+    "reports/scripts/run_shared_basic_auxiliary.py": "d251a28d9cbabd2d3938200d40ba4135f115974c98b3eca1f257a72c2c627635",
+    "reports/scripts/run_trainable_basic_fit.py": "a9107f049b8672489b4dc70359541ab7628b3145b51f299c23006a052a23dd65",
+    "reproducibility.py": "9326793bdbc629be7c29584329b182dcb93b6fd91c270f180b24a0a6fe885729",
+    "shared_auxiliary_run.py": "cd971ed6287de2f7f34362456834337838d1b1fdcabc2538a7464a26f4f264e0",
+    "shared_basic_auxiliary.py": "be0bfd617780b38c1637a43461eb5b86ee800010419241b87a8166b337f9ba71",
+    "spectral_controls.py": "bdf888bb7e8d9678fea7edad2bd9a445326ed9c6fde399af7004205874d3cd3d",
+    "trainable_basic.py": "90ef874f8fea3ade333ca801534a2c9588c655a73712ec7e7affbc0d6174fcb0",
+    "trainable_basic_bridge.py": "09ce206d0437ef12453bfa3cacc22cc4dcf7ca81077dd3b103e195f366fb6981",
+    "trainable_basic_fit.py": "cf9cd4b4f5b71a902dbc8d14abfb8787e39f5e8b713f1cc4691f061c44d6b6f6",
+    "trainer.py": "92cae41f88618e34f02f624aa3086bf9b1c7c5a9334b19409bbc8fe633d24f3f",
+    "unison_choice.py": "97ea421317da0070d31a6dac1094a68d06cb14cc1ec611e7d887de3cb6e1e565",
+    "unison_fit_data.py": "3df14ee1c6cb33e1c9a418e7150dbe56c04afecd4d663f025a8f5fe502778b87",
+    "unison_sound_fit.py": "d5b4215955e23d9ad4b3512c8c8ba7899abbdb3541c65a8772a9e25d86851ec5"
+  },
+  "tests": {
+    "github_actions_enabled": false,
+    "passed": 18,
+    "ruff_version": "0.16.2"
+  },
+  "training_states": [
+    {
+      "state_id": "7d7fd40e46a0dbb4945b4cb821097626f84f7f184fb4f373c8c16579aa78035c",
+      "training_index": 2
+    },
+    {
+      "state_id": "00101a37d15caf237c74987523d33c24160043cc2383d0e8a5be6964b1f2c19c",
+      "training_index": 8
+    },
+    {
+      "state_id": "0b6d3f3fee1292298f1e1e1b23641314c746a37c09ab306949f5e7762f7caeaa",
+      "training_index": 11
+    }
+  ],
+  "updates": [
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 8,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 8,
+          "view": 0
+        }
+      ],
+      "references": [
+        0,
+        1
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 11,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 11,
+          "view": 0
+        }
+      ],
+      "references": [
+        2,
+        3
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 8,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 8,
+          "view": 0
+        }
+      ],
+      "references": [
+        4,
+        5
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 2,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 2,
+          "view": 0
+        }
+      ],
+      "references": [
+        6,
+        7
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 2,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 2,
+          "view": 0
+        }
+      ],
+      "references": [
+        8,
+        9
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 11,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 11,
+          "view": 0
+        }
+      ],
+      "references": [
+        10,
+        11
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 2,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 2,
+          "view": 0
+        }
+      ],
+      "references": [
+        12,
+        13
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 11,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 11,
+          "view": 0
+        }
+      ],
+      "references": [
+        14,
+        15
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 8,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 8,
+          "view": 0
+        }
+      ],
+      "references": [
+        16,
+        17
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 2,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 2,
+          "view": 0
+        }
+      ],
+      "references": [
+        18,
+        19
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 8,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 8,
+          "view": 0
+        }
+      ],
+      "references": [
+        20,
+        21
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 11,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 11,
+          "view": 0
+        }
+      ],
+      "references": [
+        22,
+        23
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 2,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 2,
+          "view": 0
+        }
+      ],
+      "references": [
+        24,
+        25
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 8,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 8,
+          "view": 0
+        }
+      ],
+      "references": [
+        26,
+        27
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 2,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 2,
+          "view": 0
+        }
+      ],
+      "references": [
+        28,
+        29
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 8,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 8,
+          "view": 0
+        }
+      ],
+      "references": [
+        30,
+        31
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 11,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 11,
+          "view": 0
+        }
+      ],
+      "references": [
+        0,
+        1
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 11,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 11,
+          "view": 0
+        }
+      ],
+      "references": [
+        2,
+        3
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 11,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 11,
+          "view": 0
+        }
+      ],
+      "references": [
+        4,
+        5
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 2,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 2,
+          "view": 0
+        }
+      ],
+      "references": [
+        6,
+        7
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 8,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 8,
+          "view": 0
+        }
+      ],
+      "references": [
+        8,
+        9
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 8,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 8,
+          "view": 0
+        }
+      ],
+      "references": [
+        10,
+        11
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 2,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 2,
+          "view": 0
+        }
+      ],
+      "references": [
+        12,
+        13
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 11,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 11,
+          "view": 0
+        }
+      ],
+      "references": [
+        14,
+        15
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 11,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 11,
+          "view": 0
+        }
+      ],
+      "references": [
+        16,
+        17
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 11,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 11,
+          "view": 0
+        }
+      ],
+      "references": [
+        18,
+        19
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 2,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 2,
+          "view": 0
+        }
+      ],
+      "references": [
+        20,
+        21
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 8,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 8,
+          "view": 0
+        }
+      ],
+      "references": [
+        22,
+        23
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 8,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 8,
+          "view": 0
+        }
+      ],
+      "references": [
+        24,
+        25
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 2,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 2,
+          "view": 0
+        }
+      ],
+      "references": [
+        26,
+        27
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 11,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 11,
+          "view": 0
+        }
+      ],
+      "references": [
+        28,
+        29
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 2,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 2,
+          "view": 0
+        }
+      ],
+      "references": [
+        30,
+        31
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 2,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 2,
+          "view": 0
+        }
+      ],
+      "references": [
+        0,
+        1
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 8,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 8,
+          "view": 0
+        }
+      ],
+      "references": [
+        2,
+        3
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 11,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 11,
+          "view": 0
+        }
+      ],
+      "references": [
+        4,
+        5
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 8,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 8,
+          "view": 0
+        }
+      ],
+      "references": [
+        6,
+        7
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 8,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 8,
+          "view": 0
+        }
+      ],
+      "references": [
+        8,
+        9
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 2,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 2,
+          "view": 0
+        }
+      ],
+      "references": [
+        10,
+        11
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 11,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 11,
+          "view": 0
+        }
+      ],
+      "references": [
+        12,
+        13
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 2,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 2,
+          "view": 0
+        }
+      ],
+      "references": [
+        14,
+        15
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 11,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 11,
+          "view": 0
+        }
+      ],
+      "references": [
+        16,
+        17
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 8,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 8,
+          "view": 0
+        }
+      ],
+      "references": [
+        18,
+        19
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 8,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 8,
+          "view": 0
+        }
+      ],
+      "references": [
+        20,
+        21
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 2,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 2,
+          "view": 0
+        }
+      ],
+      "references": [
+        22,
+        23
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 2,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 2,
+          "view": 0
+        }
+      ],
+      "references": [
+        24,
+        25
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 11,
+          "view": 2
+        },
+        {
+          "input_view": 2,
+          "state": 11,
+          "view": 0
+        }
+      ],
+      "references": [
+        26,
+        27
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 8,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 8,
+          "view": 0
+        }
+      ],
+      "references": [
+        28,
+        29
+      ]
+    },
+    {
+      "examples": [
+        {
+          "input_view": 0,
+          "state": 11,
+          "view": 1
+        },
+        {
+          "input_view": 1,
+          "state": 11,
+          "view": 0
+        }
+      ],
+      "references": [
+        30,
+        31
+      ]
+    }
+  ]
+}

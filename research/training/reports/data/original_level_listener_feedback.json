@@ -3,7 +3,9 @@
   "completed_trials": 12,
   "responses_sha256": "1270072ca226ce6d6a33a52fff08545cd4725aaebf38323c07dd1dd102a69bc4",
   "user_reported_severe_loudness_mismatches": 5,
-  "trial_ids_not_supplied": true,
+  "trial_ids_not_in_comment": true,
+  "unusable_trials_from_attached_responses": ["trial-003", "trial-005", "trial-006", "trial-008", "trial-010"],
+  "unusable_count_matches_report": true,
   "tone_preferences_confounded_by_loudness": true,
   "qualified_for_model_selection": false
 }

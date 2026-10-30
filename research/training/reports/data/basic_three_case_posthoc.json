@@ -1,0 +1,63 @@
+{
+  "format": "basic_shared_three_case_posthoc_v1",
+  "parent_plan_id": "efb0885f7e0763d72fd82202798edba0fd312bdec7e5367cfa28969abcb2d5f0",
+  "source": {
+    "run": "outputs/trainable-basic-sound-fit-20261026",
+    "plan": "plan.json",
+    "final_comparisons": "finals.jsonl",
+    "plan_sha256": "9DCF994241E61D3980DDCF64C8B30ABB49085800F63EB0EEDF99369F976B6ADA",
+    "final_comparisons_sha256": "CF1C9DD785FF9D54AC856FF29A17EF41505F69AB172B89975B3F730E0F4E02EF",
+    "selected_plan_audit_cells": 21,
+    "selected_unique_input_recordings": 9
+  },
+  "selection": {
+    "posthoc": true,
+    "training_indices": [2, 8, 11],
+    "input_view": 1,
+    "input_view_role": "wide_held_input",
+    "playback_views": [0, 1],
+    "used_for_model_selection": false,
+    "independent_validation": false
+  },
+  "cases": [
+    {
+      "training_index": 2,
+      "midi": 36,
+      "state_id": "7d7fd40e46a0dbb4945b4cb821097626f84f7f184fb4f373c8c16579aa78035c",
+      "rows": [
+        {"label": "short-017", "playback_view": 1, "parameter_mrstft": 0.8495126962661743, "sound_mrstft": 1.2063030103842418, "parameter_spectral": 0.18110600113868713, "sound_spectral": 0.4183366298675537},
+        {"label": "short-018", "playback_view": 0, "parameter_mrstft": 1.1154925028483074, "sound_mrstft": 1.575452486673991, "parameter_spectral": 0.3571309447288513, "sound_spectral": 0.6474384069442749}
+      ],
+      "mean": {"parameter_mrstft": 0.9825025995572408, "sound_mrstft": 1.3908777485291164, "mrstft_relative_change": 0.41564790684106834, "parameter_spectral": 0.2691184729337692, "sound_spectral": 0.5328875184059143, "spectral_relative_change": 0.9801224070450911}
+    },
+    {
+      "training_index": 8,
+      "midi": 61,
+      "state_id": "00101a37d15caf237c74987523d33c24160043cc2383d0e8a5be6964b1f2c19c",
+      "rows": [
+        {"label": "short-059", "playback_view": 1, "parameter_mrstft": 1.2318167587121327, "sound_mrstft": 1.2190165221691132, "parameter_spectral": 0.5342532992362976, "sound_spectral": 0.5247663855552673},
+        {"label": "short-060", "playback_view": 0, "parameter_mrstft": 1.0471755067507427, "sound_mrstft": 1.0851707756519318, "parameter_spectral": 0.4029911458492279, "sound_spectral": 0.42468780279159546}
+      ],
+      "mean": {"parameter_mrstft": 1.1394961327314377, "sound_mrstft": 1.1520936489105225, "mrstft_relative_change": 0.011055339125098929, "parameter_spectral": 0.46862222254276276, "sound_spectral": 0.4747270941734314, "spectral_relative_change": 0.013027277275805105}
+    },
+    {
+      "training_index": 11,
+      "midi": 83,
+      "state_id": "0b6d3f3fee1292298f1e1e1b23641314c746a37c09ab306949f5e7762f7caeaa",
+      "rows": [
+        {"label": "short-080", "playback_view": 1, "parameter_mrstft": 1.6853907505671184, "sound_mrstft": 1.713970551888148, "parameter_spectral": 0.6998513340950012, "sound_spectral": 0.709897518157959},
+        {"label": "short-081", "playback_view": 0, "parameter_mrstft": 1.8987911939620972, "sound_mrstft": 1.922781268755595, "parameter_spectral": 0.740816056728363, "sound_spectral": 0.7393795251846313}
+      ],
+      "mean": {"parameter_mrstft": 1.792090972264608, "sound_mrstft": 1.8183759103218715, "mrstft_relative_change": 0.014667189592528329, "parameter_spectral": 0.7203336954116821, "sound_spectral": 0.7246385216712952, "spectral_relative_change": 0.0059761556165338625}
+    }
+  ],
+  "all_six_rows_equal_weight": {
+    "parameter_mrstft": 1.304696568184429,
+    "sound_mrstft": 1.4537824359205036,
+    "mrstft_relative_change": 0.11426861338612815,
+    "parameter_spectral": 0.48602479696273804,
+    "sound_spectral": 0.5774177114168803,
+    "spectral_relative_change": 0.1880416699420977
+  },
+  "interpretation_limit": "posthoc training-split description only; no independent validation, model-selection gate, or inference about cause"
+}
