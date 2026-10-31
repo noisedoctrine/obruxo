@@ -225,7 +225,7 @@ def test_failed_render_advances_neither_arm_and_candidate_ignores_parameter_labe
     assert all(equal_tree(before[arm], value.state_dict()) and not opts[arm].state for arm, value in models.items())
     models, opts = initialize()
     measured = matched_step(models, opts, codec, observations, lambda i, _patch: [.3, .4, .1, .4][i], 0, 48)
-    assert measured["losses"]["spectral"] == pytest.approx(.25 * .3 + .5 * .4 + .125 * .1 + .125 * .6)
+    assert measured["losses"]["spectral"] == pytest.approx(.25 * .3 + .5 * .4 + .125 * .1 + .125 * .5995)
     altered = copy.deepcopy(observations)
     altered_target = PilotTarget(tuple([.8] * 9), (1, 1))
     for row in altered:

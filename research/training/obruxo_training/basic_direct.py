@@ -13,13 +13,14 @@ from .trainer import inference_state, restore_model
 from .unison_choice import SCALES
 
 FORMAT = "basic_direct_correction_v1"
+LOSS = "weighted_paired_input_transfer_and_smooth_reference_excess_sound_v2"
 COUNTS = {"total_parameters": 382924, "frozen_parameters": 355806, "trainable_parameters": 27118, "dense_outputs": 14}
 SPEC = {"format": FORMAT, "input_width": 832, "hidden_width": 32, "outputs": 14, "activation": "GELU",
         "continuous_transform": "clamp_base_normalized_plus_offset_to_zero_one", "base_category_scales": list(SCALES),
         "adapter_scales": [1., 1.], "initialization": "zero_final_layer_v1"}
 REHEARSAL = {"reference_records": 32, "paired_weights": [.25, .5], "reference_weights": [.125, .125],
              "reference_excess_multiplier": 1., "reference_selection": "two_original_records_in_round_robin_per_update",
-             "reference_loss": "current_sound_loss_plus_relu_current_minus_accepted_initial_sound_loss"}
+             "reference_loss": "current_sound_loss_plus_one_sided_smooth_l1_initial_excess_v2", "reference_transition_width": .001}
 
 
 class BasicDirect(nn.Module):
@@ -64,10 +65,13 @@ class BasicDirect(nn.Module):
 
 
 def reference_loss(current, baseline):
+    """Ramp the extra regression gradient from zero to one without a jump at the baseline."""
     if (current.ndim != 0 or not torch.isfinite(current) or current < 0 or type(baseline) not in (int, float)
             or not math.isfinite(baseline) or baseline < 0):
         raise ValueError("reference rehearsal requires a finite scalar sound loss and nonnegative baseline")
-    return current + (current - baseline).relu()
+    excess = (current - baseline).relu()
+    return current + nn.functional.smooth_l1_loss(excess, torch.zeros_like(excess),
+        beta=REHEARSAL["reference_transition_width"], reduction="sum")
 
 
 def rehearsal_indices(step, records=32):

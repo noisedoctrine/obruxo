@@ -8,7 +8,7 @@ import torch
 from obruxo_data.hashing import canonical_sha256, sha256_bytes
 from obruxo_data.midi import Performance, TempoMap
 
-from .basic_direct import COUNTS, REHEARSAL, SPEC, rehearsal_indices, restore_direct
+from .basic_direct import COUNTS, LOSS, REHEARSAL, SPEC, rehearsal_indices, restore_direct
 from .basic_direct_bridge import reference_manifest
 from .conditioned_bridge import read
 from .conditioned_short_audit import cached_features, feature_bank
@@ -112,7 +112,7 @@ def make_plan(parent, bridge, recent, cache, pool, *, batching=None):
             "expected_renderer_identity": prior["expected_renderer_identity"], "model_budget": COUNTS, "model_spec": SPEC,
             "updates": updates, "epoch_shuffle_seeds": [0, 1], "rehearsal": REHEARSAL,
             "optimizer": {"name": "Adam", "learning_rate": .001, "seed": 0, "gradient_norm_cap": 5., "updates_per_arm": 48},
-            "loss": "weighted_paired_input_transfer_and_reference_excess_sound_v1", "parameter_control": "weighted_masked_basic_labels_raw_corrected_scores",
+            "loss": LOSS, "parameter_control": "weighted_masked_basic_labels_raw_corrected_scores",
             "temperature": {"start": 1., "end": .5}, "limits": LIMITS, "prefix_check_updates": 4,
             "planned_native_requests": {"paired_gradients": 4224, "reference_gradients": 2112, "qualification": 208, "total": 6544},
             "storage_bound": storage_bound(prior["fit_audit_cells"], pool.codec.contract.tail_seconds, batching=batching),

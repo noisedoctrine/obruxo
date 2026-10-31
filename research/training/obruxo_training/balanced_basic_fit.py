@@ -14,7 +14,7 @@ from obruxo_data.render.qa import audio_float32_sha256
 
 from .audit import write_json
 from .balanced_basic_data import validate_plan as validate_data
-from .basic_direct import restore_direct
+from .basic_direct import LOSS, REHEARSAL, restore_direct
 from .basic_direct_fit import SoundStore, charge_execution, tensor_bytes
 from .basic_direct_fit_data import Inputs, storage_bound
 from .benchmark import MemoryMonitor
@@ -24,6 +24,7 @@ from .conditioned_bridge import read
 from .features import tensor_digest, validate_features
 from .inward_basic import export_inward, training_model
 from .native_fit import append_durable, digest
+from .native_acceptance import SPEC as ACCEPTANCE
 from .paired_native_audit import equal_tree
 from .paired_native_fit import PairedSession
 from .shared_basic_auxiliary import step as shared_step
@@ -125,6 +126,7 @@ def prepare(paths, pool, output=None, *, batching=None):
     cells = extend_cells(prior, bank, records)
     batching = batching or BatchConfig()
     plan = {**prior, "batching": batching.to_dict(), "format": SPEC["format"], "balanced_spec": SPEC, "paths": {key: str(value) for key, value in paths.items()},
+            "loss": LOSS, "rehearsal": copy.deepcopy(REHEARSAL), "native_acceptance": copy.deepcopy(ACCEPTANCE),
             "inputs_sha256": bound, "source": {**prior["source"], **bank["source"]}, "limits": LIMITS,
             "updates": schedule(prior["updates"]), "fit_audit_cells": cells, "evaluation_indices": list(range(140)),
             "grid_comparisons": list(range(104, 140)), "maximum_native_requests": 8000, "planned_maximum_native_requests": 7418,

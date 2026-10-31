@@ -8,9 +8,9 @@ from torch.nn.utils import parameters_to_vector, vector_to_parameters
 from .basic_direct import REHEARSAL, reference_loss
 from .batching import predict_cells
 
-SPEC = {"format": "actual_native_batch_acceptance_v1", "control_change_cap": .025, "control_cap_tolerance": 1e-8,
+SPEC = {"format": "actual_native_batch_acceptance_v2", "control_change_cap": .025, "control_cap_tolerance": 1e-8,
         "cap_search_factors": [2.**-i for i in range(9)], "maximum_native_trials": 3, "minimum_objective_decrease": 1e-6,
-        "objective": "original_weighted_native_sound_and_accepted_initial_reference_hinges_float32",
+        "objective": "weighted_native_sound_and_smooth_accepted_initial_reference_excess_float32_v2",
         "refused_weights": "restore_pre_update_exactly", "adam_moments": "advance_once_per_scheduled_update_including_refusals",
         "gradient_estimates": "fresh_at_each_committed_state", "individual_sound_monotonicity": False, "auxiliary_labels": False}
 
