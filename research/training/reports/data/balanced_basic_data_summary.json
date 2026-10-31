@@ -1,0 +1,15 @@
+{
+  "archive_bytes_before_summary": 52521096,
+  "complete": true,
+  "elapsed_seconds": 38.30243468284607,
+  "experimental_updates": 0,
+  "failure": null,
+  "native_attempts": 24,
+  "peak_process_tree_rss_bytes": 924024832,
+  "plan_id": "ceb2cfb40ac58cb823685645ad5ddf06ece1e0ca5f1533800f4063d2d10708cb",
+  "qualified_for_release": false,
+  "rss_sampling_errors": 0,
+  "source_recordings": 18,
+  "test_split_used": false,
+  "within_resource_limits": true
+}
