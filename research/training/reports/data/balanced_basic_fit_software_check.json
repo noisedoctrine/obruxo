@@ -1,0 +1,13 @@
+{
+  "cold_export_comparisons": 158,
+  "elapsed_seconds": 1.5349102020263672,
+  "experimental_updates": 0,
+  "model_adam_trace_rng_recovery_exact": true,
+  "native_requests": 0,
+  "old_starting_predictions_unchanged": 104,
+  "passed": true,
+  "peak_process_tree_rss_bytes": 722821120,
+  "plan_id": "63e8b02e659bb5b8c78c8f1e2810b1eae23df9a1778fc652316efcc9c0e3d69c",
+  "rss_sampling_errors": 0,
+  "simulated_optimizer_applications": 4
+}
