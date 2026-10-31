@@ -10,4 +10,4 @@ The [software qualification](data/inward_basic_bridge_summary.json) preserves al
 
 Qualification takes 39.60 seconds and 0.69 GiB peak RAM, within ten minutes / 4 GiB / 64 MiB. It makes zero native requests and zero experimental optimizer updates. Four focused tests cover inward/outward directions, boundary behavior, actual re-entry under gradient descent, preserved inference and legacy export.
 
-No new native shared-model training has used this repair. Representation probes come first; the full reconstruction gates, reserved confirmation panel and release requirements remain open.
+No new native shared-model training has used this repair. The representation probes are complete. The next [shared reconstruction comparison](SHARED_BASIC_AUXILIARY_CARD.md) uses this derivative in both arms; the full reconstruction gates, reserved confirmation panel and release requirements remain open.

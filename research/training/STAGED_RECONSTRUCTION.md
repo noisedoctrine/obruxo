@@ -1,10 +1,10 @@
 # Basic reconstruction: spectral-training protocol
 
-Revised 2026-10-21. This specifies the immediate work in the [training plan](../modelling/TRAINING_PLAN.md): establish useful spectral-loss gradients on the small vocabulary, then train and validate the predictor with them. The plan and this protocol are proposals until their implementation and qualification gates pass. Broad preset support remains infrastructure; no broad training or curve-loss tuning is scheduled.
+Revised 2026-10-31. This specifies the immediate work in the [training plan](../modelling/TRAINING_PLAN.md): establish useful spectral-loss gradients on the small vocabulary, then train and validate the predictor with them. The plan and this protocol are proposals until their implementation and qualification gates pass. Broad preset support remains infrastructure; no broad training or curve-loss tuning is scheduled.
 
 ## Prediction contract
 
-Use the existing `PilotCodec`, including its bounds, fixed template, activity masks and identities. Predict oscillator level/pan/unison detune, filter cutoff/resonance, envelope attack/decay/sustain/release, unison voices (1/2/4) and filter on/off. This is nine continuous outputs and categorical sizes three and two: **14 output values, 355,806 trainable parameters**.
+Use the existing `PilotCodec`, including its bounds, fixed template, activity masks and identities. Predict oscillator level/pan/unison detune, filter cutoff/resonance, envelope attack/decay/sustain/release, unison voices (1/2/4) and filter on/off. This is nine continuous outputs and categorical sizes three and two: **14 output values**. The original baseline has 355,806 trainable parameters; the current trainable-input comparison has 613,788 total and 257,982 trainable parameters, with the same output count.
 
 The basic model has no learned assets, LFO curves, route slots, mapping curves, custom oscillator curves or seed bits. Other source controls retain the existing template values. The init asset and default patch are part of the saved codec contract. No parameter family is silently removed from complex source audio. This is one oscillator, not a final three-oscillator specification. At export, the five category scores reduce to two integer choices: nine scalar controls plus two selections enter the codec.
 
@@ -147,7 +147,7 @@ Package a basic inference bundle and CLI with pinned preprocessing, weights, cod
 | Baseline audit and native diagnosis | Complete; listening still pending | Existing reports, checkpoints and render receipts |
 | A0 spectral/control contract | Complete; both local A1 cards frozen | [Versioned contract and measured resource evidence](reports/BASIC_SPECTRAL_CONTRACT_RESULTS.md) |
 | A1 useful-gradient qualification | Native path qualified on the corrected renderer; learned helpers refused | [Settled-gradient evidence with all failures retained](reports/SETTLED_NATIVE_GRADIENT_RESULTS.md) |
-| A2 spectral inverse comparison | Shared model passes four of six groups; [all three individual direct fits pass](reports/DIRECT_BASIC_CONTROL_RESULTS.md), but held-note errors remain after level matching | Make one shared model learn the three cases before expanding; then retain the complete six-group/earlier-32 checks before confirmation |
+| A2 spectral inverse comparison | [Focused shared comparison](reports/SHARED_BASIC_AUXILIARY_RESULTS.md) improves the three sounds by 27–46% on average but fails per-input and preservation gates; auxiliary effect is only 0.235% | Balance the same notes and durations across all three sounds; freeze the next sound-training comparison before fitting. Keep 14 outputs and complete six-group/earlier-32 checks before confirmation |
 | A3 confirmation/basic bundle | Pending A2; [192-family reservation](reports/BASIC_CONFIRMATION_RESERVATION_CARD.md) prepares fresh data without rendering or scoring | Complete the conditional execution plan, independent confirmation, second seed and listening; fresh-runtime inference now passes |
 
 Use separate reviewable PRs for these work packages and local checks with GitHub Actions disabled. Publish exact run status, resource use and failed gates; do not equate implemented code with a passed training milestone. All upcoming work stays local; Colab notebooks, transfers and Linux qualification are deferred.

@@ -1,0 +1,30 @@
+{
+  "accepted_updates_in_prefix": {
+    "sound_auxiliary": 2,
+    "sound_only": 2
+  },
+  "full_training_complete": false,
+  "models_adam_calibration_rng_exact": true,
+  "native_calibration": {
+    "coefficient": 0.02667393603041187,
+    "sound_encoder_norm": 0.00467107322947721,
+    "unscaled_note_encoder_norm": 0.17511750887276475
+  },
+  "native_requests_added": 0,
+  "plan_id": "83bcfff742c12f2f33b799676beb2168300b8810333c37e81d289533fe70a387",
+  "qualified_for_release": false,
+  "reconstruction_quality_evaluated": false,
+  "replayed_updates_per_arm": 2,
+  "second_update": {
+    "sound_auxiliary": {
+      "auxiliary_coefficient": 0.006668484007602967,
+      "before_batch_objective": 0.6608883738517761,
+      "committed_batch_objective": 0.6515857577323914
+    },
+    "sound_only": {
+      "auxiliary_coefficient": 0.0,
+      "before_batch_objective": 0.6608883738517761,
+      "committed_batch_objective": 0.6515849828720093
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # Correct the loudness-confounded listening condition
 
-The listener submitted all **twelve original responses**, then reported **five comparisons** with severe loudness differences that prevented useful comparison. The [validated feedback record](data/original_level_listener_feedback.json) preserves the response-file identity and this limitation. Affected trial IDs were not supplied. Keep the full original packet/responses; do not remove five guesses or report a tone winner from the unmatched pass.
+The listener submitted all **twelve original responses**, then reported **five comparisons** with severe loudness differences that prevented useful comparison. The attached response file marks `usable: neither` for **trial-003, trial-005, trial-006, trial-008 and trial-010**, matching that count. The [validated feedback record](data/original_level_listener_feedback.json) preserves the response-file identity and the distinction between IDs in the comment and IDs recovered from the structured answers. Keep the full original packet/responses; do not remove five guesses or report a tone winner from the unmatched pass.
 
 The replacement uses integrated BS.1770/EBU R128 loudness matching with one constant gain per complete clip. Its -23-LUFS target may be lowered by shared headroom attenuation; the checked true-peak ceiling is -1 dBTP. No compression, limiting, trimming, channel balancing or dynamic envelope processing is applied. Original native recordings, model presets, raw reconstruction gates and the 192-family confirmation reservation remain unchanged.
 
