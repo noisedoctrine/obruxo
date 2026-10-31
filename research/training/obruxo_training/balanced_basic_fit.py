@@ -14,16 +14,17 @@ from obruxo_data.render.qa import audio_float32_sha256
 
 from .audit import write_json
 from .balanced_basic_data import validate_plan as validate_data
-from .basic_direct import restore_direct
+from .basic_direct import LOSS, REHEARSAL, restore_direct
 from .basic_direct_fit import SoundStore, charge_execution, tensor_bytes
 from .basic_direct_fit_data import Inputs, storage_bound
 from .benchmark import MemoryMonitor
+from .batching import BatchConfig, EXECUTION_BATCH_SOURCES, predict_cells, predict_features
 from .checkpoints import atomic_torch_save
 from .conditioned_bridge import read
 from .features import tensor_digest, validate_features
 from .inward_basic import export_inward, training_model
-from .model import batch_features
 from .native_fit import append_durable, digest
+from .native_acceptance import SPEC as ACCEPTANCE
 from .paired_native_audit import equal_tree
 from .paired_native_fit import PairedSession
 from .shared_basic_auxiliary import step as shared_step
@@ -84,15 +85,16 @@ def extend_cells(prior, data, records):
 
 
 def code_identity(plan):
-    code, _differences = source_code(plan)
+    code, _differences = source_code(plan, compatible=EXECUTION_BATCH_SOURCES)
     root = Path(__file__).parents[1]
-    return {**code, **{name: sha256_bytes((root / name if "/" in name else Path(__file__).with_name(name)).read_bytes().replace(b"\r\n", b"\n")) for name in SOURCES}}
+    return {**code, **{name: sha256_bytes((root / name if "/" in name else Path(__file__).with_name(name)).read_bytes().replace(b"\r\n", b"\n")) for name in (*SOURCES, *sorted(EXECUTION_BATCH_SOURCES))}}
 
 
-def prepare(paths, pool, output=None):
+def prepare(paths, pool, output=None, *, batching=None):
     control, data = paths["control"], paths["data"]
     prior, proof, bank, data_proof = (read(path) for path in (control / "plan.json", control / "verification.json", data / "plan.json", data / "verification.json"))
-    validate_data(bank, pool)
+    # Import a previously verified artifact; generation/recovery still checks its exact executable source.
+    validate_data(bank, pool, verify_source=False)
     if (not proof["verified"] or not proof["complete"] or not proof["models_adam_calibration_rng_replay_exact"]
             or proof["plan_id"] != canonical_sha256(prior) or proof["qualified_for_release"] or proof["test_split_used"]
             or not data_proof["verified"] or data_proof["plan_id"] != canonical_sha256(bank)
@@ -122,11 +124,13 @@ def prepare(paths, pool, output=None):
             raise ValueError("preceding initializer, features or original comparisons changed")
     records = {row["index"]: read(data / "records" / f"{row['index']:02d}.json") for row in bank["observations"]}
     cells = extend_cells(prior, bank, records)
-    plan = {**prior, "format": SPEC["format"], "balanced_spec": SPEC, "paths": {key: str(value) for key, value in paths.items()},
+    batching = batching or BatchConfig()
+    plan = {**prior, "batching": batching.to_dict(), "format": SPEC["format"], "balanced_spec": SPEC, "paths": {key: str(value) for key, value in paths.items()},
+            "loss": LOSS, "rehearsal": copy.deepcopy(REHEARSAL), "native_acceptance": copy.deepcopy(ACCEPTANCE),
             "inputs_sha256": bound, "source": {**prior["source"], **bank["source"]}, "limits": LIMITS,
             "updates": schedule(prior["updates"]), "fit_audit_cells": cells, "evaluation_indices": list(range(140)),
             "grid_comparisons": list(range(104, 140)), "maximum_native_requests": 8000, "planned_maximum_native_requests": 7418,
-            "storage_bound": storage_bound(cells, pool.codec.contract.tail_seconds), "control_plan_id": proof["plan_id"],
+            "storage_bound": storage_bound(cells, pool.codec.contract.tail_seconds, batching=batching), "control_plan_id": proof["plan_id"],
             "data_plan_id": data_proof["plan_id"], "parameter_control_path": prior["comparison_fit"],
             "model_admission_allowed": False, "qualified_for_release": False}
     for key in ("comparison_spec", "auxiliary_split", "diagnostic_split", "diagnostic_states_excluded_for_sound_exposure", "comparison_fit"):
@@ -160,9 +164,12 @@ class BalancedInputs(Inputs):
         for cell in plan["fit_audit_cells"][104:]:
             key = self.key(cell)
             if key not in self.baselines:
-                with torch.no_grad():
-                    self.baselines[key] = self.model(batch_features([{"features": self.features[key]}]))
+                self.baselines[key] = None
             self.cases.append({"label": cell["label"], "rows": {"initial": {"scores": {"spectral": 0.}}}})
+        missing = [key for key, value in self.baselines.items() if value is None]
+        with torch.no_grad():
+            rows = predict_features(self.model, [self.features[key] for key in missing], BatchConfig.from_plan(plan).model)
+        self.baselines.update(zip(missing, rows, strict=True))
         self.lookup = {(cell["recipe"]["state_id"], cell["input_view"], cell["playback_view"]): index for index, cell in enumerate(plan["fit_audit_cells"])}
         self.bytes = sum(tensor_bytes(value) for value in self.features.values())
         if self.bytes > plan["limits"]["replay_bytes"] or len(self.lookup) != 158 or len(self.grid_records) != 18:
@@ -189,7 +196,7 @@ class BalancedInputs(Inputs):
 def load_inputs(output, pool):
     plan = read(output / "plan.json")
     paths = {key: Path(value) for key, value in plan["paths"].items()}
-    if plan != prepare(paths, pool):
+    if plan != prepare(paths, pool, batching=BatchConfig.from_plan(plan)):
         raise ValueError("frozen balanced-fit source, inputs or allocation changed")
     return BalancedInputs(paths, plan)
 
@@ -201,9 +208,9 @@ class BalancedStore(SoundStore):
             if (index, "initial") in self.finals:
                 inputs.cases[index]["rows"]["initial"] = self.finals[index, "initial"]
 
-    def initial(self, index):
+    def initial(self, index, *, audit=None):
         if index < 104:
-            return super().initial(index)
+            return super().initial(index, audit=audit)
         if index not in self.inputs.plan["grid_comparisons"]:
             raise ValueError("training-only cells have no declared endpoint comparison")
         if (index, "initial") not in self.finals:
@@ -215,6 +222,20 @@ class BalancedStore(SoundStore):
         row = self.finals[index, "initial"]
         self.inputs.cases[index]["rows"]["initial"] = row
         return row
+
+    def collect_initial(self, indices):
+        requests = []
+        for index in indices:
+            if (index, "initial") not in self.finals:
+                prediction = self.inputs.baselines[self.inputs.key(self.inputs.plan["fit_audit_cells"][index])]
+                patch = self.inputs.adapter.export(prediction["continuous"], prediction["categorical"])[0]
+                requests.append((index, patch, "qualification", f"grid-initial:{index}"))
+        def publish(row):
+            row = {**row, "arm": "initial"}
+            append_durable(self.output / "finals.jsonl", row)
+            self.finals[row["index"], "initial"] = row
+            self.inputs.cases[row["index"]]["rows"]["initial"] = row
+        self.render_many(requests, on_result=publish)
 
     def control(self, index):
         key = index, "control"
@@ -294,18 +315,35 @@ def train(inputs, store, *, output=None, saved=None, stop_after=None):
 
 
 def collect_endpoints(inputs, store, model):
-    for index in inputs.plan["evaluation_indices"]:
-        store.initial(index)
-        store.control(index)
-        with torch.no_grad():
-            prediction = inputs.predict(model, inputs.plan["fit_audit_cells"][index])
+    from .paired_native_evidence import WaveformAudit
+    indices = inputs.plan["evaluation_indices"]
+    with torch.no_grad():
+        predictions = predict_cells(inputs, model, [inputs.plan["fit_audit_cells"][index] for index in indices])
+        controls = predict_cells(inputs, inputs.control_model, [inputs.plan["fit_audit_cells"][index] for index in indices])
+    requests, arms = [], []
+    audit = WaveformAudit(BatchConfig.from_plan(inputs.plan).spectral)
+    for index, prediction, control in zip(indices, predictions, controls, strict=True):
+        store.initial(index, audit=audit)
+        if index < 104:
+            store.control(index)
+        elif (index, "control") not in store.finals:
+            patch = inputs.adapter.export(control["continuous"], control["categorical"])[0]
+            requests.append((index, patch, "qualification", f"control:{index}"))
+            arms.append("control")
         patch = inputs.adapter.export(prediction["continuous"], prediction["categorical"])[0]
         arms = ("balanced", "balanced_repeat") if index in inputs.plan["repeat_comparisons"] else ("balanced",)
         for arm in arms:
             if (index, arm) not in store.finals:
-                row = {**store.render(index, patch, "qualification", f"{arm}:{index}"), "arm": arm}
-                append_durable(store.output / "finals.jsonl", row)
-                store.finals[index, arm] = row
+                requests.append((index, patch, "qualification", f"{arm}:{index}"))
+                arms.append(arm)
+    audit.finish()
+    pending_arms = iter(arms)
+    def publish(row):
+        arm = next(pending_arms)
+        row = {**row, "arm": arm}
+        append_durable(store.output / "finals.jsonl", row)
+        store.finals[row["index"], arm] = row
+    store.render_many(requests, on_result=publish)
 
 
 def execute(inputs, output, *, resume=False):
@@ -319,8 +357,7 @@ def execute(inputs, output, *, resume=False):
     native = PairedSession(output, inputs.plan, inputs.codec, monitor)
     store, failure, result = BalancedStore(output, inputs, native), None, None
     try:
-        for index in inputs.plan["grid_comparisons"]:
-            store.initial(index)
+        store.collect_initial(inputs.plan["grid_comparisons"])
         saved = torch.load(output / "checkpoint.pt", map_location="cpu", weights_only=True) if resume and (output / "checkpoint.pt").exists() else None
         model, _saved = train(inputs, store, output=output, saved=saved)
         collect_endpoints(inputs, store, model)

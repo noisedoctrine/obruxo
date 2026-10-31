@@ -4,6 +4,7 @@ from types import SimpleNamespace
 
 import numpy as np
 import pytest
+from render_fixtures import LifecycleReceipts
 
 torch = pytest.importorskip("torch")
 
@@ -44,7 +45,7 @@ class Frontend:
         pass
 
 
-class FakeSession(fit.PairedSession):
+class FakeSession(LifecycleReceipts, fit.PairedSession):
     def identity(self, candidate, performance, phase, label):
         self.check_limits()
         number = sum(row["event"] == "attempt" and row["phase"] == phase for row in self.events)

@@ -5,7 +5,7 @@ import pytest
 import torch
 
 from obruxo_data.render.qa import audio_float32_sha256
-from obruxo_training.basic_direct import COUNTS, SPEC, BasicDirect, export_direct, reference_loss, rehearsal_indices, restore_direct
+from obruxo_training.basic_direct import COUNTS, REHEARSAL, SPEC, BasicDirect, export_direct, reference_loss, rehearsal_indices, restore_direct
 from obruxo_training.basic_direct_bridge import gradient_access, preserve, reference_manifest, simulate, validate_references
 from obruxo_training.codec import PilotCodec
 from obruxo_training.features import AudioFeatures, BasicPitchICASSP2022, PITCH_SIZE, TIMBRE_SHAPE, tensor_digest
@@ -68,12 +68,50 @@ def test_clipping_keeps_controls_legal_and_uses_actual_clamp_derivative(data):
     model.require_frozen()
 
 
-@pytest.mark.parametrize("value,baseline,expected,derivative", [(.2, .3, .2, 1.), (.4, .3, .5, 2.), (.3, .3, .3, 1.)])
+@pytest.mark.parametrize("value,baseline,expected,derivative", [(.2, .3, .2, 1.), (.4, .3, .4995, 2.),
+    (.3, .3, .3, 1.), (.3005, .3, .300625, 1.5), (.301, .3, .3015, 2.)])
 def test_reference_sound_regression_receives_extra_gradient(value, baseline, expected, derivative):
     current = torch.tensor(value, requires_grad=True)
     result = reference_loss(current, baseline)
     result.backward()
-    assert float(result.detach()) == pytest.approx(expected) and float(current.grad) == derivative
+    assert float(result.detach()) == pytest.approx(expected)
+    assert float(current.grad) == pytest.approx(derivative, abs=3e-5)
+
+
+@pytest.mark.parametrize("baseline", [0., .07373867183923721, .2952738404273987, 1.])
+def test_reference_gradient_does_not_double_for_float32_rounding(baseline):
+    values, derivatives = [], []
+    for offset in (-3e-7, 0., 3e-7):
+        current = torch.tensor(max(0., baseline + offset), requires_grad=True)
+        loss = reference_loss(current, baseline)
+        loss.backward()
+        values.append(float(loss.detach()))
+        derivatives.append(float(current.grad))
+    assert max(derivatives) - min(derivatives) < .0004
+    assert max(values) - min(values) < 7e-7
+
+
+def test_reference_gradient_is_continuous_at_both_transition_boundaries():
+    width = REHEARSAL["reference_transition_width"]
+    for boundary, expected in ((.3, 1.), (.3 + width, 2.)):
+        derivatives = []
+        for offset in (-1e-9, 0., 1e-9):
+            current = torch.tensor(boundary + offset, dtype=torch.float64, requires_grad=True)
+            loss = reference_loss(current, .3)
+            loss.backward()
+            derivatives.append(float(current.grad))
+        assert max(derivatives) - min(derivatives) < 2e-6
+        assert derivatives[1] == pytest.approx(expected)
+
+
+def test_reference_penalty_gradients_match_finite_differences():
+    for value in (.29, .3, .30025, .301, .31):
+        current = torch.tensor(value, dtype=torch.float64, requires_grad=True)
+        loss = reference_loss(current, .3)
+        loss.backward()
+        epsilon = 1e-8
+        measured = (reference_loss(current.detach() + epsilon, .3) - reference_loss(current.detach() - epsilon, .3)) / (2 * epsilon)
+        assert float(current.grad) == pytest.approx(float(measured), abs=3e-6)
 
 
 def test_reference_schedule_covers_all_original_recordings_three_times():

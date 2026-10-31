@@ -6,10 +6,11 @@ import torch
 from torch.nn.utils import parameters_to_vector, vector_to_parameters
 
 from .basic_direct import REHEARSAL, reference_loss
+from .batching import predict_cells
 
-SPEC = {"format": "actual_native_batch_acceptance_v1", "control_change_cap": .025, "control_cap_tolerance": 1e-8,
+SPEC = {"format": "actual_native_batch_acceptance_v2", "control_change_cap": .025, "control_cap_tolerance": 1e-8,
         "cap_search_factors": [2.**-i for i in range(9)], "maximum_native_trials": 3, "minimum_objective_decrease": 1e-6,
-        "objective": "original_weighted_native_sound_and_accepted_initial_reference_hinges_float32",
+        "objective": "weighted_native_sound_and_smooth_accepted_initial_reference_excess_float32_v2",
         "refused_weights": "restore_pre_update_exactly", "adam_moments": "advance_once_per_scheduled_update_including_refusals",
         "gradient_estimates": "fresh_at_each_committed_state", "individual_sound_monotonicity": False, "auxiliary_labels": False}
 
@@ -25,7 +26,7 @@ def objective(costs, baselines):
 
 @torch.no_grad()
 def bank(inputs, model, cells):
-    predictions = [inputs.predict(model, cell) for cell in cells]
+    predictions = predict_cells(inputs, model, cells)
     continuous = torch.cat([row["continuous"] for row in predictions])
     if continuous.shape != (len(cells), 9) or not torch.isfinite(continuous).all():
         raise ValueError("invalid finite control bank for native acceptance")
@@ -33,16 +34,20 @@ def bank(inputs, model, cells):
     return continuous, choices
 
 
-def capture(inputs, model):
+def capture(inputs, model, *, anchor_cells=None):
     model.require_frozen()
     unique = {inputs.key(cell): cell for cell in inputs.plan["fit_audit_cells"]}
     cells = list(unique.values())
     continuous, choices = bank(inputs, model, cells)
-    return {"weights": parameters_to_vector(model.correction.parameters()).detach().clone(), "cells": cells,
-            "keys": list(unique), "continuous": continuous, "choices": choices}
+    snapshot = {"weights": parameters_to_vector(model.correction.parameters()).detach().clone(), "cells": cells,
+                "keys": list(unique), "continuous": continuous, "choices": choices}
+    if anchor_cells is not None:
+        controls, categories = bank(inputs, model, anchor_cells)
+        snapshot.update(anchor_keys=[inputs.key(cell) for cell in anchor_cells], anchor_continuous=controls, anchor_choices=categories)
+    return snapshot
 
 
-def accept_update(inputs, model, before, cell_lists, observations, result, evaluate):
+def accept_update(inputs, model, before, cell_lists, observations, result, evaluate, *, evaluate_many=None):
     """Keep measured improvements; restore weights on refusal or any exception.
 
     Adam has already advanced once. This function never alters its moments or
@@ -59,11 +64,17 @@ def accept_update(inputs, model, before, cell_lists, observations, result, evalu
         previous = objective(costs, baselines)
         if previous != result["losses"]["spectral"]:
             raise ValueError("acceptance changed the original float32 sound objective")
-        for cells, estimate in zip(cell_lists, estimates, strict=True):
+        for observation, (cells, estimate) in enumerate(zip(cell_lists, estimates, strict=True)):
             key = inputs.key(inputs.plan["fit_audit_cells"][cells[0]])
             index = before["keys"].index(key)
-            if (before["continuous"][index].tolist() != estimate["anchor"]["continuous"]
-                    or before["choices"][index] != estimate["anchor"]["categorical"]):
+            # Verify anchors in the exact layout used by the objective, independently of the larger cap bank.
+            if "anchor_keys" in before:
+                if before["anchor_keys"][observation] != key:
+                    raise ValueError("acceptance measurement anchor order changed")
+                controls, choices = before["anchor_continuous"][observation], before["anchor_choices"][observation]
+            else:
+                controls, choices = before["continuous"][index], before["choices"][index]
+            if (controls.tolist() != estimate["anchor"]["continuous"] or choices != estimate["anchor"]["categorical"]):
                 raise ValueError("acceptance reached a stale native measurement anchor")
 
         @torch.no_grad()
@@ -88,9 +99,9 @@ def accept_update(inputs, model, before, cell_lists, observations, result, evalu
                     trials.append({"scale": scale, "maximum_control_change": maximum, "status": "control_cap_refused"})
                     continue
                 with torch.no_grad():
-                    predictions = [inputs.predict(model, inputs.plan["fit_audit_cells"][cells[0]]) for cells in cell_lists]
+                    predictions = predict_cells(inputs, model, [inputs.plan["fit_audit_cells"][cells[0]] for cells in cell_lists])
                     patches = [inputs.adapter.export(row["continuous"], row["categorical"])[0] for row in predictions]
-                    measured = [evaluate(index, patch) for index, patch in enumerate(patches)]
+                    measured = evaluate_many(list(enumerate(patches))) if evaluate_many is not None else [evaluate(index, patch) for index, patch in enumerate(patches)]
                 after = objective(measured, baselines)
                 kept = previous - after > SPEC["minimum_objective_decrease"]
                 trials.append({"scale": scale, "maximum_control_change": maximum, "status": "accepted" if kept else "sound_refused",

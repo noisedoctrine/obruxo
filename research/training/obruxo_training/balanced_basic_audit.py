@@ -17,7 +17,8 @@ from .features import tensor_digest
 from .inward_basic import export_inward
 from .native_fit import digest
 from .paired_native_audit import equal_tree
-from .paired_native_evidence import native_ledger, rescore_waveform
+from .paired_native_evidence import native_ledger, WaveformAudit
+from .batching import BatchConfig, predict_cells
 from .unison_fit_data import require_request
 from .unison_sound_fit import lines
 
@@ -102,7 +103,8 @@ def software_check(inputs, output):
     try:
         before = tensor_digest(inputs.model.state_dict())
         for index, cell in enumerate(inputs.plan["fit_audit_cells"][:104]):
-            prediction = inputs.baselines[inputs.key(cell)]
+            # Historical byte-exact source checks reproduce the original singleton layout.
+            prediction = inputs.predict(inputs.model, cell)
             if inputs.adapter.export(prediction["continuous"], prediction["categorical"])[0].to_dict() != inputs.cases[index]["rows"]["initial"]["candidate"]:
                 raise ValueError("balanced source bridge changed an old starting prediction")
         model, expected = train(inputs, AnalyticStore(), stop_after=2)
@@ -111,9 +113,10 @@ def software_check(inputs, output):
         if not equal_tree(expected, recovered) or tensor_digest(inputs.model.state_dict()) != before:
             raise ValueError("balanced software recovery changed model, Adam, trace, RNG or initializer")
         cold, _front, _codec = restore_direct(export_inward(model, inputs.frontend, inputs.codec, inputs.plan["pool_id"]))
-        for cell in inputs.plan["fit_audit_cells"]:
-            with torch.no_grad():
-                a, b = inputs.predict(model, cell), inputs.predict(cold, cell)
+        with torch.no_grad():
+            warm_rows = predict_cells(inputs, model, inputs.plan["fit_audit_cells"])
+            cold_rows = predict_cells(inputs, cold, inputs.plan["fit_audit_cells"])
+        for a, b in zip(warm_rows, cold_rows, strict=True):
             if inputs.adapter.export(a["continuous"], a["categorical"]) != inputs.adapter.export(b["continuous"], b["categorical"]):
                 raise ValueError("balanced software cold export changed a prediction")
     finally:
@@ -168,17 +171,20 @@ def verify_evidence(inputs, output):
         raise ValueError("balanced endpoint cold export differs from replay")
     attempts, outcomes, recovered = native_ledger(lines(output / "renders.jsonl"), plan["expected_renderer_identity"])
     rescored = 0
-    for index in plan["evaluation_indices"]:
+    waveform_audit = WaveformAudit(BatchConfig.from_plan(plan).spectral)
+    with torch.no_grad():
+        prediction_banks = {id(network): predict_cells(inputs, network, [plan["fit_audit_cells"][index] for index in plan["evaluation_indices"]])
+                            for network in (inputs.model, inputs.control_model, model)}
+    for position, index in enumerate(plan["evaluation_indices"]):
         cell = plan["fit_audit_cells"][index]
         reference, _source = store.source(index)
         arms = (*ARMS, "balanced_repeat") if index in plan["repeat_comparisons"] else ARMS
         for arm in arms:
-            row = store.initial(index) if arm == "initial" else store.finals[index, arm]
+            row = store.initial(index, audit=waveform_audit) if arm == "initial" else store.finals[index, arm]
             patch = PilotTarget.from_dict(row["candidate"])
             receipt = row["receipt"]
             require_request(inputs.codec, plan, patch, Performance.from_dict(cell["recipe"]["performances"][cell["playback_view"]]), receipt)
-            if rescore_waveform(output, receipt, reference, inputs.codec.contract.tail_seconds) != row["scores"]:
-                raise ValueError("balanced comparison waveform cannot reproduce its score")
+            waveform_audit.add(output, receipt, reference, inputs.codec.contract.tail_seconds, row["scores"])
             if arm == "control" and index < 104:
                 original = inputs.control_finals[index, "sound_only"]
                 if any(row[key] != original[key] for key in ("candidate", "scores", "receipt")):
@@ -188,10 +194,11 @@ def verify_evidence(inputs, output):
                     raise ValueError("comparison receipt differs from its charged native outcome")
             network = inputs.model if arm == "initial" else inputs.control_model if arm == "control" else model
             with torch.no_grad():
-                prediction = inputs.predict(network, cell)
+                prediction = prediction_banks[id(network)][position]
             if inputs.adapter.export(prediction["continuous"], prediction["categorical"])[0] != patch:
                 raise ValueError("comparison patch differs from its declared model")
             rescored += 1
+    waveform_audit.finish()
     for index in plan["repeat_comparisons"]:
         if store.finals[index, "balanced"]["receipt"]["qa"]["audio_float32_sha256"] != store.finals[index, "balanced_repeat"]["receipt"]["qa"]["audio_float32_sha256"]:
             raise ValueError("balanced fixed-phase endpoint repeat differs")
