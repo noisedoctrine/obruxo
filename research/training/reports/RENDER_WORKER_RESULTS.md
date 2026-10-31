@@ -1,30 +1,36 @@
-# Render-worker results — 31 October 2026
+# Basic Vital session results — 1 November 2026
 
-Mean whole-request time fell from **1.643s to 0.752s (54.2% less time)** in 33 adjacent pairs with alternating execution order. Cold starts and recycling are included. All 66 attempts passed QA, and all 33 pairs matched float32 audio, state readback and provenance exactly.
+The same 126-render training update took **181.24s before and 33.29s after** (5.44× faster in these local profiles). Candidate controls and acceptance decisions were preserved. The profiles were separate runs, so host conditions also affect absolute times; this is not a full-fit timing claim.
 
-The check covers 6 basic unison/filter combinations, held notes and chords, A–B–A ordering, fixed oscillator/sampler phases, 32,768 frames of preroll and recycling after 32 jobs. Peak sampled process-tree memory was 606.6 MiB, with no sampling errors or surviving children.
+The adjacent-pair benchmark provides the controlled render comparison: **1.453s fresh versus 0.211s reused**, 85.5% less time across 33 pairs, including cold starts and recycling. All 66 attempts passed QA and all restart/memory gates passed.
 
-The implementation reuses the Python process, renderer setup and immutable state template. Each clip gets a fresh engine/plugin and full state readback. Reusing the plugin itself failed exact reproducibility in a six-request diagnostic (largest absolute sample difference 8.74e-10); that implementation was removed. No tolerance was relaxed.
+## Changes and measured costs
 
-## Remaining cost
+| Work per 126-render update | Before | After |
+| --- | ---: | ---: |
+| Create Vital instances | 77.349s | 1.500s |
+| Load/apply patch controls | 26.668s | 0.713s |
+| Validate requests | 16.182s | 0.391s |
+| Whole native worker calls | 159.203s | 19.638s |
 
-A separate instrumented run reproduced all 12 saved source clips exactly. Its means were 1.738s fresh and 0.891s reused. The table is time per reused request; the engine render is included in the audio-render total.
+The basic profile keeps one engine/plugin per worker, clears MIDI each request, and uses the host's normal render reset. It loads the complete preset initially and updates the eleven controls thereafter. Setter normalization explicitly matches the full loader's float32 arithmetic. Every render still saves and verifies native state, fingerprints the plugin and checks the audio.
 
-| Work | Seconds |
-| --- | ---: |
-| Create plugin | 0.365 |
-| Save/load plugin state | 0.168 |
-| Validate request | 0.091 |
-| Convert state | 0.026 |
-| Audio rendering, preroll and copying | 0.060 |
-| Native engine render alone (included above) | 0.059 |
+Only the reviewed legacy basic domain, 44.1kHz, 128-sample buffers, 32,768-frame preroll, fixed oscillator/sampler phases and unchanged init assets/routes/effects qualify. The shared control definition keeps the codec and renderer bounds aligned. Template changes force revalidation/recreation; other presets use the full loading path in the same renderer.
 
-Plugin creation and state handling remain the main render costs. Actual audio synthesis is already faster than real time. The earlier saved-update profile measured about 0.36s of network work per update; this change does not alter the network or its objective. A full training run has not been repeated, so the paired render speedup is not a measured whole-training speedup.
+## Numerical correctness
 
-## Integration and validation
+The fixed-phase paired check found maximum absolute sample error **2.24e-08**, with native readback/provenance identical. 9/33 audio buffers were bit-identical; the remaining pairs passed the explicit numeric limits recorded in the plan. This is numerical equivalence, not a bit-identical claim.
 
-New online streams and NativeSession collections/fits use one renderer per worker, recycled after 32 jobs by default. The duplicate one-shot worker implementation was removed; fresh correctness checks use the same worker with a one-job lifetime. 109 focused regression tests passed, covering rejection, crash/deadline/cancellation recovery, cleanup, backpressure and optimizer/RNG recovery. Static correctness checks passed. GitHub Actions remains disabled.
+For the complete update, maximum loss difference was **5.96e-08**, gradient coefficient difference **5.96e-07**, and model-weight update difference **2.33e-10**. All 126 requested candidate controls matched the original workload exactly; 36/126 waveform hashes matched exactly. The full trace differs in tiny measured numeric values. Original training artifacts were unchanged.
 
-The new lifecycle is recorded in stream contracts and native receipts. Historical runs use their recorded source revision; they cannot silently resume under this policy. This qualifies the recorded local Windows basic-control cases, not other native versions/platforms, arbitrary patches or model quality. Random-phase training remains stochastic.
+An initial double-precision setter conversion amplified tiny rounding differences in Adam and failed the update-stability guard. Matching the full loader's float32 arithmetic fixed that failure. The rejected setter and float32-readback-fallback implementations were removed; no optimizer or loss changes were introduced to accommodate them.
+
+117 focused local regression checks passed, covering generic fallback, control/structure guards, native state checks, MIDI cleanup, worker failure/recycling, backpressure and checkpoint recovery. Static correctness lint and whitespace checks passed. GitHub Actions remains disabled.
+
+## Remaining cost and scope
+
+Native worker calls now account for 59.0% of the update. Spectral feature extraction and loss comparisons together take 8.29s. There are still 120 gradient-probe renders and six acceptance renders per update; the number of trials remains an important efficiency target.
+
+This qualifies the recorded basic Windows workload and numerical bounds. It does not establish finished-model quality or arbitrary-preset/cross-platform equivalence. The v3 lifecycle is frozen in new stream contracts and native receipts; historical runs use their recorded source revision.
 
 [Usage](../RENDER_WORKER.md) · [Plan](data/render_worker_plan.json) · [Measurements](data/render_worker_summary.json)

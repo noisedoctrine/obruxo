@@ -43,13 +43,13 @@ class StreamConfig:
         object.__setattr__(self, "timeout_seconds", float(self.timeout_seconds))
 
     def to_dict(self) -> dict:
-        return {"stream": "reusable_native_renderer_v2", **asdict(self), "plugin_lifetime": "job", "renderer_lifetime": "worker",
+        return {"stream": "basic_native_session_v3", **asdict(self), "plugin_lifetime": "qualified_basic_worker_otherwise_job", "renderer_lifetime": "worker",
                 "native_rng": "process_scoped_counter_random_phases_vary", "qa": asdict(AudioQualityConfig()),
                 "reject_audio_codes": sorted(REJECT_AUDIO_CODES), "resume_audio": "regenerate_unacknowledged"}
 
     @classmethod
     def from_dict(cls, document):
-        if document.get("stream") != "reusable_native_renderer_v2":
+        if document.get("stream") != "basic_native_session_v3":
             raise ValueError("render lifecycle changed; resume historical runs from their recorded source revision")
         config = cls(**{field.name: document[field.name] for field in fields(cls)})
         if config.to_dict() != document:

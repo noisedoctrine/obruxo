@@ -256,22 +256,26 @@ def test_renderer_identity_contains_complete_plugin_fingerprint(tmp_path) -> Non
         VitalRenderer(plugin, accepted_plugin_sha256={fingerprint}, renderer_id="incomplete")
 
 
-def test_reused_renderer_caches_only_template_and_still_verifies_each_patch(tmp_path, monkeypatch):
+@pytest.mark.parametrize("basic", [False, True])
+def test_renderer_reuses_only_qualified_basic_state_and_verifies_each_patch(tmp_path, monkeypatch, basic):
     from pathlib import Path
     import sys
     from types import SimpleNamespace
     from obruxo_data.errors import DependencyUnavailableError
     import obruxo_data.render.vita as module
+    from obruxo_data.render.basic_profile import CATEGORICAL, CONTINUOUS, CONTROL_NAMES, PHASE_CONTROL
 
     plugin = tmp_path / "Vital.vst3"
     plugin.write_bytes(b"test plugin binary")
     fingerprint = hashlib.sha256(plugin.read_bytes()).hexdigest()
     renderer = VitalRenderer(plugin, accepted_plugin_sha256={fingerprint}, renderer_id=f"test-{fingerprint}")
-    instances, saves, loaded = [], [], []
+    renderer.legacy_training = basic
+    instances, saves, loaded, midi_counts = [], [], [], []
 
     class Synth:
         def __init__(self):
             self.state = _template_state({"synth_version": "1.6.4", "settings": {}})
+            self.notes = []
         def save_state(self, path):
             saves.append(Path(path).name)
             Path(path).write_bytes(self.state)
@@ -279,7 +283,18 @@ def test_reused_renderer_caches_only_template_and_still_verifies_each_patch(tmp_
             self.state = Path(path).read_bytes()
             loaded.append(_extract_vital_json(self.state))
         def add_midi_note(self, *args):
-            pass
+            self.notes.append(args)
+        def clear_midi(self):
+            self.notes.clear()
+        def get_parameters_description(self):
+            return [{"index": index, "name": renderer._basic_specs[name].display_name} for index, name in enumerate(CONTROL_NAMES)]
+        def set_parameter(self, index, value):
+            name = CONTROL_NAMES[index]
+            spec = renderer._basic_specs[name]
+            document = _extract_vital_json(self.state)
+            document["settings"][name] = spec.minimum + value * (spec.maximum - spec.minimum)
+            self.state = _template_state(document)
+            return True
 
     class Engine:
         def __init__(self, *args):
@@ -289,22 +304,57 @@ def test_reused_renderer_caches_only_template_and_still_verifies_each_patch(tmp_
         def make_plugin_processor(self, *args):
             return Synth()
         def load_graph(self, graph):
-            pass
+            midi_counts.append(len(graph[0][0].notes))
 
     monkeypatch.setitem(sys.modules, "dawdreamer", SimpleNamespace(RenderEngine=Engine))
     monkeypatch.setattr(module.importlib.metadata, "version", lambda name: "0.8.3")
     monkeypatch.setattr(module, "_render_after_preroll", lambda engine, frames, rate, channels, preroll: np.zeros((frames, channels), np.float32))
     preset, performance = VitalPreset.init(), Performance()
     performance.add_note(pitch=60, velocity=96, start_tick=0, duration_ticks=480)
-    for volume in (.5, .6, .5):
+    for value in (.2, .3, .2):
         document = json.loads(preset.to_json())
-        document["settings"]["volume"] = volume
-        renderer.render(RenderRequest(preset_json=json.dumps(document), performance=performance, renderer_id=renderer.renderer_id))
-    assert len(instances) == 3 and saves.count("template.state") == 1 and saves.count("loaded.state") == 3
-    assert [row["settings"]["volume"] for row in loaded] == [.5, .6, .5]
+        if basic:
+            document["settings"].update({name: default for name, _lo, _hi, default in CONTINUOUS})
+            document["settings"].update({name: options[0] for name, options in CATEGORICAL})
+            document["settings"].update(PHASE_CONTROL)
+        document["settings"]["osc_1_level"] = value
+        result = renderer.render(RenderRequest(preset_json=json.dumps(document), performance=performance,
+            renderer_id=renderer.renderer_id, preroll_frames=32768 if basic else 0))
+    assert len(instances) == (1 if basic else 3) and saves.count("template.state") == 1 and saves.count("loaded.state") == 3
+    assert len(loaded) == (1 if basic else 3) and midi_counts == [1, 1, 1]
+    assert result.qa["basic_session"] == {"eligible": basic, "engine_reused": basic, "direct_controls": basic, "validation_cached": basic}
+    if basic:
+        with pytest.raises(ValueError, match="end_tick"):
+            renderer.render(RenderRequest(preset_json=json.dumps(document), performance=performance,
+                renderer_id=renderer.renderer_id, preroll_frames=32768, end_tick=1))
+        # A control outside the qualified domain must take the complete validation/load path.
+        document["settings"]["osc_2_on"] = 1.
+        renderer.render(RenderRequest(preset_json=json.dumps(document), performance=performance,
+            renderer_id=renderer.renderer_id, preroll_frames=32768))
+        assert renderer._session is None and len(instances) == 2 and len(loaded) == 2
+    renderer.close()
     plugin.write_bytes(b"changed plugin")
     with pytest.raises(DependencyUnavailableError, match="binary changed"):
         renderer.render(RenderRequest(preset=preset, performance=performance, renderer_id=renderer.renderer_id))
+
+
+@pytest.mark.parametrize("name,value", [("osc_2_on", 1.), ("osc_1_random_phase", 1.), ("sample_random_phase", 1.),
+    ("env_1_release", 1.), ("filter_1_on", True), ("osc_1_unison_voices", 16), ("env_1_attack", float("nan"))])
+def test_basic_session_never_reuses_changed_structure_or_unqualified_controls(tmp_path, name, value):
+    from obruxo_data.render.basic_profile import CATEGORICAL, CONTINUOUS, PHASE_CONTROL
+    plugin = tmp_path / "Vital.vst3"
+    plugin.write_bytes(b"test plugin binary")
+    fingerprint = hashlib.sha256(plugin.read_bytes()).hexdigest()
+    renderer = VitalRenderer(plugin, accepted_plugin_sha256={fingerprint}, renderer_id=f"test-{fingerprint}")
+    renderer.legacy_training = True
+    document = VitalPreset.init().to_dict()
+    document["settings"].update({name: default for name, _lo, _hi, default in CONTINUOUS})
+    document["settings"].update({name: options[0] for name, options in CATEGORICAL})
+    document["settings"].update(PHASE_CONTROL)
+    request = RenderRequest(preset_json=json.dumps(document), performance=Performance(), preroll_frames=32768)
+    assert renderer._basic_key(request, document) is not None
+    document["settings"][name] = value
+    assert renderer._basic_key(request, document) is None
 
 
 def test_render_result_writes_atomic_wav_and_json_without_overwrite(tmp_path) -> None:

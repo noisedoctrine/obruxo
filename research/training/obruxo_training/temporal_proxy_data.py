@@ -159,7 +159,7 @@ class NativeSession:
         self.factory = renderer_factory or NativeRendererFactory(renderer_id=codec.contract.renderer_id)
         self.path = output / "renders.jsonl"
         self.events = [json.loads(line) for line in self.path.read_text().splitlines()] if self.path.exists() else []
-        self.execution_policy = {"lifecycle": "reusable_native_renderer_v2", "worker_jobs": StreamConfig().worker_jobs}
+        self.execution_policy = {"lifecycle": "basic_native_session_v3", "worker_jobs": StreamConfig().worker_jobs}
         if any(row.get("execution_policy") != self.execution_policy for row in self.events):
             raise ValueError("render lifecycle changed; resume historical runs from their recorded source revision")
         self.renderer_identity = next((row["renderer_identity"] for row in self.events if row.get("renderer_identity") is not None), None)

@@ -5,22 +5,12 @@ import json
 import math
 
 from obruxo_data.hashing import canonical_json, canonical_sha256
+from obruxo_data.render.basic_profile import CATEGORICAL, CONTINUOUS
 from obruxo_data.vital import VitalPreset, VitalSchema
 
 from .assets import AssetCatalog
 from .contracts import TrainingContract
 from .identity import DISPLAY_FIELDS, parse_document
-
-
-# Bounds are in Vital's stored control units, not seconds, hertz or display units.
-CONTINUOUS = (
-    ("osc_1_level", 0.15, 0.35, 0.25), ("osc_1_pan", -0.7, 0.7, 0.0),
-    ("osc_1_unison_detune", 0.5, 2.5, 1.0), ("filter_1_cutoff", 50.0, 120.0, 96.0),
-    ("filter_1_resonance", 0.1, 0.6, 0.25), ("env_1_attack", 0.08, 0.6, 0.15),
-    ("env_1_decay", 0.25, 1.0, 0.7), ("env_1_sustain", 0.25, 0.9, 0.7),
-    ("env_1_release", 0.2, 0.65, 0.4),
-)
-CATEGORICAL = (("osc_1_unison_voices", (1, 2, 4)), ("filter_1_on", (0, 1)))
 
 
 @dataclass(frozen=True)

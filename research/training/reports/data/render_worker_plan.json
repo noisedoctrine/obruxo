@@ -61,6 +61,10 @@
   "fresh_attempts": 33,
   "max_jobs": 32,
   "minimum_mean_wall_reduction": 0.1,
+  "numeric_limits": {
+    "maximum_absolute_sample_error": 1e-06,
+    "waveform_rmse": 1e-08
+  },
   "phase_control": {
     "osc_1_random_phase": 0.0,
     "osc_2_random_phase": 0.0,
@@ -69,7 +73,7 @@
   },
   "pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
   "preroll_frames": 32768,
-  "qualification": "reusable_native_renderer_fresh_plugins_v2",
+  "qualification": "basic_native_session_v3",
   "requests": [
     "59e7e25c3a82f036aec2b00c67c92a3ede24f47fe657cbc4cc262b11b963072b",
     "9177540708f7d56a8dfa4754aba28fb79d4804d134dec7e998b694447149a322",
@@ -122,9 +126,10 @@
   ],
   "rss_limit_bytes": 8589934592,
   "source": {
-    "data_generation\\obruxo_data\\render\\vita.py": "a1e7ee708af7c2868e889560514fe68334134e055b62bc064768dd9775ca6498",
-    "training\\obruxo_training\\stream.py": "41d606d6996c1f5549eff4d4e5461c574d0348ba78729a9b77c13cf9941e8d3d",
-    "training\\reports\\scripts\\qualify_render_worker.py": "ba3a70e394b0b247b2ce90c5c975e3b6cf2d683cd5c7c1b9ec4d347d98dc5040"
+    "data_generation\\obruxo_data\\render\\basic_profile.py": "217066f01b51e45828aeef2e5b11cdce8059278b9baa9e408f9084a49ed6e188",
+    "data_generation\\obruxo_data\\render\\vita.py": "59ef86e85dedbaf8453b9f6a6488d34c1087d0b70cd998a7f49887c64db3f11e",
+    "training\\obruxo_training\\stream.py": "ed517da8eaa4be26ba93be90dd0b690dc6600bbaee5e82d102fb5528c9c3ec59",
+    "training\\reports\\scripts\\qualify_render_worker.py": "f3c8a39b8c87b26b02b93ac3dc896413b9d324cb91ba10d8d72b8a276587a475"
   },
   "source_training_states": [
     "feea6ed56567153f27b56dd4c4231d010c6eaa42a8c2b5024f82bbc9a4122262",
@@ -141,6 +146,12 @@
     "log_spectral_rmse": 0.35,
     "peak_absolute": 0.1,
     "rms_relative": 0.01
+  },
+  "training_limits": {
+    "absolute_gradient_error": 0.0001,
+    "absolute_loss_error": 1e-06,
+    "parameter_update_error": 1e-05,
+    "relative_gradient_error_above_0_01": 0.001
   },
   "training_pool_changed": false
 }
