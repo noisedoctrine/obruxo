@@ -10,7 +10,7 @@ Keep **48 updates** and exactly the preceding control's patch order and two refe
 
 For both primary inputs, render its predicted patch under the original and currently selected grid performances, using the same reciprocal two-playback objective as the control. Keep primary weights 0.25/0.5 and two round-robin reference weights 0.125 each, including the existing accepted-initial reference hinge. The candidate receives sound loss only; no source-control labels or auxiliary note loss enter its optimizer.
 
-Keep the existing actual-sound acceptance rule: a 0.025 continuous-control cap, at most three measured trials, improvement greater than 1e-6, exact model rollback on refusal and one Adam advance per scheduled update. Apply the unchanged cap rule over the input bank including the new recordings: 86 unique inputs, versus the control's 68. This added coverage is explicit, rather than silently omitting newly trained inputs from the safety bound. Native gradients are fresh at each changed state.
+Keep the existing actual-sound acceptance rule: a 0.025 continuous-control cap, at most three measured trials, improvement greater than 1e-6, exact model rollback on refusal and one Adam advance per scheduled update. Apply the unchanged cap rule over the input bank including the new recordings: 74 unique inputs, versus the control's 56. This added coverage is explicit, rather than silently omitting newly trained inputs from the safety bound. Native gradients are fresh at each changed state.
 
 ## Evaluation and decision
 
