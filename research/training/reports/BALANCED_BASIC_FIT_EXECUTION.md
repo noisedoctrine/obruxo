@@ -8,4 +8,6 @@ The same original untrained bridge, 14 outputs, trainable mask, optimizer, sound
 
 The [execution declaration](data/balanced_basic_fit_declaration.json) records plan **63e8b02e659bb5b8c78c8f1e2810b1eae23df9a1778fc652316efcc9c0e3d69c**, implementation `8935d1e`, source identities, data/control links and full schedule. Its estimated evidence upper bound is **1.24 GiB**, below the 2-GiB cap. The six-hour / 4-GiB job allows at most 8,000 requests and checkpoints every update. It independently replays its first two native updates and automatically runs the final offline audit and waveform rescoring.
 
+The [first-two-update replay](data/balanced_basic_fit_prefix_verification.json) now passes exactly for model, Adam and RNG with zero added renders. Both proposed updates are accepted. This qualifies continuation of the frozen run; endpoint sound quality remains unmeasured.
+
 The [qualified data bank](BALANCED_BASIC_DATA_RESULTS.md) remains unchanged. The 192 reserved roots are unscored, Actions stays disabled and Colab remains deferred. This run does not advance A2 until the complete frozen reconstruction and preservation gates pass; A3, second seed, human listening and release remain incomplete.
