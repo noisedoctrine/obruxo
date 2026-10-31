@@ -109,7 +109,7 @@ def test_reuse_stream_preserves_backpressure_cursor_and_config_identity(pool):
         OnlineRenderStream(sampler, 1, config=replace(config, worker_jobs=3), resume=cursor)
     assert StreamConfig.from_dict(config.to_dict()) == config
     current = StreamConfig().to_dict()
-    assert current["worker_jobs"] == 32 and current["plugin_lifetime"] == "qualified_basic_worker_otherwise_job"
+    assert current["worker_jobs"] == 128 and current["plugin_lifetime"] == "qualified_basic_worker_otherwise_job"
     assert StreamConfig.from_dict(current) == StreamConfig()
     with pytest.raises(ValueError, match="lifecycle changed"):
         StreamConfig.from_dict({**current, "stream": "isolated_online_render_v1"})
