@@ -3,6 +3,7 @@
 import torch
 
 from .basic_direct import REHEARSAL, reference_loss
+from .batching import BatchConfig, concatenate_predictions, prediction_row
 from .continuous_auxiliary import SPEC as AUXILIARY_SPEC, paired_continuous_loss
 from .model import batch_features, loss_terms
 from .native_inverse import native_reconstruction_loss
@@ -23,7 +24,19 @@ def gradients(model):
 
 
 def predict(model, features):
-    batch = batch_features([{"features": features}])
+    return predict_many(model, [features], batch_size=1)[0]
+
+
+def predict_many(model, features, *, batch_size=32):
+    BatchConfig(model=batch_size)
+    rows = []
+    for start in range(0, len(features), batch_size):
+        rows.extend(_predict_chunk(model, features[start:start + batch_size]))
+    return rows
+
+
+def _predict_chunk(model, features):
+    batch = batch_features([{"features": feature} for feature in features])
     delta = []
     hook = model.correction.register_forward_hook(lambda _module, _args, output: delta.append(output.detach()))
     try:
@@ -32,12 +45,13 @@ def predict(model, features):
         hook.remove()
     with torch.no_grad():
         proposal = model.base(batch)["continuous"] + delta[0][:, :9]
-    bounds = {"minimum_proposal": float(proposal.min()), "maximum_proposal": float(proposal.max()),
-              "below_zero": int((proposal < 0).sum()), "above_one": int((proposal > 1).sum()), "controls": proposal.numel()}
-    return result, bounds
+    return [(prediction_row(result, index), {"minimum_proposal": float(row.min()), "maximum_proposal": float(row.max()),
+             "below_zero": int((row < 0).sum()), "above_one": int((row > 1).sum()), "controls": row.numel()})
+            for index, row in enumerate(proposal)]
 
 
-def matched_step(models, optimizers, codec, observations, evaluate, step, steps, *, norm_cap=5., continuous_auxiliary=None):
+def matched_step(models, optimizers, codec, observations, evaluate, step, steps, *, norm_cap=5., continuous_auxiliary=None,
+                 evaluate_many=None, model_batch_size=32):
     if continuous_auxiliary is not None and continuous_auxiliary != AUXILIARY_SPEC:
         raise ValueError("continuous auxiliary differs from its fixed paired contract")
     if len(observations) != 4 or [len(row["cells"]) for row in observations] != [2, 2, 1, 1]:
@@ -53,18 +67,19 @@ def matched_step(models, optimizers, codec, observations, evaluate, step, steps,
         optimizer.zero_grad(set_to_none=True)
     predictions, clamping = {}, {}
     for arm, model in models.items():
-        rows = [predict(model, row["features"]) for row in observations]
+        rows = predict_many(model, [row["features"] for row in observations], batch_size=model_batch_size)
         predictions[arm], clamping[arm] = [row[0] for row in rows], [row[1] for row in rows]
     parameter = [loss_terms(prediction, [row["target"]], codec)["loss"]
                  for prediction, row in zip(predictions["parameter"], observations, strict=True)]
-    sound, estimates, patches = [], [], []
-    for index, prediction in enumerate(predictions["spectral"]):
-        value, measured = native_reconstruction_loss(prediction, adapter, lambda _single, patch: evaluate(index, patch), temperature=temperature)
-        patch = adapter.export(prediction["continuous"], prediction["categorical"])[0]
-        if len(measured) != 1 or codec.canonical_target(measured[0].anchor) != patch:
+    prediction = concatenate_predictions(predictions["spectral"])
+    values, measured = native_reconstruction_loss(prediction, adapter, evaluate, temperature=temperature,
+                                                  evaluate_many=evaluate_many, reduction="none")
+    production = adapter.export(prediction["continuous"], prediction["categorical"])
+    sound, estimates, patches = list(values.unbind()), [], []
+    for estimate, patch in zip(measured, production, strict=True):
+        if codec.canonical_target(estimate.anchor) != patch:
             raise ValueError("direct native measurements differ from production")
-        sound.append(value)
-        estimates.append(measured[0].to_dict())
+        estimates.append(estimate.to_dict())
         patches.append(patch.to_dict())
     penalized = sound[:2] + [reference_loss(sound[i], observations[i]["baseline"]) for i in (2, 3)]
     losses = {"parameter": sum(w * value for w, value in zip(weights, parameter, strict=True)),

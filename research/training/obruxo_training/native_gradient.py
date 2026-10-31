@@ -30,69 +30,91 @@ class NativeGradient:
                 "categorical": [list(row) for row in self.categorical], "queries": self.queries}
 
 
-def measure_native_gradient(codec, anchor, evaluate):
-    """Evaluate one example serially. `evaluate` supplies the same sound loss for each legal patch."""
+def native_gradient_queries(codec, anchor):
+    """Plan every independent query in the original order, deduplicating canonical patches."""
     if type(codec) is not PilotCodec:
         raise ValueError("native gradient requires the exact basic codec")
     codec.validate_target(anchor)
-    step, cache = native_gradient_spec()["continuous_step"], {}
+    step, queries, positions = native_gradient_spec()["continuous_step"], [], {}
 
-    def score(candidate):
+    def add(candidate):
         candidate = codec.canonical_target(candidate)
-        if candidate not in cache:
-            value = float(evaluate(candidate))
-            if not math.isfinite(value) or value < 0:
-                raise ValueError("native sound loss must be finite and nonnegative")
-            cache[candidate] = value
-        return cache[candidate]
+        if candidate not in positions:
+            positions[candidate] = len(queries)
+            queries.append(candidate)
+        return positions[candidate]
 
-    base = score(anchor)
-    gradient = []
+    add(anchor)
+    spans = []
     for index, active in enumerate(codec.continuous_mask(anchor)):
         if not active:
-            gradient.append(0.)
+            spans.append(None)
             continue
         lower, upper = list(anchor.continuous), list(anchor.continuous)
         lower[index], upper[index] = max(0., lower[index] - step), min(1., upper[index] + step)
-        low = score(PilotTarget(tuple(lower), anchor.categorical))
-        high = score(PilotTarget(tuple(upper), anchor.categorical))
-        gradient.append((high - low) / (upper[index] - lower[index]))
+        low = add(PilotTarget(tuple(lower), anchor.categorical))
+        high = add(PilotTarget(tuple(upper), anchor.categorical))
+        spans.append((low, high, upper[index] - lower[index]))
     categorical = []
     for head, (_, options) in enumerate(CATEGORICAL):
         losses = []
         for option in range(len(options)):
             choices = list(anchor.categorical)
             choices[head] = option
-            losses.append(score(PilotTarget(anchor.continuous, tuple(choices))))
+            losses.append(add(PilotTarget(anchor.continuous, tuple(choices))))
         categorical.append(tuple(losses))
-    return NativeGradient(anchor, base, tuple(gradient), tuple(categorical), len(cache))
+    return tuple(queries), tuple(spans), tuple(categorical)
+
+
+def gradient_from_values(anchor, plan, values):
+    queries, spans, categories = plan
+    values = tuple(float(value) for value in values)
+    if len(values) != len(queries) or any(not math.isfinite(value) or value < 0 for value in values):
+        raise ValueError("native sound loss must be finite and nonnegative for every query")
+    continuous = tuple(0. if span is None else (values[span[1]] - values[span[0]]) / span[2] for span in spans)
+    categorical = tuple(tuple(values[index] for index in row) for row in categories)
+    return NativeGradient(anchor, values[0], continuous, categorical, len(queries))
+
+
+def measure_native_gradient(codec, anchor, evaluate=None, *, evaluate_many=None):
+    if evaluate is None and evaluate_many is None:
+        raise ValueError("native gradient needs a scalar or bulk evaluator")
+    plan = native_gradient_queries(codec, anchor)
+    values = evaluate_many(plan[0]) if evaluate_many is not None else [evaluate(query) for query in plan[0]]
+    return gradient_from_values(anchor, plan, values)
 
 
 def measured_loss(continuous, choices, estimate):
-    """Exact measured forward value, estimated backward; one example, explicit render boundary.
+    return measured_losses(continuous, choices, [estimate])[0]
+
+
+def measured_losses(continuous, choices, estimates):
+    """Exact measured forward values and estimated backwards for an arbitrary example batch.
 
     Pass raw controls, not adapter-canonicalized values: the category loss tables already
     include inactive-default jumps. Applying that blend's derivative again double-counts them.
     Choices may come from the existing adapter's hard Gumbel-softmax output.
     """
-    if (continuous.shape != (1, 9) or continuous.dtype != torch.float32
+    batch = len(estimates)
+    if (not batch or continuous.shape != (batch, 9) or continuous.dtype != torch.float32
             or not torch.isfinite(continuous).all() or len(choices) != 2):
-        raise ValueError("expected one finite float32 basic control row and two choice heads")
-    anchor = continuous.new_tensor([estimate.anchor.continuous])
+        raise ValueError("expected finite float32 basic control rows and two choice heads")
+    anchor = continuous.new_tensor([estimate.anchor.continuous for estimate in estimates])
     if not torch.equal(continuous.detach(), anchor):
         raise ValueError("gradient estimate is stale for these raw controls")
-    coefficients = (*estimate.continuous, *(value for row in estimate.categorical for value in row), estimate.value)
-    if (len(estimate.continuous) != 9 or tuple(map(len, estimate.categorical)) != (3, 2)
-            or not all(math.isfinite(value) for value in coefficients)):
-        raise ValueError("invalid native gradient coefficients")
-    loss = continuous.new_tensor(estimate.value)
-    loss = loss + ((continuous - continuous.detach()) * continuous.new_tensor([estimate.continuous])).sum()
+    for estimate in estimates:
+        coefficients = (*estimate.continuous, *(value for row in estimate.categorical for value in row), estimate.value)
+        if (len(estimate.continuous) != 9 or tuple(map(len, estimate.categorical)) != (3, 2)
+                or not all(math.isfinite(value) for value in coefficients)):
+            raise ValueError("invalid native gradient coefficients")
+    loss = continuous.new_tensor([estimate.value for estimate in estimates])
+    loss = loss + ((continuous - continuous.detach()) * continuous.new_tensor([estimate.continuous for estimate in estimates])).sum(1)
     for head, (choice, size) in enumerate(zip(choices, (3, 2), strict=True)):
-        expected = torch.nn.functional.one_hot(torch.tensor([estimate.anchor.categorical[head]], device=continuous.device), size)
-        if (choice.shape != (1, size) or choice.dtype != continuous.dtype or choice.device != continuous.device
+        expected = torch.nn.functional.one_hot(torch.tensor([estimate.anchor.categorical[head] for estimate in estimates], device=continuous.device), size)
+        if (choice.shape != (batch, size) or choice.dtype != continuous.dtype or choice.device != continuous.device
                 or not torch.equal(choice.detach(), expected.to(continuous.dtype))):
             raise ValueError("choices must match the hard patch that was measured")
-        loss = loss + ((choice - choice.detach()) * choice.new_tensor([estimate.categorical[head]])).sum()
+        loss = loss + ((choice - choice.detach()) * choice.new_tensor([estimate.categorical[head] for estimate in estimates])).sum(1)
     return loss
 
 

@@ -45,8 +45,10 @@ def validate_features(features: dict) -> None:
 class AudioFeatures(nn.Module):
     """Stereo full-band spectrum plus native Basic Pitch dense posteriors, computed on CPU."""
 
-    def __init__(self, basic_pitch_state: dict | None = None):
+    def __init__(self, basic_pitch_state: dict | None = None, *, pitch_batch_size=32):
         super().__init__()
+        from .batching import BatchConfig
+        self.pitch_batch_size = BatchConfig(pitch=pitch_batch_size).pitch
         self.basic_pitch = BasicPitchICASSP2022()
         if basic_pitch_state is None:
             basic_pitch_state = torch.load(BASIC_PITCH_ROOT / "artifacts/basic_pitch_icassp_2022.pt",
@@ -106,8 +108,8 @@ class AudioFeatures(nn.Module):
         timbre = F.adaptive_avg_pool2d(mel, TIMBRE_SHAPE[1:]).contiguous()
         mono = signal.resample_poly(audio.mean(axis=1), 1, 2).astype(np.float32)
         windows = _window_audio(mono)
-        # A bounded one-window batch also works on CPU-only Colab sessions.
-        output = [self.basic_pitch(torch.from_numpy(window[None])) for window in windows]
+        output = [self.basic_pitch(torch.from_numpy(np.stack(windows[start:start + self.pitch_batch_size])))
+                  for start in range(0, len(windows), self.pitch_batch_size)]
         arrays = {name: torch.cat([item[name] for item in output]).numpy() for name in ("note", "onset", "contour")}
         posterior = unwrap_window_outputs(arrays, original_sample_count=len(mono))
         pooled = [F.adaptive_avg_pool1d(torch.from_numpy(posterior[name]).T[None], 8).flatten()

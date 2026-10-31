@@ -5,6 +5,8 @@ import shutil
 import numpy as np
 import pytest
 import torch
+from render_fixtures import LifecycleReceipts
+from obruxo_training.batching import BatchConfig
 
 from obruxo_data.hashing import sha256_bytes
 from obruxo_data.midi import Performance, TempoMap
@@ -49,18 +51,13 @@ def receipt(codec, plan, candidate, performance, phase, label, attempt):
                    "renderer_identity": plan["expected_renderer_identity"], "qa": {"audio_float32_sha256": audio_float32_sha256(audio)}}
 
 
-class FakeSession(fit.PairedSession):
-    def _append(self, row):
-        # The simulated renderer must stamp the same lifecycle contract as native rendering.
-        super()._append({**row, "execution_policy": self.execution_policy})
-
+class FakeSession(LifecycleReceipts, fit.PairedSession):
     def render(self, candidate, performance, phase, label):
         self.check_limits()
         attempt = sum(row["event"] == "attempt" and row["phase"] == phase for row in self.events)
         if attempt >= self.plan["limits"][f"{phase}_attempts"]:
             raise RuntimeError("simulation native request limit")
         audio, result = receipt(self.codec, self.plan, candidate, performance, phase, label, attempt)
-        result["execution_policy"] = self.execution_policy
         identity = {key: result[key] for key in ("phase", "label", "attempt", "request_id", "source_sha256", "controlled_sha256")}
         self._append({"event": "attempt", **identity})
         self.renderer_identity = self.plan["expected_renderer_identity"]
@@ -95,7 +92,7 @@ def completed(tmp_path_factory):
     other = {**recipe, "state_id": "b"}
     cells = audit_cells([recipe], [recipe, other])
     updates = [{**row, "references": [0, 1]} for row in reciprocal_updates(1) + reciprocal_updates(1, seed=1)]
-    plan = {"format": "software_simulation_not_native_quality_evidence", "training": [recipe], "fit_audit_cells": cells,
+    plan = {"format": "software_simulation_not_native_quality_evidence", "batching": BatchConfig().to_dict(), "training": [recipe], "fit_audit_cells": cells,
             "regression_state_ids": ["a", "b"], "training_view_roles": ["original", "held", "alternate"], "pool_id": "simulation",
             "expected_renderer_identity": {"simulation": True}, "updates": updates,
             "optimizer": {"learning_rate": .001, "seed": 0, "gradient_norm_cap": 5.}, "prefix_check_updates": 2,

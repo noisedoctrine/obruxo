@@ -18,6 +18,7 @@ from .basic_direct import export_direct, restore_direct
 from .basic_direct_fit_data import Inputs, make_plan
 from .basic_direct_fit_step import matched_step
 from .benchmark import MemoryMonitor
+from .batching import BatchConfig
 from .checkpoints import atomic_torch_save
 from .codec import PilotTarget
 from .conditioned_bridge import read
@@ -27,7 +28,7 @@ from .native_acceptance import SPEC as ACCEPTANCE_SPEC, accept_update, capture
 from .paired_native_audit import equal_tree, training_signature
 from .paired_native_evidence import RetainedAuditSession, native_ledger
 from .paired_native_fit import PairedSession
-from .spectral import SpectralTargets, prepare_spectral_target, spectral_loss
+from .spectral import SpectralTargets, concatenate_targets, prepare_spectral_target, spectral_loss
 from .trainer import capture_rng, restore_rng
 from .unison_fit_data import require_request
 from .unison_sound_fit import CostStore, collect_finals, lines
@@ -37,8 +38,11 @@ class SoundStore(CostStore):
     def __init__(self, output, inputs, native=None):
         super().__init__(output, inputs, RetainedAuditSession(native, output) if native else None)
         self.native = native
+        self.batching = BatchConfig.from_plan(inputs.plan)
         self.probes = {}
         for row in lines(output / "probes.jsonl"):
+            if row.get("batching") != self.batching.to_dict():
+                raise ValueError("probe execution batching changed; use the recorded configuration and source revision")
             key = canonical_sha256(row["query"])
             if key in self.probes:
                 raise ValueError("duplicate direct native probe")
@@ -61,28 +65,80 @@ class SoundStore(CostStore):
         return self.targets[sha]
 
     def probe(self, step, observation, index, candidate):
-        query = {"step": step, "observation": observation, "index": index, "candidate": candidate.to_dict()}
-        key = canonical_sha256(query)
-        self.used_probes.add(key)
-        if key in self.probes:
-            return self.probes[key]["loss"]
-        if self.native is None:
-            raise ValueError("offline replay is missing a measured native probe")
-        self.check_limits()
-        cell = self.inputs.plan["fit_audit_cells"][index]
-        performance = Performance.from_dict(cell["recipe"]["performances"][cell["playback_view"]])
-        audio, receipt = self.native.render(candidate, performance, "training", probe_label(query))
-        if audio is None:
-            raise RuntimeError("direct sound probe was not accepted")
-        require_request(self.inputs.codec, self.inputs.plan, candidate, performance, receipt)
-        value = float(spectral_loss(self.measurements(torch.from_numpy(audio.copy()).T[None]), self.sound_target(index))["loss"])
-        if not np.isfinite(value) or value < 0:
-            raise ValueError("native direct sound loss must be finite and nonnegative")
-        _source, metadata = self.source(index)
-        row = {"query": query, "loss": value, "receipt": receipt, "source_audio": metadata}
-        append_durable(self.output / "probes.jsonl", row)
-        self.probes[key] = row
-        return value
+        return self.probe_many([(step, observation, index, candidate)])[0]
+
+    def probe_many(self, requests):
+        queries = [{"step": step, "observation": observation, "index": index, "candidate": candidate.to_dict()}
+                   for step, observation, index, candidate in requests]
+        keys = [canonical_sha256(query) for query in queries]
+        self.used_probes.update(keys)
+        unique = {}
+        for request, query, key in zip(requests, queries, keys, strict=True):
+            unique.setdefault(key, (request, query, key))
+        planned, pending, flushing = list(unique.values()), {}, False
+
+        def flush():
+            nonlocal flushing
+            if not pending:
+                return
+            flushing = True
+            groups = {}
+            for position, (_request, query, _key) in enumerate(chunk):
+                groups.setdefault(len(self.source(query["index"])[0]), []).append(position)
+            losses = {}
+            for positions in groups.values():
+                if not any(position in pending for position in positions):
+                    continue
+                references = [self.sound_target(chunk[position][1]["index"]) for position in positions]
+                frames = len(self.source(chunk[positions[0]][1]["index"])[0])
+                audio = np.zeros((len(positions), frames, 2), dtype=np.float32)
+                for row, position in enumerate(positions):
+                    if position in pending:
+                        audio[row] = pending[position][0]
+                values = spectral_loss(self.measurements(torch.from_numpy(audio).transpose(1, 2)), concatenate_targets(references))["loss"].tolist()
+                losses.update(zip(positions, values, strict=True))
+            for position, (_audio, receipt) in pending.items():
+                _request, query, key = chunk[position]
+                value = losses[position]
+                if not np.isfinite(value) or value < 0:
+                    raise ValueError("native direct sound loss must be finite and nonnegative")
+                _source, metadata = self.source(query["index"])
+                row = {"query": query, "loss": value, "receipt": receipt, "source_audio": metadata, "batching": self.batching.to_dict()}
+                append_durable(self.output / "probes.jsonl", row)
+                self.probes[key] = row
+            pending.clear()
+            flushing = False
+
+        # Include cached positions in planning so interruption/recovery cannot change a reduction layout.
+        for start in range(0, len(planned), self.batching.spectral):
+            chunk = planned[start:start + self.batching.spectral]
+            try:
+                for position, (request, query, key) in enumerate(chunk):
+                    if key in self.probes:
+                        continue
+                    if self.native is None:
+                        raise ValueError("offline replay is missing a measured native probe")
+                    self.check_limits()
+                    _step, _observation, index, candidate = request
+                    cell = self.inputs.plan["fit_audit_cells"][index]
+                    performance = Performance.from_dict(cell["recipe"]["performances"][cell["playback_view"]])
+                    audio, receipt = self.native.render(candidate, performance, "training", probe_label(query))
+                    if audio is None:
+                        raise RuntimeError("direct sound probe was not accepted")
+                    require_request(self.inputs.codec, self.inputs.plan, candidate, performance, receipt)
+                    pending[position] = audio, receipt
+                flush()
+            except BaseException:
+                # Only accepted rows are recorded; unrendered/cache slots are harmless discarded dummy measurements.
+                if not flushing:
+                    flush()
+                raise
+        return [self.probes[key]["loss"] for key in keys]
+
+    def evaluate_many(self, step, observations, cell_lists, requests):
+        physical = [(step, observations[observation], cell, patch) for observation, patch in requests for cell in cell_lists[observation]]
+        values = iter(self.probe_many(physical))
+        return [sum(next(values) for _cell in cell_lists[observation]) / len(cell_lists[observation]) for observation, _patch in requests]
 
 
 def probe_label(query):
@@ -127,11 +183,14 @@ def step(models, optimizers, inputs, store, index):
         costs = [store.probe(index + 1, observation, cell, candidate) for cell in cell_lists[observation]]
         return sum(costs) / len(costs)
 
-    before = capture(inputs, models["spectral"]) if policy is not None else None
+    before = capture(inputs, models["spectral"], anchor_cells=[inputs.plan["fit_audit_cells"][cells[0]] for cells in cell_lists]) if policy is not None else None
+    def evaluate_many(requests):
+        return store.evaluate_many(index + 1, list(range(len(cell_lists))), cell_lists, requests)
     result = matched_step(models, optimizers, inputs.codec, observations, evaluate, index, len(inputs.plan["updates"]),
-                          norm_cap=inputs.plan["optimizer"]["gradient_norm_cap"], continuous_auxiliary=inputs.plan.get("continuous_auxiliary"))
+                          norm_cap=inputs.plan["optimizer"]["gradient_norm_cap"], continuous_auxiliary=inputs.plan.get("continuous_auxiliary"),
+                          evaluate_many=evaluate_many, model_batch_size=BatchConfig.from_plan(inputs.plan).model)
     if before is not None:
-        result["native_acceptance"] = accept_update(inputs, models["spectral"], before, cell_lists, observations, result, evaluate)
+        result["native_acceptance"] = accept_update(inputs, models["spectral"], before, cell_lists, observations, result, evaluate, evaluate_many=evaluate_many)
     return result
 
 
@@ -293,12 +352,12 @@ def execute(inputs, output, *, resume=False):
     return report
 
 
-def run(parent, bridge, recent, cache, pool, output, *, mode="prepare"):
+def run(parent, bridge, recent, cache, pool, output, *, mode="prepare", batching=None):
     started, monitor = perf_counter(), MemoryMonitor()
     monitor.start()
     with refresh.cpu_settings():
         try:
-            plan = make_plan(parent, bridge, recent, cache, pool)
+            plan = make_plan(parent, bridge, recent, cache, pool, batching=batching)
             inputs = Inputs(parent, bridge, cache, plan)
             inputs.validate()
         finally:

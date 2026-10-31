@@ -14,6 +14,7 @@ from .conditioned_bridge import read
 from .conditioned_short_audit import cached_features, feature_bank
 from .features import PITCH_SIZE, TIMBRE_SHAPE, tensor_digest
 from .model import batch_features
+from .batching import BatchConfig, EXECUTION_BATCH_SOURCES, compatible_infrastructure_source, predict_features
 from .native_fit import digest
 from .native_fit_storage import target_tensor_bytes
 from .paired_native_step import reciprocal_updates
@@ -25,7 +26,8 @@ LIMITS = {"wall_seconds": 14400, "process_tree_bytes": 4 * 1024**3, "archive_byt
           "training_attempts": 6480, "qualification_attempts": 240}
 
 
-def storage_bound(cells, tail_seconds):
+def storage_bound(cells, tail_seconds, *, batching=None):
+    batching = batching or BatchConfig()
     frames, sources = [], {}
     for cell in cells:
         recipe, view = cell["recipe"], cell["playback_view"]
@@ -36,24 +38,26 @@ def storage_bound(cells, tail_seconds):
     # Targets and source audio are LRU-bounded to four recordings, never the whole panel.
     largest = sorted(sources.values(), reverse=True)[:4]
     features = len(sources) * 4 * (prod(TIMBRE_SHAPE) + PITCH_SIZE)
-    replay = features + sum(target_tensor_bytes(n) + 8 * n for n in largest)
+    replay = features + sum(2 * target_tensor_bytes(n) + 8 * n for n in largest)
     values = {"unique_source_audio_bytes": 8 * sum(sources.values()),
               "initial_and_two_final_comparison_audio_bytes": 3 * 8 * sum(frames),
               "waveform_serialization_allowance_bytes": (len(sources) + 3 * len(frames)) * 16384,
               "resident_feature_and_target_allowance_bytes": replay,
               "checkpoint_export_prefix_interruption_reserve_bytes": 96 * 1024**2,
               "native_probe_ledger_and_publication_reserve_bytes": 192 * 1024**2,
-              "transient_spectral_and_audio_allowance_bytes": 4 * (target_tensor_bytes(max(frames)) + 8 * max(frames)),
+              "transient_spectral_and_audio_allowance_bytes": batching.spectral * (6 * target_tensor_bytes(max(frames)) + 16 * max(frames)),
               "archive_guard_bytes": 32 * 1024**2}
-    total = sum(values.values())
-    if replay > LIMITS["replay_bytes"] or total > LIMITS["archive_bytes"]:
+    total = sum(value for name, value in values.items() if name != "transient_spectral_and_audio_allowance_bytes")
+    working = replay + values["transient_spectral_and_audio_allowance_bytes"] + 1024**3
+    if replay > LIMITS["replay_bytes"] or total > LIMITS["archive_bytes"] or working > LIMITS["process_tree_bytes"]:
         raise ValueError("direct fit source replay or evidence exceeds its declared allocation")
     return {**values, "estimated_archive_upper_bound_bytes": total, "resident_replay_upper_bound_bytes": replay,
+            "estimated_process_working_bytes": working, "spectral_batch_size": batching.spectral,
             "unique_sources": len(sources), "retained_candidate_waveforms_maximum": 3 * len(frames),
             "training_probe_audio_retained": False, "target_cache_records": 4}
 
 
-def make_plan(parent, bridge, recent, cache, pool):
+def make_plan(parent, bridge, recent, cache, pool, *, batching=None):
     proof, qualified, bridge_plan = read(parent / "verification.json"), read(bridge / "summary.json"), read(bridge / "plan.json")
     prior = proof["plan"]
     if (not proof["verified"] or not proof["offline_training_replay_exact"] or not proof["complete"] or not proof["all_native_accepted"]
@@ -84,12 +88,14 @@ def make_plan(parent, bridge, recent, cache, pool):
     root = Path(__file__).parents[1]
     for name, value in bridge_plan["source"].items():
         path = root / name if "/" in name else Path(__file__).with_name(name)
-        if sha256_bytes(path.read_bytes().replace(b"\r\n", b"\n")) != value:
+        actual = sha256_bytes(path.read_bytes().replace(b"\r\n", b"\n"))
+        if actual != value and name.removeprefix("obruxo_training/") not in EXECUTION_BATCH_SOURCES and name not in EXECUTION_BATCH_SOURCES and not compatible_infrastructure_source(name, value, actual):
             raise ValueError("qualified direct implementation changed")
-    names = ("basic_direct_fit_data.py", "basic_direct_fit_step.py", "basic_direct_fit.py", "basic_direct_fit_audit.py",
+    names = ("basic_direct_fit_data.py", "basic_direct_fit_step.py", "basic_direct_fit.py", "basic_direct_fit_audit.py", "codec.py",
              "unison_fit_data.py", "unison_sound_fit.py", "paired_native_fit.py", "paired_native_evidence.py",
              "conditioned_short_audit.py", "native_fit_storage.py", "local_execution.py", "benchmark.py", "checkpoints.py")
-    code = {name: sha256_bytes(Path(__file__).with_name(name).read_bytes().replace(b"\r\n", b"\n")) for name in names}
+    code = {name: sha256_bytes((root / name if "/" in name else Path(__file__).with_name(name)).read_bytes().replace(b"\r\n", b"\n"))
+            for name in (*names, *sorted(EXECUTION_BATCH_SOURCES))}
     script = root / "reports/scripts/run_basic_direct_fit.py"
     code["reports/scripts/run_basic_direct_fit.py"] = sha256_bytes(script.read_bytes().replace(b"\r\n", b"\n"))
     train = {state for state, assignment in pool.manifest.by_state.items() if assignment.split == "train"}
@@ -97,7 +103,7 @@ def make_plan(parent, bridge, recent, cache, pool):
         raise ValueError("direct fit cannot use held-out states")
     updates = reciprocal_updates(12, seed=0) + reciprocal_updates(12, seed=1)
     updates = [{**row, "references": list(rehearsal_indices(i))} for i, row in enumerate(updates)]
-    return {"format": "basic_direct_sound_rehearsal_fit_v1", "input_files": files, "input_cache_sha256": digest(cache),
+    return {"format": "basic_direct_sound_rehearsal_fit_v1", "batching": (batching or BatchConfig()).to_dict(), "input_files": files, "input_cache_sha256": digest(cache),
             "pool_id": pool.pool_id, "bridge_plan_id": qualified["plan_id"], "initial_file_sha256": qualified["model_file_sha256"],
             "initial_model_sha256": qualified["model_sha256"], "source": {**bridge_plan["source"], **code},
             "training": prior["training"], "fit_audit_cells": prior["fit_audit_cells"], "reference_manifest": references,
@@ -109,7 +115,7 @@ def make_plan(parent, bridge, recent, cache, pool):
             "loss": "weighted_paired_input_transfer_and_reference_excess_sound_v1", "parameter_control": "weighted_masked_basic_labels_raw_corrected_scores",
             "temperature": {"start": 1., "end": .5}, "limits": LIMITS, "prefix_check_updates": 4,
             "planned_native_requests": {"paired_gradients": 4224, "reference_gradients": 2112, "qualification": 208, "total": 6544},
-            "storage_bound": storage_bound(prior["fit_audit_cells"], pool.codec.contract.tail_seconds),
+            "storage_bound": storage_bound(prior["fit_audit_cells"], pool.codec.contract.tail_seconds, batching=batching),
             "gates": {"six_groups_sound_ratio": .9, "six_groups_at_most_parameter": True, "six_groups_mrstft_strict_improvement": True,
                       "original_32_mean_nonregression": True, "original_32_mrstft_p90_ratio": 1.1},
             "runtime": {"threads": 2, "device": "cpu", "precision": "float32", "native_workers": 1},
@@ -130,8 +136,9 @@ class Inputs(PriorInputs):
             key = self.key(cell)
             if key not in self.features:
                 self.features[key] = cached_features(bank, cell["recipe"], cell["input_view"])
-                with torch.no_grad():
-                    self.baselines[key] = self.model(batch_features([{"features": self.features[key]}]))
+        with torch.no_grad():
+            self.baselines = dict(zip(self.features, predict_features(self.model, list(self.features.values()), BatchConfig.from_plan(plan).model), strict=True))
+        self.frontend.pitch_batch_size = BatchConfig.from_plan(plan).pitch
         self.bytes = sum(value.numel() * value.element_size() for features in self.features.values() for value in features.values())
         if self.bytes > plan["limits"]["replay_bytes"]:
             raise ValueError("direct fit feature replay allocation exceeded")
@@ -146,6 +153,9 @@ class Inputs(PriorInputs):
 
     def predict(self, model, cell):
         return model(batch_features([{"features": self.features[self.key(cell)]}]))
+
+    def predict_many(self, model, cells):
+        return predict_features(model, [self.features[self.key(cell)] for cell in cells], BatchConfig.from_plan(self.plan).model)
 
     def observations(self, update):
         rows = []
