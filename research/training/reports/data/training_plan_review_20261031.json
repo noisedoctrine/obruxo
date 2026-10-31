@@ -1,0 +1,1075 @@
+{
+  "reviewed_at_utc": "2026-10-31T04:47:07.986841+00:00",
+  "main_commit": "ced6b0b728cf41a6c1560c350307d019c3382f19",
+  "earliest_training_plan_commit": "d9f2790385f559ebe8f2af6cb19e283d24a5ac74",
+  "scope": "repository plans, local recorded results and 100 latest PRs; no new training or confirmation scoring",
+  "pull_requests": {
+    "count": 100,
+    "first": 39,
+    "last": 139,
+    "all_merged": true,
+    "records": [
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/issue-38-quick-research",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/39",
+        "merged_at": "2026-10-12T19:48:43Z",
+        "number": 39,
+        "state": "closed",
+        "title": "Run four quick research checks and publish the results"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/training-pipeline-replication",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/40",
+        "merged_at": "2026-10-14T11:55:47Z",
+        "number": 40,
+        "state": "closed",
+        "title": "Add reproducible authored-pilot training pipeline"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/fresh-validation-panel",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/41",
+        "merged_at": "2026-10-14T19:14:28Z",
+        "number": 41,
+        "state": "closed",
+        "title": "Evaluate fresh validation states with compatible training renders"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/release-intervention",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/42",
+        "merged_at": "2026-10-15T10:11:30Z",
+        "number": 42,
+        "state": "closed",
+        "title": "Diagnose release generalization with a frozen native intervention"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/alpha-synthesis-coverage",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/43",
+        "merged_at": "2026-10-15T20:41:23Z",
+        "number": 43,
+        "state": "closed",
+        "title": "Expand synthesis training to wavetables, layering, LFOs and chorus"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/paired-synthesis-identity",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/44",
+        "merged_at": "2026-10-15T22:07:02Z",
+        "number": 44,
+        "state": "closed",
+        "title": "Add paired synthesis identity learning and QA-qualified feature caches"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/audio-feature-proxy",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/45",
+        "merged_at": "2026-10-15T22:07:22Z",
+        "number": 45,
+        "state": "closed",
+        "title": "Add sound prediction helper and native qualification"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/render-selected-training",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/46",
+        "merged_at": "2026-10-16T06:03:34Z",
+        "number": 46,
+        "state": "closed",
+        "title": "Add direct Vital candidate targets and matched learning qualification"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/vital-state-codec-speed",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/47",
+        "merged_at": "2026-10-16T06:03:53Z",
+        "number": 47,
+        "state": "closed",
+        "title": "Remove per-bit patch-state conversion from Vital rendering"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/audio-candidate-ranking",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/48",
+        "merged_at": "2026-10-16T06:04:19Z",
+        "number": 48,
+        "state": "closed",
+        "title": "Add qualified audio-only Vital candidate selection"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/reusable-render-worker",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/49",
+        "merged_at": "2026-10-16T06:30:06Z",
+        "number": 49,
+        "state": "closed",
+        "title": "Reuse isolated Vital workers and fix phase in correctness checks"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/conditioning-attention",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/50",
+        "merged_at": "2026-10-16T06:30:46Z",
+        "number": 50,
+        "state": "closed",
+        "title": "Compare performance-conditioning architectures and advance coverage plan"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/full-patch-rendering",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/51",
+        "merged_at": "2026-10-16T06:55:14Z",
+        "number": 51,
+        "state": "closed",
+        "title": "Verify full Vital patches through training render workers"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/broad-patch-codec",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/52",
+        "merged_at": "2026-10-16T12:36:05Z",
+        "number": 52,
+        "state": "closed",
+        "title": "Connect all Vital scalar controls to audio-only training"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/factory-asset-vocabulary",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/53",
+        "merged_at": "2026-10-16T12:36:25Z",
+        "number": 53,
+        "state": "closed",
+        "title": "Qualify factory assets and learn wavetable and sample choices"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/lfo-curve-assets",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/54",
+        "merged_at": "2026-10-16T12:36:47Z",
+        "number": 54,
+        "state": "closed",
+        "title": "Fit train-only LFO assets and qualify eight-slot decoding"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/lfo-curve-training",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/55",
+        "merged_at": "2026-10-16T17:21:06Z",
+        "number": 55,
+        "state": "closed",
+        "title": "Learn eight modulation curves from original audio"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/ordered-modulation",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/56",
+        "merged_at": "2026-10-16T17:21:31Z",
+        "number": 56,
+        "state": "closed",
+        "title": "Add learned outputs for 64 ordered modulation connections"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/warps-seeds",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/57",
+        "merged_at": "2026-10-17T14:14:46Z",
+        "number": 57,
+        "state": "closed",
+        "title": "Add custom oscillator curves and exact seed-bit outputs"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/expressive-midi",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/58",
+        "merged_at": "2026-10-17T14:16:00Z",
+        "number": 58,
+        "state": "closed",
+        "title": "Add expressive MIDI rendering and performance coverage"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/combined-coverage",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/59",
+        "merged_at": "2026-10-17T14:16:16Z",
+        "number": 59,
+        "state": "closed",
+        "title": "Audit control coverage before broader model training"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/combined-curriculum",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/60",
+        "merged_at": "2026-10-17T14:16:49Z",
+        "number": 60,
+        "state": "closed",
+        "title": "Train combined synthesis controls and qualify the full pipeline"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/source-eligibility",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/61",
+        "merged_at": "2026-10-17T14:17:07Z",
+        "number": 61,
+        "state": "closed",
+        "title": "Choose longer training notes for slow patch attacks"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/checkpoint-io",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/63",
+        "merged_at": "2026-10-17T15:22:48Z",
+        "number": 63,
+        "state": "closed",
+        "title": "Reduce checkpoint writes during initial audio collection"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/source-layouts",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/64",
+        "merged_at": "2026-10-17T15:23:05Z",
+        "number": 64,
+        "state": "closed",
+        "title": "Support original one-point curves with explicit native import"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/connection-coverage",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/65",
+        "merged_at": "2026-10-17T20:16:29Z",
+        "number": 65,
+        "state": "closed",
+        "title": "Cover every connection destination under frozen patch families"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/corpus-admission",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/66",
+        "merged_at": "2026-10-17T20:17:50Z",
+        "number": 66,
+        "state": "closed",
+        "title": "Admit original corpus labels and preserve silent FM sources"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/native-corpus-rendering",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/67",
+        "merged_at": "2026-10-18T14:04:58Z",
+        "number": 67,
+        "state": "closed",
+        "title": "Load original corpus controls with exact native readback"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/corpus-source-stream",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/68",
+        "merged_at": "2026-10-18T14:05:14Z",
+        "number": 68,
+        "state": "closed",
+        "title": "Train on original corpus sources with on-demand rendering"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/long-observations",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/69",
+        "merged_at": "2026-10-18T14:15:02Z",
+        "number": 69,
+        "state": "closed",
+        "title": "Observe slow attacks and long releases during training"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/mixed-training-sources",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/70",
+        "merged_at": "2026-10-18T15:05:05Z",
+        "number": 70,
+        "state": "closed",
+        "title": "Train on mixed corpus and authored sources without moving splits"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/mixed-overfit",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/71",
+        "merged_at": "2026-10-18T15:05:19Z",
+        "number": 71,
+        "state": "closed",
+        "title": "Fix phase-wrap gradients and verify mixed-source fitting"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/staged-reconstruction",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/72",
+        "merged_at": "2026-10-19T19:10:28Z",
+        "number": 72,
+        "state": "closed",
+        "title": "Restore staged reconstruction training and enforce basic scope"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/basic-sound-diagnosis",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/73",
+        "merged_at": "2026-10-19T19:10:44Z",
+        "number": 73,
+        "state": "closed",
+        "title": "Diagnose basic-model sound errors before expanding outputs"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/spectral-training-plan",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/74",
+        "merged_at": "2026-10-19T19:11:03Z",
+        "number": 74,
+        "state": "closed",
+        "title": "Train basic reconstruction with spectral loss before expanding scope"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/basic-spectral-contract",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/75",
+        "merged_at": "2026-10-19T19:11:19Z",
+        "number": 75,
+        "state": "closed",
+        "title": "Add local spectral loss and differentiable basic controls"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/basic-spectral-helper",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/76",
+        "merged_at": "2026-10-21T11:34:27Z",
+        "number": 76,
+        "state": "closed",
+        "title": "Add local spectral helper and record failed gradient qualification"
+      },
+      {
+        "base": "codex/basic-spectral-helper",
+        "draft": false,
+        "head": "codex/exact-render-frames",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/77",
+        "merged_at": "2026-10-21T11:34:41Z",
+        "number": 77,
+        "state": "closed",
+        "title": "Fix native renders ending one sample short"
+      },
+      {
+        "base": "codex/exact-render-frames",
+        "draft": false,
+        "head": "codex/paired-spectral-helper",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/78",
+        "merged_at": "2026-10-21T11:34:55Z",
+        "number": 78,
+        "state": "closed",
+        "title": "Train aligned native control-change pairs for spectral guidance"
+      },
+      {
+        "base": "codex/paired-spectral-helper",
+        "draft": false,
+        "head": "codex/spectral-time-coverage",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/79",
+        "merged_at": "2026-10-21T11:35:12Z",
+        "number": 79,
+        "state": "closed",
+        "title": "Diagnose training frames missing attack and release changes"
+      },
+      {
+        "base": "codex/spectral-time-coverage",
+        "draft": false,
+        "head": "codex/event-spectral-frames",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/80",
+        "merged_at": "2026-10-21T11:35:25Z",
+        "number": 80,
+        "state": "closed",
+        "title": "Keep attack and release changes visible in training samples"
+      },
+      {
+        "base": "codex/event-spectral-frames",
+        "draft": false,
+        "head": "codex/event-response-fit",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/81",
+        "merged_at": "2026-10-21T11:35:38Z",
+        "number": 81,
+        "state": "closed",
+        "title": "Qualify corrected sampling with a matched short response fit"
+      },
+      {
+        "base": "codex/event-response-fit",
+        "draft": false,
+        "head": "codex/native-spectral-gradient",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/82",
+        "merged_at": "2026-10-21T11:35:51Z",
+        "number": 82,
+        "state": "closed",
+        "title": "Add native sound-loss gradients and qualify real-audio updates"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/native-inverse-fit",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/83",
+        "merged_at": "2026-10-21T14:28:06Z",
+        "number": 83,
+        "state": "closed",
+        "title": "Integrate native spectral training and its prerequisite checks"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/native-render-settling",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/84",
+        "merged_at": "2026-10-21T14:29:15Z",
+        "number": 84,
+        "state": "closed",
+        "title": "Settle Vital controls before training MIDI and isolate render profiles"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/settled-native-inverse-fit",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/85",
+        "merged_at": "2026-10-22T00:36:17Z",
+        "number": 85,
+        "state": "closed",
+        "title": "Publish audited basic sound-loss training and remaining quality gaps"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/blind-basic-listening",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/86",
+        "merged_at": "2026-10-22T00:38:09Z",
+        "number": 86,
+        "state": "closed",
+        "title": "Prepare blind listening packets and audit actual judgments"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/category-learning-signal",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/87",
+        "merged_at": "2026-10-22T00:39:58Z",
+        "number": 87,
+        "state": "closed",
+        "title": "Verify fixed score scaling for stalled category learning"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/calibrated-native-fit",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/88",
+        "merged_at": "2026-10-22T00:40:51Z",
+        "number": 88,
+        "state": "closed",
+        "title": "Restore category gradients and audit basic sound training"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/basic-fit-coverage",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/89",
+        "merged_at": "2026-10-22T00:41:42Z",
+        "number": 89,
+        "state": "closed",
+        "title": "Diagnose basic sound training coverage before the next fit"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/broader-basic-fit",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/90",
+        "merged_at": "2026-10-22T00:42:33Z",
+        "number": 90,
+        "state": "closed",
+        "title": "Audit broader sound training with original-subset fit guards"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/renderer-input-comparison",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/91",
+        "merged_at": "2026-10-22T00:43:23Z",
+        "number": 91,
+        "state": "closed",
+        "title": "Verify renderer input shift before refreshing basic initialization"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/settled-basic-bootstrap",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/92",
+        "merged_at": "2026-10-22T00:44:15Z",
+        "number": 92,
+        "state": "closed",
+        "title": "Verify corrected-render basic fitting before refreshing initialization"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/settled-full-bootstrap",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/93",
+        "merged_at": "2026-10-22T00:45:08Z",
+        "number": 93,
+        "state": "closed",
+        "title": "Audit corrected-render basic initialization and exact full replay"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/basic-input-note-coverage",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/94",
+        "merged_at": "2026-10-22T00:45:59Z",
+        "number": 94,
+        "state": "closed",
+        "title": "Expose input-note gaps and pattern shortcuts before further training"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/varied-basic-inputs",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/95",
+        "merged_at": "2026-10-22T00:46:50Z",
+        "number": 95,
+        "state": "closed",
+        "title": "Prepare balanced varied-note inputs without expanding the model"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/varied-input-render-check",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/96",
+        "merged_at": "2026-10-22T00:47:40Z",
+        "number": 96,
+        "state": "closed",
+        "title": "Validate varied training inputs with exact native repeats"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/varied-basic-bootstrap",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/97",
+        "merged_at": "2026-10-22T00:48:31Z",
+        "number": 97,
+        "state": "closed",
+        "title": "Audit wider-input learning and loss of earlier reconstruction"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/mixed-basic-inputs",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/98",
+        "merged_at": "2026-10-22T08:52:48Z",
+        "number": 98,
+        "state": "closed",
+        "title": "Audit joint input replay with unchanged sound-quality gates"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/profile-aware-preset-export",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/99",
+        "merged_at": "2026-10-22T08:53:09Z",
+        "number": 99,
+        "state": "closed",
+        "title": "Preserve evaluated phase settings in exported presets"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/balanced-native-sound-fit",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/100",
+        "merged_at": "2026-10-22T08:53:35Z",
+        "number": 100,
+        "state": "closed",
+        "title": "Use original and wider recordings in matched sound-loss training"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/durable-native-execution",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/101",
+        "merged_at": "2026-10-22T18:55:19Z",
+        "number": 101,
+        "state": "closed",
+        "title": "Keep the native fit alive across terminal cleanup and count repeat costs"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/balanced-native-fit-result",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/102",
+        "merged_at": "2026-10-22T21:29:56Z",
+        "number": 102,
+        "state": "closed",
+        "title": "Record failed original-input gate after audited sound-loss fit"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/production-choice-bridge",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/103",
+        "merged_at": "2026-10-24T16:53:46Z",
+        "number": 103,
+        "state": "closed",
+        "title": "Add verified production-choice adapter for sound-loss training"
+      },
+      {
+        "base": "codex/production-choice-bridge",
+        "draft": false,
+        "head": "codex/production-native-screen",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/104",
+        "merged_at": "2026-10-24T16:54:20Z",
+        "number": 104,
+        "state": "closed",
+        "title": "Qualify production-choice sound gradients on real Vital"
+      },
+      {
+        "base": "codex/production-native-screen",
+        "draft": false,
+        "head": "codex/paired-native-training",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/105",
+        "merged_at": "2026-10-24T16:54:54Z",
+        "number": 105,
+        "state": "closed",
+        "title": "Pair original and wider recordings in native sound-loss training"
+      },
+      {
+        "base": "codex/paired-native-training",
+        "draft": false,
+        "head": "codex/paired-fit-sleep-recovery",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/106",
+        "merged_at": "2026-10-24T16:55:29Z",
+        "number": 106,
+        "state": "closed",
+        "title": "Resume the paired sound fit from its saved checkpoint"
+      },
+      {
+        "base": "codex/paired-fit-sleep-recovery",
+        "draft": false,
+        "head": "codex/windows-fit-report-recovery",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/107",
+        "merged_at": "2026-10-24T16:56:02Z",
+        "number": 107,
+        "state": "closed",
+        "title": "Recover Windows fit reports and record the verified sound comparison"
+      },
+      {
+        "base": "codex/windows-fit-report-recovery",
+        "draft": false,
+        "head": "codex/input-transfer-sound-objective",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/108",
+        "merged_at": "2026-10-24T16:56:37Z",
+        "number": 108,
+        "state": "closed",
+        "title": "Train each patch against both input and transfer performances"
+      },
+      {
+        "base": "codex/input-transfer-sound-objective",
+        "draft": false,
+        "head": "codex/paired-gradient-diagnosis",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/109",
+        "merged_at": "2026-10-24T16:57:13Z",
+        "number": 109,
+        "state": "closed",
+        "title": "Diagnose recording sensitivity in the basic sound model"
+      },
+      {
+        "base": "codex/paired-gradient-diagnosis",
+        "draft": false,
+        "head": "codex/conditioned-basic-bridge",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/110",
+        "merged_at": "2026-10-24T16:57:49Z",
+        "number": 110,
+        "state": "closed",
+        "title": "Add a small correction while preserving the starting predictor"
+      },
+      {
+        "base": "codex/conditioned-basic-bridge",
+        "draft": false,
+        "head": "codex/conditioned-short-sound-fit",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/111",
+        "merged_at": "2026-10-24T16:58:24Z",
+        "number": 111,
+        "state": "closed",
+        "title": "Prove correction learning with a bounded local sound fit"
+      },
+      {
+        "base": "codex/conditioned-short-sound-fit",
+        "draft": false,
+        "head": "codex/correction-update-diagnosis",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/112",
+        "merged_at": "2026-10-24T16:58:57Z",
+        "number": 112,
+        "state": "closed",
+        "title": "Explain missing category learning in the correction fit"
+      },
+      {
+        "base": "codex/correction-update-diagnosis",
+        "draft": false,
+        "head": "codex/unison-choice-bridge",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/113",
+        "merged_at": "2026-10-24T16:59:35Z",
+        "number": 113,
+        "state": "closed",
+        "title": "Qualify an independent unison correction with other controls frozen"
+      },
+      {
+        "base": "codex/unison-choice-bridge",
+        "draft": false,
+        "head": "codex/unison-sound-cost-fit",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/114",
+        "merged_at": "2026-10-24T17:00:10Z",
+        "number": 114,
+        "state": "closed",
+        "title": "Train unison choices on measured sound costs and audit preservation"
+      },
+      {
+        "base": "codex/unison-sound-cost-fit",
+        "draft": false,
+        "head": "codex/basic-direct-correction",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/115",
+        "merged_at": "2026-10-24T17:00:45Z",
+        "number": 115,
+        "state": "closed",
+        "title": "Qualify direct basic outputs and original-sound rehearsal"
+      },
+      {
+        "base": "codex/basic-direct-correction",
+        "draft": false,
+        "head": "codex/basic-direct-native-fit",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/116",
+        "merged_at": "2026-10-24T17:01:21Z",
+        "number": 116,
+        "state": "closed",
+        "title": "Learn compact basic controls from sound while preserving earlier sounds"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/basic-direct-fit-results",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/117",
+        "merged_at": "2026-10-25T15:19:15Z",
+        "number": 117,
+        "state": "closed",
+        "title": "Bring merged training stack and audited sound-fit results onto main"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/basic-continuous-auxiliary",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/118",
+        "merged_at": "2026-10-25T15:20:06Z",
+        "number": 118,
+        "state": "closed",
+        "title": "Audit auxiliary sound fit and diagnose competing updates"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/protected-basic-updates",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/119",
+        "merged_at": "2026-10-25T15:20:59Z",
+        "number": 119,
+        "state": "closed",
+        "title": "Audit sound-protected updates against native Vital audio"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/native-accepted-basic-fit",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/120",
+        "merged_at": "2026-10-25T15:21:51Z",
+        "number": 120,
+        "state": "closed",
+        "title": "Train basic sounds with measured acceptance and weight rollback"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/native-accepted-fit-results",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/121",
+        "merged_at": "2026-10-25T17:49:15Z",
+        "number": 121,
+        "state": "closed",
+        "title": "Record verified measured-acceptance training results"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/native-accepted-fit-completion",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/122",
+        "merged_at": "2026-10-26T19:29:24Z",
+        "number": 122,
+        "state": "closed",
+        "title": "Complete saved fit comparisons and publish reconstruction failures"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/trainable-basic-inputs",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/123",
+        "merged_at": "2026-10-26T19:30:17Z",
+        "number": 123,
+        "state": "closed",
+        "title": "Learn basic audio features while keeping 14 outputs"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/trainable-basic-sound-fit",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/124",
+        "merged_at": "2026-10-26T19:31:10Z",
+        "number": 124,
+        "state": "closed",
+        "title": "Train basic audio features with matched native sound loss"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/basic-direct-inference",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/125",
+        "merged_at": "2026-10-26T19:32:02Z",
+        "number": 125,
+        "state": "closed",
+        "title": "Export saved basic sound models through audio-to-preset inference"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/local-basic-bundle",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/126",
+        "merged_at": "2026-10-26T19:32:55Z",
+        "number": 126,
+        "state": "closed",
+        "title": "Package basic models as portable local inference snapshots"
+      },
+      {
+        "base": "codex/local-basic-bundle",
+        "draft": false,
+        "head": "codex/clean-local-runtime",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/127",
+        "merged_at": "2026-10-26T19:33:30Z",
+        "number": 127,
+        "state": "closed",
+        "title": "Keep basic inference dependencies inside the fresh local runtime"
+      },
+      {
+        "base": "codex/clean-local-runtime",
+        "draft": false,
+        "head": "codex/basic-confirmation-reservation",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/128",
+        "merged_at": "2026-10-26T19:34:05Z",
+        "number": 128,
+        "state": "closed",
+        "title": "Publish basic fit failures and reserve independent confirmation data"
+      },
+      {
+        "base": "codex/basic-confirmation-reservation",
+        "draft": false,
+        "head": "codex/basic-held-note-diagnosis",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/129",
+        "merged_at": "2026-10-26T19:34:40Z",
+        "number": 129,
+        "state": "closed",
+        "title": "Replay listening clips instantly and preserve pill responses"
+      },
+      {
+        "base": "codex/basic-held-note-diagnosis",
+        "draft": false,
+        "head": "codex/basic-fit-mechanism-audit",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/130",
+        "merged_at": "2026-10-26T19:35:14Z",
+        "number": 130,
+        "state": "closed",
+        "title": "Diagnose held-note learning before another model change"
+      },
+      {
+        "base": "codex/basic-fit-mechanism-audit",
+        "draft": false,
+        "head": "codex/loudness-matched-listening",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/131",
+        "merged_at": "2026-10-26T19:35:51Z",
+        "number": 131,
+        "state": "closed",
+        "title": "Match loudness for tone listening and preserve level accuracy"
+      },
+      {
+        "base": "codex/loudness-matched-listening",
+        "draft": false,
+        "head": "codex/direct-basic-control-check",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/132",
+        "merged_at": "2026-10-26T19:36:27Z",
+        "number": 132,
+        "state": "closed",
+        "title": "Add bounded direct-control reconstruction check"
+      },
+      {
+        "base": "codex/direct-basic-control-check",
+        "draft": false,
+        "head": "codex/inference-notice-inventory",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/133",
+        "merged_at": "2026-10-26T19:37:10Z",
+        "number": 133,
+        "state": "closed",
+        "title": "Preserve frontend attributions and locked runtime notices"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/basic-tone-level-diagnosis",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/134",
+        "merged_at": "2026-10-27T21:31:29Z",
+        "number": 134,
+        "state": "closed",
+        "title": "Integrate staged training work and verified reconstruction results"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/frozen-basic-representation-probes",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/135",
+        "merged_at": "2026-10-27T21:31:52Z",
+        "number": 135,
+        "state": "closed",
+        "title": "Measure pitch and performance leakage before further basic-model training"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/branch-note-removal-screen",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/136",
+        "merged_at": "2026-10-27T21:32:26Z",
+        "number": 136,
+        "state": "closed",
+        "title": "Test branch-specific note removal with calibrated gradients"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/shared-reconstruction-auxiliary",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/137",
+        "merged_at": "2026-10-31T04:40:09Z",
+        "number": 137,
+        "state": "closed",
+        "title": "Test pitch removal during shared basic sound reconstruction"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/balanced-basic-performances",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/138",
+        "merged_at": "2026-10-31T04:40:22Z",
+        "number": 138,
+        "state": "closed",
+        "title": "Give basic patches identical note and duration coverage"
+      },
+      {
+        "base": "main",
+        "draft": false,
+        "head": "codex/balanced-basic-sound-fit",
+        "html_url": "https://github.com/noisedoctrine/obruxo/pull/139",
+        "merged_at": "2026-10-31T04:40:35Z",
+        "number": 139,
+        "state": "closed",
+        "title": "Train the basic model on balanced note and duration coverage"
+      }
+    ]
+  },
+  "shared_auxiliary_timing": {
+    "source": "research/training/outputs/shared-basic-auxiliary-20261031",
+    "render_log_sha256": "2ee6a235d83b07133df7f99fe16c7df7d513d2e43cece343ebc3590c7ef34bb7",
+    "summary_sha256": "a8067223c7222aec5d8a993453b25754b3ccc59aa318284899ac8b9027398b04",
+    "attempts": 12025,
+    "outcomes": 12025,
+    "statuses": {
+      "accepted": 12025
+    },
+    "phase_counts": {
+      "training": 11805,
+      "qualification": 220
+    },
+    "updates_per_arm": 48,
+    "arms": 2,
+    "native_execution_seconds": 22500.696430921555,
+    "worker_seconds": 21510.54229710123,
+    "complete_backend_call_seconds": 13313.76178989606,
+    "outside_backend_worker_seconds": 8196.78050720517,
+    "outside_worker_run_seconds": 990.1541338203242,
+    "output_audio_seconds": 48659.13755102041,
+    "mean_output_clip_seconds": 4.046497925240782,
+    "requests_per_scheduled_update_across_both_arms": 125.26041666666667,
+    "worker_max_jobs": [
+      1
+    ],
+    "pure_synthesis_seconds": null,
+    "timer_scope": "render_seconds wraps the full backend render call including plugin creation/state I/O/readback; wall_seconds also includes worker overhead"
+  },
+  "small_profile": {
+    "source": "research/training/outputs/render-throughput-profile-20261031",
+    "result_sha256": "fcfcf6b03f9f40ae817646a468c3a12990cdcfcf3020c9f2c03f1fa768e05fde",
+    "modes": {
+      "fresh_process": {
+        "requests": 6,
+        "exact_source_matches": 6,
+        "worker_seconds": 14.264536899863742,
+        "backend_seconds": 7.383692199829966
+      },
+      "reuse_process": {
+        "requests": 6,
+        "exact_source_matches": 6,
+        "worker_seconds": 16.084825700032525,
+        "backend_seconds": 14.239094499847852
+      }
+    },
+    "experimental_updates": 0,
+    "limitations": "Sequential mode blocks during another fit; fresh plugin in both modes; cProfile does not isolate all native DSP. Correctness evidence only; no reuse speedup or DSP-only speed claim."
+  },
+  "balanced_fit_snapshot": {
+    "source": "research/training/outputs/balanced-basic-sound-fit-20261031",
+    "progress": {
+      "accepted_updates": 9,
+      "planned_updates": 48,
+      "sound_loss": 0.2986215353012085,
+      "step": 10
+    },
+    "status": "already-running frozen experiment; final result not available at review",
+    "source_checkout_unchanged": true
+  },
+  "normalization_decision": "Defer unnormalized versus LUFS versus peak input preprocessing to a later controlled comparison; no current normalization winner or loss change."
+}

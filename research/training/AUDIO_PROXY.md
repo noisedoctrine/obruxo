@@ -1,6 +1,6 @@
 # Sound prediction before audio-based inverse training
 
-This documents the historical alpha helper, which [failed native qualification](reports/SOUND_PROXY_RESULTS.md). The active [training plan](../modelling/TRAINING_PLAN.md#sound-loss-training-path) and [basic-stage protocol](STAGED_RECONSTRUCTION.md) now require a new small-scope spectral helper before inverse integration. The old artifact remains unqualified. Its implementation and original experiment protocol follow.
+This documents the historical alpha helper, which [failed native qualification](reports/SOUND_PROXY_RESULTS.md). The active [training plan](../modelling/TRAINING_PLAN.md) and [basic-stage protocol](STAGED_RECONSTRUCTION.md) permit qualified native feedback; a learned helper remains an alternative requiring its own useful-gradient qualification. The old artifact remains unqualified. Its implementation and original experiment protocol follow.
 
 The inverse model needs a way to relate changing its predicted patch to changing the sound. Vital cannot supply those gradients. This increment built a separate small forward model and checked its advice against real Vital renders before allowing it to guide inverse training.
 
