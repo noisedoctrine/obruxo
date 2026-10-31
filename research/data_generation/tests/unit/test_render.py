@@ -256,6 +256,57 @@ def test_renderer_identity_contains_complete_plugin_fingerprint(tmp_path) -> Non
         VitalRenderer(plugin, accepted_plugin_sha256={fingerprint}, renderer_id="incomplete")
 
 
+def test_reused_renderer_caches_only_template_and_still_verifies_each_patch(tmp_path, monkeypatch):
+    from pathlib import Path
+    import sys
+    from types import SimpleNamespace
+    from obruxo_data.errors import DependencyUnavailableError
+    import obruxo_data.render.vita as module
+
+    plugin = tmp_path / "Vital.vst3"
+    plugin.write_bytes(b"test plugin binary")
+    fingerprint = hashlib.sha256(plugin.read_bytes()).hexdigest()
+    renderer = VitalRenderer(plugin, accepted_plugin_sha256={fingerprint}, renderer_id=f"test-{fingerprint}")
+    instances, saves, loaded = [], [], []
+
+    class Synth:
+        def __init__(self):
+            self.state = _template_state({"synth_version": "1.6.4", "settings": {}})
+        def save_state(self, path):
+            saves.append(Path(path).name)
+            Path(path).write_bytes(self.state)
+        def load_state(self, path):
+            self.state = Path(path).read_bytes()
+            loaded.append(_extract_vital_json(self.state))
+        def add_midi_note(self, *args):
+            pass
+
+    class Engine:
+        def __init__(self, *args):
+            instances.append(self)
+        def set_bpm(self, bpm):
+            pass
+        def make_plugin_processor(self, *args):
+            return Synth()
+        def load_graph(self, graph):
+            pass
+
+    monkeypatch.setitem(sys.modules, "dawdreamer", SimpleNamespace(RenderEngine=Engine))
+    monkeypatch.setattr(module.importlib.metadata, "version", lambda name: "0.8.3")
+    monkeypatch.setattr(module, "_render_after_preroll", lambda engine, frames, rate, channels, preroll: np.zeros((frames, channels), np.float32))
+    preset, performance = VitalPreset.init(), Performance()
+    performance.add_note(pitch=60, velocity=96, start_tick=0, duration_ticks=480)
+    for volume in (.5, .6, .5):
+        document = json.loads(preset.to_json())
+        document["settings"]["volume"] = volume
+        renderer.render(RenderRequest(preset_json=json.dumps(document), performance=performance, renderer_id=renderer.renderer_id))
+    assert len(instances) == 3 and saves.count("template.state") == 1 and saves.count("loaded.state") == 3
+    assert [row["settings"]["volume"] for row in loaded] == [.5, .6, .5]
+    plugin.write_bytes(b"changed plugin")
+    with pytest.raises(DependencyUnavailableError, match="binary changed"):
+        renderer.render(RenderRequest(preset=preset, performance=performance, renderer_id=renderer.renderer_id))
+
+
 def test_render_result_writes_atomic_wav_and_json_without_overwrite(tmp_path) -> None:
     audio = np.zeros((32, 2), dtype=np.float32)
     provenance = RenderProvenance("request", "renderer", "1.0", "fingerprint")

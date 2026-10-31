@@ -260,6 +260,7 @@ class VitalRenderer(Renderer):
             from obruxo_data.vital.full_contract import FullPresetContract
             self.full_contract = FullPresetContract(renderer_id=renderer_id)
         self.qa_config = qa_config or AudioQualityConfig()
+        self._state_template = None
         self._capabilities = EXPRESSION_CAPABILITIES if renderer_id in {FULL_EXPRESSION_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_CORPUS_RENDERER_ID} else RendererCapabilities(max_channels=1)
 
     @classmethod
@@ -315,14 +316,17 @@ class VitalRenderer(Renderer):
 
         with tempfile.TemporaryDirectory(prefix="obruxo-vital-render-") as directory:
             root = Path(directory)
-            template_path = root / "template.state"
             state_path = root / "request.state"
             loaded_path = root / "loaded.state"
+            # A fresh plugin prevents residual DSP state from changing subsequent clips.
             engine = daw.RenderEngine(request.sample_rate, self.buffer_size)
             engine.set_bpm(bpm)
             synth = engine.make_plugin_processor("vital", str(self.plugin_path))
-            synth.save_state(str(template_path))
-            template = VitalVst3StateTemplate(template_path.read_bytes())
+            if self._state_template is None:
+                template_path = root / "template.state"
+                synth.save_state(str(template_path))
+                self._state_template = VitalVst3StateTemplate(template_path.read_bytes())
+            template = self._state_template
             requested_document = json.loads(request.preset_json)
             native_document, bridge_diagnostics = native_preset_document(request.preset_json, template.plugin_version,
                                                                         legacy_training=self.legacy_training)

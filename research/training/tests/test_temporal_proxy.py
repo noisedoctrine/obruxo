@@ -136,9 +136,14 @@ def test_collection_recovery_and_changed_features_refused(pool, tmp_path):
             raise InterruptedError
     with pytest.raises(InterruptedError):
         collect_frames(pool, tmp_path, recipes, session, stop)
+    session.close()
     resumed = NativeSession(tmp_path, plan, pool.codec, Monitor(), FakeRendererFactory())
     rows = collect_frames(pool, tmp_path, recipes, resumed)
+    resumed.close()
     assert len(rows) == 6 and all(row["accepted"] for row in rows)
+    assert rows[0]["receipt"]["worker_pid"] == rows[1]["receipt"]["worker_pid"]
+    assert [row["receipt"]["worker_job"] for row in rows] == [1, 2, 1, 2, 3, 4]
+    assert all(row["receipt"]["execution_policy"] == session.execution_policy for row in rows)
     assert sum(row["event"] == "attempt" for row in resumed.events) == 6
     cache = RecordCache(tmp_path, rows)
     assert cache[0]["recipe_id"] == rows[0]["recipe_id"]
@@ -146,6 +151,11 @@ def test_collection_recovery_and_changed_features_refused(pool, tmp_path):
     path.write_bytes(path.read_bytes() + b"changed")
     with pytest.raises(ValueError, match="record changed"):
         cache[1]
+    # Do not silently continue an old run under a different renderer lifetime.
+    events = [{key: value for key, value in event.items() if key != "execution_policy"} for event in resumed.events]
+    (tmp_path / "renders.jsonl").write_text("".join(json.dumps(event) + "\n" for event in events))
+    with pytest.raises(ValueError, match="lifecycle changed"):
+        NativeSession(tmp_path, plan, pool.codec, Monitor(), FakeRendererFactory())
 
 
 def test_native_guidance_is_required_even_if_helper_prediction_is_good():

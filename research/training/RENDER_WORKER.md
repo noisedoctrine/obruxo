@@ -1,6 +1,6 @@
 # Reusable isolated rendering
 
-`RenderWorker` keeps one isolated Python process and its imported libraries alive across sequential jobs. Every job still constructs a fresh renderer, engine and Vital instance, loads the full patch, reads back the native state, hashes the plugin and checks the actual audio. Shared memory holds one bounded stereo float32 clip; audio is discarded after use.
+`RenderWorker` keeps one isolated Python process, renderer and immutable state template alive across sequential jobs. Every job constructs a fresh engine and Vital instance, loads the full patch, reads back the native state, hashes the plugin and checks the actual audio. Shared memory holds one bounded stereo float32 clip; audio is discarded after use. Keeping the plugin itself alive failed exact reproducibility, so that implementation was removed.
 
 The process restarts after at most 32 jobs by default, or immediately after a crash, Python error, timeout or cancellation. The next call can recover with a new process. A rejected audio buffer is reported and never delivered. A worker accepts only one active call at a time and must be closed, normally with a context manager.
 
@@ -9,13 +9,15 @@ with RenderWorker(renderer_factory=NativeRendererFactory(plugin_path), max_jobs=
     audio, metadata = worker.render(request, timeout=30)
 ```
 
-The online queue and trainer accept `StreamConfig(worker_jobs=32)`. The CLI exposes `--worker-jobs 32` on `benchmark` and `train`. Allowed lifetimes are 1–128 jobs. The existing one-job default retains its exact saved contract, so old checkpoints and feature caches still load. Reuse has a distinct stream contract and cannot silently replace the execution policy of a resumed run. The byte/clip queue limits and explicit acknowledgements still apply.
+The online queue, trainer CLI and `NativeSession` collections/fits now default to 32 jobs per worker. The CLI exposes `--worker-jobs` on `benchmark` and `train`; allowed lifetimes are 1–128 jobs. Fresh correctness comparisons use this same worker implementation with `max_jobs=1`. There is no duplicate one-shot worker path.
+
+Stream contracts and native receipts record the new renderer lifecycle. Historical runs must use their recorded source revision; the new implementation rejects silent continuation under a changed policy. The byte/clip queue limits and explicit acknowledgements still apply. `NativeSession.close()` releases its worker; a finalizer also handles object/process teardown.
 
 ## Correctness uses fixed phase
 
 Pipeline reproducibility checks disable oscillator phase randomization in diagnostic copies of patches. They keep the patch's fixed phase knobs and all other synthesis settings. The original pool is unchanged. Codec equality is checked before applying this diagnostic control to the rendered source/decoded pair, so it cannot conceal a codec error. The pilot and alpha codec checks record this policy and use a new check identity.
 
-The worker check alternates five training families, compares fresh processes with reuse across the entire 32-job lifetime, then checks the restart. Its correctness gate requires identical float32 audio, native state readback and renderer provenance. Speed and memory are separate gates. Timing uses adjacent pairs with alternating execution order, including cold starts and process recycling.
+The current worker check alternates basic unison/filter combinations, held notes and chords, including A–B–A ordering. It fixes oscillator and sampler phases and uses 32,768 frames of preroll. It compares fresh processes with reuse across the entire 32-job lifetime, then checks the restart. Its correctness gate requires identical float32 audio, native state readback and renderer provenance. Timing uses adjacent pairs with alternating execution order, including cold starts and process recycling. See the [current measurements](reports/RENDER_WORKER_RESULTS.md).
 
 Vital's [oscillator reset](https://github.com/mtytel/vital/blob/main/src/synthesis/producers/synth_oscillator.cpp) draws random phases; its [random generator](https://github.com/mtytel/vital/blob/main/src/synthesis/framework/utils.h) seeds new generators using a process-wide incrementing counter. This source behavior is consistent with the observed differences when reusing processes with oscillator randomness enabled. Random-phase variation therefore belongs in a separate sampling check, rather than the fixed-input pipeline correctness gate.
 

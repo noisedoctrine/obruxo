@@ -343,8 +343,6 @@ def train_pilot(pool: PilotPool, output: Path, *, config: TrainConfig | None = N
     """Train with fresh renders inside the loop. after_step supports interruption testing."""
     config, stream_config = config or TrainConfig(), stream_config or StreamConfig(prefetch_clips=1)
     _require_prediction_scope(pool.codec, config.prediction_scope)
-    if config.preroll_frames and stream_config.worker_jobs != 1:
-        raise ValueError("qualified basic bootstrap uses one fresh native worker per request")
     if resume is not None and seed_replay is not None:
         raise ValueError("resume embeds its replay seed; do not supply seed_replay again")
     if resume is not None and initial_model is not None:

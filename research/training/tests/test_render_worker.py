@@ -12,12 +12,12 @@ from test_stream import FakeRenderer
 
 
 @dataclass(frozen=True)
-class FreshFactory:
+class CountingFactory:
     def __call__(self):
-        return FreshRenderer()
+        return CountingRenderer()
 
 
-class FreshRenderer:
+class CountingRenderer:
     def __init__(self):
         self.calls = 0
 
@@ -40,14 +40,14 @@ def request_for(pool, mode="valid"):
     return replace(request, preset_json=json.dumps({**document, "preset_name": mode}))
 
 
-def test_worker_reuses_process_but_not_renderer_and_recycles_at_cap(pool):
+def test_worker_reuses_renderer_and_recycles_at_cap(pool):
     before = {child.pid for child in mp.active_children()}
     request = request_for(pool)
-    with RenderWorker(renderer_factory=FreshFactory(), max_jobs=2) as worker:
+    with RenderWorker(renderer_factory=CountingFactory(), max_jobs=2) as worker:
         rows = [worker.render(request, timeout=15) for _ in range(3)]
     assert rows[0][1]["worker_pid"] == rows[1][1]["worker_pid"] != rows[2][1]["worker_pid"]
     assert [row[1]["worker_job"] for row in rows] == [1, 2, 1]
-    assert all(row[1]["renderer_qa"]["instance_calls"] == 1 for row in rows)
+    assert [row[1]["renderer_qa"]["instance_calls"] for row in rows] == [1, 2, 1]
     assert all(np.array_equal(rows[0][0], audio) and not audio.flags.writeable for audio, _ in rows)
     assert {child.pid for child in mp.active_children()} <= before
     with pytest.raises(RuntimeError, match="closed"):
@@ -56,7 +56,7 @@ def test_worker_reuses_process_but_not_renderer_and_recycles_at_cap(pool):
 
 @pytest.mark.parametrize("mode,error", [("crash", "WorkerExited"), ("hang", "RenderTimeout"), ("dtype", "ValueError")])
 def test_worker_failure_is_charged_and_next_call_uses_new_process(pool, mode, error):
-    with RenderWorker(renderer_factory=FreshFactory(), max_jobs=8) as worker:
+    with RenderWorker(renderer_factory=CountingFactory(), max_jobs=8) as worker:
         _, first = worker.render(request_for(pool), timeout=15)
         audio, failed = worker.render(request_for(pool, mode), timeout=.2 if mode == "hang" else 15)
         assert audio is None and failed["status"] == "error" and failed["error_type"] == error
@@ -66,7 +66,7 @@ def test_worker_failure_is_charged_and_next_call_uses_new_process(pool, mode, er
 
 
 def test_rejected_audio_does_not_escape_and_next_patch_keeps_worker(pool):
-    with RenderWorker(renderer_factory=FreshFactory()) as worker:
+    with RenderWorker(renderer_factory=CountingFactory()) as worker:
         audio, rejected = worker.render(request_for(pool, "silence"), timeout=15)
         assert audio is None and rejected["status"] == "rejected" and "audio.silence" in rejected["diagnostic_codes"]
         audio, accepted = render_isolated(request_for(pool), worker=worker, timeout=15)
@@ -77,7 +77,7 @@ def test_rejected_audio_does_not_escape_and_next_patch_keeps_worker(pool):
 
 def test_cancellation_reaps_native_worker_before_reusing_shared_memory(pool):
     cancel = Event()
-    with RenderWorker(renderer_factory=FreshFactory()) as worker:
+    with RenderWorker(renderer_factory=CountingFactory()) as worker:
         _, first = worker.render(request_for(pool), timeout=15)
         timer = Timer(.2, cancel.set)
         timer.start()
@@ -94,7 +94,7 @@ def test_reuse_stream_preserves_backpressure_cursor_and_config_identity(pool):
     sampler = PilotSampler(pool)
     size = request_frames(sampler.recipe_at(0).render_request()) * 8
     config = StreamConfig(prefetch_clips=2, prefetch_bytes=size, worker_jobs=2)
-    with OnlineRenderStream(sampler, 3, config=config, renderer_factory=FreshFactory()) as stream:
+    with OnlineRenderStream(sampler, 3, config=config, renderer_factory=CountingFactory()) as stream:
         rows = []
         for result in stream:
             rows.append(result)
@@ -102,20 +102,24 @@ def test_reuse_stream_preserves_backpressure_cursor_and_config_identity(pool):
         cursor = stream.state_dict()
         assert stream.metrics()["peak_reserved_bytes"] == size and stream.metrics()["accepted_acknowledged"] == 3
     assert rows[0].metadata["worker_pid"] == rows[1].metadata["worker_pid"] != rows[2].metadata["worker_pid"]
-    with OnlineRenderStream(sampler, 1, config=config, resume=cursor, renderer_factory=FreshFactory()) as resumed:
+    with OnlineRenderStream(sampler, 1, config=config, resume=cursor, renderer_factory=CountingFactory()) as resumed:
         row = next(resumed)
         assert row.recipe.sequence_id == 3 and row.metadata["worker_job"] == 1
     with pytest.raises(ValueError, match="different stream"):
         OnlineRenderStream(sampler, 1, config=replace(config, worker_jobs=3), resume=cursor)
     assert StreamConfig.from_dict(config.to_dict()) == config
-    legacy = StreamConfig().to_dict()
-    assert "worker_jobs" not in legacy and legacy["stream"] == "isolated_online_render_v1"
-    assert StreamConfig.from_dict(legacy) == StreamConfig()
+    current = StreamConfig().to_dict()
+    assert current["worker_jobs"] == 32 and current["plugin_lifetime"] == "job"
+    assert StreamConfig.from_dict(current) == StreamConfig()
+    with pytest.raises(ValueError, match="lifecycle changed"):
+        StreamConfig.from_dict({**current, "stream": "isolated_online_render_v1"})
+    with pytest.raises(ValueError, match="contract changed"):
+        StreamConfig.from_dict({**current, "plugin_lifetime": "worker"})
 
 
 def test_oversized_request_is_rejected_before_starting_process(pool):
     before = {child.pid for child in mp.active_children()}
-    with RenderWorker(renderer_factory=FreshFactory(), max_bytes=1) as worker:
+    with RenderWorker(renderer_factory=CountingFactory(), max_bytes=1) as worker:
         with pytest.raises(ValueError, match="memory budget"):
             worker.render(request_for(pool))
     assert {child.pid for child in mp.active_children()} <= before
@@ -133,7 +137,7 @@ def test_reused_worker_training_recovers_exact_optimizer_and_rng(pool, tmp_path)
     stream = StreamConfig(prefetch_clips=1, worker_jobs=2)
 
     def train(name, **kwargs):
-        return train_pilot(pool, tmp_path / name, config=config, stream_config=stream, renderer_factory=FreshFactory(), **kwargs)
+        return train_pilot(pool, tmp_path / name, config=config, stream_config=stream, renderer_factory=CountingFactory(), **kwargs)
 
     complete = train("complete")
     train("interrupted", stop_after=2)

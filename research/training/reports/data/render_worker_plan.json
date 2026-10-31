@@ -1,10 +1,61 @@
 {
+  "cases": [
+    {
+      "family": "(0, 0)",
+      "performance": "held_mid"
+    },
+    {
+      "family": "(0, 0)",
+      "performance": "chord_mid"
+    },
+    {
+      "family": "(2, 1)",
+      "performance": "held_mid"
+    },
+    {
+      "family": "(2, 1)",
+      "performance": "chord_mid"
+    },
+    {
+      "family": "(1, 1)",
+      "performance": "held_mid"
+    },
+    {
+      "family": "(1, 1)",
+      "performance": "chord_mid"
+    },
+    {
+      "family": "(1, 0)",
+      "performance": "held_mid"
+    },
+    {
+      "family": "(1, 0)",
+      "performance": "chord_mid"
+    },
+    {
+      "family": "(2, 0)",
+      "performance": "held_mid"
+    },
+    {
+      "family": "(2, 0)",
+      "performance": "chord_mid"
+    },
+    {
+      "family": "(0, 1)",
+      "performance": "held_mid"
+    },
+    {
+      "family": "(0, 1)",
+      "performance": "chord_mid"
+    }
+  ],
   "families": [
-    "wavetable",
-    "layered",
-    "filtered",
-    "modulated",
-    "chorus"
+    "(0, 0)",
+    "(2, 1)",
+    "(1, 1)",
+    "(1, 0)",
+    "(2, 0)",
+    "(0, 1)"
   ],
   "final_test_used": false,
   "fresh_attempts": 33,
@@ -13,65 +64,75 @@
   "phase_control": {
     "osc_1_random_phase": 0.0,
     "osc_2_random_phase": 0.0,
-    "osc_3_random_phase": 0.0
+    "osc_3_random_phase": 0.0,
+    "sample_random_phase": 0.0
   },
-  "pool_id": "5ffac2ae5580d9ccf8dab5c23c186c387960a2fc624e72eb546ca45ba4d8e53b",
-  "qualification": "fixed_phase_fresh_plugins_reusable_worker_v1",
+  "pool_id": "40eaadfabd24790025f99ee39bcb40caae1fa611b8c3a8cbab940b52a6acbe86",
+  "preroll_frames": 32768,
+  "qualification": "reusable_native_renderer_fresh_plugins_v2",
   "requests": [
-    "f9ab884be460c55a4943153cd6ff71d9ec26cf6276e41ada3e56172d998d3ed9",
-    "4027b692d3eba1563ba46b2d09bd1228d401086d15a565499743736c638f3184",
-    "3e3c7416c441e35a243af4dfee29889d13f099cd56657c60811b41ba776be05f",
-    "61097f15370339647ac3d852fbbbb4823a587e4a0f1c4dc92f7cd6081356e6f9",
-    "4026c06ae4919bcf162879cf20fe2081efc75017c4abcf110b7d78cbf7936226"
+    "59e7e25c3a82f036aec2b00c67c92a3ede24f47fe657cbc4cc262b11b963072b",
+    "9177540708f7d56a8dfa4754aba28fb79d4804d134dec7e998b694447149a322",
+    "fb69ea76cada0bd29397372e0e728cb191a6ecfacae20d79418c3507a1c9edc2",
+    "12de02b85f355ac0294d2db0ca88f1e602c2daf444ed061aa0017de717f91b9f",
+    "527bca1bdf022f2825db7b28092fb1daf618a91f17fd0dc2e6bf335d21cc4e8e",
+    "0c118fcb213dff29c5205b3478708ab65d24fae5e183cacb1ee42ea331b9d4ee",
+    "305947fa060465ae54ab32fcfbcc55aed32aa31d3e1f4cd4a81fb4dd0211f686",
+    "20dd3b38c112cea631d7219d8a7917c67fd6a51a0f332a3cf121ef591b54ab17",
+    "5cc4bf060b0acbc4d65efe9a262bc1031d4bbf0998c6d42cd7980511d5910177",
+    "b2eb41a501d3b54de97db40eddef73501c6fd849feca2f9cf19a9b5f9fe55fdd",
+    "8975ba7891ea7916d73025f58bca945e76e5ece195ea3a8a5aec5c0df272819a",
+    "8e57a81a81a787389f2664555c33e59c2bf5d04f8d6818f591b2d8d14d49d727"
   ],
   "reuse_attempts": 33,
   "reuse_order": [
     0,
     1,
-    2,
-    3,
-    4,
+    0,
     0,
     1,
     2,
     3,
     4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
     0,
     1,
     2,
     3,
     4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
     0,
     1,
     2,
     3,
     4,
-    0,
-    1,
-    2,
-    3,
-    4,
-    0,
-    1,
-    2,
-    3,
-    4,
-    0,
-    1,
-    2
+    5
   ],
   "rss_limit_bytes": 8589934592,
   "source": {
-    "data_generation\\obruxo_data\\render\\vita.py": "7874aaf59de491918e47d4ea6f1a91785464feca0c76f133abd6752a7084cbda",
-    "training\\obruxo_training\\stream.py": "8b9feab9141974e4064eca817ba0e54bd45a88607244ed0fc08967c4f31bdd76",
-    "training\\reports\\scripts\\qualify_render_worker.py": "a2ec998d282bf28f185a1c04f5c92e7ccc3d182c7356e43c09f62befce0f09be"
+    "data_generation\\obruxo_data\\render\\vita.py": "a1e7ee708af7c2868e889560514fe68334134e055b62bc064768dd9775ca6498",
+    "training\\obruxo_training\\stream.py": "41d606d6996c1f5549eff4d4e5461c574d0348ba78729a9b77c13cf9941e8d3d",
+    "training\\reports\\scripts\\qualify_render_worker.py": "ba3a70e394b0b247b2ce90c5c975e3b6cf2d683cd5c7c1b9ec4d347d98dc5040"
   },
   "source_training_states": [
-    "6aaab3a8ba4aa2f34d7badc41d28bf86794eb3b09b6d471fafdb6057edbe3ef1",
-    "461ee02b3896884d4e55039e4c6d960f7e7a60a6c477ccf2376bee61493a5954",
-    "aa5073d27ba4207bc1f696c8b5823add229cb467f178e77279926817d89a2d0e",
-    "93d46f0bfcfd44a2225f326fc290c3daa3ee2cfed6a35bc1c9f5daa0b229a45e",
-    "5aba9dd698b2646375ac9a74c34dd168e146e53d0ad62930155a1516c6b8c467"
+    "feea6ed56567153f27b56dd4c4231d010c6eaa42a8c2b5024f82bbc9a4122262",
+    "f20ecf11ec7a8dc5d34f2e1af27d776f391a614f04b430ef8f6841b95326f50c",
+    "d8c281a9483d6122699c3d54a62530c484e2d380a595cc7da40191c4f954fd7c",
+    "65f4559955b1e621508e1b915c6f3571f0a6e732782d000597ea7b0f85bc7aec",
+    "1c2106feeaf9e6451fee95de7a81495605b63b1e214cba4957d31e8f0637db97",
+    "9822599a6cb97be24884206b6dacf6146a46be99484d9322fd646e4d4ff555f4"
   ],
   "split": "train",
   "state_lineage": "diagnostic_phase_fixed_derivatives_of_train_only_sources",
