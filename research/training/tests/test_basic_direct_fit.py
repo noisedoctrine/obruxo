@@ -50,12 +50,17 @@ def receipt(codec, plan, candidate, performance, phase, label, attempt):
 
 
 class FakeSession(fit.PairedSession):
+    def _append(self, row):
+        # The simulated renderer must stamp the same lifecycle contract as native rendering.
+        super()._append({**row, "execution_policy": self.execution_policy})
+
     def render(self, candidate, performance, phase, label):
         self.check_limits()
         attempt = sum(row["event"] == "attempt" and row["phase"] == phase for row in self.events)
         if attempt >= self.plan["limits"][f"{phase}_attempts"]:
             raise RuntimeError("simulation native request limit")
         audio, result = receipt(self.codec, self.plan, candidate, performance, phase, label, attempt)
+        result["execution_policy"] = self.execution_policy
         identity = {key: result[key] for key in ("phase", "label", "attempt", "request_id", "source_sha256", "controlled_sha256")}
         self._append({"event": "attempt", **identity})
         self.renderer_identity = self.plan["expected_renderer_identity"]
