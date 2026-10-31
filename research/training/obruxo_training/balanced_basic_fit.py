@@ -331,6 +331,7 @@ def execute(inputs, output, *, resume=False):
         failure = f"{type(error).__name__}: {error}"
         raise
     finally:
+        native.close()
         monitor.close()
         elapsed = time() - native.started
         archive = sum(path.stat().st_size for path in output.rglob("*") if path.is_file())

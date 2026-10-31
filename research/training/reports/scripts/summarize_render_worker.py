@@ -1,4 +1,4 @@
-"""Publish phase-controlled worker correctness and paired timing evidence."""
+"""Validate and publish the basic-session benchmark and complete-update profile."""
 
 import argparse
 import hashlib
@@ -13,55 +13,80 @@ sys.path[:0] = [str(RESEARCH / "data_generation")]
 from obruxo_data.hashing import canonical_sha256  # noqa: E402
 
 
+def read(path):
+    return json.loads(path.read_text())
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--run", type=Path, required=True)
-    parser.add_argument("--phase-probe", type=Path, required=True)
+    for name in ("run", "profile", "baseline"):
+        parser.add_argument(f"--{name}", type=Path, required=True)
     parser.add_argument("--tests-passed", type=int, required=True)
     args = parser.parse_args()
-    plan = json.loads((args.run / "plan.json").read_text())
-    summary = json.loads((args.run / "summary.json").read_text())
-    probe = json.loads((args.phase_probe / "summary.json").read_text())
+    plan, summary = read(args.run / "plan.json"), read(args.run / "summary.json")
     events = [json.loads(line) for line in (args.run / "renders.jsonl").read_text().splitlines()]
-    if (summary["plan_sha256"] != canonical_sha256(plan) or plan["phase_control"] != {f"osc_{i}_random_phase": 0 for i in range(1, 4)}
-            or plan["timing_design"] != "adjacent_fresh_reuse_pairs_with_alternating_order"
+    if (summary["format"] != "obruxo_render_worker_qualification_v3" or summary["plan_sha256"] != canonical_sha256(plan)
             or len(events) != 66 or any(row["status"] != "accepted" for row in events)
-            or not probe["all_audio_identical"] or not probe["all_native_states_identical"]
-            or len(summary["checks"]) != 33 or not all(row["audio_float32_identical"] and row["native_state_identical"]
-                                                      and row["provenance_identical"] for row in summary["checks"])):
-        raise ValueError("worker evidence is incomplete or not phase-controlled")
+            or not summary["qualified"] or not all(summary["gates"].values()) or len(summary["checks"]) != 33):
+        raise ValueError("worker evidence is incomplete or failed qualification")
+    for row in summary["checks"]:
+        if (not row["native_state_identical"] or not row["provenance_identical"]
+                or row["maximum_absolute_sample_error"] > plan["numeric_limits"]["maximum_absolute_sample_error"]
+                or row["waveform_rmse"] > plan["numeric_limits"]["waveform_rmse"]):
+            raise ValueError("native equivalence limits failed")
     for name, expected in plan["source"].items():
         if hashlib.sha256((RESEARCH / name).read_bytes()).hexdigest() != expected:
             raise ValueError(f"worker qualification source changed: {name}")
-    fresh = [row for row in events if row["mode"] == "fresh"]
-    reused = [row for row in events if row["mode"] == "reuse"]
-    if (not math.isclose(mean(row["wall_seconds"] for row in fresh), summary["matched_fresh_mean_seconds"], abs_tol=1e-12)
-            or not math.isclose(mean(row["wall_seconds"] for row in reused), summary["reuse_mean_seconds"], abs_tol=1e-12)
-            or [row["worker_job"] for row in reused] != [*range(1, 33), 1]):
-        raise ValueError("worker timings or process lifetime do not match native outcomes")
-    summary.update(local_tests_passed=args.tests_passed, github_actions="disabled",
-                   phase_probe=probe, raw_evidence_sha256=hashlib.sha256((args.run / "renders.jsonl").read_bytes()).hexdigest())
-    summary["software_verification"] = {"initial_full_suite_passed": 250, "initial_full_suite_failed": 1,
-                                        "affected_test_rerun_passed": 1, "affected_test_rerun_seconds": 15.60,
-                                        "cause": "Simulated render exceeded its 60s deadline after a 383s wall-clock scheduling gap; recorded Windows Modern Standby transitions accompanied the pause. The failed render correctly advanced the stream cursor, so that run could not match the no-error trajectory. Production deadlines were not changed."}
+    for mode, key in (("fresh", "matched_fresh_mean_seconds"), ("reuse", "reuse_mean_seconds")):
+        if not math.isclose(mean(row["wall_seconds"] for row in events if row["mode"] == mode), summary[key], abs_tol=1e-12):
+            raise ValueError("worker timings do not match native outcomes")
+    if [row["worker_job"] for row in events if row["mode"] == "reuse"] != [*range(1, 33), 1]:
+        raise ValueError("worker lifetime does not match the plan")
+    profile, baseline = read(args.profile / "summary.json"), read(args.baseline / "summary.json")
+    if (not profile["complete"] or not profile["original_artifacts_unchanged"] or not profile["training_numerics_within_limits"]
+            or profile["updates"] != 1 or profile["native_requests"] != baseline["native_requests"]):
+        raise ValueError("complete-update comparison is incomplete")
+    for actual, limit in (("maximum_loss_error", "absolute_loss_error"), ("maximum_gradient_error", "absolute_gradient_error"),
+            ("maximum_relative_gradient_error", "relative_gradient_error_above_0_01"), ("maximum_parameter_update_error", "parameter_update_error")):
+        if profile[actual] > plan["training_limits"][limit]:
+            raise ValueError(f"training stability failed: {actual}")
+    public_profile = {key: value for key, value in profile.items() if key not in {"input_setup", "frontend", "frontend_samples_seconds"}}
+    case_fields = ("case", "family", "performance", "maximum_absolute_sample_error", "waveform_rmse", "audio_float32_identical",
+                   "native_state_identical", "provenance_identical", "direct_controls", "engine_reused")
+    summary["checks"] = [{key: row[key] for key in case_fields} for row in summary["checks"]]
+    summary.update(local_tests_passed=args.tests_passed, github_actions="disabled", pipeline_profile=public_profile,
+                   pipeline_baseline={key: baseline[key] for key in ("update", "worker_stages_total_seconds", "worker_wall_seconds")},
+                   raw_evidence_sha256=hashlib.sha256((args.run / "renders.jsonl").read_bytes()).hexdigest(),
+                   profile_evidence_sha256=hashlib.sha256((args.profile / "summary.json").read_bytes()).hexdigest())
     reports = Path(__file__).resolve().parents[1]
     for name, value in (("render_worker_plan.json", plan), ("render_worker_summary.json", summary)):
         (reports / "data" / name).write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
-    decision = "passed all local correctness, timing and memory gates" if summary["qualified"] else "passed correctness but did not pass every performance gate"
-    rows = ["# Reusable render-worker qualification", "",
-            f"The reusable worker **{decision}**. With oscillator phases fixed, all 33 reused-worker outputs matched fresh-process float32 audio, native state and provenance exactly, including the process restart after 32 jobs. All 66 native attempts passed QA.", "",
-            f"Mean whole-call time was **{summary['matched_fresh_mean_seconds']:.3f}s fresh** versus **{summary['reuse_mean_seconds']:.3f}s reused**, a **{100 * summary['mean_wall_reduction']:+.1f}% reduction**. The paired check alternated fresh-first and reuse-first order for adjacent renders of the same patch. It includes cold starts and recycling, rather than comparing one early baseline with a long later batch. Sampled peak process-tree RSS was {summary['peak_process_tree_rss_bytes'] / 2**20:.1f} MiB.", "",
-            "## Correctness controls", "",
-            "An initial uncontrolled check mixed pipeline reproducibility with oscillator phase randomization. That was an invalid correctness test: identical settings may legitimately generate different waveforms when random phases change. Its speed numbers are not the final comparison. The corrected gate disables oscillator randomization in diagnostic copies, preserves fixed phase knobs and the actual training pool, and requires exact audio equality on this pinned local runtime.", "",
-            f"A separate causal probe accepted {probe['accepted']}/{probe['native_attempts']} native attempts. Turning off oscillator phase randomization alone produced identical audio and state for all ten reused renders across five families. The full lifetime check then reproduced this over 32 jobs and a restart. Random-phase variation remains a separate training/sampling concern; no tolerance was loosened to make the reproducibility gate pass.", "",
-            "The pilot and alpha codec correctness checks now use explicit phase-controlled diagnostic variants as well. They compare codec controls and nested state before applying phase controls, register the derived states under training lineage, and save a distinct check identity. Ordinary training patches and audio-quality evaluation requests retain their requested phase settings.", "",
-            f"The full local renderer/training command produced **250 passed and one failed**. The affected recovery test then passed in isolation in 15.60s, covering **{args.tests_passed} distinct checks** across the full run and targeted rerun. Its first run recorded a simulated render timeout after a 383s scheduling gap while Windows Modern Standby transitions were observed. That error correctly advanced the recipe cursor, so the test no longer had the same patch sequence as its no-error control. No production deadline or correctness tolerance was relaxed.", "",
-            "Dedicated checks cover fresh renderer instances, bounded process lifetimes, QA rejection, crashes, deadlines, cancellation, shared-memory cleanup, queue limits, cursor compatibility and exact optimizer/RNG checkpoint recovery with reuse. Existing one-job contracts and exports remain compatible. GitHub Actions stays disabled.", "",
-            "## Scope", "",
-            "This qualifies the pinned Windows Vital/DawDreamer path on five authored training families with a 32-job lifetime. It does not qualify Linux/Colab, unrestricted full-schema presets, random-phase bit reproducibility or finished-model quality. A sampled RSS maximum over this bounded run is not an unlimited-duration leak test. The previous one-job default remains unchanged; new runs opt in and freeze their worker policy.", "",
-            "[Usage](../RENDER_WORKER.md) · [Frozen plan](data/render_worker_plan.json) · [Aggregate evidence](data/render_worker_summary.json)", ""]
+    old_time, new_time = (value["update"]["complete_update"]["inclusive"] for value in (baseline, profile))
+    old, new = baseline["worker_stages_total_seconds"], profile["worker_stages_total_seconds"]
+    sample_error = max(row["maximum_absolute_sample_error"] for row in summary["checks"])
+    rows = ["# Basic Vital session results — 1 November 2026", "",
+            f"The same 126-render training update took **{old_time:.2f}s before and {new_time:.2f}s after** ({old_time/new_time:.2f}× faster in these local profiles). Candidate controls and acceptance decisions were preserved. The profiles were separate runs, so host conditions also affect absolute times; this is not a full-fit timing claim.", "",
+            f"The adjacent-pair benchmark provides the controlled render comparison: **{summary['matched_fresh_mean_seconds']:.3f}s fresh versus {summary['reuse_mean_seconds']:.3f}s reused**, {100*summary['mean_wall_reduction']:.1f}% less time across 33 pairs, including cold starts and recycling. All 66 attempts passed QA and all restart/memory gates passed.", "",
+            "## Changes and measured costs", "",
+            "| Work per 126-render update | Before | After |", "| --- | ---: | ---: |",
+            *[f"| {label} | {a:.3f}s | {b:.3f}s |" for label,a,b in (("Create Vital instances", old["plugin_creation"], new["plugin_creation"]),
+              ("Load/apply patch controls", old["plugin_state_load"], new["direct_parameter_updates"]),
+              ("Validate requests", old["request_validation"], new["request_validation"]),
+              ("Whole native worker calls", baseline["worker_wall_seconds"], profile["worker_wall_seconds"]))], "",
+            "The basic profile keeps one engine/plugin per worker, clears MIDI each request, and uses the host's normal render reset. It loads the complete preset initially and updates the eleven controls thereafter. Setter normalization explicitly matches the full loader's float32 arithmetic. Every render still saves and verifies native state, fingerprints the plugin and checks the audio.", "",
+            "Only the reviewed legacy basic domain, 44.1kHz, 128-sample buffers, 32,768-frame preroll, fixed oscillator/sampler phases and unchanged init assets/routes/effects qualify. The shared control definition keeps the codec and renderer bounds aligned. Template changes force revalidation/recreation; other presets use the full loading path in the same renderer.", "",
+            "## Numerical correctness", "",
+            f"The fixed-phase paired check found maximum absolute sample error **{sample_error:.3g}**, with native readback/provenance identical. {sum(row['audio_float32_identical'] for row in summary['checks'])}/33 audio buffers were bit-identical; the remaining pairs passed the explicit numeric limits recorded in the plan. This is numerical equivalence, not a bit-identical claim.", "",
+            f"For the complete update, maximum loss difference was **{profile['maximum_loss_error']:.3g}**, gradient coefficient difference **{profile['maximum_gradient_error']:.3g}**, and model-weight update difference **{profile['maximum_parameter_update_error']:.3g}**. All 126 requested candidate controls matched the original workload exactly; {profile['exact_native_hash_matches']}/126 waveform hashes matched exactly. The full trace differs in tiny measured numeric values. Original training artifacts were unchanged.", "",
+            "An initial double-precision setter conversion amplified tiny rounding differences in Adam and failed the update-stability guard. Matching the full loader's float32 arithmetic fixed that failure. The rejected setter and float32-readback-fallback implementations were removed; no optimizer or loss changes were introduced to accommodate them.", "",
+            f"{args.tests_passed} focused local regression checks passed, covering generic fallback, control/structure guards, native state checks, MIDI cleanup, worker failure/recycling, backpressure and checkpoint recovery. Static correctness lint and whitespace checks passed. GitHub Actions remains disabled.", "",
+            "## Remaining cost and scope", "",
+            f"Native worker calls now account for {100*profile['worker_wall_seconds']/new_time:.1f}% of the update. Spectral feature extraction and loss comparisons together take {profile['update']['spectral_features']['exclusive']+profile['update']['spectral_loss']['exclusive']:.2f}s. There are still 120 gradient-probe renders and six acceptance renders per update; the number of trials remains an important efficiency target.", "",
+            "This qualifies the recorded basic Windows workload and numerical bounds. It does not establish finished-model quality or arbitrary-preset/cross-platform equivalence. The v3 lifecycle is frozen in new stream contracts and native receipts; historical runs use their recorded source revision.", "",
+            "[Usage](../RENDER_WORKER.md) · [Plan](data/render_worker_plan.json) · [Measurements](data/render_worker_summary.json)", ""]
     (reports / "RENDER_WORKER_RESULTS.md").write_text("\n".join(rows), encoding="utf-8", newline="\n")
-    print(json.dumps({key: summary[key] for key in ("qualified", "gates", "mean_wall_reduction", "accepted")}, indent=2))
+    print(json.dumps({"qualified": summary["qualified"], "paired_wall_reduction": summary["mean_wall_reduction"],
+                      "update_before_seconds": old_time, "update_after_seconds": new_time}, indent=2))
 
 
 if __name__ == "__main__":

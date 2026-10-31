@@ -100,8 +100,8 @@ def test_profile_refuses_mixed_seed_resume_and_tampered_replay(trained, tmp_path
     torch.save(saved, tmp_path / "tampered.pt")
     with pytest.raises(ValueError, match="phase policy changed"):
         train_pilot(pool, tmp_path / "tampered", config=config, resume=tmp_path / "tampered.pt")
-    with pytest.raises(ValueError, match="one fresh native worker"):
-        train_pilot(pool, tmp_path / "batch", config=config, stream_config=StreamConfig(worker_jobs=2))
+    with pytest.raises(ValueError, match="contract changed"):
+        train_pilot(pool, tmp_path / "batch", config=config, stream_config=StreamConfig(worker_jobs=2), resume=source)
 
 
 def test_profiled_validation_controls_every_render(trained, tmp_path):

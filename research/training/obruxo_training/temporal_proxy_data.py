@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import platform
 from time import time
+from weakref import finalize
 
 import numpy as np
 import torch
@@ -24,7 +25,7 @@ from .proxy import performance_inputs
 from .reproducibility import fixed_generator_phases
 from .spectral import SpectralTargets, target_bytes
 from .spectral_controls import BasicControlAdapter
-from .stream import NativeRendererFactory, RenderWorker
+from .stream import NativeRendererFactory, RenderWorker, StreamConfig
 from .temporal_proxy import sample_frames, temporal_proxy_spec
 from .trainer import atomic_torch_save
 
@@ -158,8 +159,16 @@ class NativeSession:
         self.factory = renderer_factory or NativeRendererFactory(renderer_id=codec.contract.renderer_id)
         self.path = output / "renders.jsonl"
         self.events = [json.loads(line) for line in self.path.read_text().splitlines()] if self.path.exists() else []
+        self.execution_policy = {"lifecycle": "basic_native_session_v3", "worker_jobs": StreamConfig().worker_jobs}
+        if any(row.get("execution_policy") != self.execution_policy for row in self.events):
+            raise ValueError("render lifecycle changed; resume historical runs from their recorded source revision")
         self.renderer_identity = next((row["renderer_identity"] for row in self.events if row.get("renderer_identity") is not None), None)
         self.started = json.loads((output / "run.json").read_text())["started_unix"]
+        self.worker = RenderWorker(renderer_factory=self.factory, max_jobs=self.execution_policy["worker_jobs"])
+        self._cleanup = finalize(self, self.worker.close)
+
+    def close(self):
+        self._cleanup()
 
     def check_limits(self):
         if time() - self.started >= self.plan["limits"]["wall_seconds"]:
@@ -184,12 +193,11 @@ class NativeSession:
         request = RenderRequest(preset_json=fixed_generator_phases(source).decode(), performance=performance,
                                 renderer_id=self.codec.contract.renderer_id, tail_seconds=self.codec.contract.tail_seconds,
                                 preroll_frames=self.plan.get("render_profile", {}).get("preroll_frames", 0))
-        identity = {"phase": phase, "label": label, "request_id": request.request_id, "attempt": count,
+        identity = {"phase": phase, "label": label, "request_id": request.request_id, "attempt": count, "execution_policy": self.execution_policy,
                     "source_sha256": sha256_bytes(source), "controlled_sha256": sha256_bytes(request.preset_json.encode())}
         self._append({"event": "attempt", **identity})
         remaining = self.plan["limits"]["wall_seconds"] - (time() - self.started)
-        with RenderWorker(renderer_factory=self.factory, max_jobs=1) as worker:
-            audio, metadata = worker.render(request, timeout=min(60., max(.1, remaining)))
+        audio, metadata = self.worker.render(request, timeout=min(60., max(.1, remaining)))
         if audio is not None:
             current = {key: value for key, value in metadata["provenance"].items() if key != "request_id"}
             if self.renderer_identity is not None and current != self.renderer_identity:

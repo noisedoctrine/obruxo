@@ -1,23 +1,36 @@
-# Reusable render-worker qualification
+# Basic Vital session results — 1 November 2026
 
-The reusable worker **passed all local correctness, timing and memory gates**. With oscillator phases fixed, all 33 reused-worker outputs matched fresh-process float32 audio, native state and provenance exactly, including the process restart after 32 jobs. All 66 native attempts passed QA.
+The same 126-render training update took **181.24s before and 33.29s after** (5.44× faster in these local profiles). Candidate controls and acceptance decisions were preserved. The profiles were separate runs, so host conditions also affect absolute times; this is not a full-fit timing claim.
 
-Mean whole-call time was **2.461s fresh** versus **2.051s reused**, a **+16.7% reduction**. The paired check alternated fresh-first and reuse-first order for adjacent renders of the same patch. It includes cold starts and recycling, rather than comparing one early baseline with a long later batch. Sampled peak process-tree RSS was 640.3 MiB.
+The adjacent-pair benchmark provides the controlled render comparison: **1.453s fresh versus 0.211s reused**, 85.5% less time across 33 pairs, including cold starts and recycling. All 66 attempts passed QA and all restart/memory gates passed.
 
-## Correctness controls
+## Changes and measured costs
 
-An initial uncontrolled check mixed pipeline reproducibility with oscillator phase randomization. That was an invalid correctness test: identical settings may legitimately generate different waveforms when random phases change. Its speed numbers are not the final comparison. The corrected gate disables oscillator randomization in diagnostic copies, preserves fixed phase knobs and the actual training pool, and requires exact audio equality on this pinned local runtime.
+| Work per 126-render update | Before | After |
+| --- | ---: | ---: |
+| Create Vital instances | 77.349s | 1.500s |
+| Load/apply patch controls | 26.668s | 0.713s |
+| Validate requests | 16.182s | 0.391s |
+| Whole native worker calls | 159.203s | 19.638s |
 
-A separate causal probe accepted 15/15 native attempts. Turning off oscillator phase randomization alone produced identical audio and state for all ten reused renders across five families. The full lifetime check then reproduced this over 32 jobs and a restart. Random-phase variation remains a separate training/sampling concern; no tolerance was loosened to make the reproducibility gate pass.
+The basic profile keeps one engine/plugin per worker, clears MIDI each request, and uses the host's normal render reset. It loads the complete preset initially and updates the eleven controls thereafter. Setter normalization explicitly matches the full loader's float32 arithmetic. Every render still saves and verifies native state, fingerprints the plugin and checks the audio.
 
-The pilot and alpha codec correctness checks now use explicit phase-controlled diagnostic variants as well. They compare codec controls and nested state before applying phase controls, register the derived states under training lineage, and save a distinct check identity. Ordinary training patches and audio-quality evaluation requests retain their requested phase settings.
+Only the reviewed legacy basic domain, 44.1kHz, 128-sample buffers, 32,768-frame preroll, fixed oscillator/sampler phases and unchanged init assets/routes/effects qualify. The shared control definition keeps the codec and renderer bounds aligned. Template changes force revalidation/recreation; other presets use the full loading path in the same renderer.
 
-The full local renderer/training command produced **250 passed and one failed**. The affected recovery test then passed in isolation in 15.60s, covering **251 distinct checks** across the full run and targeted rerun. Its first run recorded a simulated render timeout after a 383s scheduling gap while Windows Modern Standby transitions were observed. That error correctly advanced the recipe cursor, so the test no longer had the same patch sequence as its no-error control. No production deadline or correctness tolerance was relaxed.
+## Numerical correctness
 
-Dedicated checks cover fresh renderer instances, bounded process lifetimes, QA rejection, crashes, deadlines, cancellation, shared-memory cleanup, queue limits, cursor compatibility and exact optimizer/RNG checkpoint recovery with reuse. Existing one-job contracts and exports remain compatible. GitHub Actions stays disabled.
+The fixed-phase paired check found maximum absolute sample error **2.24e-08**, with native readback/provenance identical. 9/33 audio buffers were bit-identical; the remaining pairs passed the explicit numeric limits recorded in the plan. This is numerical equivalence, not a bit-identical claim.
 
-## Scope
+For the complete update, maximum loss difference was **5.96e-08**, gradient coefficient difference **5.96e-07**, and model-weight update difference **2.33e-10**. All 126 requested candidate controls matched the original workload exactly; 36/126 waveform hashes matched exactly. The full trace differs in tiny measured numeric values. Original training artifacts were unchanged.
 
-This qualifies the pinned Windows Vital/DawDreamer path on five authored training families with a 32-job lifetime. It does not qualify Linux/Colab, unrestricted full-schema presets, random-phase bit reproducibility or finished-model quality. A sampled RSS maximum over this bounded run is not an unlimited-duration leak test. The previous one-job default remains unchanged; new runs opt in and freeze their worker policy.
+An initial double-precision setter conversion amplified tiny rounding differences in Adam and failed the update-stability guard. Matching the full loader's float32 arithmetic fixed that failure. The rejected setter and float32-readback-fallback implementations were removed; no optimizer or loss changes were introduced to accommodate them.
 
-[Usage](../RENDER_WORKER.md) · [Frozen plan](data/render_worker_plan.json) · [Aggregate evidence](data/render_worker_summary.json)
+117 focused local regression checks passed, covering generic fallback, control/structure guards, native state checks, MIDI cleanup, worker failure/recycling, backpressure and checkpoint recovery. Static correctness lint and whitespace checks passed. GitHub Actions remains disabled.
+
+## Remaining cost and scope
+
+Native worker calls now account for 59.0% of the update. Spectral feature extraction and loss comparisons together take 8.29s. There are still 120 gradient-probe renders and six acceptance renders per update; the number of trials remains an important efficiency target.
+
+This qualifies the recorded basic Windows workload and numerical bounds. It does not establish finished-model quality or arbitrary-preset/cross-platform equivalence. The v3 lifecycle is frozen in new stream contracts and native receipts; historical runs use their recorded source revision.
+
+[Usage](../RENDER_WORKER.md) · [Plan](data/render_worker_plan.json) · [Measurements](data/render_worker_summary.json)

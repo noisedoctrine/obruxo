@@ -2,811 +2,712 @@
   "accepted": 66,
   "attempted": 66,
   "audio_files_written": 0,
+  "backend_mean_seconds": {
+    "fresh": 0.7652532181766053,
+    "reuse": 0.15790271514561027
+  },
   "checks": [
     {
       "audio_float32_identical": true,
       "case": 0,
-      "family": "wavetable",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": false,
+      "engine_reused": false,
+      "family": "(0, 0)",
+      "maximum_absolute_sample_error": 0.0,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "held_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 0.0
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 1,
-      "family": "layered",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(0, 0)",
+      "maximum_absolute_sample_error": 7.450580596923828e-09,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "chord_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 1.43600214126491e-10
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 2,
-      "family": "filtered",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(0, 0)",
+      "maximum_absolute_sample_error": 7.275957614183426e-12,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "held_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 4.68100309073531e-14
     },
     {
       "audio_float32_identical": true,
       "case": 3,
-      "family": "modulated",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(0, 0)",
+      "maximum_absolute_sample_error": 0.0,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "held_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 0.0
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 4,
-      "family": "chorus",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(0, 0)",
+      "maximum_absolute_sample_error": 7.450580596923828e-09,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "chord_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 1.43600214126491e-10
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 5,
-      "family": "wavetable",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(2, 1)",
+      "maximum_absolute_sample_error": 1.0186340659856796e-10,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "held_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 4.802752873956543e-13
     },
     {
       "audio_float32_identical": true,
       "case": 6,
-      "family": "layered",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(2, 1)",
+      "maximum_absolute_sample_error": 0.0,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "chord_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 0.0
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 7,
-      "family": "filtered",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(1, 1)",
+      "maximum_absolute_sample_error": 5.093170329928398e-11,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "held_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 4.378678008875974e-13
     },
     {
       "audio_float32_identical": true,
       "case": 8,
-      "family": "modulated",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(1, 1)",
+      "maximum_absolute_sample_error": 0.0,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "chord_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 0.0
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 9,
-      "family": "chorus",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(1, 0)",
+      "maximum_absolute_sample_error": 7.450580596923828e-09,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "held_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 6.695317327016684e-11
     },
     {
       "audio_float32_identical": true,
       "case": 10,
-      "family": "wavetable",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(1, 0)",
+      "maximum_absolute_sample_error": 0.0,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "chord_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 0.0
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 11,
-      "family": "layered",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(2, 0)",
+      "maximum_absolute_sample_error": 2.9103830456733704e-11,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "held_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 1.2165474853484423e-13
     },
     {
       "audio_float32_identical": true,
       "case": 12,
-      "family": "filtered",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(2, 0)",
+      "maximum_absolute_sample_error": 0.0,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "chord_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 0.0
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 13,
-      "family": "modulated",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(0, 1)",
+      "maximum_absolute_sample_error": 2.9103830456733704e-11,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "held_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 3.5697396677278137e-13
     },
     {
       "audio_float32_identical": true,
       "case": 14,
-      "family": "chorus",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(0, 1)",
+      "maximum_absolute_sample_error": 0.0,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "chord_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 0.0
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 15,
-      "family": "wavetable",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(0, 0)",
+      "maximum_absolute_sample_error": 7.275957614183426e-12,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "held_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 4.68100309073531e-14
     },
     {
       "audio_float32_identical": true,
       "case": 16,
-      "family": "layered",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(0, 0)",
+      "maximum_absolute_sample_error": 0.0,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "chord_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 0.0
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 17,
-      "family": "filtered",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(2, 1)",
+      "maximum_absolute_sample_error": 1.0186340659856796e-10,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "held_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 4.802752873956543e-13
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 18,
-      "family": "modulated",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(2, 1)",
+      "maximum_absolute_sample_error": 5.820766091346741e-11,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "chord_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 6.114037117564247e-13
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 19,
-      "family": "chorus",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(1, 1)",
+      "maximum_absolute_sample_error": 5.093170329928398e-11,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "held_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 4.378678008875974e-13
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 20,
-      "family": "wavetable",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(1, 1)",
+      "maximum_absolute_sample_error": 9.313225746154785e-10,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "chord_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 7.415793512577482e-12
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 21,
-      "family": "layered",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(1, 0)",
+      "maximum_absolute_sample_error": 7.450580596923828e-09,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "held_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 6.695317327016684e-11
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 22,
-      "family": "filtered",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(1, 0)",
+      "maximum_absolute_sample_error": 2.2351741790771484e-08,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "chord_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 1.502880836158142e-10
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 23,
-      "family": "modulated",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(2, 0)",
+      "maximum_absolute_sample_error": 2.9103830456733704e-11,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "held_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 1.2165474853484423e-13
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 24,
-      "family": "chorus",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(2, 0)",
+      "maximum_absolute_sample_error": 4.3655745685100555e-11,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "chord_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 3.4425457799222523e-13
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 25,
-      "family": "wavetable",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(0, 1)",
+      "maximum_absolute_sample_error": 2.9103830456733704e-11,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "held_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 3.5697396677278137e-13
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 26,
-      "family": "layered",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(0, 1)",
+      "maximum_absolute_sample_error": 2.9103830456733704e-11,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "chord_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 1.1651551969718353e-13
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 27,
-      "family": "filtered",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(0, 0)",
+      "maximum_absolute_sample_error": 7.275957614183426e-12,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "held_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 4.68100309073531e-14
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 28,
-      "family": "modulated",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(0, 0)",
+      "maximum_absolute_sample_error": 2.9103830456733704e-11,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "chord_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 1.8722206085593543e-13
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 29,
-      "family": "chorus",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(2, 1)",
+      "maximum_absolute_sample_error": 1.0186340659856796e-10,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "held_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 4.802752873956543e-13
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 30,
-      "family": "wavetable",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(2, 1)",
+      "maximum_absolute_sample_error": 5.820766091346741e-11,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "chord_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 6.114037117564247e-13
     },
     {
-      "audio_float32_identical": true,
+      "audio_float32_identical": false,
       "case": 31,
-      "family": "layered",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": true,
+      "engine_reused": true,
+      "family": "(1, 1)",
+      "maximum_absolute_sample_error": 5.093170329928398e-11,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "held_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 4.378678008875974e-13
     },
     {
       "audio_float32_identical": true,
       "case": 32,
-      "family": "filtered",
-      "log_spectral_rmse": 0.0,
+      "direct_controls": false,
+      "engine_reused": false,
+      "family": "(1, 1)",
+      "maximum_absolute_sample_error": 0.0,
       "native_state_identical": true,
-      "peak_absolute": 0.0,
+      "performance": "chord_mid",
       "provenance_identical": true,
-      "rms_relative": 0.0,
-      "tolerance": {
-        "log_spectral_rmse": 0.35,
-        "peak_absolute": 0.1,
-        "rms_relative": 0.01
-      },
-      "waveform_relative_rmse": 0.0,
-      "waveform_rmse": 0.0,
-      "within_tolerance": true
+      "waveform_rmse": 0.0
     }
   ],
-  "elapsed_seconds": 150.8337470999977,
+  "elapsed_seconds": 56.29928569996264,
   "final_test_used": false,
-  "format": "obruxo_render_worker_qualification_v1",
+  "format": "obruxo_render_worker_qualification_v3",
   "gates": {
+    "basic_session_used": true,
     "bounded_lifetime_and_cleanup": true,
     "memory": true,
     "native_equivalence": true,
     "wall_reduction": true
   },
   "github_actions": "disabled",
-  "limit": "Fixed-phase reproducibility on local Windows pinned Vital/DawDreamer, five training families and 32-job lifetime; random-phase draws are separate, and this is not Linux qualification or a model-quality claim.",
-  "local_tests_passed": 251,
-  "matched_fresh_mean_seconds": 2.461076136362945,
-  "mean_wall_reduction": 0.16650178006308836,
-  "peak_process_tree_rss_bytes": 671412224,
-  "phase_probe": {
-    "accepted": 15,
-    "all_audio_identical": true,
-    "all_native_states_identical": true,
-    "all_within_tolerance": true,
-    "checks": [
-      {
-        "audio_float32_identical": true,
-        "case": 0,
-        "family": "wavetable",
-        "log_spectral_rmse": 0.0,
-        "native_state_identical": true,
-        "peak_absolute": 0.0,
-        "rms_relative": 0.0,
-        "tolerance": {
-          "log_spectral_rmse": 0.35,
-          "peak_absolute": 0.1,
-          "rms_relative": 0.01
-        },
-        "waveform_relative_rmse": 0.0,
-        "waveform_rmse": 0.0,
-        "within_tolerance": true
+  "limit": "Fixed-phase reproducibility on local Windows pinned Vital/DawDreamer, the recorded training cases and 32-job lifetime; random-phase draws are separate, and this is not Linux qualification or a model-quality claim.",
+  "local_tests_passed": 117,
+  "matched_fresh_mean_seconds": 1.4529654606047906,
+  "mean_wall_reduction": 0.8547956286158809,
+  "peak_process_tree_rss_bytes": 729161728,
+  "pipeline_baseline": {
+    "update": {
+      "append_ledger": {
+        "calls": 127,
+        "exclusive": 0.12503929901868105,
+        "inclusive": 1.1782049995381385
       },
-      {
-        "audio_float32_identical": true,
-        "case": 1,
-        "family": "layered",
-        "log_spectral_rmse": 0.0,
-        "native_state_identical": true,
-        "peak_absolute": 0.0,
-        "rms_relative": 0.0,
-        "tolerance": {
-          "log_spectral_rmse": 0.35,
-          "peak_absolute": 0.1,
-          "rms_relative": 0.01
-        },
-        "waveform_relative_rmse": 0.0,
-        "waveform_rmse": 0.0,
-        "within_tolerance": true
+      "atomic_checkpoint_or_audio_save": {
+        "calls": 4,
+        "exclusive": 0.03670900012366474,
+        "inclusive": 0.13218120008241385
       },
-      {
-        "audio_float32_identical": true,
-        "case": 2,
-        "family": "filtered",
-        "log_spectral_rmse": 0.0,
-        "native_state_identical": true,
-        "peak_absolute": 0.0,
-        "rms_relative": 0.0,
-        "tolerance": {
-          "log_spectral_rmse": 0.35,
-          "peak_absolute": 0.1,
-          "rms_relative": 0.01
-        },
-        "waveform_relative_rmse": 0.0,
-        "waveform_rmse": 0.0,
-        "within_tolerance": true
+      "capture_predictions": {
+        "calls": 1,
+        "exclusive": 0.007788799935951829,
+        "inclusive": 0.1342870999360457
       },
-      {
-        "audio_float32_identical": true,
-        "case": 3,
-        "family": "modulated",
-        "log_spectral_rmse": 0.0,
-        "native_state_identical": true,
-        "peak_absolute": 0.0,
-        "rms_relative": 0.0,
-        "tolerance": {
-          "log_spectral_rmse": 0.35,
-          "peak_absolute": 0.1,
-          "rms_relative": 0.01
-        },
-        "waveform_relative_rmse": 0.0,
-        "waveform_rmse": 0.0,
-        "within_tolerance": true
+      "complete_update": {
+        "calls": 1,
+        "exclusive": 0.2019558004103601,
+        "inclusive": 181.23739530006424
       },
-      {
-        "audio_float32_identical": true,
-        "case": 4,
-        "family": "chorus",
-        "log_spectral_rmse": 0.0,
-        "native_state_identical": true,
-        "peak_absolute": 0.0,
-        "rms_relative": 0.0,
-        "tolerance": {
-          "log_spectral_rmse": 0.35,
-          "peak_absolute": 0.1,
-          "rms_relative": 0.01
-        },
-        "waveform_relative_rmse": 0.0,
-        "waveform_rmse": 0.0,
-        "within_tolerance": true
+      "disk_flush": {
+        "calls": 384,
+        "exclusive": 2.3302004009019583,
+        "inclusive": 2.3302004009019583
       },
-      {
-        "audio_float32_identical": true,
-        "case": 5,
-        "family": "wavetable",
-        "log_spectral_rmse": 0.0,
-        "native_state_identical": true,
-        "peak_absolute": 0.0,
-        "rms_relative": 0.0,
-        "tolerance": {
-          "log_spectral_rmse": 0.35,
-          "peak_absolute": 0.1,
-          "rms_relative": 0.01
-        },
-        "waveform_relative_rmse": 0.0,
-        "waveform_rmse": 0.0,
-        "within_tolerance": true
+      "file_read": {
+        "calls": 130,
+        "exclusive": 0.21586849971208721,
+        "inclusive": 0.21586849971208721
       },
-      {
-        "audio_float32_identical": true,
-        "case": 6,
-        "family": "layered",
-        "log_spectral_rmse": 0.0,
-        "native_state_identical": true,
-        "peak_absolute": 0.0,
-        "rms_relative": 0.0,
-        "tolerance": {
-          "log_spectral_rmse": 0.35,
-          "peak_absolute": 0.1,
-          "rms_relative": 0.01
-        },
-        "waveform_relative_rmse": 0.0,
-        "waveform_rmse": 0.0,
-        "within_tolerance": true
+      "gradient_estimation": {
+        "calls": 4,
+        "exclusive": 0.0076544994954019785,
+        "inclusive": 171.90875479986425
       },
-      {
-        "audio_float32_identical": true,
-        "case": 7,
-        "family": "filtered",
-        "log_spectral_rmse": 0.0,
-        "native_state_identical": true,
-        "peak_absolute": 0.0,
-        "rms_relative": 0.0,
-        "tolerance": {
-          "log_spectral_rmse": 0.35,
-          "peak_absolute": 0.1,
-          "rms_relative": 0.01
-        },
-        "waveform_relative_rmse": 0.0,
-        "waveform_rmse": 0.0,
-        "within_tolerance": true
+      "hashing": {
+        "calls": 1146,
+        "exclusive": 0.9991979012265801,
+        "inclusive": 0.9991979012265801
       },
-      {
-        "audio_float32_identical": true,
-        "case": 8,
-        "family": "modulated",
-        "log_spectral_rmse": 0.0,
-        "native_state_identical": true,
-        "peak_absolute": 0.0,
-        "rms_relative": 0.0,
-        "tolerance": {
-          "log_spectral_rmse": 0.35,
-          "peak_absolute": 0.1,
-          "rms_relative": 0.01
-        },
-        "waveform_relative_rmse": 0.0,
-        "waveform_rmse": 0.0,
-        "within_tolerance": true
+      "json_identity": {
+        "calls": 508,
+        "exclusive": 0.5869901991682127,
+        "inclusive": 1.2883532994892448
       },
-      {
-        "audio_float32_identical": true,
-        "case": 9,
-        "family": "chorus",
-        "log_spectral_rmse": 0.0,
-        "native_state_identical": true,
-        "peak_absolute": 0.0,
-        "rms_relative": 0.0,
-        "tolerance": {
-          "log_spectral_rmse": 0.35,
-          "peak_absolute": 0.1,
-          "rms_relative": 0.01
-        },
-        "waveform_relative_rmse": 0.0,
-        "waveform_rmse": 0.0,
-        "within_tolerance": true
+      "native_session": {
+        "calls": 126,
+        "exclusive": 1.2047825981862843,
+        "inclusive": 162.4383549001068
+      },
+      "native_worker_roundtrip": {
+        "calls": 126,
+        "exclusive": 159.25469700118992,
+        "inclusive": 159.25469700118992
+      },
+      "network_backward": {
+        "calls": 1,
+        "exclusive": 0.1444669000338763,
+        "inclusive": 0.1444669000338763
+      },
+      "network_forward": {
+        "calls": 234,
+        "exclusive": 0.365869999746792,
+        "inclusive": 0.365869999746792
+      },
+      "optimizer_step": {
+        "calls": 1,
+        "exclusive": 0.00365209998562932,
+        "inclusive": 0.00365209998562932
+      },
+      "probe_or_cache_lookup": {
+        "calls": 126,
+        "exclusive": 1.7472441005520523,
+        "inclusive": 180.37429870048072
+      },
+      "reference_target_cache": {
+        "calls": 126,
+        "exclusive": 0.06162710068747401,
+        "inclusive": 0.3110610005678609
+      },
+      "spectral_features": {
+        "calls": 129,
+        "exclusive": 5.94901889981702,
+        "inclusive": 5.94901889981702
+      },
+      "spectral_loss": {
+        "calls": 126,
+        "exclusive": 7.891912399791181,
+        "inclusive": 7.891912399791181
+      },
+      "tensor_file_load": {
+        "calls": 7,
+        "exclusive": 0.07010530005209148,
+        "inclusive": 0.07010530005209148
+      },
+      "tensor_file_save": {
+        "calls": 4,
+        "exclusive": 0.016980100073851645,
+        "inclusive": 0.016980100073851645
+      },
+      "update_acceptance": {
+        "calls": 1,
+        "exclusive": 0.015634399955160916,
+        "inclusive": 8.720452600042336
       }
-    ],
-    "final_test_used": false,
-    "format": "obruxo_worker_phase_control_v1",
-    "intervention": "osc_1/2/3_random_phase_zero_only",
-    "native_attempts": 15,
-    "panel_sha256": "119cbd1b7176ccee7da3ad8cdcd23cb6b66baed8f2fce4ac179646db1572accf",
-    "training_pool_changed": false
+    },
+    "worker_stages_total_seconds": {
+      "audio_render_including_preroll": 11.97878919960931,
+      "backend_audio_qa": 1.580644200090319,
+      "binary_verification": 1.956850700546056,
+      "dependency_setup": 0.18527079932391644,
+      "engine_midi_graph_setup": 0.02882480074185878,
+      "nested_audio_copy": 0.0776104002725333,
+      "nested_native_engine_render": 11.743487299536355,
+      "other_backend": 0.8999038966139778,
+      "plugin_creation": 77.34879379894119,
+      "plugin_state_load": 26.66845499968622,
+      "plugin_state_readback_parse": 2.4007362999254838,
+      "plugin_state_readback_save": 2.1667276992229745,
+      "request_state_encode_and_write": 0.8049701001727954,
+      "request_validation": 16.181968799908645,
+      "state_conversion": 0.07467979937791824,
+      "state_readback_verification": 0.058852899936027825,
+      "template_export_and_parse": 0.10625659965444356
+    },
+    "worker_wall_seconds": 159.20329759991728
   },
-  "plan_sha256": "638fbc33bf79666a20e3c7b6a4c3f58fcf7152bf67acc3612db3751f0b3763ef",
+  "pipeline_profile": {
+    "backend_seconds": 14.77201060031075,
+    "complete": true,
+    "elapsed_seconds": 38.41661209997255,
+    "exact_native_hash_matches": 36,
+    "maximum_gradient_error": 5.960464477539062e-07,
+    "maximum_loss_error": 5.960464477539063e-08,
+    "maximum_parameter_update_error": 2.3283064365386963e-10,
+    "maximum_query_control_error": 0.0,
+    "maximum_relative_gradient_error": 3.786616582351341e-06,
+    "native_requests": 126,
+    "original_artifacts_unchanged": true,
+    "peak_process_tree_rss_bytes": 1145131008,
+    "probe_calls": 126,
+    "qualified_for_release": false,
+    "renderer_factory_seconds": 0.06612759979907423,
+    "rss_sampling_errors": 0,
+    "source_revision": "af67c72+basic-native-session-v3",
+    "trace_exact": false,
+    "training_limits": {
+      "absolute_gradient_error": 0.0001,
+      "absolute_loss_error": 1e-06,
+      "parameter_update_error": 1e-05,
+      "relative_gradient_error_above_0_01": 0.001
+    },
+    "training_numerics_within_limits": true,
+    "update": {
+      "append_ledger": {
+        "calls": 127,
+        "exclusive": 0.11331139993853867,
+        "inclusive": 0.9267894000513479
+      },
+      "atomic_checkpoint_or_audio_save": {
+        "calls": 4,
+        "exclusive": 0.022467099712230265,
+        "inclusive": 0.1053851000033319
+      },
+      "capture_predictions": {
+        "calls": 1,
+        "exclusive": 0.005157799925655127,
+        "inclusive": 0.07661570003256202
+      },
+      "complete_update": {
+        "calls": 1,
+        "exclusive": 0.2240493999561295,
+        "inclusive": 33.286655199946836
+      },
+      "disk_flush": {
+        "calls": 384,
+        "exclusive": 1.9422754013212398,
+        "inclusive": 1.9422754013212398
+      },
+      "file_read": {
+        "calls": 130,
+        "exclusive": 0.13745170005131513,
+        "inclusive": 0.13745170005131513
+      },
+      "gradient_estimation": {
+        "calls": 4,
+        "exclusive": 0.006061699939891696,
+        "inclusive": 31.421494699898176
+      },
+      "hashing": {
+        "calls": 1146,
+        "exclusive": 0.37375979812350124,
+        "inclusive": 0.37375979812350124
+      },
+      "json_identity": {
+        "calls": 508,
+        "exclusive": 0.35552120150532573,
+        "inclusive": 0.5909748009871691
+      },
+      "native_session": {
+        "calls": 126,
+        "exclusive": 0.7147680982016027,
+        "inclusive": 21.823243698570877
+      },
+      "native_worker_roundtrip": {
+        "calls": 126,
+        "exclusive": 19.675149198970757,
+        "inclusive": 19.675149198970757
+      },
+      "network_backward": {
+        "calls": 1,
+        "exclusive": 0.11957520002033561,
+        "inclusive": 0.11957520002033561
+      },
+      "network_forward": {
+        "calls": 234,
+        "exclusive": 0.20591210038401186,
+        "inclusive": 0.20591210038401186
+      },
+      "optimizer_step": {
+        "calls": 1,
+        "exclusive": 0.0020392000442370772,
+        "inclusive": 0.0020392000442370772
+      },
+      "probe_or_cache_lookup": {
+        "calls": 126,
+        "exclusive": 0.9772767000831664,
+        "inclusive": 32.643386400071904
+      },
+      "reference_target_cache": {
+        "calls": 126,
+        "exclusive": 0.030318501289002597,
+        "inclusive": 0.23548920126631856
+      },
+      "spectral_features": {
+        "calls": 129,
+        "exclusive": 3.675990800256841,
+        "inclusive": 3.675990800256841
+      },
+      "spectral_loss": {
+        "calls": 126,
+        "exclusive": 4.618766000727192,
+        "inclusive": 4.618766000727192
+      },
+      "tensor_file_load": {
+        "calls": 8,
+        "exclusive": 0.07303939992561936,
+        "inclusive": 0.07303939992561936
+      },
+      "tensor_file_save": {
+        "calls": 4,
+        "exclusive": 0.012009100057184696,
+        "inclusive": 0.012009100057184696
+      },
+      "update_acceptance": {
+        "calls": 1,
+        "exclusive": 0.00925749959424138,
+        "inclusive": 1.3662292000371963
+      }
+    },
+    "updates": 1,
+    "worker_stages_total_seconds": {
+      "audio_render_including_preroll": 6.302041599643417,
+      "backend_audio_qa": 0.9744628994958475,
+      "binary_verification": 1.4417309989221394,
+      "dependency_setup": 0.09899179998319596,
+      "direct_parameter_updates": 0.7133765000617132,
+      "engine_creation": 0.0004031999269500375,
+      "engine_midi_graph_setup": 0.013912199879996479,
+      "nested_audio_copy": 0.06256770028267056,
+      "nested_native_engine_render": 6.130224201129749,
+      "other_backend": 0.7151075986912474,
+      "plugin_creation": 1.4999488999601454,
+      "plugin_state_readback_parse": 1.5073250007117167,
+      "plugin_state_readback_save": 0.8343550987774506,
+      "request_validation": 0.3913334005046636,
+      "state_conversion": 0.04817570035811514,
+      "state_readback_verification": 0.03128150035627186,
+      "template_export_and_parse": 0.09860779938753694
+    },
+    "worker_wall_seconds": 19.63760959962383
+  },
+  "plan_sha256": "23e87e498285ab8e87841aa5ef2880d5d978f0feb8ef0287aca33824f3dc0d7c",
+  "profile_evidence_sha256": "c46a8b556317b84e280b4228d2522b10ca42ac7fc5bf77a2ccb287564f5abbbe",
   "qualified": true,
-  "raw_evidence_sha256": "f808339c3e089fe3c97f96a43cece68a91bdf55cfe6a0a2872ebee426feaa53c",
-  "reuse_mean_seconds": 2.051302578787727,
-  "rss_sampling_errors": 0,
-  "software_verification": {
-    "affected_test_rerun_passed": 1,
-    "affected_test_rerun_seconds": 15.6,
-    "cause": "Simulated render exceeded its 60s deadline after a 383s wall-clock scheduling gap; recorded Windows Modern Standby transitions accompanied the pause. The failed render correctly advanced the stream cursor, so that run could not match the no-error trajectory. Production deadlines were not changed.",
-    "initial_full_suite_failed": 1,
-    "initial_full_suite_passed": 250
-  }
+  "raw_evidence_sha256": "d48ff941ac09b7056d587f312691aae165af1701d1dd3dc2af6f5269c44f7683",
+  "reuse_mean_seconds": 0.2109769363499557,
+  "rss_sampling_errors": 0
 }

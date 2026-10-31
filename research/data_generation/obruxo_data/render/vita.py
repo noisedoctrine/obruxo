@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import base64
+from contextlib import contextmanager
 from copy import deepcopy
 import hashlib
 import importlib.metadata
 import json
 import math
 import os
+import struct
 from pathlib import Path
 import sys
 import tempfile
@@ -22,6 +24,7 @@ from obruxo_data.vital import VitalPreset, VitalSchema
 
 from .base import DEFAULT_RENDERER_ID, FULL_CORPUS_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_EXPRESSION_RENDERER_ID, FULL_PRESET_RENDERER_ID, FULL_SEED_RENDERER_ID, LEGACY_TRAINING_RENDERER_ID, RenderProvenance, RenderRequest, RenderResult, Renderer
 from .capabilities import EXPRESSION_CAPABILITIES, RendererCapabilities
+from .basic_profile import CATEGORICAL, CONTINUOUS, CONTROL_NAMES, PHASE_CONTROL, PREROLL_FRAMES
 from .qa import AudioQualityConfig, analyze_audio
 
 
@@ -159,6 +162,10 @@ def _sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _float32(value):
+    return struct.unpack("f", struct.pack("f", value))[0]
+
+
 def verify_loaded_scalars(requested: dict[str, Any], loaded: dict[str, Any]) -> int:
     """Detect silent preset rejection or changed controls in the actual plugin state."""
     expected = {name: value for name, value in requested["settings"].items() if type(value) in (int, float)}
@@ -260,6 +267,13 @@ class VitalRenderer(Renderer):
             from obruxo_data.vital.full_contract import FullPresetContract
             self.full_contract = FullPresetContract(renderer_id=renderer_id)
         self.qa_config = qa_config or AudioQualityConfig()
+        self._state_template = None
+        self._session, self._validated_basic = None, None
+        self._schema = VitalSchema.load()
+        self._basic_specs = self._schema.parameters
+        self._basic_reference = self._schema.load_init_document()["settings"]
+        self._basic_reference.update(PHASE_CONTROL)
+        self._basic_reference = {key: value for key, value in self._basic_reference.items() if key not in CONTROL_NAMES}
         self._capabilities = EXPRESSION_CAPABILITIES if renderer_id in {FULL_EXPRESSION_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_CORPUS_RENDERER_ID} else RendererCapabilities(max_channels=1)
 
     @classmethod
@@ -293,8 +307,66 @@ class VitalRenderer(Renderer):
     def max_workers(self) -> int:
         return 1
 
+    def close(self):
+        session, self._session = self._session, None
+        if session is not None:
+            session[2].cleanup()
+
+    def _basic_key(self, request, document):
+        if (not self.legacy_training or request.sample_rate != 44100 or self.buffer_size != 128
+                or request.preroll_frames != PREROLL_FRAMES or not isinstance(document, dict)):
+            return None
+        settings = document.get("settings", {})
+        if not isinstance(settings, dict):
+            return None
+        for name, lower, upper, _default in CONTINUOUS:
+            value = settings.get(name)
+            if type(value) not in (int, float) or not lower <= value <= upper:
+                return None
+        if any(type(settings.get(name)) not in (int, float) or settings[name] not in options for name, options in CATEGORICAL):
+            return None
+        fixed = {key: value for key, value in settings.items() if key not in CONTROL_NAMES}
+        if fixed != self._basic_reference:
+            return None
+        return canonical_sha256({**document, "settings": fixed})
+
+    @contextmanager
+    def _engine_session(self, request, daw, key):
+        if self._session is not None and self._session[:2] != (key, request.sample_rate):
+            self.close()
+        directory = None
+        try:
+            reused = key is not None and self._session is not None
+            if not reused:
+                directory = tempfile.TemporaryDirectory(prefix="obruxo-vital-render-")
+                engine = daw.RenderEngine(request.sample_rate, self.buffer_size)
+                synth = engine.make_plugin_processor("vital", str(self.plugin_path))
+                parameters = {}
+                if key is not None:
+                    descriptions = synth.get_parameters_description()
+                    for name in CONTROL_NAMES:
+                        matches = [row["index"] for row in descriptions if row["name"] == self._basic_specs[name].display_name]
+                        if len(matches) != 1:
+                            raise RuntimeError(f"ambiguous native basic control: {name}")
+                        parameters[name] = matches[0]
+                    self._session = (key, request.sample_rate, directory, engine, synth, parameters)
+            else:
+                _, _, directory, engine, synth, parameters = self._session
+            if key is not None:
+                synth.clear_midi()
+            yield Path(directory.name), engine, synth, reused, parameters
+        except BaseException:
+            self.close()
+            raise
+        finally:
+            if directory is not None and (self._session is None or directory is not self._session[2]):
+                directory.cleanup()
+
     def render(self, request: RenderRequest) -> RenderResult:
-        validation_diagnostics = self._validate_request(request)
+        requested_document = json.loads(request.preset_json)
+        basic_key = self._basic_key(request, requested_document)
+        validation_cached = basic_key is not None and basic_key == self._validated_basic
+        validation_diagnostics = self._validate_request(request, basic_key=basic_key, document=requested_document)
         fingerprint = _sha256_file(self.plugin_path)
         if fingerprint != self.engine_fingerprint:
             raise DependencyUnavailableError("Vital plugin binary changed after renderer initialization")
@@ -313,17 +385,15 @@ class VitalRenderer(Renderer):
         tempo = next((event.data[0] for event in performance.canonical_events() if event.kind.value == "tempo"), 500_000)
         bpm = 60_000_000 / tempo
 
-        with tempfile.TemporaryDirectory(prefix="obruxo-vital-render-") as directory:
-            root = Path(directory)
-            template_path = root / "template.state"
+        with self._engine_session(request, daw, basic_key) as (root, engine, synth, reused, parameters):
             state_path = root / "request.state"
             loaded_path = root / "loaded.state"
-            engine = daw.RenderEngine(request.sample_rate, self.buffer_size)
             engine.set_bpm(bpm)
-            synth = engine.make_plugin_processor("vital", str(self.plugin_path))
-            synth.save_state(str(template_path))
-            template = VitalVst3StateTemplate(template_path.read_bytes())
-            requested_document = json.loads(request.preset_json)
+            if self._state_template is None:
+                template_path = root / "template.state"
+                synth.save_state(str(template_path))
+                self._state_template = VitalVst3StateTemplate(template_path.read_bytes())
+            template = self._state_template
             native_document, bridge_diagnostics = native_preset_document(request.preset_json, template.plugin_version,
                                                                         legacy_training=self.legacy_training)
             curve_changes, corpus_changes, scalar_roundtrips = [], [], []
@@ -339,8 +409,17 @@ class VitalRenderer(Renderer):
                 if curve_changes:
                     bridge_diagnostics += (Diagnostic("vital.native.curve_input_bridge", Severity.WARNING,
                         f"Applied declared float32/constant-singleton curve import to {len(curve_changes)} curves; original request is preserved"),)
-            state_path.write_bytes(template.build(json.dumps(native_document)))
-            synth.load_state(str(state_path))
+            if reused:
+                for name, index in parameters.items():
+                    spec = self._basic_specs[name]
+                    # Match the full loader's float32 arithmetic before crossing the host's normalized grid.
+                    value = _float32(native_document["settings"][name])
+                    normalized = _float32(_float32(value - spec.minimum) / _float32(spec.maximum - spec.minimum))
+                    if not synth.set_parameter(index, normalized):
+                        raise RuntimeError(f"native basic control update failed: {name}")
+            else:
+                state_path.write_bytes(template.build(json.dumps(native_document)))
+                synth.load_state(str(state_path))
             synth.save_state(str(loaded_path))
             loaded = VitalVst3StateTemplate(loaded_path.read_bytes()).preset_document
             if self.renderer_id == FULL_CORPUS_RENDERER_ID:
@@ -413,12 +492,14 @@ class VitalRenderer(Renderer):
             **({"corpus_native_policy": self.full_contract.spec["corpus_native_policy"], "corpus_changes": corpus_changes,
                 "scalar_native_roundtrips": scalar_roundtrips} if self.renderer_id == FULL_CORPUS_RENDERER_ID else {}),
         }
+        qa["basic_session"] = {"eligible": basic_key is not None, "engine_reused": reused,
+                               "direct_controls": reused, "validation_cached": validation_cached}
         if midi_transport is not None:
             qa["midi_transport"] = midi_transport
         diagnostics = validation_diagnostics + tuple(bridge_diagnostics) + audio_diagnostics
         return RenderResult(audio, request.sample_rate, diagnostics, provenance, qa)
 
-    def _validate_request(self, request: RenderRequest) -> tuple[Any, ...]:
+    def _validate_request(self, request: RenderRequest, *, basic_key=None, document=None) -> tuple[Any, ...]:
         if request.renderer_id != self.renderer_id:
             raise ValueError(f"request renderer_id {request.renderer_id!r} does not match {self.renderer_id!r}")
         if not isinstance(request.sample_rate, int) or isinstance(request.sample_rate, bool) or request.sample_rate <= 0:
@@ -432,12 +513,20 @@ class VitalRenderer(Renderer):
         end_tick = request.performance.end_tick if request.end_tick is None else request.end_tick
         if end_tick != request.performance.end_tick:
             raise ValueError("RenderRequest end_tick must match Performance.end_tick")
-        if self.full_contract is not None:
+        if basic_key is not None and basic_key == self._validated_basic:
+            diagnostics = (Diagnostic("vital.runtime.cached_basic_template", Severity.INFO,
+                "Fixed basic patch structure was previously validated; changed controls are checked against the qualified domain"),)
+        elif self.full_contract is not None:
             _, preset_report = self.full_contract.loads(request.preset_json)
+            preset_report.require_valid()
+            diagnostics = preset_report.diagnostics
         else:
-            preset = VitalPreset(json.loads(request.preset_json), VitalSchema.load())
+            preset = VitalPreset(document if document is not None else json.loads(request.preset_json), self._schema)
             preset_report = preset.validate(runtime=True)
-        preset_report.require_valid()
+            preset_report.require_valid()
+            diagnostics = preset_report.diagnostics
+            if basic_key is not None:
+                self._validated_basic = basic_key
         performance_report = request.performance.validate(self.capabilities)
         performance_report.require_valid()
-        return preset_report.diagnostics + performance_report.diagnostics
+        return diagnostics + performance_report.diagnostics
