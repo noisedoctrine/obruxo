@@ -6,7 +6,7 @@ import hashlib
 import json
 import multiprocessing as mp
 from pathlib import Path
-from statistics import mean
+from statistics import mean, median
 import sys
 from time import perf_counter
 
@@ -24,13 +24,17 @@ def main():
     from obruxo_training.pilot import PilotPool
     from obruxo_training.reproducibility import FULL_PHASE_CONTROL, fixed_generator_phases
     import numpy as np
-    from obruxo_training.stream import NativeRendererFactory, RenderWorker, render_isolated
+    from obruxo_training.stream import NativeRendererFactory, RenderWorker, StreamConfig, render_isolated
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--pool", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--plugin-path")
+    parser.add_argument("--worker-jobs", type=int, default=StreamConfig().worker_jobs)
     args = parser.parse_args()
+    jobs = StreamConfig(worker_jobs=args.worker_jobs).worker_jobs
+    if jobs < 32:
+        raise ValueError("lifetime qualification requires at least 32 jobs")
     pool = PilotPool.load(args.pool)
     families = {}
     for entry in pool.entries:
@@ -53,13 +57,14 @@ def main():
             "families": list(families), "source_training_states": [entry.state_id for entry in families.values()], "split": "train",
             "phase_control": FULL_PHASE_CONTROL, "training_pool_changed": False, "cases": cases, "preroll_frames": 32768,
             "state_lineage": "diagnostic_phase_fixed_derivatives_of_train_only_sources",
-            "requests": [request.request_id for request in requests], "max_jobs": 32, "reuse_order": [0, 1, 0] + [index % len(requests) for index in range(30)],
-            "fresh_attempts": 33, "reuse_attempts": 33, "tolerance": asdict(RepeatabilityTolerance()),
+            "requests": [request.request_id for request in requests], "max_jobs": jobs, "reuse_order": [0, 1, 0] + [index % len(requests) for index in range(jobs - 2)],
+            "fresh_attempts": jobs + 1, "reuse_attempts": jobs + 1, "tolerance": asdict(RepeatabilityTolerance()),
             "numeric_limits": {"maximum_absolute_sample_error": 1e-6, "waveform_rmse": 1e-8},
             "training_limits": {"absolute_loss_error": 1e-6, "absolute_gradient_error": 1e-4,
                                 "relative_gradient_error_above_0_01": .001, "parameter_update_error": 1e-5},
             "timing_design": "adjacent_fresh_reuse_pairs_with_alternating_order",
-            "minimum_mean_wall_reduction": .10, "rss_limit_bytes": 8 * 1024**3, "final_test_used": False}
+            "minimum_mean_wall_reduction": .10, "rss_limit_bytes": 8 * 1024**3,
+            "maximum_warm_worker_growth_bytes": 64 * 1024**2, "final_test_used": False}
     args.output.mkdir(parents=True, exist_ok=False)
     write_json(args.output / "plan.json", plan)
     factory, monitor = NativeRendererFactory(args.plugin_path, renderer_id=pool.codec.contract.renderer_id), MemoryMonitor()
@@ -70,6 +75,9 @@ def main():
 
     def record(mode, index, request, metadata):
         event = {"mode": mode, "case": index, "request_id": request.request_id, **metadata}
+        if mode == "reuse" and metadata.get("worker_job", jobs) < jobs:
+            import psutil
+            event["worker_rss_bytes"] = psutil.Process(metadata["worker_pid"]).memory_info().rss
         events.append(event)
         with (args.output / "renders.jsonl").open("a", encoding="utf-8", newline="\n") as handle:
             handle.write(json.dumps(event, allow_nan=False) + "\n")
@@ -78,7 +86,7 @@ def main():
             raise ValueError("worker qualification cannot drop rejected/error attempts")
 
     try:
-        with RenderWorker(renderer_factory=factory, max_jobs=32) as worker:
+        with RenderWorker(renderer_factory=factory, max_jobs=jobs) as worker:
             for index, selected in enumerate(plan["reuse_order"]):
                 request = requests[selected]
                 pair = {}
@@ -103,24 +111,28 @@ def main():
     matched_fresh_mean = mean(row["wall_seconds"] for row in fresh)
     reuse_mean = mean(row["wall_seconds"] for row in reused)
     reduction = 1 - reuse_mean / matched_fresh_mean
-    process_checks = (len({row["worker_pid"] for row in reused[:32]}) == 1
-                      and reused[32]["worker_pid"] != reused[0]["worker_pid"]
-                      and [row["worker_job"] for row in reused] == [*range(1, 33), 1]
+    process_checks = (len({row["worker_pid"] for row in reused[:jobs]}) == 1
+                      and reused[jobs]["worker_pid"] != reused[0]["worker_pid"]
+                      and [row["worker_job"] for row in reused] == [*range(1, jobs + 1), 1]
                       and {child.pid for child in mp.active_children()} <= children_before)
+    early_rss = median(row["worker_rss_bytes"] for row in reused if 16 <= row["worker_job"] < 32)
+    late_rss = median(row["worker_rss_bytes"] for row in reused if jobs - 16 <= row["worker_job"] < jobs)
     gates = {"native_equivalence": all(row["within_tolerance"]
                                       and row["maximum_absolute_sample_error"] <= plan["numeric_limits"]["maximum_absolute_sample_error"]
                                       and row["waveform_rmse"] <= plan["numeric_limits"]["waveform_rmse"]
                                       and row["native_state_identical"] and row["provenance_identical"] for row in checks),
-             "basic_session_used": sum(row["engine_reused"] for row in checks) == 31,
+             "basic_session_used": sum(row["engine_reused"] for row in checks) == jobs - 1,
              "bounded_lifetime_and_cleanup": process_checks, "wall_reduction": reduction >= plan["minimum_mean_wall_reduction"],
-             "memory": monitor.peak_bytes is not None and monitor.peak_bytes <= plan["rss_limit_bytes"]}
+             "memory": monitor.peak_bytes is not None and monitor.peak_bytes <= plan["rss_limit_bytes"] and monitor.errors == 0,
+             "warm_worker_memory_stable": late_rss - early_rss <= plan["maximum_warm_worker_growth_bytes"]}
     summary = {"format": "obruxo_render_worker_qualification_v3", "plan_sha256": canonical_sha256(plan), "gates": gates,
                "qualified": all(gates.values()), "accepted": len(events), "attempted": len(events), "checks": checks,
                "matched_fresh_mean_seconds": matched_fresh_mean, "reuse_mean_seconds": reuse_mean, "mean_wall_reduction": reduction,
                "backend_mean_seconds": {mode: mean(row["render_seconds"] for row in events if row["mode"] == mode) for mode in ("fresh", "reuse")},
                "elapsed_seconds": perf_counter() - started, "peak_process_tree_rss_bytes": monitor.peak_bytes,
                "rss_sampling_errors": monitor.errors, "audio_files_written": 0, "final_test_used": False,
-               "limit": "Fixed-phase reproducibility on local Windows pinned Vital/DawDreamer, the recorded training cases and 32-job lifetime; random-phase draws are separate, and this is not Linux qualification or a model-quality claim."}
+               "warm_worker_memory": {"early_median_bytes": early_rss, "late_median_bytes": late_rss, "growth_bytes": late_rss - early_rss},
+               "limit": f"Fixed-phase reproducibility on local Windows pinned Vital/DawDreamer, the recorded training cases and {jobs}-job lifetime; random-phase draws are separate, and this is not Linux qualification or a model-quality claim."}
     write_json(args.output / "summary.json", summary)
     print(json.dumps({key: value for key, value in summary.items() if key != "checks"}, indent=2), flush=True)
 

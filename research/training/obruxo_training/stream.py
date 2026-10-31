@@ -29,7 +29,7 @@ class StreamConfig:
     prefetch_bytes: int = 32 * 1024 * 1024
     timeout_seconds: float = 60.0
     max_retries: int = 0
-    worker_jobs: int = 32
+    worker_jobs: int = 128
 
     def __post_init__(self):
         if any(type(value) is not int or value <= 0 for value in (self.prefetch_clips, self.prefetch_bytes)):
@@ -141,7 +141,8 @@ def _render_loop(connection, factory, max_jobs):
 class RenderWorker:
     """Sequential jobs share one isolated renderer; recycle after a bounded lifetime."""
 
-    def __init__(self, *, renderer_factory=None, max_jobs=32, max_bytes=32 * 1024 * 1024):
+    def __init__(self, *, renderer_factory=None, max_jobs=None, max_bytes=32 * 1024 * 1024):
+        max_jobs = StreamConfig().worker_jobs if max_jobs is None else max_jobs
         StreamConfig(prefetch_bytes=max_bytes, worker_jobs=max_jobs)
         self.factory = renderer_factory or NativeRendererFactory()
         self.max_jobs, self.max_bytes = max_jobs, max_bytes
