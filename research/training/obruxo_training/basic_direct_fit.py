@@ -27,7 +27,7 @@ from .native_acceptance import SPEC as ACCEPTANCE_SPEC, accept_update, capture
 from .paired_native_audit import equal_tree, training_signature
 from .paired_native_evidence import RetainedAuditSession, native_ledger
 from .paired_native_fit import PairedSession
-from .spectral import SpectralTargets, spectral_loss
+from .spectral import SpectralTargets, prepare_spectral_target, spectral_loss
 from .trainer import capture_rng, restore_rng
 from .unison_fit_data import require_request
 from .unison_sound_fit import CostStore, collect_finals, lines
@@ -44,13 +44,14 @@ class SoundStore(CostStore):
                 raise ValueError("duplicate direct native probe")
             self.probes[key] = row
         self.used_probes, self.targets = set(), OrderedDict()
+        self.measurements = SpectralTargets()
 
     def sound_target(self, index):
         cell = self.inputs.plan["fit_audit_cells"][index]
         sha = cell["recipe"]["source_audio_sha256"][cell["playback_view"]]
         if sha not in self.targets:
             audio, _metadata = self.source(index)
-            self.targets[sha] = SpectralTargets()(torch.from_numpy(audio.copy()).T[None])
+            self.targets[sha] = prepare_spectral_target(self.measurements(torch.from_numpy(audio.copy()).T[None]))
             while len(self.targets) > 4:
                 self.targets.popitem(last=False)
         self.targets.move_to_end(sha)
@@ -74,7 +75,7 @@ class SoundStore(CostStore):
         if audio is None:
             raise RuntimeError("direct sound probe was not accepted")
         require_request(self.inputs.codec, self.inputs.plan, candidate, performance, receipt)
-        value = float(spectral_loss(SpectralTargets()(torch.from_numpy(audio.copy()).T[None]), self.sound_target(index))["loss"])
+        value = float(spectral_loss(self.measurements(torch.from_numpy(audio.copy()).T[None]), self.sound_target(index))["loss"])
         if not np.isfinite(value) or value < 0:
             raise ValueError("native direct sound loss must be finite and nonnegative")
         _source, metadata = self.source(index)

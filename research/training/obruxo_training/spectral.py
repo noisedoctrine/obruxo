@@ -67,11 +67,36 @@ class SpectralTargets(nn.Module):
                 "envelope_mask": envelope_mask, "lengths": lengths.clone()}
 
 
-def _masked_log_error(predicted, expected, mask):
-    error = (torch.log1p(predicted / .0001) - torch.log1p(expected / .0001)).abs()
+def _log_reference(expected, mask):
+    dims = tuple(range(1, expected.ndim))
+    return {"log": torch.log1p(expected / .0001), "count": mask.expand_as(expected).sum(dims).clamp_min(1)}
+
+
+@torch.no_grad()
+def prepare_spectral_target(target):
+    """Cache reference-only arithmetic for repeated losses; returned tensors must remain unchanged."""
+    tensors = [*target["magnitudes"], target["envelope"]]
+    if any(value.requires_grad for value in tensors):
+        raise ValueError("prepared spectral references must be fixed measurements")
+    resolutions = []
+    for expected, mask in zip(target["magnitudes"], target["masks"], strict=True):
+        weight = mask[:, None, None].expand_as(expected)
+        norm = torch.linalg.vector_norm((expected * weight).flatten(1), dim=1)
+        floor = .001 * weight.sum((1, 2, 3)).sqrt()
+        resolutions.append({**_log_reference(expected, weight), "norm": norm.clamp_min(floor)})
+    mask = target["envelope_mask"][:, None]
+    reference = {"magnitudes": tuple(resolutions), "envelope": _log_reference(target["envelope"][:, :2], mask),
+                 "side": _log_reference(target["envelope"][:, 2:], mask)}
+    return {**target, "_loss_reference": reference}
+
+
+def _masked_log_error(predicted, expected, mask, reference=None):
+    expected_log = torch.log1p(expected / .0001) if reference is None else reference["log"]
+    error = (torch.log1p(predicted / .0001) - expected_log).abs()
     weights = mask.expand_as(error)
     dims = tuple(range(1, error.ndim))
-    return (error * weights).sum(dims) / weights.sum(dims).clamp_min(1)
+    count = weights.sum(dims).clamp_min(1) if reference is None else reference["count"]
+    return (error * weights).sum(dims) / count
 
 
 def spectral_loss(prediction, target):
@@ -79,19 +104,25 @@ def spectral_loss(prediction, target):
     if len(prediction["magnitudes"]) != len(FFT_SIZES) or len(target["magnitudes"]) != len(FFT_SIZES):
         raise ValueError("spectral resolution count changed")
     losses = []
-    for predicted, expected, mask in zip(prediction["magnitudes"], target["magnitudes"], target["masks"], strict=True):
+    reference = target.get("_loss_reference")
+    for index, (predicted, expected, mask) in enumerate(zip(prediction["magnitudes"], target["magnitudes"], target["masks"], strict=True)):
         _validate_prediction(predicted, expected)
         weight = mask[:, None, None].expand_as(expected)
         difference = ((predicted - expected) * weight).flatten(1)
-        norm = torch.linalg.vector_norm((expected * weight).flatten(1), dim=1)
-        floor = .001 * weight.sum((1, 2, 3)).sqrt()
-        convergence = torch.linalg.vector_norm(difference, dim=1) / norm.clamp_min(floor)
-        losses.append(.5 * (convergence + _masked_log_error(predicted, expected, weight)))
+        cached = None if reference is None else reference["magnitudes"][index]
+        if cached is None:
+            norm = torch.linalg.vector_norm((expected * weight).flatten(1), dim=1)
+            floor = .001 * weight.sum((1, 2, 3)).sqrt()
+            denominator = norm.clamp_min(floor)
+        else:
+            denominator = cached["norm"]
+        convergence = torch.linalg.vector_norm(difference, dim=1) / denominator
+        losses.append(.5 * (convergence + _masked_log_error(predicted, expected, weight, cached)))
     predicted, expected = prediction["envelope"], target["envelope"]
     _validate_prediction(predicted, expected)
     mask = target["envelope_mask"][:, None]
-    envelope = _masked_log_error(predicted[:, :2], expected[:, :2], mask)
-    side = _masked_log_error(predicted[:, 2:], expected[:, 2:], mask)
+    envelope = _masked_log_error(predicted[:, :2], expected[:, :2], mask, None if reference is None else reference["envelope"])
+    side = _masked_log_error(predicted[:, 2:], expected[:, 2:], mask, None if reference is None else reference["side"])
     spectral = torch.stack(losses).mean(0)
     return {"loss": spectral + .1 * envelope + .1 * side, "spectral": spectral, "envelope": envelope, "side": side}
 
@@ -104,6 +135,9 @@ def _validate_prediction(predicted, expected):
 
 def target_bytes(target):
     tensors = [*target["magnitudes"], *target["masks"], target["envelope"], target["envelope_mask"], target["lengths"]]
+    if "_loss_reference" in target:
+        reference = target["_loss_reference"]
+        tensors.extend(value for row in (*reference["magnitudes"], reference["envelope"], reference["side"]) for value in row.values())
     return sum(value.numel() * value.element_size() for value in tensors)
 
 
