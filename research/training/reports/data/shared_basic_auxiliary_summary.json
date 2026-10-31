@@ -1,0 +1,14 @@
+{
+  "archive_bytes_before_summary": 646094824,
+  "committed_updates_per_arm": 48,
+  "complete": true,
+  "elapsed_seconds": 22500.696430921555,
+  "failure": null,
+  "native_attempts": 12025,
+  "peak_process_tree_rss_bytes": 1772371968,
+  "plan_id": "83bcfff742c12f2f33b799676beb2168300b8810333c37e81d289533fe70a387",
+  "qualified_for_release": false,
+  "rss_sampling_errors": 0,
+  "test_split_used": false,
+  "within_resource_limits": true
+}

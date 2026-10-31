@@ -1,0 +1,422 @@
+{
+  "additional_experimental_updates": 0,
+  "additional_native_requests": 0,
+  "all_changes_descriptive_after_frozen_run": true,
+  "case_input_breakdown": [
+    {
+      "categories": {
+        "initial": [
+          0,
+          1
+        ],
+        "parameter": [
+          0,
+          1
+        ],
+        "sound_auxiliary": [
+          0,
+          1
+        ],
+        "sound_only": [
+          0,
+          1
+        ]
+      },
+      "indices": [
+        14,
+        15,
+        16
+      ],
+      "input_view": 0,
+      "means": {
+        "initial": {
+          "mrstft": 0.19965187170439297,
+          "spectral": 0.1118479569753011
+        },
+        "parameter": {
+          "mrstft": 0.24797444625033271,
+          "spectral": 0.12673866748809814
+        },
+        "sound_auxiliary": {
+          "mrstft": 0.10599351591534086,
+          "spectral": 0.043232022474209465
+        },
+        "sound_only": {
+          "mrstft": 0.10470686935716204,
+          "spectral": 0.043193998436133065
+        }
+      },
+      "midi": 36,
+      "training_index": 2
+    },
+    {
+      "categories": {
+        "initial": [
+          0,
+          1
+        ],
+        "parameter": [
+          0,
+          1
+        ],
+        "sound_auxiliary": [
+          0,
+          1
+        ],
+        "sound_only": [
+          0,
+          1
+        ]
+      },
+      "indices": [
+        17,
+        18
+      ],
+      "input_view": 1,
+      "means": {
+        "initial": {
+          "mrstft": 2.371640056371689,
+          "spectral": 0.8754974007606506
+        },
+        "parameter": {
+          "mrstft": 0.9825025995572408,
+          "spectral": 0.2691184729337692
+        },
+        "sound_auxiliary": {
+          "mrstft": 1.0273769348859787,
+          "spectral": 0.3623850494623184
+        },
+        "sound_only": {
+          "mrstft": 1.0308557003736496,
+          "spectral": 0.3637199401855469
+        }
+      },
+      "midi": 36,
+      "training_index": 2
+    },
+    {
+      "categories": {
+        "initial": [
+          1,
+          1
+        ],
+        "parameter": [
+          1,
+          1
+        ],
+        "sound_auxiliary": [
+          1,
+          1
+        ],
+        "sound_only": [
+          1,
+          1
+        ]
+      },
+      "indices": [
+        19,
+        20
+      ],
+      "input_view": 2,
+      "means": {
+        "initial": {
+          "mrstft": 1.392685741186142,
+          "spectral": 0.6317022442817688
+        },
+        "parameter": {
+          "mrstft": 1.2088235914707184,
+          "spectral": 0.5806942135095596
+        },
+        "sound_auxiliary": {
+          "mrstft": 1.1138540183504424,
+          "spectral": 0.5024904906749725
+        },
+        "sound_only": {
+          "mrstft": 1.1142849599321685,
+          "spectral": 0.5024864673614502
+        }
+      },
+      "midi": 36,
+      "training_index": 2
+    },
+    {
+      "categories": {
+        "initial": [
+          2,
+          0
+        ],
+        "parameter": [
+          2,
+          0
+        ],
+        "sound_auxiliary": [
+          2,
+          0
+        ],
+        "sound_only": [
+          2,
+          0
+        ]
+      },
+      "indices": [
+        56,
+        57,
+        58
+      ],
+      "input_view": 0,
+      "means": {
+        "initial": {
+          "mrstft": 0.7154792464441724,
+          "spectral": 0.30013426144917804
+        },
+        "parameter": {
+          "mrstft": 0.6023857047160467,
+          "spectral": 0.23291556040445963
+        },
+        "sound_auxiliary": {
+          "mrstft": 0.42597806950410205,
+          "spectral": 0.15679669380187988
+        },
+        "sound_only": {
+          "mrstft": 0.4277353386084239,
+          "spectral": 0.15738853315512338
+        }
+      },
+      "midi": 61,
+      "training_index": 8
+    },
+    {
+      "categories": {
+        "initial": [
+          2,
+          0
+        ],
+        "parameter": [
+          2,
+          0
+        ],
+        "sound_auxiliary": [
+          2,
+          0
+        ],
+        "sound_only": [
+          2,
+          0
+        ]
+      },
+      "indices": [
+        59,
+        60
+      ],
+      "input_view": 1,
+      "means": {
+        "initial": {
+          "mrstft": 1.1896340052286782,
+          "spectral": 0.49147021770477295
+        },
+        "parameter": {
+          "mrstft": 1.1394961327314377,
+          "spectral": 0.46862222254276276
+        },
+        "sound_auxiliary": {
+          "mrstft": 1.1179046730200448,
+          "spectral": 0.4552457481622696
+        },
+        "sound_only": {
+          "mrstft": 1.1174976179997125,
+          "spectral": 0.4551016241312027
+        }
+      },
+      "midi": 61,
+      "training_index": 8
+    },
+    {
+      "categories": {
+        "initial": [
+          0,
+          0
+        ],
+        "parameter": [
+          0,
+          0
+        ],
+        "sound_auxiliary": [
+          0,
+          0
+        ],
+        "sound_only": [
+          0,
+          0
+        ]
+      },
+      "indices": [
+        61,
+        62
+      ],
+      "input_view": 2,
+      "means": {
+        "initial": {
+          "mrstft": 2.2282701532046003,
+          "spectral": 1.0350233018398285
+        },
+        "parameter": {
+          "mrstft": 1.7656158953905106,
+          "spectral": 0.8095954358577728
+        },
+        "sound_auxiliary": {
+          "mrstft": 0.9617841591437657,
+          "spectral": 0.3841627538204193
+        },
+        "sound_only": {
+          "mrstft": 0.9649286021788914,
+          "spectral": 0.38584621250629425
+        }
+      },
+      "midi": 61,
+      "training_index": 8
+    },
+    {
+      "categories": {
+        "initial": [
+          2,
+          1
+        ],
+        "parameter": [
+          2,
+          1
+        ],
+        "sound_auxiliary": [
+          2,
+          1
+        ],
+        "sound_only": [
+          2,
+          1
+        ]
+      },
+      "indices": [
+        77,
+        78,
+        79
+      ],
+      "input_view": 0,
+      "means": {
+        "initial": {
+          "mrstft": 0.456439277364148,
+          "spectral": 0.18298909068107605
+        },
+        "parameter": {
+          "mrstft": 0.4519848831825786,
+          "spectral": 0.1858371595541636
+        },
+        "sound_auxiliary": {
+          "mrstft": 0.4488703492614958,
+          "spectral": 0.18408780048290888
+        },
+        "sound_only": {
+          "mrstft": 0.4514229984747039,
+          "spectral": 0.18520274758338928
+        }
+      },
+      "midi": 83,
+      "training_index": 11
+    },
+    {
+      "categories": {
+        "initial": [
+          1,
+          1
+        ],
+        "parameter": [
+          1,
+          1
+        ],
+        "sound_auxiliary": [
+          0,
+          1
+        ],
+        "sound_only": [
+          0,
+          1
+        ]
+      },
+      "indices": [
+        80,
+        81
+      ],
+      "input_view": 1,
+      "means": {
+        "initial": {
+          "mrstft": 1.9551168580849965,
+          "spectral": 0.7783836722373962
+        },
+        "parameter": {
+          "mrstft": 1.792090972264608,
+          "spectral": 0.7203336954116821
+        },
+        "sound_auxiliary": {
+          "mrstft": 1.4844596087932587,
+          "spectral": 0.6417494416236877
+        },
+        "sound_only": {
+          "mrstft": 1.4857209771871567,
+          "spectral": 0.6421785056591034
+        }
+      },
+      "midi": 83,
+      "training_index": 11
+    },
+    {
+      "categories": {
+        "initial": [
+          1,
+          1
+        ],
+        "parameter": [
+          1,
+          1
+        ],
+        "sound_auxiliary": [
+          1,
+          1
+        ],
+        "sound_only": [
+          1,
+          1
+        ]
+      },
+      "indices": [
+        82,
+        83
+      ],
+      "input_view": 2,
+      "means": {
+        "initial": {
+          "mrstft": 2.8670262296994524,
+          "spectral": 1.178374469280243
+        },
+        "parameter": {
+          "mrstft": 2.531778807441394,
+          "spectral": 1.083499550819397
+        },
+        "sound_auxiliary": {
+          "mrstft": 1.8337323119242988,
+          "spectral": 0.6958768963813782
+        },
+        "sound_only": {
+          "mrstft": 1.8405869901180267,
+          "spectral": 0.6985843777656555
+        }
+      },
+      "midi": 83,
+      "training_index": 11
+    }
+  ],
+  "format": "shared_basic_auxiliary_publication_v1",
+  "frozen_sources_and_inputs_unchanged": true,
+  "plan_id": "83bcfff742c12f2f33b799676beb2168300b8810333c37e81d289533fe70a387",
+  "qualified_for_release": false,
+  "scientific_files_verified": 383,
+  "summary_file_sha256": "a8067223c7222aec5d8a993453b25754b3ccc59aa318284899ac8b9027398b04",
+  "verification_file_sha256": "26b171168b0919b2d164e0abc837af24bd667eb5f94dc8d9a771e5fd369381a4"
+}
