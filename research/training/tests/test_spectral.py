@@ -8,7 +8,7 @@ from torch import nn  # noqa: E402
 
 from obruxo_training.codec import PilotCodec, PilotTarget  # noqa: E402
 from obruxo_training.features import tensor_digest  # noqa: E402
-from obruxo_training.spectral import (SpectralTargets, require_spectral_contract, spectral_loss,  # noqa: E402
+from obruxo_training.spectral import (SpectralTargets, prepare_spectral_target, require_spectral_contract, spectral_loss,  # noqa: E402
                                       spectral_spec, target_bytes)
 from obruxo_training.spectral_controls import BasicControlAdapter, temperature_at  # noqa: E402
 
@@ -52,6 +52,30 @@ def test_padding_masks_match_individual_clip_measurements_and_losses():
     for bad in (torch.tensor([0]), torch.tensor([9000]), torch.tensor([4096.])):
         with pytest.raises(ValueError, match="lengths"):
             measure(padded, bad)
+
+
+@pytest.mark.parametrize("silent", [False, True])
+def test_prepared_reference_preserves_every_loss_and_prediction_gradient(silent):
+    source = audio().expand(2, -1, -1).clone()
+    if silent:
+        source.zero_()
+    target = SpectralTargets()(source, torch.tensor([8192, 4096]))
+    prepared = prepare_spectral_target(target)
+    results, gradients = [], []
+    for reference in (target, prepared):
+        magnitudes = tuple((value * .7 + .001).requires_grad_() for value in target["magnitudes"])
+        envelope = (target["envelope"] * .8 + .001).requires_grad_()
+        prediction = {"magnitudes": magnitudes, "envelope": envelope}
+        result = spectral_loss(prediction, reference)
+        result["loss"].sum().backward()
+        results.append(result)
+        gradients.append([value.grad for value in (*magnitudes, envelope)])
+    assert all(torch.equal(results[0][key], results[1][key]) for key in results[0])
+    assert all(torch.equal(left, right) for left, right in zip(*gradients, strict=True))
+    assert "_loss_reference" not in target and target_bytes(prepared) > target_bytes(target)
+    invalid = {**target, "envelope": target["envelope"].clone().requires_grad_()}
+    with pytest.raises(ValueError, match="fixed measurements"):
+        prepare_spectral_target(invalid)
 
 
 @pytest.mark.parametrize("voices,filtered", tuple(itertools.product(range(3), range(2))))
