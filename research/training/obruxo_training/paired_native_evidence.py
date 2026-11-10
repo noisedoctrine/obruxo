@@ -2,12 +2,14 @@
 
 import numpy as np
 import torch
+from itertools import islice
 
 from obruxo_data.hashing import sha256_bytes
 from obruxo_data.render.qa import audio_float32_sha256
 
 from .checkpoints import atomic_torch_save
-from .evaluate import audio_distance
+from .evaluate import audio_distances
+from .batching import BatchConfig
 from .spectral import SpectralTargets, spectral_loss
 
 
@@ -89,6 +91,10 @@ class RetainedAuditSession:
 
 
 def rescore_waveform(source, receipt, reference, tail_seconds):
+    return rescore_waveforms([(source, receipt, reference, tail_seconds)])[0]
+
+
+def _retained_audio(source, receipt, reference):
     retained = receipt["retained_audio"]
     expected = f"comparison_audio/{receipt['qa']['audio_float32_sha256']}.pt"
     if retained["file"] != expected:
@@ -101,10 +107,49 @@ def rescore_waveform(source, receipt, reference, tail_seconds):
     if (set(saved) != {"audio"} or audio.dtype != np.float32 or audio.shape != reference.shape
             or audio_float32_sha256(audio) != receipt["qa"]["audio_float32_sha256"]):
         raise ValueError("comparison audio does not match the recorded render")
-    measure = SpectralTargets()
-    spectral = float(spectral_loss(measure(torch.from_numpy(audio.copy()).T[None]), measure(torch.from_numpy(reference.copy()).T[None]))["loss"])
-    tail = max(1, int(tail_seconds * 44100))
-    ref_rms = np.sqrt(np.mean(reference[-tail:].astype(np.float64) ** 2, axis=0))
-    rms = np.sqrt(np.mean(audio[-tail:].astype(np.float64) ** 2, axis=0))
-    return {"spectral": spectral, "mrstft": audio_distance(reference, audio)["mrstft"],
-            "tail_error": float(np.mean(np.abs(rms - ref_rms) / np.maximum(ref_rms, .001)))}
+    return audio
+
+
+def rescore_waveforms(comparisons, *, batch_size=16):
+    """Audit bounded batches of retained pairs; group equal lengths without altering padding."""
+    BatchConfig(spectral=batch_size)
+    comparisons, results, measure = iter(comparisons), [], SpectralTargets()
+    while chunk := list(islice(comparisons, batch_size)):
+        audio = [_retained_audio(source, receipt, reference) for source, receipt, reference, _tail in chunk]
+        groups, scores = {}, {}
+        for index, value in enumerate(audio):
+            groups.setdefault(len(value), []).append(index)
+        for positions in groups.values():
+            references = np.stack([chunk[index][2] for index in positions])
+            candidates = np.stack([audio[index] for index in positions])
+            spectral = spectral_loss(measure(torch.from_numpy(candidates).transpose(1, 2)),
+                                     measure(torch.from_numpy(references).transpose(1, 2)))["loss"].tolist()
+            distances = audio_distances(references, candidates)
+            for index, loss, distance in zip(positions, spectral, distances, strict=True):
+                scores[index] = {"spectral": loss, "mrstft": distance["mrstft"]}
+        for index, (_source, _receipt, reference, tail_seconds) in enumerate(chunk):
+            tail = max(1, int(tail_seconds * 44100))
+            ref_rms = np.sqrt(np.mean(reference[-tail:].astype(np.float64) ** 2, axis=0))
+            rms = np.sqrt(np.mean(audio[index][-tail:].astype(np.float64) ** 2, axis=0))
+            results.append({**scores[index], "tail_error": float(np.mean(np.abs(rms - ref_rms) / np.maximum(ref_rms, .001)))})
+    return results
+
+
+class WaveformAudit:
+    """Bounded batching for callers that verify independently recorded scores."""
+    def __init__(self, batch_size=16):
+        self.batch_size = BatchConfig(spectral=batch_size).spectral
+        self.pending = []
+
+    def add(self, source, receipt, reference, tail_seconds, expected):
+        self.pending.append(((source, receipt, reference, tail_seconds), expected))
+        if len(self.pending) >= self.batch_size:
+            self.finish()
+
+    def finish(self):
+        if not self.pending:
+            return
+        actual = rescore_waveforms((row[0] for row in self.pending), batch_size=self.batch_size)
+        if actual != [row[1] for row in self.pending]:
+            raise ValueError("comparison waveform cannot reproduce its recorded score")
+        self.pending.clear()

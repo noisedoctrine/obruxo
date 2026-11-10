@@ -2,13 +2,14 @@ from types import SimpleNamespace
 
 import pytest
 import torch
+from obruxo_training.batching import BatchConfig, predict_features
 from obruxo_training.codec import PilotCodec
 from obruxo_training.features import PITCH_SIZE, TIMBRE_SHAPE
 from obruxo_training.model import PilotInverse, batch_features
 from obruxo_training.paired_native_audit import equal_tree
 from obruxo_training.production_controls import ProductionControlAdapter
 from obruxo_training.shared_auxiliary_run import train
-from obruxo_training.shared_basic_auxiliary import ARMS, calibrate, initialize
+from obruxo_training.shared_basic_auxiliary import ARMS, calibrate, initialize, sound_objective
 from obruxo_training.trainable_basic import COUNTS, TrainableBasic
 
 
@@ -69,3 +70,28 @@ def test_calibration_rejects_a_disconnected_training_signal():
     value = encoder(torch.ones(1, 3))
     with pytest.raises(ValueError, match="nonzero finite"):
         calibrate(value.sum(), value.sum() * 0., encoder)
+
+
+def test_reference_rounding_and_batch_layout_do_not_amplify_full_model_gradients(synthetic):
+    inputs, _rows, store = synthetic
+    models, _optimizers = initialize(inputs)
+    model = models["sound_only"]
+    cells = inputs.observations(inputs.plan["updates"][0])
+    with torch.no_grad():
+        predictions = predict_features(model, [inputs.features[i] for i in range(4)], 1)
+        for index in (2, 3):
+            patch = inputs.adapter.export(predictions[index]["continuous"], predictions[index]["categorical"])[0]
+            inputs.cases[index]["rows"]["initial"]["scores"]["spectral"] = store.probe(1, index, index, patch)
+    gradients = []
+    for size, offset in ((1, 0.), (32, -3e-7), (32, 3e-7)):
+        inputs.plan["batching"] = BatchConfig(model=size).to_dict()
+        def evaluate(observation, patch):
+            values = [store.probe(1, observation, cell, patch) for cell in cells[observation]]
+            return sum(values) / len(values) + (offset if observation >= 2 else 0.)
+        torch.manual_seed(19)
+        model.zero_grad(set_to_none=True)
+        loss, _estimates, _observations, _bounds = sound_objective(inputs, model, cells, evaluate, 0)
+        loss.backward()
+        gradients.append(torch.cat([parameter.grad.flatten() for parameter in model.correction.parameters()]))
+    assert gradients[0].norm() > 0
+    assert all(float((value - gradients[0]).norm() / gradients[0].norm()) < .001 for value in gradients[1:])

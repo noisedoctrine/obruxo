@@ -62,11 +62,11 @@ def test_timeout_during_actual_trial_recovers_both_models_adam_and_rng_exactly(a
     original_render, original_accept = FakeSession.render, fit.accept_update
     in_trial, failed = False, False
 
-    def accept(*args):
+    def accept(*args, **kwargs):
         nonlocal in_trial
         in_trial = True
         try:
-            return original_accept(*args)
+            return original_accept(*args, **kwargs)
         finally:
             in_trial = False
 

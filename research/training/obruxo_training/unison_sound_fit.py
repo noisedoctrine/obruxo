@@ -15,11 +15,12 @@ from obruxo_data.render.qa import audio_float32_sha256
 from . import category_scale_refresh as refresh
 from .audit import write_json
 from .benchmark import MemoryMonitor
+from .batching import BatchConfig, predict_cells
 from .checkpoints import atomic_torch_save
 from .conditioned_bridge import read
 from .native_fit import append_durable, digest
 from .paired_native_audit import equal_tree, training_signature
-from .paired_native_evidence import RetainedAuditSession, native_ledger, rescore_waveform
+from .paired_native_evidence import RetainedAuditSession, WaveformAudit, native_ledger, rescore_waveform
 from .paired_native_fit import PairedSession
 from .paired_performance_objective import seed_external_streams
 from .trainer import capture_rng, restore_rng
@@ -69,7 +70,7 @@ class CostStore:
         self.source_cache.move_to_end(sha)
         return self.source_cache[sha].numpy(), {"file": path.relative_to(self.output).as_posix(), "sha256": digest(path)}
 
-    def initial(self, index):
+    def initial(self, index, *, audit=None):
         if index in self.initial_rows:
             return self.initial_rows[index]
         row = self.inputs.cases[index]["rows"]["initial"]
@@ -85,7 +86,9 @@ class CostStore:
             path.parent.mkdir(exist_ok=True)
             shutil.copyfile(self.inputs.parent / expected, path)
         reference, source = self.source(index)
-        if rescore_waveform(self.output, receipt, reference, self.inputs.codec.contract.tail_seconds) != row["scores"]:
+        if audit is not None:
+            audit.add(self.output, receipt, reference, self.inputs.codec.contract.tail_seconds, row["scores"])
+        elif rescore_waveform(self.output, receipt, reference, self.inputs.codec.contract.tail_seconds) != row["scores"]:
             raise ValueError("parent initial sound score changed")
         result = {"index": index, "choice": row["candidate"]["categorical"][0], "candidate": row["candidate"],
                   "origin": "parent", "scores": row["scores"], "receipt": receipt, "source_audio": source}
@@ -93,17 +96,47 @@ class CostStore:
         return result
 
     def render(self, index, candidate, phase, label):
+        return self.render_many([(index, candidate, phase, label)])[0]
+
+    def render_many(self, requests, *, on_result=None):
+        from .paired_native_evidence import rescore_waveforms
         if self.session is None:
             raise ValueError("offline replay attempted a native render")
-        cell = self.inputs.plan["fit_audit_cells"][index]
-        performance = Performance.from_dict(cell["recipe"]["performances"][cell["playback_view"]])
-        audio, receipt = self.session.render(candidate, performance, phase, label)
-        if audio is None:
-            raise RuntimeError("unison native render was not accepted")
-        require_request(self.inputs.codec, self.inputs.plan, candidate, performance, receipt)
-        reference, source = self.source(index)
-        return {"index": index, "candidate": candidate.to_dict(), "origin": "new", "receipt": receipt, "source_audio": source,
-                "scores": rescore_waveform(self.output, receipt, reference, self.inputs.codec.contract.tail_seconds)}
+        size = BatchConfig.from_plan(self.inputs.plan).spectral
+        pending, results, flushing = [], [], False
+        def flush():
+            nonlocal flushing
+            if not pending:
+                return
+            flushing = True
+            scores = rescore_waveforms(((self.output, row["receipt"], reference, self.inputs.codec.contract.tail_seconds)
+                                       for row, reference in pending), batch_size=size)
+            for (row, _reference), score in zip(pending, scores, strict=True):
+                row = {**row, "scores": score}
+                if on_result is not None:
+                    on_result(row)
+                results.append(row)
+            pending.clear()
+            flushing = False
+        try:
+            for index, candidate, phase, label in requests:
+                self.check_limits()
+                cell = self.inputs.plan["fit_audit_cells"][index]
+                performance = Performance.from_dict(cell["recipe"]["performances"][cell["playback_view"]])
+                audio, receipt = self.session.render(candidate, performance, phase, label)
+                if audio is None:
+                    raise RuntimeError("unison native render was not accepted")
+                require_request(self.inputs.codec, self.inputs.plan, candidate, performance, receipt)
+                reference, source = self.source(index)
+                pending.append(({"index": index, "candidate": candidate.to_dict(), "origin": "new", "receipt": receipt, "source_audio": source}, reference))
+                if len(pending) >= size:
+                    flush()
+        except BaseException:
+            if not flushing:
+                flush()
+            raise
+        flush()
+        return results
 
     def cost(self, index, choice):
         key = index, choice
@@ -254,21 +287,30 @@ def train(inputs, store, output, saved=None):
 
 
 def collect_finals(inputs, store, models):
+    with torch.no_grad():
+        banks = {arm: predict_cells(inputs, model.eval(), inputs.plan["fit_audit_cells"]) for arm, model in models.items()}
+    requests, arms = [], []
+    audit = WaveformAudit(BatchConfig.from_plan(inputs.plan).spectral)
     for index, cell in enumerate(inputs.plan["fit_audit_cells"]):
-        store.initial(index)
+        store.initial(index, audit=audit)
         for arm, model in models.items():
-            with torch.no_grad():
-                candidate = inputs.target(index, prediction=inputs.predict(model.eval(), cell))
+            candidate = inputs.target(index, prediction=banks[arm][index])
             key = index, arm
             if key in store.finals:
                 if store.finals[key]["candidate"] != candidate.to_dict():
                     raise ValueError("unison final comparison changed")
                 continue
-            store.check_limits()
-            row = {**store.render(index, candidate, "qualification", f"final:{index:03d}:{arm}"), "arm": arm}
-            append_durable(store.output / "finals.jsonl", row)
-            store.finals[key] = row
-            write_json(store.output / "progress.json", {"phase": "finals", "updates": len(inputs.plan["updates"]), "comparisons": len(store.finals)})
+            requests.append((index, candidate, "qualification", f"final:{index:03d}:{arm}"))
+            arms.append(arm)
+    audit.finish()
+    pending_arms = iter(arms)
+    def publish(row):
+        arm = next(pending_arms)
+        row = {**row, "arm": arm}
+        append_durable(store.output / "finals.jsonl", row)
+        store.finals[row["index"], arm] = row
+        write_json(store.output / "progress.json", {"phase": "finals", "updates": len(inputs.plan["updates"]), "comparisons": len(store.finals)})
+    store.render_many(requests, on_result=publish)
 
 
 def execute(inputs, output, *, resume=False):

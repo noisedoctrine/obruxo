@@ -107,8 +107,10 @@ def test_unsafe_bank_refuses_without_spending_native_requests():
     assert torch.equal(parameters_to_vector(ctx.model.correction.parameters()), ctx.before["weights"])
 
 
-def test_objective_uses_original_reference_hinges_and_rejects_invalid_measurements():
-    assert objective([.2, .8, .7, .1], [.5] * 4) == pytest.approx(.575)
+def test_objective_uses_smooth_reference_penalty_and_rejects_invalid_measurements():
+    assert objective([.2, .8, .7, .1], [.5] * 4) == pytest.approx(.5749375)
+    # The same ramp must be used for accepting a measured update and for backpropagation.
+    assert objective([.2, .8, .5005, .5], [.5] * 4) == pytest.approx(.575078125)
     with pytest.raises(ValueError, match="finite nonnegative"):
         objective([.2, .8, float("nan"), .1], [.5] * 4)
 

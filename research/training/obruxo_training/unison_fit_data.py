@@ -161,6 +161,16 @@ class Inputs:
         return audit["audio"], case["source_receipt"]
 
     def validate(self):
+        previous = self.frontend.pitch_batch_size
+        # Imported feature hashes must be checked in their recorded numerical layout.
+        self.frontend.pitch_batch_size = self.plan.get("source_pitch_batch_size", 1)
+        try:
+            self._validate_sources()
+        finally:
+            self.frontend.pitch_batch_size = previous
+        self.frontend.require_frozen()
+
+    def _validate_sources(self):
         checked = set()
         for index, cell in enumerate(self.plan["fit_audit_cells"]):
             audio, _receipt = self.source(index)
@@ -171,8 +181,8 @@ class Inputs:
                     raise ValueError("retained unison source features cannot be reconstructed")
                 checked.add(key)
             initial = self.cases[index]["rows"]["initial"]
-            if initial["candidate"] != self.target(index).to_dict():
+            original = self.target(index, prediction=self.predict(self.model, cell))
+            if initial["candidate"] != original.to_dict():
                 raise ValueError("qualified unison initializer differs from retained initial prediction")
             performance = Performance.from_dict(recipe["performances"][playback])
-            require_request(self.codec, self.plan, self.target(index), performance, initial["receipt"])
-        self.frontend.require_frozen()
+            require_request(self.codec, self.plan, original, performance, initial["receipt"])

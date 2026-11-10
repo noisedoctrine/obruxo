@@ -17,7 +17,8 @@ from .conditioned_bridge import read
 from .conditioned_short_audit import means_by_state
 from .features import tensor_digest
 from .native_fit import digest
-from .paired_native_evidence import native_ledger, rescore_waveform
+from .paired_native_evidence import native_ledger, WaveformAudit
+from .batching import BatchConfig, predict_cells
 from .unison_fit_data import require_request
 
 
@@ -151,6 +152,7 @@ def verify(inputs, output):
         if metadata != row["source_audio"]:
             raise ValueError("direct probe ground-truth recording changed")
     identities = {}
+    waveform_audit = WaveformAudit(BatchConfig.from_plan(plan).spectral)
     compared = 0
     for arm, model in models.items():
         artifact = torch.load(output / f"diagnostic-{arm}.pt", map_location="cpu", weights_only=True)
@@ -159,10 +161,13 @@ def verify(inputs, output):
                 or tensor_digest(cold.state_dict()) != tensor_digest(model.state_dict())):
             raise ValueError("direct cold export differs from the replayed model")
         identities[arm] = tensor_digest(model.state_dict())
-        for index, cell in enumerate(plan["fit_audit_cells"]):
+        with torch.no_grad():
+            predictions = predict_cells(inputs, model.eval(), plan["fit_audit_cells"])
+            cold_predictions = predict_cells(inputs, cold, plan["fit_audit_cells"])
+        for index, (cell, prediction, cold_prediction) in enumerate(zip(plan["fit_audit_cells"], predictions, cold_predictions, strict=True)):
             with torch.no_grad():
-                candidate = inputs.target(index, prediction=inputs.predict(model.eval(), cell))
-                cold_target = inputs.target(index, prediction=inputs.predict(cold, cell))
+                candidate = inputs.target(index, prediction=prediction)
+                cold_target = inputs.target(index, prediction=cold_prediction)
             row = store.finals[(index, arm)]
             if candidate != cold_target or row["candidate"] != candidate.to_dict() or row["arm"] != arm or row["origin"] != "new" or row["index"] != index:
                 raise ValueError("direct final production prediction changed")
@@ -170,12 +175,14 @@ def verify(inputs, output):
             require_request(inputs.codec, plan, candidate, performance, row["receipt"])
             receipt_check(row["receipt"], "qualification", f"final:{index:03d}:{arm}")
             source, metadata = store.source(index)
-            if metadata != row["source_audio"] or rescore_waveform(output, row["receipt"], source, inputs.codec.contract.tail_seconds) != row["scores"]:
+            if metadata != row["source_audio"]:
                 raise ValueError("direct final sound cannot be independently reconstructed")
+            waveform_audit.add(output, row["receipt"], source, inputs.codec.contract.tail_seconds, row["scores"])
             compared += 1
     for index in range(len(plan["fit_audit_cells"])):
-        store.initial(index)  # Rescores the accepted initial waveform against the bound source.
+        store.initial(index, audit=waveform_audit)
         compared += 1
+    waveform_audit.finish()
     if used != {key for key, row in outcomes.items() if row["status"] == "accepted"}:
         raise ValueError("direct native ledger has an unexplained accepted request")
     result = decisions(inputs, store, saved["trace"])

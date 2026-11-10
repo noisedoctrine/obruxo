@@ -122,8 +122,8 @@ def make_plan(fit, bridge, pool, reserved):
             "confirmation_audio_rendered": False, "test_split_used": False, "experimental_updates": 0, "qualified_for_release": False}
 
 
-def validate_plan(plan, pool):
-    if (plan["spec"] != SPEC or plan["limits"] != LIMITS or plan["source"] != code_identity(plan)
+def validate_plan(plan, pool, *, verify_source=True):
+    if (plan["spec"] != SPEC or plan["limits"] != LIMITS or (verify_source and plan["source"] != code_identity(plan))
             or any(digest(Path(path)) != value for path, value in plan["inputs_sha256"].items())
             or pool.pool_id != plan["pool_id"] or pool.codec.to_dict() != plan["codec"]):
         raise ValueError("frozen balanced data code, inputs or allocation changed")

@@ -64,3 +64,13 @@ def test_single_candidate_recovers_model_adam_trace_and_rng(synthetic):  # noqa:
     _model, recovered = train(inputs, store, saved=first, stop_after=3)
     assert equal_tree(expected, recovered)
     assert all(set(row["arms"]) == {"balanced"} and row["arms"]["balanced"]["coefficient"] == 0 for row in expected["trace"])
+
+
+def test_old_loss_checkpoint_cannot_resume_under_the_new_plan(synthetic):  # noqa: F811
+    from obruxo_training.basic_direct import LOSS, REHEARSAL
+    from obruxo_training.native_acceptance import SPEC as ACCEPTANCE
+    inputs, _rows, store = synthetic
+    _model, old = train(inputs, store, stop_after=1)
+    inputs.plan.update(loss=LOSS, rehearsal=copy.deepcopy(REHEARSAL), native_acceptance=copy.deepcopy(ACCEPTANCE))
+    with pytest.raises(ValueError, match="frozen run"):
+        train(inputs, store, saved=old, stop_after=2)

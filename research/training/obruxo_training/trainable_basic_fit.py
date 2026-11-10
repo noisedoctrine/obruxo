@@ -13,7 +13,8 @@ from .basic_direct import REHEARSAL
 from .basic_direct_fit import execute, initialize
 from .basic_direct_fit_audit import run_verification
 from .basic_direct_fit_data import Inputs
-from .basic_direct_fit_step import predict
+from .basic_direct_fit_step import predict_many
+from .batching import BatchConfig, compatible_infrastructure_source
 from .benchmark import MemoryMonitor
 from .category_scale_refresh import cpu_settings
 from .codec import PilotTarget
@@ -65,9 +66,9 @@ def parameter_rehearsal(inputs):
         for index, update in enumerate(inputs.plan["updates"]):
             optimizer.zero_grad(set_to_none=True)
             rows = []
-            for cells in inputs.observations(update):
-                cell = inputs.plan["fit_audit_cells"][cells[0]]
-                prediction, _bounds = predict(model, inputs.features[inputs.key(cell)])
+            cells = [inputs.plan["fit_audit_cells"][indices[0]] for indices in inputs.observations(update)]
+            predictions = predict_many(model, [inputs.features[inputs.key(cell)] for cell in cells], batch_size=BatchConfig.from_plan(inputs.plan).model)
+            for cell, (prediction, _bounds) in zip(cells, predictions, strict=True):
                 target = PilotTarget.from_dict(cell["recipe"]["target"])
                 rows.append(loss_terms(prediction, [target], inputs.codec)["loss"])
             loss = sum(weight * value for weight, value in zip(weights, rows, strict=True))
@@ -91,14 +92,15 @@ def parameter_rehearsal(inputs):
         restore_rng(rng, "cpu")
 
 
-def source_code(plan):
+def source_code(plan, *, compatible=()):
     root, actual, differences = Path(__file__).parents[1], {}, {}
     for name, expected in plan["source"].items():
         path = root / name if "/" in name else Path(__file__).with_name(name)
         actual[name] = sha256_bytes(path.read_bytes().replace(b"\r\n", b"\n"))
         if actual[name] != expected:
-            if name not in COMPATIBLE:
-                raise ValueError("qualified numerical prediction, loss or renderer implementation changed")
+            module = name.removeprefix("obruxo_training/")
+            if module not in COMPATIBLE and module not in compatible and name not in compatible and not compatible_infrastructure_source(name, expected, actual[name]):
+                raise ValueError(f"qualified numerical prediction, loss or renderer implementation changed: {name}")
             differences[name] = {"historical": expected, "current": actual[name]}
     return actual, differences
 

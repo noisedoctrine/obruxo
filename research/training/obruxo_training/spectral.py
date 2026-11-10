@@ -141,6 +141,18 @@ def target_bytes(target):
     return sum(value.numel() * value.element_size() for value in tensors)
 
 
+def concatenate_targets(targets):
+    """Combine equal-frame references, including prepared reference-only arithmetic."""
+    def combine(values):
+        first = values[0]
+        if isinstance(first, torch.Tensor):
+            return torch.cat(values)
+        if isinstance(first, tuple):
+            return tuple(combine([value[index] for value in values]) for index in range(len(first)))
+        return {key: combine([value[key] for value in values]) for key in first}
+    return combine(targets)
+
+
 def require_spectral_contract(saved, current):
     if canonical_sha256(saved) != canonical_sha256(current):
         raise ValueError("spectral training contract changed; start a new run")

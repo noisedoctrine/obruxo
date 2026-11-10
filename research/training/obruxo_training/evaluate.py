@@ -26,20 +26,37 @@ from .trainer import TrainConfig, _run_contract, export_model, validate_replay
 
 @torch.no_grad()
 def audio_distance(reference: np.ndarray, candidate: np.ndarray) -> dict:
+    return audio_distances(reference[None], candidate[None])[0]
+
+
+def audio_distances(reference: np.ndarray, candidate: np.ndarray) -> list[dict]:
     if reference.shape != candidate.shape or not np.isfinite(reference).all() or not np.isfinite(candidate).all():
         raise ValueError("render comparison needs aligned, finite audio")
-    left, right = torch.from_numpy(reference.copy()).T, torch.from_numpy(candidate.copy()).T
+    if reference.ndim != 3 or reference.shape[2] != 2 or not len(reference):
+        raise ValueError("render comparison requires nonempty stereo batches")
+    left, right = (torch.from_numpy(value.copy()).transpose(1, 2) for value in (reference, candidate))
+    batch, channels, samples = left.shape
     scores = []
     for size in (512, 2048, 8192):
         window = torch.hann_window(size)
-        spectra = [torch.stft(value, size, hop_length=size // 4, window=window, return_complex=True).abs()
+        spectra = [torch.stft(value.reshape(batch * channels, samples), size, hop_length=size // 4, window=window,
+                              return_complex=True).abs().reshape(batch, channels, size // 2 + 1, -1)
                    for value in (left, right)]
-        convergence = (spectra[0] - spectra[1]).norm() / spectra[0].norm().clamp_min(1e-8)
-        log_mae = (spectra[0].clamp_min(1e-5).log() - spectra[1].clamp_min(1e-5).log()).abs().mean()
-        scores.append({"fft": size, "spectral_convergence": float(convergence), "log_magnitude_mae": float(log_mae)})
-    left_rms, right_rms = left.square().mean().sqrt(), right.square().mean().sqrt()
-    return {"mrstft": float(np.mean([item["spectral_convergence"] + item["log_magnitude_mae"] for item in scores])),
-            "rms_relative": float((left_rms - right_rms).abs() / left_rms.clamp_min(1e-8)), "resolutions": scores}
+        # Legacy audit scores pin each clip's reduction order; transforms and array math stay batched.
+        difference = spectra[0] - spectra[1]
+        convergence = torch.stack([row.norm() for row in difference]) / torch.stack([row.norm() for row in spectra[0]]).clamp_min(1e-8)
+        log_error = (spectra[0].clamp_min(1e-5).log() - spectra[1].clamp_min(1e-5).log()).abs()
+        log_mae = torch.stack([row.mean() for row in log_error])
+        scores.append((size, convergence.tolist(), log_mae.tolist()))
+    left_rms, right_rms = (torch.stack([row.mean() for row in value.square()]).sqrt() for value in (left, right))
+    rms = ((left_rms - right_rms).abs() / left_rms.clamp_min(1e-8)).tolist()
+    results = []
+    for index in range(batch):
+        rows = [{"fft": size, "spectral_convergence": convergence[index], "log_magnitude_mae": log_mae[index]}
+                for size, convergence, log_mae in scores]
+        results.append({"mrstft": float(np.mean([row["spectral_convergence"] + row["log_magnitude_mae"] for row in rows])),
+                        "rms_relative": rms[index], "resolutions": rows})
+    return results
 
 
 def nearest_training_target(features: dict, replay: list[dict]) -> PilotTarget:

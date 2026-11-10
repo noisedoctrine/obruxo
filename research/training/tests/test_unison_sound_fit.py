@@ -5,6 +5,7 @@ import shutil
 import numpy as np
 import pytest
 import torch
+from render_fixtures import LifecycleReceipts
 
 from obruxo_data.hashing import sha256_bytes
 from obruxo_data.midi import Performance, TempoMap
@@ -46,7 +47,7 @@ def receipt(codec, plan, candidate, performance, phase, label, attempt):
                    "renderer_identity": plan["expected_renderer_identity"], "qa": {"audio_float32_sha256": audio_float32_sha256(audio)}}
 
 
-class FakeSession(fit.PairedSession):
+class FakeSession(LifecycleReceipts, fit.PairedSession):
     def render(self, candidate, performance, phase, label):
         self.check_limits()
         attempt = sum(row["event"] == "attempt" and row["phase"] == phase for row in self.events)

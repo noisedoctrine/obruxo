@@ -6,7 +6,8 @@ import math
 import torch
 
 from .basic_direct import REHEARSAL, reference_loss
-from .basic_direct_fit_step import gradients, predict
+from .basic_direct_fit_step import gradients, predict_many
+from .batching import BatchConfig, concatenate_predictions
 from .branch_adversary import note_targets, pair_indices
 from .fitted_note_head import FittedNoteHead
 from .inward_basic import training_model
@@ -49,22 +50,18 @@ def calibrate(sound, note, encoder):
     return {"coefficient": coefficient, "sound_encoder_norm": a, "unscaled_note_encoder_norm": b}
 
 
-def sound_objective(inputs, model, cell_lists, evaluate, index):
+def sound_objective(inputs, model, cell_lists, evaluate, index, evaluate_many=None):
     predictions, observations, clamping = [], [], []
-    for cells in cell_lists:
-        cell = inputs.plan["fit_audit_cells"][cells[0]]
-        prediction, bounds = predict(model, inputs.features[inputs.key(cell)])
+    features = [inputs.features[inputs.key(inputs.plan["fit_audit_cells"][cells[0]])] for cells in cell_lists]
+    rows = predict_many(model, features, batch_size=BatchConfig.from_plan(inputs.plan).model)
+    for cells, (prediction, bounds) in zip(cell_lists, rows, strict=True):
         predictions.append(prediction)
         clamping.append(bounds)
         observations.append({"baseline": inputs.cases[cells[0]]["rows"]["initial"]["scores"]["spectral"]})
-    values, estimates = [], []
-    for observation, prediction in enumerate(predictions):
-        value, measured = native_reconstruction_loss(prediction, inputs.adapter,
-            lambda _single, patch, observation=observation: evaluate(observation, patch), temperature=temperature_at(index, len(inputs.plan["updates"])))
-        if len(measured) != 1:
-            raise ValueError("shared sound fitting requires singleton production predictions")
-        values.append(value)
-        estimates.append(measured[0].to_dict())
+    values, measured = native_reconstruction_loss(concatenate_predictions(predictions), inputs.adapter, evaluate,
+        temperature=temperature_at(index, len(inputs.plan["updates"])), evaluate_many=evaluate_many, reduction="none")
+    values = list(values.unbind())
+    estimates = [estimate.to_dict() for estimate in measured]
     penalized = values[:2] + [reference_loss(values[i], observations[i]["baseline"]) for i in (2, 3)]
     weights = REHEARSAL["paired_weights"] + REHEARSAL["reference_weights"]
     loss = sum(weight * value for weight, value in zip(weights, penalized, strict=True))
@@ -77,13 +74,14 @@ def step(inputs, store, models, optimizers, auxiliary_rows, index, calibration):
     for arm, model in models.items():
         optimizer = optimizers[arm]
         optimizer.zero_grad(set_to_none=True)
-        before = capture(inputs, model)
+        before = capture(inputs, model, anchor_cells=[inputs.plan["fit_audit_cells"][cells[0]] for cells in cell_lists])
 
         def evaluate(observation, patch, arm=arm):
             costs = [store.probe(index + 1, f"{arm}-{observation}", cell, patch) for cell in cell_lists[observation]]
             return sum(costs) / len(costs)
 
-        loss, estimates, observations, clamping = sound_objective(inputs, model, cell_lists, evaluate, index)
+        evaluate_many = (lambda requests: store.evaluate_many(index + 1, [f"{arm}-{i}" for i in range(len(cell_lists))], cell_lists, requests)) if hasattr(store, "evaluate_many") else None
+        loss, estimates, observations, clamping = sound_objective(inputs, model, cell_lists, evaluate, index, evaluate_many)
         note, coefficient = None, 0.
         if arm == "sound_auxiliary":
             encoder = model.correction[0].timbre
@@ -111,7 +109,7 @@ def step(inputs, store, models, optimizers, auxiliary_rows, index, calibration):
         access = gradients(model)
         optimizer.step()
         accepted = accept_update(inputs, model, before, cell_lists, observations,
-                                 {"estimates": estimates, "losses": {"spectral": float(loss.detach())}}, evaluate)
+                                 {"estimates": estimates, "losses": {"spectral": float(loss.detach())}}, evaluate, evaluate_many=evaluate_many)
         result["arms"][arm] = {"sound_loss": float(loss.detach()), "note_mse": None if note is None else float(note.detach()),
             "coefficient": coefficient, "gradient_norm": float(norm), "gradients": access, "clamping": clamping,
             "estimates": estimates, "acceptance": accepted}
