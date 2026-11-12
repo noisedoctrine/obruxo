@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import deque
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass, fields
 import json
 import math
@@ -256,6 +257,50 @@ class RenderWorker:
             memory.close()
             memory.unlink()
         return audio, {**metadata, "wall_seconds": perf_counter() - started}
+
+
+class RenderWorkerPool:
+    """Run independent clips on a small fixed set of isolated native workers."""
+
+    def __init__(self, *, renderer_factory=None, worker_count=1, max_jobs=None, max_bytes=32 * 1024 * 1024):
+        if type(worker_count) is not int or not 1 <= worker_count <= 4:
+            raise ValueError("render worker count must be an integer from 1 to 4")
+        max_jobs = StreamConfig().worker_jobs if max_jobs is None else max_jobs
+        StreamConfig(prefetch_bytes=max_bytes, worker_jobs=max_jobs)
+        self.worker_count = worker_count
+        self.workers = [RenderWorker(renderer_factory=renderer_factory, max_jobs=max_jobs, max_bytes=max_bytes)
+                        for _ in range(worker_count)]
+        self.executor = ThreadPoolExecutor(max_workers=worker_count) if worker_count > 1 else None
+        self.closed = False
+
+    def render_many(self, requests, *, timeout=60.):
+        if self.closed:
+            raise RuntimeError("render worker pool is closed")
+        requests = list(requests)
+        results = [None] * len(requests)
+        for start in range(0, len(requests), self.worker_count):
+            group = requests[start:start + self.worker_count]
+            if self.executor is None:
+                results[start] = self.workers[0].render(group[0], timeout=timeout)
+                continue
+            futures = {self.executor.submit(self.workers[index].render, request, timeout=timeout): start + index
+                       for index, request in enumerate(group)}
+            failure = None
+            for future in as_completed(futures):
+                try:
+                    results[futures[future]] = future.result()
+                except Exception as error:
+                    failure = failure or error
+            if failure is not None:
+                raise failure
+        return results
+
+    def close(self):
+        if self.executor is not None:
+            self.executor.shutdown(wait=True)
+        for worker in self.workers:
+            worker.close()
+        self.closed = True
 
 
 def render_isolated(request: RenderRequest, *, renderer_factory=None, timeout: float = 60, worker=None) -> tuple[np.ndarray | None, dict]:

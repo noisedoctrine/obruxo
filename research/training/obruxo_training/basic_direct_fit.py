@@ -113,6 +113,7 @@ class SoundStore(CostStore):
         for start in range(0, len(planned), self.batching.spectral):
             chunk = planned[start:start + self.batching.spectral]
             try:
+                render_jobs = []
                 for position, (request, query, key) in enumerate(chunk):
                     if key in self.probes:
                         continue
@@ -122,11 +123,22 @@ class SoundStore(CostStore):
                     _step, _observation, index, candidate = request
                     cell = self.inputs.plan["fit_audit_cells"][index]
                     performance = Performance.from_dict(cell["recipe"]["performances"][cell["playback_view"]])
-                    audio, receipt = self.native.render(candidate, performance, "training", probe_label(query))
-                    if audio is None:
+                    render_jobs.append((position, candidate, performance, "training", probe_label(query)))
+                if render_jobs:
+                    requests_to_render = [(candidate, performance, phase, label)
+                                          for _position, candidate, performance, phase, label in render_jobs]
+                    render_many = getattr(self.native, "render_many", None)
+                    rendered = (render_many(requests_to_render) if render_many else
+                                [self.native.render(*request) for request in requests_to_render])
+                    failure = len(rendered) != len(render_jobs)
+                    for (position, candidate, performance, _phase, _label), (audio, receipt) in zip(render_jobs, rendered):
+                        if audio is None:
+                            failure = True
+                            continue
+                        require_request(self.inputs.codec, self.inputs.plan, candidate, performance, receipt)
+                        pending[position] = audio, receipt
+                    if failure:
                         raise RuntimeError("direct sound probe was not accepted")
-                    require_request(self.inputs.codec, self.inputs.plan, candidate, performance, receipt)
-                    pending[position] = audio, receipt
                 flush()
             except BaseException:
                 # Only accepted rows are recorded; unrendered/cache slots are harmless discarded dummy measurements.

@@ -95,10 +95,14 @@ def make_plan(pool, bootstrap_root, bootstrap_audit_path, qualification_path, ca
 
 class PairedSession(NativeSession):
     def render(self, target, performance, phase, label):
-        audio, receipt = super().render(target, performance, phase, label)
-        if audio is not None and receipt["renderer_identity"] != self.plan["expected_renderer_identity"]:
+        return self.render_many([(target, performance, phase, label)])[0]
+
+    def render_many(self, requests):
+        results = super().render_many(requests)
+        if any(audio is not None and receipt["renderer_identity"] != self.plan["expected_renderer_identity"]
+               for audio, receipt in results):
             raise ValueError("paired fit renderer differs from its native qualification")
-        return audio, receipt
+        return results
 
 
 def archive_interruption(output, plan):

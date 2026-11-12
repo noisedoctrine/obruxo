@@ -37,4 +37,10 @@ A follow-up kept the same 126-render update design, source audio, batch sizes, f
 
 This qualifies the recorded basic Windows workload and numerical bounds. It does not establish finished-model quality or arbitrary-preset/cross-platform equivalence. The v3 lifecycle is frozen in new stream contracts and native receipts; historical runs use their recorded source revision.
 
+## Parallel native rendering
+
+The same 126 fixed-phase training requests were sent through isolated workers. Two workers reduced measured wall time for the native renders from **19.87s serial to 13.18s parallel** (about **1.51×**). All 126 were accepted, candidate controls matched exactly, and the renderer identity and request IDs matched. Against the existing two-thread frozen reference, maximum loss, gradient, relative-gradient and parameter-update differences stayed within their declared limits; an exact same-thread cached replay reproduced the trace and weights. The full two-worker update peaked at **3.07 GiB**, below its 4 GiB cap. The recorded 26.21s full-update time came from a separate runner, so it is not presented as a controlled end-to-end speedup.
+
+Four workers completed the isolated render-only batch in **5.97s** (about **3.33×** versus the same serial worker-call sum), but used **3.24 GiB** before the training update. A full four-worker update stopped after 16 of 126 renders and produced no optimizer update. It therefore does not qualify for the 4 GiB free-first run; new balanced plans default to two workers and can freeze one to four with `--render-workers`.
+
 [Usage](../RENDER_WORKER.md) · [Plan](data/render_worker_plan.json) · [Measurements](data/render_worker_summary.json)

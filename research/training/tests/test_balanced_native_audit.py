@@ -63,7 +63,17 @@ def test_complete_multiview_job_replays_and_audits_repeated_development_states(t
             return audio, {"status": "accepted", "qa": {"audio_float32_sha256": audio_float32_sha256(audio)},
                            "provenance": {"request_id": request.request_id, "simulated_worker": True}}
 
-    monkeypatch.setattr(temporal_proxy_data, "RenderWorker", Worker)
+    class WorkerPool:
+        def __init__(self, **_kwargs):
+            self.worker = Worker()
+
+        def render_many(self, requests, **kwargs):
+            return [self.worker.render(request, **kwargs) for request in requests]
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(temporal_proxy_data, "RenderWorkerPool", WorkerPool)
     monkeypatch.setattr(temporal_proxy_data, "NativeRendererFactory", lambda **_kwargs: object())
     actual_summary = native_fit.audit_summary
 
