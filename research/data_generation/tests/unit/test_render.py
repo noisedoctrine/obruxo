@@ -235,6 +235,14 @@ def test_audio_qa_reports_shape_nonfinite_silence_clipping_and_tail() -> None:
     assert {item.code for item in diagnostics} >= {
         "audio.frames", "audio.channels", "audio.non_finite", "audio.silence", "audio.clipping", "audio.tail_truncation",
     }
+    assert np.isnan(audio[0, 0]) and audio[-1, 1] == 1.5
+
+
+def test_audio_hash_matches_canonical_float32_bytes_for_empty_and_strided_audio() -> None:
+    arrays = (np.empty((0, 2), dtype=np.float32), np.arange(48, dtype=np.float64).reshape(8, 6)[:, ::2])
+    for audio in arrays:
+        expected = hashlib.sha256(np.ascontiguousarray(audio.astype("<f4", copy=False)).tobytes()).hexdigest()
+        assert audio_float32_sha256(audio) == expected
 
 
 def test_native_basic_readback_rejects_a_mismatched_control() -> None:

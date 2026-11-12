@@ -28,8 +28,9 @@ class RepeatabilityTolerance:
 def audio_float32_sha256(audio: "np.ndarray") -> str:
     import numpy as np
 
-    buffer = np.ascontiguousarray(audio.astype("<f4", copy=False)).tobytes()
-    return hashlib.sha256(buffer).hexdigest()
+    buffer = np.ascontiguousarray(audio.astype("<f4", copy=False))
+    view = memoryview(buffer).cast("B") if buffer.size else b""
+    return hashlib.sha256(view).hexdigest()
 
 
 def audio_diagnostics_from_qa(qa: dict[str, Any], *, config: AudioQualityConfig | None = None) -> tuple[Diagnostic, ...]:
@@ -100,15 +101,23 @@ def analyze_audio(audio: "np.ndarray", *, sample_rate: int, expected_frames: int
     actual_frames = int(audio.shape[0]) if audio.ndim >= 1 else 0
     actual_channels = int(audio.shape[1]) if audio.ndim == 2 else 0
     finite = bool(np.isfinite(audio).all())
-    safe = np.nan_to_num(audio.astype(np.float64, copy=False), nan=0.0, posinf=0.0, neginf=0.0)
-    absolute = np.abs(safe)
-    peak = float(absolute.max(initial=0.0))
-    clipping_count = int(np.count_nonzero(absolute >= resolved.clipping_threshold))
-    rms = float(np.sqrt(np.mean(safe * safe))) if safe.size else 0.0
+    safe = audio.astype(np.float64, copy=not finite)
+    if not finite:
+        np.nan_to_num(safe, copy=False, nan=0.0, posinf=0.0, neginf=0.0)
+    scratch = np.empty_like(safe)
+    np.abs(safe, out=scratch)
+    peak = float(scratch.max(initial=0.0))
+    clipping_count = int(np.count_nonzero(scratch >= resolved.clipping_threshold))
+    np.square(safe, out=scratch)
+    rms = float(np.sqrt(np.mean(scratch))) if safe.size else 0.0
     dc_offset = [float(item) for item in np.mean(safe, axis=0)] if safe.ndim == 2 and safe.size else []
     tail_frames = min(actual_frames, round(resolved.tail_seconds * sample_rate))
     tail = safe[-tail_frames:] if tail_frames else safe[:0]
-    tail_rms = float(np.sqrt(np.mean(tail * tail))) if tail.size else 0.0
+    if tail.size:
+        np.square(tail, out=scratch[-tail_frames:])
+        tail_rms = float(np.sqrt(np.mean(scratch[-tail_frames:])))
+    else:
+        tail_rms = 0.0
     digest = audio_float32_sha256(audio)
     qa = {
         "expected_frames": expected_frames,
