@@ -270,6 +270,13 @@ def test_renderer_reuses_only_qualified_basic_state_and_verifies_each_patch(tmp_
     fingerprint = hashlib.sha256(plugin.read_bytes()).hexdigest()
     renderer = VitalRenderer(plugin, accepted_plugin_sha256={fingerprint}, renderer_id=f"test-{fingerprint}")
     renderer.legacy_training = basic
+    hash_calls = 0
+    hash_file = module._sha256_file
+    def count_hash(path):
+        nonlocal hash_calls
+        hash_calls += 1
+        return hash_file(path)
+    monkeypatch.setattr(module, "_sha256_file", count_hash)
     instances, saves, loaded, midi_counts = [], [], [], []
 
     class Synth:
@@ -322,6 +329,7 @@ def test_renderer_reuses_only_qualified_basic_state_and_verifies_each_patch(tmp_
             renderer_id=renderer.renderer_id, preroll_frames=32768 if basic else 0))
     assert len(instances) == (1 if basic else 3) and saves.count("template.state") == 1 and saves.count("loaded.state") == 3
     assert len(loaded) == (1 if basic else 3) and midi_counts == [1, 1, 1]
+    assert hash_calls == (1 if basic else 3)
     assert result.qa["basic_session"] == {"eligible": basic, "engine_reused": basic, "direct_controls": basic, "validation_cached": basic}
     if basic:
         with pytest.raises(ValueError, match="end_tick"):

@@ -338,6 +338,8 @@ class VitalRenderer(Renderer):
         try:
             reused = key is not None and self._session is not None
             if not reused:
+                if _sha256_file(self.plugin_path) != self.engine_fingerprint:
+                    raise DependencyUnavailableError("Vital plugin binary changed after renderer initialization")
                 directory = tempfile.TemporaryDirectory(prefix="obruxo-vital-render-")
                 engine = daw.RenderEngine(request.sample_rate, self.buffer_size)
                 synth = engine.make_plugin_processor("vital", str(self.plugin_path))
@@ -367,9 +369,7 @@ class VitalRenderer(Renderer):
         basic_key = self._basic_key(request, requested_document)
         validation_cached = basic_key is not None and basic_key == self._validated_basic
         validation_diagnostics = self._validate_request(request, basic_key=basic_key, document=requested_document)
-        fingerprint = _sha256_file(self.plugin_path)
-        if fingerprint != self.engine_fingerprint:
-            raise DependencyUnavailableError("Vital plugin binary changed after renderer initialization")
+        fingerprint = self.engine_fingerprint
         try:
             import dawdreamer as daw
         except ImportError as error:
