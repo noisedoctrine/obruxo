@@ -33,6 +33,8 @@ An initial double-precision setter conversion amplified tiny rounding difference
 
 Native worker calls now account for 58.7% of the update. Spectral feature extraction and loss comparisons together take 10.85s. All 120 gradient-probe renders and six acceptance renders per update are retained.
 
+A follow-up kept the same 126-render update design, source audio, batch sizes, fixed render phases and loss, and changed the CPU calculation from two threads to four. Feature extraction fell from **5.32s to 3.00s**, and loss calculation from **4.71s to 2.91s**: **10.03s to 5.90s combined**. The full update took 33.88s versus 33.02s, while Vital worker time increased from 16.53s to 19.91s, so this one comparison does not establish a full-update speedup. A cached replay at four threads reproduced the trace and checkpoint exactly. The four-thread update stayed within the existing limits against the two-thread reference and peaked at 2.41 GiB, below the 4 GiB cap. New balanced-fit plans now record the thread count and default to four; `--cpu-threads` selects another value before the plan is prepared.
+
 This qualifies the recorded basic Windows workload and numerical bounds. It does not establish finished-model quality or arbitrary-preset/cross-platform equivalence. The v3 lifecycle is frozen in new stream contracts and native receipts; historical runs use their recorded source revision.
 
 [Usage](../RENDER_WORKER.md) · [Plan](data/render_worker_plan.json) · [Measurements](data/render_worker_summary.json)

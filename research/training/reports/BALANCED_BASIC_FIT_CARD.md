@@ -22,7 +22,7 @@ Report directional data benefit separately: at least 5% lower combined loss and 
 
 ## Resources and verification
 
-Use the same qualified Vital identity, fixed phases for all oscillators and the sampler, 32,768-frame preroll, CPU float32, two Torch threads and one isolated native worker. The source bank's 24 requests remain separately recorded. Candidate allocation:
+Use the same qualified Vital identity, fixed phases for all oscillators and the sampler, 32,768-frame preroll, CPU float32 and one isolated native worker. Freeze the deterministic CPU thread count in the plan; new plans default to four threads and can select another count with `--cpu-threads`. The source bank's 24 requests remain separately recorded. Candidate allocation:
 
 | Work | Maximum requests |
 |---|---:|

@@ -38,7 +38,9 @@ SPEC = {"format": "balanced_basic_native_sound_fit_v1", "training_indices": [2, 
 LIMITS = {"wall_seconds": 21600, "process_tree_bytes": 4 * 1024**3, "archive_bytes": 2 * 1024**3,
           "replay_bytes": 512 * 1024**2, "training_attempts": 7600, "qualification_attempts": 400,
           "native_executions": 2, "optimizer_attempts": 49}
-SOURCES = ("balanced_basic_fit.py", "balanced_basic_audit.py", "reports/scripts/run_balanced_basic_fit.py", "reports/BALANCED_BASIC_FIT_CARD.md")
+DEFAULT_CPU_THREADS = 4
+SOURCES = ("balanced_basic_fit.py", "balanced_basic_audit.py", "category_scale_refresh.py", "reports/scripts/run_balanced_basic_fit.py",
+           "reports/BALANCED_BASIC_FIT_CARD.md")
 
 
 def schedule(updates):
@@ -90,7 +92,9 @@ def code_identity(plan):
     return {**code, **{name: sha256_bytes((root / name if "/" in name else Path(__file__).with_name(name)).read_bytes().replace(b"\r\n", b"\n")) for name in (*SOURCES, *sorted(EXECUTION_BATCH_SOURCES))}}
 
 
-def prepare(paths, pool, output=None, *, batching=None):
+def prepare(paths, pool, output=None, *, batching=None, cpu_threads=DEFAULT_CPU_THREADS):
+    if type(cpu_threads) is not int or cpu_threads < 1:
+        raise ValueError("CPU thread count must be a positive integer")
     control, data = paths["control"], paths["data"]
     prior, proof, bank, data_proof = (read(path) for path in (control / "plan.json", control / "verification.json", data / "plan.json", data / "verification.json"))
     # Import a previously verified artifact; generation/recovery still checks its exact executable source.
@@ -125,7 +129,7 @@ def prepare(paths, pool, output=None, *, batching=None):
     records = {row["index"]: read(data / "records" / f"{row['index']:02d}.json") for row in bank["observations"]}
     cells = extend_cells(prior, bank, records)
     batching = batching or BatchConfig()
-    plan = {**prior, "batching": batching.to_dict(), "format": SPEC["format"], "balanced_spec": SPEC, "paths": {key: str(value) for key, value in paths.items()},
+    plan = {**prior, "batching": batching.to_dict(), "cpu_threads": cpu_threads, "format": SPEC["format"], "balanced_spec": SPEC, "paths": {key: str(value) for key, value in paths.items()},
             "loss": LOSS, "rehearsal": copy.deepcopy(REHEARSAL), "native_acceptance": copy.deepcopy(ACCEPTANCE),
             "inputs_sha256": bound, "source": {**prior["source"], **bank["source"]}, "limits": LIMITS,
             "updates": schedule(prior["updates"]), "fit_audit_cells": cells, "evaluation_indices": list(range(140)),
@@ -196,7 +200,7 @@ class BalancedInputs(Inputs):
 def load_inputs(output, pool):
     plan = read(output / "plan.json")
     paths = {key: Path(value) for key, value in plan["paths"].items()}
-    if plan != prepare(paths, pool, batching=BatchConfig.from_plan(plan)):
+    if plan != prepare(paths, pool, batching=BatchConfig.from_plan(plan), cpu_threads=plan.get("cpu_threads", 2)):
         raise ValueError("frozen balanced-fit source, inputs or allocation changed")
     return BalancedInputs(paths, plan)
 
