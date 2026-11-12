@@ -237,6 +237,25 @@ def test_audio_qa_reports_shape_nonfinite_silence_clipping_and_tail() -> None:
     }
 
 
+def test_native_basic_readback_rejects_a_mismatched_control() -> None:
+    from types import SimpleNamespace
+    from obruxo_data.render.basic_profile import CATEGORICAL, CONTINUOUS, CONTROL_NAMES
+    from obruxo_data.render.vita import verify_native_basic_controls
+
+    specs, settings = {}, {}
+    for name, lower, upper, default in CONTINUOUS:
+        specs[name] = SimpleNamespace(minimum=lower, maximum=upper)
+        settings[name] = default
+    for name, options in CATEGORICAL:
+        specs[name] = SimpleNamespace(minimum=options[0], maximum=options[-1])
+        settings[name] = options[0]
+    parameters = {name: index for index, name in enumerate(CONTROL_NAMES)}
+    synth = SimpleNamespace(get_parameter=lambda _index: 0.0)
+
+    with pytest.raises(RuntimeError, match="did not apply the requested native basic controls"):
+        verify_native_basic_controls({"settings": settings}, synth, parameters, specs)
+
+
 def test_repeatability_uses_numeric_and_spectral_tolerances() -> None:
     first = np.sin(np.linspace(0, 20, 4096, dtype=np.float64))[:, None].astype(np.float32)
     second = np.sin(np.linspace(0.1, 20.1, 4096, dtype=np.float64))[:, None].astype(np.float32)
@@ -302,6 +321,11 @@ def test_renderer_reuses_only_qualified_basic_state_and_verifies_each_patch(tmp_
             document["settings"][name] = spec.minimum + value * (spec.maximum - spec.minimum)
             self.state = _template_state(document)
             return True
+        def get_parameter(self, index):
+            name = CONTROL_NAMES[index]
+            spec = renderer._basic_specs[name]
+            value = _extract_vital_json(self.state)["settings"][name]
+            return module._float32(module._float32(value - spec.minimum) / module._float32(spec.maximum - spec.minimum))
 
     class Engine:
         def __init__(self, *args):
@@ -327,10 +351,19 @@ def test_renderer_reuses_only_qualified_basic_state_and_verifies_each_patch(tmp_
         document["settings"]["osc_1_level"] = value
         result = renderer.render(RenderRequest(preset_json=json.dumps(document), performance=performance,
             renderer_id=renderer.renderer_id, preroll_frames=32768 if basic else 0))
-    assert len(instances) == (1 if basic else 3) and saves.count("template.state") == 1 and saves.count("loaded.state") == 3
+    assert len(instances) == (1 if basic else 3) and saves.count("template.state") == 1
+    assert saves.count("loaded.state") == (1 if basic else 3)
     assert len(loaded) == (1 if basic else 3) and midi_counts == [1, 1, 1]
     assert hash_calls == (1 if basic else 3)
-    assert result.qa["basic_session"] == {"eligible": basic, "engine_reused": basic, "direct_controls": basic, "validation_cached": basic}
+    verified_scalars = len(CONTROL_NAMES) if basic else result.provenance.settings["verified_loaded_scalars"]
+    assert result.qa["basic_session"] == {"eligible": basic, "engine_reused": basic, "direct_controls": basic,
+                                          "validation_cached": basic, "verified_scalars": verified_scalars,
+                                          "control_readback": "native_parameter_getter" if basic else "full_state_json"}
+    checked = result.qa["basic_session"]["verified_scalars"]
+    if basic:
+        assert checked == len(CONTROL_NAMES)
+    else:
+        assert checked > len(CONTROL_NAMES)
     if basic:
         with pytest.raises(ValueError, match="end_tick"):
             renderer.render(RenderRequest(preset_json=json.dumps(document), performance=performance,
