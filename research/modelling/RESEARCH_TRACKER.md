@@ -20,30 +20,74 @@ Infer a valid Vital patch from exactly one reference audio clip.
 - Source-parameter supervision may support a brief, declared warm start and diagnostics, but it must not remain an inverse-model training target after warm start. The model is selected by rendered-audio quality because different settings can produce equivalent sounds.
 - A predicted patch should capture synthesis identity rather than memorize the performance in the reference clip. On paired synthetic data, test this by rendering the source and predicted patches under performances not heard by the inference model.
 - Returning several ranked candidate patches is desirable if it can be implemented without disproportionate complexity. A simpler system may generate or optimize several candidates internally and expose the best-ranked results; this does not by itself require a generative decoder.
-- **Every experiment report shows exactly which Vital controls it can change.** Give each compared experiment version a separate table, not a version/arm column. List every control in the declared inventory, including fixed and non-trainable controls individually. Put a ✅/❌ changeable indicator immediately after the control and an enabled/total count next; then show the update method, output representation and size, training signal/gradient path, and range/choices or fixed value. Count controls separately from dense outputs (for example, one unison choice is one control even when represented by three scores). Distinguish model-head training from direct patch optimization, warm-start labels from audio-loss training, fixed template values from omitted fields, and frozen from trainable heads.
+- **Every experiment report makes its control scope easy to scan.** Give each compared version its own compact table, not a version/arm column. Group rows by control family/capability; include disabled families instead of hiding them in “everything else.” Put ✅/❌ immediately after the family name and enabled/total instances next (for example, `1 / 3`). Keep control counts separate from dense output counts: one unison choice is one control even when it has three scores. Link the table to a maintained machine-readable inventory with one record per exact Vital field/instance, including fixed and disabled controls, update method, output representation, supervision/audio-loss path, range/choices, fixed value/source, masks, and notes. Distinguish shared-model training from direct patch optimization, warm-start labels from audio-loss training, fixed template values from omitted fields, and frozen from trainable heads.
 
 The central modelling problem is therefore not plain parameter regression. It is a structured, multimodal inverse problem in which musical content and synthesis identity are entangled, the forward synthesizer is non-differentiable, and the target program contains continuous controls, categorical choices, routing, permutations, and variable structured data.
 
-### Current Stage A control table
+### Current Stage A control scope
 
-This is the current basic-codec prediction inventory, not a claim that the shared model has learned these controls from audio. ✅ means the Stage A head can set that control; the count is Vital controls, not output slots. Each specific experiment must still report which controls its optimizer updates and its actual loss/gradient path. The basic trainer currently uses source-parameter supervision; its learned audio-loss helper has not passed useful-gradient qualification, and no shared audio-trained model has passed the reconstruction gate.
+This is a family-level scan of the current basic-codec inventory. ✅ means at least one instance in the family has an output head; ❌ means the controls are present but fixed for this experiment. Counts are controls/instances, not dense logits. Fixed controls are explicitly listed by meaningful family below; the linked [control inventory dataset](control_scope/stage_a_controls.jsonl) records the exact fields, fixed defaults, masks, and serialized paths. It contains 979 records: 772 scalar settings and 207 structured fields/assets/curves. Eleven scalar settings are adjustable, with 14 dense outputs (9 continuous values and 5 category scores). The current basic trainer uses source-parameter supervision; the shared audio-loss helper is not qualified, and no shared audio-trained model has passed the reconstruction gate.
 
-| Vital control | Changeable? | Enabled / total | Head representation | Range, choices, or active condition |
-|---|:---:|---:|---|---|
-| `osc_1_level` | ✅ | 1 / 1 | 1 continuous output | 0.15–0.35 stored units |
-| `osc_1_pan` | ✅ | 1 / 1 | 1 continuous output | −0.7–0.7 |
-| `osc_1_unison_detune` | ✅ | 1 / 1 | 1 continuous output | 0.5–2.5; loss masked when unison has one voice |
-| `osc_1_unison_voices` | ✅ | 1 / 1 | 3 category scores → 1 choice | 1, 2, or 4 voices |
-| `filter_1_cutoff` | ✅ | 1 / 1 | 1 continuous output | 50–120 stored units; loss masked while filter is off |
-| `filter_1_resonance` | ✅ | 1 / 1 | 1 continuous output | 0.1–0.6; loss masked while filter is off |
-| `filter_1_on` | ✅ | 1 / 1 | 2 category scores → 1 choice | Off or on |
-| `env_1_attack` | ✅ | 1 / 1 | 1 continuous output | 0.08–0.6 stored units |
-| `env_1_decay` | ✅ | 1 / 1 | 1 continuous output | 0.25–1.0 stored units |
-| `env_1_sustain` | ✅ | 1 / 1 | 1 continuous output | 0.25–0.9 stored units |
-| `env_1_release` | ✅ | 1 / 1 | 1 continuous output | 0.2–0.65 stored units |
-| **Total** | **11 enabled** | **11 / 11** | **9 continuous outputs + 5 category scores = 14 dense outputs; 11 selected values enter the codec** | **One oscillator, optional filter 1, envelope 1** |
-
-The inventory is the eleven fields declared by the [basic codec](../training/ONLINE_PILOT.md#pilot-codec). Other preset state remains pinned to its reviewed template and is outside this Stage A prediction inventory; the codec rejects changes to unsupported state. “Stored units” are not display units such as seconds or hertz.
+| Control family / capability | On? | Enabled / total | Head outputs | Current treatment |
+|---|:---:|---:|---:|---|
+| Oscillator level | ✅ | 1 / 3 | 1 continuous | Oscillator 1 only; 0.15–0.35 stored units |
+| Oscillator pan | ✅ | 1 / 3 | 1 continuous | Oscillator 1 only; −0.7–0.7 |
+| Unison detune | ✅ | 1 / 3 | 1 continuous | Oscillator 1 only; 0.5–2.5, masked at one voice |
+| Unison voice count | ✅ | 1 / 3 | 3 scores | Oscillator 1 chooses 1, 2, or 4 voices |
+| Oscillator on/off | ❌ | 0 / 3 | None | Fixed off/on values from template |
+| Oscillator pitch: transpose, tune, and quantize | ❌ | 0 / 9 | None | Fixed by template |
+| Oscillator phase and random phase | ❌ | 0 / 6 | None | Fixed phases for repeatable renders |
+| Oscillator distortion amount, type, phase, and spread | ❌ | 0 / 12 | None | Fixed by template |
+| Wavetable frame selection | ❌ | 0 / 3 | None | Fixed frame values |
+| Wavetable assets | ❌ | 0 / 3 | None | Template assets retained |
+| Wavetable frame spread | ❌ | 0 / 3 | None | Fixed by template |
+| Unison blend | ❌ | 0 / 3 | None | Fixed by template |
+| Oscillator detune range and power | ❌ | 0 / 6 | None | Fixed by template |
+| Spectral morph type, amount, and spread | ❌ | 0 / 9 | None | Fixed by template |
+| Spectral unison and stack style | ❌ | 0 / 6 | None | Fixed by template |
+| Oscillator stereo spread | ❌ | 0 / 3 | None | Fixed by template |
+| Oscillator destination and MIDI tracking | ❌ | 0 / 6 | None | Fixed by template |
+| Oscillator interpolation and 2D view | ❌ | 0 / 6 | None | Fixed by template |
+| Custom oscillator curves | ❌ | 0 / 3 | None | No curve heads; template curves retained |
+| Filter cutoff | ✅ | 1 / 2 | 1 continuous | Filter 1 only; 50–120 stored units, masked while off |
+| Filter resonance | ✅ | 1 / 2 | 1 continuous | Filter 1 only; 0.1–0.6, masked while off |
+| Filter on/off | ✅ | 1 / 2 | 2 scores | Filter 1 chooses off or on |
+| Filter model and style | ❌ | 0 / 4 | None | Fixed by template |
+| Filter drive, mix, blend, and blend transpose | ❌ | 0 / 8 | None | Fixed by template |
+| Filter formant controls | ❌ | 0 / 10 | None | Position, spread, transpose, and resonance fixed |
+| Filter input and key tracking | ❌ | 0 / 4 | None | Fixed by template |
+| Envelope attack/decay/sustain/release | ✅ | 4 / 24 | 4 continuous | Envelope 1 only; other envelope instances fixed |
+| Envelope delay and hold | ❌ | 0 / 12 | None | Fixed by template |
+| Envelope curve powers | ❌ | 0 / 18 | None | Fixed by template |
+| LFO rate and timing controls | ❌ | 0 / 48 | None | Eight LFOs remain at template settings |
+| LFO phase, smoothing, stereo, and key tracking | ❌ | 0 / 48 | None | Eight LFOs remain at template settings |
+| LFO curves | ❌ | 0 / 8 | None | Curves remain at template settings |
+| Modulation route sources | ❌ | 0 / 64 | None | All source fields fixed |
+| Modulation route destinations | ❌ | 0 / 64 | None | All destination fields fixed |
+| Per-route amount, power, polarity, stereo, and bypass | ❌ | 0 / 320 | None | All five controls for each of 64 routes fixed |
+| Per-route input mapping curves | ❌ | 0 / 64 | None | Linear default; no mapping heads |
+| Sampler controls | ❌ | 0 / 11 | None | Fixed by template |
+| Sample asset | ❌ | 0 / 1 | None | Fixed by template |
+| Chorus controls | ❌ | 0 / 12 | None | Fixed by template |
+| Compressor controls | ❌ | 0 / 20 | None | Fixed by template |
+| Delay controls | ❌ | 0 / 12 | None | Fixed by template |
+| Distortion controls | ❌ | 0 / 8 | None | Fixed by template |
+| EQ controls | ❌ | 0 / 13 | None | Fixed by template |
+| Flanger controls | ❌ | 0 / 9 | None | Fixed by template |
+| Phaser controls | ❌ | 0 / 10 | None | Fixed by template |
+| Reverb controls | ❌ | 0 / 13 | None | Fixed by template |
+| Filter-FX controls | ❌ | 0 / 15 | None | Fixed by template |
+| Randomizer controls | ❌ | 0 / 32 | None | Fixed by template |
+| Macro controls | ❌ | 0 / 4 | None | Fixed by template |
+| Voice controls | ❌ | 0 / 5 | None | Fixed by template |
+| Portamento controls | ❌ | 0 / 4 | None | Fixed by template |
+| Pitch controls | ❌ | 0 / 2 | None | Fixed by template |
+| Stereo controls | ❌ | 0 / 2 | None | Fixed by template |
+| Polyphony | ❌ | 0 / 1 | None | Fixed by template |
+| Master volume | ❌ | 0 / 1 | None | Fixed by template |
+| Tempo, bypass, effect order, legato, mod wheel, MPE, oversampling, velocity, and view settings | ❌ | 0 / 9 | None | Fixed by template |
+| **Total scalar settings** | ✅ | **11 / 772** | **14 dense outputs** | **11 selected values enter the codec** |
+| **Structured fields/assets/curves** | ❌ | **0 / 207 records** | **None** | **Remain at the reviewed template state** |
 
 ## 2. Dataset and Curriculum Design
 
