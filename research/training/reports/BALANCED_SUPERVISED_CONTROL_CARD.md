@@ -19,4 +19,4 @@ Does short training against source-setting labels give the shared predictor a us
 - [Exact field-by-field inventory for both versions](control_scope/balanced_supervised_control_20261114.jsonl)
 - [Run script](scripts/run_balanced_supervised_control.py)
 
-The next planned comparison is sound-only versus sound training with a source-label share that fades from 90% to zero versus the same label share kept on. Real Vital audio remains the deciding measure.
+A separate [four-schedule comparison](PRESET_LOSS_SCHEDULE_RESULTS.md) already tests fading, fixed label/audio mixtures, a paper-style fixed weight and abrupt warm-start removal. Its raw and gain-matched winners differ. Do not repeat it; continue with the current balanced-bank sound-feedback problem.

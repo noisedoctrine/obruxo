@@ -35,15 +35,9 @@ The balanced sound fit and its independent audit are complete. It failed the unc
 
 A bounded label-only check then ran on the same 18 balanced clips. After 48 updates, source-setting error improved by 30%, but remained above the preset fit target; only 22 of 36 category choices were correct. More importantly, the real-Vital mean spectral score worsened 29% and MR-STFT worsened 20% against the starting prediction. Means worsened in all three sound groups. This shows that closer source numbers alone do not establish better sound.
 
-The next agreed experiment compares three matched models on the balanced development bank:
+A separate [four-schedule screen](reports/PRESET_LOSS_SCHEDULE_RESULTS.md) already compared a linear 90-to-0 fade, a fixed normalized 90/10 mixture, a paper-style fixed coefficient, and a 100-update label warm start followed by audio-only training. Its decay version had the best raw MR-STFT; the paper-style fixed version had the best gain-matched MR-STFT. The direct comparison was inconclusive. It used a frozen audio proxy for training, real Vital for final scoring, and only one validation pitch per sound. It is not a full paper reproduction.
 
-1. **Sound-only:** the existing audio objective, no source-setting term.
-2. **Fading label term:** the same sound objective, with source-setting loss contributing 90% of the combined loss at the start and fading to zero over training.
-3. **Label term kept on:** the same sound objective and same initial label contribution, held at that level through training as the paper-style comparison.
-
-Use the same starting weights, active controls, examples, update budget, renderer, fixed phases and final Vital comparisons across all three. Before scoring, freeze the exact decay curve, loss normalization, training/validation roles, early-stopping policy and all sound/preservation gates. The earlier balanced source-label check is a control result, not one of these mixed-loss arms. The 18 clips are development data; do not touch the reserved roots or final test.
-
-If the fading schedule improves real sound without breaking earlier cases, keep it as the leading warm-start candidate and confirm separately. If label-bearing arms only improve source-number accuracy, keep sound-only as the preferred objective. If none passes, inspect the audio features and update path before expanding model capacity or Vital controls.
+The balanced label-only check is separate: it showed that closer source settings can worsen actual sound. Do not repeat the schedule screen. Next, check whether the audio-feedback signal tracks real Vital on the current balanced Stage A bank and pitches. If it does, run one matched sound-learning comparison with the current model, retaining the same 14 outputs and every existing earlier-case and per-sound gate. If it does not, improve the audio-feedback path before further fitting. The 18 clips are development data; keep the reserve and final test untouched.
 
 ## Data and evaluation
 

@@ -37,23 +37,15 @@ There are no predicted LFOs, routing slots, mapping curves, custom oscillator cu
 
 ## Next work, in decision order
 
-### 1. Compare source-label schedules under real sound feedback
+### 1. Use the completed schedule evidence to choose the next A2 test
 
-The balanced sound-only fit completed but failed full reconstruction and preservation gates. A separate label-only learnability check on its same 18 training clips lowered source-setting error by 30%, yet missed its pre-set fit target and worsened the average real-Vital spectral score by 29% and MR-STFT by 20%. All three source groups worsened on average. See the [fit report](../training/reports/BALANCED_BASIC_FIT_EXECUTION.md) and [label check](../training/reports/BALANCED_SUPERVISED_CONTROL_RESULTS.md).
+The balanced sound-only fit failed its full reconstruction and preservation gates. The [balanced label-only check](../training/reports/BALANCED_SUPERVISED_CONTROL_RESULTS.md) lowered source-setting error by 30%, missed its fit target, and worsened mean real-Vital sound scores for all three source groups. See the [fit execution record](../training/reports/BALANCED_BASIC_FIT_EXECUTION.md).
 
-Run the already requested matched comparison on this same development scope:
+The requested source-label schedule comparison already ran on 172 training sounds, with 600 updates for each of four versions and 21 held-out sounds rendered in real Vital. The [full report](../training/reports/PRESET_LOSS_SCHEDULE_RESULTS.md) records fading 90-to-0, fixed normalized 90/10, a paper-style fixed coefficient, and an abrupt 100-step warm start followed by audio-only training. The fading version led on raw MR-STFT, but the paper-style fixed loss led after gain matching; their paired differences were inconclusive. The paper-style arm was adapted to the local proxy/loss and is not a full reproduction. Do not repeat these four schedules.
 
-| Version | Sound feedback | Source-setting loss |
-|---|---|---|
-| Sound-only | On throughout | Off |
-| Fading label warm start | On throughout | Starts at 90% of combined loss; fades to zero |
-| Kept-label comparison | On throughout | Same starting contribution, kept constant |
+The next A2 test should first check whether the current audio-feedback signal tracks real Vital on the balanced Stage A bank and its declared pitches. If that check passes, use one matched sound-learning run on this same scope, with the current 14 outputs and all old per-sound and earlier-case gates unchanged. If it fails, fix the feedback path before spending another long fit. Keep the 18 clips as development data and leave the held-out reserve and final test untouched. Reuse only score records with exactly matching source, audio, pitch and renderer hashes.
 
-Keep starting weights, controls, input schedule, update budget, output decoding, renderer, fixed phases and final real-Vital comparisons matched. Before training, freeze the exact loss normalization and fading curve, native budget, per-sound and earlier-case gates, and checkpoint/stop rules. Report label accuracy as a diagnostic; choose models by real sound quality. Do not use the reserved roots or final test. The label-only model is a diagnostic baseline, not one of these three arms.
-
-The sound-fit runs were costly: the prior 48-update balanced fit used 6,292 native attempts in 3 h 24 min. The label-only check took about 103 seconds total, but that timing does not forecast a native sound-training run. Reuse compatible renderer records and profile the actual measured stages before fixing a long-run budget.
-
-**Exit:** establish whether the fading label term helps actual Vital sound while meeting the existing per-sound and preservation gates. Keep the zero-label model if label-bearing schedules only improve setting accuracy.
+The earlier 48-update balanced fit consumed 6,292 native attempts in 3 h 24 min. Any new native budget must be based on a fresh timed preflight and a checkpointed allocation; the 103-second label-only check is not a forecast for sound feedback.
 
 ### 2. Broaden shared learning only after the loss-schedule comparison
 
