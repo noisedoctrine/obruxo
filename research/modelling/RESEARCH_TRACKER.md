@@ -24,6 +24,27 @@ Infer a valid Vital patch from exactly one reference audio clip.
 
 The central modelling problem is therefore not plain parameter regression. It is a structured, multimodal inverse problem in which musical content and synthesis identity are entangled, the forward synthesizer is non-differentiable, and the target program contains continuous controls, categorical choices, routing, permutations, and variable structured data.
 
+### Current Stage A control table
+
+This is the current basic-codec prediction inventory, not a claim that the shared model has learned these controls from audio. ✅ means the Stage A head can set that control; the count is Vital controls, not output slots. Each specific experiment must still report which controls its optimizer updates and its actual loss/gradient path. The basic trainer currently uses source-parameter supervision; its learned audio-loss helper has not passed useful-gradient qualification, and no shared audio-trained model has passed the reconstruction gate.
+
+| Vital control | Changeable? | Enabled / total | Head representation | Range, choices, or active condition |
+|---|:---:|---:|---|---|
+| `osc_1_level` | ✅ | 1 / 1 | 1 continuous output | 0.15–0.35 stored units |
+| `osc_1_pan` | ✅ | 1 / 1 | 1 continuous output | −0.7–0.7 |
+| `osc_1_unison_detune` | ✅ | 1 / 1 | 1 continuous output | 0.5–2.5; loss masked when unison has one voice |
+| `osc_1_unison_voices` | ✅ | 1 / 1 | 3 category scores → 1 choice | 1, 2, or 4 voices |
+| `filter_1_cutoff` | ✅ | 1 / 1 | 1 continuous output | 50–120 stored units; loss masked while filter is off |
+| `filter_1_resonance` | ✅ | 1 / 1 | 1 continuous output | 0.1–0.6; loss masked while filter is off |
+| `filter_1_on` | ✅ | 1 / 1 | 2 category scores → 1 choice | Off or on |
+| `env_1_attack` | ✅ | 1 / 1 | 1 continuous output | 0.08–0.6 stored units |
+| `env_1_decay` | ✅ | 1 / 1 | 1 continuous output | 0.25–1.0 stored units |
+| `env_1_sustain` | ✅ | 1 / 1 | 1 continuous output | 0.25–0.9 stored units |
+| `env_1_release` | ✅ | 1 / 1 | 1 continuous output | 0.2–0.65 stored units |
+| **Total** | **11 enabled** | **11 / 11** | **9 continuous outputs + 5 category scores = 14 dense outputs; 11 selected values enter the codec** | **One oscillator, optional filter 1, envelope 1** |
+
+The inventory is the eleven fields declared by the [basic codec](../training/ONLINE_PILOT.md#pilot-codec). Other preset state remains pinned to its reviewed template and is outside this Stage A prediction inventory; the codec rejects changes to unsupported state. “Stored units” are not display units such as seconds or hertz.
+
 ## 2. Dataset and Curriculum Design
 
 Training may combine controlled synthetic renders, externally sourced preset corpora, and future community-contributed recordings. Available labels and metadata may be used as noisy supervision for sampling, stratified evaluation, or a future sound classifier, but they are not required model inputs. Source-specific collection and analysis remain within their dataset workstreams.
