@@ -93,6 +93,8 @@ This is a family-level scan of the current basic-codec inventory. ✅ means at l
 
 Training may combine controlled synthetic renders, externally sourced preset corpora, and future community-contributed recordings. Available labels and metadata may be used as noisy supervision for sampling, stratified evaluation, or a future sound classifier, but they are not required model inputs. Source-specific collection and analysis remain within their dataset workstreams.
 
+The latest [balanced source-label diagnostic](../training/reports/BALANCED_SUPERVISED_CONTROL_RESULTS.md) used this same 14-output scope for 48 updates. Its source-setting error fell, but average real-Vital scores worsened for each of the three sound groups. This does not qualify label matching as the training objective; the next planned comparison keeps sound feedback active and tests a fading versus constant label term.
+
 ### Performance variation curriculum
 
 Different recordings of the same preset may range from slight variations of one performance to substantially different musical uses. Where multiple performances are available, estimate their similarity from available audio and performance features so training can progress from closely related variations toward broader performance invariance. This is a curriculum and sampling hypothesis, not a mandatory clustering pipeline.

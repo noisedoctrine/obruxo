@@ -1,6 +1,6 @@
 # Basic reconstruction experiment protocol
 
-Revised 31 October 2026. The [training plan](../modelling/TRAINING_PLAN.md) sets priorities; this document defines the common experiment requirements. The [review](reports/TRAINING_REVIEW_20261031.md) preserves the reasoning and evidence. Existing cards remain authoritative for their frozen runs. The [previous detailed protocol](https://github.com/noisedoctrine/obruxo/blob/ced6b0b/research/training/STAGED_RECONSTRUCTION.md) remains available; this consolidation changes no recorded result, running deadline or split.
+Revised 14 November 2026. The [training plan](../modelling/TRAINING_PLAN.md) sets priorities; this document defines the common experiment requirements. The [review](reports/TRAINING_REVIEW_20261031.md) preserves the reasoning and evidence. Existing cards remain authoritative for their frozen runs. This update records completed outcomes without changing data splits or frozen gates. The [previous detailed protocol](https://github.com/noisedoctrine/obruxo/blob/ced6b0b/research/training/STAGED_RECONSTRUCTION.md) remains available as historical context.
 
 ## Current contract and status
 
@@ -10,7 +10,7 @@ Stage A predicts nine continuous controls, three oscillator-unison scores and tw
 |---|---|---|
 | A0 | Legal differentiable/control interfaces and bounded resources | Passed for the declared basic implementation. |
 | A1 | Proposed sound updates improve real native audio | Corrected native estimator/production-choice path passed bounded qualification. Learned helpers failed and remain refused. |
-| A2 | One shared audio-only model learns reliable basic reconstruction | Unfinished. Direct fits pass individually; shared fits fail important input/preservation gates. Balanced-data fit is running. |
+| A2 | One shared audio-only model learns reliable basic reconstruction | Unfinished. Direct fits pass individually; shared fits fail important input/preservation gates. The completed balanced sound fit and a separate balanced label-only learnability check both failed their admission/fit gates. |
 | A3 | Independent quality, replication, listening and usable bundle | Unfinished and conditional on A2. Some inference/runtime components already pass. |
 
 Pipeline connectivity is not A1, A1 is not A2, and a three-patch fit is not A3. No implementation checklist can substitute for the next stage's evidence.
@@ -31,13 +31,19 @@ Native feedback is a measured numerical estimate. Production/export uses determi
 
 ## The next decision
 
-Complete and audit the [balanced fit](reports/BALANCED_BASIC_FIT_CARD.md) unchanged. It reuses the audited sound-only control, trains on identical note/duration coverage for all three patches, and retains 104 old plus 36 grid evaluation cells. The additional eighteen reciprocal cells are training-only. Its 48-update/six-hour/8,000-request limits and full per-input/six-group/earlier-32 gates are not revised here.
+The balanced sound fit and its independent audit are complete. It failed the unchanged A2 gates: each of the three source sounds missed its learning requirement, only one added pitch-grid group passed, alternate-input groups failed, and earlier-sound preservation failed. Do not count it as a model or loosen the gates.
 
-Before another long fit, isolate process/plugin/state/synthesis/QA costs on the actual basic path, then qualify and measure an efficient worker policy. A twelve-render profile confirmed sample equality but did not establish a reuse speedup or pure DSP cost. Do not translate the old `render_seconds` timer into synthesis-only speed.
+A bounded label-only check then ran on the same 18 balanced clips. After 48 updates, source-setting error improved by 30%, but remained above the preset fit target; only 22 of 36 category choices were correct. More importantly, the real-Vital mean spectral score worsened 29% and MR-STFT worsened 20% against the starting prediction. Means worsened in all three sound groups. This shows that closer source numbers alone do not establish better sound.
 
-If balanced learning fails, the next learning diagnostic is an inexpensive shared supervised fit on that same small balanced bank, with real-render endpoints. It asks whether the inputs/features/model can learn a valid mapping. It is not final parameter-matching training and does not authorize another unchanged large initialization. If that baseline succeeds and native learning fails, test feedback/exposure or a qualified optimization-and-distillation route before adding architecture. Keep these as alternative decisions, not a factorial sweep.
+The next agreed experiment compares three matched models on the balanced development bank:
 
-Input LUFS/peak normalization remains a later independent comparison; it does not enter the running fit. The plan specifies preserving the gain and original-level loss/export semantics before that experiment is implemented.
+1. **Sound-only:** the existing audio objective, no source-setting term.
+2. **Fading label term:** the same sound objective, with source-setting loss contributing 90% of the combined loss at the start and fading to zero over training.
+3. **Label term kept on:** the same sound objective and same initial label contribution, held at that level through training as the paper-style comparison.
+
+Use the same starting weights, active controls, examples, update budget, renderer, fixed phases and final Vital comparisons across all three. Before scoring, freeze the exact decay curve, loss normalization, training/validation roles, early-stopping policy and all sound/preservation gates. The earlier balanced source-label check is a control result, not one of these mixed-loss arms. The 18 clips are development data; do not touch the reserved roots or final test.
+
+If the fading schedule improves real sound without breaking earlier cases, keep it as the leading warm-start candidate and confirm separately. If label-bearing arms only improve source-number accuracy, keep sound-only as the preferred objective. If none passes, inspect the audio features and update path before expanding model capacity or Vital controls.
 
 ## Data and evaluation
 

@@ -1,6 +1,6 @@
 # OBRUXO training plan
 
-Revised 31 October 2026 after reviewing the original plans, recorded results and PRs. **Learn to turn one isolated recording into a playable Vital patch that sounds similar and responds sensibly to different notes. Prove this with a small model before adding synthesis complexity.** Exact source settings, graph recovery and exhaustive Vital coverage are not the objective.
+Revised 14 November 2026 after reviewing the original plans, recorded results and PRs. **Learn to turn one isolated recording into a playable Vital patch that sounds similar and responds sensibly to different notes. Prove this with a small model before adding synthesis complexity.** Exact source settings, graph recovery and exhaustive Vital coverage are not the objective.
 
 The [review and lessons](../training/reports/TRAINING_REVIEW_20261031.md) explain how the work diverged and what the results establish. The [status ledger](../training/IMPLEMENTATION_STATUS.md) separates working infrastructure from unfinished quality. The [experiment protocol](../training/STAGED_RECONSTRUCTION.md) defines how to run the next comparisons. This document determines future work order; existing frozen cards, failed results, deadlines and reserved splits are unchanged. The [previous plan](https://github.com/noisedoctrine/obruxo/blob/ced6b0b/research/modelling/TRAINING_PLAN.md) remains historical evidence.
 
@@ -16,7 +16,7 @@ A first useful release may support a bounded vocabulary. It needs demonstrable s
 
 The renderer, codec, fixed-phase checks, checkpoint recovery, real-audio measurements and basic inference path work in the qualified Windows runtime. Bounded native gradients and individual fitting work: the three difficult direct fits reduce joint error by 41–86%. Shared audio-to-patch learning remains incomplete: held-note failures and earlier-sound regressions persist. The tested pitch-removal setting adds only 0.235% mean improvement and is not adopted. Neither branch naming nor probes establish successful performance/timbre separation.
 
-The balanced three-sound fit from [PR 139](https://github.com/noisedoctrine/obruxo/pull/139) is already running under its frozen card. Its final result is pending at this revision. Complete and audit that run; do not change its inputs, implementation, objective or deadline. Merging its PR did not complete the experiment. This planning change launches no additional training or confirmation scoring.
+The balanced three-sound fit from [PR 139](https://github.com/noisedoctrine/obruxo/pull/139) is complete and independently audited. It failed admission; see the [execution record](../training/reports/BALANCED_BASIC_FIT_EXECUTION.md). A separate [48-update source-label diagnostic](../training/reports/BALANCED_SUPERVISED_CONTROL_RESULTS.md) improved label metrics but worsened the average real-Vital sound scores in every source group. No candidate is admitted. The next plan item is the matched three-way loss comparison below; the held-out reserve remains untouched.
 
 ## Keep the prediction task small
 
@@ -37,32 +37,33 @@ There are no predicted LFOs, routing slots, mapping curves, custom oscillator cu
 
 ## Next work, in decision order
 
-### 1. Close the current comparison and make learning affordable
+### 1. Compare source-label schedules under real sound feedback
 
-Publish the balanced fit's complete result and independent audit under the [unchanged card](../training/reports/BALANCED_BASIC_FIT_CARD.md), including every failed group, earlier-32 preservation, accepted updates and full costs. A timeout or deadline is a recorded incomplete experiment, not permission to extend automatically. Do not repeat a control already retained with compatible inputs and renderer identity.
+The balanced sound-only fit completed but failed full reconstruction and preservation gates. A separate label-only learnability check on its same 18 training clips lowered source-setting error by 30%, yet missed its pre-set fit target and worsened the average real-Vital spectral score by 29% and MR-STFT by 20%. All three source groups worsened on average. See the [fit report](../training/reports/BALANCED_BASIC_FIT_EXECUTION.md) and [label check](../training/reports/BALANCED_SUPERVISED_CONTROL_RESULTS.md).
 
-Before another long native fit, profile the complete basic training path. The recent auxiliary comparison spent 6 h 15 min on 12,025 requests for only 48 updates per arm. About 2 h 17 min was worker time outside the backend call; backend timing also includes plugin creation and state checks. Pure synthesis speed is still unmeasured. [Detailed accounting](../training/reports/TRAINING_REVIEW_20261031.md#why-the-native-experiments-take-hours)
+Run the already requested matched comparison on this same development scope:
 
-Add stage timings for process startup, plugin creation, patch conversion/loading/readback, synthesis, QA/transfer, features, optimizer and checkpointing. Measure cold and warm calls, requests per accepted update and unique input coverage. Run interleaved comparisons with no competing fit before drawing speed conclusions. Start by qualifying the existing bounded worker reuse on the current basic profile. Consider plugin reuse or cached invariant setup only if timings justify them and A–B–A state-reset, polyphony/tail, fixed-phase and failure-restart checks pass. Keep required correctness; avoid redoing invariant work per numerical probe when a verified equivalent path exists.
+| Version | Sound feedback | Source-setting loss |
+|---|---|---|
+| Sound-only | On throughout | Off |
+| Fading label warm start | On throughout | Starts at 90% of combined loss; fades to zero |
+| Kept-label comparison | On throughout | Same starting contribution, kept constant |
 
-**Exit:** a verified local execution policy and a realistic forecast for the actual update schedule. Aim for roughly 30-minute learning diagnoses; this is a planning target, not a speed result or retroactive cap on the current run. A longer pilot requires an explicit useful question, measured forecast and fixed cap. If native calls still dominate, change how feedback is obtained rather than buy another long run with very few updates.
+Keep starting weights, controls, input schedule, update budget, output decoding, renderer, fixed phases and final real-Vital comparisons matched. Before training, freeze the exact loss normalization and fading curve, native budget, per-sound and earlier-case gates, and checkpoint/stop rules. Report label accuracy as a diagnostic; choose models by real sound quality. Do not use the reserved roots or final test. The label-only model is a diagnostic baseline, not one of these three arms.
 
-### 2. Prove shared learning on balanced small data
+The sound-fit runs were costly: the prior 48-update balanced fit used 6,292 native attempts in 3 h 24 min. The label-only check took about 103 seconds total, but that timing does not forecast a native sound-training run. Reuse compatible renderer records and profile the actual measured stages before fixing a long-run budget.
 
-Use the current eighteen-clip bank: the same three source patches crossed with MIDI 36/60/84 and 0.4/1.2-second notes. All patches receive the same performance coverage. Preserve the old evaluation cases and earlier-sound panel; new grid cells supplement them. This bank is a controlled learning fixture, not independent validation or the final dataset.
+**Exit:** establish whether the fading label term helps actual Vital sound while meeting the existing per-sound and preservation gates. Keep the zero-label model if label-bearing schedules only improve setting accuracy.
 
-If the running candidate passes its full gates, retain it and proceed to wider learning rather than run another mechanism experiment. If it fails, first ask a cheap, decisive question: **can this model learn valid controls from these same balanced inputs at all?** Use a bounded supervised control with the existing features and canonical codec targets, enough cheap updates to expose a fitting curve, and real-render endpoints. This is a new small learnability diagnostic, not a rerun of the old 404-state initialization. Exact parameter error is diagnostic; the exported patch's sound remains decisive.
+### 2. Broaden shared learning only after the loss-schedule comparison
 
-| Result | Next decision |
-|---|---|
-| Shared control cannot fit the small balanced bank | Inspect feature information, temporal coverage and model optimization. Compare at most one simpler/direct trainable predictor against the existing correction model before further native sound fitting. |
-| Shared control fits; native sound training still fails | Investigate feedback quality and useful update exposure. Local derivative success does not establish effective network training. Do not add capacity or separation losses without evidence. |
-| Native cost prevents adequate learning exposure | Test amortizing successful native optimization into teacher targets and inexpensive shared-model training on this same scope. Qualify teacher sounds across the performance grid first. This is an alternative to repeated full finite differences, not a proven solution. |
-| Shared sound model fits and preserves earlier cases | Move to wider patches and held-out performances with the same 14 outputs. |
+Keep the eighteen-clip bank as a controlled learning fixture: the same three source patches crossed with MIDI 36/60/84 and 0.4/1.2-second notes. It is development data, not independent validation.
 
-Do not restart the failed helper unchanged, sweep adversary coefficients, add another frozen-base adapter by default, or run a seed grid here. The [individual direct fits](../training/reports/DIRECT_BASIC_CONTROL_RESULTS.md) are useful reference solutions, not a deployed audio model. Optimize-and-distill or a revised differentiable helper needs its own bounded real-audio qualification. Source labels may initialize or diagnose; they do not replace the perceptual objective.
+If a sound-loss model meets the unchanged per-sound, grid and earlier-sound gates, expand to broader patches and held-out performances with the same 14 outputs. If none meets them, inspect feature information and the audio-update path before adding model capacity or Vital controls. Preserve all previous gates; a better average cannot hide a broken source group or earlier sound.
 
-**Exit:** one shared audio-only model learns every declared small-case/input group, maintains the earlier panel, and has a measured affordable learning path. Existing frozen A2 criteria cannot be bypassed by calling a failed result a new milestone. Small fitting establishes learnability, not generalization.
+Use the existing audited sound-only balanced fit as the zero-label comparison if its exact inputs, initializer and renderer match the new schedule arms; do not repeat it merely to fill a table. The new arms must start from the same checkpoint, use the same examples/update count and production decoding, and be judged on the same real-Vital clips. Retain label accuracy only as a diagnostic. The [individual direct fits](../training/reports/DIRECT_BASIC_CONTROL_RESULTS.md) are reference solutions, not a deployed audio model. Optimize-and-distill or a revised differentiable helper remains a separate proposal requiring real-audio qualification.
+
+**Exit:** a shared sound-trained model learns every declared small-case/input group, maintains the earlier panel, and has a measured affordable learning path. Existing frozen A2 criteria remain unchanged. Small-bank fitting establishes learnability, not generalization.
 
 ### 3. Establish basic generalization before more controls
 
