@@ -2,6 +2,10 @@
   "complete": true,
   "difference_from_reference": 0,
   "excluded_files": 2,
+  "exclusion_reason_counts": {
+    "invalid_json_syntax": 1,
+    "invalid_utf8": 1
+  },
   "introduced_examples": [
     {
       "changed_json_pointers": [
@@ -66,7 +70,13 @@
       "introduced_groups": 3
     }
   },
+  "reference_census": {
+    "discovered_files": 9620,
+    "malformed_files": 2,
+    "valid_files": 9618
+  },
   "reference_census_valid_files": 9618,
+  "reference_population_reconciled": true,
   "rule": "patch_identity_v1",
   "seed": 0,
   "split_policy": "simulated file-relative-path hash, expected 80/10/10; not an existing training split",

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from dataclasses import asdict
 from pathlib import Path
 import time
@@ -27,6 +28,73 @@ def posterior_diagnostics(reference, posteriors) -> list[dict]:
                      "upper_octave_mean": average(pitch_bin + 12),
                      "onset_peak_within_50ms": float(posteriors["onset"][onset, pitch_bin].max()) if onset.any() else None})
     return rows
+
+
+def _micro_counts(rows: list[dict]) -> dict:
+    tp, fp, fn = (sum(row[key] for row in rows) for key in ("tp", "fp", "fn"))
+    precision = tp / (tp + fp) if tp + fp else 0.0
+    recall = tp / (tp + fn) if tp + fn else 0.0
+    f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
+    return {"reference_count": sum(row["reference_count"] for row in rows),
+            "prediction_count": sum(row["prediction_count"] for row in rows),
+            "tp": tp, "fp": fp, "fn": fn, "precision": precision, "recall": recall, "f1": f1}
+
+
+def event_frame_summary(cases: list[dict]) -> list[dict]:
+    grouped = defaultdict(list)
+    for case in cases:
+        if "metrics" in case:
+            grouped[case["fixture_id"]].append(case)
+    groups = [(fixture_id, rows[0]["category"], rows) for fixture_id, rows in grouped.items()]
+    if grouped:
+        groups.append(("ALL", "All", [case for rows in grouped.values() for case in rows]))
+    summaries = []
+    for fixture_id, category, rows in groups:
+        metrics = [case["metrics"] for case in rows]
+        summaries.append({
+            "fixture_id": fixture_id, "category": category, "scored_cases": len(rows),
+            "onset_pitch": _micro_counts([metric["notes"]["onset_pitch"] for metric in metrics]),
+            "onset_pitch_offset": _micro_counts([metric["notes"]["onset_pitch_offset"] for metric in metrics]),
+            "frames": _micro_counts([metric["frames"] for metric in metrics]),
+            "timing_support": {name: sum(metric["notes"]["timing_diagnostics"][name]["support"] for metric in metrics)
+                               for name in ("onset", "offset", "duration")},
+        })
+    return summaries
+
+
+def event_frame_evidence(cases: list[dict], expected: int, case_coverage_complete: bool) -> dict:
+    public_cases = []
+    for case in cases:
+        row = {key: case[key] for key in ("fixture_id", "category", "performance", "state")}
+        if "metrics" in case:
+            row["metrics"] = case["metrics"]
+        public_cases.append(row)
+    return {"schema": "quick_event_frame_metrics_v1", "expected_cases": expected, "attempted_cases": len(cases),
+            "scored_cases": sum("metrics" in case for case in cases), "case_coverage_complete": case_coverage_complete,
+            "summary": event_frame_summary(cases), "cases": public_cases}
+
+
+def score_case(features, row: dict, reference, midi: Path, decode_notes, evaluate_notes_and_frames) -> tuple[dict, list[dict]]:
+    posteriors, provenance = features.get(row)
+    events = decode_notes(posteriors)
+    scores = evaluate_notes_and_frames(reference, events, posteriors["note"])
+    fields = {"features": provenance, "events": [asdict(note) for note in events],
+              "reference": [note.as_dict() for note in reference], "metrics": scores, "midi_sha256": file_hash(midi)}
+    return fields, posterior_diagnostics(reference, posteriors)
+
+
+def metric_table(summaries: list[dict]) -> str:
+    def cell(row: dict, name: str) -> str:
+        value = row[name]
+        return f"{value['f1']:.3f} ({value['tp']}/{value['fp']}/{value['fn']})"
+    lines = ["| Fixture | Cases | Notes ref/pred | Onset+pitch F1 (TP/FP/FN) | +offset F1 (TP/FP/FN) | Frames ref/pred | Frame F1 (TP/FP/FN) |",
+             "|---|---:|---:|---:|---:|---:|---:|"]
+    for row in summaries:
+        notes, frames = row["onset_pitch"], row["frames"]
+        lines.append(f"| {row['fixture_id']} | {row['scored_cases']} | {notes['reference_count']}/{notes['prediction_count']} | "
+                     f"{cell(row, 'onset_pitch')} | {cell(row, 'onset_pitch_offset')} | "
+                     f"{frames['reference_count']}/{frames['prediction_count']} | {cell(row, 'frames')} |")
+    return "\n".join(lines)
 
 
 class FrozenFeatures:
@@ -173,28 +241,26 @@ def run(context: Context, args) -> dict:
             case = {"fixture_id": fixture["fixture_id"], "category": fixture["category"], "performance": name,
                     "render_key": key, "state": row["state"], "render": row}
             if usable(row):
-                try:
-                    posteriors, provenance = features.get(row)
-                    midi, reference = references[name]
-                    events = decode_notes(posteriors)
-                    scores = evaluate_notes_and_frames(reference, events, posteriors["note"])
-                    case.update(features=provenance, events=[asdict(note) for note in events], reference=[note.as_dict() for note in reference],
-                                metrics=scores, midi_sha256=file_hash(midi))
-                    for diagnostic in posterior_diagnostics(reference, posteriors):
-                        diagnostics.append({"fixture_id": fixture["fixture_id"], "category": fixture["category"], "performance": name, **diagnostic})
-                except Exception as error:
-                    case.update(state="inference_error", error_type=type(error).__name__, error=str(error))
+                midi, reference = references[name]
+                fields, case_diagnostics = score_case(features, row, reference, midi, decode_notes, evaluate_notes_and_frames)
+                case.update(fields)
+                for diagnostic in case_diagnostics:
+                    diagnostics.append({"fixture_id": fixture["fixture_id"], "category": fixture["category"],
+                                        "performance": name, **diagnostic})
             case["case_seconds"] = time.monotonic() - started
             costs.append(case["case_seconds"])
             cases.append(case)
             write_json(context.output / "case_results.json", cases)
             write_csv(context.output / "posterior_diagnostics.csv", diagnostics)
+            write_json(context.output / "event_frame_metrics.json", event_frame_evidence(cases, len(plan), False))
             context.progress(completed_cases=len(cases), expected_cases=len(plan), backend=features.config["backend"])
     except BudgetExpired:
         reason = "budget_exhausted"
     complete = len(cases) == len(plan) and reason is None
     good = [case for case in cases if case["state"] == "ok"]
     state = reason or ("complete" if len(good) == len(plan) else "complete_with_failures")
+    evidence = event_frame_evidence(cases, len(plan), complete)
+    write_json(context.output / "event_frame_metrics.json", evidence)
     report = (f"# Controlled Basic Pitch failures\n\nStatus: {state}. Scored {len(good)}/{len(plan)} planned cases. "
               f"Backend: {features.config['backend']}, float32.\n\n"
               "Compare each performance across the same eight fixtures. Dense note/onset posteriors and stock-decoded events localize observed pitch, "
@@ -203,6 +269,9 @@ def run(context: Context, args) -> dict:
               "Missing/late onset support versus fragmented events over strong note support are diagnostic patterns to inspect, not automatic causal labels.\n\n"
               "These fixture-level observations do not establish category-wide rankings, disentanglement, or downstream conditioning benefit. "
               "No inference receives MIDI. No model is trained.\n\n")
+    if evidence["summary"]:
+        report += ("Per-fixture micro-aggregates from the existing evaluator follow. Note supports are reference/prediction event counts; "
+                   "frame supports are positive reference/prediction frame counts.\n\n" + metric_table(evidence["summary"]) + "\n\n")
     try:
         for fixture in bank["fixtures"]:
             subset = [case for case in good if case["fixture_id"] == fixture["fixture_id"]]
@@ -214,7 +283,9 @@ def run(context: Context, args) -> dict:
     except BudgetExpired:
         state, complete = "budget_exhausted", False
         report += "\nPlot generation reached the deadline; raw scored evidence is retained.\n"
+    totals = next((row for row in evidence["summary"] if row["fixture_id"] == "ALL"), None)
     write_json(context.output / "encoder_summary.json", {"complete": complete, "state": state, "expected": len(plan),
-               "attempted": len(cases), "scored": len(good), "feature_config": features.config})
+               "attempted": len(cases), "scored": len(good), "feature_config": features.config,
+               "event_frame_totals": totals, "event_frame_metrics_file": "event_frame_metrics.json"})
     write_json(context.output / "case_results.json", cases)
     return finish_report(context, "CONTROLLED_BASIC_PITCH_REPORT.md", report, state, expected=len(plan), scored=len(good))

@@ -6,6 +6,8 @@ from pathlib import Path
 from .common import Context, digest, file_hash, read_json, write_json
 from .fixtures import load_fixture, performance, perturb
 
+EXPECTED_RENDER_STATES = frozenset({"ok", "qa_failed", "render_incompatible"})
+
 
 def render_key(fixture: dict, performance_name: str, treatment: str, repeat: int) -> str:
     return f"{fixture['fixture_id']}_{performance_name}_{treatment}_repeat{repeat}"
@@ -24,8 +26,10 @@ def validated_cache(directory: Path, key: str, identity: dict) -> dict | None:
     row = read_json(sidecar)
     if row.get("identity") != identity:
         raise ValueError("render cache identity changed; use a new output directory")
-    if row["state"] == "render_error":
-        return row  # Stable failed outcome; a new run is required to retry.
+    if row.get("state") not in EXPECTED_RENDER_STATES:
+        raise ValueError("render cache contains an unexpected outcome; use a new output directory")
+    if row["state"] == "render_incompatible":
+        return row  # Stable structured preset-validation outcome; a new run is required to retry.
     if not wav.exists():
         return None
     try:
@@ -40,6 +44,7 @@ def validated_cache(directory: Path, key: str, identity: dict) -> dict | None:
 
 def render_one(context: Context, renderer, fixture: dict, performance_name: str, treatment: str, repeat: int,
                directory: Path, implementation_hash: str) -> dict:
+    from obruxo_data.errors import ValidationError
     from obruxo_data.render import RenderRequest
     context.check(10)
     preset = load_fixture(fixture)
@@ -63,6 +68,9 @@ def render_one(context: Context, renderer, fixture: dict, performance_name: str,
     context.progress(current_render=key)
     try:
         result = renderer.render(request)  # Independent call, never deduplicated by request ID.
+    except ValidationError as error:
+        row.update(state="render_incompatible", diagnostics=[item.to_dict() for item in error.report.diagnostics])
+    else:
         diagnostics = [item.to_dict() for item in result.diagnostics]
         qa = result.qa
         invalid = (not qa["finite"] or qa["clipping_count"] > 0 or qa["rms"] <= qa["silence_threshold"]
@@ -71,8 +79,6 @@ def render_one(context: Context, renderer, fixture: dict, performance_name: str,
         row.update(state="qa_failed" if invalid else "ok", qa=qa, diagnostics=diagnostics,
                    provenance=result.provenance.to_dict(), audio_sha256=qa["audio_float32_sha256"],
                    wav_sha256=file_hash(wav), shape=list(result.audio.shape))
-    except Exception as error:
-        row.update(state="render_error", error_type=type(error).__name__, error=str(error))
     row["render_seconds"] = time.monotonic() - started
     write_json(sidecar, row)
     return row

@@ -17,7 +17,7 @@ Infer a valid Vital patch from exactly one reference audio clip.
 - **Audio is the only inference-time input.** The user never supplies MIDI or any other conditioning input.
 - Pretrained models may derive latent pitch, note, performance, or other conditioning features internally from the audio. These imported models remain frozen; at most, train a small adapter on top. Training a dedicated audio-to-MIDI system is outside the core research problem.
 - The primary success criterion is **perceptual similarity** between the reference and audio rendered from the predicted patch. Exact recovery of the hidden source parameters is secondary because multiple Vital patches can be perceptually equivalent.
-- Source-parameter supervision remains useful as an auxiliary signal, especially for identifiable controls, initialization, diagnostics, and controlled experiments. It must not become the governing definition of success.
+- Source-parameter supervision may support a brief, declared warm start and diagnostics, but it must not remain an inverse-model training target after warm start. The model is selected by rendered-audio quality because different settings can produce equivalent sounds.
 - A predicted patch should capture synthesis identity rather than memorize the performance in the reference clip. On paired synthetic data, test this by rendering the source and predicted patches under performances not heard by the inference model.
 - Returning several ranked candidate patches is desirable if it can be implemented without disproportionate complexity. A simpler system may generate or optimize several candidates internally and expose the best-ranked results; this does not by itself require a generative decoder.
 
@@ -109,7 +109,7 @@ This adds three continuous values per oscillator plus categorical choices. Stand
 ### Objective hierarchy
 
 1. **Primary:** perceptual or spectral similarity between the reference and a Vital render of the predicted patch.
-2. **Auxiliary:** supervised losses on known source parameters where useful and identifiable.
+2. **Warm start only:** supervised losses on known source parameters for a brief, declared initialization period; then train and select from audio feedback.
 3. **Representation learning:** self-supervised objectives that encourage synthesis identity to remain stable across different performances of the same patch.
 
 ### Self-supervised representation learning
@@ -122,7 +122,9 @@ Vital does not provide gradients, so the primary rendered-audio objective cannot
 
 - A differentiable neural proxy for `Vital(patch, performance) -> audio features` is the leading candidate.
 - Reinforcement learning is possible but currently considered less likely.
-- Other black-box, approximate-gradient, search, reranking, or hybrid methods remain open where supported by evidence.
+- Other black-box, approximate-gradient, search, reranking, or hybrid methods remain options for later inference-time refinement, after a base model passes its reconstruction-quality gate.
+
+Status, 2026-11-14: a 21-family patch-method comparison found that direct Vital candidate edits and a small local score fit improved gain-matched error when the correct note event was supplied, while proxy-gradient patch updates and per-clip encoder tuning were inconclusive. A follow-up supplied no source MIDI and estimated note events from audio. Basic Pitch found the right pitch in all 21 clips, but starts averaged 27 ms late and note lengths 64 ms too long. The same frozen patch's pitch-55 score increased from 1.312 with the correct event to 2.494 with the estimated event, so the audio-only comparison is confounded by timing and does not establish a winning patch method. Tempo and velocity were fixed benchmark defaults; the panel had informed checkpoint/proxy selection. Keep all four test-time refinements (fixed Vital candidate edits, local score fitting, proxy-based patch adjustment, and per-clip TTT) deferred until the base model passes its quality gate. The sound proxy's role in core-model training is a separate decision.
 
 Do not describe the overall project as a neural-surrogate synthesizer. A surrogate is one possible credit-assignment mechanism for training the inverse model.
 

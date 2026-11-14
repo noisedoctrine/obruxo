@@ -11,7 +11,7 @@ PINNED_REVISION = "636ca0ef517a4db087a6a08a6a8a5e704e21f836"
 QUESTIONS = {
     "loading": "How do connection arrays and all modulation_<slot>_* controls map to runtime slots?",
     "graph": "How are route traversal, dependency scheduling and mono/poly accumulation ordered?",
-    "state": "What smoothing, ramp and initialization/reset state belongs to each route, and in which versions?",
+    "state": "What smoothing, initialization/reset, and serialized ramp_up/ramp_down state belongs to each route, and which semantics remain version-limited?",
     "dependencies": "What happens when a route targets another route's amount, including cycles and relabeling?",
     "numerics": "Which guarantees are semantic, numerical-with-tolerance, or bit-identical, and what exceptions apply?",
 }
@@ -100,7 +100,9 @@ def run(context: Context, args) -> dict:
               "Read evidence.json, follow full call/data flow in the pinned checkout, and complete review_answers.json. "
               "Use source-review to validate citation ranges and produce the final source-backed report. "
               "Neither packet collection nor report formatting verifies the truth of a human-written interpretation.\n\n"
-              "Source/build equivalence to installed Vital 1.6.4 remains unverified. Do not apply older source conclusions to newer ramp behavior without evidence. "
+              "The tracked corpus audit establishes that 1.6.x presets add modulation_<slot>_ramp_up and _ramp_down. "
+              "Source/build equivalence to installed Vital 1.6.4 remains unverified, so record their runtime semantics as unresolved when matching source is absent "
+              "and require preserving both fields with their numbered slot. "
               "No renderer or model is imported. Source files are never changed.\n")
     return finish_report(context, "SOURCE_AUDIT_WORKSHEET.md", report,
                          "evidence_collected_review_required" if complete else "budget_exhausted", contexts=len(evidence))
