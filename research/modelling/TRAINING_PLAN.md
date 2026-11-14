@@ -16,7 +16,7 @@ A first useful release may support a bounded vocabulary. It needs demonstrable s
 
 The renderer, codec, fixed-phase checks, checkpoint recovery, real-audio measurements and basic inference path work in the qualified Windows runtime. Bounded native gradients and individual fitting work: the three difficult direct fits reduce joint error by 41–86%. Shared audio-to-patch learning remains incomplete: held-note failures and earlier-sound regressions persist. The tested pitch-removal setting adds only 0.235% mean improvement and is not adopted. Neither branch naming nor probes establish successful performance/timbre separation.
 
-The balanced three-sound fit from [PR 139](https://github.com/noisedoctrine/obruxo/pull/139) is complete and independently audited. It failed admission; see the [execution record](../training/reports/BALANCED_BASIC_FIT_EXECUTION.md). A separate [48-update source-label diagnostic](../training/reports/BALANCED_SUPERVISED_CONTROL_RESULTS.md) improved label metrics but worsened the average real-Vital sound scores in every source group. No candidate is admitted. The next plan item is the matched three-way loss comparison below; the held-out reserve remains untouched.
+The balanced three-sound fit from [PR 139](https://github.com/noisedoctrine/obruxo/pull/139) is complete and independently audited. It trained from real-Vital sound feedback across the balanced pitch-and-duration grid, but failed the per-sound, most grid, wider-input and earlier-sound gates; see the [execution record](../training/reports/BALANCED_BASIC_FIT_EXECUTION.md). A separate [48-update source-label diagnostic](../training/reports/BALANCED_SUPERVISED_CONTROL_RESULTS.md) improved setting metrics but worsened average real-Vital sound scores in every source group. The four-schedule [proxy comparison](../training/reports/PRESET_LOSS_SCHEDULE_RESULTS.md) is also complete on a different model and training bank; raw and gain-matched scores favored different schedules. No candidate is admitted, and the held-out reserve remains untouched.
 
 ## Keep the prediction task small
 
@@ -37,17 +37,17 @@ There are no predicted LFOs, routing slots, mapping curves, custom oscillator cu
 
 ## Next work, in decision order
 
-### 1. Use the completed schedule evidence to choose the next A2 test
+### 1. Diagnose the completed sound-fit failure before another fit
 
-The balanced sound-only fit failed its full reconstruction and preservation gates. The [balanced label-only check](../training/reports/BALANCED_SUPERVISED_CONTROL_RESULTS.md) lowered source-setting error by 30%, missed its fit target, and worsened mean real-Vital sound scores for all three source groups. See the [fit execution record](../training/reports/BALANCED_BASIC_FIT_EXECUTION.md).
+The 48-update balanced fit already tested real-Vital sound feedback on the three sounds crossed with MIDI 36/61/83 and short/long notes. It used 6,292 native render attempts over 3 hours 24 minutes. Training gradients reached the active branches, but all three per-sound gates failed; only one of three pitch groups passed, wider alternate-input quality regressed, and earlier-sound preservation failed. The [execution record](../training/reports/BALANCED_BASIC_FIT_EXECUTION.md) and [frozen card](../training/reports/BALANCED_BASIC_FIT_CARD.md) contain the scope and gates. Do not repeat this fit just to check whether audio feedback reaches Vital.
 
-The requested source-label schedule comparison already ran on 172 training sounds, with 600 updates for each of four versions and 21 held-out sounds rendered in real Vital. The [full report](../training/reports/PRESET_LOSS_SCHEDULE_RESULTS.md) records fading 90-to-0, fixed normalized 90/10, a paper-style fixed coefficient, and an abrupt 100-step warm start followed by audio-only training. The fading version led on raw MR-STFT, but the paper-style fixed loss led after gain matching; their paired differences were inconclusive. The paper-style arm was adapted to the local proxy/loss and is not a full reproduction. Do not repeat these four schedules.
+The separate [source-label schedule comparison](../training/reports/PRESET_LOSS_SCHEDULE_RESULTS.md) used a fixed learned audio proxy, a different model and a 172-family training bank. It scored 21 validation sounds through real Vital at one pitch each. Fading led on raw MR-STFT, while the paper-style fixed loss led after gain matching; their direct differences were inconclusive. This does not select a schedule for the balanced native-feedback model. Do not repeat these four schedules.
 
-The next A2 test should first check whether the current audio-feedback signal tracks real Vital on the balanced Stage A bank and its declared pitches. If that check passes, use one matched sound-learning run on this same scope, with the current 14 outputs and all old per-sound and earlier-case gates unchanged. If it fails, fix the feedback path before spending another long fit. Keep the 18 clips as development data and leave the held-out reserve and final test untouched. Reuse only score records with exactly matching source, audio, pitch and renderer hashes.
+Next, inspect the already collected fit trace and per-sound/per-performance comparisons to identify why the model improved some groups but failed the full gate. Reuse compatible evidence; do not rerender or repeat a schedule screen. Only after a specific, evidence-backed cause is found should a bounded test change one training factor. Keep the 14 outputs, existing sound/preservation gates, 18 development clips and untouched reserve/test. If retained traces cannot answer the question, state that limitation and freeze a small diagnostic before allocating another long native run.
 
-The earlier 48-update balanced fit consumed 6,292 native attempts in 3 h 24 min. Any new native budget must be based on a fresh timed preflight and a checkpointed allocation; the 103-second label-only check is not a forecast for sound feedback.
+Any later native fit still needs a fresh timed preflight and checkpointed allocation. The 103-second label-only check is not a forecast for sound feedback.
 
-### 2. Broaden shared learning only after the loss-schedule comparison
+### 2. Broaden shared learning only after the sound-quality gate passes
 
 Keep the eighteen-clip bank as a controlled learning fixture: the same three source patches crossed with MIDI 36/60/84 and 0.4/1.2-second notes. It is development data, not independent validation.
 

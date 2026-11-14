@@ -27,4 +27,4 @@ The fit did improve the original-input own/transfer groups, but failed the full 
 
 These failures are retained as measured; the evaluation gates were not relaxed. The balanced fit remains a completed development run, not a model candidate.
 
-The [data bank report](BALANCED_BASIC_DATA_RESULTS.md) remains valid. See the [current training plan](../../modelling/TRAINING_PLAN.md) for the next matched loss comparison. The independent 192-root reserve and final test remain unscored; Actions stays disabled and Colab deferred.
+The [data bank report](BALANCED_BASIC_DATA_RESULTS.md) remains valid. The label-only and four-schedule comparisons are now complete as separate diagnostics; neither changes this failed native sound-fit result. See the [current training plan](../../modelling/TRAINING_PLAN.md) for the next step: diagnose this audited fit's group-level failures before another long native run. The independent 192-root reserve and final test remain unscored; Actions stays disabled and Colab deferred.
