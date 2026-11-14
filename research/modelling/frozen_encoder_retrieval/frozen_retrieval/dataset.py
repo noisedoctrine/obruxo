@@ -11,6 +11,8 @@ from .core import POLICY_ID, canonical_json, check_render_budget, digest
 
 SNAPSHOT_ARTIFACTS = ("contract.json", "assets.json", "performances.json", "splits.json", "members.json", "summary.json")
 SOURCE_KIND = "newly_rendered_original_preset"
+NONPERFORMANCE_META_TYPES = frozenset({"copyright", "cue_point", "device_name", "instrument_name", "key_signature",
+                                       "lyrics", "marker", "sequence_number", "text", "track_name"})
 
 
 def _load_snapshot(root: Path) -> tuple[dict, dict, dict]:
@@ -65,18 +67,38 @@ def _safe_source(root: Path, relative: str) -> Path:
 
 
 def _paired_source_midi(root: Path, directory: Path, selected_preset: Path) -> tuple[Path | None, str | None]:
-    """Apply PresetShare's structural pairing rules without validating its source WAV."""
+    """Associate one direct-child MIDI with its exact source preset; source WAVs are irrelevant."""
     midi_paths = sorted(directory.glob("*.mid"), key=lambda path: path.name)
-    wav_paths = sorted(directory.glob("*.wav"), key=lambda path: path.name)
     vital_paths = sorted(directory.glob("*.vital"), key=lambda path: path.name)
     if not midi_paths:
         return None, "pair.missing_midi"
-    if len(midi_paths) != 1 or len(wav_paths) > 1 or len(vital_paths) != 1:
+    if len(midi_paths) != 1 or len(vital_paths) != 1:
         return None, "pair.ambiguous"
     if vital_paths[0].resolve(strict=True) != selected_preset:
         return None, "pair.selected_source_mismatch"
     relative = midi_paths[0].relative_to(root).as_posix()
     return _safe_source(root, relative), None
+
+
+def _remove_nonperformance_meta_events(performance) -> dict[str, int]:
+    """Drop only known descriptive MIDI metadata and return auditable per-type counts."""
+    from obruxo_data.midi import EventKind
+
+    removed = Counter()
+    kept = []
+    for event in performance.events:
+        payload = dict(event.opaque)
+        try:
+            message = json.loads(payload.get("message", "{}"))
+        except (TypeError, json.JSONDecodeError):
+            message = {}
+        message_type = message.get("type")
+        if event.kind == EventKind.OPAQUE and message.get("is_meta") and message_type in NONPERFORMANCE_META_TYPES:
+            removed[message_type] += 1
+            continue
+        kept.append(event)
+    performance.replace_events(kept)
+    return dict(sorted(removed.items()))
 
 
 def _midi_duration(performance, tempo_map, start_tick: int, end_tick: int) -> float:
@@ -177,9 +199,9 @@ def midi_features(performance) -> dict:
 
 def prepare_dataset(snapshot: Path, data_root: Path, renderer_config: Path, output: Path, *, split: str = "validation",
                     gallery_cap: int = 4, max_render_requests: int = 50_000) -> dict:
-    """Apply the existing PresetShare pairing contract and freeze the real-render benchmark."""
+    """Freeze all eligible source presets crossed with the split's compatible real MIDI pool."""
     import yaml
-    from obruxo_data.hashing import canonical_sha256
+    from obruxo_data.hashing import canonical_json as obruxo_canonical_json, canonical_sha256
     from obruxo_data.midi import Performance
     from obruxo_data.render.capabilities import RendererCapabilities
     from obruxo_data.render.base import FULL_CORPUS_RENDERER_ID, RenderRequest
@@ -201,7 +223,7 @@ def prepare_dataset(snapshot: Path, data_root: Path, renderer_config: Path, outp
     if not capabilities.notes:
         raise ValueError("configured renderer does not support notes")
     counters = Counter()
-    presets, performances, pairing_audit = [], [], []
+    performances, pairing_audit = [], []
     selected = [row for row in docs["members.json"]["records"] if row.get("split") == split and row.get("static_eligible")]
     selected_by_state = {}
     for row in selected:
@@ -215,7 +237,7 @@ def prepare_dataset(snapshot: Path, data_root: Path, renderer_config: Path, outp
             identity = PresetIdentity.from_bytes(raw)
             if (identity.raw, identity.state) != (row["identity"]["raw"], state_id):
                 raise ValueError("source_identity_drift")
-            if source.parent.parent != root:
+            if source.parent.parent != root / "data":
                 raise ValueError("preset_not_in_direct_child_presetshare_layout")
             preset = {"state_id": state_id, "family_id": family_id, "split": split,
                       "relative_path": relative, "raw_sha256": identity.raw}
@@ -232,6 +254,7 @@ def prepare_dataset(snapshot: Path, data_root: Path, renderer_config: Path, outp
             counters[f"preset_excluded:{str(error)[:80]}"] += 1
             continue
 
+    presets = sorted(selected_by_state.values(), key=lambda row: row["state_id"])
     by_directory = {}
     for preset in selected_by_state.values():
         source = _safe_source(root, preset["relative_path"])
@@ -248,16 +271,23 @@ def prepare_dataset(snapshot: Path, data_root: Path, renderer_config: Path, outp
             continue
 
         preset = source_presets[0]
-        presets.append(preset)
         pairing_audit.append({"relative_directory": relative_directory, "selected_state_ids": selected_states,
                               "status": "eligible", "pairing_contract": "same_directory_exact_one_midi_one_vital",
                               "source_audio_used": False, "midi_relative_path": midi_path.relative_to(root).as_posix()})
-        counters["paired_presets"] += 1
+        counters["midi_pair_candidates"] += 1
         try:
             midi_raw = midi_path.read_bytes()
             source_sha256 = hashlib.sha256(midi_raw).hexdigest()
             performance = Performance.from_midi(midi_path)
-            performance.validate(capabilities).require_valid()
+            ignored_metadata = _remove_nonperformance_meta_events(performance)
+            validation = performance.validate(capabilities)
+            if not validation.valid:
+                codes = sorted({diagnostic.code for diagnostic in validation.diagnostics if diagnostic.severity.value == "error"})
+                for code in codes:
+                    counters[f"midi_excluded:{code}"] += 1
+                pairing_audit[-1].update({"status": "excluded", "reason": "renderer_incompatible_midi",
+                                          "diagnostic_codes": codes, "ignored_nonperformance_meta": ignored_metadata})
+                continue
             stats = midi_features(performance)
             excerpt, excerpt_info = bounded_excerpt(performance, capabilities)
             midi_id = digest({"normalized_performance": excerpt.to_dict(), "policy": "normalized_midi_events_v1"})
@@ -265,23 +295,39 @@ def prepare_dataset(snapshot: Path, data_root: Path, renderer_config: Path, outp
             performances.append({"midi_id": midi_id, "source_state_id": preset["state_id"], "source_family_id": preset["family_id"],
                                  "split": split, "source_relative_path": midi_path.relative_to(root).as_posix(),
                                  "source_sha256": source_sha256, "excerpt_id": excerpt_id, "source_stats": stats,
-                                 "stats": midi_features(excerpt),
+                                 "stats": midi_features(excerpt), "ignored_nonperformance_meta": ignored_metadata,
                                  "excerpt": excerpt.to_dict(), **excerpt_info})
             counters["midi_parsed"] += 1
+            pairing_audit[-1].update({"status": "midi_eligible", "ignored_nonperformance_meta": ignored_metadata,
+                                      "midi_id": midi_id, "midi_stats": stats})
+            for meta_type, count in ignored_metadata.items():
+                counters[f"midi_descriptive_meta_ignored:{meta_type}"] += count
         except Exception as error:
-            counters[f"midi_excluded:{str(error).split(':', 1)[0].strip()[:80] or type(error).__name__}"] += 1
-            presets.pop()
-            pairing_audit[-1].update({"status": "excluded", "reason": "midi_renderer_or_excerpt_ineligible"})
+            reason = f"{type(error).__name__}:{str(error).split(':', 1)[0].strip()[:60]}"
+            counters[f"midi_excluded:{reason}"] += 1
+            pairing_audit[-1].update({"status": "excluded", "reason": reason})
     unique_perf = {}
     for row in sorted(performances, key=lambda item: (item["midi_id"], item["source_state_id"])):
-        unique_perf.setdefault(row["midi_id"], row)
+        existing = unique_perf.get(row["midi_id"])
+        if existing is None:
+            row["source_state_ids"] = [row["source_state_id"]]
+            row["source_family_ids"] = [row["source_family_id"]]
+            row["source_relative_paths"] = [row["source_relative_path"]]
+            row["source_sha256s"] = [row["source_sha256"]]
+            unique_perf[row["midi_id"]] = row
+        else:
+            for field, value in (("source_state_ids", row["source_state_id"]), ("source_family_ids", row["source_family_id"]),
+                                 ("source_relative_paths", row["source_relative_path"]), ("source_sha256s", row["source_sha256"])):
+                if value not in existing[field]:
+                    existing[field].append(value)
+            counters["duplicate_midi_performance_aliases_collapsed"] += 1
     performances = list(unique_perf.values())
+    if len(presets) < 2 or len(performances) < 2:
+        raise ValueError(f"insufficient renderer-compatible corpus for retrieval: presets={len(presets)}, "
+                         f"unique_midi_excerpts={len(performances)}; need at least two of each")
     estimated_render_requests = check_render_budget(len(presets), len(performances), max_render_requests)
-    if len(performances) > 1 and len(presets) > 1:
-        candidate_sets, episodes = __import__("frozen_retrieval.core", fromlist=["build_episodes"]).build_episodes(
-            presets, performances, gallery_cap=gallery_cap)
-    else:
-        candidate_sets, episodes = {}, []
+    candidate_sets, episodes = __import__("frozen_retrieval.core", fromlist=["build_episodes"]).build_episodes(
+        presets, performances, gallery_cap=gallery_cap)
     preset_by_state = {row["state_id"]: row for row in presets}
     performance_by_id = {row["midi_id"]: row for row in performances}
     request_specs = {}
@@ -332,13 +378,16 @@ def prepare_dataset(snapshot: Path, data_root: Path, renderer_config: Path, outp
                "renderer_id": config["renderer_id"], "renderer_capabilities": capabilities.to_dict(),
                "source_root": str(root), "manifest_sha256": {name: _file_sha256(output / name) for name in manifest_files},
                "presets_selected": len(selected_by_state), "presets_verified": len(presets),
+               "source_midi_pair_candidates": counters["midi_pair_candidates"],
+               "renderer_compatible_midi_pairs": counters["midi_parsed"],
                "unique_midi_excerpts": len(performances), "episodes": len(episodes),
                "candidate_sets": len(candidate_sets), "render_requests": plan_count,
                "render_budget_maximum": max_render_requests, "render_budget_estimate": estimated_render_requests,
                "gallery_size": len(next(iter(candidate_sets.values()))["state_ids"]) if candidate_sets else 0,
                "gallery_midi_pool_size": len(next(iter(candidate_sets.values()))["gallery_midi_ids"]) if candidate_sets else 0,
                "exclusions": dict(sorted(counters.items())),
-               "source_audio": "not used; every clip is a new Vital render from an unchanged original preset"}
+               "source_audio": "not used; every clip is a new Vital render from an unchanged original preset",
+               "midi_eligibility": "only renderer-supported MIDI behavior is rendered; documented descriptive metadata is omitted and counted"}
     _write_json(output / "dataset_summary.private.json", summary)
     return summary
 

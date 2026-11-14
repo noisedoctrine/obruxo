@@ -109,7 +109,8 @@ def _version(package: str) -> str:
 
 def dependency_status(model_name: str) -> dict:
     modules = {
-        "clap_music": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "laion_clap": "laion_clap"},
+        "clap_music": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "laion_clap": "laion_clap",
+                       "transformers": "transformers"},
         "muq_mulan": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "muq": "muq",
                        "torchaudio": "torchaudio", "librosa": "librosa", "transformers": "transformers",
                        "huggingface_hub": "huggingface_hub", "einops": "einops", "easydict": "easydict",
@@ -191,6 +192,23 @@ def pipeline_dependency_status() -> dict:
 
 def _module(name: str):
     return importlib.import_module(name)
+
+
+def _freeze_model(model) -> None:
+    """Freeze a module or a loader wrapper exposing its module as ``.model``."""
+    wrapped = getattr(model, "model", None)
+    targets = [model] if wrapped is None or wrapped is model else [model, wrapped]
+    for target in targets:
+        evaluate = getattr(target, "eval", None)
+        if callable(evaluate):
+            evaluate()
+    parameters = next((target.parameters() for target in targets if callable(getattr(target, "parameters", None))), None)
+    if parameters is None:
+        raise TypeError("encoder loader did not expose a torch module with parameters")
+    for parameter in parameters:
+        parameter.requires_grad_(False)
+    if any(parameter.requires_grad for parameter in getattr(wrapped or model, "parameters")()):
+        raise RuntimeError("frozen encoder has trainable parameters")
 
 
 @dataclass
@@ -377,6 +395,34 @@ def _load_cir_ast_offline(checkpoint: Path, config_path: Path, lock_entry: dict,
     return model
 
 
+def _clap_roberta_config(config_class):
+    """Rebuild the exact roberta-base tensor dimensions embedded in the LAION-CLAP checkpoint."""
+    return config_class(max_position_embeddings=514, type_vocab_size=1)
+
+
+def _load_clap_music_offline(checkpoint: Path, device: str):
+    """Build CLAP's text-side scaffolding from config only; the audio-only task needs no HF fetch."""
+    from unittest.mock import patch
+    from laion_clap import CLAP_Module
+    from transformers import RobertaConfig, RobertaModel, RobertaTokenizer
+
+    def init_roberta(cls, model_name, *args, **kwargs):
+        if model_name != "roberta-base":
+            raise ValueError("LAION-CLAP requested an unexpected text architecture")
+        return cls(_clap_roberta_config(RobertaConfig))
+
+    def no_tokenizer(cls, model_name, *args, **kwargs):
+        if model_name != "roberta-base":
+            raise ValueError("LAION-CLAP requested an unexpected tokenizer")
+        return None
+
+    with patch.object(RobertaModel, "from_pretrained", classmethod(init_roberta)), \
+            patch.object(RobertaTokenizer, "from_pretrained", classmethod(no_tokenizer)):
+        model = CLAP_Module(enable_fusion=False, amodel="HTSAT-base", tmodel="roberta", device=device)
+    model.load_ckpt(str(checkpoint), verbose=False)
+    return model
+
+
 def load_adapter(model_name: str, checkpoint: Path, lock_entry: dict, checkpoint_digest: str, *,
                  checkpoint_root: Path, device: str = "cpu", source_root: Path | None = None) -> FrozenAdapter:
     os.environ["HF_HUB_OFFLINE"] = "1"
@@ -413,9 +459,7 @@ def load_adapter(model_name: str, checkpoint: Path, lock_entry: dict, checkpoint
     if device not in {"cpu", "cuda", "xpu"}:
         raise ValueError("device must be explicitly cpu, cuda or xpu")
     if model_name == "clap_music":
-        from laion_clap import CLAP_Module
-        model = CLAP_Module(enable_fusion=False, amodel="HTSAT-base", device=device)
-        model.load_ckpt(str(checkpoint), verbose=False)
+        model = _load_clap_music_offline(checkpoint, device)
     elif model_name == "muq_mulan":
         model = _load_muq_mulan_offline(checkpoint, local_configs, torch, device)
     elif model_name == "cir_ast":
@@ -442,11 +486,7 @@ def load_adapter(model_name: str, checkpoint: Path, lock_entry: dict, checkpoint
         model = AutoModel.from_pretrained(str(checkpoint), local_files_only=True).to(device)
     else:
         raise ValueError(f"unknown model: {model_name}")
-    model.eval()
-    for parameter in model.parameters():
-        parameter.requires_grad_(False)
-    if any(parameter.requires_grad for parameter in model.parameters()):
-        raise RuntimeError("frozen encoder has trainable parameters")
+    _freeze_model(model)
     return FrozenAdapter(model_name, checkpoint, lock_entry, checkpoint_digest, device, model, torch, np)
 
 

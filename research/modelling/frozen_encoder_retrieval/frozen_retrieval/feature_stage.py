@@ -59,7 +59,7 @@ def extract_dataset(dataset_dir: Path, model_name: str, checkpoint_root: Path, l
             raise
         except Exception as error:
             failure_rows.append({"request_id": request_id, "state_id": plan_row["state_id"],
-                                 "failure_type": type(error).__name__})
+                                 "failure_type": type(error).__name__, "failure_message": str(error)[:240]})
             counts["feature_failures"] += 1
             continue
         feature_metadata = json.loads((output_dir / f"{feature['feature_id']}.json").read_text(encoding="utf-8"))

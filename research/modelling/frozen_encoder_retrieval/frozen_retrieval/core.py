@@ -8,7 +8,7 @@ import random
 from typing import Iterable, Sequence
 
 
-POLICY_ID = "cross_performance_retrieval_v1"
+POLICY_ID = "cross_performance_retrieval_v2"
 MODEL_REGISTRY = {
     "clap_music": {"name": "LAION-CLAP Music HTSAT-base", "sample_rate": 48_000, "kind": "clip", "dimension": 512,
                    "checkpoint": "lukewys/laion_clap/music_audioset_epoch_15_esc_90.14.pt", "source": "https://huggingface.co/lukewys/laion_clap",
@@ -63,7 +63,7 @@ def stable_order(values: Iterable[dict], *keys: str, salt: str) -> list[dict]:
 
 
 def build_episodes(presets: Sequence[dict], performances: Sequence[dict], *, gallery_cap: int = 4) -> tuple[dict, list[dict]]:
-    """Use each source preset's own MIDI as query and other same-split MIDI as gallery."""
+    """Cross every candidate preset with the shared split MIDI pool for queries and galleries."""
     if gallery_cap < 2:
         raise ValueError("gallery MIDI pool must hold at least two performances so query and gallery can differ")
     splits = sorted({row["split"] for row in presets})

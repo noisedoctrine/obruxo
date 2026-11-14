@@ -59,6 +59,8 @@ def _parser() -> argparse.ArgumentParser:
     report.add_argument("--dataset", type=Path)
     report.add_argument("--checkpoint-root", type=Path)
     report.add_argument("--lock", type=Path)
+    report.add_argument("--controlled-summary", type=Path,
+                        help="private JSON produced by run_controlled_perturbation.py; adds a controlled-results section and inventory")
     report.add_argument("--output", type=Path, default=defaults["report"])
     report.add_argument("--execution-note", default=None)
     return parser
@@ -100,7 +102,7 @@ def main(argv: list[str] | None = None) -> int:
                 build_control_inventory(REPO_ROOT / "research/modelling/control_scope/stage_a_controls.jsonl", defaults["inventory"])
             result = generate_report(args.output, defaults["inventory"], dataset_dir=args.dataset,
                                      checkpoint_root=args.checkpoint_root, lock_path=args.lock,
-                                     execution_note=args.execution_note)
+                                     execution_note=args.execution_note, controlled_summary_path=args.controlled_summary)
         else:
             raise ValueError(f"unsupported command {args.command}")
     except Exception as error:

@@ -12,7 +12,8 @@ from .core import canonical_json, digest
 from .dataset import _safe_source, validate_dataset_manifests
 
 
-RENDER_POLICY_ID = "vital_original_pair_midi_excerpt_44100_stereo_2s-tail_v1"
+RENDER_POLICY_ID = "vital_original_preset_cross_midi_excerpt_44100_stereo_2s-tail_v2"
+QA_POLICY_ID = "finite_silent_reject_clipping_tail_warn_v2"
 
 
 def render_plan_identity(row: dict) -> str:
@@ -83,6 +84,16 @@ def _rss_bytes() -> int | None:
         return None
 
 
+def _qa_warnings(metadata: dict) -> list[str]:
+    qa = metadata.get("qa", {})
+    warnings = []
+    if int(qa.get("clipping_count", 0)) > 0:
+        warnings.append("amplitude_above_unit_range")
+    if float(qa.get("tail_rms", 0.0)) > float(qa.get("tail_rms_warning", float("inf"))):
+        warnings.append("tail_rms_above_warning")
+    return warnings
+
+
 def _accepted(metadata: dict) -> tuple[bool, str]:
     qa = metadata.get("qa", {})
     if not qa.get("finite") or qa.get("actual_frames") != qa.get("expected_frames"):
@@ -91,10 +102,9 @@ def _accepted(metadata: dict) -> tuple[bool, str]:
         return False, "render_qa_channel_failure"
     if float(qa.get("rms", 0.0)) <= float(qa.get("silence_threshold", 1e-6)):
         return False, "render_qa_silence"
-    if int(qa.get("clipping_count", 0)) > 0:
-        return False, "render_qa_clipping"
-    if float(qa.get("tail_rms", 0.0)) > float(qa.get("tail_rms_warning", float("inf"))):
-        return False, "render_qa_tail_truncation"
+    warnings = _qa_warnings(metadata)
+    if warnings:
+        return True, "accepted_with_" + "_and_".join(warnings)
     return True, "accepted"
 
 
@@ -167,7 +177,7 @@ def render_dataset(dataset_dir: Path, renderer_config: Path, *, plugin_path: Pat
                     timings.append(time.perf_counter() - started)
                     plan_identity = render_plan_identity(row)
                     failure = {"request_id": request.request_id, "plan_identity": plan_identity,
-                               "render_policy_id": RENDER_POLICY_ID, "accepted": False,
+                               "render_policy_id": RENDER_POLICY_ID, "qa_policy_id": QA_POLICY_ID, "accepted": False,
                                "source_kind": row["source_kind"],
                                "qa_status": f"render_exception:{type(error).__name__}",
                                "error_type": type(error).__name__}
@@ -188,11 +198,14 @@ def render_dataset(dataset_dir: Path, renderer_config: Path, *, plugin_path: Pat
                     raise ValueError("render provenance profile differs from the frozen renderer identity")
                 accepted, qa_status = _accepted(metadata)
                 receipt = {"request_id": request.request_id, "plan_identity": render_plan_identity(row),
-                    "render_policy_id": RENDER_POLICY_ID, "audio_sha256": hashlib.sha256(wav_path.read_bytes()).hexdigest(),
+                    "render_policy_id": RENDER_POLICY_ID, "qa_policy_id": QA_POLICY_ID,
+                    "audio_sha256": hashlib.sha256(wav_path.read_bytes()).hexdigest(),
                     "source_kind": row["source_kind"],
                     "duration_seconds": metadata["qa"]["actual_frames"] / metadata["sample_rate"],
                     "renderer_id": metadata["provenance"]["renderer_id"], "qa_status": qa_status,
-                    "accepted": accepted, "reused": reused,
+                    "accepted": accepted, "qa_warnings": _qa_warnings(metadata), "reused": reused,
+                    "qa_metrics": {key: metadata["qa"].get(key) for key in
+                                   ("clipping_count", "peak", "rms", "tail_rms", "tail_rms_warning")},
                     "wav_relative_path": wav_path.relative_to(dataset_dir).as_posix(),
                     "metadata_relative_path": metadata_path.relative_to(dataset_dir).as_posix()}
                 receipts.write(canonical_json(receipt) + "\n")
@@ -203,8 +216,11 @@ def render_dataset(dataset_dir: Path, renderer_config: Path, *, plugin_path: Pat
             raise RuntimeError("render manifest producer failed") from worker_error[0]
     producer.join()
     latest = {"render_policy_id": RENDER_POLICY_ID, "renderer_id": renderer.renderer_id,
+              "qa_policy_id": QA_POLICY_ID,
               "requested": summary["render_requests"], "accepted": sum(1 for row in previous.values() if row.get("accepted")),
               "excluded": dict(sorted(Counter(row["qa_status"] for row in previous.values() if not row.get("accepted")).items())),
+              "qa_warning_counts": dict(sorted(Counter(warning for row in previous.values() if row.get("accepted")
+                                                       for warning in row.get("qa_warnings", [])).items())),
               "runs_rendered_this_run": current_rendered, "cache_reused_this_run": current_reused,
               "wall_seconds_this_run": round(sum(timings), 3), "request_count_this_run": len(timings),
               "batch_size": batch_size, "bounded_queue_depth": queue_depth,
@@ -222,4 +238,7 @@ def accepted_receipts(dataset_dir: Path) -> dict[str, dict]:
         if line.strip():
             row = json.loads(line)
             rows[row["request_id"]] = row
+    stale = [row for row in rows.values() if row.get("qa_policy_id") != QA_POLICY_ID]
+    if stale:
+        raise ValueError("render receipts use a stale QA policy; rerun the resumable render stage to refresh them")
     return {key: value for key, value in rows.items() if value.get("accepted")}

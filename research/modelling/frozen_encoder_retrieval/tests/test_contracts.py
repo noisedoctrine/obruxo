@@ -18,13 +18,15 @@ for directory in (PACKAGE, REPO / "research/data_generation", REPO / "research/t
         sys.path.insert(0, str(directory))
 
 from frozen_retrieval import core
-from frozen_retrieval.dataset import (_file_sha256, _paired_source_midi, bounded_excerpt, midi_features,
+from frozen_retrieval.dataset import (_file_sha256, _paired_source_midi, _remove_nonperformance_meta_events,
+                                     bounded_excerpt, midi_features,
                                      validate_dataset_manifests)
-from frozen_retrieval.encoders import _beats_sequence, _decode_audio
+from frozen_retrieval.encoders import _beats_sequence, _clap_roberta_config, _decode_audio, _freeze_model
 from frozen_retrieval import evaluation
 from frozen_retrieval.encoders import _load_cir_ast_offline, _load_muq_mulan_offline, _resolve_local_configs
-from frozen_retrieval.rendering import RENDER_POLICY_ID, _accepted, render_plan_identity
-from frozen_retrieval.reporting import _inventory_summary, build_control_inventory, generate_report
+from frozen_retrieval.rendering import QA_POLICY_ID, RENDER_POLICY_ID, _accepted, _qa_warnings, render_plan_identity
+from frozen_retrieval.reporting import (_inventory_summary, build_control_inventory, build_controlled_inventory,
+                                        generate_report)
 
 
 def _presets():
@@ -153,6 +155,14 @@ class EpisodeContractTests(unittest.TestCase):
 
 
 class FeatureAndManifestTests(unittest.TestCase):
+    def test_clap_offline_roberta_config_matches_checkpoint_embedding_shapes(self):
+        class Config:
+            def __init__(self, **kwargs):
+                self.values = kwargs
+
+        config = _clap_roberta_config(Config)
+        self.assertEqual({"max_position_embeddings": 514, "type_vocab_size": 1}, config.values)
+
     def test_pairing_ignores_damaged_source_wav_but_keeps_structural_ambiguity(self):
         with tempfile.TemporaryDirectory(dir=REPO) as directory:
             root = Path(directory)
@@ -169,8 +179,40 @@ class FeatureAndManifestTests(unittest.TestCase):
             self.assertIsNone(reason)
             (pair_dir / "second.wav").write_bytes(b"also ignored")
             paired, reason = _paired_source_midi(root, pair_dir, preset.resolve())
-            self.assertIsNone(paired)
-            self.assertEqual("pair.ambiguous", reason)
+            self.assertEqual(midi.resolve(), paired)
+            self.assertIsNone(reason)
+
+    def test_only_audited_nonperformance_metadata_is_removed_from_midi(self):
+        import mido
+        from obruxo_data.midi import EventKind, Performance
+
+        with tempfile.TemporaryDirectory(dir=REPO) as directory:
+            path = Path(directory) / "phrase.mid"
+            midi = mido.MidiFile(ticks_per_beat=480)
+            track = mido.MidiTrack()
+            midi.tracks.append(track)
+            track.extend([
+                mido.MetaMessage("track_name", name="private source name"),
+                mido.MetaMessage("key_signature", key="C"),
+                mido.MetaMessage("set_tempo", tempo=500000),
+                mido.Message("control_change", channel=0, control=64, value=127),
+                mido.Message("note_on", channel=0, note=60, velocity=92),
+                mido.Message("note_off", channel=0, note=60, velocity=0, time=960),
+                mido.Message("program_change", channel=0, program=3),
+                mido.MetaMessage("end_of_track"),
+            ])
+            midi.save(path)
+            performance = Performance.from_midi(path)
+            removed = _remove_nonperformance_meta_events(performance)
+
+        self.assertEqual({"key_signature": 1, "track_name": 1}, removed)
+        kinds = [event.kind for event in performance.events]
+        self.assertIn(EventKind.TEMPO, kinds)
+        self.assertIn(EventKind.CONTROL_CHANGE, kinds)
+        self.assertEqual(2, sum(kind in (EventKind.NOTE_ON, EventKind.NOTE_OFF) for kind in kinds))
+        self.assertTrue(any(event.kind == EventKind.OPAQUE and
+                            json.loads(dict(event.opaque)["message"])["type"] == "program_change"
+                            for event in performance.events))
 
     def test_render_receipts_and_feature_cache_qualify_primary_episode_without_same_midi_diagnostic(self):
         with tempfile.TemporaryDirectory(dir=REPO) as directory:
@@ -209,26 +251,27 @@ class FeatureAndManifestTests(unittest.TestCase):
 
             receipts = []
             for row in rows:
-                accepted = row["request_id"] != "far-same-midi"
+                accepted = row["request_id"] not in {"far-same-midi", "far-gallery"}
                 receipts.append({"request_id": row["request_id"], "plan_identity": render_plan_identity(row),
-                                 "render_policy_id": RENDER_POLICY_ID, "accepted": accepted,
+                                 "render_policy_id": RENDER_POLICY_ID, "qa_policy_id": QA_POLICY_ID, "accepted": accepted,
                                  "qa_status": "accepted" if accepted else "render_qa_silence",
                                  "audio_sha256": "a" * 64})
             write_jsonl(root / "render_receipts.private.jsonl", receipts)
             cache_dir = root / "features" / "clap_music"
             cache_dir.mkdir(parents=True)
-            feature_requests = ("target-query", "target-gallery", "near-gallery", "far-gallery", "near-same-midi")
+            feature_requests = ("target-query", "target-gallery", "near-gallery", "near-same-midi")
             write_jsonl(cache_dir / "feature_manifest.private.jsonl", [
                 {"request_id": request_id, "feature_id": f"feature-{request_id}"} for request_id in feature_requests])
             (cache_dir / "extraction.latest.json").write_text(json.dumps({"checkpoint_sha256": "b" * 64}), encoding="utf-8")
             features = {"target-query": {"official_clip": [1.0, 0.0]},
                         "target-gallery": {"official_clip": [1.0, 0.0]},
                         "near-gallery": {"official_clip": [0.0, 1.0]},
-                        "far-gallery": {"official_clip": [-1.0, 0.0]},
                         "near-same-midi": {"official_clip": [0.0, 1.0]}}
             fake_numpy = types.ModuleType("numpy")
             fake_numpy.stack, fake_numpy.float32 = _FakeNumpy.stack, _FakeNumpy.float32
             with patch.object(evaluation, "list_clip_cache", return_value=features), \
+                    patch.object(evaluation, "_acoustic_hard_negative_candidates",
+                                 return_value={"episode": [("near", 0.95)]}), \
                     patch.dict(sys.modules, {"numpy": fake_numpy}), \
                     patch.object(evaluation, "_cosine_matrix", side_effect=_fake_cosine_matrix), \
                     patch.object(evaluation, "midi_shortcut_baseline", return_value={}):
@@ -238,12 +281,18 @@ class FeatureAndManifestTests(unittest.TestCase):
             self.assertEqual(1, coverage["planned_episodes"])
             self.assertEqual(1, coverage["qa_qualified_episodes"])
             self.assertEqual(1, coverage["common_feature_qualified_episodes_across_arms"])
+            self.assertEqual(3, result["gallery_candidate_states_original"])
+            self.assertEqual(2, result["gallery_candidate_states_render_qualified"])
+            self.assertEqual(1, result["gallery_candidate_states_excluded"])
             scores = result["model_results"]["clap_music:official_clip"]["cross_midi_common_gallery"]
             self.assertEqual(1.0, scores["recall_at_1"])
             self.assertEqual(1.0, scores["same_midi_negative_win_rate"])
             self.assertEqual(1.0, scores["known_near_neighbor_negative_win_rate"])
+            self.assertEqual(1.0, scores["acoustic_hard_negative_win_rate"])
             self.assertEqual(1, scores["same_midi_negative_win_candidates"])
             self.assertEqual(1, scores["known_near_neighbor_negative_win_candidates"])
+            self.assertEqual(1, scores["acoustic_hard_negative_win_candidates"])
+            self.assertEqual(1, scores["strata"]["source_preset_lineage_group_size"]["multi-state"]["episodes"])
             inventory = root / "inventory.jsonl"
             report = root / "report.md"
             build_control_inventory(REPO / "research/modelling/control_scope/stage_a_controls.jsonl", inventory)
@@ -251,6 +300,7 @@ class FeatureAndManifestTests(unittest.TestCase):
             report_text = report.read_text(encoding="utf-8")
             self.assertIn("Render and feature coverage", report_text)
             self.assertIn("Known source-lineage near-neighbor win rate", report_text)
+            self.assertIn("Acoustic hard-negative top-5 win rate", report_text)
 
     def test_local_config_preflight_requires_cache_assets_without_network_fallback(self):
         with tempfile.TemporaryDirectory(dir=REPO) as directory:
@@ -489,6 +539,34 @@ class FeatureAndManifestTests(unittest.TestCase):
         self.assertEqual((3, 768), output.shape)
         self.assertEqual([0.5, 10.5, 20.5], [row[0] for row in output.rows])
 
+    def test_freeze_marks_loader_wrapped_backbone_eval_and_nontrainable(self):
+        class Parameter:
+            requires_grad = True
+
+            def requires_grad_(self, value):
+                self.requires_grad = value
+
+        class Backbone:
+            training = True
+
+            def __init__(self):
+                self.parameter = Parameter()
+
+            def eval(self):
+                self.training = False
+
+            def parameters(self):
+                return iter((self.parameter,))
+
+        class Loader:
+            def __init__(self):
+                self.model = Backbone()
+
+        loader = Loader()
+        _freeze_model(loader)
+        self.assertFalse(loader.model.training)
+        self.assertFalse(loader.model.parameter.requires_grad)
+
     def test_bounded_midi_excerpt_keeps_complete_notes_and_reports_source_features(self):
         if importlib.util.find_spec("yaml") is None:
             sys.modules.setdefault("yaml", types.ModuleType("yaml"))
@@ -507,16 +585,22 @@ class FeatureAndManifestTests(unittest.TestCase):
         self.assertLessEqual(metadata["excerpt_duration_seconds"], 8.0)
         self.assertEqual(8, midi_features(excerpt)["note_count"])
 
-    def test_render_qa_rejects_silence_clipping_and_truncated_release(self):
+    def test_render_qa_rejects_silence_but_records_clipping_and_tail_warnings(self):
         good = {"qa": {"finite": True, "actual_frames": 10, "expected_frames": 10, "actual_channels": 2,
                         "expected_channels": 2, "rms": 0.1, "silence_threshold": 1e-6, "clipping_count": 0,
                         "tail_rms": 0.0, "tail_rms_warning": 0.01}}
         self.assertEqual((True, "accepted"), _accepted(good))
-        for field, value, expected in (("rms", 0.0, "render_qa_silence"), ("clipping_count", 1, "render_qa_clipping"),
-                                       ("tail_rms", 0.1, "render_qa_tail_truncation")):
-            metadata = json.loads(json.dumps(good))
-            metadata["qa"][field] = value
-            self.assertEqual((False, expected), _accepted(metadata))
+        silence = json.loads(json.dumps(good))
+        silence["qa"]["rms"] = 0.0
+        self.assertEqual((False, "render_qa_silence"), _accepted(silence))
+        clipping = json.loads(json.dumps(good))
+        clipping["qa"]["clipping_count"] = 1
+        self.assertEqual((True, "accepted_with_amplitude_above_unit_range"), _accepted(clipping))
+        self.assertEqual(["amplitude_above_unit_range"], _qa_warnings(clipping))
+        tail = json.loads(json.dumps(good))
+        tail["qa"]["tail_rms"] = 0.1
+        self.assertEqual((True, "accepted_with_tail_rms_above_warning"), _accepted(tail))
+        self.assertEqual(["tail_rms_above_warning"], _qa_warnings(tail))
 
     def test_frozen_manifest_digest_rejects_drift(self):
         with tempfile.TemporaryDirectory(dir=REPO) as directory:
@@ -542,6 +626,29 @@ class ReportingAndControlTests(unittest.TestCase):
             self.assertEqual(0, summary["enabled_controls"])
             rows = [json.loads(line) for line in destination.read_text(encoding="utf-8").splitlines()]
             self.assertTrue(all(row["output_count"] == 0 and row["changeable"] is False for row in rows))
+
+    def test_controlled_inventory_repeats_exact_fields_and_marks_only_the_perturbed_field(self):
+        source = REPO / "research/modelling/control_scope/stage_a_controls.jsonl"
+        with tempfile.TemporaryDirectory(dir=REPO) as directory:
+            root = Path(directory)
+            baseline = root / "main_inventory.jsonl"
+            controlled_inventory = root / "controlled_inventory.jsonl"
+            build_control_inventory(source, baseline)
+            result = build_controlled_inventory(baseline, controlled_inventory, {
+                "filter_cutoff_shift": {"field": "filter_1_cutoff", "before_raw": 20.0, "after_raw": 40.0,
+                                         "before_normalized": 0.1, "after_normalized": 0.3}})
+            rows = [json.loads(line) for line in controlled_inventory.read_text(encoding="utf-8").splitlines()]
+            changed = [row for row in rows if row["experiment_version"] == "filter_cutoff_shift" and row["changeable"]]
+            self.assertEqual(979 * 2, len(rows))
+            self.assertEqual(1, len(changed))
+            self.assertEqual("filter_1_cutoff", changed[0]["vital_key"])
+            self.assertEqual(0, changed[0]["output_count"])
+            self.assertNotIn("preset_state_id", changed[0])
+            self.assertNotIn("preset_source_sha256", changed[0])
+            self.assertTrue(all("data_sha256" not in row for row in rows))
+            self.assertTrue(all("hash recorded" not in str(row.get("fixed_value_source")) for row in rows))
+            self.assertEqual(1, result["versions"]["filter_cutoff_shift"]["enabled_controls"])
+            self.assertEqual(1, result["versions"]["filter_cutoff_shift"]["controls_by_family"]["Filters"]["enabled"])
 
     def test_report_lists_all_arms_without_inventing_scores(self):
         source = REPO / "research/modelling/control_scope/stage_a_controls.jsonl"

@@ -6,13 +6,13 @@ This package implements the real Vital/MIDI retrieval shootout from [issue #152]
 
 Prepare from a complete artifact produced by the repository's corpus audit and its matching original data root. Use the existing identity and lineage assignments in `splits.json` and `members.json`; do not make a new split. Source preset bytes are rehashed and their stored-state identity is rechecked. Only eligible rows in the chosen `train` or `validation` split are opened. Excluded/ineligible rows and reserved source paths are not resolved or read.
 
-The current input adapter reuses the existing PresetShare evaluator's direct-child pairing contract: one `.mid`, at most one `.wav`, and one `.vital` source preset. Ambiguous directories are excluded, the paired MIDI must pass the selected renderer's compatibility checks, and source WAVs are neither opened nor validated; they are never used as benchmark audio. Each admitted preset is then cross-rendered on every unique compatible MIDI excerpt from the selected existing split. These are explicitly new Vital renders; the benchmark does not relabel them as original captured WAV/MIDI pairs. Exact normalized MIDI-event duplicates collapse to one excerpt identity. Source file hashes and normalized excerpt IDs are retained only in ignored local manifests.
+The input adapter pairs one direct-child `.vital` with one direct-child `.mid`. Source WAVs are not enumerated, opened, validated, or used as eligibility criteria; they are never benchmark audio. Ambiguous preset/MIDI directories are excluded, and the paired MIDI must pass the selected renderer's compatibility checks. Each admitted preset is then cross-rendered on every unique compatible MIDI excerpt from the selected existing split. These are explicitly new Vital renders; the benchmark does not relabel them as original captured WAV/MIDI pairs. Exact normalized MIDI-event duplicates collapse to one excerpt identity. Source file hashes and normalized excerpt IDs are retained only in ignored local manifests.
 
 Every compatible source MIDI uses its leading, complete-note excerpt up to eight musical seconds, with a minimum of two seconds, plus the renderer's fixed two-second release tail. The model waveform is therefore 4–10 seconds. Tempo changes, channels, and supported expressive events are kept as authored. The selected renderer's declared capabilities determine eligibility; unsupported events fail with a recorded exclusion reason. No velocity, channel, tempo, or event is silently rewritten.
 
-The main validation candidate set includes all statically eligible, byte-verified original source states that also pass the exact PresetShare source pairing and selected renderer MIDI checks. For each target state, every unique compatible same-split MIDI excerpt becomes a query. A deterministic rotating MIDI from the frozen gallery pool (up to the configured pool size) is rendered on every candidate state; query and common-gallery MIDI IDs must differ. The mixed-gallery condition assigns candidate-specific gallery MIDIs deterministically. Same-MIDI hard negatives include known same-lineage preset neighbors as well as the full candidate gallery. These auxiliary query-MIDI renders support diagnostics and do not gate a primary episode, which requires only its target query and gallery requests. Per-condition render QA and encoder feature coverage are reported. The primary matrix size is preflighted as presets × unique MIDI excerpts; `--max-render-requests` fails before plan creation when the full matrix exceeds its budget and never truncates presets or MIDI files.
+The main validation candidate set includes all statically eligible, byte-verified original source states that also pass the exact PresetShare source pairing and selected renderer MIDI checks. For each target state, every unique compatible same-split MIDI excerpt becomes a query. A deterministic rotating MIDI from the frozen gallery pool (up to the configured pool size) is rendered on every candidate state; query and common-gallery MIDI IDs must differ. The mixed-gallery condition assigns candidate-specific gallery MIDIs deterministically. Same-MIDI diagnostics compare the query against the full other-preset gallery and known lineage neighbors. A separate acoustic hard-negative check selects up to five same-MIDI candidates by an independent 64-bin log-frequency spectral descriptor, then checks whether a target's cross-MIDI positive outranks those negatives. These auxiliary query-MIDI renders support diagnostics and do not gate a primary episode, which requires only its target query and gallery requests. Per-condition render QA and encoder feature coverage are reported. The primary matrix size is preflighted as presets × unique MIDI excerpts; `--max-render-requests` fails before plan creation when the full matrix exceeds its budget and never truncates presets or MIDI files.
 
-Known source lineage/alias groups remain intact. Exact state identity deduplicates display-name aliases. Family retrieval and family-cluster bootstrap are reported alongside exact-state retrieval. The pipeline does not infer fuzzy near-duplicate timbres or source instrument categories; those remain a limitation for hard-negative interpretation.
+Known source lineage/alias groups remain intact. Exact state identity deduplicates display-name aliases. Family retrieval and family-cluster bootstrap are reported alongside exact-state retrieval. The spectral hard-negative set is a coarse audio-similarity proxy, not a human-verified duplicate-timbre or source-instrument label.
 
 ## Prepare, render, cache, evaluate
 
@@ -23,7 +23,7 @@ python research/modelling/frozen_encoder_retrieval/run.py doctor
 
 python research/modelling/frozen_encoder_retrieval/run.py prepare `
   --snapshot research/training/outputs/<complete-source-snapshot> `
-  --data-root datasets/presetshare/raw/presetshare_files/data `
+  --data-root datasets/presetshare/raw/presetshare_files `
   --output research/modelling/frozen_encoder_retrieval/outputs/issue152-validation `
   --max-render-requests 50000
 
@@ -42,6 +42,27 @@ python research/modelling/frozen_encoder_retrieval/run.py evaluate `
 python research/modelling/frozen_encoder_retrieval/run.py report `
   --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation
 ```
+
+The controlled follow-up uses the same original validation preset corpus and three or four real MIDI excerpts with varied polyphony, register, note duration, and available velocity ranges. It perturbs one filter, envelope, and live modulation field in separate variants, pre-renders those variants, and caches the same encoder features:
+
+```powershell
+python research/modelling/frozen_encoder_retrieval/run_controlled_perturbation.py `
+  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation `
+  --renderer-config research/data_generation/configs/renderer_full_corpus.yaml `
+  --plugin-path 'C:\Program Files\Common Files\VST3\Vital.vst3' `
+  --checkpoint-root research/modelling/frozen_encoder_retrieval/local_checkpoints `
+  --lock research/modelling/frozen_encoder_retrieval/local_checkpoints/checkpoint-lock.json `
+  --output research/modelling/frozen_encoder_retrieval/outputs/issue152-controlled `
+  --models clap_music dac_44khz --device xpu
+
+python research/modelling/frozen_encoder_retrieval/run.py report `
+  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation `
+  --checkpoint-root research/modelling/frozen_encoder_retrieval/local_checkpoints `
+  --lock research/modelling/frozen_encoder_retrieval/local_checkpoints/checkpoint-lock.json `
+  --controlled-summary research/modelling/frozen_encoder_retrieval/outputs/issue152-controlled/controlled_summary.private.json
+```
+
+The opt-in end-to-end integration test uses the real snapshot, renderer, and plugin on a small two-preset/two-MIDI validation slice, then runs the real feature-cache and evaluation stages with a deterministic test-only adapter. It verifies stage wiring and cache/evaluation contracts, and its generated scores are never research results. Set `OBRUXO_RUN_REAL_INTEGRATION=1`, `OBRUXO_ISSUE152_SNAPSHOT`, `OBRUXO_ISSUE152_DATA_ROOT`, `OBRUXO_ISSUE152_RENDERER_CONFIG`, and `OBRUXO_VITAL_PLUGIN`, then run the package test discovery command. It is skipped in the ordinary unit-test run. If rendering and model evaluation use separate Python environments, make evaluation import the same pinned NumPy/SciPy environment as feature extraction; a mismatched native NumPy runtime can crash during matrix evaluation. Real pretrained checkpoints are exercised by the separate full-corpus experiment reported below.
 
 The plan, renderer, and feature extraction are separate commands. The render command reads a bounded queue of durable manifest batches and calls the existing `run_batch` with exactly one worker in the consumer thread. This can run independently of a later trainer; a future training producer can use the same durable request manifest and bounded queue without calling Vital synchronously in each batch. Each successful WAV and feature cache is reused on resume. Plan hashes, original preset/MIDI hashes, render provenance, checkpoint revision/digest, and cache identity are checked before reuse. A changed plan, source, checkpoint, loader/runtime, preprocessing, tap, pooling rule, or precision fails closed.
 
@@ -64,4 +85,4 @@ Clip adapters use the official clip latent. Sequence adapters are frozen/eval, F
 
 ## What is executed in this checkout
 
-See [the result report](reports/FROZEN_ENCODER_RETRIEVAL_RESULTS.md). The implementation preflight lists local data paths and checks Python dependencies; it does not parse or render raw files, load weights, or claim retrieval scores. The exact missing environment/data dependencies are recorded there. An unavailable encoder is an explicit report row, never a substitute result.
+See [the result report](reports/FROZEN_ENCODER_RETRIEVAL_RESULTS.md) for the executed real-corpus comparison, render/feature coverage, measured results, controlled diagnostic, exact provenance, and remaining unavailable arms. An unavailable encoder is an explicit report row, never a substitute result.

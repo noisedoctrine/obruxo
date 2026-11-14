@@ -8,7 +8,10 @@ from .core import (MODEL_REGISTRY, _rank_metrics, canonical_json, cluster_bootst
                    paired_cluster_bootstrap, random_baseline)
 from .encoders import list_clip_cache
 from .dataset import validate_dataset_manifests
-from .rendering import RENDER_POLICY_ID, render_plan_identity
+from .rendering import QA_POLICY_ID, RENDER_POLICY_ID, render_plan_identity
+
+
+QUALIFICATION_POLICY_ID = "render_qualified_primary_episode_set_v3"
 
 
 def _jsonl(path: Path) -> list[dict]:
@@ -39,22 +42,113 @@ def _render_receipts(dataset_dir: Path, plan: list[dict]) -> dict[str, dict]:
         if receipt.get("plan_identity") != render_plan_identity(row):
             raise ValueError("render receipt plan identity differs from the frozen request manifest")
         latest[receipt["request_id"]] = receipt
+    stale = [row for row in latest.values() if row.get("qa_policy_id") != QA_POLICY_ID]
+    if stale:
+        raise ValueError("render receipts use a stale QA policy; rerun the resumable render stage to refresh them")
     missing = set(plan_by_id) - set(latest)
     if missing:
         raise ValueError(f"render stage is incomplete: {len(missing):,} planned requests have no terminal receipt")
     return latest
 
 
+def _render_qualified_candidates(candidates: dict, pair_to_request: dict, receipts: dict[str, dict]):
+    qualified, source_to_qualified, failures_by_source = {}, {}, {}
+    for source_id, candidate in sorted(candidates.items()):
+        gallery_midi_ids = candidate["gallery_midi_ids"]
+        complete_states, failures = [], {}
+        for state_id in candidate["state_ids"]:
+            missing = []
+            for midi_id in gallery_midi_ids:
+                request_id = pair_to_request.get((state_id, midi_id))
+                receipt = receipts.get(request_id) if request_id else None
+                if not receipt or not receipt.get("accepted"):
+                    missing.append({"midi_id": midi_id, "request_id": request_id,
+                                    "qa_status": (receipt or {}).get("qa_status", "render_not_planned")})
+            if missing:
+                failures[state_id] = missing
+            else:
+                complete_states.append(state_id)
+        failures_by_source[source_id] = failures
+        if len(complete_states) < 2:
+            source_to_qualified[source_id] = None
+            continue
+        state_set = set(complete_states)
+        reduced = {"split": candidate["split"], "state_ids": complete_states,
+                   "family_by_state": {state: candidate.get("family_by_state", {}).get(state, state)
+                                       for state in complete_states},
+                   "known_near_neighbor_state_ids_by_state": {
+                       state: [neighbor for neighbor in candidate.get("known_near_neighbor_state_ids_by_state", {}).get(state, [])
+                               if neighbor in state_set]
+                       for state in complete_states},
+                   "gallery_midi_ids": gallery_midi_ids}
+        receipt_identities = {state: {midi: receipts[pair_to_request[(state, midi)]].get("audio_sha256")
+                                      for midi in gallery_midi_ids} for state in complete_states}
+        qualified_id = digest({"policy": "render_qualified_gallery_candidate_set_v1",
+                               "qa_policy_id": QA_POLICY_ID, "source_candidate_set_id": source_id,
+                               "candidate_set": reduced, "gallery_audio_sha256": receipt_identities})
+        qualified[qualified_id] = reduced
+        source_to_qualified[source_id] = qualified_id
+    return qualified, source_to_qualified, failures_by_source
+
+
 def _freeze_qa_qualified_episodes(dataset_dir: Path, episodes: list[dict], candidates: dict,
-                                  pair_to_request: dict, receipts: dict[str, dict]) -> tuple[list[dict], dict]:
+                                  pair_to_request: dict, receipts: dict[str, dict]) -> tuple[list[dict], dict, dict]:
+    qualified_candidates, candidate_ids, candidate_failures = _render_qualified_candidates(
+        candidates, pair_to_request, receipts)
+    candidate_manifest = {"qa_policy_id": QA_POLICY_ID, "source_to_qualified_candidate_set_id": candidate_ids,
+                          "candidate_sets": qualified_candidates}
+    candidate_path = dataset_dir / "candidate_sets.render_qualified.private.json"
+    if candidate_path.is_file() and json.loads(candidate_path.read_text(encoding="utf-8")) != candidate_manifest:
+        raise ValueError("render-qualified candidate set changed; use a fresh dataset output after new renders complete")
+    if not candidate_path.is_file():
+        candidate_path.write_text(json.dumps(candidate_manifest, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+
     coverage = defaultdict(lambda: {"planned_episodes": 0, "qa_qualified_episodes": 0,
-                                    "excluded_episodes": 0, "missing_required_request_status_counts": {}})
+                                    "excluded_episodes": 0, "excluded_gallery_target_episodes": 0,
+                                    "excluded_query_render_episodes": 0, "missing_required_request_status_counts": {},
+                                    "missing_gallery_candidate_status_counts": {},
+                                    "original_gallery_candidate_counts": [], "render_qualified_gallery_candidate_counts": []})
+    seen_candidate_sets = defaultdict(set)
     qualified, qualification_receipts = [], {}
     for episode in episodes:
         condition = episode["condition"]
         record = coverage[condition]
         record["planned_episodes"] += 1
-        required = _primary_request_ids(episode, candidates, pair_to_request)
+        source_candidate_id = episode["candidate_set_id"]
+        candidate_id = candidate_ids.get(source_candidate_id)
+        candidate_set = qualified_candidates.get(candidate_id) if candidate_id else None
+        if source_candidate_id not in seen_candidate_sets[condition]:
+            original_count = len(candidates[source_candidate_id]["state_ids"])
+            qualified_count = len(candidate_set["state_ids"]) if candidate_set else 0
+            record["original_gallery_candidate_counts"].append(original_count)
+            record["render_qualified_gallery_candidate_counts"].append(qualified_count)
+            seen_candidate_sets[condition].add(source_candidate_id)
+        if not candidate_set or episode["target_state_id"] not in candidate_set["state_ids"]:
+            record["excluded_episodes"] += 1
+            record["excluded_gallery_target_episodes"] += 1
+            status_counts = Counter(item["qa_status"] for item in
+                candidate_failures.get(source_candidate_id, {}).get(episode["target_state_id"], []))
+            current = Counter(record["missing_gallery_candidate_status_counts"])
+            current.update(status_counts)
+            record["missing_gallery_candidate_status_counts"] = dict(sorted(current.items()))
+            continue
+
+        qualified_episode = {**episode, "candidate_set_id": candidate_id}
+        query_request = pair_to_request.get((episode["target_state_id"], episode["query_midi_id"]))
+        query_receipt = receipts.get(query_request) if query_request else None
+        if not query_receipt or not query_receipt.get("accepted"):
+            record["excluded_episodes"] += 1
+            record["excluded_query_render_episodes"] += 1
+            status = (query_receipt or {}).get("qa_status", "render_not_planned")
+            current = Counter(record["missing_required_request_status_counts"])
+            current.update([status])
+            record["missing_required_request_status_counts"] = dict(sorted(current.items()))
+            if query_request:
+                qualification_receipts[query_request] = {key: query_receipt.get(key)
+                    for key in ("plan_identity", "audio_sha256", "accepted", "qa_status")}
+            continue
+
+        required = _primary_request_ids(qualified_episode, qualified_candidates, pair_to_request)
         missing = []
         for request_id in required:
             receipt = receipts.get(request_id)
@@ -69,16 +163,20 @@ def _freeze_qa_qualified_episodes(dataset_dir: Path, episodes: list[dict], candi
             merged.update(counts)
             record["missing_required_request_status_counts"] = dict(sorted(merged.items()))
             continue
-        qualified.append(episode)
+        qualified.append(qualified_episode)
         record["qa_qualified_episodes"] += 1
-    coverage = {condition: value for condition, value in sorted(coverage.items())}
+    coverage = {condition: {**value,
+        "original_gallery_candidate_count": max(value.pop("original_gallery_candidate_counts"), default=0),
+        "render_qualified_gallery_candidate_count": max(value.pop("render_qualified_gallery_candidate_counts"), default=0)}
+        for condition, value in sorted(coverage.items())}
     qualified.sort(key=lambda row: row["episode_id"])
-    qualification_id = digest({"policy": "qa_qualified_primary_episode_set_v1", "render_policy_id": RENDER_POLICY_ID,
+    qualification_id = digest({"policy": QUALIFICATION_POLICY_ID, "render_policy_id": RENDER_POLICY_ID,
                                "episode_ids": [row["episode_id"] for row in qualified], "coverage": coverage,
                                "required_render_receipts": qualification_receipts})
     manifest_path = dataset_dir / "episodes_qa_qualified.private.jsonl"
     summary_path = dataset_dir / "qa_episode_coverage.private.json"
-    summary = {"policy": "qa_qualified_primary_episode_set_v1", "qualification_id": qualification_id,
+    summary = {"policy": QUALIFICATION_POLICY_ID, "qa_policy_id": QA_POLICY_ID,
+               "qualification_id": qualification_id,
                "same_midi_and_near_neighbor_diagnostics_gate_primary_episodes": False,
                "coverage_by_condition": coverage}
     if manifest_path.exists() or summary_path.exists():
@@ -86,16 +184,22 @@ def _freeze_qa_qualified_episodes(dataset_dir: Path, episodes: list[dict], candi
             raise ValueError("frozen QA qualification artifacts are incomplete")
         previous = json.loads(summary_path.read_text(encoding="utf-8"))
         previous_episodes = _jsonl(manifest_path)
-        if (previous.get("qualification_id") != qualification_id or
+        if (previous.get("qa_policy_id") == QA_POLICY_ID and previous.get("policy") == QUALIFICATION_POLICY_ID and
+                (previous.get("qualification_id") != qualification_id or
                 [row["episode_id"] for row in previous_episodes] != [row["episode_id"] for row in qualified] or
-                digest(previous_episodes) != digest(qualified)):
+                digest(previous_episodes) != digest(qualified))):
             raise ValueError("QA-qualified episode set changed; use a fresh dataset output to freeze the new render coverage")
+        if previous.get("qa_policy_id") != QA_POLICY_ID or previous.get("policy") != QUALIFICATION_POLICY_ID:
+            with manifest_path.open("w", encoding="utf-8", newline="\n") as stream:
+                for row in qualified:
+                    stream.write(canonical_json(row) + "\n")
+            summary_path.write_text(json.dumps(summary, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     else:
         with manifest_path.open("w", encoding="utf-8", newline="\n") as stream:
             for row in qualified:
                 stream.write(canonical_json(row) + "\n")
         summary_path.write_text(json.dumps(summary, sort_keys=True, indent=2) + "\n", encoding="utf-8")
-    return qualified, summary
+    return qualified, summary, qualified_candidates
 
 
 def _cosine_matrix(left, right, np):
@@ -114,7 +218,81 @@ def _family_metrics(scores, state_ids, candidate_set, target_family):
     return _rank_metrics([(family, max(values)) for family, values in grouped.items()], target_family)
 
 
-def _evaluate_condition(episodes, candidates, pair_to_request, features, variant, condition):
+def _acoustic_hard_negative_candidates(dataset_dir, episodes, candidates, pair_to_request, receipts, *, top_k=5):
+    import numpy as np
+    from scipy.io import wavfile
+
+    descriptor_cache = {}
+    fft_size, hop_size = 4096, 2048
+    frequency_edges = np.geomspace(45.0, 16_000.0, 65)
+
+    def descriptor(request_id):
+        if request_id in descriptor_cache:
+            return descriptor_cache[request_id]
+        receipt = receipts.get(request_id)
+        if not receipt or not receipt.get("accepted"):
+            return None
+        sample_rate, audio = wavfile.read(dataset_dir / receipt["wav_relative_path"])
+        audio = np.asarray(audio)
+        if np.issubdtype(audio.dtype, np.integer):
+            limits = np.iinfo(audio.dtype)
+            audio = audio.astype(np.float32) / max(abs(limits.min), limits.max)
+        else:
+            audio = audio.astype(np.float32)
+        if audio.ndim == 2:
+            audio = audio.mean(axis=1)
+        elif audio.ndim != 1:
+            raise ValueError(f"unsupported audio shape for acoustic hard-negative request {request_id}")
+        if sample_rate < 32_000:
+            raise ValueError(f"acoustic hard-negative audio is below 32 kHz for request {request_id}")
+        if audio.size < fft_size:
+            audio = np.pad(audio, (0, fft_size - audio.size))
+        frames = np.lib.stride_tricks.sliding_window_view(audio, fft_size)[::hop_size]
+        window = np.hanning(fft_size).astype(np.float32)
+        frames = frames * window
+        frame_rms = np.sqrt(np.mean(frames * frames, axis=1))
+        active = frames[frame_rms > max(float(frame_rms.max()) * 0.01, 1e-8)]
+        if not len(active):
+            descriptor_cache[request_id] = None
+            return None
+        power = np.square(np.abs(np.fft.rfft(active, axis=1)))
+        frame_totals = power.sum(axis=1, keepdims=True)
+        power = power / np.maximum(frame_totals, 1e-12)
+        frequencies = np.fft.rfftfreq(fft_size, 1.0 / sample_rate)
+        bands = []
+        for low, high in zip(frequency_edges[:-1], frequency_edges[1:], strict=True):
+            selected = (frequencies >= low) & (frequencies < high)
+            bands.append(float(power[:, selected].sum(axis=1).mean()) if selected.any() else 0.0)
+        vector = np.log(np.asarray(bands, dtype=np.float32) + 1e-12)
+        vector -= vector.mean()
+        norm = np.linalg.norm(vector)
+        descriptor_cache[request_id] = vector / norm if norm else None
+        return descriptor_cache[request_id]
+
+    selected_by_episode = {}
+    for episode in episodes:
+        if episode["condition"] not in {"cross_midi_common_gallery", "cross_midi_mixed_gallery"}:
+            continue
+        query_request = pair_to_request.get((episode["target_state_id"], episode["query_midi_id"]))
+        query_descriptor = descriptor(query_request) if query_request else None
+        if query_descriptor is None:
+            selected_by_episode[episode["episode_id"]] = []
+            continue
+        ranked = []
+        candidate_set = candidates[episode["candidate_set_id"]]
+        for state_id in candidate_set["state_ids"]:
+            if state_id == episode["target_state_id"]:
+                continue
+            request_id = pair_to_request.get((state_id, episode["query_midi_id"]))
+            candidate_descriptor = descriptor(request_id) if request_id else None
+            if candidate_descriptor is not None:
+                ranked.append((state_id, float(query_descriptor @ candidate_descriptor)))
+        ranked.sort(key=lambda item: (-item[1], item[0]))
+        selected_by_episode[episode["episode_id"]] = ranked[:top_k]
+    return selected_by_episode
+
+
+def _evaluate_condition(episodes, candidates, pair_to_request, features, variant, condition, acoustic_hard_negatives):
     import numpy as np
 
     rows = []
@@ -138,7 +316,8 @@ def _evaluate_condition(episodes, candidates, pair_to_request, features, variant
             same_score_matrix = _cosine_matrix(query_matrix, same_matrix, np)
             for target_index, episode in enumerate(query_episodes):
                 same_by_state = {state: float(same_score_matrix[target_index, index]) for index, state in enumerate(same_states)}
-                row = _row_metrics(episode, score_matrix[target_index], states, candidate_set, same_by_state)
+                row = _row_metrics(episode, score_matrix[target_index], states, candidate_set, same_by_state,
+                                   acoustic_hard_negatives.get(episode["episode_id"], []))
                 rows.append(row)
         else:
             for episode in grouped_episodes:
@@ -151,11 +330,12 @@ def _evaluate_condition(episodes, candidates, pair_to_request, features, variant
                 if same_states:
                     same_scores = _cosine_matrix(query.reshape(1, -1), same_matrix, np)[0]
                     same_by_state = {state: float(same_scores[index]) for index, state in enumerate(same_states)}
-                rows.append(_row_metrics(episode, scores, states, candidate_set, same_by_state))
+                rows.append(_row_metrics(episode, scores, states, candidate_set, same_by_state,
+                                         acoustic_hard_negatives.get(episode["episode_id"], [])))
     return rows
 
 
-def _row_metrics(episode, scores, state_ids, candidate_set, same_midi_scores):
+def _row_metrics(episode, scores, state_ids, candidate_set, same_midi_scores, acoustic_hard_negative_candidates=()):
     target_index = state_ids.index(episode["target_state_id"])
     rank = _rank_metrics(list(zip(state_ids, scores.tolist(), strict=True)), episode["target_state_id"])
     families = _family_metrics(scores.tolist(), state_ids, candidate_set, episode["target_family_id"])
@@ -163,6 +343,12 @@ def _row_metrics(episode, scores, state_ids, candidate_set, same_midi_scores):
     negatives = [score for state, score in same_midi_scores.items() if state != episode["target_state_id"]]
     near_ids = candidate_set.get("known_near_neighbor_state_ids_by_state", {}).get(episode["target_state_id"], [])
     near_negatives = [same_midi_scores[state] for state in near_ids if state in same_midi_scores]
+    acoustic_ids = [state for state, _ in acoustic_hard_negative_candidates]
+    acoustic_negatives = [same_midi_scores[state] for state in acoustic_ids if state in same_midi_scores]
+    target_family_size = sum(family == episode["target_family_id"]
+                             for family in candidate_set.get("family_by_state", {}).values())
+    strata = {**episode.get("strata", {}), "source_preset_lineage_group_size":
+              "single-state" if target_family_size <= 1 else "multi-state"}
     row = {**episode, **rank, "target_cosine": float(scores[target_index]),
            "family_recall_at_1": families["recall_at_1"], "family_recall_at_5": families["recall_at_5"],
            "family_mrr": families["mrr"], "same_midi_negative_max_cosine": max(negatives, default=None),
@@ -172,6 +358,13 @@ def _row_metrics(episode, scores, state_ids, candidate_set, same_midi_scores):
            "known_near_neighbor_negative_candidate_count": len(near_negatives),
            "known_near_neighbor_negative_max_cosine": max(near_negatives, default=None),
            "known_near_neighbor_negative_win": (float(target_cosine > max(near_negatives)) if near_negatives else None),
+           "acoustic_hard_negative_state_ids": [state for state in acoustic_ids if state in same_midi_scores],
+           "acoustic_hard_negative_selector_similarities": [similarity for state, similarity in acoustic_hard_negative_candidates
+                                                             if state in same_midi_scores],
+           "acoustic_hard_negative_candidate_count": len(acoustic_negatives),
+           "acoustic_hard_negative_max_cosine": max(acoustic_negatives, default=None),
+           "acoustic_hard_negative_win": (float(target_cosine > max(acoustic_negatives)) if acoustic_negatives else None),
+           "strata": strata,
            "gallery_size": len(state_ids)}
     return row
 
@@ -181,7 +374,7 @@ def _summary(rows):
     result = {key: (sum(row[key] for row in rows) / len(rows) if rows else None) for key in metrics}
     result["episodes"] = len(rows)
     result["gallery_size"] = sorted({row["gallery_size"] for row in rows})
-    diagnostic_metrics = ("same_midi_negative_win", "known_near_neighbor_negative_win")
+    diagnostic_metrics = ("same_midi_negative_win", "known_near_neighbor_negative_win", "acoustic_hard_negative_win")
     for key in diagnostic_metrics:
         observed = [row for row in rows if row[key] is not None]
         result[f"{key}_rate"] = sum(row[key] for row in observed) / len(observed) if observed else None
@@ -199,7 +392,8 @@ def _summary(rows):
 def _strata(rows):
     axes = {key for row in rows for key in row.get("strata", {})
             if key in {"query_polyphony", "query_articulation", "query_expression", "query_duration_band",
-                       "pitch_register_gap_band", "duration_gap_band", "query_note_density_band"}}
+                       "pitch_register_gap_band", "duration_gap_band", "query_note_density_band",
+                       "source_preset_lineage_group_size"}}
     report = {}
     for axis in sorted(axes):
         groups = defaultdict(list)
@@ -270,7 +464,8 @@ def evaluate_dataset(dataset_dir: Path) -> dict:
                     if row.get("split") == dataset_summary["source_split"]]
     pair_to_request = {(row["state_id"], row["midi_id"]): row["request_id"] for row in plan}
     receipts = _render_receipts(dataset_dir, all_plan)
-    qa_episodes, qa_summary = _freeze_qa_qualified_episodes(dataset_dir, episodes, candidates, pair_to_request, receipts)
+    qa_episodes, qa_summary, candidates = _freeze_qa_qualified_episodes(
+        dataset_dir, episodes, candidates, pair_to_request, receipts)
     accepted_request_ids = {request_id for request_id, receipt in receipts.items() if receipt.get("accepted")}
     model_features = {}
     for model_dir in sorted((dataset_dir / "features").glob("*")) if (dataset_dir / "features").is_dir() else []:
@@ -305,6 +500,8 @@ def evaluate_dataset(dataset_dir: Path) -> dict:
         for valid_by_condition in eligible_by_arm.values():
             common &= valid_by_condition[condition]
         common_by_condition[condition] = common if model_features else set()
+    acoustic_hard_negatives = (_acoustic_hard_negative_candidates(dataset_dir, qa_episodes, candidates,
+        pair_to_request, receipts) if model_features else {})
     coverage_by_condition = {}
     for condition in conditions:
         qa_counts = qa_summary["coverage_by_condition"].get(condition, {"planned_episodes": 0, "qa_qualified_episodes": 0,
@@ -318,7 +515,8 @@ def evaluate_dataset(dataset_dir: Path) -> dict:
         results[arm], all_result_rows[arm] = {}, {}
         for condition in conditions:
             selected = [episode for episode in qa_episodes if episode["episode_id"] in common_by_condition[condition]]
-            rows = _evaluate_condition(selected, candidates, pair_to_request, features, variant, condition)
+            rows = _evaluate_condition(selected, candidates, pair_to_request, features, variant, condition,
+                                       acoustic_hard_negatives)
             results[arm][condition] = _summary(rows)
             results[arm][condition]["strata"] = _strata(rows)
             all_result_rows[arm][condition] = rows
@@ -341,8 +539,15 @@ def evaluate_dataset(dataset_dir: Path) -> dict:
               "qa_qualification_id": qa_summary["qualification_id"],
               "common_episode_count_across_available_arms": len(paired_episodes),
               "coverage_by_condition": coverage_by_condition,
+              "gallery_candidate_states_original": sum(len(row["state_ids"]) for row in
+                    json.loads((dataset_dir / "candidate_sets.private.json").read_text(encoding="utf-8")).values()),
+              "gallery_candidate_states_render_qualified": sum(len(row["state_ids"]) for row in candidates.values()),
+              "gallery_candidate_states_excluded": sum(len(row["state_ids"]) for row in
+                    json.loads((dataset_dir / "candidate_sets.private.json").read_text(encoding="utf-8")).values()) -
+                    sum(len(row["state_ids"]) for row in candidates.values()),
               "available_arms": arm_names, "unavailable_encoders": [name for name in MODEL_REGISTRY if not any(arm.startswith(name + ":") for arm in arm_names)],
               "model_results": results, "paired_family_bootstrap_differences": differences,
+              "acoustic_hard_negative_protocol": "For each query, rank same-MIDI candidate renders by cosine over normalized 64-bin log-frequency spectral power; score each model's cross-MIDI positive against the top five descriptor-selected negatives rendered on the query MIDI.",
               "midi_only_and_random_baselines": baseline,
               "no_source_audio_used": True, "held_out_reserved_sources_used": False,
               "primary_metric": "Recall@1", "gallery_candidate_set_is_identical_across_arms": True}
