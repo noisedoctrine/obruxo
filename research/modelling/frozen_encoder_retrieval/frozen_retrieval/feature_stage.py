@@ -21,7 +21,8 @@ def extract_dataset(dataset_dir: Path, model_name: str, checkpoint_root: Path, l
     source_root = None
     if entry.get("source_root"):
         source_root = (checkpoint_root.resolve(strict=True) / entry["source_root"]).resolve(strict=True)
-    adapter = load_adapter(model_name, checkpoint, entry, checkpoint_digest, device=device, source_root=source_root)
+    adapter = load_adapter(model_name, checkpoint, entry, checkpoint_digest, checkpoint_root=checkpoint_root,
+                           device=device, source_root=source_root)
     plan = {}
     with (dataset_dir / "render_plan.private.jsonl").open("r", encoding="utf-8") as stream:
         for line in stream:

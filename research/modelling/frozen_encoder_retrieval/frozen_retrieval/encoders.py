@@ -17,7 +17,7 @@ from .core import MODEL_REGISTRY, canonical_json, digest, masked_temporal_pools
 
 
 LOCK_VERSION = 1
-ADAPTER_ID = "frozen_audio_adapters_v1"
+ADAPTER_ID = "frozen_audio_adapters_v2"
 
 
 class CacheIdentityDriftError(ValueError):
@@ -93,6 +93,7 @@ def resolve_checkpoint(model_name: str, checkpoint_root: Path, lock: dict) -> tu
         raise ValueError(f"checkpoint lock must record an exact loader/source revision for {model_name}")
     if entry.get("license_status") != "approved":
         raise PermissionError(f"checkpoint license is not approved in the lock for {model_name}")
+    _resolve_local_configs(root, model_name, entry)
     required_runtime = {package for package in dependency_status(model_name)}
     if not required_runtime.issubset(entry.get("runtime_versions", {})):
         raise ValueError(f"checkpoint lock must pin every runtime package version for {model_name}")
@@ -109,7 +110,10 @@ def _version(package: str) -> str:
 def dependency_status(model_name: str) -> dict:
     modules = {
         "clap_music": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "laion_clap": "laion_clap"},
-        "muq_mulan": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "muq": "muq"},
+        "muq_mulan": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "muq": "muq",
+                       "torchaudio": "torchaudio", "librosa": "librosa", "transformers": "transformers",
+                       "huggingface_hub": "huggingface_hub", "einops": "einops", "easydict": "easydict",
+                       "x_clip": "x_clip"},
         "cir_ast": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "transformers": "transformers",
                      "librosa": "librosa"},
         "beats_iter3_plus": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "torchaudio": "torchaudio"},
@@ -117,6 +121,49 @@ def dependency_status(model_name: str) -> dict:
         "dac_44khz": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "transformers": "transformers"},
     }[model_name]
     return {package: {"module": module, "version": _version(package)} for package, module in modules.items()}
+
+
+def _resolve_local_configs(root: Path, model_name: str, entry: dict) -> dict[str, Path]:
+    requirements = {
+        "muq_mulan": {"audio": ("OpenMuQ/MuQ-large-msd-iter", "OpenMuQ/MuQ-large-msd-iter", ("config.json",)),
+                       "text": ("FacebookAI/xlm-roberta-base", "xlm-roberta-base", ("config.json",))},
+        "cir_ast": {"ast": (None, None, ("config.json", "preprocessor_config.json"))},
+    }.get(model_name, {})
+    if not requirements:
+        return {}
+    records = entry.get("local_configs")
+    if not isinstance(records, dict):
+        raise ValueError(f"{model_name} requires SHA-locked local architecture/config assets")
+    paths = {}
+    for name, (expected_repository_id, expected_model_name, filenames) in requirements.items():
+        record = records.get(name)
+        if not isinstance(record, dict):
+            raise ValueError(f"{model_name} checkpoint lock is missing local config bundle {name}")
+        if expected_repository_id is not None and record.get("repository_id") != expected_repository_id:
+            raise ValueError(f"{model_name} local config bundle {name} has the wrong source repository")
+        if expected_model_name is not None and record.get("model_name") != expected_model_name:
+            raise ValueError(f"{model_name} local config bundle {name} has the wrong model config name")
+        if not isinstance(record.get("repository_id"), str) or not record["repository_id"].strip():
+            raise ValueError(f"{model_name} local config bundle {name} must identify its source repository")
+        if not isinstance(record.get("model_name"), str) or not record["model_name"].strip():
+            raise ValueError(f"{model_name} local config bundle {name} must identify its architecture config")
+        if not isinstance(record.get("revision"), str) or re.fullmatch(r"[0-9a-f]{40}", record["revision"]) is None:
+            raise ValueError(f"{model_name} local config bundle {name} must pin a 40-character source revision")
+        relative = record.get("path")
+        if not isinstance(relative, str) or Path(relative).is_absolute() or ".." in Path(relative).parts:
+            raise ValueError(f"{model_name} local config bundle {name} must stay under the checkpoint root")
+        path = root / relative
+        if path.is_symlink() or path.is_junction():
+            raise ValueError(f"{model_name} local config bundle {name} cannot be a link")
+        path = path.resolve(strict=True)
+        if not path.is_relative_to(root) or not path.is_dir():
+            raise ValueError(f"{model_name} local config bundle {name} must be a local directory")
+        if any(not (path / filename).is_file() for filename in filenames):
+            raise ValueError(f"{model_name} local config bundle {name} is missing required config files")
+        if checkpoint_sha256(path) != record.get("sha256"):
+            raise ValueError(f"{model_name} local config bundle {name} digest differs from the lock")
+        paths[name] = path
+    return paths
 
 
 def _decode_audio(audio, np):
@@ -194,15 +241,8 @@ class FrozenAdapter:
                 return {"official_clip": _clip_vector(output[0], self.name, torch, np)}
             if self.name == "beats_iter3_plus":
                 features, _ = model.extract_features(signal, padding_mask=None)
-                patch_size = int(model.input_patch_size)
-                frequency_patches = 128 // patch_size
-                if features.ndim != 3 or features.shape[-1] != 768 or features.shape[1] % frequency_patches:
-                    raise ValueError("BEATs sequence output shape does not match the pinned iter3+ architecture")
-                time_patches = features.shape[1] // frequency_patches
-                time_series = features.reshape(1, frequency_patches, time_patches, 768).mean(dim=1)
                 fbanks = model.preprocess(signal)
-                valid_time = min(time_patches, fbanks.shape[1] // patch_size)
-                frames = time_series[0, :valid_time].detach().float().cpu().numpy()
+                frames = _beats_sequence(features, int(model.input_patch_size), fbanks.shape[1]).detach().float().cpu().numpy()
                 return _pool_sequence(frames, self.name)
             if self.name == "encodec_24khz":
                 encoder_input = signal.unsqueeze(1)
@@ -252,13 +292,99 @@ def _pool_sequence(frames, model_name: str) -> dict[str, list[float]]:
     return {"masked_mean": pools["masked_mean"], "temporal_pyramid_8": pools["temporal_pyramid_8"]}
 
 
-def load_adapter(model_name: str, checkpoint: Path, lock_entry: dict, checkpoint_digest: str, *, device: str = "cpu",
-                 source_root: Path | None = None) -> FrozenAdapter:
+def _beats_sequence(features, patch_size: int, valid_fbank_frames: int):
+    if patch_size <= 0 or 128 % patch_size:
+        raise ValueError("BEATs input patch size must divide the 128-bin mel axis")
+    frequency_patches = 128 // patch_size
+    if features.ndim != 3 or features.shape[0] != 1 or features.shape[-1] != 768:
+        raise ValueError("BEATs features must have shape [1,time_patches*frequency_patches,768]")
+    if features.shape[1] % frequency_patches:
+        raise ValueError("BEATs feature sequence does not contain complete time-frequency grids")
+    time_patches = features.shape[1] // frequency_patches
+    valid_time = min(time_patches, valid_fbank_frames // patch_size)
+    # BEATs flattens [B,C,time_patches,frequency_patches], so frequency is the fastest patch axis.
+    return features.reshape(1, time_patches, frequency_patches, 768).mean(dim=2)[0, :valid_time]
+
+
+def _safe_torch_load(torch, path: Path):
+    """Load tensor-only checkpoint state without allowing arbitrary pickle globals."""
+    return torch.load(path, map_location="cpu", weights_only=True)
+
+
+def _load_muq_mulan_offline(checkpoint: Path, config_paths: dict[str, Path], torch, device: str):
+    from muq.muq.muq import MuQ, MuQConfig
+    from muq.muq_mulan.models.audio import AudioSpectrogramTransformerPretrained
+    from muq.muq_mulan.models.text import TextTransformerPretrained
+    from muq.muq_mulan.muq_mulan import MuQMuLan
+    from transformers import XLMRobertaConfig, XLMRobertaModel
+
+    config = json.loads((checkpoint / "config.json").read_text(encoding="utf-8"))
+    if config.get("audio_model", {}).get("name") != "OpenMuQ/MuQ-large-msd-iter":
+        raise ValueError("MuQ-MuLan audio backbone differs from the expected official checkpoint config")
+    if config.get("text_model", {}).get("name") not in {"xlm-roberta-base", "FacebookAI/xlm-roberta-base"}:
+        raise ValueError("MuQ-MuLan text architecture differs from the expected official checkpoint config")
+    audio_config = json.loads((config_paths["audio"] / "config.json").read_text(encoding="utf-8"))
+    audio_init, text_init = AudioSpectrogramTransformerPretrained._init_pretrained_model, TextTransformerPretrained._init_pretrained_model
+
+    def init_audio(_instance, model_name):
+        # The MuQ-MuLan state dict below includes the audio tower weights. Build only its pinned architecture here.
+        if model_name != "OpenMuQ/MuQ-large-msd-iter":
+            raise ValueError("MuQ-MuLan requested an unexpected audio architecture")
+        return MuQ(MuQConfig(**audio_config))
+
+    def init_text(_instance):
+        # Text is not used by this audio-only benchmark; its architecture config is enough to load the full state dict.
+        local_config = XLMRobertaConfig.from_pretrained(str(config_paths["text"]), local_files_only=True)
+        return XLMRobertaModel(local_config)
+
+    AudioSpectrogramTransformerPretrained._init_pretrained_model = init_audio
+    TextTransformerPretrained._init_pretrained_model = init_text
+    try:
+        model = MuQMuLan(config)
+    finally:
+        AudioSpectrogramTransformerPretrained._init_pretrained_model = audio_init
+        TextTransformerPretrained._init_pretrained_model = text_init
+    state = _safe_torch_load(torch, checkpoint / "pytorch_model.bin")
+    model.load_state_dict(state, strict=True)
+    if model.sr != MODEL_REGISTRY["muq_mulan"]["sample_rate"]:
+        raise ValueError("MuQ-MuLan checkpoint sample rate differs from the frozen adapter contract")
+    return model.to(device)
+
+
+def _load_cir_ast_offline(checkpoint: Path, config_path: Path, lock_entry: dict, torch):
+    from AST import ASTFineTuned
+    from transformers import ASTConfig, ASTFeatureExtractor
+
+    state = _safe_torch_load(torch, checkpoint)
+    custom_config = state.get("custom_config") if isinstance(state, dict) else None
+    model_config = custom_config.get("model", {}) if isinstance(custom_config, dict) else {}
+    local_config = lock_entry["local_configs"]["ast"]
+    if model_config.get("pretrained") != local_config.get("model_name"):
+        raise ValueError("CIR checkpoint base architecture does not match its pinned local config bundle")
+    config = ASTConfig.from_pretrained(str(config_path), local_files_only=True)
+    model = ASTFineTuned(config)
+    model.custom_config = custom_config
+    model.feature_extractor = ASTFeatureExtractor.from_pretrained(str(config_path), local_files_only=True)
+    if model.feature_extractor.sampling_rate != MODEL_REGISTRY["cir_ast"]["sample_rate"]:
+        raise ValueError("CIR feature-extractor sample rate differs from the frozen adapter contract")
+    # The embedding path returns normalized AST CLS/distillation tokens before the classifier head.
+    model.classifier = torch.nn.Identity()
+    weights = state.get("model_state_dict")
+    if not isinstance(weights, dict):
+        raise ValueError("CIR checkpoint is missing its model tensor state")
+    weights = {name: value for name, value in weights.items() if not name.startswith("classifier.")}
+    model.load_state_dict(weights, strict=True)
+    return model
+
+
+def load_adapter(model_name: str, checkpoint: Path, lock_entry: dict, checkpoint_digest: str, *,
+                 checkpoint_root: Path, device: str = "cpu", source_root: Path | None = None) -> FrozenAdapter:
     os.environ["HF_HUB_OFFLINE"] = "1"
     os.environ["TRANSFORMERS_OFFLINE"] = "1"
     os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
     import numpy as np
     import torch
+    local_configs = _resolve_local_configs(checkpoint_root.resolve(strict=True), model_name, lock_entry)
 
     for package, expected in lock_entry.get("runtime_versions", {}).items():
         actual = _version(package)
@@ -291,21 +417,14 @@ def load_adapter(model_name: str, checkpoint: Path, lock_entry: dict, checkpoint
         model = CLAP_Module(enable_fusion=False, amodel="HTSAT-base", device=device)
         model.load_ckpt(str(checkpoint), verbose=False)
     elif model_name == "muq_mulan":
-        from muq import MuQMuLan
-        model = MuQMuLan.from_pretrained(str(checkpoint)).to(device)
+        model = _load_muq_mulan_offline(checkpoint, local_configs, torch, device)
     elif model_name == "cir_ast":
         if source_root is None:
             raise ValueError("CIR requires a local checkout pinned to the checkpoint's source revision")
         source_root = source_root.resolve(strict=True)
         if str(source_root) not in sys.path:
             sys.path.insert(0, str(source_root))
-        from AST import ASTFineTuned
-        state = torch.load(checkpoint, map_location="cpu", weights_only=False)
-        model = ASTFineTuned.from_custom_config(state["custom_config"])
-        model.load_state_dict(state["model_state_dict"])
-        model = model.to(device)
-        if model.feature_extractor.sampling_rate != MODEL_REGISTRY[model_name]["sample_rate"]:
-            raise ValueError("CIR feature-extractor sample rate differs from the frozen adapter contract")
+        model = _load_cir_ast_offline(checkpoint, local_configs["ast"], lock_entry, torch).to(device)
     elif model_name == "beats_iter3_plus":
         if source_root is None:
             raise ValueError("BEATs requires a local checkout of Microsoft's official loader source")
@@ -313,7 +432,7 @@ def load_adapter(model_name: str, checkpoint: Path, lock_entry: dict, checkpoint
         if str(source_root) not in sys.path:
             sys.path.insert(0, str(source_root))
         from BEATs import BEATs, BEATsConfig
-        state = torch.load(checkpoint, map_location="cpu", weights_only=False)
+        state = _safe_torch_load(torch, checkpoint)
         cfg = BEATsConfig(state["cfg"])
         model = BEATs(cfg)
         model.load_state_dict(state["model"])
@@ -337,6 +456,8 @@ def cache_feature(adapter: FrozenAdapter, wav_path: Path, *, request_id: str, re
     cache_identity = {"adapter_id": ADAPTER_ID, "model": adapter.name,
                       "checkpoint_sha256": adapter.checkpoint_digest, "source_revision": adapter.lock_entry["revision"],
                       "loader_revision": adapter.lock_entry["loader_revision"], "audio_file_sha256": audio_hash,
+                      "local_config_pins": {name: {key: record[key] for key in ("repository_id", "revision", "sha256")}
+                                             for name, record in adapter.lock_entry.get("local_configs", {}).items()},
                       "renderer_request_id": request_id, "tap": MODEL_REGISTRY[adapter.name]["tap"],
                       "sample_rate": adapter.sample_rate,
                       "preprocessing": "pcm_scale_stereo_mean_mono_resample_poly_no_gain_norm_v2",

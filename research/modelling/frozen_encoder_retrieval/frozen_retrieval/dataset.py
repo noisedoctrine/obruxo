@@ -6,7 +6,7 @@ import hashlib
 import json
 from pathlib import Path, PurePosixPath, PureWindowsPath
 
-from .core import POLICY_ID, canonical_json, digest
+from .core import POLICY_ID, canonical_json, check_render_budget, digest
 
 
 SNAPSHOT_ARTIFACTS = ("contract.json", "assets.json", "performances.json", "splits.json", "members.json", "summary.json")
@@ -62,6 +62,21 @@ def _safe_source(root: Path, relative: str) -> Path:
     if not resolved.is_relative_to(root):
         raise ValueError("source path escapes its declared data root")
     return resolved
+
+
+def _paired_source_midi(root: Path, directory: Path, selected_preset: Path) -> tuple[Path | None, str | None]:
+    """Apply PresetShare's structural pairing rules without validating its source WAV."""
+    midi_paths = sorted(directory.glob("*.mid"), key=lambda path: path.name)
+    wav_paths = sorted(directory.glob("*.wav"), key=lambda path: path.name)
+    vital_paths = sorted(directory.glob("*.vital"), key=lambda path: path.name)
+    if not midi_paths:
+        return None, "pair.missing_midi"
+    if len(midi_paths) != 1 or len(wav_paths) > 1 or len(vital_paths) != 1:
+        return None, "pair.ambiguous"
+    if vital_paths[0].resolve(strict=True) != selected_preset:
+        return None, "pair.selected_source_mismatch"
+    relative = midi_paths[0].relative_to(root).as_posix()
+    return _safe_source(root, relative), None
 
 
 def _midi_duration(performance, tempo_map, start_tick: int, end_tick: int) -> float:
@@ -161,13 +176,13 @@ def midi_features(performance) -> dict:
 
 
 def prepare_dataset(snapshot: Path, data_root: Path, renderer_config: Path, output: Path, *, split: str = "validation",
-                    gallery_cap: int = 4) -> dict:
+                    gallery_cap: int = 4, max_render_requests: int = 50_000) -> dict:
     """Apply the existing PresetShare pairing contract and freeze the real-render benchmark."""
     import yaml
     from obruxo_data.hashing import canonical_sha256
     from obruxo_data.midi import Performance
     from obruxo_data.render.capabilities import RendererCapabilities
-    from obruxo_data.render.base import RenderRequest
+    from obruxo_data.render.base import FULL_CORPUS_RENDERER_ID, RenderRequest
     from obruxo_training.identity import PresetIdentity
 
     if split not in {"train", "validation"}:
@@ -180,8 +195,8 @@ def prepare_dataset(snapshot: Path, data_root: Path, renderer_config: Path, outp
         raise ValueError("private benchmark outputs must be outside the source corpus")
     docs, status, manifest = _load_snapshot(snapshot)
     config = yaml.safe_load(renderer_config.read_text(encoding="utf-8"))
-    if not isinstance(config, dict) or config.get("backend") != "dawdreamer" or not config.get("renderer_id"):
-        raise ValueError("renderer config must identify the verified DawDreamer/Vital profile")
+    if not isinstance(config, dict) or config.get("backend") != "dawdreamer" or config.get("renderer_id") != FULL_CORPUS_RENDERER_ID:
+        raise ValueError("benchmark requires the corpus-qualified Vital profile with curve input and native readback")
     capabilities = RendererCapabilities.from_dict(config.get("capabilities", {}))
     if not capabilities.notes:
         raise ValueError("configured renderer does not support notes")
@@ -217,40 +232,15 @@ def prepare_dataset(snapshot: Path, data_root: Path, renderer_config: Path, outp
             counters[f"preset_excluded:{str(error)[:80]}"] += 1
             continue
 
-    # PresetShare's maintained evaluator owns the direct-child exact-one-MIDI pairing
-    # rules. We ask it to validate the source pairing only; derived audio is disabled.
-    from obruxo_basic_pitch.evaluation.corpus import _evaluate_candidate
-
     by_directory = {}
     for preset in selected_by_state.values():
         source = _safe_source(root, preset["relative_path"])
         by_directory.setdefault(source.parent, []).append(preset)
     for directory, source_presets in sorted(by_directory.items(), key=lambda item: item[0].relative_to(root).as_posix()):
         relative_directory = directory.relative_to(root).as_posix()
-        pair, audit, _ = _evaluate_candidate(directory, metadata={}, output=output,
-                                              allow_derived_render=False, renderer=None)
-        reason = audit.get("reason")
         selected_states = sorted(preset["state_id"] for preset in source_presets)
-        midi_path = None
-        if pair is not None:
-            midi_path = pair.midi_path.resolve(strict=True)
-            preset_path = pair.preset_path.resolve(strict=True) if pair.preset_path else None
-            selected_path = _safe_source(root, source_presets[0]["relative_path"])
-            if len(source_presets) != 1 or preset_path != selected_path or midi_path.parent != directory:
-                pair = None
-                reason = "pair.selected_source_mismatch"
-        elif reason == "pair.missing_audio":
-            # The established helper validates this MIDI before reporting missing
-            # audio; audio remains a newly rendered original-preset input below.
-            candidates = sorted(directory.glob("*.mid"), key=lambda path: path.name)
-            vital_paths = sorted(directory.glob("*.vital"), key=lambda path: path.name)
-            if len(source_presets) == 1 and len(candidates) == 1 and len(vital_paths) == 1:
-                midi_path = candidates[0].resolve(strict=True)
-                selected_path = _safe_source(root, source_presets[0]["relative_path"])
-                if vital_paths[0].resolve(strict=True) != selected_path:
-                    midi_path, reason = None, "pair.selected_source_mismatch"
-            else:
-                reason = "pair.ambiguous"
+        midi_path, reason = (None, "pair.ambiguous") if len(source_presets) != 1 else _paired_source_midi(
+            root, directory, _safe_source(root, source_presets[0]["relative_path"]))
         if midi_path is None:
             counters[f"pair_excluded:{reason or 'pair.unknown'}"] += 1
             pairing_audit.append({"relative_directory": relative_directory, "selected_state_ids": selected_states,
@@ -286,6 +276,7 @@ def prepare_dataset(snapshot: Path, data_root: Path, renderer_config: Path, outp
     for row in sorted(performances, key=lambda item: (item["midi_id"], item["source_state_id"])):
         unique_perf.setdefault(row["midi_id"], row)
     performances = list(unique_perf.values())
+    estimated_render_requests = check_render_budget(len(presets), len(performances), max_render_requests)
     if len(performances) > 1 and len(presets) > 1:
         candidate_sets, episodes = __import__("frozen_retrieval.core", fromlist=["build_episodes"]).build_episodes(
             presets, performances, gallery_cap=gallery_cap)
@@ -343,6 +334,7 @@ def prepare_dataset(snapshot: Path, data_root: Path, renderer_config: Path, outp
                "presets_selected": len(selected_by_state), "presets_verified": len(presets),
                "unique_midi_excerpts": len(performances), "episodes": len(episodes),
                "candidate_sets": len(candidate_sets), "render_requests": plan_count,
+               "render_budget_maximum": max_render_requests, "render_budget_estimate": estimated_render_requests,
                "gallery_size": len(next(iter(candidate_sets.values()))["state_ids"]) if candidate_sets else 0,
                "gallery_midi_pool_size": len(next(iter(candidate_sets.values()))["gallery_midi_ids"]) if candidate_sets else 0,
                "exclusions": dict(sorted(counters.items())),

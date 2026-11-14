@@ -157,14 +157,25 @@ def generate_report(destination: Path, inventory: Path, *, dataset_dir: Path | N
             lines.append(f"Vital render stage: {render.get('accepted', 0)} QA accepted of {render.get('requested', 0)} planned requests; this run rendered {render.get('runs_rendered_this_run', 0)} and reused {render.get('cache_reused_this_run', 0)} cached WAVs in {render.get('wall_seconds_this_run', 0)} seconds.")
         if evaluation:
             lines.extend([f"The comparison uses {evaluation.get('common_episode_count_across_available_arms', 0)} identical episodes across the available arms; held-out reserved sources used: **no**."])
+            coverage = evaluation.get("coverage_by_condition", {})
+            lines.extend(["", "### Render and feature coverage", "",
+                          "| Condition | Planned episodes | Render QA qualified | Excluded | Feature qualified by arm | Common across arms |",
+                          "|---|---:|---:|---:|---|---:|"])
+            for condition, record in sorted(coverage.items()):
+                feature_counts = ", ".join(f"{arm}: {count}" for arm, count in sorted(record.get("feature_qualified_episodes_by_arm", {}).items())) or "none"
+                lines.append(f"| {condition} | {record.get('planned_episodes', 0)} | {record.get('qa_qualified_episodes', 0)} | {record.get('excluded_episodes', 0)} | {feature_counts} | {record.get('common_feature_qualified_episodes_across_arms', 0)} |")
         if not render_path.is_file():
             lines.append("Vital pre-render stage: **not run**.")
         if not arms:
             lines.append("Encoder feature extraction: **not run** for this dataset.")
         if not evaluation:
             lines.append("Retrieval scores: **not run** for this dataset.")
+            if not execution_note:
+                lines.append("Empirical execution remains unfinished: the full real-corpus render matrix, encoder feature caches, and retrieval comparison are incomplete; no quantitative results are claimed.")
     else:
         lines.extend(["No prepared real dataset was supplied to this report command. No raw corpus MIDI or Vital preset was parsed, a benchmark data manifest was not prepared, and Vital renders, encoder extraction, and retrieval evaluation were not executed."])
+        if not execution_note:
+            lines.append("Empirical execution remains unfinished: the full real-corpus render matrix, encoder feature caches, and retrieval comparison are incomplete; no quantitative results are claimed.")
         local_inputs = _local_input_status()
         if local_inputs["snapshot_complete"] and local_inputs["source_root_present"]:
             audit = local_inputs["snapshot_summary"]
@@ -174,11 +185,12 @@ def generate_report(destination: Path, inventory: Path, *, dataset_dir: Path | N
             lines.append(f"Local preparation/render runtime is missing: {', '.join(f'`{name}`' for name in local_inputs['missing_pipeline_modules'])}.")
     if execution_note:
         lines.append(execution_note)
+    lines.append("Controlled patch-perturbation diagnostic: not run; no controlled score is claimed.")
     missing_runtime = sorted({package for candidate in availability.values() for package, value in candidate.get("dependencies", {}).items()
                               if value.get("version") == "missing"})
     lines.extend(["", f"Runtime preflight: Python `{sys.version.split()[0]}`; missing encoder runtime packages: {', '.join(f'`{name}`' for name in missing_runtime) or 'none'}. Checkpoint root supplied: **{'yes' if checkpoint_root else 'no'}**. Vital plugin environment variable configured: **{'yes' if os.environ.get('OBRUXO_VITAL_PLUGIN') else 'no'}**.",
                   "The existing [corpus audit report](../../../training/reports/CORPUS_INPUT_RESULTS.md) records prior static eligibility findings. Those audit counts are not native render eligibility. The separate [PresetShare audit](../../basic_pitch/README.md) has its own pairing rules and counts.", "",
-                  "The default command selects the existing full-preset expression renderer identity, with verified note/polyphony, pitch-bend, channel-pressure, CC 1/64/74, release-velocity and multi-channel capabilities; tempo changes remain unsupported and are counted as exclusions. The note-only renderer remains selectable. Unsupported events are rejected rather than silently removed. Musical spans are complete-note excerpts of 2–8 seconds plus a fixed 2-second release tail; model input is mono and 4–10 seconds, downmixed by channel mean and polyphase-resampled. No shared gain normalization is applied; EnCodec retains its own checkpoint-configured RMS normalization when enabled.", "",
+                  "The default command selects the corpus-qualified full-preset expression renderer identity, including the established curve-input, ignored-empty-map, and native scalar readback policies. It supports note/polyphony, pitch-bend, channel-pressure, CC 1/64/74, release-velocity and multiple channels; tempo changes remain unsupported and are counted as exclusions. Unsupported events are rejected rather than silently removed. Musical spans are complete-note excerpts of 2–8 seconds plus a fixed 2-second release tail; model input is mono and 4–10 seconds, downmixed by channel mean and polyphase-resampled. No shared gain normalization is applied; EnCodec retains its own checkpoint-configured RMS normalization when enabled.", "",
                   "Render and feature stages are independent, resumable commands. Vital remains a single-worker in-process renderer; an asynchronous manifest reader feeds a bounded queue of request batches. Render keys include exact preset/MIDI/excerpt/renderer/policy identities. Feature keys include audio hash, checkpoint digest/revision, loader revision, sample rate, preprocessing, extraction tap, pooling, and FP32 precision. Weights are never downloaded by the run commands. Full paths, identifiers, WAVs, caches, checkpoints, and per-episode results belong in ignored local outputs.", "",
                   "No reconstruction head, source-label warm start, shared-model training, direct patch optimization, or audio-loss training is part of this experiment. No candidate can be recommended for reconstruction until the retrieval comparison has actually run; if results remain unavailable, the decision is inconclusive.", "",
                   "## Frozen-control scope", "",
@@ -205,10 +217,16 @@ def generate_report(destination: Path, inventory: Path, *, dataset_dir: Path | N
                        ("Cross-MIDI common-gallery Recall@5", primary, "recall_at_5"),
                        ("Cross-MIDI common-gallery MRR", primary, "mrr"),
                        ("Cross-MIDI mixed-gallery Recall@1", mixed, "recall_at_1"),
-                       ("Same-MIDI other-patch negative win rate", primary, "same_midi_negative_win"))
+                       ("Same-MIDI other-patch negative win rate", primary, "same_midi_negative_win_rate"),
+                       ("Known source-lineage near-neighbor win rate", primary, "known_near_neighbor_negative_win_rate"))
             for label, record, key in metrics:
                 value = _metric(record, key)
-                value += _interval(record, key)
+                interval_key = key.removesuffix("_rate")
+                value += _interval(record, interval_key)
+                if record and key.endswith("_rate"):
+                    episodes = record.get(f"{interval_key}_episodes", 0)
+                    candidates = record.get(f"{interval_key}_candidates", 0)
+                    value += f" ({episodes} episodes; {candidates} negatives)"
                 lines.append(f"| {label} | {value} | — | frozen backbone; cosine retrieval |")
             lines.append(f"| Gallery candidates / episodes | {primary.get('gallery_size', []) if primary else 'not run'} / {primary.get('episodes', 'not run') if primary else 'not run'} | — | fixed candidate sets across encoders |")
             lines.append(f"| Extraction time / peak memory | {run.get('elapsed_seconds', 'not run') if run else 'not run'} s / {run.get('peak_process_rss_observed_bytes', 'not measured') if run else 'not measured'} bytes | — | local inference only; no training |")

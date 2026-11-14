@@ -15,6 +15,10 @@ from .dataset import _safe_source, validate_dataset_manifests
 RENDER_POLICY_ID = "vital_original_pair_midi_excerpt_44100_stereo_2s-tail_v1"
 
 
+def render_plan_identity(row: dict) -> str:
+    return digest({key: value for key, value in row.items() if key != "request"} | {"render_policy_id": RENDER_POLICY_ID})
+
+
 def _plan_batches(plan_path: Path, performances_path: Path, source_root: Path, batch_size: int):
     from obruxo_data.midi import Performance
     from obruxo_data.render.base import RenderRequest
@@ -98,6 +102,7 @@ def render_dataset(dataset_dir: Path, renderer_config: Path, *, plugin_path: Pat
                    batch_size: int = 32, queue_depth: int = 2) -> dict:
     """Run the durable manifest through a bounded producer/serial Vital consumer."""
     from obruxo_data.render.batch import run_batch, _is_complete
+    from obruxo_data.render.base import FULL_CORPUS_RENDERER_ID
     from obruxo_data.render.vita import VitalRenderer
 
     if batch_size < 1 or queue_depth < 1:
@@ -105,6 +110,8 @@ def render_dataset(dataset_dir: Path, renderer_config: Path, *, plugin_path: Pat
     dataset_dir = dataset_dir.resolve(strict=True)
     summary = json.loads((dataset_dir / "dataset_summary.private.json").read_text(encoding="utf-8"))
     validate_dataset_manifests(dataset_dir, summary)
+    if summary.get("renderer_id") != FULL_CORPUS_RENDERER_ID:
+        raise ValueError("benchmark render manifest does not use the corpus-qualified Vital profile")
     plan_path = dataset_dir / "render_plan.private.jsonl"
     if not plan_path.is_file():
         raise FileNotFoundError(plan_path)
@@ -145,8 +152,7 @@ def render_dataset(dataset_dir: Path, renderer_config: Path, *, plugin_path: Pat
                 break
             rows, requests = item
             for row in rows:
-                plan_identity = digest({key: value for key, value in row.items() if key != "request"} | {"request_id": row["request_id"],
-                                          "render_policy_id": RENDER_POLICY_ID})
+                plan_identity = render_plan_identity(row)
                 old = previous.get(row["request_id"])
                 if old and old["plan_identity"] != plan_identity:
                     raise ValueError("render plan identity drift for an existing request; stale audio is not reused")
@@ -159,10 +165,10 @@ def render_dataset(dataset_dir: Path, renderer_config: Path, *, plugin_path: Pat
                     run_batch(renderer, [request], render_root, workers=1, resume=True)
                 except Exception as error:
                     timings.append(time.perf_counter() - started)
-                    plan_identity = digest({key: value for key, value in row.items() if key != "request"} |
-                                           {"render_policy_id": RENDER_POLICY_ID})
+                    plan_identity = render_plan_identity(row)
                     failure = {"request_id": request.request_id, "plan_identity": plan_identity,
                                "render_policy_id": RENDER_POLICY_ID, "accepted": False,
+                               "source_kind": row["source_kind"],
                                "qa_status": f"render_exception:{type(error).__name__}",
                                "error_type": type(error).__name__}
                     receipts.write(canonical_json(failure) + "\n")
@@ -181,9 +187,9 @@ def render_dataset(dataset_dir: Path, renderer_config: Path, *, plugin_path: Pat
                 if metadata.get("provenance", {}).get("renderer_id") != summary["renderer_id"]:
                     raise ValueError("render provenance profile differs from the frozen renderer identity")
                 accepted, qa_status = _accepted(metadata)
-                receipt = {"request_id": request.request_id, "plan_identity": digest(
-                    {key: value for key, value in row.items() if key != "request"} | {"render_policy_id": RENDER_POLICY_ID}),
+                receipt = {"request_id": request.request_id, "plan_identity": render_plan_identity(row),
                     "render_policy_id": RENDER_POLICY_ID, "audio_sha256": hashlib.sha256(wav_path.read_bytes()).hexdigest(),
+                    "source_kind": row["source_kind"],
                     "duration_seconds": metadata["qa"]["actual_frames"] / metadata["sample_rate"],
                     "renderer_id": metadata["provenance"]["renderer_id"], "qa_status": qa_status,
                     "accepted": accepted, "reused": reused,

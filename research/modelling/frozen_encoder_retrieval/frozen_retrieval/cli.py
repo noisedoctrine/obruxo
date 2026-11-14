@@ -19,7 +19,7 @@ def _defaults() -> dict:
     root = REPO_ROOT / "research/modelling/frozen_encoder_retrieval"
     return {"root": root, "inventory": root / "reports/vital_control_inventory.jsonl",
             "report": root / "reports/FROZEN_ENCODER_RETRIEVAL_RESULTS.md",
-            "renderer": REPO_ROOT / "research/data_generation/configs/renderer_full_expression.yaml"}
+            "renderer": REPO_ROOT / "research/data_generation/configs/renderer_full_corpus.yaml"}
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -39,6 +39,8 @@ def _parser() -> argparse.ArgumentParser:
     prepare.add_argument("--output", type=Path, required=True, help="ignored local output outside the raw data root")
     prepare.add_argument("--split", choices=("train", "validation"), default="validation")
     prepare.add_argument("--gallery-midi-pool-size", type=int, default=4)
+    prepare.add_argument("--max-render-requests", type=int, default=50_000,
+                         help="fail before episode/plan creation if the full matrix exceeds this budget; never truncates")
     render = commands.add_parser("render", help="pre-render a frozen manifest with one serial Vital consumer")
     render.add_argument("--dataset", type=Path, required=True)
     render.add_argument("--renderer-config", type=Path, default=defaults["renderer"])
@@ -79,7 +81,8 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "prepare":
             from .dataset import prepare_dataset
             result = prepare_dataset(args.snapshot, args.data_root, args.renderer_config, args.output,
-                                     split=args.split, gallery_cap=args.gallery_midi_pool_size)
+                                     split=args.split, gallery_cap=args.gallery_midi_pool_size,
+                                     max_render_requests=args.max_render_requests)
         elif args.command == "render":
             from .rendering import render_dataset
             result = render_dataset(args.dataset, args.renderer_config, plugin_path=args.plugin_path,

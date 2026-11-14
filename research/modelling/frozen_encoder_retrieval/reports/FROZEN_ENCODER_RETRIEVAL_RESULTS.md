@@ -7,12 +7,13 @@ Issue: [#152](https://github.com/noisedoctrine/obruxo/issues/152). This report c
 No prepared real dataset was supplied to this report command. No raw corpus MIDI or Vital preset was parsed, a benchmark data manifest was not prepared, and Vital renders, encoder extraction, and retrieval evaluation were not executed.
 Available local inputs: complete audited snapshot at `research/training/outputs/full-curve-corpus-qualified-20261018/snapshot` and its PresetShare source directory. The snapshot census records 9620 discovered files and 131 statically eligible validation states (904 train, 118 reserved). These are pre-existing audit counts; renderer pairing and MIDI compatibility were not evaluated here.
 Local preparation/render runtime is missing: `yaml`, `mido`, `numpy`, `scipy`, `dawdreamer`, `torch`, `transformers`.
-Preparation was attempted against the complete local audit snapshot and PresetShare source root; it stopped before parsing source files because PyYAML is missing. DawDreamer, mido, numpy, scipy, torch, encoder runtimes, the Vital plugin, and pinned local checkpoints are also unavailable, so no render or feature cache was produced.
+Empirical execution is unfinished: prepare stopped before reading source files because PyYAML is missing. No Vital renders, encoder feature caches, or realistic retrieval scores were produced. Issue #152 remains open pending real-corpus results and the controlled patch-perturbation diagnostic.
+Controlled patch-perturbation diagnostic: not run; no controlled score is claimed.
 
-Runtime preflight: Python `3.13.12`; missing encoder runtime packages: `laion_clap`, `librosa`, `muq`, `numpy`, `scipy`, `torch`, `torchaudio`, `transformers`. Checkpoint root supplied: **no**. Vital plugin environment variable configured: **no**.
+Runtime preflight: Python `3.13.12`; missing encoder runtime packages: `easydict`, `einops`, `huggingface_hub`, `laion_clap`, `librosa`, `muq`, `numpy`, `scipy`, `torch`, `torchaudio`, `transformers`, `x_clip`. Checkpoint root supplied: **no**. Vital plugin environment variable configured: **no**.
 The existing [corpus audit report](../../../training/reports/CORPUS_INPUT_RESULTS.md) records prior static eligibility findings. Those audit counts are not native render eligibility. The separate [PresetShare audit](../../basic_pitch/README.md) has its own pairing rules and counts.
 
-The default command selects the existing full-preset expression renderer identity, with verified note/polyphony, pitch-bend, channel-pressure, CC 1/64/74, release-velocity and multi-channel capabilities; tempo changes remain unsupported and are counted as exclusions. The note-only renderer remains selectable. Unsupported events are rejected rather than silently removed. Musical spans are complete-note excerpts of 2–8 seconds plus a fixed 2-second release tail; model input is mono and 4–10 seconds, downmixed by channel mean and polyphase-resampled. No shared gain normalization is applied; EnCodec retains its own checkpoint-configured RMS normalization when enabled.
+The default command selects the corpus-qualified full-preset expression renderer identity, including the established curve-input, ignored-empty-map, and native scalar readback policies. It supports note/polyphony, pitch-bend, channel-pressure, CC 1/64/74, release-velocity and multiple channels; tempo changes remain unsupported and are counted as exclusions. Unsupported events are rejected rather than silently removed. Musical spans are complete-note excerpts of 2–8 seconds plus a fixed 2-second release tail; model input is mono and 4–10 seconds, downmixed by channel mean and polyphase-resampled. No shared gain normalization is applied; EnCodec retains its own checkpoint-configured RMS normalization when enabled.
 
 Render and feature stages are independent, resumable commands. Vital remains a single-worker in-process renderer; an asynchronous manifest reader feeds a bounded queue of request batches. Render keys include exact preset/MIDI/excerpt/renderer/policy identities. Feature keys include audio hash, checkpoint digest/revision, loader revision, sample rate, preprocessing, extraction tap, pooling, and FP32 precision. Weights are never downloaded by the run commands. Full paths, identifiers, WAVs, caches, checkpoints, and per-episode results belong in ignored local outputs.
 
@@ -33,6 +34,7 @@ Checkpoint: `lukewys/laion_clap/music_audioset_epoch_15_esc_90.14.pt`; requested
 | Cross-MIDI common-gallery MRR | not run | — | frozen backbone; cosine retrieval |
 | Cross-MIDI mixed-gallery Recall@1 | not run | — | frozen backbone; cosine retrieval |
 | Same-MIDI other-patch negative win rate | not run | — | frozen backbone; cosine retrieval |
+| Known source-lineage near-neighbor win rate | not run | — | frozen backbone; cosine retrieval |
 | Gallery candidates / episodes | not run / not run | — | fixed candidate sets across encoders |
 | Extraction time / peak memory | not run s / not measured bytes | — | local inference only; no training |
 | Global settings ❌ 0 / 610 | fixed source input | 0 | unchanged original preset; no loss/gradient |
@@ -56,6 +58,7 @@ Checkpoint: `OpenMuQ/MuQ-MuLan-large/pytorch_model.bin`; requested sample rate: 
 | Cross-MIDI common-gallery MRR | not run | — | frozen backbone; cosine retrieval |
 | Cross-MIDI mixed-gallery Recall@1 | not run | — | frozen backbone; cosine retrieval |
 | Same-MIDI other-patch negative win rate | not run | — | frozen backbone; cosine retrieval |
+| Known source-lineage near-neighbor win rate | not run | — | frozen backbone; cosine retrieval |
 | Gallery candidates / episodes | not run / not run | — | fixed candidate sets across encoders |
 | Extraction time / peak memory | not run s / not measured bytes | — | local inference only; no training |
 | Global settings ❌ 0 / 610 | fixed source input | 0 | unchanged original preset; no loss/gradient |
@@ -66,7 +69,7 @@ Checkpoint: `OpenMuQ/MuQ-MuLan-large/pytorch_model.bin`; requested sample rate: 
 | Effects ❌ 0 / 46 | fixed source input | 0 | unchanged original preset; no loss/gradient |
 | Wavetables, curves and samples ❌ 0 / 6 | fixed source input | 0 | unchanged original preset; no loss/gradient |
 
-Unavailable: checkpoint root not configured; missing Python packages: numpy, scipy, torch, muq.
+Unavailable: checkpoint root not configured; missing Python packages: numpy, scipy, torch, muq, torchaudio, librosa, transformers, huggingface_hub, einops, easydict, x_clip.
 
 ### CIR single-timbre AST — official_clip
 
@@ -79,6 +82,7 @@ Checkpoint: `Google Drive: ICASSP26_inst-direct-with-data-aug_final.pt`; request
 | Cross-MIDI common-gallery MRR | not run | — | frozen backbone; cosine retrieval |
 | Cross-MIDI mixed-gallery Recall@1 | not run | — | frozen backbone; cosine retrieval |
 | Same-MIDI other-patch negative win rate | not run | — | frozen backbone; cosine retrieval |
+| Known source-lineage near-neighbor win rate | not run | — | frozen backbone; cosine retrieval |
 | Gallery candidates / episodes | not run / not run | — | fixed candidate sets across encoders |
 | Extraction time / peak memory | not run s / not measured bytes | — | local inference only; no training |
 | Global settings ❌ 0 / 610 | fixed source input | 0 | unchanged original preset; no loss/gradient |
@@ -102,6 +106,7 @@ Checkpoint: `lpepino/beats_ckpts/BEATs_iter3_plus_AS2M.pt`; requested sample rat
 | Cross-MIDI common-gallery MRR | not run | — | frozen backbone; cosine retrieval |
 | Cross-MIDI mixed-gallery Recall@1 | not run | — | frozen backbone; cosine retrieval |
 | Same-MIDI other-patch negative win rate | not run | — | frozen backbone; cosine retrieval |
+| Known source-lineage near-neighbor win rate | not run | — | frozen backbone; cosine retrieval |
 | Gallery candidates / episodes | not run / not run | — | fixed candidate sets across encoders |
 | Extraction time / peak memory | not run s / not measured bytes | — | local inference only; no training |
 | Global settings ❌ 0 / 610 | fixed source input | 0 | unchanged original preset; no loss/gradient |
@@ -125,6 +130,7 @@ Checkpoint: `lpepino/beats_ckpts/BEATs_iter3_plus_AS2M.pt`; requested sample rat
 | Cross-MIDI common-gallery MRR | not run | — | frozen backbone; cosine retrieval |
 | Cross-MIDI mixed-gallery Recall@1 | not run | — | frozen backbone; cosine retrieval |
 | Same-MIDI other-patch negative win rate | not run | — | frozen backbone; cosine retrieval |
+| Known source-lineage near-neighbor win rate | not run | — | frozen backbone; cosine retrieval |
 | Gallery candidates / episodes | not run / not run | — | fixed candidate sets across encoders |
 | Extraction time / peak memory | not run s / not measured bytes | — | local inference only; no training |
 | Global settings ❌ 0 / 610 | fixed source input | 0 | unchanged original preset; no loss/gradient |
@@ -148,6 +154,7 @@ Checkpoint: `facebook/encodec_24khz`; requested sample rate: 24000 Hz; represent
 | Cross-MIDI common-gallery MRR | not run | — | frozen backbone; cosine retrieval |
 | Cross-MIDI mixed-gallery Recall@1 | not run | — | frozen backbone; cosine retrieval |
 | Same-MIDI other-patch negative win rate | not run | — | frozen backbone; cosine retrieval |
+| Known source-lineage near-neighbor win rate | not run | — | frozen backbone; cosine retrieval |
 | Gallery candidates / episodes | not run / not run | — | fixed candidate sets across encoders |
 | Extraction time / peak memory | not run s / not measured bytes | — | local inference only; no training |
 | Global settings ❌ 0 / 610 | fixed source input | 0 | unchanged original preset; no loss/gradient |
@@ -171,6 +178,7 @@ Checkpoint: `facebook/encodec_24khz`; requested sample rate: 24000 Hz; represent
 | Cross-MIDI common-gallery MRR | not run | — | frozen backbone; cosine retrieval |
 | Cross-MIDI mixed-gallery Recall@1 | not run | — | frozen backbone; cosine retrieval |
 | Same-MIDI other-patch negative win rate | not run | — | frozen backbone; cosine retrieval |
+| Known source-lineage near-neighbor win rate | not run | — | frozen backbone; cosine retrieval |
 | Gallery candidates / episodes | not run / not run | — | fixed candidate sets across encoders |
 | Extraction time / peak memory | not run s / not measured bytes | — | local inference only; no training |
 | Global settings ❌ 0 / 610 | fixed source input | 0 | unchanged original preset; no loss/gradient |
@@ -194,6 +202,7 @@ Checkpoint: `descript/dac_44khz`; requested sample rate: 44100 Hz; representatio
 | Cross-MIDI common-gallery MRR | not run | — | frozen backbone; cosine retrieval |
 | Cross-MIDI mixed-gallery Recall@1 | not run | — | frozen backbone; cosine retrieval |
 | Same-MIDI other-patch negative win rate | not run | — | frozen backbone; cosine retrieval |
+| Known source-lineage near-neighbor win rate | not run | — | frozen backbone; cosine retrieval |
 | Gallery candidates / episodes | not run / not run | — | fixed candidate sets across encoders |
 | Extraction time / peak memory | not run s / not measured bytes | — | local inference only; no training |
 | Global settings ❌ 0 / 610 | fixed source input | 0 | unchanged original preset; no loss/gradient |
@@ -217,6 +226,7 @@ Checkpoint: `descript/dac_44khz`; requested sample rate: 44100 Hz; representatio
 | Cross-MIDI common-gallery MRR | not run | — | frozen backbone; cosine retrieval |
 | Cross-MIDI mixed-gallery Recall@1 | not run | — | frozen backbone; cosine retrieval |
 | Same-MIDI other-patch negative win rate | not run | — | frozen backbone; cosine retrieval |
+| Known source-lineage near-neighbor win rate | not run | — | frozen backbone; cosine retrieval |
 | Gallery candidates / episodes | not run / not run | — | fixed candidate sets across encoders |
 | Extraction time / peak memory | not run s / not measured bytes | — | local inference only; no training |
 | Global settings ❌ 0 / 610 | fixed source input | 0 | unchanged original preset; no loss/gradient |

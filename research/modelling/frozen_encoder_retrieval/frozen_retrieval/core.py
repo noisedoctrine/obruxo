@@ -76,10 +76,18 @@ def build_episodes(presets: Sequence[dict], performances: Sequence[dict], *, gal
         ordered_midi = stable_order(midi_pool, "midi_id", salt=f"{POLICY_ID}:{split}:gallery-query-v1")
         gallery_pool = ordered_midi[:min(len(ordered_midi), gallery_cap)]
         gallery_midi_ids = [row["midi_id"] for row in gallery_pool]
+        states_by_family = defaultdict(list)
+        for row in members:
+            states_by_family[row.get("family_id", row["state_id"])].append(row["state_id"])
         candidate_set_id = digest({"split": split, "candidate_state_ids": [row["state_id"] for row in members],
+                                   "family_by_state": {row["state_id"]: row.get("family_id", row["state_id"]) for row in members},
                                    "gallery_midi_ids": gallery_midi_ids, "policy": POLICY_ID})
         candidate_sets[candidate_set_id] = {"split": split, "state_ids": [row["state_id"] for row in members],
                                             "family_by_state": {row["state_id"]: row.get("family_id", row["state_id"]) for row in members},
+                                            "known_near_neighbor_state_ids_by_state": {
+                                                row["state_id"]: sorted(state for state in states_by_family[row.get("family_id", row["state_id"])]
+                                                                        if state != row["state_id"])
+                                                for row in members},
                                             "gallery_midi_ids": gallery_midi_ids}
         for preset in members:
             queries = ordered_midi
@@ -122,6 +130,16 @@ def build_episodes(presets: Sequence[dict], performances: Sequence[dict], *, gal
                     episodes.append(mixed)
     episodes.sort(key=lambda row: row["episode_id"])
     return candidate_sets, episodes
+
+
+def check_render_budget(preset_count: int, performance_count: int, maximum: int) -> int:
+    if min(preset_count, performance_count) < 0 or maximum < 1:
+        raise ValueError("render counts must be non-negative and maximum must be positive")
+    requests = preset_count * performance_count
+    if requests > maximum:
+        raise ValueError(f"full preset × MIDI render matrix requires {requests:,} requests, above the configured "
+                         f"budget of {maximum:,}; raise --max-render-requests explicitly or choose a smaller source split")
+    return requests
 
 
 def _duration_band(value):
