@@ -1,6 +1,6 @@
 # Basic reconstruction experiment protocol
 
-Revised 31 October 2026. The [training plan](../modelling/TRAINING_PLAN.md) sets priorities; this document defines the common experiment requirements. The [review](reports/TRAINING_REVIEW_20261031.md) preserves the reasoning and evidence. Existing cards remain authoritative for their frozen runs. The [previous detailed protocol](https://github.com/noisedoctrine/obruxo/blob/ced6b0b/research/training/STAGED_RECONSTRUCTION.md) remains available; this consolidation changes no recorded result, running deadline or split.
+Revised 14 November 2026. The [training plan](../modelling/TRAINING_PLAN.md) sets priorities; this document defines the common experiment requirements. The [review](reports/TRAINING_REVIEW_20261031.md) preserves the reasoning and evidence. Existing cards remain authoritative for their frozen runs. This update records completed outcomes without changing data splits or frozen gates. The [previous detailed protocol](https://github.com/noisedoctrine/obruxo/blob/ced6b0b/research/training/STAGED_RECONSTRUCTION.md) remains available as historical context.
 
 ## Current contract and status
 
@@ -10,7 +10,7 @@ Stage A predicts nine continuous controls, three oscillator-unison scores and tw
 |---|---|---|
 | A0 | Legal differentiable/control interfaces and bounded resources | Passed for the declared basic implementation. |
 | A1 | Proposed sound updates improve real native audio | Corrected native estimator/production-choice path passed bounded qualification. Learned helpers failed and remain refused. |
-| A2 | One shared audio-only model learns reliable basic reconstruction | Unfinished. Direct fits pass individually; shared fits fail important input/preservation gates. Balanced-data fit is running. |
+| A2 | One shared audio-only model learns reliable basic reconstruction | Unfinished. Direct fits pass individually; shared fits fail important input/preservation gates. The completed balanced sound fit and a separate balanced label-only learnability check both failed their admission/fit gates. |
 | A3 | Independent quality, replication, listening and usable bundle | Unfinished and conditional on A2. Some inference/runtime components already pass. |
 
 Pipeline connectivity is not A1, A1 is not A2, and a three-patch fit is not A3. No implementation checklist can substitute for the next stage's evidence.
@@ -31,13 +31,13 @@ Native feedback is a measured numerical estimate. Production/export uses determi
 
 ## The next decision
 
-Complete and audit the [balanced fit](reports/BALANCED_BASIC_FIT_CARD.md) unchanged. It reuses the audited sound-only control, trains on identical note/duration coverage for all three patches, and retains 104 old plus 36 grid evaluation cells. The additional eighteen reciprocal cells are training-only. Its 48-update/six-hour/8,000-request limits and full per-input/six-group/earlier-32 gates are not revised here.
+The balanced sound fit and its independent audit are complete. It trained with real-Vital sound feedback across three pitches and two note lengths, but failed the unchanged per-sound, most pitch-grid, wider-input and preservation gates; no model is admitted. Do not loosen the gates.
 
-Before another long fit, isolate process/plugin/state/synthesis/QA costs on the actual basic path, then qualify and measure an efficient worker policy. A twelve-render profile confirmed sample equality but did not establish a reuse speedup or pure DSP cost. Do not translate the old `render_seconds` timer into synthesis-only speed.
+A bounded label-only check then ran on the same 18 balanced clips. After 48 updates, source-setting error improved by 30%, but remained above the preset fit target; only 22 of 36 category choices were correct. More importantly, the real-Vital mean spectral score worsened 29% and MR-STFT worsened 20% against the starting prediction. Means worsened in all three sound groups. This shows that closer source numbers alone do not establish better sound.
 
-If balanced learning fails, the next learning diagnostic is an inexpensive shared supervised fit on that same small balanced bank, with real-render endpoints. It asks whether the inputs/features/model can learn a valid mapping. It is not final parameter-matching training and does not authorize another unchanged large initialization. If that baseline succeeds and native learning fails, test feedback/exposure or a qualified optimization-and-distillation route before adding architecture. Keep these as alternative decisions, not a factorial sweep.
+A separate [four-schedule screen](reports/PRESET_LOSS_SCHEDULE_RESULTS.md) already compared a linear 90-to-0 fade, a fixed normalized 90/10 mixture, a paper-style fixed coefficient, and a 100-update label warm start followed by audio-only training. Its decay version had the best raw MR-STFT; the paper-style fixed version had the best gain-matched MR-STFT. The direct comparison was inconclusive. It used a frozen audio proxy for training, a different model and training bank, real Vital for final scoring, and only one validation pitch per sound. It does not decide the schedule for the balanced real-Vital training path, and is not a full paper reproduction.
 
-Input LUFS/peak normalization remains a later independent comparison; it does not enter the running fit. The plan specifies preserving the gain and original-level loss/export semantics before that experiment is implemented.
+The balanced real-Vital sound fit already tested audio feedback on the current bank and pitch grid, so do not spend more renders on a redundant signal check. Next, inspect the audited run's retained update trace and per-sound/per-performance results to understand why only some groups improved. Reuse compatible evidence; do not change the 14 outputs, relax gates or touch reserve/test data. Make another bounded native run only after the existing evidence supports a specific change.
 
 ## Data and evaluation
 
