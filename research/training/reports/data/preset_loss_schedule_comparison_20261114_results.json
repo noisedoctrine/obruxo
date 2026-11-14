@@ -1,0 +1,2674 @@
+{
+  "format": "preset_audio_loss_schedule_comparison_results_v1",
+  "experiment_id": "preset_audio_loss_schedule_comparison_20261114",
+  "plan_id": "b2f2687c1ddd696d22cdcd067a0017592e8f8e7afa73307e617136854c0ecb7f",
+  "plan": {
+    "arms": {
+      "decay_normalized_90_to_0": "initial-loss-normalized contributions: linearly 90% parameter/10% audio to 0% parameter/100% audio over 600 updates",
+      "fixed_normalized_90_10": "initial-loss-normalized contributions: 90% parameter, 10% audio throughout",
+      "paper_fixed_lambda1": "parameter_loss + audio_proxy_loss, fixed coefficient 1 throughout; adapted losses, not a full paper reproduction",
+      "warm100_then_audio": "100 parameter-only warm-start updates, then 500 audio-proxy-only updates"
+    },
+    "batch_size": 64,
+    "checkpoints": {
+      "feature": "456689eba49e0352d0ce55da7b9fbe5d7893b6075edd4a5c4e329759399c4100",
+      "proxy": "99ec35ff8faedc58f0b9a93eac899fc76b298ad4f5bdf4f7f04383fe27f9fd07"
+    },
+    "distinct_training_states": 172,
+    "evaluation": {
+      "final_test_used": false,
+      "metrics": [
+        "raw stereo MR-STFT",
+        "gain-matched stereo MR-STFT",
+        "relative RMS"
+      ],
+      "patches": 21,
+      "pitch": 55,
+      "renderer": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+      "selection": "actual Vital audio only",
+      "split": "validation"
+    },
+    "experiment": "preset_audio_loss_schedule_comparison_v1",
+    "initial_audio_loss_scale": 0.3757658004760742,
+    "initial_parameter_loss_scale": 1.8654794692993164,
+    "learning_rate": {
+      "optimizer_resets_at_update_101_for_all_arms": true,
+      "updates_101_to_600": 0.0002,
+      "updates_1_to_100": 0.001
+    },
+    "phase": {
+      "repeat_policy": "phase locked by experiment contract",
+      "settings": {
+        "osc_1_phase": 0.5,
+        "osc_1_random_phase": 0.0,
+        "osc_2_phase": 0.5,
+        "osc_2_random_phase": 0.0,
+        "osc_3_phase": 0.5,
+        "osc_3_random_phase": 0.0,
+        "sample_random_phase": 0.0
+      }
+    },
+    "plan_id": "b2f2687c1ddd696d22cdcd067a0017592e8f8e7afa73307e617136854c0ecb7f",
+    "proxy": "same fixed feature proxy trained on actual Vital renders for all arms; proxy updates are not compared in this experiment",
+    "question": "Does gradually reducing preset-setting loss outperform keeping both losses on or switching abruptly after warm start?",
+    "same_initial_weights_batches_rng_and_proxy": true,
+    "source_sha256": {
+      "research\\training\\obruxo_training\\codec.py": "a9e0095d0f45f80d25c1f30b0bc630b6ab93a41a4a62601d116db36d94435264",
+      "research\\training\\obruxo_training\\features.py": "83ef8178442dc467b7985c67915a136650bc83e0248237f8bb12bdd452fae951",
+      "research\\training\\obruxo_training\\model.py": "ee5cb2c6fcdc04e1ea327db3aa8cc08184dc0a4ee3a2bf2a481ceff227e1c4cb",
+      "research\\training\\outputs\\pitch-stability-consistency-20261113\\run_experiment.py": "df0b31dba873faccf7e83aa365fb53516d92cf59596bac2173cb8dfadb2d634a",
+      "research\\training\\outputs\\pitch-stability-consistency-20261113\\run_feature_proxy.py": "9d07639d565df41f403f623175a7754c65398880981d835f7327bf2d5862234a",
+      "research\\training\\outputs\\pitch-stability-consistency-20261113\\run_loss_schedule_comparison.py": "c4ac17916a35c3fa685c81bee350b64592278910f548a7a459ab4a1fdc4ca849"
+    },
+    "training_views": 256,
+    "updates_per_arm": 600
+  },
+  "training": {
+    "distinct_training_states": 172,
+    "training_views": 256,
+    "updates_per_version": 600,
+    "batch_size": 64,
+    "seed": 0,
+    "same_starting_weights_batches_rng_and_proxy": true,
+    "optimizer": "AdamW, weight decay 0.001; reset after update 100 for all versions",
+    "learning_rate": {
+      "optimizer_resets_at_update_101_for_all_arms": true,
+      "updates_101_to_600": 0.0002,
+      "updates_1_to_100": 0.001
+    },
+    "category_forward": "hard Gumbel-softmax; temperature 1.0 to 0.5",
+    "proxy": "frozen audio-feature predictor trained from actual Vital renders; it provides training gradients; Vital itself is not differentiated",
+    "initial_loss_scales": {
+      "source_setting": 1.8654794692993164,
+      "audio_proxy": 0.3757658004760742
+    },
+    "versions": {
+      "decay_normalized_90_to_0": "initial-loss-normalized contributions: linearly 90% parameter/10% audio to 0% parameter/100% audio over 600 updates",
+      "fixed_normalized_90_10": "initial-loss-normalized contributions: 90% parameter, 10% audio throughout",
+      "paper_fixed_lambda1": "parameter_loss + audio_proxy_loss, fixed coefficient 1 throughout; adapted losses, not a full paper reproduction",
+      "warm100_then_audio": "100 parameter-only warm-start updates, then 500 audio-proxy-only updates"
+    },
+    "checkpoints": {
+      "feature": "456689eba49e0352d0ce55da7b9fbe5d7893b6075edd4a5c4e329759399c4100",
+      "proxy": "99ec35ff8faedc58f0b9a93eac899fc76b298ad4f5bdf4f7f04383fe27f9fd07"
+    },
+    "training_history": {
+      "decay_normalized_90_to_0": [
+        {
+          "audio_proxy_loss": 0.3757658004760742,
+          "objective": 1.0,
+          "parameter_loss": 1.8654794692993164,
+          "source_contribution": 0.9,
+          "step": 1,
+          "temperature": 1.0
+        },
+        {
+          "audio_proxy_loss": 0.15319667756557465,
+          "objective": 0.6835842132568359,
+          "parameter_loss": 1.44562566280365,
+          "source_contribution": 0.7512520868113522,
+          "step": 100,
+          "temperature": 0.9173622704507512
+        },
+        {
+          "audio_proxy_loss": 0.11902257800102234,
+          "objective": 0.5332505702972412,
+          "parameter_loss": 1.262901782989502,
+          "source_contribution": 0.6010016694490818,
+          "step": 200,
+          "temperature": 0.833889816360601
+        },
+        {
+          "audio_proxy_loss": 0.10168486833572388,
+          "objective": 0.47201406955718994,
+          "parameter_loss": 1.3383551836013794,
+          "source_contribution": 0.4507512520868114,
+          "step": 300,
+          "temperature": 0.7504173622704507
+        },
+        {
+          "audio_proxy_loss": 0.09923812001943588,
+          "objective": 0.3743250370025635,
+          "parameter_loss": 1.1769582033157349,
+          "source_contribution": 0.3005008347245409,
+          "step": 400,
+          "temperature": 0.6669449081803005
+        },
+        {
+          "audio_proxy_loss": 0.11512717604637146,
+          "objective": 0.3631778359413147,
+          "parameter_loss": 1.2767349481582642,
+          "source_contribution": 0.15025041736227046,
+          "step": 500,
+          "temperature": 0.5834724540901502
+        },
+        {
+          "audio_proxy_loss": 0.08624044805765152,
+          "objective": 0.22950585186481476,
+          "parameter_loss": 1.304731011390686,
+          "source_contribution": 0.0,
+          "step": 600,
+          "temperature": 0.5
+        }
+      ],
+      "fixed_normalized_90_10": [
+        {
+          "audio_proxy_loss": 0.3757658004760742,
+          "objective": 1.0,
+          "parameter_loss": 1.8654794692993164,
+          "source_contribution": 0.9,
+          "step": 1,
+          "temperature": 1.0
+        },
+        {
+          "audio_proxy_loss": 0.1687471866607666,
+          "objective": 0.7152099609375,
+          "parameter_loss": 1.389372706413269,
+          "source_contribution": 0.9,
+          "step": 100,
+          "temperature": 0.9173622704507512
+        },
+        {
+          "audio_proxy_loss": 0.1264827996492386,
+          "objective": 0.6311690211296082,
+          "parameter_loss": 1.2384898662567139,
+          "source_contribution": 0.9,
+          "step": 200,
+          "temperature": 0.833889816360601
+        },
+        {
+          "audio_proxy_loss": 0.11328975111246109,
+          "objective": 0.6561746001243591,
+          "parameter_loss": 1.2975976467132568,
+          "source_contribution": 0.9,
+          "step": 300,
+          "temperature": 0.7504173622704507
+        },
+        {
+          "audio_proxy_loss": 0.10997001081705093,
+          "objective": 0.5497188568115234,
+          "parameter_loss": 1.0787721872329712,
+          "source_contribution": 0.9,
+          "step": 400,
+          "temperature": 0.6669449081803005
+        },
+        {
+          "audio_proxy_loss": 0.12895314395427704,
+          "objective": 0.535271406173706,
+          "parameter_loss": 1.0383548736572266,
+          "source_contribution": 0.9,
+          "step": 500,
+          "temperature": 0.5834724540901502
+        },
+        {
+          "audio_proxy_loss": 0.10221768170595169,
+          "objective": 0.4717895984649658,
+          "parameter_loss": 0.9215201735496521,
+          "source_contribution": 0.9,
+          "step": 600,
+          "temperature": 0.5
+        }
+      ],
+      "paper_fixed_lambda1": [
+        {
+          "audio_proxy_loss": 0.3757658004760742,
+          "objective": 2.2412452697753906,
+          "parameter_loss": 1.8654794692993164,
+          "source_contribution": 0.8323405981063843,
+          "step": 1,
+          "temperature": 1.0
+        },
+        {
+          "audio_proxy_loss": 0.161812886595726,
+          "objective": 1.6306365728378296,
+          "parameter_loss": 1.4688236713409424,
+          "source_contribution": 0.9007670283317566,
+          "step": 100,
+          "temperature": 0.9173622704507512
+        },
+        {
+          "audio_proxy_loss": 0.13092298805713654,
+          "objective": 1.4144549369812012,
+          "parameter_loss": 1.283531904220581,
+          "source_contribution": 0.9074392318725586,
+          "step": 200,
+          "temperature": 0.833889816360601
+        },
+        {
+          "audio_proxy_loss": 0.10613320022821426,
+          "objective": 1.4388551712036133,
+          "parameter_loss": 1.3327219486236572,
+          "source_contribution": 0.9262377023696899,
+          "step": 300,
+          "temperature": 0.7504173622704507
+        },
+        {
+          "audio_proxy_loss": 0.10121002793312073,
+          "objective": 1.2573261260986328,
+          "parameter_loss": 1.1561161279678345,
+          "source_contribution": 0.9195038080215454,
+          "step": 400,
+          "temperature": 0.6669449081803005
+        },
+        {
+          "audio_proxy_loss": 0.12164167314767838,
+          "objective": 1.3429900407791138,
+          "parameter_loss": 1.2213484048843384,
+          "source_contribution": 0.9094247817993164,
+          "step": 500,
+          "temperature": 0.5834724540901502
+        },
+        {
+          "audio_proxy_loss": 0.09513285756111145,
+          "objective": 1.1657843589782715,
+          "parameter_loss": 1.0706515312194824,
+          "source_contribution": 0.9183958768844604,
+          "step": 600,
+          "temperature": 0.5
+        }
+      ],
+      "warm100_then_audio": [
+        {
+          "audio_proxy_loss": 0.3757658004760742,
+          "objective": 1.8654794692993164,
+          "parameter_loss": 1.8654794692993164,
+          "source_contribution": 1.0,
+          "step": 1,
+          "temperature": 1.0
+        },
+        {
+          "audio_proxy_loss": 0.2445073276758194,
+          "objective": 1.3282405138015747,
+          "parameter_loss": 1.3282405138015747,
+          "source_contribution": 1.0,
+          "step": 100,
+          "temperature": 0.9173622704507512
+        },
+        {
+          "audio_proxy_loss": 0.12093818932771683,
+          "objective": 0.12093818932771683,
+          "parameter_loss": 1.383794903755188,
+          "source_contribution": 0.0,
+          "step": 200,
+          "temperature": 0.833889816360601
+        },
+        {
+          "audio_proxy_loss": 0.0983404591679573,
+          "objective": 0.0983404591679573,
+          "parameter_loss": 1.8778499364852905,
+          "source_contribution": 0.0,
+          "step": 300,
+          "temperature": 0.7504173622704507
+        },
+        {
+          "audio_proxy_loss": 0.102260522544384,
+          "objective": 0.102260522544384,
+          "parameter_loss": 3.272573232650757,
+          "source_contribution": 0.0,
+          "step": 400,
+          "temperature": 0.6669449081803005
+        },
+        {
+          "audio_proxy_loss": 0.10900577902793884,
+          "objective": 0.10900577902793884,
+          "parameter_loss": 4.340506553649902,
+          "source_contribution": 0.0,
+          "step": 500,
+          "temperature": 0.5834724540901502
+        },
+        {
+          "audio_proxy_loss": 0.08725752681493759,
+          "objective": 0.08725752681493759,
+          "parameter_loss": 5.025294780731201,
+          "source_contribution": 0.0,
+          "step": 600,
+          "temperature": 0.5
+        }
+      ]
+    },
+    "model_parameter_count": 355806,
+    "dense_outputs": 14,
+    "decoded_codec_settings": 11,
+    "model_checkpoint_sha256": {
+      "decay_normalized_90_to_0": "a8f6fea1ce5263fc114b241c91470f92c14e39c33c4e97ae94f54b138d1508c8",
+      "paper_fixed_lambda1": "3bb708919d199eb7ab3a249c891e7822654a7ca510963686dc76f9d7cad7c7ae",
+      "fixed_normalized_90_10": "a5f2209d845b60f39f93c856541e0f5c164c9d2c3582312d431a66f4d013cbe6",
+      "warm100_then_audio": "7a5c4b4a5be8cb04158b3583d9d423c75270754961d76aebbb02a143252cc8fe"
+    }
+  },
+  "validation": {
+    "split": "validation",
+    "source_families": 21,
+    "one_per_family_pitch": 55,
+    "renderer": "vital-1.6.4-vst3-sha256-a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1-dawdreamer-0.8.3-state-verified-v2",
+    "evaluation_uses_actual_vital": true,
+    "native_render_count": 105,
+    "fixed_phase_settings": {
+      "osc_1_phase": 0.5,
+      "osc_1_random_phase": 0.0,
+      "osc_2_phase": 0.5,
+      "osc_2_random_phase": 0.0,
+      "osc_3_phase": 0.5,
+      "osc_3_random_phase": 0.0,
+      "sample_random_phase": 0.0
+    },
+    "final_test_used": false,
+    "lower_is_better": true,
+    "aggregates": {
+      "decay_normalized_90_to_0": {
+        "mean_gain_matched_mrstft": 1.3120265573499692,
+        "mean_mrstft": 1.1358494451712993,
+        "mean_relative_rms": 0.23816168042165892
+      },
+      "fixed_normalized_90_10": {
+        "mean_gain_matched_mrstft": 1.2838161844346256,
+        "mean_mrstft": 1.3281118849676754,
+        "mean_relative_rms": 0.3949227541285966
+      },
+      "paper_fixed_lambda1": {
+        "mean_gain_matched_mrstft": 1.247217231917949,
+        "mean_mrstft": 1.180869621121221,
+        "mean_relative_rms": 0.30433502904183807
+      },
+      "warm100_then_audio": {
+        "mean_gain_matched_mrstft": 1.340703373390531,
+        "mean_mrstft": 1.3540270904463436,
+        "mean_relative_rms": 0.26859228675900904
+      }
+    },
+    "paired_vs_abrupt_100_step_warm_start": {
+      "decay_normalized_90_to_0": {
+        "bootstrap_95_interval": [
+          -0.44152669061330097,
+          -0.05838049111946948
+        ],
+        "mean_delta_mrstft": -0.21817764527504407,
+        "patches": 21,
+        "wins": 17
+      },
+      "fixed_normalized_90_10": {
+        "bootstrap_95_interval": [
+          -0.2841306922454683,
+          0.22235493472230308
+        ],
+        "mean_delta_mrstft": -0.025915205478668234,
+        "patches": 21,
+        "wins": 11
+      },
+      "paper_fixed_lambda1": {
+        "bootstrap_95_interval": [
+          -0.3961298858835583,
+          0.00939270400309131
+        ],
+        "mean_delta_mrstft": -0.17315746932512238,
+        "patches": 21,
+        "wins": 11
+      }
+    },
+    "additional_descriptive_paired_comparisons": {
+      "decay_normalized_90_to_0_minus_paper_fixed_lambda1": {
+        "mrstft": {
+          "mean_delta": -0.045020175949921706,
+          "wins_left": 12,
+          "wins_right": 9,
+          "bootstrap_95_interval": [
+            -0.14664540043662472,
+            0.05729275370637567
+          ],
+          "paired_unit": "validation sound family"
+        },
+        "gain_matched_mrstft": {
+          "mean_delta": 0.06480932543202046,
+          "wins_left": 9,
+          "wins_right": 12,
+          "bootstrap_95_interval": [
+            -0.130141904394305,
+            0.2688963161485771
+          ],
+          "paired_unit": "validation sound family"
+        },
+        "relative_rms": {
+          "mean_delta": -0.06617334862017915,
+          "wins_left": 14,
+          "wins_right": 7,
+          "bootstrap_95_interval": [
+            -0.14446895665799578,
+            0.004364624077321156
+          ],
+          "paired_unit": "validation sound family"
+        }
+      },
+      "decay_normalized_90_to_0_minus_fixed_normalized_90_10": {
+        "mrstft": {
+          "mean_delta": -0.19226243979637586,
+          "wins_left": 14,
+          "wins_right": 7,
+          "bootstrap_95_interval": [
+            -0.4135750705627576,
+            -0.0013607004273032757
+          ],
+          "paired_unit": "validation sound family"
+        },
+        "gain_matched_mrstft": {
+          "mean_delta": 0.028210372915343594,
+          "wins_left": 9,
+          "wins_right": 12,
+          "bootstrap_95_interval": [
+            -0.18672656863040868,
+            0.24197713221822464
+          ],
+          "paired_unit": "validation sound family"
+        },
+        "relative_rms": {
+          "mean_delta": -0.15676107370693768,
+          "wins_left": 14,
+          "wins_right": 7,
+          "bootstrap_95_interval": [
+            -0.37001300943305804,
+            -0.00319807807016854
+          ],
+          "paired_unit": "validation sound family"
+        }
+      },
+      "decay_normalized_90_to_0_minus_warm100_then_audio": {
+        "mrstft": {
+          "mean_delta": -0.21817764527504407,
+          "wins_left": 17,
+          "wins_right": 4,
+          "bootstrap_95_interval": [
+            -0.44152669061330097,
+            -0.05838049111946948
+          ],
+          "paired_unit": "validation sound family"
+        },
+        "gain_matched_mrstft": {
+          "mean_delta": -0.028676816040561375,
+          "wins_left": 11,
+          "wins_right": 10,
+          "bootstrap_95_interval": [
+            -0.14051269227195362,
+            0.05457437292687461
+          ],
+          "paired_unit": "validation sound family"
+        },
+        "relative_rms": {
+          "mean_delta": -0.030430606337350105,
+          "wins_left": 10,
+          "wins_right": 11,
+          "bootstrap_95_interval": [
+            -0.1137666517155421,
+            0.03599501463624959
+          ],
+          "paired_unit": "validation sound family"
+        }
+      }
+    },
+    "cases": [
+      {
+        "case": 0,
+        "state_id": "03227a3623949baf7f30aeae68f338cc1dcad8c4d3a2eae48365c84c516bb389",
+        "pitch": 55,
+        "source_audio_sha256": "502445cac2b24688c55a4a2be6df227e9de4252b40b447cca44bac888077d16c",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 1.4421874483426411,
+            "matched_gain": 0.2853501635622311,
+            "mrstft": 1.405066246787707,
+            "relative_rms": 0.09818145632743835
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 1.3911707599957783,
+            "matched_gain": 0.2764951112820617,
+            "mrstft": 1.503759652376175,
+            "relative_rms": 0.3495487868785858
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 1.8927207986513774,
+            "matched_gain": 0.3559593577294098,
+            "mrstft": 1.6518314878145854,
+            "relative_rms": 0.15301401913166046
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 1.4822884301344554,
+            "matched_gain": 0.3362483245303373,
+            "mrstft": 1.4323090463876724,
+            "relative_rms": 0.0665745735168457
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.34058165550231934,
+              0.45301371812820435,
+              0.5727500319480896,
+              0.6571428571428571,
+              0.3,
+              0.6881652474403381,
+              0.460309773683548,
+              0.32618585228919983,
+              0.41435182094573975
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.3846137821674347,
+              0.46249261498451233,
+              0.5703281164169312,
+              0.6571428571428571,
+              0.3,
+              0.6306212544441223,
+              0.5450950264930725,
+              0.32473886013031006,
+              0.4246905446052551
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.3899479806423187,
+              0.49138274788856506,
+              0.5385236144065857,
+              0.7618221044540405,
+              0.37258613109588623,
+              0.6491431593894958,
+              0.5196678638458252,
+              0.34581929445266724,
+              0.4707128703594208
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.14912672340869904,
+              0.4475419521331787,
+              0.48584064841270447,
+              0.6571428571428571,
+              0.3,
+              0.649601936340332,
+              0.4886106252670288,
+              0.428209125995636,
+              0.5819641351699829
+            ]
+          }
+        }
+      },
+      {
+        "case": 1,
+        "state_id": "16489e4a31e3008ae347a1adc220b4c396c4db62250660a3b3bf5a95eb23e076",
+        "pitch": 55,
+        "source_audio_sha256": "0312d9a3befdda484d034e54390e301c42e73830d83a8337a3edbe8dcddb4bfb",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 0.8989288409550985,
+            "matched_gain": 0.9391999876551489,
+            "mrstft": 0.8915004630883535,
+            "relative_rms": 0.21832311153411865
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 1.6066899597644806,
+            "matched_gain": 0.23764499439964165,
+            "mrstft": 1.1573898593584697,
+            "relative_rms": 0.2274964153766632
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 1.5081850091616313,
+            "matched_gain": 0.29468624555321177,
+            "mrstft": 1.1211000482241313,
+            "relative_rms": 0.24464115500450134
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 0.9453909993171692,
+            "matched_gain": 0.9454280464649973,
+            "mrstft": 0.9389777282873789,
+            "relative_rms": 0.2284662276506424
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.8761231303215027,
+              0.4003317058086395,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.2171761393547058,
+              0.501613974571228,
+              0.8298986554145813,
+              0.7370636463165283
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.766015887260437,
+              0.44634804129600525,
+              0.40787410736083984,
+              0.6571428571428571,
+              0.3,
+              0.32385632395744324,
+              0.5663319826126099,
+              0.934600293636322,
+              0.548626720905304
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.79212886095047,
+              0.4320175349712372,
+              0.33844539523124695,
+              0.6571428571428571,
+              0.3,
+              0.29409080743789673,
+              0.43257567286491394,
+              0.8939497470855713,
+              0.6723495721817017
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.7852464318275452,
+              0.42547860741615295,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.25506606698036194,
+              0.531990110874176,
+              0.8924102187156677,
+              0.8329475522041321
+            ]
+          }
+        }
+      },
+      {
+        "case": 2,
+        "state_id": "20bf67c35644e663d0cc79f4f8364a5a49cd60f9bea22685a43f2a83f48a5096",
+        "pitch": 55,
+        "source_audio_sha256": "1cb587f917f0a35cfd1ef6415d5d70b812d881587ad6c50b7ee04eac243a3074",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 1.4341605802377064,
+            "matched_gain": 0.04891232667147051,
+            "mrstft": 0.9352278014024099,
+            "relative_rms": 0.5307508707046509
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 0.9817166874806086,
+            "matched_gain": 0.26464463062269383,
+            "mrstft": 1.514127825697263,
+            "relative_rms": 0.7672131657600403
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 0.5051072935263315,
+            "matched_gain": 0.591257821276621,
+            "mrstft": 0.8484660337368647,
+            "relative_rms": 0.5315160155296326
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 1.5264215767383575,
+            "matched_gain": 0.03278202934789479,
+            "mrstft": 1.267610877752304,
+            "relative_rms": 0.6789435744285583
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.5677574872970581,
+              0.5383032560348511,
+              0.41914254426956177,
+              0.3842465281486511,
+              0.3642689287662506,
+              0.6525539755821228,
+              0.49372169375419617,
+              0.8379160761833191,
+              0.6463842391967773
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              2,
+              1
+            ],
+            "continuous": [
+              0.584604799747467,
+              0.48330315947532654,
+              0.42879346013069153,
+              0.4556547701358795,
+              0.42565810680389404,
+              0.5701248049736023,
+              0.5703209042549133,
+              0.8297930955886841,
+              0.5312732458114624
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              0,
+              1
+            ],
+            "continuous": [
+              0.5835817456245422,
+              0.529426634311676,
+              0.25,
+              0.4308547377586365,
+              0.43444985151290894,
+              0.6079381704330444,
+              0.4992201626300812,
+              0.8206208348274231,
+              0.5576566457748413
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.48983246088027954,
+              0.5367329120635986,
+              0.43074697256088257,
+              0.29693058133125305,
+              0.3765210807323456,
+              0.523267388343811,
+              0.4613429307937622,
+              0.9350989460945129,
+              0.7672976851463318
+            ]
+          }
+        }
+      },
+      {
+        "case": 3,
+        "state_id": "22b3cb59aa7d578f64e589a2ba07d23b4893e6fbc1a47d21a06fead7151e1299",
+        "pitch": 55,
+        "source_audio_sha256": "64480878203457a06ca5d07e9ec06899fc98326802ae676c0f09ddf989e0c7c6",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 1.7961593270301819,
+            "matched_gain": 0.08513956147947793,
+            "mrstft": 2.819171587626139,
+            "relative_rms": 1.1118305921554565
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 1.770222008228302,
+            "matched_gain": 0.05820138729780076,
+            "mrstft": 4.669329861799876,
+            "relative_rms": 3.0159716606140137
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 1.7591245969136555,
+            "matched_gain": 0.07992641571330514,
+            "mrstft": 3.2824814518292746,
+            "relative_rms": 1.6455371379852295
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 1.6162012418111165,
+            "matched_gain": 0.108446236355473,
+            "mrstft": 3.0218350489934287,
+            "relative_rms": 1.2620049715042114
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.26846134662628174,
+              0.540232241153717,
+              0.48687487840652466,
+              0.31083324551582336,
+              0.502177894115448,
+              0.6143060326576233,
+              0.30644187331199646,
+              0.14786186814308167,
+              0.3479773998260498
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              2,
+              1
+            ],
+            "continuous": [
+              0.4163255989551544,
+              0.5867382287979126,
+              0.5271526575088501,
+              0.37635886669158936,
+              0.5259049534797668,
+              0.5441479682922363,
+              0.4542813301086426,
+              0.14113877713680267,
+              0.4180099070072174
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.4017961323261261,
+              0.5853863954544067,
+              0.474070280790329,
+              0.3752810060977936,
+              0.565493106842041,
+              0.570282518863678,
+              0.39677736163139343,
+              0.13842034339904785,
+              0.4380059838294983
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.08944149315357208,
+              0.5427070260047913,
+              0.6907644867897034,
+              0.6571428571428571,
+              0.3,
+              0.7089403867721558,
+              0.29159247875213623,
+              0.21117739379405975,
+              0.6336390376091003
+            ]
+          }
+        }
+      },
+      {
+        "case": 4,
+        "state_id": "4fb111682a20129ed42fe0251a82fd23fdcb1168344abe4951c0f98536b15339",
+        "pitch": 55,
+        "source_audio_sha256": "5df7b89b683720aba96c35640cdf9ae482ab792dd221ae96867cc3db7803f8f6",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 0.8560170431931814,
+            "matched_gain": 0.5171730878363419,
+            "mrstft": 0.4682695170243581,
+            "relative_rms": 0.028731638565659523
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 1.3866036633650463,
+            "matched_gain": 0.22651741873275602,
+            "mrstft": 0.606290802359581,
+            "relative_rms": 0.04116866737604141
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 1.1869883239269257,
+            "matched_gain": 0.35844277216306014,
+            "mrstft": 0.6266087690989176,
+            "relative_rms": 0.05520915612578392
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 0.8719109942515691,
+            "matched_gain": 0.5032730118524702,
+            "mrstft": 0.5753820141156515,
+            "relative_rms": 0.08890579640865326
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.8579785227775574,
+              0.3477279841899872,
+              0.20384016633033752,
+              0.5509456992149353,
+              0.5206915736198425,
+              0.3995758891105652,
+              0.6221693754196167,
+              0.9740006923675537,
+              0.7449949979782104
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.777132511138916,
+              0.3075171709060669,
+              0.42091286182403564,
+              0.5237361788749695,
+              0.38397863507270813,
+              0.4504798650741577,
+              0.7599983811378479,
+              0.9909794330596924,
+              0.6371824145317078
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.7825493216514587,
+              0.2452555149793625,
+              0.3117479979991913,
+              0.5113992691040039,
+              0.42925283312797546,
+              0.3910696506500244,
+              0.6890765428543091,
+              0.978281557559967,
+              0.7497819662094116
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.8330011367797852,
+              0.24688810110092163,
+              0.22738982737064362,
+              0.6146072745323181,
+              0.5802756547927856,
+              0.48948997259140015,
+              0.7264909744262695,
+              0.9842929244041443,
+              0.7492612600326538
+            ]
+          }
+        }
+      },
+      {
+        "case": 5,
+        "state_id": "5a90dfd94d0ab2cdab2402e77bbf393273c7075ecedc4adeeb1bfc38591bae59",
+        "pitch": 55,
+        "source_audio_sha256": "98fa9b872ff5d7d7fc484d1923f96a85296552824199d56810ff4a992cedcd75",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 0.8298319379488627,
+            "matched_gain": 0.8150629920115033,
+            "mrstft": 0.813102920850118,
+            "relative_rms": 0.023887651041150093
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 1.1183409293492634,
+            "matched_gain": 0.672298585282503,
+            "mrstft": 1.0402097404003143,
+            "relative_rms": 0.09032391011714935
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 1.025235007206599,
+            "matched_gain": 0.7688970399981041,
+            "mrstft": 0.9671515425046285,
+            "relative_rms": 0.12971800565719604
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 0.8462634285291036,
+            "matched_gain": 0.8018536076254363,
+            "mrstft": 0.8135758837064108,
+            "relative_rms": 0.048670265823602676
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.57187420129776,
+              0.500433623790741,
+              0.4437433183193207,
+              0.6571428571428571,
+              0.3,
+              0.4040525555610657,
+              0.611279308795929,
+              0.4122426211833954,
+              0.3934539556503296
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.48319360613822937,
+              0.48576000332832336,
+              0.5805557370185852,
+              0.6571428571428571,
+              0.3,
+              0.5053834319114685,
+              0.6788328289985657,
+              0.5360772013664246,
+              0.43815723061561584
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.4692314863204956,
+              0.48773300647735596,
+              0.5283385515213013,
+              0.6571428571428571,
+              0.3,
+              0.5002704858779907,
+              0.6541815400123596,
+              0.4892560541629791,
+              0.4070298969745636
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.3697047531604767,
+              0.49674803018569946,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.37332677841186523,
+              0.6532514095306396,
+              0.5516791343688965,
+              0.6712887287139893
+            ]
+          }
+        }
+      },
+      {
+        "case": 6,
+        "state_id": "6b80fef15d547ae821b21171866c1046424dd3066a3bd27c979f3ebbce13c375",
+        "pitch": 55,
+        "source_audio_sha256": "27915b560edb6d73b716b8afd1a36d88a3f93cfd036dd445a735a14ab4dd4468",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 0.988592286904653,
+            "matched_gain": 0.8543063275285043,
+            "mrstft": 0.984829326470693,
+            "relative_rms": 0.15690580010414124
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 1.1109331051508586,
+            "matched_gain": 0.798113560648179,
+            "mrstft": 1.0887756546338399,
+            "relative_rms": 0.22036994993686676
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 1.0471639931201935,
+            "matched_gain": 0.8517441902187602,
+            "mrstft": 1.032684087753296,
+            "relative_rms": 0.22397193312644958
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 1.1284697155157726,
+            "matched_gain": 0.7570718074137357,
+            "mrstft": 1.1096910734971364,
+            "relative_rms": 0.11725742369890213
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.43948033452033997,
+              0.441460520029068,
+              0.5259950757026672,
+              0.6571428571428571,
+              0.3,
+              0.5370236039161682,
+              0.5826938152313232,
+              0.33408093452453613,
+              0.3993503451347351
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.3975491225719452,
+              0.46156805753707886,
+              0.6130228042602539,
+              0.6571428571428571,
+              0.3,
+              0.5868517756462097,
+              0.6473709940910339,
+              0.34577667713165283,
+              0.4176158607006073
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.3861120939254761,
+              0.45608118176460266,
+              0.565767765045166,
+              0.6571428571428571,
+              0.3,
+              0.5799282789230347,
+              0.6298341751098633,
+              0.3525553047657013,
+              0.4379523694515228
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.24596653878688812,
+              0.47034987807273865,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.4714987576007843,
+              0.6211077570915222,
+              0.45336705446243286,
+              0.6165198683738708
+            ]
+          }
+        }
+      },
+      {
+        "case": 7,
+        "state_id": "7ab23cf98c8a1cdb42183f1d44d5961737d985fc167f9ce6e5284f1e32b35f2b",
+        "pitch": 55,
+        "source_audio_sha256": "ee2b0ea6b06ba1e0f4e90978cd41f8832a2e32ac0d300f42063165e0b1f5b83f",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 0.1994013711810112,
+            "matched_gain": 0.9442524090663005,
+            "mrstft": 0.209466103464365,
+            "relative_rms": 0.047724802047014236
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 1.3131655951340993,
+            "matched_gain": 0.30550323512927513,
+            "mrstft": 0.7024428149064382,
+            "relative_rms": 0.05305837094783783
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 0.22891286512215933,
+            "matched_gain": 0.9720797639273462,
+            "mrstft": 0.23104030763109526,
+            "relative_rms": 0.010608750395476818
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 0.19436379273732504,
+            "matched_gain": 0.9450887699498094,
+            "mrstft": 0.2152783398826917,
+            "relative_rms": 0.051064383238554
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.8003607392311096,
+              0.5125821232795715,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.40439149737358093,
+              0.4308655858039856,
+              0.7780454754829407,
+              0.6034961342811584
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.6719419956207275,
+              0.4813310205936432,
+              0.3751645088195801,
+              0.6571428571428571,
+              0.3,
+              0.4423202872276306,
+              0.5221381187438965,
+              0.899701714515686,
+              0.5267462730407715
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.6974778771400452,
+              0.49626192450523376,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.4448009431362152,
+              0.41869524121284485,
+              0.8544411659240723,
+              0.5775303840637207
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.6841269135475159,
+              0.477862685918808,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.4026681184768677,
+              0.4799051582813263,
+              0.8704447150230408,
+              0.7621757984161377
+            ]
+          }
+        }
+      },
+      {
+        "case": 8,
+        "state_id": "85e3cac6f5185b14b41b716834ff0b796eb656df9b122b7e57c73800b8f9b45e",
+        "pitch": 55,
+        "source_audio_sha256": "e28023da7de065c06f3a1a34ad4a1608a695f947fa33a05b090761cc43f15b50",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 2.5911216537157693,
+            "matched_gain": 0.12821668513115633,
+            "mrstft": 1.784990906715393,
+            "relative_rms": 0.26681193709373474
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 1.7710792819658916,
+            "matched_gain": 0.10631735457053307,
+            "mrstft": 1.239823818206787,
+            "relative_rms": 0.005482794251292944
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 3.2651923497517905,
+            "matched_gain": 0.0,
+            "mrstft": 1.4006849030653636,
+            "relative_rms": 0.10399391502141953
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 2.7458834648132324,
+            "matched_gain": 0.04111279780451563,
+            "mrstft": 1.7909738222757976,
+            "relative_rms": 0.230033740401268
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.5678927898406982,
+              0.5305773019790649,
+              0.397264689207077,
+              0.5922201871871948,
+              0.3070473372936249,
+              0.7742342948913574,
+              0.3594359755516052,
+              0.7980852127075195,
+              0.4814385175704956
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.47095778584480286,
+              0.4612758755683899,
+              0.3842947781085968,
+              0.6571428571428571,
+              0.3,
+              0.7388209700584412,
+              0.5247079133987427,
+              0.8138369917869568,
+              0.49357661604881287
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.4511382579803467,
+              0.48633864521980286,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.7905653715133667,
+              0.4405759274959564,
+              0.7802347540855408,
+              0.4686785936355591
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.5102398991584778,
+              0.34206634759902954,
+              0.35311251878738403,
+              0.6755648255348206,
+              0.4606941342353821,
+              0.7104587554931641,
+              0.4992620050907135,
+              0.9246379733085632,
+              0.6057576537132263
+            ]
+          }
+        }
+      },
+      {
+        "case": 9,
+        "state_id": "868b0a4c4dc90526bd336cd8453dd60fd5d790bc05e768f3e45909d588ac4681",
+        "pitch": 55,
+        "source_audio_sha256": "60d18139870c9057edc2b6d217148917378b149ac937e548f48ca768ee21f7cc",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 1.6670631965001423,
+            "matched_gain": 0.34227622211656505,
+            "mrstft": 1.4978489577770233,
+            "relative_rms": 0.1332823485136032
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 1.400188108285268,
+            "matched_gain": 0.30727118645003665,
+            "mrstft": 1.1993412375450134,
+            "relative_rms": 0.06347313523292542
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 1.5253421366214752,
+            "matched_gain": 0.27433397660154346,
+            "mrstft": 1.264800449212392,
+            "relative_rms": 0.16445884108543396
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 1.568969190120697,
+            "matched_gain": 0.41122863874431004,
+            "mrstft": 1.39793827633063,
+            "relative_rms": 0.1158534586429596
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.5594707727432251,
+              0.5352904796600342,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.6168716549873352,
+              0.46710410714149475,
+              0.5660361051559448,
+              0.4079226553440094
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.4746634364128113,
+              0.4857948422431946,
+              0.517749547958374,
+              0.6571428571428571,
+              0.3,
+              0.6178829669952393,
+              0.6128574013710022,
+              0.6836222410202026,
+              0.4519716203212738
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.46046632528305054,
+              0.5073270201683044,
+              0.4762229919433594,
+              0.6571428571428571,
+              0.3,
+              0.6510860323905945,
+              0.5548152923583984,
+              0.6411384344100952,
+              0.4123796224594116
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.36043137311935425,
+              0.48578932881355286,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.5621393322944641,
+              0.5058354139328003,
+              0.7247558832168579,
+              0.6046068072319031
+            ]
+          }
+        }
+      },
+      {
+        "case": 10,
+        "state_id": "9908d309c791b13e91196778f15409456ddad5ae69e55944ff573648240eb50a",
+        "pitch": 55,
+        "source_audio_sha256": "6f8eca561ec2e393f1ac7d7d5014984c844a762834d2a39d0d39f0c912a3cb80",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 1.0988221665223439,
+            "matched_gain": 0.28456388906860364,
+            "mrstft": 1.049755225578944,
+            "relative_rms": 0.12741810083389282
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 0.7995103001594543,
+            "matched_gain": 0.4591021251538256,
+            "mrstft": 1.1221643090248108,
+            "relative_rms": 0.46933677792549133
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 0.617856577038765,
+            "matched_gain": 0.6070437359868633,
+            "mrstft": 0.8745965162913004,
+            "relative_rms": 0.42630311846733093
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 1.004551112651825,
+            "matched_gain": 0.41181172512298314,
+            "mrstft": 0.8653925557931265,
+            "relative_rms": 0.008832006715238094
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.612022340297699,
+              0.4297346770763397,
+              0.430855393409729,
+              0.4887479543685913,
+              0.35495826601982117,
+              0.5663288831710815,
+              0.5932943820953369,
+              0.8518901467323303,
+              0.6784065365791321
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              2,
+              1
+            ],
+            "continuous": [
+              0.6442143321037292,
+              0.4255509376525879,
+              0.5776787996292114,
+              0.4698386788368225,
+              0.34657472372055054,
+              0.5240644216537476,
+              0.6879633069038391,
+              0.9046072959899902,
+              0.541995108127594
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              2,
+              1
+            ],
+            "continuous": [
+              0.6547794938087463,
+              0.45766180753707886,
+              0.48067083954811096,
+              0.43169572949409485,
+              0.3807010054588318,
+              0.4775194525718689,
+              0.6341831684112549,
+              0.8907080888748169,
+              0.6042150855064392
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.44203630089759827,
+              0.4186552166938782,
+              0.39568302035331726,
+              0.4522232413291931,
+              0.39095956087112427,
+              0.523124098777771,
+              0.5664956569671631,
+              0.9290411472320557,
+              0.7164862155914307
+            ]
+          }
+        }
+      },
+      {
+        "case": 11,
+        "state_id": "9f1153c6ba2bb3372a03846d2966a69b8481b2304ba228ca9b0792b0d88d4f74",
+        "pitch": 55,
+        "source_audio_sha256": "d3f00f608803c3c17589942b27a8d859a5dd8fa2665d4ccc39e76e6bc443307a",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 0.585249587893486,
+            "matched_gain": 0.7874731920365345,
+            "mrstft": 0.5373525197307268,
+            "relative_rms": 0.15573349595069885
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 0.6346021840969721,
+            "matched_gain": 0.7901835776191886,
+            "mrstft": 0.6497327784697214,
+            "relative_rms": 0.054007433354854584
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 0.6268426279226939,
+            "matched_gain": 0.8331265727234344,
+            "mrstft": 0.6407892753680547,
+            "relative_rms": 0.07129297405481339
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 0.7754198064406713,
+            "matched_gain": 1.0317647154689744,
+            "mrstft": 0.7803761114676794,
+            "relative_rms": 0.4161982238292694
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.4975605309009552,
+              0.6509068608283997,
+              0.35045701265335083,
+              0.14798741042613983,
+              0.4486275315284729,
+              0.472210168838501,
+              0.4337613880634308,
+              0.45015695691108704,
+              0.4929960072040558
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              2,
+              1
+            ],
+            "continuous": [
+              0.49999159574508667,
+              0.6261119842529297,
+              0.5090283751487732,
+              0.22444935142993927,
+              0.5459436774253845,
+              0.5071845054626465,
+              0.48846006393432617,
+              0.2355753630399704,
+              0.4296400249004364
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              2,
+              1
+            ],
+            "continuous": [
+              0.49969416856765747,
+              0.6373652219772339,
+              0.43355366587638855,
+              0.2249617576599121,
+              0.5325221419334412,
+              0.4921897351741791,
+              0.44073286652565,
+              0.24148951470851898,
+              0.4536479413509369
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.1566908210515976,
+              0.6308946013450623,
+              0.6057741641998291,
+              0.23706184327602386,
+              0.2986140847206116,
+              0.5637335777282715,
+              0.306082546710968,
+              0.5885255932807922,
+              0.7430016398429871
+            ]
+          }
+        }
+      },
+      {
+        "case": 12,
+        "state_id": "9fcd25a332ad2d874f70065b1fe8c6d79619f858bb22d63447d7da3cfc836bc3",
+        "pitch": 55,
+        "source_audio_sha256": "429429f3841d7b51ee54a7fa673fa9ccc99d61893f6d742cbc8d61409ffb12f6",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 0.8510908881823221,
+            "matched_gain": 0.6845790796518352,
+            "mrstft": 0.9873185157775879,
+            "relative_rms": 0.10616642236709595
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 0.6691989898681641,
+            "matched_gain": 0.7353565534449166,
+            "mrstft": 0.8217401802539825,
+            "relative_rms": 0.1842925250530243
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 0.8474235832691193,
+            "matched_gain": 0.5812554712135041,
+            "mrstft": 1.12103471159935,
+            "relative_rms": 0.2817169427871704
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 1.7213238875071208,
+            "matched_gain": 0.5397851401140416,
+            "mrstft": 1.8969605962435405,
+            "relative_rms": 6.874542305013165e-05
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              2,
+              1
+            ],
+            "continuous": [
+              0.38283833861351013,
+              0.44857820868492126,
+              0.5603833198547363,
+              0.6489986181259155,
+              0.29630061984062195,
+              0.5537992119789124,
+              0.5637215971946716,
+              0.3053191304206848,
+              0.47127583622932434
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              2,
+              1
+            ],
+            "continuous": [
+              0.4958188831806183,
+              0.4838739335536957,
+              0.7288984060287476,
+              0.5758508443832397,
+              0.34658151865005493,
+              0.5787332057952881,
+              0.6256542801856995,
+              0.41618144512176514,
+              0.45765313506126404
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              2,
+              1
+            ],
+            "continuous": [
+              0.5048723816871643,
+              0.5017623901367188,
+              0.6048195958137512,
+              0.6017022728919983,
+              0.37020426988601685,
+              0.5181072354316711,
+              0.5757755041122437,
+              0.4062795341014862,
+              0.5462013483047485
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.1255178153514862,
+              0.45594900846481323,
+              0.4913601875305176,
+              0.6571428571428571,
+              0.3,
+              0.5652003884315491,
+              0.543775200843811,
+              0.3444729447364807,
+              0.6073841452598572
+            ]
+          }
+        }
+      },
+      {
+        "case": 13,
+        "state_id": "a1122703d92cfdecb797e19b569ba3348d598830653311377e33e32c6fe1985d",
+        "pitch": 55,
+        "source_audio_sha256": "4f41b9cd833fd244adcafd29d7d84b94fdce542e18afeaa17535db198c751306",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 1.0957527955373128,
+            "matched_gain": 0.7664822250989872,
+            "mrstft": 1.1114147504170735,
+            "relative_rms": 0.1110411137342453
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 1.730518360932668,
+            "matched_gain": 0.19696369879798786,
+            "mrstft": 1.506749451160431,
+            "relative_rms": 0.045254260301589966
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 1.7230587402979534,
+            "matched_gain": 0.20951170257656926,
+            "mrstft": 1.4786127905050914,
+            "relative_rms": 0.14316679537296295
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 0.9878793954849243,
+            "matched_gain": 0.8038592036529129,
+            "mrstft": 0.9972160160541534,
+            "relative_rms": 0.09046170860528946
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.5771328210830688,
+              0.544063925743103,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.596259355545044,
+              0.47171565890312195,
+              0.5751516819000244,
+              0.40886491537094116
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.4863659143447876,
+              0.48846790194511414,
+              0.4986918866634369,
+              0.6571428571428571,
+              0.3,
+              0.6116994619369507,
+              0.6053720712661743,
+              0.7131887078285217,
+              0.46002301573753357
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.4763427972793579,
+              0.5130752921104431,
+              0.4641360938549042,
+              0.6571428571428571,
+              0.3,
+              0.6400905251502991,
+              0.5488355159759521,
+              0.6631566882133484,
+              0.413666695356369
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.38120609521865845,
+              0.4916568696498871,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.5414164066314697,
+              0.5114660263061523,
+              0.7326571345329285,
+              0.6151494383811951
+            ]
+          }
+        }
+      },
+      {
+        "case": 14,
+        "state_id": "a3ab25f778e3e04300ac5dca4ded2afdc948f23f753df40625a3ad76635594ec",
+        "pitch": 55,
+        "source_audio_sha256": "e49ae4185d52b59cc1f36a42bf61952c6123cb4d079ae3aed4a6bada903c0b2b",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 1.730183720588684,
+            "matched_gain": 0.11213554920847163,
+            "mrstft": 1.1187377174695332,
+            "relative_rms": 0.16927161812782288
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 1.5153907338778179,
+            "matched_gain": 0.14428984415720722,
+            "mrstft": 1.0650568554798763,
+            "relative_rms": 0.034998416900634766
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 1.6159599423408508,
+            "matched_gain": 0.14793454600294437,
+            "mrstft": 1.068464199701945,
+            "relative_rms": 0.04131215065717697
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 1.5252899924914043,
+            "matched_gain": 0.18734083651489802,
+            "mrstft": 1.680765430132548,
+            "relative_rms": 0.15379920601844788
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.4927944839000702,
+              0.3924415409564972,
+              0.49640706181526184,
+              0.6316543817520142,
+              0.32997485995292664,
+              0.7421784996986389,
+              0.47304674983024597,
+              0.7565011382102966,
+              0.5373228192329407
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.5405657887458801,
+              0.40582436323165894,
+              0.4650781452655792,
+              0.7089244723320007,
+              0.3705635070800781,
+              0.6698864698410034,
+              0.5731831192970276,
+              0.8480381965637207,
+              0.5389730334281921
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.5133457183837891,
+              0.42489326000213623,
+              0.44296976923942566,
+              0.6292774081230164,
+              0.3642195761203766,
+              0.6864898204803467,
+              0.5350430607795715,
+              0.8237885236740112,
+              0.5518644452095032
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.3074215054512024,
+              0.35588571429252625,
+              0.40546366572380066,
+              0.6571428571428571,
+              0.3,
+              0.6652279496192932,
+              0.5345452427864075,
+              0.8578623533248901,
+              0.5953512787818909
+            ]
+          }
+        }
+      },
+      {
+        "case": 15,
+        "state_id": "c2f64e673a8cc51c56e260b04ee39c9e59a05dfff07f05e48ee8e6a8bbaeb298",
+        "pitch": 55,
+        "source_audio_sha256": "b9a7ae95b5fc89651d26967c2382d29034ecd515f2d321f84fc8e3356fe6db05",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 1.459238310654958,
+            "matched_gain": 0.016160478903055848,
+            "mrstft": 1.396849085887273,
+            "relative_rms": 0.8302776217460632
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 1.4962700307369232,
+            "matched_gain": 0.010435654284490852,
+            "mrstft": 2.145602226257324,
+            "relative_rms": 1.516766905784607
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 0.6773750508824984,
+            "matched_gain": 0.3674958279556841,
+            "mrstft": 1.6153111159801483,
+            "relative_rms": 1.2114542722702026
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 1.6139520208040874,
+            "matched_gain": 0.03458191526818783,
+            "mrstft": 3.339650273323059,
+            "relative_rms": 1.4855773448944092
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.3968539237976074,
+              0.48264214396476746,
+              0.5654811263084412,
+              0.5180107355117798,
+              0.3677160441875458,
+              0.7581678032875061,
+              0.3573194742202759,
+              0.562465250492096,
+              0.5389866828918457
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.5093453526496887,
+              0.4986754059791565,
+              0.4646940231323242,
+              0.45626822113990784,
+              0.46619680523872375,
+              0.6347902417182922,
+              0.48069101572036743,
+              0.5904683470726013,
+              0.5085496306419373
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              0,
+              1
+            ],
+            "continuous": [
+              0.4921472668647766,
+              0.5208950638771057,
+              0.25,
+              0.4821035861968994,
+              0.48941463232040405,
+              0.6869651079177856,
+              0.4048648178577423,
+              0.5781386494636536,
+              0.5378254652023315
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.18039926886558533,
+              0.49097567796707153,
+              0.6181867718696594,
+              0.6571428571428571,
+              0.3,
+              0.6959914565086365,
+              0.32061874866485596,
+              0.6723921895027161,
+              0.6676324605941772
+            ]
+          }
+        }
+      },
+      {
+        "case": 16,
+        "state_id": "ce2a862a2ac2327a70fc73b3f9cce558114b761935f37998e3f71aa77b8fa3dd",
+        "pitch": 55,
+        "source_audio_sha256": "b4434a3e3b27bb052c40429f9ff4bffb210826123a416715678ad12712b6e861",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 1.3828575213750203,
+            "matched_gain": 0.05782586400546259,
+            "mrstft": 1.1042992571989696,
+            "relative_rms": 0.28304383158683777
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 1.0991664628187816,
+            "matched_gain": 0.2140340125643451,
+            "mrstft": 1.623891790707906,
+            "relative_rms": 0.6498700380325317
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 1.08397180835406,
+            "matched_gain": 0.24201165993981105,
+            "mrstft": 1.5155767997105916,
+            "relative_rms": 0.5581201314926147
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 1.4368424713611603,
+            "matched_gain": 0.057794085914064174,
+            "mrstft": 1.1607077419757843,
+            "relative_rms": 0.15281449258327484
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.5041043758392334,
+              0.5042755603790283,
+              0.47704118490219116,
+              0.45874732732772827,
+              0.3327905833721161,
+              0.6553963422775269,
+              0.5034192800521851,
+              0.7213566303253174,
+              0.5994560122489929
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              2,
+              1
+            ],
+            "continuous": [
+              0.5546234846115112,
+              0.4835522770881653,
+              0.5238898992538452,
+              0.4886656105518341,
+              0.40544599294662476,
+              0.5883654952049255,
+              0.5786915421485901,
+              0.7222162485122681,
+              0.5109472870826721
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              2,
+              1
+            ],
+            "continuous": [
+              0.551778256893158,
+              0.5217654705047607,
+              0.48280036449432373,
+              0.47756102681159973,
+              0.4165276288986206,
+              0.5994375944137573,
+              0.5125065445899963,
+              0.7158417701721191,
+              0.5548973679542542
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.27498361468315125,
+              0.4729447662830353,
+              0.48378631472587585,
+              0.4182486832141876,
+              0.354310542345047,
+              0.5802087187767029,
+              0.46681731939315796,
+              0.8404483199119568,
+              0.6958522200584412
+            ]
+          }
+        }
+      },
+      {
+        "case": 17,
+        "state_id": "cec6700f895b3028246ec1c552c2df2cbab2ed7fa29c6c6cf0d58aafb81e9873",
+        "pitch": 55,
+        "source_audio_sha256": "eea3ad47be5d9a06a9bb42ad42ad242db60be5cb8425885652504aea9c402c48",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 1.7299537062644958,
+            "matched_gain": 0.14150305483225498,
+            "mrstft": 0.9568250626325607,
+            "relative_rms": 0.10934215039014816
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 0.5539475505550703,
+            "matched_gain": 0.6519355550588327,
+            "mrstft": 0.5419375523924828,
+            "relative_rms": 0.1661442518234253
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 0.6872052450974783,
+            "matched_gain": 0.6246152076899549,
+            "mrstft": 0.5013115455706915,
+            "relative_rms": 0.042381178587675095
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 1.7167790134747822,
+            "matched_gain": 0.14907227063472123,
+            "mrstft": 0.9789679944515228,
+            "relative_rms": 0.12175645679235458
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.5247822999954224,
+              0.5118911862373352,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.7364365458488464,
+              0.40914279222488403,
+              0.6680947542190552,
+              0.4375136196613312
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.4579601585865021,
+              0.46654364466667175,
+              0.48454371094703674,
+              0.6571428571428571,
+              0.3,
+              0.701359748840332,
+              0.5819569230079651,
+              0.72747403383255,
+              0.4649604558944702
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.4363986849784851,
+              0.48689761757850647,
+              0.4519568383693695,
+              0.6571428571428571,
+              0.3,
+              0.7392081618309021,
+              0.5112450122833252,
+              0.6995081901550293,
+              0.4410456120967865
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.34759435057640076,
+              0.424597829580307,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.670504093170166,
+              0.4760502576828003,
+              0.8212547302246094,
+              0.5700071454048157
+            ]
+          }
+        }
+      },
+      {
+        "case": 18,
+        "state_id": "e7449e562a3c10e61fbba75f38119746d6372e60437d6f2881304af4765a395f",
+        "pitch": 55,
+        "source_audio_sha256": "2f6c6c71b5cb490f65f68decfcaa110d2da3e6524427fdda04e477e16549a55e",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 1.94766499598821,
+            "matched_gain": 0.17463737708325744,
+            "mrstft": 1.5045827825864155,
+            "relative_rms": 0.05954780802130699
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 1.5746999184290569,
+            "matched_gain": 0.3371645736999037,
+            "mrstft": 1.4297852218151093,
+            "relative_rms": 0.09294457733631134
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 1.9156289498011272,
+            "matched_gain": 0.18741375187175,
+            "mrstft": 1.4419834117094676,
+            "relative_rms": 0.01388598047196865
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 1.917438844839732,
+            "matched_gain": 0.19047802414115025,
+            "mrstft": 1.4386532207330067,
+            "relative_rms": 0.023471113294363022
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.8734739422798157,
+              0.3880387544631958,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.29444974660873413,
+              0.40405333042144775,
+              0.849418044090271,
+              0.7503769397735596
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.7766996026039124,
+              0.45860278606414795,
+              0.32492342591285706,
+              0.6571428571428571,
+              0.3,
+              0.2454027235507965,
+              0.5283175706863403,
+              0.927918016910553,
+              0.5731087923049927
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.7938368320465088,
+              0.4572093188762665,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.3033604621887207,
+              0.40989601612091064,
+              0.8784729242324829,
+              0.6706493496894836
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.7867028713226318,
+              0.42793959379196167,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.41479915380477905,
+              0.4168243408203125,
+              0.9107968211174011,
+              0.7978243827819824
+            ]
+          }
+        }
+      },
+      {
+        "case": 19,
+        "state_id": "f2b021f8389b31a032303a8ab27a29578fc9747e3e594794e3a28e76b0dd8279",
+        "pitch": 55,
+        "source_audio_sha256": "c29a5f96ee0fd72adf8a630f1fb437beb1bbce0b902dd879c947ba25bd1b6775",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 1.2862487932046254,
+            "matched_gain": 0.28165614252636584,
+            "mrstft": 0.866627057393392,
+            "relative_rms": 0.08252613246440887
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 1.5563360055287678,
+            "matched_gain": 0.19457963786581026,
+            "mrstft": 1.000441978375117,
+            "relative_rms": 0.03586452081799507
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 0.9181634585062662,
+            "matched_gain": 0.6474777744728263,
+            "mrstft": 0.8276321987311045,
+            "relative_rms": 0.09311223030090332
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 1.0285801390806835,
+            "matched_gain": 0.4592272191599938,
+            "mrstft": 1.0832853416601818,
+            "relative_rms": 0.21291089057922363
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.6886383295059204,
+              0.5919584035873413,
+              0.30040881037712097,
+              0.6571428571428571,
+              0.3,
+              0.7019562721252441,
+              0.33773258328437805,
+              0.8301107883453369,
+              0.5162853002548218
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.52629154920578,
+              0.4849853217601776,
+              0.35040169954299927,
+              0.6571428571428571,
+              0.3,
+              0.6771882176399231,
+              0.49608224630355835,
+              0.8840259313583374,
+              0.5004745125770569
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.5421480536460876,
+              0.4910429120063782,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.7280316948890686,
+              0.3870656490325928,
+              0.8490731120109558,
+              0.5098783373832703
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              0,
+              0
+            ],
+            "continuous": [
+              0.6514484286308289,
+              0.40356573462486267,
+              0.25,
+              0.6571428571428571,
+              0.3,
+              0.676476001739502,
+              0.45263010263442993,
+              0.934108555316925,
+              0.6558765769004822
+            ]
+          }
+        }
+      },
+      {
+        "case": 20,
+        "state_id": "fb80c3992ccaa6e324253d2df5897aab3b99b9dd59fc8766de739a715b3fef48",
+        "pitch": 55,
+        "source_audio_sha256": "9ead24c82e2620109822132d4a4d55ace8d7953eb1b765b4e2a77e82fbebbe0b",
+        "scores": {
+          "decay_normalized_90_to_0": {
+            "gain_matched_mrstft": 1.6820315321286519,
+            "matched_gain": 0.30707738995119405,
+            "mrstft": 1.4096025427182515,
+            "relative_rms": 0.3505967855453491
+          },
+          "fixed_normalized_90_10": {
+            "gain_matched_mrstft": 1.4803892374038696,
+            "matched_gain": 0.30312106007262923,
+            "mrstft": 1.2617559731006622,
+            "relative_rms": 0.20979127287864685
+          },
+          "paper_fixed_lambda1": {
+            "gain_matched_mrstft": 1.534103512763977,
+            "matched_gain": 0.33102285091709094,
+            "mrstft": 1.2861003975073497,
+            "relative_rms": 0.24562090635299683
+          },
+          "warm100_then_audio": {
+            "gain_matched_mrstft": 1.5005513230959575,
+            "matched_gain": 0.3322123112605251,
+            "mrstft": 1.6490215063095093,
+            "relative_rms": 0.08677341789007187
+          }
+        },
+        "predictions": {
+          "decay_normalized_90_to_0": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.37752726674079895,
+              0.4416133463382721,
+              0.5646392107009888,
+              0.6588360667228699,
+              0.29213985800743103,
+              0.7082810997962952,
+              0.47208455204963684,
+              0.44570207595825195,
+              0.45751455426216125
+            ]
+          },
+          "fixed_normalized_90_10": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.43833208084106445,
+              0.44528213143348694,
+              0.5696364045143127,
+              0.77869713306427,
+              0.35261619091033936,
+              0.6617481708526611,
+              0.5423243045806885,
+              0.5030246376991272,
+              0.4678317606449127
+            ]
+          },
+          "paper_fixed_lambda1": {
+            "categorical": [
+              1,
+              1
+            ],
+            "continuous": [
+              0.4275205433368683,
+              0.47711336612701416,
+              0.5329340100288391,
+              0.710045337677002,
+              0.3697589635848999,
+              0.6678673028945923,
+              0.5146129131317139,
+              0.4945768415927887,
+              0.5092146396636963
+            ]
+          },
+          "warm100_then_audio": {
+            "categorical": [
+              1,
+              0
+            ],
+            "continuous": [
+              0.1654181331396103,
+              0.4339231848716736,
+              0.4605913758277893,
+              0.6571428571428571,
+              0.3,
+              0.6515989303588867,
+              0.4969620406627655,
+              0.5551493763923645,
+              0.5781126618385315
+            ]
+          }
+        }
+      }
+    ],
+    "additional_descriptive_paired_comparisons_note": "Post-hoc paired contrasts calculated from the saved 21 per-family results; 5,000 bootstrap resamples, seed 0; not preregistered decision gates."
+  },
+  "limits": {
+    "single_validation_pitch_per_family": true,
+    "paper_style_loss_is_adapted_not_full_reproduction": true,
+    "models_not_qualified_for_A2_or_release": true,
+    "source_code_and_checkpoints_retained_only_in_local_ignored_output": true
+  },
+  "source_sha256": {
+    "research\\training\\obruxo_training\\codec.py": "a9e0095d0f45f80d25c1f30b0bc630b6ab93a41a4a62601d116db36d94435264",
+    "research\\training\\obruxo_training\\features.py": "83ef8178442dc467b7985c67915a136650bc83e0248237f8bb12bdd452fae951",
+    "research\\training\\obruxo_training\\model.py": "ee5cb2c6fcdc04e1ea327db3aa8cc08184dc0a4ee3a2bf2a481ceff227e1c4cb",
+    "research\\training\\outputs\\pitch-stability-consistency-20261113\\run_experiment.py": "df0b31dba873faccf7e83aa365fb53516d92cf59596bac2173cb8dfadb2d634a",
+    "research\\training\\outputs\\pitch-stability-consistency-20261113\\run_feature_proxy.py": "9d07639d565df41f403f623175a7754c65398880981d835f7327bf2d5862234a",
+    "research\\training\\outputs\\pitch-stability-consistency-20261113\\run_loss_schedule_comparison.py": "c4ac17916a35c3fa685c81bee350b64592278910f548a7a459ab4a1fdc4ca849"
+  },
+  "local_run_path": "research/training/outputs/pitch-stability-consistency-20261113/loss-schedule-comparison-20261114",
+  "resources": {
+    "native_renders": 105,
+    "training_updates_total": 2400,
+    "wall_time_seconds": null,
+    "peak_memory_bytes": null,
+    "note": "The retained run summary does not record a reliable total runtime or RAM peak; do not use this run to forecast compute."
+  }
+}

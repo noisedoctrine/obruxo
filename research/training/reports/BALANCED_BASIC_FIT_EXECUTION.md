@@ -1,13 +1,30 @@
-# Balanced three-sound fit: execution started
+# Balanced three-sound fit: completed execution
 
-The [declared balanced-data comparison](BALANCED_BASIC_FIT_CARD.md) is implemented and started locally at **11:54 on 31 October 2026, Kuala Lumpur time**. Native completion, endpoint quality and final verification are pending. This is one new sound-trained candidate; the preceding audited sound-only model is reused as the control.
+The [frozen fit card](BALANCED_BASIC_FIT_CARD.md) is complete. The run and independent audit both completed, with no reserved/test data used. **The candidate failed the existing admission gates and was not retained as a model.** The separate [label-only learnability check](BALANCED_SUPERVISED_CONTROL_RESULTS.md) also completed; its source-label loss improved while real-Vital sound quality worsened.
 
-The same original untrained bridge, 14 outputs, trainable mask, optimizer, sound objective, rehearsal and acceptance policy remain in force. Every patch receives the same note/duration coverage under the explicit 48-update order. The implementation preserves all **104 old evaluation cells**, adds **36 grid evaluation cells**, and uses **18 additional training-only reciprocal cells**. The cap bank contains **74 distinct input recordings**, compared with the original 56.
+## Run record
 
-**16 focused tests pass**, covering patch-independent sampling, the exact old panel, reciprocal playback coverage, data-contract checks, native acceptance and exact candidate recovery. Ruff **0.16.2** and diff checks pass. The [real-initializer software check](data/balanced_basic_fit_software_check.json) preserves all 104 old starting predictions, matches all 158 logical cold-export comparisons, and exactly recovers model/Adam/trace/RNG. It takes **1.53 seconds / 0.67 GiB**, adding zero native requests or experimental updates.
+| Item | Result |
+|---|---|
+| Frozen plan | `63e8b02e659bb5b8c78c8f1e2810b1eae23df9a1778fc652316efcc9c0e3d69c` |
+| Optimizer updates | 48 committed; 46 accepted by native sound checks |
+| Native attempts | 6,292 of 8,000 maximum |
+| Wall time | 12,252 seconds (3 h 24 min) |
+| Peak process-tree memory | 1.57 GiB; under 4 GiB |
+| Independent replay and audit | Passed; model, Adam state, trace and RNG reproduced; 426 comparison rows rescored |
+| Reserved/test data | Not used |
+| Model admission | **Failed** |
 
-The [execution declaration](data/balanced_basic_fit_declaration.json) records plan **63e8b02e659bb5b8c78c8f1e2810b1eae23df9a1778fc652316efcc9c0e3d69c**, implementation `8935d1e`, source identities, data/control links and full schedule. Its estimated evidence upper bound is **1.24 GiB**, below the 2-GiB cap. The six-hour / 4-GiB job allows at most 8,000 requests and checkpoints every update. It independently replays its first two native updates and automatically runs the final offline audit and waveform rescoring.
+## Why it failed
 
-The [first-two-update replay](data/balanced_basic_fit_prefix_verification.json) now passes exactly for model, Adam and RNG with zero added renders. Both proposed updates are accepted. This qualifies continuation of the frozen run; endpoint sound quality remains unmeasured.
+The fit did improve the original-input own/transfer groups, but failed the full multi-group requirements:
 
-The [qualified data bank](BALANCED_BASIC_DATA_RESULTS.md) remains unchanged. The 192 reserved roots are unscored, Actions stays disabled and Colab remains deferred. This run does not advance A2 until the complete frozen reconstruction and preservation gates pass; A3, second seed, human listening and release remain incomplete.
+- All three source sounds failed the per-sound learning prerequisite.
+- Only one of the three added pitch-grid groups passed.
+- The wider alternate-input own/transfer groups failed.
+- Earlier-sound preservation failed.
+- The full reconstruction and directional-benefit gates both failed.
+
+These failures are retained as measured; the evaluation gates were not relaxed. The balanced fit remains a completed development run, not a model candidate.
+
+The [data bank report](BALANCED_BASIC_DATA_RESULTS.md) remains valid. The label-only and four-schedule comparisons are now complete as separate diagnostics; neither changes this failed native sound-fit result. See the [current training plan](../../modelling/TRAINING_PLAN.md) for the next step: diagnose this audited fit's group-level failures before another long native run. The independent 192-root reserve and final test remain unscored; Actions stays disabled and Colab deferred.

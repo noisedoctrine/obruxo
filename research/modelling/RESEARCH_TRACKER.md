@@ -26,7 +26,7 @@ The central modelling problem is therefore not plain parameter regression. It is
 
 ### Current Stage A control scope
 
-This is a family-level scan of the current basic-codec inventory. ✅ means at least one instance in the family has an output head; ❌ means the controls are present but fixed for this experiment. Counts are controls/instances, not dense logits. Fixed controls are explicitly listed by meaningful family below; the linked [control inventory dataset](control_scope/stage_a_controls.jsonl) records the exact fields, fixed defaults, masks, and serialized paths. It contains 979 records: 772 scalar settings and 207 structured fields/assets/curves. Eleven scalar settings are adjustable, with 14 dense outputs (9 continuous values and 5 category scores). The current basic trainer uses source-parameter supervision; the shared audio-loss helper is not qualified, and no shared audio-trained model has passed the reconstruction gate.
+This is a family-level scan of the current basic-codec inventory. ✅ means at least one instance in the family has an output head; ❌ means the controls are present but fixed for this experiment. Counts are controls/instances, not dense logits. Fixed controls are explicitly listed by meaningful family below; the linked [control inventory dataset](control_scope/stage_a_controls.jsonl) records the exact fields, fixed defaults, masks, and serialized paths. It contains 979 records: 772 scalar settings and 207 structured fields/assets/curves. Eleven scalar settings are adjustable, with 14 dense outputs (9 continuous values and 5 category scores). Source-setting and proxy-audio losses have both been tested on the 14-output model. The [four-schedule proxy screen](../training/reports/PRESET_LOSS_SCHEDULE_RESULTS.md) used real Vital for final scores, but covered only one validation pitch and did not establish a schedule winner after gain matching. No shared audio-trained model has passed the full reconstruction gate.
 
 | Control family / capability | On? | Enabled / total | Head outputs | Current treatment |
 |---|:---:|---:|---:|---|
@@ -92,6 +92,8 @@ This is a family-level scan of the current basic-codec inventory. ✅ means at l
 ## 2. Dataset and Curriculum Design
 
 Training may combine controlled synthetic renders, externally sourced preset corpora, and future community-contributed recordings. Available labels and metadata may be used as noisy supervision for sampling, stratified evaluation, or a future sound classifier, but they are not required model inputs. Source-specific collection and analysis remain within their dataset workstreams.
+
+The [balanced label-only diagnostic](../training/reports/BALANCED_SUPERVISED_CONTROL_RESULTS.md) used the same 14-output scope for 48 updates. Source-setting error fell, but average real-Vital scores worsened for all three sound groups. A separate [four-schedule screen](../training/reports/PRESET_LOSS_SCHEDULE_RESULTS.md) already compared 90-to-0 fading, fixed 90/10, a paper-style fixed weight and a 100-step label warm start followed by audio-only training. The fading version led on raw MR-STFT; the paper-style version led after gain matching. Their direct difference was inconclusive, so no schedule is selected yet.
 
 ### Performance variation curriculum
 

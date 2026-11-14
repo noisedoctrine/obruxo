@@ -6,7 +6,7 @@ Can local patch refinement improve the sound score enough to be useful after the
 
 ## What was compared
 
-The starting predictions came from the selected checkpoint of the source-parameter-loss 90-to-0 decay run. The screen covered 21 development sound families and varied oscillator 1 level, amplitude-envelope attack, and the model's predicted category choices. The methods were not given source-preset parameter values. The reported quality measure was gain-matched spectral error; a lower change is better.
+The starting predictions came from the selected checkpoint of the [completed source-label schedule comparison](PRESET_LOSS_SCHEDULE_RESULTS.md), including its linear 90-to-0 decay version. The screen covered 21 development sound families and varied oscillator 1 level, amplitude-envelope attack, and the model's predicted category choices. The methods were not given source-preset parameter values. The reported quality measure was gain-matched spectral error; a lower change is better.
 
 The first comparison supplied the correct note pattern to control patch scoring. A follow-up supplied no source MIDI and estimated note events from audio. Tempo and velocity were fixed benchmark defaults in that follow-up.
 
