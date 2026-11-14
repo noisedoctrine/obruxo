@@ -22,7 +22,7 @@ The system is intended to remain fully local and open source: no cloud dependenc
 
 ## Current research documents
 
-- [Project brief](research/PROJECT_BRIEF.md)
+- [Project brief](research/archive/initial_project_brief.md)
 - [Modelling research tracker](research/modelling/RESEARCH_TRACKER.md)
 - [Model architecture](research/modelling/MODEL_ARCHITECTURE.md)
 - [Training and release plan](research/modelling/TRAINING_PLAN.md)

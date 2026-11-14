@@ -39,6 +39,19 @@ def test_identity_rejects_ambiguous_documents(raw):
         identity.identities(raw)
 
 
+@pytest.mark.parametrize(("raw", "reason"), [
+    (b'{"a":', "invalid_json_syntax"),
+    (b'\xff', "invalid_utf8"),
+    (b'{"a":1,"a":2}', "duplicate_json_key"),
+    (b'{"a":NaN}', "nonfinite_json_constant"),
+    (b'[]', "non_object_root"),
+])
+def test_identity_exclusion_reasons_are_sanitized(raw, reason):
+    with pytest.raises(ValueError) as caught:
+        identity.identities(raw)
+    assert identity.exclusion_reason(caught.value) == reason
+
+
 def test_identity_audit_synthetic_four_files(tmp_path):
     corpus, output = tmp_path / "corpus", tmp_path / "output"
     corpus.mkdir()
@@ -52,6 +65,8 @@ def test_identity_audit_synthetic_four_files(tmp_path):
     assert result["state"] == "complete"
     summary = read_json(output / "identity_summary.json")
     assert summary["valid_files"] == 3 and summary["excluded_files"] == 1
+    assert summary["exclusion_reason_counts"] == {"nonfinite_json_constant": 1}
+    assert not summary["reference_population_reconciled"]
     assert [summary["levels"][level]["groups"] for level in identity.LEVELS] == [3, 2, 1]
     assert {path.name: file_hash(path) for path in corpus.iterdir()} == before
     rows = [json.loads(line) for line in (output / "members.jsonl").read_text().splitlines()]
@@ -168,6 +183,33 @@ def test_independent_repeat_cache_hash_and_source_guard(tmp_path):
         render_one(context, renderer, row, "held_c4", "baseline", 0, directory, "test")
 
 
+def test_only_structured_render_incompatibility_becomes_an_outcome(tmp_path):
+    from obruxo_data.errors import Diagnostic, Severity, ValidationError, ValidationReport
+    row, _ = synthetic_fixture(tmp_path)
+    context = Context(tmp_path, 20)
+
+    class IncompatibleRenderer:
+        renderer_id = "incompatible-renderer"
+
+        def render(self, request):
+            report = ValidationReport((Diagnostic("fixture.unsupported", Severity.ERROR, "unsupported fixture"),))
+            raise ValidationError(report)
+
+    result = render_one(context, IncompatibleRenderer(), row, "held_c4", "baseline", 0,
+                        tmp_path / "incompatible", "test")
+    assert result["state"] == "render_incompatible"
+    assert result["diagnostics"][0]["code"] == "fixture.unsupported"
+
+    class BrokenRenderer:
+        renderer_id = "broken-renderer"
+
+        def render(self, request):
+            raise RuntimeError("synthetic operational failure")
+
+    with pytest.raises(RuntimeError, match="synthetic operational failure"):
+        render_one(context, BrokenRenderer(), row, "held_c4", "baseline", 0, tmp_path / "broken", "test")
+
+
 def test_source_packet_requires_review_and_verifies_citations(tmp_path, monkeypatch):
     source, output = tmp_path / "source", tmp_path / "packet"
     source.mkdir()
@@ -226,6 +268,26 @@ def test_feature_shape_guard_without_model_or_torch_import():
     arrays["note"][0, 0] = np.nan
     with pytest.raises(ValueError):
         FrozenFeatures.validate(arrays)
+
+
+def test_event_metrics_are_sanitized_and_inference_errors_propagate(tmp_path):
+    from quickresearch.encoder import event_frame_evidence, score_case
+    counts = {"reference_count": 2, "prediction_count": 3, "tp": 1, "fp": 2, "fn": 1}
+    metrics = {"notes": {"onset_pitch": counts, "onset_pitch_offset": counts,
+                          "timing_diagnostics": {name: {"support": 1} for name in ("onset", "offset", "duration")}},
+               "frames": counts}
+    case = {"fixture_id": "fixture", "category": "Bass", "performance": "held_c4", "state": "ok",
+            "metrics": metrics, "render": {"wav": "private.wav"}, "features": {"arrays_path": "private.npz"}}
+    evidence = event_frame_evidence([case], 1, True)
+    assert set(evidence["cases"][0]) == {"fixture_id", "category", "performance", "state", "metrics"}
+    assert evidence["summary"][-1]["onset_pitch"] == {
+        "reference_count": 2, "prediction_count": 3, "tp": 1, "fp": 2, "fn": 1,
+        "precision": pytest.approx(1 / 3), "recall": pytest.approx(1 / 2), "f1": pytest.approx(.4),
+    }
+    features = Mock()
+    features.get.side_effect = RuntimeError("synthetic inference failure")
+    with pytest.raises(RuntimeError, match="synthetic inference failure"):
+        score_case(features, {}, [], tmp_path / "reference.mid", Mock(), Mock())
 
 
 def test_report_plots_with_synthetic_arrays(tmp_path):

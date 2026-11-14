@@ -12,6 +12,7 @@ from .common import BudgetExpired, Context, file_hash, finish_report, write_csv,
 RULE = "patch_identity_v1"
 DISPLAY_FIELDS = frozenset({"author", "comments", "preset_name"})
 LEVELS = ("raw", "canonical", "state")
+REFERENCE_CENSUS = {"discovered_files": 9620, "valid_files": 9618, "malformed_files": 2}
 
 
 def unique_object(pairs):
@@ -64,6 +65,23 @@ def identities(raw: bytes) -> dict[str, str]:
     document = parse_document(raw)
     return {"raw": hashlib.sha256(raw).hexdigest(), "canonical": document_hash(document),
             "state": document_hash(document, ignore_display=True)}
+
+
+def exclusion_reason(error: Exception) -> str:
+    if isinstance(error, json.JSONDecodeError):
+        return "invalid_json_syntax"
+    if isinstance(error, UnicodeDecodeError):
+        return "invalid_utf8"
+    if isinstance(error, OSError):
+        return "read_error"
+    message = str(error)
+    if "duplicate JSON key" in message:
+        return "duplicate_json_key"
+    if "nonfinite JSON constant" in message:
+        return "nonfinite_json_constant"
+    if "preset root must be an object" in message:
+        return "non_object_root"
+    return "invalid_document"
 
 
 def simulated_split(identifier: str, seed: int = 0) -> str:
@@ -126,7 +144,7 @@ def run(context: Context, args) -> dict:
                     path = Path(directory) / name
                     relative = path.relative_to(root).as_posix()
                     if path.is_symlink():
-                        exclusions.append({"relative_path": relative, "reason": "symlink_excluded"})
+                        exclusions.append({"relative_path": relative, "reason": "symlink"})
                         continue
                     try:
                         raw = path.read_bytes()
@@ -144,27 +162,35 @@ def run(context: Context, args) -> dict:
                                 examples.append({"level": level, "group_id": row[level], "changed_json_pointers": changed,
                                                  "interpretation": "formatting-only" if not changed else "declared display fields only"})
                     except (OSError, ValueError, TypeError, UnicodeError) as error:
-                        exclusions.append({"relative_path": relative, "reason": type(error).__name__})
+                        exclusions.append({"relative_path": relative, "reason": exclusion_reason(error)})
                     context.progress(completed_files=len(rows), excluded_files=len(exclusions))
     except BudgetExpired:
         complete = False
     os.replace(temporary, members_path)
+    reason_counts = dict(sorted(Counter(row["reason"] for row in exclusions).items()))
+    reconciled = complete and len(rows) == REFERENCE_CENSUS["valid_files"] and len(exclusions) == REFERENCE_CENSUS["malformed_files"]
     summary = {"rule": RULE, "complete": complete, "valid_files": len(rows), "excluded_files": len(exclusions),
+               "exclusion_reason_counts": reason_counts, "reference_census": REFERENCE_CENSUS,
+               "reference_population_reconciled": reconciled,
                "seed": args.seed, "split_policy": "simulated file-relative-path hash, expected 80/10/10; not an existing training split",
                "levels": summarize(rows), "introduced_examples": examples,
-               "reference_census_valid_files": 9618, "difference_from_reference": len(rows) - 9618 if complete else None}
+               "reference_census_valid_files": REFERENCE_CENSUS["valid_files"],
+               "difference_from_reference": len(rows) - REFERENCE_CENSUS["valid_files"] if complete else None}
     write_json(context.output / "identity_summary.json", summary)
     write_json(context.output / "identity_manifest.json", {"rule": RULE, "corpus_root": str(root), "complete": complete,
                "members_sha256": file_hash(members_path), "members_file": "members.jsonl", "valid_files": len(rows)})
     write_csv(context.output / "exclusions.csv", exclusions)
     table = "\n".join(f"| {level} | {value['groups']} | {value['duplicate_excess']} | {value['crossing_groups']} | {value['crossing_files']} |"
                       for level, value in summary["levels"].items())
+    reason_text = ", ".join(f"{reason}: {count}" for reason, count in reason_counts.items()) or "none"
+    reconciliation = ("This matches the reference census: 9,620 discovered, 9,618 valid, and two malformed."
+                      if reconciled else "The valid/excluded population does not match the reference census and requires inspection.")
     report = (f"# Dataset identity\n\nStatus: {'complete' if complete else 'partial / budget reached'}. "
-              f"Parsed {len(rows)} files; excluded {len(exclusions)}.\n\n"
+              f"Parsed {len(rows)} files; excluded {len(exclusions)} ({reason_text}). {reconciliation}\n\n"
               "| Identity | Groups | Extra duplicates | Simulated crossing groups | Affected files |\n|---|---:|---:|---:|---:|\n" + table +
               "\n\nFormatting and the three declared top-level display fields are the only normalization axes. "
               "These are stored-state groups, not ancestry or perceptual-equivalence claims. "
               "Split crossings concern a deterministic simulated file split.\n\n"
-              "The historical census had 9,618 parsed files; any difference is a corpus/parser population difference requiring inspection of the local exclusions. "
+              "The historical census had 9,618 parsed files and two malformed files; any difference is a corpus/parser population difference requiring inspection. "
               "Group membership and source paths are private local artifacts. Introduced-group examples contain only field pointers.\n")
     return finish_report(context, "DATASET_IDENTITY_REPORT.md", report, "complete" if complete else "budget_exhausted", valid_files=len(rows))
