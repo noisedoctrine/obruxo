@@ -1,0 +1,6 @@
+outputs/
+local_checkpoints/
+*.wav
+*.npz
+*.private.json
+*.private.jsonl
