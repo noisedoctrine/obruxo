@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import deque
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass, fields
 import json
 import math
@@ -15,12 +16,15 @@ from obruxo_data.errors import Severity
 from obruxo_data.hashing import canonical_sha256
 from obruxo_data.midi import TempoMap
 from obruxo_data.render.base import LEGACY_TRAINING_RENDERER_ID, RenderRequest
-from obruxo_data.render.qa import AudioQualityConfig, analyze_audio
+from obruxo_data.render.qa import AudioQualityConfig, analyze_audio, audio_diagnostics_from_qa
 
 from .contracts import RenderRecipe
 
 
 REJECT_AUDIO_CODES = frozenset({"audio.silence", "audio.clipping", "audio.tail_truncation"})
+WORKER_QA_FIELDS = ("expected_frames", "actual_frames", "expected_channels", "actual_channels", "finite", "peak",
+                    "clipping_count", "rms", "silence_threshold", "dc_offset", "tail_frames", "tail_rms",
+                    "tail_rms_warning", "audio_float32_sha256")
 
 
 @dataclass(frozen=True)
@@ -93,8 +97,23 @@ def _render_payload(renderer, request_json: str, memory_name: str, frames: int):
             raise ValueError("renderer returned an incompatible audio shape")
         if result.provenance.request_id != request.request_id or result.provenance.renderer_id != request.renderer_id:
             raise ValueError("renderer provenance does not match the request")
-        qa, audio_diagnostics = analyze_audio(result.audio, sample_rate=request.sample_rate, expected_frames=frames,
-                                             expected_channels=request.channels)
+        cached_qa = result.qa
+        qa_config = getattr(renderer, "qa_config", None)
+        reusable = (qa_config == AudioQualityConfig() and isinstance(cached_qa, dict)
+                    and all(field in cached_qa for field in WORKER_QA_FIELDS)
+                    and cached_qa["expected_frames"] == frames and cached_qa["actual_frames"] == frames
+                    and cached_qa["expected_channels"] == request.channels and cached_qa["actual_channels"] == request.channels
+                    and cached_qa["finite"] is True and cached_qa["silence_threshold"] == qa_config.silence_rms
+                    and cached_qa["tail_frames"] == min(frames, round(qa_config.tail_seconds * request.sample_rate))
+                    and cached_qa["tail_rms_warning"] == qa_config.tail_rms_warning
+                    and isinstance(cached_qa["audio_float32_sha256"], str)
+                    and len(cached_qa["audio_float32_sha256"]) == 64)
+        if reusable:
+            qa = {field: cached_qa[field] for field in WORKER_QA_FIELDS}
+            audio_diagnostics = audio_diagnostics_from_qa(qa, config=qa_config)
+        else:
+            qa, audio_diagnostics = analyze_audio(result.audio, sample_rate=request.sample_rate, expected_frames=frames,
+                                                 expected_channels=request.channels)
         diagnostics = result.diagnostics + audio_diagnostics
         codes = sorted({item.code for item in diagnostics})
         rejected = any(item.severity == Severity.ERROR or item.code in REJECT_AUDIO_CODES for item in diagnostics)
@@ -238,6 +257,50 @@ class RenderWorker:
             memory.close()
             memory.unlink()
         return audio, {**metadata, "wall_seconds": perf_counter() - started}
+
+
+class RenderWorkerPool:
+    """Run independent clips on a small fixed set of isolated native workers."""
+
+    def __init__(self, *, renderer_factory=None, worker_count=1, max_jobs=None, max_bytes=32 * 1024 * 1024):
+        if type(worker_count) is not int or not 1 <= worker_count <= 4:
+            raise ValueError("render worker count must be an integer from 1 to 4")
+        max_jobs = StreamConfig().worker_jobs if max_jobs is None else max_jobs
+        StreamConfig(prefetch_bytes=max_bytes, worker_jobs=max_jobs)
+        self.worker_count = worker_count
+        self.workers = [RenderWorker(renderer_factory=renderer_factory, max_jobs=max_jobs, max_bytes=max_bytes)
+                        for _ in range(worker_count)]
+        self.executor = ThreadPoolExecutor(max_workers=worker_count) if worker_count > 1 else None
+        self.closed = False
+
+    def render_many(self, requests, *, timeout=60.):
+        if self.closed:
+            raise RuntimeError("render worker pool is closed")
+        requests = list(requests)
+        results = [None] * len(requests)
+        for start in range(0, len(requests), self.worker_count):
+            group = requests[start:start + self.worker_count]
+            if self.executor is None:
+                results[start] = self.workers[0].render(group[0], timeout=timeout)
+                continue
+            futures = {self.executor.submit(self.workers[index].render, request, timeout=timeout): start + index
+                       for index, request in enumerate(group)}
+            failure = None
+            for future in as_completed(futures):
+                try:
+                    results[futures[future]] = future.result()
+                except Exception as error:
+                    failure = failure or error
+            if failure is not None:
+                raise failure
+        return results
+
+    def close(self):
+        if self.executor is not None:
+            self.executor.shutdown(wait=True)
+        for worker in self.workers:
+            worker.close()
+        self.closed = True
 
 
 def render_isolated(request: RenderRequest, *, renderer_factory=None, timeout: float = 60, worker=None) -> tuple[np.ndarray | None, dict]:

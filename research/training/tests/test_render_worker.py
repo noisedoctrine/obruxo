@@ -1,13 +1,14 @@
 from dataclasses import dataclass, replace
 import json
 import multiprocessing as mp
-from threading import Event, Timer
+from threading import Event, Lock, Timer
+from time import sleep
 
 import numpy as np
 import pytest
 
 from obruxo_training.pilot import PilotPool, PilotSampler
-from obruxo_training.stream import OnlineRenderStream, RenderWorker, StreamConfig, render_isolated, request_frames
+from obruxo_training.stream import OnlineRenderStream, RenderWorker, RenderWorkerPool, StreamConfig, render_isolated, request_frames
 from test_stream import FakeRenderer
 
 
@@ -126,6 +127,43 @@ def test_oversized_request_is_rejected_before_starting_process(pool):
     for value in (0, 129, True, 1.5):
         with pytest.raises(ValueError, match="worker_jobs"):
             RenderWorker(max_jobs=value)
+
+
+@pytest.mark.parametrize("worker_count", [1, 2])
+def test_worker_pool_preserves_request_order(monkeypatch, worker_count):
+    import obruxo_training.stream as stream
+
+    state = {"active": 0, "peak": 0, "lock": Lock()}
+
+    class FakeWorker:
+        def __init__(self, **_kwargs):
+            pass
+
+        def render(self, request, *, timeout):
+            with state["lock"]:
+                state["active"] += 1
+                state["peak"] = max(state["peak"], state["active"])
+            sleep(.04 if request == 0 else .001)
+            with state["lock"]:
+                state["active"] -= 1
+            return request, {"timeout": timeout}
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(stream, "RenderWorker", FakeWorker)
+    pool = RenderWorkerPool(worker_count=worker_count)
+    assert pool.render_many([0, 1, 2]) == [(0, {"timeout": 60.}), (1, {"timeout": 60.}), (2, {"timeout": 60.})]
+    assert state["peak"] == worker_count
+    pool.close()
+    with pytest.raises(RuntimeError, match="closed"):
+        pool.render_many([0])
+
+
+@pytest.mark.parametrize("worker_count", [0, 5, True, 1.5])
+def test_worker_pool_rejects_invalid_worker_counts(worker_count):
+    with pytest.raises(ValueError, match="worker count"):
+        RenderWorkerPool(worker_count=worker_count)
 
 
 def test_reused_worker_training_recovers_exact_optimizer_and_rng(pool, tmp_path):

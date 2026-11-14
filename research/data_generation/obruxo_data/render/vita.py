@@ -223,6 +223,23 @@ def verify_loaded_controls(requested: dict[str, Any], loaded: dict[str, Any], *,
     return checked
 
 
+def verify_native_basic_controls(requested: dict[str, Any], synth, parameters: dict[str, int], specs) -> int:
+    """Verify warm basic-control updates through Vital's native parameter readback."""
+    if set(parameters) != set(CONTROL_NAMES):
+        raise RuntimeError("Vital native parameter mapping does not cover the qualified basic controls")
+    settings = requested.get("settings", {})
+    mismatches = []
+    for name, index in parameters.items():
+        spec, value = specs[name], settings.get(name)
+        expected = _float32(_float32(value - spec.minimum) / _float32(spec.maximum - spec.minimum))
+        actual = synth.get_parameter(index)
+        if type(actual) not in (int, float) or not math.isfinite(actual) or not math.isclose(expected, actual, rel_tol=1e-6, abs_tol=1e-7):
+            mismatches.append(name)
+    if mismatches:
+        raise RuntimeError("Vital did not apply the requested native basic controls: " + ", ".join(sorted(mismatches)))
+    return len(parameters)
+
+
 def _default_plugin_path() -> Path | None:
     configured = os.environ.get("OBRUXO_VITAL_PLUGIN")
     if configured:
@@ -338,6 +355,8 @@ class VitalRenderer(Renderer):
         try:
             reused = key is not None and self._session is not None
             if not reused:
+                if _sha256_file(self.plugin_path) != self.engine_fingerprint:
+                    raise DependencyUnavailableError("Vital plugin binary changed after renderer initialization")
                 directory = tempfile.TemporaryDirectory(prefix="obruxo-vital-render-")
                 engine = daw.RenderEngine(request.sample_rate, self.buffer_size)
                 synth = engine.make_plugin_processor("vital", str(self.plugin_path))
@@ -367,9 +386,7 @@ class VitalRenderer(Renderer):
         basic_key = self._basic_key(request, requested_document)
         validation_cached = basic_key is not None and basic_key == self._validated_basic
         validation_diagnostics = self._validate_request(request, basic_key=basic_key, document=requested_document)
-        fingerprint = _sha256_file(self.plugin_path)
-        if fingerprint != self.engine_fingerprint:
-            raise DependencyUnavailableError("Vital plugin binary changed after renderer initialization")
+        fingerprint = self.engine_fingerprint
         try:
             import dawdreamer as daw
         except ImportError as error:
@@ -417,21 +434,23 @@ class VitalRenderer(Renderer):
                     normalized = _float32(_float32(value - spec.minimum) / _float32(spec.maximum - spec.minimum))
                     if not synth.set_parameter(index, normalized):
                         raise RuntimeError(f"native basic control update failed: {name}")
+                checked_scalars = verify_native_basic_controls(native_document, synth, parameters, self._basic_specs)
+                full_readback = {}
             else:
                 state_path.write_bytes(template.build(json.dumps(native_document)))
                 synth.load_state(str(state_path))
-            synth.save_state(str(loaded_path))
-            loaded = VitalVst3StateTemplate(loaded_path.read_bytes()).preset_document
-            if self.renderer_id == FULL_CORPUS_RENDERER_ID:
-                from .corpus_inputs import verify_native_corpus_controls
-                checked_scalars, scalar_roundtrips = verify_native_corpus_controls(native_document, loaded, self.full_contract)
-            else:
-                checked_scalars = verify_loaded_controls(native_document, loaded, legacy_training=self.legacy_training)
-            full_readback = {}
-            if self.full_contract is not None:
-                from .full_state import verify_full_nested_state
-                full_readback = verify_full_nested_state(native_document, loaded, self.full_contract.spec["fixed_native_ramps"],
-                                                        signed_seed_bits=self.renderer_id in {FULL_SEED_RENDERER_ID, FULL_EXPRESSION_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_CORPUS_RENDERER_ID})
+                synth.save_state(str(loaded_path))
+                loaded = VitalVst3StateTemplate(loaded_path.read_bytes()).preset_document
+                if self.renderer_id == FULL_CORPUS_RENDERER_ID:
+                    from .corpus_inputs import verify_native_corpus_controls
+                    checked_scalars, scalar_roundtrips = verify_native_corpus_controls(native_document, loaded, self.full_contract)
+                else:
+                    checked_scalars = verify_loaded_controls(native_document, loaded, legacy_training=self.legacy_training)
+                full_readback = {}
+                if self.full_contract is not None:
+                    from .full_state import verify_full_nested_state
+                    full_readback = verify_full_nested_state(native_document, loaded, self.full_contract.spec["fixed_native_ramps"],
+                                                            signed_seed_bits=self.renderer_id in {FULL_SEED_RENDERER_ID, FULL_EXPRESSION_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_CORPUS_RENDERER_ID})
             midi_transport = None
             if self.renderer_id in {FULL_EXPRESSION_RENDERER_ID, FULL_CURVE_RENDERER_ID, FULL_CORPUS_RENDERER_ID}:
                 from .midi_transport import write_sample_midi
@@ -493,7 +512,9 @@ class VitalRenderer(Renderer):
                 "scalar_native_roundtrips": scalar_roundtrips} if self.renderer_id == FULL_CORPUS_RENDERER_ID else {}),
         }
         qa["basic_session"] = {"eligible": basic_key is not None, "engine_reused": reused,
-                               "direct_controls": reused, "validation_cached": validation_cached}
+                               "direct_controls": reused, "validation_cached": validation_cached,
+                               "verified_scalars": checked_scalars,
+                               "control_readback": "native_parameter_getter" if reused else "full_state_json"}
         if midi_transport is not None:
             qa["midi_transport"] = midi_transport
         diagnostics = validation_diagnostics + tuple(bridge_diagnostics) + audio_diagnostics

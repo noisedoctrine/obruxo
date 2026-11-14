@@ -43,15 +43,17 @@ def digest(path):
 
 
 @contextmanager
-def cpu_settings():
-    threads, deterministic = torch.get_num_threads(), torch.are_deterministic_algorithms_enabled()
+def cpu_settings(threads=2):
+    if type(threads) is not int or threads < 1:
+        raise ValueError("CPU thread count must be a positive integer")
+    prior_threads, deterministic = torch.get_num_threads(), torch.are_deterministic_algorithms_enabled()
     with torch.random.fork_rng(devices=[]):
         try:
-            torch.set_num_threads(2)
+            torch.set_num_threads(threads)
             torch.use_deterministic_algorithms(True)
             yield
         finally:
-            torch.set_num_threads(threads)
+            torch.set_num_threads(prior_threads)
             torch.use_deterministic_algorithms(deterministic)
 
 

@@ -25,7 +25,7 @@ from .proxy import performance_inputs
 from .reproducibility import fixed_generator_phases
 from .spectral import SpectralTargets, target_bytes
 from .spectral_controls import BasicControlAdapter
-from .stream import NativeRendererFactory, RenderWorker, StreamConfig
+from .stream import NativeRendererFactory, RenderWorkerPool, StreamConfig
 from .temporal_proxy import sample_frames, temporal_proxy_spec
 from .trainer import atomic_torch_save
 
@@ -160,11 +160,17 @@ class NativeSession:
         self.path = output / "renders.jsonl"
         self.events = [json.loads(line) for line in self.path.read_text().splitlines()] if self.path.exists() else []
         self.execution_policy = {"lifecycle": "basic_native_session_v3", "worker_jobs": StreamConfig().worker_jobs}
+        self.worker_count = plan.get("render_workers", 1)
+        if type(self.worker_count) is not int or not 1 <= self.worker_count <= 4:
+            raise ValueError("native render worker count must be an integer from 1 to 4")
+        if self.worker_count > 1:
+            self.execution_policy["worker_count"] = self.worker_count
         if any(row.get("execution_policy") != self.execution_policy for row in self.events):
             raise ValueError("render lifecycle changed; resume historical runs from their recorded source revision")
         self.renderer_identity = next((row["renderer_identity"] for row in self.events if row.get("renderer_identity") is not None), None)
         self.started = json.loads((output / "run.json").read_text())["started_unix"]
-        self.worker = RenderWorker(renderer_factory=self.factory, max_jobs=self.execution_policy["worker_jobs"])
+        self.worker = RenderWorkerPool(renderer_factory=self.factory, worker_count=self.worker_count,
+                                       max_jobs=self.execution_policy["worker_jobs"])
         self._cleanup = finalize(self, self.worker.close)
 
     def close(self):
@@ -185,27 +191,53 @@ class NativeSession:
         self.events.append(value)
 
     def render(self, target, performance, phase, label):
+        return self.render_many([(target, performance, phase, label)])[0]
+
+    def render_many(self, requests):
+        requests = list(requests)
+        if not requests:
+            return []
+        phases = {phase for _target, _performance, phase, _label in requests}
+        if len(phases) != 1:
+            raise ValueError("one native render batch must use a single phase")
+        phase = next(iter(phases))
         self.check_limits()
-        count = sum(row["event"] == "attempt" and row["phase"] == phase for row in self.events)
-        if count >= self.plan["limits"][f"{phase}_attempts"]:
+        attempt = sum(row["event"] == "attempt" and row["phase"] == phase for row in self.events)
+        if attempt + len(requests) > self.plan["limits"][f"{phase}_attempts"]:
             raise RuntimeError("helper native-attempt budget exhausted")
-        source = self.codec.decode(target)
-        request = RenderRequest(preset_json=fixed_generator_phases(source).decode(), performance=performance,
-                                renderer_id=self.codec.contract.renderer_id, tail_seconds=self.codec.contract.tail_seconds,
-                                preroll_frames=self.plan.get("render_profile", {}).get("preroll_frames", 0))
-        identity = {"phase": phase, "label": label, "request_id": request.request_id, "attempt": count, "execution_policy": self.execution_policy,
-                    "source_sha256": sha256_bytes(source), "controlled_sha256": sha256_bytes(request.preset_json.encode())}
-        self._append({"event": "attempt", **identity})
-        remaining = self.plan["limits"]["wall_seconds"] - (time() - self.started)
-        audio, metadata = self.worker.render(request, timeout=min(60., max(.1, remaining)))
-        if audio is not None:
-            current = {key: value for key, value in metadata["provenance"].items() if key != "request_id"}
-            if self.renderer_identity is not None and current != self.renderer_identity:
-                raise ValueError("renderer identity changed")
-            self.renderer_identity = current
-        result = {"event": "outcome", **identity, **metadata, "renderer_identity": self.renderer_identity}
-        self._append(result)
-        return audio, result
+        jobs = []
+        for offset, (target, performance, _phase, label) in enumerate(requests):
+            source = self.codec.decode(target)
+            request = RenderRequest(preset_json=fixed_generator_phases(source).decode(), performance=performance,
+                                    renderer_id=self.codec.contract.renderer_id, tail_seconds=self.codec.contract.tail_seconds,
+                                    preroll_frames=self.plan.get("render_profile", {}).get("preroll_frames", 0))
+            identity = {"phase": phase, "label": label, "request_id": request.request_id, "attempt": attempt + offset,
+                        "execution_policy": self.execution_policy, "source_sha256": sha256_bytes(source),
+                        "controlled_sha256": sha256_bytes(request.preset_json.encode())}
+            jobs.append((request, identity))
+        results = []
+        for start in range(0, len(jobs), self.worker_count):
+            self.check_limits()
+            group = jobs[start:start + self.worker_count]
+            for _request, identity in group:
+                self._append({"event": "attempt", **identity})
+            remaining = self.plan["limits"]["wall_seconds"] - (time() - self.started)
+            rendered = self.worker.render_many([request for request, _identity in group],
+                                               timeout=min(60., max(.1, remaining)))
+            if len(rendered) != len(group):
+                raise RuntimeError("native worker pool returned an incomplete batch")
+            for (request, identity), (audio, metadata) in zip(group, rendered, strict=True):
+                if audio is not None:
+                    current = {key: value for key, value in metadata["provenance"].items() if key != "request_id"}
+                    if self.renderer_identity is not None and current != self.renderer_identity:
+                        raise ValueError("renderer identity changed")
+                    self.renderer_identity = current
+                result = {"event": "outcome", **identity, **metadata, "renderer_identity": self.renderer_identity}
+                self._append(result)
+                results.append((audio, result))
+            if any(audio is None for audio, _receipt in results[-len(group):]):
+                break
+        return results
 
 
 def collect_frames(pool, output, recipes, session, progress=None):
