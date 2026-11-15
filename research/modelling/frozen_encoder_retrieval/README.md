@@ -52,7 +52,7 @@ python research/modelling/frozen_encoder_retrieval/run.py report `
   --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation
 ```
 
-The controlled follow-up uses one validation preset and three or four real MIDI excerpts with varied polyphony, register, note duration, and available velocity ranges. It perturbs one filter, envelope, and routed LFO frequency in separate variants. Every variant is rendered with the source Vital seed and a distinct independent seed; same-MIDI retrieval uses the independent-seed gallery so a query cannot match itself. Patch distances are compared with same-preset seed-repeat variance:
+The controlled follow-up uses one validation preset and the complete 50-performance held-out cohort, covering varied polyphony, register, note duration, articulation, and velocity. It perturbs one filter, envelope, and routed LFO frequency in separate variants. Every variant is rendered with the source Vital seed and a distinct independent seed; same-MIDI retrieval uses the independent-seed gallery so a query cannot match itself. Patch distances are compared with same-preset seed-repeat variance, with uncertainty bootstrapped over all 50 MIDI identities:
 
 ```powershell
 python research/modelling/frozen_encoder_retrieval/run_controlled_perturbation.py `

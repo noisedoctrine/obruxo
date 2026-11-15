@@ -28,7 +28,7 @@ from frozen_retrieval import evaluation
 from frozen_retrieval.encoders import _load_cir_ast_offline, _load_muq_mulan_offline, _resolve_local_configs
 from frozen_retrieval.rendering import (QA_POLICY_ID, RENDER_POLICY_ID, _accepted, _qa_warnings,
                                         _receipt_matches_cached_audio, render_plan_identity)
-from frozen_retrieval.reporting import (_inventory_summary, _performance_profile, build_control_inventory, build_controlled_inventory,
+from frozen_retrieval.reporting import (_control_group, _inventory_summary, _performance_profile, build_control_inventory, build_controlled_inventory,
                                         generate_report)
 import run_controlled_perturbation as controlled
 
@@ -214,6 +214,14 @@ class EpisodeContractTests(unittest.TestCase):
         self.assertTrue(all(key[1] == "midi-1" and key[2] == "independent" for key in candidates))
         with self.assertRaisesRegex(ValueError, "distinct independent gallery render seed"):
             controlled._cross_seed_keys("original", "midi-1", ["original", "filter"], "source", "source")
+
+    def test_controlled_diagnostic_keeps_all_distinct_performance_clusters(self):
+        performances = [{"midi_id": f"m{index:02}"} for index in range(50)]
+        chosen = controlled._select_diagnostic_performances(list(reversed(performances)))
+        self.assertEqual(50, len(chosen))
+        self.assertEqual(sorted(row["midi_id"] for row in performances), [row["midi_id"] for row in chosen])
+        with self.assertRaisesRegex(ValueError, "three distinct real MIDI excerpts"):
+            controlled._select_diagnostic_performances(performances[:-1] + [performances[0]])
 
     def test_render_quality_strata_include_performance_uncertainty(self):
         rows = [{"episode_id": f"{midi}-{family}", "query_midi_id": midi,
@@ -748,6 +756,10 @@ class FeatureAndManifestTests(unittest.TestCase):
 
 
 class ReportingAndControlTests(unittest.TestCase):
+    def test_envelope_attack_controls_are_not_grouped_as_global_settings(self):
+        self.assertEqual("Envelopes", _control_group({"data_path": "settings.env_1_attack",
+            "control_key": "env_1_attack", "family": "env.attack"}))
+
     def test_controlled_cli_accepts_all_run_encoder_families(self):
         args = controlled._parser().parse_args([
             "--dataset", "dataset", "--renderer-config", "renderer.yaml", "--checkpoint-root", "checkpoints",
@@ -831,7 +843,8 @@ class ReportingAndControlTests(unittest.TestCase):
             self.assertIn("Status: **unavailable / not run**", text)
             self.assertIn("Recall@1 | not run", text)
             self.assertIn("control family", text)
-            self.assertEqual(1, text.count("| Global settings ❌ 0 / 610 |"))
+            self.assertRegex(text, r"\| Global settings ❌ 0 / \d+ \|")
+            self.assertRegex(text, r"\| Envelopes ❌ 0 / \d+ \|")
             self.assertLess(text.index("## Results and recommendation"), text.index("## Execution status"))
 
     def test_controlled_report_renders_each_version_family_inventory(self):
@@ -847,7 +860,14 @@ class ReportingAndControlTests(unittest.TestCase):
                 "controlled_fields": {"filter_cutoff_shift": {"field": "filter_1_cutoff",
                     "before_raw": 20.0, "after_raw": 40.0, "before_normalized": 0.1,
                     "after_normalized": 0.3}},
-                "models": {}, "midi_strata": [],
+                "models": {}, "midi_strata": [
+                    {"max_polyphony": 1, "pitch_median": 30, "duration_seconds": 3.0,
+                     "note_duration_median_seconds": 1.0, "velocity_min": 50, "velocity_max": 50,
+                     "articulation": "held"},
+                    {"max_polyphony": 3, "pitch_median": 60, "duration_seconds": 5.0,
+                     "note_duration_median_seconds": 2.0, "velocity_min": 40, "velocity_max": 90,
+                     "articulation": "phrased"},
+                ],
             }), encoding="utf-8")
             generate_report(report, inventory, controlled_summary_path=controlled)
             text = report.read_text(encoding="utf-8")
@@ -855,6 +875,8 @@ class ReportingAndControlTests(unittest.TestCase):
             self.assertIn("### Filter cutoff perturbation", text)
             self.assertIn("| Filters ✅ 1 /", text)
             self.assertIn("| Envelopes ❌ 0 /", text)
+            self.assertIn("2 MIDI IDs; polyphony 1–3, median pitch 30–60", text)
+            self.assertIn("MIDI-cluster intervals summarize variation for this one preset", text)
             self.assertLess(text.index("## Controlled preset perturbations"), text.index("## Execution status"))
 
 

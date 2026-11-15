@@ -23,7 +23,7 @@ def _control_group(row: dict) -> str:
     key = (row.get("control_key") or "").lower()
     family = (row.get("family") or "").lower()
     text = " ".join((path, key, family))
-    if path.startswith("settings.") and not any(token in text for token in ("filter", "envelope", "lfo", "osc", "unison", "reverb", "chorus", "delay", "phaser", "distortion")):
+    if path.startswith("settings.") and not any(token in text for token in ("filter", "envelope", "env_", "lfo", "osc", "unison", "reverb", "chorus", "delay", "phaser", "distortion")):
         return "Global settings"
     if any(token in text for token in ("oscillator", "osc_", "unison", "voice", "wavetable")):
         return "Oscillators and voices" if "wavetable" not in text else "Wavetables, curves and samples"
@@ -148,6 +148,21 @@ def _metric(result: dict | None, key: str) -> str:
     if not result or result.get(key) is None:
         return "not run"
     return f"{result[key]:.4f}"
+
+
+def _controlled_midi_profile(rows: list[dict]) -> str:
+    if not rows:
+        return "not recorded"
+    articulations = Counter(row.get("articulation", "unknown") for row in rows)
+    variable_velocity = sum(row.get("velocity_min") != row.get("velocity_max") for row in rows)
+    return (f"{len(rows)} MIDI IDs; polyphony {min(row['max_polyphony'] for row in rows)}–"
+            f"{max(row['max_polyphony'] for row in rows)}, median pitch {min(row['pitch_median'] for row in rows)}–"
+            f"{max(row['pitch_median'] for row in rows)}, clip length "
+            f"{min(row['duration_seconds'] for row in rows):.2f}–{max(row['duration_seconds'] for row in rows):.2f}s, "
+            f"median note duration {min(row['note_duration_median_seconds'] for row in rows):.2f}–"
+            f"{max(row['note_duration_median_seconds'] for row in rows):.2f}s, variable velocity "
+            f"{variable_velocity}/{len(rows)}, articulation {articulations['held']} held / "
+            f"{articulations['phrased']} phrased")
 
 
 def _percent(result: dict | None, key: str) -> str:
@@ -393,12 +408,15 @@ def _reader_summary(current_dataset: dict, current_eval: dict | None, comparison
         lines.append("The acoustic top-5 negatives are selected by an independent spectral descriptor, not human-verified perceptual labels. Query and gallery QA warning strata are reported to show whether render warnings shift ranking.")
     unscored = []
     measured = {arm.split(":", 1)[0] for arm in current_ranking}
+    measured_earlier = {arm.split(":", 1)[0] for arm in older_ranking}
     for model_name, spec in MODEL_REGISTRY.items():
         if model_name not in measured:
             candidate = availability.get(model_name, {})
             reasons = "; ".join(candidate.get("unavailable_reasons", [])) or "no measured results"
             source_link = f" ([source]({spec['source']}))" if spec.get("source") else ""
             license_link = f" ([license status]({spec['license_source']}))" if spec.get("license_source") else ""
+            if model_name in measured_earlier:
+                reasons = "expanded-cohort results are incomplete; original-cohort results are reported above"
             unscored.append(f"- {spec['name']}{source_link}: {reasons}; {candidate.get('license', spec['license'])}{license_link}.")
     if unscored:
         lines.extend(["**Unscored candidates and blockers:**", "", *unscored, ""])
@@ -674,10 +692,7 @@ def generate_report(destination: Path, inventory: Path, *, dataset_dir: Path | N
             lines.append("The selected MIDI set contains no supported expressive-event queries, so main-benchmark sensitivity to sustain, pitch bend, channel pressure, and CC modulation remains unmeasured.")
         lines.append("")
     if controlled and controlled_inventory_path is not None and controlled_inventory is not None:
-        midi_description = "; ".join(
-            f"polyphony {row['max_polyphony']}, median pitch {row['pitch_median']}, clip {row['duration_seconds']:.2f}s, "
-            f"median note {row['note_duration_median_seconds']:.2f}s, velocity {row['velocity_min']}–{row['velocity_max']}, {row['articulation']}"
-            for row in controlled.get("midi_strata", []))
+        midi_description = _controlled_midi_profile(controlled.get("midi_strata", []))
         validation = controlled.get("inherited_source_validation_diagnostics", {})
         lfo_control = controlled.get("controlled_fields", {}).get("lfo_frequency_shift", {})
         modulation_source = lfo_control.get("route_source", "unknown")
@@ -691,8 +706,8 @@ def generate_report(destination: Path, inventory: Path, *, dataset_dir: Path | N
             f"it exceeded identical-preset seed-repeat distance on {lfo_exceeds.get('estimate', 'not measured')} "
             f"of excerpts. This tests a routed LFO rate change, not phase reconstruction or full temporal-control recovery.")
         lines.extend(["## Controlled preset perturbations", "",
-            f"This secondary diagnostic uses one original validation preset, three single-control perturbations, {len(controlled.get('midi_strata', []))} MIDI performances, and source/independently randomized Vital renders for each version. It reports cross-MIDI identity retrieval, same-MIDI retrieval against a different random seed, and perturbation distance relative to the identical-preset repeat distance. Query vectors never appear in their own galleries. The MIDI-cluster intervals are exploratory because the diagnostic uses one preset and a small performance subset.",
-            "R@5 is a four-version ceiling and is not interpreted. The original source carried only one selected routed LFO parameter change; the audio comparison tests LFO rate sensitivity, not phase recovery or general temporal-control recovery.",
+            f"This secondary diagnostic uses one original validation preset, three single-control perturbations, {len(controlled.get('midi_strata', []))} MIDI performances, and source/independently randomized Vital renders for each version. It reports cross-MIDI identity retrieval, same-MIDI retrieval against a different random seed, and perturbation distance relative to the identical-preset repeat distance. Query vectors never appear in their own galleries. The MIDI-cluster intervals summarize variation for this one preset and do not generalize across presets or controls.",
+            "R@5 is a four-version ceiling and is not interpreted. The LFO arm changes one selected routed frequency field; no phase or modulation route is optimized.",
             f"MIDI excerpt properties: {midi_description or 'not recorded'}. The original source carried {validation.get('count', 'unreported')} inherited Vital schema diagnostics ({json.dumps(validation.get('codes', {}), sort_keys=True)}); perturbations introduced {validation.get('new_diagnostics_after_perturbation', 'unreported')} new diagnostics. Velocity ranges are recorded, but velocity response was not isolated. The independent 64-bin log-frequency audio descriptor has no human audibility threshold. {audio_sensitivity}",
             f"The linked [{controlled_inventory_path.name}](./{controlled_inventory_path.name}) records every exact Vital control/instance for each version ({controlled_inventory['records_per_version']} rows per version). No model predicts or optimizes these controls; each perturbation is manually specified, with every other source value held fixed.", ""])
         labels = {"original": "Original source preset", "filter_cutoff_shift": "Filter cutoff perturbation",

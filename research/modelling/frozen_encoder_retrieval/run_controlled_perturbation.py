@@ -57,6 +57,14 @@ def _cross_seed_keys(target: str, midi_id: str, variants: list[str], query_seed:
     return query_key, gallery_keys
 
 
+def _select_diagnostic_performances(performances: list[dict]) -> list[dict]:
+    chosen = sorted(performances, key=lambda item: item["midi_id"])
+    midi_ids = {item["midi_id"] for item in chosen}
+    if len(chosen) < 3 or len(midi_ids) != len(chosen):
+        raise ValueError("controlled experiment needs at least three distinct real MIDI excerpts")
+    return chosen
+
+
 def _bootstrap_midi_mean(rows: list[dict], metric: str, *, seed: int = 0, replicates: int = 2000) -> dict:
     grouped = defaultdict(list)
     for row in rows:
@@ -143,24 +151,7 @@ def run(args: argparse.Namespace) -> dict:
     if renderer_config.get("renderer_id") != FULL_CORPUS_RENDERER_ID:
         raise ValueError("controlled runs require the corpus-qualified Vital renderer")
 
-    mono = [row for row in performances if row["stats"]["max_polyphony"] == 1]
-    poly = [row for row in performances if row["stats"]["max_polyphony"] > 1]
-    chosen = []
-    for candidates in (
-            sorted(mono, key=lambda item: (item["stats"]["pitch_median"], item["stats"]["note_duration_median_seconds"], item["midi_id"])),
-            sorted(poly, key=lambda item: (-item["stats"]["pitch_median"], -item["stats"]["note_duration_median_seconds"], item["midi_id"])),
-            sorted(mono, key=lambda item: (-item["stats"]["note_duration_median_seconds"], -item["stats"]["pitch_median"], item["midi_id"]))):
-        candidate = next((row for row in candidates if row["midi_id"] not in {item["midi_id"] for item in chosen}), None)
-        if candidate is not None:
-            chosen.append(candidate)
-    if len(chosen) < 3:
-        raise ValueError("controlled experiment needs three different real MIDI excerpts")
-    if not any(row["stats"]["velocity_min"] < row["stats"]["velocity_max"] for row in chosen):
-        variable_velocity = [row for row in performances if row["stats"]["velocity_min"] < row["stats"]["velocity_max"]]
-        if variable_velocity:
-            chosen.append(max(variable_velocity, key=lambda row: (
-                row["stats"]["velocity_max"] - row["stats"]["velocity_min"],
-                row["stats"]["max_polyphony"], row["stats"]["pitch_median"], row["midi_id"])))
+    chosen = _select_diagnostic_performances(performances)
 
     eligible_presets = []
     for row in sorted(presets, key=lambda item: item["state_id"]):
@@ -414,7 +405,7 @@ def run(args: argparse.Namespace) -> dict:
         "audio_change_diagnostics": audio_change_diagnostics,
         "render_requests": len(render_rows), "accepted_renders": len(accepted),
         "models": model_results,
-        "confidence_intervals": "percentile bootstrap over normalized MIDI identity clusters (2,000 replicates); four MIDI clusters make intervals exploratory"}
+        "confidence_intervals": f"percentile bootstrap over normalized MIDI identity clusters ({len(chosen)} clusters; 2,000 replicates)"}
     (output / "controlled_summary.private.json").write_text(json.dumps(result, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     return result
 
