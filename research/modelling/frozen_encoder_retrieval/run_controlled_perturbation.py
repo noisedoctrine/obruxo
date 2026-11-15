@@ -27,7 +27,8 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--checkpoint-root", type=Path, required=True)
     parser.add_argument("--lock", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--models", nargs="+", choices=("clap_music", "muq_mulan", "dac_44khz", "encodec_24khz"),
+    parser.add_argument("--models", nargs="+", choices=("clap_music", "muq_mulan", "dac_44khz", "encodec_24khz",
+                        "beats_iter3_plus", "cir_ast"),
                         default=("clap_music", "dac_44khz"))
     parser.add_argument("--device", choices=("cpu", "cuda", "xpu"), default="cpu")
     return parser

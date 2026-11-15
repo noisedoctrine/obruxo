@@ -809,9 +809,9 @@ class ReportingAndControlTests(unittest.TestCase):
         args = controlled._parser().parse_args([
             "--dataset", "dataset", "--renderer-config", "renderer.yaml", "--checkpoint-root", "checkpoints",
             "--lock", "checkpoint-lock.json", "--output", "output", "--models",
-            "clap_music", "muq_mulan", "dac_44khz", "encodec_24khz",
+            "clap_music", "muq_mulan", "dac_44khz", "encodec_24khz", "beats_iter3_plus", "cir_ast",
         ])
-        self.assertEqual(["clap_music", "muq_mulan", "dac_44khz", "encodec_24khz"], args.models)
+        self.assertEqual(["clap_music", "muq_mulan", "dac_44khz", "encodec_24khz", "beats_iter3_plus", "cir_ast"], args.models)
 
     def test_performance_profile_reports_selected_split_and_midi_diversity_only(self):
         with tempfile.TemporaryDirectory(dir=REPO) as directory:
