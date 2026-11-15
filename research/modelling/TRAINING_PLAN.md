@@ -111,6 +111,10 @@ For the first such comparison, normalize only model input/features, preserve the
 
 This policy guides **future experiments**; it does not itself select MuQ, change the 14-output Stage A model, authorize a new fit or alter any already-frozen experiment. Inference/export must match the precision contract that was qualified for the selected model.
 
+## Communicating research findings
+
+Follow the repository-wide [research reporting guidance](../../AGENTS.md). Lead experiment reports and PR descriptions with the **scientific conclusion and a compact table of comparable results**, then explain the most important failure modes, evidence limits and the next decision. Explicitly name the number of distinct source presets, MIDI performances or other independent groups behind a larger episode count. **Separate research findings from operational validation** (render QA, checkpoints, runtime, RAM, caching, tests and implementation status); keep provenance and detailed Vital-control inventories later or linked. A working pipeline or many passing tests is not a scientific result.
+
 ## Execution and reporting rules
 
 All upcoming work stays local/free-first. Colab notebooks, Linux renderer qualification, paid resources and distributed training are deferred. A GPU cannot fix CPU plugin setup or repeated native-query costs by itself. Use the qualified CPU float32 renderer; choose XPU training only after measuring the coupled path. Start with one native worker, two Torch threads and a 4-GiB process-tree planning ceiling for small trials; cards may specify justified measured limits. Do not silently increase concurrency or weaken QA.
