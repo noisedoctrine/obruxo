@@ -91,8 +91,11 @@ def resolve_checkpoint(model_name: str, checkpoint_root: Path, lock: dict) -> tu
     loader_revision = entry.get("loader_revision")
     if not isinstance(loader_revision, str) or not loader_revision.strip():
         raise ValueError(f"checkpoint lock must record an exact loader/source revision for {model_name}")
-    if entry.get("license_status") != "approved":
-        raise PermissionError(f"checkpoint license is not approved in the lock for {model_name}")
+    license_status = entry.get("license_status")
+    if license_status == "explicitly-prohibited":
+        raise PermissionError(f"checkpoint terms explicitly prohibit this research use for {model_name}")
+    if license_status not in {"approved", "research-use-unverified"}:
+        raise ValueError(f"checkpoint lock must record approved terms or explicitly authorized research use for {model_name}")
     _resolve_local_configs(root, model_name, entry)
     required_runtime = {package for package in dependency_status(model_name)}
     if not required_runtime.issubset(entry.get("runtime_versions", {})):

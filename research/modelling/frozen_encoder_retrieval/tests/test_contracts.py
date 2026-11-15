@@ -23,7 +23,7 @@ from frozen_retrieval.dataset import (_file_sha256, _paired_source_midi, _perfor
                                      bounded_excerpt, midi_features,
                                      validate_dataset_manifests)
 from frozen_retrieval.encoders import (_beats_sequence, _clap_roberta_config, _decode_audio, _freeze_model,
-                                       _make_muq_audio_initializer)
+                                       _make_muq_audio_initializer, checkpoint_sha256, resolve_checkpoint)
 from frozen_retrieval import evaluation
 from frozen_retrieval.encoders import _load_cir_ast_offline, _load_muq_mulan_offline, _resolve_local_configs
 from frozen_retrieval.rendering import (QA_POLICY_ID, RENDER_POLICY_ID, _accepted, _qa_warnings,
@@ -89,6 +89,34 @@ def _fake_cosine_matrix(left, right, _np):
             row.append(sum(a * b for a, b in zip(query, candidate, strict=True)) / denominator)
         scores.append(row)
     return _Matrix(scores)
+
+
+class CheckpointLockTests(unittest.TestCase):
+    def _lock(self, root: Path, license_status: str) -> dict:
+        checkpoint = root / "clap.bin"
+        checkpoint.write_bytes(b"fixture checkpoint")
+        runtime_versions = {"numpy": "test", "scipy": "test", "torch": "test", "laion_clap": "test",
+                            "transformers": "test"}
+        return {"models": {"clap_music": {"repository_id": "lukewys/laion_clap", "path": checkpoint.name,
+                                            "sha256": checkpoint_sha256(checkpoint), "revision": "a" * 40,
+                                            "loader_revision": "laion_clap==test", "runtime_versions": runtime_versions,
+                                            "license_status": license_status}}}
+
+    def test_research_use_with_unverified_terms_is_not_blocked(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            lock = self._lock(root, "research-use-unverified")
+            path, entry, digest = resolve_checkpoint("clap_music", root, lock)
+            self.assertEqual(path.name, "clap.bin")
+            self.assertEqual(entry["license_status"], "research-use-unverified")
+            self.assertEqual(digest, entry["sha256"])
+
+    def test_explicit_research_prohibition_stops_checkpoint_loading(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            lock = self._lock(root, "explicitly-prohibited")
+            with self.assertRaisesRegex(PermissionError, "explicitly prohibit"):
+                resolve_checkpoint("clap_music", root, lock)
 
 
 class EpisodeContractTests(unittest.TestCase):
