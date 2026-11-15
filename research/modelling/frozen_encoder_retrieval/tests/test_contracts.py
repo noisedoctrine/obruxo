@@ -23,7 +23,7 @@ from frozen_retrieval.dataset import (_file_sha256, _paired_source_midi, _perfor
                                      bounded_excerpt, midi_features,
                                      validate_dataset_manifests)
 from frozen_retrieval.encoders import (_beats_sequence, _clap_roberta_config, _decode_audio, _freeze_model,
-                                       _import_source_module_without_bytecode, _make_muq_audio_initializer,
+                                       _import_source_module_without_bytecode, _make_muq_audio_initializer, cache_feature,
                                        checkpoint_sha256, resolve_checkpoint, resolve_source_checkout)
 from frozen_retrieval import evaluation
 from frozen_retrieval.encoders import _load_cir_ast_offline, _load_muq_mulan_offline, _resolve_local_configs
@@ -32,6 +32,8 @@ from frozen_retrieval.rendering import (QA_POLICY_ID, RENDER_POLICY_ID, _accepte
 from frozen_retrieval.reporting import (_control_group, _inventory_summary, _performance_profile, build_control_inventory, build_controlled_inventory,
                                         generate_report)
 import run_controlled_perturbation as controlled
+import run_controlled_candidate_shortlist as candidate_screen
+import run_issue155_validation as issue155
 
 
 def _presets():
@@ -281,7 +283,8 @@ class EpisodeContractTests(unittest.TestCase):
         rows = [{"episode_id": f"{midi}-{family}", "query_midi_id": midi,
                  "target_family_id": family, "recall_at_1": float(midi == "m1"),
                  "recall_at_5": 1.0, "mrr": float(midi == "m1"), "family_recall_at_1": 1.0,
-                 "strata": {"query_render_quality": quality, "gallery_render_quality": "clean"}}
+                 "strata": {"query_render_quality": quality,
+                            "correct_match_gallery_render_quality": "clean"}}
                 for midi in ("m1", "m2") for family, quality in (("f1", "clean"), ("f2", "warning"))]
         strata = evaluation._strata(rows)
         clean = strata["query_render_quality"]["clean"]
@@ -289,8 +292,103 @@ class EpisodeContractTests(unittest.TestCase):
         self.assertEqual(2, clean["performance_cluster_bootstrap"]["performance_clusters"])
         self.assertEqual(2, warning["two_way_cluster_bootstrap"]["performance_clusters"])
 
+    def test_one_warned_candidate_in_129_is_not_a_warning_gallery(self):
+        states = [f"state-{index}" for index in range(129)]
+        episode = {"episode_id": "episode", "condition": "cross_midi_common_gallery",
+                   "candidate_set_id": "candidate", "target_state_id": states[0],
+                   "target_family_id": "family-0", "query_midi_id": "query-midi",
+                   "gallery_midi_id": "gallery-midi"}
+        pair_to_request = {(state, "gallery-midi"): f"gallery-{index}"
+                           for index, state in enumerate(states)}
+        pair_to_request[(states[0], "query-midi")] = "query"
+        receipts = {request: {"qa_status": "accepted"} for request in pair_to_request.values()}
+        receipts["gallery-128"] = {"qa_status": "accepted_with_amplitude_above_unit_range"}
+        candidates = {"candidate": {"state_ids": states}}
+        row = {"episode_id": "episode", "query_midi_id": "query-midi", "target_family_id": "family-0",
+               "recall_at_1": 1.0, "recall_at_5": 1.0, "mrr": 1.0, "family_recall_at_1": 1.0,
+               "strata": {}}
+
+        evaluation._attach_render_quality([row], [episode], candidates, pair_to_request, receipts)
+
+        self.assertEqual("clean", row["query_render_quality"])
+        self.assertEqual("clean", row["correct_match_gallery_render_quality"])
+        self.assertEqual(1, row["gallery_warning_candidate_count"])
+        self.assertEqual(129, row["gallery_candidate_count"])
+        self.assertAlmostEqual(1 / 129, row["gallery_warning_candidate_fraction"])
+        self.assertNotIn("gallery_render_quality", row)
+        self.assertNotIn("gallery_render_quality", row["strata"])
+
+    def test_issue155_gallery_offsets_use_all_50_midis_and_never_self_match(self):
+        performances = [{"midi_id": f"midi-{index:02d}"} for index in range(50)]
+        ordered = issue155._ordered_midi_pool(performances, "validation", (1, 7, 19))
+        self.assertEqual(ordered, issue155._ordered_midi_pool(list(reversed(performances)), "validation", (1, 7, 19)))
+        for offset in (1, 7, 19):
+            galleries = [ordered[(index + offset) % len(ordered)]["midi_id"] for index in range(len(ordered))]
+            queries = [row["midi_id"] for row in ordered]
+            self.assertEqual(set(queries), set(galleries))
+            self.assertTrue(all(query != gallery for query, gallery in zip(queries, galleries, strict=True)))
+        with self.assertRaisesRegex(ValueError, "distinct, non-zero"):
+            issue155._ordered_midi_pool(performances, "validation", (1, 1))
+
 
 class FeatureAndManifestTests(unittest.TestCase):
+    def test_controlled_shortlist_midi_contexts_cover_short_and_long_held_and_phrased_notes(self):
+        rows = []
+        for articulation, durations in (("held", (0.05, 2.5)), ("phrased", (0.08, 1.2))):
+            for index, duration in enumerate(durations):
+                rows.append({"midi_id": f"{articulation}-{index}", "stats": {
+                    "articulation": articulation, "note_duration_median_seconds": duration}})
+
+        selected = candidate_screen._select_contexts(rows)
+
+        self.assertEqual({row["midi_id"] for row in selected}, {"held-0", "held-1", "phrased-0", "phrased-1"})
+        self.assertEqual({row["stats"]["articulation"] for row in selected}, {"held", "phrased"})
+        self.assertEqual({row["stats"]["note_duration_median_seconds"] for row in selected}, {0.05, 2.5, 0.08, 1.2})
+
+    def test_gain_adjusted_wav_is_linear_and_preserves_source_shape_precision_and_file(self):
+        import numpy as np
+        from scipy.io import wavfile
+
+        with tempfile.TemporaryDirectory(dir=REPO) as directory:
+            root = Path(directory)
+            source = root / "source.wav"
+            audio = np.column_stack((np.linspace(-1.8, 1.8, 2000), np.linspace(0.7, -0.7, 2000))).astype(np.float32)
+            wavfile.write(source, 44_100, audio)
+            original_bytes = source.read_bytes()
+            normalized = issue155._normalize_wavs({"dataset": root}, [{"request_id": "clip-1",
+                "state_id": "state-1", "midi_id": "midi-1", "family_id": "family-1",
+                "wav_relative_path": "source.wav", "source_audio_sha256": _file_sha256(source), "peak": 1.8}], root / "output")["clip-1"]
+            sample_rate, adjusted = wavfile.read(normalized["normalized_audio_path"])
+
+            self.assertEqual((44_100, audio.shape, audio.dtype), (sample_rate, adjusted.shape, adjusted.dtype))
+            self.assertAlmostEqual(0.95, float(np.max(np.abs(adjusted))), places=5)
+            self.assertAlmostEqual(0.95 / 1.8, normalized["gain_linear"], places=7)
+            self.assertEqual(original_bytes, source.read_bytes())
+
+    def test_gain_preprocessing_policy_has_a_separate_feature_cache_identity(self):
+        import numpy as np
+        from types import SimpleNamespace
+
+        with tempfile.TemporaryDirectory(dir=REPO) as directory:
+            root = Path(directory)
+            wav = root / "same.wav"
+            wav.write_bytes(b"source audio bytes")
+            adapter = SimpleNamespace(name="clap_music", checkpoint_digest="checkpoint", device="cpu", sample_rate=48_000,
+                lock_entry={"revision": "source", "loader_revision": "loader", "local_configs": {}},
+                model=object(), numpy=np, extract=lambda _path: {"official_clip": [1.0, 0.0]})
+            metadata = {"provenance": {"request_id": "same-request"}}
+            original = cache_feature(adapter, wav, request_id="same-request", render_metadata=metadata,
+                                     output=root / "features")
+            adjusted = cache_feature(adapter, wav, request_id="same-request", render_metadata=metadata,
+                output=root / "features", preprocessing_policy="linear_peak_gain_to_0.95_v1")
+
+            self.assertNotEqual(original["feature_id"], adjusted["feature_id"])
+            original_meta = json.loads((root / "features" / f"{original['feature_id']}.json").read_text())
+            adjusted_meta = json.loads((root / "features" / f"{adjusted['feature_id']}.json").read_text())
+            self.assertEqual("pcm_scale_stereo_mean_mono_resample_poly_no_gain_norm_v2",
+                             original_meta["cache_identity"]["preprocessing"])
+            self.assertEqual("linear_peak_gain_to_0.95_v1", adjusted_meta["cache_identity"]["preprocessing"])
+
     def test_clap_offline_roberta_config_matches_checkpoint_embedding_shapes(self):
         class Config:
             def __init__(self, **kwargs):
@@ -896,9 +994,50 @@ class ReportingAndControlTests(unittest.TestCase):
             self.assertIn("Controlled patch-perturbation diagnostic: not run", text)
             self.assertIn("Status: **unavailable / not run**", text)
             self.assertIn("Recall@1 | not run", text)
-            self.assertIn("control family", text)
-            self.assertRegex(text, r"\| Global settings ❌ 0 / \d+ \|")
-            self.assertRegex(text, r"\| Envelopes ❌ 0 / \d+ \|")
+            self.assertIn("0 outputs; all source controls stay fixed", text)
+            self.assertIn("inventory.jsonl", text)
+            self.assertNotIn("| Vital control family | Enabled / total |", text)
+            self.assertNotIn("Vital controls for this representation version", text)
+
+    def test_report_presents_issue155_results_and_keeps_candidate_gate_explicit(self):
+        source = REPO / "research/modelling/control_scope/stage_a_controls.jsonl"
+        with tempfile.TemporaryDirectory(dir=REPO) as directory:
+            root = Path(directory)
+            inventory, report = root / "inventory.jsonl", root / "report.md"
+            validation, shortlist = root / "issue155.json", root / "shortlist.json"
+            build_control_inventory(source, inventory)
+            validation.write_text(json.dumps({
+                "input_dataset": {"accepted_cached_clips": 6480},
+                "gallery_assignment_experiment": {"offsets": [1, 7, 19],
+                    "per_assignment": {}, "aggregate": {}, "gallery_midi_count_by_offset": {"1": 50},
+                    "gallery_candidate_count": {"min": 129, "max": 129},
+                    "paired_differences": {}, "per_assignment_winner": {}},
+                "clean_query_only": {"arms": {"clap_music:official_clip": {"queries": 12, "metrics": {
+                    "recall_at_1": {"mean": 0.6, "crossed_95_ci": {"lower_95": 0.5, "upper_95": 0.7}},
+                    "recall_at_5": {"mean": 0.8}, "mrr": {"mean": 0.65}}}}},
+                "strict_clean_gallery": {},
+                "gain_sensitivity": {"sample": {"size": 50}, "arms": {"clap_music:official_clip": {
+                    "adjusted_clip_embedding_cosine_distance": {"mean": 0.02, "crossed_95_ci": {"lower_95": 0.01, "upper_95": 0.03}},
+                    "roles": {role: {"samples": 1, "changed_predictions": 1, "corrected_predictions": 1,
+                        "newly_wrong_predictions": 0, "before": {"metrics": {"recall_at_1": {"mean": 0.5}}},
+                        "after": {"metrics": {"recall_at_1": {"mean": 1.0}}},
+                        "paired_after_minus_before": {"target_margin": {"difference": 0.05,
+                            "lower_95": 0.01, "upper_95": 0.09}}} for role in ("query", "correct_gallery_candidate")}}}},
+                "gain_warning_sample_selection": {},
+            }), encoding="utf-8")
+            shortlist.write_text(json.dumps({"selected_count": 8}), encoding="utf-8")
+            generate_report(report, inventory, issue155_results_path=validation,
+                            candidate_shortlist_path=shortlist)
+            text = report.read_text(encoding="utf-8")
+            self.assertIn("Issue #155 follow-up", text)
+            self.assertIn("all 50 existing excerpts", text)
+            self.assertIn("60.0% [50.0%, 70.0%]", text)
+            self.assertIn("target margin ×100 (cosine points", text)
+            self.assertNotIn("+5.00 pp", text)
+            self.assertIn("automated acoustic screen prepared 8 candidate presets", text)
+            self.assertIn("definitive multi-encoder controlled diagnostic has not been run", text)
+            self.assertLess(text.index("Issue #155 follow-up"), text.index("## Execution status"))
+            self.assertNotIn("| Vital control family | Enabled / total |", text)
             self.assertLess(text.index("## Results and recommendation"), text.index("## Execution status"))
 
     def test_controlled_report_renders_each_version_family_inventory(self):

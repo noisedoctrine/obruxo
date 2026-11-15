@@ -303,7 +303,7 @@ def _summary_cohort_lines(label: str, dataset: dict, evaluation: dict | None) ->
             if delta:
                 span = "includes zero" if delta["lower_95"] <= 0 <= delta["upper_95"] else ""
                 lines.append(f"| `{arm}` | {100 * delta['difference']:+.1f} | [{100 * delta['lower_95']:+.1f}, {100 * delta['upper_95']:+.1f}] {span} |")
-    lines.extend(["", "R@1 intervals are shown in preset-family, performance-ID, and crossed performance × preset-family order (2,000 bootstrap replicates); the heading gives the independent performance denominator. Negative-win cells show query denominators and preset-family/performance-cluster intervals. Clean/warning strata use query-render QA status; differences are descriptive because warning status can covary with preset acoustics. The full report also retains gallery quality strata.", ""])
+    lines.extend(["", "R@1 intervals are shown in preset-family, performance-ID, and crossed performance × preset-family order (2,000 bootstrap replicates); the heading gives the independent performance denominator. Negative-win cells show query denominators and preset-family/performance-cluster intervals. Clean/warning strata describe query audio and correct-match gallery audio separately. For the full candidate gallery, the report gives the number and fraction of warned renders instead of labeling all 129 candidates with one bucket. These are descriptive associations: warning status can covary with preset acoustics.", ""])
     if evaluation:
         model_results = evaluation.get("model_results", {})
         quality_leaders = []
@@ -319,6 +319,29 @@ def _summary_cohort_lines(label: str, dataset: dict, evaluation: dict | None) ->
         if quality_leaders:
             lines.extend(["**Query-render QA strata:** " + "; ".join(quality_leaders) +
                 ". These are per-stratum MIDI-cluster intervals; accepted warning status is associated with the rendered preset and does not imply a causal quality effect.", ""])
+        quality_rows = []
+        for arm, outcomes in sorted(model_results.items()):
+            primary = outcomes.get("cross_midi_common_gallery", {})
+            if not primary.get("episodes"):
+                continue
+            strata = primary.get("strata", {})
+            def quality_text(axis: str) -> str:
+                groups = strata.get(axis, {})
+                return " / ".join(f"{_percent(groups[label], 'recall_at_1')} (n={groups[label].get('episodes', 0):,})"
+                                   for label in ("clean", "warning") if label in groups) or "not split"
+            gallery_quality = primary.get("gallery_render_quality", {})
+            warned_fraction = gallery_quality.get("mean_warning_candidate_fraction")
+            warned_text = (f"{100 * warned_fraction:.1f}% of candidates on average "
+                           f"({gallery_quality.get('episodes_with_any_warning', 0):,}/{gallery_quality.get('episodes', 0):,} galleries contain a warning)"
+                           if warned_fraction is not None else "not recorded")
+            quality_rows.append((arm, quality_text("query_render_quality"),
+                                 quality_text("correct_match_gallery_render_quality"), warned_text))
+        if quality_rows:
+            lines.extend(["**Render-quality diagnostics** (R@1 clean / warning; these buckets are descriptive):", "",
+                "| Encoder arm | Query WAV | Correct-match gallery WAV | Warned candidates across all 129-candidate galleries |",
+                "|---|---:|---:|---|"])
+            lines.extend(f"| `{arm}` | {query} | {target} | {warned} |" for arm, query, target, warned in quality_rows)
+            lines.append("")
         performance_stability = evaluation.get("ranking_stability_by_performance", {})
         condition_labels = (("cross_midi_common_gallery", "Common gallery"),
                             ("cross_midi_mixed_gallery", "Mixed gallery"))
@@ -359,9 +382,104 @@ def _summary_cohort_lines(label: str, dataset: dict, evaluation: dict | None) ->
     return lines
 
 
+def _issue155_followup_lines(results: dict, shortlist: dict | None) -> list[str]:
+    def score_cell(summary: dict) -> str:
+        metrics = summary.get("metrics", {})
+        recall = metrics.get("recall_at_1", {})
+        ci = recall.get("crossed_95_ci", {})
+        r1 = recall.get("mean")
+        r1_text = "not run" if r1 is None else f"{100 * r1:.1f}%"
+        if "lower_95" in ci and "upper_95" in ci:
+            r1_text += f" [{100 * ci['lower_95']:.1f}%, {100 * ci['upper_95']:.1f}%]"
+        r5, mrr = metrics.get("recall_at_5", {}).get("mean"), metrics.get("mrr", {}).get("mean")
+        return f"{r1_text} / {100 * r5:.1f}% / {100 * mrr:.1f}%" if r5 is not None and mrr is not None else r1_text
+
+    def paired_cell(summary: dict | None) -> str:
+        if not summary:
+            return "not estimated"
+        return (f"{100 * summary['difference']:+.1f} pp "
+                f"[{100 * summary['lower_95']:+.1f}, {100 * summary['upper_95']:+.1f}]")
+
+    assignment = results.get("gallery_assignment_experiment", {})
+    offsets = assignment.get("offsets", [])
+    arms = sorted(assignment.get("aggregate", {}))
+    lines = ["### Issue #155 follow-up: the comparison melody does not set the preset candidate count", "",
+        "The original four-MIDI result is preserved as the baseline. We also reassigned the common comparison MIDI three times (deterministic offsets 1, 7 and 19) using all 50 existing excerpts. Each search still ranks the same 129 preset candidates, and the query and gallery play different MIDI excerpts. The 6,450 query inputs repeat across assignments, so we average the three outcomes within each query before estimating uncertainty across MIDI identities and preset families.", ""]
+    if offsets and arms:
+        headers = [f"Offset {offset} R@1 [crossed 95% CI] / R@5 / MRR" for offset in offsets]
+        lines.extend(["| Encoder arm | " + " | ".join(headers) + " | Three-assignment query average |",
+                      "|---|" + "---:|" * (len(headers) + 1)])
+        for arm in arms:
+            cells = [score_cell(assignment.get("per_assignment", {}).get(str(offset), {}).get(arm, {}))
+                     for offset in offsets]
+            cells.append(score_cell(assignment.get("aggregate", {}).get(arm, {})))
+            lines.append(f"| `{arm}` | " + " | ".join(cells) + " |")
+        lines.extend(["", f"All {assignment.get('gallery_midi_count_by_offset', {})} assignment rounds used the same query/preset pairs; the gallery candidate count ranged {assignment.get('gallery_candidate_count', {}).get('min', 'n/e')}–{assignment.get('gallery_candidate_count', {}).get('max', 'n/e')} after render and feature checks. The averaged three-round R@1 change from the preserved four-MIDI baseline was:", ""])
+        baseline_pairs = assignment.get("paired_differences", {}).get("assignment_average_minus_four_midi_baseline", {})
+        lines.extend(["| Arm | Paired ΔR@1, three-round average minus four-MIDI baseline (95% crossed CI) |",
+                      "|---|---:|"])
+        for arm in arms:
+            lines.append(f"| `{arm}` | {paired_cell(baseline_pairs.get(arm, {}).get('recall_at_1'))} |")
+        cir_beats = assignment.get("paired_differences", {}).get("cir_minus_beats_temporal", {})
+        lines.append("")
+        lines.append("Paired CIR minus BEATs temporal-pyramid Recall@1 by assignment (95% crossed performance × preset-family intervals): " +
+                     "; ".join(f"offset {offset}: {paired_cell(cir_beats.get(str(offset), {}).get('recall_at_1'))}"
+                                for offset in offsets) +
+                     f"; query-averaged: {paired_cell(cir_beats.get('aggregate', {}).get('recall_at_1'))}.")
+        top_arms = assignment.get("per_assignment_winner", {})
+        lines.append("Observed top arm by round: " + "; ".join(f"offset {offset}: `{top_arms.get(str(offset), 'n/e')}`"
+            for offset in offsets) + ". Assignment repeats are correlated, not additional performances.")
+    clean_query = results.get("clean_query_only", {})
+    if clean_query.get("arms"):
+        lines.extend(["", "### Audio quality checks", "",
+            f"**A — Original audio:** the six-encoder benchmark above is unchanged: {results.get('input_dataset', {}).get('accepted_cached_clips', 'n/e'):,} accepted cached clips, with the original four-MIDI results retained.",
+            "**B — Clean queries:** we re-summarized the existing cached-feature episode scores for queries whose WAVs had no QA warning. No model inference was repeated for this slice.", "",
+            "| Encoder arm | Clean-query R@1 [crossed 95% CI] / R@5 / MRR | Queries |",
+            "|---|---:|---:|"])
+        for arm, summary in sorted(clean_query["arms"].items()):
+            lines.append(f"| `{arm}` | {score_cell(summary)} | {summary.get('queries', 0):,} |")
+        strict = results.get("strict_clean_gallery", {})
+        if strict.get("status") == "completed":
+            lines.extend(["", f"For a stricter check, we recomputed ranks after removing every warned candidate render and retained only clean query/correct-match pairs. This leaves {strict.get('episodes', 0):,} distinct queries ({strict.get('assignment_observations', 0):,} observations across the correlated assignment rounds); each query uses the same clean candidate set for all encoders, with {strict.get('clean_gallery_candidate_count', {}).get('min', 'n/e')}–{strict.get('clean_gallery_candidate_count', {}).get('max', 'n/e')} candidates.", "",
+            "| Encoder arm | Clean-gallery R@1 [crossed 95% CI] / R@5 / MRR | Clean queries |",
+                "|---|---:|---:|"])
+            for arm, summary in sorted(strict.get("arms", {}).items()):
+                lines.append(f"| `{arm}` | {score_cell(summary)} | {summary.get('queries', 0):,} |")
+        else:
+            lines.append(f"A fully warning-free gallery result was not estimable: {strict.get('reason', 'no qualifying episodes')}; no clean-gallery ranking claim is made.")
+        lines.append("Clean/warning status is descriptive and may track preset acoustics; neither slice establishes a causal render-quality effect.")
+    gain = results.get("gain_sensitivity", {})
+    if gain.get("arms"):
+        sample = gain.get("sample", {})
+        lines.extend(["", f"**C — Gain-reduced warning sample:** a deterministic, stratified sample of {sample.get('size', 0)} WAVs was drawn from {results.get('gain_warning_sample_selection', {}).get('accepted_amplitude_warning_wavs', 0):,} accepted amplitude-warning renders. Copies were reduced linearly to a 0.95 peak and all six encoders re-embedded only those copies; original cached features supplied the unchanged queries/candidates. This is a sensitivity sample, not a corpus-wide accuracy estimate.", "",
+            "| Encoder arm | Clip embedding cosine distance (95% crossed CI) | Query R@1 before→after; changed / fixed / newly wrong | Correct gallery candidate R@1 before→after; changed / fixed / newly wrong | Δ target margin ×100 (cosine points; query / gallery) |",
+            "|---|---:|---:|---:|---:|"])
+        for arm, summary in sorted(gain["arms"].items()):
+            distance = summary.get("adjusted_clip_embedding_cosine_distance", {})
+            ci = distance.get("crossed_95_ci", {})
+            distance_text = f"{distance.get('mean', 0):.4f} [{ci.get('lower_95', 0):.4f}, {ci.get('upper_95', 0):.4f}]"
+            role_text = []
+            margins = []
+            for role in ("query", "correct_gallery_candidate"):
+                data = summary["roles"][role]
+                before = data["before"]["metrics"]["recall_at_1"]["mean"]
+                after = data["after"]["metrics"]["recall_at_1"]["mean"]
+                role_text.append(f"{100 * before:.1f}%→{100 * after:.1f}%; {data['changed_predictions']} / {data['corrected_predictions']} / {data['newly_wrong_predictions']}")
+                margin = data["paired_after_minus_before"]["target_margin"]
+                margins.append(f"{100 * margin['difference']:+.2f} [{100 * margin['lower_95']:+.2f}, {100 * margin['upper_95']:+.2f}]")
+            lines.append(f"| `{arm}` | {distance_text} | {role_text[0]} | {role_text[1]} | {margins[0]} / {margins[1]} |")
+        lines.append(f"Mean applied gain was {sample.get('gain_db_mean', 0):.1f} dB; adjusted peaks were at most {sample.get('peak_after_max', 0):.3f}. No limiter, compression, clipping, or other DSP was used.")
+    if shortlist:
+        selected = shortlist.get("selected_count", len(shortlist.get("candidates", [])))
+        lines.extend(["", "### Controlled-preset shortlist: awaiting user selection", "",
+            f"The automated acoustic screen prepared {selected} candidate presets and before/after/repeat listening examples in ignored local outputs. It checks the measured parameter change against unchanged-preset render variation. The shortlist is for review only; the definitive multi-encoder controlled diagnostic has not been run and no final preset has been selected."])
+    return lines
+
+
 def _reader_summary(current_dataset: dict, current_eval: dict | None, comparison_dataset: dict | None,
                     comparison_eval: dict | None, controls: dict, inventory_name: str,
-                    availability: dict[str, dict]) -> list[str]:
+                    availability: dict[str, dict], validation_results: dict | None = None,
+                    candidate_shortlist: dict | None = None) -> list[str]:
     lines = ["## Results and recommendation", ""]
     model_results = (current_eval or {}).get("model_results", {})
     current_ranking = [arm for arm, outcomes in sorted(model_results.items(),
@@ -386,6 +504,8 @@ def _reader_summary(current_dataset: dict, current_eval: dict | None, comparison
                    f"{current_dataset.get('unique_midi_excerpts', 0)} {performance_label}). "
                    "This ranks frozen representations across six model families; it is retrieval evidence, not a reconstruction result.")
         lines.extend([finding, ""])
+    if validation_results:
+        lines.extend(_issue155_followup_lines(validation_results, candidate_shortlist))
     if comparison_dataset and comparison_eval is not None:
         lines.extend(_summary_cohort_lines("Original validation-paired cohort", comparison_dataset, comparison_eval))
     lines.extend(_summary_cohort_lines("Expanded held-out performance cohort", current_dataset, current_eval))
@@ -455,16 +575,11 @@ def _reader_summary(current_dataset: dict, current_eval: dict | None, comparison
                        if measured_families == len(MODEL_REGISTRY) else
                        f"{measured_families} of six encoder families have expanded-cohort retrieval results on {common_episodes:,} identical common-gallery episodes; incomplete families are listed below.")
     lines.extend([family_coverage,
-                  f"No Vital controls are predicted or trained in retrieval. The linked [{inventory_name}](./{inventory_name}) inventories every exact source field/instance; each family is fixed with 0 enabled controls and 0 model outputs:", "",
-                  "| Vital control family | Enabled / total | Output count | Update method / training signal |",
-                  "|---|---:|---:|---|"])
-    for group in GROUPS:
-        total = controls.get(group, 0)
-        lines.append(f"| {group} ❌ 0 / {total} | 0 | unchanged original preset; no training signal, loss, or gradient |")
+                  f"No Vital controls are predicted or trained in this representation-only benchmark (0 outputs; all source controls stay fixed). The linked [{inventory_name}](./{inventory_name}) is the canonical per-field inventory."])
     if current_dataset.get("performance_identity_overlap_excluded") is not None:
         lines.append(f"The expanded performance IDs came from the permitted `{current_dataset.get('performance_source_split')}` source split; {current_dataset.get('performance_identity_overlap_excluded', 0)} exact MIDI identities overlapping the original cohort were excluded. This is held out from the original MIDI IDs but remains within PresetShare source MIDI, not an external live-performance sample. The score is frozen retrieval on newly rendered audio, not reconstruction quality.")
     if current_eval:
-        lines.append("The acoustic top-5 negatives are selected by an independent spectral descriptor, not human-verified perceptual labels. Query and gallery QA warning strata are reported to show whether render warnings shift ranking.")
+        lines.append("The acoustic top-5 negatives are selected by an independent spectral descriptor, not human-verified perceptual labels. Query and correct-match gallery quality are reported separately; warned candidates are counted within each full gallery.")
     unscored = []
     measured = {arm.split(":", 1)[0] for arm in current_ranking}
     measured_earlier = {arm.split(":", 1)[0] for arm in older_ranking}
@@ -510,9 +625,13 @@ def _local_input_status() -> dict:
 def generate_report(destination: Path, inventory: Path, *, dataset_dir: Path | None = None,
                     checkpoint_root: Path | None = None, lock_path: Path | None = None,
                     execution_note: str | None = None, controlled_summary_path: Path | None = None,
-                    comparison_dataset_dir: Path | None = None) -> dict:
+                    comparison_dataset_dir: Path | None = None,
+                    issue155_results_path: Path | None = None,
+                    candidate_shortlist_path: Path | None = None) -> dict:
     inventory_count, groups = _inventory_summary(inventory)
     controlled = json.loads(controlled_summary_path.read_text(encoding="utf-8")) if controlled_summary_path else None
+    issue155_results = json.loads(issue155_results_path.read_text(encoding="utf-8")) if issue155_results_path else None
+    candidate_shortlist = json.loads(candidate_shortlist_path.read_text(encoding="utf-8")) if candidate_shortlist_path else None
     controlled_inventory_path = destination.with_name("vital_control_inventory_controlled.jsonl") if controlled else None
     controlled_inventory = (build_controlled_inventory(inventory, controlled_inventory_path,
         controlled["controlled_fields"]) if controlled else None)
@@ -684,12 +803,6 @@ def generate_report(destination: Path, inventory: Path, *, dataset_dir: Path | N
                         interval_text = (f"; 2-way 95% CI [{interval['lower_95']:.4f}, {interval['upper_95']:.4f}]"
                                          if "lower_95" in interval and "upper_95" in interval else "")
                         lines.append(f"| Stratum: {axis} = {label} | Recall@1 {_metric(metrics_by_stratum, 'recall_at_1')}{interval_text}; Recall@5 {_metric(metrics_by_stratum, 'recall_at_5')}; MRR {_metric(metrics_by_stratum, 'mrr')} | {metrics_by_stratum.get('episodes', 0)} episodes | frozen encoder; crossed performance/family bootstrap |")
-            if primary and primary.get("episodes"):
-                lines.extend(["", "Vital controls for this representation version:", "",
-                    "| Vital control family | Enabled / exact instances | Vital output count | Update method / training signal |",
-                    "|---|---:|---:|---|"])
-                for group in GROUPS:
-                    lines.append(f"| {group} ❌ 0 / {groups.get(group, 0)} | 0 | unchanged source preset; no head, optimization, loss, or gradient |")
             if not run:
                 license_text = locked_models.get(model_name, {}).get("license", spec["license"])
                 status = (f"Unavailable: {'; '.join(unavailable)}. Checkpoint/license: {license_text}."
@@ -878,7 +991,7 @@ def generate_report(destination: Path, inventory: Path, *, dataset_dir: Path | N
         research_details = document[research_start:research_end].rstrip() + "\n\n"
         document = document[:research_start] + document[research_end:]
     reader_summary = _reader_summary(dataset_info, evaluation, comparison_info, comparison_eval, groups,
-                                     inventory.name, availability)
+                                     inventory.name, availability, issue155_results, candidate_shortlist)
     status_start = document.find("## Execution status\n")
     if status_start >= 0:
         document = document[:status_start] + "\n".join(reader_summary) + "\n" + research_details + document[status_start:]

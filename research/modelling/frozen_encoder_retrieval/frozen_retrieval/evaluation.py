@@ -358,12 +358,22 @@ def _attach_render_quality(rows, episodes, candidates, pair_to_request, receipts
             gallery_requests = [pair_to_request.get((state_id, mixed_gallery_midi_id(episode, state_id, candidates)))
                                 for state_id in candidate_set["state_ids"]]
         gallery_statuses = [receipts.get(request_id, {}).get("qa_status") for request_id in gallery_requests]
-        gallery_bucket = "warning" if any(_render_quality_bucket(status) == "warning" for status in gallery_statuses) else "clean"
+        target_request = pair_to_request.get((episode["target_state_id"], episode["gallery_midi_id"]))
+        if episode["condition"] != "cross_midi_common_gallery":
+            target_request = pair_to_request.get((episode["target_state_id"],
+                                                  mixed_gallery_midi_id(episode, episode["target_state_id"], candidates)))
+        target_status = receipts.get(target_request, {}).get("qa_status") if target_request else None
         query_bucket = _render_quality_bucket(query_status)
         row["query_render_quality"] = query_bucket
-        row["gallery_render_quality"] = gallery_bucket
+        row["correct_match_gallery_render_quality"] = _render_quality_bucket(target_status)
+        warning_count = sum(_render_quality_bucket(status) == "warning" for status in gallery_statuses)
+        row["gallery_warning_candidate_count"] = warning_count
+        row["gallery_candidate_count"] = len(gallery_statuses)
+        row["gallery_warning_candidate_fraction"] = warning_count / len(gallery_statuses) if gallery_statuses else None
+        row["gallery_unknown_candidate_count"] = sum(_render_quality_bucket(status) == "excluded_or_unknown"
+                                                     for status in gallery_statuses)
         row["strata"] = {**row.get("strata", {}), "query_render_quality": query_bucket,
-                          "gallery_render_quality": gallery_bucket}
+                          "correct_match_gallery_render_quality": row["correct_match_gallery_render_quality"]}
     return rows
 
 
@@ -406,6 +416,17 @@ def _summary(rows):
     result = {key: (sum(row[key] for row in rows) / len(rows) if rows else None) for key in metrics}
     result["episodes"] = len(rows)
     result["gallery_size"] = sorted({row["gallery_size"] for row in rows})
+    quality_rows = [row for row in rows if row.get("gallery_candidate_count", 0)]
+    if quality_rows:
+        result["gallery_render_quality"] = {
+            "episodes": len(quality_rows),
+            "mean_warning_candidates": sum(row["gallery_warning_candidate_count"] for row in quality_rows) / len(quality_rows),
+            "mean_warning_candidate_fraction": sum(row["gallery_warning_candidate_fraction"] for row in quality_rows) / len(quality_rows),
+            "episodes_with_any_warning": sum(row["gallery_warning_candidate_count"] > 0 for row in quality_rows),
+            "episodes_with_all_candidates_warned": sum(row["gallery_warning_candidate_count"] == row["gallery_candidate_count"]
+                                                       for row in quality_rows),
+            "episodes_with_unknown_candidates": sum(row["gallery_unknown_candidate_count"] > 0 for row in quality_rows),
+        }
     diagnostic_metrics = ("same_midi_negative_win", "known_near_neighbor_negative_win", "acoustic_hard_negative_win")
     for key in diagnostic_metrics:
         observed = [row for row in rows if row[key] is not None]
@@ -428,7 +449,8 @@ def _strata(rows):
     axes = {key for row in rows for key in row.get("strata", {})
             if key in {"query_polyphony", "query_articulation", "query_expression", "query_duration_band",
                        "pitch_register_gap_band", "duration_gap_band", "query_note_density_band",
-                       "source_preset_lineage_group_size", "query_render_quality", "gallery_render_quality"}}
+                       "source_preset_lineage_group_size", "query_render_quality",
+                       "correct_match_gallery_render_quality"}}
     report = {}
     for axis in sorted(axes):
         groups = defaultdict(list)

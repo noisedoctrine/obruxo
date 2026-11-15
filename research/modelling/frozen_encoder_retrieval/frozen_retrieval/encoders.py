@@ -526,7 +526,8 @@ def load_adapter(model_name: str, checkpoint: Path, lock_entry: dict, checkpoint
 
 
 def cache_feature(adapter: FrozenAdapter, wav_path: Path, *, request_id: str, render_metadata: dict,
-                  output: Path, source_precision: str = "fp32") -> dict:
+                  output: Path, source_precision: str = "fp32",
+                  preprocessing_policy: str = "pcm_scale_stereo_mean_mono_resample_poly_no_gain_norm_v2") -> dict:
     audio_hash = file_sha256(wav_path)
     cache_identity = {"adapter_id": ADAPTER_ID, "model": adapter.name,
                       "checkpoint_sha256": adapter.checkpoint_digest, "source_revision": adapter.lock_entry["revision"],
@@ -535,7 +536,7 @@ def cache_feature(adapter: FrozenAdapter, wav_path: Path, *, request_id: str, re
                                              for name, record in adapter.lock_entry.get("local_configs", {}).items()},
                       "renderer_request_id": request_id, "tap": MODEL_REGISTRY[adapter.name]["tap"],
                       "sample_rate": adapter.sample_rate,
-                      "preprocessing": "pcm_scale_stereo_mean_mono_resample_poly_no_gain_norm_v2",
+                      "preprocessing": preprocessing_policy,
                       "encoder_internal_normalization": ("encodec_config_rms" if adapter.name == "encodec_24khz"
                                                           and bool(getattr(adapter.model.config, "normalize", False)) else "none"),
                       "pooling": "native_clip_v1" if MODEL_REGISTRY[adapter.name]["kind"] == "clip" else "masked_mean_and_8bin_mean_std_v1",
