@@ -1,6 +1,6 @@
 # Frozen encoder retrieval benchmark
 
-This package implements the real Vital/MIDI retrieval shootout from [issue #152](https://github.com/noisedoctrine/obruxo/issues/152). It performs no Vital-control prediction, patch optimization, backbone fine-tuning, or reconstruction training. The main query population is the complete PresetShare-paired, renderer-compatible `validation` membership drawn from an existing frozen corpus snapshot; `train` is an explicit alternative for development only. Test and independent-confirmation reserves are rejected by the CLI.
+This package implements the real Vital/MIDI retrieval shootout from [issue #152](https://github.com/noisedoctrine/obruxo/issues/152). It performs no Vital-control prediction, patch optimization, backbone fine-tuning, or reconstruction training. The original cohort uses the PresetShare-paired, renderer-compatible `validation` membership from an existing frozen snapshot. The expanded cohort keeps that same validation preset gallery but draws held-out MIDI performances from paired `train` source directories; an exact-MIDI-ID exclusion manifest prevents overlap with the original validation performances. Its 50 MIDI IDs are selected deterministically to cover polyphony, articulation, pitch register, density, velocity range, and expression. Test and independent-confirmation reserves are rejected by the CLI.
 
 ## Source and split contract
 
@@ -10,7 +10,7 @@ The input adapter pairs one direct-child `.vital` with one direct-child `.mid`. 
 
 Every compatible source MIDI uses its leading, complete-note excerpt up to eight musical seconds, with a minimum of two seconds, plus the renderer's fixed two-second release tail. The model waveform is therefore 4–10 seconds. Tempo changes, channels, and supported expressive events are kept as authored. The selected renderer's declared capabilities determine eligibility; unsupported events fail with a recorded exclusion reason. No velocity, channel, tempo, or event is silently rewritten.
 
-The main validation candidate set includes all statically eligible, byte-verified original source states that also pass the exact PresetShare source pairing and selected renderer MIDI checks. For each target state, every unique compatible same-split MIDI excerpt becomes a query. A deterministic rotating MIDI from the frozen gallery pool (up to the configured pool size) is rendered on every candidate state; query and common-gallery MIDI IDs must differ. The mixed-gallery condition assigns candidate-specific gallery MIDIs deterministically. Same-MIDI diagnostics compare the query against the full other-preset gallery and known lineage neighbors. A separate acoustic hard-negative check selects up to five same-MIDI candidates by an independent 64-bin log-frequency spectral descriptor, then checks whether a target's cross-MIDI positive outranks those negatives. These auxiliary query-MIDI renders support diagnostics and do not gate a primary episode, which requires only its target query and gallery requests. Per-condition render QA and encoder feature coverage are reported. The primary matrix size is preflighted as presets × unique MIDI excerpts; `--max-render-requests` fails before plan creation when the full matrix exceeds its budget and never truncates presets or MIDI files.
+The validation candidate set includes all statically eligible, byte-verified original states that pass exact PresetShare pairing and renderer compatibility. The original cohort pairs them with compatible validation MIDI. The expanded cohort pairs the same candidate states with a deterministic 50-ID sample of compatible train-source MIDI, excluding all exact MIDI IDs in the original cohort. For each target state, every selected MIDI becomes a query. A deterministic rotating MIDI from the frozen gallery pool (up to the configured pool size) is rendered on every candidate state; query and common-gallery MIDI IDs must differ. The mixed-gallery condition assigns candidate-specific gallery MIDIs deterministically. Same-MIDI diagnostics compare the query against the full other-preset gallery and known lineage neighbors. A separate acoustic hard-negative check selects up to five same-MIDI candidates by an independent 64-bin log-frequency spectral descriptor, then checks whether a target's cross-MIDI positive outranks those negatives. These auxiliary query-MIDI renders support diagnostics and do not gate a primary episode, which requires only its target query and gallery requests. Per-condition render QA and encoder feature coverage are reported. The primary matrix size is preflighted as presets × unique MIDI excerpts; `--max-render-requests` fails before plan creation when the full matrix exceeds its budget and never truncates presets or MIDI files.
 
 Known source lineage/alias groups remain intact. Exact state identity deduplicates display-name aliases. Family retrieval and family-cluster bootstrap are reported alongside exact-state retrieval. The spectral hard-negative set is a coarse audio-similarity proxy, not a human-verified duplicate-timbre or source-instrument label.
 
@@ -26,6 +26,15 @@ python research/modelling/frozen_encoder_retrieval/run.py prepare `
   --data-root datasets/presetshare/raw/presetshare_files `
   --output research/modelling/frozen_encoder_retrieval/outputs/issue152-validation `
   --max-render-requests 50000
+
+# Expanded held-out performance cohort, using the same validation preset gallery:
+python research/modelling/frozen_encoder_retrieval/run.py prepare `
+  --snapshot research/training/outputs/<complete-source-snapshot> `
+  --data-root datasets/presetshare/raw/presetshare_files `
+  --split validation --performance-source-split train --max-performances 50 `
+  --exclude-performance-manifest research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-real-cross-v2b/performances.private.jsonl `
+  --output research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-train-midi-v3-50 `
+  --max-render-requests 10000
 
 python research/modelling/frozen_encoder_retrieval/run.py render `
   --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation `
@@ -43,23 +52,24 @@ python research/modelling/frozen_encoder_retrieval/run.py report `
   --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation
 ```
 
-The controlled follow-up uses the same original validation preset corpus and three or four real MIDI excerpts with varied polyphony, register, note duration, and available velocity ranges. It perturbs one filter, envelope, and live modulation field in separate variants, pre-renders those variants, and caches the same encoder features:
+The controlled follow-up uses one validation preset and three or four real MIDI excerpts with varied polyphony, register, note duration, and available velocity ranges. It perturbs one filter, envelope, and routed LFO frequency in separate variants. Every variant is rendered with the source Vital seed and a distinct independent seed; same-MIDI retrieval uses the independent-seed gallery so a query cannot match itself. Patch distances are compared with same-preset seed-repeat variance:
 
 ```powershell
 python research/modelling/frozen_encoder_retrieval/run_controlled_perturbation.py `
-  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation `
+  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-train-midi-v3-50 `
   --renderer-config research/data_generation/configs/renderer_full_corpus.yaml `
   --plugin-path 'C:\Program Files\Common Files\VST3\Vital.vst3' `
   --checkpoint-root research/modelling/frozen_encoder_retrieval/local_checkpoints `
   --lock research/modelling/frozen_encoder_retrieval/local_checkpoints/checkpoint-lock.json `
-  --output research/modelling/frozen_encoder_retrieval/outputs/issue152-controlled `
-  --models clap_music dac_44khz --device xpu
+  --output research/modelling/frozen_encoder_retrieval/outputs/issue152-controlled-midi-v3-50 `
+  --models clap_music muq_mulan dac_44khz encodec_24khz --device xpu
 
 python research/modelling/frozen_encoder_retrieval/run.py report `
-  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation `
+  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-train-midi-v3-50 `
+  --comparison-dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-real-cross-v2b `
   --checkpoint-root research/modelling/frozen_encoder_retrieval/local_checkpoints `
   --lock research/modelling/frozen_encoder_retrieval/local_checkpoints/checkpoint-lock.json `
-  --controlled-summary research/modelling/frozen_encoder_retrieval/outputs/issue152-controlled/controlled_summary.private.json
+  --controlled-summary research/modelling/frozen_encoder_retrieval/outputs/issue152-controlled-midi-v3-50/controlled_summary.private.json
 ```
 
 The opt-in end-to-end integration test uses the real snapshot, renderer, and plugin on a small two-preset/two-MIDI validation slice, then runs the real feature-cache and evaluation stages with a deterministic test-only adapter. It verifies stage wiring and cache/evaluation contracts, and its generated scores are never research results. Set `OBRUXO_RUN_REAL_INTEGRATION=1`, `OBRUXO_ISSUE152_SNAPSHOT`, `OBRUXO_ISSUE152_DATA_ROOT`, `OBRUXO_ISSUE152_RENDERER_CONFIG`, and `OBRUXO_VITAL_PLUGIN`, then run the package test discovery command. It is skipped in the ordinary unit-test run. If rendering and model evaluation use separate Python environments, make evaluation import the same pinned NumPy/SciPy environment as feature extraction; a mismatched native NumPy runtime can crash during matrix evaluation. Real pretrained checkpoints are exercised by the separate full-corpus experiment reported below.
@@ -70,7 +80,7 @@ Private manifests, WAVs, checkpoint files, feature arrays, and per-episode score
 
 ## Frozen candidates and adapters
 
-Checkpoint acquisition is a separate, manual step. The runner sets Hugging Face offline mode and only loads local files; it never downloads or substitutes weights. Fill a local lock from verified downloads and compatible source checkouts using [checkpoint-lock.example.json](checkpoint-lock.example.json). Every selected checkpoint must have its exact HF/source revision, SHA-256, loader revision, relevant runtime package versions, and `license_status: approved`. MuQ-MuLan and CIR also require separately pinned local architecture/config assets; a cold cache fails during preflight instead of reaching the network. The exact BEATs mirror SHA from the issue comment is enforced. MuQ-MuLan is non-commercial; CIR remains unavailable until its checkpoint terms are verified.
+Checkpoint acquisition is a separate, manual step. The runner sets Hugging Face offline mode and only loads local files; it never downloads or substitutes weights. Fill a local lock from verified downloads and compatible source checkouts using [checkpoint-lock.example.json](checkpoint-lock.example.json). Every selected checkpoint must have its exact HF/source revision, SHA-256, loader revision, relevant runtime package versions, and `license_status: approved`. MuQ-MuLan and CIR also require separately pinned local architecture/config assets; a cold cache fails during preflight instead of reaching the network. The exact BEATs mirror SHA from the issue comment is enforced. MuQ-MuLan is CC BY-NC 4.0 and used only for non-commercial research; CIR remains unavailable until its checkpoint terms are verified. The BEATs mirror lists MIT, but the upstream checkpoint terms remain unconfirmed ([upstream clarification issue](https://github.com/microsoft/unilm/issues/1760)).
 
 | Arm | Exact checkpoint and feature | Input rate | Output |
 |---|---|---:|---:|

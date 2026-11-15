@@ -329,6 +329,16 @@ def _safe_torch_load(torch, path: Path):
     return torch.load(path, map_location="cpu", weights_only=True)
 
 
+def _make_muq_audio_initializer(MuQ, MuQConfig, audio_config: dict):
+    def init_audio(instance, model_name):
+        # Upstream AudioSpectrogramTransformerPretrained invokes this method for its side effect.
+        if model_name != "OpenMuQ/MuQ-large-msd-iter":
+            raise ValueError("MuQ-MuLan requested an unexpected audio architecture")
+        instance.model = MuQ(MuQConfig(**audio_config))
+
+    return init_audio
+
+
 def _load_muq_mulan_offline(checkpoint: Path, config_paths: dict[str, Path], torch, device: str):
     from muq.muq.muq import MuQ, MuQConfig
     from muq.muq_mulan.models.audio import AudioSpectrogramTransformerPretrained
@@ -344,11 +354,7 @@ def _load_muq_mulan_offline(checkpoint: Path, config_paths: dict[str, Path], tor
     audio_config = json.loads((config_paths["audio"] / "config.json").read_text(encoding="utf-8"))
     audio_init, text_init = AudioSpectrogramTransformerPretrained._init_pretrained_model, TextTransformerPretrained._init_pretrained_model
 
-    def init_audio(_instance, model_name):
-        # The MuQ-MuLan state dict below includes the audio tower weights. Build only its pinned architecture here.
-        if model_name != "OpenMuQ/MuQ-large-msd-iter":
-            raise ValueError("MuQ-MuLan requested an unexpected audio architecture")
-        return MuQ(MuQConfig(**audio_config))
+    init_audio = _make_muq_audio_initializer(MuQ, MuQConfig, audio_config)
 
     def init_text(_instance):
         # Text is not used by this audio-only benchmark; its architecture config is enough to load the full state dict.
@@ -555,7 +561,9 @@ def available_candidates(checkpoint_root: Path | None, lock_path: Path | None) -
         rows.append({"id": name, "name": spec["name"], "available": not reasons,
                      "unavailable_reasons": reasons, "sample_rate": spec["sample_rate"],
                      "tap": spec["tap"], "checkpoint": spec["checkpoint"], "source": spec.get("source"),
-                     "license": spec["license"], "dependencies": dependencies})
+                     "license": (entry or {}).get("license", spec["license"]),
+                     "license_status": (entry or {}).get("license_status", "unverified"),
+                     "dependencies": dependencies})
     return rows
 
 

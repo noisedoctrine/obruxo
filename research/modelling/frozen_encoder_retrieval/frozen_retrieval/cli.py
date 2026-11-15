@@ -38,6 +38,12 @@ def _parser() -> argparse.ArgumentParser:
     prepare.add_argument("--renderer-config", type=Path, default=defaults["renderer"])
     prepare.add_argument("--output", type=Path, required=True, help="ignored local output outside the raw data root")
     prepare.add_argument("--split", choices=("train", "validation"), default="validation")
+    prepare.add_argument("--performance-source-split", choices=("train", "validation"),
+                         help="use compatible MIDI paired to this permitted source split while keeping the preset cohort unchanged")
+    prepare.add_argument("--max-performances", type=int,
+                         help="select a deterministic diversity-balanced MIDI subset after exact performance deduplication")
+    prepare.add_argument("--exclude-performance-manifest", type=Path,
+                         help="exclude normalized MIDI IDs already present in another private performance manifest")
     prepare.add_argument("--gallery-midi-pool-size", type=int, default=4)
     prepare.add_argument("--max-render-requests", type=int, default=50_000,
                          help="fail before episode/plan creation if the full matrix exceeds this budget; never truncates")
@@ -57,6 +63,8 @@ def _parser() -> argparse.ArgumentParser:
     evaluate.add_argument("--dataset", type=Path, required=True)
     report = commands.add_parser("report", help="regenerate the sanitized reader-facing comparison report")
     report.add_argument("--dataset", type=Path)
+    report.add_argument("--comparison-dataset", type=Path,
+                        help="optional earlier frozen cohort to compare with the selected result dataset")
     report.add_argument("--checkpoint-root", type=Path)
     report.add_argument("--lock", type=Path)
     report.add_argument("--controlled-summary", type=Path,
@@ -84,7 +92,10 @@ def main(argv: list[str] | None = None) -> int:
             from .dataset import prepare_dataset
             result = prepare_dataset(args.snapshot, args.data_root, args.renderer_config, args.output,
                                      split=args.split, gallery_cap=args.gallery_midi_pool_size,
-                                     max_render_requests=args.max_render_requests)
+                                     max_render_requests=args.max_render_requests,
+                                     performance_source_split=args.performance_source_split,
+                                     max_performances=args.max_performances,
+                                     exclude_performance_manifest=args.exclude_performance_manifest)
         elif args.command == "render":
             from .rendering import render_dataset
             result = render_dataset(args.dataset, args.renderer_config, plugin_path=args.plugin_path,
@@ -102,7 +113,8 @@ def main(argv: list[str] | None = None) -> int:
                 build_control_inventory(REPO_ROOT / "research/modelling/control_scope/stage_a_controls.jsonl", defaults["inventory"])
             result = generate_report(args.output, defaults["inventory"], dataset_dir=args.dataset,
                                      checkpoint_root=args.checkpoint_root, lock_path=args.lock,
-                                     execution_note=args.execution_note, controlled_summary_path=args.controlled_summary)
+                                     execution_note=args.execution_note, controlled_summary_path=args.controlled_summary,
+                                     comparison_dataset_dir=args.comparison_dataset)
         else:
             raise ValueError(f"unsupported command {args.command}")
     except Exception as error:

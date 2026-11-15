@@ -5,7 +5,8 @@ import json
 from pathlib import Path
 
 from .core import (MODEL_REGISTRY, _rank_metrics, canonical_json, cluster_bootstrap, digest, mixed_gallery_midi_id,
-                   paired_cluster_bootstrap, random_baseline)
+                   paired_cluster_bootstrap, paired_performance_bootstrap, paired_two_way_cluster_bootstrap,
+                   performance_cluster_bootstrap, performance_ranking_bootstrap, random_baseline, two_way_cluster_bootstrap)
 from .encoders import list_clip_cache
 from .dataset import validate_dataset_manifests
 from .rendering import QA_POLICY_ID, RENDER_POLICY_ID, render_plan_identity
@@ -335,6 +336,37 @@ def _evaluate_condition(episodes, candidates, pair_to_request, features, variant
     return rows
 
 
+def _render_quality_bucket(status: str | None) -> str:
+    if status == "accepted":
+        return "clean"
+    if status and status.startswith("accepted_with_"):
+        return "warning"
+    return "excluded_or_unknown"
+
+
+def _attach_render_quality(rows, episodes, candidates, pair_to_request, receipts):
+    episode_by_id = {episode["episode_id"]: episode for episode in episodes}
+    for row in rows:
+        episode = episode_by_id[row["episode_id"]]
+        query_request = pair_to_request.get((episode["target_state_id"], episode["query_midi_id"]))
+        query_status = receipts.get(query_request, {}).get("qa_status") if query_request else None
+        candidate_set = candidates[episode["candidate_set_id"]]
+        if episode["condition"] == "cross_midi_common_gallery":
+            gallery_requests = [pair_to_request.get((state_id, episode["gallery_midi_id"]))
+                                for state_id in candidate_set["state_ids"]]
+        else:
+            gallery_requests = [pair_to_request.get((state_id, mixed_gallery_midi_id(episode, state_id, candidates)))
+                                for state_id in candidate_set["state_ids"]]
+        gallery_statuses = [receipts.get(request_id, {}).get("qa_status") for request_id in gallery_requests]
+        gallery_bucket = "warning" if any(_render_quality_bucket(status) == "warning" for status in gallery_statuses) else "clean"
+        query_bucket = _render_quality_bucket(query_status)
+        row["query_render_quality"] = query_bucket
+        row["gallery_render_quality"] = gallery_bucket
+        row["strata"] = {**row.get("strata", {}), "query_render_quality": query_bucket,
+                          "gallery_render_quality": gallery_bucket}
+    return rows
+
+
 def _row_metrics(episode, scores, state_ids, candidate_set, same_midi_scores, acoustic_hard_negative_candidates=()):
     target_index = state_ids.index(episode["target_state_id"])
     rank = _rank_metrics(list(zip(state_ids, scores.tolist(), strict=True)), episode["target_state_id"])
@@ -386,6 +418,9 @@ def _summary(rows):
         observed = [row for row in rows if row[key] is not None]
         if observed:
             result["confidence_intervals"][key] = cluster_bootstrap([(row["target_family_id"], row[key]) for row in observed])
+    result["diagnostic_performance_cluster_bootstrap"] = {
+        key: performance_cluster_bootstrap([row for row in rows if row[key] is not None], metric=key)
+        for key in diagnostic_metrics if any(row[key] is not None for row in rows)}
     return result
 
 
@@ -393,7 +428,7 @@ def _strata(rows):
     axes = {key for row in rows for key in row.get("strata", {})
             if key in {"query_polyphony", "query_articulation", "query_expression", "query_duration_band",
                        "pitch_register_gap_band", "duration_gap_band", "query_note_density_band",
-                       "source_preset_lineage_group_size"}}
+                       "source_preset_lineage_group_size", "query_render_quality", "gallery_render_quality"}}
     report = {}
     for axis in sorted(axes):
         groups = defaultdict(list)
@@ -401,7 +436,11 @@ def _strata(rows):
             groups[row.get("strata", {}).get(axis, "unknown")].append(row)
         report[axis] = {label: {"episodes": len(items), "recall_at_1": sum(row["recall_at_1"] for row in items) / len(items),
                                 "recall_at_5": sum(row["recall_at_5"] for row in items) / len(items),
-                                "mrr": sum(row["mrr"] for row in items) / len(items)}
+                                "mrr": sum(row["mrr"] for row in items) / len(items),
+                                "performance_cluster_bootstrap": performance_cluster_bootstrap(
+                                    items, metric="recall_at_1") if items else {},
+                                "two_way_cluster_bootstrap": two_way_cluster_bootstrap(
+                                    items, metric="recall_at_1") if items else {}}
                         for label, items in sorted(groups.items())}
     return report
 
@@ -517,24 +556,48 @@ def evaluate_dataset(dataset_dir: Path) -> dict:
             selected = [episode for episode in qa_episodes if episode["episode_id"] in common_by_condition[condition]]
             rows = _evaluate_condition(selected, candidates, pair_to_request, features, variant, condition,
                                        acoustic_hard_negatives)
+            rows = _attach_render_quality(rows, selected, candidates, pair_to_request, receipts)
             results[arm][condition] = _summary(rows)
             results[arm][condition]["strata"] = _strata(rows)
+            results[arm][condition]["performance_cluster_bootstrap"] = ({
+                metric: performance_cluster_bootstrap(rows, metric=metric) for metric in
+                ("recall_at_1", "recall_at_5", "mrr")} if rows else {})
+            results[arm][condition]["two_way_cluster_bootstrap"] = ({
+                metric: two_way_cluster_bootstrap(rows, metric=metric) for metric in
+                ("recall_at_1", "recall_at_5", "mrr")} if rows else {})
             all_result_rows[arm][condition] = rows
     arm_names = sorted(results)
-    differences = {}
+    differences, family_differences = {}, {}
     for left_index, left_name in enumerate(arm_names):
         for right_name in arm_names[left_index + 1:]:
-            differences[f"{left_name} - {right_name}"] = {}
+            pair = f"{left_name} - {right_name}"
+            differences[pair], family_differences[pair] = {}, {}
             for condition in conditions:
                 left_rows = all_result_rows[left_name][condition]
                 right_rows = all_result_rows[right_name][condition]
                 if left_rows and right_rows:
-                    differences[f"{left_name} - {right_name}"][condition] = {
-                        metric: paired_cluster_bootstrap(left_rows, right_rows, metric=metric)
-                        for metric in ("recall_at_1", "recall_at_5", "mrr")}
+                    family = {metric: paired_cluster_bootstrap(left_rows, right_rows, metric=metric)
+                              for metric in ("recall_at_1", "recall_at_5", "mrr")}
+                    differences[pair][condition] = {
+                        "family": family,
+                        "performance": {metric: paired_performance_bootstrap(left_rows, right_rows, metric=metric)
+                                        for metric in ("recall_at_1", "recall_at_5", "mrr")},
+                        "performance_and_family": {
+                            metric: paired_two_way_cluster_bootstrap(left_rows, right_rows, metric=metric)
+                            for metric in ("recall_at_1", "recall_at_5", "mrr")}}
+                    family_differences[pair][condition] = family
+    ranking_stability = {condition: performance_ranking_bootstrap({arm: all_result_rows[arm][condition]
+        for arm in arm_names if all_result_rows[arm][condition]}) for condition in conditions
+        if len([arm for arm in arm_names if all_result_rows[arm][condition]]) > 1}
     paired_episodes = [episode for condition in conditions for episode in qa_episodes
                        if episode["condition"] == condition and episode["episode_id"] in common_by_condition[condition]]
-    baseline = midi_shortcut_baseline(paired_episodes, candidates, performances) if paired_episodes else {}
+    baseline = (midi_shortcut_baseline(paired_episodes, candidates, performances)
+                if paired_episodes and dataset_summary.get("performance_source_split", dataset_summary["source_split"])
+                == dataset_summary["source_split"] else
+                {"status": "not_applicable", "reason": "query MIDI source states are outside the validation preset gallery",
+                 "random": {condition: random_baseline([len(candidates[episode["candidate_set_id"]]["state_ids"])
+                     for episode in paired_episodes if episode["condition"] == condition])
+                     for condition in conditions if any(episode["condition"] == condition for episode in paired_episodes)}})
     result = {"version": 1, "policy": "frozen_encoder_real_vital_cross_performance_v1",
               "qa_qualification_id": qa_summary["qualification_id"],
               "common_episode_count_across_available_arms": len(paired_episodes),
@@ -546,10 +609,12 @@ def evaluate_dataset(dataset_dir: Path) -> dict:
                     json.loads((dataset_dir / "candidate_sets.private.json").read_text(encoding="utf-8")).values()) -
                     sum(len(row["state_ids"]) for row in candidates.values()),
               "available_arms": arm_names, "unavailable_encoders": [name for name in MODEL_REGISTRY if not any(arm.startswith(name + ":") for arm in arm_names)],
-              "model_results": results, "paired_family_bootstrap_differences": differences,
+              "model_results": results, "paired_family_bootstrap_differences": family_differences,
+              "paired_cluster_bootstrap_differences": differences, "ranking_stability_by_performance": ranking_stability,
               "acoustic_hard_negative_protocol": "For each query, rank same-MIDI candidate renders by cosine over normalized 64-bin log-frequency spectral power; score each model's cross-MIDI positive against the top five descriptor-selected negatives rendered on the query MIDI.",
               "midi_only_and_random_baselines": baseline,
               "no_source_audio_used": True, "held_out_reserved_sources_used": False,
+              "performance_source_split": dataset_summary.get("performance_source_split", dataset_summary["source_split"]),
               "primary_metric": "Recall@1", "gallery_candidate_set_is_identical_across_arms": True}
     (dataset_dir / "evaluation.private.json").write_text(json.dumps(result, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     with (dataset_dir / "episode_metrics.private.jsonl").open("w", encoding="utf-8", newline="\n") as stream:

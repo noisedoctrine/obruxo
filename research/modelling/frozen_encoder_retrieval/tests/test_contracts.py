@@ -18,15 +18,18 @@ for directory in (PACKAGE, REPO / "research/data_generation", REPO / "research/t
         sys.path.insert(0, str(directory))
 
 from frozen_retrieval import core
-from frozen_retrieval.dataset import (_file_sha256, _paired_source_midi, _remove_nonperformance_meta_events,
+from frozen_retrieval.dataset import (_file_sha256, _paired_source_midi, _performance_tags,
+                                     _remove_nonperformance_meta_events, _select_diverse_performances,
                                      bounded_excerpt, midi_features,
                                      validate_dataset_manifests)
-from frozen_retrieval.encoders import _beats_sequence, _clap_roberta_config, _decode_audio, _freeze_model
+from frozen_retrieval.encoders import (_beats_sequence, _clap_roberta_config, _decode_audio, _freeze_model,
+                                       _make_muq_audio_initializer)
 from frozen_retrieval import evaluation
 from frozen_retrieval.encoders import _load_cir_ast_offline, _load_muq_mulan_offline, _resolve_local_configs
 from frozen_retrieval.rendering import QA_POLICY_ID, RENDER_POLICY_ID, _accepted, _qa_warnings, render_plan_identity
-from frozen_retrieval.reporting import (_inventory_summary, build_control_inventory, build_controlled_inventory,
+from frozen_retrieval.reporting import (_inventory_summary, _performance_profile, build_control_inventory, build_controlled_inventory,
                                         generate_report)
+import run_controlled_perturbation as controlled
 
 
 def _presets():
@@ -153,6 +156,76 @@ class EpisodeContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             core.paired_cluster_bootstrap(left, right[:1], replicates=100)
 
+    def test_performance_and_crossed_cluster_bootstraps_cover_both_sampling_axes(self):
+        left = [{"episode_id": f"{midi}-{family}", "query_midi_id": midi, "target_family_id": family,
+                 "recall_at_1": value}
+                for midi, values in (("m1", (1.0, 0.0)), ("m2", (0.0, 1.0)))
+                for family, value in zip(("f1", "f2"), values, strict=True)]
+        right = [{**row, "recall_at_1": 0.0} for row in left]
+        performance = core.performance_cluster_bootstrap(left, replicates=100)
+        crossed = core.two_way_cluster_bootstrap(left, replicates=100)
+        paired = core.paired_two_way_cluster_bootstrap(left, right, replicates=100)
+        self.assertEqual(2, performance["performance_clusters"])
+        self.assertEqual((2, 2), (crossed["performance_clusters"], crossed["family_clusters"]))
+        self.assertAlmostEqual(0.5, paired["difference"])
+
+    def test_crossed_bootstrap_vectorizes_large_performance_family_grids(self):
+        rows = [{"episode_id": f"p{performance}-f{family}", "query_midi_id": f"p{performance}",
+                 "target_family_id": f"f{family}", "recall_at_1": float((performance + family) % 2)}
+                for performance in range(25) for family in range(20)]
+        result = core.two_way_cluster_bootstrap(rows, replicates=100)
+        self.assertAlmostEqual(0.5, result["estimate"])
+        self.assertEqual((25, 20), (result["performance_clusters"], result["family_clusters"]))
+        self.assertEqual(result, core.two_way_cluster_bootstrap(rows, replicates=100))
+
+    def test_performance_ranking_bootstrap_counts_performance_leads(self):
+        rows = {
+            "a": [{"episode_id": "a1", "query_midi_id": "p1", "recall_at_1": 1.0},
+                  {"episode_id": "a2", "query_midi_id": "p2", "recall_at_1": 0.0}],
+            "b": [{"episode_id": "b1", "query_midi_id": "p1", "recall_at_1": 0.0},
+                  {"episode_id": "b2", "query_midi_id": "p2", "recall_at_1": 1.0}],
+        }
+        result = core.performance_ranking_bootstrap(rows, replicates=100)
+        self.assertEqual(result, core.performance_ranking_bootstrap(rows, replicates=100))
+        self.assertEqual(2, result["a"]["performance_clusters"])
+        self.assertEqual(1, result["a"]["first_place_performances"])
+        self.assertEqual(1, result["b"]["first_place_performances"])
+        self.assertAlmostEqual(1.0, sum(row["bootstrap_top_rank_probability"] for row in result.values()))
+
+    def test_midi_diversity_selector_is_deterministic_and_tag_balanced(self):
+        rows = [{"midi_id": f"m{index}", "stats": {
+            "max_polyphony": 1 + index % 2, "articulation": "held" if index < 4 else "phrased",
+            "pitch_median": 36 + index * 8, "notes_per_second": float(index),
+            "velocity_min": 40, "velocity_max": 40 + index,
+            "pitch_bend_events": index % 2, "sustain_events": 0,
+            "expression_events": 0, "channel_pressure_events": 0}}
+            for index in range(8)]
+        selected = _select_diverse_performances(rows, 4)
+        self.assertEqual(selected, _select_diverse_performances(list(reversed(rows)), 4))
+        self.assertEqual(4, len(selected))
+        tags = set().union(*(_performance_tags(row) for row in selected))
+        self.assertTrue({"polyphony:mono", "polyphony:poly", "velocity:varied", "expression:present"} <= tags)
+
+    def test_controlled_query_and_gallery_are_distinct_randomized_renders(self):
+        query, candidates = controlled._cross_seed_keys("original", "midi-1",
+                                                         ["original", "filter", "lfo"], "source", "independent")
+        self.assertNotIn(query, candidates)
+        self.assertTrue(all(key[1] == "midi-1" and key[2] == "independent" for key in candidates))
+        with self.assertRaisesRegex(ValueError, "distinct independent gallery render seed"):
+            controlled._cross_seed_keys("original", "midi-1", ["original", "filter"], "source", "source")
+
+    def test_render_quality_strata_include_performance_uncertainty(self):
+        rows = [{"episode_id": f"{midi}-{family}", "query_midi_id": midi,
+                 "target_family_id": family, "recall_at_1": float(midi == "m1"),
+                 "recall_at_5": 1.0, "mrr": float(midi == "m1"), "family_recall_at_1": 1.0,
+                 "strata": {"query_render_quality": quality, "gallery_render_quality": "clean"}}
+                for midi in ("m1", "m2") for family, quality in (("f1", "clean"), ("f2", "warning"))]
+        strata = evaluation._strata(rows)
+        clean = strata["query_render_quality"]["clean"]
+        warning = strata["query_render_quality"]["warning"]
+        self.assertEqual(2, clean["performance_cluster_bootstrap"]["performance_clusters"])
+        self.assertEqual(2, warning["two_way_cluster_bootstrap"]["performance_clusters"])
+
 
 class FeatureAndManifestTests(unittest.TestCase):
     def test_clap_offline_roberta_config_matches_checkpoint_embedding_shapes(self):
@@ -245,7 +318,7 @@ class FeatureAndManifestTests(unittest.TestCase):
             ])
             manifest_names = ("render_plan.private.jsonl", "episodes.private.jsonl", "candidate_sets.private.json",
                               "performances.private.jsonl")
-            summary = {"source_split": "validation", "manifest_sha256": {
+            summary = {"source_split": "validation", "performance_source_split": "train", "manifest_sha256": {
                 name: _file_sha256(root / name) for name in manifest_names}}
             (root / "dataset_summary.private.json").write_text(json.dumps(summary), encoding="utf-8")
 
@@ -292,7 +365,13 @@ class FeatureAndManifestTests(unittest.TestCase):
             self.assertEqual(1, scores["same_midi_negative_win_candidates"])
             self.assertEqual(1, scores["known_near_neighbor_negative_win_candidates"])
             self.assertEqual(1, scores["acoustic_hard_negative_win_candidates"])
+            self.assertEqual(1, scores["diagnostic_performance_cluster_bootstrap"][
+                "same_midi_negative_win"]["performance_clusters"])
+            self.assertEqual(1, scores["diagnostic_performance_cluster_bootstrap"][
+                "acoustic_hard_negative_win"]["performance_clusters"])
             self.assertEqual(1, scores["strata"]["source_preset_lineage_group_size"]["multi-state"]["episodes"])
+            self.assertEqual("not_applicable", result["midi_only_and_random_baselines"]["status"])
+            self.assertIn("cross_midi_common_gallery", result["midi_only_and_random_baselines"]["random"])
             inventory = root / "inventory.jsonl"
             report = root / "report.md"
             build_control_inventory(REPO / "research/modelling/control_scope/stage_a_controls.jsonl", inventory)
@@ -301,6 +380,8 @@ class FeatureAndManifestTests(unittest.TestCase):
             self.assertIn("Render and feature coverage", report_text)
             self.assertIn("Known source-lineage near-neighbor win rate", report_text)
             self.assertIn("Acoustic hard-negative top-5 win rate", report_text)
+            self.assertIn("not applicable: query MIDI source states are outside the validation preset gallery", report_text)
+            self.assertIn("| Random chance |", report_text)
 
     def test_local_config_preflight_requires_cache_assets_without_network_fallback(self):
         with tempfile.TemporaryDirectory(dir=REPO) as directory:
@@ -333,17 +414,24 @@ class FeatureAndManifestTests(unittest.TestCase):
                 self.config = config
 
         class AudioPretrained:
+            def __init__(self, model_name):
+                self.model = None
+                self._init_pretrained_model(model_name)
+
             def _init_pretrained_model(self, _model_name):
                 raise AssertionError("the network loader must be replaced")
 
         class TextPretrained:
+            def __init__(self):
+                self.model = self._init_pretrained_model()
+
             def _init_pretrained_model(self):
                 raise AssertionError("the network loader must be replaced")
 
         class MuQMuLan:
             def __init__(self, config):
-                self.audio = AudioPretrained()._init_pretrained_model(config["audio_model"]["name"])
-                self.text = TextPretrained()._init_pretrained_model()
+                self.audio = AudioPretrained(config["audio_model"]["name"])
+                self.text = TextPretrained()
                 self.sr = 24_000
 
             def load_state_dict(self, state, strict):
@@ -403,9 +491,40 @@ class FeatureAndManifestTests(unittest.TestCase):
                 model = _load_muq_mulan_offline(checkpoint, {"audio": audio_path, "text": text_path}, FakeTorch(), "cpu")
 
             self.assertEqual(24_000, model.sr)
+            self.assertIsInstance(model.audio.model, MuQ)
+            self.assertEqual({"width": 3}, model.audio.model.config.values)
+            self.assertIsInstance(model.text.model, TextModel)
             self.assertTrue(any(row[0] == "text_config" and row[2] is True for row in calls))
             self.assertTrue(any(row[0] == "checkpoint" and row[-1] is True for row in calls))
             self.assertEqual(("device", "cpu"), calls[-1])
+
+    def test_muq_offline_initializer_attaches_model_on_upstream_audio_wrapper(self):
+        try:
+            from muq.muq_mulan.models.audio import AudioSpectrogramTransformerPretrained
+        except ImportError as error:
+            self.skipTest(f"official MuQ source package unavailable: {error}")
+
+        class Config:
+            def __init__(self, **values):
+                self.values = values
+
+        class AudioModel:
+            def __init__(self, config):
+                self.config = config
+
+            def parameters(self):
+                return iter(())
+
+        original_initializer = AudioSpectrogramTransformerPretrained._init_pretrained_model
+        AudioSpectrogramTransformerPretrained._init_pretrained_model = _make_muq_audio_initializer(
+            AudioModel, Config, {"width": 3})
+        try:
+            audio = AudioSpectrogramTransformerPretrained("OpenMuQ/MuQ-large-msd-iter")
+        finally:
+            AudioSpectrogramTransformerPretrained._init_pretrained_model = original_initializer
+
+        self.assertIsInstance(audio.model, AudioModel)
+        self.assertEqual({"width": 3}, audio.model.config.values)
 
     def test_cir_loader_builds_from_local_ast_assets_and_safe_checkpoint_weights(self):
         calls = []
@@ -615,6 +734,39 @@ class FeatureAndManifestTests(unittest.TestCase):
 
 
 class ReportingAndControlTests(unittest.TestCase):
+    def test_controlled_cli_accepts_all_run_encoder_families(self):
+        args = controlled._parser().parse_args([
+            "--dataset", "dataset", "--renderer-config", "renderer.yaml", "--checkpoint-root", "checkpoints",
+            "--lock", "checkpoint-lock.json", "--output", "output", "--models",
+            "clap_music", "muq_mulan", "dac_44khz", "encodec_24khz",
+        ])
+        self.assertEqual(["clap_music", "muq_mulan", "dac_44khz", "encodec_24khz"], args.models)
+
+    def test_performance_profile_reports_selected_split_and_midi_diversity_only(self):
+        with tempfile.TemporaryDirectory(dir=REPO) as directory:
+            dataset = Path(directory)
+            rows = [
+                {"midi_id": "private-a", "performance_source_split": "train", "stats": {
+                    "max_polyphony": 1, "articulation": "held", "pitch_median": 40,
+                    "velocity_min": 30, "velocity_max": 90, "pitch_bend_events": 1,
+                    "sustain_events": 0, "expression_events": 0, "channel_pressure_events": 0,
+                    "control_change_counts": {}}},
+                {"midi_id": "private-b", "performance_source_split": "validation", "stats": {
+                    "max_polyphony": 4, "articulation": "phrased", "pitch_median": 80,
+                    "velocity_min": 60, "velocity_max": 60, "pitch_bend_events": 0,
+                    "sustain_events": 1, "expression_events": 0, "channel_pressure_events": 0,
+                    "control_change_counts": {"64": 1}}},
+            ]
+            (dataset / "performances.private.jsonl").write_text(
+                "\n".join(json.dumps(row) for row in rows) + "\n", encoding="utf-8")
+            profile = _performance_profile(dataset, "train")
+            self.assertEqual(1, profile["performances"])
+            self.assertEqual(1, profile["mono"])
+            self.assertEqual(40, profile["pitch_median_min"])
+            self.assertEqual(1, profile["variable_velocity"])
+            self.assertEqual(1, profile["pitch_bend"])
+            self.assertNotIn("private-a", str(profile))
+
     def test_inventory_reconciles_every_vital_control_as_fixed_zero_output(self):
         source = REPO / "research/modelling/control_scope/stage_a_controls.jsonl"
         with tempfile.TemporaryDirectory(dir=REPO) as directory:
@@ -665,7 +817,31 @@ class ReportingAndControlTests(unittest.TestCase):
             self.assertIn("Status: **unavailable / not run**", text)
             self.assertIn("Recall@1 | not run", text)
             self.assertIn("control family", text)
-            self.assertEqual(9, text.count("| Global settings ❌ 0 / 610 |"))
+            self.assertEqual(1, text.count("| Global settings ❌ 0 / 610 |"))
+            self.assertLess(text.index("## Results and recommendation"), text.index("## Execution status"))
+
+    def test_controlled_report_renders_each_version_family_inventory(self):
+        source = REPO / "research/modelling/control_scope/stage_a_controls.jsonl"
+        with tempfile.TemporaryDirectory(dir=REPO) as directory:
+            root = Path(directory)
+            inventory = root / "inventory.jsonl"
+            report = root / "report.md"
+            controlled = root / "controlled.json"
+            build_control_inventory(source, inventory)
+            controlled.write_text(json.dumps({
+                "variants": ["original", "filter_cutoff_shift"],
+                "controlled_fields": {"filter_cutoff_shift": {"field": "filter_1_cutoff",
+                    "before_raw": 20.0, "after_raw": 40.0, "before_normalized": 0.1,
+                    "after_normalized": 0.3}},
+                "models": {}, "midi_strata": [],
+            }), encoding="utf-8")
+            generate_report(report, inventory, controlled_summary_path=controlled)
+            text = report.read_text(encoding="utf-8")
+            self.assertIn("### Original source preset", text)
+            self.assertIn("### Filter cutoff perturbation", text)
+            self.assertIn("| Filters ✅ 1 /", text)
+            self.assertIn("| Envelopes ❌ 0 /", text)
+            self.assertLess(text.index("## Controlled preset perturbations"), text.index("## Execution status"))
 
 
 if __name__ == "__main__":

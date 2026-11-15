@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 import hashlib
 import json
 import math
@@ -29,7 +29,8 @@ MODEL_REGISTRY = {
                          "repository_id": "lpepino/beats_ckpts",
                          "expected_sha256": "d43cbfad4d7b56381c061d7a24774f908d4d94c72961f6eb1d9090ff18cd8d34",
                          "tap": "pretrained iter3+ final pre-predictor features",
-                         "license": "checkpoint-specific license must be verified"},
+                         "license": "mirror labels MIT; upstream checkpoint license remains unconfirmed",
+                         "license_source": "https://github.com/microsoft/unilm/issues/1760"},
     "encodec_24khz": {"name": "Meta EnCodec 24 kHz", "sample_rate": 24_000, "kind": "sequence", "dimension": 128,
                        "checkpoint": "facebook/encodec_24khz", "source": "https://huggingface.co/facebook/encodec_24khz",
                        "repository_id": "facebook/encodec_24khz",
@@ -102,6 +103,7 @@ def build_episodes(presets: Sequence[dict], performances: Sequence[dict], *, gal
                               "candidate_set_id": candidate_set_id, "target_state_id": preset["state_id"],
                               "target_family_id": preset.get("family_id", preset["state_id"]),
                               "query_midi_id": query["midi_id"], "gallery_midi_id": gallery["midi_id"],
+                              "performance_source_split": query.get("performance_source_split", split),
                               "query_index": query_index, "gallery_index": gallery_index}
                     query_stats, gallery_stats = query.get("stats", {}), gallery.get("stats", {})
                     common["strata"] = {
@@ -267,6 +269,163 @@ def paired_cluster_bootstrap(left: Sequence[dict], right: Sequence[dict], *, met
     return {"metric": metric, "difference": observed, "lower_95": draws[int(0.025 * (replicates - 1))],
             "upper_95": draws[int(0.975 * (replicates - 1))], "family_clusters": len(means),
             "replicates": replicates, "seed": seed}
+
+
+def _bootstrap_interval(cluster_values: dict[str, list[float]], *, metric: str, seed: int,
+                        replicates: int, cluster_name: str) -> dict:
+    if replicates < 100 or not cluster_values:
+        raise ValueError("bootstrap needs clusters and at least 100 replicates")
+    means = [sum(values) / len(values) for _, values in sorted(cluster_values.items())]
+    rng, draws = random.Random(seed), []
+    for _ in range(replicates):
+        draws.append(sum(means[rng.randrange(len(means))] for _ in means) / len(means))
+    draws.sort()
+    return {"metric": metric, "estimate": sum(means) / len(means),
+            "lower_95": draws[int(0.025 * (replicates - 1))],
+            "upper_95": draws[int(0.975 * (replicates - 1))],
+            f"{cluster_name}_clusters": len(means), "replicates": replicates, "seed": seed}
+
+
+def performance_cluster_bootstrap(rows: Sequence[dict], *, metric: str = "recall_at_1", seed: int = 0,
+                                  replicates: int = 2000) -> dict:
+    """Resample independent normalized MIDI identities, giving each performance equal weight."""
+    grouped = defaultdict(list)
+    for row in rows:
+        grouped[row.get("query_midi_id", row["episode_id"])].append(float(row[metric]))
+    return _bootstrap_interval(grouped, metric=metric, seed=seed, replicates=replicates,
+                               cluster_name="performance")
+
+
+def two_way_cluster_bootstrap(rows: Sequence[dict], *, metric: str = "recall_at_1", seed: int = 0,
+                              replicates: int = 2000) -> dict:
+    """Resample independent performances and preset families as crossed clusters."""
+    if replicates < 100 or not rows:
+        raise ValueError("bootstrap needs rows and at least 100 replicates")
+    cells = defaultdict(list)
+    for row in rows:
+        cells[(row.get("query_midi_id", row["episode_id"]), row.get("target_family_id", row["episode_id"]))].append(float(row[metric]))
+    cell_means = {key: sum(values) / len(values) for key, values in cells.items()}
+    performances = sorted({key[0] for key in cell_means})
+    families = sorted({key[1] for key in cell_means})
+    observed = sum(cell_means.values()) / len(cell_means)
+    rng = random.Random(seed)
+    try:
+        import numpy as np
+    except ImportError:
+        np = None
+    if np is not None and hasattr(np, "full") and len(performances) * len(families) >= 500:
+        performance_index = {value: index for index, value in enumerate(performances)}
+        family_index = {value: index for index, value in enumerate(families)}
+        matrix = np.zeros((len(performances), len(families)), dtype=np.float64)
+        valid = np.zeros(matrix.shape, dtype=np.bool_)
+        for (performance, family), value in cell_means.items():
+            row, column = performance_index[performance], family_index[family]
+            matrix[row, column], valid[row, column] = value, True
+        sampled_performances = np.empty((replicates, len(performances)), dtype=np.intp)
+        sampled_families = np.empty((replicates, len(families)), dtype=np.intp)
+        for replicate in range(replicates):
+            sampled_performances[replicate] = [rng.randrange(len(performances)) for _ in performances]
+            sampled_families[replicate] = [rng.randrange(len(families)) for _ in families]
+        row_indexes, column_indexes = sampled_performances[:, :, None], sampled_families[:, None, :]
+        selected_valid = valid[row_indexes, column_indexes]
+        counts = selected_valid.sum(axis=(1, 2))
+        totals = np.where(selected_valid, matrix[row_indexes, column_indexes], 0.0).sum(axis=(1, 2))
+        draws = np.divide(totals, counts, out=np.full(replicates, np.nan), where=counts > 0).tolist()
+        for replicate, count in enumerate(counts):
+            while count == 0:
+                rows = [rng.randrange(len(performances)) for _ in performances]
+                columns = [rng.randrange(len(families)) for _ in families]
+                sampled = valid[np.ix_(rows, columns)]
+                count = int(sampled.sum())
+                if count:
+                    draws[replicate] = float(matrix[np.ix_(rows, columns)][sampled].mean())
+    else:
+        draws = []
+        for _ in range(replicates):
+            sampled_performances = [performances[rng.randrange(len(performances))] for _ in performances]
+            sampled_families = [families[rng.randrange(len(families))] for _ in families]
+            values = [cell_means[(performance, family)] for performance in sampled_performances
+                      for family in sampled_families if (performance, family) in cell_means]
+            draws.append(sum(values) / len(values))
+    draws.sort()
+    return {"metric": metric, "estimate": observed,
+            "lower_95": draws[int(0.025 * (replicates - 1))],
+            "upper_95": draws[int(0.975 * (replicates - 1))],
+            "performance_clusters": len(performances), "family_clusters": len(families),
+            "replicates": replicates, "seed": seed}
+
+
+def paired_performance_bootstrap(left: Sequence[dict], right: Sequence[dict], *, metric: str = "recall_at_1",
+                                 seed: int = 0, replicates: int = 2000) -> dict:
+    left_by_id, right_by_id = ({row["episode_id"]: row for row in rows} for rows in (left, right))
+    if replicates < 100 or left_by_id.keys() != right_by_id.keys() or not left_by_id:
+        raise ValueError("paired bootstrap requires identical non-empty episode sets")
+    grouped = defaultdict(list)
+    for episode_id, row in left_by_id.items():
+        other = right_by_id[episode_id]
+        if row.get("query_midi_id", episode_id) != other.get("query_midi_id", episode_id):
+            raise ValueError("paired episode performance differs")
+        grouped[row["query_midi_id"]].append(float(row[metric]) - float(other[metric]))
+    result = _bootstrap_interval(grouped, metric=metric, seed=seed, replicates=replicates,
+                                 cluster_name="performance")
+    result["difference"] = result.pop("estimate")
+    return result
+
+
+def paired_two_way_cluster_bootstrap(left: Sequence[dict], right: Sequence[dict], *,
+                                     metric: str = "recall_at_1", seed: int = 0,
+                                     replicates: int = 2000) -> dict:
+    left_by_id, right_by_id = ({row["episode_id"]: row for row in rows} for rows in (left, right))
+    if replicates < 100 or left_by_id.keys() != right_by_id.keys() or not left_by_id:
+        raise ValueError("paired bootstrap requires identical non-empty episode sets")
+    differences = []
+    for episode_id, row in left_by_id.items():
+        other = right_by_id[episode_id]
+        left_clusters = (row.get("query_midi_id", episode_id), row.get("target_family_id", episode_id))
+        right_clusters = (other.get("query_midi_id", episode_id), other.get("target_family_id", episode_id))
+        if left_clusters != right_clusters:
+            raise ValueError("paired episode performance or family differs")
+        differences.append({**row, metric: float(row[metric]) - float(other[metric])})
+    result = two_way_cluster_bootstrap(differences, metric=metric, seed=seed, replicates=replicates)
+    result["difference"] = result.pop("estimate")
+    return result
+
+
+def performance_ranking_bootstrap(rows_by_arm: dict[str, Sequence[dict]], *, metric: str = "recall_at_1",
+                                  seed: int = 1729, replicates: int = 2000) -> dict:
+    """Estimate per-performance rank leads and bootstrap top-rank frequency."""
+    if replicates < 100 or len(rows_by_arm) < 2:
+        raise ValueError("performance ranking needs at least two arms and 100 replicates")
+    scores = {}
+    for arm, rows in rows_by_arm.items():
+        grouped = defaultdict(list)
+        for row in rows:
+            grouped[row.get("query_midi_id", row["episode_id"])].append(float(row[metric]))
+        scores[arm] = {performance: sum(values) / len(values) for performance, values in grouped.items()}
+    performances = sorted(set.intersection(*(set(values) for values in scores.values())))
+    if not performances:
+        raise ValueError("performance ranking requires shared performance IDs")
+
+    def winners(sampled: Sequence[str]) -> list[str]:
+        means = {arm: sum(values[performance] for performance in sampled) / len(sampled)
+                 for arm, values in scores.items()}
+        best = max(means.values())
+        return [arm for arm, value in means.items() if abs(value - best) <= 1e-12]
+
+    first_places = Counter(arm for performance in performances for arm in winners([performance]))
+    rng, lead_counts = random.Random(seed), Counter()
+    for _ in range(replicates):
+        sampled = [performances[rng.randrange(len(performances))] for _ in performances]
+        leaders = winners(sampled)
+        for arm in leaders:
+            lead_counts[arm] += 1 / len(leaders)
+    return {arm: {"performance_clusters": len(performances),
+                  "mean_performance_metric": sum(scores[arm][performance] for performance in performances) / len(performances),
+                  "first_place_performances": first_places[arm],
+                  "first_place_fraction": first_places[arm] / len(performances),
+                  "bootstrap_top_rank_probability": lead_counts[arm] / replicates,
+                  "replicates": replicates, "seed": seed}
+            for arm in sorted(rows_by_arm)}
 
 
 def cluster_bootstrap(values: Sequence[tuple[str, float]], *, seed: int = 0, replicates: int = 2000) -> dict:
