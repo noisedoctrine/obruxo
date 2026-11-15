@@ -30,7 +30,7 @@ from frozen_retrieval.encoders import _load_cir_ast_offline, _load_muq_mulan_off
 from frozen_retrieval.rendering import (QA_POLICY_ID, RENDER_POLICY_ID, _accepted, _qa_warnings,
                                         _receipt_matches_cached_audio, render_plan_identity)
 from frozen_retrieval.reporting import (_control_group, _inventory_summary, _performance_profile, build_control_inventory, build_controlled_inventory,
-                                        generate_report)
+                                        generate_report, _issue155_render_quality, _execution_status_lines)
 import run_controlled_perturbation as controlled
 import run_controlled_candidate_shortlist as candidate_screen
 import run_issue155_validation as issue155
@@ -332,6 +332,33 @@ class EpisodeContractTests(unittest.TestCase):
 
 
 class FeatureAndManifestTests(unittest.TestCase):
+    def test_issue155_report_quality_collapses_assignment_repeats_by_query(self):
+        rows = []
+        for state_id, family_id, midi_id, query_quality in (
+                ("state-a", "family-a", "midi-a", "clean"), ("state-b", "family-b", "midi-b", "warning")):
+            for offset, target_quality, warning_count, recall in (
+                    (1, "warning", 1, 1.0), (7, "clean", 2, 0.0), (19, "warning", 3, 1.0)):
+                rows.append({"arm": "clap_music:official_clip", "episode_id": f"{state_id}-{offset}",
+                    "gallery_assignment_offset": offset, "target_state_id": state_id,
+                    "target_family_id": family_id, "query_midi_id": midi_id,
+                    "query_render_quality": query_quality, "correct_match_gallery_render_quality": target_quality,
+                    "gallery_candidate_count": 129, "gallery_warning_candidate_count": warning_count,
+                    "gallery_warning_candidate_fraction": warning_count / 129,
+                    "gallery_unknown_candidate_count": 0, "recall_at_1": recall, "recall_at_5": recall,
+                    "mrr": recall})
+        with tempfile.TemporaryDirectory(dir=REPO) as directory:
+            metrics_path = Path(directory) / "gallery_assignment_episode_metrics.private.jsonl"
+            metrics_path.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+
+            summary = _issue155_render_quality(metrics_path)["clap_music:official_clip"]
+
+        self.assertEqual((6, 2, 2), (summary["assignment_observations"], summary["queries"], summary["query_midi_ids"]))
+        self.assertEqual(1, summary["query_render_quality"]["clean"]["queries"])
+        self.assertEqual(1, summary["query_render_quality"]["warning"]["queries"])
+        self.assertEqual(2, summary["correct_match_gallery_render_quality"]["clean"]["queries"])
+        self.assertEqual(2, summary["mean_warning_candidates"])
+        self.assertAlmostEqual(2 / 129, summary["mean_warning_fraction"], places=8)
+
     def test_controlled_shortlist_midi_contexts_cover_short_and_long_held_and_phrased_notes(self):
         rows = []
         for articulation, durations in (("held", (0.05, 2.5)), ("phrased", (0.08, 1.2))):
@@ -540,7 +567,7 @@ class FeatureAndManifestTests(unittest.TestCase):
             report_text = report.read_text(encoding="utf-8")
             self.assertIn("Render and feature coverage", report_text)
             self.assertIn("Known source-lineage near-neighbor win rate", report_text)
-            self.assertIn("Acoustic hard-negative top-5 win rate", report_text)
+            self.assertIn("Acoustic top-5 negative win", report_text)
             self.assertIn("not applicable: query MIDI source states are outside the validation preset gallery", report_text)
             self.assertIn("| Random chance |", report_text)
 
@@ -908,6 +935,23 @@ class FeatureAndManifestTests(unittest.TestCase):
 
 
 class ReportingAndControlTests(unittest.TestCase):
+    def test_execution_summary_reports_benchmark_not_reporter_runtime(self):
+        lines = _execution_status_lines(
+            {"source_split": "validation", "performance_source_split": "train",
+             "presets_verified": 131, "unique_midi_excerpts": 50},
+            {"coverage_by_condition": {"cross_midi_common_gallery": {
+                "common_feature_qualified_episodes_across_arms": 6450}},
+             "gallery_candidate_states_render_qualified": 129,
+             "model_results": {"clap_music:official_clip": {"cross_midi_common_gallery": {"episodes": 6450}}}},
+            Path("dataset"), {"clap_music:official_clip": {"checkpoint_sha256": "abc123"}},
+            {"clap_music": {"license_status": "approved", "license": "CC0-1.0"}})
+        text = "\n".join(lines)
+        self.assertIn("50 performances; reserved test sources were not used", text)
+        self.assertIn("6,450 paired queries", text)
+        self.assertIn("512-D", text)
+        self.assertNotIn("Runtime preflight", text)
+        self.assertNotIn("Extraction pass time", text)
+
     def test_envelope_attack_controls_are_not_grouped_as_global_settings(self):
         self.assertEqual("Envelopes", _control_group({"data_path": "settings.env_1_attack",
             "control_key": "env_1_attack", "family": "env.attack"}))
@@ -1005,11 +1049,29 @@ class ReportingAndControlTests(unittest.TestCase):
             root = Path(directory)
             inventory, report = root / "inventory.jsonl", root / "report.md"
             validation, shortlist = root / "issue155.json", root / "shortlist.json"
+            assignment_metrics = root / "gallery_assignment_episode_metrics.private.jsonl"
             build_control_inventory(source, inventory)
+            assignment_rows = []
+            for state_id, family_id, midi_id, query_quality in (
+                    ("state-a", "family-a", "midi-a", "clean"), ("state-b", "family-b", "midi-b", "warning")):
+                for offset, target_quality, warning_count, recall in (
+                        (1, "warning", 1, 1.0), (7, "clean", 2, 0.0), (19, "warning", 3, 1.0)):
+                    assignment_rows.append({"arm": "clap_music:official_clip", "episode_id": f"{state_id}-{offset}",
+                        "gallery_assignment_offset": offset, "target_state_id": state_id,
+                        "target_family_id": family_id, "query_midi_id": midi_id,
+                        "query_render_quality": query_quality, "correct_match_gallery_render_quality": target_quality,
+                        "gallery_candidate_count": 129, "gallery_warning_candidate_count": warning_count,
+                        "gallery_warning_candidate_fraction": warning_count / 129,
+                        "gallery_unknown_candidate_count": 0, "recall_at_1": recall, "recall_at_5": recall, "mrr": recall})
+            assignment_metrics.write_text("".join(json.dumps(row) + "\n" for row in assignment_rows), encoding="utf-8")
             validation.write_text(json.dumps({
                 "input_dataset": {"accepted_cached_clips": 6480},
                 "gallery_assignment_experiment": {"offsets": [1, 7, 19],
-                    "per_assignment": {}, "aggregate": {}, "gallery_midi_count_by_offset": {"1": 50},
+                    "per_assignment": {}, "aggregate": {
+                        "clap_music:official_clip": {"metrics": {"recall_at_1": {"mean": 0.6}}},
+                        "beats_iter3_plus:temporal_pyramid_8": {"metrics": {"recall_at_1": {"mean": 0.5}}}},
+                    "best_pooling_arm_by_family": {"beats_iter3_plus": "beats_iter3_plus:temporal_pyramid_8"},
+                    "gallery_midi_count_by_offset": {"1": 50},
                     "gallery_candidate_count": {"min": 129, "max": 129},
                     "paired_differences": {}, "per_assignment_winner": {}},
                 "clean_query_only": {"arms": {"clap_music:official_clip": {"queries": 12, "metrics": {
@@ -1022,7 +1084,8 @@ class ReportingAndControlTests(unittest.TestCase):
                         "newly_wrong_predictions": 0, "before": {"metrics": {"recall_at_1": {"mean": 0.5}}},
                         "after": {"metrics": {"recall_at_1": {"mean": 1.0}}},
                         "paired_after_minus_before": {"target_margin": {"difference": 0.05,
-                            "lower_95": 0.01, "upper_95": 0.09}}} for role in ("query", "correct_gallery_candidate")}}}},
+                            "lower_95": 0.01, "upper_95": 0.09}, "recall_at_1": {"difference": 0.5,
+                            "lower_95": 0.2, "upper_95": 0.8}}} for role in ("query", "correct_gallery_candidate")}}}},
                 "gain_warning_sample_selection": {},
             }), encoding="utf-8")
             shortlist.write_text(json.dumps({"selected_count": 8}), encoding="utf-8")
@@ -1030,11 +1093,16 @@ class ReportingAndControlTests(unittest.TestCase):
                             candidate_shortlist_path=shortlist)
             text = report.read_text(encoding="utf-8")
             self.assertIn("Issue #155 follow-up", text)
+            self.assertIn("Plain-English readout", text)
             self.assertIn("all 50 existing excerpts", text)
             self.assertIn("60.0% [50.0%, 70.0%]", text)
             self.assertIn("target margin ×100 (cosine points", text)
             self.assertNotIn("+5.00 pp", text)
-            self.assertIn("automated acoustic screen prepared 8 candidate presets", text)
+            self.assertIn("Render-quality results for the expanded comparison-MIDI assignments", text)
+            self.assertIn("Mean warned candidates / fraction of 129", text)
+            self.assertIn("selected 8 presets", text)
+            self.assertIn("Each assignment round used 50 gallery MIDI excerpts", text)
+            self.assertNotIn("All {'1': 50}", text)
             self.assertIn("definitive multi-encoder controlled diagnostic has not been run", text)
             self.assertLess(text.index("Issue #155 follow-up"), text.index("## Execution status"))
             self.assertNotIn("| Vital control family | Enabled / total |", text)

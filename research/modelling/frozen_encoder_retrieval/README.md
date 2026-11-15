@@ -78,6 +78,37 @@ The plan, renderer, and feature extraction are separate commands. The render com
 
 Private manifests, WAVs, checkpoint files, feature arrays, and per-episode scores belong in the ignored `outputs/` and `local_checkpoints/` directories, never in Git. The report generator publishes only aggregate counts and metrics.
 
+## Issue #155 follow-up
+
+The follow-up reuses the expanded dataset's accepted renders and six feature caches. It scores three fixed common-gallery MIDI offsets, recomputes clean-query and warning-free-gallery ranks, then re-embeds only 100 gain-reduced amplitude-warning WAVs across all six encoders. The separate encoder-blind preset screen renders short and long held/phrased examples and writes private before/after/repeat listening WAVs. It stops at the shortlist; the final controlled diagnostic requires the user's choice. Run the shortlist script with the Vital-rendering Python environment that has DawDreamer installed; the pinned benchmark environment is sufficient for cached-feature evaluation.
+
+```powershell
+python research/modelling/frozen_encoder_retrieval/run_issue155_validation.py `
+  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-train-midi-v3-50 `
+  --checkpoint-root research/modelling/frozen_encoder_retrieval/local_checkpoints `
+  --lock research/modelling/frozen_encoder_retrieval/local_checkpoints/checkpoint-lock.json `
+  --output research/modelling/frozen_encoder_retrieval/outputs/issue155-validation `
+  --device xpu --gallery-offsets 1 7 19 --sample-count 100
+
+python research/modelling/frozen_encoder_retrieval/run_controlled_candidate_shortlist.py `
+  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-train-midi-v3-50 `
+  --renderer-config research/data_generation/configs/renderer_full_corpus.yaml `
+  --plugin-path 'C:\Program Files\Common Files\VST3\Vital.vst3' `
+  --output research/modelling/frozen_encoder_retrieval/outputs/issue155-controlled-candidates
+
+python research/modelling/frozen_encoder_retrieval/run.py report `
+  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-train-midi-v3-50 `
+  --comparison-dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-real-cross-v2b `
+  --checkpoint-root research/modelling/frozen_encoder_retrieval/local_checkpoints `
+  --lock research/modelling/frozen_encoder_retrieval/local_checkpoints/checkpoint-lock.json `
+  --controlled-summary research/modelling/frozen_encoder_retrieval/outputs/issue152-controlled-midi-v3-50/controlled_summary.private.json `
+  --issue155-results research/modelling/frozen_encoder_retrieval/outputs/issue155-validation/issue155_validation_summary.private.json `
+  --candidate-shortlist research/modelling/frozen_encoder_retrieval/outputs/issue155-controlled-candidates/controlled_candidate_shortlist.private.json `
+  --output research/modelling/frozen_encoder_retrieval/reports/FROZEN_ENCODER_RETRIEVAL_RESULTS.md
+```
+
+The private shortlist, WAVs and adjusted feature caches remain under ignored `outputs/`. Read `controlled_candidate_shortlist.private.md` and listen to its linked examples before choosing candidates; do not start `run_controlled_perturbation.py` until that selection is approved.
+
 ## Frozen candidates and adapters
 
 Checkpoint acquisition is separate from benchmark execution. The runner sets Hugging Face offline mode and only loads local files; it never downloads or substitutes weights. Fill a local lock from exact downloads and compatible source checkouts using [checkpoint-lock.example.json](checkpoint-lock.example.json). Every selected checkpoint records its HF/source revision, SHA-256, loader revision, runtime package versions, and terms status. Use `license_status: approved` for terms cleared for this use or `research-use-unverified` when locally authorized research proceeds while terms remain unresolved; only `explicitly-prohibited` stops extraction. MuQ-MuLan is used only for non-commercial research. This benchmark keeps all checkpoints local and does not redistribute weights; that does not clear future deployment or distribution. CIR and BEATs are evaluated with unresolved checkpoint-term notes retained in the report. MuQ-MuLan and CIR also require separately pinned local architecture/config assets; a cold cache fails during preflight instead of reaching the network. The exact BEATs mirror SHA from the issue comment is enforced.

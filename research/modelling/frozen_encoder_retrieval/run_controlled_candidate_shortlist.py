@@ -167,6 +167,11 @@ def _render_one(renderer, preset, midi: dict, output: Path, seed_id: str) -> dic
 
 def _copy_example(source: Path, destination: Path) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
+    if destination.exists():
+        if destination.samefile(source):
+            return
+        shutil.copy2(source, destination)
+        return
     try:
         destination.hardlink_to(source)
     except OSError:
@@ -247,19 +252,19 @@ def run(args: argparse.Namespace) -> dict:
             after_descriptor = controlled._spectral_descriptor(after["wav_path"], np)
             if before_descriptor is None or repeat_descriptor is None or after_descriptor is None:
                 raise RuntimeError(f"candidate acoustic descriptor missing for {candidate['state_id']}/{midi['midi_id']}")
-            repeat_distance = 1.0 - controlled._cosine(before_descriptor, repeat_descriptor, np)
-            change_distance = 1.0 - controlled._cosine(before_descriptor, after_descriptor, np)
+            repeat_distance = max(0.0, 1.0 - controlled._cosine(before_descriptor, repeat_descriptor, np))
+            change_distance = max(0.0, 1.0 - controlled._cosine(before_descriptor, after_descriptor, np))
             measured.append({"midi_id": midi["midi_id"], "articulation": midi["stats"]["articulation"],
                 "note_duration_median_seconds": midi["stats"]["note_duration_median_seconds"],
                 "duration_seconds": midi["stats"]["duration_seconds"], "note_count": midi["stats"]["note_count"],
                 "change_spectral_distance": change_distance, "repeat_spectral_distance": repeat_distance,
-                "change_to_repeat_ratio": change_distance / max(repeat_distance, 1e-8),
+                "change_to_repeat_ratio": change_distance / repeat_distance if repeat_distance > 1e-8 else None,
                 "before_wav": str(before), "after_wav": str(after["wav_path"]),
                 "repeat_wav": str(repeated["wav_path"]), "after_request_id": after["request_id"],
                 "repeat_request_id": repeated["request_id"]})
         change_values = [row["change_spectral_distance"] for row in measured]
         repeat_values = [row["repeat_spectral_distance"] for row in measured]
-        ratios = [row["change_to_repeat_ratio"] for row in measured]
+        ratios = [row["change_to_repeat_ratio"] for row in measured if row["change_to_repeat_ratio"] is not None]
         candidate_id = f"candidate_{index:02d}"
         # Listening files use short- and long-note contexts. Before audio is hard-linked from the verified frozen render.
         examples = []
@@ -280,7 +285,7 @@ def run(args: argparse.Namespace) -> dict:
             "control": control, "midi_measurements": measured,
             "mean_change_spectral_distance": sum(change_values) / len(change_values),
             "mean_repeat_spectral_distance": sum(repeat_values) / len(repeat_values),
-            "median_change_to_repeat_ratio": sorted(ratios)[len(ratios) // 2],
+            "median_change_to_repeat_ratio": sorted(ratios)[len(ratios) // 2] if ratios else None,
             "performances_exceeding_repeat_variation": sum(change > repeat for change, repeat in zip(change_values, repeat_values, strict=True)),
             "listening_examples": examples})
 
@@ -306,10 +311,13 @@ def run(args: argparse.Namespace) -> dict:
             f"- Preset state: `{candidate['state_id']}`" + (f" ({candidate['display_name']})" if candidate.get("display_name") else ""),
             f"- Control: `{control['field']}` raw {control['before_raw']} → {control['after_raw']}; normalized {control['before_normalized']:.3f} → {control['after_normalized']:.3f}" +
                 (f"; route {control.get('route_source')} → {control.get('route_destination')} (amount {control.get('route_amount'):.3f})" if control.get("route_source") else ""),
-            f"- Mean changed-audio spectral distance: {candidate['mean_change_spectral_distance']:.5f}; mean unchanged-preset repeat distance: {candidate['mean_repeat_spectral_distance']:.5f}; median change/repeat ratio: {candidate['median_change_to_repeat_ratio']:.2f}×. Change exceeded repeat distance on {candidate['performances_exceeding_repeat_variation']}/{len(contexts)} MIDI excerpts.",
+            f"- Mean changed-audio spectral distance: {candidate['mean_change_spectral_distance']:.5f}; mean unchanged-preset repeat distance: {candidate['mean_repeat_spectral_distance']:.5f}; median change/repeat ratio: {candidate['median_change_to_repeat_ratio']:.2f}× where repeat distance was measurable." if candidate["median_change_to_repeat_ratio"] is not None else
+                f"- Mean changed-audio spectral distance: {candidate['mean_change_spectral_distance']:.5f}; mean unchanged-preset repeat distance: {candidate['mean_repeat_spectral_distance']:.5f}; repeat distance was effectively zero on these contexts, so a ratio is undefined.",
+            f"Change exceeded repeat distance on {candidate['performances_exceeding_repeat_variation']}/{len(contexts)} MIDI excerpts.",
             "- MIDI-specific measurements:",
             "", "| MIDI | Articulation | Median note (s) | Change distance | Repeat distance | Ratio |", "|---|---|---:|---:|---:|---:|"])
-        lines.extend(f"| `{row['midi_id']}` | {row['articulation']} | {row['note_duration_median_seconds']:.3f} | {row['change_spectral_distance']:.5f} | {row['repeat_spectral_distance']:.5f} | {row['change_to_repeat_ratio']:.2f}× |" for row in candidate["midi_measurements"])
+        lines.extend(f"| `{row['midi_id']}` | {row['articulation']} | {row['note_duration_median_seconds']:.3f} | {row['change_spectral_distance']:.5f} | {row['repeat_spectral_distance']:.5f} | {row['change_to_repeat_ratio']:.2f}× |" if row["change_to_repeat_ratio"] is not None else
+            f"| `{row['midi_id']}` | {row['articulation']} | {row['note_duration_median_seconds']:.3f} | {row['change_spectral_distance']:.5f} | {row['repeat_spectral_distance']:.5f} | n/a |" for row in candidate["midi_measurements"])
         lines.extend(["", "Listening WAVs (before / changed / unchanged-preset repeat):"])
         for example in candidate["listening_examples"]:
             lines.append(f"- `{example['midi_id']}` ({example['articulation']}, median note {example['note_duration_median_seconds']:.3f}s): " +
