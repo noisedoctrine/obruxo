@@ -23,7 +23,8 @@ from frozen_retrieval.dataset import (_file_sha256, _paired_source_midi, _perfor
                                      bounded_excerpt, midi_features,
                                      validate_dataset_manifests)
 from frozen_retrieval.encoders import (_beats_sequence, _clap_roberta_config, _decode_audio, _freeze_model,
-                                       _make_muq_audio_initializer, checkpoint_sha256, resolve_checkpoint)
+                                       _import_source_module_without_bytecode, _make_muq_audio_initializer,
+                                       checkpoint_sha256, resolve_checkpoint)
 from frozen_retrieval import evaluation
 from frozen_retrieval.encoders import _load_cir_ast_offline, _load_muq_mulan_offline, _resolve_local_configs
 from frozen_retrieval.rendering import (QA_POLICY_ID, RENDER_POLICY_ID, _accepted, _qa_warnings,
@@ -117,6 +118,22 @@ class CheckpointLockTests(unittest.TestCase):
             lock = self._lock(root, "explicitly-prohibited")
             with self.assertRaisesRegex(PermissionError, "explicitly prohibit"):
                 resolve_checkpoint("clap_music", root, lock)
+
+
+class SourceLoaderTests(unittest.TestCase):
+    def test_source_import_does_not_dirty_pinned_checkout_with_bytecode(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            name = f"_issue152_source_loader_{id(self)}"
+            (root / f"{name}.py").write_text("VALUE = 1\n", encoding="utf-8")
+            sys.path.insert(0, str(root))
+            try:
+                module = _import_source_module_without_bytecode(name)
+                self.assertEqual(module.VALUE, 1)
+                self.assertFalse((root / "__pycache__").exists())
+            finally:
+                sys.modules.pop(name, None)
+                sys.path.remove(str(root))
 
 
 class EpisodeContractTests(unittest.TestCase):

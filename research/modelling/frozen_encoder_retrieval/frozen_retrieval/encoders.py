@@ -197,6 +197,15 @@ def _module(name: str):
     return importlib.import_module(name)
 
 
+def _import_source_module_without_bytecode(name: str):
+    previous = sys.dont_write_bytecode
+    sys.dont_write_bytecode = True
+    try:
+        return _module(name)
+    finally:
+        sys.dont_write_bytecode = previous
+
+
 def _freeze_model(model) -> None:
     """Freeze a module or a loader wrapper exposing its module as ``.model``."""
     wrapped = getattr(model, "model", None)
@@ -477,6 +486,7 @@ def load_adapter(model_name: str, checkpoint: Path, lock_entry: dict, checkpoint
         source_root = source_root.resolve(strict=True)
         if str(source_root) not in sys.path:
             sys.path.insert(0, str(source_root))
+        _import_source_module_without_bytecode("AST")
         model = _load_cir_ast_offline(checkpoint, local_configs["ast"], lock_entry, torch).to(device)
     elif model_name == "beats_iter3_plus":
         if source_root is None:
@@ -484,10 +494,10 @@ def load_adapter(model_name: str, checkpoint: Path, lock_entry: dict, checkpoint
         source_root = source_root.resolve(strict=True)
         if str(source_root) not in sys.path:
             sys.path.insert(0, str(source_root))
-        from BEATs import BEATs, BEATsConfig
+        beats_module = _import_source_module_without_bytecode("BEATs")
         state = _safe_torch_load(torch, checkpoint)
-        cfg = BEATsConfig(state["cfg"])
-        model = BEATs(cfg)
+        cfg = beats_module.BEATsConfig(state["cfg"])
+        model = beats_module.BEATs(cfg)
         model.load_state_dict(state["model"])
         model.to(device)
     elif model_name in {"encodec_24khz", "dac_44khz"}:
