@@ -22,6 +22,7 @@ MODEL_REGISTRY = {
     "cir_ast": {"name": "CIR single-timbre AST", "sample_rate": 16_000, "kind": "clip", "dimension": 768,
                 "checkpoint": "Google Drive: ICASSP26_inst-direct-with-data-aug_final.pt", "source": "https://github.com/gwendal-lv/CIR",
                 "repository_id": "gwendal-lv/CIR",
+                "expected_sha256": "b08996e4c42511e69af7245695d735d85585a2c41e49ab1fdc67dc308c604bbb",
                 "tap": "mean of final CLS and distillation tokens",
                 "license": "checkpoint license not specified in the upstream repository"},
     "beats_iter3_plus": {"name": "BEATs iter3+ AS2M", "sample_rate": 16_000, "kind": "sequence", "dimension": 768,

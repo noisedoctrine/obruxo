@@ -119,7 +119,7 @@ def dependency_status(model_name: str) -> dict:
                        "huggingface_hub": "huggingface_hub", "einops": "einops", "easydict": "easydict",
                        "x_clip": "x_clip"},
         "cir_ast": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "transformers": "transformers",
-                     "librosa": "librosa"},
+                     "librosa": "librosa", "tqdm": "tqdm"},
         "beats_iter3_plus": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "torchaudio": "torchaudio"},
         "encodec_24khz": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "transformers": "transformers"},
         "dac_44khz": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "transformers": "transformers"},
