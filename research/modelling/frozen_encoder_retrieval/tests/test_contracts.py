@@ -26,7 +26,8 @@ from frozen_retrieval.encoders import (_beats_sequence, _clap_roberta_config, _d
                                        _make_muq_audio_initializer)
 from frozen_retrieval import evaluation
 from frozen_retrieval.encoders import _load_cir_ast_offline, _load_muq_mulan_offline, _resolve_local_configs
-from frozen_retrieval.rendering import QA_POLICY_ID, RENDER_POLICY_ID, _accepted, _qa_warnings, render_plan_identity
+from frozen_retrieval.rendering import (QA_POLICY_ID, RENDER_POLICY_ID, _accepted, _qa_warnings,
+                                        _receipt_matches_cached_audio, render_plan_identity)
 from frozen_retrieval.reporting import (_inventory_summary, _performance_profile, build_control_inventory, build_controlled_inventory,
                                         generate_report)
 import run_controlled_perturbation as controlled
@@ -720,6 +721,19 @@ class FeatureAndManifestTests(unittest.TestCase):
         tail["qa"]["tail_rms"] = 0.1
         self.assertEqual((True, "accepted_with_tail_rms_above_warning"), _accepted(tail))
         self.assertEqual(["tail_rms_above_warning"], _qa_warnings(tail))
+
+    def test_render_resume_skips_only_hash_and_provenance_matched_receipts(self):
+        metadata = {"provenance": {"request_id": "request-1", "renderer_id": "vital-test"}}
+        receipt = {"request_id": "request-1", "plan_identity": "plan-1", "render_policy_id": RENDER_POLICY_ID,
+                   "qa_policy_id": QA_POLICY_ID, "renderer_id": "vital-test", "audio_sha256": "audio-1"}
+        matches = {"request_id": "request-1", "plan_identity": "plan-1", "renderer_id": "vital-test",
+                   "metadata": metadata, "audio_sha256": "audio-1"}
+        self.assertTrue(_receipt_matches_cached_audio(receipt, **matches))
+        self.assertFalse(_receipt_matches_cached_audio(receipt, **{**matches, "audio_sha256": "changed"}))
+        self.assertFalse(_receipt_matches_cached_audio(receipt, **{**matches, "plan_identity": "changed"}))
+        stale_metadata = {"provenance": {"request_id": "request-1", "renderer_id": "changed"}}
+        self.assertFalse(_receipt_matches_cached_audio(receipt, **{**matches, "metadata": stale_metadata}))
+        self.assertFalse(_receipt_matches_cached_audio({**receipt, "qa_policy_id": "stale"}, **matches))
 
     def test_frozen_manifest_digest_rejects_drift(self):
         with tempfile.TemporaryDirectory(dir=REPO) as directory:

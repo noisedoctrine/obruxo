@@ -20,6 +20,19 @@ def render_plan_identity(row: dict) -> str:
     return digest({key: value for key, value in row.items() if key != "request"} | {"render_policy_id": RENDER_POLICY_ID})
 
 
+def _receipt_matches_cached_audio(receipt: dict | None, *, request_id: str, plan_identity: str,
+                                 renderer_id: str, metadata: dict, audio_sha256: str) -> bool:
+    provenance = metadata.get("provenance", {})
+    return bool(receipt and receipt.get("request_id") == request_id
+                and receipt.get("plan_identity") == plan_identity
+                and receipt.get("render_policy_id") == RENDER_POLICY_ID
+                and receipt.get("qa_policy_id") == QA_POLICY_ID
+                and receipt.get("renderer_id") == renderer_id
+                and receipt.get("audio_sha256") == audio_sha256
+                and provenance.get("request_id") == request_id
+                and provenance.get("renderer_id") == renderer_id)
+
+
 def _plan_batches(plan_path: Path, performances_path: Path, source_root: Path, batch_size: int):
     from obruxo_data.midi import Performance
     from obruxo_data.render.base import RenderRequest
@@ -169,13 +182,23 @@ def render_dataset(dataset_dir: Path, renderer_config: Path, *, plugin_path: Pat
             for row, request in zip(rows, requests, strict=True):
                 metadata_path = render_root / f"{request.request_id}.json"
                 wav_path = render_root / f"{request.request_id}.wav"
-                reused = _is_complete(wav_path, metadata_path, request.request_id)
                 started = time.perf_counter()
+                reused = _is_complete(wav_path, metadata_path, request.request_id)
+                old = previous.get(request.request_id)
+                plan_identity = render_plan_identity(row)
+                if reused and old and old.get("audio_sha256"):
+                    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+                    audio_sha256 = hashlib.sha256(wav_path.read_bytes()).hexdigest()
+                    if _receipt_matches_cached_audio(old, request_id=request.request_id,
+                            plan_identity=plan_identity, renderer_id=summary["renderer_id"],
+                            metadata=metadata, audio_sha256=audio_sha256):
+                        timings.append(time.perf_counter() - started)
+                        current_reused += 1
+                        continue
                 try:
                     run_batch(renderer, [request], render_root, workers=1, resume=True)
                 except Exception as error:
                     timings.append(time.perf_counter() - started)
-                    plan_identity = render_plan_identity(row)
                     failure = {"request_id": request.request_id, "plan_identity": plan_identity,
                                "render_policy_id": RENDER_POLICY_ID, "qa_policy_id": QA_POLICY_ID, "accepted": False,
                                "source_kind": row["source_kind"],
