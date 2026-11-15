@@ -103,6 +103,22 @@ def resolve_checkpoint(model_name: str, checkpoint_root: Path, lock: dict) -> tu
     return path, entry, actual
 
 
+def resolve_source_checkout(checkpoint_root: Path, lock_entry: dict) -> Path | None:
+    relative = lock_entry.get("source_root")
+    if relative is None:
+        return None
+    if not isinstance(relative, str) or Path(relative).is_absolute() or ".." in Path(relative).parts:
+        raise ValueError("locked source checkout must stay under the checkpoint root")
+    root = checkpoint_root.resolve(strict=True)
+    path = root / relative
+    if path.is_symlink() or path.is_junction():
+        raise ValueError("locked source checkout cannot be a link")
+    path = path.resolve(strict=True)
+    if not path.is_relative_to(root) or not path.is_dir():
+        raise ValueError("locked source checkout must be a local directory under the checkpoint root")
+    return path
+
+
 def _version(package: str) -> str:
     try:
         return importlib.metadata.version(package)

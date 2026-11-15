@@ -7,7 +7,7 @@ import time
 
 from .core import canonical_json
 from .encoders import (CacheIdentityDriftError, cache_feature, file_sha256, load_adapter,
-                       load_checkpoint_lock, resolve_checkpoint)
+                       load_checkpoint_lock, resolve_checkpoint, resolve_source_checkout)
 from .rendering import accepted_receipts, _rss_bytes
 from .dataset import validate_dataset_manifests
 
@@ -18,9 +18,7 @@ def extract_dataset(dataset_dir: Path, model_name: str, checkpoint_root: Path, l
     validate_dataset_manifests(dataset_dir, dataset_summary)
     lock = load_checkpoint_lock(lock_path)
     checkpoint, entry, checkpoint_digest = resolve_checkpoint(model_name, checkpoint_root, lock)
-    source_root = None
-    if entry.get("source_root"):
-        source_root = (checkpoint_root.resolve(strict=True) / entry["source_root"]).resolve(strict=True)
+    source_root = resolve_source_checkout(checkpoint_root, entry)
     adapter = load_adapter(model_name, checkpoint, entry, checkpoint_digest, checkpoint_root=checkpoint_root,
                            device=device, source_root=source_root)
     plan = {}

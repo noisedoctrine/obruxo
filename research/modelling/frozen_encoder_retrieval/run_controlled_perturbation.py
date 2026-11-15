@@ -134,7 +134,8 @@ def run(args: argparse.Namespace) -> dict:
     from obruxo_data.render.vita import VitalRenderer
     from obruxo_data.vital import VitalPreset
     from frozen_retrieval.core import _rank_metrics
-    from frozen_retrieval.encoders import cache_feature, file_sha256, load_checkpoint_lock, load_adapter, resolve_checkpoint
+    from frozen_retrieval.encoders import (cache_feature, file_sha256, load_checkpoint_lock, load_adapter,
+                                           resolve_checkpoint, resolve_source_checkout)
     from frozen_retrieval.rendering import _accepted, _qa_warnings, _rss_bytes
 
     dataset = args.dataset.resolve(strict=True)
@@ -281,8 +282,9 @@ def run(args: argparse.Namespace) -> dict:
     model_results, feature_records = {}, []
     for model_name in args.models:
         checkpoint, lock_entry, checkpoint_digest = resolve_checkpoint(model_name, args.checkpoint_root, lock)
+        source_root = resolve_source_checkout(args.checkpoint_root, lock_entry)
         adapter = load_adapter(model_name, checkpoint, lock_entry, checkpoint_digest,
-                               checkpoint_root=args.checkpoint_root, device=args.device)
+                               checkpoint_root=args.checkpoint_root, device=args.device, source_root=source_root)
         if args.device == "cuda":
             adapter.torch.cuda.reset_peak_memory_stats()
         elif args.device == "xpu" and hasattr(adapter.torch.xpu, "reset_peak_memory_stats"):

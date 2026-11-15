@@ -24,7 +24,7 @@ from frozen_retrieval.dataset import (_file_sha256, _paired_source_midi, _perfor
                                      validate_dataset_manifests)
 from frozen_retrieval.encoders import (_beats_sequence, _clap_roberta_config, _decode_audio, _freeze_model,
                                        _import_source_module_without_bytecode, _make_muq_audio_initializer,
-                                       checkpoint_sha256, resolve_checkpoint)
+                                       checkpoint_sha256, resolve_checkpoint, resolve_source_checkout)
 from frozen_retrieval import evaluation
 from frozen_retrieval.encoders import _load_cir_ast_offline, _load_muq_mulan_offline, _resolve_local_configs
 from frozen_retrieval.rendering import (QA_POLICY_ID, RENDER_POLICY_ID, _accepted, _qa_warnings,
@@ -118,6 +118,15 @@ class CheckpointLockTests(unittest.TestCase):
             lock = self._lock(root, "explicitly-prohibited")
             with self.assertRaisesRegex(PermissionError, "explicitly prohibit"):
                 resolve_checkpoint("clap_music", root, lock)
+
+    def test_locked_source_checkout_resolves_under_checkpoint_root(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            checkout = root / "sources" / "beats"
+            checkout.mkdir(parents=True)
+            self.assertEqual(checkout.resolve(), resolve_source_checkout(root, {"source_root": "sources/beats"}))
+            with self.assertRaisesRegex(ValueError, "stay under"):
+                resolve_source_checkout(root, {"source_root": "../beats"})
 
 
 class SourceLoaderTests(unittest.TestCase):
