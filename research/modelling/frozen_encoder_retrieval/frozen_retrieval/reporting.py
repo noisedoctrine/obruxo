@@ -395,7 +395,7 @@ def _reader_summary(current_dataset: dict, current_eval: dict | None, comparison
             lines.extend(["**Largest descriptive performance strata for the expanded-cohort lead:**", ""])
             lines.extend(f"- {contrast}." for contrast in contrasts)
             lines.extend(["These are exploratory subgroup contrasts; the intervals resample MIDI IDs and do not imply a causal effect.", ""])
-    lines.extend([f"{measured_families} of six encoder families have measured local checkpoints and adapters in this run. Unavailable arms remain explicitly unranked; the final discussion records their technical or explicit research-use blockers.",
+    lines.extend([f"{measured_families} of six encoder families have expanded-cohort retrieval results in this report. Other arms remain unranked until their features are extracted and scored on the same episodes.",
                   f"No Vital controls are predicted or trained in retrieval. The linked [{inventory_name}](./{inventory_name}) inventories every exact source field/instance; each family is fixed with 0 enabled controls and 0 model outputs:", "",
                   "| Vital control family | Enabled / total | Output count | Update method / training signal |",
                   "|---|---:|---:|---|"])
