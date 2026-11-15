@@ -303,7 +303,59 @@ def _summary_cohort_lines(label: str, dataset: dict, evaluation: dict | None) ->
             if delta:
                 span = "includes zero" if delta["lower_95"] <= 0 <= delta["upper_95"] else ""
                 lines.append(f"| `{arm}` | {100 * delta['difference']:+.1f} | [{100 * delta['lower_95']:+.1f}, {100 * delta['upper_95']:+.1f}] {span} |")
-    lines.extend(["", "R@1 intervals are shown in preset-family, performance-ID, and crossed performance × preset-family order (2,000 bootstrap replicates); the heading gives the independent performance denominator. Negative-win cells show query denominators and preset-family/performance-cluster intervals. Clean/warning strata use query-render QA status; the full report also retains gallery quality strata.", ""])
+    lines.extend(["", "R@1 intervals are shown in preset-family, performance-ID, and crossed performance × preset-family order (2,000 bootstrap replicates); the heading gives the independent performance denominator. Negative-win cells show query denominators and preset-family/performance-cluster intervals. Clean/warning strata use query-render QA status; differences are descriptive because warning status can covary with preset acoustics. The full report also retains gallery quality strata.", ""])
+    if evaluation:
+        model_results = evaluation.get("model_results", {})
+        quality_leaders = []
+        for quality, label in (("clean", "clean"), ("warning", "warning")):
+            candidates = [(arm, outcomes.get("cross_midi_common_gallery", {}).get("strata", {}).get(
+                "query_render_quality", {}).get(quality, {})) for arm, outcomes in model_results.items()]
+            candidates = [(arm, row) for arm, row in candidates if row.get("episodes", 0)]
+            if candidates:
+                arm, row = max(candidates, key=lambda item: (item[1].get("recall_at_1", 0), item[1].get("mrr", 0)))
+                ci = row.get("performance_cluster_bootstrap", {})
+                quality_leaders.append(f"{label}: `{arm}` {_percent(row, 'recall_at_1')} {interval(ci)} "
+                    f"(q={row.get('episodes', 0):,}; {ci.get('performance_clusters', 0)} MIDI IDs)")
+        if quality_leaders:
+            lines.extend(["**Query-render QA strata:** " + "; ".join(quality_leaders) +
+                ". These are per-stratum MIDI-cluster intervals; accepted warning status is associated with the rendered preset and does not imply a causal quality effect.", ""])
+        performance_stability = evaluation.get("ranking_stability_by_performance", {})
+        condition_labels = (("cross_midi_common_gallery", "Common gallery"),
+                            ("cross_midi_mixed_gallery", "Mixed gallery"))
+        selected_by_condition = {}
+        for condition, label in condition_labels:
+            selected = {}
+            for arm, outcomes in model_results.items():
+                result = outcomes.get(condition, {})
+                if not result.get("episodes"):
+                    continue
+                family = arm.split(":", 1)[0]
+                prior = selected.get(family)
+                if prior is None or (result.get("recall_at_1", 0), result.get("mrr", 0)) > (
+                        prior[1].get("recall_at_1", 0), prior[1].get("mrr", 0)):
+                    selected[family] = (arm, result)
+            selected_by_condition[condition] = selected
+        families = sorted(set().union(*(set(rows) for rows in selected_by_condition.values())))
+        if families:
+            performance_clusters = max((row.get("performance_clusters", 0)
+                for rows in performance_stability.values() for row in rows.values()), default=0)
+            lines.extend([f"**Per-performance ranking stability** (best observed pooling within each family and condition; bootstrap resamples {performance_clusters} MIDI IDs):", "",
+                "| Encoder family | Common-gallery arm; R@1; first-place performances; bootstrap top-rank probability | Mixed-gallery arm; R@1; first-place performances; bootstrap top-rank probability |",
+                "|---|---|---|"])
+            for family in families:
+                spec = MODEL_REGISTRY[family]
+                cells = []
+                for condition, _ in condition_labels:
+                    arm, result = selected_by_condition[condition].get(family, (None, None))
+                    stability = performance_stability.get(condition, {}).get(arm, {}) if arm else {}
+                    if not result:
+                        cells.append("not run")
+                        continue
+                    cells.append(f"`{arm}`; {_percent(result, 'recall_at_1')}; "
+                        f"{stability.get('first_place_performances', 0)}/{stability.get('performance_clusters', 0)}; "
+                        f"{stability.get('bootstrap_top_rank_probability', 0):.1%}")
+                lines.append(f"| {spec['name']} | {cells[0]} | {cells[1]} |")
+            lines.extend(["", "Pooling is selected descriptively within each evaluated condition; the primary common-gallery table above lists every arm. Top-rank probabilities compare all scored arms within the condition.", ""])
     return lines
 
 
@@ -332,7 +384,7 @@ def _reader_summary(current_dataset: dict, current_eval: dict | None, comparison
                    f"{100 * leader_result.get('recall_at_1', 0):.1f}% cross-MIDI Recall@1 "
                    f"(n={leader_result.get('episodes', 0):,} queries, {gallery_size} candidate presets, "
                    f"{current_dataset.get('unique_midi_excerpts', 0)} {performance_label}). "
-                   "This is retrieval evidence, not a reconstruction result or a six-family trunk verdict.")
+                   "This ranks frozen representations across six model families; it is retrieval evidence, not a reconstruction result.")
         lines.extend([finding, ""])
     if comparison_dataset and comparison_eval is not None:
         lines.extend(_summary_cohort_lines("Original validation-paired cohort", comparison_dataset, comparison_eval))
@@ -342,7 +394,6 @@ def _reader_summary(current_dataset: dict, current_eval: dict | None, comparison
         leader = current_ranking[0]
         leader_family = leader.split(":", 1)[0]
         runner_up = next((arm for arm in current_ranking if arm.split(":", 1)[0] != leader_family), None)
-        stable = bool(older_ranking and older_ranking[0] == leader)
         recommendation = f"Observed expanded-cohort lead: `{leader}`."
         leader_stability = (current_eval or {}).get("ranking_stability_by_performance", {}).get(
             "cross_midi_common_gallery", {}).get(leader, {})
@@ -351,7 +402,8 @@ def _reader_summary(current_dataset: dict, current_eval: dict | None, comparison
                 f"{leader_stability['performance_clusters']} individual MIDI performances and led in "
                 f"{leader_stability['bootstrap_top_rank_probability']:.1%} of 2,000 performance-cluster resamples.")
         if older_ranking:
-            recommendation += f" Original-cohort leader: `{older_ranking[0]}`; top-rank stability: {'stable' if stable else 'changed'} across cohorts."
+            recommendation += (f" Earlier 12-MIDI validation-source cohort leader: `{older_ranking[0]}`; "
+                "the earlier and expanded cohorts use different MIDI pools, so this is contextual rather than a paired stability comparison.")
         if runner_up:
             paired = (current_eval or {}).get("paired_cluster_bootstrap_differences", {})
             pair, direction = f"{leader} - {runner_up}", 1.0
@@ -369,6 +421,8 @@ def _reader_summary(current_dataset: dict, current_eval: dict | None, comparison
                     recommendation += " The interval spans zero, so keep both as candidates for the later 14-output reconstruction screen."
                 else:
                     recommendation += f" Use `{leader}` as the lead and `{runner_up}` as a comparator for the later 14-output reconstruction screen."
+                if leader_family == "cir_ast":
+                    recommendation += " Keep CLAP Music as an established reference in that screen."
         lines.extend([recommendation, ""])
         leader_metrics = model_results[leader]["cross_midi_common_gallery"]
         leader_strata = leader_metrics.get("strata", {})
@@ -395,7 +449,12 @@ def _reader_summary(current_dataset: dict, current_eval: dict | None, comparison
             lines.extend(["**Largest descriptive performance strata for the expanded-cohort lead:**", ""])
             lines.extend(f"- {contrast}." for contrast in contrasts)
             lines.extend(["These are exploratory subgroup contrasts; the intervals resample MIDI IDs and do not imply a causal effect.", ""])
-    lines.extend([f"{measured_families} of six encoder families have expanded-cohort retrieval results in this report. Other arms remain unranked until their features are extracted and scored on the same episodes.",
+    common_episodes = (current_eval or {}).get("coverage_by_condition", {}).get(
+        "cross_midi_common_gallery", {}).get("common_feature_qualified_episodes_across_arms", 0)
+    family_coverage = (f"All six encoder families have expanded-cohort retrieval results on {common_episodes:,} identical common-gallery episodes per family."
+                       if measured_families == len(MODEL_REGISTRY) else
+                       f"{measured_families} of six encoder families have expanded-cohort retrieval results on {common_episodes:,} identical common-gallery episodes; incomplete families are listed below.")
+    lines.extend([family_coverage,
                   f"No Vital controls are predicted or trained in retrieval. The linked [{inventory_name}](./{inventory_name}) inventories every exact source field/instance; each family is fixed with 0 enabled controls and 0 model outputs:", "",
                   "| Vital control family | Enabled / total | Output count | Update method / training signal |",
                   "|---|---:|---:|---|"])
@@ -561,6 +620,11 @@ def generate_report(destination: Path, inventory: Path, *, dataset_dir: Path | N
                   "The default command selects the corpus-qualified full-preset expression renderer identity, including the established curve-input, ignored-empty-map, and native scalar readback policies. It supports note/polyphony, pitch-bend, channel-pressure, CC 1/64/74, release-velocity and multiple channels; tempo changes remain unsupported and are counted as exclusions. Unsupported events are rejected rather than silently removed. Musical spans are complete-note excerpts of 2–8 seconds plus a fixed 2-second release tail; model input is mono and 4–10 seconds, downmixed by channel mean and polyphase-resampled. No shared gain normalization is applied; EnCodec retains its own checkpoint-configured RMS normalization when enabled.", "",
                   "Render and feature stages are independent, resumable commands. Vital remains a single-worker in-process renderer; an asynchronous manifest reader feeds a bounded queue of request batches. Render keys include exact preset/MIDI/excerpt/renderer/policy identities. Feature keys include audio hash, checkpoint digest/revision, loader revision, sample rate, preprocessing, extraction tap, pooling, and FP32 precision. Weights are never downloaded by the run commands. Full paths, identifiers, WAVs, caches, checkpoints, and per-episode results belong in ignored local outputs.", "",
                   "No reconstruction head, source-label warm start, shared-model training, direct patch optimization, or audio-loss training is part of this experiment. Retrieval results do not establish reconstruction quality.", ""])
+    unverified_terms = [model_name for model_name, entry in locked_models.items()
+                        if entry.get("license_status") == "research-use-unverified"]
+    if unverified_terms:
+        labels = ", ".join(MODEL_REGISTRY[name]["name"] for name in unverified_terms)
+        lines.append(f"Checkpoint-term note: {labels} were evaluated under authorized local non-commercial research use; their terms remain unresolved. Checkpoint weights are kept local and are not redistributed. This records the research run only and does not establish future deployment or distribution rights.")
 
     model_results = (evaluation or {}).get("model_results", {})
     for model_name, spec in MODEL_REGISTRY.items():
@@ -620,6 +684,12 @@ def generate_report(destination: Path, inventory: Path, *, dataset_dir: Path | N
                         interval_text = (f"; 2-way 95% CI [{interval['lower_95']:.4f}, {interval['upper_95']:.4f}]"
                                          if "lower_95" in interval and "upper_95" in interval else "")
                         lines.append(f"| Stratum: {axis} = {label} | Recall@1 {_metric(metrics_by_stratum, 'recall_at_1')}{interval_text}; Recall@5 {_metric(metrics_by_stratum, 'recall_at_5')}; MRR {_metric(metrics_by_stratum, 'mrr')} | {metrics_by_stratum.get('episodes', 0)} episodes | frozen encoder; crossed performance/family bootstrap |")
+            if primary and primary.get("episodes"):
+                lines.extend(["", "Vital controls for this representation version:", "",
+                    "| Vital control family | Enabled / exact instances | Vital output count | Update method / training signal |",
+                    "|---|---:|---:|---|"])
+                for group in GROUPS:
+                    lines.append(f"| {group} ❌ 0 / {groups.get(group, 0)} | 0 | unchanged source preset; no head, optimization, loss, or gradient |")
             if not run:
                 license_text = locked_models.get(model_name, {}).get("license", spec["license"])
                 status = (f"Unavailable: {'; '.join(unavailable)}. Checkpoint/license: {license_text}."
@@ -705,11 +775,33 @@ def generate_report(destination: Path, inventory: Path, *, dataset_dir: Path | N
             f"{lfo_distance.get('lower_95', 'not measured')}, {lfo_distance.get('upper_95', 'not measured')}]; "
             f"it exceeded identical-preset seed-repeat distance on {lfo_exceeds.get('estimate', 'not measured')} "
             f"of excerpts. This tests a routed LFO rate change, not phase reconstruction or full temporal-control recovery.")
-        lines.extend(["## Controlled preset perturbations", "",
-            f"This secondary diagnostic uses one original validation preset, three single-control perturbations, {len(controlled.get('midi_strata', []))} MIDI performances, and source/independently randomized Vital renders for each version. It reports cross-MIDI identity retrieval, same-MIDI retrieval against a different random seed, and perturbation distance relative to the identical-preset repeat distance. Query vectors never appear in their own galleries. The MIDI-cluster intervals summarize variation for this one preset and do not generalize across presets or controls.",
-            "R@5 is a four-version ceiling and is not interpreted. The LFO arm changes one selected routed frequency field; no phase or modulation route is optimized.",
+        controlled_lead_summary = ""
+        current_results = (evaluation or {}).get("model_results", {})
+        if current_results:
+            leader_arm = max(current_results, key=lambda arm: current_results[arm].get(
+                "cross_midi_common_gallery", {}).get("recall_at_1", 0))
+            leader_model, leader_tap = leader_arm.split(":", 1)
+            leader_pool = controlled.get("models", {}).get(leader_model, {}).get("pool_results", {}).get(leader_tap, {})
+            sensitivity = []
+            for version, label in (("filter_cutoff_shift", "filter cutoff"), ("amp_attack_shift", "amplitude attack"),
+                                   ("lfo_frequency_shift", "routed LFO frequency")):
+                score = leader_pool.get("per_target_variant", {}).get(version, {}).get("cross_midi_retrieval", {})
+                ci = score.get("confidence_intervals_by_midi", {}).get("recall_at_1", {})
+                if score:
+                    sensitivity.append(f"{label} {_percent(score, 'recall_at_1')} "
+                        f"[{100 * ci.get('lower_95', 0):.1f}%, {100 * ci.get('upper_95', 0):.1f}%]")
+            if sensitivity:
+                controlled_lead_summary = (f"The expanded-cohort lead `{leader_arm}` scored among the four controlled versions as "
+                    f"{'; '.join(sensitivity)} (95% MIDI-cluster intervals, 50 performances; one preset).")
+        controlled_intro = ["## Controlled preset perturbations", "",
+            f"This secondary diagnostic uses one original validation preset, three single-control perturbations, {len(controlled.get('midi_strata', []))} MIDI performances, and source/independently randomized Vital renders for each version. It reports cross-MIDI identity retrieval, same-MIDI retrieval against a different random seed, and perturbation distance relative to the identical-preset repeat distance. Every query uses a source-seeded render and its gallery uses independent-seed renders; exact query audio is excluded from every gallery. BEATs and CIR controlled passes ran in isolated processes after a combined Windows XPU run faulted during a pandas/pyarrow import; their summaries were combined with the existing four-model results only after the same preset, MIDI IDs, controls, seeds, and 400 accepted renders were verified. MIDI-cluster intervals summarize variation for this one preset and do not generalize across presets or controls.",
+            ]
+        if controlled_lead_summary:
+            controlled_intro.append(controlled_lead_summary)
+        controlled_intro.extend(["R@5 is a four-version ceiling and is not interpreted. The LFO arm changes one selected routed frequency field; no phase or modulation route is optimized.",
             f"MIDI excerpt properties: {midi_description or 'not recorded'}. The original source carried {validation.get('count', 'unreported')} inherited Vital schema diagnostics ({json.dumps(validation.get('codes', {}), sort_keys=True)}); perturbations introduced {validation.get('new_diagnostics_after_perturbation', 'unreported')} new diagnostics. Velocity ranges are recorded, but velocity response was not isolated. The independent 64-bin log-frequency audio descriptor has no human audibility threshold. {audio_sensitivity}",
             f"The linked [{controlled_inventory_path.name}](./{controlled_inventory_path.name}) records every exact Vital control/instance for each version ({controlled_inventory['records_per_version']} rows per version). No model predicts or optimizes these controls; each perturbation is manually specified, with every other source value held fixed.", ""])
+        lines.extend(controlled_intro)
         labels = {"original": "Original source preset", "filter_cutoff_shift": "Filter cutoff perturbation",
                   "amp_attack_shift": "Amplitude envelope attack perturbation",
                   "lfo_frequency_shift": "Routed LFO frequency perturbation"}

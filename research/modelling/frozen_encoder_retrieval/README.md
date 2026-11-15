@@ -62,7 +62,7 @@ python research/modelling/frozen_encoder_retrieval/run_controlled_perturbation.p
   --checkpoint-root research/modelling/frozen_encoder_retrieval/local_checkpoints `
   --lock research/modelling/frozen_encoder_retrieval/local_checkpoints/checkpoint-lock.json `
   --output research/modelling/frozen_encoder_retrieval/outputs/issue152-controlled-midi-v3-50 `
-  --models clap_music muq_mulan dac_44khz encodec_24khz --device xpu
+  --models clap_music muq_mulan dac_44khz encodec_24khz beats_iter3_plus cir_ast --device xpu
 
 python research/modelling/frozen_encoder_retrieval/run.py report `
   --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-train-midi-v3-50 `
