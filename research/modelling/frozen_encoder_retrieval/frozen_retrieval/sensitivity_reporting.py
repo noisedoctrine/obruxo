@@ -120,6 +120,8 @@ def build_issue157_section(result: dict) -> str:
 
 **Finding:** The question is whether changing a Vital preset moves a frozen audio representation more than changing the MIDI performance. {ranking_readout} The comparison uses the same complete {cohort['preset_states']} preset states and {cohort['midi_performances']} distinct performances for every arm. These measurements describe representation geometry; they do not show that Vital settings can be decoded or that reconstructed audio would sound accurate.
 
+Presentation: [Preset versus MIDI sensitivity (PDF)](presentations/preset_midi_sensitivity.pdf).
+
 The preset states come from the existing `validation` membership, and the 50 performances come from `train`; they are 129 source-family clusters and 50 distinct MIDI identities. Each matrix cell is one accepted cached render. The test changes several MIDI characteristics together; it does not isolate pitch.
 
 ### Four recordings make the comparison concrete
