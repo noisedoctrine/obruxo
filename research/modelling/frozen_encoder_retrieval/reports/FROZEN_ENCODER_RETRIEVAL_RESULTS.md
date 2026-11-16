@@ -56,13 +56,45 @@ The 81.4% headline is the primary common-gallery assignment. Issue #155 reuses t
 
 ### Plain-English readout
 
-In the separate test of three comparison-MIDI assignments, CIR single-timbre AST retrieved the correct preset at rank one for 84.9% of queries, followed by BEATs iter3+ AS2M at 62.3%. The paired CIR–BEATs gap was +22.6 percentage points [+19.4, +25.8]. It ranked first for 50 of 50 MIDI performances (100.0% top-rank probability). After averaging the three comparison-MIDI rounds within query, CIR's median expected rank was 1.0, with 4.8% of queries at expected rank above 5; Meta EnCodec 24 kHz masked_mean had the largest far-failure share (72.9%). Only 1/129 CIR presets fell below 50% R@1 across the 50 excerpts, compared with 111/129 for Meta EnCodec 24 kHz masked_mean. In the 100-WAV gain-normalization sample, the largest query-ranking drop was Meta EnCodec 24 kHz temporal pyramid (-23.0 points; paired 95% interval [-40.5, -8.5]); this small, warning-enriched sample does not estimate corpus-wide accuracy. The automated screen prepared 9 preset candidates with before/after/repeat listening examples; its consistency screen labels 6 strong, 2 borderline, 1 weak or inconclusive; weak/inconclusive examples: candidate_03 (2/4 contexts); the definitive controlled diagnostic is waiting for the user's review and selection.
+In the separate test of three comparison-MIDI assignments, CIR single-timbre AST retrieved the correct preset at rank one for 84.9% of queries, followed by BEATs iter3+ AS2M at 62.3%. The paired CIR–BEATs gap was +22.6 percentage points [+19.4, +25.8]. It ranked first for 50 of 50 MIDI performances (100.0% top-rank probability). Across individual attempts in the three comparison-MIDI rounds, CIR's median expected rank was 1.0, with 3.9% of attempts at expected rank above 5; Meta EnCodec 24 kHz masked_mean had the largest far-failure share (56.2%). Only 1/129 CIR presets fell below 50% R@1 across the 50 excerpts, compared with 111/129 for Meta EnCodec 24 kHz masked_mean. In the 100-WAV gain-normalization sample, the largest query-ranking drop was Meta EnCodec 24 kHz temporal pyramid (-23.0 points; paired 95% interval [-40.5, -8.5]); this small, warning-enriched sample does not estimate corpus-wide accuracy. The automated screen prepared 9 preset candidates with before/after/repeat listening examples; its consistency screen labels 6 strong, 2 borderline, 1 weak or inconclusive; weak/inconclusive examples: candidate_03 (2/4 contexts); the definitive controlled diagnostic is waiting for the user's review and selection.
+
+### Visual summaries
+
+**Encoder × metric heatmap**
+
+![Encoder × metric heatmap](figures/issue155_encoder_metric_heatmap.png)
+
+All evaluated arms on the 50-performance cohort; colors show the retrieval and hard-negative percentages from the table.
+
+**Correct-preset rank distribution**
+
+![Correct-preset rank distribution](figures/issue155_correct_preset_rank_cdf.png)
+
+CDF of individual attempts from the three MIDI assignments; repeated attempts remain grouped for the table's crossed uncertainty estimates.
+
+**Per-preset accuracy distributions**
+
+![Per-preset accuracy distributions](figures/issue155_per_preset_accuracy_boxplots.png)
+
+Each box summarizes preset Recall@1 after averaging assignment rounds per MIDI; the dashed line marks the 50% difficult-preset threshold.
+
+**Before/after normalization comparison**
+
+![Before/after normalization comparison](figures/issue155_gain_normalization_before_after.png)
+
+Recall@1 for the targeted 100-WAV amplitude-warning sample, split by query versus correct-match gallery role; this sample is not a corpus-wide estimate.
+
+**Controlled-preset acoustic differences**
+
+![Controlled-preset acoustic differences](figures/issue155_controlled_acoustic_differences.png)
+
+Mean change and independent-seed repeat distances with four-context min–max ranges; this is a spectral screen, not an audibility judgment.
 
 ## Issue #155 diagnostic results
 
 ### Comparison-MIDI assignments
 
-The original four-MIDI result is preserved as the baseline. We also reassigned the common comparison MIDI three times (deterministic offsets 1, 7 and 19) using all 50 existing excerpts. Each search still ranks the same 129 preset candidates, and the query and gallery play different MIDI excerpts. The 6,450 query inputs repeat across assignments, so we average the three outcomes within each query before estimating uncertainty across MIDI identities and preset families.
+The original four-MIDI result is preserved as the baseline. We also reassigned the common comparison MIDI three times (deterministic offsets 1, 7 and 19) using all 50 existing excerpts. Each search still ranks the same 129 preset candidates, and the query and gallery play different MIDI excerpts. The 6,450 query inputs repeat across assignments. R@1, R@5 and MRR averages combine each query's three assignments; rank-distribution metrics below use all three attempts and keep them together in the crossed bootstrap.
 
 | Encoder arm | Offset 1 R@1 [crossed 95% CI] / R@5 / MRR | Offset 7 R@1 [crossed 95% CI] / R@5 / MRR | Offset 19 R@1 [crossed 95% CI] / R@5 / MRR | Three-assignment query average |
 |---|---:|---:|---:|---:|
@@ -106,21 +138,21 @@ Performance-level rank stability (50 MIDI identities; the aggregate-best pooling
 
 ### How retrieval fails
 
-These summaries collapse the three correlated assignment rounds (offsets 1, 7, 19) within each of 6,450 paired preset × MIDI queries. Rank is the average position among tied scores; near misses have expected rank >1 and ≤5, and far failures have expected rank >5. Intervals use 2,000 crossed bootstrap replicates over 50 MIDI performances and 129 preset-family clusters, with the same resamples for every encoder.
+Rank distributions and near/far shares use each of the three assignment attempts for 6,450 paired preset × MIDI queries (19,350 attempts per encoder). Rank is the average position among tied scores; near misses have expected rank >1 and ≤5, and far failures have expected rank >5. Crossed bootstrap resamples 50 MIDI performances and 129 preset-family clusters, keeping a query's three assignment attempts together and using the same resamples for every encoder.
 
-| Encoder arm | Median expected rank [95% crossed CI] | 90th-percentile expected rank [95% crossed CI] | Near misses (expected rank >1 to 5) | Far failures (expected rank >5) |
+| Encoder arm | Median expected rank per attempt [95% crossed CI] | 90th-percentile expected rank per attempt [95% crossed CI] | Near-miss attempts (expected rank >1 to 5) | Far-failure attempts (expected rank >5) |
 |---|---:|---:|---:|---:|
-| `beats_iter3_plus:masked_mean` | 2.0 [1.7, 2.7] | 12.0 [9.7, 15.0] | 42.4% [38.4%, 46.2%] | 25.6% [20.2%, 31.4%] |
-| `beats_iter3_plus:temporal_pyramid_8` | 2.0 [1.7, 2.3] | 11.7 [9.0, 15.0] | 42.8% [38.9%, 46.3%] | 24.0% [19.2%, 29.6%] |
-| `cir_ast:official_clip` | 1.0 [1.0, 1.0] | 2.7 [2.0, 3.7] | 27.9% [23.4%, 32.7%] | 4.8% [2.9%, 7.1%] |
-| `clap_music:official_clip` | 2.0 [1.7, 2.3] | 10.7 [8.7, 13.0] | 46.1% [42.4%, 49.9%] | 23.0% [18.6%, 28.2%] |
-| `dac_44khz:masked_mean` | 8.0 [6.0, 10.3] | 37.3 [32.0, 43.7] | 28.0% [23.7%, 32.7%] | 60.4% [53.9%, 66.5%] |
-| `dac_44khz:temporal_pyramid_8` | 7.0 [5.0, 9.3] | 35.0 [29.7, 40.7] | 30.4% [26.4%, 34.3%] | 56.4% [49.8%, 62.8%] |
-| `encodec_24khz:masked_mean` | 14.7 [11.3, 18.0] | 49.0 [43.7, 54.0] | 18.6% [15.0%, 22.4%] | 72.9% [67.3%, 78.6%] |
-| `encodec_24khz:temporal_pyramid_8` | 10.3 [8.0, 13.3] | 42.0 [36.7, 47.0] | 25.0% [20.9%, 29.3%] | 65.5% [59.2%, 71.5%] |
-| `muq_mulan:official_clip` | 8.7 [7.0, 10.7] | 39.3 [34.7, 45.0] | 29.0% [25.0%, 33.0%] | 63.1% [57.4%, 69.0%] |
+| `beats_iter3_plus:masked_mean` | 1.0 [1.0, 1.0] | 12.0 [9.0, 15.0] | 20.6% [18.3%, 23.0%] | 18.6% [15.1%, 22.3%] |
+| `beats_iter3_plus:temporal_pyramid_8` | 1.0 [1.0, 1.0] | 11.0 [8.0, 14.0] | 20.4% [18.0%, 22.7%] | 17.3% [14.1%, 20.9%] |
+| `cir_ast:official_clip` | 1.0 [1.0, 1.0] | 2.0 [2.0, 3.0] | 11.3% [9.1%, 13.5%] | 3.9% [2.6%, 5.4%] |
+| `clap_music:official_clip` | 1.0 [1.0, 1.0] | 10.0 [8.0, 13.0] | 22.7% [20.4%, 25.0%] | 16.9% [13.8%, 20.3%] |
+| `dac_44khz:masked_mean` | 4.0 [3.0, 5.0] | 47.0 [38.0, 54.0] | 21.4% [19.3%, 23.5%] | 44.8% [39.7%, 50.0%] |
+| `dac_44khz:temporal_pyramid_8` | 3.0 [2.0, 4.0] | 43.0 [35.0, 50.0] | 22.2% [20.3%, 24.0%] | 41.4% [36.3%, 46.4%] |
+| `encodec_24khz:masked_mean` | 8.0 [6.0, 11.0] | 63.0 [56.0, 70.0] | 18.2% [16.4%, 20.1%] | 56.2% [51.2%, 61.3%] |
+| `encodec_24khz:temporal_pyramid_8` | 5.0 [4.0, 7.0] | 51.0 [43.0, 59.0] | 21.5% [19.4%, 23.4%] | 49.9% [44.7%, 55.2%] |
+| `muq_mulan:official_clip` | 4.0 [3.0, 6.0] | 49.0 [42.0, 56.0] | 23.9% [22.3%, 25.5%] | 45.5% [40.8%, 50.1%] |
 
-Per-preset accuracy first averages Recall@1 across the 50 unique MIDI inputs for each preset, then summarizes the 129 preset accuracies. The difficult-preset threshold is below 50% correct across MIDI inputs; intervals resample MIDI and preset-family clusters.
+Per-preset accuracy averages Recall@1 across three assignment attempts within each preset × MIDI pair, then across the 50 unique MIDI inputs for each preset, and summarizes the 129 preset accuracies. The difficult-preset threshold is below 50% correct across MIDI inputs; intervals resample MIDI and preset-family clusters.
 
 | Encoder arm | Median Per-preset R@1 [95% crossed CI] | 10th-percentile Per-preset R@1 [95% crossed CI] | Presets below 50% R@1 (count / total; share CI) |
 |---|---:|---:|---:|
@@ -479,3 +511,5 @@ The primary results use 6,450 paired queries per measured arm and 129 common pre
 | Descript Audio Codec 44.1 kHz | `descript/dac_44khz` ([source](https://huggingface.co/descript/dac_44khz)); SHA-256 `128180a5e4d41ceabfeb952b687fb9da7cf468c2291acf5be9cadb5ab091cc46` | masked mean 1,024-D; temporal pyramid 16,384-D | MIT; executed |
 
 Checkpoint files remain local and are not included in the repository. The BEATs and CIR checkpoint terms remain unresolved for any use beyond this authorized research evaluation.
+
+Report figures were generated with Matplotlib `3.11.0` from cached evaluation and shortlist results.

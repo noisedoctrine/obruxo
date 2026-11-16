@@ -107,6 +107,8 @@ python research/modelling/frozen_encoder_retrieval/run.py report `
   --output research/modelling/frozen_encoder_retrieval/reports/FROZEN_ENCODER_RETRIEVAL_RESULTS.md
 ```
 
+The report step uses Matplotlib to write the embedded PNG summaries under `reports/figures/`; it reads cached evaluations and shortlist measurements and does not run encoder inference or rendering.
+
 The private shortlist, WAVs and adjusted feature caches remain under ignored `outputs/`. Read `controlled_candidate_shortlist.private.md` and listen to its linked examples before choosing candidates; do not start `run_controlled_perturbation.py` until that selection is approved.
 
 ## Frozen candidates and adapters

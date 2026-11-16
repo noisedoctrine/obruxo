@@ -398,7 +398,7 @@ def _issue155_followup_lines(results: dict, shortlist: dict | None) -> list[str]
     offsets = assignment.get("offsets", [])
     arms = sorted(assignment.get("aggregate", {}))
     lines = ["## Issue #155 diagnostic results", "", "### Comparison-MIDI assignments", "",
-        "The original four-MIDI result is preserved as the baseline. We also reassigned the common comparison MIDI three times (deterministic offsets 1, 7 and 19) using all 50 existing excerpts. Each search still ranks the same 129 preset candidates, and the query and gallery play different MIDI excerpts. The 6,450 query inputs repeat across assignments, so we average the three outcomes within each query before estimating uncertainty across MIDI identities and preset families.", ""]
+        "The original four-MIDI result is preserved as the baseline. We also reassigned the common comparison MIDI three times (deterministic offsets 1, 7 and 19) using all 50 existing excerpts. Each search still ranks the same 129 preset candidates, and the query and gallery play different MIDI excerpts. The 6,450 query inputs repeat across assignments. R@1, R@5 and MRR averages combine each query's three assignments; rank-distribution metrics below use all three attempts and keep them together in the crossed bootstrap.", ""]
     if offsets and arms:
         headers = [f"Offset {offset} R@1 [crossed 95% CI] / R@5 / MRR" for offset in offsets]
         lines.extend(["| Encoder arm | " + " | ".join(headers) + " | Three-assignment query average |",
@@ -451,8 +451,8 @@ def _issue155_followup_lines(results: dict, shortlist: dict | None) -> list[str]
             offsets_text = ", ".join(str(offset) for offset in rank_failure.get("assignment_offsets", []))
             exemplar = next(iter(failure_arms.values()))
             lines.extend(["", "### How retrieval fails", "",
-                f"These summaries collapse the three correlated assignment rounds (offsets {offsets_text}) within each of {exemplar.get('query_pairs', 0):,} paired preset × MIDI queries. Rank is the average position among tied scores; near misses have expected rank >1 and ≤5, and far failures have expected rank >5. Intervals use 2,000 crossed bootstrap replicates over {exemplar.get('performance_clusters', 0)} MIDI performances and {exemplar.get('preset_family_clusters', 0)} preset-family clusters, with the same resamples for every encoder.", "",
-                "| Encoder arm | Median expected rank [95% crossed CI] | 90th-percentile expected rank [95% crossed CI] | Near misses (expected rank >1 to 5) | Far failures (expected rank >5) |",
+                f"Rank distributions and near/far shares use each of the three assignment attempts for {exemplar.get('query_pairs', 0):,} paired preset × MIDI queries ({exemplar.get('individual_retrieval_attempts', 0):,} attempts per encoder). Rank is the average position among tied scores; near misses have expected rank >1 and ≤5, and far failures have expected rank >5. Crossed bootstrap resamples {exemplar.get('performance_clusters', 0)} MIDI performances and {exemplar.get('preset_family_clusters', 0)} preset-family clusters, keeping a query's three assignment attempts together and using the same resamples for every encoder.", "",
+                "| Encoder arm | Median expected rank per attempt [95% crossed CI] | 90th-percentile expected rank per attempt [95% crossed CI] | Near-miss attempts (expected rank >1 to 5) | Far-failure attempts (expected rank >5) |",
                 "|---|---:|---:|---:|---:|"])
             for arm, summary in sorted(failure_arms.items()):
                 rank = summary["rank_distribution"]
@@ -460,7 +460,7 @@ def _issue155_followup_lines(results: dict, shortlist: dict | None) -> list[str]
                     f"{interval_cell(rank['p90_expected_rank'], rank['p90_95_ci'])} | "
                     f"{interval_cell(rank['near_miss_fraction'], rank['near_miss_95_ci'], percent=True)} | "
                     f"{interval_cell(rank['far_failure_fraction'], rank['far_failure_95_ci'], percent=True)} |")
-            lines.extend(["", "Per-preset accuracy first averages Recall@1 across the 50 unique MIDI inputs for each preset, then summarizes the 129 preset accuracies. The difficult-preset threshold is below 50% correct across MIDI inputs; intervals resample MIDI and preset-family clusters.", "",
+            lines.extend(["", "Per-preset accuracy averages Recall@1 across three assignment attempts within each preset × MIDI pair, then across the 50 unique MIDI inputs for each preset, and summarizes the 129 preset accuracies. The difficult-preset threshold is below 50% correct across MIDI inputs; intervals resample MIDI and preset-family clusters.", "",
                 "| Encoder arm | Median Per-preset R@1 [95% crossed CI] | 10th-percentile Per-preset R@1 [95% crossed CI] | Presets below 50% R@1 (count / total; share CI) |",
                 "|---|---:|---:|---:|"])
             for arm, summary in sorted(failure_arms.items()):
@@ -619,8 +619,8 @@ def _issue155_plain_english(results: dict, shortlist: dict | None) -> list[str]:
         cir_presets = cir["per_preset_accuracy"]
         worst_far_label = f"{MODEL_REGISTRY[worst_far_arm.split(':', 1)[0]]['name']} {worst_far_arm.split(':', 1)[1]}"
         worst_preset_label = f"{MODEL_REGISTRY[worst_preset_arm.split(':', 1)[0]]['name']} {worst_preset_arm.split(':', 1)[1]}"
-        failure_summary = (f" After averaging the three comparison-MIDI rounds within query, CIR's median expected rank was "
-            f"{rank['median_expected_rank']:.1f}, with {rank['far_failure_fraction']:.1%} of queries at expected rank above 5; "
+        failure_summary = (f" Across individual attempts in the three comparison-MIDI rounds, CIR's median expected rank was "
+            f"{rank['median_expected_rank']:.1f}, with {rank['far_failure_fraction']:.1%} of attempts at expected rank above 5; "
             f"{worst_far_label} had the largest far-failure share ({worst_far['rank_distribution']['far_failure_fraction']:.1%}). "
             f"Only {cir_presets['presets_below_50_percent']}/{cir['preset_count']} CIR presets fell below 50% R@1 across the 50 excerpts, "
             f"compared with {worst_preset['per_preset_accuracy']['presets_below_50_percent']}/{worst_preset['preset_count']} for {worst_preset_label}.")
@@ -771,11 +771,11 @@ def _collapse_issue155_rank_rows(rows_by_arm: dict[str, list[dict]]) -> tuple[di
     return collapsed_by_arm, offsets
 
 
-def _issue155_rank_statistics(rows: list[dict], *, replicates: int = 2000, seed: int = 155) -> dict:
+def _issue155_rank_statistics(rows: list[dict], *, attempts: list[dict], replicates: int = 2000, seed: int = 155) -> dict:
     import numpy as np
 
-    if not rows:
-        raise ValueError("issue #155 rank statistics require query rows")
+    if not rows or not attempts:
+        raise ValueError("issue #155 rank statistics require query rows and individual attempts")
 
     def quantile(values, probability: float) -> float:
         ordered = sorted(float(value) for value in values)
@@ -788,7 +788,7 @@ def _issue155_rank_statistics(rows: list[dict], *, replicates: int = 2000, seed:
         return {"lower_95": ordered[int(0.025 * (len(ordered) - 1))],
                 "upper_95": ordered[int(0.975 * (len(ordered) - 1))], "replicates": len(ordered)}
 
-    ranks = np.asarray([row["rank_expected"] for row in rows], dtype=np.float64)
+    ranks = np.asarray([row["rank_expected"] for row in attempts], dtype=np.float64)
     near = ((ranks > 1) & (ranks <= 5)).astype(np.float64)
     far = (ranks > 5).astype(np.float64)
     performances = sorted({row["query_midi_id"] for row in rows})
@@ -797,8 +797,8 @@ def _issue155_rank_statistics(rows: list[dict], *, replicates: int = 2000, seed:
     performance_index = {key: index for index, key in enumerate(performances)}
     family_index = {key: index for index, key in enumerate(families)}
     state_index = {key: index for index, key in enumerate(state_ids)}
-    p_index = np.asarray([performance_index[row["query_midi_id"]] for row in rows], dtype=np.intp)
-    f_index = np.asarray([family_index[row["target_family_id"]] for row in rows], dtype=np.intp)
+    attempt_performance_index = np.asarray([performance_index[row["query_midi_id"]] for row in attempts], dtype=np.intp)
+    attempt_family_index = np.asarray([family_index[row["target_family_id"]] for row in attempts], dtype=np.intp)
     rank_order = np.argsort(ranks, kind="stable")
     sorted_ranks = ranks[rank_order]
     preset_by_midi = np.full((len(state_ids), len(performances)), np.nan, dtype=np.float64)
@@ -829,15 +829,15 @@ def _issue155_rank_statistics(rows: list[dict], *, replicates: int = 2000, seed:
     for _ in range(replicates):
         performance_counts = np.bincount([rng.randrange(len(performances)) for _ in performances], minlength=len(performances))
         family_counts = np.bincount([rng.randrange(len(families)) for _ in families], minlength=len(families))
-        weights = performance_counts[p_index] * family_counts[f_index]
-        total = int(weights.sum())
+        attempt_weights = performance_counts[attempt_performance_index] * family_counts[attempt_family_index]
+        total = int(attempt_weights.sum())
         if not total:
             continue
-        cumulative = np.cumsum(weights[rank_order])
+        cumulative = np.cumsum(attempt_weights[rank_order])
         draws["rank_median"].append(weighted_quantile(sorted_ranks, cumulative, total, 0.5))
         draws["rank_p90"].append(weighted_quantile(sorted_ranks, cumulative, total, 0.9))
-        draws["near_miss"].append(float(np.dot(weights, near) / total))
-        draws["far_failure"].append(float(np.dot(weights, far) / total))
+        draws["near_miss"].append(float(np.dot(attempt_weights, near) / total))
+        draws["far_failure"].append(float(np.dot(attempt_weights, far) / total))
 
         preset_accuracy = (preset_by_midi @ performance_counts) / max(1, int(performance_counts.sum()))
         preset_weights = family_counts[state_family_index]
@@ -849,8 +849,11 @@ def _issue155_rank_statistics(rows: list[dict], *, replicates: int = 2000, seed:
         draws["preset_p10"].append(weighted_quantile(sorted_preset_accuracy, preset_cumulative, preset_total, 0.1))
         draws["difficult_fraction"].append(float(np.dot(preset_weights, preset_accuracy < 0.5) / preset_total))
 
-    return {"query_pairs": len(rows), "preset_count": len(state_ids), "performance_clusters": len(performances),
+    return {"query_pairs": len(rows), "individual_retrieval_attempts": len(attempts),
+        "assignment_rounds_per_query_pair": len(attempts) // len(rows),
+        "preset_count": len(state_ids), "performance_clusters": len(performances),
         "preset_family_clusters": len(families), "bootstrap_seed": seed,
+        "rank_expected_values": ranks.tolist(), "per_preset_recall_at_1_values": observed_preset_accuracy.tolist(),
         "rank_expected_tie_handling": "average rank position across tied candidate scores",
         "rank_distribution": {"median_expected_rank": quantile(ranks, 0.5),
             "median_95_ci": interval(draws["rank_median"]), "p90_expected_rank": quantile(ranks, 0.9),
@@ -890,17 +893,219 @@ def _issue155_rank_failure_analysis(episode_metrics_path: Path, *, replicates: i
         if len(rows) != preset_count * performance_count:
             return {"status": "not estimable", "reason": f"incomplete preset × MIDI grid for {arm}",
                     "assignment_offsets": offsets, "arms": {}}
-    return {"assignment_offsets": offsets, "assignment_rounds_are_collapsed_within_query": True,
+    return {"assignment_offsets": offsets, "rank_metrics_use_individual_assignment_attempts": True,
+        "cluster_bootstrap_keeps_assignment_rounds_together": True,
         "confidence_interval": "95% crossed bootstrap over MIDI performance and preset-family clusters",
         "shared_bootstrap_resamples_across_arms": True,
-        "arms": {arm: _issue155_rank_statistics(rows, replicates=replicates, seed=155)
+        "arms": {arm: _issue155_rank_statistics(rows, attempts=rows_by_arm[arm], replicates=replicates, seed=155)
                  for arm, rows in sorted(collapsed.items())}}
+
+
+def _write_issue155_visualizations(output_dir: Path, evaluation: dict | None,
+                                   validation_results: dict | None, shortlist: dict | None) -> dict:
+    rank_arms = ((validation_results or {}).get("gallery_assignment_experiment", {})
+        .get("rank_failure_analysis", {}).get("arms", {}))
+    model_results = (evaluation or {}).get("model_results", {})
+    gain = (validation_results or {}).get("gain_sensitivity", {})
+    candidates = (shortlist or {}).get("candidates", [])
+    if not model_results or not rank_arms or not gain.get("arms") or not candidates:
+        return {}
+
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from matplotlib.lines import Line2D
+    from matplotlib.ticker import PercentFormatter
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    family_labels = {"cir_ast": "CIR", "beats_iter3_plus": "BEATs", "clap_music": "CLAP",
+        "dac_44khz": "DAC", "encodec_24khz": "EnCodec", "muq_mulan": "MuQ-MuLan"}
+    variant_labels = {"official_clip": "official", "masked_mean": "mean", "temporal_pyramid_8": "temporal"}
+    line_styles = {"official_clip": "-", "masked_mean": "--", "temporal_pyramid_8": ":"}
+    family_ids = list(dict.fromkeys(arm.split(":", 1)[0] for arm in sorted(model_results)))
+    palette = plt.get_cmap("tab10")
+    colors = {family: palette(index % 10) for index, family in enumerate(family_ids)}
+
+    def label(arm: str) -> str:
+        family, variant = arm.split(":", 1)
+        return f"{family_labels.get(family, family)} · {variant_labels.get(variant, variant)}"
+
+    def save(name: str, figure) -> str:
+        figure.savefig(output_dir / name, dpi=170, bbox_inches="tight", facecolor="white",
+            metadata={"Title": name, "Software": f"Matplotlib {matplotlib.__version__}"})
+        plt.close(figure)
+        return f"figures/{name}"
+
+    figures = {"matplotlib_version": matplotlib.__version__}
+    heatmap_rows = []
+    for arm, outcomes in model_results.items():
+        primary = outcomes.get("cross_midi_common_gallery", {})
+        if not primary.get("episodes", 0):
+            continue
+        heatmap_rows.append((arm, [100 * float(primary.get(key, 0)) for key in (
+            "recall_at_1", "recall_at_5", "mrr", "same_midi_negative_win_rate", "acoustic_hard_negative_win_rate")]))
+    heatmap_rows.sort(key=lambda item: (-item[1][0], item[0]))
+    if heatmap_rows:
+        with plt.rc_context({"font.size": 8, "axes.titlesize": 12, "axes.labelsize": 9}):
+            figure, axis = plt.subplots(figsize=(10, max(4.8, .42 * len(heatmap_rows) + 1.5)))
+            values = np.asarray([row[1] for row in heatmap_rows])
+            image = axis.imshow(values, cmap="YlGnBu", vmin=0, vmax=100, aspect="auto")
+            axis.set_xticks(range(5), ("R@1", "R@5", "MRR", "Same-MIDI\nhard negative", "Acoustic\nhard negative"))
+            axis.set_yticks(range(len(heatmap_rows)), [label(row[0]) for row in heatmap_rows])
+            axis.set_title("Encoder × metric comparison")
+            for row_index, row in enumerate(values):
+                for column_index, value in enumerate(row):
+                    axis.text(column_index, row_index, f"{value:.1f}%", ha="center", va="center",
+                        color="white" if value >= 58 else "#17212b", fontsize=8)
+            colorbar = figure.colorbar(image, ax=axis, pad=.02)
+            colorbar.set_label("Correct-preset or hard-negative win rate")
+            colorbar.ax.yaxis.set_major_formatter(PercentFormatter(100))
+            figures["encoder_metric_heatmap"] = save("issue155_encoder_metric_heatmap.png", figure)
+
+    available_rank_arms = [(arm, stats) for arm, stats in sorted(rank_arms.items())
+        if stats.get("rank_expected_values")]
+    if available_rank_arms:
+        with plt.rc_context({"font.size": 8, "axes.titlesize": 12, "axes.labelsize": 9}):
+            figure, axis = plt.subplots(figsize=(10, 6))
+            for arm, stats in available_rank_arms:
+                ranks = np.sort(np.asarray(stats["rank_expected_values"], dtype=np.float64))
+                cumulative = np.arange(1, len(ranks) + 1, dtype=np.float64) / len(ranks)
+                family, variant = arm.split(":", 1)
+                axis.step(ranks, cumulative, where="post", color=colors.get(family),
+                    linestyle=line_styles.get(variant, "-"), linewidth=1.5, label=label(arm))
+            axis.axvline(5, color="#606060", linestyle="--", linewidth=1, label="Rank 5")
+            axis.set_xscale("log")
+            axis.set_xlim(1, 129)
+            axis.set_xticks((1, 2, 5, 10, 20, 50, 100), ("1", "2", "5", "10", "20", "50", "100"))
+            axis.set_ylim(0, 1)
+            axis.yaxis.set_major_formatter(PercentFormatter(1))
+            axis.set_xlabel("Expected correct-preset rank (log scale)")
+            axis.set_ylabel("Share of individual attempts at or below this rank")
+            axis.set_title("Correct-preset rank distribution across comparison-MIDI attempts")
+            axis.grid(axis="y", alpha=.22)
+            axis.legend(ncol=3, fontsize=7, loc="lower right")
+            figures["rank_distribution"] = save("issue155_correct_preset_rank_cdf.png", figure)
+
+    preset_arms = [(arm, stats) for arm, stats in sorted(rank_arms.items())
+        if stats.get("per_preset_recall_at_1_values")]
+    if preset_arms:
+        with plt.rc_context({"font.size": 8, "axes.titlesize": 12, "axes.labelsize": 9}):
+            figure, axis = plt.subplots(figsize=(10, 5.8))
+            positions = np.arange(1, len(preset_arms) + 1)
+            distributions = [stats["per_preset_recall_at_1_values"] for _, stats in preset_arms]
+            boxes = axis.boxplot(distributions, positions=positions, patch_artist=True, showfliers=False,
+                medianprops={"color": "#15202b", "linewidth": 1.5}, widths=.62)
+            for box, (arm, _) in zip(boxes["boxes"], preset_arms, strict=True):
+                box.set_facecolor(colors.get(arm.split(":", 1)[0]))
+                box.set_alpha(.75)
+            axis.axhline(.5, color="#7c2d12", linestyle="--", linewidth=1.2, label="50% R@1 threshold")
+            axis.set_xticks(positions, [label(arm) for arm, _ in preset_arms], rotation=35, ha="right")
+            axis.set_ylim(0, 1)
+            axis.yaxis.set_major_formatter(PercentFormatter(1))
+            axis.set_ylabel("Recall@1 per preset")
+            axis.set_title("Accuracy distribution across 129 preset candidates")
+            axis.grid(axis="y", alpha=.22)
+            axis.legend(loc="upper right", fontsize=8)
+            figures["per_preset_accuracy"] = save("issue155_per_preset_accuracy_boxplots.png", figure)
+
+    normalization_arms = [(arm, result) for arm, result in sorted(gain.get("arms", {}).items())
+        if result.get("roles")]
+    if normalization_arms:
+        role_specs = (("query", "Normalize query audio"),
+            ("correct_gallery_candidate", "Normalize correct-match gallery audio"))
+        with plt.rc_context({"font.size": 8, "axes.titlesize": 11, "axes.labelsize": 9}):
+            figure, axes = plt.subplots(1, 2, figsize=(12.5, 5), sharey=True)
+            legend_handles = []
+            for arm, result in normalization_arms:
+                family, variant = arm.split(":", 1)
+                for role_index, (role, title) in enumerate(role_specs):
+                    role_result = result["roles"].get(role)
+                    if not role_result:
+                        continue
+                    point_values, lower_errors, upper_errors = [], [], []
+                    for condition in ("before", "after"):
+                        metric = role_result[condition]["metrics"]["recall_at_1"]
+                        point = float(metric["mean"])
+                        ci = metric.get("crossed_95_ci", {})
+                        point_values.append(point)
+                        lower_errors.append(max(0.0, point - float(ci.get("lower_95", point))))
+                        upper_errors.append(max(0.0, float(ci.get("upper_95", point)) - point))
+                    line, = axes[role_index].plot((0, 1), point_values, color=colors.get(family),
+                        linestyle=line_styles.get(variant, "-"), marker="o", markersize=4, linewidth=1.2,
+                        label=label(arm))
+                    axes[role_index].errorbar((0, 1), point_values, yerr=(lower_errors, upper_errors),
+                        fmt="none", ecolor=colors.get(family), capsize=2, linewidth=.8)
+                    if role_index == 0:
+                        legend_handles.append(line)
+            for axis, (_, title) in zip(axes, role_specs, strict=True):
+                axis.set_title(title)
+                axis.set_xticks((0, 1), ("Before", "After"))
+                axis.set_ylim(0, 1)
+                axis.yaxis.set_major_formatter(PercentFormatter(1))
+                axis.grid(axis="y", alpha=.22)
+            axes[0].set_ylabel("Recall@1 in the targeted sample")
+            figure.suptitle(f"Before and after amplitude normalization ({gain.get('sample', {}).get('size', 0)} warning WAVs)", y=1.02)
+            figure.legend(handles=legend_handles, loc="lower center", ncol=3, fontsize=7, bbox_to_anchor=(.5, -.04))
+            figures["normalization_comparison"] = save("issue155_gain_normalization_before_after.png", figure)
+
+    if candidates:
+        with plt.rc_context({"font.size": 8, "axes.titlesize": 12, "axes.labelsize": 9}):
+            ordered_candidates = sorted(candidates, key=lambda item: item["candidate_id"])
+            figure, axis = plt.subplots(figsize=(9, 6))
+            change_color, repeat_color = "#176b87", "#777777"
+            for position, candidate in enumerate(ordered_candidates):
+                measurements = candidate.get("midi_measurements", [])
+                if not measurements:
+                    continue
+                for field, color, vertical_offset in (
+                        ("change_spectral_distance", change_color, .13),
+                        ("repeat_spectral_distance", repeat_color, -.13)):
+                    values = np.asarray([float(row[field]) for row in measurements], dtype=np.float64)
+                    mean = float(values.mean())
+                    axis.errorbar(mean, position + vertical_offset,
+                        xerr=[[mean - float(values.min())], [float(values.max()) - mean]],
+                        fmt="o", color=color, ecolor=color, capsize=2, markersize=4,
+                        label=("Control change" if position == 0 and field == "change_spectral_distance" else
+                               "Independent-seed repeat" if position == 0 else None))
+            axis.set_yticks(range(len(ordered_candidates)), [
+                f"{item['candidate_id']} · {item.get('screen_strength', 'unclassified')}" for item in ordered_candidates])
+            axis.invert_yaxis()
+            axis.set_xlabel("64-band spectral distance (1 − cosine)")
+            axis.set_title("Controlled-preset acoustic change versus render variation")
+            axis.grid(axis="x", alpha=.22)
+            axis.legend(loc="lower right", fontsize=8)
+            figures["controlled_acoustic_differences"] = save("issue155_controlled_acoustic_differences.png", figure)
+
+    return figures
+
+
+def _issue155_visual_summary_lines(figures: dict | None) -> list[str]:
+    if not figures:
+        return []
+    descriptions = (
+        ("encoder_metric_heatmap", "Encoder × metric heatmap",
+         "All evaluated arms on the 50-performance cohort; colors show the retrieval and hard-negative percentages from the table."),
+        ("rank_distribution", "Correct-preset rank distribution",
+         "CDF of individual attempts from the three MIDI assignments; repeated attempts remain grouped for the table's crossed uncertainty estimates."),
+        ("per_preset_accuracy", "Per-preset accuracy distributions",
+         "Each box summarizes preset Recall@1 after averaging assignment rounds per MIDI; the dashed line marks the 50% difficult-preset threshold."),
+        ("normalization_comparison", "Before/after normalization comparison",
+         "Recall@1 for the targeted 100-WAV amplitude-warning sample, split by query versus correct-match gallery role; this sample is not a corpus-wide estimate."),
+        ("controlled_acoustic_differences", "Controlled-preset acoustic differences",
+         "Mean change and independent-seed repeat distances with four-context min–max ranges; this is a spectral screen, not an audibility judgment."))
+    lines = ["### Visual summaries", ""]
+    for key, title, caption in descriptions:
+        if key in figures:
+            filename = Path(figures[key]).as_posix()
+            lines.extend([f"**{title}**", "", f"![{title}]({filename})", "", caption, ""])
+    return lines
 
 
 def _reader_summary(current_dataset: dict, current_eval: dict | None, comparison_dataset: dict | None,
                     comparison_eval: dict | None, controls: dict, inventory_name: str,
                     availability: dict[str, dict], validation_results: dict | None = None,
-                    candidate_shortlist: dict | None = None) -> list[str]:
+                    candidate_shortlist: dict | None = None, visuals: dict | None = None) -> list[str]:
     lines = ["## Results and recommendation", ""]
     model_results = (current_eval or {}).get("model_results", {})
     current_ranking = [arm for arm, outcomes in sorted(model_results.items(),
@@ -929,6 +1134,7 @@ def _reader_summary(current_dataset: dict, current_eval: dict | None, comparison
     if validation_results:
         lines.extend(["The 81.4% headline is the primary common-gallery assignment. Issue #155 reuses those same queries and preset targets, rotates only the gallery-MIDI assignment in three deterministic rounds, and reports that paired average separately.", ""])
         lines.extend(_issue155_plain_english(validation_results, candidate_shortlist))
+        lines.extend(_issue155_visual_summary_lines(visuals))
         lines.extend(_issue155_followup_lines(validation_results, candidate_shortlist))
     if comparison_dataset and comparison_eval is not None:
         lines.extend(_summary_cohort_lines("Earlier 12-MIDI validation-source cohort", comparison_dataset, comparison_eval))
@@ -1470,8 +1676,10 @@ def generate_report(destination: Path, inventory: Path, *, dataset_dir: Path | N
     if research_start >= 0 and research_end >= 0:
         research_details = document[research_start:research_end].rstrip() + "\n\n"
         document = document[:research_start] + document[research_end:]
+    visuals = _write_issue155_visualizations(destination.parent / "figures", evaluation,
+        issue155_results, candidate_shortlist)
     reader_summary = _reader_summary(dataset_info, evaluation, comparison_info, comparison_eval, groups,
-                                     inventory.name, availability, issue155_results, candidate_shortlist)
+                                     inventory.name, availability, issue155_results, candidate_shortlist, visuals)
     status_start = document.find("## Execution status\n")
     if status_start >= 0:
         existing_execution_status = document[status_start:]
@@ -1480,6 +1688,8 @@ def generate_report(destination: Path, inventory: Path, *, dataset_dir: Path | N
         document = document[:status_start] + "\n".join(reader_summary) + "\n" + research_details
         if evaluation and local_dataset:
             status_lines = _execution_status_lines(dataset_info, evaluation, local_dataset, arms, locked_models)
+            if visuals:
+                status_lines.extend(["", f"Report figures were generated with Matplotlib `{visuals['matplotlib_version']}` from cached evaluation and shortlist results."])
             document += evaluation_protocol + "\n" + "\n".join(status_lines) + "\n"
         else:
             document += existing_execution_status

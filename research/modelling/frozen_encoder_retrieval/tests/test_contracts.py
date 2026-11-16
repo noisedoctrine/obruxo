@@ -365,7 +365,7 @@ class FeatureAndManifestTests(unittest.TestCase):
         self.assertEqual(2, summary["correct_match_gallery_render_quality"]["clean"]["assignment_observations"])
         self.assertEqual(4, summary["correct_match_gallery_render_quality"]["warning"]["assignment_observations"])
 
-    def test_issue155_rank_failure_collapses_assignments_and_uses_expected_ties(self):
+    def test_issue155_rank_failures_use_individual_attempts_with_expected_ties(self):
         rows_by_arm = {"clap_music:official_clip": []}
         values = {
             ("state-a", "family-a", "midi-a"): ((1.5, 0.5), (1.5, 0.5), (1.5, 0.5)),
@@ -386,11 +386,17 @@ class FeatureAndManifestTests(unittest.TestCase):
                     if row["target_state_id"] == "state-a" and row["query_midi_id"] == "midi-a")
         self.assertEqual(1.5, tied["rank_expected"])
         self.assertEqual(0.5, tied["recall_at_1"])
-        summary = _issue155_rank_statistics(collapsed["clap_music:official_clip"], replicates=100)
+        summary = _issue155_rank_statistics(collapsed["clap_music:official_clip"],
+            attempts=rows_by_arm["clap_music:official_clip"], replicates=100)
         self.assertEqual(2, summary["performance_clusters"])
         self.assertEqual(2, summary["preset_family_clusters"])
-        self.assertEqual(0.5, summary["rank_distribution"]["near_miss_fraction"])
-        self.assertEqual(0.5, summary["rank_distribution"]["far_failure_fraction"])
+        self.assertEqual(12, summary["individual_retrieval_attempts"])
+        self.assertEqual(3, summary["assignment_rounds_per_query_pair"])
+        self.assertEqual(12, len(summary["rank_expected_values"]))
+        self.assertEqual(5.0, summary["rank_distribution"]["median_expected_rank"])
+        self.assertEqual(8.9, summary["rank_distribution"]["p90_expected_rank"])
+        self.assertAlmostEqual(7 / 12, summary["rank_distribution"]["near_miss_fraction"])
+        self.assertAlmostEqual(5 / 12, summary["rank_distribution"]["far_failure_fraction"])
 
     def test_issue155_rank_failure_reports_all_six_families_with_shared_resamples(self):
         families = ("clap_music", "muq_mulan", "cir_ast", "beats_iter3_plus", "dac_44khz", "encodec_24khz")
@@ -415,7 +421,8 @@ class FeatureAndManifestTests(unittest.TestCase):
 
         self.assertEqual(set(arms), set(result["arms"]))
         self.assertTrue(result["shared_bootstrap_resamples_across_arms"])
-        self.assertTrue(all(summary["query_pairs"] == 4 for summary in result["arms"].values()))
+        self.assertTrue(all(summary["query_pairs"] == 4 and summary["individual_retrieval_attempts"] == 12
+            and summary["assignment_rounds_per_query_pair"] == 3 for summary in result["arms"].values()))
         self.assertEqual({155}, {summary["bootstrap_seed"] for summary in result["arms"].values()})
 
     def test_controlled_candidate_screen_labels_consistency_not_audibility(self):
@@ -1196,6 +1203,8 @@ class ReportingAndControlTests(unittest.TestCase):
             self.assertIn("How retrieval fails", text)
             self.assertIn("Median expected rank", text)
             self.assertIn("Per-preset R@1", text)
+            self.assertIn("12 attempts per encoder", text)
+            self.assertIn("keeping a query's three assignment attempts together", text)
             self.assertIn("Mean warned candidates / fraction of 129", text)
             self.assertIn("groups overlap for 4 pairs, and their union contains 4 pairs", text)
             self.assertIn("selected 8 presets", text)
