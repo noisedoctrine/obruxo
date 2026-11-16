@@ -731,26 +731,74 @@ python research/modelling/frozen_encoder_retrieval/run_issue157_sensitivity.py `
 
 ## Model efficiency and resource requirements
 
-The existing extraction records show a wide range of resource costs, while the existing retrieval results favor CIR. The figures below are compiled from prior extraction logs, locked-checkpoint sizes, model parameter counts and retrieval results; no newly measured inference results are included.
+CLAP is the fastest encoder in a standardized single-clip test; CIR has the strongest existing retrieval result. On the same 128 rendered recordings, CLAP’s median audio-to-embedding latency was 56 ms, while CIR’s was 289 ms and its original common-gallery Recall@1 was higher (81.4% versus 58.9%). These measure different goals: fast embedding does not by itself mean better preset retrieval or better audio reconstruction.
 
-| Encoder | Total loaded / audio-path parameters | Locked checkpoint payload | Existing extraction latency / throughput¹ | Peak process RAM | Peak XPU memory | Embedding dimensions² | Best tested common-gallery Recall@1³ |
-|---|---:|---:|---:|---:|---:|---|---:|
-| Spotify Basic Pitch contour trunk | 16,782 / 7,514 | 0.15 MiB | 0.449 s/item; 2.23 items/s (6,480; 6,480 extracted) | 2.20 GiB | 0.045 GiB | 704 / 11,264 | 21.9% |
-| BEATs iter3+ AS2M | 90,311,792 / 90,311,792 | 344.75 MiB | 0.229 s/item; 4.37 items/s (6,480; 6,480 extracted) | 3.33 GiB | 0.415 GiB | 768 / 12,288 | 62.2% |
-| CIR single-timbre AST | 85,909,248 / 85,909,248 | 344.78 MiB | 0.251 s/item; 3.98 items/s (6,480; 6,480 extracted) | 2.04 GiB | 0.404 GiB | 768 | 81.4% |
-| LAION-CLAP Music HTSAT-base | 199,564,633 / 73,737,303 | 2,243.49 MiB | 0.096 s/item; 10.37 items/s (1,554; 1,554 extracted) | 3.57 GiB | 0.793 GiB | 512 | 58.9% |
-| Descript Audio Codec 44.1 kHz | 76,620,777 / 22,299,200 | 292.31 MiB | 1.255 s/item; 0.80 items/s (6,480; 6,426 extracted, 54 reused) | 3.01 GiB | 0.922 GiB | 1,024 / 16,384 | 31.4% |
-| Meta EnCodec 24 kHz | 14,851,810 / 7,425,792 | 88.81 MiB | 0.645 s/item; 1.55 items/s (1,554; all extracted) | 1.99 GiB | 0.236 GiB | 128 / 2,048 | 24.2% |
-| MuQ-MuLan | 663,364,763 / 334,582,426 | 2,531.01 MiB | 0.328 s/item; 3.05 items/s (1,554; all extracted) | 6.76 GiB | 2.676 GiB | 512 | 30.2% |
+### Standardized inference benchmark
 
-¹ These are **existing extraction-pass averages**, calculated as logged pass time divided by input count, not isolated single-clip inference timings. They include per-file audio hashing, cache checks, inference for cache misses, and feature/cache writes. Device was XPU for every row. Basic Pitch, BEATs, CIR and DAC use the existing 6,480-item pass; CLAP, EnCodec and MuQ-MuLan use the existing 1,554-item pass where every input was newly extracted. The 6,480-item CLAP pass ran on CPU and reused 6,176 cached features, so it is not used for the XPU rate. The DAC pass reused 54 features. This keeps cache-hit and CPU/GPU differences visible rather than presenting the averages as standardized inference benchmarks.
+Each encoder ran in a fresh process on the same sample, at batch size 1, FP32, on the Intel Arc 140T XPU. Every model processed all 128 recordings on all three timed passes (384 successful timed inferences per model; zero failures).
 
-² Clip encoders have one output dimension. For sequence encoders, values are `masked_mean / temporal_pyramid_8`; both are produced from one feature extraction. Parameter counts are exact module counts: “audio path” excludes unused task heads for Basic Pitch and codec decoders for DAC/EnCodec, and excludes the text branch for CLAP and MuQ-MuLan. Total loaded counts include those branches/heads. Checkpoint payload sizes sum the locked local weight files and exclude configs and software dependencies.
+| Encoder | Model load¹ (s) | Audio to embedding, median / P90 (ms) | Model-call proxy, median / P90 (ms)² | Throughput (audio-s / wall-s) | Peak process RAM (GiB) | Peak XPU allocation (GiB) | Existing Recall@1³ |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Spotify Basic Pitch contour trunk | 0.05 | 239 / 297 | 8 / 10 | 27.9 | 2.14 | 0.045 | 21.9% |
+| BEATs iter3+ AS2M | 2.05 | 240 / 305 | 130 / 178 | 30.2 | 3.52 | 0.415 | 62.2% |
+| CIR single-timbre AST | 6.88 | 289 / 302 | 254 / 271 | 27.7 | 2.16 | 0.404 | 81.4% |
+| LAION-CLAP Music HTSAT-base | 10.78 | 56 / 58 | 44 / 46 | 144.0 | 3.83 | 0.793 | 58.9% |
+| Descript Audio Codec 44.1 kHz | 5.89 | 1,466 / 1,826 | 766 / 1,009 | 5.7 | 3.62 | 0.922 | 31.4% |
+| Meta EnCodec 24 kHz | 5.99 | 561 / 702 | 507 / 644 | 13.8 | 2.20 | 0.236 | 24.2% |
+| MuQ-MuLan | 13.86 | 405 / 438 | 383 / 413 | 20.5 | 7.01 | 2.676 | 30.2% |
+
+The latency values summarize each recording’s median over its three passes, then report the median and P90 across 128 recordings. Throughput is the total duration of all successfully processed audio divided by synchronized timed wall time. Process RAM is sampled every 10 ms during checkpoint verification, loading and inference; XPU allocation is the PyTorch allocator peak after runtime initialization and includes model loading and inference.
+
+### Model size and historical extraction records
+
+| Encoder | Total loaded / audio-path parameters | Locked checkpoint payload | Embedding dimensions⁴ | Historical extraction pass average (s/item)⁵ |
+|---|---:|---:|---|---:|
+| Spotify Basic Pitch contour trunk | 16,782 / 7,514 | 0.15 MiB | 704 / 11,264 | 0.449 |
+| BEATs iter3+ AS2M | 90,311,792 / 90,311,792 | 344.75 MiB | 768 / 12,288 | 0.229 |
+| CIR single-timbre AST | 85,909,248 / 85,909,248 | 344.78 MiB | 768 | 0.251 |
+| LAION-CLAP Music HTSAT-base | 199,564,633 / 73,737,303 | 2,243.49 MiB | 512 | 0.096 |
+| Descript Audio Codec 44.1 kHz | 76,620,777 / 22,299,200 | 292.31 MiB | 1,024 / 16,384 | 1.255 |
+| Meta EnCodec 24 kHz | 14,851,810 / 7,425,792 | 88.81 MiB | 128 / 2,048 | 0.645 |
+| MuQ-MuLan | 663,364,763 / 334,582,426 | 2,531.01 MiB | 512 | 0.328 |
+
+The historical column is a cache-extraction pass average, not an inference benchmark: its timer also covered audio hashing, cache checks, and feature writes; cohort sizes and cache-hit rates differed. The prior XPU passes used 6,480 inputs for Basic Pitch, BEATs, CIR and DAC, and 1,554 newly extracted inputs for CLAP, EnCodec and MuQ-MuLan. The 6,480-item CLAP pass ran on CPU and reused most features, so it is excluded. Do not compare these averages directly with the standardized timings above.
+
+Parameter counts are exact module counts. “Audio path” excludes unused Basic Pitch task heads and DAC/EnCodec decoders, and CLAP/MuQ text branches; total loaded counts include those modules. Checkpoint size sums the locked weight files, excluding configs and software dependencies. Clip encoders have one output dimension. For sequence encoders, dimensions are `masked_mean / temporal_pyramid_8`, both derived from one forward pass.
+
+### Latency by audio duration
+
+Each cell is median / P90 milliseconds across 32 recordings in the duration band, using the per-recording median across three passes.
+
+| Encoder | 4–6 s | 6–8 s | 8–10 s | 10 s |
+|---|---:|---:|---:|---:|
+| Basic Pitch | 146 / 434 | 205 / 229 | 263 / 340 | 283 / 302 |
+| BEATs | 160 / 208 | 217 / 262 | 268 / 309 | 276 / 324 |
+| CIR | 287 / 295 | 288 / 307 | 289 / 301 | 289 / 311 |
+| CLAP | 50 / 52 | 54 / 71 | 58 / 59 | 56 / 57 |
+| DAC | 937 / 1,299 | 1,222 / 1,533 | 1,702 / 2,041 | 1,638 / 1,830 |
+| EnCodec | 375 / 422 | 483 / 598 | 617 / 774 | 622 / 721 |
+| MuQ-MuLan | 404 / 430 | 409 / 450 | 408 / 439 | 405 / 438 |
+
+The duration-balanced sample is intentionally not weighted to the full corpus’s natural duration distribution. CLAP, Basic Pitch and BEATs changed little across these bands; codec latency rose with clip length, especially for DAC. The wider Basic Pitch P90 in the 4–6 s band reflects a few slower recordings, not a change in model or preprocessing.
+
+![Median inference latency versus existing retrieval accuracy](figures/model_efficiency_vs_retrieval.png)
+
+*Latency versus the existing original common-gallery Recall@1 (6,450 queries, 129 candidate presets). Retrieval is from the separate evaluation; it was not rerun for this benchmark. The plot shows a speed-quality trade-off, not a causal relationship.*
 
 ### Practical interpretation
 
-Basic Pitch is smallest on disk and has the fewest parameters, but its best tested Recall@1 is 21.9%. EnCodec had the lowest observed host-RAM peak (1.99 GiB); Basic Pitch had the lowest XPU allocation (0.045 GiB), although its host-RAM use was higher. MuQ-MuLan is the largest loaded model and used the most host and XPU memory, while reaching 30.2% Recall@1. CIR reached the strongest retrieval score (81.4%) with 85.9 million loaded parameters and about 0.40 GiB peak XPU allocation. The highest observed pass rate belongs to CLAP, but it comes from a different, smaller extraction pass; it should not be treated as a controlled speed ranking. These results show a practical trade-off, not that lower compute causes lower retrieval quality.
+CLAP is clearly fastest: it embeds a typical 8-second clip in about 56 ms and processes about 144 audio-seconds per wall-second on this XPU. It uses more memory than the smallest models (3.83 GiB host RAM and 0.79 GiB XPU allocation) and reaches 58.9% Recall@1. CIR is slower at 289 ms but leads retrieval at 81.4%, while using about 0.40 GiB XPU memory. BEATs is close to CIR in latency (240 ms) and reaches 62.2% Recall@1.
+
+Basic Pitch has the fewest parameters and the lowest XPU allocation (0.045 GiB); its observed process RAM (2.14 GiB) is also lowest, though only slightly below CIR and EnCodec. Its 21.9% Recall@1 is low. EnCodec uses little XPU memory (0.24 GiB) but is slower (561 ms) and reaches 24.2%. MuQ-MuLan is the largest and most memory-hungry (7.01 GiB host RAM, 2.68 GiB XPU) without matching CIR or BEATs retrieval. DAC is slowest at 1.47 s median and 5.7 audio-seconds per wall-second. For retrieval quality, CIR is the strongest measured choice; for embedding throughput, CLAP is the fastest. Neither result predicts downstream reconstruction quality.
 
 ### Methodology and limits
 
-The XPU extraction records were produced with PyTorch 2.12.1+xpu, FP32, and serial one-WAV-at-a-time adapter calls on an Intel Arc 140T GPU with 16 GB reported device memory. Existing WAV durations vary within the adapter’s accepted 2–10 second range; they were not normalized to one duration. The extraction timer starts after model loading and XPU peak-memory reset, then covers iterating inputs through audio hashing, cache validation, any required model inference, feature persistence, and manifest writing. Host RSS is sampled during that pass, so it excludes load-time peaks; XPU memory is the allocator high-water mark during the pass and includes resident model allocations. Per-item latency and throughput above are pass averages, not medians of repeated inference calls. Exact standardized single-clip latency is unavailable in the existing records. Retrieval scores are from the separate common-gallery evaluation (6,450 queries over 129 presets); for each family the table shows its best tested pooling arm. They are context for the resource trade-off, not scores from the extraction passes.
+The fixed seed 157 selected 128 existing, accepted rendered WAVs from a 6,480-recording pool, with 32 recordings in each duration band: 4–6, 6–8, 8–10, and exactly 10 seconds. The sample spans 5–10 seconds (median 8.13 s), and the same file list and order schedule were used for every model. All selected WAVs are float32 stereo at 44.1 kHz. Batch size was 1; batch size 8 was not tested because the existing adapters expose single-recording inference, and no batching changes were made.
+
+Every model ran in a separate process. The shared device was an Intel Arc 140T GPU with 16 GB reported memory, using PyTorch 2.12.1+xpu and FP32 weights. Each process warmed up one recording per duration band, then ran three passes over all 128 examples. XPU synchronization brackets each end-to-end recording timer. Audio-to-embedding time includes WAV reading, stereo-to-mono conversion, SciPy polyphase resampling, model-specific preprocessing, the forward call, device-to-host output transfer and pooling; it excludes model loading and warm-up. The recorded model-loading time includes checkpoint digest verification and adapter loading but excludes Python/PyTorch import and XPU driver initialization.
+
+For the separate forward proxy, the benchmark synchronized around each existing adapter’s model-call entry point: Basic Pitch `forward_trunk`, BEATs `extract_features`, the continuous EnCodec/DAC encoder, MuQ’s audio forward, and the official CLAP/CIR embedding wrappers. CLAP and CIR wrappers include their input preparation; MuQ’s forward includes its model-native frontend. These values are not pure accelerator-kernel timings and should be used as diagnostic breakdowns, not a standalone model ranking.
+
+The adapters retain their existing preprocessing: float32 conversion, stereo averaging, resampling to each model’s native rate, and no shared gain normalization (EnCodec retains its checkpoint-configured normalization). Basic Pitch’s overlapping windows, BEATs patch framing and each model’s native frontend/codec framing were unchanged. No adapter-level audio crop, CPU fallback, precision fallback or failed input was observed; all sample durations meet the adapter’s 2–10 s input contract. Internal model-native framing or padding is not surfaced as an exact retained-sample count by every upstream wrapper. Basic Pitch used its locked NumPy 2.4.6 / SciPy 1.18.0 pair; the other six models used their locked NumPy 1.26.4 / SciPy 1.17.1 pair. All used the same PyTorch/XPU runtime. Close host-RAM differences are within the 10 ms sampling resolution; RAM sampling excludes Python import and driver initialization, and XPU values are allocator allocations, not total device-wide usage.
+
+The JSON with sanitized aggregate metrics and fixed protocol is [available here](model_efficiency_benchmark.json), and the reusable [benchmark runner](../run_efficiency_benchmark.py) defaults to the existing dataset and locked checkpoints. If a model’s already-installed locked packages live in a separate site-packages directory, pass `--pythonpath MODEL=DIR` for that worker; Basic Pitch requires its locked NumPy 2.4.6 / SciPy 1.18.0 pair. Raw sample paths, per-recording timings and worker logs remain under ignored `outputs/`. No new audio was rendered, no full-corpus extraction or retrieval evaluation was rerun, and no model was trained or modified. Recall@1 values are the existing best tested arm per encoder from the original common-gallery evaluation; CIR’s 81.4% is not the separate three-assignment 84.9% result described earlier. These measurements support choosing between speed and existing retrieval performance, not claiming a universally best encoder.
