@@ -30,7 +30,9 @@ from frozen_retrieval.encoders import _load_cir_ast_offline, _load_muq_mulan_off
 from frozen_retrieval.rendering import (QA_POLICY_ID, RENDER_POLICY_ID, _accepted, _qa_warnings,
                                         _receipt_matches_cached_audio, render_plan_identity)
 from frozen_retrieval.reporting import (_control_group, _inventory_summary, _performance_profile, build_control_inventory, build_controlled_inventory,
-                                        generate_report, _issue155_render_quality, _execution_status_lines)
+                                        generate_report, _issue155_render_quality, _execution_status_lines,
+                                        _collapse_issue155_rank_rows, _issue155_rank_statistics,
+                                        _issue155_rank_failure_analysis)
 import run_controlled_perturbation as controlled
 import run_controlled_candidate_shortlist as candidate_screen
 import run_issue155_validation as issue155
@@ -358,6 +360,96 @@ class FeatureAndManifestTests(unittest.TestCase):
         self.assertEqual(2, summary["correct_match_gallery_render_quality"]["clean"]["queries"])
         self.assertEqual(2, summary["mean_warning_candidates"])
         self.assertAlmostEqual(2 / 129, summary["mean_warning_fraction"], places=8)
+        self.assertEqual(2, summary["correct_match_gallery_quality_overlap"]["clean_warning_overlap_queries"])
+        self.assertEqual(2, summary["correct_match_gallery_quality_overlap"]["queries_in_either_group"])
+        self.assertEqual(2, summary["correct_match_gallery_render_quality"]["clean"]["assignment_observations"])
+        self.assertEqual(4, summary["correct_match_gallery_render_quality"]["warning"]["assignment_observations"])
+
+    def test_issue155_rank_failure_collapses_assignments_and_uses_expected_ties(self):
+        rows_by_arm = {"clap_music:official_clip": []}
+        values = {
+            ("state-a", "family-a", "midi-a"): ((1.5, 0.5), (1.5, 0.5), (1.5, 0.5)),
+            ("state-a", "family-a", "midi-b"): ((4.0, 0.0), (3.0, 0.0), (5.0, 0.0)),
+            ("state-b", "family-b", "midi-a"): ((6.0, 0.0), (7.0, 0.0), (5.0, 0.0)),
+            ("state-b", "family-b", "midi-b"): ((9.0, 0.0), (10.0, 0.0), (8.0, 0.0)),
+        }
+        for (state_id, family_id, midi_id), rounds in values.items():
+            for offset, (rank, recall) in zip((1, 7, 19), rounds, strict=True):
+                rows_by_arm["clap_music:official_clip"].append({"target_state_id": state_id,
+                    "target_family_id": family_id, "query_midi_id": midi_id,
+                    "gallery_assignment_offset": offset, "rank_expected": rank,
+                    "recall_at_1": recall, "recall_at_5": float(rank <= 5)})
+        collapsed, offsets = _collapse_issue155_rank_rows(rows_by_arm)
+        self.assertEqual([1, 7, 19], offsets)
+        self.assertEqual(4, len(collapsed["clap_music:official_clip"]))
+        tied = next(row for row in collapsed["clap_music:official_clip"]
+                    if row["target_state_id"] == "state-a" and row["query_midi_id"] == "midi-a")
+        self.assertEqual(1.5, tied["rank_expected"])
+        self.assertEqual(0.5, tied["recall_at_1"])
+        summary = _issue155_rank_statistics(collapsed["clap_music:official_clip"], replicates=100)
+        self.assertEqual(2, summary["performance_clusters"])
+        self.assertEqual(2, summary["preset_family_clusters"])
+        self.assertEqual(0.5, summary["rank_distribution"]["near_miss_fraction"])
+        self.assertEqual(0.5, summary["rank_distribution"]["far_failure_fraction"])
+
+    def test_issue155_rank_failure_reports_all_six_families_with_shared_resamples(self):
+        families = ("clap_music", "muq_mulan", "cir_ast", "beats_iter3_plus", "dac_44khz", "encodec_24khz")
+        arms = []
+        for family in families:
+            arms.append(f"{family}:official_clip" if family in {"clap_music", "muq_mulan", "cir_ast"}
+                else f"{family}:masked_mean")
+        rows = []
+        for arm_index, arm in enumerate(arms):
+            for state_index in range(2):
+                for midi_index in range(2):
+                    for offset in (1, 7, 19):
+                        rank = 1.0 + arm_index + (5 * state_index) + midi_index
+                        rows.append({"arm": arm, "target_state_id": f"state-{state_index}",
+                            "target_family_id": f"family-{state_index}", "query_midi_id": f"midi-{midi_index}",
+                            "gallery_assignment_offset": offset, "rank_expected": rank,
+                            "recall_at_1": float(rank == 1), "recall_at_5": float(rank <= 5)})
+        with tempfile.TemporaryDirectory(dir=REPO) as directory:
+            path = Path(directory) / "episodes.private.jsonl"
+            path.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+            result = _issue155_rank_failure_analysis(path, replicates=100)
+
+        self.assertEqual(set(arms), set(result["arms"]))
+        self.assertTrue(result["shared_bootstrap_resamples_across_arms"])
+        self.assertTrue(all(summary["query_pairs"] == 4 for summary in result["arms"].values()))
+        self.assertEqual({155}, {summary["bootstrap_seed"] for summary in result["arms"].values()})
+
+    def test_controlled_candidate_screen_labels_consistency_not_audibility(self):
+        def candidate(changed, repeated):
+            return {"median_change_to_repeat_ratio": 5.0, "midi_measurements": [
+                {"change_spectral_distance": c, "repeat_spectral_distance": r}
+                for c, r in zip(changed, repeated, strict=True)]}
+
+        strong = candidate_screen._candidate_screen_strength(candidate([.01] * 4, [.001] * 4))
+        borderline = candidate_screen._candidate_screen_strength(candidate([.01, .01, .01, .001], [.001] * 4))
+        weak = candidate_screen._candidate_screen_strength(candidate([.01, .001, .001, .001], [.001] * 4))
+        zero_repeat = candidate_screen._candidate_screen_strength({"median_change_to_repeat_ratio": None,
+            "midi_measurements": [{"change_spectral_distance": .01, "repeat_spectral_distance": .001},
+                {"change_spectral_distance": 0.0, "repeat_spectral_distance": 0.0}]})
+        self.assertEqual("strong", strong[0])
+        self.assertEqual("borderline", borderline[0])
+        self.assertEqual("weak or inconclusive", weak[0])
+        self.assertIn("not an audibility claim", weak[1])
+        self.assertEqual("weak or inconclusive", zero_repeat[0])
+        self.assertIn("ratio is undefined", zero_repeat[1])
+        measured = [{"midi_id": f"midi-{index}", "articulation": "held", "note_duration_median_seconds": 1.0,
+            "change_spectral_distance": ratio * .01, "repeat_spectral_distance": .01,
+            "change_to_repeat_ratio": ratio} for index, ratio in enumerate((2.0, 4.0, 6.0, 8.0))]
+        summary = {"scanned_render_qualified_presets": 1, "midi_context_count": 4, "new_vital_renders": 8,
+            "presets_with_valid_control_candidates": {}, "candidates": [{"candidate_id": "candidate-test",
+                "state_id": "state-test", "family_id": "family-test", "display_name": None,
+                "control": {"family": "filter", "field": "filter_1_cutoff", "before_raw": 0.1,
+                    "after_raw": 0.3, "before_normalized": 0.1, "after_normalized": 0.3},
+                "median_change_to_repeat_ratio": 8.0, "midi_measurements": measured,
+                "mean_change_spectral_distance": .05, "mean_repeat_spectral_distance": .01,
+                "performances_exceeding_repeat_variation": 4, "listening_examples": []}]}
+        with tempfile.TemporaryDirectory(dir=REPO) as directory:
+            written = candidate_screen._write_shortlist_files(Path(directory), summary)
+        self.assertEqual(5.0, written["candidates"][0]["median_change_to_repeat_ratio"])
 
     def test_controlled_shortlist_midi_contexts_cover_short_and_long_held_and_phrased_notes(self):
         rows = []
@@ -567,7 +659,7 @@ class FeatureAndManifestTests(unittest.TestCase):
             report_text = report.read_text(encoding="utf-8")
             self.assertIn("Render and feature coverage", report_text)
             self.assertIn("Known source-lineage near-neighbor win rate", report_text)
-            self.assertIn("Acoustic top-5 negative win", report_text)
+            self.assertIn("Acoustic hard-negative win", report_text)
             self.assertIn("not applicable: query MIDI source states are outside the validation preset gallery", report_text)
             self.assertIn("| Random chance |", report_text)
 
@@ -1052,17 +1144,18 @@ class ReportingAndControlTests(unittest.TestCase):
             assignment_metrics = root / "gallery_assignment_episode_metrics.private.jsonl"
             build_control_inventory(source, inventory)
             assignment_rows = []
-            for state_id, family_id, midi_id, query_quality in (
-                    ("state-a", "family-a", "midi-a", "clean"), ("state-b", "family-b", "midi-b", "warning")):
-                for offset, target_quality, warning_count, recall in (
-                        (1, "warning", 1, 1.0), (7, "clean", 2, 0.0), (19, "warning", 3, 1.0)):
-                    assignment_rows.append({"arm": "clap_music:official_clip", "episode_id": f"{state_id}-{offset}",
-                        "gallery_assignment_offset": offset, "target_state_id": state_id,
-                        "target_family_id": family_id, "query_midi_id": midi_id,
-                        "query_render_quality": query_quality, "correct_match_gallery_render_quality": target_quality,
-                        "gallery_candidate_count": 129, "gallery_warning_candidate_count": warning_count,
-                        "gallery_warning_candidate_fraction": warning_count / 129,
-                        "gallery_unknown_candidate_count": 0, "recall_at_1": recall, "recall_at_5": recall, "mrr": recall})
+            for state_id, family_id in (("state-a", "family-a"), ("state-b", "family-b")):
+                for midi_id, query_quality in (("midi-a", "clean"), ("midi-b", "warning")):
+                    for offset, target_quality, warning_count, recall in (
+                            (1, "warning", 1, 1.0), (7, "clean", 2, 0.0), (19, "warning", 3, 1.0)):
+                        assignment_rows.append({"arm": "clap_music:official_clip", "episode_id": f"{state_id}-{midi_id}-{offset}",
+                            "gallery_assignment_offset": offset, "target_state_id": state_id,
+                            "target_family_id": family_id, "query_midi_id": midi_id,
+                            "query_render_quality": query_quality, "correct_match_gallery_render_quality": target_quality,
+                            "gallery_candidate_count": 129, "gallery_warning_candidate_count": warning_count,
+                            "gallery_warning_candidate_fraction": warning_count / 129,
+                            "gallery_unknown_candidate_count": 0, "rank_expected": 1.0 if recall else 9.0,
+                            "recall_at_1": recall, "recall_at_5": recall, "mrr": recall})
             assignment_metrics.write_text("".join(json.dumps(row) + "\n" for row in assignment_rows), encoding="utf-8")
             validation.write_text(json.dumps({
                 "input_dataset": {"accepted_cached_clips": 6480},
@@ -1088,23 +1181,29 @@ class ReportingAndControlTests(unittest.TestCase):
                             "lower_95": 0.2, "upper_95": 0.8}}} for role in ("query", "correct_gallery_candidate")}}}},
                 "gain_warning_sample_selection": {},
             }), encoding="utf-8")
-            shortlist.write_text(json.dumps({"selected_count": 8}), encoding="utf-8")
+            shortlist.write_text(json.dumps({"selected_count": 8,
+                "screen_strength_counts": {"strong": 4, "borderline": 3, "weak or inconclusive": 1}}), encoding="utf-8")
             generate_report(report, inventory, issue155_results_path=validation,
                             candidate_shortlist_path=shortlist)
             text = report.read_text(encoding="utf-8")
-            self.assertIn("Issue #155 follow-up", text)
+            self.assertIn("Issue #155 diagnostic results", text)
             self.assertIn("Plain-English readout", text)
             self.assertIn("all 50 existing excerpts", text)
             self.assertIn("60.0% [50.0%, 70.0%]", text)
             self.assertIn("target margin ×100 (cosine points", text)
             self.assertNotIn("+5.00 pp", text)
             self.assertIn("Render-quality results for the expanded comparison-MIDI assignments", text)
+            self.assertIn("How retrieval fails", text)
+            self.assertIn("Median expected rank", text)
+            self.assertIn("Per-preset R@1", text)
             self.assertIn("Mean warned candidates / fraction of 129", text)
+            self.assertIn("groups overlap for 4 pairs, and their union contains 4 pairs", text)
             self.assertIn("selected 8 presets", text)
+            self.assertIn("4 strong, 3 borderline, 1 weak or inconclusive", text)
             self.assertIn("Each assignment round used 50 gallery MIDI excerpts", text)
             self.assertNotIn("All {'1': 50}", text)
             self.assertIn("definitive multi-encoder controlled diagnostic has not been run", text)
-            self.assertLess(text.index("Issue #155 follow-up"), text.index("## Execution status"))
+            self.assertLess(text.index("Issue #155 diagnostic results"), text.index("## Execution status"))
             self.assertNotIn("| Vital control family | Enabled / total |", text)
             self.assertLess(text.index("## Results and recommendation"), text.index("## Execution status"))
 

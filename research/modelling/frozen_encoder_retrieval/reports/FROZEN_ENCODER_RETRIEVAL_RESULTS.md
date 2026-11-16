@@ -4,15 +4,63 @@ Issues: [#152](https://github.com/noisedoctrine/obruxo/issues/152) baseline and 
 
 ## Results and recommendation
 
-**Primary expanded-cohort result:** CIR single-timbre AST (official_clip) ranked the correct preset first in 81.4% of cross-MIDI queries (n=6,450 queries, 129 candidate presets, 50 held-out MIDI performances held out from the original cohort). This ranks frozen representations across six model families; it is retrieval evidence, not a reconstruction result.
+**Primary expanded-cohort result:** CIR single-timbre AST (official_clip) ranked the correct preset first in 81.4% of cross-MIDI queries (n=6,450 queries, 129 candidate presets; 50 MIDI performances from `train`, distinct from the earlier validation-source MIDI cohort). This ranks frozen representations across six model families; it is retrieval evidence, not a reconstruction result.
 
-The 81.4% headline is the primary common-gallery assignment. Issue #155 keeps the same 6,450 queries and preset targets, rotates only the gallery-MIDI assignment in three deterministic rounds, and reports that paired average separately.
+### Expanded held-out performance cohort: 50 selected MIDI IDs; 50 with evaluated queries; 6450 common-gallery episodes
+Validation preset gallery: 131 verified states; performances sourced from `train`. Reserved test and confirmation sources used: **no**.
+Performance selection: deterministic coverage-balanced sample of 50 from 96 compatible IDs; 46 sampled out and 0 exact-ID overlaps excluded.
+
+Selected-excerpt diversity: 24 monophonic / 26 polyphonic; 30 held, 20 phrased; median pitch 29–89; variable velocity in 25/50; expressive events in 2 sustain, 0 pitch bend, and 0 other CC/pressure excerpts.
+
+| Frozen representation | R@1 [crossed 95% CI] | R@5 | MRR | Same-MIDI hard-negative win | Acoustic hard-negative win |
+|---|---:|---:|---:|---:|---:|
+| CIR single-timbre AST — official_clip (768-D) | 81.4% [75.3%, 87.1%] | 93.5% | 86.8% | 69.4% (n=6,450) | 84.5% (n=6,450) |
+| BEATs iter3+ AS2M — temporal_pyramid_8 (12288-D) | 62.2% [53.7%, 70.9%] | 81.3% | 70.9% | 26.1% (n=6,450) | 47.2% (n=6,450) |
+| BEATs iter3+ AS2M — masked_mean (768-D) | 59.3% [50.3%, 68.8%] | 78.6% | 68.2% | 41.3% (n=6,450) | 57.4% (n=6,450) |
+| LAION-CLAP Music HTSAT-base — official_clip (512-D) | 58.9% [50.3%, 67.9%] | 79.8% | 68.4% | 40.1% (n=6,450) | 59.6% (n=6,450) |
+| Descript Audio Codec 44.1 kHz — masked_mean (1024-D) | 31.4% [24.9%, 38.7%] | 52.2% | 41.8% | 28.9% (n=6,450) | 48.1% (n=6,450) |
+| Descript Audio Codec 44.1 kHz — temporal_pyramid_8 (16384-D) | 30.7% [24.3%, 37.1%] | 52.9% | 41.8% | 17.6% (n=6,450) | 36.5% (n=6,450) |
+| MuQ-MuLan — official_clip (512-D) | 30.2% [24.7%, 36.0%] | 52.9% | 41.3% | 10.4% (n=6,450) | 28.2% (n=6,450) |
+| Meta EnCodec 24 kHz — masked_mean (128-D) | 24.2% [18.2%, 30.5%] | 41.1% | 33.6% | 21.1% (n=6,450) | 36.0% (n=6,450) |
+| Meta EnCodec 24 kHz — temporal_pyramid_8 (2048-D) | 23.4% [17.9%, 29.0%] | 43.5% | 33.9% | 12.0% (n=6,450) | 26.3% (n=6,450) |
+| Random chance | 0.8% (fixed) | 3.9% | 4.2% | — | — |
+
+Paired crossed-cluster Recall@1 differences from the leading family representation (`cir_ast:official_clip`; best pooling per family):
+
+| Comparator | ΔR@1 (percentage points) | Crossed MIDI × preset-family 95% CI |
+|---|---:|---:|
+| `beats_iter3_plus:temporal_pyramid_8` | +19.2 | [+14.8, +24.1]  |
+| `clap_music:official_clip` | +22.5 | [+17.8, +27.5]  |
+| `dac_44khz:masked_mean` | +50.0 | [+43.7, +56.4]  |
+| `muq_mulan:official_clip` | +51.2 | [+46.4, +56.2]  |
+| `encodec_24khz:masked_mean` | +57.2 | [+51.2, +63.1]  |
+
+The table gives the headline retrieval measures on the shared candidate gallery. R@1 uncertainty is crossed over preset family and MIDI performance (2,000 bootstrap replicates); the heading gives the episode and independent-performance denominators. Hard-negative rates are descriptive proportions with query denominators. Query-audio quality and correct-match gallery quality are broken out below. For the full candidate gallery, the report gives the count and fraction of warned renders rather than labeling all candidates with one bucket. These are descriptive associations: warning status can covary with preset acoustics.
+
+**Query-render QA strata:** clean: `cir_ast:official_clip` 79.4% [73.8%, 85.2%] (q=3,778; 50 MIDI IDs); warning: `cir_ast:official_clip` 84.2% [79.7%, 89.2%] (q=2,672; 50 MIDI IDs). These are per-stratum MIDI-cluster intervals; accepted warning status is associated with the rendered preset and does not imply a causal quality effect.
+
+**Per-performance ranking stability** (best observed pooling within each family and condition; bootstrap resamples 50 MIDI IDs):
+
+| Encoder family | Common-gallery arm; R@1; first-place performances; bootstrap top-rank probability | Mixed-gallery arm; R@1; first-place performances; bootstrap top-rank probability |
+|---|---|---|
+| BEATs iter3+ AS2M | `beats_iter3_plus:temporal_pyramid_8`; 62.2%; 1/50; 0.0% | `beats_iter3_plus:masked_mean`; 55.3%; 0/50; 0.0% |
+| CIR single-timbre AST | `cir_ast:official_clip`; 81.4%; 47/50; 100.0% | `cir_ast:official_clip`; 80.6%; 50/50; 100.0% |
+| LAION-CLAP Music HTSAT-base | `clap_music:official_clip`; 58.9%; 0/50; 0.0% | `clap_music:official_clip`; 55.0%; 0/50; 0.0% |
+| Descript Audio Codec 44.1 kHz | `dac_44khz:masked_mean`; 31.4%; 0/50; 0.0% | `dac_44khz:masked_mean`; 32.9%; 0/50; 0.0% |
+| Meta EnCodec 24 kHz | `encodec_24khz:masked_mean`; 24.2%; 0/50; 0.0% | `encodec_24khz:temporal_pyramid_8`; 24.6%; 0/50; 0.0% |
+| MuQ-MuLan | `muq_mulan:official_clip`; 30.2%; 0/50; 0.0% | `muq_mulan:official_clip`; 26.2%; 0/50; 0.0% |
+
+Pooling is selected descriptively within each evaluated condition; the primary common-gallery table above lists every arm. Top-rank probabilities compare all scored arms within the condition.
+
+The 81.4% headline is the primary common-gallery assignment. Issue #155 reuses those same queries and preset targets, rotates only the gallery-MIDI assignment in three deterministic rounds, and reports that paired average separately.
 
 ### Plain-English readout
 
-In the separate test of three comparison-MIDI assignments, CIR single-timbre AST retrieved the correct preset at rank one for 84.9% of queries, followed by BEATs iter3+ AS2M at 62.3%. The paired CIR–BEATs gap was +22.6 percentage points [+19.4, +25.8]. It ranked first for 50 of 50 MIDI performances (100.0% top-rank probability). In the 100-WAV gain-normalization sample, the largest query-ranking drop was Meta EnCodec 24 kHz temporal pyramid (-23.0 points; paired 95% interval [-40.5, -8.5]); this small, warning-enriched sample does not estimate corpus-wide accuracy. The automated screen prepared 9 preset candidates with before/after/repeat listening examples; the definitive controlled diagnostic is waiting for the user's review and selection.
+In the separate test of three comparison-MIDI assignments, CIR single-timbre AST retrieved the correct preset at rank one for 84.9% of queries, followed by BEATs iter3+ AS2M at 62.3%. The paired CIR–BEATs gap was +22.6 percentage points [+19.4, +25.8]. It ranked first for 50 of 50 MIDI performances (100.0% top-rank probability). After averaging the three comparison-MIDI rounds within query, CIR's median expected rank was 1.0, with 4.8% of queries at expected rank above 5; Meta EnCodec 24 kHz masked_mean had the largest far-failure share (72.9%). Only 1/129 CIR presets fell below 50% R@1 across the 50 excerpts, compared with 111/129 for Meta EnCodec 24 kHz masked_mean. In the 100-WAV gain-normalization sample, the largest query-ranking drop was Meta EnCodec 24 kHz temporal pyramid (-23.0 points; paired 95% interval [-40.5, -8.5]); this small, warning-enriched sample does not estimate corpus-wide accuracy. The automated screen prepared 9 preset candidates with before/after/repeat listening examples; its consistency screen labels 6 strong, 2 borderline, 1 weak or inconclusive; weak/inconclusive examples: candidate_03 (2/4 contexts); the definitive controlled diagnostic is waiting for the user's review and selection.
 
-### Issue #155 follow-up: the comparison melody does not set the preset candidate count
+## Issue #155 diagnostic results
+
+### Comparison-MIDI assignments
 
 The original four-MIDI result is preserved as the baseline. We also reassigned the common comparison MIDI three times (deterministic offsets 1, 7 and 19) using all 50 existing excerpts. Each search still ranks the same 129 preset candidates, and the query and gallery play different MIDI excerpts. The 6,450 query inputs repeat across assignments, so we average the three outcomes within each query before estimating uncertainty across MIDI identities and preset families.
 
@@ -56,19 +104,50 @@ Performance-level rank stability (50 MIDI identities; the aggregate-best pooling
 | `encodec_24khz` | `encodec_24khz:temporal_pyramid_8` | 29.6%; 0/50; 0.0% | 27.7%; 0/50; 0.0% | 28.6%; 0/50; 0.0% | 28.7%; 0/50; 0.0% |
 | `muq_mulan` | `muq_mulan:official_clip` | 30.3%; 0/50; 0.0% | 31.0%; 0/50; 0.0% | 30.6%; 0/50; 0.0% | 30.6%; 0/50; 0.0% |
 
+### How retrieval fails
+
+These summaries collapse the three correlated assignment rounds (offsets 1, 7, 19) within each of 6,450 paired preset × MIDI queries. Rank is the average position among tied scores; near misses have expected rank >1 and ≤5, and far failures have expected rank >5. Intervals use 2,000 crossed bootstrap replicates over 50 MIDI performances and 129 preset-family clusters, with the same resamples for every encoder.
+
+| Encoder arm | Median expected rank [95% crossed CI] | 90th-percentile expected rank [95% crossed CI] | Near misses (expected rank >1 to 5) | Far failures (expected rank >5) |
+|---|---:|---:|---:|---:|
+| `beats_iter3_plus:masked_mean` | 2.0 [1.7, 2.7] | 12.0 [9.7, 15.0] | 42.4% [38.4%, 46.2%] | 25.6% [20.2%, 31.4%] |
+| `beats_iter3_plus:temporal_pyramid_8` | 2.0 [1.7, 2.3] | 11.7 [9.0, 15.0] | 42.8% [38.9%, 46.3%] | 24.0% [19.2%, 29.6%] |
+| `cir_ast:official_clip` | 1.0 [1.0, 1.0] | 2.7 [2.0, 3.7] | 27.9% [23.4%, 32.7%] | 4.8% [2.9%, 7.1%] |
+| `clap_music:official_clip` | 2.0 [1.7, 2.3] | 10.7 [8.7, 13.0] | 46.1% [42.4%, 49.9%] | 23.0% [18.6%, 28.2%] |
+| `dac_44khz:masked_mean` | 8.0 [6.0, 10.3] | 37.3 [32.0, 43.7] | 28.0% [23.7%, 32.7%] | 60.4% [53.9%, 66.5%] |
+| `dac_44khz:temporal_pyramid_8` | 7.0 [5.0, 9.3] | 35.0 [29.7, 40.7] | 30.4% [26.4%, 34.3%] | 56.4% [49.8%, 62.8%] |
+| `encodec_24khz:masked_mean` | 14.7 [11.3, 18.0] | 49.0 [43.7, 54.0] | 18.6% [15.0%, 22.4%] | 72.9% [67.3%, 78.6%] |
+| `encodec_24khz:temporal_pyramid_8` | 10.3 [8.0, 13.3] | 42.0 [36.7, 47.0] | 25.0% [20.9%, 29.3%] | 65.5% [59.2%, 71.5%] |
+| `muq_mulan:official_clip` | 8.7 [7.0, 10.7] | 39.3 [34.7, 45.0] | 29.0% [25.0%, 33.0%] | 63.1% [57.4%, 69.0%] |
+
+Per-preset accuracy first averages Recall@1 across the 50 unique MIDI inputs for each preset, then summarizes the 129 preset accuracies. The difficult-preset threshold is below 50% correct across MIDI inputs; intervals resample MIDI and preset-family clusters.
+
+| Encoder arm | Median Per-preset R@1 [95% crossed CI] | 10th-percentile Per-preset R@1 [95% crossed CI] | Presets below 50% R@1 (count / total; share CI) |
+|---|---:|---:|---:|
+| `beats_iter3_plus:masked_mean` | 60.0% [53.3%, 66.0%] | 36.5% [30.4%, 43.7%] | 41/129 (31.8% [19.4%, 44.2%]) |
+| `beats_iter3_plus:temporal_pyramid_8` | 62.0% [55.3%, 68.7%] | 36.9% [31.2%, 44.7%] | 40/129 (31.0% [18.6%, 41.1%]) |
+| `cir_ast:official_clip` | 87.3% [82.7%, 90.7%] | 68.7% [62.0%, 74.4%] | 1/129 (0.8% [0.0%, 3.9%]) |
+| `clap_music:official_clip` | 56.7% [50.7%, 64.0%] | 40.5% [34.0%, 45.3%] | 43/129 (33.3% [19.4%, 48.1%]) |
+| `dac_44khz:masked_mean` | 27.3% [21.3%, 34.0%] | 11.9% [8.0%, 15.3%] | 103/129 (79.8% [70.5%, 86.0%]) |
+| `dac_44khz:temporal_pyramid_8` | 30.7% [24.0%, 37.3%] | 13.3% [8.7%, 16.0%] | 93/129 (72.1% [63.6%, 80.6%]) |
+| `encodec_24khz:masked_mean` | 18.7% [12.7%, 23.3%] | 5.2% [2.7%, 7.3%] | 111/129 (86.0% [77.5%, 90.7%]) |
+| `encodec_24khz:temporal_pyramid_8` | 21.3% [16.7%, 27.3%] | 5.9% [2.7%, 8.5%] | 103/129 (79.8% [71.3%, 86.8%]) |
+| `muq_mulan:official_clip` | 27.3% [22.0%, 32.0%] | 11.3% [7.3%, 13.9%] | 107/129 (82.9% [76.0%, 91.5%]) |
+
+For query-WAV quality, clean and warning labels are mutually exclusive. Correct-match gallery-WAV groups overlap: a unique preset × query-MIDI pair is counted in each label seen across the three assignments. The groups overlap for 1,296 pairs, and their union contains 6,450 pairs. Here n is unique pairs and m is assignment observations.
 Render-quality results for the expanded comparison-MIDI assignments (each encoder uses the same queries and candidates; assignment rounds are averaged within query before confidence intervals):
 
-| Encoder arm | Query WAV R@1: clean / warning | Correct-match gallery WAV R@1: clean / warning | Mean warned candidates / fraction of 129 (fraction CI) |
+| Encoder arm | Query WAV R@1: clean / warning | Correct-match gallery WAV R@1: clean / warning (overlap allowed) | Mean warned candidates / fraction of 129 (fraction CI) |
 |---|---|---|---:|
-| `beats_iter3_plus:masked_mean` | clean 55.2% [49.3%, 60.8%] (n=3,778) / warning 68.6% [62.6%, 74.2%] (n=2,672) | clean 55.6% [49.7%, 61.0%] (n=4,390) / warning 65.9% [59.9%, 71.8%] (n=3,356) | 53.4 / 0.414 [0.398, 0.433] |
-| `beats_iter3_plus:temporal_pyramid_8` | clean 56.6% [51.0%, 62.0%] (n=3,778) / warning 70.2% [64.2%, 75.8%] (n=2,672) | clean 57.0% [51.4%, 62.1%] (n=4,390) / warning 66.9% [60.4%, 72.7%] (n=3,356) | 53.4 / 0.414 [0.398, 0.433] |
-| `cir_ast:official_clip` | clean 82.9% [78.7%, 86.6%] (n=3,778) / warning 87.7% [84.1%, 90.8%] (n=2,672) | clean 82.8% [78.5%, 86.4%] (n=4,390) / warning 86.2% [82.5%, 89.3%] (n=3,356) | 53.4 / 0.414 [0.398, 0.433] |
-| `clap_music:official_clip` | clean 55.6% [50.1%, 60.7%] (n=3,778) / warning 67.2% [61.5%, 72.3%] (n=2,672) | clean 56.2% [50.8%, 61.3%] (n=4,390) / warning 63.5% [57.6%, 69.1%] (n=3,356) | 53.4 / 0.414 [0.398, 0.433] |
-| `dac_44khz:masked_mean` | clean 30.0% [25.3%, 35.4%] (n=3,778) / warning 39.0% [32.3%, 46.0%] (n=2,672) | clean 29.4% [24.6%, 34.4%] (n=4,390) / warning 35.2% [28.7%, 41.5%] (n=3,356) | 53.4 / 0.414 [0.398, 0.433] |
-| `dac_44khz:temporal_pyramid_8` | clean 31.5% [26.3%, 37.0%] (n=3,778) / warning 43.5% [36.3%, 50.6%] (n=2,672) | clean 31.0% [25.7%, 36.4%] (n=4,390) / warning 39.7% [33.0%, 46.4%] (n=3,356) | 53.4 / 0.414 [0.398, 0.433] |
-| `encodec_24khz:masked_mean` | clean 19.9% [15.7%, 24.6%] (n=3,778) / warning 33.5% [26.9%, 40.4%] (n=2,672) | clean 19.9% [15.7%, 24.5%] (n=4,390) / warning 28.9% [22.7%, 35.6%] (n=3,356) | 53.4 / 0.414 [0.398, 0.433] |
-| `encodec_24khz:temporal_pyramid_8` | clean 21.6% [17.1%, 26.6%] (n=3,778) / warning 38.6% [31.1%, 46.0%] (n=2,672) | clean 21.5% [17.0%, 26.1%] (n=4,390) / warning 34.1% [27.5%, 41.0%] (n=3,356) | 53.4 / 0.414 [0.398, 0.433] |
-| `muq_mulan:official_clip` | clean 25.6% [21.5%, 29.9%] (n=3,778) / warning 37.7% [32.0%, 43.8%] (n=2,672) | clean 25.5% [21.5%, 29.6%] (n=4,390) / warning 35.4% [29.9%, 41.0%] (n=3,356) | 53.4 / 0.414 [0.398, 0.433] |
+| `beats_iter3_plus:masked_mean` | clean 55.2% [49.3%, 60.8%] (n=3,778 unique pairs; m=11,334 assignment observations) / warning 68.6% [62.6%, 74.2%] (n=2,672 unique pairs; m=8,016 assignment observations) | clean 55.6% [49.7%, 61.0%] (n=4,390 unique pairs; m=11,334 assignment observations) / warning 65.9% [59.9%, 71.8%] (n=3,356 unique pairs; m=8,016 assignment observations) | 53.4 / 0.414 [0.398, 0.433] |
+| `beats_iter3_plus:temporal_pyramid_8` | clean 56.6% [51.0%, 62.0%] (n=3,778 unique pairs; m=11,334 assignment observations) / warning 70.2% [64.2%, 75.8%] (n=2,672 unique pairs; m=8,016 assignment observations) | clean 57.0% [51.4%, 62.1%] (n=4,390 unique pairs; m=11,334 assignment observations) / warning 66.9% [60.4%, 72.7%] (n=3,356 unique pairs; m=8,016 assignment observations) | 53.4 / 0.414 [0.398, 0.433] |
+| `cir_ast:official_clip` | clean 82.9% [78.7%, 86.6%] (n=3,778 unique pairs; m=11,334 assignment observations) / warning 87.7% [84.1%, 90.8%] (n=2,672 unique pairs; m=8,016 assignment observations) | clean 82.8% [78.5%, 86.4%] (n=4,390 unique pairs; m=11,334 assignment observations) / warning 86.2% [82.5%, 89.3%] (n=3,356 unique pairs; m=8,016 assignment observations) | 53.4 / 0.414 [0.398, 0.433] |
+| `clap_music:official_clip` | clean 55.6% [50.1%, 60.7%] (n=3,778 unique pairs; m=11,334 assignment observations) / warning 67.2% [61.5%, 72.3%] (n=2,672 unique pairs; m=8,016 assignment observations) | clean 56.2% [50.8%, 61.3%] (n=4,390 unique pairs; m=11,334 assignment observations) / warning 63.5% [57.6%, 69.1%] (n=3,356 unique pairs; m=8,016 assignment observations) | 53.4 / 0.414 [0.398, 0.433] |
+| `dac_44khz:masked_mean` | clean 30.0% [25.3%, 35.4%] (n=3,778 unique pairs; m=11,334 assignment observations) / warning 39.0% [32.3%, 46.0%] (n=2,672 unique pairs; m=8,016 assignment observations) | clean 29.4% [24.6%, 34.4%] (n=4,390 unique pairs; m=11,334 assignment observations) / warning 35.2% [28.7%, 41.5%] (n=3,356 unique pairs; m=8,016 assignment observations) | 53.4 / 0.414 [0.398, 0.433] |
+| `dac_44khz:temporal_pyramid_8` | clean 31.5% [26.3%, 37.0%] (n=3,778 unique pairs; m=11,334 assignment observations) / warning 43.5% [36.3%, 50.6%] (n=2,672 unique pairs; m=8,016 assignment observations) | clean 31.0% [25.7%, 36.4%] (n=4,390 unique pairs; m=11,334 assignment observations) / warning 39.7% [33.0%, 46.4%] (n=3,356 unique pairs; m=8,016 assignment observations) | 53.4 / 0.414 [0.398, 0.433] |
+| `encodec_24khz:masked_mean` | clean 19.9% [15.7%, 24.6%] (n=3,778 unique pairs; m=11,334 assignment observations) / warning 33.5% [26.9%, 40.4%] (n=2,672 unique pairs; m=8,016 assignment observations) | clean 19.9% [15.7%, 24.5%] (n=4,390 unique pairs; m=11,334 assignment observations) / warning 28.9% [22.7%, 35.6%] (n=3,356 unique pairs; m=8,016 assignment observations) | 53.4 / 0.414 [0.398, 0.433] |
+| `encodec_24khz:temporal_pyramid_8` | clean 21.6% [17.1%, 26.6%] (n=3,778 unique pairs; m=11,334 assignment observations) / warning 38.6% [31.1%, 46.0%] (n=2,672 unique pairs; m=8,016 assignment observations) | clean 21.5% [17.0%, 26.1%] (n=4,390 unique pairs; m=11,334 assignment observations) / warning 34.1% [27.5%, 41.0%] (n=3,356 unique pairs; m=8,016 assignment observations) | 53.4 / 0.414 [0.398, 0.433] |
+| `muq_mulan:official_clip` | clean 25.6% [21.5%, 29.9%] (n=3,778 unique pairs; m=11,334 assignment observations) / warning 37.7% [32.0%, 43.8%] (n=2,672 unique pairs; m=8,016 assignment observations) | clean 25.5% [21.5%, 29.6%] (n=4,390 unique pairs; m=11,334 assignment observations) / warning 35.4% [29.9%, 41.0%] (n=3,356 unique pairs; m=8,016 assignment observations) | 53.4 / 0.414 [0.398, 0.433] |
 A long tail or high float peak is not an automatic failure. These descriptive strata do not establish that a warning caused a ranking change.
 
 ### Audio quality checks
@@ -123,33 +202,34 @@ Mean applied gain was -4.2 dB; adjusted peaks were at most 0.950. No limiter, co
 ### Controlled-preset shortlist: awaiting user selection
 
 The encoder-blind scan checked 129 render-qualified presets. Active control candidates were found in 89 filter, 129 envelope, and 11 routed-LFO presets. It selected 9 presets across four short/long held/phrased excerpts (72 changed/repeat renders; 3 envelope, 3 filter, 3 routed lfo).
+Screen evidence labels: 6 strong, 2 borderline, 1 weak or inconclusive. Strong means the spectral change exceeded independent-seed repeat variation in every context; borderline means all but one context with median change/repeat ratio ≥3; weak or inconclusive means those criteria were not met. These labels do not establish audibility.
 The acoustic screen compares each changed source-seed render with an unchanged-preset independent-seed repeat. Presets were sampled by parameter-value quantiles before measuring effect, so encoder scores and unusually large effects did not determine inclusion. Listening WAVs and exact preset/control mappings are in the ignored local `outputs/issue155-controlled-candidates/controlled_candidate_shortlist.private.md`; the shortlist remains for review, and the definitive multi-encoder controlled diagnostic has not been run.
 
-| Candidate | Control family | Mean changed-audio distance | Mean repeat distance | Change exceeds repeat |
-|---|---|---:|---:|---:|
-| candidate_01 | filter | 0.04358 | 0.00366 | 3/4 |
-| candidate_02 | filter | 0.01171 | 0.00139 | 4/4 |
-| candidate_03 | filter | 0.00031 | 0.00015 | 2/4 |
-| candidate_04 | envelope | 0.02176 | 0.00000 | 4/4 |
-| candidate_05 | envelope | 0.00409 | 0.00061 | 3/4 |
-| candidate_06 | envelope | 0.02171 | 0.00215 | 4/4 |
-| candidate_07 | routed_lfo | 0.00947 | 0.00000 | 4/4 |
-| candidate_08 | routed_lfo | 0.00561 | 0.00050 | 4/4 |
-| candidate_09 | routed_lfo | 0.02045 | 0.00000 | 4/4 |
+| Candidate | Control family | Screen evidence | Mean changed-audio distance | Mean repeat distance | Change exceeds repeat |
+|---|---|---|---:|---:|---:|
+| candidate_01 | filter | borderline | 0.04358 | 0.00366 | 3/4 |
+| candidate_02 | filter | strong | 0.01171 | 0.00139 | 4/4 |
+| candidate_03 | filter | weak or inconclusive | 0.00031 | 0.00015 | 2/4 |
+| candidate_04 | envelope | strong | 0.02176 | 0.00000 | 4/4 |
+| candidate_05 | envelope | borderline | 0.00409 | 0.00061 | 3/4 |
+| candidate_06 | envelope | strong | 0.02171 | 0.00215 | 4/4 |
+| candidate_07 | routed_lfo | strong | 0.00947 | 0.00000 | 4/4 |
+| candidate_08 | routed_lfo | strong | 0.00561 | 0.00050 | 4/4 |
+| candidate_09 | routed_lfo | strong | 0.02045 | 0.00000 | 4/4 |
 Distances use the independent 64-band spectral descriptor; these four-context screens have no human audibility threshold or between-preset uncertainty estimate.
-### Original validation-paired cohort: 12 selected MIDI IDs; 12 with evaluated queries; 1548 common-gallery episodes
+### Earlier 12-MIDI validation-source cohort: 12 selected MIDI IDs; 12 with evaluated queries; 1548 common-gallery episodes
 Validation preset gallery: 131 verified states; performances sourced from `validation`. Reserved test and confirmation sources used: **no**.
 Selected-excerpt diversity: 4 monophonic / 8 polyphonic; 8 held, 4 phrased; median pitch 48–77; variable velocity in 3/12; expressive events in 0 sustain, 0 pitch bend, and 0 other CC/pressure excerpts.
 
-| Frozen representation (output) | R@1 (%; preset-family / MIDI / crossed 95% CI) | R@5 (%) | MRR (%) | Same-MIDI negative win (%; preset-family / MIDI CI; queries) | Acoustic top-5 negative win (%; preset-family / MIDI CI; queries) | Known source-lineage near-neighbor win rate | Query R@1 clean / warning (%) |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| LAION-CLAP Music HTSAT-base — official_clip (512-D) | 70.7% preset-family [67.3%, 74.0%] / MIDI [57.8%, 83.2%] / 2-way [57.0%, 82.7%] | 88.9% | 78.7% | 47.9% family [43.7%, 52.0%] / MIDI [33.2%, 61.9%] (q=1548) | 68.5% family [65.0%, 72.0%] / MIDI [55.4%, 80.7%] (q=1548) | not run family not estimated / MIDI not estimated (q=0) | 66.0% [52.9%, 79.7%] (q=941; MIDI IDs=12) / 78.1% [65.9%, 88.2%] (q=607; MIDI IDs=12) |
-| Descript Audio Codec 44.1 kHz — temporal_pyramid_8 (16384-D) | 36.6% preset-family [32.1%, 41.1%] / MIDI [27.8%, 46.4%] / 2-way [26.6%, 47.3%] | 60.2% | 47.4% | 26.9% family [22.4%, 31.3%] / MIDI [20.2%, 34.9%] (q=1548) | 45.5% family [40.6%, 50.3%] / MIDI [37.5%, 54.3%] (q=1548) | not run family not estimated / MIDI not estimated (q=0) | 29.4% [21.1%, 42.1%] (q=941; MIDI IDs=12) / 47.8% [38.4%, 55.6%] (q=607; MIDI IDs=12) |
-| MuQ-MuLan — official_clip (512-D) | 36.5% preset-family [32.7%, 40.2%] / MIDI [27.3%, 46.4%] / 2-way [26.6%, 47.0%] | 64.5% | 49.2% | 11.7% family [8.7%, 15.2%] / MIDI [7.5%, 16.7%] (q=1548) | 30.2% family [26.0%, 34.6%] / MIDI [22.2%, 40.2%] (q=1548) | not run family not estimated / MIDI not estimated (q=0) | 31.3% [22.6%, 41.1%] (q=941; MIDI IDs=12) / 44.5% [34.6%, 54.4%] (q=607; MIDI IDs=12) |
-| Descript Audio Codec 44.1 kHz — masked_mean (1024-D) | 31.4% preset-family [27.3%, 35.6%] / MIDI [23.5%, 40.6%] / 2-way [22.2%, 41.5%] | 53.5% | 42.1% | 28.9% family [24.9%, 33.0%] / MIDI [20.9%, 38.6%] (q=1548) | 47.3% family [42.8%, 51.6%] / MIDI [38.8%, 57.2%] (q=1548) | not run family not estimated / MIDI not estimated (q=0) | 26.7% [18.4%, 38.0%] (q=941; MIDI IDs=12) / 38.7% [31.0%, 45.6%] (q=607; MIDI IDs=12) |
-| Meta EnCodec 24 kHz — temporal_pyramid_8 (2048-D) | 29.8% preset-family [25.4%, 34.5%] / MIDI [22.8%, 39.2%] / 2-way [21.1%, 39.6%] | 51.3% | 40.9% | 18.3% family [14.4%, 22.4%] / MIDI [12.9%, 24.9%] (q=1548) | 33.9% family [28.9%, 39.0%] / MIDI [28.0%, 40.8%] (q=1548) | not run family not estimated / MIDI not estimated (q=0) | 21.8% [15.9%, 31.4%] (q=941; MIDI IDs=12) / 42.3% [32.8%, 51.1%] (q=607; MIDI IDs=12) |
-| Meta EnCodec 24 kHz — masked_mean (128-D) | 24.5% preset-family [20.5%, 28.7%] / MIDI [16.9%, 34.0%] / 2-way [15.2%, 34.6%] | 42.1% | 34.1% | 21.3% family [17.1%, 25.6%] / MIDI [14.5%, 29.7%] (q=1548) | 34.4% family [29.3%, 39.4%] / MIDI [25.8%, 44.8%] (q=1548) | not run family not estimated / MIDI not estimated (q=0) | 18.4% [12.4%, 27.6%] (q=941; MIDI IDs=12) / 33.9% [23.9%, 43.3%] (q=607; MIDI IDs=12) |
-| Random chance | 0.8% (fixed) | 3.9% | 4.2% | — | — | — |
+| Frozen representation | R@1 [crossed 95% CI] | R@5 | MRR | Same-MIDI hard-negative win | Acoustic hard-negative win |
+|---|---:|---:|---:|---:|---:|
+| LAION-CLAP Music HTSAT-base — official_clip (512-D) | 70.7% [57.0%, 82.7%] | 88.9% | 78.7% | 47.9% (n=1,548) | 68.5% (n=1,548) |
+| Descript Audio Codec 44.1 kHz — temporal_pyramid_8 (16384-D) | 36.6% [26.6%, 47.3%] | 60.2% | 47.4% | 26.9% (n=1,548) | 45.5% (n=1,548) |
+| MuQ-MuLan — official_clip (512-D) | 36.5% [26.6%, 47.0%] | 64.5% | 49.2% | 11.7% (n=1,548) | 30.2% (n=1,548) |
+| Descript Audio Codec 44.1 kHz — masked_mean (1024-D) | 31.4% [22.2%, 41.5%] | 53.5% | 42.1% | 28.9% (n=1,548) | 47.3% (n=1,548) |
+| Meta EnCodec 24 kHz — temporal_pyramid_8 (2048-D) | 29.8% [21.1%, 39.6%] | 51.3% | 40.9% | 18.3% (n=1,548) | 33.9% (n=1,548) |
+| Meta EnCodec 24 kHz — masked_mean (128-D) | 24.5% [15.2%, 34.6%] | 42.1% | 34.1% | 21.3% (n=1,548) | 34.4% (n=1,548) |
+| Random chance | 0.8% (fixed) | 3.9% | 4.2% | — | — |
 
 Paired crossed-cluster Recall@1 differences from the leading family representation (`clap_music:official_clip`; best pooling per family):
 
@@ -159,7 +239,7 @@ Paired crossed-cluster Recall@1 differences from the leading family representati
 | `muq_mulan:official_clip` | +34.2 | [+27.5, +41.3]  |
 | `encodec_24khz:temporal_pyramid_8` | +40.9 | [+29.9, +51.9]  |
 
-R@1 intervals are shown in preset-family, performance-ID, and crossed performance × preset-family order (2,000 bootstrap replicates); the heading gives the independent performance denominator. Negative-win cells show query denominators and preset-family/performance-cluster intervals. Clean/warning strata describe query audio and correct-match gallery audio separately. For the full candidate gallery, the report gives the number and fraction of warned renders instead of labeling all 129 candidates with one bucket. These are descriptive associations: warning status can covary with preset acoustics.
+The table gives the headline retrieval measures on the shared candidate gallery. R@1 uncertainty is crossed over preset family and MIDI performance (2,000 bootstrap replicates); the heading gives the episode and independent-performance denominators. Hard-negative rates are descriptive proportions with query denominators. Query-audio quality and correct-match gallery quality are broken out below. For the full candidate gallery, the report gives the count and fraction of warned renders rather than labeling all candidates with one bucket. These are descriptive associations: warning status can covary with preset acoustics.
 
 **Query-render QA strata:** clean: `clap_music:official_clip` 66.0% [52.9%, 79.7%] (q=941; 12 MIDI IDs); warning: `clap_music:official_clip` 78.1% [65.9%, 88.2%] (q=607; 12 MIDI IDs). These are per-stratum MIDI-cluster intervals; accepted warning status is associated with the rendered preset and does not imply a causal quality effect.
 
@@ -171,52 +251,6 @@ R@1 intervals are shown in preset-family, performance-ID, and crossed performanc
 | Descript Audio Codec 44.1 kHz | `dac_44khz:temporal_pyramid_8`; 36.6%; 0/12; 0.0% | `dac_44khz:temporal_pyramid_8`; 38.8%; 0/12; 0.0% |
 | Meta EnCodec 24 kHz | `encodec_24khz:temporal_pyramid_8`; 29.8%; 0/12; 0.0% | `encodec_24khz:temporal_pyramid_8`; 29.6%; 0/12; 0.0% |
 | MuQ-MuLan | `muq_mulan:official_clip`; 36.5%; 0/12; 0.0% | `muq_mulan:official_clip`; 31.1%; 0/12; 0.0% |
-
-Pooling is selected descriptively within each evaluated condition; the primary common-gallery table above lists every arm. Top-rank probabilities compare all scored arms within the condition.
-
-### Expanded held-out performance cohort: 50 selected MIDI IDs; 50 with evaluated queries; 6450 common-gallery episodes
-Validation preset gallery: 131 verified states; performances sourced from `train`. Reserved test and confirmation sources used: **no**.
-Performance selection: deterministic coverage-balanced sample of 50 from 96 compatible IDs; 46 sampled out and 0 exact-ID overlaps excluded.
-
-Selected-excerpt diversity: 24 monophonic / 26 polyphonic; 30 held, 20 phrased; median pitch 29–89; variable velocity in 25/50; expressive events in 2 sustain, 0 pitch bend, and 0 other CC/pressure excerpts.
-
-| Frozen representation (output) | R@1 (%; preset-family / MIDI / crossed 95% CI) | R@5 (%) | MRR (%) | Same-MIDI negative win (%; preset-family / MIDI CI; queries) | Acoustic top-5 negative win (%; preset-family / MIDI CI; queries) | Known source-lineage near-neighbor win rate | Query R@1 clean / warning (%) |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| CIR single-timbre AST — official_clip (768-D) | 81.4% preset-family [78.9%, 83.9%] / MIDI [76.0%, 86.7%] / 2-way [75.3%, 87.1%] | 93.5% | 86.8% | 69.4% family [66.4%, 72.4%] / MIDI [61.5%, 77.0%] (q=6450) | 84.5% family [81.7%, 87.0%] / MIDI [79.8%, 89.0%] (q=6450) | not run family not estimated / MIDI not estimated (q=0) | 79.4% [73.8%, 85.2%] (q=3778; MIDI IDs=50) / 84.2% [79.7%, 89.2%] (q=2672; MIDI IDs=50) |
-| BEATs iter3+ AS2M — temporal_pyramid_8 (12288-D) | 62.2% preset-family [58.9%, 65.3%] / MIDI [54.4%, 69.7%] / 2-way [53.7%, 70.9%] | 81.3% | 70.9% | 26.1% family [22.1%, 30.3%] / MIDI [21.0%, 32.0%] (q=6450) | 47.2% family [42.9%, 51.5%] / MIDI [40.9%, 53.6%] (q=6450) | not run family not estimated / MIDI not estimated (q=0) | 57.1% [48.7%, 65.5%] (q=3778; MIDI IDs=50) / 69.3% [63.4%, 76.8%] (q=2672; MIDI IDs=50) |
-| BEATs iter3+ AS2M — masked_mean (768-D) | 59.3% preset-family [56.1%, 62.3%] / MIDI [50.7%, 67.5%] / 2-way [50.3%, 68.8%] | 78.6% | 68.2% | 41.3% family [37.9%, 44.7%] / MIDI [32.4%, 50.3%] (q=6450) | 57.4% family [53.8%, 60.9%] / MIDI [49.1%, 65.6%] (q=6450) | not run family not estimated / MIDI not estimated (q=0) | 54.1% [44.9%, 63.4%] (q=3778; MIDI IDs=50) / 66.5% [59.6%, 74.4%] (q=2672; MIDI IDs=50) |
-| LAION-CLAP Music HTSAT-base — official_clip (512-D) | 58.9% preset-family [55.6%, 62.0%] / MIDI [50.9%, 66.6%] / 2-way [50.3%, 67.9%] | 79.8% | 68.4% | 40.1% family [36.5%, 43.8%] / MIDI [32.2%, 47.9%] (q=6450) | 59.6% family [56.0%, 63.0%] / MIDI [51.5%, 67.0%] (q=6450) | not run family not estimated / MIDI not estimated (q=0) | 54.6% [46.4%, 62.9%] (q=3778; MIDI IDs=50) / 65.0% [57.9%, 73.1%] (q=2672; MIDI IDs=50) |
-| Descript Audio Codec 44.1 kHz — masked_mean (1024-D) | 31.4% preset-family [27.5%, 35.4%] / MIDI [25.7%, 37.4%] / 2-way [24.9%, 38.7%] | 52.2% | 41.8% | 28.9% family [25.2%, 32.6%] / MIDI [23.3%, 34.9%] (q=6450) | 48.1% family [43.9%, 51.9%] / MIDI [41.9%, 54.1%] (q=6450) | not run family not estimated / MIDI not estimated (q=0) | 27.5% [21.0%, 33.0%] (q=3778; MIDI IDs=50) / 36.9% [32.5%, 44.0%] (q=2672; MIDI IDs=50) |
-| Descript Audio Codec 44.1 kHz — temporal_pyramid_8 (16384-D) | 30.7% preset-family [26.6%, 34.8%] / MIDI [26.2%, 35.6%] / 2-way [24.3%, 37.1%] | 52.9% | 41.8% | 17.6% family [13.9%, 21.2%] / MIDI [14.6%, 21.2%] (q=6450) | 36.5% family [32.4%, 40.4%] / MIDI [32.0%, 41.3%] (q=6450) | not run family not estimated / MIDI not estimated (q=0) | 24.2% [19.1%, 28.5%] (q=3778; MIDI IDs=50) / 39.8% [36.0%, 46.9%] (q=2672; MIDI IDs=50) |
-| MuQ-MuLan — official_clip (512-D) | 30.2% preset-family [26.7%, 33.6%] / MIDI [25.7%, 34.6%] / 2-way [24.7%, 36.0%] | 52.9% | 41.3% | 10.4% family [7.7%, 13.7%] / MIDI [8.4%, 12.5%] (q=6450) | 28.2% family [24.4%, 32.4%] / MIDI [24.4%, 32.2%] (q=6450) | not run family not estimated / MIDI not estimated (q=0) | 26.0% [21.6%, 30.2%] (q=3778; MIDI IDs=50) / 36.1% [32.3%, 42.3%] (q=2672; MIDI IDs=50) |
-| Meta EnCodec 24 kHz — masked_mean (128-D) | 24.2% preset-family [20.2%, 28.3%] / MIDI [19.8%, 29.3%] / 2-way [18.2%, 30.5%] | 41.1% | 33.6% | 21.1% family [17.4%, 25.1%] / MIDI [16.6%, 26.4%] (q=6450) | 36.0% family [31.7%, 40.4%] / MIDI [30.3%, 41.9%] (q=6450) | not run family not estimated / MIDI not estimated (q=0) | 19.3% [14.5%, 24.1%] (q=3778; MIDI IDs=50) / 31.1% [27.2%, 37.5%] (q=2672; MIDI IDs=50) |
-| Meta EnCodec 24 kHz — temporal_pyramid_8 (2048-D) | 23.4% preset-family [19.5%, 27.5%] / MIDI [20.0%, 27.1%] / 2-way [17.9%, 29.0%] | 43.5% | 33.9% | 12.0% family [8.8%, 15.4%] / MIDI [9.8%, 14.6%] (q=6450) | 26.3% family [22.3%, 30.6%] / MIDI [22.9%, 30.2%] (q=6450) | not run family not estimated / MIDI not estimated (q=0) | 16.6% [13.0%, 19.9%] (q=3778; MIDI IDs=50) / 33.0% [29.9%, 38.8%] (q=2672; MIDI IDs=50) |
-| Random chance | 0.8% (fixed) | 3.9% | 4.2% | — | — | — |
-
-Paired crossed-cluster Recall@1 differences from the leading family representation (`cir_ast:official_clip`; best pooling per family):
-
-| Comparator | ΔR@1 (percentage points) | Crossed MIDI × preset-family 95% CI |
-|---|---:|---:|
-| `beats_iter3_plus:temporal_pyramid_8` | +19.2 | [+14.8, +24.1]  |
-| `clap_music:official_clip` | +22.5 | [+17.8, +27.5]  |
-| `dac_44khz:masked_mean` | +50.0 | [+43.7, +56.4]  |
-| `muq_mulan:official_clip` | +51.2 | [+46.4, +56.2]  |
-| `encodec_24khz:masked_mean` | +57.2 | [+51.2, +63.1]  |
-
-R@1 intervals are shown in preset-family, performance-ID, and crossed performance × preset-family order (2,000 bootstrap replicates); the heading gives the independent performance denominator. Negative-win cells show query denominators and preset-family/performance-cluster intervals. Clean/warning strata describe query audio and correct-match gallery audio separately. For the full candidate gallery, the report gives the number and fraction of warned renders instead of labeling all 129 candidates with one bucket. These are descriptive associations: warning status can covary with preset acoustics.
-
-**Query-render QA strata:** clean: `cir_ast:official_clip` 79.4% [73.8%, 85.2%] (q=3,778; 50 MIDI IDs); warning: `cir_ast:official_clip` 84.2% [79.7%, 89.2%] (q=2,672; 50 MIDI IDs). These are per-stratum MIDI-cluster intervals; accepted warning status is associated with the rendered preset and does not imply a causal quality effect.
-
-**Per-performance ranking stability** (best observed pooling within each family and condition; bootstrap resamples 50 MIDI IDs):
-
-| Encoder family | Common-gallery arm; R@1; first-place performances; bootstrap top-rank probability | Mixed-gallery arm; R@1; first-place performances; bootstrap top-rank probability |
-|---|---|---|
-| BEATs iter3+ AS2M | `beats_iter3_plus:temporal_pyramid_8`; 62.2%; 1/50; 0.0% | `beats_iter3_plus:masked_mean`; 55.3%; 0/50; 0.0% |
-| CIR single-timbre AST | `cir_ast:official_clip`; 81.4%; 47/50; 100.0% | `cir_ast:official_clip`; 80.6%; 50/50; 100.0% |
-| LAION-CLAP Music HTSAT-base | `clap_music:official_clip`; 58.9%; 0/50; 0.0% | `clap_music:official_clip`; 55.0%; 0/50; 0.0% |
-| Descript Audio Codec 44.1 kHz | `dac_44khz:masked_mean`; 31.4%; 0/50; 0.0% | `dac_44khz:masked_mean`; 32.9%; 0/50; 0.0% |
-| Meta EnCodec 24 kHz | `encodec_24khz:masked_mean`; 24.2%; 0/50; 0.0% | `encodec_24khz:temporal_pyramid_8`; 24.6%; 0/50; 0.0% |
-| MuQ-MuLan | `muq_mulan:official_clip`; 30.2%; 0/50; 0.0% | `muq_mulan:official_clip`; 26.2%; 0/50; 0.0% |
 
 Pooling is selected descriptively within each evaluated condition; the primary common-gallery table above lists every arm. Top-rank probabilities compare all scored arms within the condition.
 

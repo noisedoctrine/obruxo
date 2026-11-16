@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import re
 import shutil
+from statistics import median
 import sys
 
 PACKAGE = Path(__file__).resolve().parent
@@ -178,6 +179,62 @@ def _copy_example(source: Path, destination: Path) -> None:
         shutil.copy2(source, destination)
 
 
+def _candidate_screen_strength(candidate: dict) -> tuple[str, str]:
+    measurements = candidate.get("midi_measurements", [])
+    total = len(measurements)
+    exceeded = sum(row["change_spectral_distance"] > row["repeat_spectral_distance"] for row in measurements)
+    ratio = candidate.get("median_change_to_repeat_ratio")
+    if total and exceeded == total and (ratio is None or ratio >= 3):
+        return "strong", f"Changed-audio distance exceeded repeat variation on all {total}/{total} contexts. This is a strong spectral screen, not an audibility claim."
+    if total and exceeded == total - 1 and ratio is not None and ratio >= 3:
+        return "borderline", f"Changed-audio distance exceeded repeat variation on {exceeded}/{total} contexts; one context did not. This is a borderline spectral screen, not an audibility claim."
+    ratio_text = f"{ratio:.2f}×" if ratio is not None else "undefined because repeat distance was effectively zero"
+    return "weak or inconclusive", (f"Changed-audio distance exceeded repeat variation on {exceeded}/{total} contexts; median change/repeat ratio is "
+        f"{ratio_text}. Treat this as weak or inconclusive spectral evidence, not an audibility claim.")
+
+
+def _write_shortlist_files(output: Path, summary: dict) -> dict:
+    output.mkdir(parents=True, exist_ok=True)
+    criteria = ("strong = exceeds repeat variation on every context; borderline = exceeds on all but one and has a median change/repeat ratio ≥3; "
+                "weak or inconclusive = does not meet those criteria. These labels summarize four-context spectral consistency, not human audibility.")
+    for candidate in summary["candidates"]:
+        ratios = [row["change_to_repeat_ratio"] for row in candidate["midi_measurements"]
+            if row.get("change_to_repeat_ratio") is not None]
+        if any("change_to_repeat_ratio" in row for row in candidate["midi_measurements"]):
+            candidate["median_change_to_repeat_ratio"] = median(ratios) if ratios else None
+        candidate["screen_strength"], candidate["screen_strength_rationale"] = _candidate_screen_strength(candidate)
+    summary["screen_strength_criteria"] = criteria
+    summary["screen_strength_counts"] = dict(Counter(candidate["screen_strength"] for candidate in summary["candidates"]))
+    (output / "controlled_candidate_shortlist.private.json").write_text(
+        json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    lines = ["# Controlled-preset candidate shortlist", "",
+        f"Status: **{len(summary['candidates'])} automatically screened candidates; awaiting user choice.** The definitive controlled diagnostic has not been run.", "",
+        f"Scanned {summary['scanned_render_qualified_presets']} render-qualified presets. Screened {sum(summary['presets_with_valid_control_candidates'].values())} active control instances; generated {summary['new_vital_renders']} new repeat/changed Vital renders across {summary['midi_context_count']} existing train-MIDI contexts. Baseline audio was reused from SHA-verified cached renders.", "",
+        "Candidates were sampled at deterministic low/middle/high parameter quantiles within each control family; acoustic scores did not affect inclusion.",
+        f"Evidence labels: {criteria} The spectral descriptor is descriptive and uses four performances. Listening is still required before selecting candidates.", ""]
+    for candidate in summary["candidates"]:
+        control = candidate["control"]
+        lines.extend([f"## {candidate['candidate_id']} — {control['family']}", "",
+            f"- Screen evidence: **{candidate['screen_strength']}**. {candidate['screen_strength_rationale']}",
+            f"- Preset state: `{candidate['state_id']}`" + (f" ({candidate['display_name']})" if candidate.get("display_name") else ""),
+            f"- Control: `{control['field']}` raw {control['before_raw']} → {control['after_raw']}; normalized {control['before_normalized']:.3f} → {control['after_normalized']:.3f}" +
+                (f"; route {control.get('route_source')} → {control.get('route_destination')} (amount {control.get('route_amount'):.3f})" if control.get("route_source") else ""),
+            f"- Mean changed-audio spectral distance: {candidate['mean_change_spectral_distance']:.5f}; mean unchanged-preset repeat distance: {candidate['mean_repeat_spectral_distance']:.5f}; median change/repeat ratio: {candidate['median_change_to_repeat_ratio']:.2f}× where repeat distance was measurable." if candidate["median_change_to_repeat_ratio"] is not None else
+                f"- Mean changed-audio spectral distance: {candidate['mean_change_spectral_distance']:.5f}; mean unchanged-preset repeat distance: {candidate['mean_repeat_spectral_distance']:.5f}; repeat distance was effectively zero on these contexts, so a ratio is undefined.",
+            f"Change exceeded repeat distance on {candidate['performances_exceeding_repeat_variation']}/{len(candidate['midi_measurements'])} MIDI excerpts.",
+            "- MIDI-specific measurements:", "", "| MIDI | Articulation | Median note (s) | Change distance | Repeat distance | Ratio |", "|---|---|---:|---:|---:|---:|"])
+        lines.extend(f"| `{row['midi_id']}` | {row['articulation']} | {row['note_duration_median_seconds']:.3f} | {row['change_spectral_distance']:.5f} | {row['repeat_spectral_distance']:.5f} | {row['change_to_repeat_ratio']:.2f}× |" if row["change_to_repeat_ratio"] is not None else
+            f"| `{row['midi_id']}` | {row['articulation']} | {row['note_duration_median_seconds']:.3f} | {row['change_spectral_distance']:.5f} | {row['repeat_spectral_distance']:.5f} | n/a |" for row in candidate["midi_measurements"])
+        lines.extend(["", "Listening WAVs (before / changed / unchanged-preset repeat):"])
+        for example in candidate["listening_examples"]:
+            lines.append(f"- `{example['midi_id']}` ({example['articulation']}, median note {example['note_duration_median_seconds']:.3f}s): " +
+                " · ".join(f"[{kind}]({example[kind]})" for kind in ("before", "after", "repeat")))
+        lines.append("")
+    (output / "controlled_candidate_shortlist.private.md").write_text("\n".join(lines), encoding="utf-8")
+    return summary
+
+
 def run(args: argparse.Namespace) -> dict:
     import numpy as np
     import yaml
@@ -285,7 +342,7 @@ def run(args: argparse.Namespace) -> dict:
             "control": control, "midi_measurements": measured,
             "mean_change_spectral_distance": sum(change_values) / len(change_values),
             "mean_repeat_spectral_distance": sum(repeat_values) / len(repeat_values),
-            "median_change_to_repeat_ratio": sorted(ratios)[len(ratios) // 2] if ratios else None,
+            "median_change_to_repeat_ratio": median(ratios) if ratios else None,
             "performances_exceeding_repeat_variation": sum(change > repeat for change, repeat in zip(change_values, repeat_values, strict=True)),
             "listening_examples": examples})
 
@@ -298,33 +355,7 @@ def run(args: argparse.Namespace) -> dict:
         "acoustic_measure": "1 - cosine of normalized 64-band log-frequency spectral descriptors; compare source-seed control change with unchanged-preset independent-seed repeat",
         "candidate_selection": "three deterministic parameter-value quantiles per control family, avoiding repeat states; encoder retrieval scores were not used",
         "candidates": candidates}
-    output.mkdir(parents=True, exist_ok=True)
-    json_path = output / "controlled_candidate_shortlist.private.json"
-    json_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    lines = ["# Controlled-preset candidate shortlist", "",
-        f"Status: **{len(candidates)} automatically screened candidates; awaiting user choice.** The definitive controlled diagnostic has not been run.", "",
-        f"Scanned {len(eligible_states)} render-qualified presets. Screened {sum(summary['presets_with_valid_control_candidates'].values())} active control instances; generated {summary['new_vital_renders']} new repeat/changed Vital renders across {len(contexts)} existing train-MIDI contexts. Baseline audio was reused from SHA-verified cached renders.", "",
-        "Candidates were sampled at deterministic low/middle/high parameter quantiles within each control family, with distinct preset states where possible. Acoustic scores did not influence which presets were included. The spectral distance is descriptive and uses four performances; values are not encoder retrieval results or inferential claims.", ""]
-    for candidate in candidates:
-        control = candidate["control"]
-        lines.extend([f"## {candidate['candidate_id']} — {control['family']}", "",
-            f"- Preset state: `{candidate['state_id']}`" + (f" ({candidate['display_name']})" if candidate.get("display_name") else ""),
-            f"- Control: `{control['field']}` raw {control['before_raw']} → {control['after_raw']}; normalized {control['before_normalized']:.3f} → {control['after_normalized']:.3f}" +
-                (f"; route {control.get('route_source')} → {control.get('route_destination')} (amount {control.get('route_amount'):.3f})" if control.get("route_source") else ""),
-            f"- Mean changed-audio spectral distance: {candidate['mean_change_spectral_distance']:.5f}; mean unchanged-preset repeat distance: {candidate['mean_repeat_spectral_distance']:.5f}; median change/repeat ratio: {candidate['median_change_to_repeat_ratio']:.2f}× where repeat distance was measurable." if candidate["median_change_to_repeat_ratio"] is not None else
-                f"- Mean changed-audio spectral distance: {candidate['mean_change_spectral_distance']:.5f}; mean unchanged-preset repeat distance: {candidate['mean_repeat_spectral_distance']:.5f}; repeat distance was effectively zero on these contexts, so a ratio is undefined.",
-            f"Change exceeded repeat distance on {candidate['performances_exceeding_repeat_variation']}/{len(contexts)} MIDI excerpts.",
-            "- MIDI-specific measurements:",
-            "", "| MIDI | Articulation | Median note (s) | Change distance | Repeat distance | Ratio |", "|---|---|---:|---:|---:|---:|"])
-        lines.extend(f"| `{row['midi_id']}` | {row['articulation']} | {row['note_duration_median_seconds']:.3f} | {row['change_spectral_distance']:.5f} | {row['repeat_spectral_distance']:.5f} | {row['change_to_repeat_ratio']:.2f}× |" if row["change_to_repeat_ratio"] is not None else
-            f"| `{row['midi_id']}` | {row['articulation']} | {row['note_duration_median_seconds']:.3f} | {row['change_spectral_distance']:.5f} | {row['repeat_spectral_distance']:.5f} | n/a |" for row in candidate["midi_measurements"])
-        lines.extend(["", "Listening WAVs (before / changed / unchanged-preset repeat):"])
-        for example in candidate["listening_examples"]:
-            lines.append(f"- `{example['midi_id']}` ({example['articulation']}, median note {example['note_duration_median_seconds']:.3f}s): " +
-                " · ".join(f"[{kind}]({example[kind]})" for kind in ("before", "after", "repeat")))
-        lines.append("")
-    (output / "controlled_candidate_shortlist.private.md").write_text("\n".join(lines), encoding="utf-8")
-    return summary
+    return _write_shortlist_files(output, summary)
 
 
 def main() -> int:
