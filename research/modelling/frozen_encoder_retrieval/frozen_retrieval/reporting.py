@@ -1192,7 +1192,8 @@ def _reader_summary(current_dataset: dict, current_eval: dict | None, comparison
                    f"{100 * leader_result.get('recall_at_1', 0):.1f}% of cross-MIDI queries "
                    f"(n={leader_result.get('episodes', 0):,} queries, {gallery_size} candidate presets; {performance_detail}). "
                    f"This ranks frozen representations across {len(MODEL_REGISTRY)} model families; it is retrieval evidence, not a reconstruction result.")
-        lines.extend([finding, ""])
+        lines.extend([finding, "",
+                      "Presentation: [Frozen encoder retrieval (PDF)](presentations/frozen_encoder_retrieval.pdf).", ""])
         lines.extend(_retrieval_explainer_lines(int(gallery_size)))
     lines.extend(_summary_cohort_lines("Expanded held-out performance cohort", current_dataset, current_eval))
     if validation_results:
