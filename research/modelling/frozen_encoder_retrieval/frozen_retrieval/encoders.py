@@ -128,6 +128,7 @@ def _version(package: str) -> str:
 
 def dependency_status(model_name: str) -> dict:
     modules = {
+        "basic_pitch_trunk": {"numpy": "numpy", "scipy": "scipy", "torch": "torch"},
         "clap_music": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "laion_clap": "laion_clap",
                        "transformers": "transformers"},
         "muq_mulan": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "muq": "muq",
@@ -274,6 +275,25 @@ class FrozenAdapter:
     def extract(self, wav_path: Path) -> dict[str, list[float]]:
         waveform = self._audio(wav_path)
         torch, np, model, device = self.torch, self.numpy, self.model, self.device
+        if self.name == "basic_pitch_trunk":
+            from obruxo_basic_pitch.constants import AUDIO_N_SAMPLES, FFT_HOP, OVERLAP
+
+            padded = np.concatenate((np.zeros((OVERLAP * FFT_HOP) // 2, dtype=np.float32), waveform))
+            hop = AUDIO_N_SAMPLES - OVERLAP * FFT_HOP
+            windows = []
+            for start in range(0, len(padded), hop):
+                window = padded[start:start + AUDIO_N_SAMPLES]
+                if len(window) < AUDIO_N_SAMPLES:
+                    window = np.pad(window, (0, AUDIO_N_SAMPLES - len(window)))
+                windows.append(window)
+            signal = torch.from_numpy(np.ascontiguousarray(windows, dtype=np.float32)).unsqueeze(-1).to(device)
+            with torch.inference_mode():
+                hidden = model.forward_trunk(signal).reshape(len(windows), 8, 172, 88, 3).mean(dim=-1)
+                frames = hidden.permute(0, 2, 1, 3).reshape(len(windows), 172, 704).float().cpu().numpy()
+            from obruxo_basic_pitch.inference import unwrap_window_outputs
+
+            unwrapped = unwrap_window_outputs({"trunk": frames}, original_sample_count=len(waveform))
+            return _pool_sequence(unwrapped["trunk"], self.name)
         signal = torch.from_numpy(waveform).unsqueeze(0).to(device=device, dtype=torch.float32)
         with torch.inference_mode():
             if self.name == "clap_music":
@@ -481,10 +501,14 @@ def load_adapter(model_name: str, checkpoint: Path, lock_entry: dict, checkpoint
         if current != lock_entry["loader_revision"] or dirty:
             raise ValueError(f"{model_name} source checkout differs from the clean locked loader revision")
     else:
-        loader_package = {"clap_music": "laion_clap", "muq_mulan": "muq", "encodec_24khz": "transformers",
-                          "dac_44khz": "transformers"}[model_name]
-        if lock_entry["loader_revision"] != f"{loader_package}=={_version(loader_package)}":
-            raise RuntimeError(f"installed {loader_package} version differs from the checkpoint lock")
+        if model_name == "basic_pitch_trunk":
+            if lock_entry["loader_revision"] != MODEL_REGISTRY[model_name]["loader_revision"]:
+                raise RuntimeError("Basic Pitch adapter revision differs from the frozen benchmark contract")
+        else:
+            loader_package = {"clap_music": "laion_clap", "muq_mulan": "muq", "encodec_24khz": "transformers",
+                              "dac_44khz": "transformers"}[model_name]
+            if lock_entry["loader_revision"] != f"{loader_package}=={_version(loader_package)}":
+                raise RuntimeError(f"installed {loader_package} version differs from the checkpoint lock")
 
     if device == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("CUDA was requested but is unavailable")
@@ -492,7 +516,13 @@ def load_adapter(model_name: str, checkpoint: Path, lock_entry: dict, checkpoint
         raise RuntimeError("XPU was requested but is unavailable")
     if device not in {"cpu", "cuda", "xpu"}:
         raise ValueError("device must be explicitly cpu, cuda or xpu")
-    if model_name == "clap_music":
+    if model_name == "basic_pitch_trunk":
+        from obruxo_basic_pitch import BasicPitchICASSP2022
+
+        model = BasicPitchICASSP2022()
+        model.load_state_dict(_safe_torch_load(torch, checkpoint), strict=True)
+        model.to(device)
+    elif model_name == "clap_music":
         model = _load_clap_music_offline(checkpoint, device)
     elif model_name == "muq_mulan":
         model = _load_muq_mulan_offline(checkpoint, local_configs, torch, device)

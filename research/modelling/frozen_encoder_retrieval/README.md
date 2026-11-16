@@ -80,7 +80,7 @@ Private manifests, WAVs, checkpoint files, feature arrays, and per-episode score
 
 ## Issue #155 follow-up
 
-The follow-up reuses the expanded dataset's accepted renders and six feature caches. It scores three fixed common-gallery MIDI offsets, recomputes clean-query and warning-free-gallery ranks, then re-embeds only 100 gain-reduced amplitude-warning WAVs across all six encoders. The separate encoder-blind preset screen renders short and long held/phrased examples and writes private before/after/repeat listening WAVs. It stops at the shortlist; the final controlled diagnostic requires the user's choice. Run the shortlist script with the Vital-rendering Python environment that has DawDreamer installed; the pinned benchmark environment is sufficient for cached-feature evaluation.
+The follow-up reuses the expanded dataset's accepted renders and feature caches. It scores three fixed common-gallery MIDI offsets, recomputes clean-query and warning-free-gallery ranks, then re-embeds only 100 gain-reduced amplitude-warning WAVs across the evaluated encoder families. The separate encoder-blind preset screen renders short and long held/phrased examples and writes private before/after/repeat listening WAVs. It stops at the shortlist; the final controlled diagnostic requires the user's choice. Run the shortlist script with the Vital-rendering Python environment that has DawDreamer installed; the pinned benchmark environment is sufficient for cached-feature evaluation.
 
 ```powershell
 python research/modelling/frozen_encoder_retrieval/run_issue155_validation.py `
@@ -118,13 +118,14 @@ Checkpoint acquisition is separate from benchmark execution. The runner sets Hug
 | Arm | Exact checkpoint and feature | Input rate | Output |
 |---|---|---:|---:|
 | LAION-CLAP Music | `lukewys/laion_clap/music_audioset_epoch_15_esc_90.14.pt`; `HTSAT-base`, `enable_fusion=False`; official clip embedding | 48 kHz | 512-D |
+| Spotify Basic Pitch contour trunk | Pinned ICASSP-2022 checkpoint; post-BN/ReLU `contour_conv1` map, pooled from three contour bins to 88 semitones | 22.05 kHz | 704-D per frame |
 | MuQ-MuLan | `OpenMuQ/MuQ-MuLan-large/pytorch_model.bin`; audio branch official latent | 24 kHz | 512-D |
 | CIR single-timbre AST | Authors' `ICASSP26_inst-direct-with-data-aug_final.pt`, not the Triplet checkpoint; mean of final CLS and distillation tokens | 16 kHz | 768-D |
 | BEATs iter3+ AS2M | `lpepino/beats_ckpts/BEATs_iter3_plus_AS2M.pt`; pretrained, not AudioSet cpt1/cpt2; pre-predictor sequence | 16 kHz | 768-D per frame |
 | Meta EnCodec | `facebook/encodec_24khz`; continuous mono encoder output before RVQ | 24 kHz | 128-D per frame |
 | Descript DAC | `descript/dac_44khz`; continuous mono encoder output before RVQ | 44.1 kHz | 1024-D per frame |
 
-Clip adapters use the official clip latent. Sequence adapters are frozen/eval, FP32, and return both a valid-frame temporal mean and an eight-bin ordered mean/std representation. BEATs flattened patches are reshaped by its 128-bin mel-frequency patch count, then frequency-averaged to a time sequence; partial final time patches are excluded. No padded frame enters a pool. Cosine scoring normalizes each cached output at evaluation time. Stereo is averaged to mono and resampling uses SciPy polyphase resampling. No shared gain normalization is applied; EnCodec's own checkpoint-configured RMS normalization is retained when enabled.
+Clip adapters use the official clip latent. Sequence adapters are frozen/eval, FP32, and return both a valid-frame temporal mean and an eight-bin ordered mean/std representation. Basic Pitch input is windowed using its fixed two-second context and overlap; its contour-branch hidden map is averaged across the three sub-semitone contour bins before flattening channels × semitones into each frame. Basic Pitch's pretrained objective is note transcription, so this representation is an exploratory performance-feature baseline, not a timbre-trained embedding. BEATs flattened patches are reshaped by its 128-bin mel-frequency patch count, then frequency-averaged to a time sequence; partial final time patches are excluded. No padded frame enters a pool. Cosine scoring normalizes each cached output at evaluation time. Stereo is averaged to mono and resampling uses SciPy polyphase resampling. No shared gain normalization is applied; EnCodec's own checkpoint-configured RMS normalization is retained when enabled.
 
 ## What is executed in this checkout
 

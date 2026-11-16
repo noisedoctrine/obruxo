@@ -106,8 +106,9 @@ def _load_context(dataset: Path) -> dict:
     arms = {f"{model}:{variant}": (model, variant, features)
             for model, features in model_caches.items()
             for variant in sorted({variant for value in features.values() for variant in value})}
-    if len(arms) != 9 or set(model_caches) != set(core.MODEL_REGISTRY):
-        raise ValueError("the assignment comparison requires all six frozen encoders and their nine pooling arms")
+    expected_arms = sum(1 if spec["kind"] == "clip" else 2 for spec in core.MODEL_REGISTRY.values())
+    if len(arms) != expected_arms or set(model_caches) != set(core.MODEL_REGISTRY):
+        raise ValueError(f"the assignment comparison requires all {len(core.MODEL_REGISTRY)} frozen encoders and {expected_arms} pooling arms")
     candidate_ids = {episode["candidate_set_id"] for episode in episodes}
     if len(candidate_ids) != 1:
         raise ValueError("the common-gallery cohort must use one frozen candidate set")

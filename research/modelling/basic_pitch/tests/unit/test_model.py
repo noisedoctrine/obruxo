@@ -29,6 +29,14 @@ def test_output_shapes_and_sigmoid_bounds() -> None:
     )
 
 
+def test_frozen_contour_trunk_tap_shape_and_activation_range() -> None:
+    model = BasicPitchICASSP2022().eval()
+    with torch.inference_mode():
+        hidden = model.forward_trunk(torch.zeros(1, AUDIO_N_SAMPLES, 1, dtype=torch.float32))
+    assert hidden.shape == (1, 8, 172, 264)
+    assert torch.isfinite(hidden).all() and hidden.min() >= 0
+
+
 def test_backward_reaches_live_parameters_not_frontend_buffers() -> None:
     model = BasicPitchICASSP2022()
     output = model(torch.zeros(1, AUDIO_N_SAMPLES, 1, dtype=torch.float32))

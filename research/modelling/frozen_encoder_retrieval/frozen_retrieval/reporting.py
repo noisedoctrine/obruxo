@@ -499,7 +499,7 @@ def _issue155_followup_lines(results: dict, shortlist: dict | None) -> list[str]
     clean_query = results.get("clean_query_only", {})
     if clean_query.get("arms"):
         lines.extend(["", "### Audio quality checks", "",
-            f"**A — Original audio:** the six-encoder benchmark above is unchanged: {results.get('input_dataset', {}).get('accepted_cached_clips', 'n/e'):,} accepted cached clips, with the original four-MIDI results retained.",
+            f"**A — Original audio:** the {results.get('input_dataset', {}).get('encoder_families', len(MODEL_REGISTRY))}-encoder benchmark above uses {results.get('input_dataset', {}).get('accepted_cached_clips', 'n/e'):,} accepted cached clips, with the original four-MIDI results retained.",
             "**B — Clean queries:** we re-summarized the existing cached-feature episode scores for queries whose WAVs had no QA warning. No model inference was repeated for this slice.", "",
             "| Encoder arm | Clean-query R@1 [crossed 95% CI] / R@5 / MRR | Queries |",
             "|---|---:|---:|"])
@@ -524,8 +524,9 @@ def _issue155_followup_lines(results: dict, shortlist: dict | None) -> list[str]
     gain = results.get("gain_sensitivity", {})
     if gain.get("arms"):
         sample = gain.get("sample", {})
-        lines.extend(["", f"**C — Gain-reduced warning sample:** a deterministic, stratified sample of {sample.get('size', 0)} WAVs was drawn from {results.get('gain_warning_sample_selection', {}).get('accepted_amplitude_warning_wavs', 0):,} accepted amplitude-warning renders. Copies were reduced linearly to a 0.95 peak and all six encoders re-embedded only those copies; original cached features supplied the unchanged queries/candidates. This is a sensitivity sample, not a corpus-wide accuracy estimate.", "",
-            "| Encoder arm | Clip embedding cosine distance (95% crossed CI) | Query R@1 before→after; changed / fixed / newly wrong | Correct gallery candidate R@1 before→after; changed / fixed / newly wrong | Δ target margin ×100 (cosine points; query / gallery) |",
+        encoder_count = results.get("input_dataset", {}).get("encoder_families", len(MODEL_REGISTRY))
+        lines.extend(["", f"**C — Gain-reduced warning sample:** a deterministic, stratified sample of {sample.get('size', 0)} WAVs was drawn from {results.get('gain_warning_sample_selection', {}).get('accepted_amplitude_warning_wavs', 0):,} accepted amplitude-warning renders. Copies were reduced linearly to a 0.95 peak and all {encoder_count} encoder families re-embedded only those copies; original cached features supplied the unchanged queries/candidates. This is a sensitivity sample, not a corpus-wide accuracy estimate.", "",
+            "| Encoder arm | Representation cosine distance (95% crossed CI) | Query R@1 before→after; changed / fixed / newly wrong | Correct gallery candidate R@1 before→after; changed / fixed / newly wrong | Δ target margin ×100 (cosine points; query / gallery) |",
             "|---|---:|---:|---:|---:|"])
         for arm, summary in sorted(gain["arms"].items()):
             distance = summary.get("adjusted_clip_embedding_cosine_distance", {})
@@ -1128,7 +1129,7 @@ def _reader_summary(current_dataset: dict, current_eval: dict | None, comparison
         finding = (f"**Primary expanded-cohort result:** {MODEL_REGISTRY[model_name]['name']} ({variant}) ranked the correct preset first in "
                    f"{100 * leader_result.get('recall_at_1', 0):.1f}% of cross-MIDI queries "
                    f"(n={leader_result.get('episodes', 0):,} queries, {gallery_size} candidate presets; {performance_detail}). "
-                   "This ranks frozen representations across six model families; it is retrieval evidence, not a reconstruction result.")
+                   f"This ranks frozen representations across {len(MODEL_REGISTRY)} model families; it is retrieval evidence, not a reconstruction result.")
         lines.extend([finding, ""])
     lines.extend(_summary_cohort_lines("Expanded held-out performance cohort", current_dataset, current_eval))
     if validation_results:
@@ -1200,9 +1201,9 @@ def _reader_summary(current_dataset: dict, current_eval: dict | None, comparison
             lines.extend(["These are exploratory subgroup contrasts; the intervals resample MIDI IDs and do not imply a causal effect.", ""])
     common_episodes = (current_eval or {}).get("coverage_by_condition", {}).get(
         "cross_midi_common_gallery", {}).get("common_feature_qualified_episodes_across_arms", 0)
-    family_coverage = (f"All six encoder families have expanded-cohort retrieval results on {common_episodes:,} identical common-gallery episodes per family."
+    family_coverage = (f"All {len(MODEL_REGISTRY)} encoder families have expanded-cohort retrieval results on {common_episodes:,} identical common-gallery episodes per family."
                        if measured_families == len(MODEL_REGISTRY) else
-                       f"{measured_families} of six encoder families have expanded-cohort retrieval results on {common_episodes:,} identical common-gallery episodes; incomplete families are listed below.")
+                       f"{measured_families} of {len(MODEL_REGISTRY)} encoder families have expanded-cohort retrieval results on {common_episodes:,} identical common-gallery episodes; incomplete families are listed below.")
     lines.extend([family_coverage,
                   f"No Vital controls are predicted or trained in this representation-only benchmark (0 outputs; all source controls stay fixed). The linked [{inventory_name}](./{inventory_name}) is the canonical per-field inventory."])
     if current_dataset.get("performance_identity_overlap_excluded") is not None:

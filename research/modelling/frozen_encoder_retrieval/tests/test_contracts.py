@@ -97,6 +97,14 @@ def _fake_cosine_matrix(left, right, _np):
 
 
 class CheckpointLockTests(unittest.TestCase):
+    def test_basic_pitch_trunk_contract_uses_frozen_semitone_activations(self):
+        spec = core.MODEL_REGISTRY["basic_pitch_trunk"]
+        self.assertEqual("sequence", spec["kind"])
+        self.assertEqual(704, spec["dimension"])
+        self.assertIn("contour_conv1", spec["tap"])
+        self.assertIn("3 bins per semitone", spec["tap"])
+        self.assertEqual("obruxo_basic_pitch@frozen_contour_trunk_v1", spec["loader_revision"])
+
     def _lock(self, root: Path, license_status: str) -> dict:
         checkpoint = root / "clap.bin"
         checkpoint.write_bytes(b"fixture checkpoint")
@@ -398,8 +406,8 @@ class FeatureAndManifestTests(unittest.TestCase):
         self.assertAlmostEqual(7 / 12, summary["rank_distribution"]["near_miss_fraction"])
         self.assertAlmostEqual(5 / 12, summary["rank_distribution"]["far_failure_fraction"])
 
-    def test_issue155_rank_failure_reports_all_six_families_with_shared_resamples(self):
-        families = ("clap_music", "muq_mulan", "cir_ast", "beats_iter3_plus", "dac_44khz", "encodec_24khz")
+    def test_issue155_rank_failure_reports_all_seven_families_with_shared_resamples(self):
+        families = ("clap_music", "muq_mulan", "cir_ast", "beats_iter3_plus", "dac_44khz", "encodec_24khz", "basic_pitch_trunk")
         arms = []
         for family in families:
             arms.append(f"{family}:official_clip" if family in {"clap_music", "muq_mulan", "cir_ast"}
