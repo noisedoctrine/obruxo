@@ -25,6 +25,7 @@ The system is intended to remain fully local and open source: no cloud dependenc
 - [Project brief](research/archive/initial_project_brief.md)
 - [Modelling research tracker](research/modelling/RESEARCH_TRACKER.md)
 - [Model architecture](research/modelling/MODEL_ARCHITECTURE.md)
+- [Frozen encoder research](research/modelling/frozen_encoder_retrieval/README.md) — [retrieval slides (PDF)](research/modelling/frozen_encoder_retrieval/reports/presentations/frozen_encoder_retrieval.pdf) · [preset/MIDI sensitivity slides (PDF)](research/modelling/frozen_encoder_retrieval/reports/presentations/preset_midi_sensitivity.pdf)
 - [Training and release plan](research/modelling/TRAINING_PLAN.md)
 - [Training pipeline and experiments](research/training/README.md)
 - [Latest 205-versus-404-state result](research/training/reports/STATE_COVERAGE_RESULTS.md)
