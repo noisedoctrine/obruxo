@@ -121,6 +121,19 @@ The report step uses Matplotlib to write the embedded PNG summaries under `repor
 
 The private shortlist, WAVs and adjusted feature caches remain under ignored `outputs/`. Read `controlled_candidate_shortlist.private.md` and listen to its linked examples before choosing candidates; do not start `run_controlled_perturbation.py` until that selection is approved.
 
+## Issue #157 cached sensitivity analysis
+
+The preset-versus-MIDI sensitivity analysis uses only the accepted frozen-embedding cache. It verifies cache identity, render receipts, archive hashes, checkpoint and loader provenance, feature shape and numeric validity before computing the exhaustive anchored comparison and crossed-bootstrap intervals. It fails closed on incomplete or mismatched caches; it does not render audio or run encoder inference. Run it from the repository root in the pinned benchmark environment:
+
+```powershell
+python research/modelling/frozen_encoder_retrieval/run_issue157_sensitivity.py `
+  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-train-midi-v3-50 `
+  --checkpoint-root research/modelling/frozen_encoder_retrieval/local_checkpoints `
+  --device xpu --bootstrap-replicates 1000 --bootstrap-combinations 32768
+```
+
+The command updates [the research report](reports/FROZEN_ENCODER_RETRIEVAL_RESULTS.md), its machine-readable result JSON, and four figures. The analysis covers seven encoder families and eleven cached representation variants on the shared 129-preset × 50-performance matrix.
+
 ## Frozen candidates and adapters
 
 Checkpoint acquisition is separate from benchmark execution. The runner sets Hugging Face offline mode and only loads local files; it never downloads or substitutes weights. Fill a local lock from exact downloads and compatible source checkouts using [checkpoint-lock.example.json](checkpoint-lock.example.json). Every selected checkpoint records its HF/source revision, SHA-256, loader revision, runtime package versions, and terms status. Use `license_status: approved` for terms cleared for this use or `research-use-unverified` when locally authorized research proceeds while terms remain unresolved; only `explicitly-prohibited` stops extraction. MuQ-MuLan is used only for non-commercial research. This benchmark keeps all checkpoints local and does not redistribute weights; that does not clear future deployment or distribution. CIR and BEATs are evaluated with unresolved checkpoint-term notes retained in the report. MuQ-MuLan and CIR also require separately pinned local architecture/config assets; a cold cache fails during preflight instead of reaching the network. The exact BEATs mirror SHA from the issue comment is enforced.

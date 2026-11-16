@@ -1,6 +1,6 @@
 # Frozen audio encoder retrieval benchmark
 
-Issues: [#152](https://github.com/noisedoctrine/obruxo/issues/152) baseline and [#155](https://github.com/noisedoctrine/obruxo/issues/155) follow-up. This report compares frozen pretrained representations on Vital presets and existing MIDI performances. No synthesis controls are predicted, tuned, or optimized.
+Issues: [#152](https://github.com/noisedoctrine/obruxo/issues/152) baseline and [#155](https://github.com/noisedoctrine/obruxo/issues/155) follow-up. This report compares frozen pretrained representations on Vital presets and existing MIDI performances. No synthesis controls are predicted, tuned, or optimized. For frozen representation-only analyses, no Vital controls are predicted or edited; the original source settings remain unchanged ([canonical frozen-control inventory](vital_control_inventory.jsonl)).
 
 ## Results and recommendation
 
@@ -88,8 +88,135 @@ The 81.4% headline is the primary common-gallery assignment. Issue #155 reuses t
 ### Plain-English readout
 
 In the separate test of three comparison-MIDI assignments, CIR single-timbre AST retrieved the correct preset at rank one for 84.9% of queries, followed by BEATs iter3+ AS2M at 62.3%. The paired CIR–BEATs gap was +22.6 percentage points [+19.4, +25.8]. It ranked first for 50 of 50 MIDI performances (100.0% top-rank probability). Across individual attempts in the three comparison-MIDI rounds, CIR's median expected rank was 1.0, with 3.9% of attempts at expected rank above 5; Spotify Basic Pitch contour trunk masked_mean had the largest far-failure share (61.9%). Only 1/129 CIR presets fell below 50% R@1 across the 50 excerpts, compared with 117/129 for Spotify Basic Pitch contour trunk masked_mean. In the 100-WAV gain-normalization sample, the largest query-ranking drop was Meta EnCodec 24 kHz temporal pyramid (-23.0 points; paired 95% interval [-40.5, -8.5]); this small, warning-enriched sample does not estimate corpus-wide accuracy. The automated screen prepared 9 preset candidates with before/after/repeat listening examples; its consistency screen labels 6 strong, 2 borderline, 1 weak or inconclusive; weak/inconclusive examples: candidate_03 (2/4 contexts); the definitive controlled diagnostic is waiting for the user's review and selection.
+## Issue #157 — Preset versus MIDI sensitivity
+
+**Finding:** The question is whether changing a Vital preset moves a frozen audio representation more than changing the MIDI performance. The measures ranked representations differently: CIR single-timbre AST — `official_clip` led existing R@1 (81.4%), while Descript Audio Codec 44.1 kHz — `masked_mean` had the largest mean normalized margin (+0.508; preset-dominant on 85.0% of anchors). The comparison uses the same complete 129 preset states and 50 distinct performances for every arm. These measurements describe representation geometry; they do not show that Vital settings can be decoded or that reconstructed audio would sound accurate.
+
+The preset states come from the existing `validation` membership, and the 50 performances come from `train`; they are 129 source-family clusters and 50 distinct MIDI identities. Each matrix cell is one accepted cached render. The test changes several MIDI characteristics together; it does not isolate pitch.
+
+### Four recordings make the comparison concrete
+
+Take preset A playing performance 1 (`A1`). Compare it with A playing a different performance (`A2`) and preset B playing the same first performance (`B1`). The first distance asks how much the representation moves when the performance changes but the preset stays fixed. The second asks how much it moves when the preset changes but the performance stays fixed. Repeat the calculation from `A2`, `B1`, and `B2` separately; the four anchors are kept distinct until each metric is calculated.
+
+Distances below are cosine distances after every cached feature vector is L2-normalized. A smaller distance means the two recordings land closer together in the representation. Let `dM` be the same-preset/different-performance distance and `dP` the different-preset/same-performance distance. The ratio is `dM / dP`, the raw difference is `dM − dP`, and the normalized margin is `(dP − dM) / (dP + dM + ε)`. A ratio below 1, a negative raw difference, and a positive margin all mean the preset change was larger. A ratio above 1, positive difference, and negative margin mean the performance change was larger. Values near 1, 0, and 0 indicate similar-sized changes.
+
+**Illustration, not a measured pair:** if `dM = 0.10` and `dP = 0.50`, the ratio is `0.20`, the difference is `−0.40`, and the margin is about `+0.67`: this representation moved five times as far for the preset change. In the reverse example, `dM = 0.50` and `dP = 0.10` give a ratio of `5.0`, difference `+0.40`, and margin about `−0.67`; MIDI changed it more. If both distances are `0.25`, the ratio is `1`, the difference and margin are `0`, and the effects tie.
+
+### Measured anchored comparisons
+
+The two distance columns show their absolute scale as well as their contrast. This matters because an encoder whose normalized features barely move at all can have a favorable ratio without being a useful timbre representation. Existing R@1 is retained beside the new measures for that reason. Each mean and its interval is paired across the same crossed preset-family and MIDI-performance resamples.
+
+| Representation | Existing R@1 | Mean distance: same preset / different MIDI | Mean distance: different preset / same MIDI | Mean Δ (MIDI − preset) | Median ratio [P10, P90] | Mean normalized margin | Preset-dominant anchors |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Spotify Basic Pitch contour trunk — `masked_mean` | 19.5% | 0.083 [0.072, 0.092] | 0.135 [0.122, 0.145] | -0.052 [-0.065, -0.040] | 0.607 [0.144, 1.801] | 0.234 [0.187, 0.295] | 71.8% [67.0, 76.5]% |
+| Spotify Basic Pitch contour trunk — `temporal_pyramid_8` | 21.9% | 0.137 [0.122, 0.148] | 0.188 [0.175, 0.198] | -0.051 [-0.067, -0.039] | 0.738 [0.270, 1.635] | 0.159 [0.124, 0.215] | 68.9% [63.9, 74.2]% |
+| BEATs iter3+ AS2M — `masked_mean` | 59.3% | 0.264 [0.235, 0.281] | 0.507 [0.486, 0.520] | -0.243 [-0.273, -0.215] | 0.511 [0.193, 1.011] | 0.327 [0.291, 0.373] | 89.6% [86.1, 91.9]% |
+| BEATs iter3+ AS2M — `temporal_pyramid_8` | 62.2% | 0.294 [0.264, 0.310] | 0.470 [0.448, 0.484] | -0.176 [-0.202, -0.155] | 0.619 [0.314, 1.089] | 0.236 [0.208, 0.278] | 86.3% [82.3, 89.2]% |
+| CIR single-timbre AST — `official_clip` | 81.4% | 0.472 [0.427, 0.497] | 0.959 [0.945, 0.958] | -0.487 [-0.526, -0.453] | 0.481 [0.212, 0.803] | 0.365 [0.335, 0.402] | 98.2% [96.6, 98.2]% |
+| LAION-CLAP Music HTSAT-base — `official_clip` | 58.9% | 0.303 [0.271, 0.324] | 0.601 [0.573, 0.619] | -0.298 [-0.335, -0.265] | 0.485 [0.197, 0.995] | 0.339 [0.303, 0.383] | 90.2% [86.6, 92.4]% |
+| Descript Audio Codec 44.1 kHz — `masked_mean` | 31.4% | 0.205 [0.161, 0.241] | 0.684 [0.591, 0.747] | -0.479 [-0.549, -0.396] | 0.208 [0.022, 1.444] | 0.508 [0.452, 0.561] | 85.0% [81.7, 87.6]% |
+| Descript Audio Codec 44.1 kHz — `temporal_pyramid_8` | 30.7% | 0.126 [0.105, 0.141] | 0.318 [0.289, 0.342] | -0.192 [-0.218, -0.167] | 0.351 [0.088, 1.313] | 0.408 [0.361, 0.459] | 84.5% [80.9, 87.3]% |
+| Meta EnCodec 24 kHz — `masked_mean` | 24.2% | 0.009 [0.007, 0.010] | 0.025 [0.020, 0.029] | -0.016 [-0.020, -0.012] | 0.313 [0.039, 1.845] | 0.410 [0.354, 0.471] | 79.7% [75.9, 83.1]% |
+| Meta EnCodec 24 kHz — `temporal_pyramid_8` | 23.4% | 0.022 [0.018, 0.025] | 0.047 [0.040, 0.054] | -0.025 [-0.031, -0.019] | 0.477 [0.111, 1.608] | 0.313 [0.266, 0.372] | 78.0% [74.0, 81.9]% |
+| MuQ-MuLan — `official_clip` | 30.2% | 0.312 [0.289, 0.323] | 0.411 [0.384, 0.429] | -0.099 [-0.132, -0.072] | 0.758 [0.307, 1.684] | 0.137 [0.107, 0.186] | 67.2% [62.8, 71.8]% |
+
+The practical ranking depends on the question. CIR had the strongest retrieval result (81.4%) and was preset-dominant on 98.2% of anchors, with a mean margin of +0.365. DAC `masked_mean` had a larger mean margin (+0.508 [+0.452, +0.561]); its paired difference from CIR was +0.139 [+0.095, +0.182]. But DAC's existing R@1 was only 31.4%, so stronger average separation did not make it the better retrieval encoder. EnCodec `masked_mean` illustrates why ratios need an absolute scale: its median ratio was 0.313, but its mean MIDI and preset distances were only 0.0085 and 0.0245, with 24.2% R@1.
+
+The population above is exhaustively derived from `129 × 50 = 6450` cached recordings per representation: `10,113,600` unordered choices of two presets and two performances, with four separate anchors each. Those 40,454,400 dependent anchor observations are not independent samples. The 95% intervals resample the 129 source-family clusters and 50 MIDI identities in crossed draws shared by every arm; within each resample, 32,768 combinations approximate the full pair average. Full-cohort point summaries use every combination. The subset is a deterministic, coverage-balanced performance cohort, so these intervals do not replace an independent confirmation cohort.
+
+The next table shows how the average margin varies across individual presets and performances. These percentile ranges describe the selected cohort; they are not extra independent-sample confidence intervals.
+
+| Representation | Per-preset mean margin P10 / P50 / P90 | Per-performance mean margin P10 / P50 / P90 |
+|---|---:|---:|
+| Spotify Basic Pitch contour trunk — `masked_mean` | -0.021 / +0.246 / +0.487 | +0.153 / +0.246 / +0.298 |
+| Spotify Basic Pitch contour trunk — `temporal_pyramid_8` | -0.049 / +0.137 / +0.353 | +0.099 / +0.159 / +0.214 |
+| BEATs iter3+ AS2M — `masked_mean` | +0.205 / +0.315 / +0.466 | +0.246 / +0.328 / +0.410 |
+| BEATs iter3+ AS2M — `temporal_pyramid_8` | +0.134 / +0.219 / +0.366 | +0.174 / +0.243 / +0.289 |
+| CIR single-timbre AST — `official_clip` | +0.252 / +0.349 / +0.485 | +0.298 / +0.363 / +0.433 |
+| LAION-CLAP Music HTSAT-base — `official_clip` | +0.215 / +0.329 / +0.460 | +0.246 / +0.341 / +0.417 |
+| Descript Audio Codec 44.1 kHz — `masked_mean` | +0.256 / +0.540 / +0.746 | +0.404 / +0.527 / +0.598 |
+| Descript Audio Codec 44.1 kHz — `temporal_pyramid_8` | +0.220 / +0.387 / +0.611 | +0.322 / +0.422 / +0.474 |
+| Meta EnCodec 24 kHz — `masked_mean` | +0.163 / +0.406 / +0.656 | +0.325 / +0.426 / +0.468 |
+| Meta EnCodec 24 kHz — `temporal_pyramid_8` | +0.098 / +0.297 / +0.541 | +0.224 / +0.327 / +0.376 |
+| MuQ-MuLan — `official_clip` | -0.015 / +0.105 / +0.309 | +0.078 / +0.132 / +0.198 |
+
+**Preset-dominant** means `dP` exceeds `dM` by more than `1e-6` cosine-distance units. Differences within that tolerance are ties. The ratio is undefined when `dP ≤ 1e-6`; those cases are excluded from ratio summaries and counted below. The normalized-margin denominator uses `ε = 1e-8`.
+
+| Representation | Anchors | Undefined ratios | Near-zero preset-distance denominators | Both distances near zero | Ties | Zero-norm vectors | Nonfinite values |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Spotify Basic Pitch contour trunk — `masked_mean` | 40,454,400 | 0 | 0 | 0 | 360 | 0 | 0 |
+| Spotify Basic Pitch contour trunk — `temporal_pyramid_8` | 40,454,400 | 0 | 0 | 0 | 289 | 0 | 0 |
+| BEATs iter3+ AS2M — `masked_mean` | 40,454,400 | 0 | 0 | 0 | 74 | 0 | 0 |
+| BEATs iter3+ AS2M — `temporal_pyramid_8` | 40,454,400 | 0 | 0 | 0 | 107 | 0 | 0 |
+| CIR single-timbre AST — `official_clip` | 40,454,400 | 0 | 0 | 0 | 17 | 0 | 0 |
+| LAION-CLAP Music HTSAT-base — `official_clip` | 40,454,400 | 0 | 0 | 0 | 69 | 0 | 0 |
+| Descript Audio Codec 44.1 kHz — `masked_mean` | 40,454,400 | 0 | 0 | 0 | 102 | 0 | 0 |
+| Descript Audio Codec 44.1 kHz — `temporal_pyramid_8` | 40,454,400 | 0 | 0 | 0 | 117 | 0 | 0 |
+| Meta EnCodec 24 kHz — `masked_mean` | 40,454,400 | 0 | 0 | 0 | 2,353 | 0 | 0 |
+| Meta EnCodec 24 kHz — `temporal_pyramid_8` | 40,454,400 | 0 | 0 | 0 | 1,211 | 0 | 0 |
+| MuQ-MuLan — `official_clip` | 40,454,400 | 0 | 0 | 0 | 134 | 0 | 0 |
+
+### Where the representation changes come from
+
+The decomposition asks how normalized embedding positions vary over the full balanced preset-by-performance matrix. **Preset variation** means presets occupy consistently different regions even while the MIDI changes. **MIDI variation** means changing the performance shifts the representations in a similar way across presets. **Interaction** is what remains when preset and MIDI averages are removed: for example, A may move upward from MIDI 1 to MIDI 2 while B moves sideways. These are shares of squared Euclidean variation among the unit-length cached vectors, not percentages of recoverable information.
+
+**Synthetic geometry examples, not measured data:** in the left panel, both presets move by the same vector when MIDI changes, so the expected decomposition is 80% preset, 20% MIDI, and 0% interaction. In the right panel, A moves upward while B moves sideways; the expected shares are 86.7% preset, 6.7% MIDI, and 6.7% interaction. Each arm’s measured components add to its total variation within the reported numeric tolerance.
+
+| Representation | Preset variation | MIDI-performance variation | Interaction variation |
+|---|---:|---:|---:|
+| Spotify Basic Pitch contour trunk — `masked_mean` | 47.6% [43.4, 53.4]% | 14.0% [11.3, 17.1]% | 38.4% [34.3, 40.8]% |
+| Spotify Basic Pitch contour trunk — `temporal_pyramid_8` | 39.0% [35.8, 44.5]% | 15.4% [13.0, 18.2]% | 45.6% [41.7, 47.3]% |
+| BEATs iter3+ AS2M — `masked_mean` | 52.6% [49.5, 57.2]% | 7.8% [6.6, 9.5]% | 39.6% [35.8, 41.6]% |
+| BEATs iter3+ AS2M — `temporal_pyramid_8` | 44.5% [42.2, 48.6]% | 10.2% [8.8, 11.9]% | 45.4% [41.9, 46.8]% |
+| CIR single-timbre AST — `official_clip` | 52.3% [49.6, 56.6]% | 1.8% [1.8, 2.5]% | 45.9% [41.6, 48.0]% |
+| LAION-CLAP Music HTSAT-base — `official_clip` | 54.9% [52.0, 59.1]% | 9.3% [7.9, 11.2]% | 35.8% [32.7, 37.4]% |
+| Descript Audio Codec 44.1 kHz — `masked_mean` | 71.9% [67.4, 77.1]% | 5.1% [3.6, 6.9]% | 23.0% [18.9, 26.3]% |
+| Descript Audio Codec 44.1 kHz — `temporal_pyramid_8` | 64.0% [60.1, 69.2]% | 8.1% [6.4, 10.1]% | 27.9% [23.8, 30.6]% |
+| Meta EnCodec 24 kHz — `masked_mean` | 68.3% [62.5, 74.2]% | 7.7% [5.6, 10.1]% | 24.0% [19.3, 28.4]% |
+| Meta EnCodec 24 kHz — `temporal_pyramid_8` | 58.4% [53.5, 64.4]% | 11.2% [9.0, 13.8]% | 30.4% [26.0, 34.3]% |
+| MuQ-MuLan — `official_clip` | 40.6% [38.0, 44.9]% | 20.8% [18.7, 23.3]% | 38.6% [35.5, 40.1]% |
+
+Paired against CIR single-timbre AST — `official_clip`; positive changes mean a larger preset-over-MIDI margin or a larger preset-dominant share.
+
+| Representation | Δ mean margin [paired 95% CI] | Δ preset-dominant share, percentage points [paired 95% CI] |
+|---|---:|---:|
+| Spotify Basic Pitch contour trunk — `masked_mean` | -0.128 [-0.175, -0.082] | -25.8 pp [-30.3, -21.2] pp |
+| Spotify Basic Pitch contour trunk — `temporal_pyramid_8` | -0.201 [-0.245, -0.156] | -28.6 pp [-33.3, -23.6] pp |
+| BEATs iter3+ AS2M — `masked_mean` | -0.037 [-0.059, -0.016] | -8.4 pp [-10.8, -6.1] pp |
+| BEATs iter3+ AS2M — `temporal_pyramid_8` | -0.125 [-0.149, -0.101] | -11.6 pp [-14.7, -8.7] pp |
+| LAION-CLAP Music HTSAT-base — `official_clip` | -0.026 [-0.048, -0.004] | -7.8 pp [-10.4, -5.6] pp |
+| Descript Audio Codec 44.1 kHz — `masked_mean` | 0.139 [0.095, 0.182] | -12.9 pp [-15.6, -10.3] pp |
+| Descript Audio Codec 44.1 kHz — `temporal_pyramid_8` | 0.042 [0.003, 0.083] | -13.3 pp [-16.2, -10.3] pp |
+| Meta EnCodec 24 kHz — `masked_mean` | 0.043 [-0.008, 0.092] | -18.0 pp [-21.3, -14.7] pp |
+| Meta EnCodec 24 kHz — `temporal_pyramid_8` | -0.051 [-0.098, -0.001] | -19.7 pp [-23.3, -15.9] pp |
+| MuQ-MuLan — `official_clip` | -0.222 [-0.258, -0.189] | -30.2 pp [-34.6, -25.9] pp |
+
+The largest-margin arm is not the arm with the strongest existing retrieval R@1. A sensitivity ranking is not a replacement for retrieval: high preset sensitivity alone does not establish decodability, useful control predictions, or audio reconstruction. The interaction term is not automatically undesirable; it can represent real preset-specific responses to pitch, rhythm, duration, velocity, or articulation. With one cached render per preset-performance cell, it also includes render-specific variation, and there is no separate noise term.
+
+### Coverage limits and next decision
+
+- The 50 performances include pitch, rhythm, duration, velocity, articulation, and other events together; this experiment does not isolate pitch.
+- No model-specific “difficult preset” subset was selected. Existing source-family metadata assigns one family to each preset but provides no independent difficulty labels, so using retrieval scores or distances to choose a hard subset would have made the comparison model-dependent.
+- This is an exploratory analysis of one selected 129-preset × 50-performance cohort. No reserved test or independent-confirmation data were used.
+- No decoder, prediction head, training, new render, or reconstruction test was run. High preset sensitivity does not show that a decoder can recover Vital settings.
+
+Use these results to select a small, controlled reconstruction comparison; keep any architecture decision gated on held-out reconstruction quality. The [machine-readable results and provenance](issue157_sensitivity_results.json) retain all eleven arm summaries and the exact analysis settings.
+
+### Issue #157 visualizations
+
+Each heatmap cell is colored on a within-column relative scale; the printed cell value is the actual metric. Distribution lines summarize all defined ratios or all margins, not independent observations. The stacked bars include every representation arm. The geometry panels are synthetic examples only.
+
+![All eleven representations across sensitivity and variation metrics](figures/issue157_sensitivity_heatmap.png)
+
+![Anchored ratio and normalized-margin distributions](figures/issue157_distance_distributions.png)
+
+![Preset, MIDI, and interaction variation for every representation](figures/issue157_variance_decomposition.png)
+
+![Illustrative low- and higher-interaction geometry; synthetic points, not measurements](figures/issue157_interaction_geometry.png)
 
 ### Visual summaries
+
+
 
 **Encoder × metric heatmap**
 
@@ -573,3 +700,31 @@ The primary results use 6,450 paired queries per measured arm and 129 common pre
 Checkpoint files remain local and are not included in the repository. The BEATs and CIR checkpoint terms remain unresolved for any use beyond this authorized research evaluation.
 
 Report figures were generated with Matplotlib `3.11.0` from cached evaluation and shortlist results.
+
+### Issue #157 execution and reproducibility
+
+The sensitivity analysis reused the persisted frozen embeddings only. Cache verification ran before scoring and checked all archive SHA-256 values; each feature identity’s checkpoint and source revision, loader, tap, sample rate, preprocessing and pooling; the render request and WAV hash; and every array’s shape, dtype, finite values and nonzero norm. The seven families each contained 6,480 accepted cache entries; 6,450 mapped to the common matrix used here. No encoder weights were loaded and no new inference or rendering was run.
+
+The analyzed matrix contains `129 × 50 × D` vectors per arm, normalized in-place on `xpu` as `float32`. Pairwise cosine distances were precomputed in tensors shaped `[129, 50, 50]` and `[50, 129, 129]`; exhaustive combinations were processed in chunks of 64 preset pairs. Total scoring and bootstrap time was 506.5 seconds. The bootstrap used 1,000 crossed resamples and 32,768 sampled combinations per resample.
+
+| Encoder family | Checkpoint SHA-256 | Pinned source revision | Loader revision | Feature tap | Cached arms / dimensions | Pooling |
+|---|---|---|---|---|---|---|
+| CIR single-timbre AST | `b08996e4c42511e69af7245695d735d85585a2c41e49ab1fdc67dc308c604bbb` | `google-drive:1rbudnDYkc8-7KHm2jYk8ouyhob0zzCHI` | `ca551b8df4234e40e3acc84202f8b921854be89c` | mean of final CLS and distillation tokens | `official_clip` 768-D | `native_clip_v1` |
+| BEATs iter3+ AS2M | `d43cbfad4d7b56381c061d7a24774f908d4d94c72961f6eb1d9090ff18cd8d34` | `5b53b0404df452a3a607d7e67687227730e5bad1` | `31c5b904ca1bf2afb4c234a6675c683a4e5fc7cd` | pretrained iter3+ final pre-predictor features | `masked_mean` 768-D; `temporal_pyramid_8` 12,288-D | `masked_mean_and_8bin_mean_std_v1` |
+| LAION-CLAP Music HTSAT-base | `fae3e9c087f2909c28a09dc31c8dfcdacbc42ba44c70e972b58c1bd1caf6dedd` | `b3708341862f581175dba5c356a4ebf74a9b6651` | `laion_clap==1.1.7` | official audio clip embedding | `official_clip` 512-D | `native_clip_v1` |
+| Descript Audio Codec 44.1 kHz | `128180a5e4d41ceabfeb952b687fb9da7cf468c2291acf5be9cadb5ab091cc46` | `c1bc521685adf9cfe247bc39a5ca58917eda1ac4` | `transformers==4.50.0` | continuous encoder output before RVQ | `masked_mean` 1,024-D; `temporal_pyramid_8` 16,384-D | `masked_mean_and_8bin_mean_std_v1` |
+| Meta EnCodec 24 kHz | `304c7656c7f978fa9d6838fbc7312108d2345ba6b1b816c8599653da8a71bdb3` | `c5e61996c75613cfd18f4c53cc06667932675776` | `transformers==4.50.0` | continuous encoder output before RVQ | `masked_mean` 128-D; `temporal_pyramid_8` 2,048-D | `masked_mean_and_8bin_mean_std_v1` |
+| MuQ-MuLan | `fe56bc76aa587d2431c0c416d63f4c857d43ef7678ee6933fbf307b46af9d938` | `2e01c796b71dca71b45251384c04cd7b237c9020` | `muq==0.1.0` | official audio embedding | `official_clip` 512-D | `native_clip_v1` |
+| Spotify Basic Pitch contour trunk | `6c8869af67af45472827bb68b4d1a99e78fe3d5e7b6dd41132ac5df609f0cb55` | `9991303bba609a3b93089d13ec80d1d495083596` | `obruxo_basic_pitch@frozen_contour_trunk_v1` | post-BN/ReLU contour_conv1; average 3 bins per semitone, flatten 8 channels × 88 pitches | `masked_mean` 704-D; `temporal_pyramid_8` 11,264-D | `masked_mean_and_8bin_mean_std_v1` |
+
+The source preset membership remained `validation`; the distinct performance source remained `train`. Reserved test and confirmation splits were not accessed. Inputs consisted only of existing private manifests, receipts, cache metadata, and feature arrays; raw IDs, source paths, audio samples, and embeddings were not added to the report or repository.
+
+Reproduce from the repository root with the existing local cache and pinned checkpoint lock:
+
+```powershell
+python research/modelling/frozen_encoder_retrieval/run_issue157_sensitivity.py `
+  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-train-midi-v3-50 `
+  --checkpoint-root research/modelling/frozen_encoder_retrieval/local_checkpoints `
+  --device xpu --bootstrap-replicates 1000 `
+  --bootstrap-combinations 32768
+```
