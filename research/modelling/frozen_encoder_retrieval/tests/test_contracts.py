@@ -1150,6 +1150,8 @@ class ReportingAndControlTests(unittest.TestCase):
         self.assertIn("64 frequency bands", text)
         self.assertIn("No eligible related-preset pairs", text)
         self.assertIn("Do not compare the two hard-negative percentages directly", text)
+        self.assertIn("Common versus mixed comparison MIDI", text)
+        self.assertIn("6,450 queries reuse the same 129 presets", text)
 
     def test_report_lists_all_arms_without_inventing_scores(self):
         source = REPO / "research/modelling/control_scope/stage_a_controls.jsonl"
@@ -1224,6 +1226,9 @@ class ReportingAndControlTests(unittest.TestCase):
             self.assertIn("Issue #155 diagnostic results", text)
             self.assertIn("Plain-English readout", text)
             self.assertIn("all 50 existing excerpts", text)
+            self.assertIn("Keep `A1` as the input", text)
+            self.assertIn("reduce the volume of `A1` alone", text)
+            self.assertIn("one fewer wrong preset to beat", text)
             self.assertIn("60.0% [50.0%, 70.0%]", text)
             self.assertIn("target margin ×100 (cosine points", text)
             self.assertNotIn("+5.00 pp", text)
@@ -1236,6 +1241,7 @@ class ReportingAndControlTests(unittest.TestCase):
             self.assertIn("Mean warned candidates / fraction of 129", text)
             self.assertIn("groups overlap for 4 pairs, and their union contains 4 pairs", text)
             self.assertIn("selected 8 presets", text)
+            self.assertIn("different random seed, `A1*`", text)
             self.assertIn("4 strong, 3 borderline, 1 weak or inconclusive", text)
             self.assertIn("Each assignment round used 50 gallery MIDI excerpts", text)
             self.assertNotIn("All {'1': 50}", text)
@@ -1274,6 +1280,7 @@ class ReportingAndControlTests(unittest.TestCase):
             self.assertIn("| Envelopes ❌ 0 /", text)
             self.assertIn("2 MIDI IDs; polyphony 1–3, median pitch 30–60", text)
             self.assertIn("MIDI-cluster intervals summarize variation for this one preset", text)
+            self.assertIn("one Vital control while keeping MIDI 1 fixed", text)
             self.assertLess(text.index("## Controlled preset perturbations"), text.index("## Execution status"))
 
 
