@@ -473,6 +473,7 @@ def _issue155_followup_lines(results: dict, shortlist: dict | None) -> list[str]
             exemplar = next(iter(failure_arms.values()))
             lines.extend(["", "### How retrieval fails", "",
                 f"Rank distributions and near/far shares use each of the three assignment attempts for {exemplar.get('query_pairs', 0):,} paired preset × MIDI queries ({exemplar.get('individual_retrieval_attempts', 0):,} attempts per encoder). Rank is the average position among tied scores; near misses have expected rank >1 and ≤5, and far failures have expected rank >5. Crossed bootstrap resamples {exemplar.get('performance_clusters', 0)} MIDI performances and {exemplar.get('preset_family_clusters', 0)} preset-family clusters, keeping a query's three assignment attempts together and using the same resamples for every encoder.", "",
+                "A correct preset at rank 1 is a success; rank 4 is a near miss; rank 20 is a far failure. These categories apply to each individual search, not an average of several searches.", "",
                 "| Encoder arm | Median expected rank per attempt [95% crossed CI] | 90th-percentile expected rank per attempt [95% crossed CI] | Near-miss attempts (expected rank >1 to 5) | Far-failure attempts (expected rank >5) |",
                 "|---|---:|---:|---:|---:|"])
             for arm, summary in sorted(failure_arms.items()):
@@ -1107,7 +1108,7 @@ def _issue155_visual_summary_lines(figures: dict | None) -> list[str]:
         return []
     descriptions = (
         ("encoder_metric_heatmap", "Encoder × metric heatmap",
-         "All evaluated arms on the 50-performance cohort; colors show the retrieval and hard-negative percentages from the table."),
+         "All evaluated arms on the 50-performance cohort. Same-MIDI negatives test against every other preset; acoustic negatives test against only five preselected sounds. Compare encoders within each metric, not the two hard-negative percentages against each other."),
         ("rank_distribution", "Correct-preset rank distribution",
          "CDF of individual attempts from the three MIDI assignments; repeated attempts remain grouped for the table's crossed uncertainty estimates."),
         ("per_preset_accuracy", "Per-preset accuracy distributions",
@@ -1122,6 +1123,28 @@ def _issue155_visual_summary_lines(figures: dict | None) -> list[str]:
             filename = Path(figures[key]).as_posix()
             lines.extend([f"**{title}**", "", f"![{title}]({filename})", "", caption, ""])
     return lines
+
+
+def _retrieval_explainer_lines(candidate_count: int) -> list[str]:
+    if candidate_count < 2:
+        raise ValueError("retrieval explanation requires at least two candidate presets")
+    other_count = candidate_count - 1
+    return [
+        "### How to read these tests",
+        "",
+        "Call a recording `A1` when **preset A plays MIDI 1**. `A2` is the same preset playing MIDI 2; `B1` is a **different preset playing MIDI 1**. Higher cosine similarity means the encoder considers two recordings more alike.",
+        "",
+        f"**Main retrieval (R@1, R@5, MRR).** Start with `A1`. Choose the correct preset from all {candidate_count} candidate presets playing **MIDI 2**: `A2` is the correct answer; `B2`, `C2`, etc. are wrong. R@1 is how often A2 ranks first; R@5 is how often it ranks in the top five; MRR rewards higher ranks (rank 1 scores 1, rank 2 scores 1/2, rank 5 scores 1/5). Ties are scored fractionally.",
+        "",
+        f"**Same-MIDI hard negatives.** This is a *separate* check: does `similarity(A1, A2) > similarity(A1, B1)` for **every one of the {other_count} other presets** B? A2 has different MIDI but the right preset; every B1 has the wrong preset but exactly the same MIDI as the input. One B1 beating or tying A2 counts as a failure.",
+        "",
+        f"**Acoustic top-five hard negatives.** Use the same A1-versus-A2 comparison, but test against **five** B1 candidates rather than all {other_count}. Choose those five in advance by looking for the wrong-preset recordings with the most similar **coarse frequency-energy profiles** to A1 (64 frequency bands). This selection uses the audio waveform, not the encoder being evaluated. \"Acoustic\" does **not** mean a person judged the sounds similar.",
+        "",
+        "**Known-related-preset negatives.** Choose B because the source data identifies it as a related version of A, rather than selecting it by audio similarity. No eligible related-preset pairs were present in this cohort, so this check has no score.",
+        "",
+        f"**Do not compare the two hard-negative percentages directly.** Beating five selected wrong presets is a different test from beating all {other_count}. Compare *encoders within the same column*, not the two columns as if they were equally difficult. Neither hard-negative score is the main {candidate_count}-preset retrieval accuracy.",
+        "",
+    ]
 
 
 def _reader_summary(current_dataset: dict, current_eval: dict | None, comparison_dataset: dict | None,
@@ -1152,6 +1175,7 @@ def _reader_summary(current_dataset: dict, current_eval: dict | None, comparison
                    f"(n={leader_result.get('episodes', 0):,} queries, {gallery_size} candidate presets; {performance_detail}). "
                    f"This ranks frozen representations across {len(MODEL_REGISTRY)} model families; it is retrieval evidence, not a reconstruction result.")
         lines.extend([finding, ""])
+        lines.extend(_retrieval_explainer_lines(int(gallery_size)))
     lines.extend(_summary_cohort_lines("Expanded held-out performance cohort", current_dataset, current_eval))
     if validation_results:
         lines.extend(["The 81.4% headline is the primary common-gallery assignment. Issue #155 reuses those same queries and preset targets, rotates only the gallery-MIDI assignment in three deterministic rounds, and reports that paired average separately.", ""])
