@@ -6,6 +6,8 @@ Issues: [#152](https://github.com/noisedoctrine/obruxo/issues/152) baseline and 
 
 **Primary expanded-cohort result:** CIR single-timbre AST (official_clip) ranked the correct preset first in 81.4% of cross-MIDI queries (n=6,450 queries, 129 candidate presets; 50 MIDI performances from `train`, distinct from the earlier validation-source MIDI cohort). This ranks frozen representations across 7 model families; it is retrieval evidence, not a reconstruction result.
 
+Presentation: [Frozen encoder retrieval (PDF)](presentations/frozen_encoder_retrieval.pdf).
+
 ### How to read these tests
 
 Call a recording `A1` when **preset A plays MIDI 1**. `A2` is the same preset playing MIDI 2; `B1` is a **different preset playing MIDI 1**. Higher cosine similarity means the encoder considers two recordings more alike.
@@ -91,6 +93,8 @@ In the separate test of three comparison-MIDI assignments, CIR single-timbre AST
 ## Issue #157 — Preset versus MIDI sensitivity
 
 **Finding:** The question is whether changing a Vital preset moves a frozen audio representation more than changing the MIDI performance. The measures ranked representations differently: CIR single-timbre AST — `official_clip` led original common-gallery Recall@1 (81.4%), while Descript Audio Codec 44.1 kHz — `masked_mean` had the largest mean normalized margin (+0.508; preset-dominant on 85.0% of anchors). The comparison uses the same complete 129 preset states and 50 distinct performances for every arm. These measurements describe representation geometry; they do not show that Vital settings can be decoded or that reconstructed audio would sound accurate.
+
+Presentation: [Preset versus MIDI sensitivity (PDF)](presentations/preset_midi_sensitivity.pdf).
 
 The preset states come from the existing `validation` membership, and the 50 performances come from `train`; they are 129 source-family clusters and 50 distinct MIDI identities. Each matrix cell is one accepted cached render. The test changes several MIDI characteristics together; it does not isolate pitch.
 

@@ -2,6 +2,15 @@
 
 This package implements the real Vital/MIDI retrieval shootout from [issue #152](https://github.com/noisedoctrine/obruxo/issues/152). It performs no Vital-control prediction, patch optimization, backbone fine-tuning, or reconstruction training. The original cohort uses the PresetShare-paired, renderer-compatible `validation` membership from an existing frozen snapshot. The expanded cohort keeps that same validation preset gallery but draws held-out MIDI performances from paired `train` source directories; an exact-MIDI-ID exclusion manifest prevents overlap with the original validation performances. Its 50 MIDI IDs are selected deterministically to cover polyphony, articulation, pitch register, density, velocity range, and expression. Test and independent-confirmation reserves are rejected by the CLI.
 
+## Results and presentations
+
+The [research results report](reports/FROZEN_ENCODER_RETRIEVAL_RESULTS.md) is the authoritative source for metrics, methodology, and limitations. These presentations explain the results for collaborators:
+
+- [Frozen encoder retrieval (PDF)](reports/presentations/frozen_encoder_retrieval.pdf) · [editable PowerPoint](reports/presentations/frozen_encoder_retrieval.pptx) — identification of Vital presets across different MIDI performances; based on the [report at commit 2aa787a](https://github.com/noisedoctrine/obruxo/blob/2aa787aea562db5d334a54c485b70704e5943a9e/research/modelling/frozen_encoder_retrieval/reports/FROZEN_ENCODER_RETRIEVAL_RESULTS.md).
+- [Preset versus MIDI sensitivity (PDF)](reports/presentations/preset_midi_sensitivity.pdf) · [editable PowerPoint](reports/presentations/preset_midi_sensitivity.pptx) — comparison of preset-induced and performance-induced embedding changes, and their interaction; based on [PR #158](https://github.com/noisedoctrine/obruxo/pull/158).
+
+Both presentations focus on the shared 129-preset × 50-performance cohort. They summarize frozen-representation measurements, not patch reconstruction results.
+
 ## Source and split contract
 
 Prepare from a complete artifact produced by the repository's corpus audit and its matching original data root. Use the existing identity and lineage assignments in `splits.json` and `members.json`; do not make a new split. Source preset bytes are rehashed and their stored-state identity is rechecked. Only eligible rows in the chosen `train` or `validation` split are opened. Excluded/ineligible rows and reserved source paths are not resolved or read.
