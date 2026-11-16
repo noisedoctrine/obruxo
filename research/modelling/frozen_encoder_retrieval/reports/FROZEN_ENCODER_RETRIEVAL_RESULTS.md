@@ -12,6 +12,8 @@ Call a recording `A1` when **preset A plays MIDI 1**. `A2` is the same preset pl
 
 **Main retrieval (R@1, R@5, MRR).** Start with `A1`. Choose the correct preset from all 129 candidate presets playing **MIDI 2**: `A2` is the correct answer; `B2`, `C2`, etc. are wrong. R@1 is how often A2 ranks first; R@5 is how often it ranks in the top five; MRR rewards higher ranks (rank 1 scores 1, rank 2 scores 1/2, rank 5 scores 1/5). Ties are scored fractionally.
 
+**Common versus mixed comparison MIDI.** Starting from `A1`, the common-MIDI test compares `A2`, `B2`, `C2`, ...: all 129 choices play MIDI 2. The mixed-MIDI test might compare `A2`, `B3`, `C4`, ...: different presets can play different MIDI, but none plays the input's MIDI 1. Both are 129-choice searches. The hard-negative checks below are separate: they deliberately test wrong presets playing MIDI 1.
+
 **Same-MIDI hard negatives.** This is a *separate* check: does `similarity(A1, A2) > similarity(A1, B1)` for **every one of the 128 other presets** B? A2 has different MIDI but the right preset; every B1 has the wrong preset but exactly the same MIDI as the input. One B1 beating or tying A2 counts as a failure.
 
 **Acoustic top-five hard negatives.** Use the same A1-versus-A2 comparison, but test against **five** B1 candidates rather than all 128. Choose those five in advance by looking for the wrong-preset recordings with the most similar **coarse frequency-energy profiles** to A1 (64 frequency bands). This selection uses the audio waveform, not the encoder being evaluated. "Acoustic" does **not** mean a person judged the sounds similar.
@@ -19,6 +21,8 @@ Call a recording `A1` when **preset A plays MIDI 1**. `A2` is the same preset pl
 **Known-related-preset negatives.** Choose B because the source data identifies it as a related version of A, rather than selecting it by audio similarity. No eligible related-preset pairs were present in this cohort, so this check has no score.
 
 **Do not compare the two hard-negative percentages directly.** Beating five selected wrong presets is a different test from beating all 128. Compare *encoders within the same column*, not the two columns as if they were equally difficult. Neither hard-negative score is the main 129-preset retrieval accuracy.
+
+**How to interpret uncertainty.** The 6,450 queries reuse the same 129 presets and 50 MIDI performances. They are not 6,450 independent instruments or performances; the confidence intervals account for repeated preset families and MIDI identities.
 
 ### Expanded held-out performance cohort: 50 selected MIDI IDs; 50 with evaluated queries; 6450 common-gallery episodes
 Validation preset gallery: 131 verified states; performances sourced from `train`. Reserved test and confirmation sources used: **no**.
@@ -122,6 +126,8 @@ Mean change and independent-seed repeat distances with four-context min–max ra
 ### Comparison-MIDI assignments
 
 The original four-MIDI result is preserved as the baseline. We also reassigned the common comparison MIDI three times (deterministic offsets 1, 7 and 19) using all 50 existing excerpts. Each search still ranks the same 129 preset candidates, and the query and gallery play different MIDI excerpts. The 6,450 query inputs repeat across assignments. R@1, R@5 and MRR averages combine each query's three assignments; rank-distribution metrics below use all three attempts and keep them together in the crossed bootstrap.
+
+**Example:** Keep `A1` as the input. One round compares it with `A2`, `B2`, `C2`, ...; another round uses `A3`, `B3`, `C3`, ... instead. The labels are illustrative; the actual MIDI choices use the fixed offsets. We are changing what the comparison presets play, not adding new inputs or increasing the number of candidate presets.
 
 | Encoder arm | Offset 1 R@1 [crossed 95% CI] / R@5 / MRR | Offset 7 R@1 [crossed 95% CI] / R@5 / MRR | Offset 19 R@1 [crossed 95% CI] / R@5 / MRR | Three-assignment query average |
 |---|---:|---:|---:|---:|
@@ -244,6 +250,8 @@ Paired clean-query CIR minus BEATs temporal-pyramid ΔR@1: +22.3 pp [+17.1, +28.
 
 For a stricter check, we recomputed ranks after removing every warned candidate render and retained only clean query/correct-match pairs. This leaves 3,690 distinct queries (10,051 observations across the correlated assignment rounds); each query uses the same clean candidate set for all encoders, with 19–87 candidates.
 
+**Why an apparently higher clean-only score can be misleading:** If `B2` has a warning and gets removed, `A2` has one fewer wrong preset to beat. Nothing about `A1`, `A2` or their embeddings improved. Searching among 19–87 candidates instead of 129 is simply a different, easier-sized task.
+
 | Encoder arm | Clean-gallery R@1 [crossed 95% CI] / R@5 / MRR | Clean queries |
 |---|---:|---:|
 | `basic_pitch_trunk:masked_mean` | 18.4% [14.0%, 23.4%] / 39.8% / 29.8% | 3,690 |
@@ -261,6 +269,8 @@ Paired clean-gallery CIR minus BEATs temporal-pyramid ΔR@1: +24.8 pp [+20.8, +2
 Clean/warning status is descriptive and may track preset acoustics; neither slice establishes a causal render-quality effect.
 
 **C — Gain-reduced warning sample:** a deterministic, stratified sample of 100 WAVs was drawn from 1,531 accepted amplitude-warning renders. Copies were reduced linearly to a 0.95 peak. New adjusted features were extracted only for Spotify Basic Pitch contour trunk; existing adjusted-feature caches were reused for the other 6 families. Original cached features supplied the unchanged queries/candidates. This is a sensitivity sample, not a corpus-wide accuracy estimate.
+
+**Example:** First reduce the volume of `A1` alone, leaving the comparison recordings unchanged, and check whether the top-ranked preset changes. Separately leave `A1` unchanged and reduce the volume of its correct comparison recording `A2`. In the table, *changed* counts a different top-ranked preset, *fixed* means a wrong answer became right, and *newly wrong* means a right answer became wrong.
 
 | Encoder arm | Representation cosine distance (95% crossed CI) | Query R@1 before→after; changed / fixed / newly wrong | Correct gallery candidate R@1 before→after; changed / fixed / newly wrong | Δ target margin ×100 (cosine points; query / gallery) |
 |---|---:|---:|---:|---:|
@@ -280,6 +290,7 @@ Mean applied gain was -4.2 dB; adjusted peaks were at most 0.950. No limiter, co
 ### Controlled-preset shortlist: awaiting user selection
 
 The encoder-blind scan checked 129 render-qualified presets. Active control candidates were found in 89 filter, 129 envelope, and 11 routed-LFO presets. It selected 9 presets across four short/long held/phrased excerpts (72 changed/repeat renders; 3 envelope, 3 filter, 3 routed lfo).
+**Example:** Take `A1` and change only its filter cutoff to obtain `A′1`. Also render the unchanged preset a second time with a different random seed, `A1*`. Compare the audio difference between `A1` and `A′1` with the ordinary repeat difference between `A1` and `A1*`. If the control change is no larger than the repeat difference, the evidence for a meaningful acoustic change is weak.
 Screen evidence labels: 6 strong, 2 borderline, 1 weak or inconclusive. Strong means the spectral change exceeded independent-seed repeat variation in every context; borderline means all but one context with median change/repeat ratio ≥3; weak or inconclusive means those criteria were not met. These labels do not establish audibility.
 The acoustic screen compares each changed source-seed render with an unchanged-preset independent-seed repeat. Presets were sampled by parameter-value quantiles before measuring effect, so encoder scores and unusually large effects did not determine inclusion. Listening WAVs and exact preset/control mappings are in the ignored local `outputs/issue155-controlled-candidates/controlled_candidate_shortlist.private.md`; the shortlist remains for review, and the definitive multi-encoder controlled diagnostic has not been run.
 
@@ -350,6 +361,8 @@ The expanded gallery contained no known multi-state lineage or alias neighbors, 
 **Scope:** retrieval only. No current OBRUXO CNN baseline, shared-model training, source-label warm start, direct patch optimization, audio-loss training, or reconstruction head was run.
 
 ## Controlled preset perturbations
+
+**What is compared here?** For one preset, `A1` is the original recording, `A′1` changes only one Vital control while keeping MIDI 1 fixed, and `A1*` is the unchanged preset rendered with a different random seed. We ask whether the control change affects the sound more than an ordinary repeat does. This is a different question from choosing preset A among 129 presets.
 
 This secondary diagnostic uses one original validation preset, three single-control perturbations, 50 MIDI performances, and source/independently randomized Vital renders for each version. It reports cross-MIDI identity retrieval, same-MIDI retrieval against a different random seed, and perturbation distance relative to the identical-preset repeat distance. Every query uses a source-seeded render and its gallery uses independent-seed renders; exact query audio is excluded from every gallery. MIDI-cluster intervals summarize variation for this one preset and do not generalize across presets or controls.
 The expanded-cohort lead `cir_ast:official_clip` scored among the four controlled versions as filter cutoff 90.0% [82.0%, 98.0%]; amplitude attack 72.0% [60.0%, 84.0%]; routed LFO frequency 50.0% [36.0%, 64.0%] (95% MIDI-cluster intervals, 50 performances; one preset).
