@@ -415,6 +415,7 @@ def _issue155_followup_lines(results: dict, shortlist: dict | None) -> list[str]
     arms = sorted(assignment.get("aggregate", {}))
     lines = ["## Issue #155 diagnostic results", "", "### Comparison-MIDI assignments", "",
         "The original four-MIDI result is preserved as the baseline. We also reassigned the common comparison MIDI three times (deterministic offsets 1, 7 and 19) using all 50 existing excerpts. Each search still ranks the same 129 preset candidates, and the query and gallery play different MIDI excerpts. The 6,450 query inputs repeat across assignments. R@1, R@5 and MRR averages combine each query's three assignments; rank-distribution metrics below use all three attempts and keep them together in the crossed bootstrap.", ""]
+    lines.extend(["**Example:** Keep `A1` as the input. One round compares it with `A2`, `B2`, `C2`, ...; another round uses `A3`, `B3`, `C3`, ... instead. The labels are illustrative; the actual MIDI choices use the fixed offsets. We are changing what the comparison presets play, not adding new inputs or increasing the number of candidate presets.", ""])
     evaluated_followup_families = {arm.split(":", 1)[0] for arm in assignment.get("aggregate", {})}
     omitted_followup_families = sorted(set(MODEL_REGISTRY) - evaluated_followup_families)
     if omitted_followup_families:
@@ -533,6 +534,7 @@ def _issue155_followup_lines(results: dict, shortlist: dict | None) -> list[str]
         strict = results.get("strict_clean_gallery", {})
         if strict.get("status") == "completed":
             lines.extend(["", f"For a stricter check, we recomputed ranks after removing every warned candidate render and retained only clean query/correct-match pairs. This leaves {strict.get('episodes', 0):,} distinct queries ({strict.get('assignment_observations', 0):,} observations across the correlated assignment rounds); each query uses the same clean candidate set for all encoders, with {strict.get('clean_gallery_candidate_count', {}).get('min', 'n/e')}–{strict.get('clean_gallery_candidate_count', {}).get('max', 'n/e')} candidates.", "",
+            "**Why an apparently higher clean-only score can be misleading:** If `B2` has a warning and gets removed, `A2` has one fewer wrong preset to beat. Nothing about `A1`, `A2` or their embeddings improved. Searching among 19–87 candidates instead of 129 is simply a different, easier-sized task.", "",
             "| Encoder arm | Clean-gallery R@1 [crossed 95% CI] / R@5 / MRR | Clean queries |",
                 "|---|---:|---:|"])
             for arm, summary in sorted(strict.get("arms", {}).items()):
@@ -558,6 +560,7 @@ def _issue155_followup_lines(results: dict, shortlist: dict | None) -> list[str]
         else:
             extraction_note = "Existing adjusted-feature caches were reused; no encoder inference was repeated."
         lines.extend(["", f"**C — Gain-reduced warning sample:** a deterministic, stratified sample of {sample.get('size', 0)} WAVs was drawn from {results.get('gain_warning_sample_selection', {}).get('accepted_amplitude_warning_wavs', 0):,} accepted amplitude-warning renders. Copies were reduced linearly to a 0.95 peak. {extraction_note} Original cached features supplied the unchanged queries/candidates. This is a sensitivity sample, not a corpus-wide accuracy estimate.", "",
+            "**Example:** First reduce the volume of `A1` alone, leaving the comparison recordings unchanged, and check whether the top-ranked preset changes. Separately leave `A1` unchanged and reduce the volume of its correct comparison recording `A2`. In the table, *changed* counts a different top-ranked preset, *fixed* means a wrong answer became right, and *newly wrong* means a right answer became wrong.", "",
             "| Encoder arm | Representation cosine distance (95% crossed CI) | Query R@1 before→after; changed / fixed / newly wrong | Correct gallery candidate R@1 before→after; changed / fixed / newly wrong | Δ target margin ×100 (cosine points; query / gallery) |",
             "|---|---:|---:|---:|---:|"])
         for arm, summary in sorted(gain["arms"].items()):
@@ -586,6 +589,7 @@ def _issue155_followup_lines(results: dict, shortlist: dict | None) -> list[str]
         family_summary = ", ".join(f"{count} {family.replace('_', ' ')}" for family, count in sorted(family_counts.items()))
         lines.extend(["", "### Controlled-preset shortlist: awaiting user selection", "",
             f"The encoder-blind scan checked {shortlist.get('scanned_render_qualified_presets', 'n/e')} render-qualified presets. Active control candidates were found in {valid_controls.get('filter', 'n/e')} filter, {valid_controls.get('envelope', 'n/e')} envelope, and {valid_controls.get('routed_lfo', 'n/e')} routed-LFO presets. It selected {selected} presets across four short/long held/phrased excerpts ({shortlist.get('new_vital_renders', 'n/e')} changed/repeat renders; {family_summary}).",
+            "**Example:** Take `A1` and change only its filter cutoff to obtain `A′1`. Also render the unchanged preset a second time with a different random seed, `A1*`. Compare the audio difference between `A1` and `A′1` with the ordinary repeat difference between `A1` and `A1*`. If the control change is no larger than the repeat difference, the evidence for a meaningful acoustic change is weak.",
             f"Screen evidence labels: {strength_text}. Strong means the spectral change exceeded independent-seed repeat variation in every context; borderline means all but one context with median change/repeat ratio ≥3; weak or inconclusive means those criteria were not met. These labels do not establish audibility.",
             "The acoustic screen compares each changed source-seed render with an unchanged-preset independent-seed repeat. Presets were sampled by parameter-value quantiles before measuring effect, so encoder scores and unusually large effects did not determine inclusion. Listening WAVs and exact preset/control mappings are in the ignored local `outputs/issue155-controlled-candidates/controlled_candidate_shortlist.private.md`; the shortlist remains for review, and the definitive multi-encoder controlled diagnostic has not been run."])
         candidates = shortlist.get("candidates", [])
@@ -1146,6 +1150,8 @@ def _retrieval_explainer_lines(candidate_count: int) -> list[str]:
         "",
         f"**Main retrieval (R@1, R@5, MRR).** Start with `A1`. Choose the correct preset from all {candidate_count} candidate presets playing **MIDI 2**: `A2` is the correct answer; `B2`, `C2`, etc. are wrong. R@1 is how often A2 ranks first; R@5 is how often it ranks in the top five; MRR rewards higher ranks (rank 1 scores 1, rank 2 scores 1/2, rank 5 scores 1/5). Ties are scored fractionally.",
         "",
+        "**Common versus mixed comparison MIDI.** Starting from `A1`, the common-MIDI test compares `A2`, `B2`, `C2`, ...: all 129 choices play MIDI 2. The mixed-MIDI test might compare `A2`, `B3`, `C4`, ...: different presets can play different MIDI, but none plays the input's MIDI 1. Both are 129-choice searches. The hard-negative checks below are separate: they deliberately test wrong presets playing MIDI 1.",
+        "",
         f"**Same-MIDI hard negatives.** This is a *separate* check: does `similarity(A1, A2) > similarity(A1, B1)` for **every one of the {other_count} other presets** B? A2 has different MIDI but the right preset; every B1 has the wrong preset but exactly the same MIDI as the input. One B1 beating or tying A2 counts as a failure.",
         "",
         f"**Acoustic top-five hard negatives.** Use the same A1-versus-A2 comparison, but test against **five** B1 candidates rather than all {other_count}. Choose those five in advance by looking for the wrong-preset recordings with the most similar **coarse frequency-energy profiles** to A1 (64 frequency bands). This selection uses the audio waveform, not the encoder being evaluated. \"Acoustic\" does **not** mean a person judged the sounds similar.",
@@ -1153,6 +1159,8 @@ def _retrieval_explainer_lines(candidate_count: int) -> list[str]:
         "**Known-related-preset negatives.** Choose B because the source data identifies it as a related version of A, rather than selecting it by audio similarity. No eligible related-preset pairs were present in this cohort, so this check has no score.",
         "",
         f"**Do not compare the two hard-negative percentages directly.** Beating five selected wrong presets is a different test from beating all {other_count}. Compare *encoders within the same column*, not the two columns as if they were equally difficult. Neither hard-negative score is the main {candidate_count}-preset retrieval accuracy.",
+        "",
+        "**How to interpret uncertainty.** The 6,450 queries reuse the same 129 presets and 50 MIDI performances. They are not 6,450 independent instruments or performances; the confidence intervals account for repeated preset families and MIDI identities.",
         "",
     ]
 
@@ -1650,6 +1658,7 @@ def generate_report(destination: Path, inventory: Path, *, dataset_dir: Path | N
                 controlled_lead_summary = (f"The expanded-cohort lead `{leader_arm}` scored among the four controlled versions as "
                     f"{'; '.join(sensitivity)} (95% MIDI-cluster intervals, 50 performances; one preset).")
         controlled_intro = ["## Controlled preset perturbations", "",
+            "**What is compared here?** For one preset, `A1` is the original recording, `A′1` changes only one Vital control while keeping MIDI 1 fixed, and `A1*` is the unchanged preset rendered with a different random seed. We ask whether the control change affects the sound more than an ordinary repeat does. This is a different question from choosing preset A among 129 presets.",
             f"This secondary diagnostic uses one original validation preset, three single-control perturbations, {len(controlled.get('midi_strata', []))} MIDI performances, and source/independently randomized Vital renders for each version. It reports cross-MIDI identity retrieval, same-MIDI retrieval against a different random seed, and perturbation distance relative to the identical-preset repeat distance. Every query uses a source-seeded render and its gallery uses independent-seed renders; exact query audio is excluded from every gallery. MIDI-cluster intervals summarize variation for this one preset and do not generalize across presets or controls.",
             ]
         if controlled_lead_summary:
