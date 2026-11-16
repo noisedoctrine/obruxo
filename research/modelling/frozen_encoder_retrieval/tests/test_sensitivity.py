@@ -11,6 +11,7 @@ from frozen_retrieval.sensitivity import (anchored_metrics_from_distances, cosin
                                           four_anchor_distances, normalize_embedding_grid,
                                           _paired_effect_summary, _sample_distinct_original_pairs,
                                           summarize_arm, variance_decomposition)
+from frozen_retrieval.sensitivity_reporting import _format_ci
 
 
 def test_all_four_anchored_orientations_match_straightforward_reference():
@@ -78,6 +79,11 @@ def test_paired_effect_uses_full_cohort_estimates_and_bootstrap_only_for_interva
     assert result["difference"] == pytest.approx(0.143)
     assert result["difference"] != pytest.approx(np.mean(np.array([0.25, 0.35]) - np.array([0.21, 0.28])))
     assert result["confidence_interval_95"] == pytest.approx([0.04075, 0.06925])
+
+
+def test_confidence_interval_formatter_displays_units_once():
+    assert _format_ci(0.98224, [0.9733, 0.9891], scale=100, digits=1, suffix="%") == "98.2% [97.3, 98.9]"
+    assert _format_ci(-0.264, [-0.312, -0.213], scale=100, digits=1, suffix=" pp") == "-26.4 pp [-31.2, -21.3]"
 
 
 def test_normalization_counts_zero_norm_and_rejects_nonfinite_vectors():

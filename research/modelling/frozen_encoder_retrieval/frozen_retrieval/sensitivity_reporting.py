@@ -17,7 +17,7 @@ def _format_ci(value: float | None, interval: list[float] | None, *, scale: floa
         return "not estimable"
     if interval is None:
         return f"{value * scale:.{digits}f}{suffix}"
-    return f"{value * scale:.{digits}f}{suffix} [{interval[0] * scale:.{digits}f}, {interval[1] * scale:.{digits}f}]{suffix}"
+    return f"{value * scale:.{digits}f}{suffix} [{interval[0] * scale:.{digits}f}, {interval[1] * scale:.{digits}f}]"
 
 
 def _ratio_quantiles(arm: dict) -> str:
@@ -26,7 +26,7 @@ def _ratio_quantiles(arm: dict) -> str:
 
 
 def _relative_table(result: dict) -> str:
-    lines = ["| Representation | Existing R@1 | Mean distance: same preset / different MIDI | Mean distance: different preset / same MIDI | Mean Δ (MIDI − preset) | Median ratio [P10, P90] | Mean normalized margin | Preset-dominant anchors |",
+    lines = ["| Representation | Original common-gallery Recall@1 | Mean distance: same preset / different MIDI | Mean distance: different preset / same MIDI | Mean Δ (MIDI − preset) | Median ratio [P10, P90] | Mean normalized margin | Preset-dominant anchors |",
              "|---|---:|---:|---:|---:|---:|---:|---:|"]
     for arm_name, arm in result["arms"].items():
         ci = arm["confidence_intervals_95"]
@@ -106,9 +106,9 @@ def build_issue157_section(result: dict) -> str:
     bootstrap = result["statistics"]
     if margin_leader == retrieval_leader:
         ranking_readout = (f"The same tested representation led both measures: {_arm_label(margin_leader)} had the largest mean normalized margin "
-                           f"({leading['mean_normalized_margin']:+.3f}) and the strongest existing R@1 ({retrieval['retrieval_recall_at_1']:.1%}).")
+                           f"({leading['mean_normalized_margin']:+.3f}) and the strongest original common-gallery Recall@1 ({retrieval['retrieval_recall_at_1']:.1%}).")
     else:
-        ranking_readout = (f"The measures ranked representations differently: {_arm_label(retrieval_leader)} led existing R@1 "
+        ranking_readout = (f"The measures ranked representations differently: {_arm_label(retrieval_leader)} led original common-gallery Recall@1 "
                            f"({retrieval['retrieval_recall_at_1']:.1%}), while {_arm_label(margin_leader)} had the largest mean normalized margin "
                            f"({leading['mean_normalized_margin']:+.3f}; preset-dominant on {leading['preset_dominant_fraction']:.1%} of anchors).")
     figure_links = "\n\n".join(f"![{label}](figures/{filename})" for label, filename in (
@@ -132,11 +132,11 @@ Distances below are cosine distances after every cached feature vector is L2-nor
 
 ### Measured anchored comparisons
 
-The two distance columns show their absolute scale as well as their contrast. This matters because an encoder whose normalized features barely move at all can have a favorable ratio without being a useful timbre representation. Existing R@1 is retained beside the new measures for that reason. Each mean and its interval is paired across the same crossed preset-family and MIDI-performance resamples.
+The two distance columns show their absolute scale as well as their contrast. This matters because an encoder whose normalized features barely move at all can have a favorable ratio without being a useful timbre representation. Original common-gallery Recall@1 is retained beside the new measures for that reason. It uses the primary single-assignment setup (81.4% for CIR), distinct from Issue #155's later three-assignment average (84.9%). Each mean and its interval is paired across the same crossed preset-family and MIDI-performance resamples.
 
 {_relative_table(result)}
 
-The practical ranking depends on the question. CIR had the strongest retrieval result ({retrieval['retrieval_recall_at_1']:.1%}) and was preset-dominant on {retrieval['preset_dominant_fraction']:.1%} of anchors, with a mean margin of {retrieval['mean_normalized_margin']:+.3f}. DAC `masked_mean` had a larger mean margin ({dac_masked['mean_normalized_margin']:+.3f} [{dac_margin_ci[0]:+.3f}, {dac_margin_ci[1]:+.3f}]); its paired difference from CIR was {result['paired_differences_vs_cir']['dac_44khz:masked_mean']['mean_margin']['difference']:+.3f} [{dac_paired_ci[0]:+.3f}, {dac_paired_ci[1]:+.3f}]. But DAC's existing R@1 was only {dac_masked['retrieval_recall_at_1']:.1%}, so stronger average separation did not make it the better retrieval encoder. EnCodec `masked_mean` illustrates why ratios need an absolute scale: its median ratio was {encodec_masked['quantiles']['ratio']['p50']:.3f}, but its mean MIDI and preset distances were only {encodec_masked['mean_midi_change_distance']:.4f} and {encodec_masked['mean_preset_change_distance']:.4f}, with {encodec_masked['retrieval_recall_at_1']:.1%} R@1.
+The practical ranking depends on the question. CIR had the strongest original common-gallery Recall@1 ({retrieval['retrieval_recall_at_1']:.1%}) and was preset-dominant on {retrieval['preset_dominant_fraction']:.1%} of anchors, with a mean margin of {retrieval['mean_normalized_margin']:+.3f}. DAC `masked_mean` had a larger mean margin ({dac_masked['mean_normalized_margin']:+.3f} [{dac_margin_ci[0]:+.3f}, {dac_margin_ci[1]:+.3f}]); its paired difference from CIR was {result['paired_differences_vs_cir']['dac_44khz:masked_mean']['mean_margin']['difference']:+.3f} [{dac_paired_ci[0]:+.3f}, {dac_paired_ci[1]:+.3f}]. But DAC's original common-gallery Recall@1 was only {dac_masked['retrieval_recall_at_1']:.1%}, so stronger average separation did not make it the better retrieval encoder. EnCodec `masked_mean` illustrates why ratios need an absolute scale: its median ratio was {encodec_masked['quantiles']['ratio']['p50']:.3f}, but its mean MIDI and preset distances were only {encodec_masked['mean_midi_change_distance']:.4f} and {encodec_masked['mean_preset_change_distance']:.4f}, with {encodec_masked['retrieval_recall_at_1']:.1%} original common-gallery Recall@1.
 
 The population above is exhaustively derived from `{cohort['preset_states']} × {cohort['midi_performances']} = {cohort['matrix_cells']}` cached recordings per representation: `{cohort['unordered_2x2_combinations']:,}` unordered choices of two presets and two performances, with four separate anchors each. Those {cohort['anchored_observations_per_arm']:,} dependent anchor observations are not independent samples. The 95% intervals resample the {cohort['preset_family_clusters']} source-family clusters and 50 MIDI identities in crossed draws shared by every arm. For anchored distances, {bootstrap['sampled_unordered_2x2_combinations_per_bootstrap_replicate']:,} combinations approximate the full pair average using two distinct original presets and two distinct original performances. If a bootstrap draw contains preset A twice and preset B once, the A–B pair receives twice the weight; A–A is excluded. Variance-share intervals resample the full crossed matrix using the same cluster draws. Full-cohort point summaries use every combination. The subset is a deterministic, coverage-balanced performance cohort, so these intervals do not replace an independent confirmation cohort.
 
