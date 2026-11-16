@@ -728,3 +728,29 @@ python research/modelling/frozen_encoder_retrieval/run_issue157_sensitivity.py `
   --device xpu --bootstrap-replicates 1000 `
   --bootstrap-combinations 32768
 ```
+
+## Model efficiency and resource requirements
+
+The existing extraction records show a wide range of resource costs, while the existing retrieval results favor CIR. The figures below are compiled from prior extraction logs, locked-checkpoint sizes, model parameter counts and retrieval results; no newly measured inference results are included.
+
+| Encoder | Total loaded / audio-path parameters | Locked checkpoint payload | Existing extraction latency / throughput¹ | Peak process RAM | Peak XPU memory | Embedding dimensions² | Best tested common-gallery Recall@1³ |
+|---|---:|---:|---:|---:|---:|---|---:|
+| Spotify Basic Pitch contour trunk | 16,782 / 7,514 | 0.15 MiB | 0.449 s/item; 2.23 items/s (6,480; 6,480 extracted) | 2.20 GiB | 0.045 GiB | 704 / 11,264 | 21.9% |
+| BEATs iter3+ AS2M | 90,311,792 / 90,311,792 | 344.75 MiB | 0.229 s/item; 4.37 items/s (6,480; 6,480 extracted) | 3.33 GiB | 0.415 GiB | 768 / 12,288 | 62.2% |
+| CIR single-timbre AST | 85,909,248 / 85,909,248 | 344.78 MiB | 0.251 s/item; 3.98 items/s (6,480; 6,480 extracted) | 2.04 GiB | 0.404 GiB | 768 | 81.4% |
+| LAION-CLAP Music HTSAT-base | 199,564,633 / 73,737,303 | 2,243.49 MiB | 0.096 s/item; 10.37 items/s (1,554; 1,554 extracted) | 3.57 GiB | 0.793 GiB | 512 | 58.9% |
+| Descript Audio Codec 44.1 kHz | 76,620,777 / 22,299,200 | 292.31 MiB | 1.255 s/item; 0.80 items/s (6,480; 6,426 extracted, 54 reused) | 3.01 GiB | 0.922 GiB | 1,024 / 16,384 | 31.4% |
+| Meta EnCodec 24 kHz | 14,851,810 / 7,425,792 | 88.81 MiB | 0.645 s/item; 1.55 items/s (1,554; all extracted) | 1.99 GiB | 0.236 GiB | 128 / 2,048 | 24.2% |
+| MuQ-MuLan | 663,364,763 / 334,582,426 | 2,531.01 MiB | 0.328 s/item; 3.05 items/s (1,554; all extracted) | 6.76 GiB | 2.676 GiB | 512 | 30.2% |
+
+¹ These are **existing extraction-pass averages**, calculated as logged pass time divided by input count, not isolated single-clip inference timings. They include per-file audio hashing, cache checks, inference for cache misses, and feature/cache writes. Device was XPU for every row. Basic Pitch, BEATs, CIR and DAC use the existing 6,480-item pass; CLAP, EnCodec and MuQ-MuLan use the existing 1,554-item pass where every input was newly extracted. The 6,480-item CLAP pass ran on CPU and reused 6,176 cached features, so it is not used for the XPU rate. The DAC pass reused 54 features. This keeps cache-hit and CPU/GPU differences visible rather than presenting the averages as standardized inference benchmarks.
+
+² Clip encoders have one output dimension. For sequence encoders, values are `masked_mean / temporal_pyramid_8`; both are produced from one feature extraction. Parameter counts are exact module counts: “audio path” excludes unused task heads for Basic Pitch and codec decoders for DAC/EnCodec, and excludes the text branch for CLAP and MuQ-MuLan. Total loaded counts include those branches/heads. Checkpoint payload sizes sum the locked local weight files and exclude configs and software dependencies.
+
+### Practical interpretation
+
+Basic Pitch is smallest on disk and has the fewest parameters, but its best tested Recall@1 is 21.9%. EnCodec had the lowest observed host-RAM peak (1.99 GiB); Basic Pitch had the lowest XPU allocation (0.045 GiB), although its host-RAM use was higher. MuQ-MuLan is the largest loaded model and used the most host and XPU memory, while reaching 30.2% Recall@1. CIR reached the strongest retrieval score (81.4%) with 85.9 million loaded parameters and about 0.40 GiB peak XPU allocation. The highest observed pass rate belongs to CLAP, but it comes from a different, smaller extraction pass; it should not be treated as a controlled speed ranking. These results show a practical trade-off, not that lower compute causes lower retrieval quality.
+
+### Methodology and limits
+
+The XPU extraction records were produced with PyTorch 2.12.1+xpu, FP32, and serial one-WAV-at-a-time adapter calls on an Intel Arc 140T GPU with 16 GB reported device memory. Existing WAV durations vary within the adapter’s accepted 2–10 second range; they were not normalized to one duration. The extraction timer starts after model loading and XPU peak-memory reset, then covers iterating inputs through audio hashing, cache validation, any required model inference, feature persistence, and manifest writing. Host RSS is sampled during that pass, so it excludes load-time peaks; XPU memory is the allocator high-water mark during the pass and includes resident model allocations. Per-item latency and throughput above are pass averages, not medians of repeated inference calls. Exact standardized single-clip latency is unavailable in the existing records. Retrieval scores are from the separate common-gallery evaluation (6,450 queries over 129 presets); for each family the table shows its best tested pooling arm. They are context for the resource trade-off, not scores from the extraction passes.
