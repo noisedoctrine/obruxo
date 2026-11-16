@@ -29,7 +29,7 @@ from frozen_retrieval import evaluation
 from frozen_retrieval.encoders import _load_cir_ast_offline, _load_muq_mulan_offline, _resolve_local_configs
 from frozen_retrieval.rendering import (QA_POLICY_ID, RENDER_POLICY_ID, _accepted, _qa_warnings,
                                         _receipt_matches_cached_audio, render_plan_identity)
-from frozen_retrieval.reporting import (_control_group, _inventory_summary, _performance_profile, build_control_inventory, build_controlled_inventory,
+from frozen_retrieval.reporting import (_retrieval_explainer_lines, _control_group, _inventory_summary, _performance_profile, build_control_inventory, build_controlled_inventory,
                                         generate_report, _issue155_render_quality, _execution_status_lines,
                                         _collapse_issue155_rank_rows, _issue155_rank_statistics,
                                         _issue155_rank_failure_analysis)
@@ -1136,6 +1136,17 @@ class ReportingAndControlTests(unittest.TestCase):
             self.assertTrue(all("hash recorded" not in str(row.get("fixed_value_source")) for row in rows))
             self.assertEqual(1, result["versions"]["filter_cutoff_shift"]["enabled_controls"])
             self.assertEqual(1, result["versions"]["filter_cutoff_shift"]["controls_by_family"]["Filters"]["enabled"])
+
+    def test_retrieval_report_explains_each_negative_with_same_example(self):
+        text = "\n".join(_retrieval_explainer_lines(129))
+        self.assertIn("A1", text)
+        self.assertIn("A2", text)
+        self.assertIn("B1", text)
+        self.assertIn("every one of the 128 other presets", text)
+        self.assertIn("five", text)
+        self.assertIn("64 frequency bands", text)
+        self.assertIn("No eligible related-preset pairs", text)
+        self.assertIn("Do not compare the two hard-negative percentages directly", text)
 
     def test_report_lists_all_arms_without_inventing_scores(self):
         source = REPO / "research/modelling/control_scope/stage_a_controls.jsonl"
