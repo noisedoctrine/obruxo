@@ -52,7 +52,7 @@ Paired crossed-cluster Recall@1 differences from the leading family representati
 | `encodec_24khz:masked_mean` | +57.2 | [+51.2, +63.1]  |
 | `basic_pitch_trunk:temporal_pyramid_8` | +59.5 | [+53.8, +65.3]  |
 
-Basic Pitch's strongest pooling arm reached 21.9% R@1 [16.6%, 27.3%] and placed first on 0 of 50 MIDI performances. The paired CIR-minus-Basic-Pitch gap was +59.5 percentage points [+53.8, +65.3]. These retrieval results do not support prioritizing this transcription-trained trunk for a later timbre-reconstruction screen.
+Basic Pitch's strongest pooling arm was `basic_pitch_trunk:temporal_pyramid_8` at 21.9% R@1 (6,450 queries; 50 MIDI performances); it placed first on 0/50 individual performances. The paired CIR-minus-Basic-Pitch gap was +59.5 pp [+53.8, +65.3] across preset-family and MIDI-performance clusters. These retrieval results do not support prioritizing this transcription-trained trunk for a later timbre-reconstruction screen.
 
 The table gives the headline retrieval measures on the shared candidate gallery. R@1 uncertainty is crossed over preset family and MIDI performance (2,000 bootstrap replicates); the heading gives the episode and independent-performance denominators. Hard-negative rates are descriptive proportions with query denominators. Query-audio quality and correct-match gallery quality are broken out below. For the full candidate gallery, the report gives the count and fraction of warned renders rather than labeling all candidates with one bucket. These are descriptive associations: warning status can covary with preset acoustics.
 
@@ -83,7 +83,7 @@ The 81.4% headline is the primary common-gallery assignment. Issue #155 reuses t
 
 ### Plain-English readout
 
-In the separate test of three comparison-MIDI assignments, CIR single-timbre AST retrieved the correct preset at rank one for 84.9% of queries, followed by BEATs iter3+ AS2M at 62.3%. The paired CIR–BEATs gap was +22.6 percentage points [+19.4, +25.8]. It ranked first for 50 of 50 MIDI performances (100.0% top-rank probability). Across individual attempts in the three comparison-MIDI rounds, CIR's median expected rank was 1.0, with 3.9% of attempts at expected rank above 5; Meta EnCodec 24 kHz masked_mean had the largest far-failure share (56.2%). Only 1/129 CIR presets fell below 50% R@1 across the 50 excerpts, compared with 111/129 for Meta EnCodec 24 kHz masked_mean. In the 100-WAV gain-normalization sample, the largest query-ranking drop was Meta EnCodec 24 kHz temporal pyramid (-23.0 points; paired 95% interval [-40.5, -8.5]); this small, warning-enriched sample does not estimate corpus-wide accuracy. The automated screen prepared 9 preset candidates with before/after/repeat listening examples; its consistency screen labels 6 strong, 2 borderline, 1 weak or inconclusive; weak/inconclusive examples: candidate_03 (2/4 contexts); the definitive controlled diagnostic is waiting for the user's review and selection.
+In the separate test of three comparison-MIDI assignments, CIR single-timbre AST retrieved the correct preset at rank one for 84.9% of queries, followed by BEATs iter3+ AS2M at 62.3%. The paired CIR–BEATs gap was +22.6 percentage points [+19.4, +25.8]. It ranked first for 50 of 50 MIDI performances (100.0% top-rank probability). Across individual attempts in the three comparison-MIDI rounds, CIR's median expected rank was 1.0, with 3.9% of attempts at expected rank above 5; Spotify Basic Pitch contour trunk masked_mean had the largest far-failure share (61.9%). Only 1/129 CIR presets fell below 50% R@1 across the 50 excerpts, compared with 117/129 for Spotify Basic Pitch contour trunk masked_mean. In the 100-WAV gain-normalization sample, the largest query-ranking drop was Meta EnCodec 24 kHz temporal pyramid (-23.0 points; paired 95% interval [-40.5, -8.5]); this small, warning-enriched sample does not estimate corpus-wide accuracy. The automated screen prepared 9 preset candidates with before/after/repeat listening examples; its consistency screen labels 6 strong, 2 borderline, 1 weak or inconclusive; weak/inconclusive examples: candidate_03 (2/4 contexts); the definitive controlled diagnostic is waiting for the user's review and selection.
 
 ### Visual summaries
 
@@ -119,14 +119,14 @@ Mean change and independent-seed repeat distances with four-context min–max ra
 
 ## Issue #155 diagnostic results
 
-The primary 50-performance comparison above includes Basic Pitch. The three-offset, rank-failure, and gain-normalization follow-up below is the earlier six-family run; it does not report Basic Pitch sensitivity on those supplementary tests.
-
 ### Comparison-MIDI assignments
 
 The original four-MIDI result is preserved as the baseline. We also reassigned the common comparison MIDI three times (deterministic offsets 1, 7 and 19) using all 50 existing excerpts. Each search still ranks the same 129 preset candidates, and the query and gallery play different MIDI excerpts. The 6,450 query inputs repeat across assignments. R@1, R@5 and MRR averages combine each query's three assignments; rank-distribution metrics below use all three attempts and keep them together in the crossed bootstrap.
 
 | Encoder arm | Offset 1 R@1 [crossed 95% CI] / R@5 / MRR | Offset 7 R@1 [crossed 95% CI] / R@5 / MRR | Offset 19 R@1 [crossed 95% CI] / R@5 / MRR | Three-assignment query average |
 |---|---:|---:|---:|---:|
+| `basic_pitch_trunk:masked_mean` | 20.3% [15.1%, 26.2%] / 38.4% / 30.0% | 19.8% [14.8%, 25.2%] / 37.7% / 29.6% | 19.6% [14.2%, 25.4%] / 38.3% / 29.6% | 19.9% [15.9%, 24.1%] / 38.1% / 29.8% |
+| `basic_pitch_trunk:temporal_pyramid_8` | 23.2% [17.9%, 29.2%] / 44.4% / 34.1% | 23.1% [17.9%, 28.9%] / 44.0% / 34.0% | 23.7% [18.0%, 29.9%] / 43.8% / 34.3% | 23.3% [19.1%, 27.9%] / 44.1% / 34.1% |
 | `beats_iter3_plus:masked_mean` | 60.2% [52.8%, 67.4%] / 81.4% / 69.8% | 61.8% [54.4%, 68.8%] / 81.7% / 70.9% | 60.2% [52.5%, 68.0%] / 81.1% / 69.7% | 60.7% [55.6%, 66.1%] / 81.4% / 70.1% |
 | `beats_iter3_plus:temporal_pyramid_8` | 62.7% [55.8%, 69.8%] / 83.2% / 71.9% | 63.0% [55.9%, 70.0%] / 82.6% / 72.0% | 61.0% [53.6%, 68.6%] / 82.3% / 70.6% | 62.3% [57.4%, 67.1%] / 82.7% / 71.5% |
 | `cir_ast:official_clip` | 84.9% [80.2%, 89.0%] / 96.3% / 89.8% | 85.6% [81.0%, 89.6%] / 96.3% / 90.2% | 84.2% [79.2%, 88.6%] / 95.9% / 89.4% | 84.9% [81.4%, 88.1%] / 96.1% / 89.8% |
@@ -141,6 +141,8 @@ Each assignment round used 50 gallery MIDI excerpts and held query/preset pairs 
 
 | Arm | Paired ΔR@1, three-round average minus four-MIDI baseline (95% crossed CI) |
 |---|---:|
+| `basic_pitch_trunk:masked_mean` | +0.4 pp [-4.1, +4.9] |
+| `basic_pitch_trunk:temporal_pyramid_8` | +1.5 pp [-2.5, +5.0] |
 | `beats_iter3_plus:masked_mean` | +1.5 pp [-7.1, +9.4] |
 | `beats_iter3_plus:temporal_pyramid_8` | +0.1 pp [-7.6, +7.8] |
 | `cir_ast:official_clip` | +3.5 pp [-1.5, +8.5] |
@@ -158,6 +160,7 @@ Performance-level rank stability (50 MIDI identities; the aggregate-best pooling
 
 | Encoder family | Arm | Offset 1: R@1; first-place MIDIs; top-rank probability | Offset 7: R@1; first-place MIDIs; top-rank probability | Offset 19: R@1; first-place MIDIs; top-rank probability | Query-averaged: R@1; first-place MIDIs; top-rank probability |
 |---|---|---:|---:|---:|---:|
+| `basic_pitch_trunk` | `basic_pitch_trunk:temporal_pyramid_8` | 23.2%; 0/50; 0.0% | 23.1%; 0/50; 0.0% | 23.7%; 0/50; 0.0% | 23.3%; 0/50; 0.0% |
 | `beats_iter3_plus` | `beats_iter3_plus:temporal_pyramid_8` | 62.7%; 3/50; 0.0% | 63.0%; 0/50; 0.0% | 61.0%; 2/50; 0.0% | 62.3%; 0/50; 0.0% |
 | `cir_ast` | `cir_ast:official_clip` | 84.9%; 48/50; 100.0% | 85.6%; 50/50; 100.0% | 84.2%; 49/50; 100.0% | 84.9%; 50/50; 100.0% |
 | `clap_music` | `clap_music:official_clip` | 59.9%; 0/50; 0.0% | 61.4%; 1/50; 0.0% | 59.8%; 1/50; 0.0% | 60.4%; 0/50; 0.0% |
@@ -173,6 +176,8 @@ A correct preset at rank 1 is a success; rank 4 is a near miss; rank 20 is a far
 
 | Encoder arm | Median expected rank per attempt [95% crossed CI] | 90th-percentile expected rank per attempt [95% crossed CI] | Near-miss attempts (expected rank >1 to 5) | Far-failure attempts (expected rank >5) |
 |---|---:|---:|---:|---:|
+| `basic_pitch_trunk:masked_mean` | 10.0 [8.0, 13.0] | 61.0 [53.0, 69.0] | 18.3% [16.4%, 20.2%] | 61.9% [56.9%, 66.9%] |
+| `basic_pitch_trunk:temporal_pyramid_8` | 8.0 [6.0, 10.0] | 55.0 [47.0, 62.0] | 20.7% [18.5%, 23.0%] | 55.9% [50.5%, 61.3%] |
 | `beats_iter3_plus:masked_mean` | 1.0 [1.0, 1.0] | 12.0 [9.0, 15.0] | 20.6% [18.3%, 23.0%] | 18.6% [15.1%, 22.3%] |
 | `beats_iter3_plus:temporal_pyramid_8` | 1.0 [1.0, 1.0] | 11.0 [8.0, 14.0] | 20.4% [18.0%, 22.7%] | 17.3% [14.1%, 20.9%] |
 | `cir_ast:official_clip` | 1.0 [1.0, 1.0] | 2.0 [2.0, 3.0] | 11.3% [9.1%, 13.5%] | 3.9% [2.6%, 5.4%] |
@@ -187,6 +192,8 @@ Per-preset accuracy averages Recall@1 across three assignment attempts within ea
 
 | Encoder arm | Median Per-preset R@1 [95% crossed CI] | 10th-percentile Per-preset R@1 [95% crossed CI] | Presets below 50% R@1 (count / total; share CI) |
 |---|---:|---:|---:|
+| `basic_pitch_trunk:masked_mean` | 12.0% [8.0%, 17.3%] | 3.3% [1.3%, 6.0%] | 117/129 (90.7% [86.0%, 96.1%]) |
+| `basic_pitch_trunk:temporal_pyramid_8` | 16.0% [10.7%, 20.7%] | 3.3% [1.3%, 6.0%] | 111/129 (86.0% [79.1%, 92.2%]) |
 | `beats_iter3_plus:masked_mean` | 60.0% [53.3%, 66.0%] | 36.5% [30.4%, 43.7%] | 41/129 (31.8% [19.4%, 44.2%]) |
 | `beats_iter3_plus:temporal_pyramid_8` | 62.0% [55.3%, 68.7%] | 36.9% [31.2%, 44.7%] | 40/129 (31.0% [18.6%, 41.1%]) |
 | `cir_ast:official_clip` | 87.3% [82.7%, 90.7%] | 68.7% [62.0%, 74.4%] | 1/129 (0.8% [0.0%, 3.9%]) |
@@ -202,6 +209,8 @@ Render-quality results for the expanded comparison-MIDI assignments (each encode
 
 | Encoder arm | Query WAV R@1: clean / warning | Correct-match gallery WAV R@1: clean / warning (overlap allowed) | Mean warned candidates / fraction of 129 (fraction CI) |
 |---|---|---|---:|
+| `basic_pitch_trunk:masked_mean` | clean 15.1% [11.3%, 19.6%] (n=3,778 unique pairs; m=11,334 assignment observations) / warning 26.6% [20.3%, 33.3%] (n=2,672 unique pairs; m=8,016 assignment observations) | clean 15.6% [11.6%, 20.2%] (n=4,390 unique pairs; m=11,334 assignment observations) / warning 23.1% [17.2%, 29.3%] (n=3,356 unique pairs; m=8,016 assignment observations) | 53.4 / 0.414 [0.398, 0.433] |
+| `basic_pitch_trunk:temporal_pyramid_8` | clean 17.9% [13.7%, 22.8%] (n=3,778 unique pairs; m=11,334 assignment observations) / warning 31.0% [24.2%, 38.7%] (n=2,672 unique pairs; m=8,016 assignment observations) | clean 18.6% [14.2%, 23.5%] (n=4,390 unique pairs; m=11,334 assignment observations) / warning 27.4% [20.8%, 34.0%] (n=3,356 unique pairs; m=8,016 assignment observations) | 53.4 / 0.414 [0.398, 0.433] |
 | `beats_iter3_plus:masked_mean` | clean 55.2% [49.3%, 60.8%] (n=3,778 unique pairs; m=11,334 assignment observations) / warning 68.6% [62.6%, 74.2%] (n=2,672 unique pairs; m=8,016 assignment observations) | clean 55.6% [49.7%, 61.0%] (n=4,390 unique pairs; m=11,334 assignment observations) / warning 65.9% [59.9%, 71.8%] (n=3,356 unique pairs; m=8,016 assignment observations) | 53.4 / 0.414 [0.398, 0.433] |
 | `beats_iter3_plus:temporal_pyramid_8` | clean 56.6% [51.0%, 62.0%] (n=3,778 unique pairs; m=11,334 assignment observations) / warning 70.2% [64.2%, 75.8%] (n=2,672 unique pairs; m=8,016 assignment observations) | clean 57.0% [51.4%, 62.1%] (n=4,390 unique pairs; m=11,334 assignment observations) / warning 66.9% [60.4%, 72.7%] (n=3,356 unique pairs; m=8,016 assignment observations) | 53.4 / 0.414 [0.398, 0.433] |
 | `cir_ast:official_clip` | clean 82.9% [78.7%, 86.6%] (n=3,778 unique pairs; m=11,334 assignment observations) / warning 87.7% [84.1%, 90.8%] (n=2,672 unique pairs; m=8,016 assignment observations) | clean 82.8% [78.5%, 86.4%] (n=4,390 unique pairs; m=11,334 assignment observations) / warning 86.2% [82.5%, 89.3%] (n=3,356 unique pairs; m=8,016 assignment observations) | 53.4 / 0.414 [0.398, 0.433] |
@@ -215,11 +224,13 @@ A long tail or high float peak is not an automatic failure. These descriptive st
 
 ### Audio quality checks
 
-**A — Original audio:** the 7-family benchmark above uses 6,480 accepted cached clips, with the original four-MIDI results retained. The supplementary analyses below retain their original six-family coverage until the Basic Pitch extension completes.
+**A — Original audio:** the expanded retrieval comparison above uses 7 encoder families and 6,480 accepted cached clips, with the original four-MIDI results retained.
 **B — Clean queries:** we re-summarized the existing cached-feature episode scores for queries whose WAVs had no QA warning. No model inference was repeated for this slice.
 
 | Encoder arm | Clean-query R@1 [crossed 95% CI] / R@5 / MRR | Queries |
 |---|---:|---:|
+| `basic_pitch_trunk:masked_mean` | 14.4% [9.4%, 20.0%] / 33.1% / 24.7% | 3,778 |
+| `basic_pitch_trunk:temporal_pyramid_8` | 16.1% [11.2%, 21.9%] / 38.2% / 27.8% | 3,778 |
 | `beats_iter3_plus:masked_mean` | 54.1% [43.6%, 64.0%] / 75.1% / 63.9% | 3,778 |
 | `beats_iter3_plus:temporal_pyramid_8` | 57.1% [47.2%, 66.6%] / 77.8% / 66.7% | 3,778 |
 | `cir_ast:official_clip` | 79.4% [72.2%, 85.8%] / 92.9% / 85.5% | 3,778 |
@@ -235,6 +246,8 @@ For a stricter check, we recomputed ranks after removing every warned candidate 
 
 | Encoder arm | Clean-gallery R@1 [crossed 95% CI] / R@5 / MRR | Clean queries |
 |---|---:|---:|
+| `basic_pitch_trunk:masked_mean` | 18.4% [14.0%, 23.4%] / 39.8% / 29.8% | 3,690 |
+| `basic_pitch_trunk:temporal_pyramid_8` | 21.6% [16.6%, 27.1%] / 44.8% / 33.5% | 3,690 |
 | `beats_iter3_plus:masked_mean` | 60.6% [55.1%, 65.9%] / 82.9% / 70.4% | 3,690 |
 | `beats_iter3_plus:temporal_pyramid_8` | 61.6% [56.1%, 66.6%] / 84.0% / 71.5% | 3,690 |
 | `cir_ast:official_clip` | 86.5% [82.8%, 89.8%] / 97.0% / 91.1% | 3,690 |
@@ -247,10 +260,12 @@ For a stricter check, we recomputed ranks after removing every warned candidate 
 Paired clean-gallery CIR minus BEATs temporal-pyramid ΔR@1: +24.8 pp [+20.8, +29.0].
 Clean/warning status is descriptive and may track preset acoustics; neither slice establishes a causal render-quality effect.
 
-**C — Gain-reduced warning sample:** a deterministic, stratified sample of 100 WAVs was drawn from 1,531 accepted amplitude-warning renders. Copies were reduced linearly to a 0.95 peak and all 6 encoder families re-embedded only those copies; original cached features supplied the unchanged queries/candidates. This is a sensitivity sample, not a corpus-wide accuracy estimate.
+**C — Gain-reduced warning sample:** a deterministic, stratified sample of 100 WAVs was drawn from 1,531 accepted amplitude-warning renders. Copies were reduced linearly to a 0.95 peak. New adjusted features were extracted only for Spotify Basic Pitch contour trunk; existing adjusted-feature caches were reused for the other 6 families. Original cached features supplied the unchanged queries/candidates. This is a sensitivity sample, not a corpus-wide accuracy estimate.
 
 | Encoder arm | Representation cosine distance (95% crossed CI) | Query R@1 before→after; changed / fixed / newly wrong | Correct gallery candidate R@1 before→after; changed / fixed / newly wrong | Δ target margin ×100 (cosine points; query / gallery) |
 |---|---:|---:|---:|---:|
+| `basic_pitch_trunk:masked_mean` | 0.0003 [0.0002, 0.0005] | 34.0%→32.0% (Δ -2.0 pp [-10.5, +6.1]); 13 / 2 / 4 | 28.0%→30.0% (Δ +2.0 pp [+0.0, +7.8]); 2 / 2 / 0 | -0.06 [-0.23, +0.09] / -0.03 [-0.19, +0.10] |
+| `basic_pitch_trunk:temporal_pyramid_8` | 0.0005 [0.0003, 0.0007] | 36.0%→34.0% (Δ -2.0 pp [-8.1, +0.0]); 7 / 0 / 2 | 33.0%→35.0% (Δ +2.0 pp [+0.0, +7.7]); 2 / 2 / 0 | -0.12 [-0.33, +0.06] / -0.05 [-0.19, +0.09] |
 | `beats_iter3_plus:masked_mean` | 0.0034 [0.0019, 0.0051] | 68.0%→67.0% (Δ -1.0 pp [-8.2, +4.8]); 5 / 1 / 2 | 69.0%→69.0% (Δ +0.0 pp [+0.0, +0.0]); 0 / 0 / 0 | -0.29 [-0.64, +0.05] / -0.22 [-0.47, +0.02] |
 | `beats_iter3_plus:temporal_pyramid_8` | 0.0030 [0.0017, 0.0045] | 71.0%→69.0% (Δ -2.0 pp [-8.2, +0.0]); 4 / 0 / 2 | 69.0%→67.0% (Δ -2.0 pp [-8.5, +0.0]); 2 / 0 / 2 | -0.27 [-0.53, -0.05] / -0.12 [-0.31, +0.06] |
 | `cir_ast:official_clip` | 0.0152 [0.0098, 0.0208] | 90.0%→87.0% (Δ -3.0 pp [-9.8, +0.0]); 4 / 0 / 3 | 87.0%→87.0% (Δ +0.0 pp [+0.0, +0.0]); 0 / 0 / 0 | -1.62 [-2.82, -0.61] / -1.34 [-2.14, -0.61] |

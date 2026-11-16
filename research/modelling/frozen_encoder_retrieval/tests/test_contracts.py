@@ -342,6 +342,9 @@ class EpisodeContractTests(unittest.TestCase):
 
 
 class FeatureAndManifestTests(unittest.TestCase):
+    def test_issue155_runner_exposes_basic_pitch_adapter_checkout(self):
+        self.assertIn(str(REPO / "research/modelling/basic_pitch"), sys.path)
+
     def test_issue155_report_quality_collapses_assignment_repeats_by_query(self):
         rows = []
         for state_id, family_id, midi_id, query_quality in (

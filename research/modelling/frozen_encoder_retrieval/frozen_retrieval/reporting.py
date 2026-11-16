@@ -546,8 +546,18 @@ def _issue155_followup_lines(results: dict, shortlist: dict | None) -> list[str]
     gain = results.get("gain_sensitivity", {})
     if gain.get("arms"):
         sample = gain.get("sample", {})
-        encoder_count = results.get("input_dataset", {}).get("encoder_families", len(MODEL_REGISTRY))
-        lines.extend(["", f"**C — Gain-reduced warning sample:** a deterministic, stratified sample of {sample.get('size', 0)} WAVs was drawn from {results.get('gain_warning_sample_selection', {}).get('accepted_amplitude_warning_wavs', 0):,} accepted amplitude-warning renders. Copies were reduced linearly to a 0.95 peak and all {encoder_count} encoder families re-embedded only those copies; original cached features supplied the unchanged queries/candidates. This is a sensitivity sample, not a corpus-wide accuracy estimate.", "",
+        extraction = gain.get("encoder_extraction", {})
+        new_families = [name for name, record in extraction.items() if record.get("newly_extracted_features", 0)]
+        reused_families = [name for name, record in extraction.items() if record.get("reused_features", 0)]
+        if new_families and reused_families:
+            extraction_note = (f"New adjusted features were extracted only for {', '.join(MODEL_REGISTRY[name]['name'] for name in new_families)}; "
+                               f"existing adjusted-feature caches were reused for the other {len(reused_families)} families.")
+        elif new_families:
+            extraction_note = "Adjusted features were extracted only for " + ", ".join(
+                MODEL_REGISTRY[name]["name"] for name in new_families) + "."
+        else:
+            extraction_note = "Existing adjusted-feature caches were reused; no encoder inference was repeated."
+        lines.extend(["", f"**C — Gain-reduced warning sample:** a deterministic, stratified sample of {sample.get('size', 0)} WAVs was drawn from {results.get('gain_warning_sample_selection', {}).get('accepted_amplitude_warning_wavs', 0):,} accepted amplitude-warning renders. Copies were reduced linearly to a 0.95 peak. {extraction_note} Original cached features supplied the unchanged queries/candidates. This is a sensitivity sample, not a corpus-wide accuracy estimate.", "",
             "| Encoder arm | Representation cosine distance (95% crossed CI) | Query R@1 before→after; changed / fixed / newly wrong | Correct gallery candidate R@1 before→after; changed / fixed / newly wrong | Δ target margin ×100 (cosine points; query / gallery) |",
             "|---|---:|---:|---:|---:|"])
         for arm, summary in sorted(gain["arms"].items()):

@@ -11,7 +11,8 @@ import time
 
 PACKAGE = Path(__file__).resolve().parent
 REPO = PACKAGE.parents[2]
-for directory in (REPO / "research/data_generation", REPO / "research/training", PACKAGE):
+for directory in (REPO / "research/data_generation", REPO / "research/training",
+                  REPO / "research/modelling/basic_pitch", PACKAGE):
     if str(directory) not in sys.path:
         sys.path.insert(0, str(directory))
 
