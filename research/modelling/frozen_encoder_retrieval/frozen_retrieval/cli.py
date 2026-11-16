@@ -61,6 +61,7 @@ def _parser() -> argparse.ArgumentParser:
     embed.add_argument("--device", choices=("cpu", "cuda", "xpu"), default="cpu")
     evaluate = commands.add_parser("evaluate", help="evaluate identical cached retrieval episodes and baselines")
     evaluate.add_argument("--dataset", type=Path, required=True)
+    evaluate.add_argument("--models", nargs="+", help="evaluate only these model families and extend an existing evaluation")
     report = commands.add_parser("report", help="regenerate the sanitized reader-facing comparison report")
     report.add_argument("--dataset", type=Path)
     report.add_argument("--comparison-dataset", type=Path,
@@ -69,6 +70,10 @@ def _parser() -> argparse.ArgumentParser:
     report.add_argument("--lock", type=Path)
     report.add_argument("--controlled-summary", type=Path,
                         help="private JSON produced by run_controlled_perturbation.py; adds a controlled-results section and inventory")
+    report.add_argument("--issue155-results", type=Path,
+                        help="private issue #155 assignment and audio-quality summary produced by run_issue155_validation.py")
+    report.add_argument("--candidate-shortlist", type=Path,
+                        help="private automated controlled-preset shortlist summary; no definitive controlled run is started")
     report.add_argument("--output", type=Path, default=defaults["report"])
     report.add_argument("--execution-note", default=None)
     return parser
@@ -105,7 +110,7 @@ def main(argv: list[str] | None = None) -> int:
             result = extract_dataset(args.dataset, args.model, args.checkpoint_root, args.lock, device=args.device)
         elif args.command == "evaluate":
             from .evaluation import evaluate_dataset
-            result = evaluate_dataset(args.dataset)
+            result = evaluate_dataset(args.dataset, models=args.models)
         elif args.command == "report":
             from .reporting import build_control_inventory, generate_report
             defaults = _defaults()
@@ -114,7 +119,9 @@ def main(argv: list[str] | None = None) -> int:
             result = generate_report(args.output, defaults["inventory"], dataset_dir=args.dataset,
                                      checkpoint_root=args.checkpoint_root, lock_path=args.lock,
                                      execution_note=args.execution_note, controlled_summary_path=args.controlled_summary,
-                                     comparison_dataset_dir=args.comparison_dataset)
+                                     comparison_dataset_dir=args.comparison_dataset,
+                                     issue155_results_path=args.issue155_results,
+                                     candidate_shortlist_path=args.candidate_shortlist)
         else:
             raise ValueError(f"unsupported command {args.command}")
     except Exception as error:

@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 import json
 from pathlib import Path
+from typing import Sequence
 
 from .core import (MODEL_REGISTRY, _rank_metrics, canonical_json, cluster_bootstrap, digest, mixed_gallery_midi_id,
                    paired_cluster_bootstrap, paired_performance_bootstrap, paired_two_way_cluster_bootstrap,
@@ -358,12 +359,22 @@ def _attach_render_quality(rows, episodes, candidates, pair_to_request, receipts
             gallery_requests = [pair_to_request.get((state_id, mixed_gallery_midi_id(episode, state_id, candidates)))
                                 for state_id in candidate_set["state_ids"]]
         gallery_statuses = [receipts.get(request_id, {}).get("qa_status") for request_id in gallery_requests]
-        gallery_bucket = "warning" if any(_render_quality_bucket(status) == "warning" for status in gallery_statuses) else "clean"
+        target_request = pair_to_request.get((episode["target_state_id"], episode["gallery_midi_id"]))
+        if episode["condition"] != "cross_midi_common_gallery":
+            target_request = pair_to_request.get((episode["target_state_id"],
+                                                  mixed_gallery_midi_id(episode, episode["target_state_id"], candidates)))
+        target_status = receipts.get(target_request, {}).get("qa_status") if target_request else None
         query_bucket = _render_quality_bucket(query_status)
         row["query_render_quality"] = query_bucket
-        row["gallery_render_quality"] = gallery_bucket
+        row["correct_match_gallery_render_quality"] = _render_quality_bucket(target_status)
+        warning_count = sum(_render_quality_bucket(status) == "warning" for status in gallery_statuses)
+        row["gallery_warning_candidate_count"] = warning_count
+        row["gallery_candidate_count"] = len(gallery_statuses)
+        row["gallery_warning_candidate_fraction"] = warning_count / len(gallery_statuses) if gallery_statuses else None
+        row["gallery_unknown_candidate_count"] = sum(_render_quality_bucket(status) == "excluded_or_unknown"
+                                                     for status in gallery_statuses)
         row["strata"] = {**row.get("strata", {}), "query_render_quality": query_bucket,
-                          "gallery_render_quality": gallery_bucket}
+                          "correct_match_gallery_render_quality": row["correct_match_gallery_render_quality"]}
     return rows
 
 
@@ -406,6 +417,17 @@ def _summary(rows):
     result = {key: (sum(row[key] for row in rows) / len(rows) if rows else None) for key in metrics}
     result["episodes"] = len(rows)
     result["gallery_size"] = sorted({row["gallery_size"] for row in rows})
+    quality_rows = [row for row in rows if row.get("gallery_candidate_count", 0)]
+    if quality_rows:
+        result["gallery_render_quality"] = {
+            "episodes": len(quality_rows),
+            "mean_warning_candidates": sum(row["gallery_warning_candidate_count"] for row in quality_rows) / len(quality_rows),
+            "mean_warning_candidate_fraction": sum(row["gallery_warning_candidate_fraction"] for row in quality_rows) / len(quality_rows),
+            "episodes_with_any_warning": sum(row["gallery_warning_candidate_count"] > 0 for row in quality_rows),
+            "episodes_with_all_candidates_warned": sum(row["gallery_warning_candidate_count"] == row["gallery_candidate_count"]
+                                                       for row in quality_rows),
+            "episodes_with_unknown_candidates": sum(row["gallery_unknown_candidate_count"] > 0 for row in quality_rows),
+        }
     diagnostic_metrics = ("same_midi_negative_win", "known_near_neighbor_negative_win", "acoustic_hard_negative_win")
     for key in diagnostic_metrics:
         observed = [row for row in rows if row[key] is not None]
@@ -428,7 +450,8 @@ def _strata(rows):
     axes = {key for row in rows for key in row.get("strata", {})
             if key in {"query_polyphony", "query_articulation", "query_expression", "query_duration_band",
                        "pitch_register_gap_band", "duration_gap_band", "query_note_density_band",
-                       "source_preset_lineage_group_size", "query_render_quality", "gallery_render_quality"}}
+                       "source_preset_lineage_group_size", "query_render_quality",
+                       "correct_match_gallery_render_quality"}}
     report = {}
     for axis in sorted(axes):
         groups = defaultdict(list)
@@ -491,8 +514,44 @@ def midi_shortcut_baseline(episodes, candidates, performances):
     return output
 
 
-def evaluate_dataset(dataset_dir: Path) -> dict:
+def evaluate_dataset(dataset_dir: Path, *, models: Sequence[str] | None = None) -> dict:
     dataset_dir = dataset_dir.resolve(strict=True)
+    selected_models = set(models) if models else None
+    if selected_models is not None and not selected_models.issubset(MODEL_REGISTRY):
+        raise ValueError(f"unknown encoder models: {sorted(selected_models - set(MODEL_REGISTRY))}")
+    previous_result, previous_rows, previous_common_by_condition, previous_hard_negatives = {}, [], {}, {}
+    if selected_models is not None:
+        result_path, rows_path = dataset_dir / "evaluation.private.json", dataset_dir / "episode_metrics.private.jsonl"
+        if not result_path.is_file() or not rows_path.is_file():
+            raise ValueError("selected-model evaluation requires an existing complete evaluation to extend")
+        previous_result = json.loads(result_path.read_text(encoding="utf-8"))
+        previous_rows = _jsonl(rows_path)
+        for row in previous_rows:
+            state_ids = row.get("acoustic_hard_negative_state_ids")
+            similarities = row.get("acoustic_hard_negative_selector_similarities")
+            if state_ids is None or similarities is None:
+                continue
+            if len(state_ids) != len(similarities):
+                raise ValueError("cached acoustic hard-negative states and selector scores disagree")
+            selected = list(zip(state_ids, similarities, strict=True))
+            episode_id = row["episode_id"]
+            if episode_id in previous_hard_negatives and previous_hard_negatives[episode_id] != selected:
+                raise ValueError(f"saved acoustic hard-negative selection differs across arms for {episode_id}")
+            previous_hard_negatives[episode_id] = selected
+        previous_arms = previous_result.get("available_arms", [])
+        for condition in ("cross_midi_common_gallery", "cross_midi_mixed_gallery"):
+            episode_ids_by_arm = [{row["episode_id"] for row in previous_rows
+                                   if row.get("arm") == arm and row.get("condition") == condition}
+                                  for arm in previous_arms]
+            if episode_ids_by_arm and any(episode_ids_by_arm) and not all(episode_ids_by_arm):
+                raise ValueError(f"existing evaluation is missing paired episode rows for {condition}")
+            previous_common_by_condition[condition] = (set.intersection(*episode_ids_by_arm)
+                if episode_ids_by_arm and all(episode_ids_by_arm) else set())
+        if selected_models & {arm.split(":", 1)[0] for arm in previous_result.get("available_arms", [])}:
+            previous_rows = [row for row in previous_rows if row.get("arm", "").split(":", 1)[0] not in selected_models]
+            previous_result["model_results"] = {arm: data for arm, data in previous_result.get("model_results", {}).items()
+                if arm.split(":", 1)[0] not in selected_models}
+            previous_result["available_arms"] = sorted(previous_result["model_results"])
     dataset_summary = json.loads((dataset_dir / "dataset_summary.private.json").read_text(encoding="utf-8"))
     validate_dataset_manifests(dataset_dir, dataset_summary)
     candidates = json.loads((dataset_dir / "candidate_sets.private.json").read_text(encoding="utf-8"))
@@ -511,6 +570,8 @@ def evaluate_dataset(dataset_dir: Path) -> dict:
         if not model_dir.is_dir() or not (model_dir / "feature_manifest.private.jsonl").is_file():
             continue
         model_name = model_dir.name
+        if selected_models is not None and model_name not in selected_models:
+            continue
         feature_manifest = _jsonl(model_dir / "feature_manifest.private.jsonl")
         feature_ids = {row["feature_id"] for row in feature_manifest}
         if len(feature_ids) != len(feature_manifest):
@@ -525,6 +586,8 @@ def evaluate_dataset(dataset_dir: Path) -> dict:
         variants = sorted({variant for row in loaded.values() for variant in row})
         for variant in variants:
             model_features[f"{model_name}:{variant}"] = (model_name, variant, loaded)
+    if selected_models is not None and not model_features:
+        raise ValueError(f"no extracted feature caches found for selected encoder models: {sorted(selected_models)}")
     conditions = ("cross_midi_common_gallery", "cross_midi_mixed_gallery")
     eligible_by_arm = {}
     for arm, (_, _, features) in model_features.items():
@@ -538,15 +601,26 @@ def evaluate_dataset(dataset_dir: Path) -> dict:
         common = {row["episode_id"] for row in qa_episodes if row["condition"] == condition}
         for valid_by_condition in eligible_by_arm.values():
             common &= valid_by_condition[condition]
+        if selected_models is not None:
+            prior_common = previous_common_by_condition[condition]
+            common &= prior_common
         common_by_condition[condition] = common if model_features else set()
-    acoustic_hard_negatives = (_acoustic_hard_negative_candidates(dataset_dir, qa_episodes, candidates,
-        pair_to_request, receipts) if model_features else {})
+    selected_episode_ids = {episode_id for episode_ids in common_by_condition.values() for episode_id in episode_ids}
+    acoustic_hard_negatives = {episode_id: previous_hard_negatives[episode_id] for episode_id in selected_episode_ids
+                               if episode_id in previous_hard_negatives}
+    missing_hard_negative_ids = selected_episode_ids - set(acoustic_hard_negatives)
+    if missing_hard_negative_ids:
+        missing_episodes = [episode for episode in qa_episodes if episode["episode_id"] in missing_hard_negative_ids]
+        acoustic_hard_negatives.update(_acoustic_hard_negative_candidates(
+            dataset_dir, missing_episodes, candidates, pair_to_request, receipts))
     coverage_by_condition = {}
     for condition in conditions:
         qa_counts = qa_summary["coverage_by_condition"].get(condition, {"planned_episodes": 0, "qa_qualified_episodes": 0,
                                                                           "excluded_episodes": 0, "missing_required_request_status_counts": {}})
+        prior_coverage = previous_result.get("coverage_by_condition", {}).get(condition, {})
         coverage_by_condition[condition] = {**qa_counts,
-            "feature_qualified_episodes_by_arm": {arm: len(rows[condition]) for arm, rows in sorted(eligible_by_arm.items())},
+            "feature_qualified_episodes_by_arm": {**prior_coverage.get("feature_qualified_episodes_by_arm", {}),
+                **{arm: len(rows[condition]) for arm, rows in sorted(eligible_by_arm.items())}},
             "common_feature_qualified_episodes_across_arms": len(common_by_condition[condition])}
     results = {}
     all_result_rows = {}
@@ -566,11 +640,25 @@ def evaluate_dataset(dataset_dir: Path) -> dict:
                 metric: two_way_cluster_bootstrap(rows, metric=metric) for metric in
                 ("recall_at_1", "recall_at_5", "mrr")} if rows else {})
             all_result_rows[arm][condition] = rows
-    arm_names = sorted(results)
-    differences, family_differences = {}, {}
+    new_result_rows = all_result_rows
+    new_arm_names = sorted(results)
+    arm_names = sorted(set(previous_result.get("available_arms", [])) | set(new_arm_names))
+    all_result_rows = {arm: {condition: [] for condition in conditions} for arm in arm_names}
+    for row in previous_rows:
+        if row.get("arm") in all_result_rows:
+            all_result_rows[row["arm"]][row["condition"]].append({key: value for key, value in row.items() if key != "arm"})
+    for arm in new_arm_names:
+        all_result_rows[arm] = new_result_rows[arm]
+    differences = dict(previous_result.get("paired_cluster_bootstrap_differences", {}))
+    family_differences = dict(previous_result.get("paired_family_bootstrap_differences", {}))
     for left_index, left_name in enumerate(arm_names):
         for right_name in arm_names[left_index + 1:]:
+            if left_name not in new_arm_names and right_name not in new_arm_names:
+                continue
             pair = f"{left_name} - {right_name}"
+            reverse_pair = f"{right_name} - {left_name}"
+            if pair in differences or reverse_pair in differences:
+                continue
             differences[pair], family_differences[pair] = {}, {}
             for condition in conditions:
                 left_rows = all_result_rows[left_name][condition]
@@ -598,7 +686,7 @@ def evaluate_dataset(dataset_dir: Path) -> dict:
                  "random": {condition: random_baseline([len(candidates[episode["candidate_set_id"]]["state_ids"])
                      for episode in paired_episodes if episode["condition"] == condition])
                      for condition in conditions if any(episode["condition"] == condition for episode in paired_episodes)}})
-    result = {"version": 1, "policy": "frozen_encoder_real_vital_cross_performance_v1",
+    result = {**previous_result, "version": 1, "policy": "frozen_encoder_real_vital_cross_performance_v1",
               "qa_qualification_id": qa_summary["qualification_id"],
               "common_episode_count_across_available_arms": len(paired_episodes),
               "coverage_by_condition": coverage_by_condition,
@@ -609,7 +697,7 @@ def evaluate_dataset(dataset_dir: Path) -> dict:
                     json.loads((dataset_dir / "candidate_sets.private.json").read_text(encoding="utf-8")).values()) -
                     sum(len(row["state_ids"]) for row in candidates.values()),
               "available_arms": arm_names, "unavailable_encoders": [name for name in MODEL_REGISTRY if not any(arm.startswith(name + ":") for arm in arm_names)],
-              "model_results": results, "paired_family_bootstrap_differences": family_differences,
+              "model_results": {**previous_result.get("model_results", {}), **results}, "paired_family_bootstrap_differences": family_differences,
               "paired_cluster_bootstrap_differences": differences, "ranking_stability_by_performance": ranking_stability,
               "acoustic_hard_negative_protocol": "For each query, rank same-MIDI candidate renders by cosine over normalized 64-bin log-frequency spectral power; score each model's cross-MIDI positive against the top five descriptor-selected negatives rendered on the query MIDI.",
               "midi_only_and_random_baselines": baseline,
@@ -618,8 +706,12 @@ def evaluate_dataset(dataset_dir: Path) -> dict:
               "primary_metric": "Recall@1", "gallery_candidate_set_is_identical_across_arms": True}
     (dataset_dir / "evaluation.private.json").write_text(json.dumps(result, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     with (dataset_dir / "episode_metrics.private.jsonl").open("w", encoding="utf-8", newline="\n") as stream:
+        for row in previous_rows:
+            stream.write(canonical_json(row) + "\n")
         for arm in arm_names:
-            for condition in all_result_rows[arm]:
-                for row in all_result_rows[arm][condition]:
+            if arm not in results:
+                continue
+            for condition in new_result_rows[arm]:
+                for row in new_result_rows[arm][condition]:
                     stream.write(json.dumps({"arm": arm, **row}, sort_keys=True, allow_nan=False, separators=(",", ":")) + "\n")
     return result

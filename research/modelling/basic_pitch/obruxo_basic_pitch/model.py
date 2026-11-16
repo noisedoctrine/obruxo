@@ -37,7 +37,7 @@ class BasicPitchICASSP2022(nn.Module):
         self.onset_bn = nn.BatchNorm2d(32, eps=1e-3, momentum=0.01)
         self.onset_conv2 = nn.Conv2d(33, 1, (3, 3))
 
-    def forward(self, audio: Tensor) -> dict[str, Tensor]:
+    def _validate_audio(self, audio: Tensor) -> None:
         if audio.ndim != 3 or audio.shape[1:] != (AUDIO_N_SAMPLES, 1):
             raise ValueError(
                 f"expected input shape [B,{AUDIO_N_SAMPLES},1], got {tuple(audio.shape)}"
@@ -45,11 +45,25 @@ class BasicPitchICASSP2022(nn.Module):
         if audio.dtype is not torch.float32:
             raise TypeError(f"expected torch.float32 input, got {audio.dtype}")
 
-        features = self.frontend(audio)
-
+    def _contour_trunk(self, features: Tensor) -> Tensor:
         contour = _pad(features, 1, 1, 19, 19)
-        contour = F.relu(self.contour_bn(self.contour_conv1(contour)))
-        contour = torch.sigmoid(self.contour_conv2(_pad(contour, 2, 2, 2, 2)))
+        return F.relu(self.contour_bn(self.contour_conv1(contour)))
+
+    def forward_trunk(self, audio: Tensor) -> Tensor:
+        """Return the contour-branch map before its output layer.
+
+        The frozen feature tap has shape [B, 8, 172, 264]: eight learned
+        channels over 172 frames and the three-bin-per-semitone contour grid.
+        It is a framewise activation map, not a global audio embedding.
+        """
+        self._validate_audio(audio)
+        return self._contour_trunk(self.frontend(audio))
+
+    def forward(self, audio: Tensor) -> dict[str, Tensor]:
+        self._validate_audio(audio)
+        features = self.frontend(audio)
+        contour_trunk = self._contour_trunk(features)
+        contour = torch.sigmoid(self.contour_conv2(_pad(contour_trunk, 2, 2, 2, 2)))
 
         note = contour
         note = F.relu(self.note_conv1(_pad(note, 3, 3, 2, 2)))

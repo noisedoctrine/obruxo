@@ -48,6 +48,16 @@ python research/modelling/frozen_encoder_retrieval/run.py embed `
 python research/modelling/frozen_encoder_retrieval/run.py evaluate `
   --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation
 
+# Add a newly extracted family to an existing evaluation without recomputing the other arms:
+python research/modelling/frozen_encoder_retrieval/run.py embed `
+  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-train-midi-v3-50 `
+  --model basic_pitch_trunk --checkpoint-root research/modelling/frozen_encoder_retrieval/local_checkpoints `
+  --lock research/modelling/frozen_encoder_retrieval/local_checkpoints/checkpoint-lock.json --device xpu
+
+python research/modelling/frozen_encoder_retrieval/run.py evaluate `
+  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-train-midi-v3-50 `
+  --models basic_pitch_trunk
+
 python research/modelling/frozen_encoder_retrieval/run.py report `
   --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation
 ```
@@ -78,6 +88,39 @@ The plan, renderer, and feature extraction are separate commands. The render com
 
 Private manifests, WAVs, checkpoint files, feature arrays, and per-episode scores belong in the ignored `outputs/` and `local_checkpoints/` directories, never in Git. The report generator publishes only aggregate counts and metrics.
 
+## Issue #155 follow-up
+
+The follow-up reuses the expanded dataset's accepted renders and feature caches. It scores three fixed common-gallery MIDI offsets, recomputes clean-query and warning-free-gallery ranks, then re-embeds only 100 gain-reduced amplitude-warning WAVs across the evaluated encoder families. The separate encoder-blind preset screen renders short and long held/phrased examples and writes private before/after/repeat listening WAVs. It stops at the shortlist; the final controlled diagnostic requires the user's choice. Run the shortlist script with the Vital-rendering Python environment that has DawDreamer installed; the pinned benchmark environment is sufficient for cached-feature evaluation.
+
+```powershell
+python research/modelling/frozen_encoder_retrieval/run_issue155_validation.py `
+  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-train-midi-v3-50 `
+  --checkpoint-root research/modelling/frozen_encoder_retrieval/local_checkpoints `
+  --lock research/modelling/frozen_encoder_retrieval/local_checkpoints/checkpoint-lock.json `
+  --output research/modelling/frozen_encoder_retrieval/outputs/issue155-validation `
+  --device xpu --gallery-offsets 1 7 19 --sample-count 100
+
+python research/modelling/frozen_encoder_retrieval/run_controlled_candidate_shortlist.py `
+  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-train-midi-v3-50 `
+  --renderer-config research/data_generation/configs/renderer_full_corpus.yaml `
+  --plugin-path 'C:\Program Files\Common Files\VST3\Vital.vst3' `
+  --output research/modelling/frozen_encoder_retrieval/outputs/issue155-controlled-candidates
+
+python research/modelling/frozen_encoder_retrieval/run.py report `
+  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-train-midi-v3-50 `
+  --comparison-dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-real-cross-v2b `
+  --checkpoint-root research/modelling/frozen_encoder_retrieval/local_checkpoints `
+  --lock research/modelling/frozen_encoder_retrieval/local_checkpoints/checkpoint-lock.json `
+  --controlled-summary research/modelling/frozen_encoder_retrieval/outputs/issue152-controlled-midi-v3-50/controlled_summary.private.json `
+  --issue155-results research/modelling/frozen_encoder_retrieval/outputs/issue155-validation/issue155_validation_summary.private.json `
+  --candidate-shortlist research/modelling/frozen_encoder_retrieval/outputs/issue155-controlled-candidates/controlled_candidate_shortlist.private.json `
+  --output research/modelling/frozen_encoder_retrieval/reports/FROZEN_ENCODER_RETRIEVAL_RESULTS.md
+```
+
+The report step uses Matplotlib to write the embedded PNG summaries under `reports/figures/`; it reads cached evaluations and shortlist measurements and does not run encoder inference or rendering.
+
+The private shortlist, WAVs and adjusted feature caches remain under ignored `outputs/`. Read `controlled_candidate_shortlist.private.md` and listen to its linked examples before choosing candidates; do not start `run_controlled_perturbation.py` until that selection is approved.
+
 ## Frozen candidates and adapters
 
 Checkpoint acquisition is separate from benchmark execution. The runner sets Hugging Face offline mode and only loads local files; it never downloads or substitutes weights. Fill a local lock from exact downloads and compatible source checkouts using [checkpoint-lock.example.json](checkpoint-lock.example.json). Every selected checkpoint records its HF/source revision, SHA-256, loader revision, runtime package versions, and terms status. Use `license_status: approved` for terms cleared for this use or `research-use-unverified` when locally authorized research proceeds while terms remain unresolved; only `explicitly-prohibited` stops extraction. MuQ-MuLan is used only for non-commercial research. This benchmark keeps all checkpoints local and does not redistribute weights; that does not clear future deployment or distribution. CIR and BEATs are evaluated with unresolved checkpoint-term notes retained in the report. MuQ-MuLan and CIR also require separately pinned local architecture/config assets; a cold cache fails during preflight instead of reaching the network. The exact BEATs mirror SHA from the issue comment is enforced.
@@ -85,13 +128,14 @@ Checkpoint acquisition is separate from benchmark execution. The runner sets Hug
 | Arm | Exact checkpoint and feature | Input rate | Output |
 |---|---|---:|---:|
 | LAION-CLAP Music | `lukewys/laion_clap/music_audioset_epoch_15_esc_90.14.pt`; `HTSAT-base`, `enable_fusion=False`; official clip embedding | 48 kHz | 512-D |
+| Spotify Basic Pitch contour trunk | Pinned ICASSP-2022 checkpoint; post-BN/ReLU `contour_conv1` map, pooled from three contour bins to 88 semitones | 22.05 kHz | 704-D per frame |
 | MuQ-MuLan | `OpenMuQ/MuQ-MuLan-large/pytorch_model.bin`; audio branch official latent | 24 kHz | 512-D |
 | CIR single-timbre AST | Authors' `ICASSP26_inst-direct-with-data-aug_final.pt`, not the Triplet checkpoint; mean of final CLS and distillation tokens | 16 kHz | 768-D |
 | BEATs iter3+ AS2M | `lpepino/beats_ckpts/BEATs_iter3_plus_AS2M.pt`; pretrained, not AudioSet cpt1/cpt2; pre-predictor sequence | 16 kHz | 768-D per frame |
 | Meta EnCodec | `facebook/encodec_24khz`; continuous mono encoder output before RVQ | 24 kHz | 128-D per frame |
 | Descript DAC | `descript/dac_44khz`; continuous mono encoder output before RVQ | 44.1 kHz | 1024-D per frame |
 
-Clip adapters use the official clip latent. Sequence adapters are frozen/eval, FP32, and return both a valid-frame temporal mean and an eight-bin ordered mean/std representation. BEATs flattened patches are reshaped by its 128-bin mel-frequency patch count, then frequency-averaged to a time sequence; partial final time patches are excluded. No padded frame enters a pool. Cosine scoring normalizes each cached output at evaluation time. Stereo is averaged to mono and resampling uses SciPy polyphase resampling. No shared gain normalization is applied; EnCodec's own checkpoint-configured RMS normalization is retained when enabled.
+Clip adapters use the official clip latent. Sequence adapters are frozen/eval, FP32, and return both a valid-frame temporal mean and an eight-bin ordered mean/std representation. Basic Pitch input is windowed using its fixed two-second context and overlap; its contour-branch hidden map is averaged across the three sub-semitone contour bins before flattening channels × semitones into each frame. Basic Pitch's pretrained objective is note transcription, so this representation is an exploratory performance-feature baseline, not a timbre-trained embedding. BEATs flattened patches are reshaped by its 128-bin mel-frequency patch count, then frequency-averaged to a time sequence; partial final time patches are excluded. No padded frame enters a pool. Cosine scoring normalizes each cached output at evaluation time. Stereo is averaged to mono and resampling uses SciPy polyphase resampling. No shared gain normalization is applied; EnCodec's own checkpoint-configured RMS normalization is retained when enabled.
 
 ## What is executed in this checkout
 

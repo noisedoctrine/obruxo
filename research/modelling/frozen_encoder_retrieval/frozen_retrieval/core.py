@@ -10,6 +10,13 @@ from typing import Iterable, Sequence
 
 POLICY_ID = "cross_performance_retrieval_v2"
 MODEL_REGISTRY = {
+    "basic_pitch_trunk": {"name": "Spotify Basic Pitch contour trunk", "sample_rate": 22_050, "kind": "sequence", "dimension": 704,
+                          "checkpoint": "obruxo/basic_pitch_icassp_2022.pt", "source": "https://github.com/spotify/basic-pitch",
+                          "repository_id": "spotify/basic-pitch",
+                          "loader_revision": "obruxo_basic_pitch@frozen_contour_trunk_v1",
+                          "expected_sha256": "6c8869af67af45472827bb68b4d1a99e78fe3d5e7b6dd41132ac5df609f0cb55",
+                          "tap": "post-BN/ReLU contour_conv1; average 3 bins per semitone, flatten 8 channels × 88 pitches",
+                          "license": "Apache-2.0 (pinned Spotify Basic Pitch ICASSP 2022 checkpoint)"},
     "clap_music": {"name": "LAION-CLAP Music HTSAT-base", "sample_rate": 48_000, "kind": "clip", "dimension": 512,
                    "checkpoint": "lukewys/laion_clap/music_audioset_epoch_15_esc_90.14.pt", "source": "https://huggingface.co/lukewys/laion_clap",
                    "repository_id": "lukewys/laion_clap",
