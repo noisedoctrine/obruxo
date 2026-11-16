@@ -6,6 +6,20 @@ Issues: [#152](https://github.com/noisedoctrine/obruxo/issues/152) baseline and 
 
 **Primary expanded-cohort result:** CIR single-timbre AST (official_clip) ranked the correct preset first in 81.4% of cross-MIDI queries (n=6,450 queries, 129 candidate presets; 50 MIDI performances from `train`, distinct from the earlier validation-source MIDI cohort). This ranks frozen representations across 7 model families; it is retrieval evidence, not a reconstruction result.
 
+### How to read these tests
+
+Call a recording `A1` when **preset A plays MIDI 1**. `A2` is the same preset playing MIDI 2; `B1` is a **different preset playing MIDI 1**. Higher cosine similarity means the encoder considers two recordings more alike.
+
+**Main retrieval (R@1, R@5, MRR).** Start with `A1`. Choose the correct preset from all 129 candidate presets playing **MIDI 2**: `A2` is the correct answer; `B2`, `C2`, etc. are wrong. R@1 is how often A2 ranks first; R@5 is how often it ranks in the top five; MRR rewards higher ranks (rank 1 scores 1, rank 2 scores 1/2, rank 5 scores 1/5). Ties are scored fractionally.
+
+**Same-MIDI hard negatives.** This is a *separate* check: does `similarity(A1, A2) > similarity(A1, B1)` for **every one of the 128 other presets** B? A2 has different MIDI but the right preset; every B1 has the wrong preset but exactly the same MIDI as the input. One B1 beating or tying A2 counts as a failure.
+
+**Acoustic top-five hard negatives.** Use the same A1-versus-A2 comparison, but test against **five** B1 candidates rather than all 128. Choose those five in advance by looking for the wrong-preset recordings with the most similar **coarse frequency-energy profiles** to A1 (64 frequency bands). This selection uses the audio waveform, not the encoder being evaluated. "Acoustic" does **not** mean a person judged the sounds similar.
+
+**Known-related-preset negatives.** Choose B because the source data identifies it as a related version of A, rather than selecting it by audio similarity. No eligible related-preset pairs were present in this cohort, so this check has no score.
+
+**Do not compare the two hard-negative percentages directly.** Beating five selected wrong presets is a different test from beating all 128. Compare *encoders within the same column*, not the two columns as if they were equally difficult. Neither hard-negative score is the main 129-preset retrieval accuracy.
+
 ### Expanded held-out performance cohort: 50 selected MIDI IDs; 50 with evaluated queries; 6450 common-gallery episodes
 Validation preset gallery: 131 verified states; performances sourced from `train`. Reserved test and confirmation sources used: **no**.
 Performance selection: deterministic coverage-balanced sample of 50 from 96 compatible IDs; 46 sampled out and 0 exact-ID overlaps excluded.
@@ -77,7 +91,7 @@ In the separate test of three comparison-MIDI assignments, CIR single-timbre AST
 
 ![Encoder × metric heatmap](figures/issue155_encoder_metric_heatmap.png)
 
-All evaluated arms on the 50-performance cohort; colors show the retrieval and hard-negative percentages from the table.
+All evaluated arms on the 50-performance cohort. Same-MIDI negatives test against every other preset; acoustic negatives test against only five preselected sounds. Compare encoders within each metric, not the two hard-negative percentages against each other.
 
 **Correct-preset rank distribution**
 
@@ -154,6 +168,8 @@ Performance-level rank stability (50 MIDI identities; the aggregate-best pooling
 ### How retrieval fails
 
 Rank distributions and near/far shares use each of the three assignment attempts for 6,450 paired preset × MIDI queries (19,350 attempts per encoder). Rank is the average position among tied scores; near misses have expected rank >1 and ≤5, and far failures have expected rank >5. Crossed bootstrap resamples 50 MIDI performances and 129 preset-family clusters, keeping a query's three assignment attempts together and using the same resamples for every encoder.
+
+A correct preset at rank 1 is a success; rank 4 is a near miss; rank 20 is a far failure. These categories apply to each individual search, not an average of several searches.
 
 | Encoder arm | Median expected rank per attempt [95% crossed CI] | 90th-percentile expected rank per attempt [95% crossed CI] | Near-miss attempts (expected rank >1 to 5) | Far-failure attempts (expected rank >5) |
 |---|---:|---:|---:|---:|
