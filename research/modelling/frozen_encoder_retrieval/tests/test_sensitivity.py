@@ -8,8 +8,9 @@ import pytest
 torch = pytest.importorskip("torch")
 
 from frozen_retrieval.sensitivity import (anchored_metrics_from_distances, cosine_distance_matrices,
-                                          four_anchor_distances, normalize_embedding_grid, summarize_arm,
-                                          variance_decomposition)
+                                          four_anchor_distances, normalize_embedding_grid,
+                                          _paired_effect_summary, _sample_distinct_original_pairs,
+                                          summarize_arm, variance_decomposition)
 
 
 def test_all_four_anchored_orientations_match_straightforward_reference():
@@ -57,6 +58,28 @@ def test_worked_examples_and_tie_and_zero_distance_handling():
     assert not edge["preset_dominant"][2] and not edge["midi_dominant"][2]
 
 
+def test_bootstrap_pair_sampling_excludes_duplicate_identities_and_uses_multiplicity_weights():
+    resampled = np.array([0, 1, 0, 2])  # A, B, A, C
+    pair_first, pair_second = np.triu_indices(3, k=1)
+    first, second = _sample_distinct_original_pairs(
+        resampled, pair_first, pair_second, sample_count=20_000, generator=np.random.default_rng(157))
+    assert np.all(first != second)
+    pair_counts = {(left, right): int(np.count_nonzero((first == left) & (second == right)))
+                   for left, right in ((0, 1), (0, 2), (1, 2))}
+    frequencies = np.asarray([pair_counts[(0, 1)], pair_counts[(0, 2)], pair_counts[(1, 2)]]) / len(first)
+    np.testing.assert_allclose(frequencies, [0.4, 0.4, 0.2], atol=0.015)
+    with pytest.raises(ValueError, match="at least two distinct source identities"):
+        _sample_distinct_original_pairs(np.array([1, 1, 1]), pair_first, pair_second, sample_count=5,
+                                        generator=np.random.default_rng(158))
+
+
+def test_paired_effect_uses_full_cohort_estimates_and_bootstrap_only_for_interval():
+    result = _paired_effect_summary(0.314, 0.171, np.array([0.25, 0.35]), np.array([0.21, 0.28]))
+    assert result["difference"] == pytest.approx(0.143)
+    assert result["difference"] != pytest.approx(np.mean(np.array([0.25, 0.35]) - np.array([0.21, 0.28])))
+    assert result["confidence_interval_95"] == pytest.approx([0.04075, 0.06925])
+
+
 def test_normalization_counts_zero_norm_and_rejects_nonfinite_vectors():
     with pytest.raises(ValueError, match="zero_norm=1"):
         normalize_embedding_grid(torch.tensor([[[0.0, 0.0]], [[1.0, 0.0]]]))
@@ -93,8 +116,8 @@ def test_chunked_exhaustive_summary_and_bootstrap(tmp_path):
     generator = torch.Generator().manual_seed(158)
     grid = normalize_embedding_grid(torch.rand((3, 4, 6), generator=generator))[0]
     rng = np.random.default_rng(159)
-    preset_draws = rng.integers(0, 3, size=(100, 3), dtype=np.int16)
-    midi_draws = rng.integers(0, 4, size=(100, 4), dtype=np.int8)
+    preset_draws = np.tile(np.array([0, 0, 1], dtype=np.int16), (100, 1))
+    midi_draws = np.tile(np.array([0, 0, 1, 2], dtype=np.int8), (100, 1))
     point, bootstrap = summarize_arm(grid, chunk_preset_pairs=2, temp_dir=tmp_path,
                                      bootstrap_replicates=100, bootstrap_combinations=1_024,
                                      preset_draws=preset_draws, midi_draws=midi_draws, device=torch.device("cpu"))

@@ -108,21 +108,21 @@ The two distance columns show their absolute scale as well as their contrast. Th
 
 | Representation | Existing R@1 | Mean distance: same preset / different MIDI | Mean distance: different preset / same MIDI | Mean Δ (MIDI − preset) | Median ratio [P10, P90] | Mean normalized margin | Preset-dominant anchors |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| Spotify Basic Pitch contour trunk — `masked_mean` | 19.5% | 0.083 [0.072, 0.092] | 0.135 [0.122, 0.145] | -0.052 [-0.065, -0.040] | 0.607 [0.144, 1.801] | 0.234 [0.187, 0.295] | 71.8% [67.0, 76.5]% |
-| Spotify Basic Pitch contour trunk — `temporal_pyramid_8` | 21.9% | 0.137 [0.122, 0.148] | 0.188 [0.175, 0.198] | -0.051 [-0.067, -0.039] | 0.738 [0.270, 1.635] | 0.159 [0.124, 0.215] | 68.9% [63.9, 74.2]% |
-| BEATs iter3+ AS2M — `masked_mean` | 59.3% | 0.264 [0.235, 0.281] | 0.507 [0.486, 0.520] | -0.243 [-0.273, -0.215] | 0.511 [0.193, 1.011] | 0.327 [0.291, 0.373] | 89.6% [86.1, 91.9]% |
-| BEATs iter3+ AS2M — `temporal_pyramid_8` | 62.2% | 0.294 [0.264, 0.310] | 0.470 [0.448, 0.484] | -0.176 [-0.202, -0.155] | 0.619 [0.314, 1.089] | 0.236 [0.208, 0.278] | 86.3% [82.3, 89.2]% |
-| CIR single-timbre AST — `official_clip` | 81.4% | 0.472 [0.427, 0.497] | 0.959 [0.945, 0.958] | -0.487 [-0.526, -0.453] | 0.481 [0.212, 0.803] | 0.365 [0.335, 0.402] | 98.2% [96.6, 98.2]% |
-| LAION-CLAP Music HTSAT-base — `official_clip` | 58.9% | 0.303 [0.271, 0.324] | 0.601 [0.573, 0.619] | -0.298 [-0.335, -0.265] | 0.485 [0.197, 0.995] | 0.339 [0.303, 0.383] | 90.2% [86.6, 92.4]% |
-| Descript Audio Codec 44.1 kHz — `masked_mean` | 31.4% | 0.205 [0.161, 0.241] | 0.684 [0.591, 0.747] | -0.479 [-0.549, -0.396] | 0.208 [0.022, 1.444] | 0.508 [0.452, 0.561] | 85.0% [81.7, 87.6]% |
-| Descript Audio Codec 44.1 kHz — `temporal_pyramid_8` | 30.7% | 0.126 [0.105, 0.141] | 0.318 [0.289, 0.342] | -0.192 [-0.218, -0.167] | 0.351 [0.088, 1.313] | 0.408 [0.361, 0.459] | 84.5% [80.9, 87.3]% |
-| Meta EnCodec 24 kHz — `masked_mean` | 24.2% | 0.009 [0.007, 0.010] | 0.025 [0.020, 0.029] | -0.016 [-0.020, -0.012] | 0.313 [0.039, 1.845] | 0.410 [0.354, 0.471] | 79.7% [75.9, 83.1]% |
-| Meta EnCodec 24 kHz — `temporal_pyramid_8` | 23.4% | 0.022 [0.018, 0.025] | 0.047 [0.040, 0.054] | -0.025 [-0.031, -0.019] | 0.477 [0.111, 1.608] | 0.313 [0.266, 0.372] | 78.0% [74.0, 81.9]% |
-| MuQ-MuLan — `official_clip` | 30.2% | 0.312 [0.289, 0.323] | 0.411 [0.384, 0.429] | -0.099 [-0.132, -0.072] | 0.758 [0.307, 1.684] | 0.137 [0.107, 0.186] | 67.2% [62.8, 71.8]% |
+| Spotify Basic Pitch contour trunk — `masked_mean` | 19.5% | 0.083 [0.074, 0.094] | 0.135 [0.123, 0.146] | -0.052 [-0.065, -0.039] | 0.607 [0.144, 1.801] | 0.234 [0.179, 0.291] | 71.8% [66.8, 76.6]% |
+| Spotify Basic Pitch contour trunk — `temporal_pyramid_8` | 21.9% | 0.137 [0.125, 0.150] | 0.188 [0.177, 0.199] | -0.051 [-0.066, -0.037] | 0.738 [0.270, 1.635] | 0.159 [0.113, 0.209] | 68.9% [63.9, 74.2]% |
+| BEATs iter3+ AS2M — `masked_mean` | 59.3% | 0.264 [0.240, 0.287] | 0.507 [0.490, 0.523] | -0.243 [-0.272, -0.214] | 0.511 [0.193, 1.011] | 0.327 [0.286, 0.370] | 89.6% [86.5, 92.5]% |
+| BEATs iter3+ AS2M — `temporal_pyramid_8` | 62.2% | 0.294 [0.270, 0.316] | 0.470 [0.452, 0.487] | -0.176 [-0.200, -0.153] | 0.619 [0.314, 1.089] | 0.236 [0.202, 0.272] | 86.3% [82.5, 89.7]% |
+| CIR single-timbre AST — `official_clip` | 81.4% | 0.472 [0.437, 0.508] | 0.959 [0.952, 0.965] | -0.487 [-0.524, -0.451] | 0.481 [0.212, 0.803] | 0.365 [0.332, 0.400] | 98.2% [97.3, 98.9]% |
+| LAION-CLAP Music HTSAT-base — `official_clip` | 58.9% | 0.303 [0.275, 0.330] | 0.601 [0.577, 0.624] | -0.298 [-0.334, -0.263] | 0.485 [0.197, 0.995] | 0.339 [0.299, 0.381] | 90.2% [87.1, 93.0]% |
+| Descript Audio Codec 44.1 kHz — `masked_mean` | 31.4% | 0.205 [0.164, 0.245] | 0.684 [0.597, 0.754] | -0.479 [-0.550, -0.397] | 0.208 [0.022, 1.444] | 0.508 [0.452, 0.565] | 85.0% [81.9, 88.0]% |
+| Descript Audio Codec 44.1 kHz — `temporal_pyramid_8` | 30.7% | 0.126 [0.107, 0.145] | 0.318 [0.292, 0.344] | -0.192 [-0.218, -0.166] | 0.351 [0.088, 1.313] | 0.408 [0.358, 0.460] | 84.5% [81.1, 87.9]% |
+| Meta EnCodec 24 kHz — `masked_mean` | 24.2% | 0.009 [0.007, 0.010] | 0.025 [0.020, 0.029] | -0.016 [-0.020, -0.012] | 0.313 [0.039, 1.845] | 0.410 [0.351, 0.471] | 79.7% [76.0, 83.4]% |
+| Meta EnCodec 24 kHz — `temporal_pyramid_8` | 23.4% | 0.022 [0.019, 0.026] | 0.047 [0.040, 0.054] | -0.025 [-0.031, -0.019] | 0.477 [0.111, 1.608] | 0.313 [0.260, 0.370] | 78.0% [73.9, 82.2]% |
+| MuQ-MuLan — `official_clip` | 30.2% | 0.312 [0.295, 0.330] | 0.411 [0.387, 0.432] | -0.099 [-0.129, -0.069] | 0.758 [0.307, 1.684] | 0.137 [0.099, 0.178] | 67.2% [62.5, 71.7]% |
 
-The practical ranking depends on the question. CIR had the strongest retrieval result (81.4%) and was preset-dominant on 98.2% of anchors, with a mean margin of +0.365. DAC `masked_mean` had a larger mean margin (+0.508 [+0.452, +0.561]); its paired difference from CIR was +0.139 [+0.095, +0.182]. But DAC's existing R@1 was only 31.4%, so stronger average separation did not make it the better retrieval encoder. EnCodec `masked_mean` illustrates why ratios need an absolute scale: its median ratio was 0.313, but its mean MIDI and preset distances were only 0.0085 and 0.0245, with 24.2% R@1.
+The practical ranking depends on the question. CIR had the strongest retrieval result (81.4%) and was preset-dominant on 98.2% of anchors, with a mean margin of +0.365. DAC `masked_mean` had a larger mean margin (+0.508 [+0.452, +0.565]); its paired difference from CIR was +0.143 [+0.098, +0.186]. But DAC's existing R@1 was only 31.4%, so stronger average separation did not make it the better retrieval encoder. EnCodec `masked_mean` illustrates why ratios need an absolute scale: its median ratio was 0.313, but its mean MIDI and preset distances were only 0.0085 and 0.0245, with 24.2% R@1.
 
-The population above is exhaustively derived from `129 × 50 = 6450` cached recordings per representation: `10,113,600` unordered choices of two presets and two performances, with four separate anchors each. Those 40,454,400 dependent anchor observations are not independent samples. The 95% intervals resample the 129 source-family clusters and 50 MIDI identities in crossed draws shared by every arm; within each resample, 32,768 combinations approximate the full pair average. Full-cohort point summaries use every combination. The subset is a deterministic, coverage-balanced performance cohort, so these intervals do not replace an independent confirmation cohort.
+The population above is exhaustively derived from `129 × 50 = 6450` cached recordings per representation: `10,113,600` unordered choices of two presets and two performances, with four separate anchors each. Those 40,454,400 dependent anchor observations are not independent samples. The 95% intervals resample the 129 source-family clusters and 50 MIDI identities in crossed draws shared by every arm. For anchored distances, 32,768 combinations approximate the full pair average using two distinct original presets and two distinct original performances. If a bootstrap draw contains preset A twice and preset B once, the A–B pair receives twice the weight; A–A is excluded. Variance-share intervals resample the full crossed matrix using the same cluster draws. Full-cohort point summaries use every combination. The subset is a deterministic, coverage-balanced performance cohort, so these intervals do not replace an independent confirmation cohort.
 
 The next table shows how the average margin varies across individual presets and performances. These percentile ranges describe the selected cohort; they are not extra independent-sample confidence intervals.
 
@@ -176,20 +176,20 @@ The decomposition asks how normalized embedding positions vary over the full bal
 | Meta EnCodec 24 kHz — `temporal_pyramid_8` | 58.4% [53.5, 64.4]% | 11.2% [9.0, 13.8]% | 30.4% [26.0, 34.3]% |
 | MuQ-MuLan — `official_clip` | 40.6% [38.0, 44.9]% | 20.8% [18.7, 23.3]% | 38.6% [35.5, 40.1]% |
 
-Paired against CIR single-timbre AST — `official_clip`; positive changes mean a larger preset-over-MIDI margin or a larger preset-dominant share.
+Paired against CIR single-timbre AST — `official_clip`; estimates are differences between observed full-cohort summaries, while intervals use the paired crossed-bootstrap differences. Positive changes mean a larger preset-over-MIDI margin or a larger preset-dominant share.
 
 | Representation | Δ mean margin [paired 95% CI] | Δ preset-dominant share, percentage points [paired 95% CI] |
 |---|---:|---:|
-| Spotify Basic Pitch contour trunk — `masked_mean` | -0.128 [-0.175, -0.082] | -25.8 pp [-30.3, -21.2] pp |
-| Spotify Basic Pitch contour trunk — `temporal_pyramid_8` | -0.201 [-0.245, -0.156] | -28.6 pp [-33.3, -23.6] pp |
-| BEATs iter3+ AS2M — `masked_mean` | -0.037 [-0.059, -0.016] | -8.4 pp [-10.8, -6.1] pp |
-| BEATs iter3+ AS2M — `temporal_pyramid_8` | -0.125 [-0.149, -0.101] | -11.6 pp [-14.7, -8.7] pp |
-| LAION-CLAP Music HTSAT-base — `official_clip` | -0.026 [-0.048, -0.004] | -7.8 pp [-10.4, -5.6] pp |
-| Descript Audio Codec 44.1 kHz — `masked_mean` | 0.139 [0.095, 0.182] | -12.9 pp [-15.6, -10.3] pp |
-| Descript Audio Codec 44.1 kHz — `temporal_pyramid_8` | 0.042 [0.003, 0.083] | -13.3 pp [-16.2, -10.3] pp |
-| Meta EnCodec 24 kHz — `masked_mean` | 0.043 [-0.008, 0.092] | -18.0 pp [-21.3, -14.7] pp |
-| Meta EnCodec 24 kHz — `temporal_pyramid_8` | -0.051 [-0.098, -0.001] | -19.7 pp [-23.3, -15.9] pp |
-| MuQ-MuLan — `official_clip` | -0.222 [-0.258, -0.189] | -30.2 pp [-34.6, -25.9] pp |
+| Spotify Basic Pitch contour trunk — `masked_mean` | -0.131 [-0.181, -0.085] | -26.4 pp [-31.1, -21.9] pp |
+| Spotify Basic Pitch contour trunk — `temporal_pyramid_8` | -0.207 [-0.252, -0.161] | -29.3 pp [-34.2, -24.4] pp |
+| BEATs iter3+ AS2M — `masked_mean` | -0.038 [-0.061, -0.016] | -8.6 pp [-11.1, -6.3] pp |
+| BEATs iter3+ AS2M — `temporal_pyramid_8` | -0.129 [-0.153, -0.105] | -12.0 pp [-15.2, -9.0] pp |
+| LAION-CLAP Music HTSAT-base — `official_clip` | -0.026 [-0.049, -0.005] | -8.0 pp [-10.8, -5.7] pp |
+| Descript Audio Codec 44.1 kHz — `masked_mean` | 0.143 [0.098, 0.186] | -13.2 pp [-16.0, -10.6] pp |
+| Descript Audio Codec 44.1 kHz — `temporal_pyramid_8` | 0.043 [0.002, 0.085] | -13.7 pp [-16.8, -10.7] pp |
+| Meta EnCodec 24 kHz — `masked_mean` | 0.044 [-0.008, 0.094] | -18.6 pp [-21.9, -15.2] pp |
+| Meta EnCodec 24 kHz — `temporal_pyramid_8` | -0.052 [-0.101, -0.003] | -20.2 pp [-24.1, -16.2] pp |
+| MuQ-MuLan — `official_clip` | -0.229 [-0.265, -0.194] | -31.0 pp [-35.5, -26.8] pp |
 
 The largest-margin arm is not the arm with the strongest existing retrieval R@1. A sensitivity ranking is not a replacement for retrieval: high preset sensitivity alone does not establish decodability, useful control predictions, or audio reconstruction. The interaction term is not automatically undesirable; it can represent real preset-specific responses to pitch, rhythm, duration, velocity, or articulation. With one cached render per preset-performance cell, it also includes render-specific variation, and there is no separate noise term.
 
@@ -705,7 +705,7 @@ Report figures were generated with Matplotlib `3.11.0` from cached evaluation an
 
 The sensitivity analysis reused the persisted frozen embeddings only. Cache verification ran before scoring and checked all archive SHA-256 values; each feature identity’s checkpoint and source revision, loader, tap, sample rate, preprocessing and pooling; the render request and WAV hash; and every array’s shape, dtype, finite values and nonzero norm. The seven families each contained 6,480 accepted cache entries; 6,450 mapped to the common matrix used here. No encoder weights were loaded and no new inference or rendering was run.
 
-The analyzed matrix contains `129 × 50 × D` vectors per arm, normalized in-place on `xpu` as `float32`. Pairwise cosine distances were precomputed in tensors shaped `[129, 50, 50]` and `[50, 129, 129]`; exhaustive combinations were processed in chunks of 64 preset pairs. Total scoring and bootstrap time was 506.5 seconds. The bootstrap used 1,000 crossed resamples and 32,768 sampled combinations per resample.
+The analyzed matrix contains `129 × 50 × D` vectors per arm, normalized in-place on `xpu` as `float32`. Pairwise cosine distances were precomputed in tensors shaped `[129, 50, 50]` and `[50, 129, 129]`; exhaustive combinations were processed in chunks of 64 preset pairs. Total scoring and bootstrap time was 433.1 seconds. The bootstrap used 1,000 crossed resamples; pair metrics sampled 32,768 weighted distinct pairs, and variance shares used the full crossed matrix.
 
 | Encoder family | Checkpoint SHA-256 | Pinned source revision | Loader revision | Feature tap | Cached arms / dimensions | Pooling |
 |---|---|---|---|---|---|---|

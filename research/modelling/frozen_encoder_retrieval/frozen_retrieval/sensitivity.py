@@ -370,26 +370,41 @@ def _quantiles(values, count: int, probabilities=(0.1, 0.25, 0.5, 0.75, 0.9)) ->
     return {f"p{int(probability * 100):02d}": float(value) for probability, value in zip(probabilities, result, strict=True)}
 
 
+def _sample_distinct_original_pairs(resampled_indices: np.ndarray, pair_first: np.ndarray,
+                                    pair_second: np.ndarray, *, sample_count: int,
+                                    generator: np.random.Generator) -> tuple[np.ndarray, np.ndarray]:
+    """Sample distinct source identities with pair probability proportional to multiplicity products."""
+    counts = np.bincount(resampled_indices, minlength=max(pair_first.max(), pair_second.max()) + 1)
+    pair_weights = counts[pair_first] * counts[pair_second]
+    total_weight = int(pair_weights.sum())
+    if total_weight == 0:
+        raise ValueError("a crossed bootstrap replicate must contain at least two distinct source identities")
+    positions = generator.choice(len(pair_weights), size=sample_count, p=pair_weights / total_weight)
+    return pair_first[positions], pair_second[positions]
+
+
 def _pair_bootstrap_distances(within, between, preset_draws: np.ndarray, midi_draws: np.ndarray, *,
                               replicates: int, combinations_per_replicate: int, device):
     import torch
 
     preset_count, midi_count = within.shape[:2]
     generator = np.random.default_rng(BOOTSTRAP_SEED + 1)
+    preset_pair_first, preset_pair_second = np.triu_indices(preset_count, k=1)
+    midi_pair_first, midi_pair_second = np.triu_indices(midi_count, k=1)
     output = {name: np.empty(replicates, dtype=np.float64) for name in
               ("mean_midi_distance", "mean_preset_distance", "mean_ratio", "mean_difference", "mean_margin",
                "preset_dominant_fraction", "midi_dominant_fraction", "tie_fraction")}
     for replicate in range(replicates):
-        p1_pos = generator.integers(0, preset_count, size=combinations_per_replicate)
-        p2_pos = generator.integers(0, preset_count - 1, size=combinations_per_replicate)
-        p2_pos += p2_pos >= p1_pos
-        m1_pos = generator.integers(0, midi_count, size=combinations_per_replicate)
-        m2_pos = generator.integers(0, midi_count - 1, size=combinations_per_replicate)
-        m2_pos += m2_pos >= m1_pos
-        p1 = torch.as_tensor(preset_draws[replicate, p1_pos], dtype=torch.long, device=device)
-        p2 = torch.as_tensor(preset_draws[replicate, p2_pos], dtype=torch.long, device=device)
-        m1 = torch.as_tensor(midi_draws[replicate, m1_pos], dtype=torch.long, device=device)
-        m2 = torch.as_tensor(midi_draws[replicate, m2_pos], dtype=torch.long, device=device)
+        p1_np, p2_np = _sample_distinct_original_pairs(
+            preset_draws[replicate], preset_pair_first, preset_pair_second,
+            sample_count=combinations_per_replicate, generator=generator)
+        m1_np, m2_np = _sample_distinct_original_pairs(
+            midi_draws[replicate], midi_pair_first, midi_pair_second,
+            sample_count=combinations_per_replicate, generator=generator)
+        p1 = torch.as_tensor(p1_np, dtype=torch.long, device=device)
+        p2 = torch.as_tensor(p2_np, dtype=torch.long, device=device)
+        m1 = torch.as_tensor(m1_np, dtype=torch.long, device=device)
+        m2 = torch.as_tensor(m2_np, dtype=torch.long, device=device)
         dm, dp = four_anchor_distances(within, between, p1, p2, m1, m2)
         metrics = anchored_metrics_from_distances(dm, dp)
         ratio_values = metrics["ratio"]
@@ -433,6 +448,13 @@ def _interval(values: np.ndarray) -> list[float] | None:
     if not len(finite):
         return None
     return [float(value) for value in np.quantile(finite, [0.025, 0.975])]
+
+
+def _paired_effect_summary(observed: float, baseline_observed: float, bootstrap_values: np.ndarray,
+                           baseline_bootstrap_values: np.ndarray) -> dict:
+    bootstrap_differences = bootstrap_values - baseline_bootstrap_values
+    return {"difference": float(observed - baseline_observed),
+            "confidence_interval_95": _interval(bootstrap_differences)}
 
 
 def _distribution_histograms(ratio_values: np.ndarray, ratio_count: int, difference_values: np.ndarray,
@@ -624,14 +646,16 @@ def analyze_cache(cache_audit: dict, *, device_name: str = "cpu", bootstrap_repl
             continue
         paired[arm] = {}
         for metric in ("mean_margin", "preset_dominant_fraction"):
-            difference = samples["relative_metrics"][metric] - arm_bootstrap[baseline]["relative_metrics"][metric]
-            paired[arm][metric] = {"difference": float(np.mean(difference)), "confidence_interval_95": _interval(difference)}
+            point_key = "mean_normalized_margin" if metric == "mean_margin" else "preset_dominant_fraction"
+            paired[arm][metric] = _paired_effect_summary(
+                arm_results[arm][point_key], arm_results[baseline][point_key],
+                samples["relative_metrics"][metric], arm_bootstrap[baseline]["relative_metrics"][metric])
     for arm, point in arm_results.items():
         if point["anchored_observations"] != 40_454_400:
             raise ArithmeticError(f"full anchor population differs from the expected matrix for {arm}")
     if device_name == "xpu":
         torch.xpu.synchronize()
-    return {"version": 1, "analysis": "issue157_preset_midi_sensitivity_v1",
+    return {"version": 2, "analysis": "issue157_preset_midi_sensitivity_v2",
             "cohort": {"preset_states": len(cache_audit["preset_ids"]), "preset_family_clusters": len(cache_audit["family_ids"]),
                        "midi_performances": len(cache_audit["midi_ids"]), "matrix_cells": cache_audit["common_cells"],
                        "source_preset_split": cache_audit["source_split"], "performance_source_split": cache_audit["performance_source_split"],
@@ -644,10 +668,11 @@ def analyze_cache(cache_audit: dict, *, device_name: str = "cpu", bootstrap_repl
                                  "checkpoint_provenance": {model: {key: value for key, value in cache_audit["model_caches"][model].items()
                                                                     if key not in {"directory", "rows_by_request"}}
                                                               for model in MODEL_ORDER}},
-            "statistics": {"bootstrap_method": "crossed preset-family × MIDI-performance cluster bootstrap; identical cluster draws and sampled combinations across arms",
+            "statistics": {"bootstrap_method": "crossed preset-family × MIDI-performance cluster bootstrap; anchored distance pairs use distinct original identities sampled in proportion to bootstrap multiplicity products; variance shares use the full crossed resampled grid; identical cluster draws and sampled pair positions across arms",
                            "bootstrap_seed": BOOTSTRAP_SEED, "bootstrap_replicates": bootstrap_replicates,
                            "sampled_unordered_2x2_combinations_per_bootstrap_replicate": bootstrap_combinations,
-                           "bootstrap_combination_sampling": "Monte Carlo estimate of the exhaustive 2x2 statistic within each crossed resample; full-cohort point summaries are exhaustive",
+                           "bootstrap_combination_sampling": "Monte Carlo estimate of the exhaustive 2x2 statistic; preset and MIDI pairs are sampled from their resampled clusters conditioned on distinct original identities, yielding multiplicity-product pair weights; full-cohort point summaries are exhaustive",
+                           "paired_effect_estimator": "difference between observed exhaustive full-cohort point estimates; paired bootstrap distribution supplies the confidence interval only",
                            "tie_tolerance_cosine_distance": TIE_TOLERANCE,
                            "near_zero_preset_distance_ratio_denominator": NEAR_ZERO_DENOMINATOR_TOLERANCE,
                            "normalized_margin_epsilon": NORMALIZED_MARGIN_EPSILON,

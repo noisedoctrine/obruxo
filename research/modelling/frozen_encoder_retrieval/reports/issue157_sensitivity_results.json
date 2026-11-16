@@ -1,41 +1,41 @@
 {
-  "analysis": "issue157_preset_midi_sensitivity_v1",
+  "analysis": "issue157_preset_midi_sensitivity_v2",
   "arms": {
     "basic_pitch_trunk:masked_mean": {
       "anchored_observations": 40454400,
       "both_distances_near_zero_count": 0,
       "confidence_intervals_95": {
         "mean_difference": [
-          -0.06543672662228346,
-          -0.03995500253513456
+          -0.06474896017462015,
+          -0.039005921594798564
         ],
         "mean_margin": [
-          0.18733084499835967,
-          0.294771246612072
+          0.1791958685964346,
+          0.29135732501745226
         ],
         "mean_midi_distance": [
-          0.07230949457734823,
-          0.09181307200342416
+          0.07350134178996086,
+          0.09375355280935764
         ],
         "mean_preset_distance": [
-          0.12182962223887443,
-          0.1451744183897972
+          0.12290753331035376,
+          0.14627093970775604
         ],
         "mean_ratio": [
-          0.7747587949037552,
-          1.069561693072319
+          0.7922488272190094,
+          1.0870946526527405
         ],
         "midi_dominant_fraction": [
-          0.2345142364501953,
-          0.3299537658691406
+          0.2336946487426758,
+          0.3317596435546875
         ],
         "preset_dominant_fraction": [
-          0.6699081420898437,
-          0.7653320312499999
+          0.6682323455810547,
+          0.7663051605224609
         ],
         "tie_fraction": [
-          3.0517578125e-05,
-          0.00034332275390625
+          0.0,
+          3.0517578125e-05
         ]
       },
       "dimension": 704,
@@ -1259,6 +1259,11 @@
         "ratio_underflow": 1140,
         "ratio_zero": 0
       },
+      "input_shape": [
+        129,
+        50,
+        704
+      ],
       "mean_midi_change_distance": 0.08326948574460245,
       "mean_normalized_margin": 0.23422446777302203,
       "mean_preset_change_distance": 0.13496157359678385,
@@ -1345,48 +1350,43 @@
       "vector_validation": {
         "nonfinite_values": 0,
         "zero_norm_vectors": 0
-      },
-      "input_shape": [
-        129,
-        50,
-        704
-      ]
+      }
     },
     "basic_pitch_trunk:temporal_pyramid_8": {
       "anchored_observations": 40454400,
       "both_distances_near_zero_count": 0,
       "confidence_intervals_95": {
         "mean_difference": [
-          -0.06730281505733729,
-          -0.038783989287912844
+          -0.06578554902225733,
+          -0.03679879046976567
         ],
         "mean_margin": [
-          0.12376608550548554,
-          0.21507924795150757
+          0.11326390132308006,
+          0.20941545106470585
         ],
         "mean_midi_distance": [
-          0.12225371915847064,
-          0.14762033782899378
+          0.12480756156146526,
+          0.15049001313745974
         ],
         "mean_preset_distance": [
-          0.17529822066426276,
-          0.19794874005019664
+          0.17708967849612237,
+          0.19935830794274806
         ],
         "mean_ratio": [
-          202.05682525634765,
-          399.5121170043945
+          0.8103996336460113,
+          0.9984207972884178
         ],
         "midi_dominant_fraction": [
-          0.25800399780273436,
-          0.3603803634643555
+          0.2582916259765625,
+          0.36104869842529297
         ],
         "preset_dominant_fraction": [
-          0.6394691467285156,
-          0.7419635772705078
+          0.6389289855957031,
+          0.7417007446289062
         ],
         "tie_fraction": [
           0.0,
-          0.00021381378173828108
+          2.288818359375e-05
         ]
       },
       "dimension": 11264,
@@ -2610,6 +2610,11 @@
         "ratio_underflow": 0,
         "ratio_zero": 0
       },
+      "input_shape": [
+        129,
+        50,
+        11264
+      ],
       "mean_midi_change_distance": 0.13746035434233767,
       "mean_normalized_margin": 0.15891648694565236,
       "mean_preset_change_distance": 0.18819354881496392,
@@ -2696,48 +2701,43 @@
       "vector_validation": {
         "nonfinite_values": 0,
         "zero_norm_vectors": 0
-      },
-      "input_shape": [
-        129,
-        50,
-        11264
-      ]
+      }
     },
     "beats_iter3_plus:masked_mean": {
       "anchored_observations": 40454400,
       "both_distances_near_zero_count": 0,
       "confidence_intervals_95": {
         "mean_difference": [
-          -0.27255636528134347,
-          -0.21522060669958593
+          -0.2717944741249084,
+          -0.21446334794163704
         ],
         "mean_margin": [
-          0.29111548587679864,
-          0.3733921408653259
+          0.2863020032644272,
+          0.36991645172238347
         ],
         "mean_midi_distance": [
-          0.23476051762700081,
-          0.28118907287716866
+          0.23996370211243628,
+          0.2871327713131905
         ],
         "mean_preset_distance": [
-          0.48612877130508425,
-          0.5197787120938301
+          0.49003869518637655,
+          0.5232871890068054
         ],
         "mean_ratio": [
-          0.5098631724715232,
-          0.6183686047792435
+          0.5204584240913391,
+          0.6319373786449433
         ],
         "midi_dominant_fraction": [
-          0.08040180206298828,
-          0.13883609771728514
+          0.07546863555908204,
+          0.13498554229736326
         ],
         "preset_dominant_fraction": [
-          0.861042594909668,
-          0.9194417953491211
+          0.8650144577026367,
+          0.9245311737060546
         ],
         "tie_fraction": [
-          3.0517578125e-05,
-          0.000335693359375
+          0.0,
+          1.52587890625e-05
         ]
       },
       "dimension": 768,
@@ -3961,6 +3961,11 @@
         "ratio_underflow": 0,
         "ratio_zero": 0
       },
+      "input_shape": [
+        129,
+        50,
+        768
+      ],
       "mean_midi_change_distance": 0.2641375865949104,
       "mean_normalized_margin": 0.32724495954023175,
       "mean_preset_change_distance": 0.5070877545391924,
@@ -4047,48 +4052,43 @@
       "vector_validation": {
         "nonfinite_values": 0,
         "zero_norm_vectors": 0
-      },
-      "input_shape": [
-        129,
-        50,
-        768
-      ]
+      }
     },
     "beats_iter3_plus:temporal_pyramid_8": {
       "anchored_observations": 40454400,
       "both_distances_near_zero_count": 0,
       "confidence_intervals_95": {
         "mean_difference": [
-          -0.20157475247979165,
-          -0.15496453270316124
+          -0.19981375746428967,
+          -0.15252257362008095
         ],
         "mean_margin": [
-          0.2081020526587963,
-          0.2780366398394108
+          0.2024939887225628,
+          0.27181379348039625
         ],
         "mean_midi_distance": [
-          0.264359337836504,
-          0.30997214615345003
+          0.2701349414885044,
+          0.3162254363298416
         ],
         "mean_preset_distance": [
-          0.4482472866773605,
-          0.4835671536624432
+          0.4520108327269554,
+          0.48705894201993943
         ],
         "mean_ratio": [
-          159.02989768981934,
-          373.5799491882324
+          0.6262139528989792,
+          0.7296816170215606
         ],
         "midi_dominant_fraction": [
-          0.10790233612060547,
-          0.17683658599853516
+          0.10324993133544921,
+          0.1747516632080078
         ],
         "preset_dominant_fraction": [
-          0.8230375289916992,
-          0.8919763565063477
+          0.8252483367919922,
+          0.8967500686645508
         ],
         "tie_fraction": [
           0.0,
-          0.000274658203125
+          1.52587890625e-05
         ]
       },
       "dimension": 12288,
@@ -5312,6 +5312,11 @@
         "ratio_underflow": 0,
         "ratio_zero": 0
       },
+      "input_shape": [
+        129,
+        50,
+        12288
+      ],
       "mean_midi_change_distance": 0.2937516709815624,
       "mean_normalized_margin": 0.23607161369271856,
       "mean_preset_change_distance": 0.4695129542882995,
@@ -5398,48 +5403,43 @@
       "vector_validation": {
         "nonfinite_values": 0,
         "zero_norm_vectors": 0
-      },
-      "input_shape": [
-        129,
-        50,
-        12288
-      ]
+      }
     },
     "cir_ast:official_clip": {
       "anchored_observations": 40454400,
       "both_distances_near_zero_count": 0,
       "confidence_intervals_95": {
         "mean_difference": [
-          -0.5263095840811729,
-          -0.45338703095912936
+          -0.5238893359899521,
+          -0.45089335441589357
         ],
         "mean_margin": [
-          0.3353956677019596,
-          0.4020491510629654
+          0.33168457821011543,
+          0.3996786683797836
         ],
         "mean_midi_distance": [
-          0.4270086593925953,
-          0.4965115115046501
+          0.4368594601750374,
+          0.5078484550118446
         ],
         "mean_preset_distance": [
-          0.944821172952652,
-          0.9580584317445755
+          0.952457632124424,
+          0.965414309501648
         ],
         "mean_ratio": [
-          0.45041283816099165,
-          0.5253605857491493
+          0.4609628774225712,
+          0.537267555296421
         ],
         "midi_dominant_fraction": [
-          0.018010711669921874,
-          0.03418464660644531
+          0.010871696472167968,
+          0.026703071594238282
         ],
         "preset_dominant_fraction": [
-          0.9656858444213867,
-          0.9818590164184571
+          0.9732969284057618,
+          0.989128303527832
         ],
         "tie_fraction": [
-          3.0517578125e-05,
-          0.000335693359375
+          0.0,
+          7.62939453125e-06
         ]
       },
       "dimension": 768,
@@ -6663,6 +6663,11 @@
         "ratio_underflow": 0,
         "ratio_zero": 0
       },
+      "input_shape": [
+        129,
+        50,
+        768
+      ],
       "mean_midi_change_distance": 0.4716791225750788,
       "mean_normalized_margin": 0.3654572641574913,
       "mean_preset_change_distance": 0.959168081785184,
@@ -6749,48 +6754,43 @@
       "vector_validation": {
         "nonfinite_values": 0,
         "zero_norm_vectors": 0
-      },
-      "input_shape": [
-        129,
-        50,
-        768
-      ]
+      }
     },
     "clap_music:official_clip": {
       "anchored_observations": 40454400,
       "both_distances_near_zero_count": 0,
       "confidence_intervals_95": {
         "mean_difference": [
-          -0.33482528626918795,
-          -0.26517889872193334
+          -0.33372733294963836,
+          -0.2633867375552654
         ],
         "mean_margin": [
-          0.3031104147434235,
-          0.38282852470874784
+          0.2992203816771507,
+          0.38147241398692133
         ],
         "mean_midi_distance": [
-          0.2706370368599892,
-          0.3235968708992004
+          0.2751936763525009,
+          0.3301569990813732
         ],
         "mean_preset_distance": [
-          0.5725894287228585,
-          0.6190043821930885
+          0.5770950466394424,
+          0.6243078425526619
         ],
         "mean_ratio": [
-          0.4945898622274399,
-          0.6017885014414787
+          0.5049950957298279,
+          0.6134855955839157
         ],
         "midi_dominant_fraction": [
-          0.07581100463867188,
-          0.13335609436035156
+          0.07043170928955078,
+          0.12901744842529295
         ],
         "preset_dominant_fraction": [
-          0.8664157867431641,
-          0.9239751815795898
+          0.8709749221801758,
+          0.9295608520507812
         ],
         "tie_fraction": [
-          3.0517578125e-05,
-          0.000335693359375
+          0.0,
+          7.62939453125e-06
         ]
       },
       "dimension": 512,
@@ -8014,6 +8014,11 @@
         "ratio_underflow": 0,
         "ratio_zero": 0
       },
+      "input_shape": [
+        129,
+        50,
+        512
+      ],
       "mean_midi_change_distance": 0.30292755278430583,
       "mean_normalized_margin": 0.3390329064611188,
       "mean_preset_change_distance": 0.6011824028862481,
@@ -8100,48 +8105,43 @@
       "vector_validation": {
         "nonfinite_values": 0,
         "zero_norm_vectors": 0
-      },
-      "input_shape": [
-        129,
-        50,
-        512
-      ]
+      }
     },
     "dac_44khz:masked_mean": {
       "anchored_observations": 40454400,
       "both_distances_near_zero_count": 0,
       "confidence_intervals_95": {
         "mean_difference": [
-          -0.548932021856308,
-          -0.3962440930306912
+          -0.5495564103126526,
+          -0.3972834184765816
         ],
         "mean_margin": [
-          0.4520295917987823,
-          0.5605589926242829
+          0.45238784700632095,
+          0.5646089226007461
         ],
         "mean_midi_distance": [
-          0.1610867537558079,
-          0.24109023436903954
+          0.16412687599658965,
+          0.24534566663205623
         ],
         "mean_preset_distance": [
-          0.5912534266710281,
-          0.7474046543240547
+          0.5971601068973541,
+          0.7539001822471618
         ],
         "mean_ratio": [
-          0.6186034396290779,
-          1.3249041825532912
+          0.6386784538626671,
+          1.3465699255466461
         ],
         "midi_dominant_fraction": [
-          0.12402133941650391,
-          0.18322620391845704
+          0.1200836181640625,
+          0.1810903549194336
         ],
         "preset_dominant_fraction": [
-          0.816590690612793,
-          0.8758180618286133
+          0.8189096450805664,
+          0.8799163818359375
         ],
         "tie_fraction": [
-          3.0517578125e-05,
-          0.00034332275390625
+          0.0,
+          1.52587890625e-05
         ]
       },
       "dimension": 1024,
@@ -9365,6 +9365,11 @@
         "ratio_underflow": 15630,
         "ratio_zero": 0
       },
+      "input_shape": [
+        129,
+        50,
+        1024
+      ],
       "mean_midi_change_distance": 0.20491415924106363,
       "mean_normalized_margin": 0.5083455355720348,
       "mean_preset_change_distance": 0.6841108023948506,
@@ -9451,48 +9456,43 @@
       "vector_validation": {
         "nonfinite_values": 0,
         "zero_norm_vectors": 0
-      },
-      "input_shape": [
-        129,
-        50,
-        1024
-      ]
+      }
     },
     "dac_44khz:temporal_pyramid_8": {
       "anchored_observations": 40454400,
       "both_distances_near_zero_count": 0,
       "confidence_intervals_95": {
         "mean_difference": [
-          -0.21785628870129586,
-          -0.1669913999736309
+          -0.21788313500583173,
+          -0.16580401100218295
         ],
         "mean_margin": [
-          0.3614007905125618,
-          0.45925454199314114
+          0.35835247561335565,
+          0.45968495383858676
         ],
         "mean_midi_distance": [
-          0.1049856198951602,
-          0.14136511012911795
+          0.10736073479056359,
+          0.14505021460354328
         ],
         "mean_preset_distance": [
-          0.2893501743674278,
-          0.3418569877743721
+          0.29192905202507974,
+          0.34418209418654444
         ],
         "mean_ratio": [
-          137.90119819641114,
-          339.9328987121582
+          0.5260063916444778,
+          0.7251112312078476
         ],
         "midi_dominant_fraction": [
-          0.12644996643066406,
-          0.19102230072021484
+          0.1214864730834961,
+          0.1884958267211914
         ],
         "preset_dominant_fraction": [
-          0.8089141845703125,
-          0.8734294891357421
+          0.8114818572998047,
+          0.8785058975219726
         ],
         "tie_fraction": [
           0.0,
-          0.00021381378173828108
+          1.52587890625e-05
         ]
       },
       "dimension": 16384,
@@ -10716,6 +10716,11 @@
         "ratio_underflow": 0,
         "ratio_zero": 0
       },
+      "input_shape": [
+        129,
+        50,
+        16384
+      ],
       "mean_midi_change_distance": 0.1262992442561335,
       "mean_normalized_margin": 0.4082227003700185,
       "mean_preset_change_distance": 0.31842589771317303,
@@ -10802,48 +10807,43 @@
       "vector_validation": {
         "nonfinite_values": 0,
         "zero_norm_vectors": 0
-      },
-      "input_shape": [
-        129,
-        50,
-        16384
-      ]
+      }
     },
     "encodec_24khz:masked_mean": {
       "anchored_observations": 40454400,
       "both_distances_near_zero_count": 0,
       "confidence_intervals_95": {
         "mean_difference": [
-          -0.019536595651879908,
-          -0.01221314729191363
+          -0.019583143386989833,
+          -0.012164053833112122
         ],
         "mean_margin": [
-          0.35392979085445403,
-          0.47056625708937644
+          0.3513683885335922,
+          0.47143135219812393
         ],
         "mean_midi_distance": [
-          0.0066921748919412495,
-          0.009987489134073258
+          0.006813722930382937,
+          0.01018954108003527
         ],
         "mean_preset_distance": [
-          0.02018519970588386,
-          0.028621529601514338
+          0.020326900528743863,
+          0.028764937585219738
         ],
         "mean_ratio": [
-          0.7434266358613968,
-          1.4293758690357208
+          0.7753288611769676,
+          1.4336505502462387
         ],
         "midi_dominant_fraction": [
-          0.16898250579833984,
-          0.24103755950927735
+          0.16604366302490234,
+          0.24022216796874998
         ],
         "preset_dominant_fraction": [
-          0.7588359832763671,
-          0.8307575225830078
+          0.7597166061401367,
+          0.8339029312133789
         ],
         "tie_fraction": [
-          7.610321044921876e-05,
-          0.000396728515625
+          2.288818359375e-05,
+          0.0001068115234375
         ]
       },
       "dimension": 128,
@@ -12067,6 +12067,11 @@
         "ratio_underflow": 11203,
         "ratio_zero": 0
       },
+      "input_shape": [
+        129,
+        50,
+        128
+      ],
       "mean_midi_change_distance": 0.008521443318573853,
       "mean_normalized_margin": 0.40951961280033533,
       "mean_preset_change_distance": 0.024512346215517254,
@@ -12153,48 +12158,43 @@
       "vector_validation": {
         "nonfinite_values": 0,
         "zero_norm_vectors": 0
-      },
-      "input_shape": [
-        129,
-        50,
-        128
-      ]
+      }
     },
     "encodec_24khz:temporal_pyramid_8": {
       "anchored_observations": 40454400,
       "both_distances_near_zero_count": 0,
       "confidence_intervals_95": {
         "mean_difference": [
-          -0.03074856651946902,
-          -0.018684937618672848
+          -0.030522327683866025,
+          -0.018555358937010172
         ],
         "mean_margin": [
-          0.2664756879210472,
-          0.37167527973651887
+          0.2597530037164688,
+          0.37019449621438977
         ],
         "mean_midi_distance": [
-          0.018408959498628974,
-          0.025399141805246474
+          0.018786482373252512,
+          0.025826645782217383
         ],
         "mean_preset_distance": [
-          0.03978354325518012,
-          0.053694869950413705
+          0.040000167582184075,
+          0.054110077768564226
         ],
         "mean_ratio": [
-          0.745580543577671,
-          4.150754189491272
+          0.6657627105712891,
+          0.8890384525060654
         ],
         "midi_dominant_fraction": [
-          0.1803823471069336,
-          0.2600214004516601
+          0.17822322845458985,
+          0.2608835220336914
         ],
         "preset_dominant_fraction": [
-          0.7397205352783203,
-          0.8194643020629883
+          0.739069938659668,
+          0.8217607498168945
         ],
         "tie_fraction": [
-          4.57763671875e-05,
-          0.00035858154296875
+          7.62939453125e-06,
+          6.103515625e-05
         ]
       },
       "dimension": 2048,
@@ -13418,6 +13418,11 @@
         "ratio_underflow": 0,
         "ratio_zero": 0
       },
+      "input_shape": [
+        129,
+        50,
+        2048
+      ],
       "mean_midi_change_distance": 0.022226919116258733,
       "mean_normalized_margin": 0.3131318826534745,
       "mean_preset_change_distance": 0.04684873449652232,
@@ -13504,48 +13509,43 @@
       "vector_validation": {
         "nonfinite_values": 0,
         "zero_norm_vectors": 0
-      },
-      "input_shape": [
-        129,
-        50,
-        2048
-      ]
+      }
     },
     "muq_mulan:official_clip": {
       "anchored_observations": 40454400,
       "both_distances_near_zero_count": 0,
       "confidence_intervals_95": {
         "mean_difference": [
-          -0.13245790600776672,
-          -0.07248515728861094
+          -0.12930534780025482,
+          -0.06941253077238799
         ],
         "mean_margin": [
-          0.10740663856267929,
-          0.1863117419183254
+          0.09948664028197526,
+          0.17796337604522705
         ],
         "mean_midi_distance": [
-          0.28851437419652937,
-          0.32324278727173805
+          0.29523260444402694,
+          0.3302409991621971
         ],
         "mean_preset_distance": [
-          0.38447912931442263,
-          0.42909077629446984
+          0.387263697385788,
+          0.4324109464883804
         ],
         "mean_ratio": [
-          0.8274416044354439,
-          0.975717268884182
+          0.8453821241855621,
+          0.9943078011274338
         ],
         "midi_dominant_fraction": [
-          0.28184032440185547,
-          0.371519660949707
+          0.2827302932739258,
+          0.3754974365234375
         ],
         "preset_dominant_fraction": [
-          0.6283605575561524,
-          0.7180278778076171
+          0.6245025634765625,
+          0.7172697067260742
         ],
         "tie_fraction": [
-          3.0517578125e-05,
-          0.000335693359375
+          0.0,
+          1.52587890625e-05
         ]
       },
       "dimension": 512,
@@ -14769,6 +14769,11 @@
         "ratio_underflow": 0,
         "ratio_zero": 0
       },
+      "input_shape": [
+        129,
+        50,
+        512
+      ],
       "mean_midi_change_distance": 0.31201421739783136,
       "mean_normalized_margin": 0.1368630574370446,
       "mean_preset_change_distance": 0.41066878226318565,
@@ -14855,12 +14860,7 @@
       "vector_validation": {
         "nonfinite_values": 0,
         "zero_norm_vectors": 0
-      },
-      "input_shape": [
-        129,
-        50,
-        512
-      ]
+      }
     }
   },
   "cache_validation": {
@@ -14880,7 +14880,7 @@
         "pooling": "masked_mean_and_8bin_mean_std_v1",
         "preprocessing": "pcm_scale_stereo_mean_mono_resample_poly_no_gain_norm_v2",
         "source_revision": "9991303bba609a3b93089d13ec80d1d495083596",
-        "tap": "post-BN/ReLU contour_conv1; average 3 bins per semitone, flatten 8 channels × 88 pitches"
+        "tap": "post-BN/ReLU contour_conv1; average 3 bins per semitone, flatten 8 channels \u00d7 88 pitches"
       },
       "beats_iter3_plus": {
         "cache_entries": 6480,
@@ -14988,9 +14988,7 @@
       ]
     },
     "dtype": "float32",
-    "elapsed_seconds": 506.5332503999998,
-    "preset_pair_chunk_size": 64,
-    "torch_version": "2.12.1+xpu",
+    "elapsed_seconds": 433.0616435999982,
     "input_shapes_by_arm": {
       "basic_pitch_trunk:masked_mean": [
         129,
@@ -15047,7 +15045,9 @@
         50,
         512
       ]
-    }
+    },
+    "preset_pair_chunk_size": 64,
+    "torch_version": "2.12.1+xpu"
   },
   "difficult_preset_stratum": {
     "reason": "Existing source-family metadata maps each of the 129 presets to a singleton family and contains no independent difficulty label; no model-specific distance or retrieval score was used to select a subset.",
@@ -15063,177 +15063,178 @@
     "basic_pitch_trunk:masked_mean": {
       "mean_margin": {
         "confidence_interval_95": [
-          -0.1753671657294035,
-          -0.08245235905051235
+          -0.1814852837473154,
+          -0.08519124910235408
         ],
-        "difference": -0.12836316668987274
+        "difference": -0.13123279638446927
       },
       "preset_dominant_fraction": {
         "confidence_interval_95": [
-          -0.30290794372558594,
-          -0.2117137908935547
+          -0.3114177703857422,
+          -0.21898651123046875
         ],
-        "difference": -0.25768328857421874
+        "difference": -0.26398661208669505
       }
     },
     "basic_pitch_trunk:temporal_pyramid_8": {
       "mean_margin": {
         "confidence_interval_95": [
-          -0.24540371745824813,
-          -0.15648647099733354
+          -0.25169381964951754,
+          -0.1608749993145466
         ],
-        "difference": -0.20141399143636227
+        "difference": -0.20654077721183894
       },
       "preset_dominant_fraction": {
         "confidence_interval_95": [
-          -0.33328819274902344,
-          -0.23551292419433595
+          -0.3418102264404297,
+          -0.2438180923461914
         ],
-        "difference": -0.28569981384277343
+        "difference": -0.2928095584163898
       }
     },
     "beats_iter3_plus:masked_mean": {
       "mean_margin": {
         "confidence_interval_95": [
-          -0.058502227813005445,
-          -0.01575121879577637
+          -0.060812640190124514,
+          -0.01638701483607293
         ],
-        "difference": -0.03692192941904068
+        "difference": -0.03821230461725955
       },
       "preset_dominant_fraction": {
         "confidence_interval_95": [
-          -0.10754261016845704,
-          -0.06111087799072266
+          -0.11136093139648437,
+          -0.06349906921386719
         ],
-        "difference": -0.08360205841064453
+        "difference": -0.08596958550862199
       }
     },
     "beats_iter3_plus:temporal_pyramid_8": {
       "mean_margin": {
         "confidence_interval_95": [
-          -0.14878325685858726,
-          -0.10107219442725182
+          -0.15318316482007505,
+          -0.10491489470005036
         ],
-        "difference": -0.12546445202827453
+        "difference": -0.12938565046477274
       },
       "preset_dominant_fraction": {
         "confidence_interval_95": [
-          -0.14694862365722655,
-          -0.08679370880126953
+          -0.15189628601074218,
+          -0.0896982192993164
         ],
-        "difference": -0.11632303619384765
+        "difference": -0.11967543703527916
       }
     },
     "clap_music:official_clip": {
       "mean_margin": {
         "confidence_interval_95": [
-          -0.04801084399223328,
-          -0.004272761940956135
+          -0.04874203577637672,
+          -0.004989548772573473
         ],
-        "difference": -0.025735860049724578
+        "difference": -0.026424357696372525
       },
       "preset_dominant_fraction": {
         "confidence_interval_95": [
-          -0.10420379638671876,
-          -0.055930709838867186
+          -0.10809459686279296,
+          -0.05731544494628907
         ],
-        "difference": -0.07838489532470704
+        "difference": -0.08046862640404995
       }
     },
     "dac_44khz:masked_mean": {
       "mean_margin": {
         "confidence_interval_95": [
-          0.09460771083831787,
-          0.1815954953432083
+          0.097663863748312,
+          0.18629888445138928
         ],
-        "difference": 0.1389673908352852
+        "difference": 0.14288827141454347
       },
       "preset_dominant_fraction": {
         "confidence_interval_95": [
-          -0.15554409027099608,
-          -0.1029886245727539
+          -0.16006927490234374,
+          -0.10612964630126955
         ],
-        "difference": -0.12862999725341798
+        "difference": -0.1321894280968201
       }
     },
     "dac_44khz:temporal_pyramid_8": {
       "mean_margin": {
         "confidence_interval_95": [
-          0.0027570270001888286,
-          0.082772708684206
+          0.0023539379239082337,
+          0.0853953868150711
         ],
-        "difference": 0.04191132640838623
+        "difference": 0.04276543621252721
       },
       "preset_dominant_fraction": {
         "confidence_interval_95": [
-          -0.1624134063720703,
-          -0.10312843322753906
+          -0.16822166442871095,
+          -0.10671482086181641
         ],
-        "difference": -0.13291619873046875
+        "difference": -0.13684620214364807
       }
     },
     "encodec_24khz:masked_mean": {
       "mean_margin": {
         "confidence_interval_95": [
-          -0.008351128548383713,
-          0.09172949790954589
+          -0.008025295287370681,
+          0.09429782629013062
         ],
-        "difference": 0.04307417857646942
+        "difference": 0.04406234864284403
       },
       "preset_dominant_fraction": {
         "confidence_interval_95": [
-          -0.21266632080078124,
-          -0.14673423767089844
+          -0.21926727294921874,
+          -0.15150184631347657
         ],
-        "difference": -0.1804865493774414
+        "difference": -0.18554770309286506
       }
     },
     "encodec_24khz:temporal_pyramid_8": {
       "mean_margin": {
         "confidence_interval_95": [
-          -0.09775981158018111,
-          -0.001331378519535069
+          -0.10076666101813317,
+          -0.003093831241130841
         ],
-        "difference": -0.050890909001231194
+        "difference": -0.05232538150401678
       },
       "preset_dominant_fraction": {
         "confidence_interval_95": [
-          -0.23250694274902345,
-          -0.1587320327758789
+          -0.24074764251708985,
+          -0.16167278289794923
         ],
-        "difference": -0.19655641174316407
+        "difference": -0.20178657945736433
       }
     },
     "muq_mulan:official_clip": {
       "mean_margin": {
         "confidence_interval_95": [
-          -0.2580230560153723,
-          -0.18862324357032778
+          -0.2653682677075267,
+          -0.19394159689545631
         ],
-        "difference": -0.22244027426838875
+        "difference": -0.2285942067204467
       },
       "preset_dominant_fraction": {
         "confidence_interval_95": [
-          -0.3461416244506836,
-          -0.25892982482910154
+          -0.35457496643066405,
+          -0.2684053421020508
         ],
-        "difference": -0.3019336395263672
+        "difference": -0.309828621855719
       }
     }
   },
   "statistics": {
-    "bootstrap_combination_sampling": "Monte Carlo estimate of the exhaustive 2x2 statistic within each crossed resample; full-cohort point summaries are exhaustive",
-    "bootstrap_method": "crossed preset-family × MIDI-performance cluster bootstrap; identical cluster draws and sampled combinations across arms",
+    "bootstrap_combination_sampling": "Monte Carlo estimate of the exhaustive 2x2 statistic; preset and MIDI pairs are sampled from their resampled clusters conditioned on distinct original identities, yielding multiplicity-product pair weights; full-cohort point summaries are exhaustive",
+    "bootstrap_method": "crossed preset-family \u00d7 MIDI-performance cluster bootstrap; anchored distance pairs use distinct original identities sampled in proportion to bootstrap multiplicity products; variance shares use the full crossed resampled grid; identical cluster draws and sampled pair positions across arms",
     "bootstrap_replicates": 1000,
     "bootstrap_seed": 15720261116,
     "confidence_interval": "percentile 95% interval over crossed cluster resamples; intervals do not treat anchor observations as independent",
     "near_zero_preset_distance_ratio_denominator": 1e-06,
     "normalized_margin_epsilon": 1e-08,
+    "paired_effect_estimator": "difference between observed exhaustive full-cohort point estimates; paired bootstrap distribution supplies the confidence interval only",
     "preset_dominant_rule": "different-preset same-MIDI distance exceeds same-preset different-MIDI distance by more than tie tolerance",
     "ratio_rule": "undefined if different-preset same-MIDI cosine distance is at or below the near-zero tolerance",
     "sampled_unordered_2x2_combinations_per_bootstrap_replicate": 32768,
     "tie_tolerance_cosine_distance": 1e-06,
     "zero_norm_tolerance": 1e-12
   },
-  "version": 1
+  "version": 2
 }
