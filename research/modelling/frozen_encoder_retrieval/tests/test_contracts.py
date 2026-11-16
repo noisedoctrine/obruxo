@@ -644,6 +644,8 @@ class FeatureAndManifestTests(unittest.TestCase):
                     patch.object(evaluation, "_cosine_matrix", side_effect=_fake_cosine_matrix), \
                     patch.object(evaluation, "midi_shortcut_baseline", return_value={}):
                 result = evaluation.evaluate_dataset(root)
+                previous_row_count = len((root / "episode_metrics.private.jsonl").read_text(encoding="utf-8").splitlines())
+                extended = evaluation.evaluate_dataset(root, models=("clap_music",))
 
             coverage = result["coverage_by_condition"]["cross_midi_common_gallery"]
             self.assertEqual(1, coverage["planned_episodes"])
@@ -677,6 +679,10 @@ class FeatureAndManifestTests(unittest.TestCase):
             self.assertIn("Acoustic hard-negative win", report_text)
             self.assertIn("not applicable: query MIDI source states are outside the validation preset gallery", report_text)
             self.assertIn("| Random chance |", report_text)
+            self.assertEqual(result["available_arms"], extended["available_arms"])
+            self.assertEqual(result["model_results"], extended["model_results"])
+            self.assertEqual(previous_row_count,
+                             len((root / "episode_metrics.private.jsonl").read_text(encoding="utf-8").splitlines()))
 
     def test_local_config_preflight_requires_cache_assets_without_network_fallback(self):
         with tempfile.TemporaryDirectory(dir=REPO) as directory:

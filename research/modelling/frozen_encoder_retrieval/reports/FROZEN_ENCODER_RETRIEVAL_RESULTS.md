@@ -4,7 +4,7 @@ Issues: [#152](https://github.com/noisedoctrine/obruxo/issues/152) baseline and 
 
 ## Results and recommendation
 
-**Primary expanded-cohort result:** CIR single-timbre AST (official_clip) ranked the correct preset first in 81.4% of cross-MIDI queries (n=6,450 queries, 129 candidate presets; 50 MIDI performances from `train`, distinct from the earlier validation-source MIDI cohort). This ranks frozen representations across six model families; it is retrieval evidence, not a reconstruction result.
+**Primary expanded-cohort result:** CIR single-timbre AST (official_clip) ranked the correct preset first in 81.4% of cross-MIDI queries (n=6,450 queries, 129 candidate presets; 50 MIDI performances from `train`, distinct from the earlier validation-source MIDI cohort). This ranks frozen representations across 7 model families; it is retrieval evidence, not a reconstruction result.
 
 ### Expanded held-out performance cohort: 50 selected MIDI IDs; 50 with evaluated queries; 6450 common-gallery episodes
 Validation preset gallery: 131 verified states; performances sourced from `train`. Reserved test and confirmation sources used: **no**.
@@ -23,6 +23,8 @@ Selected-excerpt diversity: 24 monophonic / 26 polyphonic; 30 held, 20 phrased; 
 | MuQ-MuLan — official_clip (512-D) | 30.2% [24.7%, 36.0%] | 52.9% | 41.3% | 10.4% (n=6,450) | 28.2% (n=6,450) |
 | Meta EnCodec 24 kHz — masked_mean (128-D) | 24.2% [18.2%, 30.5%] | 41.1% | 33.6% | 21.1% (n=6,450) | 36.0% (n=6,450) |
 | Meta EnCodec 24 kHz — temporal_pyramid_8 (2048-D) | 23.4% [17.9%, 29.0%] | 43.5% | 33.9% | 12.0% (n=6,450) | 26.3% (n=6,450) |
+| Spotify Basic Pitch contour trunk — temporal_pyramid_8 (11264-D) | 21.9% [16.6%, 27.3%] | 44.4% | 33.5% | 9.5% (n=6,450) | 17.6% (n=6,450) |
+| Spotify Basic Pitch contour trunk — masked_mean (704-D) | 19.5% [14.3%, 25.2%] | 38.4% | 29.7% | 11.9% (n=6,450) | 21.3% (n=6,450) |
 | Random chance | 0.8% (fixed) | 3.9% | 4.2% | — | — |
 
 Paired crossed-cluster Recall@1 differences from the leading family representation (`cir_ast:official_clip`; best pooling per family):
@@ -34,15 +36,26 @@ Paired crossed-cluster Recall@1 differences from the leading family representati
 | `dac_44khz:masked_mean` | +50.0 | [+43.7, +56.4]  |
 | `muq_mulan:official_clip` | +51.2 | [+46.4, +56.2]  |
 | `encodec_24khz:masked_mean` | +57.2 | [+51.2, +63.1]  |
+| `basic_pitch_trunk:temporal_pyramid_8` | +59.5 | [+53.8, +65.3]  |
+
+Basic Pitch's strongest pooling arm reached 21.9% R@1 [16.6%, 27.3%] and placed first on 0 of 50 MIDI performances. The paired CIR-minus-Basic-Pitch gap was +59.5 percentage points [+53.8, +65.3]. These retrieval results do not support prioritizing this transcription-trained trunk for a later timbre-reconstruction screen.
 
 The table gives the headline retrieval measures on the shared candidate gallery. R@1 uncertainty is crossed over preset family and MIDI performance (2,000 bootstrap replicates); the heading gives the episode and independent-performance denominators. Hard-negative rates are descriptive proportions with query denominators. Query-audio quality and correct-match gallery quality are broken out below. For the full candidate gallery, the report gives the count and fraction of warned renders rather than labeling all candidates with one bucket. These are descriptive associations: warning status can covary with preset acoustics.
 
 **Query-render QA strata:** clean: `cir_ast:official_clip` 79.4% [73.8%, 85.2%] (q=3,778; 50 MIDI IDs); warning: `cir_ast:official_clip` 84.2% [79.7%, 89.2%] (q=2,672; 50 MIDI IDs). These are per-stratum MIDI-cluster intervals; accepted warning status is associated with the rendered preset and does not imply a causal quality effect.
 
+**Render-quality diagnostics** (R@1 clean / warning; these buckets are descriptive):
+
+| Encoder arm | Query WAV | Correct-match gallery WAV | Warned candidates across all 129-candidate galleries |
+|---|---:|---:|---|
+| `basic_pitch_trunk:masked_mean` | 14.4% (n=3,778) / 26.6% (n=2,672) | 14.2% (n=3,951) / 27.8% (n=2,499) | 38.7% of candidates on average (6,450/6,450 galleries contain a warning) |
+| `basic_pitch_trunk:temporal_pyramid_8` | 16.1% (n=3,778) / 30.0% (n=2,672) | 15.9% (n=3,951) / 31.2% (n=2,499) | 38.7% of candidates on average (6,450/6,450 galleries contain a warning) |
+
 **Per-performance ranking stability** (best observed pooling within each family and condition; bootstrap resamples 50 MIDI IDs):
 
 | Encoder family | Common-gallery arm; R@1; first-place performances; bootstrap top-rank probability | Mixed-gallery arm; R@1; first-place performances; bootstrap top-rank probability |
 |---|---|---|
+| Spotify Basic Pitch contour trunk | `basic_pitch_trunk:temporal_pyramid_8`; 21.9%; 0/50; 0.0% | `basic_pitch_trunk:temporal_pyramid_8`; 21.9%; 0/50; 0.0% |
 | BEATs iter3+ AS2M | `beats_iter3_plus:temporal_pyramid_8`; 62.2%; 1/50; 0.0% | `beats_iter3_plus:masked_mean`; 55.3%; 0/50; 0.0% |
 | CIR single-timbre AST | `cir_ast:official_clip`; 81.4%; 47/50; 100.0% | `cir_ast:official_clip`; 80.6%; 50/50; 100.0% |
 | LAION-CLAP Music HTSAT-base | `clap_music:official_clip`; 58.9%; 0/50; 0.0% | `clap_music:official_clip`; 55.0%; 0/50; 0.0% |
@@ -91,6 +104,8 @@ Recall@1 for the targeted 100-WAV amplitude-warning sample, split by query versu
 Mean change and independent-seed repeat distances with four-context min–max ranges; this is a spectral screen, not an audibility judgment.
 
 ## Issue #155 diagnostic results
+
+The primary 50-performance comparison above includes Basic Pitch. The three-offset, rank-failure, and gain-normalization follow-up below is the earlier six-family run; it does not report Basic Pitch sensitivity on those supplementary tests.
 
 ### Comparison-MIDI assignments
 
@@ -184,7 +199,7 @@ A long tail or high float peak is not an automatic failure. These descriptive st
 
 ### Audio quality checks
 
-**A — Original audio:** the six-encoder benchmark above is unchanged: 6,480 accepted cached clips, with the original four-MIDI results retained.
+**A — Original audio:** the 7-family benchmark above uses 6,480 accepted cached clips, with the original four-MIDI results retained. The supplementary analyses below retain their original six-family coverage until the Basic Pitch extension completes.
 **B — Clean queries:** we re-summarized the existing cached-feature episode scores for queries whose WAVs had no QA warning. No model inference was repeated for this slice.
 
 | Encoder arm | Clean-query R@1 [crossed 95% CI] / R@5 / MRR | Queries |
@@ -216,9 +231,9 @@ For a stricter check, we recomputed ranks after removing every warned candidate 
 Paired clean-gallery CIR minus BEATs temporal-pyramid ΔR@1: +24.8 pp [+20.8, +29.0].
 Clean/warning status is descriptive and may track preset acoustics; neither slice establishes a causal render-quality effect.
 
-**C — Gain-reduced warning sample:** a deterministic, stratified sample of 100 WAVs was drawn from 1,531 accepted amplitude-warning renders. Copies were reduced linearly to a 0.95 peak and all six encoders re-embedded only those copies; original cached features supplied the unchanged queries/candidates. This is a sensitivity sample, not a corpus-wide accuracy estimate.
+**C — Gain-reduced warning sample:** a deterministic, stratified sample of 100 WAVs was drawn from 1,531 accepted amplitude-warning renders. Copies were reduced linearly to a 0.95 peak and all 6 encoder families re-embedded only those copies; original cached features supplied the unchanged queries/candidates. This is a sensitivity sample, not a corpus-wide accuracy estimate.
 
-| Encoder arm | Clip embedding cosine distance (95% crossed CI) | Query R@1 before→after; changed / fixed / newly wrong | Correct gallery candidate R@1 before→after; changed / fixed / newly wrong | Δ target margin ×100 (cosine points; query / gallery) |
+| Encoder arm | Representation cosine distance (95% crossed CI) | Query R@1 before→after; changed / fixed / newly wrong | Correct gallery candidate R@1 before→after; changed / fixed / newly wrong | Δ target margin ×100 (cosine points; query / gallery) |
 |---|---:|---:|---:|---:|
 | `beats_iter3_plus:masked_mean` | 0.0034 [0.0019, 0.0051] | 68.0%→67.0% (Δ -1.0 pp [-8.2, +4.8]); 5 / 1 / 2 | 69.0%→69.0% (Δ +0.0 pp [+0.0, +0.0]); 0 / 0 / 0 | -0.29 [-0.64, +0.05] / -0.22 [-0.47, +0.02] |
 | `beats_iter3_plus:temporal_pyramid_8` | 0.0030 [0.0017, 0.0045] | 71.0%→69.0% (Δ -2.0 pp [-8.2, +0.0]); 4 / 0 / 2 | 69.0%→67.0% (Δ -2.0 pp [-8.5, +0.0]); 2 / 0 / 2 | -0.27 [-0.53, -0.05] / -0.12 [-0.31, +0.06] |
@@ -295,7 +310,7 @@ Observed expanded-cohort lead: `cir_ast:official_clip`. It ranked first on 47/50
 - query polyphony: lowest `monophonic` 76.6% [68.1%, 85.1%], 3096 queries / 24 MIDI IDs; highest `polyphonic` 85.7% [79.8%, 91.3%], 3354 queries / 26 MIDI IDs.
 These are exploratory subgroup contrasts; the intervals resample MIDI IDs and do not imply a causal effect.
 
-All six encoder families have expanded-cohort retrieval results on 6,450 identical common-gallery episodes per family.
+All 7 encoder families have expanded-cohort retrieval results on 6,450 identical common-gallery episodes per family.
 No Vital controls are predicted or trained in this representation-only benchmark (0 outputs; all source controls stay fixed). The linked [vital_control_inventory.jsonl](./vital_control_inventory.jsonl) is the canonical per-field inventory.
 The expanded performance IDs came from the permitted `train` source split; 0 exact MIDI identities overlapping the original cohort were excluded. This is held out from the original MIDI IDs but remains within PresetShare source MIDI, not an external live-performance sample. The score is frozen retrieval on newly rendered audio, not reconstruction quality.
 The acoustic top-5 negatives are selected by an independent spectral descriptor, not human-verified perceptual labels. Query and correct-match gallery quality are reported separately; warned candidates are counted within each full gallery.
@@ -490,7 +505,7 @@ This benchmark uses new Vital renders only; source WAVs are not used as model in
 
 The retrieval gallery contains 131 verified `validation` presets. The permitted `train` MIDI pool contains 50 performances; reserved test sources were not used.
 Vital render QA accepted 6,480 of 6,550 planned requests. Accepted warning flags: 1,531 amplitude above unit range, 1,579 tail rms above warning; warned renders remain in the main comparison and are analyzed separately above.
-The primary results use 6,450 paired queries per measured arm and 129 common preset candidates across 6 encoder families. Retrieval results are frozen-feature cosine rankings; they do not measure reconstruction quality.
+The primary results use 6,450 paired queries per measured arm and 129 common preset candidates across 7 encoder families. Retrieval results are frozen-feature cosine rankings; they do not measure reconstruction quality.
 
 ### Render and feature coverage
 
@@ -503,6 +518,7 @@ The primary results use 6,450 paired queries per measured arm and 129 common pre
 
 | Encoder family | Checkpoint and SHA-256 | Representation and output size | Terms / execution |
 |---|---|---|---|
+| Spotify Basic Pitch contour trunk | `obruxo/basic_pitch_icassp_2022.pt` ([source](https://github.com/spotify/basic-pitch)); SHA-256 `6c8869af67af45472827bb68b4d1a99e78fe3d5e7b6dd41132ac5df609f0cb55` | masked mean 704-D; temporal pyramid 11,264-D | Apache-2.0; executed |
 | LAION-CLAP Music HTSAT-base | `lukewys/laion_clap/music_audioset_epoch_15_esc_90.14.pt` ([source](https://huggingface.co/lukewys/laion_clap)); SHA-256 `fae3e9c087f2909c28a09dc31c8dfcdacbc42ba44c70e972b58c1bd1caf6dedd` | official audio clip embedding; 512-D | CC0-1.0; executed |
 | MuQ-MuLan | `OpenMuQ/MuQ-MuLan-large/pytorch_model.bin` ([source](https://huggingface.co/OpenMuQ/MuQ-MuLan-large)); SHA-256 `fe56bc76aa587d2431c0c416d63f4c857d43ef7678ee6933fbf307b46af9d938` | official audio embedding; 512-D | CC BY-NC 4.0; non-commercial research use only, weights not redistributed; executed |
 | CIR single-timbre AST | `Google Drive: ICASSP26_inst-direct-with-data-aug_final.pt` ([source](https://github.com/gwendal-lv/CIR)); SHA-256 `b08996e4c42511e69af7245695d735d85585a2c41e49ab1fdc67dc308c604bbb` | mean of final CLS and distillation tokens; 768-D | terms unresolved; evaluated for authorized local non-commercial research; executed |

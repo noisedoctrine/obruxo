@@ -48,6 +48,16 @@ python research/modelling/frozen_encoder_retrieval/run.py embed `
 python research/modelling/frozen_encoder_retrieval/run.py evaluate `
   --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation
 
+# Add a newly extracted family to an existing evaluation without recomputing the other arms:
+python research/modelling/frozen_encoder_retrieval/run.py embed `
+  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-train-midi-v3-50 `
+  --model basic_pitch_trunk --checkpoint-root research/modelling/frozen_encoder_retrieval/local_checkpoints `
+  --lock research/modelling/frozen_encoder_retrieval/local_checkpoints/checkpoint-lock.json --device xpu
+
+python research/modelling/frozen_encoder_retrieval/run.py evaluate `
+  --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-train-midi-v3-50 `
+  --models basic_pitch_trunk
+
 python research/modelling/frozen_encoder_retrieval/run.py report `
   --dataset research/modelling/frozen_encoder_retrieval/outputs/issue152-validation
 ```

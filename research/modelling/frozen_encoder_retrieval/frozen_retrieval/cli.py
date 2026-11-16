@@ -61,6 +61,7 @@ def _parser() -> argparse.ArgumentParser:
     embed.add_argument("--device", choices=("cpu", "cuda", "xpu"), default="cpu")
     evaluate = commands.add_parser("evaluate", help="evaluate identical cached retrieval episodes and baselines")
     evaluate.add_argument("--dataset", type=Path, required=True)
+    evaluate.add_argument("--models", nargs="+", help="evaluate only these model families and extend an existing evaluation")
     report = commands.add_parser("report", help="regenerate the sanitized reader-facing comparison report")
     report.add_argument("--dataset", type=Path)
     report.add_argument("--comparison-dataset", type=Path,
@@ -109,7 +110,7 @@ def main(argv: list[str] | None = None) -> int:
             result = extract_dataset(args.dataset, args.model, args.checkpoint_root, args.lock, device=args.device)
         elif args.command == "evaluate":
             from .evaluation import evaluate_dataset
-            result = evaluate_dataset(args.dataset)
+            result = evaluate_dataset(args.dataset, models=args.models)
         elif args.command == "report":
             from .reporting import build_control_inventory, generate_report
             defaults = _defaults()

@@ -281,8 +281,8 @@ def _summary_cohort_lines(label: str, dataset: dict, evaluation: dict | None) ->
         if family not in seen_families:
             seen_families.add(family)
             family_leaders.append(arm)
+    reference = family_leaders[0] if family_leaders else None
     if len(family_leaders) > 1:
-        reference = family_leaders[0]
         lines.extend(["", f"Paired crossed-cluster Recall@1 differences from the leading family representation (`{reference}`; best pooling per family):", "",
                       "| Comparator | ΔR@1 (percentage points) | Crossed MIDI × preset-family 95% CI |",
                       "|---|---:|---:|"])
@@ -291,6 +291,22 @@ def _summary_cohort_lines(label: str, dataset: dict, evaluation: dict | None) ->
             if delta:
                 span = "includes zero" if delta["lower_95"] <= 0 <= delta["upper_95"] else ""
                 lines.append(f"| `{arm}` | {100 * delta['difference']:+.1f} | [{100 * delta['lower_95']:+.1f}, {100 * delta['upper_95']:+.1f}] {span} |")
+    basic_pitch = [(arm, primary) for arm, _, primary in ranked if arm.startswith("basic_pitch_trunk:")]
+    if basic_pitch:
+        best_bp_arm, best_bp = max(basic_pitch, key=lambda item: item[1].get("recall_at_1", 0.0))
+        bp_delta = _paired_delta(evaluation, reference, best_bp_arm) if reference else {}
+        bp_stability = (evaluation.get("ranking_stability_by_performance", {})
+            .get("cross_midi_common_gallery", {}).get(best_bp_arm, {}))
+        summary = (f"Basic Pitch's strongest pooling arm was `{best_bp_arm}` at {_percent(best_bp, 'recall_at_1')} R@1 "
+                   f"({best_bp.get('episodes', 0):,} queries; 50 MIDI performances); it placed first on "
+                   f"{bp_stability.get('first_place_performances', 0)}/{bp_stability.get('performance_clusters', 0)} "
+                   "individual performances.")
+        if bp_delta:
+            summary += (f" The paired CIR-minus-Basic-Pitch gap was {100 * bp_delta['difference']:+.1f} pp "
+                        f"[{100 * bp_delta['lower_95']:+.1f}, {100 * bp_delta['upper_95']:+.1f}] across "
+                        "preset-family and MIDI-performance clusters.")
+        summary += " These retrieval results do not support prioritizing this transcription-trained trunk for a later timbre-reconstruction screen."
+        lines.extend(["", summary])
     lines.extend(["", "The table gives the headline retrieval measures on the shared candidate gallery. R@1 uncertainty is crossed over preset family and MIDI performance (2,000 bootstrap replicates); the heading gives the episode and independent-performance denominators. Hard-negative rates are descriptive proportions with query denominators. Query-audio quality and correct-match gallery quality are broken out below. For the full candidate gallery, the report gives the count and fraction of warned renders rather than labeling all candidates with one bucket. These are descriptive associations: warning status can covary with preset acoustics.", ""])
     lineage = [f"`{arm}` {_percent(primary, 'known_near_neighbor_negative_win_rate')} (n={primary.get('known_near_neighbor_negative_win_episodes', 0):,})"
         for arm, _, primary in ranked if primary.get("known_near_neighbor_negative_win_episodes", 0)]
@@ -399,6 +415,11 @@ def _issue155_followup_lines(results: dict, shortlist: dict | None) -> list[str]
     arms = sorted(assignment.get("aggregate", {}))
     lines = ["## Issue #155 diagnostic results", "", "### Comparison-MIDI assignments", "",
         "The original four-MIDI result is preserved as the baseline. We also reassigned the common comparison MIDI three times (deterministic offsets 1, 7 and 19) using all 50 existing excerpts. Each search still ranks the same 129 preset candidates, and the query and gallery play different MIDI excerpts. The 6,450 query inputs repeat across assignments. R@1, R@5 and MRR averages combine each query's three assignments; rank-distribution metrics below use all three attempts and keep them together in the crossed bootstrap.", ""]
+    evaluated_followup_families = {arm.split(":", 1)[0] for arm in assignment.get("aggregate", {})}
+    omitted_followup_families = sorted(set(MODEL_REGISTRY) - evaluated_followup_families)
+    if omitted_followup_families:
+        labels = ", ".join(MODEL_REGISTRY[name]["name"] for name in omitted_followup_families)
+        lines.extend([f"The main 50-performance comparison above includes {labels}, but this previously completed three-offset, rank-failure, and gain-normalization follow-up does not. No Basic Pitch result is claimed for these supplementary analyses.", ""])
     if offsets and arms:
         headers = [f"Offset {offset} R@1 [crossed 95% CI] / R@5 / MRR" for offset in offsets]
         lines.extend(["| Encoder arm | " + " | ".join(headers) + " | Three-assignment query average |",
@@ -499,7 +520,7 @@ def _issue155_followup_lines(results: dict, shortlist: dict | None) -> list[str]
     clean_query = results.get("clean_query_only", {})
     if clean_query.get("arms"):
         lines.extend(["", "### Audio quality checks", "",
-            f"**A — Original audio:** the {results.get('input_dataset', {}).get('encoder_families', len(MODEL_REGISTRY))}-encoder benchmark above uses {results.get('input_dataset', {}).get('accepted_cached_clips', 'n/e'):,} accepted cached clips, with the original four-MIDI results retained.",
+            f"**A — Original audio:** the expanded retrieval comparison above uses {len(MODEL_REGISTRY)} encoder families and {results.get('input_dataset', {}).get('accepted_cached_clips', 'n/e'):,} accepted cached clips, with the original four-MIDI results retained.",
             "**B — Clean queries:** we re-summarized the existing cached-feature episode scores for queries whose WAVs had no QA warning. No model inference was repeated for this slice.", "",
             "| Encoder arm | Clean-query R@1 [crossed 95% CI] / R@5 / MRR | Queries |",
             "|---|---:|---:|"])
