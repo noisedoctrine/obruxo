@@ -1,0 +1,650 @@
+{
+  "method": {
+    "batch_size": 1,
+    "device_required": "XPU",
+    "duration_strata_seconds": {
+      "10 s": [
+        10,
+        10
+      ],
+      "4\u20136 s": [
+        4,
+        6
+      ],
+      "6\u20138 s": [
+        6,
+        8
+      ],
+      "8\u201310 s": [
+        8,
+        10
+      ]
+    },
+    "equal_allocation_per_duration_stratum": 32,
+    "forward_timing": "synchronized around the existing model forward entry point where instrumentable; wrapper boundaries may include model-native preprocessing",
+    "isolated_process_per_encoder": true,
+    "precision_required": "float32",
+    "ram_sampling_interval_seconds": 0.01,
+    "sample_count": 128,
+    "sample_profile": {
+      "accepted_receipts": 6480,
+      "duration_seconds": {
+        "maximum": 10.0,
+        "median": 8.134784580498867,
+        "minimum": 5.0
+      },
+      "duration_strata_counts": {
+        "10 s": 32,
+        "4\u20136 s": 32,
+        "6\u20138 s": 32,
+        "8\u201310 s": 32
+      },
+      "eligible_existing_wavs": 6480,
+      "sample_channels": {
+        "2": 128
+      },
+      "sample_count": 128,
+      "sample_dtypes": {
+        "float32": 128
+      },
+      "sample_source_rates_hz": {
+        "44100": 128
+      },
+      "seed": 157,
+      "skipped_or_ineligible_receipts": 0,
+      "source_channels": {
+        "2": 6480
+      },
+      "source_dtypes": {
+        "float32": 6480
+      },
+      "source_sample_rates_hz": {
+        "44100": 6480
+      }
+    },
+    "seed": 157,
+    "timed_passes": 3,
+    "timing": "synchronized per-recording wall time around existing adapter.extract; includes WAV read, mono conversion/resampling, adapter preprocessing, forward, output transfer and pooling; excludes load and warmup",
+    "warmups_per_duration_stratum": 1
+  },
+  "models": {
+    "basic_pitch_trunk": {
+      "aggregate": {
+        "audio_seconds_per_wall_second": 27.887719805185178,
+        "duration_bands": {
+          "10 s": {
+            "audio_seconds_per_wall_second": 28.474742751927177,
+            "forward_median_ms": 9.319749999121996,
+            "forward_p90_ms": 9.726569998747436,
+            "latency_median_ms": 282.7881000011985,
+            "latency_p90_ms": 301.89387000355055,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "4\u20136 s": {
+            "audio_seconds_per_wall_second": 24.800169809534783,
+            "forward_median_ms": 6.93669999964186,
+            "forward_p90_ms": 7.313500004238449,
+            "latency_median_ms": 146.07170000090264,
+            "latency_p90_ms": 434.29022000345924,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "6\u20138 s": {
+            "audio_seconds_per_wall_second": 28.773440664371602,
+            "forward_median_ms": 7.606600000144681,
+            "forward_p90_ms": 8.117000001220731,
+            "latency_median_ms": 204.58584999869345,
+            "latency_p90_ms": 229.27546999635524,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "8\u201310 s": {
+            "audio_seconds_per_wall_second": 28.701220614015515,
+            "forward_median_ms": 8.531250001396984,
+            "forward_p90_ms": 9.55129000285524,
+            "latency_median_ms": 262.5686499995936,
+            "latency_p90_ms": 339.89103000058105,
+            "recordings": 32,
+            "timed_calls": 96
+          }
+        },
+        "forward_median_ms": 8.023500002309447,
+        "forward_p90_ms": 9.53879000080633,
+        "latency_median_ms": 238.52930000066408,
+        "latency_p90_ms": 297.3419100017054,
+        "recordings": 128,
+        "timed_calls": 384
+      },
+      "all_inputs_processed": true,
+      "batch_size": 1,
+      "checkpoint_revision": "9991303bba609a3b93089d13ec80d1d495083596",
+      "checkpoint_sha256": "6c8869af67af45472827bb68b4d1a99e78fe3d5e7b6dd41132ac5df609f0cb55",
+      "device": "Intel(R) Arc(TM) 140T GPU (16GB)",
+      "display_name": "Spotify Basic Pitch contour trunk",
+      "failure_count": 0,
+      "failure_types": {},
+      "forward_timing_available": true,
+      "forward_timing_boundary": "contour trunk forward",
+      "input_count": 128,
+      "loader_revision": "obruxo_basic_pitch@frozen_contour_trunk_v1",
+      "local_config_pins": {},
+      "model": "basic_pitch_trunk",
+      "model_loading_seconds": 0.047011499998916406,
+      "peak_process_rss_bytes": 2301898752,
+      "peak_xpu_allocated_bytes": 47813632,
+      "precision": "float32",
+      "resident_xpu_bytes_after_load": 155136,
+      "runtime_versions": {
+        "numpy": "2.4.6",
+        "scipy": "1.18.0",
+        "torch": "2.12.1+xpu"
+      },
+      "successful_recordings_all_passes": 128,
+      "successful_timed_calls": 384,
+      "timed_passes": 3,
+      "warmup_failure_count": 0,
+      "warmup_recordings": 4
+    },
+    "beats_iter3_plus": {
+      "aggregate": {
+        "audio_seconds_per_wall_second": 30.154261374276604,
+        "duration_bands": {
+          "10 s": {
+            "audio_seconds_per_wall_second": 32.55132648230387,
+            "forward_median_ms": 150.42220000032103,
+            "forward_p90_ms": 189.67196000085096,
+            "latency_median_ms": 276.09469999879366,
+            "latency_p90_ms": 324.45043000043364,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "4\u20136 s": {
+            "audio_seconds_per_wall_second": 25.597253996855724,
+            "forward_median_ms": 84.76075000362471,
+            "forward_p90_ms": 111.39903999865055,
+            "latency_median_ms": 159.86940000220784,
+            "latency_p90_ms": 207.7704600043944,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "6\u20138 s": {
+            "audio_seconds_per_wall_second": 28.325237627215067,
+            "forward_median_ms": 119.58405000041239,
+            "forward_p90_ms": 157.1767600042222,
+            "latency_median_ms": 217.0615499962878,
+            "latency_p90_ms": 262.1982399999979,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "8\u201310 s": {
+            "audio_seconds_per_wall_second": 32.69648186034424,
+            "forward_median_ms": 159.39040000375826,
+            "forward_p90_ms": 183.39114999762387,
+            "latency_median_ms": 267.95955000125105,
+            "latency_p90_ms": 308.6706699956267,
+            "recordings": 32,
+            "timed_calls": 96
+          }
+        },
+        "forward_median_ms": 129.99445000241394,
+        "forward_p90_ms": 177.95561000020825,
+        "latency_median_ms": 240.01445000249078,
+        "latency_p90_ms": 304.8813999965205,
+        "recordings": 128,
+        "timed_calls": 384
+      },
+      "all_inputs_processed": true,
+      "batch_size": 1,
+      "checkpoint_revision": "5b53b0404df452a3a607d7e67687227730e5bad1",
+      "checkpoint_sha256": "d43cbfad4d7b56381c061d7a24774f908d4d94c72961f6eb1d9090ff18cd8d34",
+      "device": "Intel(R) Arc(TM) 140T GPU (16GB)",
+      "display_name": "BEATs iter3+ AS2M",
+      "failure_count": 0,
+      "failure_types": {},
+      "forward_timing_available": true,
+      "forward_timing_boundary": "BEATs feature forward",
+      "input_count": 128,
+      "loader_revision": "31c5b904ca1bf2afb4c234a6675c683a4e5fc7cd",
+      "local_config_pins": {},
+      "model": "beats_iter3_plus",
+      "model_loading_seconds": 2.0510659999999916,
+      "peak_process_rss_bytes": 3777622016,
+      "peak_xpu_allocated_bytes": 445343232,
+      "precision": "float32",
+      "resident_xpu_bytes_after_load": 361782784,
+      "runtime_versions": {
+        "numpy": "1.26.4",
+        "scipy": "1.17.1",
+        "torch": "2.12.1+xpu",
+        "torchaudio": "2.11.0+xpu"
+      },
+      "successful_recordings_all_passes": 128,
+      "successful_timed_calls": 384,
+      "timed_passes": 3,
+      "warmup_failure_count": 0,
+      "warmup_recordings": 4
+    },
+    "cir_ast": {
+      "aggregate": {
+        "audio_seconds_per_wall_second": 27.706447645714466,
+        "duration_bands": {
+          "10 s": {
+            "audio_seconds_per_wall_second": 33.484582378059066,
+            "forward_median_ms": 249.45590000061202,
+            "forward_p90_ms": 263.1541199996718,
+            "latency_median_ms": 289.05974999725004,
+            "latency_p90_ms": 311.24013000080595,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "4\u20136 s": {
+            "audio_seconds_per_wall_second": 19.257929438219616,
+            "forward_median_ms": 261.8184499988274,
+            "forward_p90_ms": 270.6760299995949,
+            "latency_median_ms": 287.2712499993213,
+            "latency_p90_ms": 295.2521300052467,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "6\u20138 s": {
+            "audio_seconds_per_wall_second": 25.360105068173716,
+            "forward_median_ms": 254.71235000077286,
+            "forward_p90_ms": 271.8733100038662,
+            "latency_median_ms": 288.15599999870756,
+            "latency_p90_ms": 306.5548999948078,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "8\u201310 s": {
+            "audio_seconds_per_wall_second": 32.57367492948309,
+            "forward_median_ms": 250.11130000348203,
+            "forward_p90_ms": 266.38362000230705,
+            "latency_median_ms": 288.8106499995047,
+            "latency_p90_ms": 301.35614000100765,
+            "recordings": 32,
+            "timed_calls": 96
+          }
+        },
+        "forward_median_ms": 253.6140499978501,
+        "forward_p90_ms": 271.1096199993335,
+        "latency_median_ms": 288.6297500008368,
+        "latency_p90_ms": 302.17308000283083,
+        "recordings": 128,
+        "timed_calls": 384
+      },
+      "all_inputs_processed": true,
+      "batch_size": 1,
+      "checkpoint_revision": "google-drive:1rbudnDYkc8-7KHm2jYk8ouyhob0zzCHI",
+      "checkpoint_sha256": "b08996e4c42511e69af7245695d735d85585a2c41e49ab1fdc67dc308c604bbb",
+      "device": "Intel(R) Arc(TM) 140T GPU (16GB)",
+      "display_name": "CIR single-timbre AST",
+      "failure_count": 0,
+      "failure_types": {},
+      "forward_timing_available": true,
+      "forward_timing_boundary": "official embedding wrapper (includes its input preparation)",
+      "input_count": 128,
+      "loader_revision": "ca551b8df4234e40e3acc84202f8b921854be89c",
+      "local_config_pins": {
+        "ast": {
+          "revision": "820128982ca1044325d77662565c4dc77411f709",
+          "sha256": "b43827aafcd9a0238c505c50b1315e1ebf191d292d6dc436b39d73b0975a1016"
+        }
+      },
+      "model": "cir_ast",
+      "model_loading_seconds": 6.884924099998898,
+      "peak_process_rss_bytes": 2316288000,
+      "peak_xpu_allocated_bytes": 433472512,
+      "precision": "float32",
+      "resident_xpu_bytes_after_load": 343636992,
+      "runtime_versions": {
+        "librosa": "1.0.0",
+        "numpy": "1.26.4",
+        "scipy": "1.17.1",
+        "torch": "2.12.1+xpu",
+        "tqdm": "4.68.4",
+        "transformers": "4.50.0"
+      },
+      "successful_recordings_all_passes": 128,
+      "successful_timed_calls": 384,
+      "timed_passes": 3,
+      "warmup_failure_count": 0,
+      "warmup_recordings": 4
+    },
+    "clap_music": {
+      "aggregate": {
+        "audio_seconds_per_wall_second": 143.99891900416566,
+        "duration_bands": {
+          "10 s": {
+            "audio_seconds_per_wall_second": 173.12477376773586,
+            "forward_median_ms": 43.91794999901322,
+            "forward_p90_ms": 44.772139997803606,
+            "latency_median_ms": 56.49230000199168,
+            "latency_p90_ms": 57.41117999641574,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "4\u20136 s": {
+            "audio_seconds_per_wall_second": 111.9340143058274,
+            "forward_median_ms": 42.35100000005332,
+            "forward_p90_ms": 43.19684999936726,
+            "latency_median_ms": 50.08855000050971,
+            "latency_p90_ms": 51.68866000531125,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "6\u20138 s": {
+            "audio_seconds_per_wall_second": 124.49753887651255,
+            "forward_median_ms": 44.29454999990412,
+            "forward_p90_ms": 45.35228999884566,
+            "latency_median_ms": 54.46450000090408,
+            "latency_p90_ms": 71.17289000016174,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "8\u201310 s": {
+            "audio_seconds_per_wall_second": 162.35635113822858,
+            "forward_median_ms": 45.36039999948116,
+            "forward_p90_ms": 46.16315999519429,
+            "latency_median_ms": 57.6173999979801,
+            "latency_p90_ms": 58.798869997553986,
+            "recordings": 32,
+            "timed_calls": 96
+          }
+        },
+        "forward_median_ms": 44.07435000030091,
+        "forward_p90_ms": 45.53481999828363,
+        "latency_median_ms": 55.767999998352025,
+        "latency_p90_ms": 58.11619000232895,
+        "recordings": 128,
+        "timed_calls": 384
+      },
+      "all_inputs_processed": true,
+      "batch_size": 1,
+      "checkpoint_revision": "b3708341862f581175dba5c356a4ebf74a9b6651",
+      "checkpoint_sha256": "fae3e9c087f2909c28a09dc31c8dfcdacbc42ba44c70e972b58c1bd1caf6dedd",
+      "device": "Intel(R) Arc(TM) 140T GPU (16GB)",
+      "display_name": "LAION-CLAP Music HTSAT-base",
+      "failure_count": 0,
+      "failure_types": {},
+      "forward_timing_available": true,
+      "forward_timing_boundary": "official embedding wrapper (includes its input preparation)",
+      "input_count": 128,
+      "loader_revision": "laion_clap==1.1.7",
+      "local_config_pins": {},
+      "model": "clap_music",
+      "model_loading_seconds": 10.77831370000058,
+      "peak_process_rss_bytes": 4111036416,
+      "peak_xpu_allocated_bytes": 851259904,
+      "precision": "float32",
+      "resident_xpu_bytes_after_load": 806957056,
+      "runtime_versions": {
+        "laion_clap": "1.1.7",
+        "numpy": "1.26.4",
+        "scipy": "1.17.1",
+        "torch": "2.12.1+xpu",
+        "transformers": "4.50.0"
+      },
+      "successful_recordings_all_passes": 128,
+      "successful_timed_calls": 384,
+      "timed_passes": 3,
+      "warmup_failure_count": 0,
+      "warmup_recordings": 4
+    },
+    "dac_44khz": {
+      "aggregate": {
+        "audio_seconds_per_wall_second": 5.727674302714439,
+        "duration_bands": {
+          "10 s": {
+            "audio_seconds_per_wall_second": 6.015961138256115,
+            "forward_median_ms": 931.0788999973738,
+            "forward_p90_ms": 1013.6572000010347,
+            "latency_median_ms": 1637.802549998014,
+            "latency_p90_ms": 1830.2784900020924,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "4\u20136 s": {
+            "audio_seconds_per_wall_second": 5.578365276265015,
+            "forward_median_ms": 541.4510999980848,
+            "forward_p90_ms": 616.2895200039201,
+            "latency_median_ms": 936.5703000003123,
+            "latency_p90_ms": 1299.464599999192,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "6\u20138 s": {
+            "audio_seconds_per_wall_second": 5.790317113745801,
+            "forward_median_ms": 698.1639999976323,
+            "forward_p90_ms": 765.3113099986513,
+            "latency_median_ms": 1222.0920500003558,
+            "latency_p90_ms": 1532.6462800003355,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "8\u201310 s": {
+            "audio_seconds_per_wall_second": 5.489155213934051,
+            "forward_median_ms": 945.7276499997533,
+            "forward_p90_ms": 1192.6887600056946,
+            "latency_median_ms": 1702.1331999967515,
+            "latency_p90_ms": 2040.892209998856,
+            "recordings": 32,
+            "timed_calls": 96
+          }
+        },
+        "forward_median_ms": 766.4326999984041,
+        "forward_p90_ms": 1009.086409999145,
+        "latency_median_ms": 1466.2558500021987,
+        "latency_p90_ms": 1826.4624300019934,
+        "recordings": 128,
+        "timed_calls": 384
+      },
+      "all_inputs_processed": true,
+      "batch_size": 1,
+      "checkpoint_revision": "c1bc521685adf9cfe247bc39a5ca58917eda1ac4",
+      "checkpoint_sha256": "128180a5e4d41ceabfeb952b687fb9da7cf468c2291acf5be9cadb5ab091cc46",
+      "device": "Intel(R) Arc(TM) 140T GPU (16GB)",
+      "display_name": "Descript Audio Codec 44.1 kHz",
+      "failure_count": 0,
+      "failure_types": {},
+      "forward_timing_available": true,
+      "forward_timing_boundary": "continuous codec encoder forward",
+      "input_count": 128,
+      "loader_revision": "transformers==4.50.0",
+      "local_config_pins": {},
+      "model": "dac_44khz",
+      "model_loading_seconds": 5.894541199995729,
+      "peak_process_rss_bytes": 3887751168,
+      "peak_xpu_allocated_bytes": 990163968,
+      "precision": "float32",
+      "resident_xpu_bytes_after_load": 308922368,
+      "runtime_versions": {
+        "numpy": "1.26.4",
+        "scipy": "1.17.1",
+        "torch": "2.12.1+xpu",
+        "transformers": "4.50.0"
+      },
+      "successful_recordings_all_passes": 128,
+      "successful_timed_calls": 384,
+      "timed_passes": 3,
+      "warmup_failure_count": 0,
+      "warmup_recordings": 4
+    },
+    "encodec_24khz": {
+      "aggregate": {
+        "audio_seconds_per_wall_second": 13.835451120695346,
+        "duration_bands": {
+          "10 s": {
+            "audio_seconds_per_wall_second": 14.930384910790897,
+            "forward_median_ms": 556.7331500024011,
+            "forward_p90_ms": 648.0512900001486,
+            "latency_median_ms": 622.4284999989322,
+            "latency_p90_ms": 721.4305399960722,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "4\u20136 s": {
+            "audio_seconds_per_wall_second": 13.682180989303554,
+            "forward_median_ms": 340.37355000327807,
+            "forward_p90_ms": 387.4743800050055,
+            "latency_median_ms": 375.0782999995863,
+            "latency_p90_ms": 422.2051899974759,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "6\u20138 s": {
+            "audio_seconds_per_wall_second": 13.868290582549603,
+            "forward_median_ms": 435.1741499995114,
+            "forward_p90_ms": 515.2946299996984,
+            "latency_median_ms": 482.6831999998831,
+            "latency_p90_ms": 597.562489999109,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "8\u201310 s": {
+            "audio_seconds_per_wall_second": 12.891513671291392,
+            "forward_median_ms": 560.8075499985716,
+            "forward_p90_ms": 659.3384099985997,
+            "latency_median_ms": 616.7386499982968,
+            "latency_p90_ms": 774.2114500018943,
+            "recordings": 32,
+            "timed_calls": 96
+          }
+        },
+        "forward_median_ms": 506.56549999985145,
+        "forward_p90_ms": 643.7313799971889,
+        "latency_median_ms": 560.7657000000472,
+        "latency_p90_ms": 702.0084800002223,
+        "recordings": 128,
+        "timed_calls": 384
+      },
+      "all_inputs_processed": true,
+      "batch_size": 1,
+      "checkpoint_revision": "c5e61996c75613cfd18f4c53cc06667932675776",
+      "checkpoint_sha256": "304c7656c7f978fa9d6838fbc7312108d2345ba6b1b816c8599653da8a71bdb3",
+      "device": "Intel(R) Arc(TM) 140T GPU (16GB)",
+      "display_name": "Meta EnCodec 24 kHz",
+      "failure_count": 0,
+      "failure_types": {},
+      "forward_timing_available": true,
+      "forward_timing_boundary": "continuous codec encoder forward",
+      "input_count": 128,
+      "loader_revision": "transformers==4.50.0",
+      "local_config_pins": {},
+      "model": "encodec_24khz",
+      "model_loading_seconds": 5.9912107000054675,
+      "peak_process_rss_bytes": 2357219328,
+      "peak_xpu_allocated_bytes": 253531648,
+      "precision": "float32",
+      "resident_xpu_bytes_after_load": 95268352,
+      "runtime_versions": {
+        "numpy": "1.26.4",
+        "scipy": "1.17.1",
+        "torch": "2.12.1+xpu",
+        "transformers": "4.50.0"
+      },
+      "successful_recordings_all_passes": 128,
+      "successful_timed_calls": 384,
+      "timed_passes": 3,
+      "warmup_failure_count": 0,
+      "warmup_recordings": 4
+    },
+    "muq_mulan": {
+      "aggregate": {
+        "audio_seconds_per_wall_second": 20.470136600594014,
+        "duration_bands": {
+          "10 s": {
+            "audio_seconds_per_wall_second": 24.91893474674577,
+            "forward_median_ms": 381.3439000005019,
+            "forward_p90_ms": 412.4101499990502,
+            "latency_median_ms": 404.5317000018258,
+            "latency_p90_ms": 438.2805100009137,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "4\u20136 s": {
+            "audio_seconds_per_wall_second": 14.234866674714597,
+            "forward_median_ms": 389.6327000002202,
+            "forward_p90_ms": 413.3927500050049,
+            "latency_median_ms": 404.1332499982673,
+            "latency_p90_ms": 429.51492000138387,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "6\u20138 s": {
+            "audio_seconds_per_wall_second": 18.621503447977886,
+            "forward_median_ms": 380.59249999787426,
+            "forward_p90_ms": 409.0297700022347,
+            "latency_median_ms": 408.52845000335947,
+            "latency_p90_ms": 450.3734199992323,
+            "recordings": 32,
+            "timed_calls": 96
+          },
+          "8\u201310 s": {
+            "audio_seconds_per_wall_second": 24.02325948899206,
+            "forward_median_ms": 385.8464999975695,
+            "forward_p90_ms": 414.85313000521273,
+            "latency_median_ms": 408.0850999998802,
+            "latency_p90_ms": 438.79741999699036,
+            "recordings": 32,
+            "timed_calls": 96
+          }
+        },
+        "forward_median_ms": 383.1552000010561,
+        "forward_p90_ms": 413.30564000236336,
+        "latency_median_ms": 404.9220000015339,
+        "latency_p90_ms": 438.3681200000865,
+        "recordings": 128,
+        "timed_calls": 384
+      },
+      "all_inputs_processed": true,
+      "batch_size": 1,
+      "checkpoint_revision": "2e01c796b71dca71b45251384c04cd7b237c9020",
+      "checkpoint_sha256": "fe56bc76aa587d2431c0c416d63f4c857d43ef7678ee6933fbf307b46af9d938",
+      "device": "Intel(R) Arc(TM) 140T GPU (16GB)",
+      "display_name": "MuQ-MuLan",
+      "failure_count": 0,
+      "failure_types": {},
+      "forward_timing_available": true,
+      "forward_timing_boundary": "MuQ audio forward (includes model-native frontend)",
+      "input_count": 128,
+      "loader_revision": "muq==0.1.0",
+      "local_config_pins": {
+        "audio": {
+          "revision": "0562a57814f6f8bbd9fdea0a25921a2fce1a841a",
+          "sha256": "a7e0d590e649147ce6af2c8bf0126f8457332054481f67ecea422b5aed28c5ce"
+        },
+        "text": {
+          "revision": "e73636d4f797dec63c3081bb6ed5c7b0bb3f2089",
+          "sha256": "2e17c855a6b77ba1fad3e980612f7f6f9ca51e7ab77da583014605e53cea9bfe"
+        }
+      },
+      "model": "muq_mulan",
+      "model_loading_seconds": 13.85917569999583,
+      "peak_process_rss_bytes": 7521566720,
+      "peak_xpu_allocated_bytes": 2873438208,
+      "precision": "float32",
+      "resident_xpu_bytes_after_load": 2663775744,
+      "runtime_versions": {
+        "easydict": "1.14",
+        "einops": "0.8.2",
+        "huggingface_hub": "0.36.0",
+        "librosa": "1.0.0",
+        "muq": "0.1.0",
+        "numpy": "1.26.4",
+        "scipy": "1.17.1",
+        "torch": "2.12.1+xpu",
+        "torchaudio": "2.11.0+xpu",
+        "transformers": "4.50.0",
+        "x_clip": "0.15.0"
+      },
+      "successful_recordings_all_passes": 128,
+      "successful_timed_calls": 384,
+      "timed_passes": 3,
+      "warmup_failure_count": 0,
+      "warmup_recordings": 4
+    }
+  },
+  "schema_version": 1,
+  "visualization": "figures/model_efficiency_vs_retrieval.png"
+}
