@@ -1,0 +1,1627 @@
+{
+  "acoustic_contract": {
+    "alignment": "sample zero; exact full-clip frame match; no shift, trim, or padding",
+    "clipping": "retain accepted float32 samples unchanged; report receipt warnings",
+    "device": "xpu",
+    "fft_sizes": [
+      512,
+      2048,
+      8192
+    ],
+    "hop_fraction": 0.25,
+    "metric": "mean_3_scale_spectral_convergence_plus_log_magnitude_mae",
+    "pair_batch_size": 64,
+    "resolutions": {
+      "2048": {
+        "fft_size": 2048,
+        "hop_length": 512,
+        "scored_ordered_pairs": 16641
+      },
+      "512": {
+        "fft_size": 512,
+        "hop_length": 128,
+        "scored_ordered_pairs": 16641
+      },
+      "8192": {
+        "fft_size": 8192,
+        "hop_length": 2048,
+        "scored_ordered_pairs": 16641
+      }
+    },
+    "scoring_window": "full saved stereo WAV including renderer tail",
+    "silence": "reject nonfinite or zero-energy clips; do not floor waveforms",
+    "window": "hann"
+  },
+  "arms": {
+    "basic_pitch_trunk:masked_mean": {
+      "envelope_relative_rmse": {
+        "clustered_95_ci": [
+          2.57099436763627,
+          7.401811039625727
+        ],
+        "family_clusters": 129,
+        "mean": 4.240744325752686,
+        "triplet_clusters": 12
+      },
+      "exact_preset_recall_at_1": 0.19488372093023257,
+      "excess_over_oracle": {
+        "clustered_95_ci": [
+          3.5460225850131932,
+          8.810473267274883
+        ],
+        "family_clusters": 129,
+        "mean": 5.353520482239489,
+        "triplet_clusters": 12
+      },
+      "family_mean_raw_error_quantiles": {
+        "0.1": 3.5444200654824574,
+        "0.5": 5.178853283325831,
+        "0.9": 10.704326673348747
+      },
+      "gain_matched_mrstft": {
+        "clustered_95_ci": [
+          3.550873014369368,
+          3.906699628864225
+        ],
+        "family_clusters": 129,
+        "mean": 3.729128085866147,
+        "triplet_clusters": 12
+      },
+      "global_rms_relative_error": {
+        "clustered_95_ci": [
+          2.3438097097203876,
+          7.15117405378921
+        ],
+        "family_clusters": 129,
+        "mean": 4.00184074642394,
+        "triplet_clusters": 12
+      },
+      "issue157_preset_dominant_fraction": 0.7182520566366082,
+      "original_level_mrstft": {
+        "clustered_95_ci": [
+          5.7386938858709895,
+          10.975864593195663
+        ],
+        "family_clusters": 129,
+        "mean": 7.541516711699562,
+        "triplet_clusters": 12
+      },
+      "rank_among_128_alternatives": {
+        "mean": 48.74418604651163,
+        "median": 39.0,
+        "oracle_first_fraction": 0.02131782945736434
+      },
+      "worst_decile_family_mean_raw_error": 28.098501118329857
+    },
+    "basic_pitch_trunk:temporal_pyramid_8": {
+      "envelope_relative_rmse": {
+        "clustered_95_ci": [
+          2.216958282881147,
+          5.526160746064864
+        ],
+        "family_clusters": 129,
+        "mean": 3.473720745161139,
+        "triplet_clusters": 12
+      },
+      "exact_preset_recall_at_1": 0.2186046511627907,
+      "excess_over_oracle": {
+        "clustered_95_ci": [
+          3.0828860356027223,
+          6.647156460119231
+        ],
+        "family_clusters": 129,
+        "mean": 4.447182506322861,
+        "triplet_clusters": 12
+      },
+      "family_mean_raw_error_quantiles": {
+        "0.1": 3.4131941656271616,
+        "0.5": 4.790568292140961,
+        "0.9": 9.29887520869573
+      },
+      "gain_matched_mrstft": {
+        "clustered_95_ci": [
+          3.548483485062378,
+          3.859871233990103
+        ],
+        "family_clusters": 129,
+        "mean": 3.697355089377063,
+        "triplet_clusters": 12
+      },
+      "global_rms_relative_error": {
+        "clustered_95_ci": [
+          1.989995675197365,
+          5.247930646074292
+        ],
+        "family_clusters": 129,
+        "mean": 3.2205400493853116,
+        "triplet_clusters": 12
+      },
+      "issue157_preset_dominant_fraction": 0.6894291103069135,
+      "original_level_mrstft": {
+        "clustered_95_ci": [
+          5.280231707479603,
+          8.825062629455356
+        ],
+        "family_clusters": 129,
+        "mean": 6.635178735782934,
+        "triplet_clusters": 12
+      },
+      "rank_among_128_alternatives": {
+        "mean": 45.32751937984496,
+        "median": 36.0,
+        "oracle_first_fraction": 0.023255813953488372
+      },
+      "worst_decile_family_mean_raw_error": 21.988403687110313
+    },
+    "beats_iter3_plus:masked_mean": {
+      "envelope_relative_rmse": {
+        "clustered_95_ci": [
+          1.9020196837162302,
+          3.45892974627049
+        ],
+        "family_clusters": 129,
+        "mean": 2.5847506079257005,
+        "triplet_clusters": 12
+      },
+      "exact_preset_recall_at_1": 0.5927131782945736,
+      "excess_over_oracle": {
+        "clustered_95_ci": [
+          2.806074076733078,
+          4.48759551471826
+        ],
+        "family_clusters": 129,
+        "mean": 3.552625728361982,
+        "triplet_clusters": 12
+      },
+      "family_mean_raw_error_quantiles": {
+        "0.1": 3.5473050514856976,
+        "0.5": 4.525788903236389,
+        "0.9": 8.99376303354899
+      },
+      "gain_matched_mrstft": {
+        "clustered_95_ci": [
+          3.389986498704907,
+          3.7834540121189923
+        ],
+        "family_clusters": 129,
+        "mean": 3.580061092125661,
+        "triplet_clusters": 12
+      },
+      "global_rms_relative_error": {
+        "clustered_95_ci": [
+          1.6977081830506855,
+          3.2402137016148544
+        ],
+        "family_clusters": 129,
+        "mean": 2.3672287669624232,
+        "triplet_clusters": 12
+      },
+      "issue157_preset_dominant_fraction": 0.8962690832146812,
+      "original_level_mrstft": {
+        "clustered_95_ci": [
+          4.969020990220691,
+          6.6906437760868736
+        ],
+        "family_clusters": 129,
+        "mean": 5.740621957822055,
+        "triplet_clusters": 12
+      },
+      "rank_among_128_alternatives": {
+        "mean": 41.77713178294574,
+        "median": 32.0,
+        "oracle_first_fraction": 0.044573643410852716
+      },
+      "worst_decile_family_mean_raw_error": 15.396100675066313
+    },
+    "beats_iter3_plus:temporal_pyramid_8": {
+      "envelope_relative_rmse": {
+        "clustered_95_ci": [
+          2.0888610481752905,
+          4.23178150909137
+        ],
+        "family_clusters": 129,
+        "mean": 2.9859857816233326,
+        "triplet_clusters": 12
+      },
+      "exact_preset_recall_at_1": 0.6215503875968992,
+      "excess_over_oracle": {
+        "clustered_95_ci": [
+          2.981732809474302,
+          5.212996768899435
+        ],
+        "family_clusters": 129,
+        "mean": 3.917288700816551,
+        "triplet_clusters": 12
+      },
+      "family_mean_raw_error_quantiles": {
+        "0.1": 3.5051085551579795,
+        "0.5": 4.582623779773712,
+        "0.9": 9.95157634019852
+      },
+      "gain_matched_mrstft": {
+        "clustered_95_ci": [
+          3.379764443019872,
+          3.7348684247419506
+        ],
+        "family_clusters": 129,
+        "mean": 3.547202822696947,
+        "triplet_clusters": 12
+      },
+      "global_rms_relative_error": {
+        "clustered_95_ci": [
+          1.8840050582673558,
+          4.02105409662982
+        ],
+        "family_clusters": 129,
+        "mean": 2.7713311263439504,
+        "triplet_clusters": 12
+      },
+      "issue157_preset_dominant_fraction": 0.8625632316880241,
+      "original_level_mrstft": {
+        "clustered_95_ci": [
+          5.176323530771012,
+          7.363815970270285
+        ],
+        "family_clusters": 129,
+        "mean": 6.105284930276624,
+        "triplet_clusters": 12
+      },
+      "rank_among_128_alternatives": {
+        "mean": 42.498062015503876,
+        "median": 32.0,
+        "oracle_first_fraction": 0.04974160206718346
+      },
+      "worst_decile_family_mean_raw_error": 18.045258725300815
+    },
+    "cir_ast:official_clip": {
+      "envelope_relative_rmse": {
+        "clustered_95_ci": [
+          1.7739781726189543,
+          3.959903588177035
+        ],
+        "family_clusters": 129,
+        "mean": 2.6944219161016196,
+        "triplet_clusters": 12
+      },
+      "exact_preset_recall_at_1": 0.8137984496124031,
+      "excess_over_oracle": {
+        "clustered_95_ci": [
+          2.4307206266321413,
+          4.6914723293283025
+        ],
+        "family_clusters": 129,
+        "mean": 3.3765732686803016,
+        "triplet_clusters": 12
+      },
+      "family_mean_raw_error_quantiles": {
+        "0.1": 2.835156593720118,
+        "0.5": 4.1903970042864485,
+        "0.9": 8.232420621315638
+      },
+      "gain_matched_mrstft": {
+        "clustered_95_ci": [
+          3.161803938890266,
+          3.5084845229521275
+        ],
+        "family_clusters": 129,
+        "mean": 3.327312053482046,
+        "triplet_clusters": 12
+      },
+      "global_rms_relative_error": {
+        "clustered_95_ci": [
+          1.5687641595932316,
+          3.728972966112576
+        ],
+        "family_clusters": 129,
+        "mean": 2.4769566440884314,
+        "triplet_clusters": 12
+      },
+      "issue157_preset_dominant_fraction": 0.9822386687233032,
+      "original_level_mrstft": {
+        "clustered_95_ci": [
+          4.596041047514371,
+          6.8958627984178
+        ],
+        "family_clusters": 129,
+        "mean": 5.564569498140375,
+        "triplet_clusters": 12
+      },
+      "rank_among_128_alternatives": {
+        "mean": 36.26227390180878,
+        "median": 23.0,
+        "oracle_first_fraction": 0.06847545219638243
+      },
+      "worst_decile_family_mean_raw_error": 17.99209620631658
+    },
+    "clap_music:official_clip": {
+      "envelope_relative_rmse": {
+        "clustered_95_ci": [
+          1.38219652239077,
+          3.397886688270775
+        ],
+        "family_clusters": 129,
+        "mean": 2.1150966275501237,
+        "triplet_clusters": 12
+      },
+      "exact_preset_recall_at_1": 0.5889922480620156,
+      "excess_over_oracle": {
+        "clustered_95_ci": [
+          2.2066880790078747,
+          4.2438215550189256
+        ],
+        "family_clusters": 129,
+        "mean": 2.9646654996915074,
+        "triplet_clusters": 12
+      },
+      "family_mean_raw_error_quantiles": {
+        "0.1": 3.1811105867226916,
+        "0.5": 4.233141700426738,
+        "0.9": 6.456409513950349
+      },
+      "gain_matched_mrstft": {
+        "clustered_95_ci": [
+          3.4198987240111336,
+          3.775882332755652
+        ],
+        "family_clusters": 129,
+        "mean": 3.58852993140541,
+        "triplet_clusters": 12
+      },
+      "global_rms_relative_error": {
+        "clustered_95_ci": [
+          1.167941613730876,
+          3.169446605204221
+        ],
+        "family_clusters": 129,
+        "mean": 1.8899834104155369,
+        "triplet_clusters": 12
+      },
+      "issue157_preset_dominant_fraction": 0.9017700423192533,
+      "original_level_mrstft": {
+        "clustered_95_ci": [
+          4.404024794668883,
+          6.408438360529349
+        ],
+        "family_clusters": 129,
+        "mean": 5.15266172915158,
+        "triplet_clusters": 12
+      },
+      "rank_among_128_alternatives": {
+        "mean": 36.39276485788114,
+        "median": 27.0,
+        "oracle_first_fraction": 0.053617571059431525
+      },
+      "worst_decile_family_mean_raw_error": 13.820152568511475
+    },
+    "dac_44khz:masked_mean": {
+      "envelope_relative_rmse": {
+        "clustered_95_ci": [
+          1.4299789273500638,
+          3.171540409042167
+        ],
+        "family_clusters": 129,
+        "mean": 2.170816890292535,
+        "triplet_clusters": 12
+      },
+      "exact_preset_recall_at_1": 0.3137984496124031,
+      "excess_over_oracle": {
+        "clustered_95_ci": [
+          2.0842893467258268,
+          4.108909188956983
+        ],
+        "family_clusters": 129,
+        "mean": 2.973016819134547,
+        "triplet_clusters": 12
+      },
+      "family_mean_raw_error_quantiles": {
+        "0.1": 3.3196733951568604,
+        "0.5": 4.123462935288747,
+        "0.9": 7.530784344673159
+      },
+      "gain_matched_mrstft": {
+        "clustered_95_ci": [
+          3.298348485668808,
+          3.7047020727869615
+        ],
+        "family_clusters": 129,
+        "mean": 3.488694596968264,
+        "triplet_clusters": 12
+      },
+      "global_rms_relative_error": {
+        "clustered_95_ci": [
+          1.1880105502674894,
+          2.9165535465165364
+        ],
+        "family_clusters": 129,
+        "mean": 1.9213857075385423,
+        "triplet_clusters": 12
+      },
+      "issue157_preset_dominant_fraction": 0.8500492406264831,
+      "original_level_mrstft": {
+        "clustered_95_ci": [
+          4.29126711267333,
+          6.30122381246598
+        ],
+        "family_clusters": 129,
+        "mean": 5.16101304859462,
+        "triplet_clusters": 12
+      },
+      "rank_among_128_alternatives": {
+        "mean": 36.10981912144703,
+        "median": 26.0,
+        "oracle_first_fraction": 0.044573643410852716
+      },
+      "worst_decile_family_mean_raw_error": 13.4790837986347
+    },
+    "dac_44khz:temporal_pyramid_8": {
+      "envelope_relative_rmse": {
+        "clustered_95_ci": [
+          1.4001057660889755,
+          4.762598286035162
+        ],
+        "family_clusters": 129,
+        "mean": 2.602512515131012,
+        "triplet_clusters": 12
+      },
+      "exact_preset_recall_at_1": 0.3068217054263566,
+      "excess_over_oracle": {
+        "clustered_95_ci": [
+          1.9069579956528444,
+          5.450016545311809
+        ],
+        "family_clusters": 129,
+        "mean": 3.2482555158994613,
+        "triplet_clusters": 12
+      },
+      "family_mean_raw_error_quantiles": {
+        "0.1": 3.094805028041204,
+        "0.5": 3.9597906470298767,
+        "0.9": 7.393273806571961
+      },
+      "gain_matched_mrstft": {
+        "clustered_95_ci": [
+          3.1510886231211113,
+          3.508489409626223
+        ],
+        "family_clusters": 129,
+        "mean": 3.3178243751057668,
+        "triplet_clusters": 12
+      },
+      "global_rms_relative_error": {
+        "clustered_95_ci": [
+          1.1364149050633363,
+          4.5142229272137415
+        ],
+        "family_clusters": 129,
+        "mean": 2.3473734662872654,
+        "triplet_clusters": 12
+      },
+      "issue157_preset_dominant_fraction": 0.8453924665796552,
+      "original_level_mrstft": {
+        "clustered_95_ci": [
+          4.10632569941786,
+          7.605451607813895
+        ],
+        "family_clusters": 129,
+        "mean": 5.4362517453595345,
+        "triplet_clusters": 12
+      },
+      "rank_among_128_alternatives": {
+        "mean": 31.96124031007752,
+        "median": 22.0,
+        "oracle_first_fraction": 0.05813953488372093
+      },
+      "worst_decile_family_mean_raw_error": 18.212257408942932
+    },
+    "encodec_24khz:masked_mean": {
+      "envelope_relative_rmse": {
+        "clustered_95_ci": [
+          1.493614536837165,
+          3.2923736298930053
+        ],
+        "family_clusters": 129,
+        "mean": 2.262807357591621,
+        "triplet_clusters": 12
+      },
+      "exact_preset_recall_at_1": 0.2421705426356589,
+      "excess_over_oracle": {
+        "clustered_95_ci": [
+          2.410048759309936,
+          4.361690956916302
+        ],
+        "family_clusters": 129,
+        "mean": 3.258363370824538,
+        "triplet_clusters": 12
+      },
+      "family_mean_raw_error_quantiles": {
+        "0.1": 3.383141243457794,
+        "0.5": 4.355402926603953,
+        "0.9": 7.86944653193156
+      },
+      "gain_matched_mrstft": {
+        "clustered_95_ci": [
+          3.573679044417248,
+          3.951924516387688
+        ],
+        "family_clusters": 129,
+        "mean": 3.7570196267323284,
+        "triplet_clusters": 12
+      },
+      "global_rms_relative_error": {
+        "clustered_95_ci": [
+          1.232032290436807,
+          3.0186903184199547
+        ],
+        "family_clusters": 129,
+        "mean": 2.0005371169686756,
+        "triplet_clusters": 12
+      },
+      "issue157_preset_dominant_fraction": 0.7966909656304382,
+      "original_level_mrstft": {
+        "clustered_95_ci": [
+          4.594923916832575,
+          6.533686432669791
+        ],
+        "family_clusters": 129,
+        "mean": 5.446359600284611,
+        "triplet_clusters": 12
+      },
+      "rank_among_128_alternatives": {
+        "mean": 39.53229974160207,
+        "median": 32.0,
+        "oracle_first_fraction": 0.029715762273901807
+      },
+      "worst_decile_family_mean_raw_error": 14.749639059488588
+    },
+    "encodec_24khz:temporal_pyramid_8": {
+      "envelope_relative_rmse": {
+        "clustered_95_ci": [
+          1.1797969678570863,
+          3.954434933134302
+        ],
+        "family_clusters": 129,
+        "mean": 2.161217766499954,
+        "triplet_clusters": 12
+      },
+      "exact_preset_recall_at_1": 0.23364341085271317,
+      "excess_over_oracle": {
+        "clustered_95_ci": [
+          1.908009621515408,
+          4.846342956372933
+        ],
+        "family_clusters": 129,
+        "mean": 2.9950185131657032,
+        "triplet_clusters": 12
+      },
+      "family_mean_raw_error_quantiles": {
+        "0.1": 3.300606564680735,
+        "0.5": 3.9539676507314048,
+        "0.9": 7.408491222063702
+      },
+      "gain_matched_mrstft": {
+        "clustered_95_ci": [
+          3.4533617673167423,
+          3.8091258950473725
+        ],
+        "family_clusters": 129,
+        "mean": 3.618606673000087,
+        "triplet_clusters": 12
+      },
+      "global_rms_relative_error": {
+        "clustered_95_ci": [
+          0.9215502344409054,
+          3.708207789081843
+        ],
+        "family_clusters": 129,
+        "mean": 1.9061196421567559,
+        "triplet_clusters": 12
+      },
+      "issue157_preset_dominant_fraction": 0.7804520892659389,
+      "original_level_mrstft": {
+        "clustered_95_ci": [
+          4.110918036611505,
+          7.047675780430243
+        ],
+        "family_clusters": 129,
+        "mean": 5.183014742625776,
+        "triplet_clusters": 12
+      },
+      "rank_among_128_alternatives": {
+        "mean": 33.30749354005168,
+        "median": 26.0,
+        "oracle_first_fraction": 0.04392764857881137
+      },
+      "worst_decile_family_mean_raw_error": 15.795891833611025
+    },
+    "muq_mulan:official_clip": {
+      "envelope_relative_rmse": {
+        "clustered_95_ci": [
+          1.9326419482494153,
+          7.028135248664622
+        ],
+        "family_clusters": 129,
+        "mean": 3.477741162815493,
+        "triplet_clusters": 12
+      },
+      "exact_preset_recall_at_1": 0.30170542635658915,
+      "excess_over_oracle": {
+        "clustered_95_ci": [
+          3.28199733641451,
+          8.893875888857306
+        ],
+        "family_clusters": 129,
+        "mean": 4.962117878465073,
+        "triplet_clusters": 12
+      },
+      "family_mean_raw_error_quantiles": {
+        "0.1": 3.778066011269887,
+        "0.5": 5.0715126395225525,
+        "0.9": 9.365218381086986
+      },
+      "gain_matched_mrstft": {
+        "clustered_95_ci": [
+          3.880648424292527,
+          4.3672663547676205
+        ],
+        "family_clusters": 129,
+        "mean": 4.108934265005496,
+        "triplet_clusters": 12
+      },
+      "global_rms_relative_error": {
+        "clustered_95_ci": [
+          1.735951324518088,
+          6.803162357980075
+        ],
+        "family_clusters": 129,
+        "mean": 3.2623532433364804,
+        "triplet_clusters": 12
+      },
+      "issue157_preset_dominant_fraction": 0.6724100468675842,
+      "original_level_mrstft": {
+        "clustered_95_ci": [
+          5.4722672929462695,
+          11.068603387128471
+        ],
+        "family_clusters": 129,
+        "mean": 7.1501141079251465,
+        "triplet_clusters": 12
+      },
+      "rank_among_128_alternatives": {
+        "mean": 49.67764857881137,
+        "median": 41.0,
+        "oracle_first_fraction": 0.03811369509043928
+      },
+      "worst_decile_family_mean_raw_error": 24.947096923222908
+    }
+  },
+  "eligible_alternatives_per_episode": 128,
+  "episodes_per_arm": 1548,
+  "metric_contract": {
+    "primary": "original-level MR-STFT = mean over 512/2048/8192 of spectral convergence + log-magnitude MAE",
+    "secondary": [
+      "RMS gain-matched MR-STFT",
+      "10 ms stereo RMS-envelope relative RMSE",
+      "global stereo RMS relative error"
+    ],
+    "ties": "rank ties receive average rank; pairwise encoder win ties count one half",
+    "uncertainty": "paired two-way bootstrap over 129 preset families and 12 fixed triplet clusters; descriptive"
+  },
+  "oracle": {
+    "clustered_95_ci": [
+      2.1030420755933807,
+      2.277447018666477
+    ],
+    "family_clusters": 129,
+    "mean": 2.187996229460073,
+    "triplet_clusters": 12
+  },
+  "paired_comparisons_vs_cir": {
+    "basic_pitch_trunk:masked_mean": {
+      "clustered_95_ci": [
+        0.4134477315273242,
+        5.203244131635052
+      ],
+      "family_clusters": 129,
+      "mean": 1.9769472135591877,
+      "triplet_clusters": 12
+    },
+    "basic_pitch_trunk:temporal_pyramid_8": {
+      "clustered_95_ci": [
+        -0.11084536825155103,
+        2.566364604706373
+      ],
+      "family_clusters": 129,
+      "mean": 1.0706092376425593,
+      "triplet_clusters": 12
+    },
+    "beats_iter3_plus:masked_mean": {
+      "clustered_95_ci": [
+        -0.8343212652479802,
+        1.0440190168766614
+      ],
+      "family_clusters": 129,
+      "mean": 0.17605245968168096,
+      "triplet_clusters": 12
+    },
+    "beats_iter3_plus:temporal_pyramid_8": {
+      "clustered_95_ci": [
+        -0.4934592794251534,
+        1.5573006180906783
+      ],
+      "family_clusters": 129,
+      "mean": 0.5407154321362498,
+      "triplet_clusters": 12
+    },
+    "cir_ast:official_clip": {
+      "clustered_95_ci": [
+        0.0,
+        0.0
+      ],
+      "family_clusters": 129,
+      "mean": 0.0,
+      "triplet_clusters": 12
+    },
+    "clap_music:official_clip": {
+      "clustered_95_ci": [
+        -1.3319668936290483,
+        0.4876465718471262
+      ],
+      "family_clusters": 129,
+      "mean": -0.4119077689887941,
+      "triplet_clusters": 12
+    },
+    "dac_44khz:masked_mean": {
+      "clustered_95_ci": [
+        -1.3727821889350271,
+        0.5650500960388152
+      ],
+      "family_clusters": 129,
+      "mean": -0.4035564495457543,
+      "triplet_clusters": 12
+    },
+    "dac_44khz:temporal_pyramid_8": {
+      "clustered_95_ci": [
+        -1.476756403137008,
+        1.7781083336480186
+      ],
+      "family_clusters": 129,
+      "mean": -0.12831775278084037,
+      "triplet_clusters": 12
+    },
+    "encodec_24khz:masked_mean": {
+      "clustered_95_ci": [
+        -1.2332875929099028,
+        0.9147143807348816
+      ],
+      "family_clusters": 129,
+      "mean": -0.1182098978557636,
+      "triplet_clusters": 12
+    },
+    "encodec_24khz:temporal_pyramid_8": {
+      "clustered_95_ci": [
+        -1.5846743429450256,
+        1.2336463850925277
+      ],
+      "family_clusters": 129,
+      "mean": -0.38155475551459833,
+      "triplet_clusters": 12
+    },
+    "muq_mulan:official_clip": {
+      "clustered_95_ci": [
+        0.03230488979731728,
+        5.19262328190339
+      ],
+      "family_clusters": 129,
+      "mean": 1.5855446097847719,
+      "triplet_clusters": 12
+    }
+  },
+  "pairwise_wins": {
+    "basic_pitch_trunk:masked_mean": {
+      "basic_pitch_trunk:masked_mean": 0.5,
+      "basic_pitch_trunk:temporal_pyramid_8": 0.47771317829457366,
+      "beats_iter3_plus:masked_mean": 0.44670542635658916,
+      "beats_iter3_plus:temporal_pyramid_8": 0.44218346253229973,
+      "cir_ast:official_clip": 0.37952196382428943,
+      "clap_music:official_clip": 0.39760981912144705,
+      "dac_44khz:masked_mean": 0.39179586563307495,
+      "dac_44khz:temporal_pyramid_8": 0.35239018087855295,
+      "encodec_24khz:masked_mean": 0.42958656330749356,
+      "encodec_24khz:temporal_pyramid_8": 0.37209302325581395,
+      "muq_mulan:official_clip": 0.5016149870801033
+    },
+    "basic_pitch_trunk:temporal_pyramid_8": {
+      "basic_pitch_trunk:masked_mean": 0.5222868217054264,
+      "basic_pitch_trunk:temporal_pyramid_8": 0.5,
+      "beats_iter3_plus:masked_mean": 0.45930232558139533,
+      "beats_iter3_plus:temporal_pyramid_8": 0.4641472868217054,
+      "cir_ast:official_clip": 0.3943798449612403,
+      "clap_music:official_clip": 0.40891472868217055,
+      "dac_44khz:masked_mean": 0.40148578811369506,
+      "dac_44khz:temporal_pyramid_8": 0.37435400516795864,
+      "encodec_24khz:masked_mean": 0.4622093023255814,
+      "encodec_24khz:temporal_pyramid_8": 0.3953488372093023,
+      "muq_mulan:official_clip": 0.5332687338501292
+    },
+    "beats_iter3_plus:masked_mean": {
+      "basic_pitch_trunk:masked_mean": 0.5532945736434108,
+      "basic_pitch_trunk:temporal_pyramid_8": 0.5406976744186046,
+      "beats_iter3_plus:masked_mean": 0.5,
+      "beats_iter3_plus:temporal_pyramid_8": 0.5022609819121447,
+      "cir_ast:official_clip": 0.4509043927648579,
+      "clap_music:official_clip": 0.4615633074935401,
+      "dac_44khz:masked_mean": 0.4654392764857881,
+      "dac_44khz:temporal_pyramid_8": 0.4189276485788114,
+      "encodec_24khz:masked_mean": 0.4903100775193798,
+      "encodec_24khz:temporal_pyramid_8": 0.4337855297157623,
+      "muq_mulan:official_clip": 0.5591085271317829
+    },
+    "beats_iter3_plus:temporal_pyramid_8": {
+      "basic_pitch_trunk:masked_mean": 0.5578165374677002,
+      "basic_pitch_trunk:temporal_pyramid_8": 0.5358527131782945,
+      "beats_iter3_plus:masked_mean": 0.4977390180878553,
+      "beats_iter3_plus:temporal_pyramid_8": 0.5,
+      "cir_ast:official_clip": 0.44670542635658916,
+      "clap_music:official_clip": 0.45962532299741604,
+      "dac_44khz:masked_mean": 0.4531653746770026,
+      "dac_44khz:temporal_pyramid_8": 0.4134366925064599,
+      "encodec_24khz:masked_mean": 0.4951550387596899,
+      "encodec_24khz:temporal_pyramid_8": 0.43249354005167956,
+      "muq_mulan:official_clip": 0.5461886304909561
+    },
+    "cir_ast:official_clip": {
+      "basic_pitch_trunk:masked_mean": 0.6204780361757106,
+      "basic_pitch_trunk:temporal_pyramid_8": 0.6056201550387597,
+      "beats_iter3_plus:masked_mean": 0.5490956072351422,
+      "beats_iter3_plus:temporal_pyramid_8": 0.5532945736434108,
+      "cir_ast:official_clip": 0.5,
+      "clap_music:official_clip": 0.5129198966408268,
+      "dac_44khz:masked_mean": 0.5197028423772609,
+      "dac_44khz:temporal_pyramid_8": 0.47351421188630494,
+      "encodec_24khz:masked_mean": 0.5490956072351422,
+      "encodec_24khz:temporal_pyramid_8": 0.49806201550387597,
+      "muq_mulan:official_clip": 0.5943152454780362
+    },
+    "clap_music:official_clip": {
+      "basic_pitch_trunk:masked_mean": 0.602390180878553,
+      "basic_pitch_trunk:temporal_pyramid_8": 0.5910852713178295,
+      "beats_iter3_plus:masked_mean": 0.53843669250646,
+      "beats_iter3_plus:temporal_pyramid_8": 0.540374677002584,
+      "cir_ast:official_clip": 0.4870801033591731,
+      "clap_music:official_clip": 0.5,
+      "dac_44khz:masked_mean": 0.4935400516795866,
+      "dac_44khz:temporal_pyramid_8": 0.45348837209302323,
+      "encodec_24khz:masked_mean": 0.5400516795865633,
+      "encodec_24khz:temporal_pyramid_8": 0.47642118863049093,
+      "muq_mulan:official_clip": 0.6088501291989664
+    },
+    "dac_44khz:masked_mean": {
+      "basic_pitch_trunk:masked_mean": 0.6082041343669251,
+      "basic_pitch_trunk:temporal_pyramid_8": 0.5985142118863049,
+      "beats_iter3_plus:masked_mean": 0.5345607235142119,
+      "beats_iter3_plus:temporal_pyramid_8": 0.5468346253229974,
+      "cir_ast:official_clip": 0.480297157622739,
+      "clap_music:official_clip": 0.5064599483204134,
+      "dac_44khz:masked_mean": 0.5,
+      "dac_44khz:temporal_pyramid_8": 0.4492894056847545,
+      "encodec_24khz:masked_mean": 0.5497416020671835,
+      "encodec_24khz:temporal_pyramid_8": 0.48223514211886304,
+      "muq_mulan:official_clip": 0.5956072351421189
+    },
+    "dac_44khz:temporal_pyramid_8": {
+      "basic_pitch_trunk:masked_mean": 0.647609819121447,
+      "basic_pitch_trunk:temporal_pyramid_8": 0.6256459948320413,
+      "beats_iter3_plus:masked_mean": 0.5810723514211886,
+      "beats_iter3_plus:temporal_pyramid_8": 0.58656330749354,
+      "cir_ast:official_clip": 0.5264857881136951,
+      "clap_music:official_clip": 0.5465116279069767,
+      "dac_44khz:masked_mean": 0.5507105943152455,
+      "dac_44khz:temporal_pyramid_8": 0.5,
+      "encodec_24khz:masked_mean": 0.6001291989664083,
+      "encodec_24khz:temporal_pyramid_8": 0.5281007751937985,
+      "muq_mulan:official_clip": 0.6447028423772609
+    },
+    "encodec_24khz:masked_mean": {
+      "basic_pitch_trunk:masked_mean": 0.5704134366925064,
+      "basic_pitch_trunk:temporal_pyramid_8": 0.5377906976744186,
+      "beats_iter3_plus:masked_mean": 0.5096899224806202,
+      "beats_iter3_plus:temporal_pyramid_8": 0.5048449612403101,
+      "cir_ast:official_clip": 0.4509043927648579,
+      "clap_music:official_clip": 0.4599483204134367,
+      "dac_44khz:masked_mean": 0.4502583979328165,
+      "dac_44khz:temporal_pyramid_8": 0.39987080103359174,
+      "encodec_24khz:masked_mean": 0.5,
+      "encodec_24khz:temporal_pyramid_8": 0.42829457364341084,
+      "muq_mulan:official_clip": 0.5700904392764858
+    },
+    "encodec_24khz:temporal_pyramid_8": {
+      "basic_pitch_trunk:masked_mean": 0.627906976744186,
+      "basic_pitch_trunk:temporal_pyramid_8": 0.6046511627906976,
+      "beats_iter3_plus:masked_mean": 0.5662144702842378,
+      "beats_iter3_plus:temporal_pyramid_8": 0.5675064599483204,
+      "cir_ast:official_clip": 0.501937984496124,
+      "clap_music:official_clip": 0.523578811369509,
+      "dac_44khz:masked_mean": 0.5177648578811369,
+      "dac_44khz:temporal_pyramid_8": 0.47189922480620156,
+      "encodec_24khz:masked_mean": 0.5717054263565892,
+      "encodec_24khz:temporal_pyramid_8": 0.5,
+      "muq_mulan:official_clip": 0.6308139534883721
+    },
+    "muq_mulan:official_clip": {
+      "basic_pitch_trunk:masked_mean": 0.4983850129198966,
+      "basic_pitch_trunk:temporal_pyramid_8": 0.4667312661498708,
+      "beats_iter3_plus:masked_mean": 0.44089147286821706,
+      "beats_iter3_plus:temporal_pyramid_8": 0.45381136950904394,
+      "cir_ast:official_clip": 0.40568475452196384,
+      "clap_music:official_clip": 0.3911498708010336,
+      "dac_44khz:masked_mean": 0.4043927648578811,
+      "dac_44khz:temporal_pyramid_8": 0.355297157622739,
+      "encodec_24khz:masked_mean": 0.4299095607235142,
+      "encodec_24khz:temporal_pyramid_8": 0.3691860465116279,
+      "muq_mulan:official_clip": 0.5
+    }
+  },
+  "preset_families": 129,
+  "random_baseline": {
+    "clustered_95_ci": [
+      7.05095435240395,
+      11.984988354822228
+    ],
+    "family_clusters": 129,
+    "mean": 8.95235333801548,
+    "triplet_clusters": 12
+  },
+  "schema": "issue161_audible_substitute_v1",
+  "seed": 161,
+  "strata": {
+    "midi1_pattern": {
+      "chords_polyphonic": {
+        "arms": {
+          "basic_pitch_trunk:masked_mean": {
+            "mean_excess_over_oracle": 4.97856094462927,
+            "mean_original_level_mrstft": 7.195030354483183
+          },
+          "basic_pitch_trunk:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 4.143931328788284,
+            "mean_original_level_mrstft": 6.3604007386421975
+          },
+          "beats_iter3_plus:masked_mean": {
+            "mean_excess_over_oracle": 3.8830881236597548,
+            "mean_original_level_mrstft": 6.099557533513668
+          },
+          "beats_iter3_plus:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 4.33371692283671,
+            "mean_original_level_mrstft": 6.550186332690624
+          },
+          "cir_ast:official_clip": {
+            "mean_excess_over_oracle": 3.4675860468500344,
+            "mean_original_level_mrstft": 5.684055456703947
+          },
+          "clap_music:official_clip": {
+            "mean_excess_over_oracle": 2.834697731821112,
+            "mean_original_level_mrstft": 5.051167141675025
+          },
+          "dac_44khz:masked_mean": {
+            "mean_excess_over_oracle": 3.525410851535871,
+            "mean_original_level_mrstft": 5.741880261389784
+          },
+          "dac_44khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 4.406856732081997,
+            "mean_original_level_mrstft": 6.623326141935911
+          },
+          "encodec_24khz:masked_mean": {
+            "mean_excess_over_oracle": 3.7502823880938596,
+            "mean_original_level_mrstft": 5.966751797947773
+          },
+          "encodec_24khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 3.571305520081705,
+            "mean_original_level_mrstft": 5.787774929935618
+          },
+          "muq_mulan:official_clip": {
+            "mean_excess_over_oracle": 3.6633716008459873,
+            "mean_original_level_mrstft": 5.8798410106999
+          }
+        },
+        "episodes": 516,
+        "triplets": 4
+      },
+      "repeating_sequence": {
+        "arms": {
+          "basic_pitch_trunk:masked_mean": {
+            "mean_excess_over_oracle": 6.0345588398072145,
+            "mean_original_level_mrstft": 8.218684447135113
+          },
+          "basic_pitch_trunk:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 4.399012665646945,
+            "mean_original_level_mrstft": 6.583138272974843
+          },
+          "beats_iter3_plus:masked_mean": {
+            "mean_excess_over_oracle": 2.9529636679000633,
+            "mean_original_level_mrstft": 5.137089275227961
+          },
+          "beats_iter3_plus:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 3.7499254576919614,
+            "mean_original_level_mrstft": 5.934051065019859
+          },
+          "cir_ast:official_clip": {
+            "mean_excess_over_oracle": 3.018096531315367,
+            "mean_original_level_mrstft": 5.202222138643265
+          },
+          "clap_music:official_clip": {
+            "mean_excess_over_oracle": 3.253380397724551,
+            "mean_original_level_mrstft": 5.437506005052448
+          },
+          "dac_44khz:masked_mean": {
+            "mean_excess_over_oracle": 2.8431876336419304,
+            "mean_original_level_mrstft": 5.027313240969828
+          },
+          "dac_44khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 2.586773617092029,
+            "mean_original_level_mrstft": 4.770899224419926
+          },
+          "encodec_24khz:masked_mean": {
+            "mean_excess_over_oracle": 2.8049918946831727,
+            "mean_original_level_mrstft": 4.98911750201107
+          },
+          "encodec_24khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 2.457086425881053,
+            "mean_original_level_mrstft": 4.641212033208951
+          },
+          "muq_mulan:official_clip": {
+            "mean_excess_over_oracle": 6.881437340910121,
+            "mean_original_level_mrstft": 9.065562948238018
+          }
+        },
+        "episodes": 516,
+        "triplets": 4
+      },
+      "single_note_melody_bass": {
+        "arms": {
+          "basic_pitch_trunk:masked_mean": {
+            "mean_excess_over_oracle": 5.047441662281983,
+            "mean_original_level_mrstft": 7.210835333480391
+          },
+          "basic_pitch_trunk:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 4.798603524533353,
+            "mean_original_level_mrstft": 6.961997195731762
+          },
+          "beats_iter3_plus:masked_mean": {
+            "mean_excess_over_oracle": 3.821825393526129,
+            "mean_original_level_mrstft": 5.985219064724538
+          },
+          "beats_iter3_plus:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 3.668223721920982,
+            "mean_original_level_mrstft": 5.831617393119391
+          },
+          "cir_ast:official_clip": {
+            "mean_excess_over_oracle": 3.6440372278755024,
+            "mean_original_level_mrstft": 5.807430899073911
+          },
+          "clap_music:official_clip": {
+            "mean_excess_over_oracle": 2.805918369528859,
+            "mean_original_level_mrstft": 4.969312040727268
+          },
+          "dac_44khz:masked_mean": {
+            "mean_excess_over_oracle": 2.5504519722258396,
+            "mean_original_level_mrstft": 4.713845643424248
+          },
+          "dac_44khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 2.7511361985243568,
+            "mean_original_level_mrstft": 4.914529869722766
+          },
+          "encodec_24khz:masked_mean": {
+            "mean_excess_over_oracle": 3.2198158296965813,
+            "mean_original_level_mrstft": 5.38320950089499
+          },
+          "encodec_24khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 2.9566635935343513,
+            "mean_original_level_mrstft": 5.12005726473276
+          },
+          "muq_mulan:official_clip": {
+            "mean_excess_over_oracle": 4.341544693639112,
+            "mean_original_level_mrstft": 6.504938364837521
+          }
+        },
+        "episodes": 516,
+        "triplets": 4
+      }
+    },
+    "midi2_pattern": {
+      "chords_polyphonic": {
+        "arms": {
+          "basic_pitch_trunk:masked_mean": {
+            "mean_excess_over_oracle": 5.047441662281983,
+            "mean_original_level_mrstft": 7.210835333480391
+          },
+          "basic_pitch_trunk:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 4.798603524533353,
+            "mean_original_level_mrstft": 6.961997195731762
+          },
+          "beats_iter3_plus:masked_mean": {
+            "mean_excess_over_oracle": 3.821825393526129,
+            "mean_original_level_mrstft": 5.985219064724538
+          },
+          "beats_iter3_plus:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 3.668223721920982,
+            "mean_original_level_mrstft": 5.831617393119391
+          },
+          "cir_ast:official_clip": {
+            "mean_excess_over_oracle": 3.6440372278755024,
+            "mean_original_level_mrstft": 5.807430899073911
+          },
+          "clap_music:official_clip": {
+            "mean_excess_over_oracle": 2.805918369528859,
+            "mean_original_level_mrstft": 4.969312040727268
+          },
+          "dac_44khz:masked_mean": {
+            "mean_excess_over_oracle": 2.5504519722258396,
+            "mean_original_level_mrstft": 4.713845643424248
+          },
+          "dac_44khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 2.7511361985243568,
+            "mean_original_level_mrstft": 4.914529869722766
+          },
+          "encodec_24khz:masked_mean": {
+            "mean_excess_over_oracle": 3.2198158296965813,
+            "mean_original_level_mrstft": 5.38320950089499
+          },
+          "encodec_24khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 2.9566635935343513,
+            "mean_original_level_mrstft": 5.12005726473276
+          },
+          "muq_mulan:official_clip": {
+            "mean_excess_over_oracle": 4.341544693639112,
+            "mean_original_level_mrstft": 6.504938364837521
+          }
+        },
+        "episodes": 516,
+        "triplets": 4
+      },
+      "repeating_sequence": {
+        "arms": {
+          "basic_pitch_trunk:masked_mean": {
+            "mean_excess_over_oracle": 4.97856094462927,
+            "mean_original_level_mrstft": 7.195030354483183
+          },
+          "basic_pitch_trunk:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 4.143931328788284,
+            "mean_original_level_mrstft": 6.3604007386421975
+          },
+          "beats_iter3_plus:masked_mean": {
+            "mean_excess_over_oracle": 3.8830881236597548,
+            "mean_original_level_mrstft": 6.099557533513668
+          },
+          "beats_iter3_plus:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 4.33371692283671,
+            "mean_original_level_mrstft": 6.550186332690624
+          },
+          "cir_ast:official_clip": {
+            "mean_excess_over_oracle": 3.4675860468500344,
+            "mean_original_level_mrstft": 5.684055456703947
+          },
+          "clap_music:official_clip": {
+            "mean_excess_over_oracle": 2.834697731821112,
+            "mean_original_level_mrstft": 5.051167141675025
+          },
+          "dac_44khz:masked_mean": {
+            "mean_excess_over_oracle": 3.525410851535871,
+            "mean_original_level_mrstft": 5.741880261389784
+          },
+          "dac_44khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 4.406856732081997,
+            "mean_original_level_mrstft": 6.623326141935911
+          },
+          "encodec_24khz:masked_mean": {
+            "mean_excess_over_oracle": 3.7502823880938596,
+            "mean_original_level_mrstft": 5.966751797947773
+          },
+          "encodec_24khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 3.571305520081705,
+            "mean_original_level_mrstft": 5.787774929935618
+          },
+          "muq_mulan:official_clip": {
+            "mean_excess_over_oracle": 3.6633716008459873,
+            "mean_original_level_mrstft": 5.8798410106999
+          }
+        },
+        "episodes": 516,
+        "triplets": 4
+      },
+      "single_note_melody_bass": {
+        "arms": {
+          "basic_pitch_trunk:masked_mean": {
+            "mean_excess_over_oracle": 6.0345588398072145,
+            "mean_original_level_mrstft": 8.218684447135113
+          },
+          "basic_pitch_trunk:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 4.399012665646945,
+            "mean_original_level_mrstft": 6.583138272974843
+          },
+          "beats_iter3_plus:masked_mean": {
+            "mean_excess_over_oracle": 2.9529636679000633,
+            "mean_original_level_mrstft": 5.137089275227961
+          },
+          "beats_iter3_plus:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 3.7499254576919614,
+            "mean_original_level_mrstft": 5.934051065019859
+          },
+          "cir_ast:official_clip": {
+            "mean_excess_over_oracle": 3.018096531315367,
+            "mean_original_level_mrstft": 5.202222138643265
+          },
+          "clap_music:official_clip": {
+            "mean_excess_over_oracle": 3.253380397724551,
+            "mean_original_level_mrstft": 5.437506005052448
+          },
+          "dac_44khz:masked_mean": {
+            "mean_excess_over_oracle": 2.8431876336419304,
+            "mean_original_level_mrstft": 5.027313240969828
+          },
+          "dac_44khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 2.586773617092029,
+            "mean_original_level_mrstft": 4.770899224419926
+          },
+          "encodec_24khz:masked_mean": {
+            "mean_excess_over_oracle": 2.8049918946831727,
+            "mean_original_level_mrstft": 4.98911750201107
+          },
+          "encodec_24khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 2.457086425881053,
+            "mean_original_level_mrstft": 4.641212033208951
+          },
+          "muq_mulan:official_clip": {
+            "mean_excess_over_oracle": 6.881437340910121,
+            "mean_original_level_mrstft": 9.065562948238018
+          }
+        },
+        "episodes": 516,
+        "triplets": 4
+      }
+    },
+    "midi3_pattern": {
+      "chords_polyphonic": {
+        "arms": {
+          "basic_pitch_trunk:masked_mean": {
+            "mean_excess_over_oracle": 6.0345588398072145,
+            "mean_original_level_mrstft": 8.218684447135113
+          },
+          "basic_pitch_trunk:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 4.399012665646945,
+            "mean_original_level_mrstft": 6.583138272974843
+          },
+          "beats_iter3_plus:masked_mean": {
+            "mean_excess_over_oracle": 2.9529636679000633,
+            "mean_original_level_mrstft": 5.137089275227961
+          },
+          "beats_iter3_plus:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 3.7499254576919614,
+            "mean_original_level_mrstft": 5.934051065019859
+          },
+          "cir_ast:official_clip": {
+            "mean_excess_over_oracle": 3.018096531315367,
+            "mean_original_level_mrstft": 5.202222138643265
+          },
+          "clap_music:official_clip": {
+            "mean_excess_over_oracle": 3.253380397724551,
+            "mean_original_level_mrstft": 5.437506005052448
+          },
+          "dac_44khz:masked_mean": {
+            "mean_excess_over_oracle": 2.8431876336419304,
+            "mean_original_level_mrstft": 5.027313240969828
+          },
+          "dac_44khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 2.586773617092029,
+            "mean_original_level_mrstft": 4.770899224419926
+          },
+          "encodec_24khz:masked_mean": {
+            "mean_excess_over_oracle": 2.8049918946831727,
+            "mean_original_level_mrstft": 4.98911750201107
+          },
+          "encodec_24khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 2.457086425881053,
+            "mean_original_level_mrstft": 4.641212033208951
+          },
+          "muq_mulan:official_clip": {
+            "mean_excess_over_oracle": 6.881437340910121,
+            "mean_original_level_mrstft": 9.065562948238018
+          }
+        },
+        "episodes": 516,
+        "triplets": 4
+      },
+      "repeating_sequence": {
+        "arms": {
+          "basic_pitch_trunk:masked_mean": {
+            "mean_excess_over_oracle": 5.047441662281983,
+            "mean_original_level_mrstft": 7.210835333480391
+          },
+          "basic_pitch_trunk:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 4.798603524533353,
+            "mean_original_level_mrstft": 6.961997195731762
+          },
+          "beats_iter3_plus:masked_mean": {
+            "mean_excess_over_oracle": 3.821825393526129,
+            "mean_original_level_mrstft": 5.985219064724538
+          },
+          "beats_iter3_plus:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 3.668223721920982,
+            "mean_original_level_mrstft": 5.831617393119391
+          },
+          "cir_ast:official_clip": {
+            "mean_excess_over_oracle": 3.6440372278755024,
+            "mean_original_level_mrstft": 5.807430899073911
+          },
+          "clap_music:official_clip": {
+            "mean_excess_over_oracle": 2.805918369528859,
+            "mean_original_level_mrstft": 4.969312040727268
+          },
+          "dac_44khz:masked_mean": {
+            "mean_excess_over_oracle": 2.5504519722258396,
+            "mean_original_level_mrstft": 4.713845643424248
+          },
+          "dac_44khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 2.7511361985243568,
+            "mean_original_level_mrstft": 4.914529869722766
+          },
+          "encodec_24khz:masked_mean": {
+            "mean_excess_over_oracle": 3.2198158296965813,
+            "mean_original_level_mrstft": 5.38320950089499
+          },
+          "encodec_24khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 2.9566635935343513,
+            "mean_original_level_mrstft": 5.12005726473276
+          },
+          "muq_mulan:official_clip": {
+            "mean_excess_over_oracle": 4.341544693639112,
+            "mean_original_level_mrstft": 6.504938364837521
+          }
+        },
+        "episodes": 516,
+        "triplets": 4
+      },
+      "single_note_melody_bass": {
+        "arms": {
+          "basic_pitch_trunk:masked_mean": {
+            "mean_excess_over_oracle": 4.97856094462927,
+            "mean_original_level_mrstft": 7.195030354483183
+          },
+          "basic_pitch_trunk:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 4.143931328788284,
+            "mean_original_level_mrstft": 6.3604007386421975
+          },
+          "beats_iter3_plus:masked_mean": {
+            "mean_excess_over_oracle": 3.8830881236597548,
+            "mean_original_level_mrstft": 6.099557533513668
+          },
+          "beats_iter3_plus:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 4.33371692283671,
+            "mean_original_level_mrstft": 6.550186332690624
+          },
+          "cir_ast:official_clip": {
+            "mean_excess_over_oracle": 3.4675860468500344,
+            "mean_original_level_mrstft": 5.684055456703947
+          },
+          "clap_music:official_clip": {
+            "mean_excess_over_oracle": 2.834697731821112,
+            "mean_original_level_mrstft": 5.051167141675025
+          },
+          "dac_44khz:masked_mean": {
+            "mean_excess_over_oracle": 3.525410851535871,
+            "mean_original_level_mrstft": 5.741880261389784
+          },
+          "dac_44khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 4.406856732081997,
+            "mean_original_level_mrstft": 6.623326141935911
+          },
+          "encodec_24khz:masked_mean": {
+            "mean_excess_over_oracle": 3.7502823880938596,
+            "mean_original_level_mrstft": 5.966751797947773
+          },
+          "encodec_24khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 3.571305520081705,
+            "mean_original_level_mrstft": 5.787774929935618
+          },
+          "muq_mulan:official_clip": {
+            "mean_excess_over_oracle": 3.6633716008459873,
+            "mean_original_level_mrstft": 5.8798410106999
+          }
+        },
+        "episodes": 516,
+        "triplets": 4
+      }
+    },
+    "midi3_register": {
+      "high": {
+        "arms": {
+          "basic_pitch_trunk:masked_mean": {
+            "mean_excess_over_oracle": 4.752424932958544,
+            "mean_original_level_mrstft": 7.057636782180431
+          },
+          "basic_pitch_trunk:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 3.6632770500903904,
+            "mean_original_level_mrstft": 5.968488899312278
+          },
+          "beats_iter3_plus:masked_mean": {
+            "mean_excess_over_oracle": 2.9012969720733257,
+            "mean_original_level_mrstft": 5.2065088212952135
+          },
+          "beats_iter3_plus:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 3.9091944694519043,
+            "mean_original_level_mrstft": 6.214406318673792
+          },
+          "cir_ast:official_clip": {
+            "mean_excess_over_oracle": 3.339752293372339,
+            "mean_original_level_mrstft": 5.644964142594227
+          },
+          "clap_music:official_clip": {
+            "mean_excess_over_oracle": 2.92437798616498,
+            "mean_original_level_mrstft": 5.229589835386868
+          },
+          "dac_44khz:masked_mean": {
+            "mean_excess_over_oracle": 3.547301861435868,
+            "mean_original_level_mrstft": 5.852513710657756
+          },
+          "dac_44khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 4.9373339897440385,
+            "mean_original_level_mrstft": 7.242545838965926
+          },
+          "encodec_24khz:masked_mean": {
+            "mean_excess_over_oracle": 3.365492344595665,
+            "mean_original_level_mrstft": 5.670704193817553
+          },
+          "encodec_24khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 3.966318192639092,
+            "mean_original_level_mrstft": 6.27153004186098
+          },
+          "muq_mulan:official_clip": {
+            "mean_excess_over_oracle": 3.890841624071432,
+            "mean_original_level_mrstft": 6.196053473293319
+          }
+        },
+        "episodes": 258,
+        "triplets": 2
+      },
+      "low": {
+        "arms": {
+          "basic_pitch_trunk:masked_mean": {
+            "mean_excess_over_oracle": 6.354772636671707,
+            "mean_original_level_mrstft": 8.503432029747533
+          },
+          "basic_pitch_trunk:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 5.2521852143205106,
+            "mean_original_level_mrstft": 7.400844607396335
+          },
+          "beats_iter3_plus:masked_mean": {
+            "mean_excess_over_oracle": 4.025322449530742,
+            "mean_original_level_mrstft": 6.173981842606566
+          },
+          "beats_iter3_plus:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 4.250064146380092,
+            "mean_original_level_mrstft": 6.398723539455917
+          },
+          "cir_ast:official_clip": {
+            "mean_excess_over_oracle": 4.016271095636279,
+            "mean_original_level_mrstft": 6.164930488712104
+          },
+          "clap_music:official_clip": {
+            "mean_excess_over_oracle": 3.4665657988044334,
+            "mean_original_level_mrstft": 5.615225191880258
+          },
+          "dac_44khz:masked_mean": {
+            "mean_excess_over_oracle": 3.4351135764165135,
+            "mean_original_level_mrstft": 5.583772969492338
+          },
+          "dac_44khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 3.699915243134634,
+            "mean_original_level_mrstft": 5.848574636210459
+          },
+          "encodec_24khz:masked_mean": {
+            "mean_excess_over_oracle": 3.669087963587862,
+            "mean_original_level_mrstft": 5.817747356663687
+          },
+          "encodec_24khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 3.3181418795764293,
+            "mean_original_level_mrstft": 5.466801272652254
+          },
+          "muq_mulan:official_clip": {
+            "mean_excess_over_oracle": 6.044806825945235,
+            "mean_original_level_mrstft": 8.19346621902106
+          }
+        },
+        "episodes": 774,
+        "triplets": 6
+      },
+      "mid": {
+        "arms": {
+          "basic_pitch_trunk:masked_mean": {
+            "mean_excess_over_oracle": 4.152190025231635,
+            "mean_original_level_mrstft": 6.340583699387174
+          },
+          "basic_pitch_trunk:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 3.631631172442621,
+            "mean_original_level_mrstft": 5.82002484659816
+          },
+          "beats_iter3_plus:masked_mean": {
+            "mean_excess_over_oracle": 3.169245024753171,
+            "mean_original_level_mrstft": 5.35763869890871
+          },
+          "beats_iter3_plus:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 3.422172648153564,
+            "mean_original_level_mrstft": 5.6105663223091025
+          },
+          "cir_ast:official_clip": {
+            "mean_excess_over_oracle": 2.435437015900316,
+            "mean_original_level_mrstft": 4.623830690055854
+          },
+          "clap_music:official_clip": {
+            "mean_excess_over_oracle": 2.231958807785382,
+            "mean_original_level_mrstft": 4.42035248194092
+          },
+          "dac_44khz:masked_mean": {
+            "mean_excess_over_oracle": 1.9927291620609373,
+            "mean_original_level_mrstft": 4.181122836216476
+          },
+          "dac_44khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 1.7262266881244128,
+            "mean_original_level_mrstft": 3.914620362279951
+          },
+          "encodec_24khz:masked_mean": {
+            "mean_excess_over_oracle": 2.588711994793988,
+            "mean_original_level_mrstft": 4.777105668949527
+          },
+          "encodec_24khz:temporal_pyramid_8": {
+            "mean_excess_over_oracle": 2.0246836238129196,
+            "mean_original_level_mrstft": 4.213077297968458
+          },
+          "muq_mulan:official_clip": {
+            "mean_excess_over_oracle": 3.873722584441651,
+            "mean_original_level_mrstft": 6.0621162585971895
+          }
+        },
+        "episodes": 516,
+        "triplets": 4
+      }
+    }
+  },
+  "triplet_coverage": {
+    "available_pattern_counts": {
+      "chords_polyphonic": 26,
+      "repeating_sequence": 37,
+      "single_note_melody_bass": 24
+    },
+    "pool_performances": 50,
+    "selected_articulation_counts": {
+      "held": 19,
+      "phrased": 17
+    },
+    "selected_pattern_counts_by_role": {
+      "midi1_query": {
+        "chords_polyphonic": 4,
+        "repeating_sequence": 4,
+        "single_note_melody_bass": 4
+      },
+      "midi2_retrieval": {
+        "chords_polyphonic": 4,
+        "repeating_sequence": 4,
+        "single_note_melody_bass": 4
+      },
+      "midi3_sound_test": {
+        "chords_polyphonic": 4,
+        "repeating_sequence": 4,
+        "single_note_melody_bass": 4
+      }
+    },
+    "selected_performances_reused": 0,
+    "selected_register_counts": {
+      "high": 12,
+      "low": 11,
+      "mid": 13
+    },
+    "selected_velocity_varied_count": 18,
+    "selected_wide_pitch_span_count": 11,
+    "triplets": 12,
+    "unavailable_patterns": [],
+    "unique_selected_performances": 36
+  },
+  "triplets": 12
+}
