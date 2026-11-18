@@ -4,6 +4,8 @@ This package implements the real Vital/MIDI retrieval shootout from [issue #152]
 
 ## Results and presentations
 
+**Start here:** [Frozen encoder visual summary](reports/FROZEN_ENCODER_VISUAL_SUMMARY.md) — five charts of the key quality, speed and memory tradeoffs.
+
 The [research results report](reports/FROZEN_ENCODER_RETRIEVAL_RESULTS.md) is the authoritative source for metrics, methodology, and limitations. These presentations explain the results for collaborators:
 
 - [Frozen encoder retrieval (PDF)](reports/presentations/frozen_encoder_retrieval.pdf) · [editable PowerPoint](reports/presentations/frozen_encoder_retrieval.pptx) — identification of Vital presets across different MIDI performances; based on the [report at commit 2aa787a](https://github.com/noisedoctrine/obruxo/blob/2aa787aea562db5d334a54c485b70704e5943a9e/research/modelling/frozen_encoder_retrieval/reports/FROZEN_ENCODER_RETRIEVAL_RESULTS.md).
