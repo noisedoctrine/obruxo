@@ -364,17 +364,45 @@ class FeatureAndManifestTests(unittest.TestCase):
             self.assertEqual({("state-a", "midi-a"): root / "audio/a.wav"},
                              issue164._accepted_wav_paths(root, audit))
 
-    def test_issue164_active_matrix_cache_rejects_old_contract_version(self):
+    def test_issue164_active_matrix_cache_ignores_target_and_rejects_old_contract_version(self):
         import numpy as np
 
         matrices = {index: np.zeros((129, 129), dtype=np.float32) for index in range(12)}
         identity = {"cache_contract_version": issue164.ACTIVE_MATRIX_CACHE_VERSION,
                     "normalization_version": "active-rms-v1", "normalization_target_active_rms": 0.025}
-        contract = {**identity, "matrix_archive_sha256": "matrix-sha256"}
+        identity.pop("normalization_target_active_rms")
+        contract = {**identity, "normalization_target_active_rms": 0.025, "matrix_archive_sha256": "matrix-sha256"}
         self.assertTrue(issue164._active_matrix_cache_matches(matrices, contract, identity, "matrix-sha256"))
         stale = {**contract, "cache_contract_version": "old-active-rms-matrix-v0"}
         self.assertFalse(issue164._active_matrix_cache_matches(matrices, stale, identity, "matrix-sha256"))
         self.assertFalse(issue164._active_matrix_cache_matches(matrices, contract, identity, "changed-matrix-sha256"))
+
+    def test_issue164_stale_assignment_cache_reloads_feature_caches(self):
+        class Issue155Stub:
+            def __init__(self):
+                self.load_features = []
+
+            def _load_context(self, _dataset, **kwargs):
+                self.load_features.append(kwargs["load_features"])
+                return {"arms": {"arm-a": object()}}
+
+            def _build_assignments(self, _context, offsets):
+                return [], {}, {"by_offset": {offset: [{"episode_id": f"episode-{offset}"}]
+                                               for offset in offsets}}
+
+            def _assignment_cache_identity(self, _context, _offsets, _expected):
+                return {"normalized_feature_identity": "current"}
+
+            def _load_cached_assignment_rows(self, *_args):
+                return None
+
+        runner = Issue155Stub()
+        with patch.object(issue164, "_target_from_preflight", return_value=0.025):
+            context, cached_rows = issue164._load_issue155_context(
+                runner, Path("dataset/features_active_rms"), Path("private/issue155_assignments"))
+        self.assertEqual([False, True], runner.load_features)
+        self.assertEqual({"arm-a"}, set(context["arms"]))
+        self.assertIsNone(cached_rows)
 
     def test_issue155_runner_exposes_basic_pitch_adapter_checkout(self):
         self.assertIn(str(REPO / "research/modelling/basic_pitch"), sys.path)

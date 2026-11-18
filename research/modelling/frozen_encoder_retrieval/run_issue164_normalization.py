@@ -481,7 +481,6 @@ def _active_matrix_expected_identity(audit: dict, triplets: dict) -> dict:
     return {"cache_contract_version": ACTIVE_MATRIX_CACHE_VERSION,
         "scoring_contract_version": ACTIVE_MRSTFT_SCORING_VERSION,
         "normalization_version": NORMALIZATION_VERSION,
-        "normalization_target_active_rms": preflight["normalization"]["target_active_rms"],
         "normalization_window_seconds": WINDOW_SECONDS, "normalization_active_floor_db": ACTIVE_FLOOR_DB,
         "cohort_identity_sha256": preflight["cohort_identity_sha256"],
         "source_manifest_sha256": preflight["source_manifest_sha256"],
@@ -503,6 +502,11 @@ def _build_active_matrices(dataset: Path, audit: dict, triplets: dict, *, device
                             for index in range(12)}
                 contract = _read_json(ACTIVE_MATRIX_CONTRACT)
                 if _active_matrix_cache_matches(matrices, contract, expected_identity, file_sha256(output_path)):
+                    obsolete_identity_fields = {"normalization_target_active_rms", "accepted_wav_hashes_sha256"}
+                    if obsolete_identity_fields.intersection(contract):
+                        for key in obsolete_identity_fields:
+                            contract.pop(key, None)
+                        _write_json(ACTIVE_MATRIX_CONTRACT, contract)
                     return matrices, contract
     plans = _jsonl(dataset / "render_plan.private.jsonl")
     audio_rows, coverage = verify_triplet_wavs(dataset, audit, plans, triplets)
@@ -530,17 +534,36 @@ def _build_active_matrices(dataset: Path, audit: dict, triplets: dict, *, device
     return matrices, contract
 
 
+def _load_issue155_context(issue155, feature_root: Path, output_dir: Path) -> tuple[dict, dict | None]:
+    expected_normalization = {"version": NORMALIZATION_VERSION,
+        "window_seconds": WINDOW_SECONDS, "active_floor_db": ACTIVE_FLOOR_DB,
+        "target_active_rms": _target_from_preflight()}
+    context = issue155._load_context(DATASET, feature_root=feature_root, load_features=False,
+                                    expected_normalization=expected_normalization)
+    offsets = (1, 7, 19)
+    _, _, coverage = issue155._build_assignments(context, offsets)
+    expected_episode_ids = {offset: {row["episode_id"] for row in rows}
+                            for offset, rows in coverage["by_offset"].items()}
+    identity = issue155._assignment_cache_identity(context, offsets, expected_episode_ids)
+    cache_path = output_dir / "gallery_assignment_episode_metrics.private.jsonl"
+    cached_rows = issue155._load_cached_assignment_rows(cache_path, set(context["arms"]),
+                                                        expected_episode_ids, identity)
+    if cached_rows is not None:
+        return context, cached_rows
+    print("Cached issue #155 assignment identity is missing or stale; recomputing from normalized feature caches without encoder inference.",
+          flush=True)
+    return issue155._load_context(DATASET, feature_root=feature_root, load_features=True,
+                                  expected_normalization=expected_normalization), None
+
+
 def _issue155_comparison(feature_root: Path, output_dir: Path) -> dict:
     import run_issue155_validation as issue155
 
-    cached_scores = output_dir / "gallery_assignment_episode_metrics.private.jsonl"
-    reuse_cached_only = cached_scores.is_file()
-    context = issue155._load_context(DATASET, feature_root=feature_root, load_features=not reuse_cached_only,
-        expected_normalization={"version": NORMALIZATION_VERSION,
-            "window_seconds": WINDOW_SECONDS, "active_floor_db": ACTIVE_FLOOR_DB,
-            "target_active_rms": _target_from_preflight()})
-    normalized, data = issue155._score_assignments(context, (1, 7, 19), output_dir,
-        reuse_cached_only=reuse_cached_only)
+    context, cached_rows = _load_issue155_context(issue155, feature_root, output_dir)
+    reuse_cached_only = cached_rows is not None
+    offsets = (1, 7, 19)
+    normalized, data = issue155._score_assignments(context, offsets, output_dir,
+        reuse_cached_only=reuse_cached_only, cached_rows_override=cached_rows)
     baseline_rows = _jsonl(ISSUE155_DIR / "gallery_assignment_episode_metrics.private.jsonl")
     paired = {}
     for arm in sorted(context["arms"]):
@@ -1118,15 +1141,18 @@ def _write_issue164_reporting(result: dict) -> None:
         "## Does input loudness normalization change the comparison?", "",
         "![Paired Recall@1 and active-RMS acoustic error effects by encoder](figures/issue164_active_rms_paired_effects.svg)", "",
         f"A single fixed active-RMS target of {result['normalization']['target_active_rms']:.5f} ({result['normalization']['target_active_rms_dbfs']:.2f} dBFS) changed Recall@1 by a median {100*np.median([result['cross_midi_retrieval'][arm]['cross_midi_common_gallery']['paired_normalized_minus_original']['recall_at_1']['difference'] for arm in all_arms]):+.1f} points across the 11 arms. In the separate acoustic test, candidate gain was matched only while scoring A3 against B3; input normalization was applied before encoding. Lower active-RMS MR-STFT error is closer audio, though it remains sensitive to pitch, timing, and envelope as well as timbre.", "",
-        "The chart shows paired changes with 95% intervals for the follow-up encoder set; Basic Pitch and MuQ-MuLan remain in the introductory comparison above. The left panel isolates the effect of normalizing each encoder input on retrieval. The right panel holds active-RMS candidate matching fixed; positive values mean normalized embeddings selected alternatives with lower acoustic error. This scoring-time gain match is different from input normalization and does not alter cached embeddings.",
+        "The chart shows paired changes with 95% intervals for the follow-up encoder set; Basic Pitch and MuQ-MuLan remain in the seven-family introductory comparison. The left panel isolates the effect of normalizing each encoder input on retrieval. The right panel holds active-RMS candidate matching fixed; positive values mean normalized embeddings selected alternatives with lower acoustic error. This scoring-time gain match is different from input normalization and does not alter cached embeddings.",
         "<!-- issue164-active-rms-summary:end -->", ""])
     vstart, vend = "<!-- issue164-active-rms-summary:start -->", "<!-- issue164-active-rms-summary:end -->"
     if vstart in visual_text and vend in visual_text:
         before, remainder = visual_text.split(vstart, 1)
         _, after = remainder.split(vend, 1)
-        visual_text = before + visual_section + after
-    else:
-        visual_text = visual_text.replace("## 1. Is recognising a preset the same as finding a good substitute?", visual_section + "\n## 1. Is recognising a preset the same as finding a good substitute?", 1)
+        visual_text = before.rstrip("\n") + "\n\n" + after.lstrip("\n")
+    first_chart_note = "The first chart includes all seven encoder families, including Basic Pitch and MuQ-MuLan. Charts 2–5 focus on the five remaining families; their Pareto frontiers use those five only."
+    if first_chart_note not in visual_text:
+        raise ValueError("visual summary is missing the seven-family introductory chart note")
+    visual_text = visual_text.replace(first_chart_note,
+        first_chart_note + "\n\n" + visual_section.rstrip("\n"), 1)
     visual_path.write_text(visual_text, encoding="utf-8", newline="\n")
 
 

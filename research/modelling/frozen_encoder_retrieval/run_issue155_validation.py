@@ -23,6 +23,7 @@ from frozen_retrieval.encoders import (cache_feature, file_sha256, list_clip_cac
 
 
 ASSIGNMENT_SCORE_CONTRACT_VERSION = "issue155-gallery-assignment-v1"
+_CACHED_ROWS_UNSET = object()
 
 
 def _jsonl(path: Path) -> list[dict]:
@@ -370,7 +371,8 @@ def _family_best(arms: dict[str, list[dict]]) -> dict[str, str]:
 
 
 def _score_assignments(context: dict, offsets: tuple[int, ...], output: Path, *,
-                       reuse_cached_only: bool = False) -> tuple[dict, dict]:
+                       reuse_cached_only: bool = False,
+                       cached_rows_override: object = _CACHED_ROWS_UNSET) -> tuple[dict, dict]:
     assignments, candidates, coverage = _build_assignments(context, offsets)
     if any(len(coverage["by_offset"][offset]) != 6450 for offset in offsets):
         raise ValueError(f"gallery assignment coverage differs from 6,450 queries: {coverage}")
@@ -382,7 +384,8 @@ def _score_assignments(context: dict, offsets: tuple[int, ...], output: Path, *,
     expected_episode_ids = {offset: {row["episode_id"] for row in episodes}
                              for offset, episodes in coverage["by_offset"].items()}
     cache_identity = _assignment_cache_identity(context, offsets, expected_episode_ids)
-    cached_rows = _load_cached_assignment_rows(output_path, set(result_rows), expected_episode_ids, cache_identity)
+    cached_rows = (_load_cached_assignment_rows(output_path, set(result_rows), expected_episode_ids, cache_identity)
+                   if cached_rows_override is _CACHED_ROWS_UNSET else cached_rows_override)
     if cached_rows is not None:
         result_rows = cached_rows
         for offset in offsets:
