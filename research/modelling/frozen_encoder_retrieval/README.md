@@ -177,8 +177,35 @@ Checkpoint acquisition is separate from benchmark execution. The runner sets Hug
 | Meta EnCodec | `facebook/encodec_24khz`; continuous mono encoder output before RVQ | 24 kHz | 128-D per frame |
 | Descript DAC | `descript/dac_44khz`; continuous mono encoder output before RVQ | 44.1 kHz | 1024-D per frame |
 
-Clip adapters use the official clip latent. Sequence adapters are frozen/eval, FP32, and return both a valid-frame temporal mean and an eight-bin ordered mean/std representation. Basic Pitch input is windowed using its fixed two-second context and overlap; its contour-branch hidden map is averaged across the three sub-semitone contour bins before flattening channels × semitones into each frame. Basic Pitch's pretrained objective is note transcription, so this representation is an exploratory performance-feature baseline, not a timbre-trained embedding. BEATs flattened patches are reshaped by its 128-bin mel-frequency patch count, then frequency-averaged to a time sequence; partial final time patches are excluded. No padded frame enters a pool. Cosine scoring normalizes each cached output at evaluation time. Stereo is averaged to mono and resampling uses SciPy polyphase resampling. No shared gain normalization is applied; EnCodec's own checkpoint-configured RMS normalization is retained when enabled.
+Clip adapters use the official clip latent. Sequence adapters are frozen/eval, FP32, and return both a valid-frame temporal mean and an eight-bin ordered mean/std representation. Basic Pitch input is windowed using its fixed two-second context and overlap; its contour-branch hidden map is averaged across the three sub-semitone contour bins before flattening channels × semitones into each frame. Basic Pitch's pretrained objective is note transcription, so this representation is an exploratory performance-feature baseline, not a timbre-trained embedding. BEATs flattened patches are reshaped by its 128-bin mel-frequency patch count, then frequency-averaged to a time sequence; partial final time patches are excluded. No padded frame enters a pool. Cosine scoring normalizes each cached output at evaluation time. Stereo is averaged to mono and resampling uses SciPy polyphase resampling. The original #152 input path applies no shared gain normalization; issue #164 adds a separate active-RMS cache. EnCodec's checkpoint-configured internal RMS normalization is retained in both conditions when enabled.
 
 ## What is executed in this checkout
 
 See [the result report](reports/FROZEN_ENCODER_RETRIEVAL_RESULTS.md) for the executed real-corpus comparison, render/feature coverage, measured results, controlled diagnostic, exact provenance, and remaining unavailable arms. An unavailable encoder is an explicit report row, never a substitute result.
+
+## Issue #164 padding-invariant active-RMS comparison
+
+The first command revalidates the original cache, accepted WAV receipts, issue #155/#157/#161 inputs, and all locked checkpoint hashes. It derives one cohort-wide target from the maximum measured peak-to-active-RMS ratio so no normalized source sample exceeds 0.95. Input normalization uses stereo mean-square 20 ms windows at every sample offset, zero extension, and a relative −40 dB gate; it runs before mono downmix and encoder resampling. `features_active_rms/` holds the separate normalized cache. The original `features/` cache and source WAVs remain untouched.
+
+```powershell
+$base = 'research/modelling/frozen_encoder_retrieval'
+$dataset = "$base/outputs/issue152-validation-train-midi-v3-50"
+$py = "$base/local_checkpoints/bench-env/Scripts/python.exe"
+& $py -B "$base/run_issue164_normalization.py" --stage preflight
+$target = (& $py -B -c "import json; print(json.load(open('$base/outputs/issue164-active-rms/preflight.private.json'))['normalization']['target_active_rms'])")
+
+foreach ($model in @('cir_ast','beats_iter3_plus','clap_music','dac_44khz','encodec_24khz','muq_mulan')) {
+  & $py -B "$base/run.py" embed --dataset $dataset --model $model --checkpoint-root "$base/local_checkpoints" --lock "$base/local_checkpoints/checkpoint-lock.json" --device xpu --active-rms-target $target
+}
+$oldPythonpath = $env:PYTHONPATH
+$env:PYTHONPATH = "$env:USERPROFILE/miniforge3/envs/obruxo-data-generation/Lib/site-packages"
+& $py -B "$base/run.py" embed --dataset $dataset --model basic_pitch_trunk --checkpoint-root "$base/local_checkpoints" --lock "$base/local_checkpoints/checkpoint-lock.json" --device xpu --active-rms-target $target
+if ($null -eq $oldPythonpath) { Remove-Item Env:PYTHONPATH -ErrorAction SilentlyContinue } else { $env:PYTHONPATH = $oldPythonpath }
+
+& $py -B "$base/run_issue164_normalization.py" --stage evaluate
+& $py -B "$base/run_issue164_normalization.py" --stage analyze --device xpu
+```
+
+To open a small live progress window while the background run is active, use `& $py -B "$base/show_issue164_progress.py"`. Play/Pause and Stop control the display only; extraction continues in the background.
+
+Use the exact target printed by preflight for all seven embedding commands. `evaluate` reuses the original evaluation's acoustic hard-negative selections. `analyze` pairs issue #152 retrieval, issue #155's three existing gallery-MIDI assignments, and issue #161's fixed triplets against the preserved baselines; it recomputes only the normalized-side rankings, active-RMS-matched acoustic matrices and small ±6 dB input-gain probe. Active-RMS matching is an evaluation-time candidate-gain operation: it leaves both inputs and cached embeddings unchanged. The output is the sanitized [issue #164 aggregate](reports/issue164_active_rms_results.json), detailed result section and concise figures in the [research report](reports/FROZEN_ENCODER_RETRIEVAL_RESULTS.md) and [visual summary](FROZEN_ENCODER_VISUAL_SUMMARY.md), with all request-level provenance and matrices stored under ignored `outputs/issue164-active-rms/`.

@@ -56,9 +56,13 @@ def _expected_pooling(model_name: str) -> str:
     return "native_clip_v1" if MODEL_REGISTRY[model_name]["kind"] == "clip" else "masked_mean_and_8bin_mean_std_v1"
 
 
-def verify_embedding_cache(dataset_dir: Path, checkpoint_root: Path, *, progress=None) -> dict:
+def verify_embedding_cache(dataset_dir: Path, checkpoint_root: Path, *, feature_root: Path | None = None,
+                           results_root: Path | None = None, normalization_target: float | None = None,
+                           model_names: tuple[str, ...] | None = None, progress=None) -> dict:
     """Validate the frozen cache contract without opening source audio or loading an encoder."""
     dataset_dir = dataset_dir.resolve(strict=True)
+    feature_root = (feature_root or dataset_dir / "features").resolve(strict=True)
+    results_root = (results_root or dataset_dir).resolve(strict=True)
     summary = json.loads((dataset_dir / "dataset_summary.private.json").read_text(encoding="utf-8"))
     validate_dataset_manifests(dataset_dir, summary)
     if summary.get("source_split") != "validation" or summary.get("performance_source_split") != "train":
@@ -66,14 +70,14 @@ def verify_embedding_cache(dataset_dir: Path, checkpoint_root: Path, *, progress
     if summary.get("reserved_split_access") != "none" or summary.get("performance_identity_overlap_excluded") != 0:
         raise ValueError("dataset manifest does not preserve the reserved-source boundary")
 
-    evaluation = json.loads((dataset_dir / "evaluation.private.json").read_text(encoding="utf-8"))
+    evaluation = json.loads((results_root / "evaluation.private.json").read_text(encoding="utf-8"))
     expected_arms = {f"{model}:{variant}" for model, variants in EXPECTED_VARIANTS.items() for variant in variants}
     if set(evaluation.get("available_arms", [])) != expected_arms:
         raise ValueError("existing evaluation does not contain the complete seven-family, eleven-arm cohort")
     if evaluation.get("held_out_reserved_sources_used") is not False:
         raise ValueError("existing evaluation does not affirm the held-out-source boundary")
 
-    metric_rows = [row for row in _jsonl(dataset_dir / "episode_metrics.private.jsonl")
+    metric_rows = [row for row in _jsonl(results_root / "episode_metrics.private.jsonl")
                    if row.get("condition") == "cross_midi_common_gallery"]
     rows_by_arm = {arm: [row for row in metric_rows if row.get("arm") == arm] for arm in sorted(expected_arms)}
     if any(len(rows) != 6_450 for rows in rows_by_arm.values()):
@@ -130,13 +134,16 @@ def verify_embedding_cache(dataset_dir: Path, checkpoint_root: Path, *, progress
     lock = json.loads((checkpoint_root / "checkpoint-lock.json").read_text(encoding="utf-8"))
     if lock.get("version") != 1 or not isinstance(lock.get("models"), dict):
         raise ValueError("local checkpoint lock is missing or unsupported")
+    selected_models = MODEL_ORDER if model_names is None else tuple(model_names)
+    if not selected_models or len(set(selected_models)) != len(selected_models) or not set(selected_models).issubset(MODEL_ORDER):
+        raise ValueError("cache verification model selection must contain unique known encoder families")
     model_caches = {}
     shared_requests = None
     shared_pair_by_request = None
     shared_audio_by_request = None
     cache_entry_counts = set()
-    for model_name in MODEL_ORDER:
-        model_dir = dataset_dir / "features" / model_name
+    for model_name in selected_models:
+        model_dir = feature_root / model_name
         manifest_rows = _jsonl(model_dir / "feature_manifest.private.jsonl")
         extraction = json.loads((model_dir / "extraction.latest.json").read_text(encoding="utf-8"))
         lock_entry = lock["models"].get(model_name)
@@ -146,18 +153,33 @@ def verify_embedding_cache(dataset_dir: Path, checkpoint_root: Path, *, progress
         locked_sha = lock_entry["sha256"]
         if MODEL_REGISTRY[model_name].get("expected_sha256") not in (None, locked_sha):
             raise ValueError(f"locked checkpoint digest differs from the pinned registry for {model_name}")
+        expected_input_count = 6_480 if normalization_target is None else 6_450
         if (extraction.get("model") != model_name or extraction.get("checkpoint_sha256") != locked_sha or
-                extraction.get("failure_count") != 0 or extraction.get("input_render_count") != 6_480 or
+                extraction.get("failure_count") != 0 or extraction.get("input_render_count") != expected_input_count or
                 extraction.get("frozen") is not True or extraction.get("eval_mode") is not True or
                 extraction.get("dimensions_by_variant") != expected_dimensions):
             raise ValueError(f"extraction summary does not match the verified cache contract for {model_name}")
-        if extraction.get("preprocessing") != "stereo mean to mono; scipy polyphase resample; no loudness normalization":
-            raise ValueError(f"extraction preprocessing differs from the frozen report for {model_name}")
+        if normalization_target is None:
+            if extraction.get("preprocessing") != "stereo mean to mono; scipy polyphase resample; no loudness normalization":
+                raise ValueError(f"extraction preprocessing differs from the frozen report for {model_name}")
+            expected_preprocessing = PREPROCESSING_ID
+        else:
+            from .normalization import ACTIVE_FLOOR_DB, NORMALIZATION_VERSION, WINDOW_SECONDS
+
+            expected_preprocessing = "pcm_scale_active_rms_stereo_mean_mono_resample_poly_v1"
+            expected_normalization = {"version": NORMALIZATION_VERSION, "window_seconds": WINDOW_SECONDS,
+                "active_floor_db": ACTIVE_FLOOR_DB, "target_active_rms": float(normalization_target),
+                "channel_energy": "mean-square across original WAV channels",
+                "placement": "before mono downmix and model-specific resampling"}
+            if extraction.get("preprocessing") != "stereo active-RMS normalization before mono downmix and scipy polyphase resample" or \
+                    extraction.get("normalization", {}).get("target_active_rms") != float(normalization_target) or \
+                    extraction.get("normalization", {}).get("version") != NORMALIZATION_VERSION:
+                raise ValueError(f"active-RMS preprocessing provenance differs for {model_name}")
         expected_extraction_pooling = ("official native clip embedding" if MODEL_REGISTRY[model_name]["kind"] == "clip"
                                        else "valid sequence frames: masked mean and 8 ordered bins of mean plus standard deviation")
         if extraction.get("pooling") != expected_extraction_pooling or extraction.get("precision") != "float32":
             raise ValueError(f"pooling or precision differs from the frozen report for {model_name}")
-        if len(manifest_rows) != 6_480 or len({row["request_id"] for row in manifest_rows}) != 6_480:
+        if len(manifest_rows) != expected_input_count or len({row["request_id"] for row in manifest_rows}) != expected_input_count:
             raise ValueError(f"feature manifest is incomplete or duplicated for {model_name}")
 
         request_ids = set()
@@ -200,12 +222,21 @@ def verify_embedding_cache(dataset_dir: Path, checkpoint_root: Path, *, progress
                     identity.get("audio_file_sha256") != row.get("audio_sha256") or
                     identity.get("tap") != MODEL_REGISTRY[model_name]["tap"] or
                     identity.get("sample_rate") != MODEL_REGISTRY[model_name]["sample_rate"] or
-                    identity.get("preprocessing") != PREPROCESSING_ID or
+                    identity.get("preprocessing") != expected_preprocessing or
                     identity.get("pooling") != _expected_pooling(model_name) or
                     identity.get("precision") != "fp32" or
                     identity.get("local_config_pins") != expected_local_configs or
                     metadata.get("dimensions") != expected_dimensions):
                 raise ValueError(f"feature provenance or integrity check failed for {model_name}")
+            if normalization_target is not None:
+                normalization = metadata.get("normalization", {})
+                if (identity.get("input_normalization") != expected_normalization or
+                        normalization.get("version") != NORMALIZATION_VERSION or
+                        normalization.get("target_active_rms") != float(normalization_target) or
+                        normalization.get("sample_rate") != 44_100 or
+                        not np.isfinite(normalization.get("applied_gain", np.nan)) or
+                        not np.isfinite(normalization.get("peak_to_active_rms", np.nan))):
+                    raise ValueError(f"active-RMS cache provenance is incomplete for {model_name}")
             if model_name != "encodec_24khz" and identity.get("encoder_internal_normalization") != "none":
                 raise ValueError(f"unexpected encoder-internal normalization for {model_name}")
             if model_name == "encodec_24khz" and identity.get("encoder_internal_normalization") not in {"none", "encodec_config_rms"}:
@@ -230,6 +261,8 @@ def verify_embedding_cache(dataset_dir: Path, checkpoint_root: Path, *, progress
         matrix_requests = {request_by_pair[pair] for pair in cohort_pairs}
         if not matrix_requests.issubset(request_ids):
             raise ValueError(f"the exact 129 by 50 cohort is incomplete for {model_name}")
+        if normalization_target is not None and request_ids != matrix_requests:
+            raise ValueError(f"active-RMS cache must contain exactly the common 129 by 50 cohort for {model_name}")
         cache_entry_counts.add(len(request_ids))
         model_caches[model_name] = {"directory": model_dir, "rows_by_request": {row["request_id"]: row for row in manifest_rows},
                                     "checkpoint_sha256": locked_sha, "source_revision": lock_entry["revision"],
@@ -246,6 +279,7 @@ def verify_embedding_cache(dataset_dir: Path, checkpoint_root: Path, *, progress
             "family_ids": sorted(family_ids), "family_by_state": family_by_state,
             "request_by_pair": request_by_pair, "receipts": receipts, "retrieval_r1": retrieval,
             "expected_arms": expected_arms, "common_cells": len(cohort_pairs), "cache_entry_counts": sorted(cache_entry_counts),
+            "verified_model_names": selected_models,
             "evaluation_arms": len(evaluation["available_arms"]), "source_split": summary["source_split"],
             "performance_source_split": summary["performance_source_split"], "reserved_split_access": summary["reserved_split_access"]}
 

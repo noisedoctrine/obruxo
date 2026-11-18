@@ -36,6 +36,7 @@ from frozen_retrieval.reporting import (_retrieval_explainer_lines, _control_gro
 import run_controlled_perturbation as controlled
 import run_controlled_candidate_shortlist as candidate_screen
 import run_issue155_validation as issue155
+import run_issue164_normalization as issue164
 
 
 def _presets():
@@ -342,8 +343,92 @@ class EpisodeContractTests(unittest.TestCase):
 
 
 class FeatureAndManifestTests(unittest.TestCase):
+    def test_issue164_gain_probe_rows_include_bootstrap_episode_identity(self):
+        rows = []
+        for index, (family_id, midi_id) in enumerate((("family-a", "midi-a"), ("family-a", "midi-b"),
+                                                       ("family-b", "midi-a"), ("family-b", "midi-b"))):
+            case = {"triplet_index": index, "target_state_id": f"state-{index}",
+                    "candidate_state_id": f"candidate-{index}", "target_family_id": family_id,
+                    "query_midi_id": midi_id}
+            rows.append(issue164._gain_probe_result_row(case, "query", -6, embedding_distance=(index + 1) / 10))
+        summary = issue164.evaluation_two_way_ci(rows, "embedding_distance")
+        self.assertEqual(0.25, summary["estimate"])
+        self.assertTrue(all(row["episode_id"].startswith("gain164:") for row in rows))
+
+    def test_issue164_wav_mapping_uses_accepted_common_requests_only(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            audit = {"request_by_pair": {("state-a", "midi-a"): "accepted"},
+                     "receipts": {"accepted": {"accepted": True, "wav_relative_path": "audio/a.wav"},
+                                  "rejected": {"accepted": False}}}
+            self.assertEqual({("state-a", "midi-a"): root / "audio/a.wav"},
+                             issue164._accepted_wav_paths(root, audit))
+
+    def test_issue164_active_matrix_cache_ignores_target_and_rejects_old_contract_version(self):
+        import numpy as np
+
+        matrices = {index: np.zeros((129, 129), dtype=np.float32) for index in range(12)}
+        identity = {"cache_contract_version": issue164.ACTIVE_MATRIX_CACHE_VERSION,
+                    "normalization_version": "active-rms-v1", "normalization_target_active_rms": 0.025}
+        identity.pop("normalization_target_active_rms")
+        contract = {**identity, "normalization_target_active_rms": 0.025, "matrix_archive_sha256": "matrix-sha256"}
+        self.assertTrue(issue164._active_matrix_cache_matches(matrices, contract, identity, "matrix-sha256"))
+        stale = {**contract, "cache_contract_version": "old-active-rms-matrix-v0"}
+        self.assertFalse(issue164._active_matrix_cache_matches(matrices, stale, identity, "matrix-sha256"))
+        self.assertFalse(issue164._active_matrix_cache_matches(matrices, contract, identity, "changed-matrix-sha256"))
+
+    def test_issue164_stale_assignment_cache_reloads_feature_caches(self):
+        class Issue155Stub:
+            def __init__(self):
+                self.load_features = []
+
+            def _load_context(self, _dataset, **kwargs):
+                self.load_features.append(kwargs["load_features"])
+                return {"arms": {"arm-a": object()}}
+
+            def _build_assignments(self, _context, offsets):
+                return [], {}, {"by_offset": {offset: [{"episode_id": f"episode-{offset}"}]
+                                               for offset in offsets}}
+
+            def _assignment_cache_identity(self, _context, _offsets, _expected):
+                return {"normalized_feature_identity": "current"}
+
+            def _load_cached_assignment_rows(self, *_args):
+                return None
+
+        runner = Issue155Stub()
+        with patch.object(issue164, "_target_from_preflight", return_value=0.025):
+            context, cached_rows = issue164._load_issue155_context(
+                runner, Path("dataset/features_active_rms"), Path("private/issue155_assignments"))
+        self.assertEqual([False, True], runner.load_features)
+        self.assertEqual({"arm-a"}, set(context["arms"]))
+        self.assertIsNone(cached_rows)
+
     def test_issue155_runner_exposes_basic_pitch_adapter_checkout(self):
         self.assertIn(str(REPO / "research/modelling/basic_pitch"), sys.path)
+
+    def test_issue155_cached_assignment_rows_require_full_arm_offset_coverage(self):
+        expected = {1: {"e1", "e2"}, 7: {"e3"}}
+        identity = {"score_contract_version": issue155.ASSIGNMENT_SCORE_CONTRACT_VERSION,
+                    "feature_cache_identity": {"identity_sha256": "cache-v1", "normalization": {
+                        "version": "active-rms-v1", "target_active_rms": 0.025}}}
+        rows = [{"arm": arm, "gallery_assignment_offset": offset, "episode_id": episode}
+                for arm in ("arm-a", "arm-b") for offset, episode_ids in expected.items()
+                for episode in episode_ids]
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "scores.jsonl"
+            path.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+            issue155._write_assignment_cache_contract(path, identity)
+            cached = issue155._load_cached_assignment_rows(path, {"arm-a", "arm-b"}, expected, identity)
+            self.assertEqual(3, len(cached["arm-a"]))
+
+            stale_identity = json.loads(json.dumps(identity))
+            stale_identity["feature_cache_identity"]["normalization"]["target_active_rms"] = 0.03
+            self.assertIsNone(issue155._load_cached_assignment_rows(
+                path, {"arm-a", "arm-b"}, expected, stale_identity))
+
+            path.write_text("".join(json.dumps(row) + "\n" for row in rows[:-1]), encoding="utf-8")
+            self.assertIsNone(issue155._load_cached_assignment_rows(path, {"arm-a", "arm-b"}, expected, identity))
 
     def test_issue155_report_quality_collapses_assignment_repeats_by_query(self):
         rows = []
@@ -524,7 +609,39 @@ class FeatureAndManifestTests(unittest.TestCase):
             adjusted_meta = json.loads((root / "features" / f"{adjusted['feature_id']}.json").read_text())
             self.assertEqual("pcm_scale_stereo_mean_mono_resample_poly_no_gain_norm_v2",
                              original_meta["cache_identity"]["preprocessing"])
+            self.assertNotIn("input_normalization", original_meta["cache_identity"])
             self.assertEqual("linear_peak_gain_to_0.95_v1", adjusted_meta["cache_identity"]["preprocessing"])
+
+    def test_active_rms_cache_has_distinct_fixed_target_provenance_without_changing_original_id(self):
+        import numpy as np
+        from types import SimpleNamespace
+
+        with tempfile.TemporaryDirectory(dir=REPO) as directory:
+            root = Path(directory)
+            wav = root / "same.wav"
+            wav.write_bytes(b"source audio bytes")
+            adapter = SimpleNamespace(name="clap_music", checkpoint_digest="checkpoint", device="cpu", sample_rate=48_000,
+                lock_entry={"revision": "source", "loader_revision": "loader", "local_configs": {}},
+                model=object(), numpy=np, extract=lambda _path: {"official_clip": [1.0, 0.0]},
+                extract_normalized=lambda _path, target: ({"official_clip": [0.0, 1.0]}, {
+                    "version": "active_rms_sliding20ms_relative_minus40db_v1", "target_active_rms": target,
+                    "applied_gain": 2.0, "active_rms": 0.1, "peak_to_active_rms": 1.2}))
+            metadata = {"provenance": {"request_id": "same-request"}}
+            original = cache_feature(adapter, wav, request_id="same-request", render_metadata=metadata,
+                                     output=root / "features")
+            normalized = cache_feature(adapter, wav, request_id="same-request", render_metadata=metadata,
+                output=root / "features_active_rms", active_rms_target=0.08)
+            original_meta = json.loads((root / "features" / f"{original['feature_id']}.json").read_text())
+            normalized_meta = json.loads((root / "features_active_rms" / f"{normalized['feature_id']}.json").read_text())
+
+            self.assertNotEqual(original["feature_id"], normalized["feature_id"])
+            self.assertEqual("pcm_scale_stereo_mean_mono_resample_poly_no_gain_norm_v2",
+                             original_meta["cache_identity"]["preprocessing"])
+            self.assertNotIn("input_normalization", original_meta["cache_identity"])
+            self.assertEqual("pcm_scale_active_rms_stereo_mean_mono_resample_poly_v1",
+                             normalized_meta["cache_identity"]["preprocessing"])
+            self.assertEqual(0.08, normalized_meta["cache_identity"]["input_normalization"]["target_active_rms"])
+            self.assertEqual(0.08, normalized_meta["normalization"]["target_active_rms"])
 
     def test_clap_offline_roberta_config_matches_checkpoint_embedding_shapes(self):
         class Config:

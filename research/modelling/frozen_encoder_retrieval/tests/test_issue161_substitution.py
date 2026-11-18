@@ -11,7 +11,8 @@ sys.path[:0] = [str(PACKAGE), str(REPO / "research/data_generation"), str(REPO /
 
 torch = pytest.importorskip("torch")
 
-from frozen_retrieval.issue161_substitution import build_results, preselect_triplets, raw_mrstft_matrix  # noqa: E402
+from frozen_retrieval.issue161_substitution import (build_results, preselect_triplets, raw_mrstft_matrix,
+    active_rms_matched_mrstft_matrix)  # noqa: E402
 
 
 def _profile(midi_id, pattern, index):
@@ -77,6 +78,25 @@ def test_raw_matrix_matches_existing_multiresolution_audio_utility(tmp_path, dev
     assert contract["fft_sizes"] == [512, 2048, 8192]
     assert contract["device"] == device_name
     assert contract["scoring_window"].startswith("full saved")
+
+
+def test_active_rms_matrix_matches_reference_after_sliding_rms_gain(tmp_path):
+    from obruxo_training.evaluate import audio_distance
+    from frozen_retrieval.normalization import measure_active_rms
+
+    rng = np.random.default_rng(164)
+    reference = rng.normal(0, 0.12, (44_100, 2)).astype(np.float32)
+    candidate = (reference * 0.55 + rng.normal(0, 0.03, reference.shape)).astype(np.float32)
+    rms = [measure_active_rms(audio, 44_100)["active_rms"] for audio in (reference, candidate)]
+    matrix, contract = active_rms_matched_mrstft_matrix([reference, candidate], rms, output_dir=tmp_path,
+        batch_size=1, device_name="cpu")
+    expected_candidate = candidate * np.float32(rms[0] / rms[1])
+    expected = audio_distance(reference, expected_candidate)["mrstft"]
+    assert matrix.shape == (2, 2)
+    assert matrix[0, 0] == 0
+    assert matrix[0, 1] == pytest.approx(expected, abs=2e-5)
+    assert contract["matching"].startswith("scale candidate B3")
+    assert "sliding" in contract["active_rms"]
 
 
 def test_aggregate_scores_each_arms_own_selected_candidate():
