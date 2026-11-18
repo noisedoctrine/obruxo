@@ -4,7 +4,106 @@ Issues: [#152](https://github.com/noisedoctrine/obruxo/issues/152) baseline and 
 
 ## Results and recommendation
 
-**Primary expanded-cohort result:** CIR single-timbre AST (official_clip) ranked the correct preset first in 81.4% of cross-MIDI queries (n=6,450 queries, 129 candidate presets; 50 MIDI performances from `train`, distinct from the earlier validation-source MIDI cohort). This ranks frozen representations across 7 model families; it is retrieval evidence, not a reconstruction result.
+<!-- issue161-audible-substitute-results:start -->
+### Issue #161 — Three-MIDI audible-substitute retrieval
+
+When the exact target preset is withheld, **CLAP had the lowest measured mean error** (5.153 original-level MR-STFT) among 11 cached representations, on 1,548 choices per arm (129 families × 12 triplets; 36 distinct MIDI performances) from the same 128-alternative pool.
+Its paired mean difference versus CIR was -0.412 [-1.332, 0.488]; because that interval crosses zero, this exploratory sample does not establish a clear winner.
+
+The selected alternatives' mean error was 2.965 [2.207, 4.244] above the MIDI-3 oracle (2.188), an evaluation-only best choice after the held-out sound test.
+
+A lower MR-STFT score means the retrieved preset's audio is closer to the target recording across three time-frequency scales. It is an acoustic distance, not a listener judgment.
+
+For example, `A1` is target preset A playing query MIDI 1. The encoder picks a different-family preset B by comparing its MIDI-2 embedding; then `A3` and `B3` are compared on the held-out third MIDI. B's MIDI-3 sound never affects which preset is retrieved.
+
+Recall@1 and Issue #157 columns are existing measurements over 6,450 common-gallery queries and 50 MIDI performances; the new acoustic columns use 1,548 matched target/triplet choices. They answer different questions and use different denominators.
+
+| Frozen representation | Exact-preset R@1 | #157 preset-dominant | Original-level MR-STFT ↓ | Excess over oracle ↓ | Mean rank / 128 ↓ | Better than CIR | Gain-matched MR-STFT ↓ | 10 ms envelope error ↓ | RMS error ↓ |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| CLAP | 58.9% | 90.2% | 5.153 [4.404, 6.408] | 2.965 [2.207, 4.244] | 36.4 | 48.7% | 3.589 | 2.115 | 1.890 |
+| DAC — mean | 31.4% | 85.0% | 5.161 [4.291, 6.301] | 2.973 [2.084, 4.109] | 36.1 | 48.0% | 3.489 | 2.171 | 1.921 |
+| EnCodec — temporal | 23.4% | 78.0% | 5.183 [4.111, 7.048] | 2.995 [1.908, 4.846] | 33.3 | 50.2% | 3.619 | 2.161 | 1.906 |
+| DAC — temporal | 30.7% | 84.5% | 5.436 [4.106, 7.605] | 3.248 [1.907, 5.450] | 32.0 | 52.6% | 3.318 | 2.603 | 2.347 |
+| EnCodec — mean | 24.2% | 79.7% | 5.446 [4.595, 6.534] | 3.258 [2.410, 4.362] | 39.5 | 45.1% | 3.757 | 2.263 | 2.001 |
+| CIR | 81.4% | 98.2% | 5.565 [4.596, 6.896] | 3.377 [2.431, 4.691] | 36.3 | 50.0% | 3.327 | 2.694 | 2.477 |
+| BEATs — mean | 59.3% | 89.6% | 5.741 [4.969, 6.691] | 3.553 [2.806, 4.488] | 41.8 | 45.1% | 3.580 | 2.585 | 2.367 |
+| BEATs — temporal | 62.2% | 86.3% | 6.105 [5.176, 7.364] | 3.917 [2.982, 5.213] | 42.5 | 44.7% | 3.547 | 2.986 | 2.771 |
+| Basic Pitch — temporal | 21.9% | 68.9% | 6.635 [5.280, 8.825] | 4.447 [3.083, 6.647] | 45.3 | 39.4% | 3.697 | 3.474 | 3.221 |
+| MuQ-MuLan | 30.2% | 67.2% | 7.150 [5.472, 11.069] | 4.962 [3.282, 8.894] | 49.7 | 40.6% | 4.109 | 3.478 | 3.262 |
+| Basic Pitch — mean | 19.5% | 71.8% | 7.542 [5.739, 10.976] | 5.354 [3.546, 8.810] | 48.7 | 38.0% | 3.729 | 4.241 | 4.002 |
+| Fixed random alternative | — | — | 8.952 [7.051, 11.985] | — | — | — | — | — | — |
+| MIDI-3 oracle (evaluation reference) | — | — | 2.188 [2.103, 2.277] | 0.000 | 1.0 | — | — | — | — |
+
+The **Better than CIR** column is the paired fraction of identical target/triplet cases where that arm's selected preset had lower original-level error than CIR; ties count one half. The aggregate JSON contains the full paired 11 × 11 win matrix.
+
+**Sample and uncertainty.** Each arm made 1,548 matched choices: 129 independent preset families × 12 selected triplets, with 128 eligible alternative families per choice. The triplets use 36 distinct MIDI performances across MIDI 1, 2, and 3. Intervals resample preset families and whole triplets in paired two-way draws (2,000 replicates); the 12-triplet axis is small, and intervals do not quantify new encoders, new MIDI populations, or an independent confirmation cohort.
+
+The oracle picks, for evaluation only, the lowest-error alternative after both candidates play the same held-out third performance. It never affects embeddings, triplet selection, or retrieval. The fixed random baseline chooses one eligible alternative per target/triplet from the same 128-state pool. Excess over oracle is the encoder choice's error minus that best available catalog choice; it cannot be negative.
+
+### Triplet diversity and performance breakdowns
+
+Triplets were selected from the actual MIDI event records before encoder rankings were read. The event tags include single-note melody/bass, simultaneous-note chords/polyphony, and repeating sequences; tags can overlap. A repeating-sequence tag requires repeated three/four-onset pitch-class motifs or a long, wide-register monophonic run. The selector rotates available types through the three roles and greedily balances articulation, register, velocity variation, and pitch span. Unavailable types are reported rather than inferred from audio.
+
+| MIDI pattern (overlapping event tags) | Available in 50-performance pool | MIDI 1 query | MIDI 2 retrieval | MIDI 3 sound test |
+|---|---:|---:|---:|---:|
+| single note melody bass | 24 | 4 | 4 | 4 |
+| chords polyphonic | 26 | 4 | 4 | 4 |
+| repeating sequence | 37 | 4 | 4 | 4 |
+
+Mean original-level MR-STFT by MIDI 3 sound-test pattern (descriptive; four triplets per pattern):
+
+| Representation | Melody/bass | Chords/poly | Repeating sequence |
+|---|---:|---:|---:|
+| CLAP | 5.051 | 5.438 | 4.969 |
+| DAC — mean | 5.742 | 5.027 | 4.714 |
+| EnCodec — temporal | 5.788 | 4.641 | 5.120 |
+| DAC — temporal | 6.623 | 4.771 | 4.915 |
+| EnCodec — mean | 5.967 | 4.989 | 5.383 |
+| CIR | 5.684 | 5.202 | 5.807 |
+| BEATs — mean | 6.100 | 5.137 | 5.985 |
+| BEATs — temporal | 6.550 | 5.934 | 5.832 |
+| Basic Pitch — temporal | 6.360 | 6.583 | 6.962 |
+| MuQ-MuLan | 5.880 | 9.066 | 6.505 |
+| Basic Pitch — mean | 7.195 | 8.219 | 7.211 |
+
+Mean original-level MR-STFT by MIDI 3 target register (descriptive; triplet count varies):
+
+| Representation | low (n=774, 6 triplets) | mid (n=516, 4 triplets) | high (n=258, 2 triplets) |
+|---|---:|---:|---:|
+| CLAP | 5.615 | 4.420 | 5.230 |
+| DAC — mean | 5.584 | 4.181 | 5.853 |
+| EnCodec — temporal | 5.467 | 4.213 | 6.272 |
+| DAC — temporal | 5.849 | 3.915 | 7.243 |
+| EnCodec — mean | 5.818 | 4.777 | 5.671 |
+| CIR | 6.165 | 4.624 | 5.645 |
+| BEATs — mean | 6.174 | 5.358 | 5.207 |
+| BEATs — temporal | 6.399 | 5.611 | 6.214 |
+| Basic Pitch — temporal | 7.401 | 5.820 | 5.968 |
+| MuQ-MuLan | 8.193 | 6.062 | 6.196 |
+| Basic Pitch — mean | 8.503 | 6.341 | 7.058 |
+Selected role coverage: 19 held and 17 phrased excerpts; register counts low/mid/high 11/13/12; velocity-varied excerpts 18/36; pitch spans of at least 24 semitones 11/36. Unavailable pattern categories: none.
+
+Equivalent means by MIDI 1 query and MIDI 2 retrieval pattern are in the sanitized aggregate. The subgroup means are descriptive: pattern strata have only the triplets shown above, and register groups are not independent of MIDI content.
+
+### Interpretation and limits
+
+The primary ordering is CLAP then DAC — mean; the second arm's original-level error is 5.161 [4.291, 6.301]. The paired difference for the leading arm versus CIR is -0.412 [-1.332, 0.488] (negative favors the leading arm). Exact-preset Recall@1 and Issue #157 preset-dominant fraction answer different questions: recognizing A across performances or moving more for a preset change does not guarantee that the nearest different preset sounds closest. The cross-arm table keeps those earlier measures beside the new acoustic result so disagreements remain visible.
+
+This is a decoder-free, training-free catalog-selection test. It does not show that any representation predicts Vital controls, builds a new patch, or produces a better reconstruction. No independent confirmation cohort was available or accessed; the selected 12 triplets are a fixed exploratory sample. No listening panel was run, so acoustic distances should not be described as human preference.
+
+**Recommendation.** Treat the lowest-error arm as a provisional catalog-search candidate only. Repeat with a separately preselected, permitted confirmation cohort and listening review before making a broader recommendation.
+
+### Execution and reproducibility
+
+The run reuses the accepted `issue152-validation-train-midi-v3-50` WAV and frozen embedding caches. The full cache audit verified all 11 representation arms, 129 × 50 common cells, render identities and accepted receipts, feature archive hashes, checkpoint/tap/pooling/preprocessing provenance, finite nonzero vectors, and the `validation` preset / `train` performance boundary. It found no missing required matrix cells. Selected MIDI 1/2/3 WAVs were then checked against receipt bytes and render metadata; no Vital rendering, feature extraction, or encoder inference was performed.
+The triplet matrix check verified 4,644 selected preset/MIDI WAV cells and loaded 1,548 MIDI-3 score WAVs. Receipt QA warnings were retained without waveform clipping or repair: {'amplitude_above_unit_range': 1127, 'tail_rms_above_warning': 1207}.
+
+The original-level primary score uses sample-zero alignment and the full saved stereo 44.1 kHz float32 WAV, including the renderer tail, with no time shift, trim, or padding. Files with clipping warnings remain at their saved level and are counted in the private execution summary; silent or nonfinite waveforms fail closed. Gain matching applies one stereo-RMS scalar to the candidate only. The envelope measure is the existing 10 ms per-channel stereo RMS relative RMSE with a zero-padded final frame; level is global stereo RMS relative error.
+
+Triplet IDs, selected WAV paths, per-case selections and errors, and intermediate acoustic matrices remain under ignored `outputs/issue161-audible-substitute/`. The committed [sanitized aggregate results](issue161_substitution_results.json) contain no raw preset or MIDI identifiers.
+
+<!-- issue161-audible-substitute-results:end -->
+**Existing cross-MIDI retrieval baseline:** CIR single-timbre AST (official_clip) ranked the correct preset first in 81.4% of cross-MIDI queries (n=6,450 queries, 129 candidate presets; 50 MIDI performances from `train`, distinct from the earlier validation-source MIDI cohort). This ranks frozen representations across 7 model families; it is retrieval evidence, not a reconstruction result.
 
 Presentation: [Frozen encoder retrieval (PDF)](presentations/frozen_encoder_retrieval.pdf).
 

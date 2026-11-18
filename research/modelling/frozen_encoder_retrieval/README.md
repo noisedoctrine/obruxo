@@ -143,6 +143,24 @@ python research/modelling/frozen_encoder_retrieval/run_issue157_sensitivity.py `
 
 The command updates [the research report](reports/FROZEN_ENCODER_RETRIEVAL_RESULTS.md), its machine-readable result JSON, and four figures. The analysis covers seven encoder families and eleven cached representation variants on the shared 129-preset × 50-performance matrix.
 
+## Issue #161 three-MIDI audible-substitute retrieval
+
+This catalog-selection test preselects 12 MIDI triplets from MIDI event records, then uses MIDI 1 embeddings to retrieve among 128 different source families rendered on MIDI 2. It scores the selected alternatives on the same third MIDI using existing WAVs. The oracle and fixed random alternative are evaluation references only. The runner verifies the existing 11-arm cache and selected WAV receipt/hash identities and does not render, extract features, load an encoder, or use reserved sources. Raw triplet IDs, case scores, WAV paths, and acoustic matrices stay in ignored `outputs/`.
+
+```powershell
+& research/modelling/frozen_encoder_retrieval/local_checkpoints/bench-env/Scripts/python.exe -B `
+  research/modelling/frozen_encoder_retrieval/run_issue161_substitution.py
+```
+
+The [runner](run_issue161_substitution.py) pins seed 161, freezes the MIDI-event-only triplet manifest before reading retrieval metrics, checks exact sample alignment and accepted render receipts, and updates the [research report](reports/FROZEN_ENCODER_RETRIEVAL_RESULTS.md) plus its sanitized [aggregate result](reports/issue161_substitution_results.json). Add `--prepare-only` to freeze the sample and verify selected WAVs without scoring. Focused tests use the same benchmark interpreter:
+
+For an interrupted run that already completed the full cache/WAV audit and saved all retrieval choices, `--resume-scoring --device xpu` revalidates source manifests and the selected MIDI-3 receipts, validates all saved 11-arm choices against the 128-family pool, and resumes only the acoustic scoring and aggregation. `--device cpu` is available for diagnostics.
+
+```powershell
+& research/modelling/frozen_encoder_retrieval/local_checkpoints/bench-env/Scripts/python.exe -B -m pytest -q `
+  research/modelling/frozen_encoder_retrieval/tests/test_issue161_substitution.py
+```
+
 ## Frozen candidates and adapters
 
 Checkpoint acquisition is separate from benchmark execution. The runner sets Hugging Face offline mode and only loads local files; it never downloads or substitutes weights. Fill a local lock from exact downloads and compatible source checkouts using [checkpoint-lock.example.json](checkpoint-lock.example.json). Every selected checkpoint records its HF/source revision, SHA-256, loader revision, runtime package versions, and terms status. Use `license_status: approved` for terms cleared for this use or `research-use-unverified` when locally authorized research proceeds while terms remain unresolved; only `explicitly-prohibited` stops extraction. MuQ-MuLan is used only for non-commercial research. This benchmark keeps all checkpoints local and does not redistribute weights; that does not clear future deployment or distribution. CIR and BEATs are evaluated with unresolved checkpoint-term notes retained in the report. MuQ-MuLan and CIR also require separately pinned local architecture/config assets; a cold cache fails during preflight instead of reaching the network. The exact BEATs mirror SHA from the issue comment is enforced.
