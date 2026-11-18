@@ -1,5 +1,7 @@
 # Frozen audio encoder retrieval benchmark
 
+**Quick overview:** [Visual summary of the key tradeoffs](FROZEN_ENCODER_VISUAL_SUMMARY.md). The detailed results and protocols remain below.
+
 Issues: [#152](https://github.com/noisedoctrine/obruxo/issues/152) baseline and [#155](https://github.com/noisedoctrine/obruxo/issues/155) follow-up. This report compares frozen pretrained representations on Vital presets and existing MIDI performances. No synthesis controls are predicted, tuned, or optimized. For frozen representation-only analyses, no Vital controls are predicted or edited; the original source settings remain unchanged ([canonical frozen-control inventory](vital_control_inventory.jsonl)).
 
 ## Results and recommendation
