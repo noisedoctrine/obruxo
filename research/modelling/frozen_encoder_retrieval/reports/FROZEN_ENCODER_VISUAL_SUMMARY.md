@@ -11,7 +11,7 @@
 
 A single fixed active-RMS target of 0.02536 (-31.92 dBFS) changed Recall@1 by a median -3.7 points across the 11 arms. In the separate acoustic test, candidate gain was matched only while scoring A3 against B3; input normalization was applied before encoding. Lower active-RMS MR-STFT error is closer audio, though it remains sensitive to pitch, timing, and envelope as well as timbre.
 
-The chart shows paired changes with 95% intervals. The left panel isolates the effect of normalizing each encoder input on retrieval. The right panel holds active-RMS candidate matching fixed and compares which alternatives original versus normalized embeddings selected. This scoring-time gain match is different from input normalization and does not alter cached embeddings.
+The chart shows paired changes with 95% intervals for the follow-up encoder set; Basic Pitch and MuQ-MuLan remain in the introductory comparison above. The left panel isolates the effect of normalizing each encoder input on retrieval. The right panel holds active-RMS candidate matching fixed; positive values mean normalized embeddings selected alternatives with lower acoustic error. This scoring-time gain match is different from input normalization and does not alter cached embeddings.
 <!-- issue164-active-rms-summary:end -->
 
 

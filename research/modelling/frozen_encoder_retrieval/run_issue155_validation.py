@@ -22,6 +22,9 @@ from frozen_retrieval.encoders import (cache_feature, file_sha256, list_clip_cac
                                        load_checkpoint_lock, resolve_checkpoint, resolve_source_checkout)
 
 
+ASSIGNMENT_SCORE_CONTRACT_VERSION = "issue155-gallery-assignment-v1"
+
+
 def _jsonl(path: Path) -> list[dict]:
     with path.open("r", encoding="utf-8") as stream:
         return [json.loads(line) for line in stream if line.strip()]
@@ -64,9 +67,61 @@ def _paired_result(left: list[dict], right: list[dict], metrics=("recall_at_1",)
             for metric in metrics}
 
 
-def _load_context(dataset: Path, *, feature_root: Path | None = None, load_features: bool = True) -> dict:
+def _feature_cache_identity(feature_root: Path, expected_normalization: dict | None = None) -> tuple[dict, dict[str, set[str]]]:
+    models, request_ids_by_model = {}, {}
+    for model_name in sorted(core.MODEL_REGISTRY):
+        cache_dir = feature_root / model_name
+        manifest_path = cache_dir / "feature_manifest.private.jsonl"
+        summary = json.loads((cache_dir / "extraction.latest.json").read_text(encoding="utf-8"))
+        normalization = summary.get("normalization")
+        if expected_normalization is not None and any(
+                normalization is None or normalization.get(key) != value
+                for key, value in expected_normalization.items()):
+            raise ValueError(f"{model_name} normalized cache has a stale or missing normalization contract")
+        manifest = _jsonl(manifest_path)
+        if len(manifest) != summary.get("feature_count") or not manifest:
+            raise ValueError(f"{model_name} feature manifest does not match its extraction summary")
+        request_ids = {row["request_id"] for row in manifest}
+        feature_ids = {row["feature_id"] for row in manifest}
+        if len(request_ids) != len(manifest) or len(feature_ids) != len(manifest):
+            raise ValueError(f"{model_name} feature manifest has duplicate request or feature identities")
+        request_ids_by_model[model_name] = request_ids
+        models[model_name] = {"checkpoint_sha256": summary.get("checkpoint_sha256"),
+            "source_revision": summary.get("source_revision"), "loader_revision": summary.get("loader_revision"),
+            "feature_count": summary["feature_count"], "normalization": normalization,
+            "manifest_sha256": file_sha256(manifest_path),
+            "request_ids_sha256": core.digest(sorted(request_ids))}
+    return {"models": models, "identity_sha256": core.digest(models)}, request_ids_by_model
+
+
+def _assignment_cache_identity(context: dict, offsets: tuple[int, ...],
+                               expected_episode_ids_by_offset: dict[int, set[str]]) -> dict:
+    episodes = {str(offset): sorted(episode_ids)
+                for offset, episode_ids in sorted(expected_episode_ids_by_offset.items())}
+    return {"score_contract_version": ASSIGNMENT_SCORE_CONTRACT_VERSION,
+        "feature_cache_identity": context["feature_cache_identity"],
+        "candidate_set_id": context["source_candidate_id"], "arms": sorted(context["arms"]),
+        "offsets": list(offsets), "episode_ids_sha256": core.digest(episodes)}
+
+
+def _assignment_cache_contract_path(path: Path) -> Path:
+    return path.with_name(path.name + ".contract.json")
+
+
+def _write_assignment_cache_contract(path: Path, identity: dict) -> None:
+    contract = {"identity": identity, "scores_sha256": file_sha256(path)}
+    _assignment_cache_contract_path(path).write_text(
+        json.dumps(contract, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+
+
+def _load_context(dataset: Path, *, feature_root: Path | None = None, load_features: bool = True,
+                  expected_normalization: dict | None = None) -> dict:
     dataset = dataset.resolve(strict=True)
     feature_root = (feature_root or dataset / "features").resolve(strict=True)
+    feature_identity, feature_request_ids = _feature_cache_identity(feature_root, expected_normalization)
+    request_set_digests = {core.digest(sorted(request_ids)) for request_ids in feature_request_ids.values()}
+    if len(request_set_digests) != 1:
+        raise ValueError("encoder feature manifests do not share the same source request cohort")
     summary = json.loads((dataset / "dataset_summary.private.json").read_text(encoding="utf-8"))
     validate_dataset_manifests(dataset, summary)
     plans = _jsonl(dataset / "render_plan.private.jsonl")
@@ -112,8 +167,7 @@ def _load_context(dataset: Path, *, feature_root: Path | None = None, load_featu
     else:
         from frozen_retrieval.sensitivity import EXPECTED_VARIANTS
 
-        accepted_requests = {request_id for request_id, receipt in receipts.items() if receipt.get("accepted")}
-        model_caches = {model: accepted_requests for model in core.MODEL_REGISTRY}
+        model_caches = {model: feature_request_ids[model] for model in core.MODEL_REGISTRY}
         arms = {f"{model}:{variant}": (model, variant, {})
                 for model, variants in EXPECTED_VARIANTS.items() for variant in variants}
     expected_arms = sum(1 if spec["kind"] == "clip" else 2 for spec in core.MODEL_REGISTRY.values())
@@ -130,7 +184,8 @@ def _load_context(dataset: Path, *, feature_root: Path | None = None, load_featu
             "receipts": receipts, "pair_to_request": pair_to_request, "candidates": all_candidates,
             "source_candidate_id": source_candidate_id, "source_candidate": candidate,
             "episodes": episodes, "performances": performances, "model_caches": model_caches,
-            "model_summaries": model_summaries, "arms": arms}
+            "model_summaries": model_summaries, "arms": arms,
+            "feature_cache_identity": feature_identity}
 
 
 def _updated_episode_strata(episode: dict, query: dict, gallery: dict) -> dict:
@@ -271,8 +326,15 @@ def _collapse_assignments(rows: list[dict]) -> list[dict]:
 
 
 def _load_cached_assignment_rows(path: Path, arms: set[str],
-                                expected_episode_ids_by_offset: dict[int, set[str]]) -> dict[str, list[dict]] | None:
+                                expected_episode_ids_by_offset: dict[int, set[str]],
+                                expected_identity: dict) -> dict[str, list[dict]] | None:
     if not path.is_file():
+        return None
+    try:
+        contract = json.loads(_assignment_cache_contract_path(path).read_text(encoding="utf-8"))
+        if contract != {"identity": expected_identity, "scores_sha256": file_sha256(path)}:
+            return None
+    except (OSError, json.JSONDecodeError, TypeError):
         return None
     rows_by_arm = {arm: [] for arm in arms}
     seen = {arm: {offset: set() for offset in expected_episode_ids_by_offset} for arm in arms}
@@ -319,7 +381,8 @@ def _score_assignments(context: dict, offsets: tuple[int, ...], output: Path, *,
     output_path = output / "gallery_assignment_episode_metrics.private.jsonl"
     expected_episode_ids = {offset: {row["episode_id"] for row in episodes}
                              for offset, episodes in coverage["by_offset"].items()}
-    cached_rows = _load_cached_assignment_rows(output_path, set(result_rows), expected_episode_ids)
+    cache_identity = _assignment_cache_identity(context, offsets, expected_episode_ids)
+    cached_rows = _load_cached_assignment_rows(output_path, set(result_rows), expected_episode_ids, cache_identity)
     if cached_rows is not None:
         result_rows = cached_rows
         for offset in offsets:
@@ -345,6 +408,7 @@ def _score_assignments(context: dict, offsets: tuple[int, ...], output: Path, *,
                     for row in reduced:
                         stream.write(json.dumps({"arm": arm, **row}, sort_keys=True, separators=(",", ":")) + "\n")
                 result_rows[arm] = all_rows
+        _write_assignment_cache_contract(output_path, cache_identity)
 
     aggregate_rows = {arm: _collapse_assignments(rows) for arm, rows in result_rows.items()}
     aggregate = {arm: _metric_result(rows) for arm, rows in aggregate_rows.items()}

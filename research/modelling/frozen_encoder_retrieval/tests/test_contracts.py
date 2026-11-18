@@ -364,21 +364,43 @@ class FeatureAndManifestTests(unittest.TestCase):
             self.assertEqual({("state-a", "midi-a"): root / "audio/a.wav"},
                              issue164._accepted_wav_paths(root, audit))
 
+    def test_issue164_active_matrix_cache_rejects_old_contract_version(self):
+        import numpy as np
+
+        matrices = {index: np.zeros((129, 129), dtype=np.float32) for index in range(12)}
+        identity = {"cache_contract_version": issue164.ACTIVE_MATRIX_CACHE_VERSION,
+                    "normalization_version": "active-rms-v1", "normalization_target_active_rms": 0.025}
+        contract = {**identity, "matrix_archive_sha256": "matrix-sha256"}
+        self.assertTrue(issue164._active_matrix_cache_matches(matrices, contract, identity, "matrix-sha256"))
+        stale = {**contract, "cache_contract_version": "old-active-rms-matrix-v0"}
+        self.assertFalse(issue164._active_matrix_cache_matches(matrices, stale, identity, "matrix-sha256"))
+        self.assertFalse(issue164._active_matrix_cache_matches(matrices, contract, identity, "changed-matrix-sha256"))
+
     def test_issue155_runner_exposes_basic_pitch_adapter_checkout(self):
         self.assertIn(str(REPO / "research/modelling/basic_pitch"), sys.path)
 
     def test_issue155_cached_assignment_rows_require_full_arm_offset_coverage(self):
         expected = {1: {"e1", "e2"}, 7: {"e3"}}
+        identity = {"score_contract_version": issue155.ASSIGNMENT_SCORE_CONTRACT_VERSION,
+                    "feature_cache_identity": {"identity_sha256": "cache-v1", "normalization": {
+                        "version": "active-rms-v1", "target_active_rms": 0.025}}}
         rows = [{"arm": arm, "gallery_assignment_offset": offset, "episode_id": episode}
                 for arm in ("arm-a", "arm-b") for offset, episode_ids in expected.items()
                 for episode in episode_ids]
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "scores.jsonl"
             path.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
-            cached = issue155._load_cached_assignment_rows(path, {"arm-a", "arm-b"}, expected)
+            issue155._write_assignment_cache_contract(path, identity)
+            cached = issue155._load_cached_assignment_rows(path, {"arm-a", "arm-b"}, expected, identity)
             self.assertEqual(3, len(cached["arm-a"]))
+
+            stale_identity = json.loads(json.dumps(identity))
+            stale_identity["feature_cache_identity"]["normalization"]["target_active_rms"] = 0.03
+            self.assertIsNone(issue155._load_cached_assignment_rows(
+                path, {"arm-a", "arm-b"}, expected, stale_identity))
+
             path.write_text("".join(json.dumps(row) + "\n" for row in rows[:-1]), encoding="utf-8")
-            self.assertIsNone(issue155._load_cached_assignment_rows(path, {"arm-a", "arm-b"}, expected))
+            self.assertIsNone(issue155._load_cached_assignment_rows(path, {"arm-a", "arm-b"}, expected, identity))
 
     def test_issue155_report_quality_collapses_assignment_repeats_by_query(self):
         rows = []

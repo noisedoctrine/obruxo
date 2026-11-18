@@ -50,6 +50,8 @@ TRIPLET_FILE = PRIVATE / "triplets.private.json"
 CHOICES_FILE = PRIVATE / "retrieval_choices.private.json"
 ISSUE161_DIR = ROOT / "outputs" / "issue161-audible-substitute"
 ISSUE155_DIR = ROOT / "outputs" / "issue155-validation"
+ACTIVE_MATRIX_CACHE_VERSION = "issue164-active-rms-mrstft-matrix-v1"
+ACTIVE_MRSTFT_SCORING_VERSION = "issue161-active-rms-mrstft-scoring-v1"
 
 
 def _write_json(path: Path, value: dict) -> None:
@@ -457,23 +459,44 @@ def _read_matrix_archive(path: Path) -> dict[int, np.ndarray]:
     return result
 
 
-def _build_active_matrices(dataset: Path, audit: dict, triplets: dict, *, device: str,
-                           output_path: Path = ACTIVE_MATRIX_FILE) -> tuple[dict[int, np.ndarray], dict]:
-    expected_identity = {"cohort_identity_sha256": _read_json(TARGET_FILE)["cohort_identity_sha256"],
+def _active_matrix_cache_matches(matrices: dict[int, np.ndarray], contract: dict,
+                                 expected_identity: dict, archive_sha256: str) -> bool:
+    return (set(matrices) == set(range(12)) and
+            all(matrix.shape == (129, 129) and np.isfinite(matrix).all() for matrix in matrices.values()) and
+            all(contract.get(key) == value for key, value in expected_identity.items()) and
+            contract.get("matrix_archive_sha256") == archive_sha256)
+
+
+def _active_matrix_expected_identity(audit: dict, triplets: dict) -> dict:
+    preflight = _read_json(TARGET_FILE)
+    accepted_wav_hashes = {request_id: receipt.get("audio_sha256") for request_id, receipt in audit["receipts"].items()
+                           if receipt.get("accepted")}
+    return {"cache_contract_version": ACTIVE_MATRIX_CACHE_VERSION,
+        "scoring_contract_version": ACTIVE_MRSTFT_SCORING_VERSION,
+        "normalization_version": NORMALIZATION_VERSION,
+        "normalization_target_active_rms": preflight["normalization"]["target_active_rms"],
+        "normalization_window_seconds": WINDOW_SECONDS, "normalization_active_floor_db": ACTIVE_FLOOR_DB,
+        "cohort_identity_sha256": preflight["cohort_identity_sha256"],
+        "source_manifest_sha256": preflight["source_manifest_sha256"],
+        "accepted_wav_hashes_sha256": digest(accepted_wav_hashes),
         "triplets_sha256": digest(triplets), "triplets": 12, "preset_families": 129,
         "scoring_wavs_loaded": 12 * 129,
         "scoring_unique_midis": len({row["roles"][2]["midi_id"] for row in triplets["triplets"]}),
         "active_rms_contract_shared_with_input_normalizer": True}
+
+
+def _build_active_matrices(dataset: Path, audit: dict, triplets: dict, *, device: str,
+                           output_path: Path = ACTIVE_MATRIX_FILE) -> tuple[dict[int, np.ndarray], dict]:
+    expected_identity = _active_matrix_expected_identity(audit, triplets)
     if output_path.is_file():
         with np.load(output_path, allow_pickle=False) as arrays:
             expected_keys = {f"active_triplet_{index:02d}" for index in range(12)}
             if set(arrays.files) == expected_keys:
                 matrices = {index: arrays[f"active_triplet_{index:02d}"].astype(np.float32, copy=False)
                             for index in range(12)}
-                if all(matrix.shape == (129, 129) and np.isfinite(matrix).all() for matrix in matrices.values()):
-                    contract = _read_json(ACTIVE_MATRIX_CONTRACT)
-                    if all(contract.get(key) == value for key, value in expected_identity.items()):
-                        return matrices, contract
+                contract = _read_json(ACTIVE_MATRIX_CONTRACT)
+                if _active_matrix_cache_matches(matrices, contract, expected_identity, file_sha256(output_path)):
+                    return matrices, contract
     plans = _jsonl(dataset / "render_plan.private.jsonl")
     audio_rows, coverage = verify_triplet_wavs(dataset, audit, plans, triplets)
     matrices = {}
@@ -493,9 +516,9 @@ def _build_active_matrices(dataset: Path, audit: dict, triplets: dict, *, device
     output_path.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(output_path, **{f"active_triplet_{index:02d}": value for index, value in matrices.items()})
     contract = {"acoustic_contract": contracts[0], **expected_identity,
+                "matrix_archive_sha256": file_sha256(output_path),
                 "selected_unique_midis": coverage["selected_unique_midis"],
-                "selected_matrix_wavs_verified": coverage["selected_matrix_wavs_verified"],
-                "source_manifest_sha256": _read_json(TARGET_FILE)["source_manifest_sha256"]}
+                "selected_matrix_wavs_verified": coverage["selected_matrix_wavs_verified"]}
     _write_json(ACTIVE_MATRIX_CONTRACT, contract)
     return matrices, contract
 
@@ -505,7 +528,10 @@ def _issue155_comparison(feature_root: Path, output_dir: Path) -> dict:
 
     cached_scores = output_dir / "gallery_assignment_episode_metrics.private.jsonl"
     reuse_cached_only = cached_scores.is_file()
-    context = issue155._load_context(DATASET, feature_root=feature_root, load_features=not reuse_cached_only)
+    context = issue155._load_context(DATASET, feature_root=feature_root, load_features=not reuse_cached_only,
+        expected_normalization={"version": NORMALIZATION_VERSION,
+            "window_seconds": WINDOW_SECONDS, "active_floor_db": ACTIVE_FLOOR_DB,
+            "target_active_rms": _target_from_preflight()})
     normalized, data = issue155._score_assignments(context, (1, 7, 19), output_dir,
         reuse_cached_only=reuse_cached_only)
     baseline_rows = _jsonl(ISSUE155_DIR / "gallery_assignment_episode_metrics.private.jsonl")
@@ -615,6 +641,7 @@ def _gain_probe_result_row(case: dict, role: str, gain_db: float, **metrics) -> 
 def _gain_sensitivity(dataset: Path, original_audit: dict, normalized_audit: dict,
                       original_choices: dict, normalized_choices: dict,
                       triplets: dict, target: float, *, checkpoint_root: Path, lock_path: Path,
+                      device: str = "xpu",
                       models: tuple[str, ...] | None = None,
                       output: Path = PRIVATE / "gain_sensitivity.private.json") -> dict:
     selected_models = models or MODEL_ORDER
@@ -672,7 +699,7 @@ def _gain_sensitivity(dataset: Path, original_audit: dict, normalized_audit: dic
         checkpoint, entry, checkpoint_digest = resolve_checkpoint(model_name, checkpoint_root, lock)
         source_root = resolve_source_checkout(checkpoint_root, entry)
         adapter = load_adapter(model_name, checkpoint, entry, checkpoint_digest,
-            checkpoint_root=checkpoint_root, device="xpu", source_root=source_root)
+            checkpoint_root=checkpoint_root, device=device, source_root=source_root)
         for arm, variant in ((f"{model_name}:{variant}", variant)
                              for variant in original_audit["model_caches"][model_name]["dimensions_by_variant"]):
             conditions = {}
@@ -813,7 +840,7 @@ def _gain_probe(model: str, dataset: Path, checkpoint_root: Path, *, device: str
     normalized_choices = _read_json(PRIVATE / "normalized_retrieval_choices.private.json")
     return _gain_sensitivity(dataset, original_audit, normalized_audit, original_choices,
         normalized_choices, triplets, target, checkpoint_root=checkpoint_root,
-        lock_path=checkpoint_root / "checkpoint-lock.json", models=(model,), output=model_output)
+        lock_path=checkpoint_root / "checkpoint-lock.json", device=device, models=(model,), output=model_output)
 
 
 def evaluation_two_way_ci(rows: list[dict], metric: str) -> dict:
@@ -1042,7 +1069,8 @@ def _write_issue164_reporting(result: dict) -> None:
         report_text = report_text.replace(anchor, anchor + section + "\n", 1)
     REPORT.write_text(report_text, encoding="utf-8", newline="\n")
 
-    arms = sorted(result["cross_midi_retrieval"])
+    all_arms = sorted(result["cross_midi_retrieval"])
+    arms = [arm for arm in all_arms if arm.split(":", 1)[0] not in {"basic_pitch_trunk", "muq_mulan"}]
     active_pairs = result["three_midi_substitution_2x2"]["paired_normalized_retrieval_minus_original"]
     labels = [_arm_label(arm) for arm in arms]
     r1, r1_lo, r1_hi, audio, audio_lo, audio_hi = [], [], [], [], [], []
@@ -1050,7 +1078,9 @@ def _write_issue164_reporting(result: dict) -> None:
         effect = result["cross_midi_retrieval"][arm]["cross_midi_common_gallery"]["paired_normalized_minus_original"]["recall_at_1"]
         r1.append(100*effect["difference"]); r1_lo.append(100*(effect["difference"]-effect["lower_95"])); r1_hi.append(100*(effect["upper_95"]-effect["difference"]))
         audio_effect = active_pairs[f"active_rms_matched:{arm}"]
-        audio.append(audio_effect["mean"]); audio_lo.append(audio_effect["mean"]-audio_effect["clustered_95_ci"][0]); audio_hi.append(audio_effect["clustered_95_ci"][1]-audio_effect["mean"])
+        audio.append(-audio_effect["mean"])
+        audio_lo.append(audio_effect["clustered_95_ci"][1]-audio_effect["mean"])
+        audio_hi.append(audio_effect["mean"]-audio_effect["clustered_95_ci"][0])
     y = np.arange(len(arms))
     with plt.rc_context({"font.size": 8, "axes.titlesize": 11, "axes.labelsize": 9}):
         figure, axes = plt.subplots(1, 2, figsize=(13, 6), sharey=True)
@@ -1062,7 +1092,7 @@ def _write_issue164_reporting(result: dict) -> None:
         axes[1].errorbar(audio, y, xerr=[audio_lo, audio_hi], fmt="o", color="#ad4b18", capsize=2)
         axes[1].axvline(0, color="#555555", linestyle="--", linewidth=1)
         axes[1].set_title("Active-RMS-matched substitute error")
-        axes[1].set_xlabel("Normalized-input error − original-input error (MR-STFT units)")
+        axes[1].set_xlabel("Original-input error − normalized-input error (MR-STFT; right = improvement)")
         for axis in axes:
             axis.grid(axis="x", alpha=.22)
         axes[0].set_yticks(y, labels)
@@ -1080,8 +1110,8 @@ def _write_issue164_reporting(result: dict) -> None:
     visual_section = "\n".join(["<!-- issue164-active-rms-summary:start -->",
         "## Does input loudness normalization change the comparison?", "",
         "![Paired Recall@1 and active-RMS acoustic error effects by encoder](figures/issue164_active_rms_paired_effects.svg)", "",
-        f"A single fixed active-RMS target of {result['normalization']['target_active_rms']:.5f} ({result['normalization']['target_active_rms_dbfs']:.2f} dBFS) changed Recall@1 by a median {100*np.median([result['cross_midi_retrieval'][arm]['cross_midi_common_gallery']['paired_normalized_minus_original']['recall_at_1']['difference'] for arm in arms]):+.1f} points across the 11 arms. In the separate acoustic test, candidate gain was matched only while scoring A3 against B3; input normalization was applied before encoding. Lower active-RMS MR-STFT error is closer audio, though it remains sensitive to pitch, timing, and envelope as well as timbre.", "",
-        "The chart shows paired changes with 95% intervals. The left panel isolates the effect of normalizing each encoder input on retrieval. The right panel holds active-RMS candidate matching fixed and compares which alternatives original versus normalized embeddings selected. This scoring-time gain match is different from input normalization and does not alter cached embeddings.",
+        f"A single fixed active-RMS target of {result['normalization']['target_active_rms']:.5f} ({result['normalization']['target_active_rms_dbfs']:.2f} dBFS) changed Recall@1 by a median {100*np.median([result['cross_midi_retrieval'][arm]['cross_midi_common_gallery']['paired_normalized_minus_original']['recall_at_1']['difference'] for arm in all_arms]):+.1f} points across the 11 arms. In the separate acoustic test, candidate gain was matched only while scoring A3 against B3; input normalization was applied before encoding. Lower active-RMS MR-STFT error is closer audio, though it remains sensitive to pitch, timing, and envelope as well as timbre.", "",
+        "The chart shows paired changes with 95% intervals for the follow-up encoder set; Basic Pitch and MuQ-MuLan remain in the introductory comparison above. The left panel isolates the effect of normalizing each encoder input on retrieval. The right panel holds active-RMS candidate matching fixed; positive values mean normalized embeddings selected alternatives with lower acoustic error. This scoring-time gain match is different from input normalization and does not alter cached embeddings.",
         "<!-- issue164-active-rms-summary:end -->", ""])
     vstart, vend = "<!-- issue164-active-rms-summary:start -->", "<!-- issue164-active-rms-summary:end -->"
     if vstart in visual_text and vend in visual_text:
