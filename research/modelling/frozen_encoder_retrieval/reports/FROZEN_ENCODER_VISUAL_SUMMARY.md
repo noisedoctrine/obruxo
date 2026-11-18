@@ -10,11 +10,13 @@
 
 CIR finds the **same preset** most reliably (81.4% Recall@1). But CLAP and DAC mean select **different presets** with lower average sound error (5.15–5.16 versus 5.56 for CIR). CLAP's measured advantage over CIR is not conclusive on this sample.
 
+The remaining charts omit Basic Pitch and MuQ-MuLan for readability. Pareto frontiers compare only the five encoder families shown, rather than all seven.
+
 ## 2. How do recognition and sound similarity trade off against inference time?
 
 ![Twin plots: Recall@1 and acoustic substitute error against encoder latency, with measured Pareto frontiers](figures/summary_speed_vs_substitution.svg)
 
-**Left:** CIR gives the highest exact-preset recall; CLAP is much faster, with lower recall. **Right:** CLAP has both the lowest measured acoustic error and the fastest inference (56 ms). The dashed frontier marks nondominated measured choices; the acoustic advantage is not conclusive.
+**Left:** CIR gives the highest exact-preset recall; CLAP is much faster, with lower recall. **Right:** CLAP has both the lowest measured acoustic error and the fastest inference (56 ms). The dashed frontier marks nondominated choices among the five displayed families; the acoustic advantage is not conclusive.
 
 ## 3. Does matching loudness change which encoder looks best?
 
@@ -32,7 +34,7 @@ Yes. CLAP leads with the recordings' original levels, while **DAC temporal and C
 
 ![Twin plots: Recall@1 and alternative-preset sound error against peak XPU memory, with measured Pareto frontiers](figures/summary_memory_vs_substitution.svg)
 
-**Left:** CIR reaches the best recall at about **0.40 GiB** peak XPU allocation. **Right:** CLAP's lower measured substitute error comes at roughly twice CIR's memory (**0.79 GiB**). MuQ-MuLan uses **2.68 GiB** without leading either measure.
+**Left:** CIR reaches the best recall at about **0.40 GiB** peak XPU allocation. **Right:** CLAP's lower measured substitute error comes at roughly twice CIR's memory (**0.79 GiB**); EnCodec uses less memory (**0.24 GiB**) with slightly higher acoustic error.
 
 ## Practical conclusion
 
