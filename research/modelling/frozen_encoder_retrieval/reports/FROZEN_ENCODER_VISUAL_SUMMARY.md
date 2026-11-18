@@ -10,7 +10,7 @@
 
 CIR finds the **same preset** most reliably (81.4% Recall@1). But CLAP and DAC mean select **different presets** with lower average sound error (5.15–5.16 versus 5.56 for CIR). CLAP's measured advantage over CIR is not conclusive on this sample.
 
-The remaining charts omit Basic Pitch and MuQ-MuLan for readability. Pareto frontiers compare only the five encoder families shown, rather than all seven.
+Basic Pitch is omitted from all charts; MuQ-MuLan appears only in the first comparison. Subsequent charts compare five encoder families, and Pareto frontiers use only those five.
 
 ## 2. How do recognition and sound similarity trade off against inference time?
 
