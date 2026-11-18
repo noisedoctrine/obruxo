@@ -469,8 +469,15 @@ def _active_matrix_cache_matches(matrices: dict[int, np.ndarray], contract: dict
 
 def _active_matrix_expected_identity(audit: dict, triplets: dict) -> dict:
     preflight = _read_json(TARGET_FILE)
-    accepted_wav_hashes = {request_id: receipt.get("audio_sha256") for request_id, receipt in audit["receipts"].items()
-                           if receipt.get("accepted")}
+    scoring_wav_hashes = {}
+    for triplet in triplets["triplets"]:
+        midi3_id = triplet["roles"][2]["midi_id"]
+        for state_id in audit["preset_ids"]:
+            request_id = audit["request_by_pair"].get((state_id, midi3_id))
+            receipt = audit["receipts"].get(request_id) if request_id else None
+            if not receipt or not receipt.get("accepted") or not receipt.get("audio_sha256"):
+                raise ValueError("active-RMS matrix identity is missing a selected scoring WAV receipt")
+            scoring_wav_hashes[request_id] = receipt["audio_sha256"]
     return {"cache_contract_version": ACTIVE_MATRIX_CACHE_VERSION,
         "scoring_contract_version": ACTIVE_MRSTFT_SCORING_VERSION,
         "normalization_version": NORMALIZATION_VERSION,
@@ -478,7 +485,7 @@ def _active_matrix_expected_identity(audit: dict, triplets: dict) -> dict:
         "normalization_window_seconds": WINDOW_SECONDS, "normalization_active_floor_db": ACTIVE_FLOOR_DB,
         "cohort_identity_sha256": preflight["cohort_identity_sha256"],
         "source_manifest_sha256": preflight["source_manifest_sha256"],
-        "accepted_wav_hashes_sha256": digest(accepted_wav_hashes),
+        "scoring_wav_hashes_sha256": digest(scoring_wav_hashes),
         "triplets_sha256": digest(triplets), "triplets": 12, "preset_families": 129,
         "scoring_wavs_loaded": 12 * 129,
         "scoring_unique_midis": len({row["roles"][2]["midi_id"] for row in triplets["triplets"]}),
