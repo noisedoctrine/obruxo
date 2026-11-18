@@ -4,6 +4,17 @@
 
 **The three-MIDI test in one example:** Start with preset **A** playing MIDI 1. Each encoder searches alternative presets playing MIDI 2, selecting one, say **B**. Then compare **A and B playing MIDI 3**, unseen during selection. The closest possible catalog alternative and a random alternative provide reference points.
 
+<!-- issue164-active-rms-summary:start -->
+## Does input loudness normalization change the comparison?
+
+![Paired Recall@1 and active-RMS acoustic error effects by encoder](figures/issue164_active_rms_paired_effects.svg)
+
+A single fixed active-RMS target of 0.02536 (-31.92 dBFS) changed Recall@1 by a median -3.7 points across the 11 arms. In the separate acoustic test, candidate gain was matched only while scoring A3 against B3; input normalization was applied before encoding. Lower active-RMS MR-STFT error is closer audio, though it remains sensitive to pitch, timing, and envelope as well as timbre.
+
+The chart shows paired changes with 95% intervals. The left panel isolates the effect of normalizing each encoder input on retrieval. The right panel holds active-RMS candidate matching fixed and compares which alternatives original versus normalized embeddings selected. This scoring-time gain match is different from input normalization and does not alter cached embeddings.
+<!-- issue164-active-rms-summary:end -->
+
+
 ## 1. Is recognising a preset the same as finding a good substitute?
 
 ![Recognition accuracy against the sound error of alternative presets](figures/summary_recognition_vs_substitution.svg)
@@ -18,11 +29,11 @@ The first chart includes all seven encoder families, including Basic Pitch and M
 
 **Left:** CIR gives the highest exact-preset recall; CLAP is much faster, with lower recall. **Right:** CLAP has both the lowest measured acoustic error and the fastest inference (56 ms). The dashed frontier marks nondominated choices among the five displayed families; the acoustic advantage is not conclusive.
 
-## 3. Does matching loudness change which encoder looks best?
+## 3. What changes under whole-clip gain matching?
 
 ![Rank changes after matching the overall loudness of candidate recordings](figures/summary_loudness_ranking.svg)
 
-Yes. CLAP leads with the recordings' original levels, while **DAC temporal and CIR lead after gain matching**. Level accuracy and timbral similarity are not identical.
+In the earlier #161 analysis, CLAP leads with the recordings' original levels, while **DAC temporal and CIR lead after whole-clip RMS matching**. That gain change is applied only while scoring audio. Issue #164 above separately normalizes encoder inputs with a sliding active-RMS measure and reports its own active-RMS-matched acoustic score.
 
 ## 4. Does preset sensitivity help recognition or sound similarity?
 
@@ -40,6 +51,6 @@ Yes. CLAP leads with the recordings' original levels, while **DAC temporal and C
 
 **Use CIR as the reference for preset identification; keep CLAP as the fast catalog-substitution candidate.** DAC is informative for timbre analysis but expensive for direct inference. None of these tests demonstrates that a representation can predict a new playable Vital patch.
 
-*Source data:* [full technical report](FROZEN_ENCODER_RETRIEVAL_RESULTS.md) · [substitution results](issue161_substitution_results.json) · [preset/MIDI sensitivity](issue157_sensitivity_results.json) · [standardized efficiency benchmark](model_efficiency_benchmark.json).
+*Source data:* [full technical report](FROZEN_ENCODER_RETRIEVAL_RESULTS.md) · [active-RMS comparison](issue164_active_rms_results.json) · [substitution results](issue161_substitution_results.json) · [preset/MIDI sensitivity](issue157_sensitivity_results.json) · [standardized efficiency benchmark](model_efficiency_benchmark.json).
 
 *Scope:* Seven frozen encoder families, 11 representations, 129 preset families and 50 MIDI performances. The substitute test uses 12 three-MIDI triplets; latency and memory use 128 matched recordings, batch 1, FP32 on Intel Arc XPU. Acoustic similarity is measured with MR-STFT rather than listening judgments. No model training or new rendering was done for this summary.
