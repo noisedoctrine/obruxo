@@ -10,11 +10,11 @@
 
 CIR finds the **same preset** most reliably (81.4% Recall@1). But CLAP and DAC mean select **different presets** with lower average sound error (5.15–5.16 versus 5.56 for CIR). CLAP's measured advantage over CIR is not conclusive on this sample.
 
-## 2. What does acoustic similarity cost in inference time?
+## 2. How do recognition and sound similarity trade off against inference time?
 
-![Speed versus alternative-preset sound error](figures/summary_speed_vs_substitution.svg)
+![Twin plots: Recall@1 and acoustic substitute error against encoder latency, with measured Pareto frontiers](figures/summary_speed_vs_substitution.svg)
 
-CLAP combines low measured sound error with **56 ms** median extraction time. CIR takes **289 ms** and DAC **1,466 ms** on the same benchmark recordings.
+**Left:** CIR gives the highest exact-preset recall; CLAP is much faster, with lower recall. **Right:** CLAP has both the lowest measured acoustic error and the fastest inference (56 ms). The dashed frontier marks nondominated measured choices; the acoustic advantage is not conclusive.
 
 ## 3. Does matching loudness change which encoder looks best?
 
@@ -22,17 +22,17 @@ CLAP combines low measured sound error with **56 ms** median extraction time. CI
 
 Yes. CLAP leads with the recordings' original levels, while **DAC temporal and CIR lead after gain matching**. Level accuracy and timbral similarity are not identical.
 
-## 4. Does sensitivity to preset changes guarantee recognition?
+## 4. Does preset sensitivity help recognition or sound similarity?
 
-![Preset-versus-MIDI separation plotted against exact-preset identification](figures/summary_sensitivity_vs_recognition.svg)
+![Twin plots: Recall@1 and alternative-preset sound error against preset-versus-MIDI sensitivity](figures/summary_sensitivity_vs_recognition.svg)
 
-No. DAC mean has the **largest normalized preset-versus-MIDI separation**, yet CIR identifies the correct preset much more often. Detecting that something changed is different from recognising what it is.
+**Left:** DAC mean has the strongest preset-versus-MIDI separation but far weaker exact-preset recall than CIR. **Right:** DAC's strong separation comes with competitive substitute-sound error. Sensitivity is informative, but not a substitute for measuring either outcome directly.
 
-## 5. What is the memory tradeoff?
+## 5. What are the recognition and sound-similarity tradeoffs in memory?
 
-![Peak XPU memory usage versus alternative-preset sound error](figures/summary_memory_vs_substitution.svg)
+![Twin plots: Recall@1 and alternative-preset sound error against peak XPU memory, with measured Pareto frontiers](figures/summary_memory_vs_substitution.svg)
 
-CIR uses about **0.40 GiB** peak XPU allocation, CLAP **0.79 GiB** and DAC **0.92 GiB**. MuQ-MuLan uses **2.68 GiB** but has a worse substitute score on this test.
+**Left:** CIR reaches the best recall at about **0.40 GiB** peak XPU allocation. **Right:** CLAP's lower measured substitute error comes at roughly twice CIR's memory (**0.79 GiB**). MuQ-MuLan uses **2.68 GiB** without leading either measure.
 
 ## Practical conclusion
 
