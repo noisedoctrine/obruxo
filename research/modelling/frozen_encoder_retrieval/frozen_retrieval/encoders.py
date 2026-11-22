@@ -187,7 +187,7 @@ def _resolve_local_configs(root: Path, model_name: str, entry: dict) -> dict[str
     return paths
 
 
-def _decode_audio(audio, np):
+def _decode_audio(audio, np, *, downmix: bool = True):
     audio = np.asarray(audio)
     if np.issubdtype(audio.dtype, np.integer):
         info = np.iinfo(audio.dtype)
@@ -195,7 +195,7 @@ def _decode_audio(audio, np):
     else:
         audio = audio.astype(np.float32, copy=False)
     if audio.ndim == 2:
-        return audio.mean(axis=1)
+        return audio.mean(axis=1) if downmix else audio
     if audio.ndim != 1:
         raise ValueError("audio must be mono or frames-by-channels")
     return audio
@@ -255,12 +255,23 @@ class FrozenAdapter:
     def sample_rate(self) -> int:
         return int(MODEL_REGISTRY[self.name]["sample_rate"])
 
-    def _audio(self, path: Path):
+    def _audio(self, path: Path, *, active_rms_target: float | None = None, input_gain_db: float = 0.0):
         from scipy.io import wavfile
         import numpy as np
         from scipy.signal import resample_poly
 
         sample_rate, audio = wavfile.read(path)
+        normalization = None
+        if active_rms_target is not None or input_gain_db != 0.0:
+            audio = _decode_audio(audio, np, downmix=False)
+            if input_gain_db != 0.0:
+                if not math.isfinite(input_gain_db):
+                    raise ValueError("input gain probe must be finite")
+                audio = (audio.astype(np.float64) * (10.0 ** (input_gain_db / 20.0))).astype(np.float32)
+            if active_rms_target is not None:
+                from .normalization import normalize_active_rms
+
+                audio, normalization = normalize_active_rms(audio, sample_rate, active_rms_target)
         audio = _decode_audio(audio, np)
         if not np.isfinite(audio).all() or len(audio) == 0:
             raise ValueError("audio contains no finite samples")
@@ -270,10 +281,24 @@ class FrozenAdapter:
         duration = len(audio) / self.sample_rate
         if duration < 2.0 or duration > 10.0:
             raise ValueError("encoder input must be 2 to 10 seconds including the fixed release tail")
-        return audio
+        return audio, normalization
 
     def extract(self, wav_path: Path) -> dict[str, list[float]]:
-        waveform = self._audio(wav_path)
+        waveform, _ = self._audio(wav_path)
+        return self._extract_waveform(waveform)
+
+    def extract_normalized(self, wav_path: Path, target_active_rms: float) -> tuple[dict[str, list[float]], dict]:
+        waveform, normalization = self._audio(wav_path, active_rms_target=target_active_rms)
+        if normalization is None:
+            raise RuntimeError("active-RMS preprocessing did not return its provenance")
+        return self._extract_waveform(waveform), normalization
+
+    def extract_gain_variant(self, wav_path: Path, gain_db: float, *,
+                             active_rms_target: float | None = None) -> dict[str, list[float]]:
+        waveform, _ = self._audio(wav_path, active_rms_target=active_rms_target, input_gain_db=gain_db)
+        return self._extract_waveform(waveform)
+
+    def _extract_waveform(self, waveform) -> dict[str, list[float]]:
         torch, np, model, device = self.torch, self.numpy, self.model, self.device
         if self.name == "basic_pitch_trunk":
             from obruxo_basic_pitch.constants import AUDIO_N_SAMPLES, FFT_HOP, OVERLAP
@@ -557,8 +582,19 @@ def load_adapter(model_name: str, checkpoint: Path, lock_entry: dict, checkpoint
 
 def cache_feature(adapter: FrozenAdapter, wav_path: Path, *, request_id: str, render_metadata: dict,
                   output: Path, source_precision: str = "fp32",
-                  preprocessing_policy: str = "pcm_scale_stereo_mean_mono_resample_poly_no_gain_norm_v2") -> dict:
+                  preprocessing_policy: str = "pcm_scale_stereo_mean_mono_resample_poly_no_gain_norm_v2",
+                  active_rms_target: float | None = None) -> dict:
     audio_hash = file_sha256(wav_path)
+    normalization_contract = None
+    if active_rms_target is not None:
+        from .normalization import ACTIVE_FLOOR_DB, NORMALIZATION_VERSION, WINDOW_SECONDS
+
+        normalization_contract = {"version": NORMALIZATION_VERSION, "window_seconds": WINDOW_SECONDS,
+                                  "active_floor_db": ACTIVE_FLOOR_DB,
+                                  "target_active_rms": float(active_rms_target),
+                                  "channel_energy": "mean-square across original WAV channels",
+                                  "placement": "before mono downmix and model-specific resampling"}
+        preprocessing_policy = "pcm_scale_active_rms_stereo_mean_mono_resample_poly_v1"
     cache_identity = {"adapter_id": ADAPTER_ID, "model": adapter.name,
                       "checkpoint_sha256": adapter.checkpoint_digest, "source_revision": adapter.lock_entry["revision"],
                       "loader_revision": adapter.lock_entry["loader_revision"], "audio_file_sha256": audio_hash,
@@ -571,6 +607,8 @@ def cache_feature(adapter: FrozenAdapter, wav_path: Path, *, request_id: str, re
                                                           and bool(getattr(adapter.model.config, "normalize", False)) else "none"),
                       "pooling": "native_clip_v1" if MODEL_REGISTRY[adapter.name]["kind"] == "clip" else "masked_mean_and_8bin_mean_std_v1",
                       "precision": source_precision, "device": adapter.device}
+    if normalization_contract is not None:
+        cache_identity["input_normalization"] = normalization_contract
     feature_id = digest(cache_identity)
     output.mkdir(parents=True, exist_ok=True)
     array_path, metadata_path = output / f"{feature_id}.npz", output / f"{feature_id}.json"
@@ -586,7 +624,11 @@ def cache_feature(adapter: FrozenAdapter, wav_path: Path, *, request_id: str, re
                     "model": adapter.name, "request_id": request_id, "audio_sha256": audio_hash}
     if render_metadata.get("provenance", {}).get("request_id") != request_id:
         raise ValueError("render provenance differs from feature request")
-    features = adapter.extract(wav_path)
+    normalization = None
+    if active_rms_target is None:
+        features = adapter.extract(wav_path)
+    else:
+        features, normalization = adapter.extract_normalized(wav_path, active_rms_target)
     np = adapter.numpy
     temporary = array_path.with_suffix(".partial.npz")
     np.savez_compressed(temporary, **{name: np.asarray(vector, dtype=np.float32) for name, vector in features.items()})
@@ -594,9 +636,12 @@ def cache_feature(adapter: FrozenAdapter, wav_path: Path, *, request_id: str, re
     metadata = {"feature_id": feature_id, "cache_identity": cache_identity,
                 "dimensions": {name: len(values) for name, values in features.items()},
                 "frozen": True, "eval_mode": True, "feature_sha256": file_sha256(array_path)}
+    if normalization is not None:
+        metadata["normalization"] = normalization
     metadata_path.write_text(json.dumps(metadata, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     return {"feature_id": feature_id, "cache_path": array_path.name, "reused": False,
-            "model": adapter.name, "request_id": request_id, "audio_sha256": audio_hash}
+            "model": adapter.name, "request_id": request_id, "audio_sha256": audio_hash,
+            "normalization": normalization}
 
 
 def available_candidates(checkpoint_root: Path | None, lock_path: Path | None) -> list[dict]:

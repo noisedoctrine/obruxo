@@ -59,6 +59,8 @@ def _parser() -> argparse.ArgumentParser:
     embed.add_argument("--checkpoint-root", type=Path, required=True)
     embed.add_argument("--lock", type=Path, required=True)
     embed.add_argument("--device", choices=("cpu", "cuda", "xpu"), default="cpu")
+    embed.add_argument("--active-rms-target", type=float,
+                       help="apply the issue #164 shared sliding active-RMS normalization before mono/resampling")
     evaluate = commands.add_parser("evaluate", help="evaluate identical cached retrieval episodes and baselines")
     evaluate.add_argument("--dataset", type=Path, required=True)
     evaluate.add_argument("--models", nargs="+", help="evaluate only these model families and extend an existing evaluation")
@@ -107,7 +109,8 @@ def main(argv: list[str] | None = None) -> int:
                                     batch_size=args.batch_size, queue_depth=args.queue_depth)
         elif args.command == "embed":
             from .feature_stage import extract_dataset
-            result = extract_dataset(args.dataset, args.model, args.checkpoint_root, args.lock, device=args.device)
+            result = extract_dataset(args.dataset, args.model, args.checkpoint_root, args.lock, device=args.device,
+                                     active_rms_target=args.active_rms_target)
         elif args.command == "evaluate":
             from .evaluation import evaluate_dataset
             result = evaluate_dataset(args.dataset, models=args.models)

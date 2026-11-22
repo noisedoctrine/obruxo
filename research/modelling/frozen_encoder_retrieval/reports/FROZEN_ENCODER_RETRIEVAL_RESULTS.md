@@ -2,9 +2,75 @@
 
 **Quick overview:** [Visual summary of the key tradeoffs](FROZEN_ENCODER_VISUAL_SUMMARY.md). The detailed results and protocols remain below.
 
-Issues: [#152](https://github.com/noisedoctrine/obruxo/issues/152) baseline and [#155](https://github.com/noisedoctrine/obruxo/issues/155) follow-up. This report compares frozen pretrained representations on Vital presets and existing MIDI performances. No synthesis controls are predicted, tuned, or optimized. For frozen representation-only analyses, no Vital controls are predicted or edited; the original source settings remain unchanged ([canonical frozen-control inventory](vital_control_inventory.jsonl)).
+Issues: [#152](https://github.com/noisedoctrine/obruxo/issues/152) baseline, [#155](https://github.com/noisedoctrine/obruxo/issues/155) gallery comparisons, [#157](https://github.com/noisedoctrine/obruxo/issues/157) sensitivity, [#161](https://github.com/noisedoctrine/obruxo/issues/161) substitute retrieval, and [#164](https://github.com/noisedoctrine/obruxo/issues/164) active-RMS re-evaluation. This report compares frozen pretrained representations on Vital presets and existing MIDI performances. No synthesis controls are predicted, tuned, or optimized. For frozen representation-only analyses, no Vital controls are predicted or edited; the original source settings remain unchanged ([canonical frozen-control inventory](vital_control_inventory.jsonl)).
 
 ## Results and recommendation
+
+**Decision: carry CIR forward as the primary frozen encoder and CLAP as the second choice for OBRUXO's patch-reconstruction experiments.** CIR leads exact-preset retrieval (81.4% Recall@1 versus 58.9% for CLAP on the original recordings) and selects competitive substitute sounds once candidate gain is matched (active-RMS-matched MR-STFT: 3.398 for CIR versus 3.656 for CLAP; lower is better). CIR also retains its recognition lead after input normalization (77.7% versus 55.6%). CLAP is the faster alternative. The other five encoder families remain useful benchmark references, but do not warrant further work in the main reconstruction track on the evidence available.
+
+**This is a development priority, not strict dominance on every metric.** DAC temporal has a slightly lower active-RMS-matched substitute-error point estimate than CIR (3.375 versus 3.398), but much weaker exact-preset recall (30.7%). BEATs temporal slightly exceeds CLAP's original-input recall (62.2% versus 58.9%), without displacing CLAP on the combined accuracy, acoustic and inference-cost tradeoff. The substitute-error differences are exploratory and do not establish a statistically certain winner. CLAP's earlier lead in *original-level* substitute error disappears once candidate gain is matched.
+
+**Input normalization is not the default recommendation.** Active-RMS normalization nearly eliminates retrieval changes under controlled ±6 dB input-gain shifts, but decreases exact-preset recall across all eleven representations and does not demonstrate better gain-matched substitute selection. Keep the original-input pipeline as the reference; treat normalization as an optional ablation. Scoring-time candidate gain matching is separate from encoder-input normalization. Next, compare CIR and CLAP on actual Vital patch reconstruction and listening tests; retrieval metrics alone cannot establish reconstruction quality.
+
+<!-- issue164-active-rms-results:start -->
+### Issue #164 — Padding-invariant active-RMS re-evaluation
+
+The paired input-normalization effect on cross-MIDI Recall@1 was arm-specific: the median change across 11 variants was -3.7 pp (range -5.7 to -0.9; see intervals below). Under active-RMS-matched acoustic scoring, the median per-arm change in substitute error was +0.004 (range -0.097 to +0.070); lower error is closer audio. These medians describe the tested variants, not a pooled independent sample. Together these comparisons estimate how input level and evaluation-time candidate gain matching influence this cohort, while MR-STFT remains an acoustic proxy rather than a listener or pure-timbre judgment.
+
+The shared target was 0.02535864 (-31.92 dBFS). The cohort is 129 preset families × 50 distinct MIDI performances (6,450 queries); #161 contributes 1,548 selections per arm from 129 families × 12 triplets and 36 distinct MIDI performances. Retrieval intervals resample preset-family and MIDI-performance clusters; substitution intervals resample preset family and whole triplet.
+
+| Frozen representation | Common-gallery original R@1 | Common-gallery normalized R@1 | Paired common-gallery ΔR@1 (95% CI) | Paired mixed-gallery ΔR@1 (95% CI) | Active-RMS-matched error (original → normalized input) | Active-RMS rank / 128 (original → normalized input) | Paired active-RMS error Δ (95% CI) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Basic Pitch — mean | 19.5% | 18.2% | -1.3 [-2.4, -0.3] pp | -1.1 [-1.9, -0.1] pp | 3.754 → 3.770 | 39.6 → 40.2 | 0.016 [-0.070, 0.101] |
+| Basic Pitch — temporal | 21.9% | 20.9% | -0.9 [-2.1, 0.2] pp | -1.3 [-2.4, -0.4] pp | 3.726 → 3.780 | 38.8 → 40.2 | 0.054 [-0.050, 0.176] |
+| BEATs — mean | 59.3% | 57.0% | -2.3 [-3.7, -1.0] pp | -1.6 [-2.6, -0.6] pp | 3.624 → 3.636 | 36.5 → 36.9 | 0.011 [-0.080, 0.105] |
+| BEATs — temporal | 62.2% | 59.5% | -2.7 [-4.2, -1.4] pp | -1.5 [-2.8, -0.3] pp | 3.586 → 3.538 | 35.9 → 34.5 | -0.048 [-0.132, 0.033] |
+| CIR — clip | 81.4% | 77.7% | -3.7 [-5.4, -2.1] pp | -3.9 [-5.4, -2.5] pp | 3.398 → 3.382 | 30.2 → 29.7 | -0.016 [-0.111, 0.082] |
+| CLAP — clip | 58.9% | 55.6% | -3.3 [-5.3, -1.5] pp | -4.3 [-6.1, -2.7] pp | 3.656 → 3.660 | 36.7 → 36.6 | 0.004 [-0.116, 0.126] |
+| DAC — mean | 31.4% | 27.5% | -3.9 [-6.4, -1.2] pp | -3.9 [-6.4, -1.6] pp | 3.542 → 3.445 | 34.8 → 31.3 | -0.097 [-0.223, 0.030] |
+| DAC — temporal | 30.7% | 25.5% | -5.2 [-8.1, -2.5] pp | -4.6 [-7.1, -2.4] pp | 3.375 → 3.408 | 30.2 → 30.2 | 0.033 [-0.064, 0.137] |
+| EnCodec — mean | 24.2% | 19.7% | -4.5 [-6.9, -2.1] pp | -4.0 [-6.2, -2.0] pp | 3.830 → 3.736 | 41.4 → 39.1 | -0.094 [-0.252, 0.063] |
+| EnCodec — temporal | 23.4% | 17.7% | -5.7 [-8.1, -3.4] pp | -6.1 [-8.2, -4.1] pp | 3.684 → 3.754 | 37.5 → 38.8 | 0.070 [-0.054, 0.195] |
+| MuQ-MuLan — clip | 30.2% | 24.9% | -5.3 [-7.6, -3.3] pp | -3.7 [-5.5, -2.0] pp | 4.185 → 4.107 | 47.9 → 46.6 | -0.078 [-0.274, 0.108] |
+
+The per-arm acoustic columns use active-RMS-matched MR-STFT. The four-row table below separates the two embedding-input conditions from the two score conditions: original-level MR-STFT keeps recorded levels, while active-RMS scoring scales each candidate B3 by active_RMS(A3)/active_RMS(B3). It never modifies the input audio or embeddings. Each score matrix has its own oracle and fixed-random reference:
+
+| Acoustic score | Embedding input | 11-arm macro selected error (95% CI) | Excess over metric-specific oracle (95% CI) | Oracle (95% CI) | Fixed random (95% CI) | Mean rank among 128 (95% CI) |
+|---|---|---:|---:|---:|---:|---:|
+| Original-level MR-STFT | original input | 5.920 [4.966, 7.293] | 3.732 [2.774, 5.155] | 2.188 [2.103, 2.277] | 8.952 [7.051, 11.985] | 40.1 [36.6, 44.1] |
+| Original-level MR-STFT | normalized input | 6.961 [5.673, 8.807] | 4.773 [3.486, 6.619] | 2.188 [2.103, 2.277] | 8.952 [7.051, 11.985] | 45.6 [41.5, 50.0] |
+| Active-RMS-matched MR-STFT | original input | 3.669 [3.517, 3.846] | 1.537 [1.386, 1.726] | 2.132 [2.039, 2.229] | 4.928 [4.707, 5.157] | 37.2 [34.0, 40.8] |
+| Active-RMS-matched MR-STFT | normalized input | 3.656 [3.491, 3.838] | 1.524 [1.354, 1.725] | 2.132 [2.039, 2.229] | 4.928 [4.707, 5.157] | 36.7 [33.1, 40.8] |
+
+Macro rows give equal weight to the 11 representation arms. The oracle is an evaluation-only choice made after the third MIDI is known; it never affects retrieval. Same-MIDI and acoustic-hard-negative win rates are also paired and recalculated. Per-arm values, paired uncertainty, and complete 2×2 scores are in the [machine-readable result](issue164_active_rms_results.json).
+
+#### Preset/MIDI sensitivity and gallery-MIDI robustness
+
+Issue #155 reuses the three existing gallery-MIDI offsets and 6,450 queries per offset. Averaged equally over the 11 arms, Recall@1 changed from 42.4% to 38.8% (paired Δ -3.7 [-4.5, -2.8] pp). Each query's three assignments were collapsed before crossed resampling; per-arm and per-offset metrics are in the machine result.
+
+Issue #157 was recomputed from normalized embeddings and its original full-cohort aggregates were reused. Across the 11 arms, the median point-estimate change was -2.0 pp for preset-dominant fraction (range -9.4 to -0.7) and -0.024 for normalized margin. The original report's aggregate intervals and new normalized-condition intervals are retained in machine output; paired intervals are unavailable because #157 did not persist original anchor-level values.
+
+The controlled ±6 dB probe perturbed query and selected-candidate audio for 48 fixed cases across 24 evenly spaced families and all 12 triplets. The normalized condition reapplies the shared RMS target after the gain change. This table averages the 11 arms and two gain directions descriptively; per-arm crossed intervals are in the machine result.
+
+| Input condition | Perturbed role | Retrieval decision change, mean (range across arm/gain) | Mean embedding cosine distance |
+|---|---|---:|---:|
+| original input | Query | 36.7% (range 10.4–72.9%) | 0.0157 |
+| original input | Selected candidate | 31.9% (range 4.2–70.8%) | 0.0135 |
+| normalized input | Query | 0.2% (range 0.0–2.1%) | 0.0000 |
+| normalized input | Selected candidate | 0.2% (range 0.0–2.1%) | 0.0000 |
+
+#### Interpretation, limits, and next experiment
+
+A change after input normalization shows that a common level factor affected the encoder's representation or its ranking on these clips. Active-RMS matching at evaluation time separately removes one candidate-gain difference from the acoustic score; remaining MR-STFT error still reflects pitch, timing, envelope, and spectral differences, not timbre alone. The 12 triplets and 24-family ±6 dB probe are exploratory; they do not cover other synthesizers, broader MIDI/performance diversity, listener similarity, or downstream patch reconstruction. The next decision should use a larger independently selected MIDI set and an actual reconstruction/listening evaluation if the intended endpoint is playable sound recovery.
+
+#### Execution and reproducibility
+
+The preflight rehashed and measured all 6,450 accepted stereo WAVs, validated every original cache and locked checkpoint, and confirmed that the prior #152 evaluation, #155 assignments, #157 aggregate, #161 choices, and original-level matrices were reusable. It found no reusable per-WAV #161 spectra, so only the 1,548 MIDI-3 WAVs were transformed into new active-RMS matrices (199,692 ordered matrix cells); no rendering, training, or original-cache regeneration occurred.
+The Numba implementation is O(N), padding invariant, and was benchmarked after compilation warm-up at 15.5 ms median per clip (range 9.2–16.4 ms for five 5–10 s stereo clips), about 5.4% of the stored median adapter latency. The normalized cache contains 6,450 WAVs per family under `outputs/issue152-validation-train-midi-v3-50/features_active_rms/`; provenance records the fixed target, gain, input receipt hash, checkpoint, and preprocessing contract. Source audio and original feature caches were unchanged.
+
+<!-- issue164-active-rms-results:end -->
+
+**Historical context:** The #161 results below preserve the original recording-level substitute ranking. For the current encoder choice, use the #164 active-RMS-matched comparison above.
 
 <!-- issue161-audible-substitute-results:start -->
 ### Issue #161 — Three-MIDI audible-substitute retrieval
