@@ -514,14 +514,18 @@ def midi_shortcut_baseline(episodes, candidates, performances):
     return output
 
 
-def evaluate_dataset(dataset_dir: Path, *, models: Sequence[str] | None = None) -> dict:
+def evaluate_dataset(dataset_dir: Path, *, models: Sequence[str] | None = None,
+                     feature_root: Path | None = None, result_root: Path | None = None,
+                     hard_negative_source: Path | None = None) -> dict:
     dataset_dir = dataset_dir.resolve(strict=True)
+    feature_root = (feature_root or dataset_dir / "features").resolve(strict=True)
+    result_root = (result_root or dataset_dir).resolve()
     selected_models = set(models) if models else None
     if selected_models is not None and not selected_models.issubset(MODEL_REGISTRY):
         raise ValueError(f"unknown encoder models: {sorted(selected_models - set(MODEL_REGISTRY))}")
     previous_result, previous_rows, previous_common_by_condition, previous_hard_negatives = {}, [], {}, {}
     if selected_models is not None:
-        result_path, rows_path = dataset_dir / "evaluation.private.json", dataset_dir / "episode_metrics.private.jsonl"
+        result_path, rows_path = result_root / "evaluation.private.json", result_root / "episode_metrics.private.jsonl"
         if not result_path.is_file() or not rows_path.is_file():
             raise ValueError("selected-model evaluation requires an existing complete evaluation to extend")
         previous_result = json.loads(result_path.read_text(encoding="utf-8"))
@@ -552,6 +556,20 @@ def evaluate_dataset(dataset_dir: Path, *, models: Sequence[str] | None = None) 
             previous_result["model_results"] = {arm: data for arm, data in previous_result.get("model_results", {}).items()
                 if arm.split(":", 1)[0] not in selected_models}
             previous_result["available_arms"] = sorted(previous_result["model_results"])
+    if hard_negative_source is not None:
+        source_rows = _jsonl(hard_negative_source / "episode_metrics.private.jsonl")
+        for row in source_rows:
+            state_ids = row.get("acoustic_hard_negative_state_ids")
+            similarities = row.get("acoustic_hard_negative_selector_similarities")
+            if state_ids is None or similarities is None:
+                continue
+            if len(state_ids) != len(similarities):
+                raise ValueError("cached acoustic hard-negative states and selector scores disagree")
+            selected = list(zip(state_ids, similarities, strict=True))
+            episode_id = row["episode_id"]
+            if episode_id in previous_hard_negatives and previous_hard_negatives[episode_id] != selected:
+                raise ValueError(f"saved acoustic hard-negative selection differs across arms for {episode_id}")
+            previous_hard_negatives[episode_id] = selected
     dataset_summary = json.loads((dataset_dir / "dataset_summary.private.json").read_text(encoding="utf-8"))
     validate_dataset_manifests(dataset_dir, dataset_summary)
     candidates = json.loads((dataset_dir / "candidate_sets.private.json").read_text(encoding="utf-8"))
@@ -566,7 +584,7 @@ def evaluate_dataset(dataset_dir: Path, *, models: Sequence[str] | None = None) 
         dataset_dir, episodes, candidates, pair_to_request, receipts)
     accepted_request_ids = {request_id for request_id, receipt in receipts.items() if receipt.get("accepted")}
     model_features = {}
-    for model_dir in sorted((dataset_dir / "features").glob("*")) if (dataset_dir / "features").is_dir() else []:
+    for model_dir in sorted(feature_root.glob("*")):
         if not model_dir.is_dir() or not (model_dir / "feature_manifest.private.jsonl").is_file():
             continue
         model_name = model_dir.name
@@ -704,8 +722,9 @@ def evaluate_dataset(dataset_dir: Path, *, models: Sequence[str] | None = None) 
               "no_source_audio_used": True, "held_out_reserved_sources_used": False,
               "performance_source_split": dataset_summary.get("performance_source_split", dataset_summary["source_split"]),
               "primary_metric": "Recall@1", "gallery_candidate_set_is_identical_across_arms": True}
-    (dataset_dir / "evaluation.private.json").write_text(json.dumps(result, sort_keys=True, indent=2) + "\n", encoding="utf-8")
-    with (dataset_dir / "episode_metrics.private.jsonl").open("w", encoding="utf-8", newline="\n") as stream:
+    result_root.mkdir(parents=True, exist_ok=True)
+    (result_root / "evaluation.private.json").write_text(json.dumps(result, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+    with (result_root / "episode_metrics.private.jsonl").open("w", encoding="utf-8", newline="\n") as stream:
         for row in previous_rows:
             stream.write(canonical_json(row) + "\n")
         for arm in arm_names:

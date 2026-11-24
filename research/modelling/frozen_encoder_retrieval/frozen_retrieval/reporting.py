@@ -624,6 +624,7 @@ def _issue155_plain_english(results: dict, shortlist: dict | None) -> list[str]:
                    f"[{100 * paired['lower_95']:+.1f}, {100 * paired['upper_95']:+.1f}].") if paired else ""
     assignment_summary = (f"In the separate test of three comparison-MIDI assignments, {leader_name} retrieved the correct preset at rank one "
         f"for {100 * leader_score:.1f}% of queries" + (f", followed by {beats_name} at {100 * beats_score:.1f}%." if beats_score is not None else ".") + paired_text)
+    assignment_summary += " Removing a warned gallery candidate makes the search easier: the correct preset has one fewer wrong preset to beat, without changing any embeddings."
     stability = assignment.get("ranking_stability_by_performance", {}).get("aggregate", {}).get(leader.split(":", 1)[0], {})
     if stability:
         assignment_summary += (f" It ranked first for {stability.get('first_place_performances', 0)} of "

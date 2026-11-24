@@ -1,3 +1,39 @@
+# Windows startup
+
+Work from the repo root in PowerShell. Pick the installed Python for the task and invoke it with `&`. Bare `python` resolves to Miniforge base on this machine.
+
+```powershell
+$obruxoFrozen = 'research/modelling/frozen_encoder_retrieval'
+$obruxoConda = Join-Path $env:USERPROFILE 'miniforge3/envs'
+$obruxoBench = "$obruxoFrozen/local_checkpoints/bench-env/Scripts/python.exe"
+$obruxoData = Join-Path $obruxoConda 'obruxo-data-generation/python.exe'
+$obruxoTorch = Join-Path $obruxoConda 'py312/python.exe'
+$obruxoNativeSite = Join-Path $obruxoConda 'obruxo-data-generation/Lib/site-packages'
+```
+
+| Task | Installed environment |
+|---|---|
+| Frozen cache analysis, CPU probes, frozen retrieval tests, or six of the seven encoder loaders | Project venv **`bench-env`** (`$obruxoBench`), built on Conda **`py312`**. Python 3.12.13, NumPy 1.26.4, SciPy 1.17.1, PyTorch 2.12.1+xpu. |
+| Basic Pitch frozen loader | **`bench-env`** with `obruxo-data-generation` site-packages (`$obruxoNativeSite`) prepended to `PYTHONPATH` for that worker. Its lock calls for NumPy 2.4.6 and SciPy 1.18.0. The efficiency runner accepts `--pythonpath "basic_pitch_trunk=$obruxoNativeSite"`. |
+| Preset/MIDI contracts and Vital rendering | Conda **`obruxo-data-generation`** (`$obruxoData`). It has the pinned [native packages](research/data_generation/environment.yml), including DawDreamer 0.8.3. |
+| PyTorch and the native trainer | Conda **`py312`** (`$obruxoTorch`) contains PyTorch. For tasks that also need the native packages, prepend `$obruxoNativeSite` for that invocation and check the [trainer's environment and renderer profile](research/training/TRAINER.md#environment-and-commands). |
+
+- Check `Test-Path` and verify the actual imports with a short command such as `& $obruxoBench -B -c 'import sys,numpy,scipy; print(sys.executable,numpy.__version__,scipy.__version__)'`. For encoder loading, check the per-model `runtime_versions` in `$obruxoFrozen/local_checkpoints/checkpoint-lock.json` before changing packages. Scope `PYTHONPATH` to the command that needs it and use `;` between entries on Windows.
+- Start with the accepted feature manifests and WAVs in `research/modelling/frozen_encoder_retrieval/outputs/issue152-validation-train-midi-v3-50` for frozen comparisons. Check the selected inputs against their receipts and reuse existing results where applicable. A fresh worktree lacks the ignored environment, checkpoints and outputs. Point the [runners](research/modelling/frozen_encoder_retrieval/README.md) at the primary checkout's existing assets. For tasks that require actual rendering, use the run's pinned renderer profile and verify the local Vital VST3 path, normally `C:\Program Files\Common Files\VST3\Vital.vst3`.
+
+| Startup failure | Recovery |
+|---|---|
+| `ModuleNotFoundError` or a package version mismatch | Check the interpreter path, import path and task lock first. The frozen CLI adds its sibling source directories automatically. Ad hoc scripts may need `research/data_generation`, `research/training`, or `research/modelling/basic_pitch` on `PYTHONPATH`. |
+| `WinError 5` loading `c10_xpu.dll` | The Windows sandbox can block importing this PyTorch build even for CPU work. Retry the exact authorized Python command with escalation for native DLL access. Check `torch.xpu.is_available()` only for XPU runs. |
+| `gh` cannot reach GitHub or read credentials, or Git cannot create `.git/index.lock` with access denied | Retry the specific authorized command with escalation for network, the Windows keyring, or writes to Git metadata. A sandboxed `gh auth status` failure is insufficient to diagnose expired credentials. |
+
+## Long-lived task progress
+
+- For work that will run for several minutes or longer, do not keep the conversation busy with repeated model polling. Run the worker independently with durable logs and a small machine-readable status file, then open a lightweight Python `tkinter` monitor for the user.
+- Keep the monitor focused on the current phase, per-stage completed/total counts, overall progress, failures when available, the last status update, and a few recent log events. Refresh from status/log files every few seconds; avoid heavy rescans.
+- Include simple Play/Pause and Stop controls for the monitor, and label clearly whether they affect only monitoring or also the worker. Prefer safe, cooperative worker controls if pausing or stopping computation is requested.
+- Once the monitor is visible and useful, stop polling continuously; let the user request progress updates when wanted.
+
 # Research findings and experiment reporting
 
 ## Reader-facing findings first

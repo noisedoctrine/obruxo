@@ -303,6 +303,86 @@ def raw_mrstft_matrix(audio_rows: list[np.ndarray], *, output_dir: Path, batch_s
         "pair_batch_size": pair_batch_size, "resolutions": resolution_diagnostics}
 
 
+def active_rms_matched_mrstft_matrix(audio_rows: list[np.ndarray], active_rms_values: list[float] | np.ndarray, *,
+                                     output_dir: Path, batch_size: int = 8, pair_batch_size: int = 64,
+                                     device_name: str = "cpu", progress=None) -> tuple[np.ndarray, dict]:
+    """Score all ordered pairs after matching candidate active RMS to the target's active RMS."""
+    import torch
+
+    if len(audio_rows) < 2 or batch_size < 1 or pair_batch_size < 1:
+        raise ValueError("active-RMS MR-STFT matrix needs multiple recordings and positive batch sizes")
+    device = torch.device(device_name)
+    if device.type == "xpu" and not torch.xpu.is_available():
+        raise RuntimeError("requested XPU is unavailable")
+    shapes = {row.shape for row in audio_rows}
+    if len(shapes) != 1 or next(iter(shapes))[1] != 2:
+        raise ValueError("active-RMS MR-STFT inputs must be sample-aligned stereo clips")
+    active_rms = np.asarray(active_rms_values, dtype=np.float64)
+    count, frames, _ = len(audio_rows), audio_rows[0].shape[0], audio_rows[0].shape[1]
+    if active_rms.shape != (count,) or not np.isfinite(active_rms).all() or np.any(active_rms <= 0.0):
+        raise ValueError("one positive finite active-RMS value is required per scoring WAV")
+    if device.type == "cpu":
+        torch.set_num_threads(max(1, min(8, torch.get_num_threads())))
+    device_rms = torch.from_numpy(active_rms.astype(np.float32)).to(device).clamp_min(1e-12)
+    scores = np.zeros((count, count), dtype=np.float64)
+    diagnostics = {}
+    output_dir.mkdir(parents=True, exist_ok=True)
+    for fft_size in FFT_SIZES:
+        hop = fft_size // 4
+        frame_count = frames // hop + 1
+        dimensions = 2 * (fft_size // 2 + 1) * frame_count
+        with tempfile.TemporaryDirectory(prefix=f"issue164-active-{fft_size}-", dir=output_dir) as temporary:
+            features = np.lib.format.open_memmap(Path(temporary) / "magnitude.npy", mode="w+", dtype=np.float32,
+                                                 shape=(count, dimensions))
+            window = torch.hann_window(fft_size, dtype=torch.float32, device=device)
+            for start in range(0, count, batch_size):
+                audio = np.stack(audio_rows[start:start + batch_size])
+                batch = torch.from_numpy(audio.copy()).to(device).transpose(1, 2).reshape(-1, frames)
+                magnitude = torch.stft(batch, fft_size, hop_length=hop, window=window, return_complex=True).abs()
+                flattened = magnitude.reshape(len(audio), 2, fft_size // 2 + 1, -1).reshape(len(audio), -1).cpu().numpy()
+                if flattened.shape[1] != dimensions:
+                    raise ValueError("active-RMS STFT frame count differs from the fixed scoring window")
+                features[start:start + len(audio)] = flattened
+                del audio, batch, magnitude, flattened
+            features.flush()
+            device_features = torch.from_numpy(np.asarray(features)).to(device)
+            resolution_scores = np.zeros((count, count), dtype=np.float64)
+            for reference_index in range(count):
+                reference = device_features[reference_index].reshape(2, fft_size // 2 + 1, frame_count)
+                reference_norm = torch.linalg.vector_norm(reference).clamp_min(1e-8)
+                reference_log = torch.log(reference.clamp_min(1e-5))
+                for start in range(0, count, pair_batch_size):
+                    end = min(count, start + pair_batch_size)
+                    candidates = device_features[start:end].reshape(end - start, 2, fft_size // 2 + 1, frame_count)
+                    scales = (device_rms[reference_index] / device_rms[start:end]).reshape(-1, 1, 1, 1)
+                    matched_candidates = candidates * scales
+                    convergence = torch.linalg.vector_norm((matched_candidates - reference).flatten(1), dim=1) / reference_norm
+                    log_mae = torch.abs(torch.log(matched_candidates.clamp_min(1e-5)) - reference_log).flatten(1).mean(dim=1)
+                    resolution_scores[reference_index, start:end] = (convergence + log_mae).cpu().numpy()
+                if progress and ((reference_index + 1) % 16 == 0 or reference_index + 1 == count):
+                    progress(f"Active-RMS FFT {fft_size}: {reference_index + 1}/{count} target spectra compared")
+            scores += resolution_scores / len(FFT_SIZES)
+            diagnostics[str(fft_size)] = {"fft_size": fft_size, "hop_length": hop,
+                                          "scored_ordered_pairs": count * count}
+            del device_features, reference, reference_log, candidates, matched_candidates, convergence, log_mae
+            if device.type == "xpu":
+                torch.xpu.synchronize()
+            features.flush()
+            features._mmap.close()
+            del features
+    np.fill_diagonal(scores, 0.0)
+    if not np.isfinite(scores).all():
+        raise ValueError("active-RMS MR-STFT matrix contains nonfinite scores")
+    contract = {"metric": "mean_3_scale_spectral_convergence_plus_log_magnitude_mae",
+        "fft_sizes": list(FFT_SIZES), "window": "hann", "hop_fraction": 0.25,
+        "alignment": "sample zero; exact full-clip frame match; no shift, trim, or padding",
+        "scoring_window": "full saved stereo WAV including renderer tail",
+        "matching": "scale candidate B3 by active_rms(A3)/active_rms(B3) before spectral comparison",
+        "active_rms": "20 ms sliding mean-square windows, zero extension, relative -40 dB gate",
+        "device": device_name, "pair_batch_size": pair_batch_size, "resolutions": diagnostics}
+    return scores.astype(np.float32), contract
+
+
 def retrieve_alternatives(cache_audit: dict, triplets: dict) -> dict:
     """Rank all common 128-preset alternative pools using only MIDI 1/2 cached embeddings."""
     preset_ids = cache_audit["preset_ids"]
