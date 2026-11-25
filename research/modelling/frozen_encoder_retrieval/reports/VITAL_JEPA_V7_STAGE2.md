@@ -17,6 +17,10 @@ Best available substitute: 2.132. Fixed random choice: 4.928.
 
 ![Retrieval and substitute results](figures/issue169_v7_stage2.png)
 
+The scatter plot compares common-gallery Recall@1 with mean substitute error; lower error and higher Recall@1 are better. Vertical bars show the clustered 95% interval for substitute error.
+
+![Recall@1 versus MR-STFT scatter plot](figures/issue169_v7_r1_vs_mrstft.png)
+
 ## Paired substitute differences
 
 Negative error difference means the first representation selected a closer-sounding substitute than the comparator.

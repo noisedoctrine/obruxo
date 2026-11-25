@@ -228,6 +228,26 @@ def publish(result):
     fig.savefig(figure, dpi=170, bbox_inches="tight")
     plt.close(fig)
 
+    scatter = REPORTS / "figures/issue169_v7_r1_vs_mrstft.png"
+    fig, ax = plt.subplots(figsize=(8, 5.5), layout="constrained")
+    palette = {"top7_mean": "#2878a5", "contrastive": "#d39025", "patch_mean": "#6a9f58",
+               "original_v7": "#777777", "cir": "#8a63a8", "clap": "#d46856"}
+    offsets = {"top7_mean": (7, -23), "contrastive": (7, -15), "patch_mean": (7, 5),
+               "original_v7": (7, -13), "cir": (7, 6), "clap": (7, 15)}
+    for arm in arms:
+        error = acoustic["arms"][arm]["error"]
+        mean, (lo, hi) = error["mean"], error["clustered_95_ci"]
+        x = retrieval[arm]["common_r1"] * 100
+        ax.errorbar(x, mean, yerr=[[mean - lo], [hi - mean]], fmt="o", ms=7, capsize=3,
+                    color=palette[arm], ecolor=palette[arm], zorder=3)
+        ax.annotate(NAMES[arm], (x, mean), xytext=offsets[arm], textcoords="offset points",
+                    fontsize=9, color=palette[arm])
+    ax.set(title="Exact retrieval vs. acoustic substitute score",
+           xlabel="Common-gallery Recall@1 (%)", ylabel="Active-RMS-matched MR-STFT error\n(lower is better)")
+    ax.grid(axis="both", color="#dddddd", linewidth=0.7, zorder=0)
+    fig.savefig(scatter, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+
     lines = ["# Issue 169 Stage 2: acoustic substitutes and sensitivity", "",
              "Of the three selected V7 representations, the top-7 patch-token mean ranked best for exact preset retrieval and had the lowest substitute error, narrowly ahead of the contrastive projection and patch-token mean. CIR remained stronger on both exact retrieval and the spectral substitute score. Across all six representations, preset changes usually moved embeddings farther than MIDI changes.", "",
              "Retrieval covers 6,450 queries from 129 presets × 50 MIDI performances. Substitute selection covers 129 preset families across 12 fixed MIDI triplets (1,548 selections per representation): MIDI 1 and 2 select an alternative from 128 different-family presets, and MIDI 3 scores it. Lower active-RMS-matched MR-STFT error means a closer spectral match on MIDI 3. Intervals resample preset families and triplets for acoustic error, and preset families and MIDI performances for sensitivity.", "",
@@ -240,6 +260,8 @@ def publish(result):
                      f"{error['mean']:.3f} [{lo:.3f}, {hi:.3f}] | {acoustic['arms'][arm]['rank']['mean']:.1f} |")
     lines += ["", f"Best available substitute: {acoustic['oracle']['mean']:.3f}. Fixed random choice: {acoustic['random']['mean']:.3f}.", "",
               "![Retrieval and substitute results](figures/issue169_v7_stage2.png)", "",
+              "The scatter plot compares common-gallery Recall@1 with mean substitute error; lower error and higher Recall@1 are better. Vertical bars show the clustered 95% interval for substitute error.", "",
+              "![Recall@1 versus MR-STFT scatter plot](figures/issue169_v7_r1_vs_mrstft.png)", "",
               "## Paired substitute differences", "",
               "Negative error difference means the first representation selected a closer-sounding substitute than the comparator.", "",
               "| Selected representation | Comparator | Error difference (95% interval) |", "| --- | --- | ---: |"]
