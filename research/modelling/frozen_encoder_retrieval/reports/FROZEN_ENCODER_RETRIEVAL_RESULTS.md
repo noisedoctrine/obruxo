@@ -6,6 +6,8 @@ Issues: [#152](https://github.com/noisedoctrine/obruxo/issues/152) baseline and 
 
 ## Results and recommendation
 
+[Issue #167 compares Vital JEPA V7 with CIR and CLAP](VITAL_JEPA_V7_COMPARISON.md).
+
 <!-- issue164-active-rms-results:start -->
 ### Issue #164 — Padding-invariant active-RMS re-evaluation
 

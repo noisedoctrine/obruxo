@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "models": {
+    "vital_jepa_v7": {
+      "path": "vital_jepa_v7/selected.pt",
+      "repository_id": "duckking032/vital-jepa-v7",
+      "revision": "e5ebdfb02dd107c15125b12c1bb4af03a7e31592",
+      "sha256": "fdcc18186aae8a406e7d241f85308a9e0bda6f4cfa976ea49b6535e27d0eb788",
+      "loader_revision": "obruxo_vital_jepa_v7_v1",
+      "runtime_versions": {"torch": "2.12.1+xpu", "torchaudio": "2.11.0+xpu", "numpy": "1.26.4", "scipy": "1.17.1"},
+      "license_status": "approved"
+    }
+  }
+}

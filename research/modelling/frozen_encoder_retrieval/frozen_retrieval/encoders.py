@@ -140,6 +140,7 @@ def dependency_status(model_name: str) -> dict:
         "beats_iter3_plus": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "torchaudio": "torchaudio"},
         "encodec_24khz": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "transformers": "transformers"},
         "dac_44khz": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "transformers": "transformers"},
+        "vital_jepa_v7": {"numpy": "numpy", "scipy": "scipy", "torch": "torch", "torchaudio": "torchaudio"},
     }[model_name]
     return {package: {"module": module, "version": _version(package)} for package, module in modules.items()}
 
@@ -272,7 +273,7 @@ class FrozenAdapter:
                 from .normalization import normalize_active_rms
 
                 audio, normalization = normalize_active_rms(audio, sample_rate, active_rms_target)
-        audio = _decode_audio(audio, np)
+        audio = _decode_audio(audio, np, downmix=self.name != "vital_jepa_v7")
         if not np.isfinite(audio).all() or len(audio) == 0:
             raise ValueError("audio contains no finite samples")
         if sample_rate != self.sample_rate:
@@ -300,6 +301,10 @@ class FrozenAdapter:
 
     def _extract_waveform(self, waveform) -> dict[str, list[float]]:
         torch, np, model, device = self.torch, self.numpy, self.model, self.device
+        if self.name == "vital_jepa_v7":
+            with torch.inference_mode():
+                vector = model(torch.from_numpy(waveform))[0]
+            return {"clip": _clip_vector(vector, self.name, torch, np)}
         if self.name == "basic_pitch_trunk":
             from obruxo_basic_pitch.constants import AUDIO_N_SAMPLES, FFT_HOP, OVERLAP
 
@@ -526,9 +531,9 @@ def load_adapter(model_name: str, checkpoint: Path, lock_entry: dict, checkpoint
         if current != lock_entry["loader_revision"] or dirty:
             raise ValueError(f"{model_name} source checkout differs from the clean locked loader revision")
     else:
-        if model_name == "basic_pitch_trunk":
+        if model_name in {"basic_pitch_trunk", "vital_jepa_v7"}:
             if lock_entry["loader_revision"] != MODEL_REGISTRY[model_name]["loader_revision"]:
-                raise RuntimeError("Basic Pitch adapter revision differs from the frozen benchmark contract")
+                raise RuntimeError(f"{model_name} adapter revision differs from the frozen benchmark contract")
         else:
             loader_package = {"clap_music": "laion_clap", "muq_mulan": "muq", "encodec_24khz": "transformers",
                               "dac_44khz": "transformers"}[model_name]
@@ -547,6 +552,10 @@ def load_adapter(model_name: str, checkpoint: Path, lock_entry: dict, checkpoint
         model = BasicPitchICASSP2022()
         model.load_state_dict(_safe_torch_load(torch, checkpoint), strict=True)
         model.to(device)
+    elif model_name == "vital_jepa_v7":
+        from .vital_jepa_v7 import VitalJepaV7
+
+        model = VitalJepaV7(checkpoint, device)
     elif model_name == "clap_music":
         model = _load_clap_music_offline(checkpoint, device)
     elif model_name == "muq_mulan":
@@ -609,6 +618,11 @@ def cache_feature(adapter: FrozenAdapter, wav_path: Path, *, request_id: str, re
                       "precision": source_precision, "device": adapter.device}
     if normalization_contract is not None:
         cache_identity["input_normalization"] = normalization_contract
+    if adapter.name == "vital_jepa_v7":
+        from .vital_jepa_v7 import POOLING, PREPROCESSING
+
+        cache_identity["preprocessing"] = PREPROCESSING
+        cache_identity["pooling"] = POOLING
     feature_id = digest(cache_identity)
     output.mkdir(parents=True, exist_ok=True)
     array_path, metadata_path = output / f"{feature_id}.npz", output / f"{feature_id}.json"

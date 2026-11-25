@@ -209,3 +209,20 @@ if ($null -eq $oldPythonpath) { Remove-Item Env:PYTHONPATH -ErrorAction Silently
 To open a small live progress window while the background run is active, use `& $py -B "$base/show_issue164_progress.py"`. Play/Pause and Stop control the display only; extraction continues in the background.
 
 Use the exact target printed by preflight for all seven embedding commands. `evaluate` reuses the original evaluation's acoustic hard-negative selections. `analyze` pairs issue #152 retrieval, issue #155's three existing gallery-MIDI assignments, and issue #161's fixed triplets against the preserved baselines; it recomputes only the normalized-side rankings, active-RMS-matched acoustic matrices and small ±6 dB input-gain probe. Active-RMS matching is an evaluation-time candidate-gain operation: it leaves both inputs and cached embeddings unchanged. The output is the sanitized [issue #164 aggregate](reports/issue164_active_rms_results.json), detailed result section and concise figures in the [research report](reports/FROZEN_ENCODER_RETRIEVAL_RESULTS.md) and [visual summary](FROZEN_ENCODER_VISUAL_SUMMARY.md), with all request-level provenance and matrices stored under ignored `outputs/issue164-active-rms/`.
+
+## Issue #167 Vital JEPA V7
+
+Place the [pinned V7 checkpoint](https://huggingface.co/duckking032/vital-jepa-v7/tree/e5ebdfb02dd107c15125b12c1bb4af03a7e31592/checkpoints/jepa_v7) at `local_checkpoints/vital_jepa_v7/selected.pt` under this directory. The [checkpoint lock](issue167-checkpoint-lock.json) records the expected file digest and runtime. The adapter uses a leading six-second stereo window, mid/side log-mel features and a 384-dimensional residual mean of online encoder tokens. Its framing and pooling are local choices based on the model configuration, checkpoint and published V5 pooling description.
+
+From the repository root in PowerShell, use the native renderer Python for `render` and the frozen benchmark Python for analysis and efficiency. `--processes` controls the number of isolated native processes. Each process uses the pinned single-worker plugin profile.
+
+```powershell
+$base = 'research/modelling/frozen_encoder_retrieval'
+$native = Join-Path $env:USERPROFILE 'miniforge3/envs/obruxo-data-generation/python.exe'
+$bench = "$base/local_checkpoints/bench-env/Scripts/python.exe"
+$env:PYTHONPATH = "$base;research/data_generation;research/training"
+& $native -B -u "$base/run_issue167_v7.py" render --processes 4
+& $bench -B -u "$base/run_issue167_analysis.py"
+```
+
+The run reads the accepted Issue #152 cohort, Issue #161 triplets, Issue #164 acoustic matrix contract and PR #160 resource sample. It writes the recovered audio and new evidence under `outputs/issue167-v7/` and uses `status.json` for progress. Open `show_issue167_progress.py` with the native Python for a monitor. The analysis CLI accepts `--wait-for-render` when a render worker is already running.
