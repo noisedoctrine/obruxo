@@ -1,0 +1,156 @@
+{
+  "metric": "common-gallery Recall@1",
+  "queries": 6450,
+  "preset_families": 129,
+  "midi_performances": 50,
+  "representation_count": 17,
+  "token_order": [
+    224,
+    192,
+    160,
+    128,
+    96,
+    64,
+    0,
+    32
+  ],
+  "selection_note": "Only the single best top-N variant is included; it was selected on this same cohort. The individual patch-position sweep is omitted from this chart and is reported separately.",
+  "representations": [
+    {
+      "name": "CIR",
+      "dimensions": 768,
+      "r1": 0.8102325581395349,
+      "group": "External baseline",
+      "selection": "Previously evaluated baseline",
+      "rank": 1
+    },
+    {
+      "name": "CLAP",
+      "dimensions": 512,
+      "r1": 0.594108527131783,
+      "group": "External baseline",
+      "selection": "Previously evaluated baseline",
+      "rank": 2
+    },
+    {
+      "name": "Top 7 tokens, mean",
+      "dimensions": 384,
+      "r1": 0.5654263565891473,
+      "group": "Top-N mean",
+      "selection": "Highest full-cohort common-gallery Recall@1 among all tested top-N variants",
+      "rank": 3
+    },
+    {
+      "name": "Contrastive projection",
+      "dimensions": 128,
+      "r1": 0.3801550387596899,
+      "group": "V7 fixed",
+      "selection": "Representation fixed before scoring",
+      "rank": 4
+    },
+    {
+      "name": "Patch token mean",
+      "dimensions": 384,
+      "r1": 0.3241860465116279,
+      "group": "V7 fixed",
+      "selection": "Representation fixed before scoring",
+      "rank": 5
+    },
+    {
+      "name": "Patch temporal pyramid",
+      "dimensions": 6144,
+      "r1": 0.3130232558139535,
+      "group": "V7 fixed",
+      "selection": "Representation fixed before scoring",
+      "rank": 6
+    },
+    {
+      "name": "Both projections concatenated",
+      "dimensions": 256,
+      "r1": 0.3085271317829457,
+      "group": "V7 fixed",
+      "selection": "Representation fixed before scoring",
+      "rank": 7
+    },
+    {
+      "name": "Original V7 pooling",
+      "dimensions": 384,
+      "r1": 0.2910077519379845,
+      "group": "V7 fixed",
+      "selection": "Representation fixed before scoring",
+      "rank": 8
+    },
+    {
+      "name": "Global tokens plus both projections",
+      "dimensions": 1792,
+      "r1": 0.2606201550387597,
+      "group": "V7 fixed",
+      "selection": "Representation fixed before scoring",
+      "rank": 9
+    },
+    {
+      "name": "Global token 1",
+      "dimensions": 384,
+      "r1": 0.25922480620155036,
+      "group": "Global token",
+      "selection": "Individual token",
+      "rank": 10
+    },
+    {
+      "name": "Global token 3",
+      "dimensions": 384,
+      "r1": 0.25488372093023254,
+      "group": "Global token",
+      "selection": "Individual token",
+      "rank": 11
+    },
+    {
+      "name": "Global token mean",
+      "dimensions": 384,
+      "r1": 0.25069767441860463,
+      "group": "V7 fixed",
+      "selection": "Representation fixed before scoring",
+      "rank": 12
+    },
+    {
+      "name": "Global tokens concatenated",
+      "dimensions": 1536,
+      "r1": 0.24930232558139534,
+      "group": "V7 fixed",
+      "selection": "Representation fixed before scoring",
+      "rank": 13
+    },
+    {
+      "name": "Global token 2",
+      "dimensions": 384,
+      "r1": 0.23348837209302326,
+      "group": "Global token",
+      "selection": "Individual token",
+      "rank": 14
+    },
+    {
+      "name": "Acoustic descriptor predictions",
+      "dimensions": 15,
+      "r1": 0.2262015503875969,
+      "group": "V7 fixed",
+      "selection": "Representation fixed before scoring",
+      "rank": 15
+    },
+    {
+      "name": "Global token 4",
+      "dimensions": 384,
+      "r1": 0.204031007751938,
+      "group": "Global token",
+      "selection": "Individual token",
+      "rank": 16
+    },
+    {
+      "name": "Control contrastive projection",
+      "dimensions": 128,
+      "r1": 0.20217054263565892,
+      "group": "V7 fixed",
+      "selection": "Representation fixed before scoring",
+      "rank": 17
+    }
+  ]
+}

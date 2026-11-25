@@ -1,6 +1,8 @@
 """Display the V7 comparison's durable progress without controlling its workers."""
 
+import argparse
 from datetime import datetime
+from pathlib import Path
 import tkinter as tk
 from tkinter import ttk
 
@@ -8,8 +10,13 @@ from run_issue167_v7 import LOG, RUN, STATUS, read_json
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--status", type=Path, default=STATUS)
+    parser.add_argument("--log", type=Path)
+    parser.add_argument("--title", default="Issue #167 · Vital JEPA V7 comparison")
+    args = parser.parse_args()
     root = tk.Tk()
-    root.title("Issue #167 · Vital JEPA V7 comparison")
+    root.title(args.title)
     root.geometry("800x275")
     panel = ttk.Frame(root, padding=14)
     panel.pack(fill="both", expand=True)
@@ -28,12 +35,12 @@ def main():
     def refresh():
         if not paused:
             try:
-                state = read_json(STATUS)
+                state = read_json(args.status)
                 phase.config(text=f"{state['phase']} · {state['state']}")
                 progress.config(maximum=max(1, state['total']), value=state['completed'])
                 updated = datetime.fromisoformat(state['updated_at']).astimezone().strftime("%H:%M:%S")
                 details.config(text=f"{state['completed']:,} / {state['total']:,} · {state['failures']:,} failures · updated {updated}")
-                log = RUN / "analysis.log" if (RUN / "analysis.log").exists() and state['phase'] != 'Render' else LOG
+                log = args.log or (RUN / "analysis.log" if (RUN / "analysis.log").exists() and state["phase"] != "Render" else LOG)
                 with log.open("rb") as stream:
                     stream.seek(max(0, log.stat().st_size - 8192))
                     tail = stream.read().decode("utf-8", errors="replace").splitlines()

@@ -1,0 +1,1592 @@
+{
+  "retrieval": {
+    "cross_midi_common_gallery": {
+      "original_v7": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.2910077519379845,
+            "lower_95": 0.22992248062015505,
+            "upper_95": 0.3558139534883721,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.5409302325581395,
+            "lower_95": 0.471937984496124,
+            "upper_95": 0.6102325581395349,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.6696124031007752,
+            "lower_95": 0.6049612403100775,
+            "upper_95": 0.7334883720930233,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.0,
+          "upper_95": 0.0,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.0
+        }
+      },
+      "contrastive": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.3801550387596899,
+            "lower_95": 0.31426356589147286,
+            "upper_95": 0.44790697674418606,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.6572093023255814,
+            "lower_95": 0.5886821705426356,
+            "upper_95": 0.7252713178294574,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.7758139534883721,
+            "lower_95": 0.7168992248062015,
+            "upper_95": 0.8296124031007752,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.06077519379844961,
+          "upper_95": 0.12046511627906976,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.08914728682170543
+        }
+      },
+      "control": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.20217054263565892,
+            "lower_95": 0.1558139534883721,
+            "upper_95": 0.25100775193798447,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.4441860465116279,
+            "lower_95": 0.3818604651162791,
+            "upper_95": 0.5103875968992249,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.5767441860465117,
+            "lower_95": 0.517984496124031,
+            "upper_95": 0.6417054263565891,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.117984496124031,
+          "upper_95": -0.06031007751937985,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.08883720930232558
+        }
+      },
+      "both_projections": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.3085271317829457,
+            "lower_95": 0.24775193798449613,
+            "upper_95": 0.37333333333333335,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.5724031007751939,
+            "lower_95": 0.5065116279069768,
+            "upper_95": 0.6444961240310078,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.6908527131782946,
+            "lower_95": 0.6282170542635659,
+            "upper_95": 0.7562790697674419,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.006356589147286822,
+          "upper_95": 0.042480620155038756,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.01751937984496124
+        }
+      },
+      "global_concat": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.24930232558139534,
+            "lower_95": 0.1930232558139535,
+            "upper_95": 0.30790697674418605,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.4750387596899225,
+            "lower_95": 0.4055813953488372,
+            "upper_95": 0.5451162790697675,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.6074418604651163,
+            "lower_95": 0.5398449612403101,
+            "upper_95": 0.6727131782945737,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.05798449612403101,
+          "upper_95": -0.026511627906976743,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.041705426356589144
+        }
+      },
+      "global_token_0": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.25922480620155036,
+            "lower_95": 0.202015503875969,
+            "upper_95": 0.3189147286821705,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.4843410852713178,
+            "lower_95": 0.4158139534883721,
+            "upper_95": 0.5533333333333333,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.6167441860465116,
+            "lower_95": 0.5506976744186046,
+            "upper_95": 0.6823255813953488,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.05054263565891473,
+          "upper_95": -0.013488372093023256,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.03178294573643411
+        }
+      },
+      "global_token_1": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.23348837209302326,
+            "lower_95": 0.18186046511627907,
+            "upper_95": 0.2886821705426357,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.4637209302325581,
+            "lower_95": 0.3953488372093023,
+            "upper_95": 0.5319379844961241,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.5933333333333334,
+            "lower_95": 0.5249612403100775,
+            "upper_95": 0.6576744186046511,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.07689922480620155,
+          "upper_95": -0.03875968992248062,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.05751937984496124
+        }
+      },
+      "global_token_2": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.25488372093023254,
+            "lower_95": 0.20031007751937985,
+            "upper_95": 0.3124031007751938,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.47333333333333333,
+            "lower_95": 0.402015503875969,
+            "upper_95": 0.5417054263565891,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.6035658914728682,
+            "lower_95": 0.5367441860465116,
+            "upper_95": 0.6685271317829458,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.055658914728682174,
+          "upper_95": -0.016434108527131782,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.03612403100775194
+        }
+      },
+      "global_token_3": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.204031007751938,
+            "lower_95": 0.1551937984496124,
+            "upper_95": 0.25751937984496126,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.40651162790697676,
+            "lower_95": 0.34449612403100777,
+            "upper_95": 0.468062015503876,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.5285271317829457,
+            "lower_95": 0.46651162790697676,
+            "upper_95": 0.5874418604651163,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.11472868217054263,
+          "upper_95": -0.06124031007751938,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.0869767441860465
+        }
+      },
+      "patch_mean": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.3241860465116279,
+            "lower_95": 0.2607751937984496,
+            "upper_95": 0.39271317829457364,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.5858914728682171,
+            "lower_95": 0.5182945736434108,
+            "upper_95": 0.6567441860465116,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.7105426356589147,
+            "lower_95": 0.6496124031007752,
+            "upper_95": 0.7722480620155039,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.01689922480620155,
+          "upper_95": 0.05069767441860465,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.03317829457364341
+        }
+      },
+      "global_mean": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.25069767441860463,
+            "lower_95": 0.1951937984496124,
+            "upper_95": 0.3075968992248062,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.4855813953488372,
+            "lower_95": 0.41891472868217056,
+            "upper_95": 0.5553488372093023,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.6145736434108527,
+            "lower_95": 0.5479069767441861,
+            "upper_95": 0.677984496124031,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.05674418604651163,
+          "upper_95": -0.02573643410852713,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.040310077519379844
+        }
+      },
+      "acoustic": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.2262015503875969,
+            "lower_95": 0.17968992248062016,
+            "upper_95": 0.27581395348837207,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.5037209302325582,
+            "lower_95": 0.44108527131782943,
+            "upper_95": 0.567906976744186,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.652093023255814,
+            "lower_95": 0.594108527131783,
+            "upper_95": 0.7066666666666667,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.09705426356589147,
+          "upper_95": -0.033643410852713176,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.06480620155038759
+        }
+      },
+      "global_both": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.2606201550387597,
+            "lower_95": 0.20248062015503876,
+            "upper_95": 0.3207751937984496,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.4958139534883721,
+            "lower_95": 0.42589147286821705,
+            "upper_95": 0.5662015503875969,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.6317829457364341,
+            "lower_95": 0.5640310077519379,
+            "upper_95": 0.6962790697674418,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.045116279069767444,
+          "upper_95": -0.01689922480620155,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.030387596899224805
+        }
+      },
+      "patch_pyramid": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.3130232558139535,
+            "lower_95": 0.2527131782945736,
+            "upper_95": 0.3786046511627907,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.5851162790697675,
+            "lower_95": 0.5170542635658915,
+            "upper_95": 0.6548837209302325,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.7153488372093023,
+            "lower_95": 0.6536434108527132,
+            "upper_95": 0.7767441860465116,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.00496124031007752,
+          "upper_95": 0.04992248062015504,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.02201550387596899
+        }
+      },
+      "cir_ast:official_clip": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.8102325581395349,
+            "lower_95": 0.7471317829457365,
+            "upper_95": 0.8663565891472869,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.9356589147286821,
+            "lower_95": 0.9034108527131783,
+            "upper_95": 0.9627906976744186,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.9651162790697675,
+            "lower_95": 0.9446511627906977,
+            "upper_95": 0.9810852713178294,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.46232558139534885,
+          "upper_95": 0.5744186046511628,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.5192248062015504
+        }
+      },
+      "clap_music:official_clip": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.594108527131783,
+            "lower_95": 0.508062015503876,
+            "upper_95": 0.6768992248062016,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.7989147286821705,
+            "lower_95": 0.7330232558139534,
+            "upper_95": 0.8584496124031008,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.8736434108527131,
+            "lower_95": 0.8226356589147287,
+            "upper_95": 0.915968992248062,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.24511627906976743,
+          "upper_95": 0.36310077519379846,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.30310077519379847
+        }
+      }
+    },
+    "cross_midi_mixed_gallery": {
+      "original_v7": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.2950387596899225,
+            "lower_95": 0.25209302325581395,
+            "upper_95": 0.33798449612403103,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.4989147286821705,
+            "lower_95": 0.4496124031007752,
+            "upper_95": 0.5457364341085271,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.615968992248062,
+            "lower_95": 0.5688372093023256,
+            "upper_95": 0.6613953488372093,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.0,
+          "upper_95": 0.0,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.0
+        }
+      },
+      "contrastive": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.36248062015503874,
+            "lower_95": 0.3156589147286822,
+            "upper_95": 0.40930232558139534,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.6077519379844961,
+            "lower_95": 0.5559689922480621,
+            "upper_95": 0.6568992248062016,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.7334883720930233,
+            "lower_95": 0.6893023255813954,
+            "upper_95": 0.7755038759689923,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.048682170542635655,
+          "upper_95": 0.08775193798449613,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.06744186046511629
+        }
+      },
+      "control": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.2215503875968992,
+            "lower_95": 0.18356589147286823,
+            "upper_95": 0.2606201550387597,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.4282170542635659,
+            "lower_95": 0.3787596899224806,
+            "upper_95": 0.4751937984496124,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.5581395348837209,
+            "lower_95": 0.5071317829457365,
+            "upper_95": 0.6083720930232558,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.09023255813953489,
+          "upper_95": -0.05581395348837209,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.07348837209302325
+        }
+      },
+      "both_projections": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.30728682170542637,
+            "lower_95": 0.2606201550387597,
+            "upper_95": 0.35271317829457366,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.5387596899224806,
+            "lower_95": 0.4863565891472868,
+            "upper_95": 0.5888372093023255,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.6595348837209303,
+            "lower_95": 0.608062015503876,
+            "upper_95": 0.7083720930232558,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.005271317829457364,
+          "upper_95": 0.030232558139534883,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.012248062015503876
+        }
+      },
+      "global_concat": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.26248062015503876,
+            "lower_95": 0.22093023255813954,
+            "upper_95": 0.3032558139534884,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.44449612403100774,
+            "lower_95": 0.3965891472868217,
+            "upper_95": 0.48914728682170544,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.5575193798449612,
+            "lower_95": 0.5093023255813953,
+            "upper_95": 0.6049612403100775,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.044186046511627906,
+          "upper_95": -0.020465116279069766,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.03255813953488372
+        }
+      },
+      "global_token_0": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.26542635658914726,
+            "lower_95": 0.22325581395348837,
+            "upper_95": 0.30666666666666664,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.46108527131782945,
+            "lower_95": 0.4103875968992248,
+            "upper_95": 0.508062015503876,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.5753488372093023,
+            "lower_95": 0.5279069767441861,
+            "upper_95": 0.6215503875968992,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.044186046511627906,
+          "upper_95": -0.014573643410852714,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.029612403100775193
+        }
+      },
+      "global_token_1": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.24263565891472869,
+            "lower_95": 0.202015503875969,
+            "upper_95": 0.2835658914728682,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.4365891472868217,
+            "lower_95": 0.38852713178294573,
+            "upper_95": 0.4812403100775194,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.5421705426356589,
+            "lower_95": 0.4965891472868217,
+            "upper_95": 0.5857364341085272,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.06682170542635658,
+          "upper_95": -0.03813953488372093,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.0524031007751938
+        }
+      },
+      "global_token_2": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.25705426356589145,
+            "lower_95": 0.21627906976744185,
+            "upper_95": 0.29875968992248064,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.4418604651162791,
+            "lower_95": 0.39395348837209304,
+            "upper_95": 0.4888372093023256,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.5497674418604651,
+            "lower_95": 0.5031007751937985,
+            "upper_95": 0.5948837209302326,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.052248062015503874,
+          "upper_95": -0.023565891472868215,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.03798449612403101
+        }
+      },
+      "global_token_3": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.2262015503875969,
+            "lower_95": 0.18728682170542635,
+            "upper_95": 0.26589147286821707,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.39612403100775195,
+            "lower_95": 0.35224806201550385,
+            "upper_95": 0.4386046511627907,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.4968992248062015,
+            "lower_95": 0.45271317829457364,
+            "upper_95": 0.5404651162790698,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.08744186046511628,
+          "upper_95": -0.04992248062015504,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.06883720930232558
+        }
+      },
+      "patch_mean": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.324031007751938,
+            "lower_95": 0.2786046511627907,
+            "upper_95": 0.37007751937984495,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.5403100775193799,
+            "lower_95": 0.4903875968992248,
+            "upper_95": 0.5874418604651163,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.6603100775193799,
+            "lower_95": 0.6130232558139534,
+            "upper_95": 0.7031007751937984,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.014263565891472868,
+          "upper_95": 0.044651162790697675,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.028992248062015506
+        }
+      },
+      "global_mean": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.26325581395348835,
+            "lower_95": 0.22372093023255815,
+            "upper_95": 0.30387596899224806,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.4522480620155039,
+            "lower_95": 0.4037209302325581,
+            "upper_95": 0.49751937984496125,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.5666666666666667,
+            "lower_95": 0.5193798449612403,
+            "upper_95": 0.611937984496124,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.043410852713178294,
+          "upper_95": -0.020310077519379844,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.03178294573643411
+        }
+      },
+      "acoustic": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.2427906976744186,
+            "lower_95": 0.20418604651162792,
+            "upper_95": 0.28310077519379845,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.48930232558139536,
+            "lower_95": 0.4418604651162791,
+            "upper_95": 0.535968992248062,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.6342635658914728,
+            "lower_95": 0.5885271317829457,
+            "upper_95": 0.6790697674418604,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.07612403100775193,
+          "upper_95": -0.02635658914728682,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.052248062015503874
+        }
+      },
+      "global_both": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.26930232558139533,
+            "lower_95": 0.22744186046511627,
+            "upper_95": 0.31131782945736436,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.4604651162790698,
+            "lower_95": 0.41255813953488374,
+            "upper_95": 0.5065116279069768,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.5730232558139535,
+            "lower_95": 0.524031007751938,
+            "upper_95": 0.6212403100775193,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.037209302325581395,
+          "upper_95": -0.013953488372093023,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": -0.02573643410852713
+        }
+      },
+      "patch_pyramid": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.3052713178294574,
+            "lower_95": 0.2589147286821705,
+            "upper_95": 0.35147286821705426,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.512093023255814,
+            "lower_95": 0.462015503875969,
+            "upper_95": 0.5607751937984496,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.6288372093023256,
+            "lower_95": 0.5806201550387597,
+            "upper_95": 0.6758139534883721,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": -0.011007751937984495,
+          "upper_95": 0.03193798449612403,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.010232558139534883
+        }
+      },
+      "cir_ast:official_clip": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.8094573643410853,
+            "lower_95": 0.7706976744186047,
+            "upper_95": 0.8443410852713178,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.9387596899224806,
+            "lower_95": 0.9184496124031007,
+            "upper_95": 0.9572093023255814,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.9685271317829457,
+            "lower_95": 0.9547286821705426,
+            "upper_95": 0.9803100775193798,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.47550387596899224,
+          "upper_95": 0.5545736434108527,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.5144186046511627
+        }
+      },
+      "clap_music:official_clip": {
+        "metrics": {
+          "recall_at_1": {
+            "metric": "recall_at_1",
+            "estimate": 0.5503875968992248,
+            "lower_95": 0.5015503875968992,
+            "upper_95": 0.5984496124031008,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_5": {
+            "metric": "recall_at_5",
+            "estimate": 0.757829457364341,
+            "lower_95": 0.7184496124031008,
+            "upper_95": 0.7936434108527132,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          },
+          "recall_at_10": {
+            "metric": "recall_at_10",
+            "estimate": 0.8367441860465116,
+            "lower_95": 0.8065116279069767,
+            "upper_95": 0.8652713178294573,
+            "performance_clusters": 50,
+            "family_clusters": 129,
+            "replicates": 2000,
+            "seed": 152
+          }
+        },
+        "paired_r1_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.2234108527131783,
+          "upper_95": 0.289922480620155,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.25534883720930235
+        }
+      }
+    }
+  },
+  "original_v7_replay_query_differences": {
+    "cross_midi_common_gallery": {
+      "recall_at_1": 0,
+      "recall_at_5": 0,
+      "recall_at_10": 0
+    },
+    "cross_midi_mixed_gallery": {
+      "recall_at_1": 0,
+      "recall_at_5": 0,
+      "recall_at_10": 0
+    }
+  },
+  "representations": {
+    "contrastive": [
+      "Contrastive projection",
+      128
+    ],
+    "control": [
+      "Control contrastive projection",
+      128
+    ],
+    "both_projections": [
+      "Both projections concatenated",
+      256
+    ],
+    "global_concat": [
+      "Global tokens concatenated",
+      1536
+    ],
+    "global_token_0": [
+      "Global token 1",
+      384
+    ],
+    "global_token_1": [
+      "Global token 2",
+      384
+    ],
+    "global_token_2": [
+      "Global token 3",
+      384
+    ],
+    "global_token_3": [
+      "Global token 4",
+      384
+    ],
+    "patch_mean": [
+      "Patch token mean",
+      384
+    ],
+    "global_mean": [
+      "Global token mean",
+      384
+    ],
+    "acoustic": [
+      "Acoustic descriptor predictions",
+      15
+    ],
+    "global_both": [
+      "Global tokens plus both projections",
+      1792
+    ],
+    "patch_pyramid": [
+      "Patch temporal pyramid",
+      6144
+    ],
+    "original_v7": [
+      "Original V7 pooling",
+      384
+    ]
+  },
+  "provenance": {
+    "checkpoint_sha256": "fdcc18186aae8a406e7d241f85308a9e0bda6f4cfa976ea49b6535e27d0eb788",
+    "checkpoint_revision": "e5ebdfb02dd107c15125b12c1bb4af03a7e31592",
+    "step": 16000,
+    "head_weight_shapes": {
+      "aux_projection.0.weight": [
+        384
+      ],
+      "aux_projection.1.weight": [
+        384,
+        384
+      ],
+      "aux_projection.3.weight": [
+        128,
+        384
+      ],
+      "category_head.weight": [
+        7,
+        384
+      ],
+      "recipe_group_head.weight": [
+        9,
+        384
+      ],
+      "recipe_delta_head.weight": [
+        2,
+        384
+      ],
+      "articulation_head.weight": [
+        8,
+        384
+      ],
+      "pitch_head.weight": [
+        1,
+        384
+      ],
+      "acoustic_feature_head.0.weight": [
+        384
+      ],
+      "acoustic_feature_head.1.weight": [
+        384,
+        384
+      ],
+      "acoustic_feature_head.3.weight": [
+        15,
+        384
+      ],
+      "acoustic_delta_head.0.weight": [
+        384
+      ],
+      "acoustic_delta_head.1.weight": [
+        384,
+        384
+      ],
+      "acoustic_delta_head.3.weight": [
+        15,
+        384
+      ],
+      "control_delta_projection.0.weight": [
+        384
+      ],
+      "control_delta_projection.1.weight": [
+        384,
+        384
+      ],
+      "control_delta_projection.3.weight": [
+        128,
+        384
+      ],
+      "control_id_head.weight": [
+        40,
+        128
+      ],
+      "control_sign_head.weight": [
+        2,
+        128
+      ],
+      "control_magnitude_head.weight": [
+        1,
+        128
+      ],
+      "control_effect_head.weight": [
+        15,
+        128
+      ]
+    },
+    "token_cache_id": "4fd187bb4f382beb7c326348b2e2971a2988e3999c4c3f0f207edf56864a6903",
+    "token_shape": [
+      260,
+      384
+    ],
+    "preprocessing": "stereo_polyphase_first_6s_right_zero_pad_mid_side_logmel_v1",
+    "pyramid_valid_time_steps": [
+      26,
+      32
+    ],
+    "token_device": "xpu",
+    "head_input": "final global mean plus final patch mean",
+    "head_activation": "GELU"
+  },
+  "diagnostic_only": [
+    "control",
+    "both_projections",
+    "global_both"
+  ],
+  "decision": "await candidate selection"
+}
