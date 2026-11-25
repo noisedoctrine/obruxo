@@ -44,6 +44,11 @@ class VitalJepaV7(nn.Module):
                                   f_min=features["f_min"], f_max=features["f_max"], n_mels=features["n_mels"])
 
     def forward(self, waveform):
+        tokens = self.encode_tokens(waveform)
+        global_count = self.global_tokens.shape[1]
+        return tokens[:, :global_count].mean(dim=1) + tokens[:, global_count:].mean(dim=1)
+
+    def encode_tokens(self, waveform):
         if waveform.ndim != 2 or waveform.shape[1] != 2:
             raise ValueError("Vital JEPA V7 expects a stereo waveform")
         waveform = waveform[:self.sample_count].T
@@ -52,6 +57,4 @@ class VitalJepaV7(nn.Module):
         mid_side = torch.stack((left + right, left - right)) / math.sqrt(2.0)
         mel = self.mel(mid_side)[..., :self.frames].clamp_min(self.log_epsilon).log()
         patches = self.patch_embed(mel.unsqueeze(0).to(self.pos_embed.device)).flatten(2).transpose(1, 2)
-        tokens = self.encoder(torch.cat((self.global_tokens, patches + self.pos_embed), dim=1))
-        global_count = self.global_tokens.shape[1]
-        return tokens[:, :global_count].mean(dim=1) + tokens[:, global_count:].mean(dim=1)
+        return self.encoder(torch.cat((self.global_tokens, patches + self.pos_embed), dim=1))

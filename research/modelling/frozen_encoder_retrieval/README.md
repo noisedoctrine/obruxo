@@ -226,3 +226,22 @@ $env:PYTHONPATH = "$base;research/data_generation;research/training"
 ```
 
 The run reads the accepted Issue #152 cohort, Issue #161 triplets, Issue #164 acoustic matrix contract and PR #160 resource sample. It writes the recovered audio and new evidence under `outputs/issue167-v7/` and uses `status.json` for progress. Open `show_issue167_progress.py` with the native Python for a monitor. The analysis CLI accepts `--wait-for-render` when a render worker is already running.
+
+## Issue #169 V7 representation sweep
+
+From the repository root, use the same frozen benchmark Python and retained Issue #167 run:
+
+```powershell
+& $bench -B -u "$base/run_issue169_tokens.py" --device xpu
+& $bench -B -u "$base/run_issue169_retrieval.py"
+```
+
+The token worker verifies the WAV hashes and reuses completed token shards under `outputs/issue169-v7-retrieval/`. The retrieval worker reads those shards and saves derived vectors and query ranks in the same output directory. The [retrieval report](reports/VITAL_JEPA_V7_REPRESENTATION_SWEEP.md) includes the plot, head input assumptions, and a link to the aggregate results. Review the retrieval results before selecting candidates for substitute scoring and sensitivity analysis.
+
+After selecting candidates, run the acoustic substitute and preset/MIDI sensitivity stage from the retained Issue #167 caches:
+
+```powershell
+& $bench -B -u "$base/run_issue169_stage2.py"
+```
+
+This stage reuses the 6,450 cached embeddings, 12 triplets, WAV receipts, and active-RMS acoustic matrices; it does not render audio or run encoder inference. Its [report](reports/VITAL_JEPA_V7_STAGE2.md) and machine-readable results are saved under `reports/`.

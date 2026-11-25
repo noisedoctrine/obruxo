@@ -1,0 +1,1401 @@
+{
+  "top_patch_indices": [
+    224,
+    192,
+    160,
+    128,
+    96,
+    64,
+    0,
+    32
+  ],
+  "results": {
+    "cross_midi_common_gallery": {
+      "mean_1": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.4865116279069767,
+          "lower_95": 0.41488372093023257,
+          "upper_95": 0.5556589147286821,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7097674418604651,
+          "lower_95": 0.6431007751937985,
+          "upper_95": 0.7736434108527132,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.7978294573643411,
+          "lower_95": 0.7410852713178294,
+          "upper_95": 0.8497674418604652,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.13984496124031007,
+          "upper_95": 0.25069767441860463,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.19550387596899224
+        }
+      },
+      "concat_1": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.4865116279069767,
+          "lower_95": 0.41488372093023257,
+          "upper_95": 0.5556589147286821,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7097674418604651,
+          "lower_95": 0.6431007751937985,
+          "upper_95": 0.7736434108527132,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.7978294573643411,
+          "lower_95": 0.7410852713178294,
+          "upper_95": 0.8497674418604652,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.13984496124031007,
+          "upper_95": 0.25069767441860463,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.19550387596899224
+        }
+      },
+      "mean_2": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5186046511627908,
+          "lower_95": 0.44372093023255815,
+          "upper_95": 0.5917829457364341,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7443410852713178,
+          "lower_95": 0.6787596899224806,
+          "upper_95": 0.8069767441860465,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8262015503875969,
+          "lower_95": 0.7714728682170543,
+          "upper_95": 0.8742635658914729,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.1710077519379845,
+          "upper_95": 0.2827906976744186,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.2275968992248062
+        }
+      },
+      "concat_2": {
+        "dimensions": 768,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5077519379844961,
+          "lower_95": 0.43348837209302327,
+          "upper_95": 0.5832558139534884,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7306976744186047,
+          "lower_95": 0.6638759689922481,
+          "upper_95": 0.7944186046511628,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8137984496124031,
+          "lower_95": 0.7565891472868217,
+          "upper_95": 0.8646511627906976,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.1586046511627907,
+          "upper_95": 0.27271317829457364,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.21674418604651163
+        }
+      },
+      "mean_3": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5342635658914728,
+          "lower_95": 0.4584496124031008,
+          "upper_95": 0.6093023255813953,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7576744186046511,
+          "lower_95": 0.6927131782945737,
+          "upper_95": 0.8189147286821705,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8415503875968993,
+          "lower_95": 0.7874418604651163,
+          "upper_95": 0.8889922480620155,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.18542635658914727,
+          "upper_95": 0.29891472868217056,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.24325581395348836
+        }
+      },
+      "concat_3": {
+        "dimensions": 1152,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.515968992248062,
+          "lower_95": 0.4407751937984496,
+          "upper_95": 0.5930232558139535,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7404651162790697,
+          "lower_95": 0.6736434108527132,
+          "upper_95": 0.8054263565891473,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8232558139534883,
+          "lower_95": 0.7665116279069767,
+          "upper_95": 0.8747286821705427,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.16682170542635658,
+          "upper_95": 0.28511627906976744,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.22496124031007753
+        }
+      },
+      "mean_4": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5477519379844962,
+          "lower_95": 0.4689922480620155,
+          "upper_95": 0.6231007751937985,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7711627906976745,
+          "lower_95": 0.7068217054263566,
+          "upper_95": 0.8303875968992248,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8510077519379845,
+          "lower_95": 0.7996899224806202,
+          "upper_95": 0.896124031007752,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.20108527131782947,
+          "upper_95": 0.3136434108527132,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.2567441860465116
+        }
+      },
+      "concat_4": {
+        "dimensions": 1536,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5254263565891473,
+          "lower_95": 0.4451162790697674,
+          "upper_95": 0.6043410852713178,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7489922480620155,
+          "lower_95": 0.6823255813953488,
+          "upper_95": 0.8136434108527132,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8265116279069767,
+          "lower_95": 0.769922480620155,
+          "upper_95": 0.8784496124031008,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.1745736434108527,
+          "upper_95": 0.29565891472868217,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.2344186046511628
+        }
+      },
+      "mean_5": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5541085271317829,
+          "lower_95": 0.47472868217054265,
+          "upper_95": 0.6308527131782946,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7781395348837209,
+          "lower_95": 0.7134883720930233,
+          "upper_95": 0.8382945736434109,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8556589147286822,
+          "lower_95": 0.806046511627907,
+          "upper_95": 0.9003100775193799,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.20775193798449612,
+          "upper_95": 0.31813953488372093,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.26310077519379843
+        }
+      },
+      "concat_5": {
+        "dimensions": 1920,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5308527131782945,
+          "lower_95": 0.4513178294573643,
+          "upper_95": 0.6105426356589148,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7567441860465116,
+          "lower_95": 0.6888372093023256,
+          "upper_95": 0.8204651162790698,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8320930232558139,
+          "lower_95": 0.7765891472868217,
+          "upper_95": 0.8831007751937985,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.177984496124031,
+          "upper_95": 0.30310077519379847,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.23984496124031007
+        }
+      },
+      "mean_6": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5596899224806201,
+          "lower_95": 0.4801550387596899,
+          "upper_95": 0.637829457364341,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7829457364341085,
+          "lower_95": 0.7195348837209302,
+          "upper_95": 0.8426356589147287,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8573643410852713,
+          "lower_95": 0.8082170542635659,
+          "upper_95": 0.9023255813953488,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.21488372093023256,
+          "upper_95": 0.32310077519379843,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.26868217054263566
+        }
+      },
+      "concat_6": {
+        "dimensions": 2304,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5378294573643411,
+          "lower_95": 0.457984496124031,
+          "upper_95": 0.6193798449612403,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7551937984496124,
+          "lower_95": 0.6862015503875969,
+          "upper_95": 0.8206201550387597,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.833953488372093,
+          "lower_95": 0.7784496124031007,
+          "upper_95": 0.8855813953488372,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.18744186046511627,
+          "upper_95": 0.3068217054263566,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.2468217054263566
+        }
+      },
+      "mean_7": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5654263565891473,
+          "lower_95": 0.4863565891472868,
+          "upper_95": 0.6438759689922481,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7937984496124031,
+          "lower_95": 0.7325581395348837,
+          "upper_95": 0.8503875968992248,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.862015503875969,
+          "lower_95": 0.8137984496124031,
+          "upper_95": 0.9057364341085271,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.22232558139534883,
+          "upper_95": 0.3268217054263566,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.2744186046511628
+        }
+      },
+      "concat_7": {
+        "dimensions": 2688,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5604651162790698,
+          "lower_95": 0.47767441860465115,
+          "upper_95": 0.6417054263565891,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7708527131782946,
+          "lower_95": 0.7052713178294574,
+          "upper_95": 0.8344186046511628,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8443410852713178,
+          "lower_95": 0.7913178294573643,
+          "upper_95": 0.8944186046511627,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.21007751937984495,
+          "upper_95": 0.3288372093023256,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.26945736434108525
+        }
+      },
+      "mean_8": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5649612403100776,
+          "lower_95": 0.4815503875968992,
+          "upper_95": 0.6435658914728682,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7933333333333333,
+          "lower_95": 0.7314728682170543,
+          "upper_95": 0.8486821705426356,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8606201550387597,
+          "lower_95": 0.8122480620155039,
+          "upper_95": 0.904031007751938,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.22108527131782946,
+          "upper_95": 0.32868217054263565,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.27395348837209305
+        }
+      },
+      "concat_8": {
+        "dimensions": 3072,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5551937984496124,
+          "lower_95": 0.47255813953488374,
+          "upper_95": 0.6361240310077519,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7691472868217054,
+          "lower_95": 0.7021705426356589,
+          "upper_95": 0.8330232558139535,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8441860465116279,
+          "lower_95": 0.7894573643410853,
+          "upper_95": 0.8937984496124031,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.204031007751938,
+          "upper_95": 0.3241860465116279,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.2641860465116279
+        }
+      }
+    },
+    "cross_midi_mixed_gallery": {
+      "mean_1": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.46124031007751937,
+          "lower_95": 0.4103875968992248,
+          "upper_95": 0.511937984496124,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.6893023255813954,
+          "lower_95": 0.6446511627906977,
+          "upper_95": 0.7305426356589148,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.7877519379844962,
+          "lower_95": 0.7513178294573644,
+          "upper_95": 0.8217054263565892,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.1268217054263566,
+          "upper_95": 0.20945736434108528,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.1662015503875969
+        }
+      },
+      "concat_1": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.46124031007751937,
+          "lower_95": 0.4103875968992248,
+          "upper_95": 0.511937984496124,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.6893023255813954,
+          "lower_95": 0.6446511627906977,
+          "upper_95": 0.7305426356589148,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.7877519379844962,
+          "lower_95": 0.7513178294573644,
+          "upper_95": 0.8217054263565892,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.1268217054263566,
+          "upper_95": 0.20945736434108528,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.1662015503875969
+        }
+      },
+      "mean_2": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.4978294573643411,
+          "lower_95": 0.4463565891472868,
+          "upper_95": 0.5469767441860465,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.722015503875969,
+          "lower_95": 0.68015503875969,
+          "upper_95": 0.7635658914728682,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8133333333333334,
+          "lower_95": 0.7772093023255814,
+          "upper_95": 0.846046511627907,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.1634108527131783,
+          "upper_95": 0.2454263565891473,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.2027906976744186
+        }
+      },
+      "concat_2": {
+        "dimensions": 768,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.4863565891472868,
+          "lower_95": 0.4345736434108527,
+          "upper_95": 0.537984496124031,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7055813953488372,
+          "lower_95": 0.6621705426356589,
+          "upper_95": 0.7469767441860465,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.7986046511627907,
+          "lower_95": 0.7609302325581395,
+          "upper_95": 0.8328682170542636,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.1510077519379845,
+          "upper_95": 0.23488372093023255,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.19131782945736434
+        }
+      },
+      "mean_3": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5069767441860465,
+          "lower_95": 0.45612403100775195,
+          "upper_95": 0.5568992248062016,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7448062015503876,
+          "lower_95": 0.7023255813953488,
+          "upper_95": 0.7851162790697674,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.830077519379845,
+          "lower_95": 0.7942635658914728,
+          "upper_95": 0.8615503875968992,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.17426356589147288,
+          "upper_95": 0.25209302325581395,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.21193798449612403
+        }
+      },
+      "concat_3": {
+        "dimensions": 1152,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.49224806201550386,
+          "lower_95": 0.44155038759689924,
+          "upper_95": 0.5454263565891473,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7258914728682171,
+          "lower_95": 0.682015503875969,
+          "upper_95": 0.7665116279069767,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8074418604651162,
+          "lower_95": 0.7696124031007752,
+          "upper_95": 0.8406201550387596,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.15813953488372093,
+          "upper_95": 0.23953488372093024,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.1972093023255814
+        }
+      },
+      "mean_4": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5190697674418605,
+          "lower_95": 0.46868217054263567,
+          "upper_95": 0.5697674418604651,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7584496124031008,
+          "lower_95": 0.7165891472868217,
+          "upper_95": 0.797984496124031,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8423255813953489,
+          "lower_95": 0.8071317829457364,
+          "upper_95": 0.8736434108527131,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.1868217054263566,
+          "upper_95": 0.26155038759689925,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.224031007751938
+        }
+      },
+      "concat_4": {
+        "dimensions": 1536,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.4987596899224806,
+          "lower_95": 0.4469767441860465,
+          "upper_95": 0.5514728682170542,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7291472868217054,
+          "lower_95": 0.6865116279069767,
+          "upper_95": 0.7682170542635659,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.812093023255814,
+          "lower_95": 0.7750387596899225,
+          "upper_95": 0.8454263565891473,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.16434108527131783,
+          "upper_95": 0.24713178294573643,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.20372093023255813
+        }
+      },
+      "mean_5": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5229457364341086,
+          "lower_95": 0.4724031007751938,
+          "upper_95": 0.5733333333333334,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7567441860465116,
+          "lower_95": 0.7142635658914729,
+          "upper_95": 0.7951937984496124,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8437209302325581,
+          "lower_95": 0.8072868217054263,
+          "upper_95": 0.8750387596899225,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.19224806201550387,
+          "upper_95": 0.26527131782945734,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.22790697674418606
+        }
+      },
+      "concat_5": {
+        "dimensions": 1920,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5097674418604651,
+          "lower_95": 0.4578294573643411,
+          "upper_95": 0.5612403100775194,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7274418604651163,
+          "lower_95": 0.6863565891472868,
+          "upper_95": 0.7666666666666667,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8134883720930233,
+          "lower_95": 0.776124031007752,
+          "upper_95": 0.8475968992248062,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.1745736434108527,
+          "upper_95": 0.25627906976744186,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.21472868217054264
+        }
+      },
+      "mean_6": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.529922480620155,
+          "lower_95": 0.4793798449612403,
+          "upper_95": 0.5804651162790697,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7584496124031008,
+          "lower_95": 0.7156589147286821,
+          "upper_95": 0.7978294573643411,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8466666666666667,
+          "lower_95": 0.8110077519379845,
+          "upper_95": 0.8776744186046511,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.19984496124031007,
+          "upper_95": 0.2713178294573643,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.23488372093023255
+        }
+      },
+      "concat_6": {
+        "dimensions": 2304,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5102325581395348,
+          "lower_95": 0.4573643410852713,
+          "upper_95": 0.5617054263565892,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7293023255813953,
+          "lower_95": 0.6872868217054263,
+          "upper_95": 0.7694573643410852,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8153488372093023,
+          "lower_95": 0.7782945736434108,
+          "upper_95": 0.8485271317829457,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.17348837209302326,
+          "upper_95": 0.2576744186046512,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.2151937984496124
+        }
+      },
+      "mean_7": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5308527131782945,
+          "lower_95": 0.477984496124031,
+          "upper_95": 0.58,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7624806201550388,
+          "lower_95": 0.7212403100775194,
+          "upper_95": 0.8015503875968992,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8531782945736434,
+          "lower_95": 0.8195348837209302,
+          "upper_95": 0.8837209302325582,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.2007751937984496,
+          "upper_95": 0.2722480620155039,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.23581395348837209
+        }
+      },
+      "concat_7": {
+        "dimensions": 2688,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5223255813953488,
+          "lower_95": 0.4691472868217054,
+          "upper_95": 0.5728682170542636,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7327131782945736,
+          "lower_95": 0.691937984496124,
+          "upper_95": 0.7725581395348837,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8204651162790698,
+          "lower_95": 0.7851162790697674,
+          "upper_95": 0.8528682170542635,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.18666666666666668,
+          "upper_95": 0.2663565891472868,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.22728682170542636
+        }
+      },
+      "mean_8": {
+        "dimensions": 384,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5302325581395348,
+          "lower_95": 0.4782945736434108,
+          "upper_95": 0.5790697674418605,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7593798449612403,
+          "lower_95": 0.717984496124031,
+          "upper_95": 0.7990697674418604,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8480620155038759,
+          "lower_95": 0.8136434108527132,
+          "upper_95": 0.8810852713178294,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.202015503875969,
+          "upper_95": 0.2689922480620155,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.2351937984496124
+        }
+      },
+      "concat_8": {
+        "dimensions": 3072,
+        "recall_at_1": {
+          "metric": "recall_at_1",
+          "estimate": 0.5217054263565891,
+          "lower_95": 0.468062015503876,
+          "upper_95": 0.5745736434108527,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_5": {
+          "metric": "recall_at_5",
+          "estimate": 0.7288372093023255,
+          "lower_95": 0.6871317829457364,
+          "upper_95": 0.7688372093023256,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "recall_at_10": {
+          "metric": "recall_at_10",
+          "estimate": 0.8181395348837209,
+          "lower_95": 0.7824806201550387,
+          "upper_95": 0.8516279069767442,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152
+        },
+        "r1_change_vs_original": {
+          "metric": "recall_at_1",
+          "lower_95": 0.18604651162790697,
+          "upper_95": 0.26744186046511625,
+          "performance_clusters": 50,
+          "family_clusters": 129,
+          "replicates": 2000,
+          "seed": 152,
+          "difference": 0.22666666666666666
+        }
+      }
+    }
+  },
+  "selection_metric": "common-gallery individual-token Recall@1",
+  "selection_cohort": "same 6,450 Issue 167 episodes",
+  "pooling": "arithmetic mean",
+  "dimensions": {
+    "mean": 384,
+    "concat_per_token": 384
+  }
+}

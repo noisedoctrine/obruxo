@@ -1,0 +1,18 @@
+﻿rank,name,dimensions,r1,r1_percent,group,selection
+1,CIR,768,0.8102325581395349,81.023,External baseline,Previously evaluated baseline
+2,CLAP,512,0.594108527131783,59.411,External baseline,Previously evaluated baseline
+3,"Top 7 tokens, mean",384,0.5654263565891473,56.543,Top-N mean,Highest full-cohort common-gallery Recall@1 among all tested top-N variants
+4,Contrastive projection,128,0.3801550387596899,38.016,V7 fixed,Representation fixed before scoring
+5,Patch token mean,384,0.3241860465116279,32.419,V7 fixed,Representation fixed before scoring
+6,Patch temporal pyramid,6144,0.3130232558139535,31.302,V7 fixed,Representation fixed before scoring
+7,Both projections concatenated,256,0.3085271317829457,30.853,V7 fixed,Representation fixed before scoring
+8,Original V7 pooling,384,0.2910077519379845,29.101,V7 fixed,Representation fixed before scoring
+9,Global tokens plus both projections,1792,0.2606201550387597,26.062,V7 fixed,Representation fixed before scoring
+10,Global token 1,384,0.25922480620155036,25.922,Global token,Individual token
+11,Global token 3,384,0.25488372093023254,25.488,Global token,Individual token
+12,Global token mean,384,0.25069767441860463,25.07,V7 fixed,Representation fixed before scoring
+13,Global tokens concatenated,1536,0.24930232558139534,24.93,V7 fixed,Representation fixed before scoring
+14,Global token 2,384,0.23348837209302326,23.349,Global token,Individual token
+15,Acoustic descriptor predictions,15,0.2262015503875969,22.62,V7 fixed,Representation fixed before scoring
+16,Global token 4,384,0.204031007751938,20.403,Global token,Individual token
+17,Control contrastive projection,128,0.20217054263565892,20.217,V7 fixed,Representation fixed before scoring
