@@ -20,7 +20,7 @@ The balanced three-sound fit from [PR 139](https://github.com/noisedoctrine/obru
 
 ## Keep the prediction task small
 
-Use the current one-oscillator basic codec, stage defaults and valid native ranges:
+The implemented 14-output Stage A baseline uses the one-oscillator basic codec, stage defaults and valid native ranges.
 
 | Component | Predictions | Dense values |
 |---|---|---:|
@@ -32,6 +32,8 @@ Use the current one-oscillator basic codec, stage defaults and valid native rang
 | **Total** | **9 continuous values and 2 categorical choices** | **14** |
 
 Production argmax reduces the five category scores to two selections: **11 predicted values enter the codec**. The codec supplies the rest of the patch from its fixed template. The original compact predictor has 355,806 weights; the current correction model has 613,788 total, with 257,982 trainable. These are implemented architectures, not a prescribed final model size. Imported Basic Pitch weights and running statistics stay frozen; the trainable timbre encoder/adapters remain separate.
+
+The proposed basic head follows the [decoder control representation](MODEL_ARCHITECTURE.md#control-output-representation) and emits **13 dense outputs for the same 11 controls**. The outputs are nine continuous values, three unison logits, and one filter-enable logit.
 
 There are no predicted LFOs, routing slots, mapping curves, custom oscillator curves or random-seed bits in this stage. Comprehensive preset support remains available infrastructure. Do not silently simplify a complex source label while training against audio outside the basic vocabulary. Keep waveform/stack/warp defaults fixed. For later three-oscillator designs, level/pan/detune would require nine values, not three; semitone transpose should use one bounded scalar per oscillator with declared export rounding. Every expansion needs an exact named output inventory before implementation.
 

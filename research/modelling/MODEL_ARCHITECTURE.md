@@ -99,6 +99,16 @@ Related reading: arXiv 2509.07635, Combes et al., Sept 2025
 
 The decoder maps `<patch_latent>` to a `.vital` patch.
 
+### Control output representation
+
+| Control type | Dense outputs | Decode to a Vital value |
+|---|---:|---|
+| Continuous | One scalar | Map it to the control's declared legal range. |
+| Exactly two legal states | One logit | Select the second state if the logit is above zero. Otherwise select the first. |
+| Three or more legal states | One logit per state | Select the state with the highest logit. |
+
+For supervised training, use binary cross-entropy with logits for two-state controls and categorical cross-entropy for controls with three or more states. The codec defines the order of legal states and supplies fixed controls from the patch template.
+
 ### The core problem
 
 The mapping from patch to audio is many-to-one — two different `.vital` patches can
