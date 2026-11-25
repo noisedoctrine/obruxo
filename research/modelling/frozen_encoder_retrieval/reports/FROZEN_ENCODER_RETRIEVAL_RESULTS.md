@@ -2,11 +2,19 @@
 
 **Quick overview:** [Visual summary of the key tradeoffs](FROZEN_ENCODER_VISUAL_SUMMARY.md). The detailed results and protocols remain below.
 
-Issues: [#152](https://github.com/noisedoctrine/obruxo/issues/152) baseline and [#155](https://github.com/noisedoctrine/obruxo/issues/155) follow-up. This report compares frozen pretrained representations on Vital presets and existing MIDI performances. No synthesis controls are predicted, tuned, or optimized. For frozen representation-only analyses, no Vital controls are predicted or edited; the original source settings remain unchanged ([canonical frozen-control inventory](vital_control_inventory.jsonl)).
+Issues: [#152](https://github.com/noisedoctrine/obruxo/issues/152) baseline, [#155](https://github.com/noisedoctrine/obruxo/issues/155) gallery comparisons, [#157](https://github.com/noisedoctrine/obruxo/issues/157) sensitivity, [#161](https://github.com/noisedoctrine/obruxo/issues/161) substitute retrieval, and [#164](https://github.com/noisedoctrine/obruxo/issues/164) active-RMS re-evaluation. This report compares frozen pretrained representations on Vital presets and existing MIDI performances. No synthesis controls are predicted, tuned, or optimized. For frozen representation-only analyses, no Vital controls are predicted or edited; the original source settings remain unchanged ([canonical frozen-control inventory](vital_control_inventory.jsonl)).
 
 ## Results and recommendation
 
 [Issue #167 compares Vital JEPA V7 with CIR and CLAP](VITAL_JEPA_V7_COMPARISON.md).
+
+**Decision: carry CIR forward as the primary frozen encoder and CLAP as the second choice for OBRUXO's patch-reconstruction experiments.** CIR leads exact-preset retrieval (81.4% Recall@1 versus 58.9% for CLAP on the original recordings) and selects competitive substitute sounds once candidate gain is matched (active-RMS-matched MR-STFT: 3.398 for CIR versus 3.656 for CLAP; lower is better). CIR also retains its recognition lead after input normalization (77.7% versus 55.6%). CLAP is the faster alternative. The other five encoder families remain useful benchmark references, but do not warrant further work in the main reconstruction track on the evidence available.
+
+**This is a development priority, not strict dominance on every metric.** DAC temporal has a slightly lower active-RMS-matched substitute-error point estimate than CIR (3.375 versus 3.398), but much weaker exact-preset recall (30.7%). BEATs temporal slightly exceeds CLAP's original-input recall (62.2% versus 58.9%), without displacing CLAP on the combined accuracy, acoustic and inference-cost tradeoff. The substitute-error differences are exploratory and do not establish a statistically certain winner. CLAP's earlier lead in *original-level* substitute error disappears once candidate gain is matched.
+
+**Input normalization is not the default recommendation.** Active-RMS normalization nearly eliminates retrieval changes under controlled ±6 dB input-gain shifts, but decreases exact-preset recall across all eleven representations and does not demonstrate better gain-matched substitute selection. Keep the original-input pipeline as the reference; treat normalization as an optional ablation. Scoring-time candidate gain matching is separate from encoder-input normalization. Next, compare CIR and CLAP on actual Vital patch reconstruction and listening tests; retrieval metrics alone cannot establish reconstruction quality.
+
+Issue #167 found V7's exact-preset Recall@1 was 29.1%, below CIR (81.0%) and CLAP (59.4%). Its active-RMS-matched substitute error was also higher: 3.727 versus 3.403 for CIR and 3.650 for CLAP. The recommendation is to defer V7; see the linked comparison for uncertainty and training-data limits.
 
 <!-- issue164-active-rms-results:start -->
 ### Issue #164 — Padding-invariant active-RMS re-evaluation
@@ -66,6 +74,7 @@ The Numba implementation is O(N), padding invariant, and was benchmarked after c
 
 <!-- issue164-active-rms-results:end -->
 
+**Historical context:** The #161 results below preserve the original recording-level substitute ranking. For the current encoder choice, use the #164 active-RMS-matched comparison above.
 
 <!-- issue161-audible-substitute-results:start -->
 ### Issue #161 — Three-MIDI audible-substitute retrieval
