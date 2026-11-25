@@ -244,7 +244,11 @@ def publish(result):
                     fontsize=9, color=palette[arm])
     ax.set(title="Exact retrieval vs. acoustic substitute score",
            xlabel="Common-gallery Recall@1 (%)", ylabel="Active-RMS-matched MR-STFT error\n(lower is better)")
+    ax.invert_yaxis()
     ax.grid(axis="both", color="#dddddd", linewidth=0.7, zorder=0)
+    ax.annotate("Better", xy=(0.95, 0.96), xytext=(0.78, 0.82), xycoords="axes fraction",
+                textcoords="axes fraction", ha="center", va="center",
+                arrowprops={"arrowstyle": "->", "color": "#333333", "lw": 1.5}, color="#333333")
     fig.savefig(scatter, dpi=180, bbox_inches="tight")
     plt.close(fig)
 
@@ -260,7 +264,7 @@ def publish(result):
                      f"{error['mean']:.3f} [{lo:.3f}, {hi:.3f}] | {acoustic['arms'][arm]['rank']['mean']:.1f} |")
     lines += ["", f"Best available substitute: {acoustic['oracle']['mean']:.3f}. Fixed random choice: {acoustic['random']['mean']:.3f}.", "",
               "![Retrieval and substitute results](figures/issue169_v7_stage2.png)", "",
-              "The scatter plot compares common-gallery Recall@1 with mean substitute error; lower error and higher Recall@1 are better. Vertical bars show the clustered 95% interval for substitute error.", "",
+              "The scatter plot compares common-gallery Recall@1 with mean substitute error. The MR-STFT axis is reversed so that higher Recall@1 and lower error both point toward the top right. Vertical bars show the clustered 95% interval for substitute error.", "",
               "![Recall@1 versus MR-STFT scatter plot](figures/issue169_v7_r1_vs_mrstft.png)", "",
               "## Paired substitute differences", "",
               "Negative error difference means the first representation selected a closer-sounding substitute than the comparator.", "",
