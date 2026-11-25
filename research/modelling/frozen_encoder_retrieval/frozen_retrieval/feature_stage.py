@@ -13,7 +13,7 @@ from .dataset import validate_dataset_manifests
 
 
 def extract_dataset(dataset_dir: Path, model_name: str, checkpoint_root: Path, lock_path: Path, *, device: str = "cpu",
-                    active_rms_target: float | None = None) -> dict:
+                    active_rms_target: float | None = None, progress=None) -> dict:
     dataset_dir = dataset_dir.resolve(strict=True)
     dataset_summary = json.loads((dataset_dir / "dataset_summary.private.json").read_text(encoding="utf-8"))
     validate_dataset_manifests(dataset_dir, dataset_summary)
@@ -82,6 +82,8 @@ def extract_dataset(dataset_dir: Path, model_name: str, checkpoint_root: Path, l
             failure_rows.append({"request_id": request_id, "state_id": plan_row["state_id"],
                                  "failure_type": type(error).__name__, "failure_message": str(error)[:240]})
             counts["feature_failures"] += 1
+            if progress and (completed % 32 == 0 or completed == len(receipts)):
+                progress(completed, len(failure_rows))
             continue
         feature_metadata = json.loads((output_dir / f"{feature['feature_id']}.json").read_text(encoding="utf-8"))
         records[request_id] = {"request_id": request_id, "state_id": plan_row["state_id"],
@@ -93,6 +95,8 @@ def extract_dataset(dataset_dir: Path, model_name: str, checkpoint_root: Path, l
                                **({"normalization": feature_metadata["normalization"]}
                                   if active_rms_target is not None else {})}
         counts["features_reused" if feature["reused"] else "features_created"] += 1
+        if progress and (completed % 32 == 0 or completed == len(receipts)):
+            progress(completed, len(failure_rows))
         if active_rms_target is not None and (completed % 500 == 0 or completed == len(receipts)):
             print(f"{model_name}: completed {completed:,}/{len(receipts):,} active-RMS features.", flush=True)
         current_rss = _rss_bytes()
@@ -123,6 +127,10 @@ def extract_dataset(dataset_dir: Path, model_name: str, checkpoint_root: Path, l
                                  "stereo mean to mono; scipy polyphase resample; no loudness normalization"),
                "pooling": "official native clip embedding" if len(records) and model_name in {"clap_music", "muq_mulan", "cir_ast"}
                else "valid sequence frames: masked mean and 8 ordered bins of mean plus standard deviation"}
+    if model_name == "vital_jepa_v7":
+        from .vital_jepa_v7 import POOLING, PREPROCESSING
+
+        summary.update(preprocessing=PREPROCESSING, pooling=POOLING)
     if active_rms_target is not None:
         from .normalization import ACTIVE_FLOOR_DB, NORMALIZATION_VERSION, WINDOW_SECONDS
 

@@ -49,6 +49,12 @@ MODEL_REGISTRY = {
                    "repository_id": "descript/dac_44khz",
                    "tap": "continuous encoder output before RVQ",
                    "license": "MIT (upstream release)"},
+    "vital_jepa_v7": {"name": "Vital JEPA V7", "sample_rate": 22_050, "kind": "clip", "dimension": 384,
+                      "checkpoint": "duckking032/vital-jepa-v7/checkpoints/jepa_v7/selected.pt",
+                      "source": "https://huggingface.co/duckking032/vital-jepa-v7", "repository_id": "duckking032/vital-jepa-v7",
+                      "loader_revision": "obruxo_vital_jepa_v7_v1",
+                      "expected_sha256": "fdcc18186aae8a406e7d241f85308a9e0bda6f4cfa976ea49b6535e27d0eb788",
+                      "tap": "online encoder, residual mean of global and patch tokens", "license": "Apache-2.0"},
 }
 
 

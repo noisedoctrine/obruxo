@@ -383,7 +383,7 @@ def active_rms_matched_mrstft_matrix(audio_rows: list[np.ndarray], active_rms_va
     return scores.astype(np.float32), contract
 
 
-def retrieve_alternatives(cache_audit: dict, triplets: dict) -> dict:
+def retrieve_alternatives(cache_audit: dict, triplets: dict, *, variants_by_model=None) -> dict:
     """Rank all common 128-preset alternative pools using only MIDI 1/2 cached embeddings."""
     preset_ids = cache_audit["preset_ids"]
     family_by_state = cache_audit["family_by_state"]
@@ -391,8 +391,8 @@ def retrieve_alternatives(cache_audit: dict, triplets: dict) -> dict:
     midi_lookup = {value: index for index, value in enumerate(midi_ids)}
     state_lookup = {value: index for index, value in enumerate(preset_ids)}
     choices = {}
-    for model_name in MODEL_ORDER:
-        variants = EXPECTED_VARIANTS[model_name]
+    variants_by_model = variants_by_model or {model: EXPECTED_VARIANTS[model] for model in MODEL_ORDER}
+    for model_name, variants in variants_by_model.items():
         dimensions = cache_audit["model_caches"][model_name]["dimensions_by_variant"]
         grids = {variant: np.empty((len(preset_ids), len(midi_ids), dimensions[variant]), dtype=np.float32)
                  for variant in variants}

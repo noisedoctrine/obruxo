@@ -175,6 +175,8 @@ def _forward_target(adapter):
         return adapter.model, "forward", "MuQ audio forward (includes model-native frontend)"
     if adapter.name == "cir_ast":
         return adapter.model, "compute_audio_embeddings", "official embedding wrapper (includes its input preparation)"
+    if adapter.name == "vital_jepa_v7":
+        return adapter.model, "forward", "local embedding wrapper (includes its log-mel frontend)"
     return adapter.model.encoder, "forward", "continuous codec encoder forward"
 
 
@@ -397,6 +399,8 @@ def _run_parent(args) -> int:
     model_results = {}
     worker_dir = output / "workers"
     for model_name in MODEL_REGISTRY:
+        if model_name not in COMMON_GALLERY_RECALL:
+            continue
         raw_path = worker_dir / f"{model_name}.private.json"
         log_path = worker_dir / f"{model_name}.private.log"
         reused = _reuse_completed_worker(raw_path, model_name, expected_ids, lock["models"][model_name])

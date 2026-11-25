@@ -33,7 +33,7 @@ def _receipt_matches_cached_audio(receipt: dict | None, *, request_id: str, plan
                 and provenance.get("renderer_id") == renderer_id)
 
 
-def _plan_batches(plan_path: Path, performances_path: Path, source_root: Path, batch_size: int):
+def _plan_batches(plan_path: Path, performances_path: Path, source_root: Path, batch_size: int, *, request_ids=None):
     from obruxo_data.midi import Performance
     from obruxo_data.render.base import RenderRequest
     from obruxo_training.identity import PresetIdentity
@@ -52,6 +52,8 @@ def _plan_batches(plan_path: Path, performances_path: Path, source_root: Path, b
             if not line.strip():
                 continue
             row = json.loads(line)
+            if request_ids is not None and row["request_id"] not in request_ids:
+                continue
             state_id = row["state_id"]
             if state_id not in raw_by_state:
                 source = _safe_source(source_root, row["preset_relative_path"])
@@ -122,7 +124,8 @@ def _accepted(metadata: dict) -> tuple[bool, str]:
 
 
 def render_dataset(dataset_dir: Path, renderer_config: Path, *, plugin_path: Path | None = None,
-                   batch_size: int = 32, queue_depth: int = 2) -> dict:
+                   batch_size: int = 32, queue_depth: int = 2, request_ids: set[str] | None = None,
+                   progress=None, receipt_path: Path | None = None) -> dict:
     """Run the durable manifest through a bounded producer/serial Vital consumer."""
     from obruxo_data.render.batch import run_batch, _is_complete
     from obruxo_data.render.base import FULL_CORPUS_RENDERER_ID
@@ -143,7 +146,7 @@ def render_dataset(dataset_dir: Path, renderer_config: Path, *, plugin_path: Pat
         raise ValueError("renderer identity/worker count differs from the frozen manifest")
     render_root = dataset_dir / "renders" / RENDER_POLICY_ID
     render_root.mkdir(parents=True, exist_ok=True)
-    journal = dataset_dir / "render_receipts.private.jsonl"
+    journal = receipt_path or dataset_dir / "render_receipts.private.jsonl"
     previous = {}
     if journal.is_file():
         for line in journal.read_text(encoding="utf-8").splitlines():
@@ -156,7 +159,7 @@ def render_dataset(dataset_dir: Path, renderer_config: Path, *, plugin_path: Pat
     def produce():
         try:
             for batch in _plan_batches(plan_path, dataset_dir / "performances.private.jsonl",
-                                       Path(summary["source_root"]), batch_size):
+                                       Path(summary["source_root"]), batch_size, request_ids=request_ids):
                 work.put(batch)
         except BaseException as error:
             worker_error.append(error)
@@ -173,6 +176,8 @@ def render_dataset(dataset_dir: Path, renderer_config: Path, *, plugin_path: Pat
             item = work.get()
             if item is None:
                 break
+            if progress:
+                progress(len(timings), sum(count for status, count in counts.items() if not status.startswith("accepted")))
             rows, requests = item
             for row in rows:
                 plan_identity = render_plan_identity(row)
@@ -240,7 +245,8 @@ def render_dataset(dataset_dir: Path, renderer_config: Path, *, plugin_path: Pat
     producer.join()
     latest = {"render_policy_id": RENDER_POLICY_ID, "renderer_id": renderer.renderer_id,
               "qa_policy_id": QA_POLICY_ID,
-              "requested": summary["render_requests"], "accepted": sum(1 for row in previous.values() if row.get("accepted")),
+              "requested": len(request_ids) if request_ids is not None else summary["render_requests"],
+              "accepted": sum(1 for row in previous.values() if row.get("accepted")),
               "excluded": dict(sorted(Counter(row["qa_status"] for row in previous.values() if not row.get("accepted")).items())),
               "qa_warning_counts": dict(sorted(Counter(warning for row in previous.values() if row.get("accepted")
                                                        for warning in row.get("qa_warnings", [])).items())),
@@ -248,7 +254,10 @@ def render_dataset(dataset_dir: Path, renderer_config: Path, *, plugin_path: Pat
               "wall_seconds_this_run": round(sum(timings), 3), "request_count_this_run": len(timings),
               "batch_size": batch_size, "bounded_queue_depth": queue_depth,
               "renderer_workers": 1, "device": "CPU, verified Vital/DawDreamer", "process_rss_peak_bytes": peak_rss}
-    (dataset_dir / "render_run.latest.json").write_text(json.dumps(latest, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+    if progress:
+        progress(len(timings), sum(count for status, count in counts.items() if not status.startswith("accepted")))
+    summary_path = receipt_path.with_suffix(".summary.json") if receipt_path else dataset_dir / "render_run.latest.json"
+    summary_path.write_text(json.dumps(latest, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     return latest
 
 

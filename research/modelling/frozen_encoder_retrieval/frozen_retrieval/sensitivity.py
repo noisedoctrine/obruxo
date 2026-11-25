@@ -629,7 +629,8 @@ def summarize_arm(unit_grid, *, chunk_preset_pairs: int = 64, temp_dir: Path, bo
 
 
 def analyze_cache(cache_audit: dict, *, device_name: str = "cpu", bootstrap_replicates: int = 1_000,
-                  bootstrap_combinations: int = 32_768, chunk_preset_pairs: int = 64, progress=None) -> dict:
+                  bootstrap_combinations: int = 32_768, chunk_preset_pairs: int = 64, progress=None,
+                  variants_by_model=None) -> dict:
     import torch
 
     if bootstrap_replicates < 100 or bootstrap_combinations < 1_024:
@@ -651,10 +652,11 @@ def analyze_cache(cache_audit: dict, *, device_name: str = "cpu", bootstrap_repl
     started = time.perf_counter()
     arm_results = {}
     arm_bootstrap = {}
+    variants_by_model = variants_by_model or {model: EXPECTED_VARIANTS[model] for model in MODEL_ORDER}
     with tempfile.TemporaryDirectory(prefix="obruxo-issue157-") as temporary:
         temp_dir = Path(temporary)
-        for model_name in MODEL_ORDER:
-            for variant in EXPECTED_VARIANTS[model_name]:
+        for model_name, variants in variants_by_model.items():
+            for variant in variants:
                 arm = f"{model_name}:{variant}"
                 unit_grid, vector_checks = load_embedding_grid(cache_audit, model_name, variant, device=device)
                 point, bootstrap = summarize_arm(unit_grid, temp_dir=temp_dir, bootstrap_replicates=bootstrap_replicates,
@@ -695,13 +697,13 @@ def analyze_cache(cache_audit: dict, *, device_name: str = "cpu", bootstrap_repl
                        "source_preset_split": cache_audit["source_split"], "performance_source_split": cache_audit["performance_source_split"],
                        "reserved_split_access": cache_audit["reserved_split_access"],
                        "unordered_2x2_combinations": 10_113_600, "anchored_observations_per_arm": 40_454_400},
-            "cache_validation": {"encoder_families": len(MODEL_ORDER), "representation_arms": len(cache_audit["expected_arms"]),
+            "cache_validation": {"encoder_families": len(variants_by_model), "representation_arms": len(cache_audit["expected_arms"]),
                                  "cache_entries_per_family": cache_audit["cache_entry_counts"],
                                  "verified_common_cells_per_arm": cache_audit["common_cells"],
                                  "all_arms_share_identical_render_matrix": True,
                                  "checkpoint_provenance": {model: {key: value for key, value in cache_audit["model_caches"][model].items()
                                                                     if key not in {"directory", "rows_by_request"}}
-                                                              for model in MODEL_ORDER}},
+                                                              for model in variants_by_model}},
             "statistics": {"bootstrap_method": "crossed preset-family × MIDI-performance cluster bootstrap; anchored distance pairs use distinct original identities sampled in proportion to bootstrap multiplicity products; variance shares use the full crossed resampled grid; identical cluster draws and sampled pair positions across arms",
                            "bootstrap_seed": BOOTSTRAP_SEED, "bootstrap_replicates": bootstrap_replicates,
                            "sampled_unordered_2x2_combinations_per_bootstrap_replicate": bootstrap_combinations,
