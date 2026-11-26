@@ -1,5 +1,7 @@
 # Training contracts, online pilot and trainer
 
+The [two-stage Vital surrogate pilot](reports/VITAL_SURROGATE_PILOT_RESULTS.md) compares a Transformer, Conformer, and conditioned residual MLP on 256 basic and 512 combined training patch roots. The residual MLP is the starting backbone for the expanded codec in milestone 2.
+
 The active work follows the [spectral reconstruction plan](../modelling/TRAINING_PLAN.md) and [basic-stage protocol](STAGED_RECONSTRUCTION.md): qualify useful sound-loss gradients, then train the audio-to-patch predictor on spectral loss before expanding capabilities. Stage A retains nine continuous controls and two categorical choices, totaling 14 dense outputs. Parameter matching is an initialization/auxiliary signal. Broad codec support does not determine the prediction head.
 
 The [fresh local runtime check](reports/CLEAN_BASIC_RUNTIME_RESULTS.md) now reproduces six audited presets after installing 36 hash-pinned dependencies in a new Windows environment. It closes the tested dependency-isolation requirement; reconstruction admission and listening remain open.
