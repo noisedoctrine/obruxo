@@ -1,0 +1,22 @@
+{
+  "format": "issue173_surrogate_model_selection_runtime_v1",
+  "plan_id": "a36b7a2eeef4d9da1272e4246e2982347e20097dfed3adb0f2ac96019a38c4cf",
+  "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:36:12) [MSC v.1944 64 bit (AMD64)]",
+  "interpreter": "C:\\Users\\angert\\miniforge3\\envs\\py312\\python.exe",
+  "numpy": "2.4.6",
+  "scipy": "1.18.0",
+  "torch": "2.12.1+xpu",
+  "dawdreamer": "0.8.3",
+  "vita": "0.1.0",
+  "vita_distribution": "PyPI 0.1.0 CPython 3.12 Windows wheel; the environment.yml Git source could not be built because no C++ toolchain was installed",
+  "vita_module_path": "C:\\Users\\angert\\miniforge3\\envs\\obruxo-data-generation\\Lib\\site-packages\\vita\\__init__.py",
+  "vita_module_sha256": "443f7b027be7649dc877940797198f935669cf3e5fe4916c508e25176b77a352",
+  "vital_vst3_path": "C:\\Program Files\\Common Files\\VST3\\Vital.vst3",
+  "vital_vst3_sha256": "a622a2c99b4066cd7945a4ab9bbdd698e7632a30702f6f0a7ccbf26a56b576e1",
+  "render_backend": "DawDreamer 0.8.3 + Vital VST3 1.6.4",
+  "device": "xpu",
+  "training_seed": 174,
+  "final_midi_seed": 175,
+  "validation_midi_seed": 176,
+  "steps_per_model": 4000
+}
