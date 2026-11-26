@@ -99,8 +99,8 @@ def native_session(output, codec, workers):
         worker.close()
 
 
-def collect(output, rows, render, progress):
-    directory = output / "pairs"
+def collect(output, rows, render, progress, *, pair_dir=None):
+    directory = Path(pair_dir) if pair_dir is not None else output / "pairs"
     directory.mkdir(exist_ok=True)
     measured = SpectralTargets()
     existing = {path.stem for path in directory.glob("*.pt")}
@@ -159,6 +159,38 @@ def finish_model(model):
     return model
 
 
+@torch.no_grad()
+def validation_metrics(model, codec, rows, pair_directory, device):
+    absolute_total = response_total = 0.
+    record_count = pair_count = 0
+    for start in range(0, len(rows), 8):
+        selected = rows[start:start + 8]
+        records = [record for row in selected for record in torch.load(
+            Path(pair_directory) / (row["pair_id"] + ".pt"), map_location="cpu", weights_only=True)["records"]]
+        measurements, times = collate_frames(records)
+        measurements = {key: tuple(item.to(device) for item in value) if isinstance(value, tuple) else value.to(device)
+                        for key, value in measurements.items()}
+        times = tuple(value.to(device) for value in times)
+        targets = [PilotTarget.from_dict(record["target"]) for record in records]
+        if codec.expanded:
+            targets = [codec.from_basic(target) if len(target.continuous) == 9 else target for target in targets]
+        controls = control_tensor(codec, targets, device)
+        played = torch.stack([record["performance"] for record in records]).to(device)
+        prediction = model(controls, played, times, measurements["lengths"])
+        absolute = spectral_loss(prediction, measurements)["loss"]
+        response = paired_change_loss(prediction, measurements)
+        absolute_total += float(absolute.sum())
+        response_total += float(response.sum())
+        record_count += len(records)
+        pair_count += len(response)
+    if record_count == 0 or pair_count == 0:
+        raise ValueError("validation set must contain accepted paired renders")
+    spectral = absolute_total / record_count
+    change = response_total / pair_count
+    return {"spectral_envelope_error": spectral, "control_change_error": change,
+            "loss": spectral + .25 * change, "clips": record_count, "pairs": pair_count}
+
+
 def widen_model(model, parent):
     original = dict(parent)
     first = original.pop("input.weight")
@@ -173,31 +205,46 @@ def widen_model(model, parent):
         weight[:, 33:] = first[:, 13:]
 
 
-def fit(output, label, backbone, codec, rows, *, steps, plan_id, device, progress):
-    torch.manual_seed(172)
+def fit(output, label, backbone, codec, rows, *, steps, plan_id, device, progress, seed=172, warm_start=True,
+        pairs_dir=None, validation_rows=None, validation_pairs_dir=None, validation_every=100):
+    torch.manual_seed(seed)
     model = VitalSurrogate(backbone, codec.width).to(device)
     checkpoint = output / f"{label}-{backbone}.pt"
     optimizer = torch.optim.AdamW(model.parameters(), lr=.001)
     step, trace, elapsed, cursor = 0, [], 0., 0
-    shuffle = torch.Generator().manual_seed(172)
+    training_window = []
+    shuffle = torch.Generator().manual_seed(seed)
     order = torch.randperm(len(rows), generator=shuffle).tolist()
     if checkpoint.exists():
         saved = torch.load(checkpoint, map_location="cpu", weights_only=True)
-        if saved["plan_id"] != plan_id or saved["stage"] != label or saved["backbone"] != backbone:
+        if (saved["plan_id"] != plan_id or saved["stage"] != label or saved["backbone"] != backbone
+                or saved.get("seed", 172) != seed):
             raise ValueError("checkpoint does not belong to this run")
         model.load_state_dict(saved["model"])
         optimizer.load_state_dict(saved["optimizer"])
         step, trace, elapsed, cursor, order = (saved[name] for name in ("step", "trace", "elapsed", "cursor", "order"))
+        training_window = saved.get("training_window", [])
         shuffle.set_state(saved["shuffle"])
-    elif codec.expanded:
+    elif codec.expanded and warm_start:
         parent = torch.load(output / f"basic-{backbone}.pt", map_location="cpu", weights_only=True)
         if parent["step"] != steps or parent["plan_id"] != plan_id:
             raise ValueError("incomplete or incompatible basic parent")
         widen_model(model, parent["model"])
 
+    pair_directory = Path(pairs_dir) if pairs_dir is not None else output / "pairs"
+    validation_directory = Path(validation_pairs_dir) if validation_pairs_dir is not None else output / "validation-pairs"
+
+    if validation_rows is not None and step == 0:
+        model.eval()
+        initial_validation = validation_metrics(model, codec, validation_rows, validation_directory, device)
+        trace.append({"step": 0, "train_loss": None, "train_spectral_envelope_error": None,
+                      "train_control_change_error": None,
+                      **{f"validation_{key}": value for key, value in initial_validation.items()}})
+        model.train()
+
     @lru_cache(maxsize=256)
     def load(pair_id):
-        return torch.load(output / "pairs" / (pair_id + ".pt"), map_location="cpu", weights_only=True)["records"]
+        return torch.load(pair_directory / (pair_id + ".pt"), map_location="cpu", weights_only=True)["records"]
 
     started = perf_counter()
     for step_number in range(step + 1, steps + 1):
@@ -222,13 +269,25 @@ def fit(output, label, backbone, codec, rows, *, steps, plan_id, device, progres
         (absolute + .25 * response).backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 5., error_if_nonfinite=True)
         optimizer.step()
-        if step_number == 1 or step_number % 100 == 0 or step_number == steps:
+        training_window.append({"spectral": float(absolute.detach()), "change": float(response.detach())})
+        if step_number % validation_every == 0 or step_number == steps:
             current_elapsed = elapsed + perf_counter() - started
-            trace.append({"step": step_number, "spectral_envelope_error": float(absolute.detach()),
-                          "control_change_error": float(response.detach()), "elapsed_seconds": current_elapsed})
+            train_spectral = sum(row["spectral"] for row in training_window) / len(training_window)
+            train_change = sum(row["change"] for row in training_window) / len(training_window)
+            record = {"step": step_number, "train_loss": train_spectral + .25 * train_change,
+                      "train_spectral_envelope_error": train_spectral,
+                      "train_control_change_error": train_change, "elapsed_seconds": current_elapsed}
+            if validation_rows is not None:
+                model.eval()
+                metrics = validation_metrics(model, codec, validation_rows, validation_directory, device)
+                record.update({f"validation_{key}": value for key, value in metrics.items()})
+                model.train()
+            trace.append(record)
+            training_window = []
             atomic_torch_save(checkpoint, {"plan_id": plan_id, "model": model.state_dict(), "optimizer": optimizer.state_dict(),
                                            "step": step_number, "trace": trace, "elapsed": current_elapsed, "backbone": backbone,
-                                           "stage": label, "order": order, "cursor": cursor, "shuffle": shuffle.get_state()})
+                                           "stage": label, "seed": seed, "order": order, "cursor": cursor,
+                                           "shuffle": shuffle.get_state(), "training_window": training_window})
         progress.update(step_number, log=step_number % 500 == 0 and step_number < steps)
     load.cache_clear()
     if step == steps:
