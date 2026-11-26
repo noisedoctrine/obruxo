@@ -6,24 +6,22 @@ We want to find out whether a neural network can approximate Vital accurately en
 
 Three architectures are compared: residual MLP, Transformer and Conformer. Each model learns to predict the stereo spectral and envelope features that Vital would produce given a set of synthesizer settings and a MIDI performance. This is a forward model (patch + MIDI → audio features), also called a surrogate. It is not a model that directly predicts a patch from audio.
 
-There are two separate questions:
+The primary question is **patch reconstruction**: can the surrogate guide optimization towards settings that reproduce a target sound when rendered through actual Vital? Real-Vital MR-STFT is the primary model selection metric.
 
-- **Audio prediction:** How accurately can the model predict what Vital will sound like?
-- **Patch reconstruction:** Can we use the model to find settings that reproduce a target sound when rendered through actual Vital?
-
-Accurate audio predictions do not necessarily mean that the model correctly predicts how the sound will change when a parameter is adjusted. We therefore evaluate the two capabilities separately.
+Two supporting metrics help explain the results: spectral/envelope error measures how accurately the surrogate predicts audio features, and paired control-change error measures how accurately it predicts changes in sound when settings are adjusted. Neither replaces the actual reconstruction measurement.
 
 ## 2. Summary of results
 
-| Architecture | Audio prediction loss ↓ | Actual Vital reconstruction error (MR-STFT) ↓ |
-| --- | ---: | ---: |
-| Residual MLP | **0.7148** | 1.7080 |
-| Transformer | 0.7592 | 1.8440 |
-| Conformer | 0.7487 | **1.6573** |
+| Architecture | Actual reconstruction error (Real-Vital MR-STFT) ↓ | 95% confidence interval | Surrogate validation loss (secondary) ↓ |
+| --- | ---: | ---: | ---: |
+| **Conformer** | **1.6573** | [1.4969, 1.8238] | 0.7487 |
+| Residual MLP | 1.7080 | [1.5288, 1.9020] | **0.7148** |
+| Transformer | 1.8440 | [1.6310, 2.1477] | 0.7592 |
+| Default patch | 10.0038 | — | — |
 
-The default patch has a mean reconstruction error of **10.0038**. All three models reduce that error to between 1.66 and 1.84 after patch optimization.
+Ranked by the primary metric, the Conformer is numerically best, followed closely by the residual MLP, then the Transformer. All three substantially reduce reconstruction error relative to the default patch. However, none of the pairwise differences establishes a clear architectural winner.
 
-The residual MLP has the lowest audio prediction loss, while the Conformer produces the closest spectral match to the target sound on average. However, the uncertainty in the pairwise reconstruction comparisons is too large to establish an architectural winner.
+The residual MLP has the lowest surrogate validation loss. This is useful diagnostic information, but does not override the real-Vital reconstruction results.
 
 These results concern standalone neural surrogates, not the frozen-encoder audio-to-patch models in [#174](https://github.com/noisedoctrine/obruxo/issues/174).
 
@@ -82,9 +80,34 @@ For example, if a target sound has a darker tone than the current patch, a usefu
 
 **The final reconstruction error is measured using real Vital audio, not the surrogate's predictions.**
 
-## 5. Audio prediction accuracy
+## 5. Patch reconstruction accuracy (primary metric)
 
-Validation loss combines two errors:
+We select architectures primarily by their actual reconstruction error on the same 192 held-out target recordings. Multi-resolution STFT (MR-STFT) measures how different the actual reconstructed audio is from the target in terms of spectral magnitude at three time-frequency resolutions. It is evaluated on real Vital renders, without gain matching. Lower is better; it is not a listening-test score. Unlike validation loss, it does not include envelope or paired control-change terms.
+
+| Architecture | Mean reconstruction error ↓ | 95% confidence interval | Error reduction from default ↑ | Cases completed |
+| --- | ---: | ---: | ---: | ---: |
+| **Conformer** | **1.6573** | [1.4969, 1.8238] | 8.3465 | 192/192 |
+| Residual MLP | 1.7080 | [1.5288, 1.9020] | 8.2958 | 192/192 |
+| Transformer | 1.8440 | [1.6310, 2.1477] | 8.1598 | 192/192 |
+| Default patch | 10.0038 | — | — | — |
+
+The Conformer produces the lowest mean reconstruction error, followed by the residual MLP and Transformer.
+
+### Are the differences meaningful?
+
+Since the models reconstruct the same target recordings, we can compare their errors directly for each recording rather than treating their results as independent samples.
+
+| Comparison (first minus second) | Mean error difference | 95% confidence interval |
+| --- | ---: | ---: |
+| Conformer − MLP | −0.0507 | [−0.2067, +0.0923] |
+| Conformer − Transformer | −0.1867 | [−0.4701, +0.0087] |
+| MLP − Transformer | −0.1359 | [−0.4385, +0.1073] |
+
+Negative values favour the first model. Every interval includes zero, so the primary metric does not establish a clear winner. The uncertainty accounts for both patch and MIDI variation; see the appendix for the calculation. It does not capture variation between training seeds.
+
+## 6. Surrogate training and validation (secondary metrics)
+
+The training and validation objective combines two errors. These help diagnose surrogate behaviour; they are not the primary criteria for choosing an architecture.
 
 | Metric | What it measures |
 | --- | --- |
@@ -109,36 +132,11 @@ Training loss is shown as a 100-update moving average. Validation loss is evalua
 
 The second plot shows these two components separately. See the appendix for their exact calculations.
 
-The residual MLP achieves the lowest final validation loss in this run. Neither the Transformer nor the Conformer demonstrates a lower final loss.
-
-## 6. Patch reconstruction accuracy
-
-We evaluate all three models on the same 192 target recordings. Multi-resolution STFT (MR-STFT) measures how different the actual reconstructed audio is from the target in terms of spectral magnitude at three time-frequency resolutions. It is evaluated on real Vital renders, without gain matching. Lower is better; it is not a listening-test score. Unlike validation loss, it does not include envelope or paired control-change terms.
-
-| Architecture | Mean reconstruction error ↓ | 95% confidence interval | Error reduction from default ↑ | Cases completed |
-| --- | ---: | ---: | ---: | ---: |
-| **Conformer** | **1.6573** | [1.4969, 1.8238] | 8.3465 | 192/192 |
-| Residual MLP | 1.7080 | [1.5288, 1.9020] | 8.2958 | 192/192 |
-| Transformer | 1.8440 | [1.6310, 2.1477] | 8.1598 | 192/192 |
-| Default patch | 10.0038 | — | — | — |
-
-The Conformer produces the lowest mean error, despite the residual MLP being more accurate at forward audio prediction.
-
-### Are the differences meaningful?
-
-Since the models reconstruct the same target recordings, we can compare their errors directly for each recording rather than treating their results as independent samples.
-
-| Comparison (first minus second) | Mean error difference | 95% confidence interval |
-| --- | ---: | ---: |
-| Conformer − MLP | −0.0507 | [−0.2067, +0.0923] |
-| Conformer − Transformer | −0.1867 | [−0.4701, +0.0087] |
-| MLP − Transformer | −0.1359 | [−0.4385, +0.1073] |
-
-Negative values favour the first model. Every interval includes zero, meaning the observed differences do not establish that any architecture is better than another. The uncertainty accounts for both patch and MIDI variation; see the appendix for the calculation. It does not capture variation between training seeds.
+The residual MLP achieves the lowest final surrogate validation loss. Nevertheless, the Conformer has the lowest mean real-Vital reconstruction error. The validation curves alone cannot establish which surrogate is best for patch optimization.
 
 ## 7. Conclusions
 
-All three surrogates support a patch optimization procedure that substantially reduces spectral reconstruction error relative to the default patch. The residual MLP has the lowest forward prediction loss, while the Conformer has the lowest average reconstruction error. There is no statistically established architectural winner.
+On the primary metric, real-Vital MR-STFT, the Conformer ranks first (1.6573), the residual MLP second (1.7080) and the Transformer third (1.8440). All three substantially reduce reconstruction error relative to the default patch (10.0038). The paired comparisons do not establish a statistically clear winner. The residual MLP's lower surrogate validation loss is a secondary finding, not grounds for selecting it over the Conformer.
 
 There are several limitations:
 
