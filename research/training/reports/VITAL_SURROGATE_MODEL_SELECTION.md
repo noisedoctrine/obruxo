@@ -84,7 +84,16 @@ For example, if a target sound has a darker tone than the current patch, a usefu
 
 ## 5. Audio prediction accuracy
 
-The validation loss measures how closely the models predict Vital's stereo spectral and envelope features, with an additional term measuring whether they predict the effect of changing synthesizer settings.
+Validation loss combines two errors:
+
+| Metric | What it measures |
+| --- | --- |
+| Spectral/envelope error | How closely the predicted spectrum and amplitude envelope match real Vital audio. |
+| Paired control-change error | How closely the predicted change in sound matches the actual change when we adjust synthesizer settings and keep the MIDI fixed. |
+
+For example, suppose we increase filter cutoff. We compare the difference between the surrogate's before/after spectra with the difference between Vital's before/after spectra. Predicting the correct direction and magnitude of the change matters for gradient-based optimization.
+
+**Validation loss = spectral/envelope error + 0.25 × paired control-change error.** Lower is better for both components.
 
 | Architecture | Final validation loss ↓ |
 | --- | ---: |
@@ -98,13 +107,13 @@ Training loss is shown as a 100-update moving average. Validation loss is evalua
 
 ![Held-out spectral and paired-change components](figures/issue173_surrogate_validation_components.png)
 
-The validation objective is spectral/envelope prediction error plus 0.25 times the error in predicting the audio feature changes between paired original and perturbed patches. The second plot separates these components.
+The second plot shows these two components separately. See the appendix for their exact calculations.
 
 The residual MLP achieves the lowest final validation loss in this run. Neither the Transformer nor the Conformer demonstrates a lower final loss.
 
 ## 6. Patch reconstruction accuracy
 
-We evaluate all three models on the same 192 target recordings. The metric is multi-resolution short-time Fourier transform loss (MR-STFT), which measures spectral differences at several time-frequency resolutions. Lower values indicate a closer spectral match; the metric is not a listening-test score.
+We evaluate all three models on the same 192 target recordings. Multi-resolution STFT (MR-STFT) measures how different the actual reconstructed audio is from the target in terms of spectral magnitude at three time-frequency resolutions. It is evaluated on real Vital renders, without gain matching. Lower is better; it is not a listening-test score. Unlike validation loss, it does not include envelope or paired control-change terms.
 
 | Architecture | Mean reconstruction error ↓ | 95% confidence interval | Error reduction from default ↑ | Cases completed |
 | --- | ---: | ---: | ---: | ---: |
@@ -142,6 +151,16 @@ There are several limitations:
 If standalone surrogate research is resumed, the residual MLP and Conformer are reasonable candidates for another matched run with a different seed, fresh patches and performances, followed by an evaluation using transcribed MIDI. These results do not require that experiment to be run now and do not replace the frozen-encoder comparison in #174.
 
 ## Technical appendix
+
+### Metric definitions
+
+All three metrics use stereo STFT magnitudes at FFT sizes 512, 2048 and 8192.
+
+- **Spectral/envelope error:** mean across the three resolutions of 0.5 × (spectral convergence + log-magnitude MAE), plus 0.1 × left/right RMS-envelope log-MAE and 0.1 × side-channel RMS-envelope log-MAE. Spectral convergence is the L2 magnitude error divided by the target magnitude norm (with a floor). Log-MAE uses log1p(magnitude / 0.0001).
+- **Paired control-change error:** for each spectrum or envelope, transform the features with log1p(value / 0.0001). Subtract the original features from the perturbed features, separately for the surrogate and real Vital. Calculate the mean absolute difference between those signed changes, divided by the mean absolute real-Vital change (floored at 0.05). Average the spectral terms across resolutions and add the left/right and side envelope terms, weighted 0.1 each. The comparison uses identical MIDI and aligned valid frames within each pair.
+- **Real-Vital MR-STFT:** mean across resolutions of spectral convergence + log-magnitude MAE, computed on the full aligned stereo renders. Here log magnitudes use a floor of 0.00001 before taking the logarithm. No gain normalization or envelope terms are applied.
+
+Implementation: [spectral/envelope loss](../obruxo_training/spectral.py), [paired control-change loss](../obruxo_training/paired_spectral.py), [real-Vital MR-STFT](../obruxo_training/evaluate.py).
 
 ### Uncertainty calculation
 
