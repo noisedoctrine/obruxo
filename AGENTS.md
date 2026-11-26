@@ -38,6 +38,8 @@ $obruxoNativeSite = Join-Path $obruxoConda 'obruxo-data-generation/Lib/site-pack
 
 Every empirical training, model-comparison or diagnostic report, and its PR summary, must answer: **what did we learn, how strong is the evidence, and what should we do next?** Write for a technically competent reader who understands the project but has not participated in the experiment.
 
+When a report exists, include a direct, clickable link to it near the top of the PR description. Link to the version on the PR's branch or commit, not a potentially outdated version on the default branch. If there are multiple reports, link each relevant report.
+
 1. **Explain the research question first.** State what we want to learn, why it matters, and how the experiment answers it. Present the main measured finding and its practical implication early; if no empirical result exists, say so.
 2. **Use plain, precise language.** Avoid unnecessary jargon, invented terminology, and overly clever phrasing. Define technical terms when first introduced. Explain what changes, what stays fixed, and what is measured, using a concrete example when it improves understanding.
 3. **Give results context.** Put a compact cross-arm results table near the top, with meaningful matched baselines, metric definitions, units and direction (higher/lower is better). Report sample sizes, denominators and independent input diversity: e.g., 1,548 queries from 129 presets × 12 distinct MIDI performances are not 1,548 independent performances.
