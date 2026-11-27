@@ -1,0 +1,50 @@
+[
+  {
+    "label": "expanded-0512:original",
+    "matches": true,
+    "original_basic_session": {
+      "control_readback": "full_state_json",
+      "direct_controls": false,
+      "eligible": true,
+      "engine_reused": false,
+      "validation_cached": false,
+      "verified_scalars": 772
+    },
+    "original_sha256": "7a77a80acfd2839673d285153cb1f3e5b9eb4bcd3d0037a4a4568174ae6411b5",
+    "original_worker_job": 1,
+    "provenance_matches": true,
+    "replayed_basic_session": {
+      "control_readback": "full_state_json",
+      "direct_controls": false,
+      "eligible": true,
+      "engine_reused": false,
+      "validation_cached": false,
+      "verified_scalars": 772
+    },
+    "replayed_sha256": "7a77a80acfd2839673d285153cb1f3e5b9eb4bcd3d0037a4a4568174ae6411b5"
+  },
+  {
+    "label": "expanded-0514:original",
+    "matches": true,
+    "original_basic_session": {
+      "control_readback": "native_parameter_getter",
+      "direct_controls": true,
+      "eligible": true,
+      "engine_reused": true,
+      "validation_cached": true,
+      "verified_scalars": 11
+    },
+    "original_sha256": "963b69ae52861134284f8b24d48d2145ee7d94a771f3d45a03c439f62bd55db4",
+    "original_worker_job": 2,
+    "provenance_matches": true,
+    "replayed_basic_session": {
+      "control_readback": "native_parameter_getter",
+      "direct_controls": true,
+      "eligible": true,
+      "engine_reused": true,
+      "validation_cached": true,
+      "verified_scalars": 11
+    },
+    "replayed_sha256": "963b69ae52861134284f8b24d48d2145ee7d94a771f3d45a03c439f62bd55db4"
+  }
+]
