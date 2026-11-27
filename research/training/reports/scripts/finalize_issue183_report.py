@@ -52,7 +52,14 @@ def _validate_listening(source, validation_source, listening, plan_id, checkpoin
         raise ValueError("listening metadata must identify ten distinct frozen source cases")
     if pilot.canonical_sha256(case_ids) != listening.get("source_case_ids_sha256"):
         raise ValueError("listening case identity digest does not match the case list")
-    manifest = validation_source.resolve().parent / "issue173-listening-test-20261127" / "manifest.json"
+    validation_source = validation_source.resolve()
+    validation_document = pilot._load_json(validation_source / "plan.json")
+    validation_plan = validation_document.get("plan", validation_document)
+    expected_validation_id = (validation_document.get("id")
+                              or validation_plan.get("training", {}).get("pilot_plan_id"))
+    if listening.get("source_plan_id") != expected_validation_id:
+        raise ValueError("listening previews use a different validation source plan")
+    manifest = validation_source.parent / "issue173-listening-test-20261127" / "manifest.json"
     if not manifest.is_file() or pilot.sha256_file(manifest) != listening.get("source_manifest_sha256"):
         raise ValueError("listening source manifest is missing or has changed")
     manifest_cases = [row["case_id"] for row in pilot._load_json(manifest)["cases"]]
@@ -61,14 +68,43 @@ def _validate_listening(source, validation_source, listening, plan_id, checkpoin
     receipts = listening.get("asset_receipts")
     if not receipts:
         raise ValueError("listening metadata is missing asset receipts")
+    packet = pilot._load_json(source / "listening" / "packet.json")
+    if (packet.get("experiment_plan_id") != plan_id or packet.get("source_plan_id") != expected_validation_id
+            or packet.get("source_manifest_sha256") != listening.get("source_manifest_sha256")
+            or packet.get("source_case_ids") != case_ids
+            or packet.get("source_case_ids_sha256") != listening.get("source_case_ids_sha256")
+            or packet.get("source_checkpoint_sha256") != checkpoint_hashes
+            or packet.get("asset_receipts") != receipts):
+        raise ValueError("listening packet provenance does not match the run summary")
+    expected_assets = {}
+    for case in packet.get("cases", []):
+        for key, relative_path in case.get("audio", {}).items():
+            role = "target_audition" if key == "target" else "listening_preview"
+            expected_assets[(case["case_id"], (Path("listening") / relative_path).as_posix())] = role
+        for relative_path in case.get("exact_outputs", {}).values():
+            expected_assets[(case["case_id"], (Path("listening") / relative_path).as_posix())] = "predicted_spectrum"
+    if len(expected_assets) != len(receipts):
+        raise ValueError("listening asset receipts do not cover the exported packet")
     asset_root = (source / "listening").resolve()
+    source_audio_dir = manifest.parent / "audio"
+    seen_assets = set()
     for receipt in receipts:
+        case_id, relative = receipt.get("case_id"), receipt.get("path")
+        key = (case_id, relative)
+        if key in seen_assets or expected_assets.get(key) != receipt.get("role"):
+            raise ValueError("listening asset receipts do not match packet cases and roles")
+        seen_assets.add(key)
         asset = (source / receipt["path"]).resolve()
         if asset != asset_root and asset_root not in asset.parents:
             raise ValueError("listening asset receipt points outside the listening directory")
         if (not asset.is_file() or asset.stat().st_size != receipt.get("bytes")
                 or pilot.sha256_file(asset) != receipt.get("sha256")):
             raise ValueError("listening asset receipt does not match a retained preview asset")
+        if receipt["role"] == "target_audition":
+            example = next(row["example"] for row in packet["cases"] if row["case_id"] == case_id)
+            source_audio = source_audio_dir / f"sample-{example}-target.wav"
+            if not source_audio.is_file() or pilot.sha256_file(source_audio) != receipt.get("source_sha256"):
+                raise ValueError("listening target receipt does not match its frozen source audio")
 
 
 def bootstrap_direct_comparisons(per_case, draws=20_000, seed=183172):

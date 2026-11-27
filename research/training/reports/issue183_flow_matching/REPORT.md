@@ -2,7 +2,7 @@
 
 We compared direct prediction with conditional flow matching at 4, 8 and 16 Euler steps for stereo Vital-spectrum prediction. At 8 steps, direct prediction had lower spectral and general octave-band error for all three backbones, so it remains the evidence-supported baseline for this panel. The single-seed result is exploratory and does not establish a best architecture overall.
 
-Spectral loss averages relative spectral-shape error and log-amplitude error. Octave-band error measures mean absolute dB error in fixed one-octave band powers from 21.5 Hz to Nyquist. Lower is better for both; positive flow-minus-direct differences indicate worse flow error.
+Spectral loss is the equal-weight average of relative spectral-shape error and log-amplitude error. Octave-band error measures mean absolute dB error in fixed one-octave band powers from 21.5 Hz to Nyquist. Lower is better for both; positive flow-minus-direct differences indicate worse flow error.
 
 The frozen validation panel contains **128 paired recipes (256 clips), 64 patch roots, and 16 distinct MIDI performances**. Each recipe pairs original and perturbed clips.
 

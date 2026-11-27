@@ -1175,7 +1175,7 @@ def write_report(output, result, plan, arm_summaries):
     lines = [
         "# Issue 183: Direct spectral prediction vs conditional flow matching", "",
         "We compared direct prediction with conditional flow matching at 4, 8 and 16 Euler steps for stereo Vital-spectrum prediction. At 8 steps, direct prediction had lower spectral and general octave-band error for all three backbones, so it remains the evidence-supported baseline for this panel. The single-seed result is exploratory and does not establish a best architecture overall.", "",
-        "Spectral loss averages relative spectral-shape error and log-amplitude error. Octave-band error measures mean absolute dB error in fixed one-octave band powers from 21.5 Hz to Nyquist. Lower is better for both; positive flow-minus-direct differences indicate worse flow error.", "",
+        "Spectral loss is the equal-weight average of relative spectral-shape error and log-amplitude error. Octave-band error measures mean absolute dB error in fixed one-octave band powers from 21.5 Hz to Nyquist. Lower is better for both; positive flow-minus-direct differences indicate worse flow error.", "",
         f"The frozen validation panel contains **{result['validation_cases'] // 2} paired recipes ({result['validation_cases']} clips), {direct_metrics['patch_roots']} patch roots, and {result['validation_midi_performances']} distinct MIDI performances**. Each recipe pairs original and perturbed clips.", "",
         "## Primary comparison", "",
         "The chart summarizes paired flow-minus-direct effects. Intervals resample patch roots and keep the MIDI-performance set fixed.", "",
@@ -1406,8 +1406,13 @@ def write_listening_previews(output, validation_source, val_rows, per_case, mode
         cases.append({"example": example, "case_id": entry["case_id"], "patch_root": entry["root"],
                       "audio": audio_files, "exact_outputs": exact_files})
     payload = {"title": "Issue 183 · Flow matching previews", "models": names, "cases": cases}
+    source_case_ids = [case["case_id"] for case in cases]
     payload["source_plan_id"] = validation_plan_id
+    payload["experiment_plan_id"] = experiment_plan_id
     payload["source_manifest_sha256"] = sha256_file(manifest_path)
+    payload["source_case_ids"] = source_case_ids
+    payload["source_case_ids_sha256"] = canonical_sha256(source_case_ids)
+    payload["source_checkpoint_sha256"] = checkpoint_sha256
     payload["asset_receipts"] = asset_receipts
     write_json(listening / "packet.json", payload)
     (listening / "index.html").write_text(listening_html(payload), encoding="utf-8")
@@ -1415,8 +1420,8 @@ def write_listening_previews(output, validation_source, val_rows, per_case, mode
             "path": repo_reference(listening / "index.html", "issue183_listening_previews"),
             "experiment_plan_id": experiment_plan_id, "source_plan_id": validation_plan_id,
             "source_manifest_sha256": payload["source_manifest_sha256"],
-            "source_case_ids": [case["case_id"] for case in cases],
-            "source_case_ids_sha256": canonical_sha256([case["case_id"] for case in cases]),
+            "source_case_ids": source_case_ids,
+            "source_case_ids_sha256": payload["source_case_ids_sha256"],
             "source_checkpoint_sha256": checkpoint_sha256, "asset_receipts": asset_receipts,
             "griffin_lim_iterations": 48,
             "normalization": "each stereo clip peak-normalized to -1 dBFS for audition only"}
