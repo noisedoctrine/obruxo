@@ -1,6 +1,6 @@
 {
   "cache_receipt_diagnosis": {
-    "action": "Do not bypass receipt validation or rerender the corpus. Keep the existing valid cache and recover only if the exact original waveform/receipt-compatible input is found.",
+    "action": "Do not bypass receipt validation or rerender the corpus. Preserve the 1536 valid cached latents; after locating the exact original waveform or another receipt-compatible source, resume the remaining cache work.",
     "duration_frames": 180075,
     "native_readback_paths": {
       "original": "cached_basic_template / 11 verified loaded scalars",
@@ -11,7 +11,8 @@
     "retry_waveform_sha256": "d0cb5d26\u2026",
     "rms_absolute_difference": 2.45e-13,
     "root_cause": "Not conclusively isolated. Renderer provenance says numeric-tolerance rather than bitwise determinism; readback paths also differ. The original waveform is absent from source pair artifacts, so the exact missing latent cannot be reconstructed from available files.",
-    "same_request_renderer_engine_preset_and_duration": true
+    "same_request_renderer_engine_preset_and_duration": true,
+    "unprocessed_cache_items_at_failure": 638
   },
   "carried_forward_baselines": {
     "cross_midi_common_gallery": {
