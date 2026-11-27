@@ -39,4 +39,15 @@ Use the directory that contains `model_config.json` and `model.safetensors` as t
 
 The codec probe uses one synthetic stereo clip to test waveform reconstruction and verify that the frozen decoder sends finite, nonzero gradients to its input. It accounts for padding before calculating the test loss. The generator probe requests a two-second stereo sample with a fixed seed and two denoising steps, and checks placement, the generator parameter dtype, and the output.
 
+| Checkpoint | Result on `xpu:0` |
+|---|---|
+| Open Small | Stereo encode and decode, nonzero decoder input gradient |
+| SAME-S | Stereo encode and decode, nonzero decoder input gradient |
+| SAME-L | Stereo encode and decode, nonzero decoder input gradient |
+| Small Music | FP16 generator, 88,200 finite samples per stereo channel |
+| Medium | FP16 generator, 88,200 finite samples per stereo channel |
+| Medium Base | FP16 generator, 88,200 finite samples per stereo channel |
+
+The [DAC 44.1 kHz checkpoint](https://huggingface.co/descript/dac_44khz) at revision `c1bc521685adf9cfe247bc39a5ca58917eda1ac4` also passed a separate mono decode and latents gradient probe on the same XPU using Transformers. This check differentiated through the decoder from the quantized embedding, with the encoder and quantizer outside the gradient path.
+
 These checks cover runtime compatibility. The Vital comparison and decision gates are defined in [issue #187](https://github.com/noisedoctrine/obruxo/issues/187).
