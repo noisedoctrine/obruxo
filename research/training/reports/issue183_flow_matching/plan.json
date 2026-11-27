@@ -1,0 +1,114 @@
+{
+  "data_receipts_sha256": "4a8e0165f1410b8949dd20cb54c707fcb24f6b38eb9049f3d917b7494594e855",
+  "hardware": {
+    "device": "xpu",
+    "device_name": "Intel(R) Arc(TM) 140T GPU (16GB)",
+    "numpy": "2.4.6",
+    "threads": 4,
+    "torch": "2.12.1+xpu"
+  },
+  "id": "a071023cd2341ac4a13514765015a6acc104ef1dd55083743d8acf889a0ca9a9",
+  "plan": {
+    "arms": [
+      {
+        "backbone": "residual_mlp",
+        "mode": "direct",
+        "steps": 500
+      },
+      {
+        "backbone": "residual_mlp",
+        "mode": "flow",
+        "steps": 500
+      },
+      {
+        "backbone": "transformer",
+        "mode": "direct",
+        "steps": 500
+      },
+      {
+        "backbone": "transformer",
+        "mode": "flow",
+        "steps": 500
+      },
+      {
+        "backbone": "conformer",
+        "mode": "direct",
+        "steps": 500
+      },
+      {
+        "backbone": "conformer",
+        "mode": "flow",
+        "steps": 500
+      }
+    ],
+    "code_sha256": {
+      "obruxo_training\\flow_matching.py": "ed4fd644b2a65cde2301eb683064ce55f50c2615f7ec57585875e74f424a5e1f",
+      "obruxo_training\\spectral.py": "25ef91b4c49c3cdd98fc854cfe470a4640eca6124f34d15d21e5aca8439ef4a9",
+      "obruxo_training\\surrogate_backbones.py": "1818fea3352662a7f4e5d26d46a65b6c812d87f800920071c9c172fb4d72e595",
+      "obruxo_training\\surrogate_codec.py": "dae235b25046e2c98c9c9cf06fb707a875b837faeb237d40c75c6c42acda29f0",
+      "run_issue183_flow_matching.py": "9ec85edbe4e6a712d2df6f059d9b7d4aaae2c6e14d85b2a64cccc9da97a92033"
+    },
+    "data": {
+      "channels": 2,
+      "fft_size": 2048,
+      "hop": 512,
+      "magnitude_scaling": "abs(stft)/sqrt(2048), physical units; flow state uses log1p(magnitude/1e-4)",
+      "sample_rate": 44100,
+      "sampled_frames_per_clip": 32,
+      "training_batch_pairs": 4,
+      "training_clip_batch": 8,
+      "training_recipe": "all accepted #172 basic and expanded pairs; basic labels are expanded with canonical default values before use",
+      "validation_recipe": "frozen #173 held-out expanded pairs; exact 2048-point spectral masks and recipe hashes verified"
+    },
+    "data_receipts": "data-receipts.jsonl",
+    "evaluation": {
+      "envelope": "Parseval RMS derived from stereo 2048 STFT; onset <50ms, decay 50\u2013250ms, sustain after 250ms, release first 300ms after MIDI note-off",
+      "euler_flow_steps": [
+        4,
+        8,
+        16
+      ],
+      "octave": "mean absolute dB error in ten fixed one-octave band powers from 21.5 Hz to Nyquist on all non-silent valid frames; report a separate MIDI-centered five-band absolute dB diagnostic on supported monophonic frames",
+      "primary": "2048-point spectral convergence plus log-magnitude L1",
+      "uncertainty": "10,000 paired patch-root bootstrap replicates; MIDI performances not resampled"
+    },
+    "format": "issue183_direct_vs_flow_matching_v2",
+    "issue": 183,
+    "question": "Does conditional flow matching improve known-patch known-MIDI forward audio prediction, particularly monophonic octave energy and MIDI-aligned envelope fidelity?",
+    "sources": {
+      "cache_receipt_count": 2176,
+      "issue172_plan_id": "243927fbc32fa8a65e3c40d195dd3c2eb5a7459146ec400d3baf887141751b1f",
+      "issue172_run": "research/training/outputs/issue172-surrogate-pilot-20261126",
+      "issue173_validation_plan_id": "707d2de2aab25f1d30637196687cb9754182191c969cf1cbee63214251d22855",
+      "issue173_validation_run": "research/training/outputs/issue173-model-selection-active-20261126-v4",
+      "training_pair_count": 2046,
+      "training_patch_roots": 512,
+      "validation_clips": 256,
+      "validation_midi_performances": 16,
+      "validation_pair_count": 128,
+      "validation_patch_roots": 64
+    },
+    "training": {
+      "device": "xpu",
+      "direct_loss": "single-resolution spectral convergence plus log-magnitude L1, equal weights",
+      "flow_loss": "MSE velocity in log1p magnitude space; z(t)=(1-t)e+t*x; velocity is predicted clean endpoint minus full-dimensional initial noise; t shared per clip; e~N(0,I)",
+      "flow_sampler": {
+        "method": "fixed-grid Euler",
+        "steps": [
+          4,
+          8,
+          16
+        ]
+      },
+      "gradient_clip_norm": 5.0,
+      "learning_rate": 0.001,
+      "optimizer": "AdamW",
+      "seed": 183,
+      "starting_weights": "random initialization; no pretrained or #173 checkpoints loaded",
+      "threads": 4,
+      "updates_per_arm": 500,
+      "validation_curve_sampler_steps": 8,
+      "validation_every_updates": 100
+    }
+  }
+}

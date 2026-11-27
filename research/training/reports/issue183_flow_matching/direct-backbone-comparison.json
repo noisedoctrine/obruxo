@@ -1,0 +1,125 @@
+{
+  "bootstrap_draws": 20000,
+  "bootstrap_unit": "patch root",
+  "comparisons": {
+    "conformer": {
+      "attack_envelope_error_db": {
+        "ci95": [
+          -1.0144026143270917,
+          0.5210349608739271
+        ],
+        "mean_difference": -0.24196079717198238,
+        "patch_roots": 64
+      },
+      "decay_envelope_error_db": {
+        "ci95": [
+          -3.1987857321551147,
+          -1.2982450122401266
+        ],
+        "mean_difference": -2.2194570780258043,
+        "patch_roots": 64
+      },
+      "monophonic_octave_energy_error_db": {
+        "ci95": [
+          -1.0404650737271381,
+          -0.1259307994030476
+        ],
+        "mean_difference": -0.5704706310530219,
+        "patch_roots": 48
+      },
+      "octave_band_energy_error_db": {
+        "ci95": [
+          -0.7316481292566492,
+          -0.12102381870820329
+        ],
+        "mean_difference": -0.42802664884558944,
+        "patch_roots": 64
+      },
+      "release_envelope_error_db": {
+        "ci95": [
+          -1.3088617863203293,
+          0.5303749234415011
+        ],
+        "mean_difference": -0.3453459532204596,
+        "patch_roots": 64
+      },
+      "spectral_loss": {
+        "ci95": [
+          -0.011199911552103004,
+          -0.003008710851645448
+        ],
+        "mean_difference": -0.006915013713296503,
+        "patch_roots": 64
+      },
+      "sustain_envelope_error_db": {
+        "ci95": [
+          -4.226657203840199,
+          -2.59412772860179
+        ],
+        "mean_difference": -3.3973816367702776,
+        "patch_roots": 64
+      }
+    },
+    "transformer": {
+      "attack_envelope_error_db": {
+        "ci95": [
+          -0.9152633801651586,
+          0.9552607222993381
+        ],
+        "mean_difference": 0.002582649983252583,
+        "patch_roots": 64
+      },
+      "decay_envelope_error_db": {
+        "ci95": [
+          -1.6493709061633148,
+          0.09403608526332202
+        ],
+        "mean_difference": -0.791049322013019,
+        "patch_roots": 64
+      },
+      "monophonic_octave_energy_error_db": {
+        "ci95": [
+          -0.6928288310288684,
+          0.10031475406591214
+        ],
+        "mean_difference": -0.29707257948443067,
+        "patch_roots": 48
+      },
+      "octave_band_energy_error_db": {
+        "ci95": [
+          -1.2589013110987533,
+          -0.21804771740706785
+        ],
+        "mean_difference": -0.7456727833936292,
+        "patch_roots": 64
+      },
+      "release_envelope_error_db": {
+        "ci95": [
+          -1.338065584466622,
+          0.07001196576412518
+        ],
+        "mean_difference": -0.5908347205802911,
+        "patch_roots": 64
+      },
+      "spectral_loss": {
+        "ci95": [
+          -0.02080681828811066,
+          -0.008768423370747774
+        ],
+        "mean_difference": -0.014448079928115476,
+        "patch_roots": 64
+      },
+      "sustain_envelope_error_db": {
+        "ci95": [
+          -1.8994015749127953,
+          -0.46227059445100854
+        ],
+        "mean_difference": -1.175838653815896,
+        "patch_roots": 64
+      }
+    }
+  },
+  "difference": "residual_mlp minus comparison backbone",
+  "format": "issue183_direct_backbone_comparison_v2",
+  "seed": 183172
+}

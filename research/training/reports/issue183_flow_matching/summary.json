@@ -1,0 +1,3360 @@
+{
+  "data_receipts_sha256": "4a8e0165f1410b8949dd20cb54c707fcb24f6b38eb9049f3d917b7494594e855",
+  "evaluation": {
+    "conformer-direct": {
+      "metrics": {
+        "attack_envelope_error_db": 19.31442307243585,
+        "attack_frames": 1114,
+        "clips": 256,
+        "decay_envelope_error_db": 23.863328716619385,
+        "decay_frames": 1314,
+        "log_magnitude_mae": 0.3060883024954819,
+        "midi_performances": 16,
+        "monophonic_frames": 2804,
+        "monophonic_frames_total": 2804,
+        "monophonic_octave_energy_error_db": 25.767268954181617,
+        "octave_band_energy_error_db": 24.154509218347094,
+        "octave_band_frames": 5409,
+        "octave_band_total_frames": 8192,
+        "patch_roots": 64,
+        "release_envelope_error_db": 38.16005628632773,
+        "release_frames": 1914,
+        "spectral_convergence": 0.8570580030427664,
+        "spectral_loss": 0.5815731552138459,
+        "sustain_envelope_error_db": 27.707021799577085,
+        "sustain_frames": 1472
+      },
+      "sampler_steps": 1
+    },
+    "conformer-flow": {
+      "16": {
+        "attack_envelope_error_db": 24.39598328575464,
+        "attack_frames": 1114,
+        "clips": 256,
+        "decay_envelope_error_db": 27.73990119330659,
+        "decay_frames": 1314,
+        "log_magnitude_mae": 0.4540495465043932,
+        "midi_performances": 16,
+        "monophonic_frames": 2804,
+        "monophonic_frames_total": 2804,
+        "monophonic_octave_energy_error_db": 27.6253053190603,
+        "octave_band_energy_error_db": 26.37671306721336,
+        "octave_band_frames": 5409,
+        "octave_band_total_frames": 8192,
+        "patch_roots": 64,
+        "release_envelope_error_db": 40.5828845854642,
+        "release_frames": 1914,
+        "spectral_convergence": 0.9246870901552029,
+        "spectral_loss": 0.6893683159723878,
+        "sustain_envelope_error_db": 25.18105346466168,
+        "sustain_frames": 1472
+      },
+      "4": {
+        "attack_envelope_error_db": 25.820421819539085,
+        "attack_frames": 1114,
+        "clips": 256,
+        "decay_envelope_error_db": 29.297918902233803,
+        "decay_frames": 1314,
+        "log_magnitude_mae": 0.4170255745993927,
+        "midi_performances": 16,
+        "monophonic_frames": 2804,
+        "monophonic_frames_total": 2804,
+        "monophonic_octave_energy_error_db": 27.507164797024146,
+        "octave_band_energy_error_db": 26.038492239847173,
+        "octave_band_frames": 5409,
+        "octave_band_total_frames": 8192,
+        "patch_roots": 64,
+        "release_envelope_error_db": 40.12533739754176,
+        "release_frames": 1914,
+        "spectral_convergence": 0.888216293300502,
+        "spectral_loss": 0.6526209325529635,
+        "sustain_envelope_error_db": 26.311922428507092,
+        "sustain_frames": 1472
+      },
+      "8": {
+        "attack_envelope_error_db": 24.968919677655297,
+        "attack_frames": 1114,
+        "clips": 256,
+        "decay_envelope_error_db": 28.401846768666125,
+        "decay_frames": 1314,
+        "log_magnitude_mae": 0.4358360487385653,
+        "midi_performances": 16,
+        "monophonic_frames": 2804,
+        "monophonic_frames_total": 2804,
+        "monophonic_octave_energy_error_db": 27.584489851291607,
+        "octave_band_energy_error_db": 26.22622990309629,
+        "octave_band_frames": 5409,
+        "octave_band_total_frames": 8192,
+        "patch_roots": 64,
+        "release_envelope_error_db": 40.38433420437393,
+        "release_frames": 1914,
+        "spectral_convergence": 0.9066342659643851,
+        "spectral_loss": 0.6712351570604369,
+        "sustain_envelope_error_db": 25.668786222409164,
+        "sustain_frames": 1472
+      }
+    },
+    "residual_mlp-direct": {
+      "metrics": {
+        "attack_envelope_error_db": 19.072462275263867,
+        "attack_frames": 1114,
+        "clips": 256,
+        "decay_envelope_error_db": 21.64387163859358,
+        "decay_frames": 1314,
+        "log_magnitude_mae": 0.2971087789555895,
+        "midi_performances": 16,
+        "monophonic_frames": 2804,
+        "monophonic_frames_total": 2804,
+        "monophonic_octave_energy_error_db": 25.19679832312859,
+        "octave_band_energy_error_db": 23.726482569501503,
+        "octave_band_frames": 5409,
+        "octave_band_total_frames": 8192,
+        "patch_roots": 64,
+        "release_envelope_error_db": 37.81471033310727,
+        "release_frames": 1914,
+        "spectral_convergence": 0.8522075048058468,
+        "spectral_loss": 0.5746581415005494,
+        "sustain_envelope_error_db": 24.514177163158365,
+        "sustain_frames": 1472
+      },
+      "sampler_steps": 1
+    },
+    "residual_mlp-flow": {
+      "16": {
+        "attack_envelope_error_db": 23.320664349540834,
+        "attack_frames": 1114,
+        "clips": 256,
+        "decay_envelope_error_db": 26.123256715732353,
+        "decay_frames": 1314,
+        "log_magnitude_mae": 0.4077273048751522,
+        "midi_performances": 16,
+        "monophonic_frames": 2804,
+        "monophonic_frames_total": 2804,
+        "monophonic_octave_energy_error_db": 26.322898022974954,
+        "octave_band_energy_error_db": 25.242011463623598,
+        "octave_band_frames": 5409,
+        "octave_band_total_frames": 8192,
+        "patch_roots": 64,
+        "release_envelope_error_db": 39.771691737516434,
+        "release_frames": 1914,
+        "spectral_convergence": 0.9015235021070112,
+        "spectral_loss": 0.6546254025597591,
+        "sustain_envelope_error_db": 24.96889415136385,
+        "sustain_frames": 1472
+      },
+      "4": {
+        "attack_envelope_error_db": 24.764647510023302,
+        "attack_frames": 1114,
+        "clips": 256,
+        "decay_envelope_error_db": 27.8249052799627,
+        "decay_frames": 1314,
+        "log_magnitude_mae": 0.38495506506296806,
+        "midi_performances": 16,
+        "monophonic_frames": 2804,
+        "monophonic_frames_total": 2804,
+        "monophonic_octave_energy_error_db": 26.434597853482245,
+        "octave_band_energy_error_db": 25.084221794380902,
+        "octave_band_frames": 5409,
+        "octave_band_total_frames": 8192,
+        "patch_roots": 64,
+        "release_envelope_error_db": 39.58704122738648,
+        "release_frames": 1914,
+        "spectral_convergence": 0.8804704555077478,
+        "spectral_loss": 0.632712761813309,
+        "sustain_envelope_error_db": 26.146095891979623,
+        "sustain_frames": 1472
+      },
+      "8": {
+        "attack_envelope_error_db": 23.913375993646387,
+        "attack_frames": 1114,
+        "clips": 256,
+        "decay_envelope_error_db": 26.817367302006023,
+        "decay_frames": 1314,
+        "log_magnitude_mae": 0.3962761883449275,
+        "midi_performances": 16,
+        "monophonic_frames": 2804,
+        "monophonic_frames_total": 2804,
+        "monophonic_octave_energy_error_db": 26.371374085767275,
+        "octave_band_energy_error_db": 25.169161976761025,
+        "octave_band_frames": 5409,
+        "octave_band_total_frames": 8192,
+        "patch_roots": 64,
+        "release_envelope_error_db": 39.67347592625621,
+        "release_frames": 1914,
+        "spectral_convergence": 0.8912831475608982,
+        "spectral_loss": 0.6437796657555737,
+        "sustain_envelope_error_db": 25.46069556532905,
+        "sustain_frames": 1472
+      }
+    },
+    "transformer-direct": {
+      "metrics": {
+        "attack_envelope_error_db": 19.069879625280613,
+        "attack_frames": 1114,
+        "clips": 256,
+        "decay_envelope_error_db": 22.434920960606604,
+        "decay_frames": 1314,
+        "log_magnitude_mae": 0.31957923049048986,
+        "midi_performances": 16,
+        "monophonic_frames": 2804,
+        "monophonic_frames_total": 2804,
+        "monophonic_octave_energy_error_db": 25.493870902613022,
+        "octave_band_energy_error_db": 24.472155352895133,
+        "octave_band_frames": 5409,
+        "octave_band_total_frames": 8192,
+        "patch_roots": 64,
+        "release_envelope_error_db": 38.405545053687554,
+        "release_frames": 1914,
+        "spectral_convergence": 0.8586332088088966,
+        "spectral_loss": 0.5891062214286649,
+        "sustain_envelope_error_db": 25.790959361376714,
+        "sustain_frames": 1472
+      },
+      "sampler_steps": 1
+    },
+    "transformer-flow": {
+      "16": {
+        "attack_envelope_error_db": 24.137844710565144,
+        "attack_frames": 1114,
+        "clips": 256,
+        "decay_envelope_error_db": 26.582922129982634,
+        "decay_frames": 1314,
+        "log_magnitude_mae": 0.4884178212087136,
+        "midi_performances": 16,
+        "monophonic_frames": 2804,
+        "monophonic_frames_total": 2804,
+        "monophonic_octave_energy_error_db": 26.847160011888857,
+        "octave_band_energy_error_db": 26.070544350853197,
+        "octave_band_frames": 5409,
+        "octave_band_total_frames": 8192,
+        "patch_roots": 64,
+        "release_envelope_error_db": 40.80504900165923,
+        "release_frames": 1914,
+        "spectral_convergence": 0.9198155779740773,
+        "spectral_loss": 0.7041166971903294,
+        "sustain_envelope_error_db": 24.122300947135763,
+        "sustain_frames": 1472
+      },
+      "4": {
+        "attack_envelope_error_db": 25.276733965883665,
+        "attack_frames": 1114,
+        "clips": 256,
+        "decay_envelope_error_db": 27.848749140702495,
+        "decay_frames": 1314,
+        "log_magnitude_mae": 0.4496258518192917,
+        "midi_performances": 16,
+        "monophonic_frames": 2804,
+        "monophonic_frames_total": 2804,
+        "monophonic_octave_energy_error_db": 26.670938308555524,
+        "octave_band_energy_error_db": 25.69321333988465,
+        "octave_band_frames": 5409,
+        "octave_band_total_frames": 8192,
+        "patch_roots": 64,
+        "release_envelope_error_db": 40.35093309843295,
+        "release_frames": 1914,
+        "spectral_convergence": 0.8902387917332817,
+        "spectral_loss": 0.669932322925888,
+        "sustain_envelope_error_db": 24.927507607424904,
+        "sustain_frames": 1472
+      },
+      "8": {
+        "attack_envelope_error_db": 24.603459553676295,
+        "attack_frames": 1114,
+        "clips": 256,
+        "decay_envelope_error_db": 27.097394957899265,
+        "decay_frames": 1314,
+        "log_magnitude_mae": 0.46954985908814706,
+        "midi_performances": 16,
+        "monophonic_frames": 2804,
+        "monophonic_frames_total": 2804,
+        "monophonic_octave_energy_error_db": 26.77802819472529,
+        "octave_band_energy_error_db": 25.907385300420827,
+        "octave_band_frames": 5409,
+        "octave_band_total_frames": 8192,
+        "patch_roots": 64,
+        "release_envelope_error_db": 40.608322710996504,
+        "release_frames": 1914,
+        "spectral_convergence": 0.9057540317880921,
+        "spectral_loss": 0.6876519453362562,
+        "sustain_envelope_error_db": 24.463338116250206,
+        "sustain_frames": 1472
+      }
+    }
+  },
+  "evaluation_before_phase_reconstruction": true,
+  "hardware": {
+    "device": "xpu",
+    "device_name": "Intel(R) Arc(TM) 140T GPU (16GB)",
+    "numpy": "2.4.6",
+    "threads": 4,
+    "torch": "2.12.1+xpu"
+  },
+  "inference": {
+    "conformer-direct": {
+      "1": {
+        "median_ms_per_clip_32_frames": 8.442299999842362,
+        "p90_ms_per_clip_32_frames": 9.707390000403393,
+        "peak_temporary_bytes": 796160
+      }
+    },
+    "conformer-flow": {
+      "16": {
+        "median_ms_per_clip_32_frames": 37.62249999999767,
+        "p90_ms_per_clip_32_frames": 44.071109999822504,
+        "peak_temporary_bytes": 1068544
+      },
+      "4": {
+        "median_ms_per_clip_32_frames": 15.061449999848264,
+        "p90_ms_per_clip_32_frames": 24.224399998638546,
+        "peak_temporary_bytes": 1068544
+      },
+      "8": {
+        "median_ms_per_clip_32_frames": 21.182299999964016,
+        "p90_ms_per_clip_32_frames": 24.11187999859976,
+        "peak_temporary_bytes": 1068544
+      }
+    },
+    "residual_mlp-direct": {
+      "1": {
+        "median_ms_per_clip_32_frames": 5.152949999683187,
+        "p90_ms_per_clip_32_frames": 6.048479999117262,
+        "peak_temporary_bytes": 796160
+      }
+    },
+    "residual_mlp-flow": {
+      "16": {
+        "median_ms_per_clip_32_frames": 28.11660000043048,
+        "p90_ms_per_clip_32_frames": 32.0819799999299,
+        "peak_temporary_bytes": 1068544
+      },
+      "4": {
+        "median_ms_per_clip_32_frames": 10.191700000177661,
+        "p90_ms_per_clip_32_frames": 11.145469999792113,
+        "peak_temporary_bytes": 1068544
+      },
+      "8": {
+        "median_ms_per_clip_32_frames": 16.77700000072946,
+        "p90_ms_per_clip_32_frames": 17.792950000875862,
+        "peak_temporary_bytes": 1068544
+      }
+    },
+    "transformer-direct": {
+      "1": {
+        "median_ms_per_clip_32_frames": 7.946300000185147,
+        "p90_ms_per_clip_32_frames": 8.282440000948554,
+        "peak_temporary_bytes": 796160
+      }
+    },
+    "transformer-flow": {
+      "16": {
+        "median_ms_per_clip_32_frames": 36.293499999374035,
+        "p90_ms_per_clip_32_frames": 49.47069000118062,
+        "peak_temporary_bytes": 1068544
+      },
+      "4": {
+        "median_ms_per_clip_32_frames": 12.02000000012049,
+        "p90_ms_per_clip_32_frames": 12.718060001316188,
+        "peak_temporary_bytes": 1068544
+      },
+      "8": {
+        "median_ms_per_clip_32_frames": 16.986999999971886,
+        "p90_ms_per_clip_32_frames": 21.123400001488335,
+        "peak_temporary_bytes": 1068544
+      }
+    }
+  },
+  "listening": {
+    "asset_receipts": [
+      {
+        "bytes": 1093738,
+        "case_id": "fresh-057-0",
+        "path": "listening/audio/example-01-conformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "f7986dbff5c300156073e5856833e06ec60aba88242557c87e3bfd24b9ca9516",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1093738,
+        "case_id": "fresh-057-0",
+        "path": "listening/audio/example-01-conformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "4547876b9ec1035f91f31830ea815bc041ae2f316190ff79486cbc918e92ad84",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1093738,
+        "case_id": "fresh-057-0",
+        "path": "listening/audio/example-01-residual_mlp-direct.wav",
+        "role": "listening_preview",
+        "sha256": "b95aaaea560417df713fe17df20f6d122726191291cfc5782eab3791c7085fc3",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1093738,
+        "case_id": "fresh-057-0",
+        "path": "listening/audio/example-01-residual_mlp-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "a6841fa2cbf84f53a4076a9896118a73ed5582bd5ab6d242b5661fc740995a0f",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1093738,
+        "case_id": "fresh-057-0",
+        "path": "listening/audio/example-01-target.wav",
+        "role": "target_audition",
+        "sha256": "ca0d041f0c2f8f36a8243546610a88c42431a25bf0d352c7b697943e49b5298f",
+        "source_sha256": "ca0d041f0c2f8f36a8243546610a88c42431a25bf0d352c7b697943e49b5298f"
+      },
+      {
+        "bytes": 1093738,
+        "case_id": "fresh-057-0",
+        "path": "listening/audio/example-01-transformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "4007d0d483cb5c606eda21ae22fc93ea94fdeb26bd7fdc49e9dba4ef6ac3f905",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1093738,
+        "case_id": "fresh-057-0",
+        "path": "listening/audio/example-01-transformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "0a1e28d7d85eaa219abca13a9e428a6d3dfef0bf66be6d062062c782343ea6bd",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1956566,
+        "case_id": "fresh-057-0",
+        "path": "listening/audio/example-01-conformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "bafb4c250ed12a80bd8050e8ba16986e56bddf134db7734e026de5502b973740",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1507381,
+        "case_id": "fresh-057-0",
+        "path": "listening/audio/example-01-conformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "1e5be140d400e4610a77508d3f75a1299b6f86238aff13b609ba2c4dad83c810",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1942952,
+        "case_id": "fresh-057-0",
+        "path": "listening/audio/example-01-residual_mlp-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "d0295f1fee802a943e3740263d932647f6a069b88f57ce7fbc53cc37274baa91",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1382363,
+        "case_id": "fresh-057-0",
+        "path": "listening/audio/example-01-residual_mlp-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "3a5ad5d421e8f87a42c6159baf87ded49fe6f39b6b41e5bbd27f4d8b8282be28",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1925132,
+        "case_id": "fresh-057-0",
+        "path": "listening/audio/example-01-transformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "2a3bf67ccf59ce4bb67b382ac33c4d1f33ae8b3339f267b50098c5aebdf4e9f2",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1491811,
+        "case_id": "fresh-057-0",
+        "path": "listening/audio/example-01-transformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "1d32789689b9ad480fb3b2cd777440a7e9e7cc9ef5c70b9607683a7ba4262e6e",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1176058,
+        "case_id": "fresh-024-0",
+        "path": "listening/audio/example-02-conformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "b38e4c126ccbf08a55d61e57cd147207e889c6675346036f8e4fd96ae203151b",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1176058,
+        "case_id": "fresh-024-0",
+        "path": "listening/audio/example-02-conformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "9dde79406a0848f8b640706c53722bc342ea966d2ff27490cca295c96a43bcff",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1176058,
+        "case_id": "fresh-024-0",
+        "path": "listening/audio/example-02-residual_mlp-direct.wav",
+        "role": "listening_preview",
+        "sha256": "7bcf568d710dbe6b3694f3ba322f00ac3083c4ec8e45fa7219021e11fb81c2d7",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1176058,
+        "case_id": "fresh-024-0",
+        "path": "listening/audio/example-02-residual_mlp-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "e99a7ec39bb98b893ed52d0494bd0131e89b3ee30829e9c4ba4e4c9ff72449e2",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1176058,
+        "case_id": "fresh-024-0",
+        "path": "listening/audio/example-02-target.wav",
+        "role": "target_audition",
+        "sha256": "ee3b6319f8c7e348077449dc7ec92e53ebdb496914c9ecaf7db377cdf34375b3",
+        "source_sha256": "ee3b6319f8c7e348077449dc7ec92e53ebdb496914c9ecaf7db377cdf34375b3"
+      },
+      {
+        "bytes": 1176058,
+        "case_id": "fresh-024-0",
+        "path": "listening/audio/example-02-transformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "54fd3b767df6bf17bcf14edfeb95a45afee0b20f5be26973a9166e00cb759a0f",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1176058,
+        "case_id": "fresh-024-0",
+        "path": "listening/audio/example-02-transformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "1148f40737855d382b9d0b8d65beeabf0da47aa05b2fcc4bc939fda94824e887",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2058580,
+        "case_id": "fresh-024-0",
+        "path": "listening/audio/example-02-conformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "fb9dcb821c2c4da5b5699f4c7691f2d606b8f65115bf73b9435e35150c1e6877",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1556156,
+        "case_id": "fresh-024-0",
+        "path": "listening/audio/example-02-conformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "59efd3f53e8e99f3f2d4419523f3ecae7823bd869a2db841203c9271f975485d",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2030129,
+        "case_id": "fresh-024-0",
+        "path": "listening/audio/example-02-residual_mlp-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "b2011f08d02bd067227942a315cebf5eb3cc97e6f143d6c34029453f3dd180f1",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1475265,
+        "case_id": "fresh-024-0",
+        "path": "listening/audio/example-02-residual_mlp-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "51a84d6ba9f0337635d5a28850ce9fd8485a56bc9da414f51dba19a961181e38",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2045077,
+        "case_id": "fresh-024-0",
+        "path": "listening/audio/example-02-transformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "06c3fa030498e1f19e8affdcdd4e443d15eb78b8fe0193bcb20335ffca8d62fb",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1621000,
+        "case_id": "fresh-024-0",
+        "path": "listening/audio/example-02-transformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "f211b1757c48a69315ce85b5171a64be7e4365d9d16cca9a4d0f00a07db0ead7",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1129018,
+        "case_id": "fresh-015-0",
+        "path": "listening/audio/example-03-conformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "41406163120300452661b40d7340a70e62ab56850869d30b4ffdecbe1cc4827e",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1129018,
+        "case_id": "fresh-015-0",
+        "path": "listening/audio/example-03-conformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "36082d04595b29ca22d812297da8b66c07f2f33109b27a0a4cb4c6aa428fec32",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1129018,
+        "case_id": "fresh-015-0",
+        "path": "listening/audio/example-03-residual_mlp-direct.wav",
+        "role": "listening_preview",
+        "sha256": "328905a6b9e31b937333063af28281361ee13c4b93390e0828039ac43c2c9411",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1129018,
+        "case_id": "fresh-015-0",
+        "path": "listening/audio/example-03-residual_mlp-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "0c832c7a5dea7c77f4c69f9d528e0effff92ba9f09e65e98affb9926800f853b",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1129018,
+        "case_id": "fresh-015-0",
+        "path": "listening/audio/example-03-target.wav",
+        "role": "target_audition",
+        "sha256": "240de80073585861072b721f60d7b45b35bbb6000f5ad1ba91a5dbb50fbca668",
+        "source_sha256": "240de80073585861072b721f60d7b45b35bbb6000f5ad1ba91a5dbb50fbca668"
+      },
+      {
+        "bytes": 1129018,
+        "case_id": "fresh-015-0",
+        "path": "listening/audio/example-03-transformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "02380a9e80644bf1bbdc3d83883be5b55f7521630f917a08c3b3085db548100d",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1129018,
+        "case_id": "fresh-015-0",
+        "path": "listening/audio/example-03-transformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "490f2a06e089e5e51363c6b33cfb1800ec5115f8e8685891dc97157bc34f1ca8",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1999152,
+        "case_id": "fresh-015-0",
+        "path": "listening/audio/example-03-conformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "d5d6853222ca8e4b6a9c7f1b46bdc7e13a0d28da47d10ae1136ed0f843fc727b",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1495380,
+        "case_id": "fresh-015-0",
+        "path": "listening/audio/example-03-conformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "cd18525d3735d4c5846ea469a31ffef03a75f032e2fe203fe4ac1d5e92cee004",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1955735,
+        "case_id": "fresh-015-0",
+        "path": "listening/audio/example-03-residual_mlp-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "b0a83434242c42376981045edbe3424f3886fb07012b002a480f5760cb6db3b6",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1364354,
+        "case_id": "fresh-015-0",
+        "path": "listening/audio/example-03-residual_mlp-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "c49bae223a1fa8f0bcca33c3b2e89379b19156544a7eb9e8fdbe9e338e8d1d13",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1977831,
+        "case_id": "fresh-015-0",
+        "path": "listening/audio/example-03-transformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "4aca7afba33f89a7da6895e257c5b705c1f8ba8737ac6e6d6498867f19bfff43",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1494149,
+        "case_id": "fresh-015-0",
+        "path": "listening/audio/example-03-transformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "bea47fbbd80079454bd2b3848b99ae50f65d5fb656cb0d75877a0112c5d13bdc",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1031322,
+        "case_id": "fresh-073-0",
+        "path": "listening/audio/example-04-conformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "1ee143c8606d2bba79249c475fc6226c6babd5b1d089310610f676035082ab3c",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1031322,
+        "case_id": "fresh-073-0",
+        "path": "listening/audio/example-04-conformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "cef8721179ada7feee3ff7312de669b49228ef21a14275dbfc426cca8fc367f9",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1031322,
+        "case_id": "fresh-073-0",
+        "path": "listening/audio/example-04-residual_mlp-direct.wav",
+        "role": "listening_preview",
+        "sha256": "cc51bb289d0cfeeefbb87b866ecde272bbf66a0e7e73dffe6e8e86af7d8cb08e",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1031322,
+        "case_id": "fresh-073-0",
+        "path": "listening/audio/example-04-residual_mlp-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "0c38e0ed6b9cdd43442e3fa1af69624c65df4434b337d18b4630d74c03fda9e8",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1031322,
+        "case_id": "fresh-073-0",
+        "path": "listening/audio/example-04-target.wav",
+        "role": "target_audition",
+        "sha256": "7d683bbdfc314da8b6b64bf55ba65beba4cc1bd538899c44cf71511b5432bd1b",
+        "source_sha256": "7d683bbdfc314da8b6b64bf55ba65beba4cc1bd538899c44cf71511b5432bd1b"
+      },
+      {
+        "bytes": 1031322,
+        "case_id": "fresh-073-0",
+        "path": "listening/audio/example-04-transformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "35893bd4087e790275bf60463b6a0caa157551df0a2a6ce743d51582dbda6b57",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1031322,
+        "case_id": "fresh-073-0",
+        "path": "listening/audio/example-04-transformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "b77a9fb4f8ac0426f55f9e7b3283fa4f6a23401fc606ade6ec9884042f149992",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1798360,
+        "case_id": "fresh-073-0",
+        "path": "listening/audio/example-04-conformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "76b394c72c646d510def1d3de0b8ccab78e812ba3f8aab7b7da110a41b5b9bc7",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1310367,
+        "case_id": "fresh-073-0",
+        "path": "listening/audio/example-04-conformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "9907caa04a294897a69975c9be464b3c207be4943808f5fa7149e0a337ceab1f",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1771820,
+        "case_id": "fresh-073-0",
+        "path": "listening/audio/example-04-residual_mlp-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "18e46193375bfa92a9a58db981487f5d802b5766125f5fd6831fc0e3c10ebbe3",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1235967,
+        "case_id": "fresh-073-0",
+        "path": "listening/audio/example-04-residual_mlp-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "9e318fa35276b592ca9b11e44d3e4489748590ff0421fdf1e0270c5e065869c2",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1773786,
+        "case_id": "fresh-073-0",
+        "path": "listening/audio/example-04-transformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "2c2d8ed0272d7f686b267fca6e4436e9273806529005d8e5bc66a8afddd072b5",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1357418,
+        "case_id": "fresh-073-0",
+        "path": "listening/audio/example-04-transformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "0d173f7e15a5b1facecccf51ad15e44d96a4b42e91fe6183424811c1e8ca37b8",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1411258,
+        "case_id": "fresh-076-0",
+        "path": "listening/audio/example-05-conformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "b4078f80b31e677b3dbbce3daf04593d197c3bb20697df565a9b8e12a649d76b",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1411258,
+        "case_id": "fresh-076-0",
+        "path": "listening/audio/example-05-conformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "d2c5dd66a7354440b76f7b8fb715f5a8a395ea30fa438ea6af0c8d328525efe4",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1411258,
+        "case_id": "fresh-076-0",
+        "path": "listening/audio/example-05-residual_mlp-direct.wav",
+        "role": "listening_preview",
+        "sha256": "4cc0a3b0654c57acaa44ebbc15bef7a992b6d174fee2c91a99937e82c0910184",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1411258,
+        "case_id": "fresh-076-0",
+        "path": "listening/audio/example-05-residual_mlp-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "ea3e5507772d3e1db1cfb704e3b74874b4b4d2c1c71dcd5173105879ea0a7c58",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1411258,
+        "case_id": "fresh-076-0",
+        "path": "listening/audio/example-05-target.wav",
+        "role": "target_audition",
+        "sha256": "e58aaebd85890a79ce53d2e7a4d7fa6c1060c48a28142873ba400a70abf42893",
+        "source_sha256": "e58aaebd85890a79ce53d2e7a4d7fa6c1060c48a28142873ba400a70abf42893"
+      },
+      {
+        "bytes": 1411258,
+        "case_id": "fresh-076-0",
+        "path": "listening/audio/example-05-transformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "3fbf8cb056a27ad08389925a2f49fdb9f3e04b368e2b1d63dded244d2395cc3b",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1411258,
+        "case_id": "fresh-076-0",
+        "path": "listening/audio/example-05-transformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "e520b0e882874cd954c970bdb0d3ddf85e53499661335f794911db9c6647773e",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2549797,
+        "case_id": "fresh-076-0",
+        "path": "listening/audio/example-05-conformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "63266678aa5a6406b8a595c5a2d56d2786692d5ed4c6dffe8ebb68a1b747ecd5",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2028567,
+        "case_id": "fresh-076-0",
+        "path": "listening/audio/example-05-conformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "e1e8a81f2b5d46d4f394b7a9d774bf11912082cd1bf11c499dd634371c9a60e4",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2531307,
+        "case_id": "fresh-076-0",
+        "path": "listening/audio/example-05-residual_mlp-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "20c7f0a6ac58d51abd560b8e415d9b7f19f7c7a585dd479d37cef1d771fba936",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2126838,
+        "case_id": "fresh-076-0",
+        "path": "listening/audio/example-05-residual_mlp-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "dd22497e15432688eef571bb73b427c5ceab2b83d5eb01d23da9dbc9565ec4d8",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2509041,
+        "case_id": "fresh-076-0",
+        "path": "listening/audio/example-05-transformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "0c45d3e58ab5f0766b4a917dac2d01135dbf713eb15768da76e377f4d16699bd",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2195492,
+        "case_id": "fresh-076-0",
+        "path": "listening/audio/example-05-transformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "d2e1d571a73c06503d93e98b2e29204c86b0ebd4d1a3446306837edd2b1cd963",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1031322,
+        "case_id": "fresh-049-0",
+        "path": "listening/audio/example-06-conformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "d4a96991dbc1654982a2d79a9e48743a3a6887f16ee0f80a07e01c52d5ae9420",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1031322,
+        "case_id": "fresh-049-0",
+        "path": "listening/audio/example-06-conformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "d8ef4cccf4dbbd68347da9309aa8466d853c3c41a21be5abdc4e7637018ae042",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1031322,
+        "case_id": "fresh-049-0",
+        "path": "listening/audio/example-06-residual_mlp-direct.wav",
+        "role": "listening_preview",
+        "sha256": "b39bd5aa0d0bafd51b93c3e292b32824aa52fb938171dc84a963fdacf60aca21",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1031322,
+        "case_id": "fresh-049-0",
+        "path": "listening/audio/example-06-residual_mlp-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "9d3485a4faf4695fd2f51df05e06cae922290acce75f5746f867adf8d79c7a8b",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1031322,
+        "case_id": "fresh-049-0",
+        "path": "listening/audio/example-06-target.wav",
+        "role": "target_audition",
+        "sha256": "87ee7272b6b86f11b0c474cb4c02471f851a4a68dca36be77f2a5029bc41c8ac",
+        "source_sha256": "87ee7272b6b86f11b0c474cb4c02471f851a4a68dca36be77f2a5029bc41c8ac"
+      },
+      {
+        "bytes": 1031322,
+        "case_id": "fresh-049-0",
+        "path": "listening/audio/example-06-transformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "38792131fc4b619ba3d9613d5d04fde243b5427f2c98a35fa85dd28b114f9213",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1031322,
+        "case_id": "fresh-049-0",
+        "path": "listening/audio/example-06-transformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "1d36a0c85f9d55966e1a17eef9f1f32b2939f587d27a9d9b0ac4484306c00a8a",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1822070,
+        "case_id": "fresh-049-0",
+        "path": "listening/audio/example-06-conformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "26c70d67f4260f4bcc9ba7fa003cdb83ed45e2c36bd1c9003af09ab84745c886",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1353340,
+        "case_id": "fresh-049-0",
+        "path": "listening/audio/example-06-conformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "14012f7315dcb97c2040baada7738dd82ea68f14dcde1bfa939e20ab636eee55",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1801603,
+        "case_id": "fresh-049-0",
+        "path": "listening/audio/example-06-residual_mlp-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "0c47b40e7b4a73e3a4a9f7c7908f156e63a2fd2e5f7220c0310706c2c2b3ed64",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1324473,
+        "case_id": "fresh-049-0",
+        "path": "listening/audio/example-06-residual_mlp-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "1aa308c8734e0f08b8782222d8798493a694886744a4f8e9880854f14f4e873f",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1790886,
+        "case_id": "fresh-049-0",
+        "path": "listening/audio/example-06-transformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "6b5e26700045b93303187dea818381cc06e676259b2f715d99861d8b1a470be2",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1396104,
+        "case_id": "fresh-049-0",
+        "path": "listening/audio/example-06-transformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "c4a94fa0052558cd836e4ed9e8effb214658c466983f243b4dc5c07cdb424fe5",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1176058,
+        "case_id": "fresh-036-0",
+        "path": "listening/audio/example-07-conformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "ad76cdf59bd7e105ff6f85ab2c816da9a4723a2cf2c1d2c40cabef5d6d303d3b",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1176058,
+        "case_id": "fresh-036-0",
+        "path": "listening/audio/example-07-conformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "9ce1ee09806feefeb8f49c89427c8dee40e242cb6c1d6869927a0a3bb8d276d8",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1176058,
+        "case_id": "fresh-036-0",
+        "path": "listening/audio/example-07-residual_mlp-direct.wav",
+        "role": "listening_preview",
+        "sha256": "f9986ddf98d3a44ad61756a7592396ffaefbfa24cd745ecee6fcde90e549f400",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1176058,
+        "case_id": "fresh-036-0",
+        "path": "listening/audio/example-07-residual_mlp-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "65a938e37ab353006cc93a019ac4210ff9dc0c90154180527de1cd26e0135527",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1176058,
+        "case_id": "fresh-036-0",
+        "path": "listening/audio/example-07-target.wav",
+        "role": "target_audition",
+        "sha256": "228754f9551500db27f4a74059e57e5b91ec5a313735d2abc6464f6fa7ca5321",
+        "source_sha256": "228754f9551500db27f4a74059e57e5b91ec5a313735d2abc6464f6fa7ca5321"
+      },
+      {
+        "bytes": 1176058,
+        "case_id": "fresh-036-0",
+        "path": "listening/audio/example-07-transformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "1d26e7411612065f3ecba5f1f03fa76468a13ce51f00f421fc2801376cc48d3a",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1176058,
+        "case_id": "fresh-036-0",
+        "path": "listening/audio/example-07-transformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "fbef2011c9b8ec62d1ef838765e8779532a16cee82eeb64ac0993c7a5bacc055",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2103259,
+        "case_id": "fresh-036-0",
+        "path": "listening/audio/example-07-conformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "db2f1f01c1262f1b41da50e8358820e6cfbc41b317f20afe8aa699422e3bd7da",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1645631,
+        "case_id": "fresh-036-0",
+        "path": "listening/audio/example-07-conformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "c6fa262f94dc45bfd4c9d526b686c8cce738b51a6e0677250b58bc3c9e71878f",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2093575,
+        "case_id": "fresh-036-0",
+        "path": "listening/audio/example-07-residual_mlp-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "a5fb581ed9b9095cb83d5609b225d8a0c29b71ed1bc80f22e2af148e5e39f677",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1593881,
+        "case_id": "fresh-036-0",
+        "path": "listening/audio/example-07-residual_mlp-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "b1d33bb6b8c090cc65dec654c0457023760f5331861805de963e549496f48ce2",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2076137,
+        "case_id": "fresh-036-0",
+        "path": "listening/audio/example-07-transformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "45befe46503802bfb78c50b2fefb0b4b95cf814665f2929aeb3c9266eab7d607",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1694228,
+        "case_id": "fresh-036-0",
+        "path": "listening/audio/example-07-transformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "7a48f95b25ea3155e023dc3f013c5be58cd250f0323f0bc052f79e8c9858eee5",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1411258,
+        "case_id": "fresh-088-0",
+        "path": "listening/audio/example-08-conformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "85cc28712da72c004e41fadc6875bcb95f601e533fadc52dafadc70c11ed5782",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1411258,
+        "case_id": "fresh-088-0",
+        "path": "listening/audio/example-08-conformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "91f57781656edf35cd6c168a68dafc35e16c26bf5e1b9f8f7defc991cc452a99",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1411258,
+        "case_id": "fresh-088-0",
+        "path": "listening/audio/example-08-residual_mlp-direct.wav",
+        "role": "listening_preview",
+        "sha256": "5c95375608a5a7e93b87979dec80c8d2eb0c8eb4ad7b6a34c08e514ee876a90c",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1411258,
+        "case_id": "fresh-088-0",
+        "path": "listening/audio/example-08-residual_mlp-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "8d6d8a1784b66fddc24ea475cb0f3a5a022202fa5ecd6f62899f2a8d8ed2b6b7",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1411258,
+        "case_id": "fresh-088-0",
+        "path": "listening/audio/example-08-target.wav",
+        "role": "target_audition",
+        "sha256": "f29663e2fd2e9fee41cb511c005fe3024fd7ffad403179b044644c2c6880179b",
+        "source_sha256": "f29663e2fd2e9fee41cb511c005fe3024fd7ffad403179b044644c2c6880179b"
+      },
+      {
+        "bytes": 1411258,
+        "case_id": "fresh-088-0",
+        "path": "listening/audio/example-08-transformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "40c8b9f11130c8c2c65009d7ddde4718239169f73d9bad754e23c471c7c6b03c",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1411258,
+        "case_id": "fresh-088-0",
+        "path": "listening/audio/example-08-transformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "9161ce2c2e55cc830e73b9a9558d80e0e0cb3d17d8119f827d33bc47699684df",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2540335,
+        "case_id": "fresh-088-0",
+        "path": "listening/audio/example-08-conformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "d8ab3ab9fe557142461312ba4980c502384b81a57205128d439b6d0568870fca",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1957747,
+        "case_id": "fresh-088-0",
+        "path": "listening/audio/example-08-conformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "e90fb8de8682540c5724f15e8840c3400af999ba77cf446dd95eb0ddeb4b50c6",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2531647,
+        "case_id": "fresh-088-0",
+        "path": "listening/audio/example-08-residual_mlp-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "0788ff7dbd2b250618cdf08e5a110ad9f798e98326f69da488baaea4ebe03383",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1983373,
+        "case_id": "fresh-088-0",
+        "path": "listening/audio/example-08-residual_mlp-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "ce9cb0ee41fc528c21a002111cde4f2e014eb7ee68c2fff97685682f2f1d9389",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2507001,
+        "case_id": "fresh-088-0",
+        "path": "listening/audio/example-08-transformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "5c244280c2b818291825ecff76a9141523aa95b21bc3269fdaa52443383f7762",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2086969,
+        "case_id": "fresh-088-0",
+        "path": "listening/audio/example-08-transformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "90b97dfd3659497f167865c25e17ac2b6b0114d76169eab4dcdc13758665060e",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1307026,
+        "case_id": "fresh-079-0",
+        "path": "listening/audio/example-09-conformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "a7a0eabe19a49d02124de175a14d7054363852c19ffad88cd746c96fcecfeb87",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1307026,
+        "case_id": "fresh-079-0",
+        "path": "listening/audio/example-09-conformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "b44f9ce0e0f9d2cd804714bc276d0e96cfa030225acaaaa8b4aacb258da07917",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1307026,
+        "case_id": "fresh-079-0",
+        "path": "listening/audio/example-09-residual_mlp-direct.wav",
+        "role": "listening_preview",
+        "sha256": "60b0c0967b937e3061815373b0e0f1ecea5d997ae6ad3346dd7c0ae020cfb548",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1307026,
+        "case_id": "fresh-079-0",
+        "path": "listening/audio/example-09-residual_mlp-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "24d2a03c3a9d92e634a39f5cffb1f6943337601efaa91b80d7fc16f22534d738",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1307026,
+        "case_id": "fresh-079-0",
+        "path": "listening/audio/example-09-target.wav",
+        "role": "target_audition",
+        "sha256": "146af343d0daa1fc9e03edbe9720988be0c5af579a934cbaa28cbc1f84c86ee7",
+        "source_sha256": "146af343d0daa1fc9e03edbe9720988be0c5af579a934cbaa28cbc1f84c86ee7"
+      },
+      {
+        "bytes": 1307026,
+        "case_id": "fresh-079-0",
+        "path": "listening/audio/example-09-transformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "36d071fdf59ea1e8828ed1849aafa8c123952e1b108dd9ef9a44fbbadf351723",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1307026,
+        "case_id": "fresh-079-0",
+        "path": "listening/audio/example-09-transformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "b6f077dff4d026371ce69cacf25644a4e82654e54f8f9075b6392e8c898783c3",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2293086,
+        "case_id": "fresh-079-0",
+        "path": "listening/audio/example-09-conformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "624e1b2ab9fda941c5f9c747f9ea4ab06d10873187143d086809ffa23ac99825",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1673544,
+        "case_id": "fresh-079-0",
+        "path": "listening/audio/example-09-conformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "e94ed35f6fe9bf7fe83fdbc018165d3b8de04416f23189532037609544d5eb95",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2237780,
+        "case_id": "fresh-079-0",
+        "path": "listening/audio/example-09-residual_mlp-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "6d3f553675228053a4d6d90f7566700a4613da83cedb9a43ec08088b4e735fc6",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1597123,
+        "case_id": "fresh-079-0",
+        "path": "listening/audio/example-09-residual_mlp-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "52788e118ecb423be1e5ed709e62c7bc8991b49e7d8b722ff585a8bfe5a50cd2",
+        "source_sha256": null
+      },
+      {
+        "bytes": 2265851,
+        "case_id": "fresh-079-0",
+        "path": "listening/audio/example-09-transformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "93addc74cf527b1f384eeef06f88e3cefc6a718cb2a30b348560fc03b4b6d0f8",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1733595,
+        "case_id": "fresh-079-0",
+        "path": "listening/audio/example-09-transformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "7d2d88e9ff4196370624fe02d854a05f130559f6d8c104d8161eb402dc44db25",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1093738,
+        "case_id": "fresh-045-0",
+        "path": "listening/audio/example-10-conformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "986eb4320b506c72d78cba7d3df160b326e62e2196a2a391bbd3632612629a9d",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1093738,
+        "case_id": "fresh-045-0",
+        "path": "listening/audio/example-10-conformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "aff06f552876f9e290c2c436573fc946895beda0edfbdd1ce12a6dc9e73dc620",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1093738,
+        "case_id": "fresh-045-0",
+        "path": "listening/audio/example-10-residual_mlp-direct.wav",
+        "role": "listening_preview",
+        "sha256": "e250567e3d242c4fe7439f211d4bd3da7b2acc22cfd16f2da24180b6c1646b2f",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1093738,
+        "case_id": "fresh-045-0",
+        "path": "listening/audio/example-10-residual_mlp-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "5bf1e54140c0a50574625876d3d30e7072be6af9ac39c2b611a0635b058eb138",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1093738,
+        "case_id": "fresh-045-0",
+        "path": "listening/audio/example-10-target.wav",
+        "role": "target_audition",
+        "sha256": "d2004b3004c31275b4e196a240e5606ecc924529b9a777b6192ba2acb89d9b19",
+        "source_sha256": "d2004b3004c31275b4e196a240e5606ecc924529b9a777b6192ba2acb89d9b19"
+      },
+      {
+        "bytes": 1093738,
+        "case_id": "fresh-045-0",
+        "path": "listening/audio/example-10-transformer-direct.wav",
+        "role": "listening_preview",
+        "sha256": "e749c804f34f73e9c10d0dc247e3bbbddef73cb3bd9ec027969683c8fcb239c5",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1093738,
+        "case_id": "fresh-045-0",
+        "path": "listening/audio/example-10-transformer-flow-16.wav",
+        "role": "listening_preview",
+        "sha256": "427437d359c39df822853515bcd7ddb3151ee799126e5950a3cd7b373f2ba77a",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1957606,
+        "case_id": "fresh-045-0",
+        "path": "listening/audio/example-10-conformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "01a25ee5e6857c146da2903258f3e93ee2652d31753dea93332203a8f3134ed9",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1437969,
+        "case_id": "fresh-045-0",
+        "path": "listening/audio/example-10-conformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "87565a3c37d4f44860221febf669470753dd58846d1d0f58a37b4abe0a3cf458",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1918969,
+        "case_id": "fresh-045-0",
+        "path": "listening/audio/example-10-residual_mlp-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "4316da36b283aca46944ef8428958fd6d844ba43289166d0aa09f3aa765b2289",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1283091,
+        "case_id": "fresh-045-0",
+        "path": "listening/audio/example-10-residual_mlp-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "dc9fa3ddb81bd6c8f60bd797eae1a3dcfb3f5d90234b22a78a3246308f224f5f",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1919614,
+        "case_id": "fresh-045-0",
+        "path": "listening/audio/example-10-transformer-direct.npz",
+        "role": "predicted_spectrum",
+        "sha256": "56ef87f66029382a4c0a02434d9722f56da4b0536b8bb71c6c82349049c732da",
+        "source_sha256": null
+      },
+      {
+        "bytes": 1479020,
+        "case_id": "fresh-045-0",
+        "path": "listening/audio/example-10-transformer-flow-16.npz",
+        "role": "predicted_spectrum",
+        "sha256": "bafdc0047035b498cd0a825545ad033cdba06bbba08a48fdd1c58ada4e56aa1f",
+        "source_sha256": null
+      }
+    ],
+    "available": true,
+    "examples": 10,
+    "experiment_plan_id": "a071023cd2341ac4a13514765015a6acc104ef1dd55083743d8acf889a0ca9a9",
+    "griffin_lim_iterations": 48,
+    "normalization": "each stereo clip peak-normalized to -1 dBFS for audition only",
+    "path": "research/training/outputs/issue183-flow-matching-corrected-v2-20261127/listening/index.html",
+    "source_case_ids": [
+      "fresh-057-0",
+      "fresh-024-0",
+      "fresh-015-0",
+      "fresh-073-0",
+      "fresh-076-0",
+      "fresh-049-0",
+      "fresh-036-0",
+      "fresh-088-0",
+      "fresh-079-0",
+      "fresh-045-0"
+    ],
+    "source_case_ids_sha256": "52fa1333ac93372e6cdf8738716ab643267abd95670131016543a412425c4ee9",
+    "source_checkpoint_sha256": {
+      "conformer-direct": "fa157b7d036211e35cd6c1bafeddec1c7a1416d4c3138408bc638b5adf6ce6a5",
+      "conformer-flow": "7cd65a7540593fcd29c8a3f228a1dcd2fa100ec1c5bcdbfb1b6309a497eede52",
+      "residual_mlp-direct": "08f11f66016440b19abcc00805789f2e0b95f32f91ab4710da70e9883dc4cadc",
+      "residual_mlp-flow": "0e980540380c2729e1588a899b56c7259575b54769d6efc8322d031a468c4b86",
+      "transformer-direct": "c8035728492862e71525327ce2523bd569f9faea4c5dacff4a627f03741f76d0",
+      "transformer-flow": "5b4541bc275a9a1027afc6d7d0a4e7364f28d7081c74b75f86d1b10459bfea05"
+    },
+    "source_manifest_sha256": "f6ee53e6ea7906d19ef375fdd263f7be92eeb9234d3bc368838b0aebe8196fee",
+    "source_plan_id": "a36b7a2eeef4d9da1272e4246e2982347e20097dfed3adb0f2ac96019a38c4cf"
+  },
+  "noise_sensitivity": {
+    "aggregate_by_seed": {
+      "conformer-flow": {
+        "16": {
+          "90183": {
+            "attack_envelope_error_db": 24.39598328575464,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 27.73990119330659,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.4540495465043932,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 27.6253053190603,
+            "octave_band_energy_error_db": 26.37671306721336,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 40.5828845854642,
+            "release_frames": 1914,
+            "spectral_convergence": 0.9246870901552029,
+            "spectral_loss": 0.6893683159723878,
+            "sustain_envelope_error_db": 25.18105346466168,
+            "sustain_frames": 1472
+          },
+          "90184": {
+            "attack_envelope_error_db": 24.557678464393355,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 27.173360582049526,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.45167943538399413,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 27.34738988181394,
+            "octave_band_energy_error_db": 26.24622728709268,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 39.92194828424378,
+            "release_frames": 1914,
+            "spectral_convergence": 0.9196534430375323,
+            "spectral_loss": 0.6856664409860969,
+            "sustain_envelope_error_db": 24.864634319900496,
+            "sustain_frames": 1472
+          },
+          "90185": {
+            "attack_envelope_error_db": 25.18319486303539,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 26.676370077173747,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.4515114563109819,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 27.61280946814921,
+            "octave_band_energy_error_db": 26.40283108558568,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 39.52414135890937,
+            "release_frames": 1914,
+            "spectral_convergence": 0.9236712822457775,
+            "spectral_loss": 0.6875913686817512,
+            "sustain_envelope_error_db": 26.10276784312557,
+            "sustain_frames": 1472
+          }
+        },
+        "4": {
+          "90183": {
+            "attack_envelope_error_db": 25.820421819539085,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 29.297918902233803,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.4170255745993927,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 27.507164797024146,
+            "octave_band_energy_error_db": 26.038492239847173,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 40.12533739754176,
+            "release_frames": 1914,
+            "spectral_convergence": 0.888216293300502,
+            "spectral_loss": 0.6526209325529635,
+            "sustain_envelope_error_db": 26.311922428507092,
+            "sustain_frames": 1472
+          },
+          "90184": {
+            "attack_envelope_error_db": 26.029303929033397,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 28.99810993452639,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.4153506219154224,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 27.269446752789595,
+            "octave_band_energy_error_db": 25.942641995563534,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 39.5924699097572,
+            "release_frames": 1914,
+            "spectral_convergence": 0.885830780985998,
+            "spectral_loss": 0.650590700970497,
+            "sustain_envelope_error_db": 25.94433026430906,
+            "sustain_frames": 1472
+          },
+          "90185": {
+            "attack_envelope_error_db": 26.318665058205667,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 28.479549924246406,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.4158302524010651,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 27.447631480022228,
+            "octave_band_energy_error_db": 26.04723200285869,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 39.30642199468079,
+            "release_frames": 1914,
+            "spectral_convergence": 0.8870349368662573,
+            "spectral_loss": 0.651432593469508,
+            "sustain_envelope_error_db": 26.995968737561334,
+            "sustain_frames": 1472
+          }
+        },
+        "8": {
+          "90183": {
+            "attack_envelope_error_db": 24.968919677655297,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 28.401846768666125,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.4358360487385653,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 27.584489851291607,
+            "octave_band_energy_error_db": 26.22622990309629,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 40.38433420437393,
+            "release_frames": 1914,
+            "spectral_convergence": 0.9066342659643851,
+            "spectral_loss": 0.6712351570604369,
+            "sustain_envelope_error_db": 25.668786222409164,
+            "sustain_frames": 1472
+          },
+          "90184": {
+            "attack_envelope_error_db": 25.147189269931296,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 27.93750280949311,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.43372833845205605,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 27.314112272324934,
+            "octave_band_energy_error_db": 26.11038968250773,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 39.76813800336219,
+            "release_frames": 1914,
+            "spectral_convergence": 0.9027506778656971,
+            "spectral_loss": 0.6682395090465434,
+            "sustain_envelope_error_db": 25.31448654646607,
+            "sustain_frames": 1472
+          },
+          "90185": {
+            "attack_envelope_error_db": 25.643454051974526,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 27.42886000081818,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.4337981542630587,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 27.553858254127146,
+            "octave_band_energy_error_db": 26.24699993951042,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 39.410493718188356,
+            "release_frames": 1914,
+            "spectral_convergence": 0.9054663478746079,
+            "spectral_loss": 0.6696322513162158,
+            "sustain_envelope_error_db": 26.481236124979493,
+            "sustain_frames": 1472
+          }
+        }
+      },
+      "residual_mlp-flow": {
+        "16": {
+          "90183": {
+            "attack_envelope_error_db": 23.320664349540834,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 26.123256715732353,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.4077273048751522,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 26.322898022974954,
+            "octave_band_energy_error_db": 25.242011463623598,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 39.771691737516434,
+            "release_frames": 1914,
+            "spectral_convergence": 0.9015235021070112,
+            "spectral_loss": 0.6546254025597591,
+            "sustain_envelope_error_db": 24.96889415136385,
+            "sustain_frames": 1472
+          },
+          "90184": {
+            "attack_envelope_error_db": 23.23966036514376,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 26.092827450414326,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.4076110555615742,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 26.130158831812707,
+            "octave_band_energy_error_db": 25.177277367489104,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 39.56474271407443,
+            "release_frames": 1914,
+            "spectral_convergence": 0.9064132937055547,
+            "spectral_loss": 0.6570121733238921,
+            "sustain_envelope_error_db": 24.93191088626823,
+            "sustain_frames": 1472
+          },
+          "90185": {
+            "attack_envelope_error_db": 23.468576039428,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 25.42311002458819,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.4090055105043575,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 26.355227715874975,
+            "octave_band_energy_error_db": 25.309039664730776,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 39.24678234716595,
+            "release_frames": 1914,
+            "spectral_convergence": 0.9095902100089006,
+            "spectral_loss": 0.6592978589469567,
+            "sustain_envelope_error_db": 25.868917448375246,
+            "sustain_frames": 1472
+          }
+        },
+        "4": {
+          "90183": {
+            "attack_envelope_error_db": 24.764647510023302,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 27.8249052799627,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.38495506506296806,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 26.434597853482245,
+            "octave_band_energy_error_db": 25.084221794380902,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 39.58704122738648,
+            "release_frames": 1914,
+            "spectral_convergence": 0.8804704555077478,
+            "spectral_loss": 0.632712761813309,
+            "sustain_envelope_error_db": 26.146095891979623,
+            "sustain_frames": 1472
+          },
+          "90184": {
+            "attack_envelope_error_db": 24.74077582868719,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 27.934351768375073,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.3844640431634616,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 26.29365415789809,
+            "octave_band_energy_error_db": 25.03826949824373,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 39.36710816481771,
+            "release_frames": 1914,
+            "spectral_convergence": 0.8834435838507488,
+            "spectral_loss": 0.6339538155880291,
+            "sustain_envelope_error_db": 26.06316802798139,
+            "sustain_frames": 1472
+          },
+          "90185": {
+            "attack_envelope_error_db": 24.916266299463892,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 27.256674169280547,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.38515581790125,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 26.43288157636806,
+            "octave_band_energy_error_db": 25.131862516174202,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 39.182816141136485,
+            "release_frames": 1914,
+            "spectral_convergence": 0.8844538153789472,
+            "spectral_loss": 0.6348048170330003,
+            "sustain_envelope_error_db": 26.85983109114377,
+            "sustain_frames": 1472
+          }
+        },
+        "8": {
+          "90183": {
+            "attack_envelope_error_db": 23.913375993646387,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 26.817367302006023,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.3962761883449275,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 26.371374085767275,
+            "octave_band_energy_error_db": 25.169161976761025,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 39.67347592625621,
+            "release_frames": 1914,
+            "spectral_convergence": 0.8912831475608982,
+            "spectral_loss": 0.6437796657555737,
+            "sustain_envelope_error_db": 25.46069556532905,
+            "sustain_frames": 1472
+          },
+          "90184": {
+            "attack_envelope_error_db": 23.84357633544687,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 26.8605590258043,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.3959285603777971,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 26.19465501447094,
+            "octave_band_energy_error_db": 25.11210248826793,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 39.47408575435425,
+            "release_frames": 1914,
+            "spectral_convergence": 0.8952339459210634,
+            "spectral_loss": 0.6455812547646929,
+            "sustain_envelope_error_db": 25.414500918654532,
+            "sustain_frames": 1472
+          },
+          "90185": {
+            "attack_envelope_error_db": 24.054934792393716,
+            "attack_frames": 1114,
+            "clips": 256,
+            "decay_envelope_error_db": 26.17657692011149,
+            "decay_frames": 1314,
+            "log_magnitude_mae": 0.39683738705934957,
+            "midi_performances": 16,
+            "monophonic_frames": 2804,
+            "monophonic_frames_total": 2804,
+            "monophonic_octave_energy_error_db": 26.384976326761613,
+            "octave_band_energy_error_db": 25.22562521116309,
+            "octave_band_frames": 5409,
+            "octave_band_total_frames": 8192,
+            "patch_roots": 64,
+            "release_envelope_error_db": 39.20887477685178,
+            "release_frames": 1914,
+            "spectral_convergence": 0.8973779131192714,
+            "spectral_loss": 0.6471076494199224,
+            "sustain_envelope_error_db": 26.30037645157528,
+            "sustain_frames": 1472
+          }
+        }
+      }
+    },
+    "euler_steps": [
+      4,
+      8,
+      16
+    ],
+    "finalists": [
+      "residual_mlp",
+      "conformer"
+    ],
+    "format": "issue183_flow_noise_sensitivity_v1",
+    "midi_performances": 16,
+    "noise_seeds": [
+      90183,
+      90184,
+      90185
+    ],
+    "seed_ranges": {
+      "conformer-flow": {
+        "16": {
+          "attack_envelope_error_db": {
+            "max": 25.18319486303539,
+            "mean": 24.712285537727794,
+            "min": 24.39598328575464,
+            "values": [
+              24.39598328575464,
+              24.557678464393355,
+              25.18319486303539
+            ]
+          },
+          "decay_envelope_error_db": {
+            "max": 27.73990119330659,
+            "mean": 27.19654395084329,
+            "min": 26.676370077173747,
+            "values": [
+              27.73990119330659,
+              27.173360582049526,
+              26.676370077173747
+            ]
+          },
+          "monophonic_octave_energy_error_db": {
+            "max": 27.6253053190603,
+            "mean": 27.52850155634115,
+            "min": 27.34738988181394,
+            "values": [
+              27.6253053190603,
+              27.34738988181394,
+              27.61280946814921
+            ]
+          },
+          "octave_band_energy_error_db": {
+            "max": 26.40283108558568,
+            "mean": 26.34192381329724,
+            "min": 26.24622728709268,
+            "values": [
+              26.37671306721336,
+              26.24622728709268,
+              26.40283108558568
+            ]
+          },
+          "release_envelope_error_db": {
+            "max": 40.5828845854642,
+            "mean": 40.00965807620579,
+            "min": 39.52414135890937,
+            "values": [
+              40.5828845854642,
+              39.92194828424378,
+              39.52414135890937
+            ]
+          },
+          "spectral_loss": {
+            "max": 0.6893683159723878,
+            "mean": 0.6875420418800786,
+            "min": 0.6856664409860969,
+            "values": [
+              0.6893683159723878,
+              0.6856664409860969,
+              0.6875913686817512
+            ]
+          },
+          "sustain_envelope_error_db": {
+            "max": 26.10276784312557,
+            "mean": 25.382818542562585,
+            "min": 24.864634319900496,
+            "values": [
+              25.18105346466168,
+              24.864634319900496,
+              26.10276784312557
+            ]
+          }
+        },
+        "4": {
+          "attack_envelope_error_db": {
+            "max": 26.318665058205667,
+            "mean": 26.05613026892605,
+            "min": 25.820421819539085,
+            "values": [
+              25.820421819539085,
+              26.029303929033397,
+              26.318665058205667
+            ]
+          },
+          "decay_envelope_error_db": {
+            "max": 29.297918902233803,
+            "mean": 28.925192920335533,
+            "min": 28.479549924246406,
+            "values": [
+              29.297918902233803,
+              28.99810993452639,
+              28.479549924246406
+            ]
+          },
+          "monophonic_octave_energy_error_db": {
+            "max": 27.507164797024146,
+            "mean": 27.408081009945324,
+            "min": 27.269446752789595,
+            "values": [
+              27.507164797024146,
+              27.269446752789595,
+              27.447631480022228
+            ]
+          },
+          "octave_band_energy_error_db": {
+            "max": 26.04723200285869,
+            "mean": 26.009455412756466,
+            "min": 25.942641995563534,
+            "values": [
+              26.038492239847173,
+              25.942641995563534,
+              26.04723200285869
+            ]
+          },
+          "release_envelope_error_db": {
+            "max": 40.12533739754176,
+            "mean": 39.67474310065992,
+            "min": 39.30642199468079,
+            "values": [
+              40.12533739754176,
+              39.5924699097572,
+              39.30642199468079
+            ]
+          },
+          "spectral_loss": {
+            "max": 0.6526209325529635,
+            "mean": 0.6515480756643228,
+            "min": 0.650590700970497,
+            "values": [
+              0.6526209325529635,
+              0.650590700970497,
+              0.651432593469508
+            ]
+          },
+          "sustain_envelope_error_db": {
+            "max": 26.995968737561334,
+            "mean": 26.41740714345916,
+            "min": 25.94433026430906,
+            "values": [
+              26.311922428507092,
+              25.94433026430906,
+              26.995968737561334
+            ]
+          }
+        },
+        "8": {
+          "attack_envelope_error_db": {
+            "max": 25.643454051974526,
+            "mean": 25.253187666520375,
+            "min": 24.968919677655297,
+            "values": [
+              24.968919677655297,
+              25.147189269931296,
+              25.643454051974526
+            ]
+          },
+          "decay_envelope_error_db": {
+            "max": 28.401846768666125,
+            "mean": 27.922736526325806,
+            "min": 27.42886000081818,
+            "values": [
+              28.401846768666125,
+              27.93750280949311,
+              27.42886000081818
+            ]
+          },
+          "monophonic_octave_energy_error_db": {
+            "max": 27.584489851291607,
+            "mean": 27.484153459247896,
+            "min": 27.314112272324934,
+            "values": [
+              27.584489851291607,
+              27.314112272324934,
+              27.553858254127146
+            ]
+          },
+          "octave_band_energy_error_db": {
+            "max": 26.24699993951042,
+            "mean": 26.194539841704813,
+            "min": 26.11038968250773,
+            "values": [
+              26.22622990309629,
+              26.11038968250773,
+              26.24699993951042
+            ]
+          },
+          "release_envelope_error_db": {
+            "max": 40.38433420437393,
+            "mean": 39.85432197530816,
+            "min": 39.410493718188356,
+            "values": [
+              40.38433420437393,
+              39.76813800336219,
+              39.410493718188356
+            ]
+          },
+          "spectral_loss": {
+            "max": 0.6712351570604369,
+            "mean": 0.669702305807732,
+            "min": 0.6682395090465434,
+            "values": [
+              0.6712351570604369,
+              0.6682395090465434,
+              0.6696322513162158
+            ]
+          },
+          "sustain_envelope_error_db": {
+            "max": 26.481236124979493,
+            "mean": 25.821502964618244,
+            "min": 25.31448654646607,
+            "values": [
+              25.668786222409164,
+              25.31448654646607,
+              26.481236124979493
+            ]
+          }
+        }
+      },
+      "residual_mlp-flow": {
+        "16": {
+          "attack_envelope_error_db": {
+            "max": 23.468576039428,
+            "mean": 23.342966918037533,
+            "min": 23.23966036514376,
+            "values": [
+              23.320664349540834,
+              23.23966036514376,
+              23.468576039428
+            ]
+          },
+          "decay_envelope_error_db": {
+            "max": 26.123256715732353,
+            "mean": 25.879731396911623,
+            "min": 25.42311002458819,
+            "values": [
+              26.123256715732353,
+              26.092827450414326,
+              25.42311002458819
+            ]
+          },
+          "monophonic_octave_energy_error_db": {
+            "max": 26.355227715874975,
+            "mean": 26.26942819022088,
+            "min": 26.130158831812707,
+            "values": [
+              26.322898022974954,
+              26.130158831812707,
+              26.355227715874975
+            ]
+          },
+          "octave_band_energy_error_db": {
+            "max": 25.309039664730776,
+            "mean": 25.242776165281157,
+            "min": 25.177277367489104,
+            "values": [
+              25.242011463623598,
+              25.177277367489104,
+              25.309039664730776
+            ]
+          },
+          "release_envelope_error_db": {
+            "max": 39.771691737516434,
+            "mean": 39.527738932918936,
+            "min": 39.24678234716595,
+            "values": [
+              39.771691737516434,
+              39.56474271407443,
+              39.24678234716595
+            ]
+          },
+          "spectral_loss": {
+            "max": 0.6592978589469567,
+            "mean": 0.6569784782768693,
+            "min": 0.6546254025597591,
+            "values": [
+              0.6546254025597591,
+              0.6570121733238921,
+              0.6592978589469567
+            ]
+          },
+          "sustain_envelope_error_db": {
+            "max": 25.868917448375246,
+            "mean": 25.25657416200244,
+            "min": 24.93191088626823,
+            "values": [
+              24.96889415136385,
+              24.93191088626823,
+              25.868917448375246
+            ]
+          }
+        },
+        "4": {
+          "attack_envelope_error_db": {
+            "max": 24.916266299463892,
+            "mean": 24.80722987939146,
+            "min": 24.74077582868719,
+            "values": [
+              24.764647510023302,
+              24.74077582868719,
+              24.916266299463892
+            ]
+          },
+          "decay_envelope_error_db": {
+            "max": 27.934351768375073,
+            "mean": 27.671977072539438,
+            "min": 27.256674169280547,
+            "values": [
+              27.8249052799627,
+              27.934351768375073,
+              27.256674169280547
+            ]
+          },
+          "monophonic_octave_energy_error_db": {
+            "max": 26.434597853482245,
+            "mean": 26.387044529249465,
+            "min": 26.29365415789809,
+            "values": [
+              26.434597853482245,
+              26.29365415789809,
+              26.43288157636806
+            ]
+          },
+          "octave_band_energy_error_db": {
+            "max": 25.131862516174202,
+            "mean": 25.084784602932945,
+            "min": 25.03826949824373,
+            "values": [
+              25.084221794380902,
+              25.03826949824373,
+              25.131862516174202
+            ]
+          },
+          "release_envelope_error_db": {
+            "max": 39.58704122738648,
+            "mean": 39.378988511113555,
+            "min": 39.182816141136485,
+            "values": [
+              39.58704122738648,
+              39.36710816481771,
+              39.182816141136485
+            ]
+          },
+          "spectral_loss": {
+            "max": 0.6348048170330003,
+            "mean": 0.6338237981447795,
+            "min": 0.632712761813309,
+            "values": [
+              0.632712761813309,
+              0.6339538155880291,
+              0.6348048170330003
+            ]
+          },
+          "sustain_envelope_error_db": {
+            "max": 26.85983109114377,
+            "mean": 26.356365003701598,
+            "min": 26.06316802798139,
+            "values": [
+              26.146095891979623,
+              26.06316802798139,
+              26.85983109114377
+            ]
+          }
+        },
+        "8": {
+          "attack_envelope_error_db": {
+            "max": 24.054934792393716,
+            "mean": 23.937295707162324,
+            "min": 23.84357633544687,
+            "values": [
+              23.913375993646387,
+              23.84357633544687,
+              24.054934792393716
+            ]
+          },
+          "decay_envelope_error_db": {
+            "max": 26.8605590258043,
+            "mean": 26.618167749307272,
+            "min": 26.17657692011149,
+            "values": [
+              26.817367302006023,
+              26.8605590258043,
+              26.17657692011149
+            ]
+          },
+          "monophonic_octave_energy_error_db": {
+            "max": 26.384976326761613,
+            "mean": 26.317001808999944,
+            "min": 26.19465501447094,
+            "values": [
+              26.371374085767275,
+              26.19465501447094,
+              26.384976326761613
+            ]
+          },
+          "octave_band_energy_error_db": {
+            "max": 25.22562521116309,
+            "mean": 25.16896322539735,
+            "min": 25.11210248826793,
+            "values": [
+              25.169161976761025,
+              25.11210248826793,
+              25.22562521116309
+            ]
+          },
+          "release_envelope_error_db": {
+            "max": 39.67347592625621,
+            "mean": 39.45214548582074,
+            "min": 39.20887477685178,
+            "values": [
+              39.67347592625621,
+              39.47408575435425,
+              39.20887477685178
+            ]
+          },
+          "spectral_loss": {
+            "max": 0.6471076494199224,
+            "mean": 0.6454895233133963,
+            "min": 0.6437796657555737,
+            "values": [
+              0.6437796657555737,
+              0.6455812547646929,
+              0.6471076494199224
+            ]
+          },
+          "sustain_envelope_error_db": {
+            "max": 26.30037645157528,
+            "mean": 25.72519097851962,
+            "min": 25.414500918654532,
+            "values": [
+              25.46069556532905,
+              25.414500918654532,
+              26.30037645157528
+            ]
+          }
+        }
+      }
+    },
+    "selected_by": "best 4-step validation spectral loss among three flow backbones on the same exploratory holdout",
+    "source_checkpoint_sha256": {
+      "conformer-flow": "7cd65a7540593fcd29c8a3f228a1dcd2fa100ec1c5bcdbfb1b6309a497eede52",
+      "residual_mlp-flow": "0e980540380c2729e1588a899b56c7259575b54769d6efc8322d031a468c4b86"
+    },
+    "source_plan_id": "a071023cd2341ac4a13514765015a6acc104ef1dd55083743d8acf889a0ca9a9",
+    "validation_clips": 256,
+    "validation_pairs": 128,
+    "validation_patch_roots": 64
+  },
+  "paired_effects": {
+    "conformer-flow-16": {
+      "attack_envelope_error_db": {
+        "ci95": [
+          3.273741460390176,
+          6.933730713188357
+        ],
+        "flow_minus_direct": 5.08156021331879,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "attack_envelope_error_db",
+        "patch_roots": 64
+      },
+      "decay_envelope_error_db": {
+        "ci95": [
+          1.4311908513386642,
+          6.4330034768102164
+        ],
+        "flow_minus_direct": 3.8765724766872047,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "decay_envelope_error_db",
+        "patch_roots": 64
+      },
+      "monophonic_octave_energy_error_db": {
+        "ci95": [
+          0.41489919870223574,
+          3.273482281688231
+        ],
+        "flow_minus_direct": 1.858036364878683,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "monophonic_octave_energy_error_db",
+        "patch_roots": 48
+      },
+      "octave_band_energy_error_db": {
+        "ci95": [
+          1.0448632860148288,
+          3.402795989868288
+        ],
+        "flow_minus_direct": 2.2222038488662674,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "octave_band_energy_error_db",
+        "patch_roots": 64
+      },
+      "release_envelope_error_db": {
+        "ci95": [
+          0.8399785382372896,
+          3.970196053483382
+        ],
+        "flow_minus_direct": 2.422828299136479,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "release_envelope_error_db",
+        "patch_roots": 64
+      },
+      "spectral_loss": {
+        "ci95": [
+          0.09198557859708671,
+          0.12541469861462246
+        ],
+        "flow_minus_direct": 0.1077951607585419,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "spectral_loss",
+        "patch_roots": 64
+      },
+      "sustain_envelope_error_db": {
+        "ci95": [
+          -4.661507996905611,
+          -0.17912995436079127
+        ],
+        "flow_minus_direct": -2.4446927344307805,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "sustain_envelope_error_db",
+        "patch_roots": 64
+      }
+    },
+    "conformer-flow-4": {
+      "attack_envelope_error_db": {
+        "ci95": [
+          4.476809772568612,
+          8.494142371949662
+        ],
+        "flow_minus_direct": 6.505998747103236,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "attack_envelope_error_db",
+        "patch_roots": 64
+      },
+      "decay_envelope_error_db": {
+        "ci95": [
+          2.757705157305813,
+          8.118498391483778
+        ],
+        "flow_minus_direct": 5.434590185614421,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "decay_envelope_error_db",
+        "patch_roots": 64
+      },
+      "monophonic_octave_energy_error_db": {
+        "ci95": [
+          0.2547423750290632,
+          3.263133714557707
+        ],
+        "flow_minus_direct": 1.739895842842533,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "monophonic_octave_energy_error_db",
+        "patch_roots": 48
+      },
+      "octave_band_energy_error_db": {
+        "ci95": [
+          0.6666909668019915,
+          3.1003222220445283
+        ],
+        "flow_minus_direct": 1.8839830215000766,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "octave_band_energy_error_db",
+        "patch_roots": 64
+      },
+      "release_envelope_error_db": {
+        "ci95": [
+          0.42243273792086045,
+          3.474504565358096
+        ],
+        "flow_minus_direct": 1.965281111214036,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "release_envelope_error_db",
+        "patch_roots": 64
+      },
+      "spectral_loss": {
+        "ci95": [
+          0.06140000471095845,
+          0.08128123732349195
+        ],
+        "flow_minus_direct": 0.0710477773391176,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "spectral_loss",
+        "patch_roots": 64
+      },
+      "sustain_envelope_error_db": {
+        "ci95": [
+          -3.553470125663277,
+          1.1956523878649346
+        ],
+        "flow_minus_direct": -1.225172153757348,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "sustain_envelope_error_db",
+        "patch_roots": 64
+      }
+    },
+    "conformer-flow-8": {
+      "attack_envelope_error_db": {
+        "ci95": [
+          3.7515560208103986,
+          7.569988434577346
+        ],
+        "flow_minus_direct": 5.654496605219448,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "attack_envelope_error_db",
+        "patch_roots": 64
+      },
+      "decay_envelope_error_db": {
+        "ci95": [
+          1.9620946181885308,
+          7.1915231862211835
+        ],
+        "flow_minus_direct": 4.5385180520467445,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "decay_envelope_error_db",
+        "patch_roots": 64
+      },
+      "monophonic_octave_energy_error_db": {
+        "ci95": [
+          0.3648674306876799,
+          3.245363234251963
+        ],
+        "flow_minus_direct": 1.8172208971099966,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "monophonic_octave_energy_error_db",
+        "patch_roots": 48
+      },
+      "octave_band_energy_error_db": {
+        "ci95": [
+          0.8671986290692355,
+          3.220439863363618
+        ],
+        "flow_minus_direct": 2.0717206847491942,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "octave_band_energy_error_db",
+        "patch_roots": 64
+      },
+      "release_envelope_error_db": {
+        "ci95": [
+          0.6720272970211847,
+          3.7860717630098315
+        ],
+        "flow_minus_direct": 2.2242779180462,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "release_envelope_error_db",
+        "patch_roots": 64
+      },
+      "spectral_loss": {
+        "ci95": [
+          0.07731217000437027,
+          0.1033934340764972
+        ],
+        "flow_minus_direct": 0.08966200184659101,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "spectral_loss",
+        "patch_roots": 64
+      },
+      "sustain_envelope_error_db": {
+        "ci95": [
+          -4.222281158280433,
+          0.43491957133543346
+        ],
+        "flow_minus_direct": -1.916295697290173,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "sustain_envelope_error_db",
+        "patch_roots": 64
+      }
+    },
+    "residual_mlp-flow-16": {
+      "attack_envelope_error_db": {
+        "ci95": [
+          2.790697970236978,
+          5.735102004834972
+        ],
+        "flow_minus_direct": 4.2482020742769695,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "attack_envelope_error_db",
+        "patch_roots": 64
+      },
+      "decay_envelope_error_db": {
+        "ci95": [
+          2.722992468892048,
+          6.278156121709591
+        ],
+        "flow_minus_direct": 4.479385077138773,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "decay_envelope_error_db",
+        "patch_roots": 64
+      },
+      "monophonic_octave_energy_error_db": {
+        "ci95": [
+          -0.060613282673275606,
+          2.303251606141372
+        ],
+        "flow_minus_direct": 1.1260996998463595,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "monophonic_octave_energy_error_db",
+        "patch_roots": 48
+      },
+      "octave_band_energy_error_db": {
+        "ci95": [
+          0.40857048752143543,
+          2.630133661147884
+        ],
+        "flow_minus_direct": 1.5155288941220961,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "octave_band_energy_error_db",
+        "patch_roots": 64
+      },
+      "release_envelope_error_db": {
+        "ci95": [
+          0.9899973398795209,
+          2.976071944034366
+        ],
+        "flow_minus_direct": 1.9569814044091678,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "release_envelope_error_db",
+        "patch_roots": 64
+      },
+      "spectral_loss": {
+        "ci95": [
+          0.06900423445913476,
+          0.0923394717676274
+        ],
+        "flow_minus_direct": 0.0799672610592097,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "spectral_loss",
+        "patch_roots": 64
+      },
+      "sustain_envelope_error_db": {
+        "ci95": [
+          -1.0157783697186724,
+          2.60694892094636
+        ],
+        "flow_minus_direct": 0.7871185319361136,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "sustain_envelope_error_db",
+        "patch_roots": 64
+      }
+    },
+    "residual_mlp-flow-4": {
+      "attack_envelope_error_db": {
+        "ci95": [
+          4.070542693772772,
+          7.332839332826463
+        ],
+        "flow_minus_direct": 5.692185234759435,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "attack_envelope_error_db",
+        "patch_roots": 64
+      },
+      "decay_envelope_error_db": {
+        "ci95": [
+          4.263050393985175,
+          8.151623950989297
+        ],
+        "flow_minus_direct": 6.181033641369122,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "decay_envelope_error_db",
+        "patch_roots": 64
+      },
+      "monophonic_octave_energy_error_db": {
+        "ci95": [
+          -0.03200555927241179,
+          2.517546636517147
+        ],
+        "flow_minus_direct": 1.2377995303536553,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "monophonic_octave_energy_error_db",
+        "patch_roots": 48
+      },
+      "octave_band_energy_error_db": {
+        "ci95": [
+          0.16014463629563003,
+          2.5340299115205047
+        ],
+        "flow_minus_direct": 1.3577392248793974,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "octave_band_energy_error_db",
+        "patch_roots": 64
+      },
+      "release_envelope_error_db": {
+        "ci95": [
+          0.7931951240083526,
+          2.78576600581879
+        ],
+        "flow_minus_direct": 1.772330894279213,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "release_envelope_error_db",
+        "patch_roots": 64
+      },
+      "spectral_loss": {
+        "ci95": [
+          0.05046400035862462,
+          0.06623464812437305
+        ],
+        "flow_minus_direct": 0.05805462031275965,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "spectral_loss",
+        "patch_roots": 64
+      },
+      "sustain_envelope_error_db": {
+        "ci95": [
+          0.10956064210010656,
+          3.9594285246491903
+        ],
+        "flow_minus_direct": 2.0156067293793387,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "sustain_envelope_error_db",
+        "patch_roots": 64
+      }
+    },
+    "residual_mlp-flow-8": {
+      "attack_envelope_error_db": {
+        "ci95": [
+          3.335501861154683,
+          6.368939279833347
+        ],
+        "flow_minus_direct": 4.840913718382522,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "attack_envelope_error_db",
+        "patch_roots": 64
+      },
+      "decay_envelope_error_db": {
+        "ci95": [
+          3.300802163070012,
+          7.070402479779735
+        ],
+        "flow_minus_direct": 5.173495663412444,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "decay_envelope_error_db",
+        "patch_roots": 64
+      },
+      "monophonic_octave_energy_error_db": {
+        "ci95": [
+          -0.047175894279549234,
+          2.365958570484166
+        ],
+        "flow_minus_direct": 1.1745757626386848,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "monophonic_octave_energy_error_db",
+        "patch_roots": 48
+      },
+      "octave_band_energy_error_db": {
+        "ci95": [
+          0.282376898832873,
+          2.5526587519222828
+        ],
+        "flow_minus_direct": 1.4426794072595186,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "octave_band_energy_error_db",
+        "patch_roots": 64
+      },
+      "release_envelope_error_db": {
+        "ci95": [
+          0.873385810042517,
+          2.8713578775272834
+        ],
+        "flow_minus_direct": 1.8587655931489424,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "release_envelope_error_db",
+        "patch_roots": 64
+      },
+      "spectral_loss": {
+        "ci95": [
+          0.05997825585363899,
+          0.07926538309984607
+        ],
+        "flow_minus_direct": 0.06912152425502427,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "spectral_loss",
+        "patch_roots": 64
+      },
+      "sustain_envelope_error_db": {
+        "ci95": [
+          -0.5534653990643086,
+          3.219943308050218
+        ],
+        "flow_minus_direct": 1.304669593112398,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "sustain_envelope_error_db",
+        "patch_roots": 64
+      }
+    },
+    "transformer-flow-16": {
+      "attack_envelope_error_db": {
+        "ci95": [
+          3.475950921124255,
+          6.6548885213231035
+        ],
+        "flow_minus_direct": 5.067965085284531,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "attack_envelope_error_db",
+        "patch_roots": 64
+      },
+      "decay_envelope_error_db": {
+        "ci95": [
+          2.358096167871981,
+          5.957827729764459
+        ],
+        "flow_minus_direct": 4.148001169376039,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "decay_envelope_error_db",
+        "patch_roots": 64
+      },
+      "monophonic_octave_energy_error_db": {
+        "ci95": [
+          0.23398714901955364,
+          2.474152244997626
+        ],
+        "flow_minus_direct": 1.3532891092758348,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "monophonic_octave_energy_error_db",
+        "patch_roots": 48
+      },
+      "octave_band_energy_error_db": {
+        "ci95": [
+          0.6569273078901978,
+          2.5949965097174603
+        ],
+        "flow_minus_direct": 1.5983889979580659,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "octave_band_energy_error_db",
+        "patch_roots": 64
+      },
+      "release_envelope_error_db": {
+        "ci95": [
+          0.9256382403061242,
+          3.827851981323839
+        ],
+        "flow_minus_direct": 2.3995039479716644,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "release_envelope_error_db",
+        "patch_roots": 64
+      },
+      "spectral_loss": {
+        "ci95": [
+          0.09979544521484059,
+          0.1312417802415439
+        ],
+        "flow_minus_direct": 0.11501047576166457,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "spectral_loss",
+        "patch_roots": 64
+      },
+      "sustain_envelope_error_db": {
+        "ci95": [
+          -3.223761359669882,
+          0.23867214601282497
+        ],
+        "flow_minus_direct": -1.5327492864164136,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "sustain_envelope_error_db",
+        "patch_roots": 64
+      }
+    },
+    "transformer-flow-4": {
+      "attack_envelope_error_db": {
+        "ci95": [
+          4.4229900492983925,
+          7.880018349751992
+        ],
+        "flow_minus_direct": 6.206854340603051,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "attack_envelope_error_db",
+        "patch_roots": 64
+      },
+      "decay_envelope_error_db": {
+        "ci95": [
+          3.4511930194441693,
+          7.328731076311283
+        ],
+        "flow_minus_direct": 5.413828180095892,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "decay_envelope_error_db",
+        "patch_roots": 64
+      },
+      "monophonic_octave_energy_error_db": {
+        "ci95": [
+          -0.015300460289909555,
+          2.4220263848534707
+        ],
+        "flow_minus_direct": 1.1770674059425021,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "monophonic_octave_energy_error_db",
+        "patch_roots": 48
+      },
+      "octave_band_energy_error_db": {
+        "ci95": [
+          0.20920608871901517,
+          2.2841925719010314
+        ],
+        "flow_minus_direct": 1.221057986989519,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "octave_band_energy_error_db",
+        "patch_roots": 64
+      },
+      "release_envelope_error_db": {
+        "ci95": [
+          0.5057672600667233,
+          3.3334669201155727
+        ],
+        "flow_minus_direct": 1.945388044745389,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "release_envelope_error_db",
+        "patch_roots": 64
+      },
+      "spectral_loss": {
+        "ci95": [
+          0.07125037139558117,
+          0.09131969026675506
+        ],
+        "flow_minus_direct": 0.08082610149722314,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "spectral_loss",
+        "patch_roots": 64
+      },
+      "sustain_envelope_error_db": {
+        "ci95": [
+          -2.4123138154476247,
+          1.2562614988999776
+        ],
+        "flow_minus_direct": -0.6268539076945375,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "sustain_envelope_error_db",
+        "patch_roots": 64
+      }
+    },
+    "transformer-flow-8": {
+      "attack_envelope_error_db": {
+        "ci95": [
+          3.8877046903214367,
+          7.128726755257349
+        ],
+        "flow_minus_direct": 5.533579928395682,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "attack_envelope_error_db",
+        "patch_roots": 64
+      },
+      "decay_envelope_error_db": {
+        "ci95": [
+          2.804002690369222,
+          6.517437669483717
+        ],
+        "flow_minus_direct": 4.662473997292667,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "decay_envelope_error_db",
+        "patch_roots": 64
+      },
+      "monophonic_octave_energy_error_db": {
+        "ci95": [
+          0.14254938930735336,
+          2.4063106026926144
+        ],
+        "flow_minus_direct": 1.284157292112265,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "monophonic_octave_energy_error_db",
+        "patch_roots": 48
+      },
+      "octave_band_energy_error_db": {
+        "ci95": [
+          0.4541008945518306,
+          2.4104517518600046
+        ],
+        "flow_minus_direct": 1.4352299475256918,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "octave_band_energy_error_db",
+        "patch_roots": 64
+      },
+      "release_envelope_error_db": {
+        "ci95": [
+          0.7774450299085798,
+          3.645533391473083
+        ],
+        "flow_minus_direct": 2.202777657308946,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "release_envelope_error_db",
+        "patch_roots": 64
+      },
+      "spectral_loss": {
+        "ci95": [
+          0.08615452750600525,
+          0.1121208018998004
+        ],
+        "flow_minus_direct": 0.09854572390759131,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "spectral_loss",
+        "patch_roots": 64
+      },
+      "sustain_envelope_error_db": {
+        "ci95": [
+          -2.889938391909239,
+          0.6473969187436701
+        ],
+        "flow_minus_direct": -1.1525755446384034,
+        "interval_scope": "patch-root bootstrap; MIDI-performance diversity is not resampled",
+        "metric": "sustain_envelope_error_db",
+        "patch_roots": 64
+      }
+    }
+  },
+  "plan_id": "a071023cd2341ac4a13514765015a6acc104ef1dd55083743d8acf889a0ca9a9",
+  "source_checkpoint_sha256": {
+    "conformer-direct": "fa157b7d036211e35cd6c1bafeddec1c7a1416d4c3138408bc638b5adf6ce6a5",
+    "conformer-flow": "7cd65a7540593fcd29c8a3f228a1dcd2fa100ec1c5bcdbfb1b6309a497eede52",
+    "residual_mlp-direct": "08f11f66016440b19abcc00805789f2e0b95f32f91ab4710da70e9883dc4cadc",
+    "residual_mlp-flow": "0e980540380c2729e1588a899b56c7259575b54769d6efc8322d031a468c4b86",
+    "transformer-direct": "c8035728492862e71525327ce2523bd569f9faea4c5dacff4a627f03741f76d0",
+    "transformer-flow": "5b4541bc275a9a1027afc6d7d0a4e7364f28d7081c74b75f86d1b10459bfea05"
+  },
+  "throughput": {
+    "arm": "residual_mlp-flow",
+    "assumption": "first 100 updates and first two validation/probe passes represent the matching arm groups",
+    "elapsed_train_seconds": 4.9939862000001085,
+    "estimate_scope": "complete six-arm run, extrapolated from first 100 updates and first validation/probe passes",
+    "estimated_total_seconds": 480.79846139999245,
+    "estimated_training_probe_seconds": 23.350076999997327,
+    "estimated_training_seconds": 149.81958600000326,
+    "estimated_validation_seconds": 307.62879839999187,
+    "measured_after_updates": 100,
+    "source_plan_id": "a071023cd2341ac4a13514765015a6acc104ef1dd55083743d8acf889a0ca9a9",
+    "updates_per_second": 20.024084167472836
+  },
+  "training": {
+    "conformer-direct": {
+      "arm": "conformer-direct",
+      "backbone": "conformer",
+      "mode": "direct",
+      "model_head": {
+        "head_parameters": 133250,
+        "output_head": "linear 64\u21922050; positive log1p magnitude",
+        "parameters": 223706
+      },
+      "parameters": 223706,
+      "seed": 183,
+      "steps": 500,
+      "trainable_parameters": 223706,
+      "training_probe_seconds": 1.3099999705445953e-05,
+      "training_seconds": 34.05635100000109,
+      "validation_seconds": 47.2828142999997
+    },
+    "conformer-flow": {
+      "arm": "conformer-flow",
+      "backbone": "conformer",
+      "mode": "flow",
+      "model_head": {
+        "head_parameters": 352066,
+        "parameters": 442522,
+        "velocity_head": "framewise 2050\u219264 noisy spectrum, time embedding, two residual MLP blocks, 64\u21922050 clean endpoint minus full-dimensional initial-noise skip"
+      },
+      "parameters": 442522,
+      "seed": 183,
+      "steps": 500,
+      "trainable_parameters": 442522,
+      "training_probe_seconds": 7.377338000000236,
+      "training_reconstruction_probe": {
+        "final": {
+          "clips": 32,
+          "noise_seed": 70183,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 24.922144984954283,
+          "sampled_spectral_loss": 0.5885252635926008,
+          "velocity_mse": 0.1341533064842224
+        },
+        "initial": {
+          "clips": 32,
+          "noise_seed": 70183,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 29.14593711144494,
+          "sampled_spectral_loss": 1.4457589238882065,
+          "velocity_mse": 3.7861580848693848
+        }
+      },
+      "training_seconds": 32.9891134999998,
+      "validation_seconds": 49.5277372999999
+    },
+    "residual_mlp-direct": {
+      "arm": "residual_mlp-direct",
+      "backbone": "residual_mlp",
+      "mode": "direct",
+      "model_head": {
+        "head_parameters": 133250,
+        "output_head": "linear 64\u21922050; positive log1p magnitude",
+        "parameters": 221338
+      },
+      "parameters": 221338,
+      "seed": 183,
+      "steps": 500,
+      "trainable_parameters": 221338,
+      "training_probe_seconds": 1.3500001841748599e-05,
+      "training_seconds": 22.9556638999984,
+      "validation_seconds": 49.65712210000129
+    },
+    "residual_mlp-flow": {
+      "arm": "residual_mlp-flow",
+      "backbone": "residual_mlp",
+      "mode": "flow",
+      "model_head": {
+        "head_parameters": 352066,
+        "parameters": 440154,
+        "velocity_head": "framewise 2050\u219264 noisy spectrum, time embedding, two residual MLP blocks, 64\u21922050 clean endpoint minus full-dimensional initial-noise skip"
+      },
+      "parameters": 440154,
+      "seed": 183,
+      "steps": 500,
+      "trainable_parameters": 440154,
+      "training_probe_seconds": 7.2052254000000175,
+      "training_reconstruction_probe": {
+        "final": {
+          "clips": 32,
+          "noise_seed": 70183,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 24.024482506298316,
+          "sampled_spectral_loss": 0.5531379524618387,
+          "velocity_mse": 0.1354992538690567
+        },
+        "initial": {
+          "clips": 32,
+          "noise_seed": 70183,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 29.145611505005935,
+          "sampled_spectral_loss": 1.4455288909375668,
+          "velocity_mse": 3.7846579551696777
+        }
+      },
+      "training_seconds": 23.967759099999057,
+      "validation_seconds": 50.292649599999095
+    },
+    "transformer-direct": {
+      "arm": "transformer-direct",
+      "backbone": "transformer",
+      "mode": "direct",
+      "model_head": {
+        "head_parameters": 133250,
+        "output_head": "linear 64\u21922050; positive log1p magnitude",
+        "parameters": 221850
+      },
+      "parameters": 221850,
+      "seed": 183,
+      "steps": 500,
+      "trainable_parameters": 221850,
+      "training_probe_seconds": 1.120000069931848e-05,
+      "training_seconds": 24.44028900000103,
+      "validation_seconds": 47.595941000000494
+    },
+    "transformer-flow": {
+      "arm": "transformer-flow",
+      "backbone": "transformer",
+      "mode": "flow",
+      "model_head": {
+        "head_parameters": 352066,
+        "parameters": 440666,
+        "velocity_head": "framewise 2050\u219264 noisy spectrum, time embedding, two residual MLP blocks, 64\u21922050 clean endpoint minus full-dimensional initial-noise skip"
+      },
+      "parameters": 440666,
+      "seed": 183,
+      "steps": 500,
+      "trainable_parameters": 440666,
+      "training_probe_seconds": 7.362295499998254,
+      "training_reconstruction_probe": {
+        "final": {
+          "clips": 32,
+          "noise_seed": 70183,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 25.36865746031593,
+          "sampled_spectral_loss": 0.6212310744449496,
+          "velocity_mse": 0.13626250624656677
+        },
+        "initial": {
+          "clips": 32,
+          "noise_seed": 70183,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 29.144371376520617,
+          "sampled_spectral_loss": 1.4456524401903152,
+          "velocity_mse": 3.7854597568511963
+        }
+      },
+      "training_seconds": 27.40385569999853,
+      "validation_seconds": 50.82008320000023
+    }
+  },
+  "training_probe_noise_sensitivity": {
+    "arms": {
+      "conformer-flow": {
+        "per_seed": [
+          {
+            "clips": 32,
+            "noise_seed": 70183,
+            "patch_roots": 16,
+            "recipes": 16,
+            "sampled_octave_band_energy_error_db": 24.922144984954283,
+            "sampled_spectral_loss": 0.5885252635926008,
+            "velocity_mse": 0.1341533064842224
+          },
+          {
+            "clips": 32,
+            "noise_seed": 70184,
+            "patch_roots": 16,
+            "recipes": 16,
+            "sampled_octave_band_energy_error_db": 24.532540519335633,
+            "sampled_spectral_loss": 0.5823092511855066,
+            "velocity_mse": 0.13385038077831268
+          },
+          {
+            "clips": 32,
+            "noise_seed": 70185,
+            "patch_roots": 16,
+            "recipes": 16,
+            "sampled_octave_band_energy_error_db": 25.315228550113826,
+            "sampled_spectral_loss": 0.5832637269049883,
+            "velocity_mse": 0.1392386257648468
+          }
+        ],
+        "sampled_octave_band_energy_error_db": {
+          "max": 25.315228550113826,
+          "mean": 24.92330468480125,
+          "min": 24.532540519335633,
+          "values": [
+            24.922144984954283,
+            24.532540519335633,
+            25.315228550113826
+          ]
+        },
+        "sampled_spectral_loss": {
+          "max": 0.5885252635926008,
+          "mean": 0.5846994138943652,
+          "min": 0.5823092511855066,
+          "values": [
+            0.5885252635926008,
+            0.5823092511855066,
+            0.5832637269049883
+          ]
+        },
+        "velocity_mse": {
+          "max": 0.1392386257648468,
+          "mean": 0.13574743767579397,
+          "min": 0.13385038077831268,
+          "values": [
+            0.1341533064842224,
+            0.13385038077831268,
+            0.1392386257648468
+          ]
+        }
+      },
+      "residual_mlp-flow": {
+        "per_seed": [
+          {
+            "clips": 32,
+            "noise_seed": 70183,
+            "patch_roots": 16,
+            "recipes": 16,
+            "sampled_octave_band_energy_error_db": 24.024482506298316,
+            "sampled_spectral_loss": 0.5531379524618387,
+            "velocity_mse": 0.1354992538690567
+          },
+          {
+            "clips": 32,
+            "noise_seed": 70184,
+            "patch_roots": 16,
+            "recipes": 16,
+            "sampled_octave_band_energy_error_db": 23.668918284111477,
+            "sampled_spectral_loss": 0.546917240601033,
+            "velocity_mse": 0.13429689407348633
+          },
+          {
+            "clips": 32,
+            "noise_seed": 70185,
+            "patch_roots": 16,
+            "recipes": 16,
+            "sampled_octave_band_energy_error_db": 24.60604058108325,
+            "sampled_spectral_loss": 0.5571908922865987,
+            "velocity_mse": 0.13987746834754944
+          }
+        ],
+        "sampled_octave_band_energy_error_db": {
+          "max": 24.60604058108325,
+          "mean": 24.09981379049768,
+          "min": 23.668918284111477,
+          "values": [
+            24.024482506298316,
+            23.668918284111477,
+            24.60604058108325
+          ]
+        },
+        "sampled_spectral_loss": {
+          "max": 0.5571908922865987,
+          "mean": 0.5524153617831568,
+          "min": 0.546917240601033,
+          "values": [
+            0.5531379524618387,
+            0.546917240601033,
+            0.5571908922865987
+          ]
+        },
+        "velocity_mse": {
+          "max": 0.13987746834754944,
+          "mean": 0.13655787209669748,
+          "min": 0.13429689407348633,
+          "values": [
+            0.1354992538690567,
+            0.13429689407348633,
+            0.13987746834754944
+          ]
+        }
+      },
+      "transformer-flow": {
+        "per_seed": [
+          {
+            "clips": 32,
+            "noise_seed": 70183,
+            "patch_roots": 16,
+            "recipes": 16,
+            "sampled_octave_band_energy_error_db": 25.36865746031593,
+            "sampled_spectral_loss": 0.6212310744449496,
+            "velocity_mse": 0.13626250624656677
+          },
+          {
+            "clips": 32,
+            "noise_seed": 70184,
+            "patch_roots": 16,
+            "recipes": 16,
+            "sampled_octave_band_energy_error_db": 25.033756448242606,
+            "sampled_spectral_loss": 0.6144821578636765,
+            "velocity_mse": 0.13493774831295013
+          },
+          {
+            "clips": 32,
+            "noise_seed": 70185,
+            "patch_roots": 16,
+            "recipes": 16,
+            "sampled_octave_band_energy_error_db": 25.86615439265895,
+            "sampled_spectral_loss": 0.6149885859340429,
+            "velocity_mse": 0.14201965928077698
+          }
+        ],
+        "sampled_octave_band_energy_error_db": {
+          "max": 25.86615439265895,
+          "mean": 25.422856100405827,
+          "min": 25.033756448242606,
+          "values": [
+            25.36865746031593,
+            25.033756448242606,
+            25.86615439265895
+          ]
+        },
+        "sampled_spectral_loss": {
+          "max": 0.6212310744449496,
+          "mean": 0.6169006060808897,
+          "min": 0.6144821578636765,
+          "values": [
+            0.6212310744449496,
+            0.6144821578636765,
+            0.6149885859340429
+          ]
+        },
+        "velocity_mse": {
+          "max": 0.14201965928077698,
+          "mean": 0.13773997128009796,
+          "min": 0.13493774831295013,
+          "values": [
+            0.13626250624656677,
+            0.13493774831295013,
+            0.14201965928077698
+          ]
+        }
+      }
+    },
+    "clips": 32,
+    "format": "issue183_training_probe_noise_sensitivity_v1",
+    "noise_seeds": [
+      70183,
+      70184,
+      70185
+    ],
+    "patch_roots": 16,
+    "recipes": 16,
+    "sampler_steps": 8,
+    "source_checkpoint_sha256": {
+      "conformer-flow": "7cd65a7540593fcd29c8a3f228a1dcd2fa100ec1c5bcdbfb1b6309a497eede52",
+      "residual_mlp-flow": "0e980540380c2729e1588a899b56c7259575b54769d6efc8322d031a468c4b86",
+      "transformer-flow": "5b4541bc275a9a1027afc6d7d0a4e7364f28d7081c74b75f86d1b10459bfea05"
+    },
+    "source_plan_id": "a071023cd2341ac4a13514765015a6acc104ef1dd55083743d8acf889a0ca9a9"
+  },
+  "validation_cases": 256,
+  "validation_midi_performances": 16,
+  "validation_patch_roots": 64
+}

@@ -1,0 +1,183 @@
+{
+  "arms": {
+    "conformer-direct": {
+      "arm": "conformer-direct",
+      "backbone": "conformer",
+      "mode": "direct",
+      "model_head": {
+        "head_parameters": 133250,
+        "output_head": "linear 64\u21922050; positive log1p magnitude",
+        "parameters": 223706
+      },
+      "parameters": 223706,
+      "seed": 183,
+      "steps": 500,
+      "trainable_parameters": 223706,
+      "training_probe_seconds": 1.3099999705445953e-05,
+      "training_seconds": 34.05635100000109,
+      "validation_seconds": 47.2828142999997
+    },
+    "conformer-flow": {
+      "arm": "conformer-flow",
+      "backbone": "conformer",
+      "mode": "flow",
+      "model_head": {
+        "head_parameters": 352066,
+        "parameters": 442522,
+        "velocity_head": "framewise 2050\u219264 noisy spectrum, time embedding, two residual MLP blocks, 64\u21922050 clean endpoint minus full-dimensional initial-noise skip"
+      },
+      "parameters": 442522,
+      "seed": 183,
+      "steps": 500,
+      "trainable_parameters": 442522,
+      "training_probe_seconds": 7.377338000000236,
+      "training_reconstruction_probe": {
+        "final": {
+          "clips": 32,
+          "noise_seed": 70183,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 24.922144984954283,
+          "sampled_spectral_loss": 0.5885252635926008,
+          "velocity_mse": 0.1341533064842224
+        },
+        "initial": {
+          "clips": 32,
+          "noise_seed": 70183,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 29.14593711144494,
+          "sampled_spectral_loss": 1.4457589238882065,
+          "velocity_mse": 3.7861580848693848
+        }
+      },
+      "training_seconds": 32.9891134999998,
+      "validation_seconds": 49.5277372999999
+    },
+    "residual_mlp-direct": {
+      "arm": "residual_mlp-direct",
+      "backbone": "residual_mlp",
+      "mode": "direct",
+      "model_head": {
+        "head_parameters": 133250,
+        "output_head": "linear 64\u21922050; positive log1p magnitude",
+        "parameters": 221338
+      },
+      "parameters": 221338,
+      "seed": 183,
+      "steps": 500,
+      "trainable_parameters": 221338,
+      "training_probe_seconds": 1.3500001841748599e-05,
+      "training_seconds": 22.9556638999984,
+      "validation_seconds": 49.65712210000129
+    },
+    "residual_mlp-flow": {
+      "arm": "residual_mlp-flow",
+      "backbone": "residual_mlp",
+      "mode": "flow",
+      "model_head": {
+        "head_parameters": 352066,
+        "parameters": 440154,
+        "velocity_head": "framewise 2050\u219264 noisy spectrum, time embedding, two residual MLP blocks, 64\u21922050 clean endpoint minus full-dimensional initial-noise skip"
+      },
+      "parameters": 440154,
+      "seed": 183,
+      "steps": 500,
+      "trainable_parameters": 440154,
+      "training_probe_seconds": 7.2052254000000175,
+      "training_reconstruction_probe": {
+        "final": {
+          "clips": 32,
+          "noise_seed": 70183,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 24.024482506298316,
+          "sampled_spectral_loss": 0.5531379524618387,
+          "velocity_mse": 0.1354992538690567
+        },
+        "initial": {
+          "clips": 32,
+          "noise_seed": 70183,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 29.145611505005935,
+          "sampled_spectral_loss": 1.4455288909375668,
+          "velocity_mse": 3.7846579551696777
+        }
+      },
+      "training_seconds": 23.967759099999057,
+      "validation_seconds": 50.292649599999095
+    },
+    "transformer-direct": {
+      "arm": "transformer-direct",
+      "backbone": "transformer",
+      "mode": "direct",
+      "model_head": {
+        "head_parameters": 133250,
+        "output_head": "linear 64\u21922050; positive log1p magnitude",
+        "parameters": 221850
+      },
+      "parameters": 221850,
+      "seed": 183,
+      "steps": 500,
+      "trainable_parameters": 221850,
+      "training_probe_seconds": 1.120000069931848e-05,
+      "training_seconds": 24.44028900000103,
+      "validation_seconds": 47.595941000000494
+    },
+    "transformer-flow": {
+      "arm": "transformer-flow",
+      "backbone": "transformer",
+      "mode": "flow",
+      "model_head": {
+        "head_parameters": 352066,
+        "parameters": 440666,
+        "velocity_head": "framewise 2050\u219264 noisy spectrum, time embedding, two residual MLP blocks, 64\u21922050 clean endpoint minus full-dimensional initial-noise skip"
+      },
+      "parameters": 440666,
+      "seed": 183,
+      "steps": 500,
+      "trainable_parameters": 440666,
+      "training_probe_seconds": 7.362295499998254,
+      "training_reconstruction_probe": {
+        "final": {
+          "clips": 32,
+          "noise_seed": 70183,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 25.36865746031593,
+          "sampled_spectral_loss": 0.6212310744449496,
+          "velocity_mse": 0.13626250624656677
+        },
+        "initial": {
+          "clips": 32,
+          "noise_seed": 70183,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 29.144371376520617,
+          "sampled_spectral_loss": 1.4456524401903152,
+          "velocity_mse": 3.7854597568511963
+        }
+      },
+      "training_seconds": 27.40385569999853,
+      "validation_seconds": 50.82008320000023
+    }
+  },
+  "hardware": {
+    "device": "xpu",
+    "device_name": "Intel(R) Arc(TM) 140T GPU (16GB)",
+    "numpy": "2.4.6",
+    "threads": 4,
+    "torch": "2.12.1+xpu"
+  },
+  "plan_id": "a071023cd2341ac4a13514765015a6acc104ef1dd55083743d8acf889a0ca9a9",
+  "preparation_seconds": 508.2357278999998,
+  "source_checkpoint_sha256": {
+    "conformer-direct": "fa157b7d036211e35cd6c1bafeddec1c7a1416d4c3138408bc638b5adf6ce6a5",
+    "conformer-flow": "7cd65a7540593fcd29c8a3f228a1dcd2fa100ec1c5bcdbfb1b6309a497eede52",
+    "residual_mlp-direct": "08f11f66016440b19abcc00805789f2e0b95f32f91ab4710da70e9883dc4cadc",
+    "residual_mlp-flow": "0e980540380c2729e1588a899b56c7259575b54769d6efc8322d031a468c4b86",
+    "transformer-direct": "c8035728492862e71525327ce2523bd569f9faea4c5dacff4a627f03741f76d0",
+    "transformer-flow": "5b4541bc275a9a1027afc6d7d0a4e7364f28d7081c74b75f86d1b10459bfea05"
+  }
+}
