@@ -10,9 +10,9 @@ Can a pretrained codec preserve the sound of a Vital patch well enough to build 
 | SAME-S | 0.003515 [0.002544, 0.004657] | 0.004370 | 0.446 | 10.54 | 95.97 | 2.994 |
 | SAME-L standalone | 0.002300 [0.001673, 0.003021] | 0.003128 | 0.586 | **14.98** | 97.26 | 2.224 |
 | Medium embedded SAME-L | 0.002504 [0.001816, 0.003311] | 0.003269 | 0.586 | 14.44 | **97.31** | 2.392 |
-| DAC (two independent mono channels) | Pending | — | — | — | — | — |
+| DAC (two independent mono channels) | 0.003593 [0.002550, 0.004785] | 0.004145 | 0.693 | 10.36 | 96.71 | 1.526 |
 
-Each completed cell covers 256 clips from 64 patch roots and 16 distinct MIDI performances. ViSQOL is unavailable on this host. The primary metric measures how closely the reconstructed sound follows the reference energy across mel frequency bands. CIR measures similarity in a frozen timbre representation. SI-SDR measures waveform fidelity after a fitted gain and CCPC compares stereo phase coherence. Retrieval remains a separate endpoint.
+Each reported metric covers 256 clips from 64 patch roots and 16 distinct MIDI performances. ViSQOL is unavailable on this host. The primary metric measures how closely the reconstructed sound follows the reference energy across mel frequency bands. CIR measures similarity in a frozen timbre representation. SI-SDR measures waveform fidelity after a fitted gain and CCPC compares stereo phase coherence. Retrieval remains a separate endpoint.
 
 | Paired difference, candidate minus Open Small | MEL-log1p ↓ | CIR cosine ↑ | SI-SDR ↑ (dB) | CCPC ↑ (pp) |
 |---|---:|---:|---:|---:|
@@ -20,6 +20,10 @@ Each completed cell covers 256 clips from 64 patch roots and 16 distinct MIDI pe
 | Medium embedded SAME-L | +0.000267 [+0.000044, +0.000528] | −0.188 [−0.218, −0.157] | +6.82 [5.91, 7.75] | +3.27 [1.88, 4.95] |
 
 MEL-log1p and legacy MR-STFT disagree about which of Open Small and standalone SAME-L wins on 133 of 256 clips. STFT-log1p agrees with MEL-log1p on 196, and CIR cosine agrees on 133. Open Small's mean MEL advantage over standalone SAME-L is uncertain. Its advantage over the actual Medium codec is about 12% and the paired interval excludes zero. These intervals condition on the observed MIDI panel and cannot establish listener preference.
+
+**DAC comparison:** mean encode/decode time was 0.93/2.02 seconds per stereo clip in this XPU run. This checkpoint uses two independent mono streams and has no matching pretrained generator in the study. The project releases the DAC weights under MIT. [DAC checkpoint terms](https://github.com/descriptinc/descript-audio-codec#weights).
+
+Recomputing legacy MR-STFT on the exact waveforms used for MEL-log1p gives 133 disagreements out of 256 for Open Small versus standalone SAME-L. The archived and replayed MR-STFT values are retained separately in the CSV. Maximum absolute differences by codec are open-small 0.0008485, same-s 0.1145, same-l 0.4457, same-l-embedded 0.2246.
 
 The [per-clip results](STAGE1_RESCORE_CASES.csv) and [paired intervals](STAGE1_RESCORE.json) preserve the different rankings. The following examples use original playback levels and the same reference for every codec. They are for review and have no listener ratings.
 
@@ -145,4 +149,4 @@ The pinned Open Small checkpoint contains both its 64-channel VAE and an RF deno
 
 ## Decision and remaining questions
 
-Open Small best preserves the measured mel spectrum and CIR timbre embedding. Medium is the one trunk recommended for qualification in the matched adapter experiment because its exact generator and training cache fit the study constraints. This report has no independent confirmation panel or listening ratings. [Machine-readable selection](STAGE1_SELECTION.json)
+Open Small best preserves the measured mel spectrum and CIR timbre embedding. Medium is the one trunk selected for the matched adapter experiment subject to XPU qualification because its exact generator and training cache fit the study constraints. This report has no independent confirmation panel or listening ratings. [Machine-readable selection](STAGE1_SELECTION.json)
