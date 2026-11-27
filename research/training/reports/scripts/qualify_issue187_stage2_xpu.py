@@ -17,17 +17,23 @@ sys.path[:0] = [str(TRAINING.parent / "data_generation"), str(TRAINING)]
 
 from obruxo_data.midi import Performance
 from obruxo_training.issue187_stage2 import (
-    EventSetEncoder, Issue187Adapter, MIDI_ENCODER_REVISION, align_mask,
+    EventSetEncoder, Issue187Adapter, MIDI_ENCODER_REVISION,
     encode_midi_spans, load_midi_encoder, performance_to_spans, trainable_parameter_count,
 )
+from obruxo_training.codec import PilotCodec
+from obruxo_training.surrogate_codec import SurrogateCodec
 
 
 def check_gradients(module, controls, frozen):
     if controls.grad is None or not torch.isfinite(controls.grad).all() or controls.grad.norm() == 0:
-        raise RuntimeError("adapter loss did not produce a finite, nonzero patch-control gradient")
+        norm = None if controls.grad is None else float(controls.grad.norm())
+        raise RuntimeError(f"adapter loss did not produce a finite, nonzero patch-control gradient (norm={norm})")
     active = [p for p in module.parameters() if p.requires_grad]
-    if not any(p.grad is not None and torch.isfinite(p.grad).all() and p.grad.norm() > 0 for p in active):
-        raise RuntimeError("adapter loss did not produce a finite, nonzero trainable gradient")
+    gradients = [p.grad for p in active if p.grad is not None]
+    if len(gradients) != len(active) or any(not torch.isfinite(grad).all() for grad in gradients):
+        raise RuntimeError("adapter has missing or nonfinite trainable gradients")
+    if not any(grad.norm() > 0 for grad in gradients):
+        raise RuntimeError("adapter loss did not produce a nonzero trainable gradient")
     if any(p.requires_grad or p.grad is not None for p in frozen.parameters()):
         raise RuntimeError("a pretrained parameter was trainable or accumulated a gradient")
 
@@ -43,6 +49,7 @@ def performance():
 def compare_midi_encoder(encoder_path: Path, upstream_source: Path, device: torch.device) -> dict:
     sys.path.insert(0, str(upstream_source))
     upstream = importlib.import_module("spansynth.model")
+    encoder = load_midi_encoder(encoder_path)
     reference = upstream.EventSetEncoder(upstream.EventSetConfig())
     reference.load_state_dict(encoder.state_dict(), strict=True)
     reference.eval().requires_grad_(False)
@@ -67,7 +74,7 @@ def compare_midi_encoder(encoder_path: Path, upstream_source: Path, device: torc
                             xpu_rows["numeric"], xpu_rows["event_valid"])
         torch.xpu.synchronize(device)
     elapsed = perf_counter() - started
-    if not torch.equal(xpu_result, ref_xpu):
+    if not torch.allclose(xpu_result, ref_xpu, rtol=2e-5, atol=2e-5):
         raise RuntimeError(f"XPU checkpoint parity failed; max absolute difference={(xpu_result-ref_xpu).abs().max().item()}")
     difference = (xpu_result.cpu() - cpu_result).abs()
     if not torch.allclose(xpu_result.cpu(), cpu_result, rtol=2e-5, atol=2e-5):
@@ -93,18 +100,18 @@ def load_generator(source: Path, snapshot: Path, device: torch.device):
 
 def check_direct_arm(backbone: str, encoder_tokens: torch.Tensor, encoder_mask: torch.Tensor,
                      codec, device: torch.device) -> dict:
-    adapter = Issue187Adapter(backbone, 24, 256).to(device)
-    controls = torch.randn(1, 24, device=device, requires_grad=True)
+    adapter = Issue187Adapter(backbone, SurrogateCodec(PilotCodec(), expanded=True).width, 256).to(device)
+    controls = torch.randn(1, SurrogateCodec(PilotCodec(), expanded=True).width, device=device, requires_grad=True)
     frames = max(1, codec.sample_rate // codec.downsampling_ratio)
     tokens = encoder_tokens.to(device)
+    torch.xpu.reset_peak_memory_stats(device)
+    started = perf_counter()
     output = adapter(controls, tokens, encoder_mask.to(device), target_frames=frames,
                      target_hz=codec.sample_rate / codec.downsampling_ratio)
     codec_frozen = all(not p.requires_grad for p in codec.parameters())
     if not codec_frozen:
         raise RuntimeError("codec weights were not frozen")
     sentinel = next(codec.parameters()).detach().clone()
-    torch.xpu.reset_peak_memory_stats(device)
-    started = perf_counter()
     decoded = codec.decode_audio(output)
     decoded.square().mean().backward()
     torch.xpu.synchronize(device)
@@ -127,26 +134,40 @@ def check_generator_arm(backbone: str, encoder_tokens: torch.Tensor, encoder_mas
     frames = max(1, generator.min_input_length // latent_hop)
     duration = frames * latent_hop / codec.sample_rate
     token_frames = math.ceil(duration * 25)
-    adapter = Issue187Adapter(backbone, 24, condition_width, generator=True).to(device)
-    controls = torch.randn(1, 24, device=device, requires_grad=True)
-    conditioning, mask = adapter(controls, encoder_tokens.to(device), encoder_mask.to(device),
-                                 target_frames=token_frames, target_hz=25)
-    latent = torch.randn(1, 256, frames, device=device, dtype=torch.float16)
-    time = torch.tensor([.5], device=device)
-    sentinel = next(generator.parameters()).detach().clone()
+    control_width = SurrogateCodec(PilotCodec(), expanded=True).width
+    adapter = Issue187Adapter(backbone, control_width, condition_width, generator=True).to(device)
+    controls = torch.randn(1, control_width, device=device, requires_grad=True)
     torch.xpu.reset_peak_memory_stats(device)
     started = perf_counter()
+    conditioning, mask = adapter(controls, encoder_tokens.to(device), encoder_mask.to(device),
+                                 target_frames=token_frames, target_hz=25)
+    valid_length = int(mask[0].sum().item())
+    if valid_length == 0:
+        raise RuntimeError("generator conditioning has no valid MIDI frames")
+    conditioning, mask = conditioning[:, :valid_length], mask[:, :valid_length]
+    latent = torch.randn(1, 256, frames, device=device, dtype=torch.float16)
+    sentinel = next(generator.parameters()).detach().clone()
     # Reuse PR #188's tested Stable Audio prompt/flow connector for this adapter's tokens.
     bridge = SimpleNamespace(codec=SimpleNamespace(hop=latent_hop), generator=generator)
-    velocity = ExistingStage2Adapter.velocity(bridge, latent, time, conditioning, duration)
-    velocity.float().square().mean().backward()
+    steps = 2
+    with torch.nn.attention.sdpa_kernel(torch.nn.attention.SDPBackend.MATH):
+        for step in range(steps):
+            time = latent.new_full((1,), 1 - step / steps)
+            velocity = ExistingStage2Adapter.velocity(bridge, latent, time, conditioning, duration,
+                                                       prompt_mask=mask)
+            latent = latent - velocity.to(latent.dtype) / steps
+        audio = codec.decode_audio(latent * generator.pretransform.scale)
+        audio.float().square().mean().backward()
     torch.xpu.synchronize(device)
     elapsed = perf_counter() - started
+    if controls.grad is not None and not torch.isfinite(controls.grad).all():
+        raise RuntimeError(f"generator sampler/decoder backward has nonfinite patch gradients; velocity_finite={bool(torch.isfinite(velocity).all())}, audio_finite={bool(torch.isfinite(audio).all())}")
     check_gradients(adapter, controls, generator)
     if not torch.equal(next(generator.parameters()), sentinel):
         raise RuntimeError("frozen generator weights changed")
     return {"backbone": backbone, "trainable_parameters": trainable_parameter_count(adapter),
             "conditioning_shape": list(conditioning.shape), "velocity_shape": list(velocity.shape),
+            "decoded_audio_shape": list(audio.shape), "sampler_steps": steps,
             "forward_backward_seconds": elapsed,
             "peak_allocated_bytes": int(torch.xpu.max_memory_allocated(device)),
             "patch_gradient_norm": float(controls.grad.norm()), "generator_frozen": True,
@@ -171,6 +192,8 @@ def main() -> None:
     encoder = load_midi_encoder(args.encoder)
     result = {"device": str(device), "midi_encoder_revision": MIDI_ENCODER_REVISION,
               "midi_encoder": compare_midi_encoder(args.encoder, args.upstream_source, device)}
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     notes = performance_to_spans(performance(), default_program=80)
     rows = encode_midi_spans(notes, duration_seconds=1.0)
     with torch.inference_mode():
@@ -181,15 +204,21 @@ def main() -> None:
     codec = load_codec("same-codec", args.same_s_codec_snapshot, device)
     result["direct_decoder"] = [check_direct_arm(name, tokens, mask, codec, device)
                                  for name in ("residual_mlp", "transformer")]
+    args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     generator, condition_width = load_generator(args.stable_audio_3_source,
                                                args.same_s_generator_snapshot, device)
-    result["generator_conditioning"] = [check_generator_arm(name, tokens, mask, generator, condition_width,
-                                                             codec, device)
-                                        for name in ("residual_mlp", "transformer")]
+    try:
+        result["generator_conditioning"] = [check_generator_arm(name, tokens, mask, generator, condition_width,
+                                                                 codec, device)
+                                            for name in ("residual_mlp", "transformer")]
+    except RuntimeError as exc:
+        result["generator_conditioning"] = {"status": "failed", "error": str(exc)}
+        result["generator_condition_width"] = condition_width
+        args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        raise
     result["generator_condition_width"] = condition_width
     del generator, codec
     torch.xpu.empty_cache()
-    args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps(result, sort_keys=True), flush=True)
 

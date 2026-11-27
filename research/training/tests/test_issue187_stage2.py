@@ -4,7 +4,7 @@ from obruxo_data.midi import Performance
 from obruxo_training.codec import PilotCodec
 from obruxo_training.issue187_stage2 import (
     EventSetEncoder, Issue187Adapter, MidiEmbeddingCache, align_midi_tokens, encode_midi_spans,
-    midi_cache_key, performance_to_spans, trainable_parameter_count,
+    align_mask, midi_cache_key, midi_history, performance_to_spans, trainable_parameter_count,
 )
 from obruxo_training.surrogate_codec import SurrogateCodec
 
@@ -31,7 +31,39 @@ def test_span_rows_retain_polyphony_timing_velocity_and_release():
 def test_token_alignment_samples_in_seconds_and_is_exact_at_native_rate():
     tokens = torch.arange(6, dtype=torch.float32).view(1, 6, 1)
     assert torch.equal(align_midi_tokens(tokens, 4, 25), tokens[:, :4])
-    assert torch.allclose(align_midi_tokens(tokens, 5, 50).flatten(), torch.tensor([0., .5, 1., 1.5, 2.]))
+    assert torch.allclose(align_midi_tokens(tokens, 5, 50).flatten(), torch.tensor([0., 0., 1., 1., 2.]))
+
+
+def test_interval_alignment_preserves_a_short_midi_frame_when_downsampling():
+    tokens = torch.zeros(1, 6, 1)
+    tokens[0, 1, 0] = 1
+    aligned = align_midi_tokens(tokens, 2, 10)
+    assert aligned[0, 0, 0] > 0
+    assert aligned[0, 1, 0] == 0
+    assert align_mask(torch.ones(1, 6, dtype=torch.bool), 2, 10).all()
+
+
+def test_shared_midi_history_distinguishes_silent_release_frames_for_mlp():
+    model = Issue187Adapter("residual_mlp", 33, 256).eval()
+    controls = torch.zeros(2, 33)
+    midi = torch.zeros(2, 3, 768)
+    midi[0, 0, 0] = 1
+    midi[1, 0, 0] = -1
+    result = model(controls, midi, torch.ones(2, 3, dtype=torch.bool), target_frames=3, target_hz=25)
+    assert torch.allclose(midi[:, 2], torch.zeros(2, 768))
+    assert not torch.allclose(result[0, :, 2], result[1, :, 2])
+    assert midi_history(midi)[0, 2].abs().sum() > 0
+
+
+def test_transformer_valid_outputs_are_invariant_to_extra_padding():
+    torch.manual_seed(187)
+    model = Issue187Adapter("transformer", 33, 256).eval()
+    controls = torch.randn(1, 33)
+    midi = torch.randn(1, 6, 768)
+    short = model(controls, midi[:, :3], torch.ones(1, 3, dtype=torch.bool), target_frames=3, target_hz=25)
+    padded_mask = torch.tensor([[True, True, True, False, False, False]])
+    padded = model(controls, midi, padded_mask, target_frames=6, target_hz=25)
+    assert torch.allclose(short[..., :3], padded[..., :3], atol=1e-6, rtol=1e-6)
 
 
 def test_performance_ticks_and_tempo_changes_map_to_absolute_samples():
@@ -85,5 +117,5 @@ def test_adapter_variants_are_parameter_matched_and_backpropagate_for_both_arms(
                    if p.ndim == 2) == 81_920
         mlp, transformer = counts[arm, "residual_mlp"], counts[arm, "transformer"]
         assert abs(mlp - transformer) / max(mlp, transformer) < .01
-    assert counts == {("direct", "residual_mlp"): 151_488, ("direct", "transformer"): 151_936,
-                      ("generator", "residual_mlp"): 184_768, ("generator", "transformer"): 185_216}
+    assert counts == {("direct", "residual_mlp"): 200_704, ("direct", "transformer"): 201_152,
+                      ("generator", "residual_mlp"): 233_984, ("generator", "transformer"): 234_432}

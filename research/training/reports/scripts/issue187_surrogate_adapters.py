@@ -99,7 +99,7 @@ class Adapter(nn.Module):
         times = torch.arange(frames, device=controls.device).float()[None] * (self.codec.hop / SAMPLE_RATE)
         return self.head(_frame_context(self.backbone, controls, played, times.expand(len(controls), -1), lengths))
 
-    def velocity(self, latent, time, tokens, duration, *, recompute=False):
+    def velocity(self, latent, time, tokens, duration, *, prompt_mask=None, recompute=False):
         generator = self.generator
         dtype = next(generator.model.parameters()).dtype
         patch = generator.min_input_length // self.codec.hop
@@ -108,7 +108,8 @@ class Adapter(nn.Module):
         mask = torch.arange(padded.shape[-1], device=latent.device)[None] < frames
         number = generator.conditioner.conditioners["seconds_total"]([duration], latent.device)
         # The generator is frozen. Keep the prompt embeddings attached to the trainable adapter.
-        cond = {"prompt": [tokens.to(dtype), mask[:, :frames]], "seconds_total": number,
+        prompt_mask = mask[:, :tokens.shape[1]] if prompt_mask is None else prompt_mask
+        cond = {"prompt": [tokens.to(dtype), prompt_mask], "seconds_total": number,
                 "inpaint_mask": [padded.new_zeros((1, 1, padded.shape[-1]))],
                 "inpaint_masked_input": [torch.zeros_like(padded)]}
 

@@ -1,0 +1,61 @@
+{
+  "device": "xpu:0",
+  "direct_decoder": [
+    {
+      "audio_shape": [
+        1,
+        2,
+        40960
+      ],
+      "backbone": "residual_mlp",
+      "codec_frozen": true,
+      "forward_backward_seconds": 1.9976464999999735,
+      "latent_shape": [
+        1,
+        256,
+        10
+      ],
+      "patch_gradient_norm": 0.0009865956380963326,
+      "peak_allocated_bytes": 536314368,
+      "trainable_parameters": 200704
+    },
+    {
+      "audio_shape": [
+        1,
+        2,
+        40960
+      ],
+      "backbone": "transformer",
+      "codec_frozen": true,
+      "forward_backward_seconds": 0.27885779999996885,
+      "latent_shape": [
+        1,
+        256,
+        10
+      ],
+      "patch_gradient_norm": 0.0007306706975214183,
+      "peak_allocated_bytes": 537488896,
+      "trainable_parameters": 201152
+    }
+  ],
+  "generator_condition_width": 768,
+  "generator_conditioning": {
+    "error": "generator sampler/decoder backward has nonfinite patch gradients; velocity_finite=False, audio_finite=False",
+    "status": "failed"
+  },
+  "midi_encoder": {
+    "cpu_reference_max_abs": 0.0,
+    "cpu_xpu_max_abs": 5.960464477539062e-07,
+    "device": "xpu:0",
+    "encoder_parameters_frozen": true,
+    "forward_seconds": 1.273855100000219,
+    "peak_allocated_bytes": 13623296,
+    "shape": [
+      1,
+      512,
+      768
+    ],
+    "xpu_reference_max_abs": 4.470348358154297e-08
+  },
+  "midi_encoder_revision": "9a3eff857e821c91f21a05bda8048b7541f4d9e4"
+}

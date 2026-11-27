@@ -274,21 +274,37 @@ class MidiEmbeddingCache:
         return embedding
 
 
+def _temporal_overlap(tokens: Tensor, target_frames: int, target_hz: float, source_hz: float) -> Tensor:
+    source_frames = tokens.shape[1]
+    source_start = torch.arange(source_frames, device=tokens.device, dtype=torch.float32) / source_hz
+    target_start = torch.arange(target_frames, device=tokens.device, dtype=torch.float32) / target_hz
+    overlap = (torch.minimum(target_start[:, None] + 1 / target_hz, source_start[None, :] + 1 / source_hz)
+               - torch.maximum(target_start[:, None], source_start[None, :])).clamp_min(0)
+    return overlap.to(tokens.dtype)
+
+
 def align_midi_tokens(tokens: Tensor, target_frames: int, target_hz: float, *, source_hz: float = MIDI_HZ) -> Tensor:
-    """Linearly sample 25 Hz frame-start features at a decoder/generator time grid."""
+    """Area-average all source frames overlapping each destination time interval."""
     if tokens.ndim != 3 or target_frames < 1 or source_hz <= 0 or target_hz <= 0:
         raise ValueError("tokens must be [batch, frames, channels] and rates/frame count positive")
-    locations = torch.arange(target_frames, device=tokens.device, dtype=torch.float32) * (source_hz / target_hz)
-    left = locations.floor().long().clamp_max(tokens.shape[1] - 1)
-    right = (left + 1).clamp_max(tokens.shape[1] - 1)
-    fraction = (locations - left).to(tokens.dtype)[None, :, None]
-    return torch.lerp(tokens[:, left], tokens[:, right], fraction)
+    overlap = _temporal_overlap(tokens, target_frames, target_hz, source_hz)
+    totals = overlap.sum(-1).clamp_min(torch.finfo(tokens.dtype).eps)
+    return torch.einsum("ts,bsc->btc", overlap, tokens) / totals[None, :, None]
 
 
 def align_mask(mask: Tensor, target_frames: int, target_hz: float, *, source_hz: float = MIDI_HZ) -> Tensor:
-    locations = torch.arange(target_frames, device=mask.device, dtype=torch.float32) * (source_hz / target_hz)
-    index = locations.floor().long().clamp_max(mask.shape[1] - 1)
-    return mask[:, index]
+    overlap = _temporal_overlap(mask[:, :, None].float(), target_frames, target_hz, source_hz)
+    return (overlap.bool()[None] & mask[:, None, :]).any(-1)
+
+
+def midi_history(tokens: Tensor, *, source_hz: float = MIDI_HZ, half_life_seconds: float = 2.0) -> Tensor:
+    """Expose a shared, causal two-second-decay summary to frame-independent adapters."""
+    if tokens.ndim != 3 or source_hz <= 0 or half_life_seconds <= 0:
+        raise ValueError("tokens must be [batch, frames, channels] and rates/half-life positive")
+    decay = math.exp(-math.log(2) / (source_hz * half_life_seconds))
+    scale = torch.pow(torch.tensor(decay, device=tokens.device, dtype=tokens.dtype),
+                      torch.arange(tokens.shape[1], device=tokens.device, dtype=tokens.dtype))
+    return torch.cumsum(tokens / scale[None, :, None], dim=1) * scale[None, :, None]
 
 
 class RMSNorm(nn.Module):
@@ -320,7 +336,7 @@ class RotarySelfAttention(nn.Module):
         self.out_proj = nn.Linear(WIDTH, WIDTH)
         self.q_norm, self.k_norm = RMSNorm(self.head_dim), RMSNorm(self.head_dim)
 
-    def forward(self, value: Tensor) -> Tensor:
+    def forward(self, value: Tensor, valid_mask: Tensor) -> Tensor:
         batch, frames, _ = value.shape
         def split(layer):
             return layer(value).view(batch, frames, self.heads, self.head_dim)
@@ -333,7 +349,8 @@ class RotarySelfAttention(nn.Module):
             even, odd = tensor.float()[..., 0::2], tensor.float()[..., 1::2]
             return torch.stack((even * cosine - odd * sine, even * sine + odd * cosine), -1).flatten(-2).to(tensor.dtype)
         q, k = self.q_norm(rotate(q)), self.k_norm(rotate(k))
-        attended = F.scaled_dot_product_attention(q.transpose(1, 2), k.transpose(1, 2), v.transpose(1, 2))
+        attended = F.scaled_dot_product_attention(q.transpose(1, 2), k.transpose(1, 2), v.transpose(1, 2),
+                                                   attn_mask=valid_mask[:, None, None, :])
         return self.out_proj(attended.transpose(1, 2).reshape(batch, frames, WIDTH))
 
 
@@ -344,8 +361,8 @@ class TransformerBlock(nn.Module):
         self.attention = RotarySelfAttention()
         self.gate, self.up, self.down = nn.Linear(WIDTH, 128), nn.Linear(WIDTH, 128), nn.Linear(128, WIDTH)
 
-    def forward(self, value: Tensor) -> Tensor:
-        value = value + self.attention(self.attn_norm(value))
+    def forward(self, value: Tensor, valid_mask: Tensor) -> Tensor:
+        value = value + self.attention(self.attn_norm(value), valid_mask)
         normalized = self.ff_norm(value)
         hidden = F.silu(self.gate(normalized)) * self.up(normalized)
         return value + self.down(hidden)
@@ -381,6 +398,7 @@ class Issue187Adapter(nn.Module):
         self.backbone_name = backbone
         self.patch = nn.Linear(control_width, WIDTH)
         self.midi = nn.Linear(MIDI_WIDTH, WIDTH)
+        self.history = nn.Linear(MIDI_WIDTH, WIDTH)
         self.timing = nn.Linear(3, WIDTH)
         self.fusion_norm = nn.LayerNorm(WIDTH)
         block = ResidualMLPBlock if backbone == "residual_mlp" else TransformerBlock
@@ -393,13 +411,16 @@ class Issue187Adapter(nn.Module):
                 target_frames: int, target_hz: float) -> Tensor | tuple[Tensor, Tensor]:
         if controls.ndim != 2 or midi_tokens.ndim != 3 or len(controls) != len(midi_tokens):
             raise ValueError("controls must be [batch, controls], MIDI tokens [batch, frames, 768]")
+        history_tokens = midi_history(midi_tokens)
         aligned = align_midi_tokens(midi_tokens, target_frames, target_hz)
+        aligned_history = align_midi_tokens(history_tokens, target_frames, target_hz)
         mask = align_mask(midi_mask, target_frames, target_hz)
         times = torch.arange(target_frames, device=controls.device, dtype=aligned.dtype) / target_hz
         time_features = torch.stack((times, torch.sin(2 * math.pi * times), torch.cos(2 * math.pi * times)), -1)
-        hidden = self.fusion_norm(self.patch(controls)[:, None] + self.midi(aligned) + self.timing(time_features)[None])
+        hidden = self.fusion_norm(self.patch(controls)[:, None] + self.midi(aligned) + self.history(aligned_history)
+                                  + self.timing(time_features)[None])
         for block in self.blocks:
-            hidden = block(hidden)
+            hidden = block(hidden, mask) if isinstance(block, TransformerBlock) else block(hidden)
         hidden = self.final_norm(hidden)
         if isinstance(self.connector, GeneratorConditioningConnector):
             return self.connector(hidden, mask)
