@@ -147,16 +147,31 @@ def score(manifest, name, output, visqol):
     print(f"{name}: completed {len(manifest)} waveform scores", flush=True)
 
 
+def check_legacy_reproduction(output, models):
+    for name in models:
+        manifest = experiment.read_json(output / f"waveforms-{name}.json")
+        cases = {}
+        for row in manifest:
+            original = np.load(row["original_path"], allow_pickle=False)
+            wave = read_reconstruction(Path(row["wave_path"]), original)
+            cases[row["case"]] = experiment.audio_distance(original, wave)["mrstft"]
+        BASE.write_json(output / f"replay-mrstft-{name}.json", cases)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--prior-run", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--models", choices=CHECKPOINTS, nargs="+", default=list(CHECKPOINTS))
     parser.add_argument("--visqol-model", type=Path)
+    parser.add_argument("--check-legacy-reproduction", action="store_true")
     args = parser.parse_args()
     torch.set_num_threads(4)
     old_run, output = args.prior_run.resolve(), args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
+    if args.check_legacy_reproduction:
+        check_legacy_reproduction(output, args.models)
+        return
     panel = list(validation_panel(old_run))
     visqol = VisqolAudio(args.visqol_model) if args.visqol_model else None
     progress = experiment.Progress(output)

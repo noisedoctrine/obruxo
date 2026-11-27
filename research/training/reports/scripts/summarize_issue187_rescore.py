@@ -12,7 +12,7 @@ from scipy.stats import spearmanr
 
 MODELS = ("open-small", "same-s", "same-l", "same-l-embedded", "dac")
 METRICS = ("mel_log1p", "stft_log1p", "visqol_audio", "cir_cosine", "si_sdr_db", "ccpc",
-           "mrstft", "spectral_loss", "spectral_convergence", "log_magnitude_mae",
+           "mrstft", "replay_mrstft", "spectral_loss", "spectral_convergence", "log_magnitude_mae",
            "octave_band_energy_error_db", "monophonic_octave_energy_error_db",
            "attack_envelope_error_db", "decay_envelope_error_db", "sustain_envelope_error_db",
            "release_envelope_error_db", "rms_relative", "side_to_mid_error_db",
@@ -28,6 +28,8 @@ def load_model(run, name):
     model = load(run / f"rescore-{name}.json")
     cir_path = run / f"cir-{name}.json"
     cir = load(cir_path)["cases"] if cir_path.is_file() else {}
+    replay_path = run / f"replay-mrstft-{name}.json"
+    replay = load(replay_path) if replay_path.is_file() else {}
     rows = {r["case"]: r for r in model["cases"]}
     if len(rows) != 256 or (cir and set(cir) != set(rows)):
         raise ValueError(f"{name}: unexpected CIR or waveform panel")
@@ -35,6 +37,7 @@ def load_model(run, name):
         legacy = row.pop("legacy")
         row.update({key: legacy[key] for key in METRICS if key in legacy})
         row["cir_cosine"] = cir.get(case)
+        row["replay_mrstft"] = replay.get(case)
     return model["revision"], rows
 
 
@@ -99,7 +102,7 @@ def main():
     if any(panel_key(rows) != panel_key(reference) for rows in models.values()):
         raise ValueError("candidate rows do not share an identical validation panel")
     keys = ("mel_log1p", "stft_log1p", "visqol_audio", "cir_cosine", "si_sdr_db", "ccpc", "mrstft",
-            "spectral_loss", "octave_band_energy_error_db", "rms_relative")
+            "replay_mrstft", "spectral_loss", "octave_band_energy_error_db", "rms_relative")
     summaries = {name: {key: interval(rows, key) for key in METRICS} for name, rows in models.items()}
     differences = {name: {key: interval(rows, key, reference) for key in keys}
                    for name, rows in models.items() if name != "open-small"}

@@ -52,12 +52,30 @@ def merge_validation(path, cases):
     write(path, validation)
 
 
+def follow(run):
+    seen = set()
+    while True:
+        for path in sorted(run.glob("waveforms-*.json"), key=lambda item: item.stat().st_mtime):
+            name = path.stem.removeprefix("waveforms-")
+            if name not in seen:
+                seen.add(name)
+                yield name
+        status = run / "status.json"
+        if status.is_file() and json.loads(status.read_text(encoding="utf-8"))["state"] in {
+            "analysis_required", "incomplete", "blocked", "failed", "complete",
+        }:
+            return
+        time.sleep(5)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--checkpoint-root", type=Path, required=True)
     parser.add_argument("--device", default="cpu")
-    parser.add_argument("--models", nargs="+", required=True)
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--models", nargs="+")
+    mode.add_argument("--follow", action="store_true", help="score validation manifests as training produces them")
     parser.add_argument("--wait-seconds", type=int, default=0)
     args = parser.parse_args()
     torch.set_num_threads(3)
@@ -68,7 +86,7 @@ def main():
     adapter = load_adapter(model, checkpoint, entry, digest, checkpoint_root=root, device=args.device,
                            source_root=resolve_source_checkout(root, entry))
     references = {}
-    for name in args.models:
+    for name in follow(args.run) if args.follow else args.models:
         output = args.run / f"cir-{name}.json"
         if output.exists():
             merge_validation(args.run / f"validation-{name}.json",

@@ -1,5 +1,7 @@
 """Train gated frozen surrogates and replay the Issue 173 inversion panel."""
 
+from collections import deque
+from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
 import json
 import math
@@ -266,37 +268,54 @@ def validate(adapter, rows, controls, latents, waves, deadline, output, step, pr
     reconstructed.mkdir(parents=True, exist_ok=True)
     manifest = []
     progress.set(f"Stage 2 · {adapter.name} validation at {step:,}", 2 * len(rows), 2)
-    for index, row in enumerate(rows):
-        if perf_counter() >= deadline:
-            raise TimeoutError("the arm reached its five-hour cap during validation")
-        batch, metas = BASE.collate_pairs([row], data, controls, DEVICE, loader)
-        expected = torch.load(latents / f"validation-{row['pair_id']}.pt", weights_only=True)
-        performance = experiment.Performance.from_dict(row["performance"])
-        for j, ((role, _), meta) in enumerate(zip(experiment.ROLES, metas, strict=True)):
-            clip = experiment.split_batch(batch, j)
-            case_id = f"{row['pair_id']}-{role}"
-            original_path = (waves / f"{case_id}.npy").resolve()
-            original = np.load(original_path, allow_pickle=False)
-            midi = adapter.midi(performance, len(original))
-            started = perf_counter()
-            predicted = adapter.waveform(clip["controls"], midi, clip["lengths"],
-                                         expected[j].shape[-1], SEED + 2 * index + j)
-            torch.xpu.synchronize()
-            seconds = perf_counter() - started
-            record = experiment.measured_case(predicted, original, clip, meta)
-            wave = predicted[0].T.cpu().numpy()
-            record.update(waveform_scores(original, wave), cir_cosine=None, visqol_audio=None)
-            waveform_path = (reconstructed / f"{case_id}.wav").resolve()
-            wavfile.write(waveform_path, SAMPLE_RATE, wave)
-            manifest.append({"case": case_id, "original_path": str(original_path), "wave_path": str(waveform_path)})
-            record["forward_seconds"] = seconds
-            cases.append(record)
-            if step in (500, 8000) and index in (0, 32, 64, 96):
-                listening = output / "listening"
-                listening.mkdir(exist_ok=True)
-                name = f"{row['pair_id']}-{role}-{adapter.name}-{step}.wav"
-                wavfile.write(listening / name, SAMPLE_RATE, wave)
-        progress.update(len(cases))
+
+    def score_and_save(record, original, wave, path):
+        record.update(waveform_scores(original, wave), cir_cosine=None, visqol_audio=None)
+        wavfile.write(path, SAMPLE_RATE, wave)
+        return record
+
+    def predictions():
+        for index, row in enumerate(rows):
+            if perf_counter() >= deadline:
+                raise TimeoutError("the arm reached its five-hour cap during validation")
+            batch, metas = BASE.collate_pairs([row], data, controls, DEVICE, loader)
+            expected = torch.load(latents / f"validation-{row['pair_id']}.pt", weights_only=True)
+            performance = experiment.Performance.from_dict(row["performance"])
+            for j, ((role, _), meta) in enumerate(zip(experiment.ROLES, metas, strict=True)):
+                clip = experiment.split_batch(batch, j)
+                case_id = f"{row['pair_id']}-{role}"
+                original_path = (waves / f"{case_id}.npy").resolve()
+                original = np.load(original_path, allow_pickle=False)
+                midi = adapter.midi(performance, len(original))
+                started = perf_counter()
+                predicted = adapter.waveform(clip["controls"], midi, clip["lengths"],
+                                             expected[j].shape[-1], SEED + 2 * index + j)
+                torch.xpu.synchronize()
+                seconds = perf_counter() - started
+                record = experiment.measured_case(predicted, original, clip, meta)
+                wave = predicted[0].T.cpu().numpy()
+                waveform_path = (reconstructed / f"{case_id}.wav").resolve()
+                record["forward_seconds"] = seconds
+                if step in (500, 8000) and index in (0, 32, 64, 96):
+                    listening = output / "listening"
+                    listening.mkdir(exist_ok=True)
+                    name = f"{row['pair_id']}-{role}-{adapter.name}-{step}.wav"
+                    wavfile.write(listening / name, SAMPLE_RATE, wave)
+                yield record, original, wave, waveform_path, {
+                    "case": case_id, "original_path": str(original_path), "wave_path": str(waveform_path),
+                }
+
+    with ThreadPoolExecutor(max_workers=1) as scorer:
+        pending = deque()
+        for record, original, wave, path, entry in predictions():
+            manifest.append(entry)
+            pending.append(scorer.submit(score_and_save, record, original, wave, path))
+            if len(pending) >= 3:
+                cases.append(pending.popleft().result())
+                progress.update(len(cases))
+        while pending:
+            cases.append(pending.popleft().result())
+            progress.update(len(cases))
     summary = BASE.aggregate_cases(cases)
     summary.update({key: float(np.mean([row[key] for row in cases])) for key in
                     ("mrstft", "side_to_mid_error_db", "rms_relative", "forward_seconds")})
@@ -669,7 +688,15 @@ def run_later_stages(output, selection, plan, training, validation, controls, wa
         decision["stage3"] = "complete"
         BASE.write_json(path, decision)
         return "complete"
-    reports = {}
+    reports_path = output / "stage2.json"
+    reports = experiment.read_json(reports_path) if reports_path.is_file() else {}
+    if not smoke and target_step == MAX_UPDATES:
+        qualified &= {name for name, report in reports.items()
+                      if report["updates"] >= 500 and not report.get("stopped")}
+        if not qualified:
+            decision.update(stage2="incomplete", stage3="not_started", reason="no viable 500-update pilot")
+            BASE.write_json(path, decision)
+            return "incomplete"
     for mode in available:
         backbones = [b for b in ("residual_mlp", "transformer") if smoke or f"{mode}-{b}" in qualified]
         if not backbones:
@@ -687,7 +714,7 @@ def run_later_stages(output, selection, plan, training, validation, controls, wa
                 progress.set(f"Stage 2 · Load {adapter.name} arm", 1, 2)
                 reports[adapter.name] = arm(output, adapter, training, validation, controls, latents, waves,
                                             direct, progress, started, smoke=smoke, target_step=target_step)
-                BASE.write_json(output / "stage2.json", reports)
+                BASE.write_json(reports_path, reports)
                 del adapter
             del generator
         except (RuntimeError, ValueError, OSError) as exc:
@@ -695,7 +722,7 @@ def run_later_stages(output, selection, plan, training, validation, controls, wa
             progress.failures += 1
             progress.update(progress.done, log=True, message=str(exc))
         torch.xpu.empty_cache()
-    BASE.write_json(output / "stage2.json", reports)
+    BASE.write_json(reports_path, reports)
     if smoke:
         qualified = [name for name, report in reports.items()
                      if report.get("smoke", {}).get("checkpoint_reloaded") and "1" in report["checkpoints"]]
