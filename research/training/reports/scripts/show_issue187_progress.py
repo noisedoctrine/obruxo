@@ -2,6 +2,7 @@
 
 from datetime import datetime, timezone
 import json
+import math
 from pathlib import Path
 import re
 import sys
@@ -115,6 +116,32 @@ def format_elapsed(seconds):
     return f"{seconds}s"
 
 
+def read_learning_curves(output):
+    curves = {"training": {}, "validation": {}}
+    for mode in ("latent", "generator"):
+        arm_path = output / f"arm-{mode}.json"
+        try:
+            arm = json.loads(arm_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            arm = {}
+        training = [(int(row["update"]), float(row["loss"])) for row in arm.get("logs", [])
+                    if math.isfinite(float(row["loss"]))]
+        validation = []
+        for step in (0, 500, 1000, 2000, 4000, 8000):
+            path = output / f"validation-{mode}-{step}.json"
+            try:
+                loss = float(json.loads(path.read_text(encoding="utf-8"))["metrics"]["spectral_loss"])
+            except (OSError, ValueError, KeyError, TypeError):
+                continue
+            if math.isfinite(loss):
+                validation.append((step, loss))
+        if training:
+            curves["training"][mode] = training
+        if validation:
+            curves["validation"][mode] = validation
+    return curves
+
+
 def main(output):
     set_dpi_awareness()
     root = tk.Tk()
@@ -160,7 +187,7 @@ def main(output):
 
     dashboard = ttk.Frame(split, padding=16, width=dashboard_width)
     dashboard.columnconfigure(0, weight=1)
-    dashboard.rowconfigure(5, weight=1)
+    dashboard.rowconfigure(7, weight=1)
     split.add(side, minsize=max(360, int(window_width * .3)), stretch="always", padx=3, pady=3)
     split.add(dashboard, minsize=max(360, int(window_width * .3)), stretch="always", padx=3, pady=3)
     phase = ttk.Label(dashboard, text="Waiting for the worker",
@@ -177,9 +204,60 @@ def main(output):
     stage_bar.grid(row=4, column=0, sticky="ew", pady=(6, 18))
     events = ttk.Label(dashboard, justify="left", wraplength=int(dashboard_width * .88))
     events.grid(row=5, column=0, sticky="nw")
+    ttk.Label(dashboard, text="Training and validation curves", font=heading_font).grid(
+        row=6, column=0, sticky="w", pady=(10, 2))
+    curve_canvas = tk.Canvas(dashboard, height=430, background="white", highlightthickness=1,
+                             highlightbackground="#b5b5b5")
+    curve_canvas.grid(row=7, column=0, sticky="nsew")
     controls = ttk.Frame(dashboard)
-    controls.grid(row=6, column=0, sticky="w", pady=(10, 0))
+    controls.grid(row=8, column=0, sticky="w", pady=(10, 0))
     paused = False
+    learning_curves = {"training": {}, "validation": {}}
+
+    def draw_plot(title, series, y, height):
+        width = max(200, curve_canvas.winfo_width())
+        curve_canvas.create_text(10, y + 4, text=title, anchor="nw", font=heading_font)
+        top, bottom, left, right = y + 29, y + height - 25, 58, width - 18
+        points = [(x, value) for values in series.values() for x, value in values]
+        if not points:
+            curve_canvas.create_text(left, (top + bottom) / 2, text="Waiting for Stage 2 data", anchor="w",
+                                     fill="#555555", font=body_font)
+            return
+        x_max = max(1, max(x for x, _ in points))
+        y_min, y_max = min(value for _, value in points), max(value for _, value in points)
+        padding = max((y_max - y_min) * .12, abs(y_max) * .02, 1e-8)
+        y_min, y_max = y_min - padding, y_max + padding
+        for fraction in (0., .5, 1.):
+            grid_y = bottom - fraction * (bottom - top)
+            label = y_min + fraction * (y_max - y_min)
+            curve_canvas.create_line(left, grid_y, right, grid_y, fill="#e1e1e1")
+            curve_canvas.create_text(left - 6, grid_y, text=f"{label:.3g}", anchor="e", fill="#555555",
+                                     font=body_font)
+        curve_canvas.create_line(left, top, left, bottom, fill="#777777")
+        curve_canvas.create_line(left, bottom, right, bottom, fill="#777777")
+        colors = {"latent": "#1464a5", "generator": "#c45820"}
+        for index, (mode, values) in enumerate(series.items()):
+            coords = []
+            for step, value in values:
+                px = left + step / x_max * (right - left)
+                py = bottom - (value - y_min) / (y_max - y_min) * (bottom - top)
+                coords.extend((px, py))
+            color = colors[mode]
+            if len(coords) >= 4:
+                curve_canvas.create_line(*coords, fill=color, width=2)
+            for px, py in zip(coords[::2], coords[1::2], strict=True):
+                curve_canvas.create_oval(px - 3, py - 3, px + 3, py + 3, fill=color, outline=color)
+            legend_x = left + index * 125
+            curve_canvas.create_line(legend_x, y + 17, legend_x + 22, y + 17, fill=color, width=2)
+            curve_canvas.create_text(legend_x + 28, y + 17, text=mode, anchor="w", fill=color, font=body_font)
+        curve_canvas.create_text((left + right) / 2, bottom + 14, text="Updates", fill="#555555", font=body_font)
+
+    def redraw_curves(_event=None):
+        curve_canvas.delete("all")
+        height = max(160, curve_canvas.winfo_height() // 2)
+        draw_plot("Training objective", learning_curves["training"], 0, height)
+        draw_plot("Validation spectral loss", learning_curves["validation"], height, height)
+    curve_canvas.bind("<Configure>", redraw_curves)
     specs, items = plan_tree(), {}
 
     def insert(nodes, parent=""):
@@ -301,6 +379,8 @@ def main(output):
                 decisions_path = output / "decisions.json"
                 decisions = json.loads(decisions_path.read_text(encoding="utf-8")) if decisions_path.exists() else {}
                 refresh_tree(state, read_timeline(output, now), decisions, now)
+                learning_curves = read_learning_curves(output)
+                redraw_curves()
             except (OSError, ValueError, KeyError, TypeError):
                 pass
         root.after(2500, refresh)
