@@ -1,0 +1,18 @@
+{
+  "active_event_rows": 36,
+  "active_notes": 3,
+  "device": "cpu",
+  "encoder_max_absolute_difference": 0.0,
+  "encoder_output_shape": [
+    1,
+    512,
+    768
+  ],
+  "midi_row_max_absolute_differences": {
+    "event_valid": 0.0,
+    "kind_id": 0.0,
+    "numeric": 0.0,
+    "pitch_id": 0.0
+  },
+  "nonzero_feature_frames": 22
+}
