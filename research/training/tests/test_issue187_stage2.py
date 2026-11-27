@@ -43,6 +43,16 @@ def test_interval_alignment_preserves_a_short_midi_frame_when_downsampling():
     assert align_mask(torch.ones(1, 6, dtype=torch.bool), 2, 10).all()
 
 
+def test_interval_alignment_ignores_invalid_padding_at_same_codec_rate():
+    valid = torch.ones(1, 3, 1)
+    padded = torch.cat((valid, torch.zeros(1, 8, 1)), dim=1)
+    valid_mask = torch.tensor([[True, True, True, False, False, False, False, False, False, False, False]])
+    same_codec_rate = 44_100 / 4_096
+    expected = align_midi_tokens(valid, 2, same_codec_rate)
+    actual = align_midi_tokens(padded, 2, same_codec_rate, source_mask=valid_mask)
+    assert torch.allclose(actual, expected)
+
+
 def test_shared_midi_history_distinguishes_silent_release_frames_for_mlp():
     model = Issue187Adapter("residual_mlp", 33, 256).eval()
     controls = torch.zeros(2, 33)
@@ -60,10 +70,11 @@ def test_transformer_valid_outputs_are_invariant_to_extra_padding():
     model = Issue187Adapter("transformer", 33, 256).eval()
     controls = torch.randn(1, 33)
     midi = torch.randn(1, 6, 768)
-    short = model(controls, midi[:, :3], torch.ones(1, 3, dtype=torch.bool), target_frames=3, target_hz=25)
+    codec_rate = 44_100 / 4_096
+    short = model(controls, midi[:, :3], torch.ones(1, 3, dtype=torch.bool), target_frames=2, target_hz=codec_rate)
     padded_mask = torch.tensor([[True, True, True, False, False, False]])
-    padded = model(controls, midi, padded_mask, target_frames=6, target_hz=25)
-    assert torch.allclose(short[..., :3], padded[..., :3], atol=1e-6, rtol=1e-6)
+    padded = model(controls, midi, padded_mask, target_frames=2, target_hz=codec_rate)
+    assert torch.allclose(short, padded, atol=1e-6, rtol=1e-6)
 
 
 def test_performance_ticks_and_tempo_changes_map_to_absolute_samples():

@@ -1,6 +1,6 @@
 # Issue 187 — Stage 2 preparation
 
-**No model-quality result is claimed:** this change prepares the frozen MIDI path and the two Stage 2 adapter arms; it does not train them or select an audio trunk. CPU parity against the released SpanSynth-Edit implementation is exact. Encoder and direct-decoder XPU checks passed; Stable Audio generator-conditioning backward still fails with nonfinite gradients.
+**No Stage 2 model-quality result is claimed:** this change prepares the frozen MIDI path and the two adapter arms; it does not train them or select an audio trunk. CPU parity against the released SpanSynth-Edit implementation is exact. The XPU checks below distinguish the passing native flow-matching objective from the still-failing Transformer sampler backward.
 
 ## Implemented architecture
 
@@ -36,18 +36,19 @@ The CPU equivalence check used a three-note overlapping score and reported zero 
 
 | XPU check | Status |
 |---|---|
-| Extracted MIDI encoder load, frozen placement, upstream-vs-XPU and CPU-vs-XPU numerical comparison | **Passed**; upstream XPU max difference `4.47e-8`, CPU/XPU max difference `5.96e-7` |
+| Extracted MIDI encoder load, frozen placement, upstream-vs-XPU and CPU-vs-XPU numerical comparison | **Passed**; upstream XPU max difference `5.96e-8`, CPU/XPU max difference `5.96e-7` |
 | Both backbones through the existing SAME-S decoder, including audio decode | **Passed**; MLP 2.00 s / 536,314,368 bytes peak, Transformer 0.28 s / 537,488,896 bytes peak |
-| Both backbones through the Stable Audio 3 generator, full two-step sampler and decoder | **Blocked**; FP16 XPU backward produced nonfinite velocity/audio gradients |
-| Generator-conditioning adapter and patch-control gradients | **Blocked by generator backward NaNs**; the harness checks every adapter parameter for a finite gradient |
-| Generator-path runtime and peak memory | **Not measured to completion**; failure is recorded in the smoke JSON |
+| Both backbones through the native Stable Audio rectified-flow training objective | **Passed**; MLP 2.92 s / 1,595,971,200 bytes peak, Transformer 0.31 s / 1,600,805,376 bytes peak; both had finite nonzero adapter/patch gradients and frozen generator weights |
+| Residual MLP through a two-step Stable Audio sampler and codec decoder | **Forward passed; backward failed**; 1.39 s / 1,702,774,784 bytes peak. Sampler velocities, decoded audio, and decoder latent gradient were finite; generator-conditioning gradient was NaN. Latent magnitude grew `3.54 → 86.2` and velocity reached `371.5`. |
+| Transformer through the same sampler and decoder | **Forward passed; backward failed**; 0.52 s / 1,700,711,424 bytes peak. Sampler velocities, decoded audio, and decoder latent gradient were finite; generator-conditioning gradient was NaN. Latent magnitude grew `3.54 → 85.1` and velocity reached `406`. |
 
-The first XPU attempt was deferred while the active Issue 187 worker occupied the device. After that worker exited, encoder parity passed (1.27 s, 13,623,296 bytes peak) and both direct-decoder arms completed forward/backward with finite nonzero patch gradients. Full Stable Audio sampling revealed nonfinite XPU FP16 backward gradients, so generator-path training readiness is **not verified**. Resolve this before training the generator-conditioning arm; do not silently substitute precision or another generator. The reproducible command is `qualify_issue187_stage2_xpu.py`. The harness records completed phases when a later phase fails.
+The direct and generator smoke checks reused the SAME-S codec and Stable Audio 3 Small Music checkpoint already present for Stage 1; this is a compatibility fixture, not a trunk selection. The rerun used upstream-default SDPA with no test-only backend override and a synthetic `[1, 512, 768]` MIDI-token fixture (the extracted encoder has its own real-checkpoint XPU parity check). Generator training uses the PR #188 velocity connector and FP32 flow latents/noise while the frozen generator remains FP16. Both one-step flow-matching objectives pass. For sampler loss, each denoising output, latent update, and decoded waveform is checked before backward; the first nonfinite values occur in gradients flowing into generator conditioning. The reproducible harness records each backbone and objective separately so one failure does not hide the other arm.
 
 ## Remaining integration
 
-- Resolve and re-run Stable Audio generator backward qualification on XPU; the current FP16 path produced nonfinite gradients.
-- The Stage 1 runner still instantiates its prior adapter. Formal training was deliberately not integrated in this preparation task; before resuming it, wire both Stage 2 backbones to the reusable latent cache and verify the selected codec/generator interfaces.
+- The legacy Stage 1 runner now fails closed before decoder-latent caching or training because it still instantiates the superseded residual MLP and custom MIDI path. Wire both prepared adapters to the cache and selected codec/generator before resuming Stage 2.
+- Resolve the generator-conditioning backward NaNs seen in both sampler arms before using differentiable sampler loss. The native one-step flow-matching training objective passes for both backbones; the sampler forward and codec decode are finite.
 - Once Stage 1 selects a trunk, do the final codec/generator interface and latent-grid integration smoke check for that selection. The connectors are dimension-configurable, so the trunk choice does not change the adapter backbones.
 - Variable-length batching through Stable Audio conditioning remains untested. Single-clip conditioning is trimmed to valid MIDI extent because the upstream DiT does not use cross-attention masks.
+- Stage 1 stopped at 1,536/2,174 cached latents on a strict render-receipt mismatch. The existing cache is preserved; the original waveform needed to regenerate the missing latent is absent from available pair artifacts. Diagnosis and the no-bypass recovery constraint are recorded in [STAGE1_INTERIM.md](STAGE1_INTERIM.md).
 - Formal training, training curves, and architecture selection remain out of scope for this preparation.

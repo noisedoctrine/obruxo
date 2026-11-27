@@ -1,4 +1,18 @@
 {
+  "cache_receipt_diagnosis": {
+    "action": "Do not bypass receipt validation or rerender the corpus. Keep the existing valid cache and recover only if the exact original waveform/receipt-compatible input is found.",
+    "duration_frames": 180075,
+    "native_readback_paths": {
+      "original": "cached_basic_template / 11 verified loaded scalars",
+      "retry": "full_state_json / 772 verified loaded scalars"
+    },
+    "original_waveform_sha256": "963b69ae\u2026",
+    "request_id": "283cb1c2fccc7a467e0f422fbc8ff6fd687ac7d612f603637168703ff2ee88e4",
+    "retry_waveform_sha256": "d0cb5d26\u2026",
+    "rms_absolute_difference": 2.45e-13,
+    "root_cause": "Not conclusively isolated. Renderer provenance says numeric-tolerance rather than bitwise determinism; readback paths also differ. The original waveform is absent from source pair artifacts, so the exact missing latent cannot be reconstructed from available files.",
+    "same_request_renderer_engine_preset_and_duration": true
+  },
   "carried_forward_baselines": {
     "cross_midi_common_gallery": {
       "cir_ast:official_clip": {
@@ -198,6 +212,7 @@
     }
   },
   "control_scope": "Frozen Stage 1 representations and codec reconstruction only; no Vital controls are predicted or edited.",
+  "dac_disposition": "No standalone DAC retrieval baseline or candidate trunk. DAC was only a codec decode/gradient compatibility probe; carried-forward baselines were CIR, CLAP, and Vital JEPA V7.",
   "dataset": {
     "distinct_query_midi_performances": 50,
     "episodes_per_condition": {
@@ -250,6 +265,14 @@
           "mrr": 0.4854994183666568,
           "recall_at_1": 0.39085271317829456,
           "recall_at_10": 0.6675968992248063,
+          "recall_at_1_clustered_95": {
+            "family_clusters": 129,
+            "lower": 0.3169,
+            "performance_clusters": 50,
+            "replicates": 2000,
+            "seed": 187,
+            "upper": 0.4699
+          },
           "recall_at_5": 0.5880620155038759
         },
         "cross_midi_mixed_gallery": {
@@ -257,6 +280,14 @@
           "mrr": 0.478480019200261,
           "recall_at_1": 0.38992248062015505,
           "recall_at_10": 0.6479069767441861,
+          "recall_at_1_clustered_95": {
+            "family_clusters": 129,
+            "lower": 0.3366,
+            "performance_clusters": 50,
+            "replicates": 2000,
+            "seed": 187,
+            "upper": 0.4428
+          },
           "recall_at_5": 0.5671317829457364
         }
       }
@@ -291,6 +322,16 @@
         "spectral_loss": 0.20405080622731475,
         "sustain_envelope_error_db": 1.7673362607759158,
         "sustain_frames": 1472
+      },
+      "retrieval": {
+        "cross_midi_common_gallery": {
+          "episodes": 6450,
+          "recall_at_1": 0.4167
+        },
+        "cross_midi_mixed_gallery": {
+          "episodes": 6450,
+          "recall_at_1": 0.4212
+        }
       }
     },
     "same-s": {
@@ -330,6 +371,14 @@
           "mrr": 0.5037971257556008,
           "recall_at_1": 0.40434108527131785,
           "recall_at_10": 0.7009302325581396,
+          "recall_at_1_clustered_95": {
+            "family_clusters": 129,
+            "lower": 0.329,
+            "performance_clusters": 50,
+            "replicates": 2000,
+            "seed": 187,
+            "upper": 0.4834
+          },
           "recall_at_5": 0.6110077519379845
         },
         "cross_midi_mixed_gallery": {
@@ -337,21 +386,76 @@
           "mrr": 0.4991444039155076,
           "recall_at_1": 0.4055813953488372,
           "recall_at_10": 0.6854263565891473,
+          "recall_at_1_clustered_95": {
+            "family_clusters": 129,
+            "lower": 0.3505,
+            "performance_clusters": 50,
+            "replicates": 2000,
+            "seed": 187,
+            "upper": 0.4594
+          },
           "recall_at_5": 0.5978294573643411
         }
       }
     }
   },
+  "paired_cluster_bootstrap_95": {
+    "deltas_recall_at_1": {
+      "cross_midi_common_gallery": {
+        "same-l_minus_open-small": {
+          "estimate": 0.0259,
+          "lower": -0.0079,
+          "upper": 0.0609
+        },
+        "same-l_minus_same-s": {
+          "estimate": 0.0124,
+          "lower": 0.004,
+          "upper": 0.0223
+        },
+        "same-s_minus_open-small": {
+          "estimate": 0.0135,
+          "lower": -0.0206,
+          "upper": 0.0484
+        }
+      },
+      "cross_midi_mixed_gallery": {
+        "same-l_minus_open-small": {
+          "estimate": 0.0313,
+          "lower": 0.0025,
+          "upper": 0.0617
+        },
+        "same-l_minus_same-s": {
+          "estimate": 0.0157,
+          "lower": 0.0071,
+          "upper": 0.0251
+        },
+        "same-s_minus_open-small": {
+          "estimate": 0.0157,
+          "lower": -0.0138,
+          "upper": 0.0459
+        }
+      }
+    },
+    "method": "Two-way paired bootstrap over preset-family and MIDI-performance clusters; 2000 replicates, seed 187."
+  },
   "retrieval_metric": "Recall@k is the share of queries whose exact target preset is ranked in the top k; higher is better.",
   "run_status": {
-    "completed": 364,
-    "failures": 0,
-    "phase": "Stage 1 \u00b7 Cross-MIDI features with same-l",
-    "state": "running",
-    "total": 6450,
-    "updated_at": "2026-11-27T18:05:06+00:00"
+    "completed": 1536,
+    "failures": 1,
+    "message": "expanded-0514:original failed the native render receipt comparison; preserve the 1536 verified cached latents and do not bypass the receipt guard.",
+    "phase": "Stage 2 \u00b7 Cache decoder input latents",
+    "state": "failed",
+    "total": 2174,
+    "updated_at": "2026-11-27T20:29:50Z"
   },
-  "snapshot_utc": "2026-11-27T18:05:06+00:00",
+  "snapshot_utc": "2026-11-27T20:29:50Z",
   "stage": 1,
-  "uncertainty_note": "The baseline has preset-family \u00d7 MIDI-performance clustered 95% bootstrap intervals. The new-encoder retrieval outputs currently contain point estimates only; no interval has been computed for them in this interim report."
+  "stage1_selection": {
+    "gate": "spectral_loss < 0.5551536325147026, finite MR-STFT, and finite nonzero decoder gradient",
+    "rationale": "Operational codec/generator readiness only. Compatible generator candidates passed; SAME-L had lower spectral loss than SAME-S. Open Small had lower standalone loss but no registered compatible generator. Retrieval does not establish SAME-L as best overall.",
+    "selected_codec_family": "same-l",
+    "selected_generator_codec_revision": "d4d3579395a8ac0df4ab13b5b1d7138ce7290f81",
+    "stage2_training_completed": false
+  },
+  "uncertainty_note": "New encoder intervals and paired deltas use two-way preset-family \u00d7 MIDI-performance cluster bootstrap (2000 replicates, seed 187); baseline intervals are carried forward from Issue 167 v7 (2000 replicates, seed 152). The intervals generalize only over the sampled panel and its two cluster dimensions."
 }

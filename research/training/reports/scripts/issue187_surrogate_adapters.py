@@ -429,6 +429,12 @@ def run_later_stages(output, stage1, _source, plan, training, validation, contro
         progress.update(progress.done, log=True, message=decision["reason"])
         return
 
+    decision.update(stage2="blocked_pending_adapter_integration", stage3="not_started",
+                    reason="Stage 2 preparation introduced replacement adapters, but this legacy runner still constructs the superseded Adapter. Integrate the prepared backbones before resuming; preserve existing latent cache files.")
+    BASE.write_json(path, decision)
+    progress.update(progress.done, log=True, message=decision["reason"])
+    return
+
     compatible_generator = winner in experiment.GENERATORS
     if compatible_generator and not generator_codec_matches(winner):
         embedded = experiment.Codec(f"{winner}-embedded", experiment.GENERATORS[winner])

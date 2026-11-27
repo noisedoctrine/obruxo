@@ -283,13 +283,19 @@ def _temporal_overlap(tokens: Tensor, target_frames: int, target_hz: float, sour
     return overlap.to(tokens.dtype)
 
 
-def align_midi_tokens(tokens: Tensor, target_frames: int, target_hz: float, *, source_hz: float = MIDI_HZ) -> Tensor:
+def align_midi_tokens(tokens: Tensor, target_frames: int, target_hz: float, *, source_hz: float = MIDI_HZ,
+                      source_mask: Tensor | None = None) -> Tensor:
     """Area-average all source frames overlapping each destination time interval."""
     if tokens.ndim != 3 or target_frames < 1 or source_hz <= 0 or target_hz <= 0:
         raise ValueError("tokens must be [batch, frames, channels] and rates/frame count positive")
+    if source_mask is None:
+        source_mask = torch.ones(tokens.shape[:2], dtype=torch.bool, device=tokens.device)
+    if source_mask.shape != tokens.shape[:2]:
+        raise ValueError("source_mask must match [batch, source_frames]")
     overlap = _temporal_overlap(tokens, target_frames, target_hz, source_hz)
-    totals = overlap.sum(-1).clamp_min(torch.finfo(tokens.dtype).eps)
-    return torch.einsum("ts,bsc->btc", overlap, tokens) / totals[None, :, None]
+    weights = overlap[None] * source_mask[:, None, :].to(tokens.dtype)
+    totals = weights.sum(-1).clamp_min(torch.finfo(tokens.dtype).eps)
+    return torch.einsum("bts,bsc->btc", weights, tokens) / totals[:, :, None]
 
 
 def align_mask(mask: Tensor, target_frames: int, target_hz: float, *, source_hz: float = MIDI_HZ) -> Tensor:
@@ -412,8 +418,8 @@ class Issue187Adapter(nn.Module):
         if controls.ndim != 2 or midi_tokens.ndim != 3 or len(controls) != len(midi_tokens):
             raise ValueError("controls must be [batch, controls], MIDI tokens [batch, frames, 768]")
         history_tokens = midi_history(midi_tokens)
-        aligned = align_midi_tokens(midi_tokens, target_frames, target_hz)
-        aligned_history = align_midi_tokens(history_tokens, target_frames, target_hz)
+        aligned = align_midi_tokens(midi_tokens, target_frames, target_hz, source_mask=midi_mask)
+        aligned_history = align_midi_tokens(history_tokens, target_frames, target_hz, source_mask=midi_mask)
         mask = align_mask(midi_mask, target_frames, target_hz)
         times = torch.arange(target_frames, device=controls.device, dtype=aligned.dtype) / target_hz
         time_features = torch.stack((times, torch.sin(2 * math.pi * times), torch.cos(2 * math.pi * times)), -1)
