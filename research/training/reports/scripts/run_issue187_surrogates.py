@@ -2,7 +2,8 @@
 
 # ruff: noqa: E402
 import argparse
-from collections import defaultdict
+from collections import defaultdict, deque
+from concurrent.futures import ThreadPoolExecutor
 import json
 import math
 import os
@@ -32,6 +33,8 @@ from obruxo_training.surrogate_pilot import Progress, native_session
 
 DEVICE = "xpu:0"
 SEED = 183
+PREFETCH_WORKERS = 4
+PREFETCH_DEPTH = 8
 ROLES = (("original", "target"), ("perturbed", "changed"))
 HUB = Path(os.environ.get("HF_HUB_CACHE", Path.home() / "HuggingFace/hub"))
 PROXY_SOURCE = baseline.VALIDATION_SOURCE
@@ -218,6 +221,29 @@ def retrieval_clip(dataset, receipt):
     return audio
 
 
+def prefetch_audio(requests, load_audio, *, workers=PREFETCH_WORKERS, depth=PREFETCH_DEPTH):
+    requests = iter(requests)
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        pending = deque()
+        exhausted = False
+
+        def fill():
+            nonlocal exhausted
+            while not exhausted and len(pending) < depth:
+                try:
+                    request = next(requests)
+                except StopIteration:
+                    exhausted = True
+                    break
+                pending.append((request, pool.submit(load_audio, request)))
+
+        fill()
+        while pending:
+            request, future = pending.popleft()
+            yield request, future.result()
+            fill()
+
+
 @torch.no_grad()
 def retrieve(output, name, codec, progress):
     result_path = output / f"retrieval-{name}.json"
@@ -247,12 +273,21 @@ def retrieve(output, name, codec, progress):
     cache = output / f"retrieval-features-{name}"
     cache.mkdir(exist_ok=True)
     vectors = {}
-    for index, request in enumerate(sorted(needed), 1):
+    ordered = sorted(needed)
+    audio_rows = None
+    for index, request in enumerate(ordered, 1):
         path = cache / f"{request}.npy"
         if path.exists():
             vectors[request] = np.load(path, allow_pickle=False)
         else:
-            audio = retrieval_clip(dataset, receipts_by_id[request])
+            if audio_rows is None:
+                missing = (item for item in ordered if not (cache / f"{item}.npy").exists())
+                audio_rows = iter(prefetch_audio(
+                    missing, lambda item: retrieval_clip(dataset, receipts_by_id[item]),
+                ))
+            prefetched_request, audio = next(audio_rows)
+            if prefetched_request != request:
+                raise RuntimeError("prefetched retrieval audio lost request order")
             latent = codec.encode(samples(audio), int(request[:8], 16))
             vector = torch.cat((latent.mean(-1), latent.std(-1, unbiased=False)), -1)[0]
             vectors[request] = F.normalize(vector, dim=0).cpu().numpy()
