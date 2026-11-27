@@ -34,6 +34,24 @@ def score(adapter, manifest, output, references):
     return cases
 
 
+def write(path, record):
+    temporary = path.with_suffix(".cir.tmp")
+    temporary.write_text(json.dumps(record, allow_nan=False) + "\n", encoding="utf-8")
+    temporary.replace(path)
+
+
+def merge_validation(path, cases):
+    if not path.is_file():
+        return
+    validation = json.loads(path.read_text(encoding="utf-8"))
+    for row in validation["cases"]:
+        row["cir_cosine"] = cases[f"{row['pair_id']}-{row['clip_role']}"]
+    valid = [value for value in cases.values() if value is not None]
+    validation["metrics"].update(cir_cosine=float(np.mean(valid)) if valid else None,
+                                 cir_cosine_valid=len(valid))
+    write(path, validation)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, required=True)
@@ -53,6 +71,8 @@ def main():
     for name in args.models:
         output = args.run / f"cir-{name}.json"
         if output.exists():
+            merge_validation(args.run / f"validation-{name}.json",
+                             json.loads(output.read_text(encoding="utf-8"))["cases"])
             continue
         manifest_path = args.run / f"waveforms-{name}.json"
         deadline = time.monotonic() + args.wait_seconds
@@ -60,10 +80,8 @@ def main():
             time.sleep(2)
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         cases = score(adapter, manifest, output, references)
-        temporary = output.with_suffix(".tmp")
-        temporary.write_text(json.dumps({"checkpoint_sha256": digest, "cases": cases}, allow_nan=False) + "\n",
-                             encoding="utf-8")
-        temporary.replace(output)
+        write(output, {"checkpoint_sha256": digest, "cases": cases})
+        merge_validation(args.run / f"validation-{name}.json", cases)
         print(f"{name}: {sum(value is not None for value in cases.values())}/{len(cases)} CIR scores", flush=True)
 
 

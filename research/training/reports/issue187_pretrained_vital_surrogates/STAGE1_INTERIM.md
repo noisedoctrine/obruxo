@@ -1,25 +1,35 @@
 # Issue 187 — Stage 1: pretrained audio representation quality
 
-The revised reconstruction rescore is in progress. The tables below preserve the original Stage 1 results and the earlier provisional trunk choice.
-
 ## Research question and findings
 
-Can a pretrained audio model preserve the sound of a Vital patch accurately enough to serve as the basis of a differentiable surrogate? If it can, we could train a smaller network to translate patch parameters and MIDI into the model's latent representation instead of learning audio synthesis from scratch.
+Can a pretrained codec preserve the sound of a Vital patch well enough to build a differentiable surrogate? On the 256-clip panel, Open Small leads the primary log-mel reconstruction metric and CIR embedding similarity among the four Stable Audio codecs. Medium's embedded SAME-L leads stereo phase coherence and better preserves level and sample-by-sample waveform structure. The metrics support different choices depending on which errors matter.
 
-Stage 1 tests two properties without training anything: how accurately each audio encoder and decoder reconstruct an existing recording, and how well the encoder identifies the same patch when the MIDI performance changes.
+| Codec | MEL-log1p ↓ (95% CI) | STFT-log1p ↓ | CIR cosine ↑ | SI-SDR ↑ (dB) | CCPC ↑ (%) | Legacy MR-STFT ↓ |
+|---|---:|---:|---:|---:|---:|---:|
+| Open Small | **0.002237 [0.001622, 0.002954]** | **0.002657** | **0.775** | 7.62 | 94.04 | **1.055** |
+| SAME-S | 0.003515 [0.002544, 0.004657] | 0.004370 | 0.446 | 10.54 | 95.97 | 2.994 |
+| SAME-L standalone | 0.002300 [0.001673, 0.003021] | 0.003128 | 0.586 | **14.98** | 97.26 | 2.224 |
+| Medium embedded SAME-L | 0.002504 [0.001816, 0.003311] | 0.003269 | 0.586 | 14.44 | **97.31** | 2.392 |
+| DAC (two independent mono channels) | Pending | — | — | — | — | — |
 
-**Open Small has the lowest multi-resolution spectral reconstruction error and octave error. SAME-L has better level and attack/decay/sustain accuracy, while SAME-S decodes considerably faster.** All three standalone codecs reconstruct the supplied audio with lower shared spectral loss than our existing forward MLP achieves when predicting a spectrum from patch and MIDI. This establishes useful reconstruction potential, not an improvement in end-to-end surrogate performance.
+Each completed cell covers 256 clips from 64 patch roots and 16 distinct MIDI performances. ViSQOL is unavailable on this host. The primary metric measures how closely the reconstructed sound follows the reference energy across mel frequency bands. CIR measures similarity in a frozen timbre representation. SI-SDR measures waveform fidelity after a fitted gain and CCPC compares stereo phase coherence. Retrieval remains a separate endpoint.
 
-| Pretrained audio codec | MR-STFT ↓ | Shared spectral loss ↓ | Octave error (dB) ↓ | Decode time (ms) ↓ | Cross-MIDI Recall@1 ↑ |
-|---|---:|---:|---:|---:|---:|
-| Open Small | **1.055** | **0.2014** | **7.65** | 427 | 39.1% |
-| SAME-S | 2.994 | 0.2621 | 14.45 | **52** | 40.4% |
-| SAME-L | 2.224 | 0.2041 | 12.32 | 393 | **41.7%** |
-| Existing direct MLP (#185) | — | 0.5552 | 14.03 | — | — |
+| Paired difference, candidate minus Open Small | MEL-log1p ↓ | CIR cosine ↑ | SI-SDR ↑ (dB) | CCPC ↑ (pp) |
+|---|---:|---:|---:|---:|
+| SAME-L standalone | +0.000063 [−0.000127, +0.000277] | −0.189 | +7.36 [6.45, 8.30] | +3.22 [1.84, 4.91] |
+| Medium embedded SAME-L | +0.000267 [+0.000044, +0.000528] | −0.188 [−0.218, −0.157] | +6.82 [5.91, 7.75] | +3.27 [1.88, 4.95] |
 
-Reconstruction uses 256 clips from 64 patch roots and 16 distinct MIDI performances. Retrieval uses 6,450 queries per condition from 129 preset families and 50 performances. These are different panels and measure different properties. The MLP row is a reference from the 8,000-update checkpoint, not a matched encode/decode arm: it receives patch and MIDI rather than the correct audio and predicts magnitudes rather than a waveform.
+MEL-log1p and legacy MR-STFT disagree about which of Open Small and standalone SAME-L wins on 133 of 256 clips. STFT-log1p agrees with MEL-log1p on 196, and CIR cosine agrees on 133. Open Small's mean MEL advantage over standalone SAME-L is uncertain. Its advantage over the actual Medium codec is about 12% and the paired interval excludes zero. These intervals condition on the observed MIDI panel and cannot establish listener preference.
 
-The runner provisionally selected SAME-L for Stage 2 because it passed the reconstruction and gradient checks and has a registered compatible generator. This is a practical selection, not evidence that SAME-L is the best reconstruction model. Before adapter training, Open Small's exclusion deserves reconsideration.
+The [per-clip results](STAGE1_RESCORE_CASES.csv) and [paired intervals](STAGE1_RESCORE.json) preserve the different rankings. The following examples use original playback levels and the same reference for every codec. They are for review and have no listener ratings.
+
+| Clip and what to compare | Native | Open Small | SAME-L | Medium embedded |
+|---|---|---|---|---|
+| 062-0 original. SAME-L has lower MEL error, while legacy MR-STFT prefers Open Small. Compare sustained tone and stereo image. | [Play](listening/mel_favors_same_l-reference.flac) | [Play](listening/mel_favors_same_l-open-small.flac) | [Play](listening/mel_favors_same_l-same-l.flac) | [Play](listening/mel_favors_same_l-same-l-embedded.flac) |
+| 061-1 perturbed. Open Small has lower MEL error and its RMS differs by 30.4% versus 1.8% for SAME-L. Compare timbre and overall level separately. | [Play](listening/mel_favors_open_small-reference.flac) | [Play](listening/mel_favors_open_small-open-small.flac) | [Play](listening/mel_favors_open_small-same-l.flac) | [Play](listening/mel_favors_open_small-same-l-embedded.flac) |
+| 058-1 perturbed. Typical example from the cases where both metrics disagree in the same direction. SAME-L leads MEL, Open Small leads legacy MR-STFT and CIR, and Medium is between them on MEL. | [Play](listening/mel_and_mrstft_disagree-reference.flac) | [Play](listening/mel_and_mrstft_disagree-open-small.flac) | [Play](listening/mel_and_mrstft_disagree-same-l.flac) | [Play](listening/mel_and_mrstft_disagree-same-l-embedded.flac) |
+
+**Trunk recommendation for this experiment:** qualify the Medium embedded codec for the matched decoder and generator arms. It has gains on waveform fidelity, stereo phase and level, a slightly faster measured decoder, and 1,536 existing exact-revision training latent pairs. Advancing Open Small would require recovering original audio for those 3,072 clips as well, leaving nearly the whole training corpus to replay. Open Small is the strongest measured choice on the primary reconstruction metric. The Medium choice reflects the study constraints and leaves Open Small's acoustic advantage visible.
 
 ## 1. How accurately do the codecs reconstruct Vital audio?
 
@@ -57,7 +67,7 @@ SAME-L best preserves the attack, decay and sustain phases and overall level; Op
 
 Relative RMS error measures the difference in overall signal level relative to the original. Stereo side-to-mid error measures the difference in the ratio of stereo-difference energy to common-channel energy; it does not establish complete stereo waveform fidelity.
 
-These reconstruction comparisons are descriptive means over the same panel. Paired reconstruction confidence intervals and formal listening ratings are not available in the committed Stage 1 results. In particular, the small shared-loss difference between Open Small and SAME-L is not a demonstrated statistically reliable advantage.
+The legacy values here preserve the original aggregation. Confidence intervals in the rescore use paired patch-root resampling over the same clips. The original direct MLP predicts magnitudes from patch and MIDI and is a common spectral reference. It cannot be scored on native waveform metrics.
 
 ### Reconstruction cost and latent size
 
@@ -82,12 +92,14 @@ The common-MIDI condition plays all 129 comparison patches using the same differ
 |---|---:|---:|---:|---:|---:|---:|
 | CIR | **81.0% [74.7, 86.6]** | 93.6% | 96.5% | **80.9% [77.1, 84.4]** | 93.9% | 96.9% |
 | CLAP | 59.4% [50.8, 67.7] | 79.9% | 87.4% | 55.0% [50.2, 59.8] | 75.8% | 83.7% |
-| SAME-L | 41.7% [33.9, 49.6] | — | — | 42.1% [36.6, 47.6] | — | — |
+| SAME-L | 41.7% [33.9, 49.6] | 62.5% | 70.8% | 42.1% [36.6, 47.6] | 61.1% | 69.4% |
 | SAME-S | 40.4% [32.9, 48.3] | 61.1% | 70.1% | 40.6% [35.1, 45.9] | 59.8% | 68.5% |
 | Open Small | 39.1% [31.7, 47.0] | 58.8% | 66.8% | 39.0% [33.7, 44.3] | 56.7% | 64.8% |
 | Vital JEPA V7 (original pooling) | 29.1% [23.0, 35.6] | 54.1% | 67.0% | 29.5% [25.2, 33.8] | 49.9% | 61.6% |
 
-Dashes indicate values not published in the current Stage 1 snapshot, not zero recall. The comparison reuses the Issue 167 baseline, including JEPA V7's original pooling. Issue #169 subsequently found an exploratory 56.5% common Recall@1 for top-seven-token mean pooling on this cohort; see the [representation ranking and its held-out evaluation caveats](../../../modelling/frozen_encoder_retrieval/reports/VITAL_JEPA_V7_ALL_REPRESENTATIONS.md). The new codecs therefore should not be described as outperforming the best tested JEPA V7 representation.
+The comparison reuses the Issue 167 baseline, including JEPA V7's original pooling. Issue #169 subsequently found an exploratory 56.5% common Recall@1 for top-seven-token mean pooling on this cohort. See the [representation ranking and its held-out evaluation caveats](../../../modelling/frozen_encoder_retrieval/reports/VITAL_JEPA_V7_ALL_REPRESENTATIONS.md).
+
+The older Issue 152 DAC masked-mean result was 31.4% common Recall@1 (95% CI 24.9–38.7%), 52.2% Recall@5, and 32.9% mixed Recall@1. Its 129-way galleries and 6,450 queries have the same scale as Issue 167. The published episode snapshot differs, so the DAC result is historical context outside the matched table. No retrieval was repeated. [Frozen encoder retrieval report](../../../modelling/frozen_encoder_retrieval/reports/FROZEN_ENCODER_RETRIEVAL_RESULTS.md)
 
 | Paired Recall@1 difference (percentage points) | Common MIDI, estimate [95% CI] | Mixed MIDI, estimate [95% CI] |
 |---|---:|---:|
@@ -103,7 +115,7 @@ For these new representations, the runner concatenates the mean and standard dev
 
 | Candidate | Reason to consider it | Limitation |
 |---|---|---|
-| Open Small | Lowest MR-STFT and octave error; compact latents | Slow decoding relative to SAME-S; generator connector not registered |
+| Open Small | Lowest MEL, STFT, and octave errors, strongest CIR match, compact latents | Full training would require 3,072 more original waveforms |
 | SAME-L | Lowest attack/decay/sustain and level errors; registered generator | Higher MR-STFT and octave error than Open Small |
 | SAME-S | Much faster encode/decode | Highest MR-STFT and shared spectral loss of the three |
 
@@ -116,22 +128,21 @@ The operational gate required shared spectral loss below the #185 direct MLP's 8
 
 The embedded codec is slightly worse on the reported metrics; do not substitute the standalone codec's other metrics or timings for the embedded revision. The intended Stage 2 comparison must use the same actual decoder in both adapter arms.
 
-Open Small had lower standalone MR-STFT and shared spectral loss, but the runner registers only Stable Audio 3 Small Music and Medium as generators. The lack of an Open Small connector is an implementation limitation, not a demonstrated incompatibility of the model architecture. Check the feasibility, licensing and cost of that connector before treating SAME-L as the final choice. Open Small is the leading reconstruction-quality candidate from Stage 1; SAME-L is a reasonable practical alternative for a matched decoder/generator comparison.
+The pinned Open Small checkpoint contains both its 64-channel VAE and an RF denoiser that consumes the same latent grid. Its DiT takes 768D prompt tokens and duration conditioning, so an adapter can replace those tokens through the separate Stable Audio Tools wrapper. The missing registration was an implementation gap. The connector is present for future qualification, and this run qualifies Medium only. The model cards put Open Small, SAME and Medium under Stability AI community terms. Deployment and redistribution are outside this local experiment. [Open Small model card](https://huggingface.co/stabilityai/stable-audio-open-small) · [Medium model card](https://huggingface.co/stabilityai/stable-audio-3-medium).
 
 ## Execution and reproducibility
 
 - **Control scope:** zero predicted or edited Vital controls. This is a frozen representation benchmark; all source patches and MIDI performances are fixed and no model weights are trained.
 - **Reconstruction panel:** 128 original/perturbed pairs (256 clips), 64 patch roots and 16 MIDI performances from the frozen #185 validation data. The octave metric covers 5,409 of 8,192 candidate frames; the MIDI-centered metric covers 2,804 of 2,804 active monophonic candidate frames. Envelope frame counts are 1,114 attack, 1,314 decay, 1,472 sustain and 1,914 release. Open Small uses seeded VAE sampling.
+- **Rescore definitions:** 44.1 kHz float32 stereo at native level with sample alignment and centered zero padding. Periodic Hann windows overlap 75%. STFT-log1p averages the absolute difference of raw magnitude `log1p` values over channels, frames and bins, then equally over FFT sizes 128–4,096. MEL-log1p applies the same loss after the paper's `64 / (FFT / 2 + 1)` scaling of 64 unit-height Slaney mel bands at FFT sizes 1,024, 2,048 and 4,096. The paper does not specify the filter convention or padding. CCPC compares left/right phase differences, using a weighted mean resultant length per frame and averaging frames by their weights. Joint geometric cross-spectrum weights give zero-energy bins no influence. FFT sizes are 512, 1,024, 2,048 and 4,096. SI-SDR uses mean-centered channels and a fitted gain per channel, excludes silent channels and bounds singularities to ±100 dB. Phase agreement and SI-SDR are undefined for a silent pair. The local results have no normalized-away gain adjustment for the spectral metrics. [SAME §5.3](https://arxiv.org/html/2605.18613) · [Back to Ear §4.4.1](https://arxiv.org/html/2509.14912v2#S4.SS4.SSS1).
+- **CIR and ViSQOL:** locked CIR `official_clip` (768D, checkpoint SHA-256 `b08996e4…`) uses the original retrieval preprocessing: average stereo to mono, resample to 16 kHz, and keep level. CIR cosine is within the same recording and its reconstruction. The official ViSQOL audio mode would resample the stereo mean to 48 kHz. The official binding, CLI and Windows Bazel build tools are absent in this environment. ViSQOL has 0 valid cases. [ViSQOL audio-mode documentation](https://github.com/google/visqol).
+- **Rescore provenance:** eight saved waveforms per Stable Audio candidate were reused. The other 248 per candidate used the pinned checkpoint and original deterministic seed assignment. All originals were checked against their native render receipts. Uncertainty is a 5,000-replicate paired bootstrap over the 64 patch roots, using seed 187 and keeping both roles and all clips of a sampled root together. These are validation panel estimates at the fixed observed performances.
 - **Retrieval panel:** 6,450 recordings and 6,450 queries per condition, 12,900 episodes in total. These are not independent samples. The new Recall@1 and paired-difference intervals use a two-way bootstrap over preset family and MIDI performance (2,000 replicates, seed 187). Baseline intervals use the existing Issue 167 bootstrap (2,000 replicates, seed 152). The intervals cover variation over the sampled preset/performance dimensions, not training seeds or all possible sounds.
-- **DAC:** only a mono decode/gradient compatibility probe was performed. The requested quantitative reconstruction benchmark is missing; no new DAC retrieval test was run or prior DAC retrieval score carried into this table. DAC cannot be ranked on reconstruction from these results. See [XPU setup and checkpoint revisions](XPU_SETUP.md).
-- **Stage 2 audio recovery:** the previous worker stopped at 1,536/2,174 cached pairs on `expanded-0514:original`. Running it on a new engine selected full JSON readback (772 verified scalars) and produced a different waveform hash. Its original receipt records it as job 2 on a reused engine (11 verified scalars through the native parameter getter). Replaying `expanded-0512:original` first on the same isolated worker reproduced exact original audio hashes and renderer provenance for both jobs, including `963b69ae…` for the failure. See the [two-job replay evidence](STAGE2_AUDIO_RECOVERY_PROBE.json). This verifies the first failure; the remaining missing audio requires its own receipt checks.
+- **DAC:** the matched reconstruction pass uses the pinned 44.1 kHz mono RVQ checkpoint independently for left and right as a two-item batch. It decodes the sum of the quantized code vectors, not the discrete indices or the encoder's raw output. Its joint stereo model and pretrained generator are absent. The previous isolated decode gradient probe followed the continuous quantized embedding through the decoder. [XPU setup and checkpoint revisions](XPU_SETUP.md).
+- **Stage 2 audio recovery:** the previous worker stopped at 1,536/2,174 cached pairs on `expanded-0514:original`. Running it on a new engine selected full JSON readback (772 verified scalars) and produced a different waveform hash. Its original receipt records it as job 2 on a reused engine (11 verified scalars through the native parameter getter). Replaying `expanded-0512:original` first reproduced both original hashes and renderer provenance, including `963b69ae…` for the failure. The worker-prefix replay then recovered all 1,019 other missing training waveforms with exact matches and no errors. The other 128 pending pairs already have receipt-verified validation audio. The 1,536 legacy latent files were preserved and remain subject to the selected codec revision and input receipt audit. [Two-job replay evidence](STAGE2_AUDIO_RECOVERY_PROBE.json)
 
 [Machine-readable Stage 1 results and uncertainty](STAGE1_INTERIM.json) · [Issue 167 retrieval baseline](../../../modelling/frozen_encoder_retrieval/reports/issue167_v7_results.json) · [Issue 185 direct MLP baseline](../issue185_direct_flow_mlp/REPORT.md) · [Stage 2 preparation and outstanding integration](STAGE2_PREPARATION.md).
 
 ## Decision and remaining questions
 
-Stage 1 supports continuing the pretrained-surrogate investigation: the tested codecs preserve enough acoustic detail to justify a bounded adapter experiment, especially Open Small and SAME-L. It has not established that a patch-and-MIDI adapter can predict those latents accurately, that a full generator improves on a decoder alone, or that either yields better gradients for real Vital patch optimization.
-
-Resolve the candidate-selection and cache issues before formal Stage 2 training. Keep the existing direct MLP as the baseline, use the agreed matched adapter budget, and judge the final surrogate by actual Vital reconstruction after patch optimization in Stage 3. Do not reopen the main encoder-selection research on the basis of these retrieval results or treat this research as a prerequisite for #174.
-
-This report expands the recorded Stage 1 findings without repeating retrieval, codec reconstruction or training. No independent confirmation/test panel, formal adapter learning curves, or Stage 3 results are available yet.
+Open Small best preserves the measured mel spectrum and CIR timbre embedding. Medium is the one trunk recommended for qualification in the matched adapter experiment because its exact generator and training cache fit the study constraints. This report has no independent confirmation panel or listening ratings. [Machine-readable selection](STAGE1_SELECTION.json)

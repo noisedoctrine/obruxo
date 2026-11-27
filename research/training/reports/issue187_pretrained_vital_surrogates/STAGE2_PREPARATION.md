@@ -1,5 +1,23 @@
 # Issue 187 — Stage 2 preparation
 
+The Medium integration run is now underway. The measurements below describe the earlier compatibility fixtures. The [Stage 1 rescore and decision](STAGE1_INTERIM.md) establish which checkpoint the actual runner qualifies.
+
+## Experiment runner and scheduling
+
+| Work | Resource | Dependency |
+|---|---|---|
+| Recover missing #172 audio | CPU, three original worker histories at a time | Frozen render ledger and identical native readback path |
+| Rescore codec outputs | XPU codec inference, then overlapping CPU waveform metrics and locked CIR inference | Receipt-verified #185 originals and original codec revisions |
+| Qualify Medium adapters | XPU, one variant at a time | Medium selected for qualification, original receipts, pinned MIDI checkpoint |
+| Run 500-update pilots, then extend viable arms | XPU training and validation, independent CIR scoring | Published Stage 1 decision, passing selected-model qualification, verified training data |
+| Optimize 192 patches and render in Vital | XPU optimization and native CPU rendering | Stage 2 evidence for one arm and a comparable #173 baseline |
+
+The original-worker replay recovered all 1,020 missing training clips exactly. The runner compares the frozen input receipt manifests before reusing legacy pairs, checks the selected codec revision, and verifies the shape, dtype and finiteness of each cached latent. Missing source audio returns a blocked status. [Receipt recovery evidence](STAGE2_AUDIO_RECOVERY_PROBE.json)
+
+The Medium path uses the generator's embedded 256-channel codec on the 4,096-sample grid, with 768D SpanSynth-derived conditioning tokens at 25 Hz. The frozen generator uses its shipped `rf_denoiser` velocity objective. Validation uses eight pingpong steps with the checkpoint's distribution shift and independently seeded initial and per-step noise keyed to each clip. Pretrained generator weights are FP16, codec weights and adapter parameters are FP32. The runner reuses the same frozen codec in both arms and qualifies both adapter variants at a disposable optimizer update before the scheduled training checkpoints.
+
+The #173 run retains legacy per-case MR-STFT, but the listening WAVs are later, gain-processed previews. None of the ten preview reference/baseline pairs match both original native waveform receipts. The full-panel primary MEL comparison would need receipt-compatible baseline audio if a Stage 2 survivor advances. No baseline was repeated to prepare this runner.
+
 **No Stage 2 model-quality result is claimed:** this change prepares the frozen MIDI path and the two adapter arms; it does not train them or select an audio trunk. CPU parity against the released SpanSynth-Edit implementation is exact. The XPU checks below distinguish the passing native flow-matching objective from the still-failing Transformer sampler backward.
 
 ## Implemented architecture
@@ -44,7 +62,7 @@ The CPU equivalence check used a three-note overlapping score and reported zero 
 
 The direct and generator smoke checks reused the SAME-S codec and Stable Audio 3 Small Music checkpoint already present for Stage 1; this is a compatibility fixture, not a trunk selection. The rerun used upstream-default SDPA with no test-only backend override and a synthetic `[1, 512, 768]` MIDI-token fixture (the extracted encoder has its own real-checkpoint XPU parity check). Generator training uses the PR #188 velocity connector and FP32 flow latents/noise while the frozen generator remains FP16. Both one-step flow-matching objectives pass. For sampler loss, each denoising output, latent update, and decoded waveform is checked before backward; the first nonfinite values occur in gradients flowing into generator conditioning. The reproducible harness records each backbone and objective separately so one failure does not hide the other arm.
 
-## Remaining integration
+## Historical handoff from preparation
 
 - The legacy Stage 1 runner now fails closed before decoder-latent caching or training because it still instantiates the superseded residual MLP and custom MIDI path. Wire both prepared adapters to the cache and selected codec/generator before resuming Stage 2.
 - Resolve the generator-conditioning backward NaNs seen in both sampler arms before using differentiable sampler loss. The native one-step flow-matching training objective passes for both backbones; the sampler forward and codec decode are finite.

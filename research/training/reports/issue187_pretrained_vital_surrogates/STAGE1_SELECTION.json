@@ -1,0 +1,7 @@
+{
+  "codec": "same-l-embedded",
+  "codec_revision": "d4d3579395a8ac0df4ab13b5b1d7138ce7290f81",
+  "generator": "same-l",
+  "stage1_complete": false,
+  "reason": "Qualify the Stable Audio 3 Medium embedded codec for the matched decoder and generator experiment. Open Small has lower MEL-log1p; Medium has better stereo phase, waveform alignment and level preservation, a slightly faster measured decoder, an exact matching generator checkpoint, and 1,536 preserved codec-specific training latent pairs. DAC and CIR scoring are still in progress."
+}

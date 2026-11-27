@@ -213,7 +213,7 @@
     }
   },
   "control_scope": "Frozen Stage 1 representations and codec reconstruction only; no Vital controls are predicted or edited.",
-  "dac_disposition": "No standalone DAC retrieval baseline or candidate trunk. DAC was only a codec decode/gradient compatibility probe; carried-forward baselines were CIR, CLAP, and Vital JEPA V7.",
+  "dac_disposition": "The existing expanded held-out frozen-encoder report gives prior DAC retrieval results. They use the same gallery size and count but a different episode snapshot, so they are retained as historical reference rather than pooled with the Issue 167 v7 panel.",
   "dataset": {
     "distinct_query_midi_performances": 50,
     "episodes_per_condition": {
@@ -327,11 +327,15 @@
       "retrieval": {
         "cross_midi_common_gallery": {
           "episodes": 6450,
-          "recall_at_1": 0.4167
+          "recall_at_1": 0.4167,
+          "recall_at_10": 0.7080620155038759,
+          "recall_at_5": 0.6251162790697674
         },
         "cross_midi_mixed_gallery": {
           "episodes": 6450,
-          "recall_at_1": 0.4212
+          "recall_at_1": 0.4212,
+          "recall_at_10": 0.6936434108527132,
+          "recall_at_5": 0.6105426356589148
         }
       }
     },

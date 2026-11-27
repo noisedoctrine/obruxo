@@ -317,7 +317,8 @@ def retrieve(output, name, codec, progress):
     return summary
 
 
-def run(output):
+def run(output, *, selection=None, prior_run=None, recovered=None, midi_checkpoint=None, smoke=False,
+        qualification=None, target_step=500, inversion_decision=None):
     torch.set_num_threads(4)
     output.mkdir(parents=True, exist_ok=True)
     progress = Progress(output)
@@ -333,6 +334,17 @@ def run(output):
             baseline.TRAINING_SOURCE, PROXY_SOURCE, output, SimpleNamespace(update=receipt_progress))
         baseline.write_json(output / "input-receipts.json", pair_receipts)
         controls = baseline.SurrogateCodec(baseline.PilotCodec(), expanded=True)
+        if selection is not None:
+            from issue187_surrogate_adapters import run_later_stages
+
+            waves = prior_run / "validation-audio"
+            state = run_later_stages(output, read_json(selection), plan, train_rows, rows, controls, waves,
+                                     progress, recovered=recovered, prior_run=prior_run,
+                                     midi_checkpoint=midi_checkpoint, smoke=smoke, qualification=qualification,
+                                     target_step=target_step, inversion_decision=inversion_decision)
+            if state != "blocked":
+                progress.update(progress.done, state=state)
+            return
         waves = validation(output, rows, controls, progress)
         models = {}
         for name in CHECKPOINTS:
@@ -343,11 +355,12 @@ def run(output):
             torch.xpu.empty_cache()
         retrieval_baseline = read_json(RETRIEVAL_BASELINE)["retrieval"]["metrics"]
         baseline.write_json(output / "stage1.json", {"models": models, "retrieval_baseline": retrieval_baseline})
-        from issue187_surrogate_adapters import run_later_stages
-
-        run_later_stages(output, models, source, plan, train_rows, rows, controls, waves, progress)
-        progress.set("Complete", 1, 3)
-        progress.update(1, state="complete")
+        path = output / "decisions.json"
+        decision = read_json(path) if path.is_file() else {}
+        reason = "Publish the revised Stage 1 comparison and pass its recorded codec selection explicitly"
+        decision.update(stage2="awaiting_stage1_selection", stage3="not_started", reason=reason)
+        baseline.write_json(path, decision)
+        progress.update(progress.done, state="blocked", message=reason)
     except Exception as exc:
         progress.failures += 1
         progress.update(progress.done, state="failed", log=True, message=str(exc))
@@ -357,4 +370,21 @@ def run(output):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
-    run(parser.parse_args().output.resolve())
+    parser.add_argument("--selection", type=Path, help="published Stage 1 rescore codec selection")
+    parser.add_argument("--prior-run", type=Path, help="previous run with receipt-verified validation audio")
+    parser.add_argument("--recovered", type=Path, help="exact receipt-matched training audio recovered from original workers")
+    parser.add_argument("--midi-checkpoint", type=Path, help="extracted frozen SpanSynth-Edit MIDI encoder")
+    parser.add_argument("--smoke", action="store_true", help="one disposable optimizer update and full validation")
+    parser.add_argument("--qualification", type=Path, help="passing selected-model qualification decisions")
+    parser.add_argument("--target-step", type=int, choices=(500, 8000), default=500)
+    parser.add_argument("--inversion-decision", type=Path, help="reviewed Stage 2 selection to take to Stage 3")
+    args = parser.parse_args()
+    if args.selection and not all((args.prior_run, args.recovered, args.midi_checkpoint)):
+        parser.error("--selection requires --prior-run, --recovered, and --midi-checkpoint")
+    if args.smoke and args.selection is None:
+        parser.error("--smoke requires a published --selection")
+    if args.selection and not args.smoke and args.qualification is None:
+        parser.error("formal execution requires --qualification with the smoke decision record")
+    run(args.output.resolve(), selection=args.selection, prior_run=args.prior_run, recovered=args.recovered,
+        midi_checkpoint=args.midi_checkpoint, smoke=args.smoke, qualification=args.qualification,
+        target_step=args.target_step, inversion_decision=args.inversion_decision)

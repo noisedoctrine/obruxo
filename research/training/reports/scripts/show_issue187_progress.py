@@ -55,7 +55,7 @@ def read_timeline(output, now):
         if active is None:
             active = {"phase": phase, "start": timestamp}
         if done >= total or state != "running":
-            close(timestamp, completed=state == "complete" or (total > 0 and done >= total))
+            close(timestamp, completed=state == "complete" or (state == "running" and total > 0 and done >= total))
     if active:
         close(now)
     return records
@@ -67,10 +67,12 @@ def plan_tree():
 
     stage1 = [leaf("receipts", "Verify input receipts", "Verify input receipts"),
               leaf("waves", "Restore validation audio", "Recover frozen validation waveforms")]
-    for model in ("open-small", "same-s", "same-l"):
+    for model in ("open-small", "same-s", "same-l", "same-l-embedded", "dac"):
         stage1.append({"id": model, "title": f"{model} codec", "children": [
-            leaf(f"{model}-recon", "Reconstruct validation pairs", f"Reconstruct with {model}"),
-            leaf(f"{model}-retrieval", "Encode features; score retrieval", f"Cross-MIDI features with {model}"),
+            leaf(f"{model}-recon", "Recover missing reconstructions", f"Reconstruct with {model}",
+                 artifact=f"waveforms-{model}.json"),
+            leaf(f"{model}-score", "Score waveform reconstruction", artifact=f"rescore-{model}.json"),
+            leaf(f"{model}-cir", "Score CIR similarity", artifact=f"cir-{model}.json"),
         ]})
     stage1.extend([
         leaf("stage1-results", "Save results; apply Stage 1 gate", artifact="stage1.json"),
@@ -78,7 +80,7 @@ def plan_tree():
     stage2 = [leaf("qualify-generator", "Select codec; qualify generator",
                    phase="-embedded", decision="stage1_selected"),
               leaf("latent-cache", "Cache decoder latents", "Cache decoder input latents")]
-    for mode in ("latent", "generator"):
+    for mode in ADAPTERS:
         arm = [leaf(f"{mode}-load", "Initialize arm", f"Load {mode} arm"),
                leaf(f"{mode}-updates", "Train adapter (up to 8,000 updates)", f"{mode} updates")]
         arm.extend(leaf(f"{mode}-val-{step}", f"Validation checkpoint · {step:,} updates",
@@ -118,7 +120,7 @@ def format_elapsed(seconds):
 
 def read_learning_curves(output):
     curves = {"training": {}, "validation": {}}
-    for mode in ("latent", "generator"):
+    for mode in (*ADAPTERS, "latent", "generator"):
         arm_path = output / f"arm-{mode}.json"
         try:
             arm = json.loads(arm_path.read_text(encoding="utf-8"))
@@ -130,7 +132,8 @@ def read_learning_curves(output):
         for step in (0, 500, 1000, 2000, 4000, 8000):
             path = output / f"validation-{mode}-{step}.json"
             try:
-                loss = float(json.loads(path.read_text(encoding="utf-8"))["metrics"]["spectral_loss"])
+                metrics = json.loads(path.read_text(encoding="utf-8"))["metrics"]
+                loss = float(metrics.get("mel_log1p", metrics["spectral_loss"]))
             except (OSError, ValueError, KeyError, TypeError):
                 continue
             if math.isfinite(loss):
@@ -140,6 +143,10 @@ def read_learning_curves(output):
         if validation:
             curves["validation"][mode] = validation
     return curves
+
+
+ADAPTERS = tuple(f"{arm}-{backbone}" for arm in ("latent", "generator")
+                 for backbone in ("residual_mlp", "transformer"))
 
 
 def main(output):
@@ -235,19 +242,19 @@ def main(output):
                                      font=body_font)
         curve_canvas.create_line(left, top, left, bottom, fill="#777777")
         curve_canvas.create_line(left, bottom, right, bottom, fill="#777777")
-        colors = {"latent": "#1464a5", "generator": "#c45820"}
+        colors = ("#1464a5", "#7741a7", "#c45820", "#268062")
         for index, (mode, values) in enumerate(series.items()):
             coords = []
             for step, value in values:
                 px = left + step / x_max * (right - left)
                 py = bottom - (value - y_min) / (y_max - y_min) * (bottom - top)
                 coords.extend((px, py))
-            color = colors[mode]
+            color = colors[index % len(colors)]
             if len(coords) >= 4:
                 curve_canvas.create_line(*coords, fill=color, width=2)
             for px, py in zip(coords[::2], coords[1::2], strict=True):
                 curve_canvas.create_oval(px - 3, py - 3, px + 3, py + 3, fill=color, outline=color)
-            legend_x = left + index * 125
+            legend_x = left + index * max(70, (right - left) / len(series))
             curve_canvas.create_line(legend_x, y + 17, legend_x + 22, y + 17, fill=color, width=2)
             curve_canvas.create_text(legend_x + 28, y + 17, text=mode, anchor="w", fill=color, font=body_font)
         curve_canvas.create_text((left + right) / 2, bottom + 14, text="Updates", fill="#555555", font=body_font)
@@ -256,7 +263,7 @@ def main(output):
         curve_canvas.delete("all")
         height = max(160, curve_canvas.winfo_height() // 2)
         draw_plot("Training objective", learning_curves["training"], 0, height)
-        draw_plot("Validation spectral loss", learning_curves["validation"], height, height)
+        draw_plot("Validation MEL-log1p", learning_curves["validation"], height, height)
     curve_canvas.bind("<Configure>", redraw_curves)
     specs, items = plan_tree(), {}
 
