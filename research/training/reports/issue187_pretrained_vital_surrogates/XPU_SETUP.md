@@ -51,3 +51,9 @@ The codec probe uses one synthetic stereo clip to test waveform reconstruction a
 The [DAC 44.1 kHz checkpoint](https://huggingface.co/descript/dac_44khz) at revision `c1bc521685adf9cfe247bc39a5ca58917eda1ac4` also passed a separate mono decode and latents gradient probe on the same XPU using Transformers. This check differentiated through the decoder from the quantized embedding, with the encoder and quantizer outside the gradient path.
 
 These checks cover runtime compatibility. The Vital comparison and decision gates are defined in [issue #187](https://github.com/noisedoctrine/obruxo/issues/187).
+
+## Chained Vital experiment
+
+Run `run_issue187_surrogates.py --output <run-directory>` with the same patched source paths and the Windows native renderer packages on `PYTHONPATH`. Run `show_issue187_progress.py <run-directory>` separately for the monitor. The run directory receives the current phase, event log, per-case measurements, and decision records.
+
+Stage 1 recovers the #185 validation waveforms by matching the original #173 audio hashes. The cross-MIDI runs use the #167 recordings, candidate assignments, and cached CLAP, CIR, and JEPA reference scores. Stage 2 advances one codec, uses the #172 training pairs, and stops each adapter at 8,000 updates or five hours. The update-100 projection can stop an arm earlier. Stage 3 advances a qualifying adapter to the 192 #173 inversion cases. The decision file records any stage skipped by a gate.
