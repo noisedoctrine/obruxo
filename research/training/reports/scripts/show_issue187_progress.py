@@ -187,6 +187,20 @@ def main(output):
     tree.heading("#0", text="Task / subtask", anchor="w")
     tree.heading("state", text="State", anchor="w")
     tree.heading("elapsed", text="Elapsed", anchor="e")
+    status_tags = {"Complete": "complete", "In progress": "in_progress", "Checkpoint": "checkpoint",
+                   "Stopped": "stopped", "Failed": "stopped", "Skipped": "muted", "Not run": "muted",
+                   "Upcoming": "upcoming"}
+    tree.tag_configure("complete", background="#E8F5E9", foreground="#1B5E20")
+    tree.tag_configure("in_progress", background="#E3F2FD", foreground="#0D47A1")
+    tree.tag_configure("checkpoint", background="#FFF8E1", foreground="#8A5700")
+    tree.tag_configure("stopped", background="#FFEBEE", foreground="#B71C1C")
+    tree.tag_configure("muted", background="#F1F3F4", foreground="#616161")
+    tree.tag_configure("upcoming", background="#FFFFFF", foreground="#333333")
+
+    def set_row_status(iid, status):
+        tree.set(iid, "state", status)
+        tree.item(iid, tags=(status_tags.get(status, "upcoming"),))
+
     tree_width = max(400, panel_width - 48)
     task_width = int(tree_width * .54)
     state_width = int(tree_width * .23)
@@ -282,7 +296,8 @@ def main(output):
 
     def insert(nodes, parent=""):
         for node in nodes:
-            iid = tree.insert(parent, "end", iid=node["id"], text=node["title"], values=("Upcoming", "—"))
+            iid = tree.insert(parent, "end", iid=node["id"], text=node["title"], values=("Upcoming", "—"),
+                              tags=("upcoming",))
             items[iid] = node
             insert(node.get("children", []), iid)
     insert(specs)
@@ -318,7 +333,7 @@ def main(output):
                                    if name.startswith(f"Stage {stage + 1} ·") and row["started"]]
                     if next_events:
                         seconds = (min(next_events) - stage_start).total_seconds()
-                tree.set(iid, "state", status)
+                set_row_status(iid, status)
                 tree.set(iid, "elapsed", format_elapsed(seconds) if stage_events else "—")
                 elapsed_values[iid] = seconds
                 continue
@@ -340,7 +355,7 @@ def main(output):
                 else:
                     status = "Upcoming"
                 elapsed = sum(elapsed_values.get(child["id"], 0.) for child in children)
-                tree.set(iid, "state", status)
+                set_row_status(iid, status)
                 tree.set(iid, "elapsed", format_elapsed(elapsed) if elapsed else "—")
                 elapsed_values[iid] = elapsed
                 continue
@@ -378,7 +393,7 @@ def main(output):
                 status = "Not run"
             if node["id"] == "inversion" and decisions.get("stage3") == "skipped":
                 status = "Skipped"
-            tree.set(iid, "state", status)
+            set_row_status(iid, status)
             tree.set(iid, "elapsed", format_elapsed(seconds))
             elapsed_values[iid] = seconds or 0.
 
