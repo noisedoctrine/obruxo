@@ -1,0 +1,18 @@
+diff --git a/stable_audio_tools/models/lora/__init__.py b/stable_audio_tools/models/lora/__init__.py
+index 68eaa19..d2ec0c7 100644
+--- a/stable_audio_tools/models/lora/__init__.py
++++ b/stable_audio_tools/models/lora/__init__.py
+@@ -25,5 +25,12 @@ from .utils import (
+     prepare_dora_state_dict,
+     resolve_adapter_type
+ )
+-from .callbacks import LoRASafetensorsCheckpoint, StepOffsetCallback
+ from .loader import load_and_apply_loras
++
++
++def __getattr__(name):
++    if name in {"LoRASafetensorsCheckpoint", "StepOffsetCallback"}:
++        from . import callbacks
++
++        return getattr(callbacks, name)
++    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

@@ -1,0 +1,51 @@
+diff --git a/stable_audio_3/loading_utils.py b/stable_audio_3/loading_utils.py
+index 775ef0a..27251bf 100644
+--- a/stable_audio_3/loading_utils.py
++++ b/stable_audio_3/loading_utils.py
+@@ -66,9 +66,7 @@ def load_diffusion_cond(
+ ):
+     model = create_diffusion_cond_from_config(model_config)
+     copy_state_dict(model, load_file(ckpt_path))
+-    model.to(device).eval().requires_grad_(False)
+-    if model_half:
+-        model.to(torch.float16)
++    model.to(device=device, dtype=torch.float16 if model_half else None).eval().requires_grad_(False)
+     return model
+
+
+diff --git a/stable_audio_3/model.py b/stable_audio_3/model.py
+index 66d5f75..02aca4c 100644
+--- a/stable_audio_3/model.py
++++ b/stable_audio_3/model.py
+@@ -32,13 +32,16 @@ class StableAudioModel:
+         # Load the model and any necessary components here
+         if device is None and torch.cuda.is_available():
+             device = "cuda"
++        elif device is None and torch.xpu.is_available():
++            device = "xpu"
+         elif device is None and torch.backends.mps.is_available():
+             device = "mps"
+         elif device is None:
+             device = "cpu"
+
+-        if not torch.cuda.is_available():
+-            if model_name in ("medium", "medium-base"):
++        device_type = torch.device(device).type
++        if device_type not in ("cuda", "xpu"):
++            if device_type == "cpu" and model_name in ("medium", "medium-base"):
+                 print(
+                     f"Warning: You are loading the {model_name} model without a GPU. This model is not designed to run on cpu"
+                 )
+diff --git a/stable_audio_3/models/transformer.py b/stable_audio_3/models/transformer.py
+index 72989d6..34b97dd 100644
+--- a/stable_audio_3/models/transformer.py
++++ b/stable_audio_3/models/transformer.py
+@@ -679,7 +679,7 @@ class Attention(nn.Module):
+                 seq_q, seq_k = q.shape[2], k.shape[2]
+                 wl, wr = flash_attn_sliding_window
+                 handled = False
+-                if flex_attention_available and flex_attention_compiled is not None:
++                if q.device.type != "xpu" and flex_attention_available and flex_attention_compiled is not None:
+                     try:
+                         bm = _get_sliding_window_block_mask(seq_q, seq_k, wl, wr, q.device)
+                         out = flex_attention_compiled(q, k, v, block_mask=bm)
