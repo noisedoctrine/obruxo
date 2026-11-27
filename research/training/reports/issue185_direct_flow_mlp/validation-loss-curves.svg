@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 430" role="img" aria-labelledby="title desc">
+<title id="title">Residual MLP validation spectral loss</title>
+<desc id="desc">Direct prediction and eight-step flow matching at five cumulative update counts.</desc>
+<rect width="800" height="430" fill="#fff"/>
+<text x="90" y="26" font-family="Segoe UI, sans-serif" font-size="17" font-weight="bold">Validation spectral loss (lower is better)</text>
+<line x1="90" y1="48.0" x2="730" y2="48.0" stroke="#e4e8ee"/>
+<text x="78" y="52.0" text-anchor="end" font-family="Segoe UI, sans-serif" font-size="12" fill="#343b45">0.753</text>
+<line x1="90" y1="124.5" x2="730" y2="124.5" stroke="#e4e8ee"/>
+<text x="78" y="128.5" text-anchor="end" font-family="Segoe UI, sans-serif" font-size="12" fill="#343b45">0.692</text>
+<line x1="90" y1="201.0" x2="730" y2="201.0" stroke="#e4e8ee"/>
+<text x="78" y="205.0" text-anchor="end" font-family="Segoe UI, sans-serif" font-size="12" fill="#343b45">0.631</text>
+<line x1="90" y1="277.5" x2="730" y2="277.5" stroke="#e4e8ee"/>
+<text x="78" y="281.5" text-anchor="end" font-family="Segoe UI, sans-serif" font-size="12" fill="#343b45">0.570</text>
+<line x1="90" y1="354.0" x2="730" y2="354.0" stroke="#e4e8ee"/>
+<text x="78" y="358.0" text-anchor="end" font-family="Segoe UI, sans-serif" font-size="12" fill="#343b45">0.509</text>
+<line x1="90" y1="48" x2="90" y2="354" stroke="#343b45"/>
+<line x1="90" y1="354" x2="730" y2="354" stroke="#343b45"/>
+<line x1="90.0" y1="354" x2="90.0" y2="359" stroke="#343b45"/>
+<text x="90.0" y="379" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#343b45">500</text>
+<line x1="132.7" y1="354" x2="132.7" y2="359" stroke="#343b45"/>
+<text x="132.7" y="379" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#343b45">1,000</text>
+<line x1="218.0" y1="354" x2="218.0" y2="359" stroke="#343b45"/>
+<text x="218.0" y="379" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#343b45">2,000</text>
+<line x1="388.7" y1="354" x2="388.7" y2="359" stroke="#343b45"/>
+<text x="388.7" y="379" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#343b45">4,000</text>
+<line x1="730.0" y1="354" x2="730.0" y2="359" stroke="#343b45"/>
+<text x="730.0" y="379" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#343b45">8,000</text>
+<text x="410.0" y="409" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#343b45">Cumulative optimizer updates</text>
+<polyline points="90.0,272.0 132.7,291.2 218.0,304.1 388.7,313.5 730.0,296.4" fill="none" stroke="#276EF1" stroke-width="3"/>
+<circle cx="90.0" cy="272.0" r="4.5" fill="#276EF1"/>
+<circle cx="132.7" cy="291.2" r="4.5" fill="#276EF1"/>
+<circle cx="218.0" cy="304.1" r="4.5" fill="#276EF1"/>
+<circle cx="388.7" cy="313.5" r="4.5" fill="#276EF1"/>
+<circle cx="730.0" cy="296.4" r="4.5" fill="#276EF1"/>
+<line x1="520" y1="68" x2="545" y2="68" stroke="#276EF1" stroke-width="3"/>
+<text x="552" y="72" font-family="Segoe UI, sans-serif" font-size="12" fill="#276EF1">Direct prediction</text>
+<polyline points="90.0,185.2 132.7,88.5 218.0,202.6 388.7,95.3 730.0,127.3" fill="none" stroke="#D55E00" stroke-width="3"/>
+<circle cx="90.0" cy="185.2" r="4.5" fill="#D55E00"/>
+<circle cx="132.7" cy="88.5" r="4.5" fill="#D55E00"/>
+<circle cx="218.0" cy="202.6" r="4.5" fill="#D55E00"/>
+<circle cx="388.7" cy="95.3" r="4.5" fill="#D55E00"/>
+<circle cx="730.0" cy="127.3" r="4.5" fill="#D55E00"/>
+<line x1="520" y1="93" x2="545" y2="93" stroke="#D55E00" stroke-width="3"/>
+<text x="552" y="97" font-family="Segoe UI, sans-serif" font-size="12" fill="#D55E00">Flow matching · Euler 8</text>
+</svg>

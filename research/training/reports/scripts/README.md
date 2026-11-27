@@ -1,3 +1,7 @@
+# Current experiment tooling
+
+`run_issue185_learning_curves.py --output research/training/outputs/issue185-direct-flow-learning-curves-20261127` resumes the corrected Issue 183 direct and eight-step flow Residual MLP checkpoints through 8,000 updates, saving milestone results and recovery state. Run `show_issue185_learning_curves.py OUTPUT_DIRECTORY` in a separate desktop process for the live, read-only Tk monitor; its Play/Pause and Stop controls affect the monitor only. `finalize_issue185_report.py` checks the completed checkpoints, source receipts, validation coverage and hashes before publishing the tracked [Issue 185 report](../issue185_direct_flow_mlp/REPORT.md).
+
 # Archived diagnostic sources
 
 `run_destination_check.py`, `run_combined_check.py` and `run_combined_integration.py` qualify the [combined curriculum](../../COMBINED_CURRICULUM.md). They check native routing domains, all registered assets, phase-controlled fresh-process repeats, audible family effects, bounded on-demand collection and exact optimizer/RNG recovery. `summarize_combined_exposure.py` reports actual retained supervision without a learning-quality claim.

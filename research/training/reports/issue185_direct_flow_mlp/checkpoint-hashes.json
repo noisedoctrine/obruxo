@@ -1,0 +1,37 @@
+{
+  "checkpoint_storage": "research/training/outputs/issue185-direct-flow-learning-curves-20261127/checkpoints/",
+  "milestone_checkpoint_sha256": {
+    "residual_mlp-direct": {
+      "1000": "0f0e15a7ea04932b9966a9a08bd65fe5942530bbdc1a5058185fbce4fec4b5da",
+      "2000": "f19d51426d15eb38709244658b52bbea49c253d57a6bacb82dad15a9610e9822",
+      "4000": "28d663bfa8ae4ce970ab4467c96e32c6acc19a3ebeab9aeef025b21ef29112ca",
+      "500": "2dbbd2ecd48b71aa5e1ce79e91c242ff0702719e20a1d157e5252c25b705d92b",
+      "8000": "91081e5d23a949880d8b650cc4326b43f500fe376523b1a41749ac90a9f9c7d5"
+    },
+    "residual_mlp-flow": {
+      "1000": "a727ee7eac010abf660e6898a0029a9315e50698876aec959efb8d15c9c59632",
+      "2000": "c5d96a6a9466a4207ee8b6da966b6f1860f023a12c64c076c025c4753b3bbc2a",
+      "4000": "5748c4e7f47c6ef633e50845c10d4a6a07514ab0913a6ef8aea477a932dd9760",
+      "500": "4060e8544a1a209f800c749f6dce7630f606bb6408edb50ef085ee5b55d258bf",
+      "8000": "e435b4fce39a06757406a0d16e356bc29bb94fba8f672c78fd7e9c6e24c39be7"
+    }
+  },
+  "milestones": [
+    500,
+    1000,
+    2000,
+    4000,
+    8000
+  ],
+  "plan_id": "ae6cede5dbaa24b56f40b8ec213d73fd83584d74c6fba96bea8cc8e4debe99d3",
+  "source_checkpoint_sha256": {
+    "residual_mlp-direct": "08f11f66016440b19abcc00805789f2e0b95f32f91ab4710da70e9883dc4cadc",
+    "residual_mlp-flow": "0e980540380c2729e1588a899b56c7259575b54769d6efc8322d031a468c4b86"
+  },
+  "source_plan_id": "a071023cd2341ac4a13514765015a6acc104ef1dd55083743d8acf889a0ca9a9",
+  "source_receipts_path": "../issue183_flow_matching/data-receipts.jsonl",
+  "source_receipts_sha256": "4a8e0165f1410b8949dd20cb54c707fcb24f6b38eb9049f3d917b7494594e855",
+  "validation_cases": 256,
+  "validation_midi_performances": 16,
+  "validation_patch_roots": 64
+}
