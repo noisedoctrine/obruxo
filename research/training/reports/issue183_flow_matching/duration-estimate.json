@@ -1,0 +1,23 @@
+{
+  "arm": "residual_mlp-flow",
+  "assumption": "first 100 updates and first two validation/probe passes represent the matching arm groups",
+  "elapsed_train_seconds": 4.9939862000001085,
+  "elapsed_training_probe_seconds": 2.594452999999703,
+  "elapsed_validation_seconds": 17.090488799999548,
+  "estimate_scope": "complete six-arm run, extrapolated from first 100 updates and first validation/probe passes",
+  "estimated_total_seconds": 480.79846139999245,
+  "estimated_training_probe_seconds": 23.350076999997327,
+  "estimated_training_seconds": 149.81958600000326,
+  "estimated_validation_seconds": 307.62879839999187,
+  "measured_after_updates": 100,
+  "source_checkpoint_sha256": {
+    "conformer-direct": "fa157b7d036211e35cd6c1bafeddec1c7a1416d4c3138408bc638b5adf6ce6a5",
+    "conformer-flow": "7cd65a7540593fcd29c8a3f228a1dcd2fa100ec1c5bcdbfb1b6309a497eede52",
+    "residual_mlp-direct": "08f11f66016440b19abcc00805789f2e0b95f32f91ab4710da70e9883dc4cadc",
+    "residual_mlp-flow": "0e980540380c2729e1588a899b56c7259575b54769d6efc8322d031a468c4b86",
+    "transformer-direct": "c8035728492862e71525327ce2523bd569f9faea4c5dacff4a627f03741f76d0",
+    "transformer-flow": "5b4541bc275a9a1027afc6d7d0a4e7364f28d7081c74b75f86d1b10459bfea05"
+  },
+  "source_plan_id": "a071023cd2341ac4a13514765015a6acc104ef1dd55083743d8acf889a0ca9a9",
+  "updates_per_second": 20.024084167472836
+}

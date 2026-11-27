@@ -1,0 +1,203 @@
+{
+  "arms": {
+    "conformer-flow": {
+      "per_seed": [
+        {
+          "clips": 32,
+          "noise_seed": 70183,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 24.922144984954283,
+          "sampled_spectral_loss": 0.5885252635926008,
+          "velocity_mse": 0.1341533064842224
+        },
+        {
+          "clips": 32,
+          "noise_seed": 70184,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 24.532540519335633,
+          "sampled_spectral_loss": 0.5823092511855066,
+          "velocity_mse": 0.13385038077831268
+        },
+        {
+          "clips": 32,
+          "noise_seed": 70185,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 25.315228550113826,
+          "sampled_spectral_loss": 0.5832637269049883,
+          "velocity_mse": 0.1392386257648468
+        }
+      ],
+      "sampled_octave_band_energy_error_db": {
+        "max": 25.315228550113826,
+        "mean": 24.92330468480125,
+        "min": 24.532540519335633,
+        "values": [
+          24.922144984954283,
+          24.532540519335633,
+          25.315228550113826
+        ]
+      },
+      "sampled_spectral_loss": {
+        "max": 0.5885252635926008,
+        "mean": 0.5846994138943652,
+        "min": 0.5823092511855066,
+        "values": [
+          0.5885252635926008,
+          0.5823092511855066,
+          0.5832637269049883
+        ]
+      },
+      "velocity_mse": {
+        "max": 0.1392386257648468,
+        "mean": 0.13574743767579397,
+        "min": 0.13385038077831268,
+        "values": [
+          0.1341533064842224,
+          0.13385038077831268,
+          0.1392386257648468
+        ]
+      }
+    },
+    "residual_mlp-flow": {
+      "per_seed": [
+        {
+          "clips": 32,
+          "noise_seed": 70183,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 24.024482506298316,
+          "sampled_spectral_loss": 0.5531379524618387,
+          "velocity_mse": 0.1354992538690567
+        },
+        {
+          "clips": 32,
+          "noise_seed": 70184,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 23.668918284111477,
+          "sampled_spectral_loss": 0.546917240601033,
+          "velocity_mse": 0.13429689407348633
+        },
+        {
+          "clips": 32,
+          "noise_seed": 70185,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 24.60604058108325,
+          "sampled_spectral_loss": 0.5571908922865987,
+          "velocity_mse": 0.13987746834754944
+        }
+      ],
+      "sampled_octave_band_energy_error_db": {
+        "max": 24.60604058108325,
+        "mean": 24.09981379049768,
+        "min": 23.668918284111477,
+        "values": [
+          24.024482506298316,
+          23.668918284111477,
+          24.60604058108325
+        ]
+      },
+      "sampled_spectral_loss": {
+        "max": 0.5571908922865987,
+        "mean": 0.5524153617831568,
+        "min": 0.546917240601033,
+        "values": [
+          0.5531379524618387,
+          0.546917240601033,
+          0.5571908922865987
+        ]
+      },
+      "velocity_mse": {
+        "max": 0.13987746834754944,
+        "mean": 0.13655787209669748,
+        "min": 0.13429689407348633,
+        "values": [
+          0.1354992538690567,
+          0.13429689407348633,
+          0.13987746834754944
+        ]
+      }
+    },
+    "transformer-flow": {
+      "per_seed": [
+        {
+          "clips": 32,
+          "noise_seed": 70183,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 25.36865746031593,
+          "sampled_spectral_loss": 0.6212310744449496,
+          "velocity_mse": 0.13626250624656677
+        },
+        {
+          "clips": 32,
+          "noise_seed": 70184,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 25.033756448242606,
+          "sampled_spectral_loss": 0.6144821578636765,
+          "velocity_mse": 0.13493774831295013
+        },
+        {
+          "clips": 32,
+          "noise_seed": 70185,
+          "patch_roots": 16,
+          "recipes": 16,
+          "sampled_octave_band_energy_error_db": 25.86615439265895,
+          "sampled_spectral_loss": 0.6149885859340429,
+          "velocity_mse": 0.14201965928077698
+        }
+      ],
+      "sampled_octave_band_energy_error_db": {
+        "max": 25.86615439265895,
+        "mean": 25.422856100405827,
+        "min": 25.033756448242606,
+        "values": [
+          25.36865746031593,
+          25.033756448242606,
+          25.86615439265895
+        ]
+      },
+      "sampled_spectral_loss": {
+        "max": 0.6212310744449496,
+        "mean": 0.6169006060808897,
+        "min": 0.6144821578636765,
+        "values": [
+          0.6212310744449496,
+          0.6144821578636765,
+          0.6149885859340429
+        ]
+      },
+      "velocity_mse": {
+        "max": 0.14201965928077698,
+        "mean": 0.13773997128009796,
+        "min": 0.13493774831295013,
+        "values": [
+          0.13626250624656677,
+          0.13493774831295013,
+          0.14201965928077698
+        ]
+      }
+    }
+  },
+  "clips": 32,
+  "format": "issue183_training_probe_noise_sensitivity_v1",
+  "noise_seeds": [
+    70183,
+    70184,
+    70185
+  ],
+  "patch_roots": 16,
+  "recipes": 16,
+  "sampler_steps": 8,
+  "source_checkpoint_sha256": {
+    "conformer-flow": "7cd65a7540593fcd29c8a3f228a1dcd2fa100ec1c5bcdbfb1b6309a497eede52",
+    "residual_mlp-flow": "0e980540380c2729e1588a899b56c7259575b54769d6efc8322d031a468c4b86",
+    "transformer-flow": "5b4541bc275a9a1027afc6d7d0a4e7364f28d7081c74b75f86d1b10459bfea05"
+  },
+  "source_plan_id": "a071023cd2341ac4a13514765015a6acc104ef1dd55083743d8acf889a0ca9a9"
+}

@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="660" viewBox="0 0 900 660">
+<rect width="100%" height="100%" fill="white"/>
+<text x="24" y="28" font-family="Segoe UI, sans-serif" font-size="18" font-weight="bold">Issue 183 validation loss · 2048-point spectral metric</text>
+<text x="24" y="72" font-family="Segoe UI, sans-serif" font-size="14" font-weight="bold">residual_mlp</text>
+<path d="M 74 206 H 860 M 74 94 V 206" stroke="#666" fill="none"/>
+<text x="460" y="232" font-family="Segoe UI, sans-serif" font-size="11">Training updates</text>
+<text x="26" y="152" transform="rotate(-90 26 152)" font-family="Segoe UI, sans-serif" font-size="11">Spectral loss</text>
+<polyline points="74.0,104.8 231.2,190.8 388.4,192.5 545.6,193.9 702.8,193.0 860.0,195.2" fill="none" stroke="#276EF1" stroke-width="2.4"/>
+<circle cx="74.0" cy="104.8" r="3.1" fill="#276EF1"/>
+<circle cx="231.2" cy="190.8" r="3.1" fill="#276EF1"/>
+<circle cx="388.4" cy="192.5" r="3.1" fill="#276EF1"/>
+<circle cx="545.6" cy="193.9" r="3.1" fill="#276EF1"/>
+<circle cx="702.8" cy="193.0" r="3.1" fill="#276EF1"/>
+<circle cx="860.0" cy="195.2" r="3.1" fill="#276EF1"/>
+<polyline points="74.0,111.7 231.2,191.1 388.4,187.2 545.6,188.9 702.8,193.2 860.0,188.1" fill="none" stroke="#D55E00" stroke-width="2.4"/>
+<circle cx="74.0" cy="111.7" r="3.1" fill="#D55E00"/>
+<circle cx="231.2" cy="191.1" r="3.1" fill="#D55E00"/>
+<circle cx="388.4" cy="187.2" r="3.1" fill="#D55E00"/>
+<circle cx="545.6" cy="188.9" r="3.1" fill="#D55E00"/>
+<circle cx="702.8" cy="193.2" r="3.1" fill="#D55E00"/>
+<circle cx="860.0" cy="188.1" r="3.1" fill="#D55E00"/>
+<text x="690" y="76" fill="#276EF1" font-family="Segoe UI, sans-serif" font-size="12">Direct</text>
+<text x="760" y="76" fill="#D55E00" font-family="Segoe UI, sans-serif" font-size="12">Flow · Euler 8</text>
+<text x="40" y="209" font-family="Segoe UI, sans-serif" font-size="10">0</text>
+<text x="835" y="209" font-family="Segoe UI, sans-serif" font-size="10">500</text>
+<text x="40" y="97" font-family="Segoe UI, sans-serif" font-size="10">1.571</text>
+<text x="40" y="205" font-family="Segoe UI, sans-serif" font-size="10">0.468</text>
+<text x="24" y="262" font-family="Segoe UI, sans-serif" font-size="14" font-weight="bold">transformer</text>
+<path d="M 74 396 H 860 M 74 284 V 396" stroke="#666" fill="none"/>
+<text x="460" y="422" font-family="Segoe UI, sans-serif" font-size="11">Training updates</text>
+<text x="26" y="342" transform="rotate(-90 26 342)" font-family="Segoe UI, sans-serif" font-size="11">Spectral loss</text>
+<polyline points="74.0,294.8 231.2,382.3 388.4,383.9 545.6,384.3 702.8,384.3 860.0,385.2" fill="none" stroke="#276EF1" stroke-width="2.4"/>
+<circle cx="74.0" cy="294.8" r="3.1" fill="#276EF1"/>
+<circle cx="231.2" cy="382.3" r="3.1" fill="#276EF1"/>
+<circle cx="388.4" cy="383.9" r="3.1" fill="#276EF1"/>
+<circle cx="545.6" cy="384.3" r="3.1" fill="#276EF1"/>
+<circle cx="702.8" cy="384.3" r="3.1" fill="#276EF1"/>
+<circle cx="860.0" cy="385.2" r="3.1" fill="#276EF1"/>
+<polyline points="74.0,301.8 231.2,379.5 388.4,377.7 545.6,376.3 702.8,383.0 860.0,375.0" fill="none" stroke="#D55E00" stroke-width="2.4"/>
+<circle cx="74.0" cy="301.8" r="3.1" fill="#D55E00"/>
+<circle cx="231.2" cy="379.5" r="3.1" fill="#D55E00"/>
+<circle cx="388.4" cy="377.7" r="3.1" fill="#D55E00"/>
+<circle cx="545.6" cy="376.3" r="3.1" fill="#D55E00"/>
+<circle cx="702.8" cy="383.0" r="3.1" fill="#D55E00"/>
+<circle cx="860.0" cy="375.0" r="3.1" fill="#D55E00"/>
+<text x="690" y="266" fill="#276EF1" font-family="Segoe UI, sans-serif" font-size="12">Direct</text>
+<text x="760" y="266" fill="#D55E00" font-family="Segoe UI, sans-serif" font-size="12">Flow · Euler 8</text>
+<text x="40" y="399" font-family="Segoe UI, sans-serif" font-size="10">0</text>
+<text x="835" y="399" font-family="Segoe UI, sans-serif" font-size="10">500</text>
+<text x="40" y="287" font-family="Segoe UI, sans-serif" font-size="10">1.570</text>
+<text x="40" y="395" font-family="Segoe UI, sans-serif" font-size="10">0.484</text>
+<text x="24" y="452" font-family="Segoe UI, sans-serif" font-size="14" font-weight="bold">conformer</text>
+<path d="M 74 586 H 860 M 74 474 V 586" stroke="#666" fill="none"/>
+<text x="460" y="612" font-family="Segoe UI, sans-serif" font-size="11">Training updates</text>
+<text x="26" y="532" transform="rotate(-90 26 532)" font-family="Segoe UI, sans-serif" font-size="11">Spectral loss</text>
+<polyline points="74.0,484.8 231.2,571.5 388.4,573.1 545.6,574.1 702.8,574.7 860.0,575.2" fill="none" stroke="#276EF1" stroke-width="2.4"/>
+<circle cx="74.0" cy="484.8" r="3.1" fill="#276EF1"/>
+<circle cx="231.2" cy="571.5" r="3.1" fill="#276EF1"/>
+<circle cx="388.4" cy="573.1" r="3.1" fill="#276EF1"/>
+<circle cx="545.6" cy="574.1" r="3.1" fill="#276EF1"/>
+<circle cx="702.8" cy="574.7" r="3.1" fill="#276EF1"/>
+<circle cx="860.0" cy="575.2" r="3.1" fill="#276EF1"/>
+<polyline points="74.0,491.8 231.2,568.5 388.4,563.7 545.6,568.2 702.8,572.3 860.0,566.0" fill="none" stroke="#D55E00" stroke-width="2.4"/>
+<circle cx="74.0" cy="491.8" r="3.1" fill="#D55E00"/>
+<circle cx="231.2" cy="568.5" r="3.1" fill="#D55E00"/>
+<circle cx="388.4" cy="563.7" r="3.1" fill="#D55E00"/>
+<circle cx="545.6" cy="568.2" r="3.1" fill="#D55E00"/>
+<circle cx="702.8" cy="572.3" r="3.1" fill="#D55E00"/>
+<circle cx="860.0" cy="566.0" r="3.1" fill="#D55E00"/>
+<text x="690" y="456" fill="#276EF1" font-family="Segoe UI, sans-serif" font-size="12">Direct</text>
+<text x="760" y="456" fill="#D55E00" font-family="Segoe UI, sans-serif" font-size="12">Flow · Euler 8</text>
+<text x="40" y="589" font-family="Segoe UI, sans-serif" font-size="10">0</text>
+<text x="835" y="589" font-family="Segoe UI, sans-serif" font-size="10">500</text>
+<text x="40" y="477" font-family="Segoe UI, sans-serif" font-size="10">1.571</text>
+<text x="40" y="585" font-family="Segoe UI, sans-serif" font-size="10">0.476</text>
+</svg>
