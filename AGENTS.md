@@ -27,6 +27,12 @@ $obruxoNativeSite = Join-Path $obruxoConda 'obruxo-data-generation/Lib/site-pack
 | `WinError 5` loading `c10_xpu.dll` | The Windows sandbox can block importing this PyTorch build even for CPU work. Retry the exact authorized Python command with escalation for native DLL access. Check `torch.xpu.is_available()` only for XPU runs. |
 | `gh` cannot reach GitHub or read credentials, or Git cannot create `.git/index.lock` with access denied | Retry the specific authorized command with escalation for network, the Windows keyring, or writes to Git metadata. A sandboxed `gh auth status` failure is insufficient to diagnose expired credentials. |
 
+## Pretrained audio on Intel XPU
+
+- Use `py312` with pinned source checkouts and any extra dependencies in a scratch `pip --target --no-deps` directory. For Stable Audio, reuse the [patches and smoke probe](research/training/reports/issue187_pretrained_vital_surrogates/XPU_SETUP.md). Load only the codec for reconstruction.
+- Pass `device="xpu"` explicitly. Some upstream loaders check only CUDA and disable FP16 on Intel GPUs. Cast during transfer to avoid a full FP32 copy on the GPU. Use the existing PyTorch SDPA fallback if compiled FlexAttention needs an unavailable compiler. Verify tensor placement, dtype, and decoder input gradients when needed.
+- For gated Hugging Face models, verify that the weight file downloads. If Windows blocks cache symlinks, pass `local_dir` to `snapshot_download`. Reuse auxiliary weights and tokenizers when their content hashes match.
+
 ## Long-lived task progress
 
 - For work that will run for several minutes or longer, do not keep the conversation busy with repeated model polling. Run the worker independently with durable logs and a small machine-readable status file, then open a lightweight Python `tkinter` monitor for the user.
