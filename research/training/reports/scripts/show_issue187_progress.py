@@ -22,19 +22,24 @@ def set_dpi_awareness():
 
 
 def read_timeline(output, now):
-    path = output / "events.log"
-    if not path.exists():
-        return {}
     pattern = re.compile(r"^(\S+) (.*?): (\d+)/(\d+) \(([^)]+)\)")
     events = []
-    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
-        match = pattern.match(line)
-        if match:
-            timestamp, phase, done, total, state = match.groups()
-            events.append((datetime.fromisoformat(timestamp), phase, int(done), int(total), state))
-    starts = [index for index, item in enumerate(events)
-              if item[1] == "Stage 1 · Verify input receipts" and item[2] == 0]
-    events = events[starts[-1]:] if starts else events
+    paths = (output / "events.log", output.parent / "issue187-rescore" / "events.log")
+    for path in paths:
+        if not path.exists():
+            continue
+        source_events = []
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            match = pattern.match(line)
+            if match:
+                timestamp, phase, done, total, state = match.groups()
+                source_events.append((datetime.fromisoformat(timestamp), phase, int(done), int(total), state))
+        starts = [index for index, item in enumerate(source_events)
+                  if item[1] == "Stage 1 · Verify input receipts" and item[2] == 0]
+        events.extend(source_events[starts[-1]:] if starts else source_events)
+    if not events:
+        return {}
+    events.sort(key=lambda item: item[0])
     records, active = {}, None
 
     def close(end, completed=False):
@@ -66,16 +71,17 @@ def plan_tree():
         return {"id": key, "title": title, "phase": phase, "artifact": artifact, "decision": decision}
 
     stage1 = [leaf("receipts", "Verify input receipts", "Verify input receipts"),
-              leaf("waves", "Restore validation audio", "Recover frozen validation waveforms")]
+              leaf("waves", "Restore validation audio", artifact="validation-waveforms")]
     for model in ("open-small", "same-s", "same-l", "same-l-embedded", "dac"):
         stage1.append({"id": model, "title": f"{model} codec", "children": [
             leaf(f"{model}-recon", "Recover missing reconstructions", f"Reconstruct with {model}",
-                 artifact=f"waveforms-{model}.json"),
-            leaf(f"{model}-score", "Score waveform reconstruction", artifact=f"rescore-{model}.json"),
-            leaf(f"{model}-cir", "Score CIR similarity", artifact=f"cir-{model}.json"),
+                 artifact=f"../issue187-rescore/waveforms-{model}.json"),
+            leaf(f"{model}-score", "Score waveform reconstruction", f"Score reconstruction with {model}",
+                 artifact=f"../issue187-rescore/rescore-{model}.json"),
+            leaf(f"{model}-cir", "Score CIR similarity", artifact=f"../issue187-rescore/cir-{model}.json"),
         ]})
     stage1.extend([
-        leaf("stage1-results", "Save results; apply Stage 1 gate", artifact="stage1.json"),
+        leaf("stage1-results", "Save results; apply Stage 1 gate", artifact="stage1-published-receipt.json"),
     ])
     stage2 = [leaf("qualify-generator", "Select codec; qualify generator",
                    phase="-embedded", decision="stage1_selected"),
@@ -336,9 +342,10 @@ def main(output):
             phase_match = node.get("phase")
             matching = [(name, record) for name, record in records.items()
                         if phase_match and phase_match in name]
+            artifact_complete = bool(node.get("artifact") and (output / node["artifact"]).exists())
             if node.get("artifact"):
                 artifact = output / node["artifact"]
-                if artifact.exists():
+                if artifact_complete:
                     status = "Complete"
                     seconds = 0.
                 if node.get("decision") and decisions:
@@ -354,10 +361,12 @@ def main(output):
             if matching:
                 record = max(matching, key=lambda pair: pair[1]["started"] or now)[1]
                 seconds = sum(item["seconds"] for _, item in matching)
-                status = "Complete" if record["complete"] else "Checkpoint"
+                if not artifact_complete:
+                    status = "Complete" if record["complete"] else "Checkpoint"
                 if phase_match and phase_match in state.get("phase", ""):
-                    status = "In progress"
-                    seconds = max(seconds, (now - (record["started"] or now)).total_seconds())
+                    if not artifact_complete:
+                        status = "In progress"
+                        seconds = max(seconds, (now - (record["started"] or now)).total_seconds())
             if node["id"].startswith("generator-") and decisions.get("generator"):
                 status = "Not run"
             if node["id"] == "inversion" and decisions.get("stage3") == "skipped":
