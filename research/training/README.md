@@ -1,5 +1,7 @@
 # Training contracts, online pilot and trainer
 
+The [Issue 185 learning curves](reports/issue185_direct_flow_mlp/REPORT.md) extend the matched Residual MLP direct-prediction and eight-step flow runs to 8,000 updates. On the one-seed validation panel (256 clips, 64 patch roots, 16 MIDI performances), direct prediction ends at 0.5552 spectral loss versus 0.6899 for flow matching; the gap grows from +0.0691 at update 500 to +0.1347 at update 8,000. Direct remains better-supported on this panel, pending a second seed.
+
 The [two-stage Vital surrogate pilot](reports/VITAL_SURROGATE_PILOT_RESULTS.md) compares a Transformer, Conformer, and conditioned residual MLP on 256 basic and 512 combined training patch roots. The residual MLP is the starting backbone for the expanded codec in milestone 2.
 
 The active work follows the [spectral reconstruction plan](../modelling/TRAINING_PLAN.md) and [basic-stage protocol](STAGED_RECONSTRUCTION.md): qualify useful sound-loss gradients, then train the audio-to-patch predictor on spectral loss before expanding capabilities. Stage A retains nine continuous controls and two categorical choices, totaling 14 dense outputs. Parameter matching is an initialization/auxiliary signal. Broad codec support does not determine the prediction head.

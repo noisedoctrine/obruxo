@@ -1,0 +1,56 @@
+{
+  "id": "ae6cede5dbaa24b56f40b8ec213d73fd83584d74c6fba96bea8cc8e4debe99d3",
+  "plan": {
+    "evaluation": {
+      "flow_euler_steps": 8,
+      "metrics": [
+        "spectral_loss",
+        "octave_band_energy_error_db",
+        "monophonic_octave_energy_error_db",
+        "attack_envelope_error_db",
+        "decay_envelope_error_db",
+        "sustain_envelope_error_db",
+        "release_envelope_error_db"
+      ],
+      "milestones": [
+        500,
+        1000,
+        2000,
+        4000,
+        8000
+      ],
+      "paired_interval": "10,000 bootstrap replicates over patch roots",
+      "source_validation_plan_id": "707d2de2aab25f1d30637196687cb9754182191c969cf1cbee63214251d22855",
+      "validation_clip_count": 256,
+      "validation_midi_performances": 16,
+      "validation_pair_count": 128,
+      "validation_patch_roots": 64
+    },
+    "format": "issue185_direct_vs_flow_mlp_continuation_v1",
+    "hardware": {
+      "device": "xpu",
+      "device_name": "Intel(R) Arc(TM) 140T GPU (16GB)",
+      "numpy": "2.4.6",
+      "threads": 4,
+      "torch": "2.12.1+xpu"
+    },
+    "issue": 185,
+    "runner_sha256": "2b5cc8ca8085a136defa466ead2fc8efc5e206af17426c4c8861334ba78b6669",
+    "source": "research/training/outputs/issue183-flow-matching-corrected-v2-20261127",
+    "source_checkpoint_sha256": {
+      "residual_mlp-direct": "08f11f66016440b19abcc00805789f2e0b95f32f91ab4710da70e9883dc4cadc",
+      "residual_mlp-flow": "0e980540380c2729e1588a899b56c7259575b54769d6efc8322d031a468c4b86"
+    },
+    "source_plan_id": "a071023cd2341ac4a13514765015a6acc104ef1dd55083743d8acf889a0ca9a9",
+    "source_receipts_sha256": "4a8e0165f1410b8949dd20cb54c707fcb24f6b38eb9049f3d917b7494594e855",
+    "training": {
+      "batch_pairs": 4,
+      "learning_rate": 0.001,
+      "optimizer": "restored AdamW",
+      "recovery_every_updates": 100,
+      "seed": 183,
+      "source_updates": 500,
+      "target_updates": 8000
+    }
+  }
+}
