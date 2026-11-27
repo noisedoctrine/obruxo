@@ -229,10 +229,11 @@ def main(output):
 
     def draw_plot(title, series, y, height):
         width = max(200, curve_canvas.winfo_width())
-        curve_canvas.create_text(10, y + 4, text=title, anchor="nw", font=heading_font)
-        top, bottom, left, right = y + 29, y + height - 25, 58, width - 18
+        curve_canvas.create_text(10, y + 2, text=f"{title} (updates)", anchor="nw", font=heading_font)
+        left = 78
         points = [(x, value) for values in series.values() for x, value in values]
         if not points:
+            top, bottom = y + 75, y + height - 35
             curve_canvas.create_text(left, (top + bottom) / 2, text="Waiting for Stage 2 data", anchor="w",
                                      fill="#555555", font=body_font)
             return
@@ -240,12 +241,14 @@ def main(output):
         y_min, y_max = min(value for _, value in points), max(value for _, value in points)
         padding = max((y_max - y_min) * .12, abs(y_max) * .02, 1e-8)
         y_min, y_max = y_min - padding, y_max + padding
-        for fraction in (0., .5, 1.):
+        y_ticks = [y_min + fraction * (y_max - y_min) for fraction in (0., .5, 1.)]
+        y_labels = [f"{value:.3g}" for value in y_ticks]
+        left = max(78, max(body_font.measure(label) for label in y_labels) + 16)
+        right, top, bottom = width - 20, y + 75, y + height - 35
+        for fraction, label in zip((0., .5, 1.), y_labels, strict=True):
             grid_y = bottom - fraction * (bottom - top)
-            label = y_min + fraction * (y_max - y_min)
             curve_canvas.create_line(left, grid_y, right, grid_y, fill="#e1e1e1")
-            curve_canvas.create_text(left - 6, grid_y, text=f"{label:.3g}", anchor="e", fill="#555555",
-                                     font=body_font)
+            curve_canvas.create_text(left - 8, grid_y, text=label, anchor="e", fill="#555555", font=body_font)
         curve_canvas.create_line(left, top, left, bottom, fill="#777777")
         curve_canvas.create_line(left, bottom, right, bottom, fill="#777777")
         colors = ("#1464a5", "#7741a7", "#c45820", "#268062")
@@ -261,9 +264,13 @@ def main(output):
             for px, py in zip(coords[::2], coords[1::2], strict=True):
                 curve_canvas.create_oval(px - 3, py - 3, px + 3, py + 3, fill=color, outline=color)
             legend_x = left + index * max(70, (right - left) / len(series))
-            curve_canvas.create_line(legend_x, y + 17, legend_x + 22, y + 17, fill=color, width=2)
-            curve_canvas.create_text(legend_x + 28, y + 17, text=mode, anchor="w", fill=color, font=body_font)
-        curve_canvas.create_text((left + right) / 2, bottom + 14, text="Updates", fill="#555555", font=body_font)
+            curve_canvas.create_line(legend_x, y + 48, legend_x + 22, y + 48, fill=color, width=2)
+            curve_canvas.create_text(legend_x + 28, y + 48, text=mode, anchor="w", fill=color, font=body_font)
+        for fraction in (0., .5, 1.):
+            tick_x = left + fraction * (right - left)
+            curve_canvas.create_line(tick_x, bottom, tick_x, bottom + 5, fill="#777777")
+            curve_canvas.create_text(tick_x, bottom + 8, text=f"{fraction * x_max:,.0f}", anchor="n",
+                                     fill="#555555", font=body_font)
 
     def redraw_curves(_event=None):
         curve_canvas.delete("all")
@@ -376,6 +383,7 @@ def main(output):
             elapsed_values[iid] = seconds or 0.
 
     def refresh():
+        nonlocal learning_curves
         if not paused:
             try:
                 now = datetime.now(timezone.utc)
