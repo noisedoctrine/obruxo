@@ -132,7 +132,9 @@ def main(output):
     style.configure("TLabel", font=body_font)
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
-    split = ttk.Panedwindow(root, orient="horizontal", cursor="sb_h_double_arrow")
+    split = tk.PanedWindow(root, orient=tk.HORIZONTAL, sashwidth=14, sashpad=3, sashrelief="raised",
+                           sashcursor="sb_h_double_arrow", showhandle=True, handlesize=16, handlepad=4,
+                           opaqueresize=True, borderwidth=0, relief="flat", background="#b5b5b5")
     split.grid(row=0, column=0, sticky="nsew")
 
     side = ttk.Frame(split, padding=10, width=panel_width)
@@ -154,13 +156,13 @@ def main(output):
     scrollbar = ttk.Scrollbar(side, orient="vertical", command=tree.yview)
     tree.configure(yscrollcommand=scrollbar.set)
     tree.grid(row=2, column=0, sticky="nsew")
-    scrollbar.grid(row=2, column=1, sticky="ns")
+    scrollbar.grid(row=2, column=1, sticky="ns", padx=(5, 14))
 
     dashboard = ttk.Frame(split, padding=16, width=dashboard_width)
     dashboard.columnconfigure(0, weight=1)
     dashboard.rowconfigure(5, weight=1)
-    split.add(side, weight=1)
-    split.add(dashboard, weight=1)
+    split.add(side, minsize=max(360, int(window_width * .3)), stretch="always", padx=3, pady=3)
+    split.add(dashboard, minsize=max(360, int(window_width * .3)), stretch="always", padx=3, pady=3)
     phase = ttk.Label(dashboard, text="Waiting for the worker",
                       font=tkfont.Font(root, family="Segoe UI", size=14, weight="bold"),
                       wraplength=int(dashboard_width * .88))
