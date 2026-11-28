@@ -680,7 +680,7 @@ def run_later_stages(output, selection, plan, training, validation, controls, wa
     midi = load_midi_encoder(midi_checkpoint, device=DEVICE).eval()
     midi_cache = MidiEmbeddingCache(output / "midi-embeddings")
     width = BASE.control_tensor(controls, [BASE.PilotTarget.from_dict(validation[0]["target"])], DEVICE).shape[-1]
-    available = ("latent", "generator") if generator_name else ("latent",)
+    available = ("generator", "latent") if generator_name else ("latent",)
     if inversion_decision is not None:
         chosen = experiment.read_json(inversion_decision)
         adapter_names = chosen.get("adapters", [chosen.get("adapter")])

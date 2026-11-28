@@ -59,6 +59,14 @@ def test_formal_stage2_runs_to_its_update_budget_without_wall_clock_cutoff():
     assert isinstance(cap, ast.Tuple) and isinstance(cap.elts[0], ast.Attribute) and cap.elts[0].attr == "inf"
 
 
+def test_stage2_finishes_stable_audio_3_medium_arms_before_same_l():
+    tree = ast.parse(RUNNER.read_text(encoding="utf-8"))
+    modes = next(node.value for node in ast.walk(tree) if isinstance(node, ast.Assign)
+                 and any(isinstance(target, ast.Name) and target.id == "available" for target in node.targets))
+    assert isinstance(modes, ast.IfExp)
+    assert tuple(element.value for element in modes.body.elts) == ("generator", "latent")
+
+
 def test_report_defines_embedded_decoder_and_medium_trunk_once():
     report = SCRIPT.parents[1] / "issue187_pretrained_vital_surrogates" / "STAGE2_PREPARATION.md"
     content = report.read_text(encoding="utf-8")
