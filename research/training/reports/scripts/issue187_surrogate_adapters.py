@@ -31,6 +31,16 @@ DEVICE, SEED = experiment.DEVICE, experiment.SEED
 CAP_SECONDS, MAX_UPDATES, SAMPLER_STEPS = 5 * 3600, 8_000, 8
 MILESTONES = tuple(range(0, MAX_UPDATES + 1, 500))
 DIRECT = BASE.MAIN_ROOT / "research/training/outputs/issue185-direct-flow-learning-curves-20261127"
+CONFIGURATION_NAMES = {
+    "latent-residual_mlp": "Residual MLP + SAME-L",
+    "latent-transformer": "Transformer + SAME-L",
+    "generator-residual_mlp": "Residual MLP + Stable Audio 3 Medium",
+    "generator-transformer": "Transformer + Stable Audio 3 Medium",
+}
+
+
+def configuration_name(name):
+    return CONFIGURATION_NAMES.get(name, name)
 
 
 class MissingTrainingAudio(RuntimeError):
@@ -267,7 +277,7 @@ def validate(adapter, rows, controls, latents, waves, deadline, output, step, pr
     reconstructed = output / "validation-waveforms" / f"{adapter.name}-{step}"
     reconstructed.mkdir(parents=True, exist_ok=True)
     manifest = []
-    progress.set(f"Stage 2 · {adapter.name} validation at {step:,}", 2 * len(rows), 2)
+    progress.set(f"Stage 2 · {configuration_name(adapter.name)} validation at {step:,}", 2 * len(rows), 2)
 
     def score_and_save(record, original, wave, path):
         record.update(waveform_scores(original, wave), cir_cosine=None, visqol_audio=None)
@@ -396,7 +406,7 @@ def arm(output, adapter, training, validation, controls, latents, waves, direct,
     try:
         if first_update == 1 and not smoke:
             save(0)
-        progress.set(f"Stage 2 · {adapter.name} updates", target_step, 2)
+        progress.set(f"Stage 2 · {configuration_name(adapter.name)} updates", target_step, 2)
         tick = perf_counter()
         for step in range(first_update, target_step + 1):
             if perf_counter() >= deadline:
@@ -474,7 +484,7 @@ def arm(output, adapter, training, validation, controls, latents, waves, direct,
                     break
                 save(step)
                 if step in MILESTONES and step < target_step:
-                    progress.set(f"Stage 2 · {adapter.name} updates", target_step, 2)
+                    progress.set(f"Stage 2 · {configuration_name(adapter.name)} updates", target_step, 2)
                     progress.update(step)
                 tick = perf_counter()
     except (RuntimeError, TimeoutError, ValueError) as exc:
@@ -526,7 +536,7 @@ def inverse_panel(output, adapter, controls, plan, progress):
     cases = plan["evaluation"]["cases"]
     if len(cases) != 192:
         raise ValueError("Stage 3 requires exactly the 192 Issue 173 cases")
-    progress.set(f"Stage 3 · Native Vital inversion with {adapter.name}", len(cases), 3)
+    progress.set(f"Stage 3 · Native Vital inversion with {configuration_name(adapter.name)}", len(cases), 3)
     path = output / f"stage3-{adapter.name}-cases.jsonl"
     previous = {row["case_id"] for row in experiment.read_rows(path)} if path.exists() else set()
     original_receipts = experiment.receipts(experiment.PROXY_SOURCE)
@@ -738,7 +748,7 @@ def run_later_stages(output, selection, plan, training, validation, controls, wa
                 torch.manual_seed(SEED)
                 adapter = Adapter(mode, backbone, codec, width, codec.model.latent_dim, midi, midi_cache,
                                   generator, context_width, config).to(DEVICE)
-                progress.set(f"Stage 2 · Load {adapter.name} arm", 1, 2)
+                progress.set(f"Stage 2 · Load {configuration_name(adapter.name)} arm", 1, 2)
                 reports[adapter.name] = arm(output, adapter, training, validation, controls, latents, waves,
                                             direct, progress, started, smoke=smoke, target_step=target_step)
                 BASE.write_json(reports_path, reports)

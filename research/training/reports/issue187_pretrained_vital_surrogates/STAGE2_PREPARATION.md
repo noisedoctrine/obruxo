@@ -37,6 +37,17 @@ Both trainable variants receive the same 33D expanded Issue 187 patch representa
 
 The direct connector's output width is set by the selected codec. The generator connector takes its width from the selected generator's conditioning config. The XPU smoke harness uses the already downloaded SAME-S/Stable Audio 3 Small Music pair (256 latent channels, 768 conditioning dimensions); this is a compatibility fixture, **not a Stage 1 selection**. It calls PR #188's existing Stable Audio velocity connector instead of copying that integration.
 
+### Stage 2 configuration names
+
+SAME-L names the embedded autoencoder's decoder; Stable Audio 3 Medium names the frozen DiT together with that same decoder. Configuration names follow data flow from the trainable adapter to its frozen downstream model.
+
+| Configuration | Trainable adapter | Frozen downstream model |
+|---|---|---|
+| Residual MLP + SAME-L | Residual MLP | SAME-L decoder |
+| Transformer + SAME-L | Transformer | SAME-L decoder |
+| Residual MLP + Stable Audio 3 Medium | Residual MLP | Stable Audio 3 Medium DiT and SAME-L decoder |
+| Transformer + Stable Audio 3 Medium | Transformer | Stable Audio 3 Medium DiT and SAME-L decoder |
+
 ## Adapter parameter counts
 
 Counts use the actual expanded patch width (33), direct latent width 256, and available Stable Audio 3 Small Music conditioning width 768. Each backbone has exactly **81,920 matrix projection weights** across its two blocks, excluding bias and normalization parameters.

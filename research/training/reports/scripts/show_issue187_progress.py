@@ -33,6 +33,7 @@ def read_timeline(output, now):
             match = pattern.match(line)
             if match:
                 timestamp, phase, done, total, state = match.groups()
+                phase = display_text(phase)
                 source_events.append((datetime.fromisoformat(timestamp), phase, int(done), int(total), state))
         starts = [index for index, item in enumerate(source_events)
                   if item[1] == "Stage 1 · Verify input receipts" and item[2] == 0]
@@ -87,17 +88,19 @@ def plan_tree():
                    phase="-embedded", decision="stage1_selected"),
               leaf("latent-cache", "Cache decoder latents", "Cache decoder input latents")]
     for mode in ADAPTERS:
-        arm = [leaf(f"{mode}-load", "Initialize arm", f"Load {mode} arm"),
-               leaf(f"{mode}-updates", "Train adapter (up to 8,000 updates)", f"{mode} updates")]
+        name = CONFIGURATION_NAMES[mode]
+        arm = [leaf(f"{mode}-load", "Initialize arm", f"Load {name} arm"),
+               leaf(f"{mode}-updates", "Train adapter (up to 8,000 updates)", f"{name} updates")]
         arm.extend(leaf(f"{mode}-val-{step}", f"Validation checkpoint · {step:,} updates",
-                        f"{mode} validation at {step:,}") for step in MILESTONES)
-        stage2.append({"id": f"{mode}-arm", "title": f"{mode.title()} adapter arm", "children": arm})
+                        f"{name} validation at {step:,}") for step in MILESTONES)
+        stage2.append({"id": f"{mode}-arm", "title": name, "children": arm})
     stage2.append(
         leaf("stage2-gate", "Compare to direct baseline; apply Stage 2 gate", artifact="stage2.json",
              decision="stage2_selected"),
     )
-    stage3 = [leaf(f"stage3-{mode}", f"Optimize and render 192 cases · {mode}",
-                   f"Native Vital inversion with {mode}", artifact=f"stage3-{mode}.json") for mode in ADAPTERS]
+    stage3 = [leaf(f"stage3-{mode}", f"Optimize and render 192 cases · {CONFIGURATION_NAMES[mode]}",
+                   f"Native Vital inversion with {CONFIGURATION_NAMES[mode]}", artifact=f"stage3-{mode}.json")
+              for mode in ADAPTERS]
     stage3.append(leaf("stage3-summary", "Summarize inversion and diagnostics", artifact="stage3.json",
                        decision="stage3"))
     return [
@@ -153,7 +156,19 @@ def read_learning_curves(output):
 
 ADAPTERS = tuple(f"{arm}-{backbone}" for arm in ("latent", "generator")
                  for backbone in ("residual_mlp", "transformer"))
+CONFIGURATION_NAMES = {
+    "latent-residual_mlp": "Residual MLP + SAME-L",
+    "latent-transformer": "Transformer + SAME-L",
+    "generator-residual_mlp": "Residual MLP + Stable Audio 3 Medium",
+    "generator-transformer": "Transformer + Stable Audio 3 Medium",
+}
 MILESTONES = tuple(range(0, 8_001, 500))
+
+
+def display_text(value):
+    for internal, display in CONFIGURATION_NAMES.items():
+        value = value.replace(internal, display)
+    return value
 
 
 def main(output):
@@ -171,6 +186,7 @@ def main(output):
     style.configure("Treeview", font=body_font, rowheight=body_font.metrics("linespace") + 10)
     style.configure("Treeview.Heading", font=heading_font)
     style.configure("TLabel", font=body_font)
+    legend_font = tkfont.Font(root, family="Segoe UI", size=9)
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
     split = tk.PanedWindow(root, orient=tk.HORIZONTAL, sashwidth=14, sashpad=3, sashrelief="raised",
@@ -256,16 +272,19 @@ def main(output):
                  for mode, values in series.items()}
         detail_points = [(x, value) for values in later.values() for x, value in values]
         colors = ("#1464a5", "#7741a7", "#c45820", "#268062")
-        names = {"latent-residual_mlp": "Latent MLP", "latent-transformer": "Latent Transformer",
-                 "generator-residual_mlp": "Generator MLP", "generator-transformer": "Generator Transformer"}
+        names = CONFIGURATION_NAMES
+        slot = (width - 20) / 2
+        legend_width = max(90, int(slot - 30))
+        wrapped = any(legend_font.measure(names.get(mode, mode)) > legend_width for mode in series)
+        legend_row_height = 32 if wrapped else 21
         legend_y = y + 38
-        slot = (width - 20) / max(1, len(series))
         for index, mode in enumerate(series):
             color = colors[index % len(colors)]
-            legend_x = 10 + index * slot
-            curve_canvas.create_line(legend_x, legend_y, legend_x + 18, legend_y, fill=color, width=2)
-            curve_canvas.create_text(legend_x + 23, legend_y, text=names.get(mode, mode), anchor="w",
-                                     fill=color, font=body_font)
+            legend_x = 10 + (index % 2) * slot
+            row_y = legend_y + (index // 2) * legend_row_height
+            curve_canvas.create_line(legend_x, row_y, legend_x + 18, row_y, fill=color, width=2)
+            curve_canvas.create_text(legend_x + 23, row_y, text=names.get(mode, mode), anchor="w",
+                                     justify="left", width=legend_width, fill=color, font=legend_font)
 
         def draw_panel(panel_x, panel_width, label, panel_series):
             panel_points = [(x, value) for values in panel_series.values() for x, value in values]
@@ -279,8 +298,9 @@ def main(output):
             y_ticks = [y_min + fraction * (y_max - y_min) for fraction in (0., .5, 1.)]
             y_labels = [f"{value:.3g}" for value in y_ticks]
             left = panel_x + max(48, max(body_font.measure(tick) for tick in y_labels) + 12)
-            right, top, bottom = panel_x + panel_width - 8, y + 84, y + height - 32
-            curve_canvas.create_text(panel_x + 8, y + 59, text=label, anchor="nw", fill="#444444",
+            heading_y = y + (82 if wrapped else 72)
+            right, top, bottom = panel_x + panel_width - 8, heading_y + 23, y + height - 32
+            curve_canvas.create_text(panel_x + 8, heading_y, text=label, anchor="nw", fill="#444444",
                                      font=body_font)
             for fraction, tick in zip((0., .5, 1.), y_labels, strict=True):
                 grid_y = bottom - fraction * (bottom - top)
@@ -440,7 +460,7 @@ def main(output):
                 done, total = state["completed"], max(1, state["total"])
                 stage, count = state["stage_index"], state["stage_count"]
                 updated = datetime.fromisoformat(state["updated_at"]).astimezone().strftime("%H:%M:%S")
-                phase.config(text=f"{state['phase']} · {state['state']}")
+                phase.config(text=f"{display_text(state['phase'])} · {state['state']}")
                 detail.config(text=f"{done:,} / {total:,} · {state['failures']:,} failures · updated {updated}")
                 phase_bar.config(maximum=total, value=done)
                 overall.config(text=f"Stage {stage} of {count}")
@@ -448,7 +468,7 @@ def main(output):
                 with (output / "events.log").open("rb") as stream:
                     stream.seek(max(0, stream.seek(0, 2) - 8192))
                     tail = stream.read().decode("utf-8", errors="replace").splitlines()[-5:]
-                events.config(text="Recent events\n" + "\n".join(tail))
+                events.config(text="Recent events\n" + "\n".join(display_text(line) for line in tail))
                 decisions_path = output / "decisions.json"
                 decisions = json.loads(decisions_path.read_text(encoding="utf-8")) if decisions_path.exists() else {}
                 refresh_tree(state, read_timeline(output, now), decisions, now)
