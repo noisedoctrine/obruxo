@@ -28,7 +28,8 @@ from obruxo_training.surrogate_pilot import native_session
 
 BASE = experiment.baseline
 DEVICE, SEED = experiment.DEVICE, experiment.SEED
-CAP_SECONDS, MAX_UPDATES, SAMPLER_STEPS = 5 * 3600, 8_000, 8
+# Stage 2 now runs to its update budget; elapsed-time estimates remain diagnostic only.
+CAP_SECONDS, MAX_UPDATES, SAMPLER_STEPS = math.inf, 8_000, 8
 MILESTONES = tuple(range(0, MAX_UPDATES + 1, 500))
 DIRECT = BASE.MAIN_ROOT / "research/training/outputs/issue185-direct-flow-learning-curves-20261127"
 CONFIGURATION_NAMES = {

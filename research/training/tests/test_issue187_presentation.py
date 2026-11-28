@@ -1,3 +1,4 @@
+import ast
 import importlib.util
 from pathlib import Path
 
@@ -6,6 +7,7 @@ SCRIPT = Path(__file__).resolve().parents[1] / "reports/scripts/show_issue187_pr
 SPEC = importlib.util.spec_from_file_location("show_issue187_progress", SCRIPT)
 MONITOR = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MONITOR)
+RUNNER = SCRIPT.with_name("issue187_surrogate_adapters.py")
 
 
 def test_stage2_configurations_use_adapter_then_frozen_model_names():
@@ -41,6 +43,20 @@ def test_monitor_distinguishes_capped_training_from_an_active_arm():
     assert MONITOR.training_status(capped, active=False) == "Stopped"
     assert MONITOR.training_status(active, active=True) == "In progress"
     assert MONITOR.training_status(complete, active=False) == "Complete"
+
+
+def test_formal_stage2_runs_to_its_update_budget_without_wall_clock_cutoff():
+    tree = ast.parse(RUNNER.read_text(encoding="utf-8"))
+    def names(target):
+        if isinstance(target, ast.Name):
+            yield target.id
+        elif isinstance(target, (ast.Tuple, ast.List)):
+            for child in target.elts:
+                yield from names(child)
+
+    cap = next(node.value for node in ast.walk(tree) if isinstance(node, ast.Assign)
+               and "CAP_SECONDS" in {name for target in node.targets for name in names(target)})
+    assert isinstance(cap, ast.Tuple) and isinstance(cap.elts[0], ast.Attribute) and cap.elts[0].attr == "inf"
 
 
 def test_report_defines_embedded_decoder_and_medium_trunk_once():
