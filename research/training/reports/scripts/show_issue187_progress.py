@@ -90,17 +90,16 @@ def plan_tree():
         arm = [leaf(f"{mode}-load", "Initialize arm", f"Load {mode} arm"),
                leaf(f"{mode}-updates", "Train adapter (up to 8,000 updates)", f"{mode} updates")]
         arm.extend(leaf(f"{mode}-val-{step}", f"Validation checkpoint · {step:,} updates",
-                        f"{mode} validation at {step:,}") for step in (0, 500, 1000, 2000, 4000, 8000))
+                        f"{mode} validation at {step:,}") for step in MILESTONES)
         stage2.append({"id": f"{mode}-arm", "title": f"{mode.title()} adapter arm", "children": arm})
     stage2.append(
         leaf("stage2-gate", "Compare to direct baseline; apply Stage 2 gate", artifact="stage2.json",
              decision="stage2_selected"),
     )
-    stage3 = [
-        leaf("inversion", "Optimize and render 192 inversion cases", "Native Vital inversion"),
-        leaf("stage3-summary", "Summarize inversion and diagnostics", artifact="stage3.json",
-             decision="stage3"),
-    ]
+    stage3 = [leaf(f"stage3-{mode}", f"Optimize and render 192 cases · {mode}",
+                   f"Native Vital inversion with {mode}", artifact=f"stage3-{mode}.json") for mode in ADAPTERS]
+    stage3.append(leaf("stage3-summary", "Summarize inversion and diagnostics", artifact="stage3.json",
+                       decision="stage3"))
     return [
         {"id": "stage1", "title": "Stage 1 · Codec and retrieval screening", "stage": 1,
          "children": stage1},
@@ -126,7 +125,7 @@ def format_elapsed(seconds):
 
 def read_learning_curves(output):
     curves = {"training": {}, "validation": {}}
-    for mode in (*ADAPTERS, "latent", "generator"):
+    for mode in ADAPTERS:
         arm_path = output / f"arm-{mode}.json"
         try:
             arm = json.loads(arm_path.read_text(encoding="utf-8"))
@@ -135,9 +134,9 @@ def read_learning_curves(output):
         training = [(int(row["update"]), float(row["loss"])) for row in arm.get("logs", [])
                     if math.isfinite(float(row["loss"]))]
         validation = []
-        for step in (0, 500, 1000, 2000, 4000, 8000):
-            path = output / f"validation-{mode}-{step}.json"
+        for path in output.glob(f"validation-{mode}-*.json"):
             try:
+                step = int(path.stem.rsplit("-", 1)[1])
                 metrics = json.loads(path.read_text(encoding="utf-8"))["metrics"]
                 loss = float(metrics.get("mel_log1p", metrics["spectral_loss"]))
             except (OSError, ValueError, KeyError, TypeError):
@@ -147,12 +146,14 @@ def read_learning_curves(output):
         if training:
             curves["training"][mode] = training
         if validation:
+            validation.sort()
             curves["validation"][mode] = validation
     return curves
 
 
 ADAPTERS = tuple(f"{arm}-{backbone}" for arm in ("latent", "generator")
                  for backbone in ("residual_mlp", "transformer"))
+MILESTONES = tuple(range(0, 8_001, 500))
 
 
 def main(output):
@@ -243,48 +244,72 @@ def main(output):
 
     def draw_plot(title, series, y, height):
         width = max(200, curve_canvas.winfo_width())
-        curve_canvas.create_text(10, y + 2, text=f"{title} (updates)", anchor="nw", font=heading_font)
-        left = 78
+        curve_canvas.create_text(10, y + 2, text=title, anchor="nw", font=heading_font)
         points = [(x, value) for values in series.values() for x, value in values]
         if not points:
-            top, bottom = y + 75, y + height - 35
-            curve_canvas.create_text(left, (top + bottom) / 2, text="Waiting for Stage 2 data", anchor="w",
+            curve_canvas.create_text(10, y + height / 2, text="Waiting for Stage 2 data", anchor="w",
                                      fill="#555555", font=body_font)
             return
         x_max = max(1, max(x for x, _ in points))
-        y_min, y_max = min(value for _, value in points), max(value for _, value in points)
-        padding = max((y_max - y_min) * .12, abs(y_max) * .02, 1e-8)
-        y_min, y_max = y_min - padding, y_max + padding
-        y_ticks = [y_min + fraction * (y_max - y_min) for fraction in (0., .5, 1.)]
-        y_labels = [f"{value:.3g}" for value in y_ticks]
-        left = max(78, max(body_font.measure(label) for label in y_labels) + 16)
-        right, top, bottom = width - 20, y + 75, y + height - 35
-        for fraction, label in zip((0., .5, 1.), y_labels, strict=True):
-            grid_y = bottom - fraction * (bottom - top)
-            curve_canvas.create_line(left, grid_y, right, grid_y, fill="#e1e1e1")
-            curve_canvas.create_text(left - 8, grid_y, text=label, anchor="e", fill="#555555", font=body_font)
-        curve_canvas.create_line(left, top, left, bottom, fill="#777777")
-        curve_canvas.create_line(left, bottom, right, bottom, fill="#777777")
+        first_update = min(x for x, _ in points)
+        later = {mode: [(x, value) for x, value in values if x > first_update]
+                 for mode, values in series.items()}
+        detail_points = [(x, value) for values in later.values() for x, value in values]
         colors = ("#1464a5", "#7741a7", "#c45820", "#268062")
-        for index, (mode, values) in enumerate(series.items()):
-            coords = []
-            for step, value in values:
-                px = left + step / x_max * (right - left)
-                py = bottom - (value - y_min) / (y_max - y_min) * (bottom - top)
-                coords.extend((px, py))
+        names = {"latent-residual_mlp": "Latent MLP", "latent-transformer": "Latent Transformer",
+                 "generator-residual_mlp": "Generator MLP", "generator-transformer": "Generator Transformer"}
+        legend_y = y + 38
+        slot = (width - 20) / max(1, len(series))
+        for index, mode in enumerate(series):
             color = colors[index % len(colors)]
-            if len(coords) >= 4:
-                curve_canvas.create_line(*coords, fill=color, width=2)
-            for px, py in zip(coords[::2], coords[1::2], strict=True):
-                curve_canvas.create_oval(px - 3, py - 3, px + 3, py + 3, fill=color, outline=color)
-            legend_x = left + index * max(70, (right - left) / len(series))
-            curve_canvas.create_line(legend_x, y + 48, legend_x + 22, y + 48, fill=color, width=2)
-            curve_canvas.create_text(legend_x + 28, y + 48, text=mode, anchor="w", fill=color, font=body_font)
-        for fraction in (0., .5, 1.):
-            tick_x = left + fraction * (right - left)
-            curve_canvas.create_line(tick_x, bottom, tick_x, bottom + 5, fill="#777777")
-            curve_canvas.create_text(tick_x, bottom + 8, text=f"{fraction * x_max:,.0f}", anchor="n",
-                                     fill="#555555", font=body_font)
+            legend_x = 10 + index * slot
+            curve_canvas.create_line(legend_x, legend_y, legend_x + 18, legend_y, fill=color, width=2)
+            curve_canvas.create_text(legend_x + 23, legend_y, text=names.get(mode, mode), anchor="w",
+                                     fill=color, font=body_font)
+
+        def draw_panel(panel_x, panel_width, label, panel_series):
+            panel_points = [(x, value) for values in panel_series.values() for x, value in values]
+            if not panel_points:
+                curve_canvas.create_text(panel_x + 8, y + 68, text=f"{label}: no later points",
+                                         anchor="nw", fill="#555555", font=body_font)
+                return
+            y_min, y_max = min(value for _, value in panel_points), max(value for _, value in panel_points)
+            padding = max((y_max - y_min) * .12, abs(y_max) * .02, 1e-8)
+            y_min, y_max = y_min - padding, y_max + padding
+            y_ticks = [y_min + fraction * (y_max - y_min) for fraction in (0., .5, 1.)]
+            y_labels = [f"{value:.3g}" for value in y_ticks]
+            left = panel_x + max(48, max(body_font.measure(tick) for tick in y_labels) + 12)
+            right, top, bottom = panel_x + panel_width - 8, y + 84, y + height - 32
+            curve_canvas.create_text(panel_x + 8, y + 59, text=label, anchor="nw", fill="#444444",
+                                     font=body_font)
+            for fraction, tick in zip((0., .5, 1.), y_labels, strict=True):
+                grid_y = bottom - fraction * (bottom - top)
+                curve_canvas.create_line(left, grid_y, right, grid_y, fill="#e1e1e1")
+                curve_canvas.create_text(left - 6, grid_y, text=tick, anchor="e", fill="#555555",
+                                         font=body_font)
+            curve_canvas.create_line(left, top, left, bottom, fill="#777777")
+            curve_canvas.create_line(left, bottom, right, bottom, fill="#777777")
+            for index, (mode, values) in enumerate(panel_series.items()):
+                coords = []
+                for step, value in values:
+                    px = left + step / x_max * (right - left)
+                    py = bottom - (value - y_min) / (y_max - y_min) * (bottom - top)
+                    coords.extend((px, py))
+                color = colors[index % len(colors)]
+                if len(coords) >= 4:
+                    curve_canvas.create_line(*coords, fill=color, width=2)
+                for px, py in zip(coords[::2], coords[1::2], strict=True):
+                    curve_canvas.create_oval(px - 3, py - 3, px + 3, py + 3, fill=color, outline=color)
+            for fraction in (0., .5, 1.):
+                tick_x = left + fraction * (right - left)
+                curve_canvas.create_line(tick_x, bottom, tick_x, bottom + 5, fill="#777777")
+                curve_canvas.create_text(tick_x, bottom + 7, text=f"{fraction * x_max:,.0f}", anchor="n",
+                                         fill="#555555", font=body_font)
+
+        gap = 12
+        panel_width = (width - 20 - gap) / 2
+        draw_panel(10, panel_width, "Full y range", series)
+        draw_panel(10 + panel_width + gap, panel_width, "Detail · after first update", later if detail_points else series)
 
     def redraw_curves(_event=None):
         curve_canvas.delete("all")
@@ -374,10 +399,6 @@ def main(output):
                     decision = decisions.get(node["decision"])
                     if node["id"] == "qualify-generator" and decision:
                         status = "Complete"
-                    elif node["id"] == "stage2-gate" and decisions.get("stage3") == "skipped":
-                        status = "Skipped"
-                    elif node["id"] == "stage3-summary" and decision == "skipped":
-                        status = "Skipped"
                     elif decision:
                         status = "Complete"
             if matching:
@@ -389,10 +410,23 @@ def main(output):
                     if not artifact_complete:
                         status = "In progress"
                         seconds = max(seconds, (now - (record["started"] or now)).total_seconds())
-            if node["id"].startswith("generator-") and decisions.get("generator"):
-                status = "Not run"
-            if node["id"] == "inversion" and decisions.get("stage3") == "skipped":
-                status = "Skipped"
+            if node["id"] == "stage2-gate":
+                stage2_state = decisions.get("stage2")
+                if stage2_state in ("analysis_required", "complete"):
+                    status = "Complete"
+                elif stage2_state in ("incomplete", "blocked_missing_verified_audio"):
+                    status = "Stopped"
+                else:
+                    status = "In progress" if stage2_state == "running" else "Upcoming"
+            elif node["id"] == "stage3-summary":
+                stage3_state = decisions.get("stage3")
+                status = {"complete": "Complete", "skipped": "Skipped", "running": "In progress"}.get(
+                    stage3_state, "Upcoming")
+            elif node["id"].startswith("stage3-"):
+                completed = set(decisions.get("completed_configurations", []))
+                if decisions.get("stage2") in ("analysis_required", "complete", "incomplete") \
+                        and node["id"].removeprefix("stage3-") not in completed:
+                    status = "Skipped"
             set_row_status(iid, status)
             tree.set(iid, "elapsed", format_elapsed(seconds))
             elapsed_values[iid] = seconds or 0.

@@ -29,7 +29,7 @@ from obruxo_training.surrogate_pilot import native_session
 BASE = experiment.baseline
 DEVICE, SEED = experiment.DEVICE, experiment.SEED
 CAP_SECONDS, MAX_UPDATES, SAMPLER_STEPS = 5 * 3600, 8_000, 8
-MILESTONES = (0, 500, 1000, 2000, 4000, 8000)
+MILESTONES = tuple(range(0, MAX_UPDATES + 1, 500))
 DIRECT = BASE.MAIN_ROOT / "research/training/outputs/issue185-direct-flow-learning-curves-20261127"
 
 
@@ -526,8 +526,8 @@ def inverse_panel(output, adapter, controls, plan, progress):
     cases = plan["evaluation"]["cases"]
     if len(cases) != 192:
         raise ValueError("Stage 3 requires exactly the 192 Issue 173 cases")
-    progress.set(f"Stage 3 · Native Vital inversion with {adapter.mode}", len(cases), 3)
-    path = output / "stage3-cases.jsonl"
+    progress.set(f"Stage 3 · Native Vital inversion with {adapter.name}", len(cases), 3)
+    path = output / f"stage3-{adapter.name}-cases.jsonl"
     previous = {row["case_id"] for row in experiment.read_rows(path)} if path.exists() else set()
     original_receipts = experiment.receipts(experiment.PROXY_SOURCE)
     torch.xpu.reset_peak_memory_stats()
@@ -589,7 +589,8 @@ def inverse_panel(output, adapter, controls, plan, progress):
     if matched:
         stats["matched_mrstft_difference"] = float(np.mean(differences))
         stats["patch_root_and_midi_interval"] = inversion._bootstrap_interval(matched, differences)
-    BASE.write_json(output / "stage3.json", stats)
+    BASE.write_json(output / f"stage3-{adapter.name}.json", stats)
+    return stats
 
 
 def run_later_stages(output, selection, plan, training, validation, controls, waves, progress, *,
@@ -670,22 +671,48 @@ def run_later_stages(output, selection, plan, training, validation, controls, wa
     available = ("latent", "generator") if generator_name else ("latent",)
     if inversion_decision is not None:
         chosen = experiment.read_json(inversion_decision)
-        mode, backbone = chosen["adapter"].split("-", 1)
-        report = experiment.read_json(output / f"arm-{chosen['adapter']}.json")
-        if chosen["adapter"] not in qualified or report["updates"] != MAX_UPDATES or mode not in available:
-            raise ValueError("Stage 3 requires a selected, qualified, completed Stage 2 arm")
-        generator, context_width, config = generator_model(generator_name, codec) if mode == "generator" else (None,) * 3
-        adapter = Adapter(mode, backbone, codec, width, codec.model.latent_dim, midi, midi_cache,
-                          generator, context_width, config).to(DEVICE)
-        saved = torch.load(output / f"adapter-{adapter.name}-{MAX_UPDATES}.pt", map_location="cpu", weights_only=True)
-        if saved["codec_revision"] != checkpoint.name:
-            raise ValueError("Stage 3 adapter codec differs from the selected checkpoint")
-        adapter.network.load_state_dict(saved["adapter"])
-        adapter.eval().requires_grad_(False)
-        decision.update(stage2="complete", stage2_selected=chosen, stage3="running")
+        adapter_names = chosen.get("adapters", [chosen.get("adapter")])
+        adapter_names = list(dict.fromkeys(name for name in adapter_names if name))
+        reports = experiment.read_json(output / "stage2.json")
+        completed = set(decision.get("completed_configurations", []))
+        invalid = [name for name in adapter_names if name not in qualified or name not in completed
+                   or reports.get(name, {}).get("updates") != MAX_UPDATES or reports.get(name, {}).get("stopped")]
+        if not adapter_names or invalid:
+            raise ValueError(f"Stage 3 requires completed, qualified Stage 2 arms; invalid: {invalid or 'empty list'}")
+        stage3_results_path = output / "stage3.json"
+        stage3_results = experiment.read_json(stage3_results_path) if stage3_results_path.is_file() else {}
+        stage3_results.setdefault("planned_per_configuration", len(plan["evaluation"]["cases"]))
+        configurations = stage3_results.setdefault("configurations", {})
+        decision.update(stage2="complete", stage2_selected={"adapters": adapter_names}, stage3="running")
         BASE.write_json(path, decision)
-        inverse_panel(output, adapter, controls, plan, progress)
+        for name in adapter_names:
+            result_path = output / f"stage3-{name}.json"
+            if result_path.is_file():
+                configurations[name] = experiment.read_json(result_path)
+                continue
+            mode, backbone = name.split("-", 1)
+            generator, context_width, config = generator_model(generator_name, codec) if mode == "generator" else (None,) * 3
+            adapter = Adapter(mode, backbone, codec, width, codec.model.latent_dim, midi, midi_cache,
+                              generator, context_width, config).to(DEVICE)
+            saved = torch.load(output / f"adapter-{name}-{MAX_UPDATES}.pt", map_location="cpu", weights_only=True)
+            if saved["codec_revision"] != checkpoint.name:
+                raise ValueError("Stage 3 adapter codec differs from the selected checkpoint")
+            adapter.network.load_state_dict(saved["adapter"])
+            adapter.eval().requires_grad_(False)
+            decision["stage3_current_configuration"] = name
+            BASE.write_json(path, decision)
+            configurations[name] = inverse_panel(output, adapter, controls, plan, progress)
+            stage3_results["completed_configurations"] = list(configurations)
+            BASE.write_json(stage3_results_path, stage3_results)
+            decision["stage3_completed_configurations"] = list(configurations)
+            BASE.write_json(path, decision)
+            del adapter, generator
+            torch.xpu.empty_cache()
+        stage3_results["completed_configurations"] = list(configurations)
+        BASE.write_json(stage3_results_path, stage3_results)
+        decision["stage3_completed_configurations"] = list(configurations)
         decision["stage3"] = "complete"
+        decision.pop("stage3_current_configuration", None)
         BASE.write_json(path, decision)
         return "complete"
     reports_path = output / "stage2.json"
