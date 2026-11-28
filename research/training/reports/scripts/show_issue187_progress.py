@@ -68,8 +68,9 @@ def read_timeline(output, now):
 
 
 def plan_tree():
-    def leaf(key, title, phase=None, artifact=None, decision=None):
-        return {"id": key, "title": title, "phase": phase, "artifact": artifact, "decision": decision}
+    def leaf(key, title, phase=None, artifact=None, decision=None, training_report=None):
+        return {"id": key, "title": title, "phase": phase, "artifact": artifact,
+                "decision": decision, "training_report": training_report}
 
     stage1 = [leaf("receipts", "Verify input receipts", "Verify input receipts"),
               leaf("waves", "Restore validation audio", artifact="validation-waveforms")]
@@ -89,10 +90,13 @@ def plan_tree():
               leaf("latent-cache", "Cache decoder latents", "Cache decoder input latents")]
     for mode in ADAPTERS:
         name = CONFIGURATION_NAMES[mode]
-        arm = [leaf(f"{mode}-load", "Initialize arm", f"Load {name} arm"),
-               leaf(f"{mode}-updates", "Train adapter (up to 8,000 updates)", f"{name} updates")]
+        report = f"arm-{mode}.json"
+        arm = [leaf(f"{mode}-load", "Initialize arm", f"Load {name} arm", artifact=report),
+               leaf(f"{mode}-updates", "Train adapter (up to 8,000 updates)", f"{name} updates",
+                    training_report=report)]
         arm.extend(leaf(f"{mode}-val-{step}", f"Validation checkpoint · {step:,} updates",
-                        f"{name} validation at {step:,}") for step in MILESTONES)
+                        f"{name} validation at {step:,}", artifact=f"validation-{mode}-{step}.json")
+                    for step in MILESTONES)
         stage2.append({"id": f"{mode}-arm", "title": name, "children": arm})
     stage2.append(
         leaf("stage2-gate", "Compare to direct baseline; apply Stage 2 gate", artifact="stage2.json",
@@ -169,6 +173,18 @@ def display_text(value):
     for internal, display in CONFIGURATION_NAMES.items():
         value = value.replace(internal, display)
     return value
+
+
+def training_status(report, active):
+    if report is None:
+        return None
+    if active:
+        return "In progress"
+    if report.get("updates", 0) >= 8_000:
+        return "Complete"
+    if report.get("stopped"):
+        return "Stopped"
+    return "Checkpoint"
 
 
 def main(output):
@@ -389,8 +405,12 @@ def main(output):
                     status = "Complete"
                 elif statuses and all(value in ("Skipped", "Not run") for value in statuses):
                     status = "Skipped"
-                elif any(value in ("In progress", "Checkpoint") for value in statuses):
+                elif "In progress" in statuses:
                     status = "In progress"
+                elif "Stopped" in statuses:
+                    status = "Stopped"
+                elif "Checkpoint" in statuses:
+                    status = "Checkpoint"
                 elif any(value == "Complete" for value in statuses):
                     status = "In progress"
                 elif node.get("id") == "generator-arm" and decisions.get("generator"):
@@ -430,6 +450,14 @@ def main(output):
                     if not artifact_complete:
                         status = "In progress"
                         seconds = max(seconds, (now - (record["started"] or now)).total_seconds())
+            if node.get("training_report"):
+                report_path = output / node["training_report"]
+                try:
+                    report = json.loads(report_path.read_text(encoding="utf-8"))
+                except (OSError, ValueError):
+                    report = None
+                active = (node.get("phase") in state.get("phase", "") and state.get("state") == "running")
+                status = training_status(report, active) or status
             if node["id"] == "stage2-gate":
                 stage2_state = decisions.get("stage2")
                 if stage2_state in ("analysis_required", "complete"):
