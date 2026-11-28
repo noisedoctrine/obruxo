@@ -27,11 +27,19 @@ $obruxoNativeSite = Join-Path $obruxoConda 'obruxo-data-generation/Lib/site-pack
 | `WinError 5` loading `c10_xpu.dll` | The Windows sandbox can block importing this PyTorch build even for CPU work. Retry the exact authorized Python command with escalation for native DLL access. Check `torch.xpu.is_available()` only for XPU runs. |
 | `gh` cannot reach GitHub or read credentials, or Git cannot create `.git/index.lock` with access denied | Retry the specific authorized command with escalation for network, the Windows keyring, or writes to Git metadata. A sandboxed `gh auth status` failure is insufficient to diagnose expired credentials. |
 
+## Pretrained audio on Intel XPU
+
+- Use `py312` with pinned source checkouts and any extra dependencies in a scratch `pip --target --no-deps` directory. For Stable Audio, reuse the [patches and smoke probe](research/training/reports/issue187_pretrained_vital_surrogates/XPU_SETUP.md). Load only the codec for reconstruction.
+- Pass `device="xpu"` explicitly. Some upstream loaders check only CUDA and disable FP16 on Intel GPUs. Cast during transfer to avoid a full FP32 copy on the GPU. Use the existing PyTorch SDPA fallback if compiled FlexAttention needs an unavailable compiler. Verify tensor placement, dtype, and decoder input gradients when needed.
+- For gated Hugging Face models, verify that the weight file downloads. If Windows blocks cache symlinks, pass `local_dir` to `snapshot_download`. Reuse auxiliary weights and tokenizers when their content hashes match.
+
 ## Long-lived task progress
 
 - For work that will run for several minutes or longer, do not keep the conversation busy with repeated model polling. Run the worker independently with durable logs and a small machine-readable status file, then open a lightweight Python `tkinter` monitor for the user.
-- Keep the monitor focused on the current phase, per-stage completed/total counts, overall progress, failures when available, the last status update, and a few recent log events. Refresh from status/log files every few seconds; avoid heavy rescans.
+- For long XPU retrieval passes, overlap bounded CPU-side hash/WAV reads with the serial device encoder (four readers, queue depth eight); preserve per-item seeds and atomic cache writes. Do not batch pooled encodes without per-checkpoint equivalence: an equal-length two-clip XPU probe shifted SAME-L pooled features by 0.31% relative (SAME-S by 0.0005%), while Open Small also has seed-sensitive VAE sampling.
+- Keep the monitor focused on overall progress, failures, the last update and recent events. Include an expandable side-panel tree of past, active and upcoming stages, tasks and subtasks; show elapsed time for completed and active work from event timestamps, and no fabricated duration for pending tasks. Plot live training and validation curves from arm/checkpoint files when available. Use a visible, wide draggable panel sash, keep a gutter between the elapsed column and panel edge, and let users resize tree columns. Size rows from font metrics on high-DPI displays to prevent clipping. Refresh from status/log files every few seconds; avoid heavy rescans.
 - Include simple Play/Pause and Stop controls for the monitor, and label clearly whether they affect only monitoring or also the worker. Prefer safe, cooperative worker controls if pausing or stopping computation is requested.
+- On Windows high-DPI displays, set Tk process DPI awareness before creating the root window so monitor text stays crisp; launch it visibly in the interactive desktop session.
 - Once the monitor is visible and useful, stop polling continuously; let the user request progress updates when wanted.
 
 # Research findings and experiment reporting

@@ -1,0 +1,466 @@
+{
+  "cache_receipt_diagnosis": {
+    "action": "Do not bypass receipt validation or rerender the corpus. Preserve the 1536 valid cached latents; after locating the exact original waveform or another receipt-compatible source, resume the remaining cache work.",
+    "duration_frames": 180075,
+    "native_readback_paths": {
+      "original": "cached_basic_template / 11 verified loaded scalars",
+      "retry": "full_state_json / 772 verified loaded scalars"
+    },
+    "original_waveform_sha256": "963b69ae\u2026",
+    "request_id": "283cb1c2fccc7a467e0f422fbc8ff6fd687ac7d612f603637168703ff2ee88e4",
+    "retry_waveform_sha256": "d0cb5d26\u2026",
+    "rms_absolute_difference": 2.45e-13,
+    "root_cause": "Not conclusively isolated. Renderer provenance says numeric-tolerance rather than bitwise determinism; readback paths also differ. The original waveform is absent from source pair artifacts, so the exact missing latent cannot be reconstructed from available files.",
+    "same_request_renderer_engine_preset_and_duration": true,
+    "unprocessed_cache_items_at_failure": 638
+  },
+  "carried_forward_baselines": {
+    "cross_midi_common_gallery": {
+      "cir_ast:official_clip": {
+        "recall_at_1": {
+          "estimate": 0.8102325581395349,
+          "family_clusters": 129,
+          "lower_95": 0.7471317829457365,
+          "metric": "recall_at_1",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.8663565891472869
+        },
+        "recall_at_10": {
+          "estimate": 0.9651162790697675,
+          "family_clusters": 129,
+          "lower_95": 0.9446511627906977,
+          "metric": "recall_at_10",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.9810852713178294
+        },
+        "recall_at_5": {
+          "estimate": 0.9356589147286821,
+          "family_clusters": 129,
+          "lower_95": 0.9034108527131783,
+          "metric": "recall_at_5",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.9627906976744186
+        }
+      },
+      "clap_music:official_clip": {
+        "recall_at_1": {
+          "estimate": 0.594108527131783,
+          "family_clusters": 129,
+          "lower_95": 0.508062015503876,
+          "metric": "recall_at_1",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.6768992248062016
+        },
+        "recall_at_10": {
+          "estimate": 0.8736434108527131,
+          "family_clusters": 129,
+          "lower_95": 0.8226356589147287,
+          "metric": "recall_at_10",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.915968992248062
+        },
+        "recall_at_5": {
+          "estimate": 0.7989147286821705,
+          "family_clusters": 129,
+          "lower_95": 0.7330232558139534,
+          "metric": "recall_at_5",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.8584496124031008
+        }
+      },
+      "vital_jepa_v7:clip": {
+        "recall_at_1": {
+          "estimate": 0.2910077519379845,
+          "family_clusters": 129,
+          "lower_95": 0.22992248062015505,
+          "metric": "recall_at_1",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.3558139534883721
+        },
+        "recall_at_10": {
+          "estimate": 0.6696124031007752,
+          "family_clusters": 129,
+          "lower_95": 0.6049612403100775,
+          "metric": "recall_at_10",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.7334883720930233
+        },
+        "recall_at_5": {
+          "estimate": 0.5409302325581395,
+          "family_clusters": 129,
+          "lower_95": 0.471937984496124,
+          "metric": "recall_at_5",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.6102325581395349
+        }
+      }
+    },
+    "cross_midi_mixed_gallery": {
+      "cir_ast:official_clip": {
+        "recall_at_1": {
+          "estimate": 0.8094573643410853,
+          "family_clusters": 129,
+          "lower_95": 0.7706976744186047,
+          "metric": "recall_at_1",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.8443410852713178
+        },
+        "recall_at_10": {
+          "estimate": 0.9685271317829457,
+          "family_clusters": 129,
+          "lower_95": 0.9547286821705426,
+          "metric": "recall_at_10",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.9803100775193798
+        },
+        "recall_at_5": {
+          "estimate": 0.9387596899224806,
+          "family_clusters": 129,
+          "lower_95": 0.9184496124031007,
+          "metric": "recall_at_5",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.9572093023255814
+        }
+      },
+      "clap_music:official_clip": {
+        "recall_at_1": {
+          "estimate": 0.5503875968992248,
+          "family_clusters": 129,
+          "lower_95": 0.5015503875968992,
+          "metric": "recall_at_1",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.5984496124031008
+        },
+        "recall_at_10": {
+          "estimate": 0.8367441860465116,
+          "family_clusters": 129,
+          "lower_95": 0.8065116279069767,
+          "metric": "recall_at_10",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.8652713178294573
+        },
+        "recall_at_5": {
+          "estimate": 0.757829457364341,
+          "family_clusters": 129,
+          "lower_95": 0.7184496124031008,
+          "metric": "recall_at_5",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.7936434108527132
+        }
+      },
+      "vital_jepa_v7:clip": {
+        "recall_at_1": {
+          "estimate": 0.2950387596899225,
+          "family_clusters": 129,
+          "lower_95": 0.25209302325581395,
+          "metric": "recall_at_1",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.33798449612403103
+        },
+        "recall_at_10": {
+          "estimate": 0.615968992248062,
+          "family_clusters": 129,
+          "lower_95": 0.5688372093023256,
+          "metric": "recall_at_10",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.6613953488372093
+        },
+        "recall_at_5": {
+          "estimate": 0.4989147286821705,
+          "family_clusters": 129,
+          "lower_95": 0.4496124031007752,
+          "metric": "recall_at_5",
+          "performance_clusters": 50,
+          "replicates": 2000,
+          "seed": 152,
+          "upper_95": 0.5457364341085271
+        }
+      }
+    }
+  },
+  "control_scope": "Frozen Stage 1 representations and codec reconstruction only; no Vital controls are predicted or edited.",
+  "dac_disposition": "The existing expanded held-out frozen-encoder report gives prior DAC retrieval results. They use the same gallery size and count but a different episode snapshot, so they are retained as historical reference rather than pooled with the Issue 167 v7 panel.",
+  "dataset": {
+    "distinct_query_midi_performances": 50,
+    "episodes_per_condition": {
+      "cross_midi_common_gallery": 6450,
+      "cross_midi_mixed_gallery": 6450
+    },
+    "gallery_sizes": [
+      129
+    ],
+    "preset_families": 129,
+    "source": "Issue 167 v7 shared panel",
+    "total_episodes": 12900
+  },
+  "issue": 187,
+  "new_encoders": {
+    "open-small": {
+      "reconstruction": {
+        "attack_envelope_error_db": 2.7372204255540424,
+        "attack_frames": 1114,
+        "clips": 256,
+        "decay_envelope_error_db": 1.975019089961941,
+        "decay_frames": 1314,
+        "decode_seconds": 0.42713201718737537,
+        "decoder_gradient_norm": 1.8476467289474385e-07,
+        "encode_seconds": 0.40014801914105647,
+        "latent_bytes": 20352.0,
+        "log_magnitude_mae": 0.17944213223017869,
+        "midi_performances": 16,
+        "monophonic_frames": 2804,
+        "monophonic_frames_total": 2804,
+        "monophonic_octave_energy_error_db": 7.866454947023719,
+        "mrstft": 1.0550344487322338,
+        "octave_band_energy_error_db": 7.648654319017801,
+        "octave_band_frames": 5409,
+        "octave_band_total_frames": 8192,
+        "patch_roots": 64,
+        "release_envelope_error_db": 21.57284222673922,
+        "release_frames": 1914,
+        "revision": "ea2772170fc06f80dfd02bea6e57a44d9d4bc9d3",
+        "rms_relative": 0.13682394797024244,
+        "side_to_mid_error_db": 1.8736988065244025,
+        "spectral_convergence": 0.2232842130906647,
+        "spectral_loss": 0.20136317246033286,
+        "sustain_envelope_error_db": 2.4684000864987437,
+        "sustain_frames": 1472
+      },
+      "retrieval": {
+        "cross_midi_common_gallery": {
+          "episodes": 6450,
+          "mrr": 0.4854994183666568,
+          "recall_at_1": 0.39085271317829456,
+          "recall_at_10": 0.6675968992248063,
+          "recall_at_1_clustered_95": {
+            "family_clusters": 129,
+            "lower": 0.3169,
+            "performance_clusters": 50,
+            "replicates": 2000,
+            "seed": 187,
+            "upper": 0.4699
+          },
+          "recall_at_5": 0.5880620155038759
+        },
+        "cross_midi_mixed_gallery": {
+          "episodes": 6450,
+          "mrr": 0.478480019200261,
+          "recall_at_1": 0.38992248062015505,
+          "recall_at_10": 0.6479069767441861,
+          "recall_at_1_clustered_95": {
+            "family_clusters": 129,
+            "lower": 0.3366,
+            "performance_clusters": 50,
+            "replicates": 2000,
+            "seed": 187,
+            "upper": 0.4428
+          },
+          "recall_at_5": 0.5671317829457364
+        }
+      }
+    },
+    "same-l": {
+      "reconstruction": {
+        "attack_envelope_error_db": 1.911817974929093,
+        "attack_frames": 1114,
+        "clips": 256,
+        "decay_envelope_error_db": 1.027734859456768,
+        "decay_frames": 1314,
+        "decode_seconds": 0.39278003437499365,
+        "decoder_gradient_norm": 8.799008099913408e-08,
+        "encode_seconds": 0.38970036718750833,
+        "latent_bytes": 40960.0,
+        "log_magnitude_mae": 0.281861646741163,
+        "midi_performances": 16,
+        "monophonic_frames": 2804,
+        "monophonic_frames_total": 2804,
+        "monophonic_octave_energy_error_db": 9.627209343052558,
+        "mrstft": 2.22409665411639,
+        "octave_band_energy_error_db": 12.322761252890274,
+        "octave_band_frames": 5409,
+        "octave_band_total_frames": 8192,
+        "patch_roots": 64,
+        "release_envelope_error_db": 23.971191947785087,
+        "release_frames": 1914,
+        "revision": "54b0fe9c9fc27aa1d5eac36402788efea15f73eb",
+        "rms_relative": 0.06978207604651487,
+        "side_to_mid_error_db": 1.5981340704338676,
+        "spectral_convergence": 0.12623996471847931,
+        "spectral_loss": 0.20405080622731475,
+        "sustain_envelope_error_db": 1.7673362607759158,
+        "sustain_frames": 1472
+      },
+      "retrieval": {
+        "cross_midi_common_gallery": {
+          "episodes": 6450,
+          "recall_at_1": 0.4167,
+          "recall_at_10": 0.7080620155038759,
+          "recall_at_5": 0.6251162790697674
+        },
+        "cross_midi_mixed_gallery": {
+          "episodes": 6450,
+          "recall_at_1": 0.4212,
+          "recall_at_10": 0.6936434108527132,
+          "recall_at_5": 0.6105426356589148
+        }
+      }
+    },
+    "same-s": {
+      "reconstruction": {
+        "attack_envelope_error_db": 2.240243574733854,
+        "attack_frames": 1114,
+        "clips": 256,
+        "decay_envelope_error_db": 1.1914085018756908,
+        "decay_frames": 1314,
+        "decode_seconds": 0.05155635585936835,
+        "decoder_gradient_norm": 1.83907218342938e-07,
+        "encode_seconds": 0.05397413437496823,
+        "latent_bytes": 41216.0,
+        "log_magnitude_mae": 0.34048804800841026,
+        "midi_performances": 16,
+        "monophonic_frames": 2804,
+        "monophonic_frames_total": 2804,
+        "monophonic_octave_energy_error_db": 12.29871757788608,
+        "mrstft": 2.9935192061044895,
+        "octave_band_energy_error_db": 14.452720659746554,
+        "octave_band_frames": 5409,
+        "octave_band_total_frames": 8192,
+        "patch_roots": 64,
+        "release_envelope_error_db": 26.383595310639045,
+        "release_frames": 1914,
+        "revision": "63a63b7193ee9b6ee9836776c5f3c52a2f9600df",
+        "rms_relative": 0.08610434374713805,
+        "side_to_mid_error_db": 1.1046468800094207,
+        "spectral_convergence": 0.18372913951679948,
+        "spectral_loss": 0.2621085930732079,
+        "sustain_envelope_error_db": 2.235797630815637,
+        "sustain_frames": 1472
+      },
+      "retrieval": {
+        "cross_midi_common_gallery": {
+          "episodes": 6450,
+          "mrr": 0.5037971257556008,
+          "recall_at_1": 0.40434108527131785,
+          "recall_at_10": 0.7009302325581396,
+          "recall_at_1_clustered_95": {
+            "family_clusters": 129,
+            "lower": 0.329,
+            "performance_clusters": 50,
+            "replicates": 2000,
+            "seed": 187,
+            "upper": 0.4834
+          },
+          "recall_at_5": 0.6110077519379845
+        },
+        "cross_midi_mixed_gallery": {
+          "episodes": 6450,
+          "mrr": 0.4991444039155076,
+          "recall_at_1": 0.4055813953488372,
+          "recall_at_10": 0.6854263565891473,
+          "recall_at_1_clustered_95": {
+            "family_clusters": 129,
+            "lower": 0.3505,
+            "performance_clusters": 50,
+            "replicates": 2000,
+            "seed": 187,
+            "upper": 0.4594
+          },
+          "recall_at_5": 0.5978294573643411
+        }
+      }
+    }
+  },
+  "paired_cluster_bootstrap_95": {
+    "deltas_recall_at_1": {
+      "cross_midi_common_gallery": {
+        "same-l_minus_open-small": {
+          "estimate": 0.0259,
+          "lower": -0.0079,
+          "upper": 0.0609
+        },
+        "same-l_minus_same-s": {
+          "estimate": 0.0124,
+          "lower": 0.004,
+          "upper": 0.0223
+        },
+        "same-s_minus_open-small": {
+          "estimate": 0.0135,
+          "lower": -0.0206,
+          "upper": 0.0484
+        }
+      },
+      "cross_midi_mixed_gallery": {
+        "same-l_minus_open-small": {
+          "estimate": 0.0313,
+          "lower": 0.0025,
+          "upper": 0.0617
+        },
+        "same-l_minus_same-s": {
+          "estimate": 0.0157,
+          "lower": 0.0071,
+          "upper": 0.0251
+        },
+        "same-s_minus_open-small": {
+          "estimate": 0.0157,
+          "lower": -0.0138,
+          "upper": 0.0459
+        }
+      }
+    },
+    "method": "Two-way paired bootstrap over preset-family and MIDI-performance clusters; 2000 replicates, seed 187."
+  },
+  "retrieval_metric": "Recall@k is the share of queries whose exact target preset is ranked in the top k; higher is better.",
+  "run_status": {
+    "completed": 1536,
+    "failures": 1,
+    "message": "expanded-0514:original failed the native render receipt comparison; preserve the 1536 verified cached latents and do not bypass the receipt guard.",
+    "phase": "Stage 2 \u00b7 Cache decoder input latents",
+    "state": "failed",
+    "total": 2174,
+    "updated_at": "2026-11-27T20:29:50Z"
+  },
+  "snapshot_utc": "2026-11-27T20:29:50Z",
+  "stage": 1,
+  "stage1_selection": {
+    "gate": "spectral_loss < 0.5551536325147026, finite MR-STFT, and finite nonzero decoder gradient",
+    "rationale": "Operational codec/generator readiness only. Compatible generator candidates passed; SAME-L had lower spectral loss than SAME-S. Open Small had lower standalone loss but no registered compatible generator. Retrieval does not establish SAME-L as best overall.",
+    "selected_codec_family": "same-l",
+    "selected_generator_codec_revision": "d4d3579395a8ac0df4ab13b5b1d7138ce7290f81",
+    "stage2_training_completed": false
+  },
+  "uncertainty_note": "New encoder intervals and paired deltas use two-way preset-family \u00d7 MIDI-performance cluster bootstrap (2000 replicates, seed 187); baseline intervals are carried forward from Issue 167 v7 (2000 replicates, seed 152). The intervals generalize only over the sampled panel and its two cluster dimensions."
+}

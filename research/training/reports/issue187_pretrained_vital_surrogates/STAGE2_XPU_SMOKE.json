@@ -1,0 +1,165 @@
+{
+  "device": "xpu:0",
+  "direct_decoder": [
+    {
+      "audio_shape": [
+        1,
+        2,
+        40960
+      ],
+      "backbone": "residual_mlp",
+      "codec_frozen": true,
+      "forward_backward_seconds": 1.9607338000023447,
+      "latent_shape": [
+        1,
+        256,
+        10
+      ],
+      "patch_gradient_norm": 0.0006691066082566977,
+      "peak_allocated_bytes": 536314368,
+      "trainable_parameters": 200704
+    },
+    {
+      "audio_shape": [
+        1,
+        2,
+        40960
+      ],
+      "backbone": "transformer",
+      "codec_frozen": true,
+      "forward_backward_seconds": 0.27947969999877387,
+      "latent_shape": [
+        1,
+        256,
+        10
+      ],
+      "patch_gradient_norm": 0.000768186233472079,
+      "peak_allocated_bytes": 537488896,
+      "trainable_parameters": 201152
+    }
+  ],
+  "generator_condition_width": 768,
+  "generator_conditioning": [
+    {
+      "backbone": "residual_mlp",
+      "conditioning_gradient_abs_max": "NaN",
+      "conditioning_gradient_finite": false,
+      "decoded_audio_finite": true,
+      "decoded_audio_shape": [
+        1,
+        2,
+        49152
+      ],
+      "decoder_latent_gradient_abs_max": 64.29850006103516,
+      "decoder_latent_gradient_finite": true,
+      "forward_backward_seconds": 1.3893641999966349,
+      "generator_frozen": true,
+      "peak_allocated_bytes": 1702774784,
+      "sampler_forward_finite": true,
+      "sampler_steps": 2,
+      "status": "failed_backward",
+      "trainable_parameters": 233984,
+      "trajectory": [
+        {
+          "latent_abs_max": 3.5366859436035156,
+          "latent_finite": true,
+          "time": 0.75,
+          "velocity_abs_max": 177.125,
+          "velocity_finite": true
+        },
+        {
+          "latent_abs_max": 86.173583984375,
+          "latent_finite": true,
+          "time": 0.25,
+          "velocity_abs_max": 371.5,
+          "velocity_finite": true
+        }
+      ]
+    },
+    {
+      "backbone": "transformer",
+      "conditioning_gradient_abs_max": "NaN",
+      "conditioning_gradient_finite": false,
+      "decoded_audio_finite": true,
+      "decoded_audio_shape": [
+        1,
+        2,
+        49152
+      ],
+      "decoder_latent_gradient_abs_max": 93.16405487060547,
+      "decoder_latent_gradient_finite": true,
+      "forward_backward_seconds": 0.5226075000027777,
+      "generator_frozen": true,
+      "peak_allocated_bytes": 1700711424,
+      "sampler_forward_finite": true,
+      "sampler_steps": 2,
+      "status": "failed_backward",
+      "trainable_parameters": 234432,
+      "trajectory": [
+        {
+          "latent_abs_max": 3.5366859436035156,
+          "latent_finite": true,
+          "time": 0.75,
+          "velocity_abs_max": 174.0,
+          "velocity_finite": true
+        },
+        {
+          "latent_abs_max": 85.05125427246094,
+          "latent_finite": true,
+          "time": 0.25,
+          "velocity_abs_max": 406.0,
+          "velocity_finite": true
+        }
+      ]
+    }
+  ],
+  "generator_qualification_rerun": {
+    "codec_checkpoint": "stabilityai/SAME-S@63a63b7193ee9b6ee9836776c5f3c52a2f9600df",
+    "condition_width": 768,
+    "device": "xpu:0",
+    "diagnosis": "Both sampler forward paths and decoded audio are finite. The first observed nonfinite values are gradients at generator conditioning during backpropagation; decoder-latent gradients are finite. Both independent native single-step flow-matching objectives pass with finite, nonzero patch and adapter gradients.",
+    "generator_weights_frozen": true,
+    "midi_input": "synthetic smoke fixture [1,512,768], first 25 frames valid; MIDI encoder itself has separate real-checkpoint XPU parity result above",
+    "sdpa_backend": "upstream default; no test-only override",
+    "stable_audio_checkpoint": "stabilityai/stable-audio-3-small-music@8bdfb53c6b0fbc62113cd571fd37373efe15fa14"
+  },
+  "generator_training_objective": [
+    {
+      "backbone": "residual_mlp",
+      "forward_backward_seconds": 2.9208485999988625,
+      "generator_frozen": true,
+      "loss": 4396.35498046875,
+      "patch_gradient_norm": 628.7434692382812,
+      "peak_allocated_bytes": 1595973120,
+      "status": "passed",
+      "trainable_parameters": 233984,
+      "velocity_abs_max": 180.0
+    },
+    {
+      "backbone": "transformer",
+      "forward_backward_seconds": 0.3095434999995632,
+      "generator_frozen": true,
+      "loss": 3432.4873046875,
+      "patch_gradient_norm": 702.771240234375,
+      "peak_allocated_bytes": 1600805376,
+      "status": "passed",
+      "trainable_parameters": 234432,
+      "velocity_abs_max": 176.875
+    }
+  ],
+  "midi_encoder": {
+    "cpu_reference_max_abs": 0.0,
+    "cpu_xpu_max_abs": 5.960464477539062e-07,
+    "device": "xpu:0",
+    "encoder_parameters_frozen": true,
+    "forward_seconds": 1.2483285000016622,
+    "peak_allocated_bytes": 13623296,
+    "shape": [
+      1,
+      512,
+      768
+    ],
+    "xpu_reference_max_abs": 5.960464477539063e-08
+  },
+  "midi_encoder_revision": "9a3eff857e821c91f21a05bda8048b7541f4d9e4"
+}

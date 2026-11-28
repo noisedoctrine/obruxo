@@ -1,0 +1,16 @@
+{
+  "config_sha256": "53c0d9d53d6e153ce90b38514dab033bfa283c89cf894847e5252435570c6262",
+  "extracted_encoder": {
+    "parameter_count": 56160,
+    "revision": "9a3eff857e821c91f21a05bda8048b7541f4d9e4",
+    "tensor_count": 10
+  },
+  "extracted_encoder_sha256": "52cc59780c5c325c0ec21fb2f6f44599e39d12ca05777ce1027f3c4169333046",
+  "full_checkpoint_sha256": "5a6b4b420e60ca8e0d2a328b761513d7e3b4c377434cec5b7ff4ad258a3d5ae6",
+  "license": "Apache-2.0",
+  "model_subdirectory": "v3-sq-v8-127750step",
+  "repository": "https://huggingface.co/mimbres/spansynth-edit",
+  "revision": "9a3eff857e821c91f21a05bda8048b7541f4d9e4",
+  "upstream_source": "https://github.com/mimbres/spansynth-edit",
+  "upstream_source_revision": "f593bf21e48cc4aa836002a3834cfae42e8d4254"
+}
