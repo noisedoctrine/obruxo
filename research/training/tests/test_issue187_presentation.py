@@ -8,6 +8,7 @@ SPEC = importlib.util.spec_from_file_location("show_issue187_progress", SCRIPT)
 MONITOR = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MONITOR)
 RUNNER = SCRIPT.with_name("issue187_surrogate_adapters.py")
+CLI = SCRIPT.with_name("run_issue187_surrogates.py")
 
 
 def test_stage2_configurations_use_adapter_then_frozen_model_names():
@@ -39,10 +40,11 @@ def test_stage2_configurations_use_adapter_then_frozen_model_names():
 def test_monitor_distinguishes_capped_training_from_an_active_arm():
     capped = {"updates": 5_483, "stopped": "the arm reached its five-hour cap during an update"}
     active = {"updates": 1_200, "stopped": None}
-    complete = {"updates": 8_000, "stopped": None}
+    complete = {"updates": 5_500, "stopped": None}
     assert MONITOR.training_status(capped, active=False) == "Stopped"
     assert MONITOR.training_status(active, active=True) == "In progress"
     assert MONITOR.training_status(complete, active=False) == "Complete"
+    assert MONITOR.training_status({"updates": 5_501, "stopped": None}, active=False) == "Over budget"
 
 
 def test_formal_stage2_runs_to_its_update_budget_without_wall_clock_cutoff():
@@ -57,6 +59,16 @@ def test_formal_stage2_runs_to_its_update_budget_without_wall_clock_cutoff():
     cap = next(node.value for node in ast.walk(tree) if isinstance(node, ast.Assign)
                and "CAP_SECONDS" in {name for target in node.targets for name in names(target)})
     assert isinstance(cap, ast.Tuple) and isinstance(cap.elts[0], ast.Attribute) and cap.elts[0].attr == "inf"
+    maximum = next(node.value for node in ast.walk(tree) if isinstance(node, ast.Assign)
+                   and "MAX_UPDATES" in {name for target in node.targets for name in names(target)})
+    assert isinstance(maximum, ast.Tuple) and maximum.elts[1].value == 5_500
+    cli = ast.parse(CLI.read_text(encoding="utf-8"))
+    target_argument = next(node for node in ast.walk(cli) if isinstance(node, ast.Call)
+                           and isinstance(node.func, ast.Attribute) and node.func.attr == "add_argument"
+                           and node.args and isinstance(node.args[0], ast.Constant)
+                           and node.args[0].value == "--target-step")
+    choices = next(keyword.value for keyword in target_argument.keywords if keyword.arg == "choices")
+    assert tuple(value.value for value in choices.elts) == (500, 5500)
 
 
 def test_stage2_finishes_stable_audio_3_medium_arms_before_same_l():
@@ -65,6 +77,8 @@ def test_stage2_finishes_stable_audio_3_medium_arms_before_same_l():
                  and any(isinstance(target, ast.Name) and target.id == "available" for target in node.targets))
     assert isinstance(modes, ast.IfExp)
     assert tuple(element.value for element in modes.body.elts) == ("generator", "latent")
+    assert MONITOR.MILESTONES[-1] == 5_500
+    assert MONITOR.plan_tree()[1]["children"][2]["children"][1]["title"] == "Train adapter (up to 5,500 updates)"
 
 
 def test_report_defines_embedded_decoder_and_medium_trunk_once():

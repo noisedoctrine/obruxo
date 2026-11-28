@@ -30,7 +30,7 @@ from obruxo_training.surrogate_pilot import native_session
 BASE = experiment.baseline
 DEVICE, SEED = experiment.DEVICE, experiment.SEED
 # Stage 2 now runs to its update budget; elapsed-time estimates remain diagnostic only.
-CAP_SECONDS, MAX_UPDATES, SAMPLER_STEPS = math.inf, 8_000, 8
+CAP_SECONDS, MAX_UPDATES, SAMPLER_STEPS = math.inf, 5_500, 8
 MILESTONES = tuple(range(0, MAX_UPDATES + 1, 500))
 DIRECT = BASE.MAIN_ROOT / "research/training/outputs/issue185-direct-flow-learning-curves-20261127"
 CONFIGURATION_NAMES = {
@@ -308,7 +308,7 @@ def validate(adapter, rows, controls, latents, waves, deadline, output, step, pr
                 wave = predicted[0].T.cpu().numpy()
                 waveform_path = (reconstructed / f"{case_id}.wav").resolve()
                 record["forward_seconds"] = seconds
-                if step in (500, 8000) and index in (0, 32, 64, 96):
+                if step in (500, MAX_UPDATES) and index in (0, 32, 64, 96):
                     listening = output / "listening"
                     listening.mkdir(exist_ok=True)
                     name = f"{row['pair_id']}-{role}-{adapter.name}-{step}.wav"
@@ -371,8 +371,15 @@ def arm(output, adapter, training, validation, controls, latents, waves, direct,
     frozen_versions = [p._version for p in frozen_parameters]
     if resume_path.is_file():
         saved = torch.load(resume_path, map_location="cpu", weights_only=True)
-        if saved["cap"] != cap or saved["codec_revision"] != adapter.codec.checkpoint.name:
+        if saved["cap"] not in (cap, 8_000) or saved["codec_revision"] != adapter.codec.checkpoint.name:
             raise ValueError("adapter checkpoint differs from this experiment configuration")
+        if saved["update"] > MAX_UPDATES:
+            bounded_path = output / f"adapter-{adapter.name}-{MAX_UPDATES}.pt"
+            if not bounded_path.is_file():
+                raise ValueError(f"cannot resume {adapter.name} within the 5,500-update budget")
+            saved = torch.load(bounded_path, map_location="cpu", weights_only=True)
+            saved["cap"] = cap
+            BASE.atomic_torch_save(resume_path, saved)
         adapter.network.load_state_dict(saved["adapter"])
         optimizer.load_state_dict(saved["optimizer"])
         rng.set_state(saved["rng"])
@@ -770,8 +777,8 @@ def run_later_stages(output, selection, plan, training, validation, controls, wa
         BASE.write_json(path, decision)
         return "qualified" if qualified else "blocked"
 
-    finished = {name: report["checkpoints"]["8000"] for name, report in reports.items()
-                if "8000" in report["checkpoints"]}
+    finished = {name: report["checkpoints"][str(MAX_UPDATES)] for name, report in reports.items()
+                if str(MAX_UPDATES) in report["checkpoints"]}
     pilot_ready = any(report["updates"] >= 500 and not report["stopped"] for report in reports.values())
     state = "analysis_required" if finished else "pilot_complete" if pilot_ready else "incomplete"
     decision.update(stage2=state,

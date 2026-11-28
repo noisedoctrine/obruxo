@@ -376,7 +376,7 @@ if __name__ == "__main__":
     parser.add_argument("--midi-checkpoint", type=Path, help="extracted frozen SpanSynth-Edit MIDI encoder")
     parser.add_argument("--smoke", action="store_true", help="one disposable optimizer update and full validation")
     parser.add_argument("--qualification", type=Path, help="passing selected-model qualification decisions")
-    parser.add_argument("--target-step", type=int, choices=(500, 8000), default=500)
+    parser.add_argument("--target-step", type=int, choices=(500, 5500), default=500)
     parser.add_argument("--inversion-decision", type=Path, help="reviewed Stage 2 selection to take to Stage 3")
     args = parser.parse_args()
     if args.selection and not all((args.prior_run, args.recovered, args.midi_checkpoint)):

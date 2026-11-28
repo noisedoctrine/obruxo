@@ -92,7 +92,7 @@ def plan_tree():
         name = CONFIGURATION_NAMES[mode]
         report = f"arm-{mode}.json"
         arm = [leaf(f"{mode}-load", "Initialize arm", f"Load {name} arm", artifact=report),
-               leaf(f"{mode}-updates", "Train adapter (up to 8,000 updates)", f"{name} updates",
+               leaf(f"{mode}-updates", f"Train adapter (up to {MAX_UPDATES:,} updates)", f"{name} updates",
                     training_report=report)]
         arm.extend(leaf(f"{mode}-val-{step}", f"Validation checkpoint · {step:,} updates",
                         f"{name} validation at {step:,}", artifact=f"validation-{mode}-{step}.json")
@@ -166,7 +166,8 @@ CONFIGURATION_NAMES = {
     "generator-residual_mlp": "Residual MLP + Stable Audio 3 Medium",
     "generator-transformer": "Transformer + Stable Audio 3 Medium",
 }
-MILESTONES = tuple(range(0, 8_001, 500))
+MAX_UPDATES = 5_500
+MILESTONES = tuple(range(0, MAX_UPDATES + 1, 500))
 
 
 def display_text(value):
@@ -180,8 +181,10 @@ def training_status(report, active):
         return None
     if active:
         return "In progress"
-    if report.get("updates", 0) >= 8_000:
+    if report.get("updates", 0) == MAX_UPDATES:
         return "Complete"
+    if report.get("updates", 0) > MAX_UPDATES:
+        return "Over budget"
     if report.get("stopped"):
         return "Stopped"
     return "Checkpoint"
