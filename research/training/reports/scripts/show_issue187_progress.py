@@ -35,7 +35,12 @@ def read_timeline(output, now):
                 timestamp, phase, done, total, state = match.groups()
                 phase = display_text(phase)
                 source_events.append((datetime.fromisoformat(timestamp), phase, int(done), int(total), state))
-        events.extend(source_events)
+        receipt_starts = [index for index, item in enumerate(source_events)
+                          if item[1] == "Stage 1 · Verify input receipts" and item[2] == 0]
+        latest_receipt = receipt_starts[-1] if receipt_starts else None
+        events.extend(item for index, item in enumerate(source_events)
+                      if item[1] != "Stage 1 · Verify input receipts" or latest_receipt is None
+                      or index >= latest_receipt)
     if not events:
         return {}
     events.sort(key=lambda item: item[0])
@@ -377,6 +382,8 @@ def main(output):
         for iid, node in items.items():
             if node.get("stage"):
                 stage = node["stage"]
+                stage_events = [row for phase_name, row in records.items()
+                                if phase_name.startswith(f"Stage {stage} ·")]
                 if state.get("state") in ("complete", "failed") and stage <= current_stage:
                     status = "Complete" if state.get("state") == "complete" else "Stopped"
                 elif stage < current_stage:
@@ -386,8 +393,7 @@ def main(output):
                 elif stage == current_stage and state.get("state") == "failed":
                     status = "Stopped"
                 else:
-                    status = "Upcoming"
-                stage_events = [row for phase_name, row in records.items() if phase_name.startswith(f"Stage {stage} ·")]
+                    status = "Checkpoint" if stage_events else "Upcoming"
                 seconds = sum(row["seconds"] for row in stage_events)
                 stage_start = min((row["started"] for row in stage_events if row["started"]), default=None)
                 if status == "In progress" and stage_start:

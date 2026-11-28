@@ -54,12 +54,15 @@ def test_monitor_keeps_elapsed_history_from_before_a_worker_restart(tmp_path):
     (output / "events.log").write_text(
         "2026-11-28T09:00:00+00:00 Stage 2 · arm updates: 0/100 (running)\n"
         "2026-11-28T09:00:12+00:00 Stage 2 · arm updates: 100/100 (complete)\n"
+        "2026-11-28T08:00:00+00:00 Stage 1 · Verify input receipts: 0/1 (running)\n"
+        "2026-11-28T08:30:00+00:00 Stage 1 · Verify input receipts: 1/1 (running)\n"
         "2026-11-28T09:10:00+00:00 Stage 1 · Verify input receipts: 0/1 (running)\n"
         "2026-11-28T09:10:01+00:00 Stage 1 · Verify input receipts: 1/1 (running)\n",
         encoding="utf-8",
     )
     records = MONITOR.read_timeline(output, datetime(2026, 11, 28, 9, 11, tzinfo=timezone.utc))
     assert records["Stage 2 · arm updates"]["seconds"] == 12
+    assert records["Stage 1 · Verify input receipts"]["seconds"] == 1
 
 
 def test_monitor_hides_curve_points_above_the_current_update_budget(tmp_path):
