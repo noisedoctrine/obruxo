@@ -1,4 +1,5 @@
 import ast
+from datetime import datetime, timezone
 import importlib.util
 from pathlib import Path
 
@@ -44,7 +45,32 @@ def test_monitor_distinguishes_capped_training_from_an_active_arm():
     assert MONITOR.training_status(capped, active=False) == "Stopped"
     assert MONITOR.training_status(active, active=True) == "In progress"
     assert MONITOR.training_status(complete, active=False) == "Complete"
-    assert MONITOR.training_status({"updates": 5_501, "stopped": None}, active=False) == "Over budget"
+    assert MONITOR.training_status({"updates": 5_800, "stopped": None}, active=False) == "Checkpoint"
+
+
+def test_monitor_keeps_elapsed_history_from_before_a_worker_restart(tmp_path):
+    output = tmp_path / "run"
+    output.mkdir()
+    (output / "events.log").write_text(
+        "2026-11-28T09:00:00+00:00 Stage 2 · arm updates: 0/100 (running)\n"
+        "2026-11-28T09:00:12+00:00 Stage 2 · arm updates: 100/100 (complete)\n"
+        "2026-11-28T09:10:00+00:00 Stage 1 · Verify input receipts: 0/1 (running)\n"
+        "2026-11-28T09:10:01+00:00 Stage 1 · Verify input receipts: 1/1 (running)\n",
+        encoding="utf-8",
+    )
+    records = MONITOR.read_timeline(output, datetime(2026, 11, 28, 9, 11, tzinfo=timezone.utc))
+    assert records["Stage 2 · arm updates"]["seconds"] == 12
+
+
+def test_monitor_hides_curve_points_above_the_current_update_budget(tmp_path):
+    (tmp_path / "arm-latent-residual_mlp.json").write_text(
+        '{"logs":[{"update":5500,"loss":0.2},{"update":5800,"loss":0.1}]}', encoding="utf-8")
+    for step, value in ((5500, 0.2), (8000, 0.1)):
+        (tmp_path / f"validation-latent-residual_mlp-{step}.json").write_text(
+            f'{{"metrics":{{"mel_log1p":{value},"spectral_loss":{value}}}}}', encoding="utf-8")
+    curves = MONITOR.read_learning_curves(tmp_path)
+    assert curves["training"]["latent-residual_mlp"] == [(5500, 0.2)]
+    assert curves["validation"]["latent-residual_mlp"] == [(5500, 0.2)]
 
 
 def test_formal_stage2_runs_to_its_update_budget_without_wall_clock_cutoff():

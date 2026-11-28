@@ -35,9 +35,7 @@ def read_timeline(output, now):
                 timestamp, phase, done, total, state = match.groups()
                 phase = display_text(phase)
                 source_events.append((datetime.fromisoformat(timestamp), phase, int(done), int(total), state))
-        starts = [index for index, item in enumerate(source_events)
-                  if item[1] == "Stage 1 · Verify input receipts" and item[2] == 0]
-        events.extend(source_events[starts[-1]:] if starts else source_events)
+        events.extend(source_events)
     if not events:
         return {}
     events.sort(key=lambda item: item[0])
@@ -139,11 +137,13 @@ def read_learning_curves(output):
         except (OSError, ValueError):
             arm = {}
         training = [(int(row["update"]), float(row["loss"])) for row in arm.get("logs", [])
-                    if math.isfinite(float(row["loss"]))]
+                    if int(row["update"]) <= MAX_UPDATES and math.isfinite(float(row["loss"]))]
         validation = []
         for path in output.glob(f"validation-{mode}-*.json"):
             try:
                 step = int(path.stem.rsplit("-", 1)[1])
+                if step > MAX_UPDATES:
+                    continue
                 metrics = json.loads(path.read_text(encoding="utf-8"))["metrics"]
                 loss = float(metrics.get("mel_log1p", metrics["spectral_loss"]))
             except (OSError, ValueError, KeyError, TypeError):
@@ -184,7 +184,7 @@ def training_status(report, active):
     if report.get("updates", 0) == MAX_UPDATES:
         return "Complete"
     if report.get("updates", 0) > MAX_UPDATES:
-        return "Over budget"
+        return "Checkpoint"
     if report.get("stopped"):
         return "Stopped"
     return "Checkpoint"
@@ -461,6 +461,8 @@ def main(output):
                     report = None
                 active = (node.get("phase") in state.get("phase", "") and state.get("state") == "running")
                 status = training_status(report, active) or status
+                if report:
+                    seconds = max(seconds, float(report.get("elapsed_seconds", 0.) or 0.))
             if node["id"] == "stage2-gate":
                 stage2_state = decisions.get("stage2")
                 if stage2_state in ("analysis_required", "complete"):
