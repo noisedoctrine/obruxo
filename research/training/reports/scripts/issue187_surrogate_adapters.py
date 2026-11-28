@@ -19,7 +19,8 @@ from torch.utils.checkpoint import checkpoint
 import run_issue187_surrogates as experiment
 import run_surrogate_model_selection as inversion
 from obruxo_training.issue187_stage2 import (
-    Issue187Adapter, MidiEmbeddingCache, load_midi_encoder, performance_to_spans, trainable_parameter_count,
+    Issue187Adapter, MidiEmbeddingCache, is_resumable_stage2_stop, load_midi_encoder, performance_to_spans,
+    trainable_parameter_count,
 )
 from obruxo_training.reconstruction_metrics import waveform_scores
 from obruxo_training.spectral import FFT_SIZES, ENVELOPE_HOP, ENVELOPE_WINDOW, SAMPLE_RATE
@@ -380,7 +381,7 @@ def arm(output, adapter, training, validation, controls, latents, waves, direct,
         report, durations, train_seconds = saved["report"], saved["durations"], saved["train_seconds"]
         prior_seconds = saved["elapsed_seconds"]
         deadline -= prior_seconds
-        if report.get("stopped"):
+        if not is_resumable_stage2_stop(report.get("stopped")):
             return report
         report["stopped"] = None
 

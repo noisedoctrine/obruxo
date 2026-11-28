@@ -4,7 +4,8 @@ from obruxo_data.midi import Performance
 from obruxo_training.codec import PilotCodec
 from obruxo_training.issue187_stage2 import (
     EventSetEncoder, Issue187Adapter, MidiEmbeddingCache, align_midi_tokens, encode_midi_spans,
-    align_mask, midi_cache_key, midi_history, performance_to_spans, trainable_parameter_count,
+    align_mask, is_resumable_stage2_stop, midi_cache_key, midi_history, performance_to_spans,
+    trainable_parameter_count,
 )
 from obruxo_training.surrogate_codec import SurrogateCodec
 
@@ -130,3 +131,10 @@ def test_adapter_variants_are_parameter_matched_and_backpropagate_for_both_arms(
         assert abs(mlp - transformer) / max(mlp, transformer) < .01
     assert counts == {("direct", "residual_mlp"): 200_704, ("direct", "transformer"): 201_152,
                       ("generator", "residual_mlp"): 233_984, ("generator", "transformer"): 234_432}
+
+
+def test_stage2_resume_only_clears_obsolete_wall_clock_stops():
+    assert is_resumable_stage2_stop(None)
+    assert is_resumable_stage2_stop("update-100 projection exceeds five hours")
+    assert is_resumable_stage2_stop("the arm reached its five-hour cap during validation")
+    assert not is_resumable_stage2_stop("adapter gradients are missing or nonfinite")

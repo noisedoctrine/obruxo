@@ -28,6 +28,13 @@ MIDI_ENCODER_REVISION = "9a3eff857e821c91f21a05bda8048b7541f4d9e4"
 MIDI_SOURCE_REVISION = "f593bf21e48cc4aa836002a3834cfae42e8d4254"
 PREPROCESSING_VERSION = "spansynth-v8-fine40-sample-rows-v1"
 
+
+def is_resumable_stage2_stop(reason: str | None) -> bool:
+    """Only obsolete wall-clock stops may resume; preserve terminal failures."""
+    return (reason is None or reason == "update-100 projection exceeds five hours"
+            or reason.startswith("the arm reached its five-hour cap"))
+
+
 # SpanSynth-Edit's Fine40 GM program vocabulary (Apache-2.0; see NOTICE).
 _PROGRAM_GROUPS = (
     (0, 1, 3, 6, 7), (2, 4, 5), tuple(range(8, 16)), tuple(range(16, 24)),
