@@ -41,7 +41,7 @@ def test_stage2_configurations_use_adapter_then_frozen_model_names():
 def test_monitor_distinguishes_capped_training_from_an_active_arm():
     capped = {"updates": 5_483, "stopped": "the arm reached its five-hour cap during an update"}
     active = {"updates": 1_200, "stopped": None}
-    complete = {"updates": 5_500, "stopped": None}
+    complete = {"updates": 6_000, "stopped": None}
     assert MONITOR.training_status(capped, active=False) == "Stopped"
     assert MONITOR.training_status(active, active=True) == "In progress"
     assert MONITOR.training_status(complete, active=False) == "Complete"
@@ -64,13 +64,13 @@ def test_monitor_keeps_elapsed_history_from_before_a_worker_restart(tmp_path):
 
 def test_monitor_hides_curve_points_above_the_current_update_budget(tmp_path):
     (tmp_path / "arm-latent-residual_mlp.json").write_text(
-        '{"logs":[{"update":5500,"loss":0.2},{"update":5800,"loss":0.1}]}', encoding="utf-8")
-    for step, value in ((5500, 0.2), (8000, 0.1)):
+        '{"logs":[{"update":6000,"loss":0.2},{"update":6500,"loss":0.1}]}', encoding="utf-8")
+    for step, value in ((6000, 0.2), (8000, 0.1)):
         (tmp_path / f"validation-latent-residual_mlp-{step}.json").write_text(
             f'{{"metrics":{{"mel_log1p":{value},"spectral_loss":{value}}}}}', encoding="utf-8")
     curves = MONITOR.read_learning_curves(tmp_path)
-    assert curves["training"]["latent-residual_mlp"] == [(5500, 0.2)]
-    assert curves["validation"]["latent-residual_mlp"] == [(5500, 0.2)]
+    assert curves["training"]["latent-residual_mlp"] == [(6000, 0.2)]
+    assert curves["validation"]["latent-residual_mlp"] == [(6000, 0.2)]
 
 
 def test_formal_stage2_runs_to_its_update_budget_without_wall_clock_cutoff():
@@ -87,14 +87,14 @@ def test_formal_stage2_runs_to_its_update_budget_without_wall_clock_cutoff():
     assert isinstance(cap, ast.Tuple) and isinstance(cap.elts[0], ast.Attribute) and cap.elts[0].attr == "inf"
     maximum = next(node.value for node in ast.walk(tree) if isinstance(node, ast.Assign)
                    and "MAX_UPDATES" in {name for target in node.targets for name in names(target)})
-    assert isinstance(maximum, ast.Tuple) and maximum.elts[1].value == 5_500
+    assert isinstance(maximum, ast.Tuple) and maximum.elts[1].value == 6_000
     cli = ast.parse(CLI.read_text(encoding="utf-8"))
     target_argument = next(node for node in ast.walk(cli) if isinstance(node, ast.Call)
                            and isinstance(node.func, ast.Attribute) and node.func.attr == "add_argument"
                            and node.args and isinstance(node.args[0], ast.Constant)
                            and node.args[0].value == "--target-step")
     choices = next(keyword.value for keyword in target_argument.keywords if keyword.arg == "choices")
-    assert tuple(value.value for value in choices.elts) == (500, 5500)
+    assert tuple(value.value for value in choices.elts) == (500, 6000)
 
 
 def test_stage2_finishes_stable_audio_3_medium_arms_before_same_l():
@@ -103,8 +103,8 @@ def test_stage2_finishes_stable_audio_3_medium_arms_before_same_l():
                  and any(isinstance(target, ast.Name) and target.id == "available" for target in node.targets))
     assert isinstance(modes, ast.IfExp)
     assert tuple(element.value for element in modes.body.elts) == ("generator", "latent")
-    assert MONITOR.MILESTONES[-1] == 5_500
-    assert MONITOR.plan_tree()[1]["children"][2]["children"][1]["title"] == "Train adapter (up to 5,500 updates)"
+    assert MONITOR.MILESTONES[-1] == 6_000
+    assert MONITOR.plan_tree()[1]["children"][2]["children"][1]["title"] == "Train adapter (up to 6,000 updates)"
 
 
 def test_report_defines_embedded_decoder_and_medium_trunk_once():

@@ -30,7 +30,7 @@ from obruxo_training.surrogate_pilot import native_session
 BASE = experiment.baseline
 DEVICE, SEED = experiment.DEVICE, experiment.SEED
 # Stage 2 now runs to its update budget; elapsed-time estimates remain diagnostic only.
-CAP_SECONDS, MAX_UPDATES, SAMPLER_STEPS = math.inf, 5_500, 8
+CAP_SECONDS, MAX_UPDATES, SAMPLER_STEPS = math.inf, 6_000, 8
 MILESTONES = tuple(range(0, MAX_UPDATES + 1, 500))
 DIRECT = BASE.MAIN_ROOT / "research/training/outputs/issue185-direct-flow-learning-curves-20261127"
 CONFIGURATION_NAMES = {
@@ -376,7 +376,7 @@ def arm(output, adapter, training, validation, controls, latents, waves, direct,
         if saved["update"] > MAX_UPDATES:
             bounded_path = output / f"adapter-{adapter.name}-{MAX_UPDATES}.pt"
             if not bounded_path.is_file():
-                raise ValueError(f"cannot resume {adapter.name} within the 5,500-update budget")
+                raise ValueError(f"cannot resume {adapter.name} within the 6,000-update budget")
             saved = torch.load(bounded_path, map_location="cpu", weights_only=True)
             saved["cap"] = cap
             BASE.atomic_torch_save(resume_path, saved)

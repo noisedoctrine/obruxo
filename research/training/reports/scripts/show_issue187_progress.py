@@ -166,7 +166,7 @@ CONFIGURATION_NAMES = {
     "generator-residual_mlp": "Residual MLP + Stable Audio 3 Medium",
     "generator-transformer": "Transformer + Stable Audio 3 Medium",
 }
-MAX_UPDATES = 5_500
+MAX_UPDATES = 6_000
 MILESTONES = tuple(range(0, MAX_UPDATES + 1, 500))
 
 
